@@ -1,0 +1,1 @@
+.so man3/libosi.3.man

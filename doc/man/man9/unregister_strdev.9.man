@@ -1,0 +1,351 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH UNREGISTER_STRDEV 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B unregister_strdev
+\- unregister a \fISTREAMS\fR device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "unregister_strdev(struct cdevsw *" cdev ", major_t " major );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'major\(em'u
+.I cdev
+a pointer to a
+.BR cdevsw (9)
+structure indicating the characteristics for the driver.
+All members of the
+.BR cdevsw (9)
+structure, pointed to by
+.IR cdev ,
+are significant.
+.I cdev
+must point to a 
+.BR cdevsw (9)
+structure previously registered with
+.BR register_strdev (9).
+.TP
+.I major
+the (external) character major device number to unregister, or zero (0),
+indicating that all registered character major device numbers for this driver
+are to be unregistered.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR unregister_strdev ()
+deregisters the
+.I STREAMS
+device described by the
+.BR cdevsw (9)
+structure,
+.IR cdev ,
+from the character major device number specified by
+.IR major .
+.PP
+.I major
+can also be set to zero (0)
+to indicate that the
+.I STREAMS
+executive should unregister all character major device numbers currently
+associated with the
+.I STREAMS
+device,
+.IR cdev .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR unregister_strdev ()
+can be called multiple times for the same device driver with different
+selections of the
+.I major
+device number.  This has the effect that multiple (external) character major
+device numbers will be disassociated with the
+.I STREAMS
+device.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR unregister_strdev ()
+unregisters the
+.I STREAMS
+driver described by
+.I cdev
+and returns zero (0).
+Upon failure,
+.BR unregister_strdev ()
+does not effect unregistration and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR unregister_strdev ()
+fails to unregister the specified
+.I STREAMS
+driver, it returns an appropriate negative error number as follows:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EINVAL ]
+.I cdev
+was
+.BR NULL ,
+or the
+.BR cdevsw (9)
+structure referenced contained invalid information.
+.TP
+.RB [ EINVAL ]
+.I major
+is invalid
+.RB ( ">= MAX_CHRDEV" ).
+.TP
+.RB [ ENXIO ]
+.I cdev
+does not reference a registered
+.I STREAMS
+driver.
+.TP
+.RB [ ENXIO ]
+.I major
+is not registered to a device.
+.TP
+.RB [ EPERM ]
+.I major
+is registered to a driver other than that referenced by
+.IR cdev .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unregister_strdev ()
+can be called from any blocking context.  Consideration for import on
+performance and latency should be given before calling
+.BR unregister_strdev ()
+from soft or hard interrupt context.  Typically,
+.BR unregister_strdev ()
+is called from the
+.BR module_exit (9)
+procedure of a kernel module associated with a
+.I STREAMS
+device.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR unregister_strdev ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR regsiter_strdev (9)
+when loading must call
+.BR unregister_strdev ()
+before unloading.
+.BR unregister_strdev ()
+must be called with the same value of
+.I cdev
+with which
+.BR register_strdev (9)
+was called.
+.PP
+Drivers unregistered with
+.BR unregister_strdev ()
+will no longer appear in
+.BR /proc/streams/devices .
+.PP
+Drivers unregistered with
+.BR unregister_strdev ()
+will also disappear as a device directory in
+.BR /dev/streams ,
+when the
+.BR specfs (5)
+filesystem has been mounted on
+.BR /dev/streams .
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR register_strdev (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR unregister_strdev ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unregister_strdev ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+implementation specific function.  Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implementations
+and additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and unregistration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR unregister_strdev ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unregister_strdev ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+LfS
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

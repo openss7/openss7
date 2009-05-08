@@ -1,0 +1,1 @@
+.so man3/snidtox25.3.man

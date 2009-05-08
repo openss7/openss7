@@ -1,0 +1,1 @@
+.so man9/alloclk.9.man

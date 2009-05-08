@@ -1,0 +1,1 @@
+.so man7/SL_LOCAL_PROCESSOR_OUTAGE_REQ.7.man

@@ -1,0 +1,1 @@
+.so man9/enableok.9.man

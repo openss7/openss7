@@ -1,0 +1,1 @@
+.so man9/mi_open_obj.9.man

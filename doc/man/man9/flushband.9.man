@@ -1,0 +1,657 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH FLUSHBAND 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B flushband
+\- flushes band \fISTREAMS\fR messages from a message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void flushband(queue_t *" q ", unsigned char " band ", int " flag ");
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue to flush.
+.PD 0
+.TP
+.I band
+the band to flush within the queue.
+.TP
+.I flag
+how to flush the band within the queue.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR flushband ()
+is used to flush messages from a message queue band.
+It is typically called in a
+.BR M_FLUSH (9)
+handling routine to flush the requested messages from a queue band.
+.PP
+If
+.I band
+is zero (0),
+.BR flushband ()
+will flush only normal and high priority messages.
+.PP
+.I flag
+can be one of the following:
+.TP \w'\ FLUSHDATA\ 'u
+.B FLUSHDATA
+Flush only data messages; do not flush the control messages from the queue band.
+.PD 0
+.TP
+.B FLUSHALL
+Flush all the messages from queue band: both data messages and control
+messages.
+.PD
+.PP
+If
+.I flag
+is other than
+.BR FLUSHDATA " or " FLUSHALL
+.BR flushband ()
+will perform
+.BR FLUSHALL .
+.PP
+If
+.B QB_WANTW
+is set for the band and the flush causes the band's count to fall below the low water mark, or if
+the band's count is reduced to zero, the nearest feeding queue with a
+.IR qi_srvp (9)
+procedure or that is a
+stream head or stream end (including a multiplexing driver) will be enabled.  That is, back-enabling
+will be performed.  The
+.B QB_FULL
+and
+.B QB_WANTW
+flags will also be cleared.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR flushband ()
+flushes the band and then returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR flushband ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR flushband ()
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR flushband ()
+is MP-safe when called from any context; however, the caller is responsibility for the validity of
+the passed in
+.I q
+pointer across the call.
+.PP
+The validity of either queue in the pair, and either
+.I q_next
+pointer for a queue in the pair, for the queue pointer passed to a module
+procedure, callout or synchronous callback functions, is guaranteed by
+.BR "@PACKAGE_TITLE@" .
+Any queue pointer in the pair passed as an argument to an asynchronous callback
+function are also valid, providing the driver or module observes the rules for
+cancellation of asynchronous callbacks on close.
+.BR "@PACKAGE_TITLE@"
+also provides that a queue pointer in the pair within whose procedures an
+asynchronous callback was invoked, and either
+.I q_next
+pointer, are also valid in an asynchronous callback.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR flushband ()
+is a widely supported
+.I STREAMS
+function.
+Portable
+.I STREAMS
+drivers and modules may use
+.BR flushband ();
+however, portable
+.I STREAMS
+drivers and modules
+will not call
+.BR flushband ()
+with a band of zero (0).
+See
+.RI \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR flushband ()
+performs fast flushes by linking all band messages into the per-thread free
+messages list.  These messages will then later be broken into individual
+message blocks and freed to the per-thread free list and finally to the
+.B mdbblock
+memory cache at the end of any queue run.  A new queue service run will be
+scheduled if one is not already running.
+.PP
+.BR flushband ()
+is well optimized to handle the initial stage of
+.B FLUSHALL
+flushes in constant time.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.BR flushband ()
+is normally used within the
+.BR M_FLUSH (9)
+handling procedures for a
+.I STREAMS
+driver or module as follows:
+.PP
+.nf
+\fC\s-2\
+ 1  int
+ 2  x_w_flush(queue_t *q, mblk_t *mp)
+ 3  {
+ 4      if (*mp->b_rptr & FLUSHW) {
+ 5          if (*mp->b_rptr & FLUSHBAND
+ 6              && mp->b_rptr[1] != 0)
+ 7              flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+ 8          else
+ 9              flushq(WR(q), FLUSHALL);
+10          if (q->q_next) {
+11              putnext(q, mp);
+12              return (0);
+13          }
+14          *mp->b_rptr &= ~FLUSHW;
+15      }
+16      if (*mp->b_rptr & FLUSHR) {
+17          if (*mp->b_rptr & FLUSHBAND
+18              && mp->b_rptr[1] != 0)
+19              flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+20          else
+21              flushq(RD(q), FLUSHALL);
+22          if (!q->q_next) {
+23              qreply(q, mp);
+24              return (0);
+25          }
+26          *mp->b_rptr &= ~FLUSHR;
+27      }
+28      freemsg(mp);
+29      return (0);
+30  }
+31  
+32  int
+33  x_r_flush(queue_t *q, mblk_t *mp)
+34  {
+35      if (*mp->b_rptr & FLUSHR) {
+36          if (*mp->b_rptr & FLUSHBAND
+37              && mp->b_rptr[1] != 0)
+38              flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+39          else
+40              flushq(RD(q), FLUSHALL);
+41          if (q->q_next) {
+42              putnext(q, mp);
+43              return (0);
+44          }
+45          *mp->b_rptr &= ~FLUSHR;
+46      }
+47      if (*mp->b_rptr & FLUSHW) {
+48          if (*mp->b_rptr & FLUSHBAND
+49              && mp->b_rptr[1] != 0)
+50              flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+51          else
+52              flushq(WR(q), FLUSHALL);
+53          if (!q->q_next) {
+54              qreply(q, mp);
+55              return (0);
+56          }
+57          *mp->b_rptr &= ~FLUSHW;
+58      }
+59      freemsg(mp);
+60      return (0);
+61  }
+\s+2\fR
+.fi
+.PP
+Note in the example that the band is checked for band zero (0) before calling
+.BR flushband ().
+If the band is zero (0), then
+.BR flushq (9)
+is call instead.  This is consistent with portability recommendations listed under
+.RI \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freezestr (9),
+.BR flushq (9).
+.\"
+.\"
+.SH BUGS
+.BR flushband ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR flushband ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR flushband ()
+moves messages from the queue to the per-CPU free chains list.  Freeing blocks
+on the free chains list will be deferred to the next
+.BR runqueues (9)
+pass.  The next
+.BR runqueues (9)
+pass frees message blocks from the flush to the per-CPU free blocks list for
+use by
+.IR qi_srvp (9)
+procedures in the pass.
+.BR runqueues (9)
+runs at normal soft interrupt priority.
+.I LiS
+removes all messages from the queue and then rebuilds the queue one
+message at a time while freeing those to be flushed.  This is a rather
+inefficient way to do things, and with
+.I LiS
+running at higher priority than
+soft interrupts, bottom halves and timeouts, all these are locked out until
+the flush is complete.
+.B @PACKAGE_TITLE@
+.BR flushband ()
+should have far less of an impact on system latency and performance as that of
+.IR LiS .
+.IP ""
+Performing
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+.BR flushband ()
+holds the queue write lock while removing selected messages or unlinking
+entire bands.  Order is preserved across concurrent attempts to perform
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9)
+or
+.BR putbq (9)
+functions.
+.I LiS
+empties the queue and unlocks the queue and then goes about adding
+messages back onto the queue that need to remain using normal utility
+functions.  This means that order is not necessarily preserved (even for messages
+that were on the queue) with concurrent calls to
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9)
+or
+.BR putbq (9)
+functions.
+Also, queue enabling and back-enabling will not necessary be performed
+correctly.
+There doesn't seem to be any excuse for the
+.I LiS
+approach, removing messages
+from the queue,
+.BR rmvq (9),
+is no more difficult than inserting them,
+.BR insq (9).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+.BR flushband ()
+flushes normal and high priority messages when
+.I band
+is zero (0).
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+state that a
+.I band
+of zero (0) will only flush ordinary messages.
+.IR IRIX \(rg,
+.[
+irixdoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg
+.[
+solspg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+state that a
+.I band
+of zero (0) flushes normal and high priority messages.
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+states that a
+.I band
+of zero (0) flushes normal priority (band 0) messages.
+.IR LiS ,
+when
+.I band
+is zero (0), will only flush normal priority messages from band zero and will leave high priority
+messages on the queue.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules should never call
+.BR flushband ()
+with a band of zero (0).  Portable
+.I STREAMS
+drivers and modules should call
+.BR flushq (9)
+instead.
+.IP \(em
+.BR flushband ()
+does not clear the
+.B QWANTR
+flag when flushing an empty queue.  This is an indication to the
+.I STREAMS
+scheduler that
+.BR getq (9)
+read an empty queue and the queue needs to be enabled when a message is placed on the queue.
+.I LiS
+clears the
+.B QWANTR
+flag when flushing an empty queue.  This means that a call to
+.BR putbq "(9), " insq "(9) or " appq (9)
+for the empty queue will fail to enable the queue.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+.BR flushband ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR flushband ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR flushband ()
+on a Stream frozen by the caller with
+.BR freezestr (9).
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR flushband ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+also lists
+.BR flushband ()
+as a utility that cannot be called from user functions or
+.RI non- STREAMS
+code; that is, contexts asynchronous to the Stream containing
+.IR q .
+.IP ""
+.IR HP-UX \(rg
+compatible drivers and modules will not call
+.BR flushband ()
+from outside of a
+.BR qinit (9)
+routine for the queue pair of
+.IR q .
+As
+.B "@PACKAGE_TITLE@"
+permits this more restricted operation as a subset of its capabilities, there are no portability
+issues.
+.IP \(em
+.IR Solaris \(rg
+.[
+solspg
+.]
+permits
+.BR flushband ()
+to be called from outside of
+.I STREAMS
+(e.g., by a driver flushing its own write queue from an ISR, or across a multiplexing
+driver).
+.IP ""
+As
+.B "@PACKAGE_TITLE@"
+permits the same, there are no portability issues.
+.IP \(em
+.\"Symbol
+.\".BR lis_flushband ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\".BR lis_flushband ()
+.\"calls
+.\".BR flushband ()
+.\"directly.
+.\"See
+.\".BR liscompat (9).
+.I LiS
+appears to be rather buggy with regard to flushing queues and
+.BR flushband ()
+may behave rather different from that of
+.IR LiS .
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+instead of
+.IR LiS .
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR flushband ()
+first appeared in
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

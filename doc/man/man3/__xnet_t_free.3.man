@@ -1,0 +1,1 @@
+.so man3/t_free.3.man

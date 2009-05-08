@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+             DL_TOKEN ----\   |                  |                              
+              request      \->|                  |                              
+                              |                  |                              
+                           /--|                  |                              
+             DL_TOKEN <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

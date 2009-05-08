@@ -1,0 +1,479 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH FMODSW\ HELPERS 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B fmod_count, fmodsw_list, fmodsw_lock, fmod_add, fmod_del, fmod_get, fmod_find, fmod_str, fmod_put
+\- file module switch table helper functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.B int " fmod_count" ;
+.PD 0
+.HP
+.B "struct list_head " fmodsw_list ;
+.HP
+.B "rwlock_t " fmodsw_lock ;
+.PD
+.HP
+.BI "void fmod_add(struct fmodsw *" fmod ", modID_t " modid ");
+.PD 0
+.HP
+.BI "void fmod_del(struct fmodsw *" fmod ");
+.HP
+.BI "struct fmodsw *fmod_get(modID_t " modid ");
+.HP
+.BI "struct fmodsw *fmod_find(const char *" name ");
+.HP
+.BI "struct fmodsw *fmod_str(const struct streamtab *" str ");
+.HP
+.BI "void fmod_put(struct fmodsw *" fmod ");
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fImodid\fR\(em'u
+.I fmod
+a pointer to an existing file module switch tabele,
+.BR fmodsw (9),
+entry;
+.PD 0
+.TP
+.I modid
+a module module identifier;
+.TP
+.I name
+a module name;
+.TP
+.I str
+a pointer to a module's defining
+.BR streamtab (9)
+structure.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+.BR DDI/DKI ,
+internal,
+implementation extensions,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+implements the file module switch table
+.BR fmodsw (9)
+of
+.IR "SVR 4"
+.[
+svr4
+.]
+as a list instead of a fixed size array.
+The helper functions described here can be used to help create an entry, acquire and release an
+entry, and search the list of entries on some criteria.
+.\" ------------------------
+.PP
+.B fmod_count
+is an integer that always contains the number of entries in the file module switch table list.
+.\" ------------------------
+.PP
+.B fmodsw_list
+is a kernel
+.B list_head
+structure that forms the head of the
+.BR fmodsw (9)
+table implemented as a list.
+.\" ------------------------
+.PP
+.B fmodsw_lock
+is a kernel
+.B rwlock_t
+reader-writer lock that protects the elements of the
+.BR fmodsw (9)
+table implemented as a list.
+.\" ------------------------
+.PP
+.BR fmod_add ()
+adds the
+.BR fmodsw (9)
+structure specified by
+.I fmod
+to the
+.BR fmodsw_list
+at the index specified by
+.IR modid ,
+or returns an error number.
+.\" ------------------------
+.PP
+.BR fmod_del ()
+deletes the
+.BR fmodsw (9)
+structure specified by
+.I fmod
+from the
+.BR fmodsw_list .
+.\" ------------------------
+.PP
+.BR fmod_get ()
+locates the file module switch table entry that owns the module identification number
+.IR modid .
+This helper function has the side-effect that if the module identification number is not already assigned to
+a file module switch table entry, it will try to load a driver for the module identification number.
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR fmod_put ().
+.\" ------------------------
+.PP
+.BR fmod_find ()
+locates the file module switch table entry that has the same name as
+.IR name .
+This helper function has the side-effect that if the name is not found, it will try to load a
+module using that name.
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR fmod_put ().
+.\" ------------------------
+.PP
+.BR fmod_str ()
+locates the file module switch table entry that has the same
+.BR streamtab (9)
+structure pointer as
+.IR str .
+This function also acquires and passes a reference to the entry to the caller that must be released
+with
+.BR fmod_put ().
+.\" ------------------------
+.PP
+.BR fmod_put ()
+releases a reference to the file module switch table entry
+.IR fmod .
+.\"
+.\"
+.SH USAGE
+.PP
+None of these functions are intended to be used by portable
+.I STREAMS
+drivers and modules.  They are exported primarly for use by the Stream head,
+.BR sth (4)
+.I STREAMS
+module when it is configured as a separate loadable kernel module.
+.PP
+.BR fmod_add ()
+is only used by
+.BR register_strmod (9).
+Call
+.BR register_strmod (9)
+instead.
+.PP
+.BR fmod_del ()
+is only used by
+.BR unregister_strmod (9).
+Call
+.BR unregister_strmod (9)
+instead.
+.PP
+.BR fmod_get ()
+is only used by
+.BR getadmin (9).
+Call
+.BR getadmin (9)
+instead.
+.PP
+.BR fmod_find ()
+is used by the
+.BR I_PUSH (7)
+.BR sth (4)
+operation,
+.BR getmid (9),
+.BR autopush (9),
+and
+.BR autopush_vml (9),
+used by the
+.BR sad (4)
+driver.
+.PP
+.BR fmod_str ()
+is currently unused.
+.PP
+.BR fmod_put ()
+is used to release a reference to a
+.BR fmodsw (9)
+entry acquired with
+.BR fmod_get (),
+.BR fmod_find (),
+or
+.BR fmod_str ().
+Any kernel moudle associated with the
+.BR fmodsw (9)
+entry (via the
+.I f_kmod
+member), will not be allowed to unload until the reference to the
+.BR fmodsw (9)
+entry is released.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR fmod_add (),
+.BR fmod_del (),
+and
+.BR fmod_put ()
+return void.
+.PP
+.BR fmod_get (),
+.BR fmod_find (),
+and
+.BR fmod_str (),
+return a pointer to the
+.BR fmodsw (9)
+table entry upon success, and
+.B NULL
+upon failure.
+.\"
+.\"
+.SH ERRORS
+.PP
+.PP
+When
+.BR fmod_get (),
+.BR fmod_find (),
+or
+.BR fmod_str (),
+fail, they return
+.BR NULL .
+.\"
+.\"
+.SH CONTEXT
+.PP
+These helper functions (and the
+.I STREAMS
+utilities that call them)
+can only be called from a blocking process context, such as the callouts:
+.IR qi_qopen (9)
+open routine, or
+.IR qi_qclose (9)
+close routine,
+or kernel module initialization and termination sequences.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+These functions are MP-safe when called from the proper context.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.BR fmodsw (9)
+helper functions are not intended to be called by portable
+.I STREAMS
+drivers and modules.  They are only used by the Stream head,
+.BR sth (4)
+module
+within the
+.I "@PACKAGE_TITLE@"
+.B @PACKAGE@-@VERSION@
+distribution.
+.PP
+.I STREAMS
+drivers and modules, not part of the distribution, that call these functions are likely to break
+from version to version and release to release.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+See the source file
+.I src/kernel/strlookup.c
+for implementation details.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+See the source files
+.IR src/drivers/sth.c ,
+in the distribution for example usage.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR fmodsw (9),
+.BR streamtab (9),
+.BR sth (4),
+.BR register_strmod (9),
+.BR unregister_strmod (9),
+.BR getadmin (9),
+.BR I_PUSH (7),
+.BR getmid (9),
+.BR autopush (9),
+.BR autopush_vml (9),
+.BR sad (4),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR fmod_add (),
+.BR fmod_del (),
+.BR fmod_get (),
+.BR fmod_find (),
+.BR fmod_str (),
+.BR fmod_put (),
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.BR fmod_add (),
+.BR fmod_del (),
+.BR fmod_get (),
+.BR fmod_find (),
+.BR fmod_str (),
+.BR fmod_put (),
+helper functions provide access to the
+.BR fmodsw (9)
+list that would otherwise be implemented directly by interating through a fixed
+.BR fmodsw (9)
+table.
+These are
+.B "@PACKAGE_TITLE@"
+implementation specific functions not intended to be used by
+.I STREAMS
+drivers and modules and not subject to standardization.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+These functions are new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

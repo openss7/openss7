@@ -1,0 +1,8 @@
+                                                                                
+                              |                  |                              
+              DL_DATA ----\   |                  |                              
+              request      \->|- - - - - - - - - |------->   DL_DATA            
+                              |                  |           indication         
+                              |                  |                              
+                              |                  |                              
+                                                                                

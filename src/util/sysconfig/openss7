@@ -1,0 +1,135 @@
+#
+# This is an initial configuration file for the OPENSS7 subsystem.
+#
+
+#
+# This is an example system configuration file for strace.  It goes in
+# /etc/sysconfig/strace.  For more information see the /etc/init.d/strace init
+# script and strace(8).
+#
+# This is an example system configuration file for strerr.  It goes in
+# /etc/sysconfig/strerr.  For more information see the /etc/init.d/strerr init
+# script and strerr(8).
+#
+# Additional command line options to pass to strace(8):
+STRACEOPTIONS=""
+# Additional command line options to pass to strerr(8):
+STRERROPTIONS=""
+# Additional command line options to pass to strlogd(8):
+STRLOGDOPTIONS=""
+# Mail user id (default root) for notification errors.
+STRERR_MAILUID="root"
+# Mail user id (default root) for notification errors.
+STRLOGD_MAILUID="root"
+# Directory for trace logs (default /var/log/streams).
+STRACE_DIRECTORY="/var/log/streams"
+# Directory for error logs (default /var/log/streams).
+STRERR_DIRECTORY="/var/log/streams"
+# Directory for error logs (default /var/log/streams).
+STRLOGD_DIRECTORY="/var/log/streams"
+# Basename for trace log files (default trace).
+STRACE_BASENAME="trace"
+# Basename for error log files (default error).
+STRERR_BASENAME="error"
+# Basename for error log files (default error).
+STRLOGD_BASENAME="error"
+# Output file name (default $BASENAME.pid).
+STRACE_OUTFILE=""
+# Output file name (default $BASENAME.mm-dd).
+STRERR_OUTFILE=""
+# Output file name (default $BASENAME.mm-dd).
+STRLOGD_OUTFILE=""
+# Error file name (default $BASENAME.error).
+STRACE_ERRFILE=""
+# Error file name (default $BASENAME.error).
+STRERR_ERRFILE=""
+# Error file name (default $BASENAME.error).
+STRLOGD_ERRFILE=""
+# Log device (default /dev/strlog, /dev/streams/log, /dev/log).
+STRACE_LOGDEVICE="/dev/streams/clone/log"
+# Log device (default /dev/strlog, /dev/streams/log, /dev/log).
+STRERR_LOGDEVICE="/dev/streams/clone/log"
+# Log device (default /dev/strlog, /dev/streams/log, /dev/log).
+STRLOGD_LOGDEVICE="/dev/streams/clone/log"
+# Modules: triplets of <mod> <sub> <pri>, see strace(8)
+STRACE_MODULES=""
+
+# Kernel modules in load order.
+# Kernel modules.  Needs to be populated by the configuration script.  This
+# really needs to be a '.in' file.
+#OPENSS7_MODULES="@OPENSS7_MODULES@"
+OPENSS7_PRELOAD=""
+OPENSS7_DRIVERS="streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nuls streams-pipe streams-sad streams-sfx streams-spx streams-pty streams-ip_to_dlpi streams-ldl streams-np_ip streams-x25-lapb streams-x25-plp streams-inet streams-rawip streams-udp streams-sctp streams-clns streams-tp streams-x25-lapb streams-x25-plp streams-socksys streams-ua_as streams-m2ua_as streams-m3ua_as streams-sua_as streams-tua_as streams-isua_as streams-atm streams-tstdrv streams-sl-x400p" 
+OPENSS7_MODULES="streams-bufmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat streams-ldterm streams-pckt streams-ptem streams-ttcompat streams-ip_strm_mod streams-xot streams-timod streams-tirdwr streams-tpiperf streams-cmot streams-isot streams-itot streams-lpp streams-tcpns streams-xot streams-sockmod streams-m2pa_sl streams-sdl_sctp streams-sdt_sctp streams-sdt_tpi streams-sl_tpi streams-sl_sctp streams-m2tp streams-phys streams-aal1 streams-aal2 streams-aal5 streams-sscop streams-sscopmce streams-mtp3b streams-tstmod" 
+# Make real character devices before intializing subsystem?
+OPENSS7_MAKEDEVICES='yes'
+# Remove devices after removing subsystem?
+OPENSS7_REMOVEDEVICES='no'
+# Mount/unmount specfs file system?
+OPENSS7_MOUNTSPECFS="yes"
+# Mount point?  The mount point (default /dev/streams), null for no mount
+OPENSS7_MOUNTPOINT="/dev/streams"
+# Mount options are as follows:
+# user id to assign to device and module directories
+OPENSS7_UID="0"
+# group id to assign to device and modules directories
+OPENSS7_GID="0"
+# mode to assign to device and module directories
+OPENSS7_MODE="0777"
+
+
+# =============================================================================
+#
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# -----------------------------------------------------------------------------
+#
+# $Log$
+# =============================================================================
+# vim ft=sh sw=4

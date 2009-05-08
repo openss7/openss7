@@ -1,0 +1,233 @@
+// File: SNMPMgmt.idl
+#ifndef _SNMPMGMT_IDL_
+#define _SNMPMGMT_IDL_
+#include <orb.idl>
+#include <CosPropertyService.idl>
+#include <ASN1Types.idl>
+#include <JIDM.idl>
+#pragma prefix jidm.org
+module SNMPMgmt {
+const string ManagementDomainKeyId = Internet Management;
+const string ManagementDomainKeyKind = XSM environment;
+const string ProtocolVer = Protocol Version;
+const string TransportProtocol = Transport Protocol;
+const string DomainTitle = Domain Title;
+const string TransportAddress = Transport Address;
+const string TransportPort = Transport Port;
+const string CommunityName = Community Name;
+const string ContextEngineID = Context EngineID;
+const string ContextName = Context Name;
+// Redefinition of types
+typedef CORBA::ScopedName ScopedName;
+typedef CosLifeCycle::Criteria Criteria;
+typedef CosPropertyService::PropertyName VarName;
+typedef CosPropertyService::PropertyNames VarNameList;
+typedef CosPropertyService::Property NameValuePair;
+typedef CosPropertyService::Properties NVPairList;
+typedef ASN1_ObjectIdentifier EntryIndex;
+typedef sequence < EntryIndex > EntryIndexList;
+typedef string TAddress; // Transport address of an agent
+enum ProtocolVersion { snmpV1, snmpV2c, snmpV3 };
+// SNMP Protocol specific exceptions
+exception ProtocolError {
+ASN1_Integer error_status;
+ASN1_Integer error_index;
+};
+exception MultVarProtocolError {
+ASN1_Integer error_status;
+VarNameList error_var_list;
+NVPairList result_var_list;
+};
+// SMI information module specific exceptions.
+exception NoSuchSmiModule { };
+exception NoSuchSmiEntry { };
+exception NoSuchVariable { };
+// MIB entry specific exceptions
+exception NoSuchHost { };
+exception NoSuchObject { };
+exception EndOfMibView { };
+exception AlreadyExists { };
+interface SmiEntry : CosLifeCycle::LifeCycleObject,
+CosPropertyService::PropertySet {
+// the value of entry_name is always 0 for the groups.
+readonly attribute ASN1_ObjectIdentifier entry_name;
+};
+typedef sequence < SmiEntry > SmiEntryList;
+interface SmiTableIterator {
+boolean next_one_entry( out SmiEntry smi_entry );
+boolean next_n_entries (
+in unsigned long how_many,
+out SmiEntryList smi_entry_list
+);
+void destroy();
+};
+interface GenericFactory : CosLifeCycle::GenericFactory {
+SmiEntry create_mib_entry (
+in ScopedName t_entry_type,
+in ASN1_ObjectIdentifier entry_index,
+in Criteria create_criteria
+) raises ( NoSuchSmiEntry, AlreadyExists );
+SmiEntry create_mib_entry_with_auto_name (
+in ScopedName t_entry_type,
+in Criteria create_criteria
+) raises ( NoSuchSmiEntry, AlreadyExists );
+};
+interface GetNextEntryIterator {
+// Get the next entry index according to lexical ordering rule
+// of SNMP OIDs -- follows SNMP get-next traversal rule
+boolean next_one_entry ( out EntryIndex entry_index );
+boolean next_n_entries (
+in unsigned long how_many,
+out EntryIndexList entry_index_list
+);
+void destroy();
+};
+// NamingContext extends CosNaming::NamingContext to provide
+// navigating the SNMP name space in the lexicographic order
+// and SNMP specific name and context resolution
+interface NamingContext : CosNaming::NamingContext {
+string get_next_entry(
+in string entry_name
+) raises ( InvalidName, NotFound, CannotProceed );
+GetNextEntryIterator get_next_entry_iterator(
+in string initial_entry_name
+) raises ( InvalidName, NotFound );
+};
+interface NamingDirectory : NamingContext {
+NamingContext resolve_domain_context(
+in TAddress p_host_name
+) raises ( NoSuchHost, CannotProceed, InvalidName, NotFound );
+NamingContext resolve_smi_module(
+in TAddress p_host_name,
+in string p_smi_module_name
+) raises ( NoSuchHost, NoSuchSmiModule, InvalidName, NotFound );
+NamingContext resolve_smi_entry(
+in TAddress p_host_name,
+in ScopedName p_entry_type
+) raises ( NoSuchHost, NoSuchSmiEntry, CannotProceed, InvalidName,
+NotFound );
+SmiEntry resolve_mib_entry(
+in TAddress p_host_name,
+in ScopedName p_entry_type,
+in string p_entry_index
+) raises ( NoSuchHost, NoSuchSmiEntry, CannotProceed, InvalidName,
+NotFound );
+void list_smi_entries(
+in TAddress p_host_name,
+in ScopedName p_entry_type,
+in unsigned long how_many,
+out SmiEntryList out_list,
+out SmiTableIterator table_iterator
+) raises ( NoSuchHost, NoSuchSmiEntry, CannotProceed, InvalidName,
+NotFound );
+};
+// ProxyAgent
+interface ProxyAgent : JIDM::ProxyAgent {
+readonly attribute TAddress host_name;
+ASN1_Any get_a_variable (
+in TAddress p_host_name,
+in ScopedName p_var_scoped_name,
+in EntryIndex p_var_index
+) raises ( NoSuchHost, NoSuchVariable, NoSuchObject, ProtocolError );
+NVPairList get_variables (
+in TAddress p_host_name,
+in ScopedName p_entry_scoped_name,
+in VarNameList p_var_name_list,
+in EntryIndex p_var_index
+) raises ( NoSuchHost, NoSuchSmiEntry, NoSuchObject,
+MultVarProtocolError );
+void set_a_variable (
+in TAddress p_host_name,
+in ScopedName p_var_scoped_name,
+in EntryIndex p_var_index,
+in ASN1_Any p_var_new_value
+) raises ( NoSuchHost, NoSuchVariable, NoSuchObject, ProtocolError );
+void set_variables (
+in TAddress p_host_name,
+in ScopedName p_entry_scoped_name,
+in NVPairList p_var_nvp_list,
+in EntryIndex p_var_index
+) raises ( NoSuchHost, NoSuchSmiEntry, NoSuchObject,
+MultVarProtocolError );
+void list_mib_entries(
+in TAddress p_host_name,
+in ScopedName p_entry_scoped_name,
+in long p_how_many,
+out EntryIndexList p_entry_index_list,
+out GetNextEntryIterator p_entry_name_list_itr
+) raises ( NoSuchHost, NoSuchSmiEntry, NoSuchObject, ProtocolError );
+boolean mib_entry_exists (
+in TAddress p_host_name,
+in ScopedName p_entry_scoped_name
+) raises ( NoSuchHost, NoSuchSmiEntry, ProtocolError );
+boolean is_mib_module_supported (
+in TAddress p_host_name,
+in string p_smi_module_name
+) raises ( NoSuchHost, NoSuchSmiModule, ProtocolError );
+};
+struct EntryVarBind {
+ScopedName entry_name; // IDL scoped name of the interface for table-entry
+string entry_index; // row index of an entry in the form of ObjectId string
+CosPropertyService::Properties nvp_list;
+};
+typedef sequence<EntryVarBind> EntryVarBindList;
+typedef EntryVarBindList NotificationVariableList;
+typedef EntryVarBindList InformVariableList;
+struct NotificationInfo { // to be sent when using untyped event channel
+CosNaming::Name src_entry_name;
+ScopedName event_type;
+ASN1_GeneralizedTime event_time;
+any notification_info;
+};
+struct InformInfo { // to be sent when using untyped event channel
+CosNaming::Name src_obj_name;
+InformVariableList inform_info;
+};
+interface Notifications {
+void snmp_notification (
+in CosNaming::Name src_entry_name,
+in ScopedName event_type,
+in ASN1_GeneralizedTime event_time,
+in any notification_info
+);
+void snmp_inform (
+in CosNaming::Name src_entry_name,
+in InformVariableList inform_variables
+);
+void snmp_report (
+in CosNaming::Name src_entry_name,
+in InformVariableList report_variables
+);
+};
+interface PullNotifications {
+boolean try_snmp_notification (
+out CosNaming::Name src_entry_name,
+out ScopedName event_type,
+out ASN1_GeneralizedTime event_time,
+out any notification_info
+);
+void pull_snmp_notification (
+out CosNaming::Name src_entry_name,
+out ScopedName event_type,
+out ASN1_GeneralizedTime event_time,
+out any notification_info
+);
+boolean try_snmp_inform (
+out CosNaming::Name src_entry_name,
+out InformVariableList inform_variables
+);
+void pull_snmp_inform (
+out CosNaming::Name src_entry_name,
+out InformVariableList inform_variables
+);
+boolean try_snmp_report (
+out CosNaming::Name src_entry_name,
+out InformVariableList report_variables
+);
+void pull_snmp_report (
+out CosNaming::Name src_entry_name,
+out InformVariableList report_variables
+);
+};
+};
+#endif /* _SNMPMGMT_IDL_ */

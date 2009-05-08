@@ -1,0 +1,506 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_COPYOUT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_copyout
+\- copy data from a user buffer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "void mi_copyout(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the current write-side queue whose
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
+.BR mi_copyout ()
+is being called.
+.TP
+.I mp
+a pointer to the message block that contains the
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message being processed.  This is the message that was passed to the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
+.BR mi_copyout ()
+is invoked.
+.BR mi_copyout_alloc (9)
+must be used to allocate the message blocks into which the data to be copied out is placed.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_copyout ()
+is one of a set of helper functions that supports both
+.B TRANSPARENT
+and
+.IR I_STR (7)
+input-output controls (see
+.BR ioctl (2s)
+and
+.BR streamio (7)).
+These helper functions include:
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_done (9),
+.BR MI_COPY_CASE (9),
+.BR mi_copy_set_rval (9)
+and
+.BR mi_copy_state (9).
+.PP
+.BR mi_copyout ()
+is used to copy data from the kernel to user-space.  When a driver or module
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure receives a
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message, and there is data to be copied out to user-space, the
+.BR mi_copyout_alloc (9)
+function is used to add data to the message pointed to by
+.I mp
+and then the
+.BR mi_copyout ()
+function is called to invoke the
+.BR M_COPYOUT (9)
+message upstream.
+.PP
+If called after the last copy in or copy out operation and no copy out allocations were generated
+with
+.BR mi_copyout_alloc (9)
+or remain after previous
+.BR mi_copyout ()
+calls, then
+.BR mi_copyout ()
+will close the input output control operation as though
+.BR mi_copy_done (9)
+was called like:
+\fBmi_copy_done\fR(\fIq\fR, \fImp\fR, \fIcp->cp_rval\fR).
+.PP
+When
+.BR mi_copyout ()
+is called for a non-transparent
+.IR I_STR (7)
+operation, the input-output control operation is completed and an
+.BR M_IOCACK (9)
+message issued upstream.  If a copyout operation was previously specified with
+a call to
+.BR mi_copyout_alloc (9),
+an implicit copyout operation is included by setting the
+.I ioc_count
+member of the
+.BR iocblk (9)
+structure to the size of the copyout operation.
+.PP
+If it is desired that the return value returned on an
+.IR I_STR (7)
+operation be other than zero, the
+.BR mi_copy_set_rval (9)
+utility can be used to set the return value before
+.BR mi_copyout (9)
+is called.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_copyout ()
+is used in conjunction with
+.BR mi_copyout_alloc (9)
+to copy data out to the user in the last stage of an input-output control
+operation.
+.I mp
+can either represent a
+.BR M_IOCTL (9)
+.BR I_STR (7)-based
+input-output control, or a
+.B TRANSPARENT
+input-output control that did not require any data to be copied in,
+or an
+.BR M_IOCDATA (9)
+message from a previous copyin or copyout operation.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_copyout ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_copyout ()
+fails when passed invalid pointers.  When
+.BR mi_copyout ()
+fails, it panics the kernel.
+.PP
+If
+.BR mi_copyout ()
+suffers an internal failure, it will close the input-output control operation with a suitable error
+code.  The error codes returned by
+.BR mi_copyout ()
+to the
+.BR ioctl (2s)
+operation in
+.BR errno (3),
+are as follows:
+.TP \w'[\fBENOBUFS\fR]\ \ 'u
+.RB [ EPROTO ]
+.BR mi_copyout ()
+was passed an invalid argument, or the passed in message block was of an invalid format.
+.TP
+.RB [ ENOSR ]
+.BR mi_copyout (),
+or the stream head, could not allocate a
+.I STREAMS
+resource
+to complete the operation.
+.TP
+.RB [ ENOMEM ]
+.BR mi_copyout (),
+or the stream head, could not allocate 
+memory to
+complete the operation.
+.TP
+.RB [ ENOBUFS ]
+.BR mi_copyout (),
+or the stream head, could not allocate 
+a buffer
+to complete the operation.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+See
+.BR mi_copyin (9)
+and
+.BR mi_copyout (9)
+for examples of the usage of
+.BR mi_copyout ().
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_copyout ()
+can be called from any context; however, it is normally called from the
+.I STREAMS
+driver or module write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_copyout ()
+is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
+in message blocks.  This is normally the case when the function is called from the
+.I STREAMS
+driver or module write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_copyout ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+If
+.B mi_copyout ()
+is called incorrectly, it will abort the input-output control operation and
+send an
+.BR M_IOCNAK (9)
+message in response with error number
+.RB [ EPROTO ].
+Otherwise, an
+.BR M_COPYOUT (9)
+message is formulated and sent upstream.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_copy_done (9),
+.BR mi_copyin (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_set_rval (9),
+.BR mi_copy_state (9),
+.BR MI_COPY_CASE (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_copyout ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_copyout ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_copyout ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common message utility functions
+should be used in its stead.
+.IP \(em
+.BR mi_copyout ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_copyout ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_copyout ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_copyout ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_copyout ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_copyout ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_copyout ()
+appears in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

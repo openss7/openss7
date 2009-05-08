@@ -1,0 +1,680 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRERR 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B strerr
+\- receives error log messages from the \fISTREAMS\fR \fBlog\fR(4) driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.hy 0
+.HP \w'strerr\ 'u
+\fBstrerr\fR [\fIoptions\fR]
+[\fB-nqDv\fR]
+[{\fB-a\fR|\fB--admin\fR[=]}\fImailuid\fR]
+[{\fB-d\fR|\fB--directory\fR[=]}\fIdirectory\fR]
+[{\fB-p\fR|\fB--pidfile\fR[=]}[\fIpidfile\fR]]
+[{\fB-l\fR|\fB--logdev\fR[=]}[\fIlogdevice\fR]]
+[{\fB-D\fR|\fB--debug\fR[=]}[\fIlevel\fR]]
+[{\fB-v\fR|\fB--verbose\fR[=]}[\fIlevel\fR]]
+.PD 0
+.HP
+\fBstrerr\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBstrerr\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBstrerr\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strerr
+daemon receives error log messages from the
+.I STREAMS
+log driver
+.RB ( log (4))
+and writes these messages to standard output.
+When run as a daemon,
+.B strerr
+appends these messages to a log file.
+The error log files produced
+reside in the directory
+.BR /var/adm/streams " or " /var/log/streams ,
+or a user-specified directory,
+and are named
+.BI error. mm-dd\fR,
+where
+.I mm
+is the month and
+.I dd
+is the day of the messages contained in each log file.
+.PP
+By default,
+.B strlogd
+logs all
+.I STREAMS
+error messages from all drivers and modules.
+.PP
+Messages that appear in the error log are intended to report exceptional
+conditions that require the attention of the person who administers your
+system.  Those messages indicating the total failure of a
+.I STREAMS
+driver or module should have the
+.B F
+flag set.  Those messages requiring the immediate attention of the
+administrator should have the
+.B N
+flag set, which causes the console logger to send the message to that person by
+way of the
+.BR mail (1)
+command.  The priority level usually has no meaning in the error log, but does
+have meaning if the message is also sent to the tracer process.
+.PP
+Once initiated, the
+.B strerr
+daemon continues to execute until terminated by the user.  Usually, the
+.B strerr
+daemon is executed asynchronously.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-a\fR, \fB--admin\fR \fImailuid\fR
+Specifies the mail user or alias to which to send all mail messages.  Mail is
+sent to
+.RB \(lq root \(rq
+by default.
+.TP
+\fB-d\fR, \fB--directory\fR \fIdirectory\fR
+Specifies a directory to contain the messages.  Default is to search for
+.RB \(lq /var/adm/streams \(rq
+and then
+.RB \(lq /var/log/streams .\(rq
+.TP
+\fB-n\fR, \fB--nodaemon\fR
+Do not daemonize, run in the foreground, print output to
+.I stdout
+and error logs to
+.IR stderr .
+This option is most usefull for debugging
+.BR strerr .
+.TP
+\fB-b\fR, \fB--basename\fR \fIbasename\fR
+Specify the log file basename.  Default is
+.RB \(lq error \(rq .
+.TP
+\fB-o\fR, \fB--outfile\fR \fIoutfile\fR
+Specifiy the log file output name.
+When run as a daemon, the default is
+.RI \(lq basename . mm-dd \(rq,
+where
+.I mm-dd
+is the current month and day of month.
+When run in the foreground, the default is ignored and all output is to
+.IR stdout .
+When specified, standard output is redirected to the specified file regardless of whether
+.B strerr
+is being run in the foreground or as a daemon.
+.TP
+\fB-e\fR, \fB--errfile\fR \fIerrfile\fR
+Specify the error file output name.
+When run as a daemon, the default is
+.RI \(lq /dev/null \(rq
+and all errors are logged to
+.BR syslogd (8).
+When run in the foreground, the default is ignored and all errors are logged to
+.IR stderr .
+When specified, standard error is redirected to the specified file regardless of whether
+.B strerr
+is being run in the foreground or as a daemon.
+.TP
+\fB-p\fR, \fB--pidfile\fR \fIpidfile\fR
+Specify the pid file output name.  Default is
+.RB \(lq /var/run/strerr.pid .\(rq
+When run in the foreground, the default is ignored.
+.TP
+\fB-l\fR, \fB--logdev\fR \fIlogdevice\fR
+Specifies the log device.  Default is to search
+.RB \(lq /dev/streams/strlog ,\(rq
+.RB \(lq /dev/streams/log ,\(rq
+.RB \(lq /dev/strlog \(rq
+and
+.RB \(lq /dev/log .\(rq
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+This option is equivalent to
+.BR --verbose = 0 .
+.TP
+\fB-D\fR, \fB--debug\fR [\fIlevel\fR]
+Increase or specify the debug output
+.IR level .
+When a debug
+.I level
+has been specified,
+.B strerr
+will log to
+.IR stdout ,
+prints debug messages to
+.IR stderr ,
+and will not place itself in the background.
+This option may be repeated.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase or specify the verbosity
+.I level
+of the output.  This option may be repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B strerr
+displays usage information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B strerr
+displays version information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B strerr
+displays copying and copyright information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.B strerr
+takes no non-option arguments.
+.\"
+.\"
+.SH FORMAT
+.PP
+.I STREAMS
+error log messages have the following format:
+.HP
+.RB < seq "> <" time "> <" ticks "> <" flags "> <" mid "> <" sid "> <" text >
+.PP
+Components are interpreted as follows:
+.TP \w'<flags>\(em'u
+.RB < seq >
+Error sequence number.
+.PD 0
+.TP
+.RB < time >
+Time the message was sent expressed in hh:mm:ss.
+.TP
+.RB < ticks >
+Time the message was sent expressed in machine ticks since last boot.
+.TP
+.RB < flags >
+Any combination of the following three message indicators:
+.RS
+.IP \fBT\fP 3
+The message has also sent to a tracing process.
+.IP \fBF\fP
+The message signalled a fatal error.
+.IP \fBN\fP
+The message has also been mailed to the system administrator.
+.RE
+.TP
+.RB < mid >
+Module identification number of the error message source.
+.TP
+.RB < sid >
+Sub-identification number of the error message source.
+.TP
+.RB < text >
+Formatted text of the error message.
+.PD
+.\"On multiprocessor systems,
+.\".RB < text >
+.\"is composed of two parts:
+.\".RS
+.\".IP \(bu
+.\"the number of processors where the owner of the message has sent it.
+.\".IP \(bu
+.\"the formatted text itself.
+.\".RE
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.RB ( 1 )
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two
+.RB ( 2 )
+indicates that the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH SIGNALS
+.PP
+.B strerr
+catches the
+.B SIGHUP
+signal
+.RB "(see " signal (7)).
+.TP
+.B SIGHUP
+When the
+.B SIGHUP
+signal is caught,
+.B strerr
+will close the current log file and open a new (or reopen the existing) log
+file.  This is for use with
+.BR logrotate (8).
+.TP
+.B SIGTERM
+When the
+.B SIGTERM
+signal is caught,
+.B strerr
+flushes and closes all of its log files and then exits.
+.\"
+.\"
+.SH NOTICES
+.PP
+Only one
+.B strerr
+daemon or process at a time is permitted to open the
+.I STREAMS
+log driver as an error logger.
+If a module or driver is generating a large number of error
+messages, running the error logger causes a degradation in
+.I STREAMS
+performance.  If a large number of messages are generated in a short time, the
+log driver may not be able to deliver some of the messages.  This situation is
+indicated by gaps in the sequence numbering of the messages in the log files.
+.PP
+When run in the foreground,
+.B strerr
+runs until terminated by the caller.
+.PP
+Running
+.B strerr
+can impair
+.I STREAMS
+performance, particularly for those modules and drivers that are sending the
+messages.
+Also be aware that
+.B strerr
+may not be able to handle a large number of messages.  If drivers and modules
+return messages to
+.B strerr
+too quickly, some may be lost.
+.PP
+Due to performance considerations, only one
+.B strerr
+command is permitted to open the
+.I STREAMS
+.B log
+driver at a time.
+Running the
+.B strerr
+command has the most impact on the timing of modules and drivers generating
+the error messages that are sent to the
+.B strerr
+process.  If error messages are generated faster than the
+.B strerr
+process can handle them, some of the messages will be lost.  This last case
+can be determined by examining the sequence numbers on the error messages
+output.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/streams/strlog ", " /dev/streams/log ", " /dev/strlog " or " /dev/log
+the
+.I STREAMS
+logging device.
+See
+.BR strlog (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strerr
+contains the
+.B strerr
+command.
+.TP
+.BR /var/log/streams " or " /var/adm/streams
+directory containing the error log files.
+.TP
+.BI /var/log/streams/error. "mm-dd \fR or " /var/adm/streams/error. mm-dd
+error log file.
+.TP
+.BR /etc/init.d/strerr " or " /etc/strerr.sh
+an SysV or Debian init script for starting the error logger.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR log (4),
+.BR strlog (4),
+.BR strlog (9),
+.BR strlog (1),
+.BR strace (8),
+.BR strclean (8),
+.BR syslogd (8),
+.BR syslog (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B strerr
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strerr
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42cr
+.]
+and systems based on
+.IR "SVR 4.2" ,
+such as
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Options
+.BR -n ", " -D ", " -b ", " -o ", " -e ", " -p " and " -l ,
+and all long options, are specific to this
+.I @PACKAGE_TITLE@
+implementation of
+.B strerr
+and should not be used by portable applications.
+.IP \(em
+No other implementation documents the
+.BR -q ", " -D ", " -v ", " -h ", " -V " or " -C
+options.
+They should not be used by portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+.IR AIX \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+do not document the
+.BR -a " or " -d
+options;
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+do.
+.IP \(em
+All other implementations document the log file directory as
+.B /var/adm/streams
+instead of
+.BR /var/log/streams .
+.B /var/log/streams
+is used under
+.B Linux
+for compatibility with the
+.BR "Linux File Standard" .
+For compatibility,
+.B strerr
+first checks if the directory
+.B /var/adm/streams
+exists, and then creates
+.B /var/log/streams
+if necessary, unless a directory is specified with the
+.B -d
+option.
+.IP \(em
+Under
+.IR "SVR 4.2"
+.[
+svr42cr
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+the
+.I STREAMS
+log device is called
+.B /dev/log
+rather than
+.BR /dev/strlog .
+.B Linux
+already has a
+.RB non- STREAMS
+based log mechanism (BSD-style) logging device named
+.BR /dev/log .
+.IP \(em
+Under
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+the
+.I STREAMS
+log device is called
+.B /dev/streams/log
+instead of
+.BR /dev/strlog .
+.IP \(em
+For compatibility with these operating environments,
+.B strerr
+attempts to open
+.BR /dev/streams/strlog ", " /dev/streams/log ", " /dev/strlog " and then " /dev/log
+if not specified with the
+.B -l
+option.
+The call to
+.B strerr
+will fail if there is no
+.IR STREAMS -based
+log device in this search sequence, or specified with the
+.B -l
+option.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" ;
+.[
+svr42cr
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.[
+uxpdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strerr
+first appear in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

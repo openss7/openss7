@@ -1,0 +1,302 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH CONNLD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.\"
+.\"
+.SH NAME
+.B connld
+\- \fISTREAMS\fP connection line discipline module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+.BI "int " pfds[2] ;
+.HP 12
+.BI "int s_pipe(" pfds );
+.HP 12
+.BI "int ioctl(" pfds[0] ", " I_PUSH ", " \*(lqconnld\*(rq );
+.HP 12
+.BI "int fattach(" pfds[0] ", " \*(lq/tmp/server\*(rq );
+.HP 12
+.BI "int ioctl(" pfds[1] ", " I_RECVFD ", struct strfdinsert *" fdi );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B connld
+is a
+.I STREAMS
+module that can be pushed over a
+.IR STREAMS -based
+bi-drectional software pipe (see
+.BR spx (4))
+to provide automatic generation of new
+.IR STREAMS -based
+bi-drectional software pipes between a client and server process.
+.PP
+When
+.BR open (2s)
+is called on the end of a pipe upon which
+.B connld
+has been pushed (see
+.BR streamio (7))
+a new software pipe is created.  The file descriptor for the far end of the
+newly created pipe is sent to the other end of the existing pipe in the same
+fashion as an
+.I I_SENDFD
+IO control (see
+.BR streamio (7))
+and can be received at the other end of the existing pipe with
+.IR I_RECVFD .
+The file descriptor returned by the
+.BR open (2s)
+call will be the near end of the newly created pipe.
+.\"
+.\"
+.SH USAGE
+.PP
+The normal usage of
+.B connld
+is as follows:
+.IP (1) \w'(000)'u
+A server process creates a software pipe using
+.BR pipe (2s)
+or
+.BR spx (4).
+.IP (2)
+The server process pushes the
+.B connld
+module on the client end of the pipe using the
+.I I_PUSH
+command of
+.BR streamio (7).
+.IP (3)
+The server process names the client end of the pipe using
+.BR fattach (3).
+.IP (4)
+The server process uses
+.BR poll (2s)
+to listen for received file descriptors on the server end of the pipe.
+.IP (5)
+When a client process performs an
+.BR open (2s)
+on the file to which the client end of the pipe has been named with
+.BR fattach (3),
+.B connld
+creates a new pipe, sends the server side file descriptor to the server with
+the
+.I I_SENDFD
+command of
+.BR streamio (7)
+and returns the file descriptor of the client end of the new pipe in return to
+the
+.BR open (2s)
+call.
+.IP (6)
+The server receives the file descriptor with the
+.I I_RECVFD
+command of
+.BR streamio (7)
+resulting in a unique per-client bi-directional
+.IR STREAMS -based
+pipe for each connecting client.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+A description and a client-server example for the
+.B connld
+module appears in
+.IR "\*(lqAdvanced Programming in the UNIX\(rg Environment\*(rq" .
+.[
+advprog
+%P 498
+.]
+.\"
+.\"
+.SH MODULES
+.PP
+.B connld
+is a
+.I STREAMS
+module named
+.IR \*(lqconnld\*(rq .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR spx (4)),
+.BR open (2s),
+.BR streamio (7),
+.BR fattach (3),
+.BR poll (2s).
+.\"
+.\"
+.SH BUGS
+.PP
+.B connld
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B connld
+is compatible with
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+.BR SVR 4.2
+.[
+svr42
+.]
+and
+.BR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2,
+.[
+svr42
+.]
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3.
+.[
+susv3
+.]
+Conformance is verified using the
+.BR test-connld (8)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B connld
+first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

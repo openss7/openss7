@@ -1,0 +1,4127 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: mtpi.texi,v 0.9.2.13 2009-05-01 04:50:30 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2009-05-01 04:50:30 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename mtpi.info
+@include texi/args.texi
+@set MANUAL_TITLE Message Transfer Part Interface (MTPI)
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* MTPI: (mtpi).			Message Transfer Part Interface
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Message Transfer Part Interface (MTPI)
+@set MANUAL_TYPE Specification
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Message Transfer Part Interface (MTPI)
+@set MANUAL_TYPE Specification
+
+@set PART Message Transfer
+@set LONG Message Transfer Part
+@set SHORT MTP
+@set INTERFACE MTPI
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@subsubheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@strong{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{[\name\]}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@var{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{[\name\]}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@var{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@macro mobj{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* The @value{SHORT} Layer::
+* @value{INTERFACE} Services Definition::
+* @value{INTERFACE} Primitives::
+* Diagnostics Requirements::
+* @value{INTERFACE} Input-Output Controls::
+* @value{INTERFACE} Management Information Base::
+* Addendum for @value{SHORT} Conformance::
+* Mapping @value{INTERFACE} Primitives::
+* State/Event Tables::
+* Precedence Tables::
+@c * Allowable Sequence of @value{INTERFACE} Primitives::
+@c * Precedence of @value{INTERFACE} Primitives::
+@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
+@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
+* @value{INTERFACE} Header Files::
+* @value{INTERFACE} Library::
+* @value{INTERFACE} Drivers and Modules::
+* @value{INTERFACE} Utilities::
+* @value{INTERFACE} File Formats::
+* @value{INTERFACE} Compatibility and Porting::
+* Glossary::
+* Acronyms::
+* References::
+* Licenses::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
+* Index::
+@c @end ifnottex
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Notice
+
+Software in this document and related software is released under the AGPL (@pxref{GNU Affero General
+Public License}).  Please note, however, that there are different licensing terms for some of the
+manual package and some of the documentation.  Consult permission notices contained in the
+documentation of those components for more information.
+
+This document is released under the FDL (@pxref{GNU Free Documentation License}) with no invariant
+sections, no front-cover texts and no back-cover texts.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
+components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+
+@subsection Purpose
+@cpindex STREAMS
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@subsection Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@subsection Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+A current version of this specification is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallexample
+@verbatim
+$Log: mtpi.texi,v $
+Revision 0.9.2.13  2009-05-01 04:50:30  brian
+- update documentation for release
+
+Revision 0.9.2.12  2009-04-30 06:07:36  brian
+- more documentation updates for release
+
+Revision 0.9.2.11  2009-04-29 18:05:18  brian
+- updated documentation for release
+
+Revision 0.9.2.10  2008-11-26 12:01:32  brian
+- updated to FDL 1.3
+
+Revision 0.9.2.9  2008-11-17 14:13:05  brian
+- documentation additions
+
+Revision 0.9.2.8  2008-09-20 11:04:29  brian
+- added package patchlevel
+
+Revision 0.9.2.7  2008-08-03 06:03:31  brian
+- protected agains texinfo commands in log entries
+
+Revision 0.9.2.6  2008-08-03 05:05:15  brian
+- conditional @syncodeindex frags out automake, fails distcheck
+
+Revision 0.9.2.5  2008-07-23 08:29:01  brian
+- updated references and support for 2.6.18-92.1.6.el5 kernel
+
+Revision 0.9.2.4  2008-07-11 09:36:12  brian
+- updated documentation
+
+Revision 0.9.2.3  2008-04-29 07:10:38  brian
+- updating headers for release
+
+Revision 0.9.2.2  2007/08/14 12:17:00  brian
+- GPLv3 header updates
+
+Revision 0.9.2.1  2007/06/27 08:42:19  brian
+- added MTPI spec document
+@end verbatim
+@end smallexample
+
+@section ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this maual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is a @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infrincement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Aquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granded herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplerment
+to the FAR (or any successor regulations).
+
+@section Acknowledgements
+
+@url{http://www.openss7.org/,The OpenSS7 Project} was funded in part by:
+
+@itemize @bullet
+@item @url{http://www.monavacon.com/,Monavacon Limited}
+@item @url{http://www.openss7.com/,OpenSS7 Corporation}
+@end itemize
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @url{http://www.fsf.org/,Free Software Foundation}, the
+@url{http://www.kernel.org/,Linux Kernel Community}, and the open source software movement at large.
+
+@node Introduction
+@chapter Introduction
+@cpindex STREAMS
+
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T
+@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a @value{PART}
+service to access and use any of a variety of conforming @value{PART} providers without specific
+knowledge of the provider's protocol.  The service interface is designed to support any network
+@value{PART} protocol and user @value{PART} protocol.  This interface only specifies access to
+@value{PART} service providers, and does not address issues concerning @value{PART} management,
+protocol performance, and performance analysis tools.
+
+This specification assumes that the reader is familiar with ITU-T state machines and @value{PART}
+interfaces (e.g.  Q.704, T1.111.4), and @cite{STREAMS}.
+
+@section Related Documentation
+
+@itemize ---
+@item @strong{ITU-T Recommendation Q.704 (White Book)}
+@item @strong{ETSI ETS 300 008-1}
+@item @strong{ANSI T1.111.4/2002}
+@item @strong{System V Interface Definition, Issue 2 --- Volume 3}
+@end itemize
+
+@subsection Role
+
+This document specifies an interface that supports the services provided by the @dfn{Signalling
+System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation
+Q.704, ANSI T1.111.4, ETSI ETS 300 008-1.  These specifications are targeted for use by developers
+and testers of protocol modules that require @value{PART} service.
+
+@section Definitions, Acronyms, Abbreviations
+
+@table @dfn
+@item Originating SL User
+A SL-User that initiates a Signalling Link.
+@item Destination SL User
+A SL-User with whom an originating SL user wishes to establish a Signalling Link.
+@item ISO
+International Organization for Standardization
+@item SL User
+Kernel level protocol or user level application that is accessing the services
+of the Signalling Link sub-layer.
+@item SL Provider
+Signalling Link sub-layer entity/entities that provide/s the services of the
+Signalling Link interface.
+@item SLI
+Signalling Link Interface
+@item TIDU
+Signalling Link Interface Data Unit
+@item TSDU
+Signalling Link Service Data Unit
+@item OSI
+Open Systems Interconnection
+@item QOS
+Quality of Service
+@item STREAMS
+A communication services development facility first available with UNIX System V Release 3.
+@end table
+
+@node The @value{SHORT} Layer
+@chapter The @value{SHORT} Layer
+
+@menu
+* Model of the @value{INTERFACE}::
+* @value{INTERFACE} Services::
+* @value{SHORT} Service Primitives::
+@end menu
+
+The @value{SHORT} Layer provides the means to manage the association of @value{SHORT}-Users into
+connections.  It is responsible for the routing and management of data to and from SS7 network
+connections between @value{SHORT}-user entities.
+
+@node Model of the @value{INTERFACE}
+@section Model of the @value{INTERFACE}
+
+The @value{INTERFACE} defines the services provided by the signalling link layer to the signalling
+link user at the boundary between the signalling link provider and the signalling link user entity.
+The interface consists of a set of primitives defined as @cite{STREAMS} messages that provide access
+to the signalling link layer services, and are transferred between the @value{SHORT} user entity and
+the @value{SHORT} provider.  These primitives are of two types; ones that originate from the
+@value{SHORT} user, and other that originate from the @value{SHORT} provider.  The primitives that
+originate from the @value{SHORT} user make requests to the @value{SHORT} provider, or respond to an
+indication of an event of the @value{SHORT} provider.  The primitives that originate from the
+@value{SHORT} provider are either confirmations of a request or are indications to the CCS user that
+an event has occurred.  @figref{1} shows the model of the @value{INTERFACE}.
+
+@figuresized{mtpi01,1,Model of the @value{INTERFACE},4.0in}
+
+The @value{INTERFACE} allows the @value{SHORT} provider to be configured with any @value{SHORT} user
+(such as ISUP) that also conforms to the @value{INTERFACE}.  A call control layer user can also be a
+user program that conforms to the @value{INTERFACE} and accesses the @value{SHORT} provider via
+@manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
+
+@node @value{INTERFACE} Services
+@section @value{INTERFACE} Services
+
+The features of the @value{INTERFACE} are defined in terms of the services provided by the
+@value{SHORT}, and the individual primitives that may flow between the @value{SHORT}-User and the
+@value{SHORT}.
+
+The services supported by the @value{INTERFACE} are based on two distinct modes of communication,
+connectionless (CLMS) and connection oriented (COMS).  Within these modes, the @value{INTERFACE}
+provides support for both sequenced and unsequenced message transfer.  Also, the @value{INTERFACE}
+supports services for local mangement.
+
+@subsection CLMS
+
+The main features of the connectionless mode of communication are:
+
+@enumerate
+@item
+it is datagram oriented;
+@item
+it provides transfer of data in self contained units;
+@item
+there is no logical relationship between these units of data.
+@end enumerate
+
+Connectionless mode communication has no separate phases.  Each unit of data is transmitted from
+source to destination independently, appropriate addressing information is included with each unit
+of data.  Although the units of data are transmitted independently from source to destination,
+@value{SHORT} provides a high level of assurance of sequencing if sequenced service is requested.
+When unsequenced service is requested, there are no guarantees of proper sequence.  Although
+@value{SHORT} services are inherently unreliable, @value{SHORT} provide a high level of assurance
+that messages are not lost.
+
+The connectionless service of @value{SHORT} is suited to @value{SHORT} User protocols such as the
+Signalling Connection Control Part (SCCP).@footnote{@ref{Q.711,,Q.711}.}
+
+@subsection COMS
+
+The main features of the @value{SHORT} connection oriented mode of communication are:
+
+@enumerate
+@item
+it is virtual circuit oriented;
+@item
+it provides transfer of data via a pre-established path.
+@end enumerate
+
+There are three phases to each instance of communication: Connection Establishment, Data Transfer;
+and Connection Termination.  Units of data arrive at their destination in the same order as they
+departed their source when the sequenced delivery service is requested and the data is protected
+against duplication or loss of data within some specified quality of service.
+
+The connection oriented service of @value{SHORT} is suited to @value{SHORT} User protocols such as
+the Integrated Services Digital Network User Part (ISUP), [Q.764] Telephone User Part (TUP), [Q.724]
+and Bearer Indexed Call Control (BICC).@footnote{ISUP consists of @dfn{signalling relations} between
+two switches which also have digital facilities between them.  In general an ISUP @value{SHORT}-User
+can communicate with many other @value{SHORT}-User peers, however, signalling between any given two
+enpoints only concerns the digital facilities which exist between the two endpoints.  So, management
+of ISUP switches is best performed on a pairing of endpoints (@dfn{signalling relations}).  Also,
+the COMS mode of operation is provided in support of DPC list Routing Keys for M3UA. [RFC 4666]}
+
+@subsection Local Management
+
+The @value{INTERFACE} specifications also defines a set of local management functions that apply to
+COMS and CLMS modes of communication.  These services have local significance only.
+
+@subsection Provider Management
+
+The @value{INTERFACE} specification also defines a set of provider management functions that apply
+to the @value{SHORT} service provider.  These services have local and end-to-end significance.
+
+@node @value{SHORT} Service Primitives
+@section @value{SHORT} Service Primitives
+
+@tabref{1}, @tabref{2}, @tabref{3} and @tabref{4} summarize the @value{INTERFACE} service primitives
+by their state and service
+
+@tabfig{mtpi_tab01,1,@value{INTERFACE} Service Primitives for Local Management}
+@tabfig{mtpi_tab02,2,@value{INTERFACE} Service Primitives for Connectionless Mode Data Transfer}
+@tabfig{mtpi_tab03,3,@value{INTERFACE} Service Primitives for Connection Mode Data Transfer}
+@tabfig{mtpi_tab04,4,@value{INTERFACE} Service Primitives for @value{SHORT} Management}
+
+@node @value{INTERFACE} Services Definition
+@chapter @value{INTERFACE} Services Definition
+@cindex @value{INTERFACE} Services Definition
+
+@menu
+* Local Management Services::
+* Connectionless Services::
+* Connection Oriented Services::
+* @value{SHORT} Provider Management Services::
+@end menu
+
+This section describes the services of the @value{INTERFACE} primitives.  Time-sequence diagrams
+that illustrate the sequence of primitives are included.@footnote{Conventions for the time-sequence
+diagrams are defined in ITU-T X.210. [X.210]} The format of the primitives will be defined later in
+this document.
+
+@node Local Management Services
+@section Local Management Services
+
+The services defined in this section are outside the scope of international standards.  These
+services apply to COMS and CLMS modes of communication.  They are invoked for the
+initialization/de-initialization of a stream connected to the @value{SHORT}.  They are also used to
+manage options supported by the @value{SHORT} and to report information on the supported parameter
+values.
+
+@subsection @value{LONG} Information Reporting Service
+
+This service provides information on the options supported by the @value{SHORT} provider.
+
+@table @strong
+@item MTP_INFO_REQ:
+@prindex MTP_INFO_REQ
+This primitive requests that the @value{SHORT} return the values of all the supported protocol
+parameters.  This request may be invoked during any phase.
+@item MTP_INFO_ACK:
+@prindex MTP_INFO_ACK
+This primitive is in response to the @prim{MTP_INFO_REQ} primitive and returns the values of the
+supported protocol parameters to the @value{SHORT}-User.
+@end table
+
+
+The sequence of primitives for @value{SHORT} information management is shown in @figref{2}.
+
+@figuresized{mtpi02,2,@value{LONG} Information Reporting Service,4.0in}
+
+@subsection @value{SHORT} Address Service
+
+This service allows an @value{SHORT}-User to determine the @value{SHORT} address (@value{SHORT}-SAPI
+or signalling point code and service indicator) that has been associated with a Stream.  It permits
+the @value{SHORT}-User to not necessarily retain this information locally, and allows the
+@value{SHORT}-User to determine this information from the @value{SHORT} provider at any time.
+
+@table @strong
+@item MTP_ADDR_REQ:
+@prindex MTP_ADDR_REQ
+This primitive requests that the @value{SHORT} return information concerning which @value{SHORT}
+address (@value{SHORT}-SAPI) the @value{SHORT}-User is bound as well as the @value{SHORT} address
+upon which the @value{SHORT}-User is currently engaged in association.
+@item MTP_ADDR_ACK:
+@prindex MTP_ADDR_ACK
+This primitive is in response to the @prim{MTP_ADDR_REQ} primitive and indicates to the
+@value{SHORT}-User the requested information.
+@end table
+
+The sequence of primitives is shown in @figref{3}.
+
+@figuresized{mtpi42,3,@value{LONG} User Address Service,4.0in}
+
+@subsection @value{SHORT} User Bind Service
+
+
+This service allows an @value{SHORT} address (@value{SHORT}-SAPI: signalling point code and service
+indicator) to be associated with a Stream.
+
+It allows the @value{SHORT}-User to negotiate the number of connect indications that can remain
+unacknowledged for that @value{SHORT}-User (a connect indication is considered unacknowledged while
+it is awaiting a corresponding connect response or release request from the @value{SHORT}-User).
+This service also defines a mechanism that allows a Stream (bound to an @value{SHORT} address of the
+@value{SHORT}-User) to be reserved to handle incoming connections only.  This Stream is referred to
+as the listener Stream.
+
+@table @strong
+@item MTP_BIND_REQ:
+@prindex MTP_BIND_REQ
+This primitive requests that the @value{SHORT}-User be bound to a particular @value{SHORT} address
+(@value{SHORT}-SAPI), and negotiate the number of allowable outstanding connect indications for that
+address.
+@item MTP_BIND_ACK:
+@prindex MTP_BIND_ACK
+This primitive is in response to the @prim{MTP_BIND_REQ} primitive and indicates to the user that
+the specified @value{SHORT}-User has been bound to an @value{SHORT} address.
+@end table
+
+The sequence of primitives is shown in @figref{4}.
+
+@figuresized{mtpi03,4,@value{LONG} User Bind Service,4.0in}
+
+@subsection @value{SHORT} User Unbind Service
+
+This service allows the @value{SHORT}-User to be unbound from an @value{SHORT} address.
+
+@table @strong
+@item MTP_UNBIND_REQ:
+@prindex MTP_UNBIND_REQ
+This primitive requests that the @value{SHORT}-User be unbound from the @value{SHORT} address that
+it had previously been bound to.
+@end table
+
+
+The sequence of primitives is shown in @figref{5}.
+
+@figuresized{mtpi04,5,@value{LONG} User Unbind Service,4.0in}
+
+@subsection Receipt Acknowledgement Service
+
+@table @strong
+@item MTP_OK_ACK:
+@prindex MTP_OK_ACK
+This primitive indicates to the @value{SHORT}-User that the previous @value{SHORT}-User originated
+primitive was received successfully by the @value{SHORT}.
+@end table
+
+
+An example showing the sequence of primitives for successful receipt acknowledgement is depicted in
+@figref{6}.
+
+@figuresized{mtpi05,6,@value{LONG} Receipt Ackknowledgement Service,4.0in}
+
+@subsection Options Management Service
+
+This service allows the @value{SHORT}-User to manage options parameter values associated wtih the
+@value{SHORT}.
+
+@table @strong
+@item MTP_OPTMGMT_REQ:
+@prindex MTP_OPTMGMT_REQ
+This primitive allows the @value{SHORT}-User to select default values for options parameters within
+the range supported by the @value{SHORT}, and to indicate the default selection of receipt
+confirmation.
+@end table
+
+@figref{7} shows the sequence of primitives for @value{SHORT} options management.
+
+@figuresized{mtpi06,7,@value{LONG} Options Management Service,4.0in}
+
+@subsection Error Acknowledgement Service
+
+@table @strong
+@item MTP_ERROR_ACK:
+@prindex MTP_ERROR_ACK
+This primitive indicates to the @value{SHORT}-User that a non-fatal error has occured in the last
+@value{SHORT}-User originated request or response primitive (listed in @figref{8}), on the stream.
+@end table
+
+@figref{8} shows the sequence or primitives for the error management primitive.
+
+@figuresized{mtpi07,8,@value{LONG} Error Acknowledgement Service,4.0in}
+
+@node Connectionless Services
+@section Connectionless Services
+
+The CLMS allows for the transfer of @value{SHORT}-User data in one or both directions simultaneously
+without establishing an association between @value{SHORT}-User peers.  A set of primitives are
+defined that carry user data and control information between the @value{SHORT}-User and
+@value{SHORT} entities.  The primitives are modeled as requests initiated by the @value{SHORT}-User
+and indications initiated by the @value{SHORT} provider.  Indications may be initiated by the
+@value{SHORT} independently from requests by the @value{SHORT}-User.
+
+The connectionless @value{SHORT} service consists of one phase.
+
+@subsection Data Transfer
+
+@subsubsection User Primitives for Data Transfer
+
+@table @strong
+@item MTP_TRANSFER_REQ:
+@prindex MTP_TRANSFER_REQ
+This primitive requests that the @value{SHORT} send the data unit to the specified destination with
+the specified sequence control.
+@end table
+
+@subsubsection Provider Primitives for Data Transfer
+
+@table @strong
+@item MTP_TRANSFER_IND:
+@prindex MTP_TRANSFER_IND
+This primitive indicates to the @value{SHORT}-User that a data unit has been received from the
+specified source address.
+@end table
+
+
+@figref{9} shows the sequence of primitives for the connectionless mode of data transfer.
+@figuresized{mtpi44,9,@value{LONG} Data Transfer,4.0in}
+
+@subsection Error Management
+@subsubsection Provider Primitives for Error Management
+
+@table @strong
+@item MTP_PAUSE_IND:
+@prindex MTP_PAUSE_IND
+This primitive indicates to the @value{SHORT}-User that the specified destination address is no
+longer accessible.
+@item MTP_RESUME_IND:
+@prindex MTP_RESUME_IND
+This primitive indicates to the @value{SHORT}-User that the specified destination address is now
+accessible.
+@item MTP_STATUS_IND:
+@prindex MTP_STATUS_IND
+This primitive indicates ot the @value{SHORT}-User that the congestions status to the specified
+destination address has changed, or that the remote @value{SHORT}-User is no longer available.
+@end table
+
+@figref{10} shows the sequence of primitives for the connectionless mode error management primitives.
+
+@figuresized{mtpi31,10,@value{LONG} Error Management,4.0in}
+
+
+@node Connection Oriented Services
+@section Connection Oriented Services
+
+This section describes the required @value{SHORT} service primitives that define the CLMS interface.
+
+The queue model for CLMS is discused in more detail in ITU-T Q.704. [Q.704] For Q.704 specific
+conformance considerations, see Addendum 1.
+
+The queue model represents the operation of an @value{SHORT} connection in the abstract by a pair of
+queues linking the two @value{SHORT} addresses.  There is one queue for each direction of signalling
+transfer.  The ability of a user to add objects to a queue will be determined by the behavior of the
+user removing objects from that queue, and the state of the queue.  The pair of queues is considered
+to be available for each potential association.  Objects that are entered or removed from the queue
+are either as a result of interactions at the two @value{SHORT} addresses, or as the result of
+@value{SHORT} initiatives.
+
+@itemize @minus{}
+@item
+A queue is empty until a connect object has been entered and can be returned to this state, with
+loss of its contents, by the @value{SHORT}.
+@item
+Objects may be entered into a queue as a result of the action of the source @value{SHORT}-User,
+subject to control by the @value{SHORT}.
+@item
+Objects may also be entered into a queue by the @value{SHORT}.
+@item
+Objects are removed from the queue under the control of the receiving @value{SHORT} user.
+@item
+Objects are normally removed under the control of the @value{SHORT}-User in the same order as they
+were entered except:
+@item
+if the object is of a type defined to be able to advance ahead of the preceding object (however, no
+object is defined to be able to advance ahead of another object of the same type), or
+@item
+if the following object is defined to be destructive with respect to the preceding object on the
+queue.  If necessary, the last object on the queue will be deleted to allow a destructive object to
+be entered --- they will therefore always be added to the queue.  For example, "reset" objects are
+defined to be destructive with respect to all other objects.
+@end itemize
+
+@tabref{5} shows the ordering relationship amoung the queue model objects.
+
+@tabfig{mtpi_tab05,5,Flow Control Relationships Between Queue Model Objects}
+
+@multitable @columnfractions 0.10 0.90
+@item AA @tab Indicates that Object X is defined to be able to advance ahead of preceding Object Y.
+@item DES @tab Indicates that Object X is defined to be destructive with respect to preceding Object Y.
+@item @minus{} @tab Indicates that Object X is neither destructive with respect to Object Y, nor able to advance ahead of Object Y.
+@item N/A @tab Indicates that Object X will not occur in a position succeeding Object Y in a valid state of a queue.
+@end multitable
+
+@subsection Connection Establishment Phase
+
+A pair of queues is associated with an @value{SHORT} association between two @value{SHORT} addresses
+when the @value{SHORT} receives an @prim{MTP_CONN_REQ} primitive at one of the @value{SHORT}
+addresses resulting in a connect object being entered into the queue.  The queues will remain
+associated with the @value{SHORT} association until an @prim{MTP_DISCON_REQ} primitive (resulting in
+a disconnect object) is either entered or removed from a queue.  Similarly, in the queue from the
+remote @value{SHORT}-User, objects can be entered into the queue only after the connect object
+associated with an @prim{MTP_CONN_REQ} has been entered into the queue.
+
+The @value{SHORT} association procedure will fail if the @value{SHORT} is unable to route to the
+remote @value{SHORT}-User.
+
+@subsubsection User primitives for Successful @value{SHORT} Association Establishment
+
+@table @strong
+@item MTP_CONN_REQ:
+@prindex MTP_CONN_REQ
+This primitive requests that the @value{SHORT} establish an association between the local
+@value{SHORT}-User and the specified destination.
+@end table
+
+@subsubsection Provider primitives for Successful @value{SHORT} Association Establishment
+
+@table @strong
+@item MTP_CONN_CON:
+@prindex MTP_CONN_CON
+This primitive indicates to the @value{SHORT}-User that an association request has been confirmed.
+@end table
+
+
+The sequence of primitives in a successful @value{SHORT} association establishment is defined by the
+time sequence diagram as shown in @figref{11}.
+
+@figuresized{mtpi24,11,@value{LONG} Association Service,4.0in}
+
+@subsection Data Transfer Phase
+
+Flow control on the @value{SHORT} association is done by management of queue capacity, by allowing
+objects of certain type to be inserted to the queues as shown in @tabref{5}.
+
+@subsubsection User primitives for @value{SHORT} Data Transfer
+
+@table @strong
+@item MTP_TRANSFER_REQ:
+@prindex MTP_TRANSFER_REQ
+This primitive requests that the @value{SHORT} transfer the specified data.
+@end table
+
+@subsubsection Provider primitives for @value{SHORT} Data Transfer
+
+@table @strong
+@item MTP_TRANSFER_IND:
+@prindex MTP_TRANSFER_IND
+This primitive indicates to the @value{SHORT}-User that this message contains data.
+@end table
+
+@figref{12} shows the sequence of primitives for successful data transfer.  The sequence of
+primitives may remain incomplete if an @prim{MTP_DISCON_REQ} primitive occurs.
+
+@figuresized{mtpi44,12,@value{LONG} Data Transfer,4.0in}
+
+This sequence of primtives may remain incomplete if an @prim{MTP_PAUSE} or @prim{MTP_STATUS}
+indication is received from the @value{SHORT}.
+
+@subsection Error Management Primitives
+
+The @value{SHORT} error management service is used by the @value{SHORT} to report detected loss of
+unrecoverable data.
+
+@subsubsection Provider Primitives for Management
+
+@table @strong
+@item MTP_PAUSE_IND:
+This primitive indicates to the @value{SHORT}-User that the remote @value{SHORT} is no longer
+accessible.
+@item MTP_RESUME_IND:
+This primitive indicates to the @value{SHORT}-User that the remote @value{SHORT} is now accesible.
+@item MTP_STATUS_IND:
+This pirmitive indicates to the @value{SHORT}-User that the congestion status to te remote
+@value{SHORT} has changed, or that the remote @value{SHORT} User is no longer accessible.
+@end table
+
+@figref{13} shows the sequence of primitives for the connection mode error management primitives.
+The sequence of primitives may remain incomplete if an @prim{MTP_DISCON_REQ} or
+@prim{MTP_DISCON_IND} primitive occurs.
+
+@figuresized{mtpi31,13,@value{LONG} Error Management,4.0in}
+
+@subsection Connection Termination Phase
+
+The @value{SHORT} association release procedure is initialized by the insertion of a disconnect
+object (associated with an @prim{MTP_DISCON_REQ}) into the queue.  As shown in @figref{13}, the
+disconnect procedure is destructive with respect to other objects in the queue, and eventually
+results in the emptying of queues and termination of the @value{SHORT} association.
+
+@subsubsection User Primitives for @value{SHORT} Association Termination
+
+@table @strong
+@item MTP_DISCON_REQ:
+@prindex MTP_DISCON_REQ
+This primitive requests that the @value{SHORT} disconnect an existing @value{SHORT} association.
+@end table
+
+The sequence of primitives are shown in the time sequence diagram in @figref{14}.
+@figuresized{mtpi08,14, @value{LONG} Connection Termination,4.0in}
+
+
+@node @value{SHORT} Provider Management Services
+@section @value{SHORT} Provider Management Services
+
+This section describes the required @value{SHORT} service primitives that define the @value{SHORT}
+Provider Management interface.
+
+@value{SHORT} Provider Management allows for the coordination of @value{SHORT} management messages
+between @value{SHORT} Provider peers.  A set of primitives are defined that invoke management
+actions that are communicated from @value{SHORT} to @value{SHORT} entities.  The primitives are
+modeled as requires initiated by the @value{SHORT} management and indications initiated by the
+@value{SHORT}.  Indications may be initiated by the @value{SHORT} independently from requests by the
+@value{SHORT} management.
+
+The @value{SHORT} Provider Management service consists of one phase.
+
+@subsection Link Management
+
+The @value{SHORT} link management service allows @value{SHORT} management to inhibit or uninhibit a
+link, linkset or combined linkset.
+
+@subsubsection User Primitives for Link Inhibit Service
+
+@table @strong
+@item MTP_INHIBIT_REQ:
+@prindex MTP_INHIBIT_REQ
+Requests that the @value{SHORT} inhibit the specified link, linkset or combined linkset.
+@end table
+
+@subsubsection Provider Primitives for Link Inhibit Service
+
+@table @strong
+@item MTP_INHIBIT_IND:
+@prindex MTP_INHIBIT_IND
+Indicates that the remote @value{SHORT} has inibited the specified link, linkset or combined
+linkset.
+@item MTP_INHIBIT_CON:
+@prindex MTP_INHIBIT_CON
+Confirms that the @value{SHORT} has successfully inhibited the specified link, linkset or combined
+linkset in coordination with the @value{SHORT} peer.
+@end table
+
+@figref{15} shows the sequence of primitives for the @value{SHORT} management link inihibit service,
+for a successful link inhibit.
+
+@figuresized{mtpi09,15,@value{LONG} Successful Link Inhibit,4.0in}
+
+@figref{16} shows the sequence of primitives for the @value{SHORT} management link inihibit service,
+for an unsuccessful link inhibit.
+
+@figuresized{mtpi10b,16,@value{LONG} Unsuccessful Link Inhibit,4.0in}
+
+@subsubsection User Primitives for Link Uninhibit Service
+
+@table @strong
+@item MTP_UNINHIBIT_REQ:
+Requests that the @value{SHORT} uninhibit the specified link, linkset or combined linkset.
+@end table
+
+@subsubsection Provider Primitives for Link Uninhibit Service
+
+@table @strong
+@item MTP_UNINHIBIT_IND:
+Indicates that an inhibit attempt has failed or the remote @value{SHORT} has uninibited the
+specified link, linkset or combined linkset.
+@item MTP_UNINHIBIT_CON:
+Confirms that the @value{SHORT} has successfully uninhibited the specified link, linkset or combined
+linkset in coordination with the @value{SHORT} peer.
+@end table
+
+@figref{17} shows the sequence of primitives for the @value{SHORT} management link uninihibit
+service.
+
+@figuresized{mtpi23,17,@value{LONG} Link Uninhibit Service,4.0in}
+
+@subsection Route Management
+
+The @value{SHORT} route management service allows @value{SHORT} management to allow or prohibit a
+route or routeset to a specific destination.
+
+@subsubsection User Primitives for Route Allow Service
+
+@table @strong
+@item MTP_ALLOW_REQ:
+Requests that the @value{SHORT} allow the specified route or routeset for the specified destination.
+@end table
+
+@subsubsection Provider Primitives for Route Allow Service
+
+@table @strong
+@item MTP_ALLOW_IND:
+Indicates to the @value{SHORT}-User that the network has allowed the specified route or routeset for
+the specified destination.
+@item MTP_ALLOW_CON:
+Confirms to the @value{SHORT}-User that the @value{SHORT} has successfully allowed the specified
+route or routeset for the specified destination to the network.
+@end table
+
+@figref{18} shows the sequence of primitives for the @value{SHORT} management route allow service.
+
+@figuresized{mtpi47,18,@value{LONG} Route Allow Service,4.0in}
+
+@subsubsection User Primitives for Route Prohibit Service
+
+@table @strong
+@item MTP_PROHIBIT_REQ:
+Requests that the @value{SHORT} prohibit the specified route or routeset for the specified
+destination.
+@end table
+
+@subsubsection Provider Primitives for Route Prohibit Service
+
+@table @strong
+@item MTP_PROHIBIT_IND:
+Indicates to the @value{SHORT}-User that an allow request has failed or the network has prohibitted
+the specified route or routeset for the specified destination.
+@item MTP_PROHIBIT_CON:
+Confirms to the @value{SHORT}-User that the @value{SHORT} has successfully prohibited the specified
+route or routeset for the specified destination to the newtork.
+@end table
+
+@figref{19} shows the sequence of primitives for the @value{SHORT} management route prohibit
+service.
+
+@figuresized{mtpi10,19,@value{LONG} Route Prohibit Service,4.0in}
+
+@c --------------------------
+@c --------------------------
+@c --------------------------
+@c --------------------------
+@c --------------------------
+@c --------------------------
+@c --------------------------
+
+@subsection Layer Management
+
+The @value{SHORT} layer management service allows @value{SHORT} management to request and receive
+event indications (alarms and 1st and deltas) and to request and receive stats indications
+(statistics and operational measurements) for specified intervals.
+
+@subsubsection User Primitives for Event Indications
+
+@table @strong
+@item MTP_NOTIFY_REQ:
+Requests that the @value{SHORT} issue notifications for specified events.
+@end table
+
+@subsubsection Provider Primitives for Event Indications
+
+@table @strong
+@item MTP_EVENT_IND:
+Indicates to the @value{SHORT}-User a notification of a requested event.
+@end table
+
+@figref{20} shows the sequence of primitives for the @value{SHORT} management event service.
+
+@figuresized{mtpi11,20,@value{LONG} Event Service,4.0in}
+
+@subsubsection User Primitives for Statistics Indications
+
+@table @strong
+@item MTP_STATS_REQ:
+Requests that the @value{SHORT} collect specified statistics and operational measurements on
+specified intervals.
+@end table
+
+@subsubsection Provider Primitives for Statistics Indications
+
+@table @strong
+@item MTP_STATS_IND:
+Indicates to the @value{SHORT}-User that the specified statistics and operational measurements have
+been collected as requested.
+@end table
+
+@figref{21} shows the sequence of primitives for the @value{SHORT} management statistics service.
+
+@figuresized{mtpi11b,21,@value{LONG} Measurements Service,4.0in}
+
+@node @value{INTERFACE} Primitives
+@chapter @value{INTERFACE} Primitives
+@cindex @value{INTERFACE} primitives
+
+@menu
+* Local Management Primitives::
+* Connection Mode and Connectionless Primitives::
+* @value{SHORT} Provider Management Primitives::
+@end menu
+
+This section describes the format and parameters of the @value{INTERFACE} primitives (@ref{Mapping
+MTPI Primitives}, shows the mapping of @value{INTERFACE} primitives for the primitives
+defined in Q.701 [Q.701] and T1.111.1 [T1.111.1]).
+
+Also, it discusses the states the primitive is valid in, the resulting state, and the
+acknowledgement that the primitive expects.  (The state/event tables for these primitives are shown
+in @ref{State/Event Tables}.  The precedence tables for the @value{INTERFACE} primitives are shown
+in @ref{Precedence Tables}.) Rules for ITU-T conformance [Q.704] are described in addendum to this
+document in @ref{Addendum for MTP Conformance}, rules for ANSI conformance [T1.111] are
+described in addendum @ref{Addendum for MTP Conformance}, and rules for JITC conformance
+[JQ.704] are described in addendum @ref{Addendum for MTP Conformance}.
+
+@tabref{6}, @tabref{7} and @tabref{8} provide a summary of the @value{SHORT} @value{SHORT}
+primitives and their parameters.
+
+@page
+
+@node Local Management Primitives
+@section Local Management Primitives
+
+@menu
+* @value{LONG} Information Request::
+* @value{LONG} Information Acknowledgement::
+* Protocol Address Request::
+* Protocol Address Acknowledgement::
+* Bind Protocol Address Request::
+* Bind Protocol Address Acknowledgement::
+* Unbind Protocol Address Request::
+* @value{LONG} Options Management Request::
+* Error Acknowledgement::
+* Successful Receipt Acknowledgements::
+@end menu
+
+These primitives apply to CLMS and COMS.
+
+@node @value{LONG} Information Request
+@subsection @value{LONG} Information Request
+
+@subsubheading MTP_INFO_REQ
+@prindex MTP_INFO_REQ
+
+This primitive requests the @value{SHORT} to return the values of all supported protocol parameters
+(see under MTP_INFO_ACK), and also the current state of the @value{SHORT} (as defined in Appendix
+B).  This primitive does not affect the state of the @value{SHORT} and does not appear in the state
+tables.
+
+@subsubheading Format
+@tpindex struct MTP_info_req
+@tpindex MTP_info_req_t
+
+The format of the message is one @msg{M_PCPROTO} message block and its structure is as follows:
+
+@smallexample
+typedef struct MTP_info_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_INFO_REQ */
+@} MTP_info_req_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_INFO_REQ.
+@end vtable
+
+@subsubheading Valid States
+
+This primitive is valid in any state where a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Acknowledgements
+
+This primitive requires the @value{SHORT} to generate one of the following acknowledgements upon
+receipt of the primitive:
+
+@itemize --
+@item @emph{Successful}:  Acknowledgement of the primitive via the @var{MTP_INFO_ACK}
+@prindex MTP_INFO_ACK
+primitive.
+@item @emph{Non-fatal errors}:  There are no errors associated with the issuance of this primitive.
+@end itemize
+
+@page
+@node @value{LONG} Information Acknowledgement
+@subsection @value{LONG} Information Acknowledgement
+
+@subsubheading MTP_INFO_ACK
+@prindex MTP_INFO_ACK
+
+This primitive indicates to the @value{SHORT}-User any relevant protocol-dependent parameters.  It
+should be initiated in response to the MTP_INFO_REQ primitive described above.
+
+@subsubheading Format
+@tpindex struct MTP_info_ack
+@tpindex MTP_info_ack_t
+
+The format of this message is one @msg{M_PCPROTO} message block and its structure is as follows:
+
+@smallexample
+typedef struct MTP_info_ack @{
+        mtp_ulong mtp_primitive;        /* always MTP_INFO_ACK */
+        mtp_ulong mtp_msu_size;         /* maximum MSU size for guaranteed delivery */
+        mtp_ulong mtp_addr_size;        /* maximum address size */
+        mtp_ulong mtp_addr_length;      /* address length */
+        mtp_ulong mtp_addr_offset;      /* address offset */
+        mtp_ulong mtp_current_state;    /* current interface state */
+        mtp_ulong mtp_serv_type;        /* service type */
+        mtp_ulong mtp_version;          /* version of interface */
+@} MTP_info_ack_t;
+
+#define M_COMS  1               /* Connection-mode @value{SHORT} service supported */
+#define M_CLMS  2               /* Connection-less @value{SHORT} service supported */
+@end smallexample
+
+@subsubheading Parameters
+
+The above fields have the following meaning:
+
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_INFO_ACK.
+@item mtp_msu_size
+Indicates the maximum MSU size.
+@item mtp_addr_size
+Indicates the (maximum) size of an @value{SHORT} address (@value{SHORT}-SAPI).
+@item mtp_addr_length
+Indicates the length of the bound and connected @value{SHORT} addresses.  When the stream is in a
+bound state, the @value{SHORT} addresses include the bound address.  When the stream is in a
+connected state and the service type is M_COMS, the @value{SHORT} addresses also includes the
+connected address.
+@item mtp_addr_offset
+Indicates the offset of the bound and connected @value{SHORT} addresses from the start of the
+@msg{M_PCPROTO} block.
+@item mtp_current_state
+Indicates the current state of the @value{SHORT} interface.
+@item mtp_serv_type
+Indicates the service type of the interface.  The service type is either M_COMS or M_CLMS.
+@item mtp_version
+Indicates the version of the interface.
+@end vtable
+
+@subsubheading Flags
+@subsubheading Valid States
+
+This primitive is valid in any state in response to an MTP_INFO_REQ primitive.
+@prindex MTP_INFO_REQ
+
+@subsubheading New State
+
+The state remains the same.
+
+@page
+@node Protocol Address Request
+@subsection Protocol Address Request
+@subsubheading MTP_ADDR_REQ
+@prindex MTP_ADDR_REQ
+
+This primitive requests that the @value{SHORT} return information concerning the @value{SHORT}
+addresses upon which the @value{SHORT}-User is bound or engaged in an association.
+
+The format of the message is one @msg{M_PROTO} message block and its structure is as follows:
+
+@smallexample
+typedef struct MTP_addr_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_ADDR_REQ */
+@} MTP_addr_req_t;
+@end smallexample
+@tpindex struct MTP_addr_req
+@tpindex MTP_addr_req_t
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.  This field is always coded MTP_ADDR_REQ.
+@end vtable
+
+@subsubheading Valid States
+
+This primitive is valid in any state.
+
+@subsubheading New State
+
+The new state is MTPS_WACK_AREQ.
+
+@subsubheading Rules
+
+@itemize ---
+@item
+If the stream is not in a bound state, no bound or connected address information will be returned in
+the MTP_ADDR_ACK.
+@item
+If the stream is bound and not connected, no connected address information will be returned in the
+MTP_ADDR_ACK.
+@end itemize
+
+@subsubheading Acknowledgements
+
+The @value{SHORT} will generate on of the following acknowledgements upon receipt of the MTP_ADDR_REQ
+primitive:
+
+@itemize ---
+@item @emph{Successful}:
+Correct acknowledgment of the primitive is indicated via the MTP_ADDR_ACK primitive.
+@item @emph{Unsuccessful (Non-fatal errors)}:
+These errors will be indicated via the MTP_ERROR_ACK primitive.  The applicable non-fatal errors are
+as follows:
+@vtable @var
+@item MSYSERR
+A system error occured and the UNIX system error is indicated in the primitive.
+@end vtable
+@end itemize
+
+@page
+@node Protocol Address Acknowledgement
+@subsection Protocol Address Acknowledgement
+
+@subsubheading MTP_ADDR_ACK
+@prindex MTP_ADDR_ACK
+
+This primitive acknowledges the corresponding request primitive and is used by the @value{SHORT} to
+return information concerning the local and remote protocol addresses for the stream.
+
+The format of the message is one @msg{M_PCPROTO} message block and its structure is as follows:
+
+@smallexample
+typedef struct MTP_addr_ack @{
+        mtp_ulong mtp_primitive;        /* always MTP_ADDR_ACK */
+        mtp_ulong mtp_loc_length;       /* length of local @value{SHORT} address */
+        mtp_ulong mtp_loc_offset;       /* offset of local @value{SHORT} address */
+        mtp_ulong mtp_rem_length;       /* length of remote @value{SHORT} address */
+        mtp_ulong mtp_rem_offset;       /* offset of remote @value{SHORT} address */
+@} MTP_addr_ack_t;
+@end smallexample
+@tpindex struct MTP_addr_ack
+@tpindex MTP_addr_ack_t
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_ADDR_ACK.
+@item mtp_loc_length
+Indicates the length of the local @value{SHORT} address (@value{SHORT}-SAPI).  If the stream is not
+bound to a local @value{SHORT}-SAPI, this field will be coded zero (0).
+@item mtp_loc_offset
+Indicates the offset of the local @value{SHORT} address (@value{SHORT}-SAPI) from the start of the
+@msg{M_PCPROTO} message block.  If the stream is not bound to a local @value{SHORT}-SAPI, this field
+will be coded zero (0).
+@item mtp_rem_length
+Indicates the length of the remote @value{SHORT} address (@value{SHORT}-SAPI).  If the stream is not
+connected to a remote @value{SHORT}-SAPI, this field will be coded zero (0).
+@item mtp_rem_offset
+Indicates the offset of the remote @value{SHORT} address (@value{SHORT}-SAPI) from the start of the
+@msg{M_PCPROTO} message block.  If the stream is not connected to a remote @value{SHORT}-SAPI, this
+field will be coded zero (0).
+@end vtable
+
+@subsubheading Valid State
+
+This primitive is valid in state MTP_WACK_AREQ.
+
+@subsubheading New State
+
+The new state is the state previous to the MTP_ADDR_REQ.
+
+@subsubheading Rules
+
+@itemize ---
+@item
+If the requesting stream is not bound to an @value{SHORT} address (@value{SHORT}-SAPI), the
+@value{SHORT} will code the @var{mtp_loc_length} and @var{mtp_loc_offset} fields to zero.
+Otherwise, the @value{SHORT} will return the same @value{SHORT} address that was returned in the
+MTP_BIND_ACK.
+@item
+If the requesting stream is not associated with a remote peer (i.e, not bound in a signalling
+relation), the @value{SHORT} will code the @var{mtp_rem_length} and @var{mtp_rem_offset} fields to
+zero.  Otherwise, the @value{SHORT} will indicate the remote @value{SHORT} address
+(@value{SHORT}-SAPI) of the associated remote @value{SHORT}-User.
+@end itemize
+
+@page
+@node Bind Protocol Address Request
+@subsection Bind Protocol Address Request
+@subsubheading MTP_BIND_REQ
+@prindex MTP_BIND_REQ
+
+This primitive requests that the @value{SHORT} bind an @value{SHORT}-User entity to an @value{SHORT}
+address (@value{SHORT}-SAPI).
+
+@subsubheading Format
+@tpindex struct MTP_bind_req
+@tpindex MTP_bind_req_t
+
+The format of the message is one @msg{M_PROTO} message block and its structure is as follows:
+
+@smallexample
+typedef struct MTP_bind_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_BIND_REQ */
+        mtp_ulong mtp_addr_length;      /* length of @value{SHORT} address */
+        mtp_ulong mtp_addr_offset;      /* offset of @value{SHORT} address */
+        mtp_ulong mtp_bind_flags;       /* bind flags */
+@} MTP_bind_req_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Is the primitive type.  This field is always coded MTP_BIND_REQ.
+@item mtp_addr_length
+Is the length in bytes of the @value{SHORT} address (@value{SHORT}-SAPI) to be bound to the stream.
+@item mtp_addr_offset
+Is the offset from the beginning of the @msg{M_PROTO} block where the @value{SHORT} address
+(@value{SHORT}-SAPI) begins.
+@item mtp_bind_flags
+See "Flags" below.
+@end vtable
+
+@subsubheading Flags
+
+Only one of the following flags may be set:
+
+@vtable @var
+@item MTP_MANAGEMENT
+When set, this flag indicates that this stream is to be bound only as @value{SHORT} management and
+not as an @value{SHORT}-User.  The stream can then invoke @value{SHORT} Management services for the
+bound @value{SHORT} entity.
+@item MTP_CONNECTION_ORIENTED
+When set, this flag specifies that this stream is to be bound for COMS service regardless of the
+Service Indicator in the bound address.
+@item MTP_CONNECTIONLESS
+When set, this flag specifies that this stream is to be bound for CLMS service regardless of the
+Service Indicator in the bound address.
+@end vtable
+
+When all flags are clear, the COMS or CLMS service type will be chosen according to the Service
+Indicator in the specified address.
+
+@subsubheading Valid States
+
+This primitive is valid in state MTPS_UNBND (see Appendix B).
+
+@subsubheading New State
+
+The new state is MTPS_WACK_BREQ.
+
+@subsubheading Acknowledgements
+
+The @value{SHORT} will generate one of the following acknowledgements upon receipt of the
+MTP_BIND_REQ primitive:
+
+@itemize ---
+@item @emph{Successful}:  Correct acknowledgement of the primitive is indicated via the MTP_BIND_ACK primitive.
+@item @emph{Non-fatal errors}:  These errors will be indicated viat the MTP_ERROR_ACK primitive.
+The applicable non-fatal errors are as follows:
+@vtable @var
+@item MSYSERR
+A system error occured and the UNIX system error is indicated in the primitive.
+@item MOUTSTATE
+The primitive was issued from an invalid state.
+@item MBADADDR
+The @value{SHORT} address (@value{SHORT}-SAPI) was in an incorrect format or the address contained
+illegal information.  It is not intended to indicate protocol errors.
+@item MNOADDR
+The @value{SHORT}-User did not provide an @value{SHORT} address (@value{SHORT}-SAPI) and the
+@value{SHORT} could not allocate an address to the user.
+@item MADDRBUSY
+The @value{SHORT}-User attempted to bind a second stream to an @value{SHORT} address
+(@value{SHORT}-SAPI).
+@item MACCESS
+The @value{SHORT}-User attempted to bind to an @value{SHORT} address (@value{SHORT}-SAPI) for which
+it did not have sufficient access permissions or attemtped to bind with the MTP_MANAGEMENT flag set
+and did not have permission to bind as @value{SHORT} management.
+@item MBOUND
+The @value{SHORT}-User attempted to bind a second stream to an @value{SHORT} address with the
+MTP_MANAGEMENT flag set.
+@item MBADPRIM
+The primitive format was incorrect (i.e. too short).
+@end vtable
+@end itemize
+
+@page
+@node Bind Protocol Address Acknowledgement
+@subsection Bind Protocol Address Acknowledgement
+@subsubheading MTP_BIND_ACK
+@prindex MTP_BIND_ACK
+
+This primitive indicates to the @value{SHORT}-User that the specified @value{SHORT}-User entity has
+been bound to the requested @value{SHORT} address (@value{SHORT}-SAPI).
+
+@subsubheading Format
+@tpindex struct MTP_bind_ack
+@tpindex MTP_bind_ack_t
+
+The format of the meessage is one @msg{M_PCPROTO} message block, and its structure is the following:
+
+@smallexample
+typedef struct MTP_bind_ack @{
+        mtp_ulong mtp_primitive;        /* always MTP_BIND_ACK */
+        mtp_ulong mtp_addr_length;      /* length of bound @value{SHORT} address */
+        mtp_ulong mtp_addr_offset;      /* offset of bound @value{SHORT} address */
+@} MTP_bind_ack_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_BIND_ACK.
+@item mtp_addr_length
+Is the length of the @value{SHORT} address (@value{SHORT}-SAPI) that was bound.
+@item mtp_addr_offset
+Is the offset from the beginning of the @msg{M_PCPROTO} block where the @value{SHORT} address
+(@value{SHORT}-SAPI) begins.
+
+The proper alignment of the address in the @msg{M_PCPROTO} message block is not guaranteed.
+@end vtable
+
+@subsubheading Rules
+
+The following rules apply to the binding of the specified @value{SHORT} address to the stream:
+
+@itemize ---
+@item
+If the @var{mtp_addr_length} field in the MTP_BIND_REQ primitive is zero, then the @value{SHORT} is
+to assign an @value{SHORT} address (@value{SHORT}-SAPI) to the user.
+@item
+The @value{SHORT} is to bind the @value{SHORT} address (@value{SHORT}-SAPI) as specified in the
+MTP_BIND_REQ primitive.  If the @value{SHORT} cannot bind the specified address, it may assign
+another @value{SHORT} address to the user.  It is the @value{SHORT}-User's responsibility to check
+the @value{SHORT} address returned in the MTP_BIND_ACK primitive to see if it is the same as the one
+requested.
+@end itemize
+
+@emph{If the above rules result in an error condition, then the @value{SHORT} must issue an
+MTP_ERROR_ACK primitive to the @value{SHORT}-User specifying the error as defined in the description
+of the MTP_BIND_REQ primitive.}
+
+@subsubheading Valid States
+
+This primitive is in response to an MTP_BIND_REQ primitive and is valid in the state MTPS_WACK_BREQ.
+
+@subsubheading New State
+
+The new state is MTPS_IDLE.
+
+@page
+@node Unbind Protocol Address Request
+@subsection Unbind Protocol Address Request
+@subsubheading MTP_UNBIND_REQ
+@prindex MTP_UNBIND_REQ
+
+This primitive requests that the @value{SHORT} unbind the @value{SHORT}-User entity that was
+previously bound to the @value{SHORT} address (@value{SHORT}-SAPI).
+
+@subsubheading Format
+@tpindex struct MTP_unbind_req
+@tpindex MTP_unbind_req_t
+
+The format of the message is one @msg{M_PROTO} block, and its structure is as follows:
+
+@smallexample
+typedef struct MTP_unbind_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_UNBIND_REQ */
+@} MTP_unbind_req_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_UNBIND_REQ.
+@end vtable
+
+@subsubheading Valid States
+
+This primitive is valid in the MTPS_IDLE state.
+
+@subsubheading New State
+
+The new state is MTPS_WACK_UREQ.
+
+@subsubheading Acknowledgements
+
+This primitive requires the @value{SHORT} to generate the following acknolwedgements upon receipt of
+the primitive:
+
+@itemize ---
+@item @emph{Successful}:  Correct acknowledgement of the primitive is indicated via the MTP_OK_ACK
+primtiive.
+@item @emph{Unsuccessful (Non-fatal errors)}:  These errors will be indicated via the MTP_ERROR_ACK
+primitive.  The applicable non-fatal errors are as follows:
+@vtable @var
+@item MOUTSTATE
+The primitive was issued from an invalid state.
+@item MSYSERR
+A system error has occured and the UNIX system error is indicated in the primtiive.
+@end vtable
+@end itemize
+
+@page
+@node @value{LONG} Options Management Request
+@subsection @value{LONG} Options Management Request
+@subsubheading MTP_OPTMGMT_REQ
+@prindex MTP_OPTMGMT_REQ
+
+This primitive allows the @value{SHORT}-User to manage the @value{SHORT} parameter values associated
+with the stream.
+
+@subsubheading Format
+@tpindex struct MTP_optmgmt_req
+@tpindex MTP_optmgmt_req_t
+
+The format of the message is one @msg{M_PROTO} message block, and its structure is as follows:
+
+@smallexample
+typedef struct MTP_optmgmt_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_OPTMGMT_REQ */
+        mtp_ulong mtp_opt_length;       /* length of options */
+        mtp_ulong mtp_opt_offset;       /* offset of options */
+        mtp_ulong mtp_mgmt_flags;       /* management flags */
+@} MTP_optmgmt_req_t;
+
+#define MTP_DEFAULT     0UL
+#define MTP_CHECK       1UL
+#define MTP_NEGOTIATE   2UL
+#define MTP_CURRENT     3UL
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.  This field is always coded MTP_OPTMGMT_REQ.
+@item mtp_opt_length
+Specifies the length of the default values of the options parameters as selected by the
+@value{SHORT}-User.
+These values will be used in subsequent @msg{M_DATA} transfers to the stream.  If the
+@value{SHORT}-User cannot determine the value of an option, it value should be set to MTP_UNKNOWN.
+If the @value{SHORT}-User does not specify any option parameter values, the length of this field
+should be set to zero.
+@item mtp_opt_offset
+Specifies the offset of the options parameters from the beginning of the @msg{M_PROTO} message block.
+@item mtp_mgmt_flags
+See "Flags" below.
+@end vtable
+
+@subsubheading Flags
+
+@vtable @var
+@item MTP_DEFAULT
+Requests that the @value{SHORT} return the default option settings for the specified (or all)
+options in a MTP_OPTMGMT_ACK primitive.
+@item MTP_CHECK
+Requests that the @value{SHORT} check the specified options and return the success or failure of
+each specified option in an MTP_OPTMGMT_ACK primitive.
+@item MTP_NEGOTIATE
+Requests that the @value{SHORT} negotiate the value of the specified options and return the success
+or failure and the negotiated value in an MTP_OPTMGMT_ACK primitive.
+@item MTP_CURRENT
+Requests that the @value{SHORT} return the current option settings for the specified (or all)
+options in a MTP_OPTMGMT_ACK primitive.
+@end vtable
+
+Only one of the above flags can be set.
+
+@subsubheading Valid States
+
+This primitive is valid in the MTPS_IDLE state.
+
+@subsubheading New State
+
+The new state is MTPS_WACK_OPTREQ.
+
+@subsubheading Acknowledgements
+
+The MTP_OPTMGMT_REQ primitive requires the @value{SHORT} to generate one of the following
+acknowledgements upon receipt of the primitive:
+
+@itemize ---
+@item @emph{Successful}:  Acknowledgement is via the MTP_OK_ACK primitive.  At successful
+completions, the resulting state is MTPS_IDLE.
+@item @emph{Non-fatal errors}:  These errors are indicated in the MTP_ERROR_ACK primitive.  The
+resulting state remains unchanged.  The applicable non-fatal errors are defined as follows:
+@vtable @var
+@item MSYSERR
+A system error has occurred and the UNIX system error is indicated in the primitive.
+@item MOUTSTATE
+The primitive was issued from an invalid state.
+@item MBADOPT
+The option parameter values specified are outside the range supported by the @value{SHORT}.
+@item MBADOPTTYPE
+The option structure tupe is not supported by the @value{SHORT}.
+@item MBADFLAG
+The flags were invalid or unsupported, or the combination of flags was invalid.
+@item MBADPRIM
+The primitive format was incorrect (i.e. too short).
+@item MACCESS
+The user did not have proper permissions.
+@end vtable
+@end itemize
+
+@page
+@node Error Acknowledgement
+@subsection Error Acknowledgement
+@subsubheading MTP_ERROR_ACK
+@prindex MTP_ERROR_ACK
+
+This primitive indicates to the @value{SHORT}-User that a non-fatal error has occured in the last
+@value{SHORT}-User or @value{SHORT}-Management originated primitive.  This may only be initiated as
+an acknowledgement for those primitives that require one.  It also indicates to the user that no
+action was taken on the primitive that caused the error.
+
+@subsubheading Format
+@tpindex struct MTP_error_ack
+@tpindex MTP_error_ack_t
+
+The format of the mssage is one @msg{M_PCPROTO} message block, and its structure is as follows:
+
+@smallexample
+typedef struct MTP_error_ack @{
+        mtp_ulong mtp_primitive;        /* always MTP_ERROR_ACK */
+        mtp_ulong mtp_error_primitive;  /* primitive in error */
+        mtp_ulong mtp_mtpi_error;       /* @value{SHORT} interface error */
+        mtp_ulong mtp_unix_error;       /* UNIX error */
+@} MTP_error_ack_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Identifies the primitive type.  This field is always coded MTP_ERROR_ACK.
+@item mtp_error_primitive
+Identifies the primitive type that cause the error.
+@item mtp_mtpi_error
+Contains the @value{LONG} Interface error code.
+@item mtp_unix_error
+Contains the UNIX system error code.  This may only be non-zero if the @var{mtp_mtpi_error} is
+equal to MSYSERR.
+@end vtable
+
+@subsubheading Valid Error Codes
+
+@emph{The following error codes are allowed to be returned:}
+
+@vtable @var
+@item MSYSERR
+A system error has occurred and the UNIX system error is indicated in the primitive.
+@item MOUTSTATE
+The primitive was issued from an invalid state.
+@item MBADADDR
+The @value{SHORT} address as specified in the primitive was in an incorrect format, or the address contained
+illegal information.
+@item MBADOPT
+The options values as specified in the primitive were in an incorrect format, or they contained
+illegal information.
+@item MBADOPTTYPE
+The option structure tupe is not supported by the @value{SHORT}.
+@item MNOADDR
+The @value{SHORT} could not allocate an address.
+@item MADDRBUSY
+The @value{SHORT} could not use the specified address because the specified address is already in use.
+@item MBADFLAG
+The flags specified in the primitive were incorrect or illegal.
+@item MNOTSUPPORT
+Specified primitive type is not known to the @value{SHORT}.
+@item MBADPRIM
+The primitive was of an incorrect format (i.e. too small, or an offset it out of range).
+@item MACCESS
+The user did not have proper permissions.
+@end vtable
+
+@subsubheading Valid States
+
+This primitive is valid in all states that have a pending acknowledgment or confirmation.
+
+@subsubheading New State
+
+The new state is the same as the one from which the acknowledged request or response was issued.
+
+@page
+@node Successful Receipt Acknowledgements
+@subsection Successful Receipt Acknowledgements
+@subsubheading MTP_OK_ACK
+@prindex MTP_OK_ACK
+
+The primitive indicates to the @value{SHORT}-User that the previous @value{SHORT}-User or management
+originated primitive was received successfully by the @value{SHORT}.  It does not indicate to the
+@value{SHORT}-User any @value{SHORT} protocol action taken due to the issuance of the last
+primitive.  The MTP_OK_ACK primitive may only be initiated as an acknowledgement for those user or
+management originated primitives that have no other means of confirmation.
+
+@subsubheading Format
+@tpindex struct MTP_ok_ack
+@tpindex MTP_ok_ack_t
+
+The format of the mssage is one @msg{M_PCPROTO} message block, and its structrue is as follows:
+
+@smallexample
+typedef struct MTP_ok_ack @{
+        mtp_ulong mtp_primitive;        /* always MTP_OK_ACK */
+        mtp_ulong mtp_correct_prim;     /* correct primitive */
+@} MTP_ok_ack_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Identifies the primitive.  This field is always coded MTP_OK_ACK.
+@item mtp_correct_prim
+Identifies the successfully received primitive type.
+@end vtable
+
+@subsubheading Valid States
+
+This primitive is issued in states MTPS_WACK_UREQ, MTPS_WACK_OPTREQ, MTPS_WACK_CREQ and
+MTPS_WACK_DREQ.
+
+@subsubheading New State
+
+The resulting state depends on the current state (see Appendix B, Tables B-7 and B-8.).
+
+@page
+@node Connection Mode and Connectionless Primitives
+@section Connection Mode and Connectionless Primitives
+
+@menu
+* Signalling Relation Establishment Phase::
+* Signalling Relation Data Transfer Phase::
+* Signalling Relation Release Phase::
+@end menu
+
+This section describes the format of the COMS primitives and the rules associated with these
+primitives.  The default values of the options parameters associated with an @value{SHORT}
+association may be selected via the @prim{MTP_OPTMGMT_REQ} primitive.
+
+@node Signalling Relation Establishment Phase
+@subsection Signalling Relation Establishment Phase
+
+The following @value{SHORT} service primitives pertain to the establishment of an association
+between local and remote @value{SHORT}-SAPs, provided the @value{SHORT} users exist, and are known
+to the @value{SHORT}.
+
+@subsubsection @value{LONG} Connection Request
+@subsubheading MTP_CONN_REQ
+@prindex MTP_CONN_REQ
+
+This primitive requests that the @value{SHORT} form an association to the specified destination.
+
+@subsubheading Format
+@tpindex struct MTP_conn_req
+@tpindex MTP_conn_req_t
+
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+message block is as follows:
+
+@smallexample
+typedef struct MTP_conn_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_CONN_REQ */
+        mtp_ulong mtp_addr_length;      /* length of @value{SHORT} address to connect */
+        mtp_ulong mtp_addr_offset;      /* offset of @value{SHORT} address to connect */
+        mtp_ulong mtp_conn_flags;       /* connect flags */
+@} MTP_conn_req_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.  This field is always coded MTP_CONN_REQ.
+@item mtp_addr_length
+Specifies the length of the @value{SHORT} address (@value{SHORT}-SAPI) of the peer to which a
+signalling relation is to be established.  If no @value{SHORT} address is provided by the
+@value{SHORT}-User, this field must be coded zero (0).  The coding of the @value{SHORT} address
+(@value{SHORT}-SAPI) is protocol and provider-specific.
+@item mtp_addr_offset
+Specifies the offset of the @value{SHORT} address (@value{SHORT}-SAPI) from the beginning of the
+@msg{M_PROTO} message block.
+@item mtp_conn_flags
+Indicates a bit field of connection options.  (See @emph{Flags} below.)
+@end vtable
+
+@subsubheading Flags
+
+@subsubheading Rules
+
+The following rules apply to the establishment of associations between the specified addresses:
+
+@itemize ---
+@item
+If the @var{mtp_addr_length} field in the MTP_CONN_REQ primitive is zero, then the @value{SHORT} is
+to select a remote @value{SHORT} address (@value{SHORT}-SAPI) with which to associate.  If the
+@value{SHORT} cannot select a address for the association, the @value{SHORT} responds with an
+MTP_ERROR_ACK primitive with error MNOADDR.
+@item
+If the @var{mtp_addr_length} field in the MTP_CONN_REQ primitive is non-zero, the @value{SHORT} is
+to associate with the specified remote @value{SHORT} address (@value{SHORT}-SAPI).  if the
+@value{SHORT} cannot associate with the specified remote @value{SHORT} address (@value{SHORT}-SAPI),
+the primitive will fail and the @value{SHORT} will return an MTP_ERROR_ACK primitive with the
+appropriate error value (e.g, MBADADDR).
+@end itemize
+
+The following rules apply to the @value{SHORT} addresses (@value{SHORT}-SAPIs):
+
+@itemize ---
+@item
+If the @value{SHORT}-User does not specify an @value{SHORT} address (i.e. @var{mtp_addr_length} is
+set to zero), then the @value{SHORT} may attempt to assign a remote @value{SHORT} address
+(@value{SHORT}-SAPI) and associate it with the stream for the duration of the association.
+@end itemize
+
+@subsubheading Valid States
+
+This primitive is valid in state MTPS_IDLE.
+
+@subsubheading New State
+
+The new state is MTPS_DATA_XFER.
+
+@subsubheading Acknowledgements
+
+The following acknolwedgements are valid for this primitive:
+
+@itemize ---
+@item @emph{Successful}: Correct acknowledgement of the primtive is indicated via the MTP_OK_ACK
+primitive.
+@item @emph{Unsuccessful (Non-fatal errors)}:  These are indicated via the MTP_ERROR_ACK primitive.
+The applicable non-fatal errors are defined as follows:
+@vtable @var
+@item MSYSERR
+A system error has occurred and the UNIX system eror is indicated in the primitive.
+@item MOUTSTATE
+The primitive was issued from an invalid state.
+@item MBADADDR
+The @value{SHORT} address as specified in the primitive was in an incorrect format, or the address
+contained illegal information.
+@item MNOADDR
+The user did not provide an @value{SHORT} address and one was required by the @value{SHORT}.  The
+@value{SHORT} could not select a remote @value{SHORT} address
+(@value{SHORT}-SAPI).
+@item MADDRBUSY
+The @value{SHORT} could not use the specified address because the specified address is already in
+use.
+@item MBADFLAG
+The specified flags were invalid.
+@item MNOTSUPPORT
+The primitive is not supported for by the @value{SHORT} provider.
+@item MBADPRIM
+The primitive was of an incorrect format (i.e. too small, or an offset it out of range).
+@item MACCESS
+The user did not have proper permissions for the use of the requested address.
+@end vtable
+@end itemize
+
+@page
+@node Signalling Relation Data Transfer Phase
+@subsection Signalling Relation Data Transfer Phase
+
+The data transfer service primitive provide for an exchange of @value{SHORT}-User data, known as
+MSDUs, in either direction or in both directions simultaneously on a signalling relation.  The
+@value{SHORT} service preserves the sequence of MSDUs that have the same Signalling Link Selection
+(SLS) value specified in the MTP_TRANSFER_REQ.  MSDUs are self-contained messages with implicit
+boundaries.
+
+The following @value{SHORT} service primtiives pertain to the Data Transfer phase of a signalling
+relation.
+
+@subsubsection @value{LONG} Transfer Request
+@subsubheading MTP_TRANSFER_REQ
+@prindex MTP_TRANSFER_REQ
+
+This user-originated primitive indicates to the @value{SHORT} that this message contains
+@value{SHORT}-User data.  It allows the transfer of @value{SHORT}-User data between
+@value{SHORT}-Users, without modification by the @value{SHORT} provider.
+
+The @value{SHORT}-User must send an integral number of octets of data greater than zero.  In a case
+where the size of the MSDU exceeds the MIDU (as specified by the size of the @pval{MIDU_size}
+parameter of the @prim{MTP_INFO_ACK} primitive), the MSDU may be broken up into more than one MIDU.
+When an MSDU is broken up into more than one MIDU, the @pval{MTP_MORE_DATA_FLAG} will be set on each
+MIDU except the last one.
+
+@subsubheading Format
+@tpindex struct MTP_transfer_req
+@tpindex MTP_transfer_req_t
+
+The format of the message is one or more @msg{M_DATA} blocks.  Use of a @msg{M_PROTO} message block
+is optional.  The @msg{M_PROTO} message block is used for two reasons:
+
+@enumerate
+@item
+to indicate that the MSDU is broken into more than one MIDU, and that the data carried in the
+following @msg{M_DATA} message block constitutes one MIDU;
+@item
+to indicate the message priority and signalling link selection to be associated with the MSDU.
+@end enumerate
+
+@noindent
+@emph{Guidelines for the use of @msg{M_PROTO}}
+
+The following guidelines must be followed with respect to the use of the @msg{M_PROTO} message
+block:
+
+@enumerate
+@item
+The @msg{M_PROTO} message block need not be present when the MSDU size is less than or equal to the
+MIDU size and one of the following is true:
+@itemize @minus{}
+@item
+the values of the message priority and signalling link selection have been previously set with the
+MTP_OPTMGMT_REQ primitive; or
+@item
+the default values of the message priority and signalling link selection are to be specified.
+@end itemize
+@item
+The @msg{M_PROTO} message block must be present when:
+@itemize @minus{}
+@item
+The MSDU size is greater than the MIDU size.
+@item
+the values of the message priority or signalling link selection as specified by the MTP_OPTMGMT_REQ
+primitive needs to be overriden for this MSDU.
+@end itemize
+@end enumerate
+
+The format of the @msg{M_PROTO} message block, if present, is as follows:
+
+@smallexample
+typedef struct MTP_transfer_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_TRANSFER_REQ */
+        mtp_ulong mtp_dest_length;      /* length of destination address */
+        mtp_ulong mtp_dest_offset;      /* offset of destination address */
+        mtp_ulong mtp_mp;               /* message priority */
+        mtp_ulong mtp_sls;              /* signalling link selection */
+@} MTP_transfer_req_t;
+@end smallexample
+
+@subsubheading Parameters
+
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.  This field is always coded @var{MTP_TRANSFER_REQ}.
+@item mtp_dest_length
+Specifies the length of the destination @value{SHORT} address (@value{SHORT}-SAPI) to which the
+message is to be sent.  If the stream is connected in an established signalling relation, this field
+may be coded zero (0).
+@item mtp_dest_offset
+Specifies the offset of the destination @value{SHORT} address (@value{SHORT}-SAPI) from the
+beginning of the @msg{M_PROTO} message block.
+@item mtp_mp
+Specifies the message priority to be used when sending the message.  Support for message priority is
+protocol variant
+and provider specific.
+@item mtp_sls
+Specifies the signalling link selection value to be used when sending the message.  If this field is
+coded MTP_UNKNOWN (-1) then the @value{SHORT} provider will choose a value of the signalling link
+selection which best performs loadsharing of the resulting message traffic.
+@end vtable
+
+@subsubheading Rules
+
+If the signalling relation is associated with a single destination address (@value{SHORT}-SAPI),
+@msg{M_DATA} blocks can be used with no @msg{M_PROTO} block to transfer messages.  The destination
+adddress and the values of SLS and MP will be the default values or the laster values that were
+successfully set with MTP_OPTMGMT_REQ.
+
+@subsubheading Valid States
+
+This primitive is valid in state MTP_IDLE for connectionless streams and in state MTP_DATA_XFER for
+pseudo-connection oriented streams.
+
+@subsubheading New State
+
+The new state is unchanged.
+
+@subsubheading Acknowledgements
+
+This primitive does not require any acknowledgements, although it may generate a fatal error.  This
+is indicated to the @value{SHORT}-User via a @msg{M_ERROR} STREAMS message type (specifying an errno
+value of @errno{EPROTO}) which results in the failure of all system calls on that stream.  The
+applicable errors are defined as follows:
+
+@vtable @errno
+@item EPROTO
+This indicates one of the following unrecoverable protocol conditions:
+@itemize ---
+@item
+The @value{SHORT} interface was found to be in an incorrect state.
+@item
+The amount of @value{SHORT}-User data associated wtih the primitive was outside the range supported
+by the @value{SHORT} (as specified in the MIDU_size parameter of the MTP_INFO_ACK primitive).
+@item
+The options requested are either not support by the @value{SHORT}.
+@item
+The @msg{M_PROTO} message block was not followed by one or more @msg{M_DATA} message blocks.
+@item
+The amount of @value{SHORT}-User data associated with the current MSDU is outside the range
+supported by the @value{SHORT} (as specified by the MSDU_size parameter in the MTP_INFO_ACK
+primitive.)
+@item
+The flags field contained an unknown value.
+@end itemize
+
+@strong{Note.} @i{If the interface is in the MTP_IDLE state when the provider received the
+MTP_TRANSFER_REQ primitive, then the @value{SHORT} should discard the request without generating a
+fatal error.}
+@end vtable
+
+@page
+@subsubsection @value{LONG} Transfer Indication
+@subsubheading MTP_TRANSFER_IND
+@prindex MTP_TRANSFER_IND
+@subsubheading Format
+@tpindex struct MTP_transfer_ind
+@tpindex MTP_transfer_ind_t
+The format of this message is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks.  The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct MTP_transfer_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_TRANSFER_IND */
+        mtp_ulong mtp_srce_length;      /* length of source address */
+        mtp_ulong mtp_srce_offset;      /* offset of source address */
+        mtp_ulong mtp_mp;               /* message priority */
+        mtp_ulong mtp_sls;              /* signalling link selection */
+} MTP_transfer_ind_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_TRANSFER_IND.
+@item mtp_srce_length
+@item mtp_srce_offset
+@item mtp_mp
+@item mtp_sls
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+This primitive is valid in state MTP_DATA_XFER.
+@subsubheading New State
+The new state is unchanged.
+
+@page
+@subsubsection @value{LONG} Status Indication
+@subsubheading MTP_STATUS_IND
+@prindex MTP_STATUS_IND
+@subsubheading Format
+@tpindex struct MTP_status_ind
+@tpindex MTP_status_ind_t
+The format of the message is one @msg{M_PCPROTO} message block.  The structure of the
+@msg{M_PCPROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct MTP_status_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_STATUS_IND */
+        mtp_ulong mtp_addr_length;      /* length of affected MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
+        mtp_ulong mtp_type;             /* type */
+        mtp_ulong mtp_status;           /* status */
+} MTP_status_ind_t;
+
+/* Type for MTP_STATUS_IND */
+#define MTP_STATUS_TYPE_CONG            0x00    /* congestion */
+#define MTP_STATUS_TYPE_UPU             0x01    /* user part unavailability */
+
+/* Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_UPU */
+#define MTP_STATUS_UPU_UNKNOWN          0x01    /* unknown */
+#define MTP_STATUS_UPU_UNEQUIPPED       0x02    /* unequipped remote user. */
+#define MTP_STATUS_UPU_INACCESSIBLE     0x03    /* inaccessible remote user. 
+                                                 */
+
+/* Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_CONG */
+#define MTP_STATUS_CONGESTION_LEVEL0    0x00    /* congestion level 0 */
+#define MTP_STATUS_CONGESTION_LEVEL1    0x01    /* congestion level 1 */
+#define MTP_STATUS_CONGESTION_LEVEL2    0x02    /* congestion level 2 */
+#define MTP_STATUS_CONGESTION_LEVEL3    0x03    /* congestion level 3 */
+#define MTP_STATUS_CONGESTION           0x04    /* congestion */
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.  This field is always coded MTP_STATUS_IND.
+@item mtp_addr_length
+Indicates the length of the affected @value{SHORT} address (@value{SHORT}-SAPI).
+@item mtp_addr_offset
+Indicates the offset of the affected @value{SHORT} address (@value{SHORT}-SAPI) from the beginning
+of the @msg{M_PCPROTO} message block.
+@item mtp_type
+Inidcates the type of the status indication.  See @emph{Type and Status} below.
+@item mtp_status
+Inidcates the status of the status indication.  See @emph{Type and Status} below.
+@end vtable
+@subsubheading Type and Status
+@vtable @var
+@item MTP_STATUS_TYPE_CONG
+This type indicates that the affected @value{SHORT} adddress (@value{SHORT}-SAPI) is experiencing
+congestion and that the mtp_status field contains information pertaining to the degree of congestion
+experienced by the affected destination as follows:
+@vtable @var
+@item MTP_STATUS_CONGESTION_LEVEL0
+Signalling network congestion towards the affected destination has dropped to level zero (0),
+indicating that there is no longer signalling network congestion towards the affected destination.
+Whether this indication is given at all is protocol variant and provider-specific.
+@item MTP_STATUS_CONGESTION_LEVEL1
+Signalling network congestion towards the affected destination has onset or abated to level one (1).
+If possible, the @value{SHORT}-User should withdraw from issuing MTP_TRANSFER_REQ primitives with
+mtp_mp fields set to less than one (1) to the affected destination.
+@item MTP_STATUS_CONGESTION_LEVEL2
+Signalling network congestion towards the affected destination has onset or abated to level two (2).
+If possible, the @value{SHORT}-User should withdraw from issuing MTP_TRANSFER_REQ primitives with
+mtp_mp fields set to less than two (2) to the affected destination.
+@item MTP_STATUS_CONGESTION_LEVEL3
+Signalling network congestion towards the affected destination has onset or abated to level three
+(3).  If possible, the @value{SHORT}-User should withdraw from issuing MTP_TRANSFER_REQ primitives
+with mtp_mp fields set to less than three (3) to the affected destination.
+@item MTP_STATUS_CONGESTION
+Signalling network congestion exists towards the affected destination.  If possible, the
+@value{SHORT}-User should withdraw from issuing MTP_TRANSFER_REQ primitives of lower priority to the
+affected destination.
+@end vtable
+
+@emph{@value{SHORT} congestion level status is protocol variant and provider specific.  See the
+Addendum for more information.}
+@item MTP_STATUS_TYPE_UPU
+This type indicates that the affected @value{SHORT} address (@value{SHORT}-SAPI) has no accessible
+corresponding @value{SHORT}-User and that the mtp_status field contains information pertianing to
+the nature of the inaccessibility of the remote @value{SHORT}-User at the affected destination as
+follows:
+@item MTP_STATUS_UPU_UNKNOWN
+Indicates that the reason for inaccessibility of the remote @value{SHORT}-User is unknown.
+@item MTP_STATUS_UPU_UNEQUIPPED
+Indicates that the reason for inaccessibility of the remote @value{SHORT}-User is that the remote
+@value{SHORT}-User is not equipped at the affected @value{SHORT} address (@value{SHORT}-SAPI).
+@item MTP_STATUS_UPU_INACCESSIBLE
+Indicates that the reason for inaccessibility of the remote @value{SHORT}-User is that the remote
+@value{SHORT}-User is temporarily inaccessible at the affected @value{SHORT} address
+(@value{SHORT}-SAPI).
+@end vtable
+
+@emph{@value{SHORT} user part status is protocol variant and provider specific.  See the Addendum
+for more information.}
+
+@subsubheading Rules
+@subsubheading Valid States
+This primitive is valid in state MTPS_DATA_XFER.
+@subsubheading New State
+The new state is unchanged (MTPS_DATA_XFER).
+
+@page
+@subsubsection @value{LONG} Pause Indication
+@subsubheading MTP_PAUSE_IND
+@prindex MTP_PAUSE_IND
+This primitive indicates to the @value{SHORT}-User that the indicated remote @value{SHORT}-entity
+(signalling point) is temporarily inaccessible.  This implies the inaccessibility of remote
+@value{SHORT}-User at the affected signalling point.
+@subsubheading Format
+@tpindex struct MTP_pause_ind
+@tpindex MTP_pause_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+message block is as follows:
+@smallexample
+@verbatim
+typedef struct MTP_pause_ind {
+        mtp_ulong mtp_primitive;        /* always MTP_PAUSE_IND */
+        mtp_ulong mtp_addr_length;      /* length of affected MTP address */
+        mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
+} MTP_pause_ind_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@item mtp_addr_length
+Indicates the length of the @value{SHORT} address (@value{SHORT}-SAPI) corresponding to the affected
+remote @value{SHORT}-entity.
+@item mtp_addr_offset
+Indicates the offset of the @value{SHORT} address (@value{SHORT}-SAPI) from the beginning of the
+@msg{M_PROTO} message block.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+This primitive is valid in state MTPS_DATA_XFER.
+@subsubheading New State
+The new state is unchanged (MTPS_DATA_XFER).
+
+@page
+@subsubsection @value{LONG} Resume Indication
+@subsubheading MTP_RESUME_IND
+@prindex MTP_RESUME_IND
+This primitive indicates to the @value{SHORT}-User that a previously inaccesible remote
+@value{SHORT}-entity (signalling point) is now accessible.  This does not imply the accessibility of
+the remote @value{SHORT}-User at the affected signalling point: the @value{SHORT}-User is
+responsible for sending protocol messages to the remote @value{SHORT}-User to test its
+accessibility.
+@subsubheading Format
+@tpindex struct MTP_resume_ind
+@tpindex MTP_resume_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+typedef struct MTP_resume_ind @{
+        mtp_ulong mtp_primitive;        /* always MTP_RESUME_IND */
+        mtp_ulong mtp_addr_length;      /* length of affected @value{SHORT} address */
+        mtp_ulong mtp_addr_offset;      /* offset of affected @value{SHORT} address */
+@} MTP_resume_ind_t;
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@item mtp_addr_length
+Indicates the length of the @value{SHORT} address (@value{SHORT}-SAPI) corresponding to the affected
+remote @value{SHORT}-entity.
+@item mtp_addr_offset
+Indicates the offset of the @value{SHORT} address (@value{SHORT}-SAPI) from the beginning of the
+@msg{M_PROTO} message block.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+This primitive is valid in state MTPS_DATA_XFER.
+@subsubheading New State
+The new state is unchanged (MTPS_DATA_XFER).
+
+@page
+@subsubsection @value{LONG} Restart Complete Indication
+@subsubheading MTP_RESTART_COMPLETE_IND
+@prindex MTP_RESTART_COMPLETE_IND
+@subsubheading Format
+@tpindex struct MTP_restart_complete_ind
+@tpindex MTP_restart_complete_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+typedef struct MTP_restart_complete_ind @{
+        mtp_ulong mtp_primitive;        /* always MTP_RESTART_COMPLETE_IND */
+@} MTP_restart_complete_ind_t;
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+This primitive is valid in state MTPS_DATA_XFER.
+@subsubheading New State
+The new state is unchanged (MTPS_DATA_XFER).
+
+@page
+@node Signalling Relation Release Phase
+@subsection Signalling Relation Release Phase
+@subsubsection @value{LONG} Disconnect Request
+@subsubheading MTP_DISCON_REQ
+@prindex MTP_DISCON_REQ
+@subsubheading Format
+@tpindex struct MTP_discon_req
+@tpindex MTP_discon_req_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+typedef struct MTP_discon_req @{
+        mtp_ulong mtp_primitive;        /* always MTP_DISCON_REQ */
+@} MTP_discon_req_t;
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+This primitive is valid in state MTPS_DATA_XFER.
+@subsubheading New State
+The new state is MTPS_WACK_DREQ.
+@subsubheading Acknowledgements
+
+@page
+@node @value{SHORT} Provider Management Primitives
+@section @value{SHORT} Provider Management Primitives
+@subsection Link Management Primitives
+@subsubsection Link Inhibit Request
+@subsubheading MTP_INHIBIT_REQ
+@prindex MTP_INHIBIT_REQ
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.
+@end vtable
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+@page
+@subsubsection Link Inhibit Indication
+@subsubheading MTP_INHIBIT_IND
+@prindex MTP_INHIBIT_IND
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Link Inhibit Confirmation
+@subsubheading MTP_INHIBIT_CON
+@prindex MTP_INHIBIT_CON
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Link Uninhibit Request
+@subsubheading MTP_UNINHIBIT_REQ
+@prindex MTP_UNINHIBIT_REQ
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.
+@end vtable
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+@page
+@subsubsection Link Uninhibit Indication
+@subsubheading MTP_UNINHIBIT_IND
+@prindex MTP_UNINHIBIT_IND
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Link Uninhibit Confirmation
+@subsubheading MTP_UNINHIBIT_CON
+@prindex MTP_UNINHIBIT_CON
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsection Route Management Primitives
+@subsubsection Route Prohibit Request
+@subsubheading MTP_PROHIBIT_REQ
+@prindex MTP_PROHIBIT_REQ
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.
+@end vtable
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+@page
+@subsubsection Route Prohibit Indication
+@subsubheading MTP_PROHIBIT_IND
+@prindex MTP_PROHIBIT_IND
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Route Prohibit Confirmation
+@subsubheading MTP_PROHIBIT_CON
+@prindex MTP_PROHIBIT_CON
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Route Allow Request
+@subsubheading MTP_ALLOW_REQ
+@prindex MTP_ALLOW_REQ
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Specifies the primitive type.
+@end vtable
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+@page
+@subsubsection Route Allow Indication
+@subsubheading MTP_ALLOW_IND
+@prindex MTP_ALLOW_IND
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Route Allow Confirmation
+@subsubheading MTP_ALLOW_CON
+@prindex MTP_ALLOW_CON
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsection Layer Management Primitives
+@subsubsection Layer Event Indication
+@subsubheading MTP_EVENT_IND
+@prindex MTP_EVENT_IND
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Statistics Indication
+@subsubheading MTP_STATS_IND
+@prindex MTP_STATS_IND
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+block is as follows:
+@smallexample
+
+@end smallexample
+@subsubheading Parameters
+@vtable @var
+@item mtp_primitive
+Indicates the primitive type.
+@end vtable
+@subsubheading Rules
+@subsubheading Valid States
+@subsubheading New State
+
+@node Diagnostics Requirements
+@chapter Diagnostics Requirements
+
+Two error handling facilities should be provided to the @value{SHORT} user: one to handle non-fatal
+errors, and the other to handle fatal errors.
+
+@section Non-Fatal Error Handling Facility
+
+These are errors that do not change the state of the @value{SHORT} service interface as seen by the
+@value{SHORT} service user, and provide the user the option of reissuing the @value{SHORT} service
+primitive with the corrected options specification.  The non-fatal error handling is provided only
+to those primitive that require acknowledgements, and uses the @prim{MTP_ERROR_ACK} primitive to
+report these errors.  These errors retain the state of hte @value{SHORT} service interface the same
+as it was before the @value{SHORT} service provider received the primitive that was in error.
+Syntax errros and rule violations are reported via the non-fatal error handling facility.
+
+@section Fatal Error Handling Facility
+
+These errors are issued by the @value{SHORT} provider when it detects errors that are not
+correctable by the @value{SHORT} user, or if it is unable to report a correctible error to the
+@value{SHORT} user.  Fatal errors are indicated via the STREAMS message type @msg{M_ERROR} with the
+UNIX system error @errno{EPROTO}.  The @msg{M_ERROR} STREAMS message type will result in the failure
+of all the UNIX system calls on the stream.  The @value{SHORT} user can recover from a fatal error
+by having all the processes close the files associated with the stream, and then reopening them for
+processing.
+
+These errors are issued by the @value{SHORT} when it detects errors that are not correctable by the
+@value{SHORT} service user, or if it is unable to report a correctable error to the @value{SHORT}
+service user.  Fatal errors are indicated via the STREAMS message type @msg{M_ERROR} with the UNIX
+system error @errno{EPROTO}.  The @msg{M_ERROR} STREAMS message type will result in the failure of
+all the UNIX system calls on the stream.  The @value{SHORT} service user can recover from a fatal
+error by having all the processes close the files associated with the stream, and then reopening
+them for processing.
+
+@node @value{INTERFACE} Input-Output Controls
+@chapter @value{INTERFACE} Input-Output Controls
+@cindex @value{INTERFACE} input-output controls
+
+@section @value{SHORT} Protocol Object Options
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_option @{
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        /* followed by object-specific protocol options structure */
+@} mtp_option_t;
+@end smallexample
+@subsubheading Fields
+@vtable @var
+@item type
+The object type.  The object type is one of the following objects:
+@vtable @var
+@item MTP_OBJ_TYPE_SL
+Signalling link object.
+@item MTP_OBJ_TYPE_LK
+Link set object.
+@item MTP_OBJ_TYPE_LS
+Combined Link Set object.
+@item MTP_OBJ_TYPE_RT
+Route object.
+@item MTP_OBJ_TYPE_RL
+Route List object.
+@item MTP_OBJ_TYPE_RS
+Route Set object.
+@item MTP_OBJ_TYPE_SP
+Signalling Point object.
+@item MTP_OBJ_TYPE_NA
+Network Appearance object.
+@item MTP_OBJ_TYPE_DF
+Default object.
+@end vtable
+@item id
+The object identifier.
+@end vtable
+@subsection Get @value{SHORT} Protocol Object Options
+@subsubheading MTP_IOCGOPTION
+Get the protocol options associated with the identified object.
+@subsection Set @value{SHORT} Protocol Object Options
+@subsubheading MTP_IOCSOPTION
+Set the protocol options associated with the identified object.
+@subsection Signalling Link Options
+@smallexample
+typedef struct mtp_opt_conf_sl @{
+        /* signalling link timers */
+        ulong t1;                               /* timer t1 value */
+        ulong t2;                               /* timer t2 value */
+        ulong t3;                               /* timer t3 value */
+        ulong t4;                               /* timer t4 value */
+        ulong t5;                               /* timer t5 value */
+        ulong t12;                              /* timer t12 value */
+        ulong t13;                              /* timer t13 value */
+        ulong t14;                              /* timer t14 value */
+        ulong t17;                              /* timer t17 value */
+        ulong t19a;                             /* timer t19a value */
+        ulong t20a;                             /* timer t20a value */
+        ulong t21a;                             /* timer t21a value */
+        ulong t22;                              /* timer t22 value */
+        ulong t23;                              /* timer t23 value */
+        ulong t24;                              /* timer t24 value */
+        ulong t31a;                             /* timer t31a value */
+        ulong t32a;                             /* timer t32a value */
+        ulong t33a;                             /* timer t33a value */
+        ulong t34a;                             /* timer t34a value */
+        ulong t1t;                              /* timer t1t value */
+        ulong t2t;                              /* timer t2t value */
+        ulong t1s;                              /* timer t1s value */
+@} mtp_opt_conf_sl_t;
+@end smallexample
+@subsection Link Set Options
+@smallexample
+typedef struct mtp_opt_conf_lk @{
+        /* signalling link timers */
+        ulong t1;                               /* timer t1 value */
+        ulong t2;                               /* timer t2 value */
+        ulong t3;                               /* timer t3 value */
+        ulong t4;                               /* timer t4 value */
+        ulong t5;                               /* timer t5 value */
+        ulong t12;                              /* timer t12 value */
+        ulong t13;                              /* timer t13 value */
+        ulong t14;                              /* timer t14 value */
+        ulong t17;                              /* timer t17 value */
+        ulong t19a;                             /* timer t19a value */
+        ulong t20a;                             /* timer t20a value */
+        ulong t21a;                             /* timer t21a value */
+        ulong t22;                              /* timer t22 value */
+        ulong t23;                              /* timer t23 value */
+        ulong t24;                              /* timer t24 value */
+        ulong t31a;                             /* timer t31a value */
+        ulong t32a;                             /* timer t32a value */
+        ulong t33a;                             /* timer t33a value */
+        ulong t34a;                             /* timer t34a value */
+        ulong t1t;                              /* timer t1t value */
+        ulong t2t;                              /* timer t2t value */
+        ulong t1s;                              /* timer t1s value */
+        /* link timers */
+        ulong t7;                               /* timer t7 value */
+@} mtp_opt_conf_lk_t;
+@end smallexample
+@subsection Combined Link Set Options
+@smallexample
+typedef struct mtp_opt_conf_ls @{
+        /* signalling link timers */
+        ulong t1;                               /* timer t1 value */
+        ulong t2;                               /* timer t2 value */
+        ulong t3;                               /* timer t3 value */
+        ulong t4;                               /* timer t4 value */
+        ulong t5;                               /* timer t5 value */
+        ulong t12;                              /* timer t12 value */
+        ulong t13;                              /* timer t13 value */
+        ulong t14;                              /* timer t14 value */
+        ulong t17;                              /* timer t17 value */
+        ulong t19a;                             /* timer t19a value */
+        ulong t20a;                             /* timer t20a value */
+        ulong t21a;                             /* timer t21a value */
+        ulong t22;                              /* timer t22 value */
+        ulong t23;                              /* timer t23 value */
+        ulong t24;                              /* timer t24 value */
+        ulong t31a;                             /* timer t31a value */
+        ulong t32a;                             /* timer t32a value */
+        ulong t33a;                             /* timer t33a value */
+        ulong t34a;                             /* timer t34a value */
+        ulong t1t;                              /* timer t1t value */
+        ulong t2t;                              /* timer t2t value */
+        ulong t1s;                              /* timer t1s value */
+        /* link timers */
+        ulong t7;                               /* timer t7 value */
+@} mtp_opt_conf_ls_t;
+@end smallexample
+@subsection Route Options
+@smallexample
+typedef struct mtp_opt_conf_rt @{
+        /* route timers */
+        ulong t6;                               /* timer t6 value */
+        ulong t10;                              /* timer t10 value */
+@} mtp_opt_conf_rt_t;
+@end smallexample
+@subsection Route List Options
+@smallexample
+typedef struct mtp_opt_conf_rl @{
+        /* route timers */
+        ulong t6;                               /* timer t6 value */
+        ulong t10;                              /* timer t10 value */
+@} mtp_opt_conf_rl_t;
+@end smallexample
+@subsection Route Set Options
+@smallexample
+typedef struct mtp_opt_conf_rs @{
+        /* route timers */
+        ulong t6;                               /* timer t6 value */
+        ulong t10;                              /* timer t10 value */
+        /* route set timers */
+        ulong t8;                               /* timer t8 value */
+        ulong t11;                              /* timer t11 value */
+        ulong t15;                              /* timer t15 value */
+        ulong t16;                              /* timer t16 value */
+        ulong t18a;                             /* timer t18a value */
+@} mtp_opt_conf_rs_t;
+@end smallexample
+@subsection Signalling Point Options
+@smallexample
+typedef struct mtp_opt_conf_sp @{
+        /* signalling link timers */
+        ulong t1;                               /* timer t1 value */
+        ulong t2;                               /* timer t2 value */
+        ulong t3;                               /* timer t3 value */
+        ulong t4;                               /* timer t4 value */
+        ulong t5;                               /* timer t5 value */
+        ulong t12;                              /* timer t12 value */
+        ulong t13;                              /* timer t13 value */
+        ulong t14;                              /* timer t14 value */
+        ulong t17;                              /* timer t17 value */
+        ulong t19a;                             /* timer t19a value */
+        ulong t20a;                             /* timer t20a value */
+        ulong t21a;                             /* timer t21a value */
+        ulong t22;                              /* timer t22 value */
+        ulong t23;                              /* timer t23 value */
+        ulong t24;                              /* timer t24 value */
+        ulong t31a;                             /* timer t31a value */
+        ulong t32a;                             /* timer t32a value */
+        ulong t33a;                             /* timer t33a value */
+        ulong t34a;                             /* timer t34a value */
+        ulong t1t;                              /* timer t1t value */
+        ulong t2t;                              /* timer t2t value */
+        ulong t1s;                              /* timer t1s value */
+        /* link timers */
+        ulong t7;                               /* timer t7 value */
+        /* route timers */
+        ulong t6;                               /* timer t6 value */
+        ulong t10;                              /* timer t10 value */
+        /* route set timers */
+        ulong t8;                               /* timer t8 value */
+        ulong t11;                              /* timer t11 value */
+        ulong t15;                              /* timer t15 value */
+        ulong t16;                              /* timer t16 value */
+        ulong t18a;                             /* timer t18a value */
+        /* signalling point timers */
+        ulong t1r;                              /* timer t1r value */
+        ulong t18;                              /* timer t18 value */
+        ulong t19;                              /* timer t19 value */
+        ulong t20;                              /* timer t20 value */
+        ulong t21;                              /* timer t21 value */
+        ulong t22a;                             /* timer t22a value */
+        ulong t23a;                             /* timer t23a value */
+        ulong t24a;                             /* timer t24a value */
+        ulong t25a;                             /* timer t25a value */
+        ulong t26a;                             /* timer t26a value */
+        ulong t27a;                             /* timer t27a value */
+        ulong t28a;                             /* timer t28a value */
+        ulong t29a;                             /* timer t29a value */
+        ulong t30a;                             /* timer t30a value */
+@} mtp_opt_conf_sp_t;
+@end smallexample
+@subsection Network Appearance Options
+@smallexample
+typedef struct mtp_opt_conf_na @{
+        /* signalling link timers */
+        ulong t1;                               /* timer t1 value */
+        ulong t2;                               /* timer t2 value */
+        ulong t3;                               /* timer t3 value */
+        ulong t4;                               /* timer t4 value */
+        ulong t5;                               /* timer t5 value */
+        ulong t12;                              /* timer t12 value */
+        ulong t13;                              /* timer t13 value */
+        ulong t14;                              /* timer t14 value */
+        ulong t17;                              /* timer t17 value */
+        ulong t19a;                             /* timer t19a value */
+        ulong t20a;                             /* timer t20a value */
+        ulong t21a;                             /* timer t21a value */
+        ulong t22;                              /* timer t22 value */
+        ulong t23;                              /* timer t23 value */
+        ulong t24;                              /* timer t24 value */
+        ulong t31a;                             /* timer t31a value */
+        ulong t32a;                             /* timer t32a value */
+        ulong t33a;                             /* timer t33a value */
+        ulong t34a;                             /* timer t34a value */
+        ulong t1t;                              /* timer t1t value */
+        ulong t2t;                              /* timer t2t value */
+        ulong t1s;                              /* timer t1s value */
+        /* link timers */
+        ulong t7;                               /* timer t7 value */
+        /* route timers */
+        ulong t6;                               /* timer t6 value */
+        ulong t10;                              /* timer t10 value */
+        /* route set timers */
+        ulong t8;                               /* timer t8 value */
+        ulong t11;                              /* timer t11 value */
+        ulong t15;                              /* timer t15 value */
+        ulong t16;                              /* timer t16 value */
+        ulong t18a;                             /* timer t18a value */
+        /* signalling point timers */
+        ulong t1r;                              /* timer t1r value */
+        ulong t18;                              /* timer t18 value */
+        ulong t19;                              /* timer t19 value */
+        ulong t20;                              /* timer t20 value */
+        ulong t21;                              /* timer t21 value */
+        ulong t22a;                             /* timer t22a value */
+        ulong t23a;                             /* timer t23a value */
+        ulong t24a;                             /* timer t24a value */
+        ulong t25a;                             /* timer t25a value */
+        ulong t26a;                             /* timer t26a value */
+        ulong t27a;                             /* timer t27a value */
+        ulong t28a;                             /* timer t28a value */
+        ulong t29a;                             /* timer t29a value */
+        ulong t30a;                             /* timer t30a value */
+@} mtp_opt_conf_na_t;
+@end smallexample
+@subsection Default Options
+@smallexample
+typedef struct mtp_opt_conf_df @{
+@} mtp_opt_conf_df_t;
+@end smallexample
+
+@page
+@section @value{SHORT} Protocol Object Configuration
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_config @{
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong cmd;                              /* configuration command */
+        /* followed by object-specific configuration structure */
+@} mtp_config_t;
+
+#define MTP_GET         0       /* get configuration */
+#define MTP_ADD         1       /* add configuration */
+#define MTP_CHA         2       /* cha configuration */
+#define MTP_DEL         3       /* del configuration */
+@end smallexample
+@vtable @var
+@item type
+The object type.  The object type is one of the following objects:
+@vtable @var
+@item MTP_OBJ_TYPE_SL
+Signalling link object.
+@item MTP_OBJ_TYPE_LK
+Link set object.
+@item MTP_OBJ_TYPE_LS
+Combined Link Set object.
+@item MTP_OBJ_TYPE_RT
+Route object.
+@item MTP_OBJ_TYPE_RL
+Route List object.
+@item MTP_OBJ_TYPE_RS
+Route Set object.
+@item MTP_OBJ_TYPE_SP
+Signalling Point object.
+@item MTP_OBJ_TYPE_NA
+Network Appearance object.
+@item MTP_OBJ_TYPE_DF
+Default object.
+@end vtable
+@item id
+The object identifier.
+@item cmd
+The configuration command to execute.  The command may be one of the following:
+@vtable @var
+@item MTP_GET
+Get the specified protocol object configuration including the configuration of as many direct descendants of the
+object as possible.
+@item MTP_ADD
+Add the specified protocol object.
+@item MTP_CHA
+Change the specified protocol object.
+@item MTP_DEL
+Delete the specified protocol object.
+@end vtable
+@end vtable
+@subsection Get @value{SHORT} Protocol Object Configuration
+@subsubheading MTP_IOCGCONFIG
+@subsection Set @value{SHORT} Protocol Object Configuration
+@subsubheading MTP_IOCSCONFIG
+@subsection Test @value{SHORT} Protocol Object Configuration
+@subsubheading MTP_IOCTCONFIG
+@subsection Commit @value{SHORT} Protocol Object Configuration
+@subsubheading MTP_IOCCCONFIG
+@subsection Signalling Link Configuration
+@smallexample
+typedef struct mtp_conf_sl @{
+        ulong muxid;                            /* lower multiplexor id */
+        ulong lkid;                             /* link set id */
+        ulong slc;                              /* signalling link code in lk */
+@} mtp_conf_sl_t;
+@end smallexample
+@subsection Link Set Configuration
+@smallexample
+typedef struct mtp_conf_lk @{
+        ulong lsid;                             /* combined link set id */
+        ulong rsid;                             /* routeset of adjacent signalling point */
+        ulong ni;                               /* network indicator for link set */
+        ulong slot;                             /* slot of SLS for this link set */
+@} mtp_conf_lk_t;
+@end smallexample
+@subsection Combined Link Set Configuration
+@smallexample
+typedef struct mtp_conf_ls @{
+        ulong spid;                             /* signalling point id */
+        ulong sls_mask;                         /* mask of bits selecting link set */
+@} mtp_conf_ls_t;
+@end smallexample
+@subsection Route Configuration
+@smallexample
+typedef struct mtp_conf_rt @{
+        ulong rlid;                             /* route list id */
+        ulong lkid;                             /* link id */
+        ulong slot;                             /* slot of SLS for this route */
+@} mtp_conf_rt_t;
+@end smallexample
+@subsection Route List Configuration
+@smallexample
+typedef struct mtp_conf_rl @{
+        ulong rsid;                             /* route set id */
+        ulong lsid;                             /* combined link set id */
+        ulong cost;                             /* cost in routeset */
+@} mtp_conf_rl_t;
+@end smallexample
+@subsection Route Set Configuration
+@smallexample
+typedef struct mtp_conf_rs @{
+        ulong spid;                             /* signalling point id */
+        ulong dest;                             /* destination point code */
+        ulong flags;                            /* options flags */
+@} mtp_conf_rs_t;
+@end smallexample
+@subsection Signalling Point Configuration
+@smallexample
+typedef struct mtp_conf_sp @{
+        ulong naid;                             /* network appearance id */
+        ulong pc;                               /* point code */
+        ulong users;                            /* mask of equipped users */
+        ulong flags;                            /* options flags */
+@} mtp_conf_sp_t;
+@end smallexample
+@subsection Network Appearance Configuration
+@smallexample
+typedef struct mtp_conf_na @{
+        lmi_option_t options;                   /* protocol options */
+        struct @{
+                ulong member;                   /* PC member mask */
+                ulong cluster;                  /* PC cluster mask */
+                ulong network;                  /* PC network mask */
+        @} mask;
+        ulong sls_bits;                         /* bits in SLS */
+@} mtp_conf_na_t;
+
+/* additional @value{SHORT} protocol options */
+#define SS7_POPT_TFR    0x00010000      /* old broadcast method - no responsive */
+#define SS7_POPT_TFRB   0x00020000      /* new broadcast method - no regulation */
+#define SS7_POPT_TFRR   0x00040000      /* new responsive method - regulated */
+#define SS7_POPT_MCSTA  0x00080000      /* multiple congestion states */
+@end smallexample
+@subsection Default Configuration
+@smallexample
+typedef struct mtp_conf_df @{
+@} mtp_conf_df_t;
+@end smallexample
+
+@page
+@section @value{SHORT} Protocol Object State Machine
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_statem @{
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong flags;                            /* object flags */
+        ulong state;                            /* object state */
+        /* followed by object-specific state structure */
+@} mtp_statem_t;
+@end smallexample
+@subsection Signalling Link State
+@smallexample
+typedef struct mtp_timers_sl @{
+        ulong t1;                               /* timer t1 */
+        ulong t2;                               /* timer t2 */
+        ulong t3;                               /* timer t3 */
+        ulong t4;                               /* timer t4 */
+        ulong t5;                               /* timer t5 */
+        ulong t12;                              /* timer t12 */
+        ulong t13;                              /* timer t13 */
+        ulong t14;                              /* timer t14 */
+        ulong t17;                              /* timer t17 */
+        ulong t19a;                             /* timer t19a */
+        ulong t20a;                             /* timer t20a */
+        ulong t21a;                             /* timer t21a */
+        ulong t22;                              /* timer t22 */
+        ulong t23;                              /* timer t23 */
+        ulong t24;                              /* timer t24 */
+        ulong t31a;                             /* timer t31a */
+        ulong t32a;                             /* timer t32a */
+        ulong t33a;                             /* timer t33a */
+        ulong t34a;                             /* timer t34a */
+        ulong t1t;                              /* timer t1t */
+        ulong t2t;                              /* timer t2t */
+        ulong t1s;                              /* timer t1s */
+@} mtp_timers_sl_t;
+typedef struct mtp_statem_sl @{
+        struct mtp_timers_sl timers;
+@} mtp_statem_sl_t;
+
+#define SLS_OUT_OF_SERVICE      0       /* out of service */
+#define SLS_PROC_OUTG           1       /* processor outage */
+#define SLS_IN_SERVICE          2       /* in service */
+#define SLS_WACK_COO            3       /* waiting COA/ECA in response to COO */
+#define SLS_WACK_ECO            4       /* waiting COA/ECA in response to ECO */
+#define SLS_WCON_RET            5       /* waiting for retrieval confrimation */
+#define SLS_WIND_CLRB           6       /* waiting for clear buffers indication */
+#define SLS_WIND_BSNT           7       /* waiting for BSNT indication */
+#define SLS_WIND_INSI           8       /* waiting for in service indication */
+#define SLS_WACK_SLTM           9       /* waiting SLTA in response to 1st SLTM */
+
+#define SL_RESTORED         (MTP_ALLOWED)       /* Sig link Activated/Restored/Resumed */
+#define SL_DANGER           (MTP_DANGER)        /* Sig link Danger of congestion (overloaded) */
+#define SL_CONGESTED        (MTP_CONGESTED)     /* Sig link Congested (link congestion) */
+#define SL_UNUSABLE         (MTP_RESTRICTED)    /* Sig link Unusable (Local Processor Outage) */
+#define SL_RETRIEVAL        (MTP_RESTART)       /* Sig link Retrieving */
+#define SL_FAILED           (MTP_PROHIBITED)    /* Sig link Failed */
+#define SL_INHIBITED        (MTP_INHIBITED)     /* Sig link Inhibited (Management inhibited) */
+#define SL_BLOCKED          (MTP_BLOCKED)       /* Sig link Blocked (Processor Outage) */
+#define SL_INACTIVE         (MTP_INACTIVE)      /* Sig link Inactive (Out of Service) */
+#define SL_NODANGER         (MTP_NODANGER)      /* Sig link Out of Danger (transient state) */
+#define SL_UNCONGESTED      (MTP_UNCONGESTED)   /* Sig link Uncongested (transient state) */
+#define SL_UPDATED          (MTP_RESTARTED)     /* Sig link Buffer Update Complete (transient state) */
+#define SL_UNINHIBITED      (MTP_UNINHIBITED)   /* Sig link Uninhibited (transient state) */
+#define SL_UNBLOCKED        (MTP_UNBLOCKED)     /* Sig link Unblocked (transient state) */
+#define SL_ACTIVE           (MTP_ACTIVE)        /* Sig link Active (Link in service) */
+
+#define SLF_TRAFFIC         (MTPF_TRAFFIC)      /* Sig link has sent traffic */
+#define SLF_COO_RECV        (MTPF_COO_RECV)     /* Sig link has received a COO */
+#define SLF_ECO_RECV        (MTPF_ECO_RECV)     /* Sig link has received a ECO */
+#define SLF_WACK_SLTM       (MTPF_WACK_SLTM)    /* Sig link waiting for response to 1st SLTM */
+#define SLF_WACK_SLTM2      (MTPF_WACK_SLTM2)   /* Sig link waiting for response to 2nd SLTM */
+#define SLF_WACK_SSLTM      (MTPF_WACK_SSLTM)   /* Sig link waiting for response to 1st SSLTM */
+#define SLF_WACK_SSLTM2     (MTPF_WACK_SSLTM2)  /* Sig link waiting for response to 2nd SSLTM */
+
+#define SLF_RESTORED        (MTPF_ALLOWED)      /* Sig link Activated/Restored */
+#define SLF_DANGER          (MTPF_DANGER)       /* Sig link Danger of congestion (overloaded) */
+#define SLF_CONGESTED       (MTPF_CONGESTED)    /* Sig link Congested (link congestion) */
+#define SLF_UNUSABLE        (MTPF_RESTRICTED)   /* Sig link Unusable (Local Processor Outage) */
+#define SLF_RETRIEVAL       (MTPF_RESTART)      /* Sig link Retrieving */
+#define SLF_FAILED          (MTPF_PROHIBITED)   /* Sig link Failed */
+#define SLF_INHIBITED       (MTPF_INHIBITED)    /* Sig link Inhibited (Management inhibited) */
+#define SLF_BLOCKED         (MTPF_BLOCKED)      /* Sig link Blocked (Processor Outage) */
+#define SLF_INACTIVE        (MTPF_INACTIVE)     /* Sig link Inactive (Out of Service) */
+
+#define SLF_LOSC_PROC_A     (MTPF_LOSC_PROC_A)  /* Sig link uses link oscillation procedure A */
+#define SLF_LOSC_PROC_B     (MTPF_LOSC_PROC_B)  /* Sig link uses link oscillation procedure B */
+@end smallexample
+@subsection Link Set State
+@smallexample
+typedef struct mtp_timers_lk @{
+        ulong t7;                               /* timer t7 */
+@} mtp_timers_lk_t;
+typedef struct mtp_statem_lk @{
+        struct mtp_timers_lk timers;
+@} mtp_statem_lk_t;
+
+#define LK_ALLOWED          (MTP_ALLOWED)       /* Link Allowed */
+#define LK_DANGER           (MTP_DANGER)        /* Link Danger of congestion (primary or secondary) */
+#define LK_CONGESTED        (MTP_CONGESTED)     /* Link Congested (Link Set congestion, primary or secondary ) */
+#define LK_RESTRICTED       (MTP_RESTRICTED)    /* Link Restricted (Route Failure or received TFR) */
+#define LK_RESTART          (MTP_RESTART)       /* Link Restarting */
+#define LK_PROHIBITED       (MTP_PROHIBITED)    /* Link Prohibited (Received TFP) */
+#define LK_INHIBITED        (MTP_INHIBITED)     /* Link Inhibited (Management inhibited) */
+#define LK_BLOCKED          (MTP_BLOCKED)       /* Link Blocked (Local Link Set failure) */
+#define LK_INACTIVE         (MTP_INACTIVE)      /* Link Inactive (Link out of service) */
+#define LK_NODANGER         (MTP_NODANGER)      /* Link Out of Danger (transient state) */
+#define LK_UNCONGESTED      (MTP_UNCONGESTED)   /* Link Uncongested (transient state) */
+#define LK_RESTARTED        (MTP_RESTARTED)     /* Link Restarted */
+#define LK_UNINHIBITED      (MTP_UNINHIBITED)   /* Link Uninhibited (transient state) */
+#define LK_UNBLOCKED        (MTP_UNBLOCKED)     /* Link Unblocked (transient state) */
+#define LK_ACTIVE           (MTP_ACTIVE)        /* Link Active (Link in service) */
+@end smallexample
+@subsection Combined Link Set State
+@smallexample
+typedef struct mtp_timers_ls @{
+@} mtp_timers_ls_t;
+typedef struct mtp_statem_ls @{
+        struct mtp_timers_ls timers;
+@} mtp_statem_ls_t;
+
+#define LS_ALLOWED          (MTP_ALLOWED)       /* Linkset Allowed */
+#define LS_DANGER           (MTP_DANGER)        /* Linkset Danger of congestion (primary or secondary) */
+#define LS_CONGESTED        (MTP_CONGESTED)     /* Linkset Congested (Link Set congestion, primary or secondary ) 
+                                                 */
+#define LS_RESTRICTED       (MTP_RESTRICTED)    /* Linkset Restricted (Route Failure or received TFR) */
+#define LS_RESTART          (MTP_RESTART)       /* Linkset Restarting */
+#define LS_PROHIBITED       (MTP_PROHIBITED)    /* Linkset Prohibited (Received TFP) */
+#define LS_INHIBITED        (MTP_INHIBITED)     /* Linkset Inhibited (Management inhibited) */
+#define LS_BLOCKED          (MTP_BLOCKED)       /* Linkset Blocked (Local Link Set failure) */
+#define LS_INACTIVE         (MTP_INACTIVE)      /* Linkset Inactive (Link out of service) */
+#define LS_NODANGER         (MTP_NODANGER)      /* Linkset Out of Danger (transient state) */
+#define LS_UNCONGESTED      (MTP_UNCONGESTED)   /* Linkset Uncongested (transient state) */
+#define LS_RESTARTED        (MTP_RESTARTED)     /* Linkset Restarted */
+#define LS_UNINHIBITED      (MTP_UNINHIBITED)   /* Linkset Uninhibited (transient state) */
+#define LS_UNBLOCKED        (MTP_UNBLOCKED)     /* Linkset Unblocked (transient state) */
+#define LS_ACTIVE           (MTP_ACTIVE)        /* Linkset Active (Link in service) */
+@end smallexample
+@subsection Route State
+@smallexample
+typedef struct mtp_timers_rt @{
+        ulong t6;                               /* timer t6 */
+        ulong t10;                              /* timer t10 */
+@} mtp_timers_rt_t;
+typedef struct mtp_statem_rt @{
+        struct mtp_timers_rt timers;
+@} mtp_statem_rt_t;
+
+#define RT_ALLOWED          (MTP_ALLOWED)       /* Route Allowed */
+#define RT_DANGER           (MTP_DANGER)        /* Route Danger of congestion (primary or secondary) */
+#define RT_CONGESTED        (MTP_CONGESTED)     /* Route Congested (Link Set congestion, primary or secondary ) */
+#define RT_RESTRICTED       (MTP_RESTRICTED)    /* Route Restricted (Route Failure or received TFR) */
+#define RT_RESTART          (MTP_RESTART)       /* Route Restarting */
+#define RT_PROHIBITED       (MTP_PROHIBITED)    /* Route Prohibited (Received TFP) */
+#define RT_INHIBITED        (MTP_INHIBITED)     /* Route Inhibited (Management inhibited) */
+#define RT_BLOCKED          (MTP_BLOCKED)       /* Route Blocked (Local Link Set failure) */
+#define RT_INACTIVE         (MTP_INACTIVE)      /* Route Inactive (Link out of service) */
+#define RT_NODANGER         (MTP_NODANGER)      /* Route Out of Danger (transient state) */
+#define RT_UNCONGESTED      (MTP_UNCONGESTED)   /* Route Uncongested (transient state) */
+#define RT_RESTARTED        (MTP_RESTARTED)     /* Route Restarted */
+#define RT_UNINHIBITED      (MTP_UNINHIBITED)   /* Route Uninhibited (transient state) */
+#define RT_UNBLOCKED        (MTP_UNBLOCKED)     /* Route Unblocked (transient state) */
+#define RT_ACTIVE           (MTP_ACTIVE)        /* Route Active (Link in service) */
+//#define RT_RESTART_PHASE_1  (MTP_RESTART_PHASE_1)     /* Route Restarting Phase 1 */
+//#define RT_RESTART_PHASE_2  (MTP_RESTART_PHASE_2)     /* Route Restarting Phase 2 */
+
+#define RTF_ALLOWED         (MTPF_ALLOWED)      /* Route is allowed */
+#define RTF_DANGER          (MTPF_DANGER)       /* Route is in danger of congestion */
+#define RTF_CONGESTED       (MTPF_CONGESTED)    /* Route is congested */
+#define RTF_RESTRICTED      (MTPF_RESTRICTED)   /* Route is restricted */
+#define RTF_RESTART         (MTPF_RESTART)      /* Route is restarting */
+#define RTF_PROHIBITED      (MTPF_PROHIBITED)   /* Route is prohibited */
+#define RTF_INHIBITED       (MTPF_INHIBITED)    /* Route is inhibited */
+#define RTF_BLOCKED         (MTPF_BLOCKED)      /* Route is blocked */
+#define RTF_INACTIVE        (MTPF_INACTIVE)     /* Route is inactive */
+@end smallexample
+@subsection Route List State
+@smallexample
+typedef struct mtp_timers_rl @{
+@} mtp_timers_rl_t;
+typedef struct mtp_statem_rl @{
+        struct mtp_timers_rl timers;
+@} mtp_statem_rl_t;
+
+//#define RL_ALLOWED        (MTP_ALLOWED)       /* Routelist Allowed */
+//#define RL_DANGER         (MTP_DANGER)        /* Routelist Danger of congestion (primary or secondary) */
+//#define RL_CONGESTED      (MTP_CONGESTED)     /* Routelist Congested (Link Set cong, primary or secondary) */
+#define RL_RESTRICTED       (MTP_RESTRICTED)    /* Routelist Restricted (Route Failure or received TFR) */
+#define RL_RESTART          (MTP_RESTART)       /* Routelist Restarting */
+//#define RL_PROHIBITED     (MTP_PROHIBITED)    /* Routelist Prohibited (Received TFP) */
+//#define RL_INHIBITED      (MTP_INHIBITED)     /* Routelist Inhibited (Management inhibited) */
+//#define RL_BLOCKED        (MTP_BLOCKED)       /* Routelist Blocked (Local Link Set failure) */
+//#define RL_INACTIVE       (MTP_INACTIVE)      /* Routelist Inactive (Link out of service) */
+//#define RL_NODANGER       (MTP_NODANGER)      /* Routelist Out of Danger (transient state) */
+//#define RL_UNCONGESTED            (MTP_UNCONGESTED)   /* Routelist Uncongested (transient state) */
+//#define RL_RESTARTED      (MTP_RESTARTED)     /* Routelist Restarted */
+//#define RL_UNINHIBITED            (MTP_UNINHIBITED)   /* Routelist Uninhibited (transient state) */
+//#define RL_UNBLOCKED      (MTP_UNBLOCKED)     /* Routelist Unblocked (transient state) */
+//#define RL_ACTIVE         (MTP_ACTIVE)        /* Routelist Active (Link in service) */
+//#define RL_RESTART_PHASE_1  (MTP_RESTART_PHASE_1)     /* Routelist Restarting Phase 1 */
+//#define RL_RESTART_PHASE_2  (MTP_RESTART_PHASE_2)     /* Routelist Restarting Phase 2 */
+@end smallexample
+@subsection Route Set State
+@smallexample
+typedef struct mtp_timers_rs @{
+        ulong t8;                               /* timer t8 */
+        ulong t11;                              /* timer t11 */
+        ulong t15;                              /* timer t15 */
+        ulong t16;                              /* timer t16 */
+        ulong t18a;                             /* timer t18a */
+@} mtp_timers_rs_t;
+typedef struct mtp_statem_rs @{
+        struct mtp_timers_rs timers;
+@} mtp_statem_rs_t;
+
+#define RS_ALLOWED          (MTP_ALLOWED)       /* Routeset Allowed */
+#define RS_DANGER           (MTP_DANGER)        /* Routeset Danger of congestion (primary or secondary) */
+#define RS_CONGESTED        (MTP_CONGESTED)     /* Routeset Congested (Link Set cong, primary or secondary) */
+#define RS_RESTRICTED       (MTP_RESTRICTED)    /* Routeset Restricted (Route Failure or received TFR) */
+#define RS_RESTART          (MTP_RESTART)       /* Routeset Restarting */
+#define RS_PROHIBITED       (MTP_PROHIBITED)    /* Routeset Prohibited (Received TFP) */
+#define RS_INHIBITED        (MTP_INHIBITED)     /* Routeset Inhibited (Management inhibited) */
+#define RS_BLOCKED          (MTP_BLOCKED)       /* Routeset Blocked (Local Link Set failure) */
+#define RS_INACTIVE         (MTP_INACTIVE)      /* Routeset Inactive (Link out of service) */
+#define RS_NODANGER         (MTP_NODANGER)      /* Routeset Out of Danger (transient state) */
+#define RS_UNCONGESTED      (MTP_UNCONGESTED)   /* Routeset Uncongested (transient state) */
+#define RS_RESTARTED        (MTP_RESTARTED)     /* Routeset Restarted */
+#define RS_UNINHIBITED      (MTP_UNINHIBITED)   /* Routeset Uninhibited (transient state) */
+#define RS_UNBLOCKED        (MTP_UNBLOCKED)     /* Routeset Unblocked (transient state) */
+#define RS_ACTIVE           (MTP_ACTIVE)        /* Routeset Active (Link in service) */
+#define RS_RESTART_PHASE_1  (MTP_RESTART_PHASE_1)       /* Routeset Restarting Phase 1 */
+#define RS_RESTART_PHASE_2  (MTP_RESTART_PHASE_2)       /* Routeset Restarting Phase 2 */
+
+#define RSF_ALLOWED         (MTPF_ALLOWED)      /* Routeset is allowed */
+#define RSF_DANGER          (MTPF_DANGER)       /* Routeset is in danger of congestion */
+#define RSF_CONGESTED       (MTPF_CONGESTED)    /* Routeset is congested */
+#define RSF_RESTRICTED      (MTPF_RESTRICTED)   /* Routeset is restricted */
+#define RSF_RESTART         (MTPF_RESTART)      /* Routeset is restarting */
+#define RSF_PROHIBITED      (MTPF_PROHIBITED)   /* Routeset is prohibited */
+#define RSF_INHIBITED       (MTPF_INHIBITED)    /* Routeset is inhibited */
+#define RSF_BLOCKED         (MTPF_BLOCKED)      /* Routeset is blocked */
+#define RSF_INACTIVE        (MTPF_INACTIVE)     /* Routeset is inactive */
+
+#define RSF_TFR_PENDING     (MTPF_TFR_PENDING)  /* Routeset has TFR pending */
+#define RSF_CLUSTER         (MTPF_CLUSTER)      /* Routeset is cluster route */
+#define RSF_XFER_FUNC       (MTPF_XFER_FUNC)    /* Routeset has transfer function */
+#define RSF_ADJACENT        (MTPF_ADJACENT)     /* Routeset is adjacent */
+@end smallexample
+@subsection Signalling Point State
+@smallexample
+typedef struct mtp_timers_sp @{
+        ulong t1r;                              /* timer t1r */
+        ulong t18;                              /* timer t18 */
+        ulong t19;                              /* timer t19 */
+        ulong t20;                              /* timer t20 */
+        ulong t21;                              /* timer t21 */
+        ulong t22a;                             /* timer t22a */
+        ulong t23a;                             /* timer t23a */
+        ulong t24a;                             /* timer t24a */
+        ulong t25a;                             /* timer t25a */
+        ulong t26a;                             /* timer t26a */
+        ulong t27a;                             /* timer t27a */
+        ulong t28a;                             /* timer t28a */
+        ulong t29a;                             /* timer t29a */
+        ulong t30a;                             /* timer t30a */
+@} mtp_timers_sp_t;
+typedef struct mtp_statem_sp @{
+        struct mtp_timers_sp timers;
+@} mtp_statem_sp_t;
+
+#define SP_ALLOWED          (MTP_ALLOWED)       /* Sig Point Allowed */
+#define SP_DANGER           (MTP_DANGER)        /* Sig Point Danger of congestion (primary or secondary) */
+#define SP_CONGESTED        (MTP_CONGESTED)     /* Sig Point Congested (Link Set cong, primary or secondary ) */
+#define SP_RESTRICTED       (MTP_RESTRICTED)    /* Sig Point Restricted (Route Failure or received TFR) */
+#define SP_RESTART          (MTP_RESTART)       /* Sig Point Restarting */
+#define SP_PROHIBITED       (MTP_PROHIBITED)    /* Sig Point Prohibited (Received TFP) */
+#define SP_INHIBITED        (MTP_INHIBITED)     /* Sig Point Inhibited (Management inhibited) */
+#define SP_BLOCKED          (MTP_BLOCKED)       /* Sig Point Blocked (Local Link Set failure) */
+#define SP_INACTIVE         (MTP_INACTIVE)      /* Sig Point Inactive (Link out of service) */
+#define SP_NODANGER         (MTP_NODANGER)      /* Sig Point Out of Danger (transient state) */
+#define SP_UNCONGESTED      (MTP_UNCONGESTED)   /* Sig Point Uncongested (transient state) */
+#define SP_RESTARTED        (MTP_RESTARTED)     /* Sig Point Restarted */
+#define SP_UNINHIBITED      (MTP_UNINHIBITED)   /* Sig Point Uninhibited (transient state) */
+#define SP_UNBLOCKED        (MTP_UNBLOCKED)     /* Sig Point Unblocked (transient state) */
+#define SP_ACTIVE           (MTP_ACTIVE)        /* Sig Point Active (Link in service) */
+#define SP_RESTART_PHASE_1  (MTP_RESTART_PHASE_1)       /* Sig Point Restarting Phase 1 */
+#define SP_RESTART_PHASE_2  (MTP_RESTART_PHASE_2)       /* Sig Point Restarting Phase 2 */
+
+#define SPF_RESTART         (MTPF_RESTART)      /* Sig Point restarting */
+#define SPF_CLUSTER         (MTPF_CLUSTER)      /* Sig Point is cluster route */
+#define SPF_XFER_FUNC       (MTPF_XFER_FUNC)    /* Sig Point has transfer function */
+#define SPF_SECURITY        (MTPF_SECURITY)     /* Sig Point has additional security procedures */
+#define SPF_LOSC_PROC_A     (MTPF_LOSC_PROC_A)  /* Sig Point uses link oscillation procedure A */
+#define SPF_LOSC_PROC_B     (MTPF_LOSC_PROC_B)  /* Sig Point uses link oscillation procedure B */
+#define SPF_RESTART_PHASE_1 (MTPF_RESTART_PHASE_1)      /* Sig Point restarting */
+#define SPF_RESTART_PHASE_2 (MTPF_RESTART_PHASE_2)      /* Sig Point restarting */
+@end smallexample
+@subsection Network Appearance State
+@smallexample
+typedef struct mtp_timers_na @{
+@} mtp_timers_na_t;
+typedef struct mtp_statem_na @{
+        struct mtp_timers_na timers;
+@} mtp_statem_na_t;
+@end smallexample
+@subsection Default State
+@smallexample
+typedef struct mtp_timers_df @{
+@} mtp_timers_df_t;
+typedef struct mtp_statem_df @{
+        struct mtp_timers_df timers;
+@} mtp_statem_df_t;
+@end smallexample
+@subsection Get @value{SHORT} Protocol Object State Machine
+@subsubheading MTP_IOCGSTATEM
+@subsection Reset @value{SHORT} Protocol Object State Machine
+@subsubheading MTP_IOCCMRESET
+
+@page
+@section @value{SHORT} Protocol Object Statistics
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_stats @{
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong header;                           /* object stats header */
+        /* followed by object-specific statistics structure */
+@} mtp_stats_t;
+@end smallexample
+@subsection Get @value{SHORT} Protocol Object Statistics Periods
+@subsubheading MTP_IOCGSTATSP
+@subsection Set @value{SHORT} Protocol Object Statistics Periods
+@subsubheading MTP_IOCSSTATSP
+@subsection Get @value{SHORT} Protocol Object Statistics
+@subsubheading MTP_IOCGSTATS
+@subsection Set @value{SHORT} Protocol Object Statistics
+@subsubheading MTP_IOCSSTATS
+
+@page
+@section @value{SHORT} Protoocl Object Notifications
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_notify @{
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        /* followed by object-specific notification structure */
+@} mtp_notify_t;
+@end smallexample
+@subsection Get @value{SHORT} Protocol Object Notifications
+@subsubheading MTP_IOCGNOTIFY
+@subsection Set @value{SHORT} Protocol Object Notifications
+@subsubheading MTP_IOCSNOTIFY
+@subsection Clear @value{SHORT} Protocol Object Notifications
+@subsubheading MTP_IOCCNOTIFY
+
+@page
+@section @value{SHORT} Protocol Object Management
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_mgmt @{
+        ulong type;                             /* object type */
+        ulong id;                               /* object id */
+        ulong cmd;                              /* mgmt command */
+@} mtp_mgmt_t;
+
+#define MTP_MGMT_ALLOW                   0
+#define MTP_MGMT_RESTRICT                1
+#define MTP_MGMT_PROHIBIT                2
+#define MTP_MGMT_ACTIVATE                3
+#define MTP_MGMT_DEACTIVATE              4
+#define MTP_MGMT_BLOCK                   5
+#define MTP_MGMT_UNBLOCK                 6
+#define MTP_MGMT_INHIBIT                 7
+#define MTP_MGMT_UNINHIBIT               8
+#define MTP_MGMT_CONGEST                 9
+#define MTP_MGMT_UNCONGEST              10
+#define MTP_MGMT_DANGER                 11
+#define MTP_MGMT_NODANGER               12
+#define MTP_MGMT_RESTART                13
+#define MTP_MGMT_RESTARTED              14
+@end smallexample
+@subsection Manage @value{SHORT} Protocol Object
+@subsubheading MTP_IOCCMGMT
+
+@page
+@section @value{SHORT} Provider Pass-Along Control
+@subsubheading Argument Format
+@smallexample
+typedef struct mtp_pass @{
+        ulong muxid;                            /* mux index of lower SL structure to pass message to */
+        ulong type;                             /* type of message block */
+        ulong band;                             /* band of mesage block */
+        ulong ctl_length;                       /* length of cntl part */
+        ulong dat_length;                       /* length of data part */
+        /* followed by cntl and data part of message to pass to signalling link */
+@} mtp_pass_t;
+@end smallexample
+@subsubheading MTP_IOCCPASS
+
+@node @value{INTERFACE} Management Information Base
+@chapter @value{INTERFACE} Management Information Base
+@cindex @value{INTERFACE} management information base
+
+@node Addendum for @value{SHORT} Conformance
+@unnumbered Addendum for @value{SHORT} Conformance
+
+@menu
+* Addendum for ITU-T Q.704 Conformance::
+* Addendum for ANSI T1.111.4 Conformance::
+* Addendum for ETSI ETS 300 008-1 Conformance::
+* Addendum for ITU-T Q.2210 Conformance::
+@end menu
+
+@node Addendum for ITU-T Q.704 Conformance
+@unnumberedsec Addendum for ITU-T Q.704 Conformance
+
+This addendum describes the formats and rules that are specific to ETSI EN 300 008-1 V3.2.2.  The
+addendum must be used along with the generic @value{INTERFACE} as defined in the main document, and
+the EN 300 008-1 conformance defined in Addendum 2, when implementing an @value{SHORT} that will be
+configured with the EN 300 008-1 @value{LONG}.
+
+@unnumberedsec Primitives and Rules for ETSI EN 300 008-1 V3.2.2 Conformance
+
+The following are the additional rules that apply to the @value{INTERFACE} primitives for ETSI EN
+300 008-1 V3.2.2 compatibility.
+
+@unnumberedsubsec Local Management Primitives
+
+@subsubheading Parameters
+@subsubheading Flags
+@subsubheading Rules
+
+@unnumberedsubsec Connection Mode Primitives
+
+@subsubheading Parameters
+@subsubheading Flags
+@subsubheading Rules
+
+@unnumberedsubsec Connectionless Primitives
+
+@subsubheading Parameters
+@subsubheading Flags
+@subsubheading Rules
+
+@page
+@node Addendum for ANSI T1.111.4 Conformance
+@unnumberedsec Addendum for ANSI T1.111.4 Conformance
+
+@page
+@node Addendum for ETSI ETS 300 008-1 Conformance
+@unnumberedsec Addendum for ETSI ETS 300 008-1 Conformance
+
+@page
+@node Addendum for ITU-T Q.2210 Conformance
+@unnumberedsec Addendum for ITU-T Q.2210 Conformance
+
+@node Mapping @value{INTERFACE} Primitives
+@appendix Mapping @value{INTERFACE} Primitives
+
+@menu
+* Mapping @value{INTERFACE} Primitives to Q.701::
+* Mapping @value{INTERFACE} Primitives to ANSI T1.111.1::
+* Mapping @value{INTERFACE} Primitives to ETSI ETS 300 008-2::
+@end menu
+
+@node Mapping @value{INTERFACE} Primitives to Q.701
+@section Mapping @value{INTERFACE} Primitives to Q.701
+
+Table A-1 shows the mapping of the @value{INTERFACE} primitives to the @value{SHORT} definition
+primitives listed in ITU-T Recommendation Q.704.
+
+The mapping of @value{INTERFACE} primitives to Q.701 primitives is shown in @tabref{6}.  For the
+most part, this mapping is a one to one mapping of service primitives, with the exception of
+@emph{Connect Request} and @emph{Disconnect Request}.
+
+In Q.701 there is no concept of an @dfn{association} between @value{SHORT}-entities.  In OpenSS7
+@value{INTERFACE}, the @prim{MTP_CONN_REQ} and @prim{MTP_DISCON_REQ} primitives are used to
+establish and release an association between @value{SHORT}-entities.
+
+@tabfig{mtpi_tab06,6,Mapping of @value{INTERFACE} primitives to Q.701 Primitives}
+
+@page
+@node Mapping @value{INTERFACE} Primitives to ANSI T1.111.1
+@section Mapping @value{INTERFACE} Primitives to ANSI T1.111.1
+
+The mapping of @value{INTERFACE} primitives to T1.111.1 primitives is shown in @tabref{7}.  For the
+most part, this mapping is a one to one mapping of service primitives, with the exception of
+@emph{Connect Request} and @emph{Disconnect Request}.
+
+In T1.111.1 there is no concept of an @dfn{association} between @value{SHORT}-entities.  In OpenSS7
+@value{INTERFACE}, the @prim{MTP_CONN_REQ} and @prim{MTP_DISCON_REQ} primitives are used to
+establish and release an association between @value{SHORT}-entities.
+
+@tabfig{mtpi_tab07,7,Mapping of @value{INTERFACE} primitives to T1.111.1 Primitives}
+
+@page
+@node Mapping @value{INTERFACE} Primitives to ETSI ETS 300 008-2
+@section Mapping @value{INTERFACE} Primitives to ETSI ETS 300 008-2
+
+The mapping of @value{INTERFACE} primitives to ETS 300 008-2 primitives is shown in @tabref{8}.  For the
+most part, this mapping is a one to one mapping of service primitives, with the exception of
+@emph{Connect Request} and @emph{Disconnect Request}.
+
+In ETS 300 008-2 there is no concept of an @dfn{association} between @value{SHORT}-entities.  In OpenSS7
+@value{INTERFACE}, the @prim{MTP_CONN_REQ} and @prim{MTP_DISCON_REQ} primitives are used to
+establish and release an association between @value{SHORT}-entities.
+
+@c @tabfig{mtpi_tab08,8,Mapping of @value{INTERFACE} primitives to ETS 300 008-2 Primitives}
+
+@node State/Event Tables
+@appendix State/Event Tables
+
+@node Precedence Tables
+@appendix Precedence Tables
+
+@c @node Allowable Sequence of @value{INTERFACE} Primitives
+@c @chapter Allowable Sequence of @value{INTERFACE} Primitives
+
+@c @node Precedence of @value{INTERFACE} Primitives
+@c @chapter Precedence of @value{INTERFACE} Primitives
+
+@c @node Guidelines for Protocol Independent @value{INTERFACE} Users
+@c @appendix Guidelines for Protocol Independent @value{INTERFACE} Users
+
+@c @node Required Information for @value{INTERFACE} Provider-Specific Addenda
+@c @appendix Required Information for @value{INTERFACE} Provider-Specific Addenda
+
+@node @value{INTERFACE} Header Files
+@appendix @value{INTERFACE} Header Files
+
+@noindent
+@smallformat
+@verbatiminclude mtpi.h
+@end smallformat
+
+@node @value{INTERFACE} Library
+@appendix @value{INTERFACE} Library
+
+@node @value{INTERFACE} Drivers and Modules
+@appendix @value{INTERFACE} Drivers and Modules
+
+@node @value{INTERFACE} Utilities
+@appendix @value{INTERFACE} Utilities
+
+@node @value{INTERFACE} File Formats
+@appendix @value{INTERFACE} File Formats
+
+@node @value{INTERFACE} Compatibility and Porting
+@appendix @value{INTERFACE} Compatibility and Porting
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+@item Signalling Data Link Service Data Unit
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+@item Data transfer
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+@item SDL provider
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+@item SDL user
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+@item Local management
+The phase in connection and connectionless modes in which a SDL user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+@item PPA
+The point at which a system attaches itself to a physical communications medium.
+@item PPA identifier
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
+@item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
+@end multitable
+
+@node References
+@unnumbered References
+
+@multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
+@item [1] @anchor{Q.700} @tab @uref{http://www.itu.int/rec/T-REC-Q.700/,ITU-T Recommendation Q.700},
+@cite{Introduction to CCITT Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [2] @anchor{Q.701} @tab @uref{http://www.itu.int/rec/T-REC-Q.701/,ITU-T Recommendation Q.701},
+@cite{Functional Description of the Message Transfer Part (MTP) of Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [3] @anchor{Q.702} @tab @uref{http://www.itu.int/rec/T-REC-Q.702/,ITU-T Recommendation Q.702},
+@cite{Signalling System No. 7---Signalling Data Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [4] @anchor{Q.703} @tab @uref{http://www.itu.int/rec/T-REC-Q.703/,ITU-T Recommendation Q.703},
+@cite{Signalling System No. 7---Signalling Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [5] @anchor{Q.704} @tab @uref{http://www.itu.int/rec/T-REC-Q.704/,ITU-T Recommendation Q.704},
+@cite{Message Transfer Part---Signalling Network Functions and Messages},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [6] @anchor{CDIAPI} @tab
+Geoffrey Gerrietts; Dave Grothe, Mikel Matthews, Dave Healy,
+@cite{CDI---Application Program Interface Guide},
+March 1999,
+(Savoy, IL),
+GCOM, Inc.
+@item [7] @anchor{Q.771} @tab @uref{http://www.itu.int/rec/T-REC-Q.771/,ITU-T Recommendation Q.771},
+@cite{Signalling System No. 7---Functional Description of Transaction Capabilities},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@end multitable
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the Author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

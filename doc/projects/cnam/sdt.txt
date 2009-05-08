@@ -1,0 +1,27 @@
+                                                                                
+                 _______                                _______                 
+                |       | STREAM                       |       | STREAM         
+                 \_____/  head                          \_____/  head           
+ Data Link Provider |                                      |                    
+ Interface (DLPI)   /                                      /                    
+                    \             Signalling Data Terminal \                    
+ Comm. Device       /               Interface (SDTI)       /                    
+ Interface (CDI)    |                                      |                    
+                    |                                      |                    
+          ,---O--O--O--O--O--------------------------O--O--O--O--O---,          
+          |   |  |  |  |  |                          |  |  |  |  |   |          
+          |   |__|__|__|__|                          |__|__|__|__|   |          
+          |  |             |                        |             |  |          
+          |  |             |       SDT Driver       |             |  |          
+          |  |             |Signalling Data Terminal|             |  |          
+          |  |_____________|                        |_____________|  |          
+          |     _|_   _|_                                 _|_        |          
+          |    |   | |   |                               |   |       |          
+          |    |   | |   |                               |   |       |          
+          '----|   |-|   |-------------------------------|   |-------'          
+               |   | |   |                               |   |                  
+               |   | |   |            SDLI               |   |                  
+               |___| |___|    Signalling Data Link       |___|                  
+                 |     |            Interface              |                    
+                 |     |                                   |                    
+                                                                                

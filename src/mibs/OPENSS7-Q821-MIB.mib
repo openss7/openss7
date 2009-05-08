@@ -1,0 +1,539 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-Q821-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Opaque
+        FROM SNMPv2-SMI
+    DateAndTime, IpAddress, RowPointer, RowStatus, StorageType, 
+    TimeInterval, TimeStamp
+        FROM SNMPv2-TC
+    AdministrativeState, OperationalState, GnmAlarmStatus
+        FROM OPENSS7-SMI-MIB
+    objectInstance, perceivedSeverity, probableCause
+        FROM OPENSS7-TMN-SMI
+    ProbableCause, SimpleNameType
+        FROM OPENSS7-TMN-TC
+    openss7, openss7Q
+        FROM OPENSS7-SMI;
+
+q821MIB MODULE-IDENTITY
+    LAST-UPDATED
+        "200901210056Z"
+    ORGANIZATION
+        "The OpenSS7 Project"
+    CONTACT-INFO
+        "Brian Bidulock
+         Monavacon Limited
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION
+        "This is a basic MIB module providing definitions of 
+         objects based on the TMN Q3 Alarm Surveillance 
+         specification (ITU-T Rec. Q.821 (2000)"
+    ::= { openss7Q 821 }
+
+AlarmStatusList ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Specifies an alarm status list.  This is a set-valued 
+	 attribute."
+    REFERENCE
+	"ITU-T Recommendation M.3100 ASN.1 AlarmStatus."
+    SYNTAX BITS {
+	    cleared(0),
+	    activeReportable-Indeterminate(1),
+	    activeReportable-Warning(2),
+	    activeReportable-Minor(3),
+	    activeReportable-Major(4),
+	    activeReportable-Critical(5),
+	    activePending(6)
+	}
+
+PerceivedSeverityList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Recommendation Q.821 (2000) 
+             perceivedSeverityList."
+    SYNTAX      Opaque
+
+ProbableCauseList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Recommendation Q.821 (2000) 
+             probableCauseList."
+    SYNTAX      Opaque
+
+ObjectList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Recommendation Q.821 (2000) 
+             objectList."
+    SYNTAX      Opaque
+
+q821Notifications OBJECT IDENTIFIER
+    ::= { q821MIB 0 }
+
+currentAlarmSummaryReport NOTIFICATION-TYPE
+    OBJECTS     {
+        objectInstance,
+        perceivedSeverity,
+        alarmStatus,
+        probableCause
+    }
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) currentAlarmSummaryReport 
+             NOTIFICATION."
+    ::= { q821Notifications 1 }
+
+q821Objects OBJECT IDENTIFIER
+    ::= { q821MIB 1 }
+
+q821Notifs OBJECT IDENTIFIER
+    ::= { q821Objects 1 }
+
+alarmStatus OBJECT-TYPE
+    SYNTAX      GnmAlarmStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Provides an object for use with notifications."
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) 
+             Q821-ASN1Module.AlarmSummaryData."
+    ::= { q821Notifs 1 }
+
+q821Tables OBJECT IDENTIFIER
+    ::= { q821Objects 2 }
+
+-- =====================================================================
+-- 
+-- Managed objects from ITU-T Rec. Q.821
+-- 
+-- =====================================================================
+
+currentAlarmSummaryControl OBJECT IDENTIFIER
+    ::= { q821Tables 1 }
+
+currentAlarmSummaryControlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CurrentAlarmSummaryControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q821 (2000) currentAlarmSummaryControl MOC."
+    ::= { currentAlarmSummaryControl 1 }
+
+currentAlarmSummaryControlEntry OBJECT-TYPE
+    SYNTAX      CurrentAlarmSummaryControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q821 (2000) currentAlarmSummaryControl MO."
+    INDEX   {
+        currentAlarmSummaryControlId -- index
+    }
+    ::= { currentAlarmSummaryControlTable 1 }
+
+CurrentAlarmSummaryControlEntry ::=
+    SEQUENCE {
+        currentAlarmSummaryControlId
+            SimpleNameType,
+        alarmStatusList
+            AlarmStatusList,
+        objectList
+            ObjectList,
+        perceivedSeverityList
+            PerceivedSeverityList,
+        probableCauseList
+            ProbableCauseList,
+        currentAlarmSummaryStorageType
+            StorageType,
+        currentAlarmSummaryRowStatus
+            RowStatus
+}
+
+currentAlarmSummaryControlId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) currentAlarmSummaryControlId 
+             ATTRIBUTE."
+    ::= { currentAlarmSummaryControlEntry 1 }
+
+alarmStatusList OBJECT-TYPE
+    SYNTAX      AlarmStatusList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) alarmStatusList ATTRIBUTE."
+    ::= { currentAlarmSummaryControlEntry 2 }
+
+objectList OBJECT-TYPE
+    SYNTAX      ObjectList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) objectList ATTRIBUTE."
+    ::= { currentAlarmSummaryControlEntry 3 }
+
+perceivedSeverityList OBJECT-TYPE
+    SYNTAX      PerceivedSeverityList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) perceivedSeverityList ATTRIBUTE."
+    ::= { currentAlarmSummaryControlEntry 4 }
+
+probableCauseList OBJECT-TYPE
+    SYNTAX      ProbableCauseList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) probableCauseList ATTRIBUTE."
+    ::= { currentAlarmSummaryControlEntry 5 }
+
+currentAlarmSummaryStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { currentAlarmSummaryControlEntry 6 }
+
+currentAlarmSummaryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { currentAlarmSummaryControlEntry 7 }
+
+
+managementOperationsSchedule OBJECT IDENTIFIER
+    ::= { q821Tables 2 }
+
+managementOperationsScheduleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ManagementOperationsScheduleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) managementOperationsSchedule 
+             MOC."
+    :;= { managementOperationsSchedule 1 }
+
+managementOperationsScheduleEntry OBJECT-TYPE
+    SYNTAX      ManagementOperationsScheduleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) managementOperationsSchedule 
+             MO."
+    INDEX   {
+        mosScheduleId -- index
+    }
+    :;= { managementOperationsScheduleTable 1 }
+
+ManagementOperationsScheduleEntry ::=
+    SEQUENCE {
+        mosAdministrativeState
+            AdministrativeState,
+        mosAffectedObjectInstance
+            RowPointer,
+        mosBeginTime
+            DateAndTime,
+        mosDestinationAddress
+            IpAddress,
+        mosEndTime
+            DateAndTime,
+        mosInterval
+            TimeInterval,
+        mosScheduleId
+            SimpleNameType,
+        mosOperationalState
+            OperationalState,
+        mosStorageType
+            StorageType,
+        mosRowStatus
+            RowStatus
+    }
+
+mosAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) administrativeState ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 1 }
+
+mosAffectedObjectInstance OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) affectedObjectClass and 
+             affectedObjectInstances ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 2 }
+
+mosBeginTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) beginTime ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 3 }
+
+mosDestinationAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) destinationAddress ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 4 }
+
+mosEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) endTime ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 5 }
+
+mosInterval OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) interval ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 6 }
+
+mosScheduleId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible -- index
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) scheduleId ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 7 }
+
+mosOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) operationalState ATTRIBUTE."
+    ::= { managmentOperationsScheduleEntry 8 }
+
+mosStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { managmentOperationsScheduleEntry 9 }
+
+mosRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { managmentOperationsScheduleEntry 10 }
+
+
+enhancedCurrentAlarmSummaryControl OBJECT IDENTIFIER
+    ::= { q821Tables 3 }
+
+enhancedCurrentAlarmSummaryControlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EnhancedCurrentAlarmSummaryControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) 
+             enhancedCurrentAlarmSummaryControl MOC."
+    ::= { enhancedCurrentAlarmSummaryControl 1 }
+
+enhancedCurrentAlarmSummaryControlEntry OBJECT-TYPE
+    SYNTAX      EnhancedCurrentAlarmSummaryControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) 
+             enhancedCurrentAlarmSummaryControl MO."
+    INDEX   {
+        enhancedCurrentAlarmSummaryControlId -- index
+    }
+    ::= { enhancedCurrentAlarmSummaryControlTable 1 }
+
+EnhancedCurrentAlarmSummaryControlEntry ::=
+    SEQUENCE {
+        enhancedCurrentAlarmSummaryControlId
+            SimpleNameType,
+	-- ACTION alarmSynchronization
+	--      logRecordIdActionParameter
+	--      correlatedRecordNameActionParameter
+	--      invalidBaseManagedObjectErrorParameter
+	--      invalidObjectInstanceErrorParameter
+	--      suspectObjectListActionParameter
+	--      cancelledAlarmSynchronizationParameter
+        enhancedCurrentAlarmSummaryControlStorageType
+            StorageType,
+        enhancedCurrentAlarmSummaryControlRowStatus
+            RowStatus
+    }
+
+enhancedCurrentAlarmSummaryControlId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "ITU-T Rec. Q.821 (2000) 
+             enhancedCurrentAlarmSummaryControlId ATTRIBUTE."
+    ::= { enhancedCurrentAlarmSummaryControlEntry 1 }
+
+enhancedCurrentAlarmSummaryControlStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "STD 58 StorageType TEXTUAL-CONVENTION."
+    ::= { enhancedCurrentAlarmSummaryControlEntry 2 }
+
+enhancedCurrentAlarmSummaryControlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE
+        "STD 58 RowStatus TEXTUAL-CONVENTION."
+    ::= { enhancedCurrentAlarmSummaryControlEntry 3 }
+
+END -- OPENSS7-Q821-MIB
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

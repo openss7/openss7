@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+            DL_DETACH ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

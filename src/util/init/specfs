@@ -1,0 +1,335 @@
+#!/bin/bash
+#
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 12:54:11 $
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# All Rights Reserved.
+#
+# Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
+# permissions.
+#
+# Redhat chkconfig init script conventions
+#
+# specfs:	mount and unmount specfs
+# chkconfig:	2345 01 98
+# lockfile:	/var/lock/subsys/specfs
+# config:	/etc/sysconfig/specfs
+# probe:	true
+# hide:		false
+# license:	GPL
+# description:	The SPECFS is a special shadow filesystem used for Linux \
+#		Fast-STREAMS.  The purpose of this init script is to detect \
+#		whether the specfs is supported for the running kernel, and if \
+#		it is, to configure and load the kernel module associated with \
+#		the special filesystem.
+#
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: specfs
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: mount and unmount specfs
+# License: GPL
+# Description:	The SPECFS is a special shadow filesystem used for Linux
+#	Fast-STREAMS.  The purpose of this init script is to detect whether the
+#	specfs is supported for the running kernel, and if it is, to configure
+#	and load the kernel module associated with the special filesystem.
+### END INIT INFO
+
+# Source init script functions library
+init_mode="standalone"
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
+fi
+
+case "$init_mode" in
+    (chkconfig)
+	;;
+    (insserv)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $?
+	}
+	;;
+    (standalone|*)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
+
+name='specfs'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+
+if [ ! -e /proc/modules     ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+if [ ! -e /proc/filesystems ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+
+# Specify defaults
+
+[ -n "$SPECFS_MOUNTPOINT" ] || SPECFS_MOUNTPOINT="/dev/streams"
+[ -n "$SPECFS_UID"        ] || SPECFS_UID=
+[ -n "$SPECFS_GID"        ] || SPECFS_GID=
+[ -n "$SPECFS_MODE"       ] || SPECFS_MODE=
+[ -n "$SPECFS_OPTIONS"    ] || SPECFS_OPTIONS=
+
+# Source redhat and/or debian config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+RETVAL=0
+
+umask 077
+
+build_options() {
+    # Build up the options string
+    [ -n "$SPECFS_UID" ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
+    [ -n "$SPECFS_GID" ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
+    [ -n "$SPECFS_MODE" ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
+    [ "$1" = remount ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
+}
+
+start() {
+    if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems >/dev/null 2>&1 ; then
+	    action $"Loading kernel module specfs: " \
+		modprobe -k -q -- specfs
+	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+	if [ ! -d "$SPECFS_MOUNTPOINT" ] ; then
+	    action $"Creating mountpoint $SPECFS_MOUNTPOINT: " \
+		mkdir -p -- "$SPECFS_MOUNTPOINT"
+	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+	if ! mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+	    build_options
+	    action $"Mounting SPECFS filesystem on $SPECFS_MOUNTPOINT: " \
+		mount -t specfs ${SPECFS_OPTIONS} -- specfs "$SPECFS_MOUNTPOINT"
+	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    fi
+    touch $lockfile
+    return 0
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing SPECFS modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
+}
+
+stop() {
+    mount | grep ' on [^[:space:]]* type specfs' 2>/dev/null | \
+    while read -a tokens ; do
+	SPECFS_MOUNTPOINT="${tokens[2]}"
+	action $"Unmounting SPECFS filesystem from $SPECFS_MOUNTPOINT: " \
+	    umount -- $SPECFS_MOUNTPOINT
+    done
+    egrep '^(streams|specfs[[:space:]])' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reload() {
+    [ -n "$SPECFS_MOUNTPOINT" ] || return 0
+    build_options remount
+    action $"Remounting SPECFS on $SPECFS_MOUNTPOINT: " \
+	mount -t specfs ${SPECFS_OPTIONS} -- specfs $SPECFS_MOUNTPOINT
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	$1 || RETVAL=$?
+	;;
+    (status)
+	# First check for mount
+	if grep '\<specfs\>' /etc/mtab >/dev/null 2>&1 ; then
+	    # mounted
+	    if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+		# mounted in the right place
+		echo $"$name ($SPECFS_MOUNTPOINT) is mounted..."
+		RETVAL=0
+	    else
+		# mounted in the wrong place
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    echo $"$name is mounted in wrong place"
+		    RETVAL=1
+		else
+		    echo $"$name should not be mounted"
+		    RETVAL=1
+		fi
+	    fi
+	else
+	    # See if lockfile exists
+	    if [ -f $lockfile ] ; then
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    echo $"$name not mounted but subsys locked"
+		    RETVAL=2
+		else
+		    echo $"$name is not mounted..."
+		    RETVAL=0
+		fi
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
+	;;
+    (force-reload|try-restart|condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	if grep '\<specfs\>' /etc/mtab >/dev/null 2>&1 ; then
+	    # mounted
+	    if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+		# mounted in the right place
+		if [ ! -f $lockfile ] ; then
+		    # mounted in the right place but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # mounted in the right place and subsystem locked
+		    for file in $config ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# mounted, but in the wrong place (or should not be mounted), need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unmounted
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    # unmounted (wrong) but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
+# =============================================================================
+# 
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 12:54:11 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2008-04-28 12:54:11 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: specfs,v $
+# Revision 0.9.2.20  2008-04-28 12:54:11  brian
+# - update file headers for release
+#
+# Revision 0.9.2.19  2007/08/13 22:46:39  brian
+# - GPLv3 header updates
+#
+# =============================================================================
+
+# vim: ft=sh sw=4 tw=80

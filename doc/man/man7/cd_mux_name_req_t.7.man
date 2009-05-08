@@ -1,0 +1,1 @@
+.so man7/CD_MUX_NAME_REQ.7.man

@@ -1,0 +1,1 @@
+.so man3/sp_sperror.3.man

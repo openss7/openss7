@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+        DL_PROMSICOFF ----\   |                  |                              
+              request      \->|                  |                              
+                              |                  |                              
+                           /--|                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

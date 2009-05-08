@@ -1,0 +1,404 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SLEEP 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B sleep, mpsleep, streams_mpsleep
+\- put a process to sleep
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/svr4ddi.h>
+.HP
+.BI "int sleep(caddr_t " event ", pl_t " priority ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIpriority\fR\(em'u
+.I event
+The event (kernel address) on which to sleep.
+.PD 0
+.TP
+.I priority
+The priority at which to run when awoken.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR sleep ()
+suspends execution of a process to await certain events such as reaching a
+known system state in hardware or software.  For instance, when a process
+wants to read a device a no data are available, the driver may need to call
+.BR sleep ()
+to wait for data to become available before returning.  This causes the kernel
+to suspend execution of the currently running process and schedule another
+process.  The process that called sleep can be resumed by a call to the
+.BR wakeup (9)
+function with the same
+.I event
+as specified in the call to
+.BR sleep ().
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.I event
+argument address has no significance except that the same address must be
+passed to
+.BR wakeup (9)
+to resume the sleeping process.  The address used should be the address of a
+kernel data structure associated with the caller, or one of the caller's own
+data structures.  Use of an arbitrary address not associated with a private
+data structure can result in a conflict with another, unrelated sleep and
+wakeup operations in the kernel.
+.PP
+The
+.I priority
+argument can have valid values from zero
+.RB ( 0 )
+through thirty-nine
+.RB ( 39 )
+inclusive.  In general, a lower value will result in more favorable scheduling
+although the exact semantic of the priority argument is specific to the
+scheduling class of the caller, and some scheduling classes may choose to
+ignore the argument altogether for the purpose of assigning a scheduling
+priority.
+.PP
+Also, the value of the
+.I priority 
+argument determines whether the sleep may be interrupted by signals.  If the
+value of
+.I priority
+is less than or equal to the value of the constant
+.BR PZERO ,
+the sleeping process will not be awakened by a signal.  If the value of
+.I priority
+is greater than
+.B PZERO
+and the
+.B PCATCH
+bit flag is ORed into the
+.I priority
+argument, the process will wake up prematurely (without a call to
+.BR wakeup (9))
+upon receipt of a non-ignored, non-held signal and will normally return
+one
+.RB ( 1 )
+to the calling code.  If
+.I priority
+is greater than
+.B PZERO
+and
+.B PCATCH
+is not set, the sleeping process will exit upon receipt of a signal and will
+never return to the caller.
+.PP
+Calls to
+.BR sleep ()
+must be able to tolerate premature wakeups.  After it is awakened, the code
+must reexamine the condition on which it was sleeping.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR sleep ()
+returns zero
+.RB ( 0 )
+if the caller woke due to a
+.BR wakeup ()
+or was stopped and restarted due to job control.  If the sleep is interrupted
+by a signal and
+.B PCATCH
+was set in
+.IR priority ,
+the call returns one
+.RB ( 1 ).
+If the calling process catches a signal an
+.B PCATCH
+is not set, the call never returns.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR sleep ()
+always succeeds.
+.BR sleep ()
+exits when the sleep is interrupted by a signal and
+.B PCATCH
+was set in the
+.I priority
+argument.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR sleep ()
+can be called from any blocking context.  Private locks cannot be held across
+the call.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR sleep ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR sleep ()
+is a
+.IR "SVR 4.2" -specific
+function:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+or
+.B CONFIG_STREAMS_COMPAT_SVR4_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+This
+.IR "SVR 4"
+.[
+svr4
+.]
+version of
+.BR sleep ()
+has not yet been implemented.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR sleep ()
+is not yet implemented.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR sleep ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Symbol
+.BR streams_mpsleep ()
+is provided for source level compatibility with
+.IR HP-UX \(rg
+for the purpose of porting
+.IR HP-UX \(rg
+drivers and modules to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR HP-UX \(rg
+binaries are incompatible.
+.IP \(em
+.BR sleep ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR sleep ()
+and
+.BR streams_mpsleep ()
+only provide functionality comparable to
+.IR "SVR 4.2"
+and
+.IR HP-UX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR sleep ()
+or
+.BR streams_mpsleep ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR hpuxcompat (9),
+.BR svr4compat (9)
+and
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.[
+uslspg
+.]
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR sleep ()
+first appeared in
+.IR "SVR 4" .
+.[
+svr42
+.]
+.BR streams_mpsleep ()
+appears in
+.IR STREAMS/UX .
+.[
+hpuxspg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

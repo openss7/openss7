@@ -1,0 +1,543 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.TH AP_POLL 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XAP Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_poll
+\- input/output multiplexing
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation Library Interface,
+APLI,
+.[
+APLI UNIX International
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libapli (3),
+.BR libxap (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+APLI Library prototype:
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.HP
+.BR "int " ap_poll(
+.PD 0
+.RS
+.HP
+.BI "struct ap_pollfd *" fds ,
+.HP
+.BI "int " nfds ,
+.HP
+.BI "int " timeout
+.RE
+.HP
+.BR );
+.PD
+.PP
+XAP Library prototype:
+.PP
+.B #include <xap.h>
+.HP
+.BR "int " ap_poll(
+.PD 0
+.RS
+.HP
+.BI "ap_pollfd_t " fds [],
+.HP
+.BI "int " nfds ,
+.HP
+.BI "int " timeout ,
+.HP
+.BI "unsigned long *" aperrno_p
+.RE
+.HP
+.RB );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fds
+an array of structures of type
+.B ap_pollfd_t
+that contain the file descriptors of XAP instances to poll.
+.TP
+.I nfds
+the number of structures in the
+.I fds
+array.
+.TP
+.I timeout
+the amount of time to wait in milliseconds.
+.TP
+.I aperrno_p
+for XAP, a location into which to store a diagnostic error code when
+unsuccessful.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function provides users with a consistent interface for detecting when
+certain events have occurred on an XAP instance.
+.PP
+The
+.I fds
+argument is an array of
+.I nfds
+number of
+.B ap_pollfd_t
+structures.  The
+.B ap_pollfd_t
+structure includes the following members:
+.sp
+.nf
+\fC\s-2\
+int fd;         /* XAP instance identifier */
+short events;   /* requested events        */
+short revents;  /* returned events         */
+\s+2\fP
+.fi
+.PP
+The
+.IR UNIX \(rg
+file descriptor is used for the purposes of clarification in the standard,
+although
+.I fd
+may be replaced with a comparable entity on a
+.RI non- UNIX \(rg
+system.
+.PP
+The
+.I events
+field is a bitmask used to indicate which events should be reported for the
+instance.
+The
+.I revents
+field will be set by XAP to indicate which of the requested events have
+occurred.  All XAP Library implementations recognize the following events:
+.TP \w'\fBAP_POLLWRNORM\fP\(em'u
+.B AP_POLLRDNORM
+Data (e\&.g\&. an XAP Library primitive of user data associated with an XAP
+library primitive) has arrived on the normal data flow and is available to be
+read.
+.TP
+.B AP_POLLRDBAND
+Data has arrived outside the normal data flow and is available to be read.
+This event may occur if the implementation supports out-of-band-data and a
+\fBP_XDATA_IND\fP(7) primitive arrives.  In implementations that do not
+support multiple data bands, expedited data will arrive on the normal data
+flow and this event will never occur.
+.TP
+.B AP_POLLIN
+Data has arrived (on either band) and is available to be read.
+.TP
+.B AP_POLLOUT
+Data can be sent on the normal priority band.
+.TP
+.B AP_POLLWRNORM
+The same as \fBAP_POLLOUT\fP.
+.TP
+.B AP_POLLWRBAND
+Out-of-band data can be sent.  This event will never be true in
+implementations that do not support multiple data bands.
+.TP
+.B AP_POLLNVAL
+Specified file descriptor is an invalid XAP instance identifier.  This bit is
+only valid for
+.IR revents .
+.PP
+If none of the defined events have occurred on the selected instances,
+.BR ap_poll ()
+waits
+.I timeout
+milliseconds for an event to occur on one of the selected instances before
+returning.  On implementations where millisecond timing is not available,
+.I timeout
+is rounded up to the nearest legal value on the system.  If the value of
+.I timeout
+is zero (0),
+.BR ap_poll ()
+returns immediately.  If the value of
+.I timeout is
+.BR AP_INFTIM ,
+.BR ap_poll ()
+waits until a requested event occurs or until the call is interrupted.  The
+.BR ap_poll ()
+call is not affected by whether the specified instances are operating in
+blocking or non-blocking execution mode.
+.PP
+For XAP,
+.I aperrno_p
+must be set to point to a location which will be used to carry an error code
+back to the user.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successul completion, a non-negative value is returned.  A positive value
+indicates the number of instances for which
+.I revents
+is non-zero.  A return value of zero (0) indicates that the call timed out and
+no instances were selected.  Upon failure, a value of minus one (-1, FAIL) is
+returned.  For XAP, the location pointed to by
+.I aperrno_p
+is set to indicate the error; for APLI, the global thread-specific
+.BR aperrno (3)
+variable contains the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+Only operating system class errors are reported.  For XAP, operating system
+errors are reported in \fB*aperrno_p\fP; for APLI, in \fIerrno\fP(3).
+.TP \w'[\fBEINVAL\fP]\(em'u
+.RB [ EBADF ]
+An invalid \fIfd\fP member was given in one of the \fBpollfd\fP structures
+specified by the \fIfds\fP argument.  This error is not specified by SUSv2
+.[
+susv2
+.]
+or POSIX.
+.[
+susv3
+.]
+.TP
+.RB [ ENOMEM ]
+There was insufficient memory to allocate file descriptor tables.  This error
+is not specified by SUSv2
+.[
+susv2
+.]
+or POSIX
+.[
+susv3
+.]
+(see [\fBEAGAIN\fP], below).
+.TP
+.RB [ EFAULT ]
+The \fIfds\fP argument specifies an address outside the caller's valid address
+space.
+.TP
+.RB [ EINTR ]
+A signal was caught during \fBap_poll\fP().
+.TP
+.RB [ EINVAL ]
+The \fInfds\fP argument is greater than {\fBNR_OPEN\fP}, or one of the
+\fIfd\fP members refers to a Stream or multiplexer that is linked (directly or
+indirectly) downstream from a multiplexer.
+.TP
+.RB [ EAGAIN ]
+The allocation of internal data structures failed but a subsequent request may
+succeed.
+.\"
+.\"
+.SH MT-LEVEL
+.PP
+.BR ap_poll ()
+is MT-safe.  Note that
+.BR ap_poll ()
+represents a thread cancellation point as does
+.BR poll (2s).
+.\"
+.\"
+.SH NOTICES
+.PP
+Support for events other than those listed above is optional in the standard.
+Users interested in developing applications that are portable across different
+XAP Library implementations should keep this caveat in mind.
+.PP
+The OpenSS7 XAP library also supports the following:
+.TP \w'\fBAP_POLLWRNORM\fP\(em'u
+.B AP_POLLPRI
+High priority data may be read from \fIfd\fP without blocking.  For
+\fISTREAMS\fP(4) APLI and XAP instances, this event occurs when an
+\fBM_PCPROTO\fP(9) or \fBM_HPDATA\fP(9) message arrives at the Stream head and
+is generated even when the data available is of zero length.
+This flag is valid in both the corresponding \fIevents\fP and \fIrevents\fP
+members.
+.TP
+.B AP_POLLERR
+An error has occured on the file.  For \fISTREAMS\fP(4) APLI and XAP
+instances, this event occurs when an \fBM_ERROR\fP(9) message indicating an
+error arrives at the Stream head.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.TP
+.B AP_POLLHUP
+A hangup has occured on the file.  For \fISTREAMS\fP(4) APLI and XAP
+instances, this event occurs when an \fBM_HANGUP\fP(9) message arrives at the
+Stream head or the Stream is closing.  A Stream cannot be writable while this
+event is in force.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.TP
+.B AP_POLLNVAL
+The corresponding \fIfd\fP is invalid.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.TP
+.B AP_POLLMSG
+A pending signal has occured on the file.  For \fISTREAMS\fP(4) APLI and XAP
+instances, this event occurs when an \fBM_SIG\fP(9) message arrives at the
+Stream head.
+This flag is only valid in the corresponding \fIrevents\fP member.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The OpenSS7 implementation of
+.BR ap_poll ()
+calls
+.BR poll (2s)
+directly.
+The
+.B ap_pollfd_t
+structure is a typedef of
+the
+.BR pollfd
+structure, see
+.BR poll (2s).
+Additional
+.I revents
+that may be returned are
+.BR POLLERR " (" AP_POLLERR ),
+.BR POLLHUP " (" AP_POLLHUP ),
+and
+.BR POLLMSG " (" AP_POLLMSG ),
+as defined in
+.BR poll (2s).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR poll (2s),
+.BR ap_snd (3),
+.BR ap_rcv (3),
+.BR ap_ioctl (3),
+.BR XAP (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_poll ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ap_poll ()
+is compatible with XAP,
+.[
+xap c303
+.]
+and implementations based on XAP such as
+.IR Solaris \(rg
+and
+.IR HP-UX \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The APLI function only documents the \fBAP_POLLIN\fP and \fBAP_POLLOUT\fP
+flags.  Only these flags will be used by portable APLI implementations.
+.IP \(em
+The XAP function only documents the \fBAP_POLLIN\fP, \fBAP_POLLOUT\fP,
+\fBAP_POLLRDNORM\fP, \fBAP_POLLRDBAND\fP, \fBAP_POLLWRNORM\fP and
+\fBAP_POLLWRBAND\fP flags.  Only these flags will be used by portable XAP
+implementations.
+.IP \(em
+The OpenSS7 APLI and XAP libraries implement the full range of \fBpoll\fP(2s)
+flags for both these functions.  Portable programs will only use those defined
+by the standard.
+.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
+.PP
+See
+.BR XAP (3)
+and
+.IR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XNS,
+.[
+xns 5.2
+.]
+XAP,
+.[
+xap c303
+.]
+XAP-ROSE.
+.[
+xap-rose
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_poll ()
+first appeared in APLI.
+.[
+apli unix international
+.]
+The older function,
+.BR apli_poll (3),
+did not have the
+.I aperrno_p
+argument and defined the
+.B ap_pollfd_t
+as:
+.sp
+.nf
+\fC\s-2\
+typedef struct pollfd ap_pollfd_t;
+\s+2\fP
+.fi
+where the
+.B pollfd
+structure is defined in
+.RB < sys/poll.h >,
+which is what the OpenSS7 implementation of both versions of
+.BR ap_poll ()
+does.
+The older function only documented the use of
+.BR AP_POLLIN
+and
+.BR AP_POLLOUT .
+.PP
+Both the APLI and XAP versions of the function seem to be an attempt to escape
+the POSIX programming model and the use of \fISTREAMS\fP as the underlying
+implementation.  For both the OpenSS7 APLI and XAP libraries, the POSIX
+conformant \fBpoll\fP(2s) system call can be used instead of \fBap_poll\fP()
+in a fully portable manner.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+

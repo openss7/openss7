@@ -1,0 +1,101 @@
+## 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# Copyright (c) 2008-2009  Monavacon Limited.
+# All Rights Reserved.
+##
+## net-snmp/ucd-snmp SNMP Daemon Configuration Database
+## for the STREAMS subsystem.
+##
+## See snmpd.conf(5) for more information.
+##
+# stuff added to provide access to the MIBs
+com2sec os7wsecurity 10.0.0.0/8     openss7
+com2sec os7wsecurity 127.0.0.0/8    openss7
+com2sec os7wsecurity 172.16.0.0/12  openss7
+com2sec os7wsecurity 192.168.0.0/16 openss7
+com2sec os7rsecurity default        openss7
+#
+group os7rsystem v1  os7rsecurity
+group os7rsystem v2c os7rsecurity
+group os7rsystem usm os7rsecurity
+group os7wsystem v1  os7wsecurity
+group os7wsystem v2c os7wsecurity
+group os7wsystem usm os7wsecurity
+#
+view os7only included .1.3.6.1.4.1.29591
+view os7full included .1
+#
+access os7rsystem "" any noauth exact os7only none none
+access os7wsystem "" any noauth exact os7full os7full os7full
+# dlmod <NAME>      <PATH> (default /usr/lib/snmp/dlmod/PATH.so)
+# ----- ----------- -----------
+dlmod   strMIB      strMIB
+# ----- ----------- -----------
+# dlmod <NAME>      <PATH> (default /usr/lib/snmp/dlmod/PATH.so)
+# ----- ----------- -----------
+#dlmod   sigtranMIB  sigtranMIB
+# ----- ----------- -----------
+# dlmod	<NAME>	    <PATH> (default /usr/lib/snmp/dlmod/PATH.so)
+# -----	----------- ----------
+dlmod	ss7MIB	    ss7MIB
+# -----	----------- ----------
+# dlmod <NAME>      <PATH> (default /usr/lib/snmp/dlmod/PATH.so)
+# ----- ----------- -----------
+dlmod	mxMIB	    mxMIB
+# ----- ----------- -----------
+## =============================================================================
+## 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date$ by $Author$
+##
+## -----------------------------------------------------------------------------
+##
+## $Log$
+## =============================================================================
+## vim: ft=conf comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

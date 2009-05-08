@@ -1,0 +1,1 @@
+.so man4/pipe.4.man

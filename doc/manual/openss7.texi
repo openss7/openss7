@@ -1,0 +1,1337 @@
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id$
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission notice
+% identical to this one except for the removal of this paragraph (this
+% paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not have
+% taken the same level of care in the production of this manual, which is
+% licensed free of charge, as they might when working professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by the
+% source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date$ by $Author$
+%
+% =========================================================================
+
+\input texinfo
+@setfilename openss7.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* openss7: (@value{PACKAGE_TARNAME}).	    OpenSS7 Master Package.
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@subsubheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@strong{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of makefile targets
+@defcodeindex mk
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@c An index of manual pages
+@defcodeindex mp
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::			Preface to this manual
+
+* Quick Start Guide::		Quick Installation Instructions
+
+* Introduction::		Introduction to the package
+* Overview::			Overview of the package
+* Reference::			Contents of the package
+* Development::			Developing with the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+
+* Licenses::			Copies of OpenSource Licenses
+
+* Indices::			Index of Indices
+
+ ----- detailed node listing -----
+
+Preface
+
+* Notice::			Notices for this package
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions of this manual
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+
+Introduction
+
+* Objective::			Objective
+* Organization::		Organization
+* Conventions::			Conventions
+
+Overview
+
+* Background::			Background of the project
+* Package Contents::		Basic contents of the master package.
+
+Reference
+
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
+
+Conformance
+
+* NPI Interface Conformance::	    Conformance to the NPI.
+* TPI Interface Conformance::	    Conformance to the TPI.
+* XTI Interface Conformance::	    Conformance to the XTI.
+* IETF Conformance::		    Conformance to IETF
+
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Maturity::			Package Maturity
+* Bugs::			Package Defects
+* Schedule::			Development and Bug Fix Schedule
+* History::			Project History
+
+Installation
+
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removing::			Removing the package
+* Loading::			Loading the package
+* Maintenance::			Maintaining the package
+
+Troubleshooting
+
+* Test Suites::			Test Suites for the package
+* Problem Reports::		Problem Reports for the package
+* Known Problems::		Known Probelms with the package
+
+Appendices
+
+Licenses
+
+* University of Illinois License::	The UI license
+* Hewlett-Packard License::		The HP license
+* BSD/USL Combined License::		The BSD license
+* GNU Affero General Public License::	The AGPL license
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+
+Indices
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
+* Manual Page Index::		Index of Manual Pages Referenced
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@node Preface
+@unnumbered Preface
+
+@menu
+* Notice::			Notices for this package
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions of this manual
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+@end menu
+
+@node Notice
+@section Notice
+@cindex manual notice
+@cindex licensing
+
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
+License}).  Please note, however, that there are different licensing terms for the manual pages and
+some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
+publications and other sources).  Consult the permission notices contained in the documentation for
+more information.
+
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
+invariant sections, no front-cover texts and no back-cover texts.  Some of the manuals and
+documentation contained in this package are released under different terms.  Please consult the
+specific manual for more information.
+
+@node Abstract
+@section Abstract
+@cindex manual abstract
+
+This manual provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@subsection Objective
+@cindex manual objective
+
+The objective of this manual is to provide a guide for the @cite{@value{PACKAGE_TITLE}} developer
+when downloading, building, installing and using the @cite{@value{PACKAGE_TITLE}} package.
+
+This guide provides information to developers on the downloading, building, installation and use of
+the @cite{@value{PACKAGE_TITLE}} package.
+
+@subsection Intent
+@cindex manual intent
+
+The intent of this manual is to act as an installation guide and reference manual to the
+@cite{@value{PACKAGE_TITLE}} developer.  It is intended to be read alone and is not intended to
+replace or supplement the @cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing
+code, the manual pages (see @manref{STREAMS(9)}) provide a better reference to the programmer.
+
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@subsection Audience
+@cindex manual audience
+
+This manual is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, administration, kernel dumps, crashes, oops logs, package managers, the autoconf packaging
+system, etc.
+
+The guide is intended for installers and maintainers of @cite{@value{PACKAGE_TITLE}} software.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@node Revision History
+@section Revision History
+@cindex manual revisions
+
+Take care that you are working with a current version of this manual: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this manual is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallexample
+@verbatim
+$Log$
+@end verbatim
+@end smallexample
+
+@subsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED VERSION}.
+
+@node Disclaimer
+@section Disclaimer
+@cindex manual disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@c ----------------------------------------------------------------------------
+
+@node Acknowledgements
+@section Acknowledgements
+@cindex credits
+
+@url{http://www.openss7.org/,, The OpenSS7 Project} was funded in part by:
+
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @uref{http://www.monavacon.com/, Monavacon Limited}
+@item @tab @bullet{} @uref{http://www.openss7.com/, OpenSS7 Corporation}
+@end multitable
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/,, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+@include texi/funding.texi
+
+@node Authors
+@section Authors
+@cindex authors
+
+The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@auindex Bidulock, Brian
+@end multitable
+
+See @refman{Author Index}, for a complete listing and cross-index of authors to
+sections of this manual.
+
+@node Maintainer
+@section Maintainer
+@cindex maintainer
+
+The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
+
+@node Web Resources
+@section Web Resources
+@cindex web resources
+
+@include texi/mail.texi
+
+@c ----------------------------------------------------------------------------
+
+@node Quick Start Guide
+@unnumbered Quick Start Guide
+@cindex quick start guide
+
+@include texi/quick.texi
+
+@c ----------------------------------------------------------------------------
+
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and future development
+schedule of the @cite{@value{PACKAGE_TITLE}} package.
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Objective::			Objective
+* Organization::		Organization
+* Conventions::			Conventions
+@end menu
+
+@ignore
+@node Notice
+@section Notice
+@cindex notice
+@cindex licensing
+
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
+License}).  Please note, however, that there are different licensing terms for the manual pages and
+some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
+publications and other sources).  Consult the permission notices contained in the documentation for
+more information.
+
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
+Invariant Sections, no Front-Cover Texts and no Back-Cover texts.
+@end ignore
+
+@node Objective
+@section Objective
+@cindex objective
+
+This manual documents the design, implementation, installation, operation and future development of
+the @cite{@value{PACKAGE_TITLE}} package.
+
+The @value{PACKAGE_TITLE} package is
+a STREAMS ATM Networking (ATM) package for Linux
+that can be used with
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+@ignore
+or
+@cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+@end ignore
+It includes development tools, header files and manual pages for
+@value{PACKAGE_TITLE}.
+
+@node Organization
+@section Organization of this Manual
+@cindex organization
+
+This manual is organized (loosely) into several sections as follows:
+
+@ifnottex
+@menu
+  Introduction::		This introduction
+* Overview::			Overview of the package
+* Reference::			Contents of the package
+* Development::			Developing with the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+@end menu
+@end ifnottex
+@ifnotinfo
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Overview}.
+@tab Overview of the package
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end ifnotinfo
+@ifplaintext
+@multitable @columnfractions .50 .50
+@item @cite{Introduction}.
+@tab This introduction
+@item @cite{Overview}.
+@tab Overview of the package
+@item @cite{Reference}.
+@tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
+@item @cite{Conformance}.
+@tab Conformance of the package
+@item @cite{Releases}.
+@tab Releases of the package
+@item @cite{Installation}.
+@tab Installation of the package
+@item @cite{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end ifplaintext
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Overview
+@chapter Overview
+@cindex overview
+
+@menu
+* Background::			Background of the project
+* Package Contents::		Basic contents of the package.
+@end menu
+
+@node Background
+@section Background
+@cindex background
+
+@uref{http://www.openss7.org/, The OpenSS7 Project} was started in 1996 and made its Web debut in
+2000.  The initial objectives of the OpenSS7 Project were to provide an SS7 stack implementation for
+Linux.  Initial work on development of the SS7 stack attempted to integrate the SS7 protocol
+elements into Linux's BSD-like Sockets based networking system.  Early on this approach became
+problematic.  Although the true BSD sockets networking system is somewhat amenable to a wider range
+of protocols that just the TCP/IP protocol suite, as evidenced by the early adoption of OSI
+protocols into BSD 4.3, the incarnation of the system present in Linux deviates largely from the
+BSD module in that there is no clean separation between the socket layer and the protocol layer, and
+that the protocol layer cannot actually be stacked in the same fashion as is possible in BSD.  Also,
+the Linux @type{sk_buff} was crude and did not have the capabilities of the BSD @type{mbuf}.  These
+and other difficulties led the project, in 2001, to pursue the STREAMS approach to networking.
+
+At the time (in 2000), there was an implementation for STREAMS for Linux, called Linux STREAMS, or
+@cite{LiS} for short.  The OpenSS7 Project worked extensively with enhancing the @cite{LiS} package
+for use with SS7 and SIGTRAN protocols.  The versions of @cite{LiS} that were available for the
+Linux 2.2 series kernels available at the time were quite stable.@footnote{Linux 2.2 series kernels
+did @emph{not} support symmetrical multi-processing (SMP) making it similar to SVR 4.0.}  The
+versions of @cite{LiS} that were available for the Linux 2.4 series kernels attempted to support SMP
+using the same SVR 4.0-like STREAMS model.  These versions of @cite{LiS} were incredibly difficult
+to stabilize on Linux 2.4 series kernels.  Much of the problems with @cite{LiS} appeared to be
+related to a poor coding style, and the attempt to maintain portability to systems other than Linux
+(even though it appears that ports were not even popular) resulting in obfuscation of the code.
+
+Therefore, in 2003, the OpenSS7 Project decided to replace @cite{LiS} with a completely new
+implementation of STREAMS for Linux based, on SVR 4.2 documentation, called @cite{Linux
+Fast-STREAMS}, or @cite{LfS}.  The OpenSS7 Project also decided to support a fork of @cite{LiS} in
+the meantime to developing @cite{Linux Fast-STREAMS} to production grade.  The project maintained a
+fork of @cite{LiS-2.16} for the Linux 2.4 kernel series, and later a fork of @cite{LiS-2.18} for the
+Linux 2.6 kernel series.  The development of @cite{Linux Fast-STREAMS} culminated with the first
+production grade release for Linux 2.4 and 2.6 kernel services at the beginning of 2006, after which
+the OpenSS7 forks of @cite{LiS} were completely deprecated.
+
+Beginning in 2001, the OpenSS7 Project has developed STREAMS components over a wide range of
+applications, not just SS7.  These components are divided into groups of components that were
+released within separate sub-packages of an OpenSS7 Master Package.  While the separation of
+sub-packages suited the needs of maintaining modules and drivers across multiple STREAMS packages,
+it led to a significan maintenance load.  In early 2009, the OpenSS7 Project collapsed these
+sub-packages into a single OpenSS7 package significantly reducing the maintenance load and providing
+an more straightforward distribution suitable for repository downloads.
+
+@node Package Contents
+@section Package Contents
+@cindex package contents
+
+The @dfn{@value{PACKAGE_TITLE}} package is intended as a single build and installation package for
+all components available from @uref{http://www.openss7.org/, The OpenSS7 Project}.  The
+package began as a slim framework for development of the other packages and blossomed into a
+combined build and development environment for all OpenSS7 packages.  The package is
+currently very mature and provides a simple way for users of the OpenSS7 components to download, build
+and install all available OpenSS7 Project components without concern or consideration for intricate
+dependencies between components.
+
+Because OpenSS7 components first built with @dfn{Linux STREAMS (LiS)} but now builds with the superior
+@dfn{Linux Fast-STREAMS (LfS)}, the master package had the objective from the onset of being able to
+build all OpenSS7 packages against either @dfn{LiS} or @dfn{LfS} or both.  This was the case from
+@dfn{LiS} version @emph{2.18.1} through @emph{2.18.3} and @dfn{streams} version @emph{0.7a.3}
+through @emph{0.7a.5}, or master package releases @emph{0.9.2.A} through @emph{0.9.2.C}.  With the
+release of master package @emph{0.9.2.D} containing @dfn{streams} @emph{0.9.2.1}, @dfn{LiS} was no
+longer supported in the master package.  @dfn{LiS} @emph{2.18.3} was the final public release of
+@dfn{LiS} from the OpenSS7 Project.@footnote{Additional internal releases up to @emph{2.18.7} are
+available on the CVS archive.}
+
+Because @dfn{LiS} is now completely deprecated, and sub-packages forks such as @file{iperf} and
+@file{netperf} have outlived their usefulness, a new package was generated that collapsed all of the
+former subpackages, including STREAMS, into a single release package containing all OpenSS7
+components.
+
+Whereas in the old master package, protocol components and suites were organized by subpackage,
+components in the @value{PACKAGE_TITLE} package are now organized by protocol suite and application.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Reference
+@chapter Reference
+@cindex reference
+
+@menu
+* Components::			Components included in the package
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Components
+@section Components
+@cindex components
+
+Following is a list of major components contained in the @dfn{@value{PACKAGE_TITLE}} package:
+
+@menu
+@end menu
+
+
+@node Files
+@section Files
+@cindex files
+
+@include tree.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers
+@section Drivers
+@cindex drivers
+
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} drivers:
+
+@table @asis
+
+@item @manref{atm(4)} (@file{streams_atm.ko})
+Contains the @manpage{atm(4)} driver.
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules
+@section Modules
+@cindex modules
+
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} modules:
+
+@table @asis
+
+@item @manref{phys(4)} (@file{streams_phys.ko})
+Contains the @manpage{phys(4)} module.
+
+@item @manref{aal1(4)} (@file{streams_aal1.ko})
+Contains the @manpage{aal1(4)} module.
+
+@item @manref{aal2(4)} (@file{streams_aal2.ko})
+Contains the @manpage{aal2(4)} module.
+
+@item @manref{aal5(4)} (@file{streams_aal5.ko})
+Contains the @manpage{aal5(4)} module.
+
+@item @manref{aal0(4)} (@file{streams_aal0.ko})
+Contains the @manpage{aal0(4)} module.
+
+@item @manref{sscop(4)} (@file{streams_sscop.ko})
+Contains the @manpage{sscop(4)} module.
+
+@item @manref{sscopmce(4)} (@file{streams_sscopmce.ko})
+Contains the @manpage{sscopmce(4)} module.
+
+@item @manref{mtp3b(4)} (@file{streams_mtp3b.ko})
+Contains the @manpage{mtp3b(4)} module.
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Libraries
+@section Libraries
+@cindex libraries
+
+The @cite{@value{PACKAGE_TITLE}} package provides the following shared object and static libraries:
+
+The @cite{@value{PACKAGE_TITLE}} package does not currently provide any libraries.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities
+@section Utilities
+@cindex utilities
+
+@subsection Init Scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{ATM} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{ATM} subsystem, @manpage{strxnet(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@subsection Administrative Utilities
+
+Following are user utilities for manipulating @dfn{INET}:
+
+The @cite{@value{PACKAGE_TITLE}} package
+builds and installs the following utilities:
+
+@table @command
+
+@item @value{PACKAGE}_mknod
+This is a C-language program that can be used by startup scripts to create device nodes for the
+@samp{@value{PACKAGE}} package.  This utility is normally installed in the @file{/usr/sbin}
+directory.
+See @manref{@value{PACKAGE}_mknod(8)} for more information.
+
+@item @value{PACKAGE}
+This is a @cite{RedHat}-style System V init script that is installed and used to start and stop the
+@samp{@value{PACKAGE}} package.  Starting consists of creating ATM device nodes using
+@command{@value{PACKAGE}_mknod} and installing the @file{streams-sctp} and
+@file{streams-tpiperf} modules in the running kernel.  This init script is normally installed in the
+@file{/etc/init.d} directory.
+
+@item @value{PACKAGE}.sh
+This is a @cite{Debian}-style System V init script that is installed and used to start and stop the
+@samp{@value{PACKAGE}} package in a similar fashion to the @command{@value{PACKAGE}}
+script, but in the @cite{Debian} style.  This init script is normally installed in the
+@file{/etc/rc.d/init.d} directory.
+
+@end table
+
+@subsection Performance Test Programs
+
+Following are performance test programs:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any performance programs.  For
+performance testing of various transport providers, see the @file{netperf-@value{VERSION_NETPERF}}
+package.
+
+@subsection Conformance Test Programs
+
+Following are conformance and validation test programs included in the package:
+
+
+The @cite{@value{PACKAGE_TITLE}} package
+builds and installs the following test programs:
+
+@table @command
+
+
+@end table
+
+For more information on the use of the problem reporting scripts, see @refman{Generating Problem
+Reports}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Development
+@chapter Development
+@cindex developing
+
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
+manual pages and documentation necessary for the development of both user space applications
+programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
+follow describe these development facilities.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files::
+@section Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a preprocessor option.
+
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
+ordered in the reverse order of the dependencies between packages.  So, for example, if the include
+files from all add-on packages are required, the order of these directives would be:
+@samp{-I/usr/include/@value{PACKAGE}}
+@samp{-I/usr/include/strxns}
+@samp{-I/usr/include/strcompat}
+@samp{-I/usr/include/streams}.
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+
+@end table
+
+@subsection User Space Programs
+
+Typical include files for interacting with Transport providers from user space include the
+@file{xti.h} header file.  Additional header files for interacting with specific drivers or modules
+may also be required.  The @cite{xti.h} header file is for interacting with the XTI library.
+
+@subsection Kernel Space Drivers and Modules
+
+Typical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+in kernels space include @cite{xti.h} and @cite{xti_sctp.h}.  The header files provide access to
+definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
+and modules.  Additional header files for interacting with specific drivers or modules may also be
+required.
+
+Aside from including this header files, the general procedures for compiling @dfn{STREAMS} modules
+and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
+Interface.
+
+@node Static and Shared Libraries
+@section Libraries
+
+Shared or static version of the @cite{libxnet} library may be linked when using the
+@file{@value{PACKAGE}-@value{VERSION}} package.@footnote{Note that the @file{libxnet} library is
+now provided by the @file{strxnet-@value{VERSION_STRXNET}} package.} The library may either be
+specified on the @command{gcc} command line as a shared library (e.g. @samp{-lxnet}) or as a static
+library (e.g.  @samp{/usr/lib/libxnet.a}).
+
+If the shared object library is linked, include the following options on the @command{gcc} command
+line:
+
+@table @samp
+
+@item -lxnet
+Link to the @file{/usr/lib/libxnet.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+
+@item /usr/lib/libxnet.a
+Link to the @file{/usr/lib/libxnet.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@section Kernel Modules
+
+Developing TPI kernel modules is similar to user space programs with regard to header files.
+@file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
+command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
+@dfn{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
+should be considered:
+
+@itemize @bullet
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel and @dfn{STREAMS} base package.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
+can be used to accomplish this.
+
+@item The @command{gcc} command line must include several important files directly on the command
+line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
+kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
+output of @samp{uname -r}.}
+
+@end itemize
+
+@node Manual Pages
+@section Manual Pages
+
+To assist in the development of user programs and @cite{STREAMS} driver or modules using the
+@cite{@value{PACKAGE_TITLE}} protocol module, the following manual pages are provided:
+
+The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory
+@file{/usr/share/man/man3}):
+
+@table @manref
+
+
+@end table
+
+To assist in the development of user programs and @cite{STREAMS} driver or modules using the
+@cite{@value{PACKAGE_TITLE}} protocol module, the following header files are provided:
+
+@table @header
+
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance
+@chapter Conformance
+@cindex conformance
+
+Although @cite{OpenSS7 Project} software is of high quality, and untested behaviour is often correct
+behaviour, the principle of the @cite{OpenSS7 Project} is to test all functional requirements
+against the behaviour of the package in a repeatable validation test suite that can be used to
+perform regression, target architecture validation and trouble shooting, (@pxrefman{Maturity}, and
+@pxrefman{Test Suites}).
+
+@menu
+* NPI Interface Conformance::	    Conformance to the NPI.
+* TPI Interface Conformance::	    Conformance to the TPI.
+* XTI Interface Conformance::	    Conformance to the XTI.
+* IETF Conformance::		    Conformance to IETF
+@end menu
+
+@node NPI Interface Conformance
+@section NPI Interface Conformance
+@cindex NPI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Network Provider Interface (NPI)
+Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
+available from @uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7 Project Website}.
+A reprint of the document specifying this version of the protocol is available as part of the
+@samp{strxns} package available on line in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
+or also in simple @uref{http://www.openss7.org/specs/npi.html, HTML format}.
+
+@node TPI Interface Conformance
+@section TPI Interface Conformance
+@cindex TPI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Transport Provider Interface (TPI)
+Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
+available from @uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7 Project Website}.
+A reprint of the document specifying this version of the protocol is available as part of the
+@samp{strxnet} package available on line in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
+or also in simple @uref{http://www.openss7.org/specs/tpi.html, HTML format}.
+
+@node XTI Interface Conformance
+@section XTI Interface Conformance
+@cindex XTI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{X/Open Transport Interface/Transport
+Layer Interface (XTI/TLI) X/Open Networking Services (XNS) Revision 5.2} as released by @cite{The
+OpenGroup}.  A copy of the original document is available from @uref{http://www.opengroup.org/, The
+OpenGroup website}.
+Reprints of the document are not available from The OpenSS7 Project website due to copyright
+restrictions.  Similar information is available in the manual pages that accompany the
+@samp{strxnet} package.  These can be viewed on line starting at
+@uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
+
+@node IETF Conformance
+@section IETF Conformance
+@cindex IETF conformance
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installation
+@chapter Installation
+@cindex installation
+
+@include install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Troubleshooting
+@chapter Troubleshooting
+@cindex troubleshooting
+
+@include texi/testsuite.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Licenses
+@unnumbered Licenses
+@cindex licenses
+
+@menu
+* University of Illinois License::	The UI license
+* Hewlett-Packard License::		The HP license
+* BSD/USL Combined License::		The BSD license
+* Sun RPC License::			The TIRPCSRC license
+* UNIX International DLPI License::	The DLPI license
+* UNIX International NPI License::	The NPI license
+* UNIX International TPI License::	The TPI license
+* GNU Affero General Public License::	The AGPL license
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
+
+@page
+@include texi/ui.texi
+@page
+@include texi/hp.texi
+@page
+@include texi/uslbsd.texi
+@page
+@include texi/sunrpc.texi
+@page
+@include texi/uidlpi.texi
+@page
+@include texi/uinpi.texi
+@page
+@include texi/uitpi.texi
+@page
+@include texi/agpl3.texi
+@page
+@include texi/gpl3.texi
+@page
+@include texi/lgpl3.texi
+@page
+@include texi/fdl13.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
+@unnumbered Indices
+@cindex indices
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
+* Manual Page Index::		Index of Manual Pages Referenced
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Concept Index
+@unnumberedsec Index of Concepts
+@printindex cp
+
+@page
+@node Type Index
+@unnumberedsec Index of Data Types
+@printindex tp
+
+@page
+@node Function Index
+@unnumberedsec Index of Functions and Macros
+@printindex fn
+
+@page
+@node Variable Index
+@unnumberedsec Index of Variables and Constants
+@printindex vr
+
+@page
+@node File Index
+@unnumberedsec Index of Files and Programs
+@printindex pg
+
+@page
+@node Option Index
+@unnumberedsec Index of Configuration Options
+@printindex op
+
+@page
+@node Makefile Target Index
+@unnumberedsec Index of Makefile Targets
+@printindex mk
+
+@page
+@node Author Index
+@unnumberedsec Index of Authors
+@printindex au
+
+@page
+@node Manual Page Index
+@unnumberedsec Index of Manual Pages Referenced
+@printindex mp
+
+@c ----------------------------------------------------------------------------
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
+@c ============================================================================

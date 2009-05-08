@@ -1,0 +1,479 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M_HANGUP 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_HANGUP
+\- \fISTREAMS\fP hangup message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_HANGUP
+message block is a
+.BR datab (9)
+structure and associated data buffer that contains no data.
+.PP
+An
+.B M_HANGUP
+message is a high priority message that consists of a single
+.B M_HANGUP
+message block.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B M_HANGUP
+message is generated and sent upstream by a driver or module to report that it can no longer accept
+data downstream.  As an example, this might be due to an error, or to a remote line connection being
+dropped.
+.PP
+When the message reaches the
+Stream head,
+the
+Stream
+is marked so that all subsequent
+.BR write (2s),
+.BR putmsg (2),
+.BR putpmsg (2s),
+and write-related
+system calls issued to the
+Stream
+will fail and return
+.RB [ ENXIO ]
+error.  Those
+.BR ioctl (2s)s
+that cause messages to be sent downstream or otherwise affect he sending of messages downstream are
+also failed.
+.B POLLHUP
+is set if the
+Stream
+is being polled [see
+.BR poll (2s)].
+For a
+.IR STREAMS -based
+.BR pipe (4)
+.RB [ EPIPE ]
+is returned instead of
+.RB [ ENXIO ]
+and a
+.RI { SIGPIPE }
+signal is sent to the writing process.
+For a
+.IR STREAMS -based
+controlling terminal,
+.RB [ ENXIO ]
+is returned,
+and a
+.RI { SIGHUP }
+signal is sent to the controlling process.  The signal is sent to the controlling process instead of
+the foreground process group, since the allocation and deallocation of controlling terminals to a
+session is the responsibility of the controlling process.
+Any process that has registered for a
+.B S_HANGUP
+event for the
+Stream
+will have a
+.RI { SIGPOLL }
+signal sent.
+.PP
+However, subsequent
+.BR read (2s),
+.BR getmsg (2),
+.BR getpmsg (2s),
+and read-related
+system calls issued to the
+Stream
+will not generate an error.  These calls will return any messages (according to their function) that
+were on, or in transit to, the
+Stream head
+read queue before the
+.B M_HANGUP
+message was received.  When all such messages have been read,
+.BR read (2s)
+will return zero
+.RB ( 0 )
+and
+.BR getmsg (2)
+will set each of its two length fields to zero
+.RB ( 0 )
+to indicate terminal hangup.  (Note that, in constrast, a terminal end-of-file is indicated by
+setting the control part length to minus one
+.RB ( -1 )
+and the data part length to zero
+.RB ( 0 ).)
+.PP
+Any process attempting to open a hungup
+Stream,
+with the
+.BR open (2s)
+system call,
+will fail and the caller will be returned the error number
+.RB [ EIO ]
+in
+.IR errno (3).
+.PP
+A hangup condition induced at the
+Stream head
+by sending an
+.B M_HANGUP
+message can be reversed under some implementataions with the non-portable
+.BR M_UNHANGUP (9)
+message.
+See
+.BR M_UNHANGUP (9)
+for details.
+.\"
+.PP
+.B M_HANGUP
+messages cannot be generated directly by a user level process, except by closing one side of a
+.IR STREAMS -based
+.BR pipe (4)
+or the slave side of a
+.IR STREAMS -based
+pseudo-terminal.
+.B M_HANGUP
+messages arriving at a non-multiplexing drivers should be discarded (ignored and freed).
+.B M_HANGUP
+messages can be generated by drivers and modules.
+.B M_HANGUP
+messages arriving at the
+Stream head
+are consumed.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B M_HANGUP
+message is used normally for terminals and terminal-like interfaces that use primarly the
+.BR read (2s)
+and
+.BR write (2s)
+system calls for IO to the driver.
+.PP
+An example of such a terminal-like interface is the
+.BR tirdwr (4)
+module that converts a
+.I "Transport Provider Interface (TPI)"
+networking Stream to provide support to a primarily terminal-like
+.BR read (2s)/ write " (2s)
+interface.
+See
+.BR tirdwr (4)
+for details.
+.PP
+The
+.B M_HANGUP
+message can be used in much the same circumstances an an
+.BR M_ERROR (9)
+message.  Indeed, the differences between an
+.BR M_ERROR (9)
+message with only a write-side error of
+.RB [ ENXIO ]
+are slight.
+(Such an
+.BR M_ERROR (9)
+will generate an
+.B S_ERROR
+event instead of
+.B S_HANGUP
+and
+.B POLLERR
+will be reported instead of
+.BR POLLHUP .)
+.PP
+The following guidelines provide best practise for generation of the
+.B M_HANGUP
+message for drivers and modules:
+.IP \(bu \w'\(bu\(em'u
+The
+.B M_HANGUP
+message is a high priority message and is not subjected to flow control.  Modules should pass the
+.B M_HANGUP
+message along directly from a
+.IR qi_putp (9)
+procedure and should not queue the message.
+.IP \(bu
+Modules and drivers should only pass this message upstream.  Intermediate modules may record the fact
+that a
+.B M_HANGUP
+message has transitted the module; however, the
+module must pass the
+.B M_HANGUP
+message along upstream.
+.IP \(bu
+An
+.B M_HANGUP
+message arriving at the write-side queue of a module should be passed along as an unrecognized
+message type.
+This permits
+.B M_HANGUP
+messages to be passed along a
+.IR STREAMS -based
+.BR pipe (4).
+.IP \(bu
+An
+.B M_HANGUP
+message arriving at the write-side queue of a driver should be discarded.
+.IP \(bu
+An
+.B M_HANGUP
+message arriving at the read-side queue on the lower side of a multiplexing driver should be
+treated in a similar fashion as the
+Stream head.
+That is, the driver should cease sending messages
+on the lower multiplexer queue pair.
+.IP \(bu
+Because of the asynchronous nature of the
+.B M_HANGUP
+message, use of the
+.B M_HANGUP
+message by a driver or module should be reserved for disconnect conditions, where the
+Stream
+is unusable for transmission and will require the
+Stream
+to be dismantled and recreated to reestablish communications.  Non-disconnect conditions should be
+reported with the protocol of the service interface, or using the
+.BR M_ERROR (9)
+message.
+.IP \(bu
+Fatal protocol errors are to be reported with the
+.BR M_ERROR (9)
+message and not with the
+.B M_HANGUP
+message.
+.IP \(bu
+.B M_HANGUP
+should not be used to return an error to an
+.BR ioctl (2s)
+system call.
+Unless a hangup condition has truly occured, an
+.BR M_IOCNAK (9)
+message should be used instead.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR M_TRAIL (9),
+.BR M_UNHANGUP (9),
+.BR M_ERROR (9),
+.BR M_IOCNAK (9),
+.IR qi_putp (9),
+.BR read (2s),
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR write (2s),
+.BR putmsg (2),
+.BR putpmsg (2s),
+.BR pipe (4),
+.BR tirdwr (4),
+.IR errno (3),
+.BR datab (9),
+.BR msgb (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_HANGUP
+.I STREAMS
+message is compatible with
+.IR "SVR 4.2 MP STREAMS" ,
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+documents that an
+.BR M_TRAIL (9)
+message is to be sent to the Stream head following an
+.B M_HANGUP
+message.
+.IR HPUX \(rg
+documents that an
+.BR M_TRAIL (9)
+message is to be sent to the Stream head following an
+.B M_HANGUP
+message that contains the special two-byte value,
+.BR TRAIL_TOKEN .
+See
+.BR M_TRAIL (9)
+for more information.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will send an
+.BR M_TRAIL (9)
+message to the Stream head after an
+.B M_HANGUP
+message when the
+.B M_TRAIL
+message type is defined.
+.IP \(em
+.B M_HANGUP
+is has the wrong message type value on older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+Binary compatibiltiy is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP STREAMS" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_HANGUP
+message first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

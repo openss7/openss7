@@ -1,0 +1,39 @@
+                                                                                
+     ________  ___________________                                              
+    |        ||                   |                                             
+    |        ||      Appache      |                                             
+    |        ||       1.3.22      |              .__.        _____________      
+    |        ||___________________|              |  |       |/       \|   |     
+    |        ||                   |              'TT'       |         ||| |     
+    | Linux  ||       Perl        |               ||        |         | | |     
+    | Dist.  ||       5.6.1       |              .JL.       |         ||| |     
+    |        ||___________________|     ix86     |  |-------|\_______/|___|     
+    | WBEL3  ||                   |      UP      'TT'         _|_______|_       
+    |        ||     LiS STREAMS   |   ________    ||         /bbbbbbbb bb\      
+    |        ||      2.16.18      |  | ______ |   ||        /_____________\     
+    |        ||___________________|  ||______||  .JL.                           
+    |        ||                   |  ||______||==|  | 1x10/100baseT             
+    |        ||    Linux Kernel   |  |        |  '--'                           
+    |        ||       2.4.21      |  |     OO |                                 
+    |________||___________________|  | ====== |                                 
+                                     | ====== |  .__.                           
+           4xE1 SS7 ,___________,    | ====== |  |  |                           
+           =========|           |====| ====== |  'TT'                           
+       SS7          '-----------'    |        |   ||                            
+Signalling            E400P-SS7      |        |   ||                            
+   Network 4xE1 SS7 ,___________,    |        |  .JL.                           
+           =========|           |====|        |==|  | 4x10/100baseT             
+                    '-----------'    |________|  'TT'                           
+                      E400P-SS7                   || 4 10/100baseT NICs.  Each  
+                                                  || NIC can be multihomed on a 
+           8 E1 spans.  Spans can be run fully    || different Ethernet segment 
+           channelized with 31 64kbps Q.703       || and IP subnetwork for      
+           signalling links or 2.048Mbps Q.703    || redundancy.  These NICs are
+           Annex B high-speed signalling links.   || not required until M3UA is 
+           Each E1 span can be configured fully   || to be deployed in the test 
+           channelized or unchannelized.          || environment.               
+                                                  ||                            
+      M3UA  M3UA                                  JL                            
+Signalling ======================================|  |                           
+   Gateway                                       '--'                           
+                                                                                

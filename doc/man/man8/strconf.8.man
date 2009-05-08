@@ -1,0 +1,365 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRCONF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B strconf
+\- \fISTREAMS\fP configuration utility
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+\fBstrconf\fR [\fIoptions\fR] [\fICONFIGFILE\fR \fI...\fR]
+.PD 0
+.HP 12
+\fBstrconf\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrconf\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrconf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B strconf
+is a
+.I STREAMS
+configuration utility that is used with all
+.B OpenSS7
+.I STREAMS
+packages.
+.\"
+.\"
+.SH OPTIONS
+.TP
+\fB-b\fR, \fB--basemajor\fR \fIMAJOR\fR
+Set the base major number for automatic assignment of major device numbers.
+The
+.B LiS
+.[
+LiS
+.]
+.I Configure
+script, run from the top level \*(lqmake,\*(rq uses the value of the
+environment variable
+.B ${LIS_MAJOR_BASE}
+to set this parameter, or a default value if this variable is not defined.  By
+defining this symbol in your environment, you can override the default base
+for major device numbers.
+.TP
+\fB-B\fR, \fB--minorbits\fR \fIMINORBITS\fR
+number of bits in a minor device number.  Default
+.RB ' 8 '.
+.TP
+\fB-h\fR, \fB--hconfig\fR [\fIHCONFIG\fR]
+full path and filename of the
+.I STREAMS
+configuration header file.  Default
+.RB ' config.h '.
+This option must be specified to cause
+.B strconf
+to generate the
+.I STREAMS
+configuration header file.
+.TP
+\fB-o\fR, \fB--modconf\fR [\fIMODCONFINC\fR]
+full path and filename of the module configuration include file.  Default
+.RB ' modconf.inc '.
+This option must be specified to cause
+.B strconf
+to generate the
+module configuration include file.
+.TP
+\fB-m\fR, \fB--makenodes\fR [\fIMAKENODES\fR]
+full path and filename of the makenodes file.  Default
+.RB ' makenodes.c '.
+This option must be specified to cause
+.B strconf
+to generate the
+makenodes file.
+.TP
+\fB-p\fR, \fB--permission\fR [\fIPERM\fR]
+permissions to assign to created files.  Default
+.RB ' 0666 '.
+.TP
+\fB-l\fR, \fB--driverconf\fR [\fIDRIVERCONF\fR]
+full path and filename of the driver configuration file.  Default
+.RB ' drvconf.mk '.
+This option must be specified to cause
+.B strconf
+to generate the
+driver configuration file.
+.TP
+\fB-L\fR, \fB--confmodules\fR [\fICONFMODULES\fR]
+full path and filename of the modules configuration file.  Default
+.RB ' conf.modules '.
+This option must be specified to cause
+.B strconf
+to generate the
+modules configuration file.
+.TP
+\fB-r\fR, \fB--functionname\fR [\fIFUNCNAME\fR]
+function name of the function in makenodes.  Default
+.RB ' main '.
+.TP
+\fB-s\fR, \fB--strmknods\fR [\fIMAKEDEVICES\fR]
+full path and filename of the makedevices script.  Default
+.RB ' makedev.lst '.
+This option must be specified to cause
+.B strconf
+to generate the
+makedevices script.
+.TP
+\fB-S\fR, \fB--strsetup\fR [\fISTRSETUP\fR]
+full path and filename of the
+.BR strsetup (8)
+configuration file.  Default
+.RB ' strsetup.conf '.
+This option must be specified to cause
+.B strconf
+to generate the
+.BR strsetup (8)
+configuration file.
+.TP
+\fB-O\fR, \fB--strload\fR [\fISTRLOAD\fR]
+full path and filename of the
+.BR strload (8)
+configuration file.  Default
+.RB ' strload.conf '.
+This option must be specified to cause
+.B strconf
+to generate the
+.BR strload (8)
+configuration file.
+.TP
+\fB-k\fR, \fB--package\fR [\fIPACKAGE\fR]
+name of
+.I STREAMS
+package.  Default
+.RB ' LiS '.
+The option can be one of:
+.RS
+.TP
+.B LiS
+the Linux STREAMS package.
+.[
+lis
+.]
+.PD 0
+.TP
+.B LfS
+the Linux Fast-STREAMS package.
+.[
+lfs
+.]
+.PD
+.RE
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+[\fICONFIGFILE\fR \fI...\fR]
+specifies the input configuration file.  If no configuration file is specified for input,
+.B strconf
+will read input from
+.IR stdin .
+If more than one input configuration file is specified, each will be read in the sequence specified
+on the command line.
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B --strsetup
+option generates a configuration file suitable for use by
+.BR strsetup (8).
+For more information on the format of
+.BR strsetup (8)
+configuration files, see
+.BR strsetup (8).
+.PP
+The
+.B --strload
+option generates a configuration file suitable for use by
+.BR strload (8).
+For more information on the format of
+.BR strload (8)
+configuration files, see
+.BR strload (8).
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strconf
+contains the
+.B strconf
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.BR strconf (5).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH CAVEATS
+.PP
+This man page was shamelessly stolen directly from the
+.BR "LiS htdocs" .
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strconf
+is compatible with
+.B LiS
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

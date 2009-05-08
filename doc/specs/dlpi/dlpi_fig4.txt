@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+            DL_ATTACH ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

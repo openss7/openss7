@@ -1,0 +1,169 @@
+// File: ASN1.idl
+#ifndef _ASN1_IDL_
+#define _ASN1_IDL_
+#include <orb.idl>
+#include <ASN1Types.idl>
+#pragma prefix jidm.org
+module ASN1 {
+typedef CORBA::Identifier Identifier;
+enum Kind {
+ak_none, // used when value is not ASN.1 based
+ak_null, ak_boolean,
+ak_integer, ak_real,
+ak_numericstring, ak_printablestring,
+ak_visiblestring, ak_iso646string,
+ak_graphicstring, ak_objectdescriptor,
+ak_teletexstring, ak_t61string,
+ak_generalizedtime, ak_utctime,
+ak_octetstring, ak_generalstring,
+ak_ia5string, ak_videotexstring,
+ak_bmpstring, ak_universalstring,
+ak_objectidentifier,
+ak_bitstring,
+ak_any, ak_definedany,
+ak_external,
+ak_enum,
+ak_sequence, ak_set,
+ak_sequenceof, ak_setof,
+ak_choice
+};
+interface DynAny : CORBA::DynAny {
+Kind asn1_kind() raises (Invalid);
+Identifier asn1_type_name () raises (Invalid);
+Identifier asn1_module_name() raises (Invalid);
+Identifier asn1_module_nickname() raises (Invalid);
+ASN1_ObjectIdentifier asn1_module_oid() raises (Invalid);
+void asn1_assign (in DynAny asn1_dyn_any) raises (Invalid);
+void from_dyn_any (in CORBA::DynAny dyn_any) raises (Invalid);
+CORBA::DynAny to_dyn_any() raises (Invalid);
+DynAny asn1_copy();
+void insert_asn1_null(in ASN1_Null value) raises(InvalidValue);
+void insert_asn1_boolean(in ASN1_Boolean value) raises(InvalidValue);
+void insert_asn1_unsigned16(in ASN1_Unsigned16 value) raises(InvalidValue);
+void insert_asn1_unsigned(in ASN1_Unsigned value) raises(InvalidValue);
+void insert_asn1_unsigned64(in ASN1_Unsigned64 value) raises(InvalidValue);
+void insert_asn1_integer16(in ASN1_Integer16 value) raises(InvalidValue);
+void insert_asn1_integer(in ASN1_Integer value) raises(InvalidValue);
+void insert_asn1_integer64(in ASN1_Integer64 value) raises(InvalidValue);
+void insert_asn1_real(in ASN1_Real value) raises(InvalidValue);
+void insert_asn1_numericstring(in ASN1_NumericString value) raises(InvalidValue);
+void insert_asn1_printablestring(in ASN1_PrintableString value) raises(InvalidValue);
+void insert_asn1_visiblestring(in ASN1_VisibleString value) raises(InvalidValue);
+void insert_asn1_iso646string(in ASN1_ISO646String value) raises(InvalidValue);
+void insert_asn1_graphicstring(in ASN1_GraphicString value) raises(InvalidValue);
+void insert_asn1_objectdescriptor(in ASN1_ObjectDescriptor value) raises(InvalidValue);
+void insert_asn1_teletexstring(in ASN1_TeletexString value) raises(InvalidValue);
+void insert_asn1_t61string(in ASN1_T61String value) raises(InvalidValue);
+void insert_asn1_generalizedtime(in ASN1_GeneralizedTime value) raises(InvalidValue);
+void insert_asn1_utctime(in ASN1_UTCTime value) raises(InvalidValue);
+void insert_asn1_octetstring(in ASN1_OctetString value) raises(InvalidValue);
+void insert_asn1_generalstring(in ASN1_GeneralString value) raises(InvalidValue);
+void insert_asn1_ia5string(in ASN1_IA5String value) raises(InvalidValue);
+void insert_asn1_videotexstring(in ASN1_VideotexString value) raises(InvalidValue);
+void insert_asn1_bmpstring(in ASN1_BMPString value) raises(InvalidValue);
+void insert_asn1_universalstring(in ASN1_UniversalString value) raises(InvalidValue);
+void insert_asn1_objectidentifier(in ASN1_ObjectIdentifier value) raises(InvalidValue);
+void insert_asn1_bitstring(in ASN1_BitString value) raises(InvalidValue);
+void insert_asn1_any(in ASN1_Any value) raises(InvalidValue);
+void insert_asn1_definedany(in ASN1_DefinedAny value) raises(InvalidValue);
+void insert_asn1_external(in ASN1_External value) raises(InvalidValue);
+ASN1_Null get_asn1_null() raises(TypeMismatch);
+ASN1_Boolean get_asn1_boolean() raises(TypeMismatch);
+ASN1_Unsigned16 get_asn1_unsigned16() raises(TypeMismatch);
+ASN1_Unsigned get_asn1_unsigned() raises(TypeMismatch);
+ASN1_Unsigned64 get_asn1_unsigned64() raises(TypeMismatch);
+ASN1_Integer16 get_asn1_integer16() raises(TypeMismatch);
+ASN1_Integer get_asn1_integer() raises(TypeMismatch);
+ASN1_Integer64 get_asn1_integer64() raises(TypeMismatch);
+ASN1_Real get_asn1_real() raises(TypeMismatch);
+ASN1_NumericString get_asn1_numericstring() raises(TypeMismatch);
+ASN1_PrintableString get_asn1_printablestring() raises(TypeMismatch);
+ASN1_VisibleString get_asn1_visiblestring() raises(TypeMismatch);
+ASN1_ISO646String get_asn1_iso646string() raises(TypeMismatch);
+ASN1_GraphicString get_asn1_graphicstring() raises(TypeMismatch);
+ASN1_ObjectDescriptor get_asn1_objectdescriptor() raises(TypeMismatch);
+ASN1_TeletexString get_asn1_teletexstring() raises(TypeMismatch);
+ASN1_T61String get_asn1_t61string() raises(TypeMismatch);
+ASN1_GeneralizedTime get_asn1_generalizedtime() raises(TypeMismatch);
+ASN1_UTCTime get_asn1_utctime() raises(TypeMismatch);
+ASN1_OctetString get_asn1_octetstring() raises(TypeMismatch);
+ASN1_GeneralString get_asn1_generalstring() raises(TypeMismatch);
+ASN1_IA5String get_asn1_ia5string() raises(TypeMismatch);
+ASN1_VideotexString get_asn1_videotexstring() raises(TypeMismatch);
+ASN1_BMPString get_asn1_bmpstring() raises(TypeMismatch);
+ASN1_UniversalString get_asn1_universalstring() raises(TypeMismatch);
+ASN1_ObjectIdentifier get_asn1_objectidentifier() raises(TypeMismatch);
+ASN1_BitString get_asn1_bitstring() raises(TypeMismatch);
+ASN1_Any get_asn1_any() raises(TypeMismatch);
+ASN1_DefinedAny get_asn1_definedany() raises(TypeMismatch);
+ASN1_External get_asn1_external() raises(TypeMismatch);
+DynAny current_asn1_component () raises(Invalid);
+};
+interface DynEnum: DynAny, CORBA::DynEnum {
+attribute string value_as_asn1_identifier;
+attribute long value_as_asn1_value;
+};
+interface DynNamedNumber: DynAny {
+attribute string value_as_asn1_identifier;
+};
+typedef CORBA::FieldName FieldName;
+typedef CORBA::NameValuePairSeq NameValuePairSeq;
+interface DynSetSeq: DynAny, CORBA::DynStruct {
+FieldName current_asn1_elem_name ();
+Kind current_asn1_elem_kind ();
+NameValuePairSeq get_asn1_elems() raises(Invalid);
+void set_asn1_elems(in NameValuePairSeq value) raises (InvalidSeq);
+void insert_optional_absent() raises (InvalidValue);
+DynAny insert_optional_present() raises (InvalidValue);
+void insert_default_absent() raises (InvalidValue);
+DynAny insert_default_present() raises (InvalidValue);
+boolean get_optional_presence() raises (TypeMismatch);
+DynAny get_optional_present() raises (TypeMismatch);
+boolean get_default_presence() raises (TypeMismatch);
+DynAny get_default_present() raises (TypeMismatch);
+};
+interface DynChoice: DynAny, CORBA::DynUnion {
+DynAny asn1_elem ();
+attribute FieldName asn1_elem_name;
+Kind asn1_elem_kind ();
+};
+interface DynSetSeqOf : DynAny, CORBA::DynSequence {
+Kind asn1_item_kind ();
+};
+interface DynAnyFactory {
+exception InconsistentKind {};
+exception InconsistentTypeCode {};
+typedef CORBA::Identifier Identifier;
+DynAny create_asn1_dyn_any(in any value);
+DynAny create_basic_dyn_any(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+CORBA::DynStruct create_dyn_struct(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+CORBA::DynSequence create_dyn_sequence(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+CORBA::DynUnion create_dyn_union(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+CORBA::DynEnum create_dyn_enum(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+CORBA::DynArray create_dyn_array(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+CORBA::DynFixed create_dyn_fixed(in CORBA::TypeCode type)
+raises(InconsistentTypeCode);
+DynAny create_asn1_dyn_primitive(in Identifier asn1_nickname,
+in Identifier asn1_name)
+raises(InconsistentKind);
+DynEnum create_asn1_dyn_enum(in Identifier asn1_nickname,
+in Identifier asn1_name)
+raises(InconsistentKind);
+DynSetSeq create_asn1_dyn_setseq(in Identifier asn1_nickname,
+in Identifier asn1_name)
+raises(InconsistentKind);
+DynSetSeqOf create_asn1_dyn_setseqof(in Identifier asn1_nickname,
+in Identifier asn1_name)
+raises(InconsistentKind);
+DynChoice create_asn1_dyn_choice(in Identifier asn1_nickname,
+in Identifier asn1_name)
+raises(InconsistentKind);
+};
+};
+#endif /* _ASN1_IDL_ */

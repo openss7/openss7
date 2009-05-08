@@ -1,0 +1,568 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_OPEN_COMM 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_open_comm, mi_open_comm_cache
+\- \fISTREAMS\fP common minor device open utility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+int \fBmi_open_comm\fR(caddr_t *\fIhead\fR, size_t \fIsize\fR, queue_t
+*\fIq\fR, dev_t *\fIdevp\fR, int \fIoflag\fR, int \fIsflag\fR, cred_t
+*\fIcrp\fR);
+.HP
+int \fBmi_open_comm_cache\fR(caddr_t *\fIhead\fR, kmem_cachep_t \fIcachep\fR, queue_t
+*\fIq\fR, dev_t *\fIdevp\fR, int \fIoflag\fR, int \fIsflag\fR, cred_t
+*\fIcrp\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'sflag\ \ 'u
+.I head
+Specifies the address of a static pointer which will be used internally by
+.BR mi_open_comm ()
+to store the address of the module's list of open Streams.  The pointer that
+.I head
+references should be initialized to
+.BR NULL
+before the first call to
+.BR mi_open_comm ()
+with
+.I head
+as an argument.
+.TP
+.I size
+Specifies the amount of memory the module needs for its per-stream data.  It
+is usually the size of the local structure which contains the module's
+instance data.
+.TP
+.I cachep
+Specifies the kernel memory cache pointer of a memory cache with appropriately sized objects.  The
+objects in this memory cache can be appropriately sized using the
+.BR mi_open_size (9)
+utility.
+.TP
+.I q
+A pointer to the driver or module's read queue,
+obtained directly from
+.IR qi_qopen (9).
+.TP
+.I devp
+A pointer to the device number,
+obtained directly from
+.IR qi_qopen (9).
+.TP
+.I oflag
+The open flags,
+obtained directly from
+.IR qi_qopen (9).
+.TP
+.I sflag
+The stream flags,
+obtained directly from
+.IR qi_qopen (9).
+Specifies how the
+.I devp
+argument is used as follows:
+.RS
+.TP \w'CLONEOPEN\ \ 'u
+.B DEVOPEN
+The minor device number specified by the
+.I devp
+argument is used.
+.TP
+.B MODOPEN
+The
+.I devp
+argument is
+.BR NULL .
+This value should be used if
+.BR mi_open_comm ()
+is called from the
+.IR qi_qopen (9)
+routine of a
+.I STREAMS
+module rather than a
+.I STREAMS
+driver.
+.TP
+.B CLONEOPEN
+A unique minor device number (above 5) is assigned (minor numbers 0 through 5,
+inclusive,
+are reserved as special access codes).
+.RE
+.TP
+.I crp
+A pointer to the credentials of the opening user,
+obtained directly from
+.IR qi_qopen (9).
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+perform housekeeping during
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+operations.
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+are intended to be called by the driver or module
+.IR qi_qopen (9)
+procedure.  They assign a minor device number to the stream (as specified by
+the
+.I sflag
+argument), allocate the requested per-stream data, and set the
+.I q_ptr
+fields of the stream being opened.
+.PP
+Each call to
+.BR mi_open_comm ()
+must have a corresponding call to
+.BR mi_close_comm (9).
+.PP
+Each call to
+.BR mi_open_comm_cache ()
+must have a corresponding call to
+.BR mi_close_comm_cache (9).
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+succeed, they return zero (0);
+when they fail, they return a non-zero error code.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+fail they return a non-zero error code as follows:
+.TP \w'[EAGAIN]\ \ 'u
+.RB [ ENXIO ]
+an argument to the call is invalid.
+.TP
+.RB [ EAGAIN ]
+an internal structure could not be allocated and the call should be retried.
+.PP
+These error codes are selected so that they can be returned directly from
+.IR qi_qopen (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+can be called from User Context.
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+are normally called from within a
+.I STREAMS
+module's
+.IR qi_qopen (9)
+procedure (User Context).
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+are MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+are
+.IR MPS \(rg-specific
+functions:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_open_comm ()
+performs some sanity checks on the arguments that are passed to it, calls
+.BR mi_open_alloc_sleep (9)
+to acquire the private structure and then calls
+.BR mi_open_link (9)
+to link the private structure into the list and
+.BR mi_attach (9)
+to attach the private structure to the
+.I q_ptr
+members of each queue in the queue pair.
+.PP
+.BR mi_open_comm_cache ()
+performs some sanity checks on the arguments that are passed to it, calls
+.BR mi_open_alloc_cache (9)
+to acquire the private structure and then calls
+.BR mi_open_link (9)
+to link the private structure into the list and
+.BR mi_attach (9)
+to attach the private structure to the
+.I q_ptr
+members of each queue in the queue pair.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of a module
+.IR qi_qopen (9)
+procedure using
+.BR mi_open_comm ():
+.PP
+.nf
+\fC\s-1
+static caddr_t xxx_state = NULL;
+
+typedef struct {
+    dev_t my_dev;
+    queue_t *rq;
+    long some_data;
+    long some_more_data;
+} xxx_priv_t;
+
+int
+xxx_open(queue_t *q, dev_t *devp, int oflag, int sflag,
+	 cred_t *crp)
+{
+    int err;
+    xxx_priv_t *priv;
+
+    err = mi_open_comm(&xxx_state, sizeof(xxx_priv_t),
+		       q, devp, oflag, sflag, crp);
+    if (err != 0) {
+	return (err);
+    }
+
+    priv = q->q_ptr;
+
+    priv->my_dev = *devp;
+    priv->rq = q;
+    priv->some_data = SOME_DATA_INITIALIZER;
+    priv->some_more_data = SOME_MORE_DATA_INITIALIZER;
+
+    return (0);
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR qi_qopen (9),
+.BR mi_close_comm (9),
+.BR mi_open_alloc_sleep (9),
+.BR mi_open_alloc (9),
+.BR mi_open_alloc_cache (9),
+.BR mi_open_link (9),
+.BR mi_attach (9),
+.BR mi_next_ptr (9),
+.BR ddi_soft_state_zalloc (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_open_comm ()
+and
+.BR mi_open_comm_cache ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_open_comm ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_open_comm ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+Use of
+.BR mi_open_comm ()
+requires different include file sequences on
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+than on
+.IR AIX \(rg
+or
+.IR MacOT \(rg.
+.IR AIX \(rg
+includes
+.B <pse/mi.h>
+and
+.B <sys/stream.h>
+only.
+.IP \(em
+.BR mi_open_comm ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_open_comm ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_open_comm ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.PP
+.BR mi_open_comm_cache ()
+is an
+.I OpenSS7 Project
+specific implementation of
+.BR mi_open_comm ()
+that is inherently non-portable.  While it is fairly straightforward to implement these in any
+Mentat implementation present on modern day UNIX systems, it requires exposing internals to the MPS
+implementation that might not be desirable.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation,
+.[
+aixcpc
+.]
+.IR "The OpenSS7 Project" .
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_open_comm ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_open_comm ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_open_comm ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_open_comm ()
+appears in
+.IR Solaris \(rg.
+.PP
+.BR mi_open_comm_cache ()
+is an
+.I OpenSS7 Project
+function based loosely on the
+.BR mi_open_comm ()
+Mentat function.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

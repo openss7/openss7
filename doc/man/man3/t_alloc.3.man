@@ -1,0 +1,441 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH T_ALLOC 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "XTI/TLI Library Calls"
+.SH NAME
+.B t_alloc
+\- allocate a library structure
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.HP 8
+.BI "void *t_alloc(int " fd ", int " type ", int " fields );
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the transport endpoint against which to allocate the structure.
+.TP
+.I type
+the type of structure to allocate.
+.TP
+.I fields
+the
+.BR netbuf (3)
+fields to populate and for which to allocate buffers.
+.SH DESCRIPTION
+.PP
+.BR t_alloc ()
+allocates the specified XTI/TLI
+.[
+xti revision 1.0
+.]
+.[
+xns 5.2
+.]
+structure
+.I type
+and initializes requested
+.BR netbuf (3)
+parameter
+.I fields
+in the structure.
+.PP
+.I fd
+specifies the local endpoint for which to allocate structures.  The local
+endpoint is necessary because the sizes of
+.BR netbuf (3)
+fields is determined by the protocol limits returned in the
+.B t_info
+structure from calls to
+.BR t_open "(3) or " t_getinfo (3).
+.PP
+.I type
+specifies the type of XTI/TLI
+.[
+xti revision 1.0
+.]
+.[
+xns 5.2
+.]
+structure to allocate, and may be one of the
+following:
+.TP \w'T_UNITDATA\(em'u
+.B T_BIND
+specifies the
+.B t_bind
+structure.
+.PD 0
+.TP
+.B T_OPTMGMT
+specifies the
+.B t_optmgmt
+structure.
+.TP
+.B T_CALL
+specifies the
+.B t_call
+structure.
+.TP
+.B T_DIS
+specifies the
+.B t_discon
+structure.
+.TP
+.B T_UNITDATA
+specifies the
+.B t_unitdata
+structure.
+.TP
+.B T_UDERROR
+specifies the
+.B t_uderr
+structure.
+.TP
+.B T_INFO
+specifies the
+.B t_info
+structure.
+.PD
+.PP
+.I fields
+specifies which
+.BR netbuf (3)
+parameters to initialize with buffers in addition to allocating the structure.
+The size of the buffer is gleened by
+.BR t_alloc ()
+from protocol sizing information associated with the local transport endpoint
+.IR fd .
+.I fields
+is a bitwise OR of zero or more of the following flags:
+.TP \w'T_UNITDATA\(em'u
+.B T_ADDR
+allocate and initialize the
+.I addr
+.BR netbuf (3)
+structure and buffer.
+.TP
+.B T_OPT
+allocate and initialize the
+.I opt
+.BR netbuf (3)
+structure and buffer.
+.TP
+.B T_UDATA
+allocate and initialize the
+.I udata
+.BR netbuf (3)
+structure and buffer.
+.TP
+.B T_ALL
+allocate and initialize all relevant
+.BR netbuf (3)
+structures and buffers.
+.PP
+The
+.BR netbuf (3)
+parameters in the allocated structure that have their corresponding flag set
+will have their
+.I buf
+fields set to the allocated buffer, their
+.I maxlen
+fields set to the length of the allocated buffer, and their
+.I len
+fields set to zero (0).  (The caller must sent the
+.I len
+fields appropriately after placing contents into the buffer, but not in excess
+of
+.IR maxlen .)
+.PP
+The
+.BR netbuf (3)
+parameters in the allocated structure that do not have the corresponding flag
+set,
+which have a length of zero (0) in the information structure returned by
+.BR t_getinfo (3),
+or which have a length of
+.B T_INVALID
+in the information structure returned by
+.BR t_getinfo (3)
+and
+.I fields
+is set to
+.BR T_ALL ,
+will have their
+.I buf
+fields set to
+.BR NULL ,
+and their
+.IR maxlen " and " len
+fields set to zero.
+.PP
+If a field with its flag set has a length of
+.B T_INVALID
+in the information structure returned by
+.BR t_getinfo (3)
+and
+.B T_ALL
+was not specified for
+.IR fields ,
+.BR t_alloc ()
+will fail with error
+.RB [ EINVAL ].
+.PP
+Any flag positions in the
+.I fields
+argument not relevant to the structure type in the
+.I type
+argument will be ignored.
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR t_alloc ()
+returns a
+.BR "" non- NULL
+pointer to the allocated structure.
+Upon failure,
+.BR t_alloc ()
+returns
+.B NULL
+and sets
+.IR t_errno (3)
+to an appropriate error number.
+.SH ERRORS
+.PP
+When
+.BR t_alloc ()
+fails, it returns
+.B NULL
+and sets
+.IR t_errno (3)
+to an appropriate error number as follows:
+.TP \w'[TNOTSUPPORT]\(em'u
+.RB [ TBADF ]
+.I fd
+is invalid.
+.TP
+.RB [ TNOSTRUCTYPE ]
+The argument \fItype\fR was not a valid or supported structure type, or was
+not an appropriate structure type for the service type of the transport
+endpoint.
+.TP
+.RB [ TPROTO ]
+A protocol error occured between the XTI/TLI library and the underlying transport provider.
+.TP
+.RB [ TSYSERR ]
+A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in \fIerrno\fR(3).
+This occurs in the following situations:
+.TP
+.RB [ ENOMEM ]
+Memory could not be allocated for the structure or a buffer in the structure.
+.TP
+.RB [ EINVAL ]
+.I fields
+was specified (i.e. not set to
+.BR T_ALL )
+and at least one of the specified fields was of size
+.B T_INVALID
+in the information structure (see
+.BR t_getinfo (3)).
+.SH NOTICES
+.PP
+If a field with its flag set has a length of
+.B T_INFINITE
+in the information structure returned by
+.BR t_getinfo (3),
+or if the length is greater that an internal maximum size,
+.BR t_alloc ()
+will only allocate the internal maximum size.
+.SH "SEE ALSO"
+.PP
+.BR t_getinfo (3),
+.BR t_free (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR t_alloc ()
+has no known bugs.
+.BR t_alloc ()
+has been tested with the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+conformance test suites.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The XTI/TLI library functions are compatible with 
+SVR4.2,
+.[
+svr42
+.]
+XNS 5.2,
+.[
+xns 5.2
+.]
+SUSv2.
+.[
+susv2
+.]
+Compatibility is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XTI/TLI,
+.[
+xti revision 1.0
+.]
+TPI,
+.[
+TPI Revision 2.0.0
+.]
+XPG5,
+XNS 5.2,
+.[
+xns 5.2
+.]
+SUSv2.
+.[
+susv2
+.]
+Conformance is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B t_alloc
+first appeared in SVR4.2.
+.[
+svr42
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XTI/TLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

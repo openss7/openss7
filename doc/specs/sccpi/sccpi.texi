@@ -1,0 +1,4437 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: sccpi.texi,v 0.9.2.6 2009-05-01 04:50:32 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2009-05-01 04:50:32 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename sccpi.info
+@include texi/args.texi
+@set MANUAL_TITLE Signalling Connection Control Part Interface (SCCPI)
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* SCCPI: (sccpi).		Signalling Connection Control Part Interface
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Signalling Connection Control Part Interface (SCCPI)
+@set MANUAL_TYPE Specification
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Signalling Connection Control Part Interface (SCCPI)
+@set MANUAL_TYPE Specification
+
+@set PART Signalling Connection Control
+@set LONG Signalling Connection Control Part
+@set SHORT SCCP
+@set INTERFACE SCCPI
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@subsubheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@strong{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{[\name\]}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@var{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{[\name\]}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@var{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@macro mobj{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* The @value{SHORT} Layer::
+* @value{INTERFACE} Services Definition::
+* @value{INTERFACE} Primitives::
+* Diagnostics Requirements::
+* @value{INTERFACE} Input-Output Controls::
+* @value{INTERFACE} Management Information Base::
+* Addendum for @value{SHORT} Conformance::
+* Mapping @value{INTERFACE} Primitives::
+* State/Event Tables::
+* Precedence Tables::
+@c * Allowable Sequence of @value{INTERFACE} Primitives::
+@c * Precedence of @value{INTERFACE} Primitives::
+@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
+@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
+* @value{INTERFACE} Header Files::
+* @value{INTERFACE} Library::
+* @value{INTERFACE} Drivers and Modules::
+* @value{INTERFACE} Utilities::
+* @value{INTERFACE} File Formats::
+* @value{INTERFACE} Compatibility and Porting::
+* Glossary::
+* Acronyms::
+* References::
+* Licenses::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
+* Index::
+@c @end ifnottex
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Notice
+
+Software in this document and related software is released under the AGPL (@pxref{GNU Affero General
+Public License}).  Please note, however, that there are different licensing terms for some of the
+manual package and some of the documentation.  Consult permission notices contained in the
+documentation of those components for more information.
+
+This document is released under the FDL (@pxref{GNU Free Documentation License}) with no invariant
+sections, no front-cover texts and no back-cover texts.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
+components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+
+@subsection Purpose
+@cpindex STREAMS
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@subsection Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@subsection Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+A current version of this specification is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallformat
+@verbatim
+$Log: sccpi.texi,v $
+Revision 0.9.2.6  2009-05-01 04:50:32  brian
+- update documentation for release
+
+Revision 0.9.2.5  2009-04-30 06:07:38  brian
+- more documentation updates for release
+
+Revision 0.9.2.4  2009-04-29 18:05:20  brian
+- updated documentation for release
+
+Revision 0.9.2.3  2008-12-20 12:55:39  brian
+- add new mibs and agents
+
+Revision 0.9.2.2  2008-11-26 12:01:34  brian
+- updated to FDL 1.3
+
+Revision 0.9.2.1  2008-11-17 14:04:33  brian
+- added documentation and conversion modules
+
+Revision 0.9.2.8  2008-09-20 11:04:29  brian
+- added package patchlevel
+
+Revision 0.9.2.7  2008-08-03 06:03:31  brian
+- protected agains texinfo commands in log entries
+
+Revision 0.9.2.6  2008-08-03 05:05:15  brian
+- conditional @syncodeindex frags out automake, fails distcheck
+
+Revision 0.9.2.5  2008-07-23 08:29:01  brian
+- updated references and support for 2.6.18-92.1.6.el5 kernel
+
+Revision 0.9.2.4  2008-07-11 09:36:12  brian
+- updated documentation
+
+Revision 0.9.2.3  2008-04-29 07:10:38  brian
+- updating headers for release
+
+Revision 0.9.2.2  2007/08/14 12:17:00  brian
+- GPLv3 header updates
+
+Revision 0.9.2.1  2007/06/27 08:42:19  brian
+- added MTPI spec document
+@end verbatim
+@end smallformat
+
+@section ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this maual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is a @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infrincement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Aquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granded herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplerment
+to the FAR (or any successor regulations).
+
+@section Acknowledgements
+
+@url{http://www.openss7.org/,The OpenSS7 Project} was funded in part by:
+
+@itemize @bullet
+@item @url{http://www.monavacon.com/,Monavacon Limited}
+@item @url{http://www.openss7.com/,OpenSS7 Corporation}
+@end itemize
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @url{http://www.fsf.org/,Free Software Foundation}, the
+@url{http://www.kernel.org/,Linux Kernel Community}, and the open source software movement at large.
+
+@node Introduction
+@chapter Introduction
+@cpindex STREAMS
+
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T
+@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a @value{PART}
+service to access and use any of a variety of conforming @value{PART} providers without specific
+knowledge of the provider's protocol.  The service interface is designed to support any network
+@value{PART} protocol and user @value{PART} protocol.  This interface only specifies access to
+@value{PART} service providers, and does not address issues concerning @value{PART} management,
+protocol performance, and performance analysis tools.
+
+This specification assumes that the reader is familiar with ITU-T state machines and @value{PART}
+interfaces (e.g. Q.711, T1.112), and @cite{STREAMS}.
+
+@section Related Documentation
+
+@itemize ---
+@item @strong{ITU-T Recommendation Q.711 (White Book)}
+@item @strong{ETSI EN 300 009-1}
+@item @strong{ANSI T1.112/2002}
+@item @strong{System V Interface Definition, Issue 2 --- Volume 3}
+@end itemize
+
+@subsection Role
+
+This document specifies an interface that supports the services provided by the @dfn{Signalling
+System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation
+Q.711, ANSI T1.112, ETSI EN 300 009-1.  These specifications are targeted for use by developers
+and testers of protocol modules that require @value{PART} service.
+
+@section Definitions, Acronyms, Abbreviations
+
+@table @dfn
+@item Originating SL User
+A SL-User that initiates a Signalling Link.
+@item Destination SL User
+A SL-User with whom an originating SL user wishes to establish a Signalling Link.
+@item ISO
+International Organization for Standardization
+@item SL User
+Kernel level protocol or user level application that is accessing the services
+of the Signalling Link sub-layer.
+@item SL Provider
+Signalling Link sub-layer entity/entities that provide/s the services of the
+Signalling Link interface.
+@item SLI
+Signalling Link Interface
+@item TIDU
+Signalling Link Interface Data Unit
+@item TSDU
+Signalling Link Service Data Unit
+@item OSI
+Open Systems Interconnection
+@item QOS
+Quality of Service
+@item STREAMS
+A communication services development facility first available with UNIX System V Release 3.
+@end table
+
+@node The @value{SHORT} Layer
+@chapter The @value{SHORT} Layer
+
+@menu
+* Model of the @value{INTERFACE}::
+* @value{INTERFACE} Services::
+* @value{SHORT} Service Primitives::
+@end menu
+
+The @value{SHORT} Layer provides the means to manage the NC of @value{SHORT}-Users into
+connections.  It is responsible for the routing and management of data to and from SS7 network
+connections between @value{SHORT}-user entities.
+
+@node Model of the @value{INTERFACE}
+@section Model of the @value{INTERFACE}
+
+The @value{INTERFACE} defines the services provided by the signalling link layer to the signalling
+link user at the boundary between the signalling link provider and the signalling link user entity.
+The interface consists of a set of primitives defined as @cite{STREAMS} messages that provide access
+to the signalling link layer services, and are transferred between the @value{SHORT} user entity and
+the @value{SHORT} provider.  These primitives are of two types; ones that originate from the
+@value{SHORT} user, and other that originate from the @value{SHORT} provider.  The primitives that
+originate from the @value{SHORT} user make requests to the @value{SHORT} provider, or respond to an
+indication of an event of the @value{SHORT} provider.  The primitives that originate from the
+@value{SHORT} provider are either confirmations of a request or are indications to the CCS user that
+an event has occurred.  @figref{1} shows the model of the @value{INTERFACE}.
+
+@figuresized{sccpi01,1,Model of the @value{INTERFACE},4.0in}
+
+The @value{INTERFACE} allows the @value{SHORT} provider to be configured with any @value{SHORT} user
+(such as TCAP) that also conforms to the @value{INTERFACE}.  A network layer user
+can also be a user program that conforms to the @value{INTERFACE} and accesses the @value{SHORT}
+provider via @manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
+
+@node @value{INTERFACE} Services
+@section @value{INTERFACE} Services
+
+The features of the @value{INTERFACE} are defined in terms of the services provided by the
+@value{SHORT}, and the individual primitives that may flow between the @value{SHORT}-User and the
+@value{SHORT}.
+
+The services supported by the @value{INTERFACE} are based on two distinct modes of communication,
+connectionless (CLNS) and connection oriented (CONS).  Within these modes, the @value{INTERFACE}
+provides support for both sequenced and unsequenced message transfer.  Also, the @value{INTERFACE}
+supports services for local mangement.
+
+@subsection CLNS
+
+The main features of the connectionless mode of communication are:
+
+@enumerate
+@item
+it is datagram oriented;
+@item
+it provides transfer of data in self contained units;
+@item
+there is no logical relationship between these units of data.
+@end enumerate
+
+Connectionless mode communication has no separate phases.  Each unit of data is transmitted from
+source to destination independently, appropriate addressing information is included with each unit
+of data.  Although the units of data are transmitted independently from source to destination,
+@value{SHORT} provides a high level of assurance of sequencing if sequenced service is requested.
+When unsequenced service is requested, there are no guarantees of proper sequence.  Although
+@value{SHORT} services are inherently unreliable, @value{SHORT} provide a high level of assurance
+that messages are not lost.
+
+The connectionless service of @value{SHORT} is suited to @value{SHORT} User protocols such as the
+Transaction Capabilities Application Part (TCAP).@footnote{@ref{Q.714,,Q.714}.}
+
+@subsection CONS
+
+The main features of the @value{SHORT} connection oriented mode of communication are:
+
+@enumerate
+@item
+it is virtual circuit oriented;
+@item
+it provides transfer of data via a pre-established path.
+@end enumerate
+
+There are three phases to each instance of communication: Connection Establishment, Data Transfer;
+and Connection Termination.  Units of data arrive at their destination in the same order as they
+departed their source when the sequenced delivery service is requested and the data is protected
+against duplication or loss of data within some specified quality of service.
+
+The connection oriented service of @value{SHORT} is suited to @value{SHORT} User protocols such as
+the Integrated Services Digital Network User Part (ISUP), [Q.764] Telephone User Part (TUP), [Q.724]
+and Bearer Indexed Call Control (BICC).@footnote{ISUP consists of @dfn{signalling relations} between
+two switches which also have digital facilities between them.  In general an ISUP @value{SHORT}-User
+can communicate with many other @value{SHORT}-User peers, however, signalling between any given two
+enpoints only concerns the digital facilities which exist between the two endpoints.  So, management
+of ISUP switches is best performed on a pairing of endpoints (@dfn{signalling relations}).  Also,
+the CONS mode of operation is provided in support of DPC list Routing Keys for M3UA. [RFC 4666]}
+
+@subsection Local Management
+
+The @value{INTERFACE} specifications also defines a set of local management functions that apply to
+CONS and CLNS modes of communication.  These services have local significance only.
+
+@subsection Provider Management
+
+The @value{INTERFACE} specification also defines a set of provider management functions that apply
+to the @value{SHORT} service provider.  These services have local and end-to-end significance.
+
+@node @value{SHORT} Service Primitives
+@section @value{SHORT} Service Primitives
+
+@tabref{1}, @tabref{2}, @tabref{3} and @tabref{4} summarize the @value{INTERFACE} service primitives
+by their state and service
+
+@tabfig{sccpi_tab01,1,@value{INTERFACE} Service Primitives for Local Management}
+@tabfig{sccpi_tab02,2,@value{INTERFACE} Service Primitives for Connectionless Mode Data Transfer}
+@tabfig{sccpi_tab03,3,@value{INTERFACE} Service Primitives for Connection Mode Data Transfer}
+@tabfig{sccpi_tab04,4,@value{INTERFACE} Service Primitives for @value{SHORT} Management}
+
+@node @value{INTERFACE} Services Definition
+@chapter @value{INTERFACE} Services Definition
+@cindex @value{INTERFACE} Services Definition
+
+@menu
+* Local Management Services::
+* Connectionless Services::
+* Connection Oriented Services::
+* @value{SHORT} Provider Management Services::
+@end menu
+
+This section describes the services of the @value{INTERFACE} primitives.  Time-sequence diagrams
+that illustrate the sequence of primitives are included.@footnote{Conventions for the time-sequence
+diagrams are defined in ITU-T X.210. [X.210]} The format of the primitives will be defined later in
+this document.
+
+@node Local Management Services
+@section Local Management Services
+
+The services defined in this section are outside the scope of international standards.  These
+services apply to CONS and CLNS modes of communication.  They are invoked for the
+initialization/de-initialization of a stream connected to the @value{SHORT}.  They are also used to
+manage options supported by the @value{SHORT} and to report information on the supported parameter
+values.
+
+@subsection @value{LONG} Information Reporting Service
+
+This service provides information on the options supported by the @value{SHORT} provider.
+
+@table @strong
+@item N_INFO_REQ:
+@prindex N_INFO_REQ
+This primitive requests that the @value{SHORT} return the values of all the supported protocol
+parameters.  This request may be invoked during any phase.
+@item N_INFO_ACK:
+@prindex N_INFO_ACK
+This primitive is in response to the @prim{N_INFO_REQ} primitive and returns the values of the
+supported protocol parameters to the @value{SHORT}-User.
+@end table
+
+
+The sequence of primitives for @value{SHORT} information management is shown in @figref{2}.
+
+@figuresized{sccpi02,2,@value{LONG} Information Reporting Service,4.0in}
+
+@subsection @value{SHORT} User Bind Service
+
+
+This service allows an @value{SHORT} address (@value{SHORT}-SAPI) to be associated with a Stream.
+
+It allows the @value{SHORT}-User to negotiate the number of connect indications that can remain
+unacknowledged for that @value{SHORT}-User (a connect indication is considered unacknowledged while
+it is awaiting a corresponding connect response or release request from the @value{SHORT}-User).
+This service also defines a mechanism that allows a Stream (bound to an @value{SHORT} address of the
+@value{SHORT}-User) to be reserved to handle incoming connections only.  This Stream is referred to
+as the listener Stream.
+
+@table @strong
+@item N_BIND_REQ:
+@prindex N_BIND_REQ
+This primitive requests that the @value{SHORT}-User be bound to a particular @value{SHORT} address
+(@value{SHORT}-SAPI), and negotiate the number of allowable outstanding connect indications for that
+address.
+@item N_BIND_ACK:
+@prindex N_BIND_ACK
+This primitive is in response to the @prim{N_BIND_REQ} primitive and indicates to the user that
+the specified @value{SHORT}-User has been bound to an @value{SHORT} address.
+@end table
+
+The sequence of primitives is shown in @figref{4}.
+
+@figuresized{sccpi03,4,@value{LONG} User Bind Service,4.0in}
+
+@subsection @value{SHORT} User Unbind Service
+
+This service allows the @value{SHORT}-User to be unbound from an @value{SHORT} address.
+
+@table @strong
+@item N_UNBIND_REQ:
+@prindex N_UNBIND_REQ
+This primitive requests that the @value{SHORT}-User be unbound from the @value{SHORT} address that
+it had previously been bound to.
+@end table
+
+
+The sequence of primitives is shown in @figref{5}.
+
+@figuresized{sccpi04,5,@value{LONG} User Unbind Service,4.0in}
+
+@subsection Receipt Acknowledgement Service
+
+@table @strong
+@item N_OK_ACK:
+@prindex N_OK_ACK
+This primitive indicates to the @value{SHORT}-User that the previous @value{SHORT}-User originated
+primitive was received successfully by the @value{SHORT}.
+@end table
+
+
+An example showing the sequence of primitives for successful receipt acknowledgement is depicted in
+@figref{6}.
+
+@figuresized{sccpi05,6,@value{LONG} Receipt Ackknowledgement Service,4.0in}
+
+@subsection Options Management Service
+
+This service allows the @value{SHORT}-User to manage options parameter values associated wtih the
+@value{SHORT}.
+
+@table @strong
+@item N_OPTMGMT_REQ:
+@prindex N_OPTMGMT_REQ
+This primitive allows the @value{SHORT}-User to select default values for options parameters within
+the range supported by the @value{SHORT}, and to indicate the default selection of receipt
+confirmation.
+@end table
+
+@figref{7} shows the sequence of primitives for @value{SHORT} options management.
+
+@figuresized{sccpi06,7,@value{LONG} Options Management Service,4.0in}
+
+@subsection Error Acknowledgement Service
+
+@table @strong
+@item N_ERROR_ACK:
+@prindex N_ERROR_ACK
+This primitive indicates to the @value{SHORT}-User that a non-fatal error has occured in the last
+@value{SHORT}-User originated request or response primitive (listed in @figref{8}), on the stream.
+@end table
+
+@figref{8} shows the sequence or primitives for the error management primitive.
+
+@figuresized{sccpi07,8,@value{LONG} Error Acknowledgement Service,4.0in}
+
+@node Connectionless Services
+@section Connectionless Services
+
+The CLNS allows for the transfer of @value{SHORT}-User data in one or both directions simultaneously
+without establishing an NC between @value{SHORT}-User peers.  A set of primitives are
+defined that carry user data and control information between the @value{SHORT}-User and
+@value{SHORT} entities.  The primitives are modeled as requests initiated by the @value{SHORT}-User
+and indications initiated by the @value{SHORT} provider.  Indications may be initiated by the
+@value{SHORT} independently from requests by the @value{SHORT}-User.
+
+The connectionless @value{SHORT} service consists of one phase.
+
+@subsection Data Transfer
+
+@subsubsection User Primitives for Data Transfer
+
+@table @strong
+@item N_UNITDATA_REQ:
+@prindex N_UNITDATA_REQ
+This primitive requests that the @value{SHORT} send the data unit to the specified destination with
+the specified sequence control.
+@end table
+
+@subsubsection Provider Primitives for Data Transfer
+
+@table @strong
+@item N_UNITDATA_IND:
+@prindex N_UNITDATA_IND
+This primitive indicates to the @value{SHORT}-User that a data unit has been received from the
+specified source address.
+@end table
+
+
+@figref{9} shows the sequence of primitives for the connectionless mode of data transfer.
+@figuresized{sccpi44,9,@value{LONG} Data Transfer,4.0in}
+
+@c @subsection Error Management
+@c @subsubsection Provider Primitives for Error Management
+@c 
+@c @table @strong
+@c @item MTP_PAUSE_IND:
+@c @prindex MTP_PAUSE_IND
+@c This primitive indicates to the @value{SHORT}-User that the specified destination address is no
+@c longer accessible.
+@c @item MTP_RESUME_IND:
+@c @prindex MTP_RESUME_IND
+@c This primitive indicates to the @value{SHORT}-User that the specified destination address is now
+@c accessible.
+@c @item MTP_STATUS_IND:
+@c @prindex MTP_STATUS_IND
+@c This primitive indicates ot the @value{SHORT}-User that the congestions status to the specified
+@c destination address has changed, or that the remote @value{SHORT}-User is no longer available.
+@c @end table
+@c 
+@c @figref{10} shows the sequence of primitives for the connectionless mode error management primitives.
+@c 
+@c @figuresized{mtpi31,10,@value{LONG} Error Management,4.0in}
+
+
+@node Connection Oriented Services
+@section Connection Oriented Services
+
+This section describes the required @value{SHORT} service primitives that define the CLNS interface.
+
+The queue model for CLNS is discused in more detail in ITU-T Q.711. [Q.711] For Q.711 specific
+conformance considerations, see Addendum 1.
+
+The queue model represents the operation of an @value{SHORT} connection in the abstract by a pair of
+queues linking the two @value{SHORT} addresses.  There is one queue for each direction of signalling
+transfer.  The ability of a user to add objects to a queue will be determined by the behavior of the
+user removing objects from that queue, and the state of the queue.  The pair of queues is considered
+to be available for each potential NC.  Objects that are entered or removed from the queue
+are either as a result of interactions at the two @value{SHORT} addresses, or as the result of
+@value{SHORT} initiatives.
+
+@itemize @minus{}
+@item
+A queue is empty until a connect object has been entered and can be returned to this state, with
+loss of its contents, by the @value{SHORT}.
+@item
+Objects may be entered into a queue as a result of the action of the source @value{SHORT}-User,
+subject to control by the @value{SHORT}.
+@item
+Objects may also be entered into a queue by the @value{SHORT}.
+@item
+Objects are removed from the queue under the control of the receiving @value{SHORT} user.
+@item
+Objects are normally removed under the control of the @value{SHORT}-User in the same order as they
+were entered except:
+@item
+if the object is of a type defined to be able to advance ahead of the preceding object (however, no
+object is defined to be able to advance ahead of another object of the same type), or
+@item
+if the following object is defined to be destructive with respect to the preceding object on the
+queue.  If necessary, the last object on the queue will be deleted to allow a destructive object to
+be entered --- they will therefore always be added to the queue.  For example, "reset" objects are
+defined to be destructive with respect to all other objects.
+@end itemize
+
+@tabref{5} shows the ordering relationship amoung the queue model objects.
+
+@tabfig{sccpi_tab05,5,Flow Control Relationships Between Queue Model Objects}
+
+@multitable @columnfractions 0.10 0.90
+@item AA @tab Indicates that Object X is defined to be able to advance ahead of preceding Object Y.
+@item DES @tab Indicates that Object X is defined to be destructive with respect to preceding Object Y.
+@item @minus{} @tab Indicates that Object X is neither destructive with respect to Object Y, nor able to advance ahead of Object Y.
+@item N/A @tab Indicates that Object X will not occur in a position succeeding Object Y in a valid state of a queue.
+@end multitable
+
+@subsection Connection Establishment Phase
+
+A pair of queues is associated with an @value{SHORT} NC between two @value{SHORT} addresses
+when the @value{SHORT} receives an @prim{N_CONN_REQ} primitive at one of the @value{SHORT}
+addresses resulting in a connect object being entered into the queue.  The queues will remain
+associated with the @value{SHORT} NC until an @prim{N_DISCON_REQ} primitive (resulting in
+a disconnect object) is either entered or removed from a queue.  Similarly, in the queue from the
+remote @value{SHORT}-User, objects can be entered into the queue only after the connect object
+associated with an @prim{N_CONN_REQ} has been entered into the queue.
+
+The @value{SHORT} NC procedure will fail if the @value{SHORT} is unable to route to the
+remote @value{SHORT}-User.
+
+@subsubsection User primitives for Successful @value{SHORT} Association Establishment
+
+@table @strong
+@item N_CONN_REQ:
+@prindex N_CONN_REQ
+This primitive requests that the @value{SHORT} establish an NC between the local
+@value{SHORT}-User and the specified destination.
+@end table
+
+@subsubsection Provider primitives for Successful @value{SHORT} Association Establishment
+
+@table @strong
+@item N_CONN_CON:
+@prindex N_CONN_CON
+This primitive indicates to the @value{SHORT}-User that an NC request has been confirmed.
+@end table
+
+
+The sequence of primitives in a successful @value{SHORT} NC establishment is defined by the
+time sequence diagram as shown in @figref{11}.
+
+@figuresized{sccpi24,11,@value{LONG} Association Service,4.0in}
+
+@subsection Data Transfer Phase
+
+Flow control on the @value{SHORT} NC is done by management of queue capacity, by allowing
+objects of certain type to be inserted to the queues as shown in @tabref{5}.
+
+@subsubsection User primitives for @value{SHORT} Data Transfer
+
+@table @strong
+@item N_DATA_REQ:
+@prindex N_DATA_REQ
+This primitive requests that the @value{SHORT} transfer the specified data.
+@end table
+
+@subsubsection Provider primitives for @value{SHORT} Data Transfer
+
+@table @strong
+@item N_DATA_IND:
+@prindex N_DATA_IND
+This primitive indicates to the @value{SHORT}-User that this message contains data.
+@end table
+
+@figref{12} shows the sequence of primitives for successful data transfer.  The sequence of
+primitives may remain incomplete if an @prim{N_DISCON_REQ} primitive occurs.
+
+@figuresized{sccpi44,12,@value{LONG} Data Transfer,4.0in}
+
+This sequence of primtives may remain incomplete if an @prim{N_RESET_IND} or @prim{N_RESET_CON}
+indication is received from the @value{SHORT}.
+
+@subsection Error Management Primitives
+
+The @value{SHORT} error management service is used by the @value{SHORT} to report detected loss of
+unrecoverable data.
+
+@subsubsection Provider Primitives for Management
+
+@table @strong
+@item N_INFORM_REQ:
+@prindex N_INFORM_REQ
+@item N_INFORM_IND:
+@prindex N_INFORM_IND
+@end table
+
+@figref{13} shows the sequence of primitives for the connection mode error management primitives.
+The sequence of primitives may remain incomplete if an @prim{N_DISCON_REQ} or
+@prim{N_DISCON_IND} primitive occurs.
+
+@figuresized{sccpi31,13,@value{LONG} Error Management,4.0in}
+
+@subsection Connection Termination Phase
+
+The @value{SHORT} NC release procedure is initialized by the insertion of a disconnect
+object (associated with an @prim{N_DISCON_REQ}) into the queue.  As shown if @figref{13}, the
+disconnect procedure is destructive with respect to other objects in the queue, and eventually
+results in the emptying of queues and termination of the @value{SHORT} NC.
+
+@subsubsection User Primitives for @value{SHORT} Association Termination
+
+@table @strong
+@item N_DISCON_REQ:
+@prindex N_DISCON_REQ
+This primitive requests that the @value{SHORT} disconnect an existing @value{SHORT} NC.
+@end table
+
+The sequence of primitives are shown in the time sequence diagram in @figref{14}.
+@figuresized{sccpi08,14, @value{LONG} Connection Termination,4.0in}
+
+
+@node @value{SHORT} Provider Management Services
+@section @value{SHORT} Provider Management Services
+
+This section describes the required @value{SHORT} service primitives that define the @value{SHORT}
+Provider Management interface.
+
+@value{SHORT} Provider Management allows for the coordination of @value{SHORT} management messages
+between @value{SHORT} Provider peers.  A set of primitives are defined that invoke management
+actions that are communicated from @value{SHORT} to @value{SHORT} entities.  The primitives are
+modeled as requires initiated by the @value{SHORT} management and indications initiated by the
+@value{SHORT}.  Indications may be initiated by the @value{SHORT} independently from requests by the
+@value{SHORT} management.
+
+The @value{SHORT} Provider Management service consists of one phase.
+
+@subsection Subsystem Management
+
+The @value{SHORT} subsystem management service allows @value{SHORT} management to allow or prohibit
+a subsystem or a duplicated subsystem.
+
+@subsubsection User Primitives for Subsystem Management Service
+
+@table @strong
+@item N_COORD_REQ:
+@prindex N_COORD_REQ
+@item N_COORD_RES:
+@prindex N_COORD_RES
+@end table
+
+@subsubsection Provider Primitives for Subsystem Management Service
+
+@table @strong
+@item N_COORD_IND:
+@prindex N_COORD_IND
+@item N_COORD_CON:
+@prindex N_COORD_CON
+@end table
+
+@node @value{INTERFACE} Primitives
+@chapter @value{INTERFACE} Primitives
+@cindex @value{INTERFACE} primitives
+
+@menu
+* Local Management Primitives::
+* Connection Mode Primitives::
+* Connectionless Mode Primitives::
+* @value{SHORT} Provider Management Primitives::
+@end menu
+
+This section describes the format and parameters of the @value{INTERFACE} primitives (@ref{Mapping
+SCCPI Primitives}, shows the mapping of @value{INTERFACE} primitives for the primitives
+defined in Q.711 [Q.711] and T1.112 [T1.112]).
+
+Also, it discusses the states the primitive is valid in, the resulting state, and the
+acknowledgement that the primitive expects.  (The state/event tables for these primitives are shown
+in @ref{State/Event Tables}.  The precedence tables for the @value{INTERFACE} primitives are shown
+in @ref{Precedence Tables}.) Rules for ITU-T conformance [Q.711] are described in addendum to this
+document in @ref{Addendum for SCCP Conformance}, rules for ANSI conformance [T1.112] are
+described in addendum @ref{Addendum for SCCP Conformance}, and rules for JITC conformance
+[JQ.711] are described in addendum @ref{Addendum for SCCP Conformance}.
+
+
+@page
+
+@node Local Management Primitives
+@section Local Management Primitives
+
+@menu
+* @value{SHORT} Information Request::
+* @value{SHORT} Information Acknowledgement::
+* Bind Protocol Address Request::
+* Bind Protocol Address Acknowledgement::
+* Unbind Protocol Address Request::
+* @value{SHORT} Options Management Request::
+* Error Acknowledgement::
+* Successful Receipt Acknowledgements::
+@end menu
+
+These primitives apply to CLNS and CONS.
+
+@node @value{SHORT} Information Request
+@subsection @value{SHORT} Information Request
+
+@subsubheading N_INFO_REQ
+@anchor{N_INFO_REQ}
+@prindex N_INFO_REQ
+
+This primitive requests the NS provider to return the values of all supported protocol parameters
+(@pxref{N_INFO_ACK}), and also the current state of the NS provider (as defined in @ref{State/Event
+Tables}).  This primitive does not affect the state of the network provider and does not appear in
+the state tables.
+
+
+@subsubheading Format
+@tpindex N_info_req_t
+This primitive consits of one @msg{M_PCPROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_INFO_REQ */
+} N_info_req_t;
+@end verbatim
+@end smallexample
+
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_INFO_REQ}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive in valid in any state where a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Acknowledgements
+
+This primitive requires the NS provider to generate one of the following acknowledgements upon
+receipt of the primitive:
+
+@itemize ---
+@item @emph{Successful:}
+Acknowledgement of the primitive via the @prim{N_INFO_ACK} primitive.
+@item @emph{Unsuccessful (Non-fatal errors):}
+There are no errors associated with the issuance of this primitive.
+@end itemize
+
+@page
+@node N_INFO_ACK
+@subsection Network Information Acknowledgement
+
+@subsubheading N_INFO_ACK
+@prindex N_INFO_ACK
+This primitive indicates to the NS user any relevant protocol-dependent parameters.@footnote{In the
+future, this primitive will be modified such that it will allow the @value{INTERFACE} to accept
+either sub-network point of attachment addresses or network addresses.}  It should be initiated in
+response to the @prim{N_INFO_REQ} primitive described above.
+
+@subsubheading Format
+@tpindex N_info_ack_t
+This primitive consists of one @msg{M_PCPROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_INFO_ACK */
+        np_ulong NSDU_size;             /* maximum NSDU size */
+        np_ulong ENSDU_size;            /* maximum ENSDU size */
+        np_ulong CDATA_size;            /* connect data size */
+        np_ulong DDATA_size;            /* discon data size */
+        np_ulong ADDR_size;             /* address size */
+        np_ulong ADDR_length;           /* address length */
+        np_ulong ADDR_offset;           /* address offset */
+        np_ulong QOS_length;            /* QOS values length */
+        np_ulong QOS_offset;            /* QOS values offset */
+        np_ulong QOS_range_length;      /* length of QOS values' range */
+        np_ulong QOS_range_offset;      /* offset of QOS values' range */
+        np_ulong OPTIONS_flags;         /* bit masking for options supported */
+        np_ulong NIDU_size;             /* network i/f data unit size */
+        np_long SERV_type;              /* service type */
+        np_ulong CURRENT_state;         /* current state */
+        np_ulong PROVIDER_type;         /* type of NS provider */
+        np_ulong NODU_size;             /* optimal NSDU size */
+        np_ulong PROTOID_length;        /* length of bound protocol ids */
+        np_ulong PROTOID_offset;        /* offset of bound protocol ids */
+        np_ulong NPI_version;           /* version # of npi that is supported */
+} N_info_ack_t;
+
+/* Flags to indicate support of NS provider options */
+#define REC_CONF_OPT    0x00000001L
+#define EX_DATA_OPT     0x00000002L
+#define DEFAULT_RC_SEL  0x00000004L
+
+/* Service types supported by the NS provider */
+#define N_CONS 1
+#define N_CLNS 2
+
+/* Valid provider types */
+#define N_SNICFP 1
+#define N_SUBNET 2
+@end verbatim
+@tpindex N_info_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+The above fields have the following meaning:
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_INFO_ACK}.
+@item @parm{NSDU_size} @tab
+Specifies the maximum size (in octets) of a @dfn{Network Service Data Unit (NSDU)} supported by the
+NS provider.
+@item @parm{ENSDU_size} @tab
+Specifies the maximum size (in octets) of an @dfn{Expedited Network Service Data Unit (ENSDU)}
+supported by the NS provider.
+@item @parm{CDATA_size} @tab
+Specifies the maximum number of octets of data that may be associated with connection establishment
+primitives.
+@item @parm{DDATA_size} @tab
+Specifies the maximum number of octets of data that may be associated with the disconnect
+primitives.
+@item @parm{ADDR_size} @tab
+Specifies the maximum size (in decimal digits) of a network address.
+@item @parm{ADDR_length} @tab
+Specifies the length in bytes of the network address bound on the Stream on which the
+@prim{N_INFO_REQ} primitive was issued (a network address is bound to a Stream with the
+@prim{N_BIND_REQ} primitive).
+@item @parm{ADDR_offset} @tab
+Specifies the offset of the bound network address from the beginning of the @msg{M_PCPROTO} message
+block (this field should be ignored if the @parm{ADDR_length} field is zero).
+@item @parm{QOS_length} @tab
+In the connection-mode environment, when this primitive is invoked before the NC is established on
+the Stream, the values returned specify the default values supported by the NS provider.  When this
+primitive is invoked after a NC has been established on the Stream, the values returned indicate the
+negotiated values for the QOS parameters.  In the connection-less environment, these values
+represent the default or the selected QOS parameter values.  In case a QOS parameter is not
+supported by NS Provider, a value of @pval{QOS_UNKNOWN} will be returned.  In the case where no QOS
+parameters are supported by the NS provider, this field will be zero.
+@item @parm{QOS_offset} @tab
+Indicates the offset of the QOS parameters from the beginning of the @msg{M_PCPROTO} message block.
+@item @parm{QOS_range_length} @tab
+Indicates the length in bytes, of the available range of QOS parameters values supported by the NS
+provider.  These ranges are used by the NS user to select QOS parameter values that are valid with
+the NS provider.  QOS parameter values are selected, or the default values altered via the
+@prim{N_OPTMGMT_REQ} primitive.  In the connection-mode environment, the values for end-to-end QOS
+parameters may be specified with the @prim{N_CONN_REQ} or @prim{N_CONN_RES} primitives for
+negotiation.  If the NS provider does not support a certain QOS parameter, its value will be set to
+@pval{QOS_UNKNOWN}.  In the case where no QOS parameters are supported by the NS provider, the
+length of this field will be zero.
+@item @parm{QOS_range_offset} @tab
+Indicates the offset of the range of QOS parameter values from the beginning of the @msg{M_PCPROTO}
+message block.
+@item @parm{OPTIONS_flags} @tab
+Defines flags that indicate whether the options described below are supported by the NS provider.
+The possible options are receipt confirmation, expedited data and default selection for use of
+receipt confirmation.
+@item @parm{NIDU_size} @tab
+This indicates the amount of user data that may be present in an @prim{N_DATA_REQ} or
+@prim{N_DATA_IND} primitive.  The @parm{NIDU_size} should not be larger than the @parm{NSDU_size}
+specification.
+@item @parm{SERV_type} @tab
+Indicates the service type supported by the NS provider.  The possible values can be @pval{N_CONS},
+@pval{N_CLNS}, (or both as indicated by using @pval{N_CONS}|@pval{N_CLNS}).
+@item @parm{CURRENT_state} @tab
+Indicates the current state of the NS provider.
+@item @parm{PROVIDER_type} @tab
+Indicates the type of NS provider.  The possible values can be @pval{N_SNICFP} or @pval{N_SUBNET}.
+The value @pval{N_SNICFP} indicates that the provider is the @dfn{Subnetwork Independent Convergence
+Function/Protocol} sub-layer of the network layer.  The value @pval{N_SUBNET} indicates that the
+provider is a subnetwork.
+@item @parm{NODU_size} @tab
+Indicates the optimal NSDU size (in octets) of an NSDU given the current routing information.
+@item @parm{PROTOID_length} @tab
+Indicates the length of the protocol identifiers that were bound using the @prim{N_BIND_REQ}.
+@item @parm{PROTOID_offset} @tab
+Indicates the offset of the protocol identifiers that were bound using the @prim{N_BIND_REQ}, from
+the beginning of the @msg{M_PCPROTO} message block.
+@item @parm{NPI_version} @tab
+Indicates the current version of @value{INTERFACE} that is supported.
+Always @pval{N_VERSION_2} for this specificaiton.
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item REC_CONF_OPT
+When set, it indicates that the NS provider supports receipt confirmation.
+
+@emph{This flag is used only in the connection-mode environment.}
+Also, this flag is not applicable to @value{LONG}, because @value{SHORT} does not support receipt confirmation.
+@item EX_DATA_OPT
+When set, it indicates that the NS provider supports expedited data transfer.
+
+@emph{This flag is used only in the connection-mode environment.}
+@emph{Also, this flag is not applicable to any @value{LONG} protocol class except @dfn{Protocol Class 3}.}
+@item DEFAULT_RC_SEL
+When set, indicates that the default selection is for the use of receipt confirmation for every
+@prim{N_DATA_REQ} primitive.  This flag is only applicable when use of receipt confirmation is
+successfully negotiated via the @prim{N_CONN_REQ} or @prim{N_CONN_RES} primitives.
+@emph{This flag is only used in the connection-mode environment.}
+@emph{This flag is not applicable to @value{LONG}, because @value{SHORT} does not support receipt confirmation.}
+@end table
+
+@subsubheading Service Types
+
+@table @pval
+@item N_CONS
+When set, indicates that the NS provider supports connection-mode network services.
+@item N_CLNS
+When set, indicates that the NS provider supports connection-less network services.
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in any state in response to an @prim{N_INFO_REQ} primitive.
+
+@subsubheading New State
+
+The state remains unchanged.
+
+@page
+@node N_BIND_REQ
+@subsection Bind Protocol Address Request
+@subsubheading N_BIND_REQ
+@prindex N_BIND_REQ
+This primitive requests that the NS provider bind an NS user entity to a network address and
+negotiate the number of connect indications allowed to be outstanding by the NS provider for the
+specified NS user entity being bound.
+@subsubheading Format
+This primitive consists of one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_BIND_REQ */
+        np_ulong ADDR_length;           /* length of address */
+        np_ulong ADDR_offset;           /* offset of address */
+        np_ulong CONIND_number;         /* req # of conn-indications to be queued */
+        np_ulong BIND_flags;            /* flags associated with N_BIND_REQ */
+        np_ulong PROTOID_length;        /* length of the protocol id */
+        np_ulong PROTOID_offset;        /* offset of protocol id */
+} N_bind_req_t;
+
+/* Flags associated with N_BIND_REQ */
+#define DEFAULT_LISTENER    0x00000001L
+#define TOKEN_REQUEST       0x00000002L
+#define DEFAULT_DEST        0x00000004L
+@end verbatim
+@tpindex N_bind_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_BIND_REQ}.
+@item @parm{ADDR_length} @tab
+Specifies the length of the protocol address to bind.
+@item @parm{ADDR_offset} @tab
+Specifies the offset of the protocol address to bind from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{CONIND_number} @tab
+Specifies the requested maximum number of outstanding connection indications to be issued.
+
+This is the requested number of connection indications allowed to be outstanding by the NS provider
+for the specified protocol address.  (If the number of outstanding connect indications equals
+@parm{CONIND_number}, the NS provider need not discard further incoming connect indications, but may
+choose to queue them internally until the number of outstanding connect indications drops below the
+@parm{CONIND_number}.)  Only one Stream per network address is allowed to have a
+@parm{CONIND_number} value greater than zero.  This indicates to the network provider that this
+Stream is the listener Stream for the NS user.  This Stream will be used by the NS provider for
+connect indications for that network address.
+
+If a Stream is bound as a listener Stream, it will not be able to initiate connect requests.  If the
+NS user attempts to send an @prim{N_CONN_REQ} primitive down this Stream, an @prim{N_ERROR_ACK}
+primitive will be sent to the NS user by the NS provider with an error value of @perr{NACCESS}.
+
+@emph{This field should be ignored in CLNS.}
+@item @parm{BIND_flags} @tab
+Specifies the bind option flags associated with the request.
+@item @parm{PROTOID_length} @tab
+Specifies the length of protocol identifiers to bind.
+@item @parm{PROTOID_offset} @tab
+Specifies the offset of protocol identifiers to bind from the beginning of the @msg{M_PROTO} message
+block.
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item DEFAULT_LISTENER
+When set, this flag indicates that this Stream is the @dfn{Default Listener Stream}.  This Stream
+is used to pass connect indications for all incoming calls that contain protocol identifiers that
+are not bound to any other listener, or when a listener Stream with @parm{CONIND_number} value of
+greater than zero is not found.  Also, the default listener will receive all incoming call
+indications that contain no user data.
+
+Only one @dfn{Default Listener Stream} is allowed per occurrence of NPI.  An attempt to bind a
+@dfn{Default Listener Stream} when one is already bound should result in an error (of type
+@perr{NBOUND}).
+
+@emph{The @pval{DEFAULT_LISTENER} flag is ignored in CLNS.}
+@item TOKEN_REQUEST
+When set, this flag indicates to the NS provider that the NS user has requested that a @dfn{token}
+be assigned to the Stream (to be used in the NC response message), and the @dfn{token value} be
+returned to the NS user via the @prim{N_BIND_ACK} primitive.
+
+The @dfn{token} assigned by the NS provider can then be used by the NS user in a subsequent
+@prim{N_CONN_RES} primitive to identify the Stream on which the NC is to be established.
+
+@emph{The @pval{TOKEN_REQUEST} flag is ignored in CLNS.}
+@item DEFAULT_DEST
+When set, this flag indicates that this Stream is the @dfn{Default Destination Stream}.  This Stream
+will receive all packets destined for the NSAP specified in the bind request.  If no NSAP is
+indicated in the bind request, then this Stream should receive all packets destined to an NSAP that
+is bound to no other Stream.
+
+Only one @dfn{Default Destination Stream} per NSAP is allowed per occurrence of NPI.  An attempt to
+bind a @dfn{Default Destination Stream} to an NSAP when one is already bound should result in an
+error of type @perr{NBOUND}.
+
+@emph{The @pval{DEFAULT_DEST} flag is ignored in the CONS.}
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_UNBND} (@pxref{State/Event Tables}).
+
+@subsubheading New State
+
+The new state is @psta{NS_WACK_BREQ}.
+
+@subsubheading Acknowledgements
+
+The NS provider will generate one of the following acknowledgements upon receipt of the
+@prim{N_BIND_REQ} primitive:
+
+@itemize ---
+@item @emph{Successful:}
+Correct acknowledgement of the primitive is indicated using the @prim{N_BIND_ACK} primitive.
+@item @emph{Unsuccessful (Non-fatal errors):}
+These errors will be indicated using the @prim{N_ERROR_ACK} primitive.  The applicable non-fatal
+errors are as follows:
+@multitable @columnfractions .2 .8
+@item @perr{NBADADDR} @tab
+The network address was in an incorrect format or the address contained illegal information.  It is
+not intended to indicate protocol errors.
+@item @perr{NBOUND} @tab
+The NS user attempted to bind a second Stream to a network address with the @parm{CONIND_number} set
+to a non-zero value, or attempted to bind a second Stream with the @pval{DEFAULT_LISTENER} flag
+value set to non-zero.
+@item @perr{NNOADDR} @tab
+The NS provider could not allocate an address.
+@item @perr{NACCESS} @tab
+The NS user did not have proper permissions for the use of the requested address.
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error
+is indicated in the primitive.
+@item @perr{NNOPROTOID} @tab
+Protocol identifier could not be allocated.
+@end multitable
+@end itemize
+
+@page
+@node N_BIND_ACK
+@subsection Bind Protocol Address Acknowledgement
+@subsubheading N_BIND_ACK
+@prindex N_BIND_ACK
+This primitive indicates to the NS user that the specified network user entity has been bound to the
+requested network address and that the specified number of connect indications are allowed to be
+queued by the NS provider for the specified network address.
+@subsubheading Format
+This primitives consists of one @msg{M_PCPROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+    np_ulong PRIM_type;        /* always N_BIND_ACK */
+    np_ulong ADDR_length;      /* address length */
+    np_ulong ADDR_offset;      /* offset of address */
+    np_ulong CONIND_number;    /* connection indications */
+    np_ulong TOKEN_value;      /* NC response token value */
+    np_ulong PROTOID_length;   /* length of protocol id */
+    np_ulong PROTOID_offset;   /* offset from beg. of block */
+} N_bind_ack_t;
+@end verbatim
+@tpindex N_bind_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_BIND_ACK}.
+@item @parm{ADDR_length} @tab
+Indicates the length of the network address that was bound.
+@item @parm{ADDR_offset} @tab
+Indicates the offset of the network address that was bound, from the beginning of the
+@msg{M_PCPROTO} message block.
+@item @parm{CONIND_number} @tab
+Indicates the accepted number of connection indications allowed to be outstanding by the NS provider
+for the specified network address.  If its value is zero, this Stream cannot accept
+@prim{N_CONN_IND} primitives.  If its value is greater than zero, then the NS user can accept
+@prim{N_CONN_IND} primitives up to the value specified in this parameter before having to respond
+with an @prim{N_CONN_RES} or an @prim{N_DISCON_REQ} primitive.
+
+@emph{This field should be ignored for CLNS.}
+@item @parm{TOKEN_value} @tab
+Indicates the value of the @dfn{token} assigned to this Stream that can be used by the NS user in a
+@prim{N_CONN_RES} primitive to accept an NC on this Stream.  It is a non-zero value, and is unique
+to all Streams bound to the NS provider.
+
+@emph{This field should be ignored for CLNS.}
+@item @parm{PROTOID_length} @tab
+Indicates the length of the protocol identifiers that were bound.
+@item @parm{PROTOID_offset} @tab
+Indicates the offset of the protocol identifiers that were bound, from the beginning of the
+@msg{M_PCPROTO} message block.
+@end multitable
+
+Note that the proper alignment of the address in the @msg{M_PCPROTO} message block is not
+guaranteed.
+
+@subsubheading Bind Rules:
+
+The following rules apply to the binding of the specified network address to the
+Stream:
+
+@itemize ---
+@item
+If the @parm{ADDR_length} field in the @prim{N_BIND_REQ} primitive is zero, then the NS provider is
+to assign a network address to the user.
+@item
+The NS provider is to bind the network address as specified in the @prim{N_BIND_REQ} primitive.  If
+the NS provider cannot bind the specified address, it may assign another network address to the
+user.  It is the network user's responsibility to check the network address returned in the
+@prim{N_BIND_ACK} primitive to see if it is the same as the one requested.
+@end itemize
+
+The following rules apply to negotiating @parm{CONIND_number} argument:
+
+@itemize ---
+@item
+The @parm{CONIND_number} in the @prim{N_BIND_ACK} primitive must be less than or equal to the
+corresponding requested number as indicated in the @prim{N_BIND_REQ} primitive.
+@item
+Only one Stream that is bound to the indicated network address may have a negotiated accepted number
+of maximum connect requests greater than zero.  If a @prim{N_BIND_REQ} primitive specifies a value
+greater than zero, but another Stream has already bound itself to the given network address with a
+value greater than zero, the NS provider should assign another protocol address to the user.
+@item
+If a Stream with @parm{CONIND_number} greater than zero is used to accept a connection, the Stream
+will be found busy during the duration of that connection and no other Streams may be bound to that
+network address with a @parm{CONIND_number} greater than zero.  This will prevent more than one
+Stream bound to the identical network address from accepting connect indications.
+@item
+A Stream requesting a @parm{CONIND_number} of zero should always be legal.  This indicates to the NS
+provider that the Stream is to be used to request connections only.
+@item
+A Stream with a negotiated @parm{CONIND_number} greater than zero may generate connect requests or
+accept connect indications.
+@end itemize
+
+@emph{If the above rules result in an error condition, then the NS provider must issue an
+@prim{N_ERROR_ACK} primitive to the NS user specifying the error as defined in the description of
+the @prim{N_BIND_REQ} primitive, @pxref{N_BIND_REQ}.}
+
+@subsubheading Valid States
+
+This primitive is valid in response to an @prim{N_BIND_REQ} primitive and is valid in the state
+@psta{NS_WACK_BREQ} (@pxref{State/Event Tables}.)
+
+@subsubheading New State
+
+The new state is @psta{NS_IDLE}.
+
+@page
+@node N_UNBIND_REQ
+@subsection Unbind Protocol Address Request
+@subsubheading N_UNBIND_REQ
+@prindex N_UNBIND_REQ
+This primitive requests that the NS provider unbind the NS user entity that was previously bound to
+the network address.
+@subsubheading Format
+This primitives consists of one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_UNBIND_REQ */
+} N_unbind_req_t;
+@end verbatim
+@tpindex N_unbind_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_UNBIND_REQ}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_IDLE} state.
+
+@subsubheading New State
+
+The new state is @psta{NS_WACK_UREQ}.
+
+@subsubheading Acknowledgements
+
+This primitive requires the NS provider to generate the following acknowledgements upon receipt of
+the primitive:
+
+@itemize ---
+@item @emph{Successful:}
+Correct acknowledgement of the primitive is indicated via the @prim{N_OK_ACK} primitive,
+@pxref{N_OK_ACK}.
+@item @emph{Unsuccessful (Non-fatal errors):}
+These errors will be indicated via the @prim{N_ERROR_ACK} primitive.  The applicable non-fatal
+errors are as follows:
+@multitable @columnfractions .2 .7
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+primitive.
+@end multitable
+@end itemize
+
+@page
+@node @value{SHORT} Options Management Request
+@subsection @value{SHORT} Options Management Request
+@subsubheading N_OPTMGMT_REQ
+@anchor{N_OPTMGMT_REQ}
+@prindex N_OPTMGMT_REQ
+This primitive allows the NS user to manage QOS parameter values associated with the Stream.
+@subsubheading Format
+These primitives consists of one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+    np_ulong PRIM_type;			/* always N_OPTMGMT_REQ */
+    np_ulong QOS_length;		/* length of QOS parameter values */
+    np_ulong QOS_offset;		/* offset of QOS parameter values */
+    np_ulong OPTMGMT_flags;		/* options management flags */
+} N_optmgmt_req_t;
+@end verbatim
+@tpindex N_optmgmt_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_OPTMGMT_REQ}.
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters.  Specifies the length of the default
+values of the QOS parameters as selected by the NS user.  In the connection-mode environment these
+values will be used in subsequent @prim{N_CONN_REQ} primitives on the Stream that do not specify
+values for these QOS parameters.  In the connection-less environment, these values represent the
+selected QOS values that would apply to each unit data transmission.  If the NS user cannot
+determine the value of a QOS parameter, its value should be set to @pval{QOS_UNKNOWN}.  If the NS
+user does not specify any QOS parameter values, the length of this field should be set to zero.
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters, from the beginning of the @msg{M_PROTO}
+message block.
+@item @parm{OPTMGMT_flags} @tab
+Specifies the options management flags associated with the request.  (See ``Flags'' below.)
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item DEFAULT_RC_SEL
+When set, it indicates to the NS provider that the NS user's default selection is for the use of
+receipt confirmation with every @prim{N_DATA_REQ} message (applicable only when its use is
+successfully negotiated via the @prim{N_CONN_REQ} or @prim{N_CONN_RES} primitives).  This default
+indication is used only when the @msg{M_PROTO} message block is not present in the @prim{N_DATA_REQ}
+(i.e. the primitive only contains @msg{M_DATA} message blocks).
+
+@emph{This flag should be ignored in the connection-less environment.}
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_IDLE} state.
+
+@subsubheading New State
+
+The new state is @psta{NS_WACK_OPTREQ}.
+
+@subsubheading Acknowledgements
+
+The @prim{N_OPTMGMT_REQ} primitive requires the NS provider to generate one of the following
+acknowledgements upon receipt of the primitive:
+
+@itemize ---
+@item @emph{Successful:}
+Acknowledgement is via the @prim{N_OK_ACK} primitive.  At successful completion, the resulting state
+is @psta{NS_IDLE}.
+@item @emph{Unsuccessful (Non-fatal errors):}
+These errors are indicated in the @prim{N_ERROR_ACK} primitive.  The resulting state remains
+unchanged.  The applicable non-fatal errors are defined as follows:
+@multitable @columnfractions .2 .7
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NBADQOSPARAM} @tab
+The QOS parameter values specified are outside the range supported by the NS provider.
+@item @perr{NBADQOSTYPE} @tab
+The QOS structure type is not supported by the NS provider.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+primitive.
+@end multitable
+@end itemize
+
+@page
+@node N_ERROR_ACK
+@subsection Error Acknowledgement
+@subsubheading N_ERROR_ACK
+@prindex N_ERROR_ACK
+This primitive indicates to the NS user that a non-fatal error has occurred in the last
+network-user-originated primitive.  This may only be initiated as an acknowledgement for those
+primitives that require one.  It also indicates to the user that no action was taken on the
+primitive that caused the error.
+@subsubheading Format
+This primitives consists of one @msg{M_PCPROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_ERROR_ACK */
+        np_ulong ERROR_prim;            /* primitive in error */
+        np_ulong NPI_error;             /* NPI error code */
+        np_ulong UNIX_error;            /* UNIX error code */
+} N_error_ack_t;
+@end verbatim
+@tpindex N_error_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_ERROR_ACK}.
+@item @parm{ERROR_prim} @tab
+Indicates the primitive type that caused the error.
+@item @parm{NPI_error} @tab
+Indicates the Network Provider Interface error code.
+@item @parm{UNIX_error} @tab
+Indicates the @cite{UNIX@registeredsymbol{}} system error code.  This may only be non-zero when the
+@parm{NPI_error} is equal to @perr{NSYSERR}.
+@end multitable
+
+@subsubheading Error Primitives
+
+@emph{One of the following error primitive types are allowed to be returned in the @parm{ERROR_prim}
+field:}
+
+@multitable @columnfractions .2 .8
+@item @prim{N_BIND_REQ} @tab
+Bind Request.
+@item @prim{N_OPTMGMT_REQ} @tab
+Options Management Request.
+@item @prim{N_CONN_REQ} @tab
+Connect Request.
+@item @prim{N_CONN_RES} @tab
+Connect Response.
+@item @prim{N_RESET_REQ} @tab
+Reset Request.
+@item @prim{N_RESET_RES} @tab
+Reset Response.
+@item @prim{N_DISCON_REQ} @tab
+Disconnect Request.
+@item @prim{N_UNBIND_REQ} @tab
+Unbind Request.
+@item @prim{N_INFORM_REQ} @tab
+Inform Request.
+@item @prim{N_STATE_REQ} @tab
+State Request (SCCPI only).
+@item @prim{N_COORD_REQ} @tab
+Coordination Request (SCCPI only).
+@item @prim{N_COORD_RES} @tab
+Coordination Response (SCCPI only).
+@end multitable
+
+@emph{Also, any unrecognized primitive type may also be returned in conjunction with the
+@perr{NNOTSUPPORT} error code.}
+
+@subsubheading Valid Error Codes
+
+@emph{The following error codes are allowed to be returned in the @parm{NPI_error} field:}
+
+@multitable @columnfractions .2 .8
+@item @perr{NBADADDR} @tab
+The network address as specified in the primitive was in an incorrect format, or the address
+contained illegal information.
+@item @perr{NBADOPT} @tab
+The options values as specified in the primitive were in an incorrect format, or they contained
+illegal information.
+@item @perr{NBADQOSPARAM} @tab
+The QOS values specified are outside the range supported by the NS provider.
+@item @perr{NBADQOSTYPE} @tab
+The QOS structure type is not supported by the NS provider.
+@item @perr{NBADTOKEN} @tab
+Token used is not associated with an open Stream.
+@item @perr{NNOADDR} @tab
+The NS provider could not allocate an address.
+@item @perr{NACCESS} @tab
+The user did not have proper permissions.
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NBADSEQ} @tab
+The sequence number specified in the primitive was incorrect or illegal.
+@item @perr{NBADFLAG} @tab
+The flags specified in the primitive were incorrect or illegal.
+@item @perr{NBADDATA} @tab
+The amount of user data specified was outside the range supported by the NS provider.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+primitive.
+@item @perr{NNOTSUPPORT} @tab
+Specified primitive type is not known to the NS provider.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in all states that have a pending acknowledgement or
+confirmation.
+
+@subsubheading New State
+
+The new state is the same as the one from which the acknowledged request or
+response was issued.
+
+@page
+@node N_OK_ACK
+@subsection Successful Receipt Acknowledgement
+@subsubheading N_OK_ACK
+@prindex N_OK_ACK
+This primitive indicates to the NS user that the previous network-user-originated primitive was
+received successfully by the network provider.  It does not indicate to the NS user any network
+protocol action taken due to the issuance of the last primitive.  The @prim{N_OK_ACK} primitive may
+only be initiated as an acknowledgement for those user originated primitives that have no other
+means of confirmation.
+@subsubheading Format
+This primitives consists of one @msg{M_PCPROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_OK_ACK */
+        np_ulong CORRECT_prim;          /* primitive being acknowledged */
+} N_ok_ack_t;
+@end verbatim
+@tpindex N_ok_ack_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_OK_ACK}.
+@item @parm{CORRECT_prim} @tab
+Indicates the successfully received primitive type.
+@end multitable
+
+@subsubheading Correct Primitives
+
+@multitable @columnfractions .2 .8
+@item @prim{N_OPTMGMT_REQ} @tab
+Options Management Request.
+@item @prim{N_CONN_RES} @tab
+Connection Response.
+@item @prim{N_RESET_RES} @tab
+Reset Response.
+@item @prim{N_DISCON_REQ} @tab
+Disconnect Request.
+@item @prim{N_UNBIND_REQ} @tab
+Unbind Request.
+@item @prim{N_COORD_RES} @tab
+Coordination Response (SCCPI only).
+@item @prim{N_INFORM_REQ} @tab
+Inform Request (SCCPI only).
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is issued in the following states:
+
+@multitable @columnfractions .2 .8
+@item @psta{NS_WACK_UREQ} @tab
+Wait for acknowledgement of Unbind Request.
+@item @psta{NS_WACK_OPTREQ} @tab
+Wait for acknowledgement of Options Management Request.
+@item @psta{NS_WACK_RRES} @tab
+Wait for acknowledgement of Reset Response.
+@item @psta{NS_WACK_CRES} @tab
+Wait for acknowledgement of Connection Response.
+@item @psta{NS_WACK_DREQ6} @tab
+Wait for acknowledgement of Disconnect Request.
+@item @psta{NS_WACK_DREQ7} @tab
+Wait for acknowledgement of Disconnect Request.
+@item @psta{NS_WACK_DREQ9} @tab
+Wait for acknowledgement of Disconnect Request.
+@item @psta{NS_WACK_DREQ10} @tab
+Wait for acknowledgement of Disconnect Request.
+@item @psta{NS_WACK_DREQ11} @tab
+Wait for acknowledgement of Disconnect Request.
+@end multitable
+
+@subsubheading New State
+
+The resulting state depends on the current state (see @tabref{B-7}, and @tabref{B-8}).
+
+@page
+@node Connection Mode Primitives
+@section Connection Mode Primitives
+
+@menu
+* Connection Establishment Phase::
+* Normal Data Transfer Phase::
+* Receipt Confirmation Service Primitives::
+* Expedited Data Transfer Service::
+* Reset Service::
+* Inform Service::
+* Network Connection Release Phase::
+@end menu
+
+This section describes the format of the CONS primitives and the rules associated with these
+primitives.  The default values of the QOS parameters associated with an NC may be selected via the
+@prim{N_OPTMGMT_REQ} primitive.
+
+@node Connection Establishment Phase
+@subsection Connection Establishment Phase
+
+@menu
+* N_CONN_REQ::
+* N_CONN_IND::
+* N_CONN_RES::
+* N_CONN_CON::
+@end menu
+
+The following @value{SHORT} service primitives pertain to the establishment of an NC
+between local and remote @value{SHORT}-SAPs, provided the @value{SHORT} users exist, and are known
+to the @value{SHORT}.
+
+@node N_CONN_REQ
+@subsubsection @value{LONG} Connection Request
+@subsubheading N_CONN_REQ
+@prindex N_CONN_REQ
+This primitive requests that the @value{SHORT} form an NC to the specified destination.
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks for the NS user data transfer.  The specification of the NS user data is optional.
+The NS user can send any integral number of octets of data within the range supported by the NS
+provider (@pxref{N_INFO_ACK}).  If the user does not specify QOS parameter values, the default
+values (specified via @prim{N_OPTMGMT_REQ}) are used by the NS provider.
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_CONN_REQ */
+        np_ulong DEST_length;           /* destination address length */
+        np_ulong DEST_offset;           /* destination address offset */
+        np_ulong CONN_flags;            /* bit masking for options flags */
+        np_ulong QOS_length;            /* length of QOS parameter values */
+        np_ulong QOS_offset;            /* offset of QOS parameter values */
+} N_conn_req_t;
+
+/* Flags to indicate if options are requested */
+#define REC_CONF_OPT    0x00000001L
+#define EX_DATA_OPT     0x00000002L
+@end verbatim
+@tpindex N_conn_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_CONN_REQ}.
+@item @parm{DEST_length} @tab
+Specifies the length of the destination address to which to connect.  Identifies the NS user to
+which the NC is to be established.  This field will accommodate variable length addresses within a
+range supported by the NS provider.
+@item @parm{DEST_offset} @tab
+Specifies the offset of the destination address to which to connect, from the beginning of the
+@msg{M_PROTO} message block.
+@item @parm{CONN_flags} @tab
+Specifies the connection options flags.  (See ``Flags'' below.)
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters negotiated.  Indicates the QOS parameter
+values that apply to the NC being requested.  If the NS user cannot determine the value of a QOS
+parameter, its value should be set to @pval{QOS_UNKNOWN}.  If the NS user does not specify any QOS
+parameter values, the length of this field should be set to zero (@samp{0}).
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters negotiated, from the beginning of the
+@msg{M_PROTO} message block.
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item REC_CONF_OPT
+The receipt confirmation selection parameter indicates the use/availability of the receipt
+confirmation service on the NC.  The receipt confirmation service must be supported by the NS
+provider to be used on the NC.
+@item EX_DATA_OPT
+Specifies the use of the expedited data transfer service on the NC.  The expedited data transfer
+service must be provided by the NS provider for it to be used on the NC.
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_IDLE}.
+
+@subsubheading New State
+
+The new state is @psta{NS_WCON_CREQ}.
+
+@subsubheading Acknowledgements
+
+The following acknowledgements are valid for this primitive:
+
+@itemize ---
+@item @emph{Successful NC Establishment:}
+This is indicated using the @prim{N_CONN_CON} primitive.  This results in the @psta{NS_DATA_XFER}
+state.
+@item @emph{Unsuccessful NC Establishment:}
+This is indicated using the @prim{N_DISCON_IND} primitive.  For example, a connection may be
+rejected because either the called NS user cannot be reached, or the NS provider and/or the called
+NS user did not agree with the specified QOS.  This results in the @psta{NS_IDLE} state.
+@item @emph{Unsuccessful (Non-fatal errors):}
+These are indicated using the @prim{N_ERROR_ACK} primitive.  The applicable non-fatal errors are
+defined as follows:
+@multitable @columnfractions .2 .7
+@item @perr{NACCESS} @tab
+The user did not have proper permission for the user of the requested address or options.
+@item @perr{NBADQOSPARAM} @tab
+The QOS parameter values specified are outside the range supported by the NS provider.
+@item @perr{NBADQOSTYPE} @tab
+The QOS structure type is not supported by the NS provider.
+@item @perr{NBADADDR} @tab
+The network address was in an incorrect format or contained illegal information.  It is not intended
+to indicate NC errors, such as an unreachable destination.  These error types are included using the
+@prim{N_DISCON_IND} primitive.
+@item @perr{NBADOPT} @tab
+The options were in an incorrect format, or they contain illegal information.
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NBADDATA} @tab
+The amount of user data specified was outside the range supported by the NS provider.
+@item @perr{NSYSERR} @tab
+A system error occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+primitive.
+@end multitable
+@end itemize
+
+@page
+@node N_CONN_IND
+@subsubsection @value{LONG} Connection Indication
+@subsubheading N_CONN_IND
+@prindex N_CONN_IND
+This primitive indicates to the destination NS user that a network connect request has been made by
+the user at the specified source address.
+@subsubheading Format
+The format of this message is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks for NS user data.  The specification of NS user data is optional.  The NS user can
+send any integral number of octets of data within the range supported by the NS provider.  The NS
+user data will only be present if the corresponding @prim{N_CONN_RES} had an NS user data parameter
+specified, and their data will be identical.
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_CONN_IND */
+        np_ulong DEST_length;           /* destination address length */
+        np_ulong DEST_offset;           /* destination address offset */
+        np_ulong SRC_length;            /* source address length */
+        np_ulong SRC_offset;            /* source address offset */
+        np_ulong SEQ_number;            /* sequence number */
+        np_ulong CONN_flags;            /* bit masking for options flags */
+        np_ulong QOS_length;            /* length of QOS parameter values */
+        np_ulong QOS_offset;            /* offset of QOS parameter values */
+} N_conn_ind_t;
+@end verbatim
+@tpindex N_conn_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_CONN_IND}.
+@item @parm{DEST_length} @tab
+Indicates the length of the destination address.  This is the an address identifying the NS user to
+which the NC is to be established.
+@item @parm{DEST_offset} @tab
+Indicates the offset of the destination address, from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SRC_length} @tab
+Indicates the length of the source address.  The source address is the network address of the NS
+user from which the NC has been requested.  The semantics of the value in the @prim{N_CONN_IND}
+primitive is identical to the value associated with the Stream on which the @prim{N_CONN_REQ} was
+issued.
+@item @parm{SRC_offset} @tab
+Indicates the offset of the source address from the beginning of the @msg{M_PROTO} message block.
+@item @parm{SEQ_number} @tab
+Indicates the sequence number that can be used by the NS user to associate this message with the
+@prim{N_CONN_RES} or @prim{N_DISCON_REQ} primitive that is to follow.  This value must be unique
+among the outstanding @prim{N_CONN_IND} messages.  The use of this field allows the NS user to issue
+the @prim{N_CONN_RES} or the @prim{N_DISCON_REQ} messages in any order.
+@item @parm{CONN_flags} @tab
+Indicates the connection options flags associated with the indication.
+@item @parm{QOS_length} @tab
+Indicates the length of the Quality of Service parameters.  This is the QOS values that are
+negotiated during NC establishment.  If the destination NS user does not agree to the range of QOS
+values specified by the source NS user in the @prim{N_CONN_REQ} primitive, it will reject the NC
+establishment by invoking a @prim{N_DISCON_REQ} primitive (the originator parameter in the
+@prim{N_DISCON_REQ} primitive will indicate NS user initiated release).  If the NS user does not
+support or cannot determine the value of a QOS parameter, its value will be set to
+@pval{QOS_UNKNOWN}.  If the NS user does not specify any QOS parameter values, the length of this
+field should be set to zero.
+@item @parm{QOS_offset} @tab
+Indicates the offset of the Quality of Service parameters, from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item REC_CONF_OPT
+The receipt confirmation selection parameter indicates the use/availability of the receipt
+confirmation service on the NC.  The receipt confirmation service must be provided in the network
+service to be used on the NC.
+@item EX_DATA_OPT
+The expedited data selection parameter indicates the use/availability of the expedited data transfer
+service on the NC.  The expedited data transfer service must be provided by the NS provider for it
+to be used on the NC.
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in the states @psta{NS_IDLE} and @psta{NS_WRES_CIND}.
+
+@subsubheading New State
+
+In both cases the resulting state is @psta{NS_WRES_CIND} (the number of connect indications waiting
+for user response is incremented by one).
+
+@page
+@node N_CONN_RES
+@subsubsection @value{LONG} Connection Response
+@subsubheading N_CONN_RES
+@prindex N_CONN_RES
+This primitive allows the destination NS user to request that the network provider accept a previous
+connect request.
+@subsubheading Format
+The format of this primitive is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks (for NS user data).  The specification of the NS user data is optional.
+
+The NS user can send any integral number of octets of data within the range supported by the NS
+provider.
+
+The structure of the @msg{M_PROTO} block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_CONN_RES */
+        np_ulong TOKEN_value;           /* NC response token value */
+        np_ulong RES_length;            /* responding address length */
+        np_ulong RES_offset;            /* responding address offset */
+        np_ulong SEQ_number;            /* sequence number */
+        np_ulong CONN_flags;            /* bit masking for options flags */
+        np_ulong QOS_length;            /* length of QOS parameter values */
+        np_ulong QOS_offset;            /* offset of QOS parameter values */
+} N_conn_res_t;
+@end verbatim
+@tpindex N_conn_res_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_CONN_RES}.
+@item @parm{TOKEN_value} @tab
+Specifies the response token value of the Stream upon which the connection is to be accepted, or
+zero, if the connection is to be accepted on the issuing Stream.  This value is used to identify the
+Stream that the NS user want to establish the NC on.  (Its value is determined by the NS user by
+issuing a @prim{N_BIND_REQ} primitive with the @pval{TOKEN_REQUEST} flag set.  The token value is
+returned in the @prim{N_BIND_ACK}).  The value of this field should be non-zero when the NS user
+wants to establish the NC on a Stream other than the Stream on which the @prim{N_CONN_IND} arrived.
+If the NS user wants to establish a NC on the same Stream that the @prim{N_CONN_IND} arrived on,
+then the value of this field should be zero (@samp{0}).
+@item @parm{RES_length} @tab
+Specifies the length of the responding address.  This field conveys the network address of the NS
+user to which the NC has been established.  Under certain circumstances, such as call redirection,
+generic addressing, etc., the value of this parameter may be different from the destination address
+parameter specified in the corresponding @prim{N_CONN_REQ}.
+@item @parm{RES_offset} @tab
+Specifies the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SEQ_number} @tab
+Specifies the sequence number of the corresponding connection indication to which this primitive is
+responding.  This is the sequence number of the @prim{N_CONN_RES} primitive.  It is used by the NS
+provider to associate the @prim{N_CONN_RES} message with an outstanding @prim{N_CONN_IND} message.
+An invalid sequence number should result in an @prim{N_ERROR_ACK} primitive with the error type
+@perr{NBADSEQ}.
+@item @parm{CONN_flags} @tab
+Specifies the connection options flags associated with the connection response.  (See ``Flags''
+below.)
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters.  This is the QOS parameter values that
+are negotiated during NC establishment by invoking a @prim{N_DISCON_REQ} primitive (the originator
+parameter in the @parm{N_DISCON_REQ} primitive will indicate NS user invoked release).  If the NS
+user cannot determine the value of a QOS parameter, its value should be set to @pval{QOS_UNKNOWN}.
+If the NS user does not specify any QOS parameter values, the length of this field should be set to
+zero (@samp{0}).
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item REC_CONF_OPT
+The receipt confirmation selection parameter indicates the use/availability of the receipt
+confirmation service on the NC.  The receipt confirmation service must be provided in the network
+service to be used on the NC.
+@emph{SCCP does not provide receipt confirmation so this flag will not be indicated and will be
+ignored when specified.  Alternately, when specified the NS provider
+may retun an @prim{N_ERROR_ACK} primitive with error type @perr{NBADOPT}.}
+@item EX_DATA_OPT
+The expedited data selection parameter indicates the use/availability of the expedited data transfer
+service on the NC.  The expedited data transfer service must be provided by the NS provider for it
+to be used on the NC.
+@emph{SCCP only provides for expedited data on Protocol Class 3 connections.  This flag will only be
+indicated and can only be accepted when Protocol Class 3 operation is supported.}
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_WRES_CIND}.
+
+@subsubheading New State
+
+The new state is @psta{NS_WACK_CRES}.
+
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Successful:}
+Successful completion is indicated via the @prim{N_OK_ACK} primitive.  The final state will be
+@psta{NS_DATA_XFER} for the accepting Stream and @psta{NS_IDLE} or @psta{NS_WRES_CIND} for the
+listening Stream when the listening Stream is different than the accepting Stream and depending upon
+whether there are additional outstanding connection indications.
+@item @emph{Unsuccessful (Non-fatal errors):}
+Errors are indicated with the @prim{N_ERROR_ACK} primitive.  The applicable non-fatal errors are
+defined as follows:
+@multitable @columnfractions .2 .7
+@item @perr{NBADOPT} @tab
+The options were in an incorrect format, or they contained illegal information.
+@item @perr{NBADQOSPARAM} @tab
+The QOS parameter values specified are outside the range supported by the NS provider.
+@item @perr{NBADQOSTYPE} @tab
+The QOS structure type is not supported by the NS provider.
+@item @perr{NBADTOKEN} @tab
+The token specified is not associated with an open Stream.
+@item @perr{NACCESS} @tab
+The user did not have proper permissions for the use of the options or the token or response
+identifier.
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NBADDATA} @tab
+The amount of user data specified was outside the range supported by the NS provider.
+@item @perr{NBADSEQ} @tab
+The sequence number specified in the primitive was incorrect or illegal.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+primitive.
+@end multitable
+@end itemize
+
+@page
+@node N_CONN_CON
+@subsubsection @value{LONG} Connection Confirmation
+@subsubheading N_CONN_CON
+@prindex N_CONN_CON
+This primitive indicates to the source NS user that the network connect request has been confirmed
+on the specified responding address.
+@subsubheading Format
+The format of the @prim{N_CONN_CON} primitive is one @msg{M_PROTO} message block followed by one or
+more @msg{M_DATA} message blocks (for NS user data).  The specification of the NS user data is optional.
+
+The NS user can send any integral number of octets of NS user data within a range supported by the
+NS provider (@pxref{N_INFO_ACK}).  The NS user data will only be present if the corresponding
+@prim{N_CONN_RES} had NS user data specified with it, and their data will always be identical.
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_CONN_CON */
+        np_ulong RES_length;            /* responding address length */
+        np_ulong RES_offset;            /* responding address offset */
+        np_ulong CONN_flags;            /* bit masking for options flags */
+        np_ulong QOS_length;            /* length of QOS parameter values */
+        np_ulong QOS_offset;            /* offset of QOS parameter values */
+} N_conn_con_t;
+@end verbatim
+@tpindex N_conn_con_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_CONN_CON}.
+@item @parm{RES_length} @tab
+Indicates the length of the responding address.  This field conveys the network address of the NS
+user entity to which the NC has been established.  The semantics of the values in the
+@prim{N_CONN_CON} is identical to the values in @prim{N_CONN_RES}.  Under certain circumstances,
+such as call redirection, generic addressing, etc., the value of this parameter may be different
+from the destination address parameter specification in the corresponding @prim{N_CONN_REQ}.
+@item @parm{RES_offset} @tab
+Indicates the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{CONN_flags} @tab
+Indicates the connect options flags associated with the connect confirmation.  (See ``Flags''
+below.)
+@item @parm{QOS_length} @tab
+Indicates the length of the Quality of Service parameters.  This field conveys the QOS parameter
+values selected by the responding NS user.  If the NS provider does not support or cannot determine
+the selected value of the QOS parameter, its value will be set to @pval{QOS_UNKNOWN}.  If the NS
+provider does not specify any QOS parameter values, the length of this field should be set to zero
+(@samp{0}).
+@item @parm{QOS_offset} @tab
+Indicates the offset of the Quality of Service parameters from the beginning of the
+@msg{M_PROTO} message block.
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item REC_CONF_OPT
+The receipt confirmation selection parameter indicates the use/availability of the receipt
+confirmation service on the NC.  The receipt confirmation service must be provided in the network
+service to be used on the NC.
+@item EX_DATA_OPT
+The expedited data selection parameter indicates the use/availability of the expedited data transfer
+service on the NC.  The expedited data transfer service must be provided by the NS provider for it
+to be used on the NC.
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_WCON_CREQ}.
+
+@subsubheading New State
+
+The new state is @psta{NS_DATA_XFER}.
+
+@page
+@node Normal Data Transfer Phase
+@subsection Normal Data Transfer Phase
+
+@menu
+* N_DATA_REQ::
+* N_DATA_IND::
+@end menu
+
+The data transfer service primitives provide for an exchange of NS user data known as NSDUs, in
+either direction or in both directions simultaneously on an NC.  The network service preserves both
+the sequence and the boundaries of the NSDUs (when the NS provider supports NSDUs).
+
+@node N_DATA_REQ
+@subsubsection Normal Data Transfer Request
+@subsubheading N_DATA_REQ
+@prindex N_DATA_REQ
+This user-originated primitive specifies to the NS provider that this message contains NS user data.
+It allows the transfer of NS user data between NS users without modification by the NS provider.
+The NS user must send any integral number of octets of data greater than zero.  In a case where the
+size of the NSDU exceeds the NIDU (as specified by the size of the @parm{NIDU_size} parameter of the
+@prim{N_INFO_ACK} primitive), the NSDU may be broken up into more than one NIDU.  When an NSDU is
+broken up into more than one NIDU, the @pval{N_MORE_DATA_FLAG} will be set on each NIDU except the
+last one.  The @pval{N_RC_FLAG} may only be set on the last NIDU.
+@subsubheading Format
+The format of the message is one or more @msg{M_DATA} message blocks.  Use of a @msg{M_PROTO}
+message block is optional.  The @msg{M_PROTO} message block is used for two reasons:
+
+@enumerate
+@item to indicate that the NSDU is broken into more than one NIDUs, and that the data carried in the
+following @msg{M_DATA} message block constitutes one NIDU;
+@item to indicate whether receipt confirmation is desired for the NSDU.
+@end enumerate
+
+@b{Guidelines for use of @msg{M_PROTO}:}
+
+The following guidelines must be followed with respect to the use of the @msg{M_PROTO} message
+block:
+
+@enumerate
+@item The @msg{M_PROTO} message block need not be present when the NSDU size is less than or equal
+to the NIDU size and one of the following is true:
+@itemize ---
+@item receipt confirmation has been negotiated for non-user (with the @prim{N_CONN_REQ} and
+@prim{N_CONN_RES} primitives); or
+@item receipt confirmation has been successfully negotiated for use or non-use and the default
+selection as specified with the @prim{N_OPTMGMT_REQ} primitive is to be used.
+@end itemize
+@item The @msg{M_PROTO} message block must be present when:
+@itemize ---
+@item the NSDU size is greater than the NIDU size;
+@item receipt confirmation has been successfully negotiated for use and the default selection as
+specified with the @prim{N_OPTMGMT_REQ} primitive needs to be overridden.
+@end itemize
+@end enumerate
+
+The structure of the @msg{M_PROTO} message block, if present, is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_DATA_REQ */
+        np_ulong DATA_xfer_flags;       /* data transfer flags */
+} N_data_req_t;
+
+/* Data Transfer Flags */
+#define N_MORE_DATA_FLAG    0x00000001L
+#define N_RC_FLAG           0x00000002L
+@end verbatim
+@tpindex N_data_req_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_DATA_REQ}.
+@item @parm{DATA_xfer_flags} @tab
+Specifies the data transfer flags associated with the data.  (See ``Flags'' below.)
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item N_MORE_DATA_FLAG
+When set, this flag indicates that the next @prim{N_DATA_REQ} primitive (NISDU) is also part of this
+NSDU.
+@item N_RC_FLAG
+By setting this flag on the @prim{N_DATA_REQ}, the originating NS user can request confirmation of
+receipt of the @prim{N_DATA_REQ} primitive.  The receipt is provided by the @prim{N_DATACK_IND}
+primitive.  The parameter may only be present if use of Receipt Confirmation was agreed by both NS
+users and the NS provider during NC establishment.
+
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_DATA_XFER} state.
+
+@subsubheading New State
+
+The resulting state remains the same (@psta{NS_DATA_XFER}).
+
+@subsubheading Acknowledgements
+
+This primitive does not require any acknowledgements, although it may generate a fatal error.  This
+is indicated to the NS user with a @msg{M_ERROR} @cite{STREAMS} message type (specifying an error
+number value of @errno{EPROTO}) that results in the failure of all system calls on that Stream.  The
+applicable errors are defined as follows:
+
+@table @errno
+@item EPROTO
+This indicates one of the following unrecoverable protocol conditions:
+@itemize ---
+@item The network interface was found to be in an incorrect state.
+@item The amount of NS user data associated with the primitive is outside the range supported by the
+NS provider (as specified by the @parm{NIDU_size} parameter of the @prim{N_INFO_ACK} primitive).
+@item The options requested are either not supported by the NS provider or its use not specified
+with the @prim{N_CONN_REQ} primitive.
+@item The @msg{M_PROTO} message block was not followed by one or more @msg{M_DATA} message blocks.
+@item The amount of NS user data associated with the current NSDU is outside the range supported by
+the NS provider (as specified by the @parm{NSDU_size} parameter in the @prim{N_INFO_ACK} primitive.)
+@item The @pval{N_RC_FLAG} and @pval{N_MORE_DATA_FLAG} were both set in the primitive, or the flags
+field contained an unknown value.
+@end itemize
+@end table
+
+@emph{NOTE:}  If the interface is in the @psta{NS_IDLE} or @psta{NS_WRES_RIND} states when the
+provider receives the @prim{N_DATA_REQ} primitive, then the NS provider should discard the request
+without generating a fatal error.
+
+@page
+@node N_DATA_IND
+@subsubsection Normal Data Transfer Indication
+
+@subsubheading N_DATA_IND
+@prindex N_DATA_IND
+This network-provider-originated primitive indicates to the NS user that this message contains NS
+user data.  As in the @prim{N_DATA_REQ} primitive, the NSDU can be segmented into more than one
+NIDUs.  The NIDUs are associated with the NSDU by using the @pval{N_MORE_DATA_FLAG}.  The
+@pval{N_RC_FLAG} is allowed to be set only on the last NIDU.
+@subsubheading Format
+The format of the message is one or more @msg{M_DATA} message blocks.  The value of the NS user data
+field is always the same as that supplied in the corresponding @prim{N_DATA_REQ} primitive at the
+peer service access point.  Use of @msg{M_PROTO} message blocks is optional (see guidelines under
+@pxref{N_DATA_REQ}).
+
+The structure of the @msg{M_PROTO} message block, if present, is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_DATA_IND */
+        np_ulong DATA_xfer_flags;       /* data transfer flags */
+} N_data_ind_t;
+
+/* Data Transfer Flags */
+#define N_MORE_DATA_FLAG    0x00000001L
+#define N_RC_FLAG           0x00000002L
+@end verbatim
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_DATA_IND}.
+@item @parm{DATA_xfer_flags} @tab
+Indicates the data transfer flags associated with the data.  (See ``Flags'' below.)
+@end multitable
+
+@subsubheading Flags
+
+@table @pval
+@item N_MORE_DATA_FLAG
+When set, indicates that the next @prim{N_DATA_IND} message (NIDU) is part of this NSDU.
+@item N_RC_FLAG
+The value of the parameter may indicate either that confirmation is requested or that it is not
+requested.  The parameter is allowed to be set only if use of Receipt Confirmation was agreed to
+between both the NS users and the NS provider during NC establishment.  The value of this parameter
+is always identical to that supplied in the corresponding @prim{N_DATA_REQ} primitive.
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_DATA_XFER}.
+
+@subsubheading New State
+
+The resulting state remains the same (@psta{NS_DATA_XFER}).
+
+@page
+@node Receipt Confirmation Service Primitives
+@subsection Receipt Confirmation Service Primitives
+
+@menu
+* N_DATACK_REQ::
+* N_DATACK_IND::
+@end menu
+
+The receipt confirmation service is requested by the confirmation request parameter on the
+@prim{N_DATA_REQ} primitive.  For each and every NSDU with the confirmation request parameter set,
+the receiving NS user should return an @prim{N_DATACK_REQ} primitive.  Such acknowledgements should
+be issued in the same sequence as the corresponding @prim{N_DATA_IND} primitives are received, and
+are to be conveyed by the NS provider in such a way so as to preserve them distinct from any
+previous or subsequent acknowledgements.  The NS user may thus correlate them with the original
+requests by counting.  When an NSDU has been segmented into more than one NIDUs, only the last NIDU
+is allowed to request receipt confirmation.  @prim{N_DATACK_REQ} primitive will not be subject to
+the flow control affecting @prim{N_DATA_REQ} primitives at the same NC endpoint.
+@prim{N_DATACK_IND} primitives will not be subject to the flow control affecting @prim{N_DATA_IND}
+primitives at the same NC endpoint.
+
+The use of the receipt confirmation service must be agreed to by the two NS users of the NC and the
+NS provider during the NC establishment by using the @pval{DEFAULT_RC} parameter on the
+@prim{N_CONN_REQ} or @prim{N_CONN_RES} primitive.
+
+@node N_DATACK_REQ
+@subsubsection Data Acknowledgement Request
+@subsubheading N_DATACK_REQ
+@prindex N_DATACK_REQ
+This is a user-originated primitive that requests that the network provider acknowledge the
+@prim{N_DATA_IND} that had previously been received with the receipt confirmation parameter set.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_DATACK_REQ */
+} N_datack_req_t;
+@end verbatim
+@tpindex N_datack_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_DATACK_REQ}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_DATA_XFER}.
+
+@subsubheading New State
+
+The resulting state remains the same (@psta{NS_DATA_XFER}).
+
+@subsubheading Acknowledgements
+
+This primitive does not require any acknowledgements, although it may generate a fatal
+(unrecoverable) error.  This is indicated via an @msg{M_ERROR} @cite{STREAMS} message type (issued
+to the NS user specifying the error number value of @errno{EPROTO}), which results in the failure of
+all system calls on that Stream.  The allowable errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @errno{EPROTO} @tab
+This indicates the following unrecoverable protocol condition:
+@itemize ---
+@item The network interface was found to be in an incorrect state.
+@end itemize
+@end multitable
+
+@emph{NOTE:}  If the interface is in the @psta{NS_IDLE} state when the provider receives the
+@prim{N_DATACK_REQ} primitive, then the NS provider should discard the request without generating a
+fatal error.  If the NS provider had no knowledge of a previous @prim{N_DATA_IND} with the receipt
+confirmation flag set, then the NS provider should just ignore the request without generating a
+fatal error.
+
+@page
+@node N_DATACK_IND
+@subsubsection Data Acknowledgement Indication
+@subsubheading N_DATACK_IND
+@prindex N_DATACK_IND
+This is a NS provider originated primitive that indicates to the network service user that the
+remote network service user has acknowledged the data that had previously been sent with the receipt
+confirmation set.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_DATACK_IND */
+} N_datack_ind_t;
+@end verbatim
+@tpindex N_datack_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_DATACK_IND}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_DATA_XFER}.
+
+@subsubheading New State
+
+The resulting state remains the same (@psta{NS_DATA_XFER}).
+
+@page
+@node Expedited Data Transfer Service
+@subsection Expedited Data Transfer Service
+
+@menu
+* N_EXDATA_REQ::
+* N_EXDATA_IND::
+@end menu
+
+The expedited data transfer service provides a further means of information exchange on an NC in
+both directions simultaneously.  The transfer of expedited network service data unit (ENSDU) is
+subject to separate flow control from that applying to NS user data.  (However, a separate
+@cite{STREAMS} message type for expedited data is not available with @cite{UNIX@registeredsymbol{}
+System V Release 3.1}.  Until a new @cite{STREAMS} message type is provided, expedited data will be
+implemented via queue manipulation).  The NS provider should guarantee that an expedited-NSDU will
+not be delivered after any subsequently issued NSDU or expedited-NSDU on that NC.  The relationship
+between normal and expedited data is shown in @tabref{2}.  Expedited data can still be delivered
+when the receiving NS user is not accepting normal data (however this cannot be guaranteed if there
+are blockages occurring in the lower layers).  The expedited data transfer service is a NS provider
+option, and its use must be agreed by the two NS users of the NC and the NS provider during NC
+establishment by using the @pval{EX_DATA_OPT} parameter on the @prim{N_CONN_REQ} and
+@prim{N_CONN_RES} primitives.
+
+@node N_EXDATA_REQ
+@subsubsection Expedited Data Transfer Request
+@subsubheading N_EXDATA_REQ
+@prindex N_EXDATA_REQ
+This is an NS user originated primitive and is used to indicate to the network provider that the
+message block contains an ENSDU.
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block, followed by one or more @msg{M_DATA}
+message blocks.  The NS user must send an integral number of octets of data within the range
+supported by the NS provider (@pxref{N_INFO_ACK}).
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_EXDATA_REQ */
+} N_exdata_req_t;
+@end verbatim
+@tpindex N_exdata_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_EXDATA_REQ}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_DATA_XFER}.
+
+@subsubheading New State
+
+The resulting state remains the same (@psta{NS_DATA_XFER}).
+
+@subsubheading Acknowledgements
+
+This primitive does not require any acknowledgements, although it may generate a fatal
+(unrecoverable) error.  This is indicated with an @msg{M_ERROR} @cite{STREAMS} message type (issued
+to the NS user with the error number value of @errno{EPROTO}), which results in the failure of all
+system calls on that Stream.  The applicable errors are as follows:
+
+@multitable @columnfractions .2 .8
+@item @errno{EPROTO} @tab
+This indicates one of the following unrecoverable protocol conditions:
+@itemize ---
+@item The network interface was found to be in an incorrect state.
+@item The amount of NS user data associated with the primitive defines an expedited network service
+data unit of a size that is outside the range supported by the NS provider.
+@item Expedited data transfer is either not supported by the NS provider or not requested with the
+@prim{N_CONN_REQ} primitive.
+@end itemize
+@end multitable
+
+@emph{NOTE:}  If the interface is in the @psta{NS_IDLE} or @psta{NS_WRES_RIND} states when the
+provider receives the @prim{N_EXDATA_REQ} primitive, then the NS provider should discard the request
+without generating a fatal error.
+
+@page
+@node N_EXDATA_IND
+@subsubsection Expedited Data Transfer Indication
+@subsubheading N_EXDATA_IND
+@prindex N_EXDATA_IND
+This is a NS provider originated primitive and is used to indicate to the NS user that this message
+contains an ENSDU.
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block, followed by one or more @msg{M_DATA}
+message blocks.  The value of the data in the @msg{M_DATA} message blocks is identical to that
+supplied with the corresponding @prim{N_EXDATA_REQ} primitive.
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_EXDATA_IND */
+} N_exdata_ind_t;
+@end verbatim
+@tpindex N_exdata_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_EXDATA_IND}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in the state @psta{NS_DATA_XFER}.
+
+@subsubheading New State
+
+The resulting state remains the same (@psta{NS_DATA_XFER}).
+
+
+@page
+@node Reset Service
+@subsection Reset Service
+
+@menu
+* N_RESET_REQ::
+* N_RESET_IND::
+* N_RESET_RES::
+* N_RESET_CON::
+@end menu
+
+The reset service can be used by the NS user to resynchronize the use of the NC; or by the NS
+provider to report detected loss of data unrecoverable within the network service.
+
+All loss of data that does not involve loss of the NC is reported in this way.  Invocation of the
+reset service will unblock the flow of NSDUs and ENSDUs in case of congestion of the NC; it will
+cause the NS provider to discard NSDUs, ENSDUs, or confirmations of receipt associated with the NC
+(see @tabref{1}), and to notify any NS user or users that did not invoke reset that a reset has
+occurred.  The service will be completed in finite time irrespective of the acceptance of the NSDUs,
+ENSDUs, and confirmations of receipt by the NS users.
+
+@node N_RESET_REQ
+@subsubsection Reset Request
+@subsubheading N_RESET_REQ
+@prindex N_RESET_REQ
+This user-originated primitive requests that the NS provider reset the network connection.
+@subsubheading Format
+The format of this primitive is one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_RESET_REQ */
+        np_ulong RESET_reason;          /* reason for reset */
+} N_reset_req_t;
+@end verbatim
+@tpindex N_reset_req_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_RESET_REQ}.
+@item @parm{RESET_reason} @tab
+Specifies the reason for the reset.  (See ``Reasons'' below.)
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_DATA_XFER} state.
+
+@subsubheading New State
+
+The resulting state is @psta{NS_WACK_RREQ}.
+
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Successful:}
+This primitive does not require an immediate acknowledgement, although when the resynchronization
+completes successfully, an @prim{N_RESET_CON} primitive is issued to the NS user that issued the
+@prim{N_RESET_REQ}.
+@item @emph{Unsuccessful (Non-fatal errors):}
+A non-fatal error is acknowledged with the @prim{N_ERROR_ACK} primitive.  In this case the resulting
+state remains unchanged.  The following non-fatal error codes are valid:
+@multitable @columnfractions .2 .7
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated with the
+@prim{N_ERROR_ACK} primitive.
+@end multitable
+@end itemize
+
+@emph{NOTE:}  If the interface is in the @psta{NS_IDLE} state when the provider receives the
+@prim{N_RESET_REQ} primitive, then the NS provider should discard the message without generating an
+error.
+
+@page
+@node N_RESET_IND
+@subsubsection Reset Indication
+@subsubheading N_RESET_IND
+@prindex N_RESET_IND
+This network-provider-originated primitive indicates to the NS user that the network connection has
+been reset.
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_RESET_IND */
+        np_ulong RESET_orig;            /* reset originator */
+        np_ulong RESET_reason;          /* reason for reset */
+} N_reset_ind_t;
+@end verbatim
+@tpindex N_reset_ind_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_RESET_IND}.
+@item @parm{RESET_orig} @tab
+Indicates the source of the reset.  (See ``Reasons'' below.)
+@item @parm{RESET_reason} @tab
+Indicates the reason fro the reset.  (See ``Reasons'' below.)
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_DATA_XFER} state.
+
+@subsubheading New State
+
+The new state is @psta{NS_WRES_RIND}.
+
+
+@page
+@node N_RESET_RES
+@subsubsection Reset Response
+@subsubheading N_RESET_RES
+@prindex N_RESET_RES
+This user-originated primitive indicates that the NS user has accepted a reset request.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block and is structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_RESET_RES */
+} N_reset_res_t;
+@end verbatim
+@tpindex N_reset_res_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_RESET_RES}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_WRES_RIND}.
+
+@subsubheading New State
+
+The new state is @psta{NS_WACK_RRES}.
+
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Successful:}
+The successful completion of this primitive is indicated with the @prim{N_OK_ACK} primitive.  This
+results in the data transfer state (@psta{NS_DATA_XFER}).
+@item @emph{Unsuccessful (Non-fatal errors):}
+An unsuccessful completion of this primitive is indicated with the @prim{N_ERROR_ACK} primitive.
+The resulting state remains the same.  The following non-fatal error codes are valid:
+@multitable @columnfractions .2 .7
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+@prim{N_ERROR_ACK} primitive.
+@end multitable
+@end itemize
+
+@emph{NOTE:}  If the interface is in the @psta{NS_IDLE} state when the provider receives the
+@prim{N_RESET_RES} primitive, then the NS provider should discard the message without generating an
+error.
+
+@page
+@node N_RESET_CON
+@subsubsection Reset Confirmation
+@subsubheading N_RESET_CON
+@prindex N_RESET_CON
+This NS provider-originated primitive indicates to the network user that initiated the reset, that
+the reset request has been confirmed.  The NS providers is allowed to issue the @prim{N_RESET_CON}
+primitive to the NS user that initiated the reset even before receiving a @prim{N_RESET_RES}.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_RESET_CON */
+} N_reset_con_t;
+@end verbatim
+@tpindex N_reset_con_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_RESET_CON}.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_WCON_RREQ}.
+
+@subsubheading New State
+
+The resulting state is @psta{NS_DATA_XFER}.
+
+@page
+@node Inform Service
+@subsection Inform Service
+
+@subsubsection @value{SHORT} Inform Request
+@subsubheading N_INFORM_REQ
+@anchor{N_INFORM_REQ}
+@prindex N_INFORM_REQ
+@subsubsection Format
+@tpindex N_inform_req_t
+@smallexample
+@verbatim
+#define N_INFORM_REQ    33
+typedef struct {
+        np_ulong PRIM_type;             /* always N_INFORM_REQ */
+        np_ulong QOS_length;            /* qos parameters */
+        np_ulong QOS_offset;
+        np_ulong REASON;                /* inform reason */
+} N_inform_req_t;
+
+/* Inform reasons for use with N_INFORM_REQ */
+#define N_SCCP_INFR_NSU_FAILURE         4
+#define N_SCCP_INFR_NSU_CONGESTION      5
+#define N_SCCP_INFR_NSU_QOS_CHANGE      6
+
+/* Inform reasons for use with N_INFORM */
+#define N_SCCP_INFR_UNSPECIFIED         7
+@end verbatim
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_INFORM_REQ}.
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@item @parm{REASON} @tab
+Specifies the reason for informing the NS provider.  (See ``Reason'' below.)
+@end multitable
+
+@subsubheading Reason
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_DATA_XFER} state.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Acknowledgements
+
+@page
+@subsubsection @value{SHORT} Inform Indication
+@subsubheading N_INFORM_IND
+@anchor{N_INFORM_IND}
+@prindex N_INFORM_IND
+@subsubsection Format
+@tpindex N_inform_ind_t
+@smallexample
+@verbatim
+#define N_INFORM_IND    34
+typedef struct {
+        np_ulong PRIM_type;             /* always N_INFORM_IND */
+        np_ulong QOS_length;            /* qos parameters */
+        np_ulong QOS_offset;
+        np_ulong REASON;                /* inform reason */
+} N_inform_ind_t;
+
+/* Inform reasons for use with N_INFORM_IND */
+#define N_SCCP_INFR_NSP_FAILURE         1
+#define N_SCCP_INFR_NSP_CONGESTION      2
+#define N_SCCP_INFR_NSP_QOS_CHANGE      3
+
+/* Inform reasons for use with N_INFORM */
+#define N_SCCP_INFR_UNSPECIFIED         7
+@end verbatim
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_INFORM_IND}.
+@item @parm{QOS_length} @tab
+Indicates the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Indicates the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@item @parm{REASON} @tab
+Indicates the reason for informing the NS user.  (See ``Reason'' below.)
+@end multitable
+
+@subsubheading Reason
+
+@subsubheading Valid States
+
+This primitive is valid in the @psta{NS_DATA_XFER} state.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Network Connection Release Phase
+@subsection Network Connection Release Phase
+
+@menu
+* N_DISCON_REQ::
+* N_DISCON_IND::
+@end menu
+
+The NC release service primitives are used to release a NC.  The release may be performed by:
+
+@itemize ---
+@item either or both of the NS users to release an established NC;
+@item the NS provider to release an established NC (all failures to maintain an NC are indicated in
+this manner);
+@item the destination NS user to reject an @prim{N_CONN_IND};
+@item by the NS provider to indicate its inability to establish a requested NC.
+@end itemize
+
+An NC release is permitted at any time regardless of the current phase of the NC.  Once an NC
+release procedure has been invoked, the NC will be released; a request for release cannot be
+rejected.  The network service does not guarantee delivery of any data once the NC release phase is
+entered (see @tabref{1}).
+
+@node N_DISCON_REQ
+@subsubsection Disconnect Request
+@subsubheading N_DISCON_REQ
+@prindex N_DISCON_REQ
+This user-originated primitive requests that the NS provider deny a request for a network
+connection, or disconnect an existing connection.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block, followed by one or more @msg{M_DATA}
+message blocks (for NS user data).  The NS user data may be lost if the NS provider initiates
+release before the @prim{N_DISCON_IND} is delivered.  Therefore, the NS user data parameter is
+present only if the originator parameters (@pxref{N_DISCON_IND}) indicates that the release was
+originated by an NS user.  The NS user may send any integral number of octets of data within a range
+supported by the NS provider (@pxref{N_INFO_ACK}).
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_DISCON_REQ */
+        np_ulong DISCON_reason;         /* reason */
+        np_ulong RES_length;            /* responding address length */
+        np_ulong RES_offset;            /* responding address offset */
+        np_ulong SEQ_number;            /* sequence number */
+} N_discon_req_t;
+@end verbatim
+@tpindex N_discon_req_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_DISCON_REQ}.
+@item @parm{DISCON_reason} @tab
+Specifies the disconnect reason.  (See ``Reason'' below.)
+@item @parm{RES_length} @tab
+Specifies the length of the responding address.  The responding address parameter is an optional
+parameter, and is present in the primitive only in the case where the primitive is used to indicate
+rejection of an NC establishment attempt by an NS user.  The responding address parameter conveys
+the network address of the NS user entity from which the @prim{N_DISCON_REQ} was issued and under
+certain circumstances (e.g. call redirection, generic addressing, etc.) may be different from the
+@dfn{Destination Address} in the corresponding @prim{N_CONN_REQ} primitive.
+@item @parm{RES_offset} @tab
+Specifies the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SEQ_number} @tab
+Specifies the connection indication being disconnected.  When non-zero, it identifies the sequence
+number of the @prim{N_CONN_IND} message being rejected.  This number is used by the NS provider to
+associate the @prim{N_DISCON_REQ} with an unacknowledged @prim{N_CONN_IND} that is to be rejected.
+If the @prim{N_DISCON_REQ} is rejecting a NC that is already established (or rejecting a
+@prim{N_CONN_REQ} that the NS user had previously sent and has not yet been confirmed), then this
+field should have a value of zero (@samp{0}).
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in states @psta{NS_WCON_CREQ}, @psta{NS_WRES_CIND}, @psta{NS_DATA_XFER},
+@psta{NS_WCON_RREQ} and @psta{NS_WRES_RIND}.
+
+@subsubheading New State
+
+The new state depends on the original state (see @tabref{B-8}).
+
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Successful:}
+Successful completion is indicated with the @prim{N_OK_ACK} primitive.
+@item @emph{Unsuccessful (Non-fatal errors):}
+Errors are indicated with the @prim{N_ERROR_ACK} primitive.  The applicable non-fatal errors are as
+follows:
+@multitable @columnfractions .2 .7
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@item @perr{NBADDATA} @tab
+The amount of user data specified was outside the range supported by the NS provider.
+@item @perr{NSYSERR} @tab
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} system error is indicated in the
+primitive.
+@item @perr{NBADSEQ} @tab
+The specified sequence number referred to an invalid @prim{N_CONN_IND} message, or the
+@prim{N_DISCON_REQ} is rejecting an NC that is already established (or rejecting an
+@prim{N_CONN_REQ} that the NS user had previously sent and has not yet been confirmed) and the value
+of the sequence number is not @samp{0}.
+@end multitable
+@end itemize
+
+@page
+@node N_DISCON_IND
+@subsubsection Disconnect Indication
+@subsubheading N_DISCON_IND
+@prindex N_DISCON_IND
+This network-provider originated primitive indicates to the NS user that either a request for
+connection has been denied or an existing connection has been disconnected.
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block, followed by one or more @msg{M_DATA}
+blocks.  The value of the NS user data parameter is identical to the value in the corresponding
+@prim{N_DISCON_REQ} primitive.  The NS user data parameter is present only if the originator
+parameter indicates that the release was initiated by the NS user.
+
+The structure of the @msg{M_PROTO} message block is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_DISCON_IND */
+        np_ulong DISCON_orig;           /* originator */
+        np_ulong DISCON_reason;         /* reason */
+        np_ulong RES_length;            /* address length */
+        np_ulong RES_offset;            /* address offset */
+        np_ulong SEQ_number;            /* sequence number */
+} N_discon_ind_t;
+@end verbatim
+@tpindex N_discon_ind_t
+@end smallexample
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_DISCON_REQ}.
+@item @parm{DISCON_orig} @tab
+Indicates the disconnect source.  (See ``Reason'' below.)
+@item @parm{DISCON_reason} @tab
+Indicates the disconnect reason.  (See ``Reason'' below.)
+@item @parm{RES_length} @tab
+Indicates the length of the responding address.  The responding address parameter is an optional
+parameter, and is present in the primitive only in the case where the primitive is used to indicate
+rejection of an NC establishment attempt by an NS user.  When not present, the value of this
+parameter is zero.  When present, the value of the disconnect address parameter is identical to that
+supplied with the corresponding @prim{N_DISCON_REQ} primitive.
+@item @parm{RES_offset} @tab
+Indicates the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SEQ_number} @tab
+Indicates the connection indication being disconnected.  When its value is non-zero, it identifies
+the sequence number associated with the @prim{N_CONN_IND} primitive that is being aborted.
+
+The value of this parameter must be zero when:
+
+@enumerate a
+@item indicating the rejection of a previously issued @prim{N_CONN_REQ} primitive; or
+@item indicating the release of a NC that is already successfully established.
+@end enumerate
+
+When this field is non-zero and its value is the same as the sequence number assigned to an
+unacknowledged @prim{N_CONN_IND}, it indicates that the NS provider is canceling the unacknowledged
+@prim{N_CONN_IND}.
+@end multitable
+
+@subsubheading Valid States
+
+The valid states are as follows:
+
+@multitable @columnfractions .2 .8
+@item @psta{NS_WCON_CREQ} @tab
+Waiting confirmation of connection request. 
+@item @psta{NS_WRES_CIND} @tab
+Waiting response of connection indication.
+@item @psta{NS_DATA_XFER} @tab
+Waiting response of data transfer.
+@item @psta{NS_WCON_RREQ} @tab
+Waiting confirmation of reset request.
+@item @psta{NS_WRES_RIND} @tab
+Waiting response to reset indication.
+@end multitable
+
+@subsubheading New State
+
+The new state is @psta{NS_IDLE} (except when number of outstanding connect indications is greater
+than 1, in which case the resulting state is @psta{NS_WRES_CIND}).
+
+@page
+@node Connectionless Mode Primitives
+@section Connectionless Mode Primitives
+
+@menu
+* Unit Data Transfer::
+* Unit Data Error::
+@end menu
+
+This section describes the format of the CLNS primitives and the rules associated with these
+primitives.  The values of the QOS parameters associated with each unit data transmission are
+selected with the @prim{N_OPTMGMT_REQ} primitive.
+
+@node Unit Data Transfer
+@subsection Unit Data Transfer
+
+@node N_UNITDATA_REQ
+@subsubsection Unit Data Request
+@subsubheading N_UNITDATA_REQ
+@prindex N_UNITDATA_REQ
+This primitive requests that the NS provider send the specified datagram to the specified
+destination.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks.  The @msg{M_PROTO} message block is structured as followed:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_UNITDATA_REQ */
+        np_ulong DEST_length;           /* destination address length */
+        np_ulong DEST_offset;           /* destination address offset */
+        np_ulong RESERVED_field[2];     /* reserved field for DLPI compatibility */
+} N_unitdata_req_t;
+@end verbatim
+@tpindex N_unitdata_req_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_UNITDATA_REQ}.
+@item @parm{DEST_length} @tab
+Specifies the length of the destination address.
+@item @parm{DEST_offset} @tab
+Specifies the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{RESERVED_field[0]} @tab
+Specified the length of the Quality of Service parameters.
+@item @parm{RESERVED_field[1]} @tab
+Specified the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_IDLE}.
+
+@subsubheading New State
+
+The resulting state remains unchanged.
+
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Successful:}
+There is no acknowledgement for the successful completion of this primitive.
+@item @emph{Unsuccessful (Non-fatal errors):}
+If a non-fatal error occurs, it is the responsibility of the NS provider to report it with the
+@prim{N_UDERROR_IND} primitive.  The following non-fatal error codes are allowed:
+@multitable @columnfractions .2 .7
+@item @perr{NBADADDR} @tab
+The network address as specified in the primitive was in an incorrect format, or the address
+contained illegal information.
+@item @perr{NBADDATA} @tab
+The amount of user data specified was outside the range supported by the NS provider.
+@item @perr{NOUTSTATE} @tab
+The primitive was issued from an invalid state.
+@end multitable
+@item @emph{Fatal Error:}
+Fatal errors are indicated with an @msg{M_ERROR} @cite{STREAMS} message type (issued to the NS user with
+the error number value of @errno{EPROTO}), that results in the failure of all
+@cite{UNIX@registeredsymbol{}} system calls on the Stream.  The fatal errors are as follows:
+@multitable @columnfractions .2 .7
+@item @errno{EPROTO} @tab
+This indicates one of the following unrecoverable protocol conditions:
+@itemize ---
+@item The network service interface was found to be in an incorrect state.
+@item The amount of NS user data associated with the primitive defines a network service data unit
+larger than that allowed by the NS provider.
+@end itemize
+@end multitable
+@end itemize
+
+@page
+@node N_UNITDATA_IND
+@subsubsection Unit Data Indication
+@subsubheading N_UNITDATA_IND
+@prindex N_UNITDATA_IND
+This primitive indicates to the NS user that a datagram has been received from the specified source
+address.
+@subsubheading Format
+The format of the message is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks containing at least one byte of data.  The format of the @msg{M_PROTO} is as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_UNITDATA_IND */
+        np_ulong SRC_length;            /* source address length */
+        np_ulong SRC_offset;            /* source address offset */
+        np_ulong DEST_length;           /* source address length */
+        np_ulong DEST_offset;           /* source address offset */
+        np_ulong ERROR_type;            /* reserved field for DLPI compatibility */
+} N_unitdata_ind_t;
+@end verbatim
+@tpindex N_unitdata_ind_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_UNITDATA_IND}.
+@item @parm{SRC_length} @tab
+Indicates the length of the source network address.  This address is the same as the value
+associated with the Stream on which the @prim{N_UNITDATA_REQ} was issued.
+@item @parm{SRC_offset} @tab
+Indicates the offset of the source address from the beginning of the @msg{M_PROTO} message block.
+@item @parm{DEST_length} @tab
+Indicates the length of the destination address.  The address is the same as in the corresponding
+@prim{N_UNITDATA_REQ} primitive.
+@item @parm{DEST_offset} @tab
+Indicates the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{ERROR_type} @tab
+Specifies the reason for the error.  The possible values are:
+@table @pval
+@item N_UD_CONGESTION
+This packet experienced congestion during its delivery.
+@end table
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_IDLE}.
+
+@subsubheading New State
+
+The resulting state remains unchanged.
+
+@page
+@node Unit Data Error
+@subsection Unit Data Error
+
+@node N_UDERROR_IND
+@subsubsection Unit Data Error Indication
+@subsubheading N_UDERROR_IND
+@prindex N_UDERROR_IND
+This primitive indicates to the NS user that a datagram with the specified destination address and
+QOS parameters has resulted in an error condition.
+@subsubheading Format
+The format of the primitive is one @msg{M_PROTO} message block, structured as follows:
+@smallexample
+@verbatim
+typedef struct {
+        np_ulong PRIM_type;             /* always N_UDERROR_IND */
+        np_ulong DEST_length;           /* destination address length */
+        np_ulong DEST_offset;           /* destination address offset */
+        np_ulong RESERVED_field;        /* reserved field for DLPI compatibility */
+        np_ulong ERROR_type;            /* error type */
+} N_uderror_ind_t;
+@end verbatim
+@tpindex N_uderror_ind_t
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_UDERROR_IND}.
+@item @parm{DEST_length} @tab
+Indicates the length of the destination address.  The address is the same as in the corresponding
+@prim{N_UNITDATA_REQ} primitive.
+@item @parm{DEST_offset} @tab
+Indicates the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{RESERVED_field} @tab
+This field is reserved whose value must be set to zero.
+@item @parm{ERROR_type} @tab
+Indicates the reason for the error.  (See ``Errors'' below.)
+@end multitable
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_IDLE}.
+
+@subsubheading New State
+
+The resulting state remains unchanged.
+
+
+@page
+@node Notice Indication
+@subsubsection Notice Indication
+@subsubheading N_NOTICE_IND
+@anchor{N_NOTICE_IND}
+@prindex N_NOTICE_IND
+This primitive indicates to the NS user that a datagram with the specifid destination address,
+source address and Quality of Service parameters has been returned due to an error.
+@subsubheading Format
+@tpindex N_notice_ind_t
+The format of the mssage is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
+message blocks (containing the originalling sent NS user data).
+@smallexample
+@verbatim
+#define N_NOTICE_IND    32
+typedef struct {
+        np_ulong PRIM_type;             /* always N_NOTICE_IND */
+        np_ulong DEST_length;           /* address data was sent to */
+        np_ulong DEST_offset;
+        np_ulong SRC_length;            /* address data was sent from */
+        np_ulong SRC_offset;
+        np_ulong QOS_length;            /* QOS parameters data was sent with */
+        np_ulong QOS_offset;
+        np_ulong RETURN_cause;          /* reason for return of data */
+} N_notice_ind_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_NOTICE_IND}.
+@item @parm{DEST_length} @tab
+Indicates the length of the destination address.
+@item @parm{DEST_offset} @tab
+Indicates the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SRC_length} @tab
+Indicates the length of the source address.
+@item @parm{SRC_offset} @tab
+Indicates the offset of the source address from the beginning of the @msg{M_PROTO} message block.
+@item @parm{QOS_length} @tab
+Indicates the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Indicates the length of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@item @parm{RETURN_cause} @tab
+Indicates the cause for the return of the datagram.  (See ``Cause'' below.)
+@end multitable
+
+@subsubheading Cause
+
+@table @pval
+@item SCCP_RETC_NO_ADDRESS_TYPE_TRANSLATION
+No address type translation.
+@item SCCP_RETC_NO_ADDRESS_TRANSLATION
+No address translation.
+@item SCCP_RETC_SUBSYSTEM_CONGESTION
+Subsystem congestion.
+@item SCCP_RETC_SUBSYSTEM_FAILURE
+Subsystem failure.
+@item SCCP_RETC_UNEQUIPPED_USER
+Unequipped user.
+@item SCCP_RETC_MTP_FAILURE
+MTP failure.
+@item SCCP_RETC_NETWORK_CONGESTION
+Network congestion.
+@item SCCP_RETC_UNQUALIFIED
+Unqualified.
+@item SCCP_RETC_MESSAGE_TRANSPORT_ERROR
+Message transport error.
+@item SCCP_RETC_LOCAL_PROCESSING_ERROR
+Local processing error.
+@item SCCP_RETC_NO_REASSEMBLY_AT_DESTINATION
+No reassembly at destination.
+@item SCCP_RETC_SCCP_FAILURE
+SCCP failure.
+@item SCCP_RETC_SCCP_HOP_COUNTER_VIOLATION
+SCCP hop counter violation.
+@item SCCP_RETC_SEGMENTATION_NOT_SUPPORTED
+Segmentation not supported.
+@item SCCP_RETC_SEGMENTATION_FAILURE
+Segmenetation failure.
+@item SCCP_RETC_MESSAGE_CHANGE_FAILURE
+Message change failure.
+@item SCCP_RETC_INVALID_INS_ROUTING_REQUEST
+Invalid INS routing request.
+@item SCCP_RETC_INVALID_INSI_ROUTING_REQUEST
+Invalid INSI routing request.
+@item SCCP_RETC_UNAUTHORIZED_MESSAGE
+Unauthorized message.
+@item SCCP_RETC_MESSAGE_INCOMPATIBILITY
+Message incompatibility.
+@item SCCP_RETC_CANNOT_PERFORM_ISNI_CONSTRAINED_ROUTING
+Cannot perform ISNI constrained routing.
+@item SCCP_RETC_REDUNDANT_ISNI_CONSTRAINED_ROUTING_INFO
+Redundant ISNI constrained routing information.
+@item SCCP_RETC_UNABLE_TO_PERFORM_ISNI_IDENTIFICATION
+Unable to perform ISNI identification.
+@end table
+
+@subsubheading Valid States
+
+This primitive is valid in state @psta{NS_IDLE}.
+
+@subsubheading New State
+
+The resulting state remains unchanged.
+
+@page
+@node @value{SHORT} Provider Management Primitives
+@section @value{SHORT} Provider Management Primitives
+
+@menu
+* @value{SHORT} Status Service::
+* @value{SHORT} PC Status Service::
+* @value{SHORT} Coordination Service::
+@end menu
+
+@node @value{SHORT} Status Service
+@subsection @value{SHORT} Status Service
+
+@subsubsection State Request
+@subsubheading N_STATE_REQ
+@anchor{N_STATE_REQ}
+@prindex N_STATE_REQ
+@subsubheading Format
+@tpindex N_state_req_t
+@smallexample
+@verbatim
+#define N_STATE_REQ     39
+typedef struct {
+        np_ulong PRIM_type;             /* always N_STATE_REQ */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong STATUS;                /* user status */
+} N_state_req_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_STATE_REQ}.
+@item @parm{ADDR_length} @tab
+Specifies the length of the affected address (point code and subsystem).
+@item @parm{ADDR_offset} @tab
+Specifies the offset of the affected address (point code and subsystem) from the beginning of the
+@msg{M_PROTO} message block.
+@item @parm{STATUS} @tab
+Specifies the user status.  (See ``Status'' below.)
+@end multitable
+
+@subsubheading Status
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Succcessful:}
+@item @emph{Unsuccessful (Non-fatal errors):}
+@end itemize
+
+@page
+@subsubsection State Indication
+@subsubheading N_STATE_IND
+@anchor{N_STATE_IND}
+@prindex N_STATE_IND
+@subsubheading Format
+@tpindex N_state_ind_t
+The format of the message is one @msg{M_PCPROTO} message block.  The structure of the
+@msg{M_PCPROTO} message block is as follows:
+@smallexample
+@verbatim
+#define N_STATE_IND     40
+typedef struct {
+        np_ulong PRIM_type;             /* always N_STATE_IND */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong STATUS;                /* user status */
+        np_ulong SMI;                   /* subsystem multiplicity indicator */
+} N_state_ind_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_STATE_IND}.
+@item @parm{ADDR_length} @tab
+Indicates the length of the affected address (point code and subsystem).
+@item @parm{ADDR_offset} @tab
+Indicates the offset of the affected address (point code and subsystem) from the beginning of the
+@msg{M_PROTO} message block.
+@item @parm{STATUS} @tab
+Indicates the user status.  (See ``Status'' below.)
+@item @parm{SMI} @tab
+Indicates the subsystem multiplicity indicator.
+@end multitable
+
+@subsubheading Type and Status
+
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@node @value{SHORT} PC Status Service
+@subsection @value{SHORT} PC Status Service
+
+@subsubsection PC State Indication
+@subsubheading N_PCSTATE_IND
+@anchor{N_PCSTATE_IND}
+@prindex N_PCSTATE_IND
+This primitive indicates to the @value{SHORT}-User that the indicated remote @value{SHORT}-entity
+(signalling point) is temporarily inaccessible.  This implies the inaccessibility of remote
+@value{SHORT}-User at the affected signalling point.
+@subsubheading Format
+@tpindex N_pcstate_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
+message block is as follows:
+@smallexample
+@verbatim
+#define N_PCSTATE_IND   41
+typedef struct {
+        np_ulong PRIM_type;             /* always N_PCSTATE_IND */
+        np_ulong ADDR_length;           /* affected point code */
+        np_ulong ADDR_offset;
+        np_ulong STATUS;                /* status */
+} N_pcstate_ind_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_PCSTATE_IND}.
+@item @parm{ADDR_length} @tab
+Indicates the length of the affected address (point code and subsystem).
+@item @parm{ADDR_offset} @tab
+Indicates the offset of the affected address (point code and subsystem) from the beginning of the
+@msg{M_PROTO} message block.
+@item @parm{STATUS} @tab
+Indicates the user status.  (See ``Status'' below.)
+@end multitable
+
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@node @value{SHORT} Coordination Service
+@subsection @value{SHORT} Coordination Service
+
+@subsubsection Coordination Request
+@subsubheading N_COORD_REQ
+@anchor{N_COORD_REQ}
+@prindex N_COORD_REQ
+@subsubheading Format
+@tpindex N_coord_req_t
+@smallexample
+@verbatim
+#define N_COORD_REQ     35
+typedef struct {
+        np_ulong PRIM_type;             /* alwyas N_COORD_REQ */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+} N_coord_req_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Succcessful:}
+@item @emph{Unsuccessful (Non-fatal errors):}
+@end itemize
+
+
+@page
+@subsubsection Coordination Indication
+@subsubheading N_COORD_IND
+@anchor{N_COORD_IND}
+@prindex N_COORD_IND
+@subsubheading Format
+@tpindex N_coord_ind_t
+@smallexample
+@verbatim
+#define N_COORD_IND     37
+typedef struct {
+        np_ulong PRIM_type;             /* alwyas N_COORD_IND */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong SMI;                   /* subsystem multiplicity indicator */
+} N_coord_ind_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_COORD_IND}.
+@item @parm{ADDR_length} @tab
+Indicates the length of the affected address (point code and subsystem).
+@item @parm{ADDR_offset} @tab
+Indicates the offset of the affected address (point code and subsystem) from the beginning of the
+@msg{M_PROTO} message block.
+@item @parm{SMI} @tab
+Indicates the subsystem multiplicity indicator.
+@end multitable
+
+@subsubheading Valid States
+@subsubheading New State
+
+@page
+@subsubsection Coordination Response
+@subsubheading N_COORD_RES
+@anchor{N_COORD_RES}
+@prindex N_COORD_RES
+@subsubheading Format
+@tpindex N_coord_res_t
+@smallexample
+@verbatim
+#define N_COORD_RES     36
+typedef struct {
+        np_ulong PRIM_type;             /* always N_COORD_RES */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+} N_coord_res_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Specifies the primitive type: always @prim{N_COORD_RES}.
+@item @parm{ADDR_length} @tab
+Specifies the length of the affected address (point code and subsystem).
+@item @parm{ADDR_offset} @tab
+Specifies the offset of the affected address (point code and subsystem) from the beginning of the
+@msg{M_PROTO} message block.
+@end multitable
+
+@subsubheading Valid States
+@subsubheading New State
+@subsubheading Acknowledgements
+
+The NS provider should generate one of the following acknowledgements upon receipt of this
+primitive:
+
+@itemize ---
+@item @emph{Succcessful:}
+@item @emph{Unsuccessful (Non-fatal errors):}
+@end itemize
+
+
+@page
+@subsubsection Coordination Confirmation
+@subsubheading N_COORD_CON
+@anchor{N_COORD_CON}
+@prindex N_COORD_CON
+@subsubheading Format
+@tpindex N_coord_con_t
+@smallexample
+@verbatim
+#define N_COORD_CON     38
+typedef struct {
+        np_ulong PRIM_type;             /* always N_COORD_CON */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong SMI;                   /* subsystem multiplicity indicator */
+} N_coord_con_t;
+@end verbatim
+@end smallexample
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{PRIM_type} @tab
+Indicates the primitive type: always @prim{N_PCSTATE_IND}.
+@item @parm{ADDR_length} @tab
+Indicates the length of the affected address (point code and subsystem).
+@item @parm{ADDR_offset} @tab
+Indicates the offset of the affected address (point code and subsystem) from the beginning of the
+@msg{M_PROTO} message block.
+@item @parm{STATUS} @tab
+Indicates the user status.  (See ``Status'' below.)
+@end multitable
+
+@subsubheading Valid States
+@subsubheading New State
+
+@node Diagnostics Requirements
+@chapter Diagnostics Requirements
+
+Two error handling facilities should be provided to the @value{SHORT} user: one to handle non-fatal
+errors, and the other to handle fatal errors.
+
+@section Non-Fatal Error Handling Facility
+
+These are errors that do not change the state of the @value{SHORT} service interface as seen by the
+@value{SHORT} service user, and provide the user the option of reissuing the @value{SHORT} service
+primitive with the corrected options specification.  The non-fatal error handling is provided only
+to those primitive that require acknowledgements, and uses the @prim{N_ERROR_ACK} primitive to
+report these errors.  These errors retain the state of hte @value{SHORT} service interface the same
+as it was before the @value{SHORT} service provider received the primitive that was in error.
+Syntax errros and rule violations are reported via the non-fatal error handling facility.
+
+@section Fatal Error Handling Facility
+
+These errors are issued by the @value{SHORT} provider when it detects errors that are not
+correctable by the @value{SHORT} user, or if it is unable to report a correctible error to the
+@value{SHORT} user.  Fatal errors are indicated via the @cite{STREAMS} message type @msg{M_ERROR} with the
+UNIX system error @errno{EPROTO}.  The @msg{M_ERROR} @cite{STREAMS} message type will result in the failure
+of all the UNIX system calls on the stream.  The @value{SHORT} user can recover from a fatal error
+by having all the processes close the files associated with the stream, and then reopening them for
+processing.
+
+These errors are issued by the @value{SHORT} when it detects errors that are not correctable by the
+@value{SHORT} service user, or if it is unable to report a correctable error to the @value{SHORT}
+service user.  Fatal errors are indicated via the @cite{STREAMS} message type @msg{M_ERROR} with the UNIX
+system error @errno{EPROTO}.  The @msg{M_ERROR} @cite{STREAMS} message type will result in the failure of
+all the UNIX system calls on the stream.  The @value{SHORT} service user can recover from a fatal
+error by having all the processes close the files associated with the stream, and then reopening
+them for processing.
+
+@node @value{INTERFACE} Input-Output Controls
+@chapter @value{INTERFACE} Input-Output Controls
+@cindex @value{INTERFACE} input-output controls
+
+@node @value{INTERFACE} Management Information Base
+@chapter @value{INTERFACE} Management Information Base
+@cindex @value{INTERFACE} management information base
+
+@node Addendum for @value{SHORT} Conformance
+@unnumbered Addendum for @value{SHORT} Conformance
+
+@menu
+* Addendum for ITU-T Q.711 Conformance::
+* Addendum for ANSI T1.112 Conformance::
+* Addendum for ETSI EN 300 009-1 Conformance::
+@end menu
+
+@node Addendum for ITU-T Q.711 Conformance
+@unnumberedsec Addendum for ITU-T Q.711 Conformance
+
+This addendum describes the formats and rules that are specific to ETSI EN 300 009-1 V3.2.2.  The
+addendum must be used along with the generic @value{INTERFACE} as defined in the main document, and
+the EN 300 009-1 conformance defined in Addendum 2, when implementing an @value{SHORT} that will be
+configured with the EN 300 008-1 @value{LONG}.
+
+@unnumberedsec Primitives and Rules for ETSI EN 300 009-1 V3.2.2 Conformance
+
+The following are the additional rules that apply to the @value{INTERFACE} primitives for ETSI EN
+300 009-1 V3.2.2 compatibility.
+
+@unnumberedsubsec Local Management Primitives
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@end multitable
+
+@subsubheading Flags
+@subsubheading Rules
+
+@unnumberedsubsec Connection Mode Primitives
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@end multitable
+
+@subsubheading Flags
+@subsubheading Rules
+
+@unnumberedsubsec Connectionless Primitives
+
+@subsubheading Parameters
+
+@multitable @columnfractions .2 .8
+@end multitable
+
+@subsubheading Flags
+@subsubheading Rules
+
+@page
+@node Addendum for ANSI T1.112 Conformance
+@unnumberedsec Addendum for ANSI T1.112 Conformance
+
+@page
+@node Addendum for ETSI EN 300 009-1 Conformance
+@unnumberedsec Addendum for ETSI EN 300 009-1 Conformance
+
+@node Mapping @value{INTERFACE} Primitives
+@appendix Mapping @value{INTERFACE} Primitives
+
+@menu
+* Mapping @value{INTERFACE} Primitives to Q.711::
+* Mapping @value{INTERFACE} Primitives to ANSI T1.112::
+* Mapping @value{INTERFACE} Primitives to ETSI EN 300 009-1::
+@end menu
+
+@node Mapping @value{INTERFACE} Primitives to Q.711
+@section Mapping @value{INTERFACE} Primitives to Q.711
+
+Table A-1 shows the mapping of the @value{INTERFACE} primitives to the @value{SHORT} definition
+primitives listed in ITU-T Recommendation Q.711.
+
+The mapping of @value{INTERFACE} primitives to Q.711 primitives is shown in @tabref{6}.  For the
+most part, this mapping is a one to one mapping of service primitives, with the exception of
+@emph{Connect Request} and @emph{Disconnect Request}.
+
+In Q.711 there is no concept of an @dfn{NC} between @value{SHORT}-entities.  In OpenSS7
+@value{INTERFACE}, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
+establish and release an NC between @value{SHORT}-entities.
+
+@c @tabfig{sccpi_tab06,6,Mapping of @value{INTERFACE} primitives to Q.711 Primitives}
+
+@page
+@node Mapping @value{INTERFACE} Primitives to ANSI T1.112
+@section Mapping @value{INTERFACE} Primitives to ANSI T1.112
+
+The mapping of @value{INTERFACE} primitives to T1.112 primitives is shown in @tabref{7}.  For the
+most part, this mapping is a one to one mapping of service primitives, with the exception of
+@emph{Connect Request} and @emph{Disconnect Request}.
+
+In T1.112 there is no concept of an @dfn{NC} between @value{SHORT}-entities.  In OpenSS7
+@value{INTERFACE}, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
+establish and release an NC between @value{SHORT}-entities.
+
+@c @tabfig{sccpi_tab07,7,Mapping of @value{INTERFACE} primitives to T1.112 Primitives}
+
+@page
+@node Mapping @value{INTERFACE} Primitives to ETSI EN 300 009-1
+@section Mapping @value{INTERFACE} Primitives to ETSI EN 300 009-1
+
+The mapping of @value{INTERFACE} primitives to EN 300 009-1 primitives is shown in @tabref{8}.  For the
+most part, this mapping is a one to one mapping of service primitives, with the exception of
+@emph{Connect Request} and @emph{Disconnect Request}.
+
+In EN 300 009-1 there is no concept of an @dfn{NC} between @value{SHORT}-entities.  In OpenSS7
+@value{INTERFACE}, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
+establish and release an NC between @value{SHORT}-entities.
+
+@c @tabfig{sccpi_tab08,8,Mapping of @value{INTERFACE} primitives to EN 300 009-1 Primitives}
+
+@node State/Event Tables
+@appendix State/Event Tables
+
+@node Precedence Tables
+@appendix Precedence Tables
+
+@c @node Allowable Sequence of @value{INTERFACE} Primitives
+@c @chapter Allowable Sequence of @value{INTERFACE} Primitives
+
+@c @node Precedence of @value{INTERFACE} Primitives
+@c @chapter Precedence of @value{INTERFACE} Primitives
+
+@c @node Guidelines for Protocol Independent @value{INTERFACE} Users
+@c @appendix Guidelines for Protocol Independent @value{INTERFACE} Users
+
+@c @node Required Information for @value{INTERFACE} Provider-Specific Addenda
+@c @appendix Required Information for @value{INTERFACE} Provider-Specific Addenda
+
+@node @value{INTERFACE} Header Files
+@appendix @value{INTERFACE} Header Files
+
+@noindent
+@smallformat
+@c @verbatiminclude sccpi.h
+@end smallformat
+
+@node @value{INTERFACE} Library
+@appendix @value{INTERFACE} Library
+
+@node @value{INTERFACE} Drivers and Modules
+@appendix @value{INTERFACE} Drivers and Modules
+
+@c @figuresized{sccpi_figc1,C-1,@value{INTERFACE} Drivers and Modules,5.5in}
+
+@node @value{INTERFACE} Utilities
+@appendix @value{INTERFACE} Utilities
+
+@node @value{INTERFACE} File Formats
+@appendix @value{INTERFACE} File Formats
+
+@node @value{INTERFACE} Compatibility and Porting
+@appendix @value{INTERFACE} Compatibility and Porting
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+@item Signalling Data Link Service Data Unit
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+@item Data transfer
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+@item SDL provider
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+@item SDL user
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+@item Local management
+The phase in connection and connectionless modes in which a SDL user initializes a Stream and
+attaches a PPA address to the Stream.  Primitives in this phase generate local operations only.
+@item PPA
+The point at which a system attaches itself to a physical communications medium.
+@item PPA identifier
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
+@item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
+@end multitable
+
+@node References
+@unnumbered References
+
+@multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
+@item [1] @anchor{Q.700} @tab @uref{http://www.itu.int/rec/T-REC-Q.700/,ITU-T Recommendation Q.700},
+@cite{Introduction to CCITT Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [2] @anchor{Q.701} @tab @uref{http://www.itu.int/rec/T-REC-Q.701/,ITU-T Recommendation Q.701},
+@cite{Functional Description of the Message Transfer Part (MTP) of Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [3] @anchor{Q.702} @tab @uref{http://www.itu.int/rec/T-REC-Q.702/,ITU-T Recommendation Q.702},
+@cite{Signalling System No. 7---Signalling Data Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [4] @anchor{Q.703} @tab @uref{http://www.itu.int/rec/T-REC-Q.703/,ITU-T Recommendation Q.703},
+@cite{Signalling System No. 7---Signalling Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [5] @anchor{Q.704} @tab @uref{http://www.itu.int/rec/T-REC-Q.704/,ITU-T Recommendation Q.704},
+@cite{Message Transfer Part---Signalling Network Functions and Messages},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [6] @anchor{CDIAPI} @tab
+Geoffrey Gerrietts; Dave Grothe, Mikel Matthews, Dave Healy,
+@cite{CDI---Application Program Interface Guide},
+March 1999,
+(Savoy, IL),
+GCOM, Inc.
+@item [7] @anchor{Q.771} @tab @uref{http://www.itu.int/rec/T-REC-Q.771/,ITU-T Recommendation Q.771},
+@cite{Signalling System No. 7---Functional Description of Transaction Capabilities},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@end multitable
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the Author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

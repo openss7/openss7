@@ -1,0 +1,448 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ALLOCBI 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B allocbi
+\- allocate a \fISTREAMS\fR message block
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MAC_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/macddi.h>
+.HP
+.BI "typedef void (*" allocbi_fcn_t ")(caddr_t);
+.HP
+.BI "mblk_t *allocbi(size_t " size ", int " pri ", allocbi_fcn_t " func ", caddr_t " arg ", unsigned char *" base );
+.\"
+.\"
+.SH INTERFACE
+.PP
+.I STREAMS
+.RI ( MacOT \(rg
+.[
+macspg
+.]
+compatibility).
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I size
+the size of the user supplied message buffer.
+.PD 0
+.TP
+.I pri
+the priority of the request.
+.TP
+.I func
+the callback function to call when the buffer is freed.
+.TP
+.I arg
+an argument to pass to the callback function,
+.IR func ,
+when the buffer is freed.
+.TP
+.I base
+the base of the user supplied message buffer.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR allocbi ()
+is used where the
+.I STREAMS
+driver needs control over the location, allocation and deallocation of data
+buffers.  This may be because the data buffers are subject to some physical
+constratins (e.g. must be allocated in DMA-able memory, or must exist in
+dual-ported RAM or in a descriptor ring).  This may also be because some other
+mechanism outside of
+.I STREAMS
+has already allocated and passed the data buffer to a
+.I STREAMS
+driver.
+.PP
+.BR allocbi ()
+allocates a message block and a data block using the caller supplied data
+buffer at base,
+.IR base ,
+of the specified size
+.IR size ,
+and priority,
+.IR pri .
+The priority,
+.IR pri ,
+value can be one of the following values:
+.TP \w'\fBBPRI_WAITOK\fP\(em'u
+.B BPRI_LO
+The caller requests a low priority message buffer.
+.PD 0
+.TP
+.B BPRI_MED
+The caller requests a medium priority message buffer.
+.TP
+.B BPRI_HI
+The caller requests a high priority message buffer.
+.TP
+.B BPRI_WAITOK
+The caller requests a low priority message buffer and can block.
+.PD
+.PP
+If
+.BR allocbi ()
+is called with a
+.I pri
+value other than
+.BR BPRI_LOW ", " BPRI_MED ", " BPRI_HI " or " BPRI_WAITOK ,
+the request will be treated as
+.BR BPRI_LO .
+.PP
+The
+.I pri
+argument is ignored by
+.IR "SVR 4"
+.[
+svr4
+.]
+and later implementations.
+.PP
+The data buffer of length
+.I size
+and with the necesssary physical memory type has already been allocated by the
+caller and is pointed to by the argument
+.IR base .
+Also,
+.BR allocbi ()
+accepts a pointer to a callback function,
+.IR func ,
+and an argument for that function,
+.IR arg .
+.PP
+The callback function,
+.IR func ,
+is a
+.B allocbi_fnc_t
+function that returns
+.B void
+and accepts a single
+.B caddr_t
+argument.  This function should performw whatever actionsa are necessary to
+free the buffer pointed to by
+.I base
+passed in the call to
+.BR allocbi ().
+.PP
+The callback function argument,
+.IR arg ,
+is a
+.B caddr_t
+argument that will be passed to a call to
+.I func
+when the message block returned by
+.BR allocbi ()
+is freed directly or indirectly with
+.BR freeb (9)
+or
+.BR freemsg (9).
+.PP
+The allocated message block will have a data block type of
+.BR M_DATA (9).
+.\"
+.\"
+.SH USAGE
+.PP
+Priority
+.BR BPRI_WAITOK
+is added for
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+compatibility and should not be used by portable
+.I STREAMS
+drivers and modules.
+
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR allocbi ()
+succeeds, it returns a
+.RB non- NULL
+pointer to the allocated message block;
+when it fails, it returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR allocbi ()
+fails when a message or data block cannot be allocated.
+.BR allocbi ()
+will always fail to allocate a message block when the number of outstanding
+combind message data block allocated by the
+.I STREAMS
+system exceeds the system control
+.BR sysctl_str_nstrmsgs .
+.BR allocbi ()
+will also fail if
+.I size
+is greater than the system control
+.BR sysctl_str_strmsgsz ,
+the maximum
+.I STREAMS
+message size.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR allocbi ()
+can be called from any context, including usr context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.  The priority
+.B BPRI_WAITOK
+must only be used from a blocking context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR allocbi ()
+is MP-safe.  The caller has exclusive access to the returned message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR allocbi ()
+is a
+.IR MacOT \(rg-specific
+function:
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR allocbi ()
+is implemented with a simple call to
+.BR esballoc (9)
+with argumentss adjusted slightly.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR allocb (9),
+.BR esballoc (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR M_DATA (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR allocbi ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR allocbi ()
+is compatible with
+.IR MacOT \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR allocbi ()
+is an
+.IR MacOT \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more portable
+.BR allocb (9)
+or
+.BR esballoc (9)
+function should be used in its stead.
+.IP \(em
+.BR allocbi ()
+is provided for source level compatibility with
+.IR MacOT \(rg
+for the purpose of porting
+.IR MacOT \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MacOT \(rg,
+binaries are incompatible.
+.IP \(em
+.BR allocbi ()
+only provides functionality comparable to
+.IR MacOT \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR allocbi ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR maccompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MacOT \(rg
+DDI documentation.
+.[
+macotr
+.]
+.[
+macspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR allocbi ()
+first appeared in
+.IR MacOT \(rg.
+.BR allocbi ()
+is probably a Mentat, Inc. function that goes all the way back to the
+.RI pre-
+OSF/1
+.I Mentat
+implementation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

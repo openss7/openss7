@@ -1,0 +1,939 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SL-MUX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B sl-mux
+\- Signalling Link Multiplexer
+.\"
+.\"
+.SH SYNOPSIS
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sli.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.br
+.B #include <ss7/sl_mux.h>
+.HP
+.BI "int " sl_stream " = open(" \fR/dev/sl\fP ", " \fRO_RDWR\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B sl-mux
+is a Signalling Link multiplexing driver.  The purpose of the driver is to consolidate signalling
+link streams from a wide range of drivers and provide common naming, addressing, management and
+monitoring procedures for signalling links.
+.PP
+.B sl-mux
+is used in conjunction with a Signalling Link configuration utility and the Signalling Link
+configuration daemon,
+.BR slconfd (8).
+.PP
+The configuration utility is responsible for opening, configuring, and attaching Signalling Link
+streams from an associated drivers and linking them under the
+.B sl-mux
+multiplexing driver.  This makes signalling links from a number of drivers available for use through
+the single
+.B sl-mux
+multiplexing driver.  Configuration utilities exist for each type of Signalling Link provider.  For
+example, the
+.BR x400p-ss7 (4)
+driver uses a configuration utility called
+.BR x400pconf (8);
+.BR m2pa (4),
+.BR m2paconf (8);
+etc.
+.PP
+The Signalling Link configuration daemon,
+.BR slconfd (8),
+is responsible for the general configuration of Signalling Links and performing common
+administration (such as management, configuration, monitoring, statistics collection and event
+reporting).
+.PP
+The facilities provided by the
+.B sl-mux
+multiplexing driver are as follows:
+.\"
+.SS Addressing
+.PP
+The
+.B sl-mux
+provides a global addressing mechanism for addressing signalling links.  There
+are three addressing mechanisms provided by the driver:
+.TP
+.B Global PPA
+A Physical Point of Attachment addressing mechanism that is global to the
+host.  Each signalling link stream is assigned a 32-bit PPA that is unique to
+the host platform.  There is no restrictions on the internal form of the PPA,
+merely that it be unique for each signalling link.  The
+.BR slconf (5)
+configuration file provides a mechanism whereby the system administrator can
+assign arbitrary PPA addresses to signalling links from multiple drivers.
+.TP
+.B CLEI
+A Common Language Equipment Identifier (ascii string) addressing mechanism that
+is global across all platforms.  This is the Telcordia/Bellcore standard
+mechanism for naming equipment.  The driver does not impose a restriction on
+the CLEI string, only that the string be unique for each signalling link, and
+that the string be no longer than 32 characters in length.
+.TP
+.B Minor Device Number
+The minor device numbers 11 through 4106 can be opened an obtain individual
+Style I SL Streams.  These minor device number correspond to device 1 through
+4096 (simply add 10 to the device number to arrive at the character minor
+device number).
+.PP
+The
+.B sl-mux
+driver permits Style I signalling link streams to be opened; or, Style II
+signalling link streams to be opened and attached to specific signalling links
+using either the PPA or CLEI as an address for attachment.  See
+.BR LMI_ATTACH_REQ (7).
+Style I Streams are obtained by opening character minor device number 11
+through 4106 corresponding to unit 1 through 4096.
+Style II Streams are obtained by opening character minor device number zero
+.RB ( /dev/sl ),
+which is a clone minor device.
+.PP
+Linking of signalling link streams beneath the multiplexing driver is
+performed by the Signalling Link configuration daemon,
+.BR slconfd (8).
+The daemon opens the administrative minor device,
+.IR /dev/sl-admin ,
+and then opens signalling link streams on various drivers according to the
+configuration specified in a configuration file,
+.BR slconf (5),
+attaches and configures the streams.  The daemon then links the SL streams
+under the
+.B sl-mux
+driver using the
+.IR I_PLINK (7)
+input-output control.  It then uses the
+.B SLM_IOCSPPA
+input-output control to associate a global PPA and CLEI with the linked
+stream.  The daemon does this for each and every signalling link stream that
+is to be linked under the driver.
+.\"
+.SS Configuration
+.PP
+The
+.B sl-mux
+driver provides the ability to perform configuration and administration of
+signalling links.  This is accomplished by opening a specialized minor device
+number of the driver,
+.IR /dev/sl-admin .
+Using modified
+.BR sl_ioctl (4)
+signalling link input-output controls, the administrative application can
+configure and query the configuration for each and any (or all) signalling
+links.  This interface is used by the the
+.BR slconfd (8)
+configuration utility to query and configure signalling links in accordance
+with the signalling link management model presented in Q.751-1.
+.[
+q751-1
+.]
+.PP
+Two forms of configuration are possible: public and private configuration:
+.IP 1. \w'0.\(em'u
+In the public form, streams are opened by the configuration utility, normally
+as part of a system startup procedure, and linked under the
+.B sl-mux
+driver using the
+.IR I_PLINK (7)
+input-output control operation.  Signalling link streams linked in this
+fashion are available for attachment by any opened upper stream.
+Also, these signalling links exhibit persistence as described below.
+.IP 2.
+In the private form, an upper stream is opened by an application and a
+signalling link is configured and linked under the stream using the
+.IR I_LINK (7)
+input-output control operation.  The upper stream is attached to this lower
+stream and the signalling link is not available for attachment by other upper
+streams.  When the control stream is closed, the lower signalling link stream
+is also closed as part of the dismantling of the multiplex.  Streams linked in
+this fashion are private to the configuring application for use, but are
+available for the collection of statistics, reporting of events, and
+signalling link monitoring.
+.\"
+.SS Persistence
+.PP
+The
+.B sl-mux
+provides the ability for a Signalling Link to exist and operate without an
+application present.  When configured, Signalling Links may be persistently
+linked beneath the
+.B sl-mux
+driver using the
+.IR I_PLINK (7)
+input-output control operation.  Signalling Link linked in this fashion can be
+attached by Streams opened on the upper multiplex and brought into service.
+The
+.B sl-mux
+driver tracks the state of the Signalling Link and, if the upper Stream is
+closed while the link is operating, the
+.B sl-mux
+driver places the link into local processor outage.  When a stream is again
+opened, attached and enabled, local processor recovery is indicated and the
+Signalling Link and be resumed without realignment.  This is a useful feature
+for reconfiguring (or replacing) MTP on a live system, for example, to perform
+live upgrades.
+.\"
+.SS Statistics
+.PP
+The
+.B sl-mux
+driver provides the ability to collect statistics (operational measurements)
+for each and any signalling link.  This is accomplished by opening a
+specialized minor device number on the driver,
+.IR /dev/sl-stats .
+Using modified
+.BR sl_ioctl (4)
+signalling link input-output controls, the administrative application can
+collect statistics for each and any (or all) signalling links.  This interface
+is used by the
+.BR slstats (8)
+utility to collect and record operational measurements for signalling links in
+accordance with Q.751-1.
+.[
+q.751-1
+.]
+.\"
+.SS Events
+.PP
+The
+.B sl-mux
+driver provides the ability to collect event notifications (operational
+measurements) for each and any signalling link.  This is accomplished by
+opening a specialized minor device number on the driver,
+.IR /dev/sl-events .
+Using modified
+.BR sl_ioctl (4)
+signalling link input-output controls, the administrative application can
+collect event notifications for each and any (or all) signalling links.  This
+interface is used by the
+.BR slstats (8)
+utility to collect and record operational measurements for signalling links in
+accordance with Q.751-1.
+.[
+q751-1
+.]
+.\"
+.SS Monitoring
+.PP
+The
+.B sl-mux
+driver provides the ability to monitor the service interface to each or any
+signalling link.  This is accomplished by opening a specialized minor device
+number on the driver,
+.IR /dev/sl-mon ,
+and attaching it using the
+.BR SLM_IOCSMON " and " SLM_IOCCMON
+input-output controls to specify the Signalling Links by lower multiplex
+index, gloabl PPA or CLEI that the monitoring Stream wishes to monitor.
+The stream may also monitor all lower stream by using a zero lower multipelx
+index, zero global PPA and null CLEI.  Once activated for monitoring, lower
+streams will deliver a copy of each and every STREAMS message that is passed
+between an upper SL-user and the monitored signalling link(s), regardless
+of whether the primiitve is an SL-user to SL-provider primitive or an
+SL-provider to SL-user primitive.  The STREAMS message will be encapsulated
+as follows:
+.PP
+The control part of the message will be copied and encapsulated in a band zero
+(0)
+.BR M_PROTO (9)
+message block with a
+.B slmux_mon
+structure prepended as follows:
+.sp
+.nf
+\fC\s-1\
+struct slmux_mon {
+    struct slmux_ppa mon_ppa;
+    int mon_dir;
+    uchar mon_msg_type;
+    uchar mon_msg_band;
+    ushort mon_msg_flags;
+    uchar mon_msg_data[0];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B slmux_mon
+structure is defined in the
+.RB < ss7/sl_mux.h >
+header file and contains the following fields:
+.TP
+.I mon_ppa
+This member contains a
+.B slmux_ppa
+structure that describes the multiplexer identifier, global PPA and CLEI for
+the stream upon which the message was captured.
+.TP
+.I mon_dir
+This member indicates the direction in which the message was flowing: (0),
+upstream, (1) downstream.
+.TP
+.I mon_msg_type
+This member contains the original message type that was contained in the
+.I db_type
+field of the
+.BR datab (9)
+structure associated with the control part of the message.
+.TP
+.I mon_msg_band
+This member contains the original message band that was contained in the
+.I b_band
+field of the
+.BR msgb (9)
+structure associated with the control part of the message.
+.TP
+.I mon_msg_flags
+This member contains the original message flags that were contained in the
+.I b_flag
+field of the
+.BR msgb (9)
+structure associated with the control part of the message.
+.TP
+.I mon_msg_data
+This member defines the start of the encapsulated data from the original
+control part message.
+.PP
+The
+.B slmux_mon
+structure is followed with the contents of the original control part message
+block.  The data part of the message will be copied unchanged into
+.BR M_DATA (9)
+message blocks linked to the encapsulating
+.BR M_PROTO (9)
+message block.
+.PP
+This provides the ability to monitor live signalling links that are in use by
+other modules or drivers, such as the
+.BR mtp (4),
+Message Transfer Part driver, independent of the use of those drivers.
+.\".PP
+.\"A monitoring stream will also process signalling link input-output controls on
+.\"the monitoring stream.  See
+.\".BR sl_ioctl (4)
+.\"for a discussion of the available signalling link input-output controls.
+.PP
+Monitoring of signalling links is performed using the
+.BR slmon (8)
+utility.  The utility opens a
+.I /dev/sl-mon
+stream, and associates it with a specific signalling link using the
+.BR SLM_IOCSMON
+input-output control.  Once set for monitoring, primitives that traverse the
+SL-user to SL-provider interface are delivered to the stream.  The monitor
+disassociates with the signalling link using the
+.BR SLM_IOCCMON
+input-output control, or by simply closing the stream.  The stream will also
+respond to SL input-output controls,
+.BR sli_ioctl (4),
+from the monitoring stream.  The monitoring process must have root privilege
+to open the
+.I /dev/sl-mon
+device.
+.PP
+Note that a modified
+.BR libpcap (3)
+library might also be provided in the future that will allow live capture of
+raw SS7 (MTP3 header) packets for use with
+.BR ethereal (1)
+or
+.BR wireshark (1).
+.\"
+.\"
+.SH NOTICES
+.PP
+It is not necessary to use the
+.B sl-mux
+driver to use signalling links.  The
+.B sl-mux
+driver and associated utilities are intended to provide standard management
+capabilities.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B sl-mux
+driver supports the input-output controls of the Signalling Link, Signalling
+Data Terminal and Signalling Data Link interfaces.
+See
+.BR sli_ioctl (4),
+.BR sdti_ioctl (4)
+and
+.BR sdli_ioctl (4)
+for more information.
+.PP
+Also, the
+.B sl-mux
+drivers supports some specialized input-output controls for configuring
+lower multiplex Signalling Links streams.  These specialize input-output
+controls are defined in the
+.RB < ss7/sl_mux.h >
+header file, and are described in the subsections that follow:
+.\"
+.SS SLM_IOCSPPA
+.PP
+This input-output controls is responsible for setting information associated
+with lower multiplex Signalling Links.
+.I arg
+is a pointer to an
+.B slmux_ppa
+structure.  The
+.B slmux_ppa
+structure is defined in the
+.RB < ss7/sl_mux.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+#define SLMUX_CLEI_MAX      32
+
+struct slmux_ppa {
+    int slm_index;
+    uint32_t slm_ppa;
+    char slm_clei[SLMUX_CLEI_MAX];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B slmux_ppa
+structure contains the following members:
+.TP
+.I slm_index
+This member is the lower multiplex index returned by the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation that was used to link the lower stream.  It
+specifies the lower multiplex Signalling Link stream for which to configure
+the global PPA and CLEI.
+.TP
+.I slm_ppa
+This member specifies the global PPA for the stream.  This global PPA must be
+unique across all lower multiplex Signalling Link streams and is used by upper
+multiplex user and management streams to attach to or otherwise identify the
+Stream.  If a CLEI is provided, this member is optional.  When not specified,
+this member is populated with the value zero (0).
+.TP
+.I slm_clei
+This member specifies the Common Language Equipment Identifier (CLEI) for the
+stream.  The CLEI is an ASCII string of up to 32 characters (null terminated
+if less than 32 characters).  This CLEI must be unique across all lower
+multiplex Signalling Link streams and is used by upper multiplex user and
+management streams to attach to or otherwise identify the Stream.  If a global
+PPA is provided, this member is optional.  When not specified, this member is
+populated with a null string.
+.PP
+This input-output control can be invoked as either an
+.IR I_STR (7)
+input-output control or a
+.B TRANSPARENT
+input-output control, but it is recommended that the
+.IR I_STR (7)
+version of the input-output control be used.
+The input-output control returns zero (0) on success and minus one (-1) on
+failure.
+.\"
+.SS SLM_IOCGPPA
+This input-output control is responsible for retrieving information associated
+with a lower multiplex Signalling Link.
+.I arg
+is a pointer to a
+.B slmux_ppa
+structure (as defined above).
+The caller populates the
+.I slm_index
+member of the structure with the multiplex identifier returned by the
+.IR I_LINK "(7) or " I_PLINK (7)
+operation that linked the stream.  On successful return, the driver populates
+the
+.IR slm_ppa " and " slm_clei
+members with the associated information.
+.PP
+This input-output control can be invoked as either an
+.IR I_STR (7)
+input-output control or a
+.B TRANSPARENT
+input-output control, but it is recommended that the
+.IR I_STR (7)
+version of the input-output control be used.
+The input-output control returns zero (0) on success and minus one (-1) on
+failure.
+.\"
+.SS SLM_IOCLPPA
+.PP
+This input-output control is responsible for listing information associated
+with lower multiplex Signalling Links.
+.I arg
+is either a pointer to an
+.B slmux_ppa_list
+structure, or
+.BR NULL .
+The
+.B slmux_ppa_list
+structure is defined in the
+.RB < ss7/sl_mux.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct slmux_ppa_list {
+    int slm_list_num;
+    struct slmux_ppa slm_list_array[0];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B slmux_ppa_list
+structure contains the following members:
+.TP
+.I slm_list_num
+This member contains the number of elements in the array of
+.B slm_ppa
+structures in the
+.I slm_list_array
+member below.  This member is not altered by a successful input-output control
+operation.
+.TP
+.I slm_list_array
+This member is an array of
+.B slm_ppa
+structures.  The number of elements in the array is specified by the
+.I slm_list_num
+member.  This member is not altered by a successful input-output control
+operation, however, elements of the array are altered by the input-output
+control operation, without examination.
+.PP
+The input-output control returns a zero (0) or positive number on success and
+minus one (-1) on failure.  When successful, the zero (0) or positive number
+returned is the current number of links with information available for retrieval.
+When passed a
+.B NULL
+.I arg
+value, this return value can be used to size the
+.B slmux_ppa_list
+structure for a subsequent input-output operation.  Note, however, that the
+number of signalling links available for information retrieval may change, and
+the return value from the subsequent operation should be checked to ensure
+that complete information has been obtained.
+.PP
+Upon successful return with a
+.RB non- NULL
+.I arg
+value, the driver will have populated up to
+.I slm_list_num
+elements in the array
+.I slm_list_array
+with the multiplex identifier, global PPA and CLEI of available signalling
+links in arbitrary order.  If fewer elements were populated than were
+available, the return value from the input-output control operation will be
+less than
+.IR slm_list_num.
+.\"
+.SS SLM_IOCSMON
+.PP
+This input-output control is responsible for setting monitoring of a specified
+lower multiplex Signalling Link.
+.I arg
+is a pointer to a
+.B slmux_ppa
+structure.  The
+.B slmux_ppa
+struture is defined in the
+.RB < ss7/sl_mux.h >
+header file and is formatted shown above under
+.RI \(lq SLM_IOCSPPA .\(rq
+The caller populates the
+.IR slm_index ", " slm_ppa ", or " slm_clei
+members of the structure.  Unused members are populated with zero.  The first
+non-zero member will be used to locate the lower multiplex Signalling Link
+stream that will be assigned for monitoring.
+.PP
+This input-output control can be invoked as either an
+.IR I_STR (7)
+input-output control or a
+.B TRANSPARENT
+input-output control, bit is is recommended that the
+.IR I_STR (7)
+version of the input-output control be used.  The input-output control returns
+zero (0) on success and minus one (-1) on failure and sets
+.RI errno (3)
+appropriately.  Some errors returned by this input-output control are as
+follows:
+.TP 12
+.RB [ EINVAL ]
+An argument was invalid, or did not specify an existing lower Stream.
+.PD 0
+.TP
+.RB [ EALREADY ]
+The Stream identified by the
+.B slm_ppa
+structure is already being monitored.
+.TP
+.RB [ EBUSY ]
+The Stream identified by the
+.B slm_ppa
+structure is being monitored by another control Stream.
+.TP
+.RB [ EPERM ]
+The user does not have sufficient privileges to perform monitoring.
+.TP
+.RB [ ENOMEM ]
+Memory required to complete the operation was not immediately available.
+.TP
+.RB [ ENOBUFS ]
+Buffers required to complete the operation were not immediately available.
+.PD
+.PP
+Upon successful completion of the input-output control, the specified Stream
+will be marked for monitoring and will start delivering messages to the
+invoking upper Stream as described in
+.RI \(lq Monitoring ,\(rq
+above.
+.\"
+.SS SLM_IOCCMON
+.PP
+This input-output control is responsible for clearing monitoring of a
+specified lower multiplex Signalling Link.
+.I arg
+is a pointer to a
+.B slmux_ppa
+structure.  The
+.B slmux_ppa
+structre is defined in the
+.RB < ss7/sl_mux.h >
+header file and is formatted as shown above under
+.RI \(lq SLM_IOCSPPA .\(rq
+The caller populates the
+.IR slm_index ", " slm_ppa ", or " slm_clei
+members of the structure.  Unused members are populated with zero.  The first
+non-zero member will be used to locate the lower multiplex Signalling Link
+stream that will be cleared from monitoring.
+.PP
+This input-output control can be invoked as either an
+.IR I_STR (7)
+input-output control or a
+.B TRANSPARENT
+input-output control, bit is is recommended that the
+.IR I_STR (7)
+version of the input-output control be used.  The input-output control returns
+zero (0) on success and minus one (-1) on failure and sets
+.RI errno (3)
+appropriately.  Some errors returned by this input-output control are as
+follows:
+.TP 12
+.RB [ EINVAL ]
+An argument was invalid, or did not specify an existing lower Stream.
+.PD 0
+.TP
+.RB [ EPERM ]
+The user does not have sufficient privileges to clear monitoring of a Stream.
+.TP
+.RB [ EBUSY ]
+The Stream identified by the
+.B slm_ppa
+structure is being monitored by another control Stream.
+.TP
+.RB [ ENOMEM ]
+Memory required to complete the operation was not immediately available.
+.TP
+.RB [ ENOBUFS ]
+Buffers required to complete the operation were not immediately available.
+.PD
+.PP
+Upon successful completion of the input-output control, the specified Stream
+will be removed for monitoring and will stop delivering messages to the
+invoking upper Stream as described in
+.RI \(lq Monitoring ,\(rq
+above.
+.\"
+.\".SS SLM_IOCCLINK
+.\".PP
+.\"The input-output control is used for encapsulating other input-output
+.\"controls, from the
+.\".BR sli_ioctl (4),
+.\".BR sdti_ioctl (4)
+.\"or
+.\".BR sdli_ioctl (4)
+.\"input-output controls sets, to be applied to a specific lower signalling link.
+.\".I arg
+.\"is a pointer to an
+.\".B slmux_ioc
+.\"structure.  The
+.\".B slmux_ioc
+.\"structure is defined in the
+.\".RB < ss7/sl_mux.h >
+.\"header file and is formatted as follows:
+.\".sp
+.\".nf
+.\"struct slmux_ioc {
+.\"    struct slmux_ppa slm_ioc_ppa;
+.\"    int slm_ioc_cmd;
+.\"    int slm_ioc_len;
+.\"    char *slm_ioc_buf;
+.\"};
+.\".fi
+.\".PP
+.\"The
+.\".B slmux_ioc
+.\"structure contains the following members:
+.\".TP
+.\".I slm_ioc_ppa
+.\"This member contains a
+.\".B slmux_ppa
+.\"structure that is used by the caller to identify the lower multiplex stream
+.\"that is to receive the input-output control.  One of the
+.\".IR slm_index ", " slm_ppa " or " slm_clei
+.\"members must be populated to identify the stream.  The first member populated
+.\"will be used to find the appropriate lower stream.  When the
+.\".I slm_index
+.\"member is not specified, it is set to zero (0); an unspecified
+.\".I slm_ppa
+.\"member is also set to zero (0); an uspecified
+.\".I slm_clei
+.\"member is set to a null string.
+.\".TP
+.\".I slm_ioc_cmd
+.\"This member contains the input-output control command to pass to the lower
+.\"stream specified by the
+.\".I slm_ioc_ppa
+.\"member.
+.\".TP
+.\".I slm_ioc_len
+.\"This member is the length of the information to be initially copied in.
+.\".TP
+.\".I slm_ioc_buf
+.\"This member is a pointer to a user buffer that contains the information to be
+.\"initially copied in.  The information contained in this buffer and the
+.\"specific input-output control command determines where information is to be
+.\"copied out, if any.
+.\".PP
+.\"The return value from this input-output command, when valid, is the return
+.\"value from the associated input-output control operation on the specified
+.\"lower stream.
+.\".PP
+.\"This input-output control can only be invoked by the adminstration stream,
+.\".IR /dev/sl-admin ,
+.\"and will return
+.\".RB [ EACCES ]
+.\"on all other
+.\".B sl-mux
+.\"streams.
+.\"
+.\"
+.SH FILES
+.PP
+See
+.BR slconf (5).
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.I /dev/sl
+Device opened by SL-user.  Streams can be attached to lower multiplex streams
+using the
+.BR LMI_ATTACH_REQ (7)
+primitive, or linked using the
+.IR I_LINK (7)
+input-output control and configured using the
+.B SLM_IOCSPPA
+input-output control.
+.TP
+.I /dev/sl-admin
+Device opened by the
+.BR slconfd (8)
+utility for configuration management of Signalling Links.
+.I /dev/sl-admin
+Streams can be attached to lower multiplex streams for which the caller has
+permission using the
+.BR LMI_ATTACH_REQ (7)
+primitive.  Normal signalling link input-output control commands can then be
+performed on the signalling link.
+.TP
+.I /dev/sl-stats
+Device opened by the
+.BR slstats (8)
+utility for operational measurements statistics collection for Signalling
+Links.
+Streams can be attached to lower multiplex streams for which the caller has
+permission using the
+.BR LMI_ATTACH_REQ (7)
+primitive.  Statistics collection information will then be encapsulated and
+delivered to this stream instead of the SL-user stream.  Statistics collection
+on a single stream or multiple streams is possible.
+.TP
+.I /dev/sl-events
+Device opened by the
+.BR slstats (8)
+utility for operational measurement event collection for Signalling Links.
+Streams can be attached to lower multiplex streams for which the caller has
+permission using the
+.BR LMI_ATTACH_REQ (7)
+primitive.  Event reporting information will then be encapsulated and
+delivered to this stream instead of the SL-user stream.
+.TP
+.I /dev/sl-mon
+Device opened by the
+.BR slmon (8)
+monitoring utility for monitoring of Signalling Links.
+Streams can be attached to lower multiplex streams for which the caller has
+permission using the
+.BR LMI_ATTACH_REQ (7)
+primitive.  Copies of primitives exchanged between SL-User and SL-Provider
+will then be encapsulated and delivered to this stream.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sl (4),
+.BR sli (7),
+.BR slconfd (8),
+.BR slconf (5),
+.BR slstats (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B sl-mux
+driver is new for
+.BR strss7-0.9a.6 ,
+and is compatible with the OpenSS7 SLI Specification.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.B sl-mux
+driver conforms to the SLI Specification, Revision
+.BR @PACKAGE_VERSION@ .
+The object model for configuration conforms to Q.751-1.
+.[
+q.751-1
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B sl-mux
+driver and associated utilities were first released in
+.BR strss7-0.9a.6 .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

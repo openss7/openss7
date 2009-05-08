@@ -1,0 +1,835 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH I_GETPMSG 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.\"
+.\"
+.SH NAME
+.B I_GETPMSG
+\- \fISTREAMS\fP getpmsg system call emulation
+.\"
+.\"
+.SH SYNOPSIS   
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <stropts.h>
+.HP
+.BI "int " retval " = ioctl (int " fd ", I_GETPMSG, ... /* " arg " */);"
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the file descriptor of a Stream.  This is the file descriptor that was returned from the
+.BR open (2s)
+or
+.BR pipe (2s)
+call when the Stream was created.
+.TP
+.I cmd
+always
+.BR I_GETPMSG .
+.TP
+.I arg
+is a pointer to a
+.B strpmsg
+structure formatted as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct strpmsg {
+    struct strbuf ctlbuf;
+    struct strbuf databuf;
+    int band;
+    int flags;          /* actually long for Mac OT */
+};
+\s+1\fP
+.fi
+.TP
+.I ctlbuf
+a
+.B strbuf
+structure representing the control part, containing the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+the size of the user buffer;
+.PD 0
+.TP
+.I len
+on return, the number of bytes copied into the user buffer; and,
+.TP
+.I buf
+a pointer to the user buffer.
+.PD
+.RE
+.TP
+.I databuf
+a
+.B strbuf
+structure representing the data part, containing the following members:
+.RS
+.TP \w'\fImaxlen\fR\(em'u
+.I maxlen
+the size of the user buffer;
+.PD 0
+.TP
+.I len
+on return, the number of bytes copied into the user buffer; and,
+.TP
+.I buf
+a pointer to the user buffer.
+.PD
+.RE
+.TP
+.I band
+an integer band number specifying the band of the message to retrieve on call, and returning the
+band of the retrieved message on return.
+.TP
+.I flags
+integer flags specifying which messages to retrieve on call, and returning the priority of the
+retrieved message on return.
+.I flags
+can be one of the following for
+.BR getmsg (2)
+emulation:
+.RS
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B 0
+.PD 0
+retrieve any message (retrieved message was normal priority); or,
+.TP
+.B RS_HIPRI
+retrieve only high priority messages (retrieved message was high priority).
+.PD
+.PP
+or one of the following for
+.BR getpmsg (2s)
+emulation:
+.TP \w'\fBMSG_HIPRI\fR\(em'u
+.B MSG_ANY
+.PD 0
+retrieve any message (not set on return);
+.TP
+.B MSG_BAND
+retrieve only normal priority messages with a priority band greater than or equal to
+.I band
+(retrieved message was a normal priority message with priority band
+.IR band );
+.TP
+.B MSG_HIPRI
+retrieve only high priority messages (retrieved message was high priority).
+.PD
+.RE
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B I_GETPMSG
+provides an
+.BR ioctl (2s)
+emulation of the
+.BR getmsg (2)
+and
+.BR getpmsg (2s)
+system calls.
+.B I_GETPMSG
+is emulated in this way due to the
+.B Linux
+kernel's failure to provide any means to implement standard system calls.
+.PP
+Under the emulation,
+.I fd
+is the same as the
+.I fd
+argument to
+.BR getmsg (2)
+or
+.BR getpmsg (2s);
+.I arg
+points to a structure containing the remaining arguments for
+.BR getmsg (2)
+and
+.BR getpmsg (2s).
+.I cmd
+is always
+.BR I_GETPMSG .
+.PP
+See
+.BR getmsg (2)
+and
+.BR getpmsg (2s)
+for the purpose and function of the arguments.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B I_GETPMSG
+input-output control is not intended to be invoked directly with the
+.BR ioctl (2s)
+interface, but rather via the
+.BR getmsg (2)
+and
+.BR getpmsg (2s)
+library calls.
+.PP
+See
+.BR getmsg (2)
+and
+.BR getpmsg (2s)
+for details on the operation of the system call this
+.BR ioctl (2s)
+emulates, and usage information.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success, the
+.B I_GETPMSG
+.BR ioctl (2s)
+will return a non-negative value with any of the following flags set:
+.TP \w'\fBMOREDATA\fR\(em'u
+.B MORECTL
+indicates that more control information belonging to the same message is
+waiting to be retrieved from the stream head read queue with a subsequent
+.BR getmsg (2)
+operation.
+.TP
+.B MOREDATA
+indicates that more data belonging to the same message is waiting to be
+retrieved from the stream head read queue with a subsequent
+.B I_GETPMSG
+operation.
+.TP
+.B 0
+indicates that the entire message was received successfully.
+.PP
+Upon failure, the
+.B I_GETPMSG
+.BR ioctl (2s)
+command returns
+.B -1
+and sets
+.IR errno (3)
+to an appropriate error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When the
+.B I_GETPMSG
+.BR ioctl (2s)
+command fails, it returns
+.B -1
+and sets
+.IR errno (3)
+to one of the following errors:
+.PP
+The following errors are returned for the
+.BR getmsg (2)
+emulation:
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid file descriptor or is not open for reading.
+.TP
+.RB [ EFAULT ]
+A specified address is outside the user's accessible address space.
+Specified addresses include,
+.IR ctlptr ", " datptr ", " flagsp ,
+and the
+.I buf
+fields of the
+.B strbuf
+structure pointed to by
+.IR cttlptr " and " datptr .
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.BR getmsg (2)
+system call.
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.TP
+.RB [ EIO ]
+I/O error, or,
+.I fd
+refers to a stream that is open but is in the process of closing.
+.\".TP
+.\".RB [ EPERM ]
+.\".I fd
+.\"points to a dynamic device and read permission on the device is denied.
+.\"
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.I fd
+is linked under a multiplexing driver; or,
+.BR getmsg (2)
+is not supported; or, the flags pointed to by
+.I flagsp
+were invalid for
+.BR getmsg (2).
+.TP
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation and
+.BR getmsg (2)
+would block: that is, no message of the requested type and priority band is
+available to be read.
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ],
+above.
+(For most architectures under
+.BR Linux ,
+.RB [ EAGAIN ]
+and
+.RB [ EWOULDBLOCK ]
+have the same value.)
+.TP
+.RB [ EINTR ]
+A signal was caught, or an
+.BR M_SIG (9)
+message processed, before the call to
+.BR getmsg (2)
+could return any data.
+.TP
+.RB [ ENOSTR ]
+.I fd
+has no stream associated with the file descriptor.
+.TP
+.RB [ EBADMSG ]
+The message at the head of the queue is of an invalid message type (valid
+message types include:
+.BR M_DATA ", " M_PROTO " and " M_PCPROTO );
+or, the message at head of the of the queue is not of the requested type
+as specified by
+.IR flagsp .
+.PP
+Other errors may be returned by
+.BR getmsg (2).
+If the
+.I STREAMS
+module sends a
+.BR M_ERROR (9)
+message to the stream head, the error returned on all subsequent read
+operations, including
+.BR getmsg (2),
+is specified in the
+.BR M_ERROR (9)
+message by the
+.I STREAMS
+module.
+Which errors are returned under which conditions form part of the
+necessary documentation of the
+.I STREAMS
+module.
+
+.PP
+The following errors are returned for the
+.BR getpmsg (2s)
+emulation:
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
+.RB [ EISDIR ]
+.I fd
+refers to a directory.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid file descriptor or is not open for reading.
+.TP
+.RB [ EFAULT ]
+A specified address is outside the user's accessible address space.
+Specified addresses include,
+.IR ctlptr ", " datptr ", " bandp ", " flagsp ,
+and the
+.I buf
+fields of the
+.B strbuf
+structure pointed to by
+.IR cttlptr " and " datptr .
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a device that does not support the
+.BR getpmsg (2s)
+system call.
+.TP
+.RB [ ENOSTR ]
+.I fd
+refers to a device that has no stream associated with it.
+.TP
+.RB [ EIO ]
+I/O error, or,
+.I fd
+refers to a stream that is open but is in the process of closing.
+.\".TP
+.\".RB [ EPERM ]
+.\".I fd
+.\"points to a dynamic device and read permission on the device is denied.
+.\"
+.\"
+.\"
+.TP
+.RB [ EINVAL ]
+.I fd
+is linked under a multiplexing driver; or,
+.BR getpmsg (2s)
+is not supported; or, the flags were invalid for
+.BR getpmsg (2s)
+(not
+.BR MSG_HIPRI ", " MSG_ANY " or " MSG_BAND ).
+.TP
+.RB [ EAGAIN ]
+The stream head is set for non-blocking operation and
+.BR getpmsg (2s)
+would block: that is, no message of the requested type and priority band is
+available to be read.
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ],
+above.
+(For most architectures under
+.BR Linux ,
+.RB [ EAGAIN ]
+and
+.RB [ EWOULDBLOCK ]
+have the same value.)
+.TP
+.RB [ EINTR ]
+A signal was caught, or an
+.BR M_SIG (9)
+message processed, before the call to
+.BR getpmsg (2s)
+could return any data.
+.TP
+.RB [ ENOSTR ]
+.I fd
+has no stream associated with the file descriptor.
+.TP
+.RB [ EBADMSG ]
+The message at the head of the queue is of an invalid message type (valid
+message types include:
+.BR M_DATA ", " M_PROTO " and " M_PCPROTO );
+or, the message at head of the of the queue is not of the requested type
+as specified by
+.IR flagsp ,
+or priority band as specified by
+.IR bandp .
+.PP
+Other errors may be returned by
+.BR getpmsg (2s).
+If the protocol module sends a
+.B M_ERROR
+message to the stream head, the error returned on all subsequent read
+operations, including
+.BR getpmsg (2s),
+is specified in the
+.B M_ERROR
+message by the protocol module.
+Which errors are returned under which conditions form part of the
+necessary documentation of the protocol module.
+.\"
+.PP
+In general, any
+.BR ioctl (2s)
+command can fail if:
+.TP \w'[\fBEWOULDBLOCK\fR]\(em'u
+.RB [ EFAULT ]
+.IR arg ,
+or a pointer member of a structure pointed to by
+.IR arg ,
+points to an address that is outside the caller's valid address space.
+.TP
+.RB [ EINVAL ]
+.IR fd ", " cmd ", " arg " or a member of " arg " or a member of a structure pointed to by " arg
+is invalid.
+.TP
+.RB [ EBADF ]
+.I fd
+is not a valid open file descriptor.
+.TP
+.RB [ ENOSTR ]
+.I fd
+is not a
+.I STREAMS
+special file.
+.TP
+.RB [ EOPNOTSUPP ]
+.I fd
+does not support the requested operation.
+.TP
+.RB [ EIO ]
+.I fd
+refers to Stream that is closing.
+.TP
+.RB [ ENOTTY ]
+.I fd
+does not refer to a
+.I STREAMS
+special file that accepts I/O controls.
+.TP
+.RB [ ENODEV ]
+.I fd
+refers to a
+.I STREAMS
+special file that does not support the
+.BR ioctl (2s)
+system call.
+(Under
+.BR "@PACKAGE_TITLE@" ,
+all
+.I STREAMS
+special files support the
+.BR ioctl (2s)
+system call.)
+.TP
+.RB [ ENXIO ]
+.I fd
+refers to Stream that has received a hangup, that is, an
+.BR M_HANGUP (9)
+message was received by the Stream head.
+.TP
+.RB [ ENXIO ]
+the I/O control command cannot be performed by this particular sub-device.
+.TP
+.RB [ EPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe and the other end of the pipe is closed.
+.TP
+.RB [ ESTRPIPE ]
+.I fd
+refers to a
+.IR STREAMS -based
+pipe and a write operation was attempted with no
+readers at the other end, or a read operation was attempted, the pipe is
+empty, and there are no writers at the other end.
+(This error is not normally returned to user level programs.)
+.TP
+.RB [ EINVAL ]
+.I fd
+refers to a Stream that is linked under a multiplexing driver.  If a Stream is
+linked under a multiplexing driver, all
+.BR ioctl (2s)
+commands other than
+.B I_UNLINK
+or
+.B I_PUNLINK
+will return
+.RB [ EINVAL ].
+.TP
+.RB [ ERESTARTSYS ]
+a signal was received (or generated by the call) before the operation could begin.
+.TP
+.RB [ EINTR ]
+a signal was received before the operation could complete.
+.TP
+.RB [ EAGAIN "]
+the file is set for asynchronous I/O and the operation would block.  (A
+.I STREAMS
+special file is set for asynchronous I/O when
+.BR open (2s)
+was called with the
+.B O_NDELAY
+or
+.B O_NONBLOCK
+flags, or one these flags were subsequently set with a call to
+.BR fcntl (2).)
+.TP
+.RB [ EWOULDBLOCK ]
+See
+.RB [ EAGAIN ].
+(For most architectures under
+.BR Linux ,
+.RB [ EAGAIN ]
+and
+.RB [ EWOULDBLOCK ]
+have the same value.)
+.TP
+.RB [ ETIME ]
+the operation timed out awaiting an acknowledgement or response (to the
+.BR M_IOCTL (9)
+message) from the module or driver.
+.TP
+.RB [ ENOSR ]
+a message block could not be allocated during the operation and the operation
+is not permitted to block.
+Under some circumstances, an
+.BR ioctl (2s)
+command will block awaiting the availability of message blocks, regardless of the setting of
+.BR O_NDELAY " or " O_NONBLOCK .
+.PP
+Any error delivered to the Stream head in an
+.BR M_ERROR (9)
+message can be returned in
+.IR errno (3).
+.PP
+Where the command results in a call to a module or driver
+.BR qopen "(9) or " qclose (9)
+procedures, as is the case for
+.BR I_PUSH (7),
+.BR I_POP (7),
+.BR I_UNLINK (7),
+or
+.BR I_PUNLINK (7),
+an error number returned by the module or driver
+.BR qopen "(9) or " qclose (9)
+procedure can also be returned in
+.IR errno (3).
+.PP
+Any error returned in an
+.BR M_IOCNAK (9)
+message from the module or driver in response to an
+.BR M_IOCTL (9)
+message issued for an
+.BR I_STR (7),
+.BR I_LINK (7),
+or
+.BR I_PLINK (7),
+.BR ioctl (2s)
+can be returned in
+.IR errno (3).
+.\"
+.\"
+.SH NOTICES
+.PP
+.I STREAMS
+.BR ioctl (2s)
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ioctl (3p),
+.BR streamio (7),
+.BR ioctl (2s),
+.BR errno (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B I_GETPMSG
+has no known bugs.
+.PP
+.I STREAMS
+.BR ioctl (2s)
+calls are complex and there is much conflicting documentation in specific
+areas of behaviour.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B I_GETPMSG
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B I_GETPMSG
+conforms as closely as possible to the
+.I POSIX/SUSv3
+specifications.
+Where a specific
+.IR "SVR 4.2" -based
+implementation differs from
+.IR POSIX/SUSv3 ,
+there will be differences with this
+.I @PACKAGE_TITLE@
+implementation.
+.IP ""
+Portable
+.I STREAMS
+applications programs will expect conformance to
+.IR POSIX/SUSv3 .
+.IP \(em
+It is fairly common practise to emulate system calls with
+.BR ioctl (2s)
+commands.
+.IP \(em
+.B I_GETPMSG
+should not be invoked directly, but, rather, via the appropriate library call.
+.PP
+For general
+.BR ioctl (2s)
+compatibility, see
+.BR streamio (7).
+.PP
+If your
+.B Linux
+system is equipped with
+.I OpenGroup
+manual pages, see
+.BR ioctl (3p)
+for the equivalent
+.I POSIX/SUSv3
+reference page.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.PP
+Conformance is tested using the
+.BR test-streams (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ioctl (2s)
+for
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

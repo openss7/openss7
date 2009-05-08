@@ -1,0 +1,394 @@
+// File: OSIMgmt.idl
+#ifndef _OSIMGMT_IDL_
+#define _OSIMGMT_IDL_
+#include <orb.idl>
+#include <JIDM.idl>
+#include X501Inf.idl
+#include X711CMI.idl
+#pragma prefix jidm.org
+// Macros used in the `raises clauses
+#define ROSE_ERRORS\
+OSIMgmt::ROSEDuplicateInvocation,\
+OSIMgmt::ROSEMistypedArgument,\
+OSIMgmt::ROSEResourceLimitation, \
+OSIMgmt::ROSEUnrecognizedOperation
+#define CREATE_ERRORS\
+ROSE_ERRORS, \
+OSIMgmt::AccessDenied,\
+OSIMgmt::ClassInstanceConflict,\
+OSIMgmt::DuplicateManagedObjectInstance,\
+OSIMgmt::InvalidAttributeValue,\
+OSIMgmt::InvalidObjectInstance,\
+OSIMgmt::MissingAttributeValue,\
+OSIMgmt::NoSuchAttribute,\
+OSIMgmt::NoSuchObjectClass,\
+OSIMgmt::NoSuchObjectInstance,\
+OSIMgmt::NoSuchReferenceObject,\
+OSIMgmt::ProcessingFailure,\
+OSIMgmt::ProcessingFailureEmpty
+#define COMMON_ERRORS \
+ROSE_ERRORS, \
+OSIMgmt::AccessDenied, \
+OSIMgmt::ClassInstanceConflict, \
+OSIMgmt::ComplexityLimitation, \
+OSIMgmt::ComplexityLimitationEmpty, \
+OSIMgmt::InvalidScope, \
+OSIMgmt::InvalidFilter, \
+OSIMgmt::NoSuchObjectClass, \
+OSIMgmt::NoSuchObjectInstance, \
+OSIMgmt::ProcessingFailure, \
+OSIMgmt::ProcessingFailureEmpty, \
+OSIMgmt::SyncNotSupported
+#define GET_ERRORS \
+COMMON_ERRORS, \
+OSIMgmt::GetListError, \
+OSIMgmt::OperationCancelled
+#define SET_ERRORS \
+COMMON_ERRORS, \
+OSIMgmt::SetListError
+#define ATTRIBUTE_ERRORS \
+COMMON_ERRORS, \
+OSIMgmt::GetListError, \
+OSIMgmt::SetListError
+#define ACTION_ERRORS \
+COMMON_ERRORS, \
+OSIMgmt::InvalidArgumentValue, \
+OSIMgmt::NoSuchAction, \
+OSIMgmt::NoSuchArgument
+#define DELETE_ERRORS \
+COMMON_ERRORS
+module OSIMgmt
+{
+// Definitions of ROSE and CMIS exceptions
+exception ROSEDuplicateInvocation { };
+exception ROSEMistypedArgument { };
+exception ROSEResourceLimitation { };
+exception ROSEUnrecognizedOperation { };
+exception AccessDenied { };
+exception ClassInstanceConflict
+{ X711CMI::BaseManagedObjectIdType error_info; };
+exception ComplexityLimitation
+{ X711CMI::ComplexityLimitationType error_info; };
+exception ComplexityLimitationEmpty { };
+exception DuplicateManagedObjectInstance
+{ X711CMI::ObjectInstanceType error_info; };
+exception GetListError
+{ X711CMI::GetListErrorType error_info; };
+exception InvalidArgumentValue
+{ X711CMI::InvalidArgumentValueType error_info; };
+exception InvalidAttributeValue
+{ X711CMI::AttributeType error_info; };
+exception InvalidFilter
+{ X711CMI::CMISFilterType error_info; };
+exception InvalidScope
+{ X711CMI::ScopeType error_info; };
+exception InvalidObjectInstance
+{ X711CMI::ObjectInstanceType error_info; };
+exception MissingAttributeValue
+{ X711CMI::MissingAttributeValueType error_info; };
+exception MistypedOperation { };
+exception NoSuchAction
+{ X711CMI::NoSuchActionType error_info; };
+exception NoSuchArgument
+{ X711CMI::NoSuchArgumentType error_info; };
+exception NoSuchAttribute
+{ X711CMI::AttributeIdType error_info; };
+exception NoSuchObjectClass
+{ X711CMI::ObjectClassType error_info; };
+exception NoSuchObjectInstance
+{ X711CMI::ObjectInstanceType error_info; };
+exception NoSuchReferenceObject
+{ X711CMI::ObjectInstanceType error_info; };
+exception OperationCancelled { };
+exception ProcessingFailure
+{ X711CMI::ProcessingFailureType error_info; };
+exception ProcessingFailureEmpty { };
+exception SetListError
+{ X711CMI::SetListErrorType error_info; };
+exception SyncNotSupported
+{ X711CMI::CMISSyncType error_info; };
+exception NoSuchEventType
+{ X711CMI::NoSuchEventTypeType error_info; };
+exception NoSuchInvokeId
+{ X711CMI::InvokeIdTypeType error_info; };
+// Using Multiple Replies exception for Actions
+interface RepliesIterator; // forward declaration
+exception UsingMR
+{ RepliesIterator replies_iterator; };
+// Definition of specific types used within this module
+typedef string NameString;
+typedef sequence<ASN1_ObjectIdentifier> ASN1_ObjectIdentifierSeq;
+struct AttributeValue {
+ASN1_ObjectIdentifier attribute_id;
+ASN1_DefinedAny value;
+};
+typedef sequence<AttributeValue> AttributeValueSeq;
+// Type to be used in cmis_create operations
+enum CreationKind
+{simple, autonaming, subordinate};
+// Type to be used in scoped set operations
+enum ModifyOperator
+{replace, add_member, remove_member, replace_with_default};
+struct AttributeSetOperator {
+ModifyOperator modify_operator;
+ASN1_ObjectIdentifier attribute_id;
+ASN1_DefinedAny attribute_value;
+};
+typedef sequence <AttributeSetOperator> SetOperationArgument;
+// Forward declaration for ReplyHandler interfaces
+interface LinkedReplyHandler;
+interface EndOfRepliesHandler;
+// ProxyAgent
+interface ProxyAgent : JIDM::ProxyAgent {
+void cmis_create (
+in CORBA::ScopedName interface_name,
+in CreationKind creation_kind,
+in CosNaming::Name object_name,
+in X711CMI::AccessControlTypeOpt access_control,
+in CosNaming::Name reference_object,
+in AttributeValueSeq req_attribute_values,
+in LinkedReplyHandler reply_handler
+);
+void cmis_create_sync (
+in CORBA::ScopedName interface_name,
+in CreationKind creation_kind,
+in CosNaming::Name object_name,
+in X711CMI::AccessControlTypeOpt access_control,
+in CosNaming::Name reference_object,
+in AttributeValueSeq req_attribute_values,
+out CORBA::ScopedName created_interface_name,
+out CosNaming::Name created_object_name,
+out X711CMI::ASN1_GeneralizedTimeOpt creation_time,
+out AttributeValueSeq created_attribute_values
+) raises (CREATE_ERRORS);
+void cmis_get (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name object_name,
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in ASN1_ObjectIdentifierSeq attribute_id_list,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+void cmis_set (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name object_name,
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in SetOperationArgument modification_list,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+void cmis_action (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name object_name,
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in ASN1_ObjectIdentifier action_name,
+in ASN1_DefinedAny action_info,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+void cmis_delete (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name object_name,
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+};
+const ASN1_ObjectIdentifier ACTUAL_CLASS = 2.9.3.4.3.42;
+interface ManagedObject; // forward declaration
+interface NamingContext : CosNaming::NamingContext {
+// NOTE: These operations are optional
+ManagedObject resolve_with_intf (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name object_name
+) raises (NotFound, CannotProceed, InvalidName);
+ManagedObject resolve_osi_name (
+in ASN1_ObjectIdentifier managed_object_class,
+in X711CMI::ObjectInstanceType object_instance
+) raises (NotFound, CannotProceed, InvalidName);
+CosNaming::Name translate_osi_name (
+in X711CMI::ObjectInstanceType object_instance
+) raises (InvalidName);
+X711CMI::ObjectInstanceType translate_idl_name (
+in CosNaming::Name idl_name
+) raises (InvalidName);
+};
+// ManagedObject
+interface ManagedObject : NamingContext, CosLifeCycle::LifeCycleObject {
+readonly attribute CosNaming::Name object_name;
+void scoped_get (
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in ASN1_ObjectIdentifierSeq attribute_id_list,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+void scoped_set (
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in SetOperationArgument modification_list,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+void scoped_action (
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in ASN1_ObjectIdentifier action_name,
+in ASN1_DefinedAny action_info,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+void scoped_delete (
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType synchronization,
+in X711CMI::AccessControlTypeOpt access_control,
+in LinkedReplyHandler reply_handler,
+in EndOfRepliesHandler end_of_replies_handler
+);
+AttributeValueSeq get_attributes (
+in ASN1_ObjectIdentifierSeq attribute_id_list
+) raises (GET_ERRORS);
+AttributeValueSeq set_attributes (
+in SetOperationArgument modification_list
+) raises (SET_ERRORS);
+ASN1_DefinedAny perform_action (
+in ASN1_ObjectIdentifier action_name,
+in ASN1_DefinedAny action_info
+) raises (ACTION_ERRORS, UsingMR);
+void delete_mo () raises (DELETE_ERRORS);
+};
+// ManagedObjectFactory
+interface ManagedObjectFactory {
+ManagedObject create (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name object_name,
+in ManagedObject reference_object,
+in AttributeValueSeq requested_attribute_values
+) raises (CREATE_ERRORS);
+ManagedObject create_with_auto_naming (
+in CORBA::ScopedName interface_name,
+in ManagedObject reference_object,
+in AttributeValueSeq requested_attribute_values
+) raises (CREATE_ERRORS);
+ManagedObject create_subordinate (
+in CORBA::ScopedName interface_name,
+in CosNaming::Name superior_name,
+in ManagedObject reference_object,
+in AttributeValueSeq requested_attribute_values
+) raises (CREATE_ERRORS);
+};
+// LocalRoot
+typedef sequence<ManagedObject> ManagedObjectSeq;
+interface LocalRoot : ManagedObject {
+exception NoDescendants {};
+ManagedObjectSeq list_orphans ( );
+ManagedObjectSeq
+list_orphan_descendants (in CosNaming::Name object_name)
+raises (NoDescendants);
+};
+// LName
+interface LName {
+exception InvalidName {};
+readonly attribute boolean is_distinguished_name;
+readonly attribute unsigned long num_components;
+void from_osi_form (in X711CMI::ObjectInstanceType osi_name);
+X711CMI::ObjectInstanceType to_osi_form ()
+raises(InvalidName);
+void from_idl_form (in CosNaming::Name idl_name);
+CosNaming::Name to_idl_form ()
+raises(InvalidName);
+LName to_ancestor_name (in unsigned long levels_up)
+raises(InvalidName);
+LName to_relative_name (in unsigned long levels_up)
+raises(InvalidName);
+LName append (in LName name);
+LName append_ava (in X501Inf::AttributeValueAssertionType ava)
+raises(InvalidName);
+X501Inf::AttributeValueAssertionType get_ava (in unsigned long index)
+raises(InvalidName);
+boolean equals (in LName name);
+LName copy ();
+void from_string_form (in NameString name_string);
+NameString to_string_form ()
+raises(InvalidName);
+void destroy ();
+};
+// ReplyHandler interfaces
+interface LinkedReplyHandler {
+void send_reply (
+in CORBA::ScopedName object_interface,
+in CosNaming::Name object_name,
+in X711CMI::ASN1_GeneralizedTimeOpt current_time,
+in any reply_info
+);
+void send_mo_error (
+in CORBA::ScopedName object_interface,
+in CosNaming::Name object_name,
+in X711CMI::ASN1_GeneralizedTimeOpt current_time,
+in short error_code,
+in any error_info
+);
+void send_subtree_error (
+in CORBA::ScopedName object_interface,
+in CosNaming::Name object_name,
+in X711CMI::ASN1_GeneralizedTimeOpt current_time,
+in short error_code,
+in any error_info
+);
+};
+interface EndOfRepliesHandler {
+void end_of_replies ( );
+};
+interface MultipleRepliesHandler : LinkedReplyHandler, EndOfRepliesHandler {};
+// BufferedRepliesHandler
+struct Reply {
+CORBA::ScopedName object_interface;
+CosNaming::Name object_name;
+X711CMI::ASN1_GeneralizedTimeOpt current_time;
+any reply_info;
+};
+typedef sequence<Reply> ReplyList;
+interface RepliesIterator {
+exception MoError {
+CORBA::ScopedName object_interface;
+CosNaming::Name object_name;
+X711CMI::ASN1_GeneralizedTimeOpt current_time;
+short error_code;
+any error_info;
+};
+exception SubtreeError {
+CORBA::ScopedName object_interface;
+CosNaming::Name object_name;
+X711CMI::ASN1_GeneralizedTimeOpt current_time;
+short error_code;
+any error_info;
+};
+boolean get_reply (out Reply r) raises (MoError, SubtreeError);
+boolean get_n_replies (in unsigned long how_many, out ReplyList r_list)
+raises (MoError, SubtreeError);
+boolean finished (out unsigned long num_pending);
+void destroy ();
+};
+interface BufferedRepliesHandler : MultipleRepliesHandler, RepliesIterator {};
+};
+#define UsingMR OSIMgmt::UsingMR
+#endif /* _OSIMGMT_IDL_ */

@@ -1,0 +1,346 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRVF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B strvf
+\- \fISTREAMS\fR verification tool
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBstrvf\fR [\fIoptions\fR]
+.PD 0
+.HP 12
+\fBstrvf\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBstrvf\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBstrvf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strvf
+command executes a series of subcommands that verify whether or not
+.I STREAMS
+is currently installed and configured on your system.  All output is sent to
+.IR stdout .
+Verbose output is always sent to the log file
+.BR /var/log/streams/strvf.log .
+.\".BR /var/adm/streams/strvf.log .
+.PP
+These subcommands make sure that the
+.I STREAMS
+kernel daemons are running and that
+.BR open (2s),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR ioctl (2s)
+and
+.BR close (2)
+can be performed on
+.BR /dev/echo .
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-n\fR, \fB--nologging\fR
+Suppress logging, send output to
+.B stdout
+and errors to
+.BR stderr .
+Default: off.
+.TP
+\fB-b\fR, \fB--basename\fR \fIBASENAME\fR
+Only significant when logging.
+Set the base name of logging and error files.  Default:
+.RB \(lq strvf \(rq.
+.TP
+\fB-O\fR, \fB--directory\fR \fIDIRECTORY\fR
+Only significant when logging.
+Set the directory to which log and error files are written.  Default:
+.RB \(lq /var/log/streams \(rq.
+.TP
+\fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
+Only significant when logging.
+Set the output file name for logging.  Default:
+\(lq\fIBASENAME\fB.log\fR\(rq.
+.TP
+\fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
+Only significant when logging.
+Set the output file name for errors.  Default:
+\(lq\fIBASENAME\fB.err\fR\(rq.
+.TP
+\fB-D\fR, \fB--devname\fR \fIDEVNAME\fR
+Only significant when logging.
+Set the device name to perform test upon.  Default:
+.RB \(lq /dev/echo \(rq.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppress normal output.
+.TP
+\fB-d\fR, \fB--debug\fR [\fIlevel\fR]
+Increase, or specify the debugging of the output.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase, or specify the verbosity of the output.
+.TP
+\fB-h\fR, \fB--help\fR
+Print usage information and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+Print version information and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+Print copying information and exit.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.B strvf
+returns a zero (0) exit status on success.  If
+.B strvf
+fails, it returns an exit status of one (1) and prints a diagnostic error
+message to
+.BR stderr .
+.PP
+An exit status of zero (0) indicates that
+.B strvf
+was successful; one (1) indicates that an error occurred and diagnostic message
+is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+Errors may result from the failure of any of the test in the verification
+procedure, failure to open the
+.B /dev/echo
+device, or inadequate permissions.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Sample output:
+.RS
+.nf
+\fC\s-1
+.\"-> Logging results to /var/adm/streams/strvf.log
+-> Logging results to /var/log/streams/strvf.log
+--------------------------------------------------
+-> Verify Linux Fast-STREAMS installation.
+-> Verify open, putmsg, getmsg, ioctl, and close
+-> can be performed on a stream.
+--------------------------------------------------
+--------------------------------------------------
+-> Linux Fast-STREAMS is installed and operational
+--------------------------------------------------
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.B /dev/echo
+Loopback
+.I STREAMS
+driver used by
+.BR strvf .
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strvf
+contains the
+.B strvf
+command.
+.TP
+.B /var/log/streams/strvf.log
+.\".B /var/adm/streams/strvf.log
+contains a verbose description and status of all sub-commands.
+.TP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR echo (4),
+.BR strtst (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B strvf
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.IR HP-UX \(rg.
+This is an
+.IR HP-UX \(rg-specific
+command.
+.[
+hpuxspg
+.]
+.B strvf
+is provided in
+.I @PACKAGE_TITLE@
+for compatibility with
+.IR HP-UX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR HP-UX \(rg
+does not document any long options.
+.IP \(em
+.IR HP-UX \(rg
+does not document the
+.BR -d ", " -q ", " -v ", " -h ", " -V " or " -C options.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+The format of the output from the
+.B strvf
+command may be different from that of
+.IR HP-UX \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+documentation.
+.[
+hpuxdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strvf
+first appeared in
+.IR HP-UX \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

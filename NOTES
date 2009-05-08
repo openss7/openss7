@@ -1,0 +1,12 @@
+
+How to go about doing a release number update:
+
+- Update the version number in the .pkgrelease file.
+
+- Update the version number and release notes in doc/manual/news.texi.
+
+- Update the version number in debian/changelog.
+
+- Update LSM.
+
+- Prepare ANNOUNCE email.

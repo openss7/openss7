@@ -1,0 +1,509 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH BACKQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B backq
+\- find the upstream or downstream queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "queue_t *backq(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue for which to find the previous queue.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR backq ()
+returns a pointer to the queue behind a given queue.  That is, it returns a pointer to the queue
+whose
+.I q_next
+pointer is
+.IR q .
+If no such queue exists (as when
+.I q
+is at a
+Stream head
+or
+.IR "Stream end" ),
+.BR backq ()
+returns
+.BR NULL .
+.PP
+.BR backq ()
+returns a pointer to the queue
+which feeds messages to
+.IR q .
+.\".PP
+.\"If
+.\".I q
+.\"references a normal read queue, then the returned queue pointer references the
+.\"downstream queue.  If
+.\".I q
+.\"references a normal write queue, then the returned queue pointer references
+.\"the upstream queue.
+.\".PP
+.\"If
+.\".I q
+.\"references a
+.\".BR fifo (4)
+.\"read queue, then the returned queue pointer references the
+.\".BR fifo (4)
+.\"write queue.  If
+.\".I q
+.\"references a
+.\".BR fifo (4)
+.\"write queue, then the returned queue pointer references the
+.\".BR fifo (4)
+.\"read queue.
+.\".PP
+.\"If
+.\".I q
+.\"references a
+.\".BR pipe (4)
+.\"read queue, then the returned queue pointer references the
+.\"write queue at the other end of the
+.\".BR pipe (4).
+.\"If
+.\".I q
+.\"references a
+.\".BR pipe (4)
+.\"write queue, then the returned queue pointer references the
+.\"read queue at the other end of the
+.\".BR pipe (4).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR backq ()
+is problematic in MP systems.
+MP-safe drivers and modules should avoid using this function.
+When
+.BR backq ()
+is absolutely necessary, it should only be called from a module procedure and
+should only be passed a
+.I q
+belonging to the queue pair for which a module procedure is synchronized.
+.PP
+Normally it is unnecessary to know the queue feeding a given queue.
+.I STREAMS
+utilities
+.BR getq (9)
+and
+.BR rmvq (9)
+handle back-enabling.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR backq ()
+returns a pointer to the feeding queue, or
+.B NULL
+when there is no feeding queue.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR backq ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR backq ()
+can only be invoked from a
+.I STREAMS
+context synchronous on
+.IR q ,
+that is, a queue procedure, call-out or synchronized callback.
+To use this utility from sofwtare interrupts, bottom-halves, tasklets or interrupt service routines,
+bracket the call with
+.BR freezestr (9)
+and
+.BR unfreezestr (9).
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR backq ()
+is MP-safe when invoked from the correct context.
+The caller is responsible for the validity of the passed in queue pointer,
+.IR q ,
+across the call.
+.PP
+When called from outside of the
+.I STREAMS
+context, the returned queue reference might no longer be valid
+after the return from
+.BR backq ()
+if an
+.BR I_PUSH (7),
+or
+.BR I_POP (7),
+of a module has been performed on the queue
+.IR q ,
+or the queue
+.I q
+has been welded with
+.BR weldq (9),
+or unwelded with
+.BR unweldq (9).
+.PP
+If the
+Stream
+is frozen using
+.BR freezestr (9)
+before the call to
+.BR backq (),
+the returned queue reference will be valid until after a call to
+.BR unfreezestr (9),
+or the queue pointers are otherwise manipulated by the caller.
+.PP
+See also
+.BR mp-streams (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR backq (),
+is obsolete.
+.\"There are no utility functions that protect dereference of the
+.\".BI OTHERQ( q ) ->q_next
+.\"across the return from the call (such as
+.\".I q->q_next
+.\"is protected by, for example,
+.\".BR putnext (9)).
+.\".BR backq (),
+.\"should not be used by portable MP-safe modules.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freezestr (9),
+.BR unfreezestr (9),
+.BR strqget (9),
+.BR strqset (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR backq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR backq ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4"
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR SUPER-UX \(rg
+.[
+suxdoc
+.]
+does not document this function.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR backq ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+also lists
+.BR backq ()
+as a utility that cannot be called from user functions or
+.RI non- STREAMS
+code; that is, contexts asynchronous to the Stream containing
+.IR q .
+.IP ""
+.IR HP-UX \(rg
+compatible drivers and modules will not call
+.BR backq ()
+from outside of a
+.BR qinit (9)
+routine for the queue pair of
+.IR q .
+.IP \(em
+.BR backq ()
+returns
+.B NULL
+if
+.I q
+points to a Stream end read queue, regardless of whether a FIFO or PIPE
+midpoint exists beyond
+.IR q .
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and
+.IR Solaris \(rg
+.[
+soldoc
+.]
+indicate that the returned pointer is
+.B NULL
+if
+.I q
+is a Stream head write queue or a Stream end read queue.
+.IP \(em
+.BR backq ()
+returns
+.B NULL
+if
+.I q
+points to a Stream end read queue, regardless of whether a FIFO or PIPE
+midpoint exists beyond
+.IR q .
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.IR UXP/V \(rg
+.[
+uxpdoc
+.]
+do not explicitly document what happens in the case of FIFOs and PIPEs, but
+indicate that the queue pointer returned is that whose
+.I q_next
+pointer points to
+.IR q .
+.IP \(em
+.BR backq ()
+will kernel oops if
+.I q
+is
+.BR NULL .
+Under
+.IR LiS ,
+.BR backq ()
+will return
+.B NULL
+if
+.I q
+is
+.BR NULL .
+.IP \(em
+.BR backq ()
+will destabilize the kernel if
+.I q
+is a
+.RB non- NULL
+pointer to a structure other than a valid
+.B queue_t
+structure.
+Under
+.IR LiS ,
+.BR backq ()
+will return
+.B NULL
+in the same situation.
+.IP \(em
+.BR backq ()
+always succeeds.
+Under
+.IR LiS ,
+.BR backq ()
+will fail silently and return
+.B NULL
+in the two situations above, and when an internal error occurs.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+instead of
+.IR LiS .
+.\".IP \(em
+.\"Symbol
+.\".BR lis_backq ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_backq ()
+.\"simply calls
+.\".BR backq ()
+.\"directly.
+.IP \(em
+.BR backq ()
+is a function.
+.BR backq ()
+is implemented as a \(lqC\(rq pre-processor macro in some implementations.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules won't care whether
+.BR backq ()
+is a \(lqC\(rq function or a pre-processor macro.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR backq ()
+appeared as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR backq ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,1 @@
+.so man9/SPLX.9.man

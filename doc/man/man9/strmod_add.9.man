@@ -1,0 +1,581 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRMOD_ADD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strmod_add
+\- add a \fISTREAMS\fR module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _OSF_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+dev_t \fBstrmod_add\fR(dev_t \fIdev\fR, struct streamtab *\fIst\fR, struct streamadm *\fIsa\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I dev
+The external device number to use when adding a driver.  If
+.B NODEV
+is used, the first available slot is used.  This parameter is ignored for
+modules.
+.TP
+.I st
+A pointer to the
+.B streamtab
+structure describing the
+.I STREAMS
+module.  This structure is statically allocated by the driver or module.
+.[
+svr3
+.]
+.TP
+.I sa
+A pointer to the
+.B streamadm
+structure describing the
+.I STREAMS
+module.  This structure does not have to be statically allocated.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strmod_add ()
+is used to configure
+.I STREAMS
+drivers and modules into the kernel.  It allows
+.I STREAMS
+drivers to add entry points in character device switch tables.  Modules are
+added to the
+.I STREAMS
+module switch.
+.PP
+When adding a driver only,
+.BR strmod_add ()
+takes a device number, which is used to determine the device switch slot for
+the entry points.  A
+.I STREAMS
+driver can supply
+.B NODEV
+instead of a device number.  In this case,
+.BR strmod_add ()
+finds the first available device switch slot and returns the number actually
+used.  If a device switch lot is already in use or if there are not slots
+available,
+.B NODEV
+is returned.
+.PP
+.I st
+is a pointer to a traditional
+.[
+svr3
+.]
+.B streamtab
+structure.  The structure contains pointers to entry points for the module's
+read and write queue routines.
+.PP
+.I sa
+points to a
+.B streamadm
+structure providing additional information that is required under
+.IR OSF/1 \(rg.
+.\"
+.SS CONFIGURATION
+.PP
+The
+.B streamadm
+structure defines additional configuration information for
+.I STREAMS
+drivers and modules.
+.IR OSF/1 \(rg
+uses this structure in addition to the traditional
+.B streamtab
+structure when configuring a
+.I STREAMS
+driver or module.
+.PP
+.nf
+\fC\s-1
+struct streamadm {
+    uint sa_version;
+    uint sa_flags;
+    char sa_name[FMNAMESZ + 1];
+    caddr_t sa_ttys;
+    uint sa_sync_level;
+    caddr_t sa_sync_info;
+};
+\s+1\fR
+.fi
+.TP
+.B sa_version
+Version of the
+.B streamadm
+structure.
+This field is for forward and backward compatibility.
+.IP ""
+This field is ignored by
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE@
+.]
+.TP
+.B sa_flags
+Flags specifying additional characteristics of the driver or module being
+added.  The flags are a bitwise OR of one or more of the following flags:
+.RS
+.TP
+.B STR_IS_DEVICE
+The
+.I STREAMS
+module being registered is a device driver.  For drivers, the
+.I dev
+argument to
+.BR strmod_add ()
+and the return value
+are significant.
+One, and only one, of
+.B STR_IS_DEVICE
+or
+.B STR_IS_MODULE
+can be specified.
+.TP
+.B STR_IS_MODULE
+The
+.I STREAMS
+module being registered is a pushable module.  For pushable modules, the
+.I dev
+argument to
+.BR strmod_add ()
+and the return value
+are ignored.
+One, and only one, of
+.B STR_IS_DEVICE
+or
+.B STR_IS_MODULE
+can be specified.
+.TP
+.B STR_SYSV4_OPEN
+The
+.I STREAMS
+driver or module being registered follows
+.I SVR 4
+.IR qi_qopen (9)
+semantics.  If this flag is not set, the
+driver or module obeys
+.I SVR 3
+.IR qi_qopen (9)
+semantics.
+.TP
+.B STR_QSAFETY
+When this flag is set, it indicates that the driver or module requires
+interrupt-safe callback functions.  Setting this flag causes the
+.I STREAMS
+executive to suppress interrupts while executing all asynchronous callback
+functions.
+.RE
+.TP
+.B sa_name
+The unique name of the driver or module.  Modules and drivers share a common
+name space.  The maximum length for a name is set by
+.BR FMNAMESZ ,
+which is typically set to eight (8) characters.
+.IP ""
+This name is used to register character devices for device drivers, and is the
+name that must be used as the argument of an
+.B I_PUSH
+IO control
+.RB (see streamio (7))
+for a pushable module.  It is also used as the name for verification of module
+presence for both drivers and modules with the
+.BR sad (4)
+driver and the
+.BR autopush (8)
+utility.
+.TP
+.B sa_ttys
+A pointer to the
+.BR ttys ()
+routine that wil be used by the driver or module.  When the driver or module
+is added with
+.BR strmod_add (),
+this pointer will be placed in the
+.I d_ttys
+field in the
+.B cdevsw
+structure.  If the driver is not a
+.BR tty ,
+this field is set to
+.BR NULL .
+.IP ""
+This field is ignored by
+.BR "@PACKAGE_TITLE@" .
+.TP
+.B sa_sync_level
+This field specifies the synchronization level to be used with the module or
+drivers.  The synchronization level specifies the number of concurrent thread
+of execution that can be within a scope.
+For additional information concerning the synchronization of
+.I STREAMS
+drivers and modules, see
+.BR mt-streams (9).
+The scope can be specified at one of
+a number of levels as follows:
+.RS
+.TP
+.B SQLVL_DEFAULT
+Default level synchronization.
+.IP ""
+.IR OSF/1 \(rg
+specifies
+.[
+osfspg
+.]
+that the default level is the same as
+.BR SQLVL_GLOBAL ,
+below.
+.TP
+.B SQLVL_GLOBAL
+Global level synchronization.
+.TP
+.B SQLVL_ELSEWHERE
+Arbitrary level synchronization.
+.TP
+.B SQLVL_MODULE
+Module level synchronization.
+.TP
+.B SQLVL_QUEUEPAIR
+Queue pair level synchronization.
+.TP
+.B SQLVL_QUEUE
+Queue level synchronization.
+.TP
+.B SQLVL_NOP
+No synchronization.
+.IP ""
+This level is not provided by
+.IR OSF/1 \(rg.
+.[
+osfspg
+.]
+.RE
+.TP
+.B sa_sync_info
+A pointer to synchronization data.  This field is relevant only if
+.I sa_sync_level
+is set to
+.BR SQLVL_ELSEWHERE
+and specifies the arbitrary scope of synchronization.
+.IP
+The value of this member is a character string providing the name of the
+external synchronization.  The registration function matches this name against
+all existing external synchronization names.  If a match is found, that
+synchronization queue is shared with this module.  If no match is found, a new
+synchronization queue with the provided name is created.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR strmod_add ()
+succeeds,
+and
+.I sa_flags
+has
+.B STR_IS_DEVICE
+set, the return value is the character device number assigned to the driver.
+When
+.BR strmod_add ()
+succeeds,
+and
+.I sa_flags
+has
+.B STR_IS_MODULE
+set, the return value is the the module identifier assigned to the module.
+When either call fails,
+the return value is
+.BR NODEV .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR strmod_add ()
+fails, it returns
+.BR NODEV .
+.BR strmod_add ()
+can fail because of failure to allocate the necessary structures, invalid parameters, or the
+unavailability of the requested name or major device number.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR strmod_add ()
+should be called from User context.  It is intended to be called by kernel
+module initialization routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strmod_add ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+The device number can be constructed from the major number with
+.BR makedevice (9).
+.PP
+.BR strmod_add ()
+is a
+.IR OSF/1 \(rg-specific
+function:
+.B _OSF_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_OSF
+or
+.B CONFIG_STREAMS_COMPAT_OSF_MODULE
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.IR qi_qopen (9),
+.BR streamio (7),
+.BR sad (4),
+.BR autopush (8),
+.BR mt-streams (9),
+.BR makedevice (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strmod_add ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strmod_add ()
+is compatible with
+.IR OSF/1 \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR strmod_add ()
+ignores the
+.I sa_version
+field of the
+.B streamadm
+structure, unlike
+.IR OSF/1 \(rg.
+.[
+osfdoc
+.]
+.IP \(em
+.BR strmod_add ()
+ignores the
+.I sa_ttys
+field of the
+.B streamadm
+structure, unlike
+.IR OSF/1 \(rg.
+.[
+osfdoc
+.]
+.IP \(em
+Specifying
+.B SQLVL_DEFAULT
+in the
+.I sa_sync_level
+field of the
+.B streamadm
+structure is equivalent to
+.B SQLVL_MODULE
+instead of
+.B SQLVL_GLOBAL
+as specified in
+.IR OSF/1 \(rg
+documentation.
+.[
+osfdoc
+.]
+.IP \(em
+.BR strmod_add ()
+recognizes the
+.B SQLVL_NOP
+setting in the
+.I sa_sync_level
+field, whereas,
+.IR OSF/1 \(rg
+does not document this level.
+.IP \(em
+.BR strmod_add ()
+is provided for source level compatibility with
+.IR OSF/1 \(rg
+for the purpose of porting
+.IR OSF/1 \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR OSF/1 \(rg,
+binaries are incompatible.
+.IP \(em
+.BR strmod_add ()
+only provides functionality comparable to
+.IR OSF/1 \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR strmod_add ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR OSF/1 \(rg
+DDI documentation.
+.[
+osfdoc
+.]
+.[
+osfspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strmod_add ()
+first appeared in
+.IR OSF/1 \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

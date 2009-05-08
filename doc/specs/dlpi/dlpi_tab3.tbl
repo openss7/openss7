@@ -1,0 +1,124 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|cb|cbss
+l|l|lss.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Connnectionless-mode Data Transfer
+T}:T{
+.hy 0
+.ad l
+Data Transfer
+T}:T{
+DL_UNITDATA_REQ, DL_UNITDATA_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+QOS Management
+T}:T{
+.hy 0
+.ad l
+DL_UDQOS_REQ, DL_OK_ACK, DL_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Error Reporting
+T}:T{
+.hy 0
+.ad l
+DL_UDERROR_IND
+T}
+=
+T{
+.hy 0
+.ad l
+XID and TEST services
+T}:T{
+.hy 0
+.ad l
+XID
+T}:T{
+.hy 0
+.ad l
+DL_XID_REQ, DL_XID_IND, DL_XID_RES, DL_XID_CON
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+TEST
+T}:T{
+.hy 0
+.ad l
+DL_TEST_REQ, DL_TEST_IND, DL_TEST_RES, DL_TEST_CON
+T}
+=
+T{
+.hy 0
+.ad l
+Acknowledged Connectionless-mode Data Transfer
+T}:T{
+.hy 0
+.ad l
+Data Tranfer
+T}:T{
+.hy 0
+.ad l
+DL_DATA_ACK_REQ, DL_DATA_ACK_IND, DL_DATA_ACK_STATUS_IND, DL_REPLY_REQ, DL_REPLY_IND,
+DL_REPLY_STATUS_IND, DL_REPLY_UPDATE_REQ, DL_REPLY_UPDATE_STATUS_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+QOS Management
+T}:T{
+.hy 0
+.ad l
+DL_UDQOS_REQ, DL_OK_ACK, DL_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Error Reporting
+T}:T{
+.hy 0
+.ad l
+DL_UDERROR_IND
+T}
+.TE

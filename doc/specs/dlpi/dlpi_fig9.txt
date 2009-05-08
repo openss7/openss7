@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+        DL_DISABMULTI ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

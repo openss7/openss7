@@ -1,0 +1,506 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NSDEV 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B nsdev
+\- named \fISTREAMS\fP device
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.HP
+.BI "int " fd " = open(" \*(lq/dev/xxx.yyy\*(rq ", " oflags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B nsdev
+is a \*(lqNamed
+.I STREAMS
+Device\*(rq pseudo-device driver similar in some
+respects to
+.BR clone (4).
+.B nsdev
+is perhaps the only assigned major device number that is ever needed by a
+.I STREAMS
+device driver.
+.PP
+Whereas the
+.BR clone (4)
+pseudo-device driver transforms the device number
+.I dev
+into
+.BI makedevice(getminor( dev "), " 0 ),
+the
+.B nsdev
+pseudo-device driver transforms the device number
+.I dev
+into
+.BI makedevice( major ", getminor(" dev )),
+where
+.I major
+is determined from the name of the device rather than the device number.
+.PP
+To determine the
+.I major
+component of the device number,
+.B nsdev
+looks for a registered
+.I STREAMS
+device with the same initial substring (before a dot) as the name of the device opened
+.RI ( xxx
+in the
+.RI \(lq SYNOPSIS \(rq
+above).
+.PP
+If no registered
+.I STREAMS
+device can be found that match the initial substring,
+.IR xxx ,
+of the device name, the
+.B nsdev
+requests that the kernel load the module named
+.BI streams- xxx\fR,
+where
+.I xxx
+is the longest initial substring of the device name that does not contain a
+period (\(lq.\(rq) character.  This makes it possible to create Named
+.I STREAMS
+Devices knowing only the character major device number associated with the
+.B nsdev
+driver and demand load other
+.I STREAMS
+modules and drivers that may then dynamically allocate their major device
+numbers (or not allocate any major device numbers at all).
+.PP
+For additional information on device numbers, see the
+.RI \(lq "Device Numbering" \(rq
+section of the
+.BR "Linux Fast-STREAMS Programmer's Guide" ,
+.BR SPG (9),
+or the
+.BR dev_t (9)
+manual page.
+.\"
+.SS
+Super Cloning
+.PP
+The
+.B nsdev
+supports the concept of super cloning when used in conjunction with the
+traditional
+.BR clone (4)
+device.
+A super clone device has the clone device major device number as a major
+number and the
+.B nsdev
+major device number as a minor number.  This is a traditional clone device
+application to the
+.B nsdev
+pseudo-device driver.
+This arrangement has the characteristic that when such a
+.BR clone (4)
+device is opened, it chains the open call to the
+.B nsdev
+with the
+.B CLONEOPEN
+flag set in
+.IR sflag .
+The Named
+.I STREAMS
+Device then chains the open to the device number derived
+from the device name and the minor device number (in this case zero (0)) as
+normal.
+.\"
+.SS
+Named Clone Devices
+.PP
+The
+.B nsdev
+can be used to create named clone devices.  A named clone device can be
+created by assigning the
+.B ndev
+major device number to devices with the name
+.BI clone. yyy
+and assigning the traditional clone device minor number (see
+.BR clone (4)).
+In this way, it is not even necessary to know the device major number of the
+.BR clone (4)
+device.
+.\"
+.\"
+.SH NOTICES
+.PP
+Performing an
+.BR open (2s)
+of the
+.B nsdev
+can result in the loading of (or an attempt to load) the kernel module
+named
+.BI streams- xxx\fR.
+.PP
+If the device opened is a symbolic link, the name of the actual file is the
+name used for determining the
+.I major
+device number of the cloned device.
+If the device opened is a hard link, the name of the opened file is the name
+used for determining the
+.I major
+device number of the cloned device.
+.PP
+.B nsdev
+is used by the
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+system provided drivers to limit the use of major device numbers to a single
+major device number for the
+.I STREAMS
+system installed device drivers.
+Clonable minor devices are allocated against a single
+.I STREAMS
+system major device number rather than allocating new major device numbers for
+each facility.
+.PP
+When
+.B nsdev
+loads, it assigns a major device number either statically or dynamically.  In
+either event, the major device number associated with the
+.B nsdev
+can be found by search the
+.B /proc/devices
+file for the major device number assigned to
+.RB \*(lq nsdev \*(rq.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B nsdev
+is not implemented as a normal
+.I STREAMS
+driver: it is implemented as a shadow special device node under
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.B Linux Fast-STREAMS
+shadow special device nodes call
+.BR nsdev_open ()
+from
+.BR cdev_open ()
+instead of
+.BR spec_open ()
+permitting the
+.B nsdev
+device to intercept and redirect the open call to the appropriate device.
+This is consitent with the descriptions for the internal
+.BR clone_open ()
+under
+.IR "SVR 4" .
+.[
+magic
+.]
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following are some examples of how to use the
+Named
+.I STREAMS
+Device:
+.SS
+Named
+.I STREAMS
+Device Example
+.PP
+If the following is performed to create the device (assuming that major device
+number 56 is the major device number of the Named
+.I STREAMS
+Device):
+.sp
+.nf
+\fC\s-1\
+$> mknod -m 0666 /dev/mystream.04 c 56 3
+$> ln -s /dev/mystream.04 /dev/ticlts
+\s+1\fP
+.fi
+.sp
+then opening
+.RB \*(lq /dev/ticlts \*(rq
+will result in opening minor device number
+.I 3
+of the
+.RB \*(lq mystream \*(rq
+device.
+The device will be opened with the
+.I sflag
+argument to
+.BR qopen (9)
+set to
+.B DRVOPEN
+unless the device has had cloning set using
+.BR D_CLONE
+during registration of the major or minor device nodes (see
+.BR register_strdev (9)),
+or unless
+.BR SAP_CLONE
+was set using the
+.I STREAMS
+Administrative Driver
+.BR sad (4)
+for the ultimate device node.  In either of these later cases, the device will
+be opened with a
+.I sflag
+argument of
+.BR CLONEOPEN .
+.SS
+Super Clone Example
+.PP
+If the following is performed to create a
+.BR clone (4)
+device in addition to the above example (assuming that the
+.BR clone (4)
+major device number is 74):
+.sp
+.nf
+\fC\s-1\
+$> mknod -m 0666 /dev/mystream.00 c 56 0
+$> mknod -m 0666 /dev/mystream c 74 56
+$> ln -s /dev/mystream my_super_clone_device
+\s+1\fP
+.fi
+.sp
+then opening either
+.RB \*(lq my_super_clone_device \*(rq
+or
+.RB \*(lq /dev/mystream \*(rq
+will result in opening minor device number
+.I 0
+of the
+.RB \*(lq mystream \*(rq
+device with the
+.I sflag
+argument to
+.BR qopen (9)
+being set to
+.BR CLONEOPEN .
+For additional information on the super cloning technique using the Named
+.I STREAMS
+Device, see
+.BR clone (4).
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/nsdev
+The external filesystem named
+.I STREAMS
+device.
+.TP
+.BR /dev/streams/nsdev ", " /devices/nsdev
+The
+.BR specfs (5)
+shadow special filesystem named
+.I STREAMS
+device.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR specfs (5),
+.BR open (2s),
+.BR qopen (9),
+.BR register_strdev (9),
+.BR clone (4),
+.BR sad (4),
+.BR SPG (9),
+.BR dev_t (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B nsdev
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.B nsdev
+is compatible with
+.I SVR 4.2
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UXP/V \(rg,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B nsdev
+is a
+.B Linux Fast-STREAMS
+specific device.
+.IP \(em
+Although
+.B nsdev
+is
+.B Linux Fast-STREAMS
+specific, the operation of this device is a file system artifice and is
+transparent to both the
+.I STREAMS
+device user and the
+.I STREAMS
+device driver itself.
+.IP \(em
+When the
+.B nsdev
+is opened directly, the driver has no indication that it has been opened via
+the Named
+.I STREAMS
+Device and, for all intents and purposes, appears to the
+driver as having been opened as a direct minor node of the driver.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B nsdev
+is a
+.B Linux Fast-STREAMS
+specific mechanism.
+Conformance is verified using the
+.BR test-nsdev (4)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B nsdev
+first appeared in
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

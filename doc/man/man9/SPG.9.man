@@ -1,0 +1,2271 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SPG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B SPG
+\- \fBLinux Fast-STREAMS\fP Programmers Guide
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/dki.h>
+.br
+.B #include <sys/kmem.h>
+.br
+.B #include <sys/cmn_err.h>
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.I STREAMS
+is a system call interface and kernel facility for the development of configurable and reusable
+drivers and modules supporting service interfaces and organized into protocol stacks.  It supports a
+wide array of service interfaces, from character terminals to application layer networking protocols.
+.PP
+This manual page provides a roadmap to the manual pages describing specific user and kernel level
+facilities.  For a 10,000 foot overview of
+.IR STREAMS ,
+see the
+.BR STREAMS (9)
+manual page.
+.PP
+This manual page discusses
+.I STREAMS
+concepts and facilities.
+.PP
+.I STREAMS
+concepts include framework definitions, components, configuration, service interfaces, messages,
+message passing, message processing, flow control, modules, drivers, multiplexing, diagnosis, and
+administration.
+.PP
+.I STREAMS
+facilities include: user-level facilities, kernel-resident facilities, and adminstrative facilities.
+.\"
+.SS User Level Facilities
+User-level facilities include system calls and input-output controls
+available to user level programs when communicating with
+.I STREAMS
+device and pseudo-device drivers.
+.\"
+.SS Kernel Resident Facilities
+Kernel-resident facilities include the data structures and
+.I STREAMS
+utility functions that are used to implement
+.I STREAMS
+drivers and modules within the
+.I STREAMS
+kernel framework.
+.\"
+.SS Administrative Facilities
+Administrative facilities are system level utilities for use by system adminstrators that assist in the
+configuration,
+monitoring, diagnosis and tuning of the
+.I STREAMS
+subsystem.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.SS "System Calls"
+.PP
+.IP \fBclose\fR(2) \w'\fBisastream\fR(2)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfattach\fR(3)
+\(en\ 
+.IP \fBfdetach\fR(3)
+\(en\ 
+.IP \fBgetmsg\fR(2)
+\(en\ get next message from a \fISTREAMS\fR character device
+.IP \fBgetpmsg\fR(2)
+\(en\ get next message from a \fISTREAMS\fR character device
+.IP \fBioctl\fR(2)
+\(en\ 
+.IP \fBisastream\fR(2)
+\(en\ 
+.IP \fBopen\fR(2)
+\(en\ 
+.IP \fBpipe\fR(2)
+\(en\ 
+.IP \fBpoll\fR(2)
+\(en\ wait for some event on a \fISTREAMS\fR character device
+.IP \fBputmsg\fR(2)
+\(en\ put a message to a \fISTREAMS\fR character device
+.IP \fBputpmsg\fR(2)
+\(en\ put a message to a \fISTREAMS\fR character device
+.IP \fBread\fR(2)
+\(en\ 
+.IP \fBreadv\fR(2)
+\(en\ 
+.IP \fBstreamio\fR(7)
+\(en\ 
+.IP \fBtermios\fR(7)
+\(en\ 
+.IP \fBwrite\fR(2)
+\(en\ 
+.IP \fBwritev\fR(2)
+\(en\ 
+.PD
+
+.IP \fBfattach\fR(2)
+\(en\ 
+.PD 0
+.IP \fBfcntl\fR(2)
+\(en\ 
+.IP \fBfcntl\fR(2s)
+\(en\ 
+.IP \fBgetmsg\fR(2)
+\(en\ 
+.IP \fBgetpmsg\fR(2s)
+\(en\ 
+.IP \fBioctl\fR(2s)
+\(en\ 
+.IP \fBpipe\fR(2)
+\(en\ 
+.IP \fBpipe\fR(2s)
+\(en\ 
+.IP \fBpoll\fR(2)
+\(en\ 
+.IP \fBpoll\fR(2s)
+\(en\ 
+.IP \fBputmsg\fR(2)
+\(en\ 
+.IP \fBputpmsg\fR(2s)
+\(en\ 
+.IP \fBread\fR(2)
+\(en\ 
+.IP \fBread\fR(2s)
+\(en\ 
+.IP \fBreadv\fR(2)
+\(en\ 
+.IP \fBreadv\fR(2s)
+\(en\ 
+.IP \fBsoon\fR(2)
+\(en\ 
+.IP \fBwrite\fR(2)
+\(en\ 
+.IP \fBwrite\fR(2s)
+\(en\ 
+.IP \fBwritev\fR(2)
+\(en\ 
+.IP \fBwritev\fR(2s)
+\(en\ 
+.PD
+
+.PP
+.B SYSTEM CALLS
+.PP
+.IP \fBfattach\fR(2) \w'\fBgetpmsg\fR(2s)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfcntl\fR(2s)
+\(en\ 
+.IP \fBgetmsg\fR(2)
+\(en\ 
+.IP \fBgetpmsg\fR(2s)
+\(en\ 
+.IP \fBpipe\fR(2s)
+\(en\ 
+.IP \fBpoll\fR(2s)
+\(en\ 
+.IP \fBputmsg\fR(2)
+\(en\ 
+.IP \fBputpmsg\fR(2s)
+\(en\ 
+.IP \fBread\fR(2s)
+\(en\ 
+.IP \fBreadv\fR(2s)
+\(en\ 
+.IP \fBwrite\fR(2s)
+\(en\ 
+.IP \fBwritev\fR(2s)
+\(en\ 
+.PD
+
+.PP
+.B LIBRARY CALLS
+.PP
+.IP \fBfattach\fR(3) \w'\fBlibstreams\fR(3)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfdetach\fR(3)
+\(en\ 
+.IP \fBisastream\fR(3)
+\(en\ 
+.IP \fBlibstreams\fR(3)
+\(en\ 
+.IP \fBpipe\fR(3)
+\(en\ 
+.IP \fBs_pipe\fR(3)
+\(en\ 
+.PD
+
+.PP
+.B MODULES
+.PP
+.IP \fBbufmod\fR(4) \w'\fBtestmod\fR(4)\(en'u
+\(en\ 
+.PD 0
+.IP \fBconnld\fR(4)
+\(en\ 
+.IP \fBnullmod\fR(4)
+\(en\ 
+.IP \fBpipemod\fR(4)
+\(en\ 
+.IP \fBsc\fR(4)
+\(en\ 
+.IP \fBsth\fR(4)
+\(en\ 
+.IP \fBtestmod\fR(4)
+\(en\ 
+.PD
+
+.PP
+.B DRIVERS
+.PP
+.IP \fBclone\fR(4) \w'\fBloop_clone\fR(4)\(en'u
+\(en\ 
+.PD 0
+.IP \fBconslog\fR(4)
+\(en\ 
+.IP \fBecho\fR(4)
+\(en\ 
+.IP \fBfifo\fR(4s)
+\(en\ 
+.IP \fBlog\fR(4)
+\(en\ 
+.IP \fBloop\fR(4)
+\(en\ 
+.IP \fBloop_clone\fR(4)
+\(en\ 
+.IP \fBmux\fR(4)
+\(en\ 
+.IP \fBnsdev\fR(4)
+\(en\ 
+.IP \fBnuls\fR(4)
+\(en\ 
+.IP \fBpipe\fR(4)
+\(en\ 
+.IP \fBsad\fR(4)
+\(en\ 
+.IP \fBs_fifo\fR(4)
+\(en\ 
+.IP \fBsfx\fR(4)
+\(en\ 
+.IP \fBsloop\fR(4)
+\(en\ 
+.IP \fBspx\fR(4)
+\(en\ 
+.IP \fBstrlog\fR(4)
+\(en\ 
+.PD
+
+.PP
+.B INPUT-OUTPUT CONTROLS
+.PP
+
+.IP \fBstreamio\fR(7) \w'\fBI_GETCLTIME\fR(7)\(en'u
+\(en\ 
+
+.IP \fBI_ANCHOR\fR(7) \w'\fBI_GETCLTIME\fR(7)\(en'u
+\(en\ 
+.PD 0
+.IP \fBI_ATMARK\fR(7)
+\(en\ 
+.IP \fBI_CANPUT\fR(7)
+\(en\ 
+.IP \fBI_CKBAND\fR(7)
+\(en\ 
+.IP \fBI_FATTACH\fR(7)
+\(en\ 
+.IP \fBI_FDETACH\fR(7)
+\(en\ 
+.IP \fBI_FDINSERT\fR(7)
+\(en\ 
+.IP \fBI_FIND\fR(7)
+\(en\ 
+.IP \fBI_FLUSH\fR(7)
+\(en\ 
+.IP \fBI_FLUSHBAND\fR(7)
+\(en\ 
+.IP \fBI_GERROPT\fR(7)
+\(en\ 
+.IP \fBI_GETBAND\fR(7)
+\(en\ 
+.IP \fBI_GETCLTIME\fR(7)
+\(en\ 
+.IP \fBI_GETPMSG\fR(7)
+\(en\ 
+.IP \fBI_GETSIG\fR(7)
+\(en\ 
+.IP \fBI_GRDOPT\fR(7)
+\(en\ 
+.IP \fBI_GWROPT\fR(7)
+\(en\ 
+.IP \fBI_LINK\fR(7)
+\(en\ 
+.IP \fBI_LIST\fR(7)
+\(en\ 
+.IP \fBI_LOOK\fR(7)
+\(en\ 
+.IP \fBI_NREAD\fR(7)
+\(en\ 
+.IP \fBI_PEEK\fR(7)
+\(en\ 
+.IP \fBI_PIPE\fR(7)
+\(en\ 
+.IP \fBI_PLINK\fR(7)
+\(en\ 
+.IP \fBI_POP\fR(7)
+\(en\ 
+.IP \fBI_PUNLINK\fR(7)
+\(en\ 
+.IP \fBI_PUSH\fR(7)
+\(en\ 
+.IP \fBI_PUTPMSG\fR(7)
+\(en\ 
+.IP \fBI_RECVFD\fR(7)
+\(en\ 
+.IP \fBI_SENDFD\fR(7)
+\(en\ 
+.IP \fBI_SERROPT\fR(7)
+\(en\ 
+.IP \fBI_SETCLTIME\fR(7)
+\(en\ 
+.IP \fBI_SETSIG\fR(7)
+\(en\ 
+.IP \fBI_SRDOPT\fR(7)
+\(en\ 
+.IP \fBI_STR\fR(7)
+\(en\ 
+.IP \fBI_SWROPT\fR(7)
+\(en\ 
+.IP \fBI_UNLINK\fR(7)
+\(en\ 
+.IP \fBstrioctl\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B ADMINISTRATIVE UTILITIES
+.PP
+.IP \fBstrchg\fR(1) \w'\fBstreams_mknod\fR(8)\(en'u
+\(en\ 
+.PD 0
+.IP \fBstrconf\fR(1)
+\(en\ 
+.IP \fBstrreset\fR(1)
+\(en\ 
+.IP \fBautopush\fR(5)
+\(en\ 
+.IP \fBspecfs\fR(5)
+\(en\ 
+.IP \fBstrsetup.conf\fR(5)
+\(en\ 
+.IP \fBautopush\fR(8)
+\(en\ 
+.IP \fBfattach\fR(8)
+\(en\ 
+.IP \fBfdetach\fR(8)
+\(en\ 
+.IP \fBinsf\fR(8)
+\(en\ 
+.IP \fBperftest\fR(8)
+\(en\ 
+.IP \fBperftestn\fR(8)
+\(en\ 
+.IP \fBscls\fR(8)
+\(en\ 
+.IP \fBstrace\fR(8)
+\(en\ 
+.IP \fBstrclean\fR(8)
+\(en\ 
+.IP \fBstreams_mknod\fR(8)
+\(en\ 
+.IP \fBstrerr\fR(8)
+\(en\ 
+.IP \fBstrinfo\fR(8)
+\(en\ 
+.IP \fBstrload\fR(8)
+\(en\ 
+.IP \fBstrsetup\fR(8)
+\(en\ 
+.IP \fBstrvf\fR(8)
+\(en\ 
+.PD
+
+.PP
+.B TEST PROGRAMS
+.PP
+.IP \fBtest-clone\fR(8) \w'\fBtest-streams\fR(8)\(en'u
+\(en\ 
+.PD 0
+.IP \fBtest-connld\fR(8)
+\(en\ 
+.IP \fBtest-echo\fR(8)
+\(en\ 
+.IP \fBtest-fifo\fR(8)
+\(en\ 
+.IP \fBtest-log\fR(8)
+\(en\ 
+.IP \fBtest-loop\fR(8)
+\(en\ 
+.IP \fBtest-mux\fR(8)
+\(en\ 
+.IP \fBtest-nsdev\fR(8)
+\(en\ 
+.IP \fBtest-nuls\fR(8)
+\(en\ 
+.IP \fBtest-pipe\fR(8)
+\(en\ 
+.IP \fBtest-pipemod\fR(8)
+\(en\ 
+.IP \fBtest-sad\fR(8)
+\(en\ 
+.IP \fBtest-sc\fR(8)
+\(en\ 
+.IP \fBtest-streams\fR(8)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE UTILITIES
+.PP
+.IP \fBadjmsg\fR(9) \w'\fBmsgpullup\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBallocb\fR(9)
+\(en\ 
+.IP \fB__bufcall\fR(9)
+\(en\ 
+.IP \fBbufcall\fR(9)
+\(en\ 
+.IP \fBcopyb\fR(9)
+\(en\ 
+.IP \fBcopymsg\fR(9)
+\(en\ 
+.IP \fBctlmsg\fR(9)
+\(en\ 
+.IP \fBdatamsg\fR(9)
+\(en\ 
+.IP \fBdupb\fR(9)
+\(en\ 
+.IP \fBdupmsg\fR(9)
+\(en\ 
+.IP \fBesballoc\fR(9)
+\(en\ 
+.IP \fBesbbcall\fR(9)
+\(en\ 
+.IP \fBfreeb\fR(9)
+\(en\ 
+.IP \fBfreemsg\fR(9)
+\(en\ 
+.IP \fBisdatablk\fR(9)
+\(en\ 
+.IP \fBisdatamsg\fR(9)
+\(en\ 
+.IP \fBlinkb\fR(9)
+\(en\ 
+.IP \fBlinkmsg\fR(9)
+\(en\ 
+.IP \fBmsgdsize\fR(9)
+\(en\ 
+.IP \fBmsgpullup\fR(9)
+\(en\ 
+.IP \fBmsgsize\fR(9)
+\(en\ 
+.IP \fBpcmsg\fR(9)
+\(en\ 
+.IP \fBpullupmsg\fR(9)
+\(en\ 
+.IP \fBrmvb\fR(9)
+\(en\ 
+.IP \fBtestb\fR(9)
+\(en\ 
+.IP \fBunbufcall\fR(9)
+\(en\ 
+.IP \fBunlinkb\fR(9)
+\(en\ 
+.IP \fBunlinkmsg\fR(9)
+\(en\ 
+.IP \fBxmsgsize\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE CONVENIENCE FUNCTIONS
+.PP
+.IP \fBputctl\fR(9) \w'\fBputnextctl2\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBputctl1\fR(9)
+\(en\ 
+.IP \fBputctl2\fR(9)
+\(en\ 
+.IP \fBputnextctl\fR(9)
+\(en\ 
+.IP \fBputnextctl1\fR(9)
+\(en\ 
+.IP \fBputnextctl2\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE TYPES
+.PP
+.IP \fBQNORM\fR(9) \w'\fBM_PCSETOPTS\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBQPCTL\fR(9)
+\(en\ 
+.IP \fBM_BACKDONE\fR(9)
+\(en\ 
+.IP \fBM_BACKWASH\fR(9)
+\(en\ 
+.IP \fBM_BREAK\fR(9)
+\(en\ 
+.IP \fBM_COPYIN\fR(9)
+\(en\ 
+.IP \fBM_COPYOUT\fR(9)
+\(en\ 
+.IP \fBM_CTL\fR(9)
+\(en\ 
+.IP \fBM_DATA\fR(9)
+\(en\ 
+.IP \fBM_DELAY\fR(9)
+\(en\ 
+.IP \fBM_DONTPLAY\fR(9)
+\(en\ 
+.IP \fBM_ERROR\fR(9)
+\(en\ 
+.IP \fBM_EVENT\fR(9)
+\(en\ 
+.IP \fBM_FLUSH\fR(9)
+\(en\ 
+.IP \fBM_HANGUP\fR(9)
+\(en\ 
+.IP \fBM_HPDATA\fR(9)
+\(en\ 
+.IP \fBM_IOCACK\fR(9)
+\(en\ 
+.IP \fBM_IOCDATA\fR(9)
+\(en\ 
+.IP \fBM_IOCNAK\fR(9)
+\(en\ 
+.IP \fBM_IOCTL\fR(9)
+\(en\ 
+.IP \fBM_LETSPLAY\fR(9)
+\(en\ 
+.IP \fBM_NOTIFY\fR(9)
+\(en\ 
+.IP \fBM_PASSFP\fR(9)
+\(en\ 
+.IP \fBM_PCCTL\fR(9)
+\(en\ 
+.IP \fBM_PCEVENT\fR(9)
+\(en\ 
+.IP \fBM_PCPROTO\fR(9)
+\(en\ 
+.IP \fBM_PCRSE\fR(9)
+\(en\ 
+.IP \fBM_PCSETOPTS\fR(9)
+\(en\ 
+.IP \fBM_PCSIG\fR(9)
+\(en\ 
+.IP \fBM_PROTO\fR(9)
+\(en\ 
+.IP \fBM_READ\fR(9)
+\(en\ 
+.IP \fBM_RSE\fR(9)
+\(en\ 
+.IP \fBM_SETOPTS\fR(9)
+\(en\ 
+.IP \fBM_SIG\fR(9)
+\(en\ 
+.IP \fBM_START\fR(9)
+\(en\ 
+.IP \fBM_STARTI\fR(9)
+\(en\ 
+.IP \fBM_STOP\fR(9)
+\(en\ 
+.IP \fBM_STOPI\fR(9)
+\(en\ 
+.IP \fBM_TRAIL\fR(9)
+\(en\ 
+.IP \fBM_UNHANGUP\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MESSAGE STRUCTURES AND TYPES
+.PP
+.IP \fBdatab\fR(9) \w'\fBbufcall_id_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBmsgb\fR(9)
+\(en\ 
+.IP \fBalloclk\fR(9)
+\(en\ allocate a link block
+.IP \fBfreelk\fR(9)
+\(en\ free a link block
+.IP \fBcopyreq\fR(9)
+\(en\ \fBM_COPYIN\fR(9), \fBM_COPYOUT\fR(9) copy request structure
+.IP \fBcopyresp\fR(9)
+\(en\ \fBM_IOCDATA\fR(9) copy response structure
+.IP \fBiocblk\fR(9)
+\(en\ \fBM_IOCTL\fR(9), \fBM_IOCACK\fR(9), \fBM_IOCNAK\fR(9) ioctl structure
+.IP \fBlinkblk\fR(9)
+\(en\ \fBI_LINK\fR(7), \fBI_UNLINK\fR(7), \fBI_PLINK\fR(7), \fBI_PUNLINK\fR(7) structure
+.IP \fBstroptions\fR(9)
+\(en\ \fBM_SETOPTS\fR(9), \fBM_PCSETOPTS\fR(9) Stream head options structure
+.IP \fBbcid_t\fR(9)
+\(en\ 
+.IP \fBbufcall_id_t\fR(9)
+\(en\ 
+.IP \fBdblk_t\fR(9)
+\(en\ 
+.IP \fBfrtn_t\fR(9)
+\(en\ 
+.IP \fBmblk_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B MODULE AND DRIVER ENTRY POINTS
+.PP
+.IP \fBsetq\fR(9) \w'\fBqi_qclose\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBsetsq\fR(9)
+\(en\ 
+.IP \fBqi_putp\fR(9)
+\(en\ 
+.IP \fBqi_qadmin\fR(9)
+\(en\ 
+.IP \fBqi_qclose\fR(9)
+\(en\ 
+.IP \fBqi_qopen\fR(9)
+\(en\ 
+.IP \fBqi_srvp\fR(9)
+\(en\ 
+.IP \fBqprocsoff\fR(9)
+\(en\ 
+.IP \fBqprocson\fR(9)
+\(en\ 
+.IP \fBadmin\fR(9s)
+\(en\ 
+.IP \fBopen\fR(9s)
+\(en\ 
+.IP \fBclose\fR(9s)
+\(en\ 
+.IP \fBputp\fR(9)
+\(en\ 
+.IP \fBservice\fR(9s)
+\(en\ 
+.IP \fBsrv\fR(9s)
+\(en\ 
+.IP \fBsrvp\fR(9)
+\(en\ 
+.IP \fBgetadmin\fR(9)
+\(en\ 
+.IP \fBgetmid\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B QUEUE STRUCTURES AND TYPES
+.PP
+.IP \fBqband\fR(9) \w'\fBqi_qclose_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBqfields\fR(9)
+\(en\ 
+.IP \fBqueue\fR(9)
+\(en\ 
+.IP \fBqi_putp_t\fR(9)
+\(en\ 
+.IP \fBqi_qadmin_t\fR(9)
+\(en\ 
+.IP \fBqi_qclose_t\fR(9)
+\(en\ 
+.IP \fBqi_qopen_t\fR(9)
+\(en\ 
+.IP \fBqi_srvp_t\fR(9)
+\(en\ 
+.IP \fBqband_t\fR(9)
+\(en\ 
+.IP \fBqfields_t\fR(9)
+\(en\ 
+.IP \fBqueue_t\fR(9)
+\(en\ 
+.IP \fBweld_arg_t\fR(9)
+\(en\ 
+.IP \fBweld_fcn_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B QUEUE UTILITIES
+.PP
+.IP \fBallocq\fR(9) \w'\fBqcountstrm\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBappq\fR(9)
+\(en\ 
+.IP \fBbackq\fR(9)
+\(en\ 
+.IP \fBflushband\fR(9)
+\(en\ 
+.IP \fBflushq\fR(9)
+\(en\ 
+.IP \fBfreeq\fR(9)
+\(en\ 
+.IP \fBgetq\fR(9)
+\(en\ 
+.IP \fBinsq\fR(9)
+\(en\ 
+.IP \fBOTHERQ\fR(9)
+\(en\ 
+.IP \fBput\fR(9)
+\(en\ 
+.IP \fBput\fR(9s)
+\(en\ 
+.IP \fBputbq\fR(9)
+\(en\ 
+.IP \fBputnext\fR(9)
+\(en\ 
+.IP \fBputq\fR(9)
+\(en\ 
+.IP \fBqcountstrm\fR(9)
+\(en\ 
+.IP \fBqreply\fR(9)
+\(en\ 
+.IP \fBqsize\fR(9)
+\(en\ 
+.IP \fBRD\fR(9)
+\(en\ 
+.IP \fBrmvq\fR(9)
+\(en\ 
+.IP \fBSAMESTR\fR(9)
+\(en\ 
+.IP \fBstrqget\fR(9)
+\(en\ 
+.IP \fBstrqset\fR(9)
+\(en\ 
+.IP \fBunweldq\fR(9)
+\(en\ 
+.IP \fBweldq\fR(9)
+\(en\ 
+.IP \fBWR\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B FLOW CONTROL UTILITIES
+.PP
+.IP \fBbcanget\fR(9) \w'\fBbcanputnextany\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBbcangetany\fR(9)
+\(en\ 
+.IP \fBbcanput\fR(9)
+\(en\ 
+.IP \fBbcanputany\fR(9)
+\(en\ 
+.IP \fBbcanputnext\fR(9)
+\(en\ 
+.IP \fBbcanputnextany\fR(9)
+\(en\ 
+.IP \fBcanenable\fR(9)
+\(en\ 
+.IP \fBcanget\fR(9)
+\(en\ 
+.IP \fBcanput\fR(9)
+\(en\ 
+.IP \fBcanputnext\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B SCHEDULING UTILITIES
+.PP
+.IP \fBenableok\fR(9) \w'\fBqbackenable\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBenableq\fR(9)
+\(en\ 
+.IP \fBnoenable\fR(9)
+\(en\ 
+.IP \fBqbackenable\fR(9)
+\(en\ 
+.IP \fBqenable\fR(9)
+\(en\ 
+.IP \fBqready\fR(9)
+\(en\ 
+.IP \fBrunqueues\fR(9)
+\(en\ 
+.IP \fBsetqsched\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B DDI/DKI STRUCTURES AND TYPES
+.PP
+
+.IP \fBcred_t\fR(9) \w'\fBtimeout_id_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBdev_t\fR(9)
+\(en\ 
+.IP \fBmajor_t\fR(9)
+\(en\ 
+.IP \fBminor_t\fR(9)
+\(en\ 
+.IP \fBtimeout_id_t\fR(9)
+\(en\ 
+.IP \fBtimo_fcn_t\fR(9)
+\(en\ 
+.IP \fBtoid_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B DDI/DKI UTILITIES
+.PP
+
+.IP \fBDDI\fR(9) \w'\fBkmem_zalloc_node\fR(9)\(en'u
+\(en\ 
+
+.IP \fBbcmp\fR(9) \w'\fBkmem_zalloc_node\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBbcopy\fR(9)
+\(en\ 
+.IP \fBbzero\fR(9)
+\(en\ 
+.IP \fBcmn_err\fR(9)
+\(en\ 
+.IP \fBcopyin\fR(9)
+\(en\ 
+.IP \fBcopyout\fR(9)
+\(en\ 
+.IP \fBdelay\fR(9)
+\(en\ 
+.IP \fBdrv_getparm\fR(9)
+\(en\ 
+.IP \fBdrv_hztomsec\fR(9)
+\(en\ 
+.IP \fBdrv_hztousec\fR(9)
+\(en\ 
+.IP \fBdrv_msectohz\fR(9)
+\(en\ 
+.IP \fBdrv_priv\fR(9)
+\(en\ 
+.IP \fBdrv_usectohz\fR(9)
+\(en\ 
+.IP \fBdrv_usecwait\fR(9)
+\(en\ 
+.IP \fBgetmajor\fR(9)
+\(en\ 
+.IP \fBgetminor\fR(9)
+\(en\ 
+.IP \fBkmem_alloc\fR(9)
+\(en\ 
+.IP \fBkmem_alloc_node\fR(9)
+\(en\ 
+.IP \fBkmem_free\fR(9)
+\(en\ 
+.IP \fBkmem_zalloc\fR(9)
+\(en\ 
+.IP \fBkmem_zalloc_node\fR(9)
+\(en\ 
+.IP \fBmakedevice\fR(9)
+\(en\ 
+.IP \fBmax\fR(9)
+\(en\ 
+.IP \fBmin\fR(9)
+\(en\ 
+.IP \fB__timeout\fR(9)
+\(en\ 
+.IP \fBtimeout\fR(9)
+\(en\ 
+.IP \fBuntimeout\fR(9)
+\(en\ 
+.IP \fBvcmn_err\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B CONFIGURATION STRUCTURES AND TYPES
+.PP
+.IP \fBcdevsw\fR(9) \w'\fBmodule_stat_t\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBdevnode\fR(9)
+\(en\ 
+.IP \fBfmodsw\fR(9)
+\(en\ 
+.IP \fBmodule_info\fR(9)
+\(en\ 
+.IP \fBmodule_stat\fR(9)
+\(en\ 
+.IP \fBqinit\fR(9)
+\(en\ 
+.IP \fBstreamtab\fR(9)
+\(en\ 
+.IP \fBmodID_t\fR(9)
+\(en\ 
+.IP \fBmodule_stat_t\fR(9)
+\(en\ 
+.IP \fBstreamtab_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B CONFIGURATION UTILITIES
+.PP
+.IP \fBcdev_count\fR(9) \w'\fB__cmin_search\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBcdev_find\fR(9)
+\(en\ 
+.IP \fB__cdev_lookup\fR(9)
+\(en\ 
+.IP \fBcdev_match\fR(9)
+\(en\ 
+.IP \fBcdev_minor\fR(9)
+\(en\ 
+.IP \fB__cdev_search\fR(9)
+\(en\ 
+.IP \fBcdev_str\fR(9)
+\(en\ 
+.IP \fBcdevsw_list\fR(9)
+\(en\ 
+.IP \fBcdevsw_lock\fR(9)
+\(en\ 
+.IP \fBcdrv_get\fR(9)
+\(en\ 
+.IP \fB__cdrv_lookup\fR(9)
+\(en\ 
+.IP \fBcdrv_put\fR(9)
+\(en\ 
+.IP \fBcmaj_add\fR(9)
+\(en\ 
+.IP \fBcmaj_del\fR(9)
+\(en\ 
+.IP \fBcmaj_get\fR(9)
+\(en\ 
+.IP \fB__cmaj_lookup\fR(9)
+\(en\ 
+.IP \fBcmin_add\fR(9)
+\(en\ 
+.IP \fBcmin_count\fR(9)
+\(en\ 
+.IP \fBcmin_del\fR(9)
+\(en\ 
+.IP \fBcmin_find\fR(9)
+\(en\ 
+.IP \fBcmin_get\fR(9)
+\(en\ 
+.IP \fB__cmin_lookup\fR(9)
+\(en\ 
+.IP \fB__cmin_search\fR(9)
+\(en\ 
+.IP \fBcminsw_list\fR(9)
+\(en\ 
+.IP \fBfmod_add\fR(9)
+\(en\ 
+.IP \fBfmod_count\fR(9)
+\(en\ 
+.IP \fBfmod_del\fR(9)
+\(en\ 
+.IP \fBfmod_find\fR(9)
+\(en\ 
+.IP \fBfmod_get\fR(9)
+\(en\ 
+.IP \fB__fmod_lookup\fR(9)
+\(en\ 
+.IP \fBfmod_put\fR(9)
+\(en\ 
+.IP \fB__fmod_search\fR(9)
+\(en\ 
+.IP \fBfmod_str\fR(9)
+\(en\ 
+.IP \fBfmodsw_list\fR(9)
+\(en\ 
+.IP \fBfmodsw_lock\fR(9)
+\(en\ 
+.IP \fBnodesw_lock\fR(9)
+\(en\ 
+.IP \fBsdev_add\fR(9)
+\(en\ 
+.IP \fBsdev_del\fR(9)
+\(en\ 
+.IP \fBsdev_get\fR(9)
+\(en\ 
+.IP \fBsdev_put\fR(9)
+\(en\ 
+.IP \fB__smod_search\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B REGISTRATION UTILITIES
+.PP
+.IP \fBregister_clone\fR(9) \w'\fBunregister_strmod\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBregister_cmajor\fR(9)
+\(en\ 
+.IP \fBregister_strdev\fR(9)
+\(en\ 
+.IP \fBregister_strdrv\fR(9)
+\(en\ 
+.IP \fBregister_strmod\fR(9)
+\(en\ 
+.IP \fBregister_strnod\fR(9)
+\(en\ 
+.IP \fBunregister_clone\fR(9)
+\(en\ 
+.IP \fBunregister_cmajor\fR(9)
+\(en\ 
+.IP \fBunregister_strdev\fR(9)
+\(en\ 
+.IP \fBunregister_strdrv\fR(9)
+\(en\ 
+.IP \fBunregister_strmod\fR(9)
+\(en\ 
+.IP \fBunregister_strnod\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B KERNEL ADMINSTRATION UTILITIES
+.PP
+.IP \fBautopush\fR(9) \w'\fBsysctl_str_strmsgsz\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBapush_get\fR(9)
+\(en\ 
+.IP \fBapush_set\fR(9)
+\(en\ 
+.IP \fBapush_vml\fR(9)
+\(en\ 
+.IP \fBautopush_add\fR(9)
+\(en\ 
+.IP \fBautopush_del\fR(9)
+\(en\ 
+.IP \fBautopush_find\fR(9)
+\(en\ 
+.IP \fBautopush_search\fR(9)
+\(en\ 
+.IP \fBautopush_vml\fR(9)
+\(en\ 
+.IP \fBstrlog\fR(9)
+\(en\ 
+.IP \fBsysctl_str_nstrpush\fR(9)
+\(en\ 
+.IP \fBsysctl_str_strctlsz\fR(9)
+\(en\ 
+.IP \fBsysctl_str_strmsgsz\fR(9)
+\(en\ 
+.IP \fBvstrlog\fR(9)
+\(en\ 
+.IP \fBvstrlog_t\fR(9)
+\(en\ 
+.PD
+
+.PP
+.B STREAM HEAD
+.PP
+
+.IP \fBallocstr\fR(9) \w'\fBstrsendpage\fR(9)\(en'u
+\(en\ 
+.PD 0
+.IP \fBfreestr\fR(9)
+\(en\ 
+.IP \fBfreezestr\fR(9)
+\(en\ 
+.IP \fBqattach\fR(9)
+\(en\ 
+.IP \fBqclose\fR(9)
+\(en\ 
+.IP \fBqdelete\fR(9)
+\(en\ 
+.IP \fBqdetach\fR(9)
+\(en\ 
+.IP \fBqinsert\fR(9)
+\(en\ 
+.IP \fBqopen\fR(9)
+\(en\ 
+.IP \fBqscan\fR(9)
+\(en\ 
+.IP \fBstr_close\fR(9)
+\(en\ 
+.IP \fBstrgetpmsg\fR(9)
+\(en\ 
+.IP \fBstrm_f_ops\fR(9)
+\(en\ 
+.IP \fBstr_open\fR(9)
+\(en\ 
+.IP \fBstrpoll\fR(9)
+\(en\ 
+.IP \fBstrputpmsg\fR(9)
+\(en\ 
+.IP \fBstrread\fR(9)
+\(en\ 
+.IP \fBstrrput\fR(9)
+\(en\ 
+.IP \fBstrsendpage\fR(9)
+\(en\ 
+.IP \fBstrwput\fR(9)
+\(en\ 
+.IP \fBstrwrite\fR(9)
+\(en\ 
+.IP \fBstrwsrv\fR(9)
+\(en\ 
+.IP \fBunfreezestr\fR(9)
+\(en\ 
+.PD
+
+.PD 0
+.IP \fBdi_alloc\fR(9) \w'\fBspec_reparent\fR(9)\(en'u
+\(en\ 
+.IP \fBdi_put\fR(9)
+\(en\ 
+.IP \fBdo_fattach\fR(9)
+\(en\ 
+.IP \fBdo_fdetach\fR(9)
+\(en\ 
+.IP \fBdo_spipe\fR(9)
+\(en\ 
+.IP \fBIntro\fR(9)
+\(en\ 
+.IP \fBLfS\fR(9)
+\(en\ 
+.IP \fBmp-streams\fR(9)
+\(en\ 
+.IP \fBpipe\fR(9)
+\(en\ 
+.IP \fBqueinfo\fR(9)
+\(en\ 
+.IP \fBsd_get\fR(9)
+\(en\ 
+.IP \fBsd_put\fR(9)
+\(en\ 
+.IP \fBsealloc\fR(9)
+\(en\ 
+.IP \fBsefree\fR(9)
+\(en\ 
+.IP \fBspecfs_mount\fR(9)
+\(en\ 
+.IP \fBspecfs_umount\fR(9)
+\(en\ 
+.IP \fBspec_open\fR(9)
+\(en\ 
+.IP \fBspec_reparent\fR(9)
+\(en\ 
+.IP \fBSPG\fR(9)
+\(en\ 
+.IP \fBSTREAMS\fR(9)
+\(en\ 
+.IP \fBstrthread\fR(9)
+\(en\ 
+.IP \fBstrthreads\fR(9)
+\(en\ 
+.IP \fBundoc\fR(9)
+\(en\ 
+
+.\"
+.\"
+.SS "Base Functions"
+.PP
+.B "Message Utility Functions"
+.TP
+.BR adjmsg (9)
+.PD 0
+.TP
+.BR allocb (9)
+.TP
+.BR bufcall (9)
+.TP
+.BR copyb (9)
+.TP
+.BR copymsg (9)
+.TP
+.BR datamsg (9)
+.TP
+.BR dupb (9)
+.TP
+.BR dupmsg (9)
+.TP
+.BR esballoc (9)
+.TP
+.BR freeb (9)
+.TP
+.BR freemsg (9)
+.TP
+.BR linkb (9)
+.TP
+.BR msgdsize (9)
+.TP
+.BR msgpullup (9)
+.TP
+.BR pcmsg (9)
+.TP
+.BR pullupmsg (9)
+.TP
+.BR rmvb (9)
+.TP
+.BR testb (9)
+.TP
+.BR unbufcall (9)
+.TP
+.BR unlinkb (9)
+.PD
+.PP
+.B "Queue Utility Functions"
+.TP
+.BR backq (9)
+.PD 0
+.TP
+.BR bcanput (9)
+.TP
+.BR canenable (9)
+.TP
+.BR enableok (9)
+.TP
+.BR flushband (9)
+.TP
+.BR flushq (9)
+.TP
+.BR getq (9)
+.TP
+.BR insq (9)
+.TP
+.BR noenable (9)
+.TP
+.BR OTHERQ (9)
+.TP
+.BR putbq (9)
+.TP
+.BR putctl (9)
+.TP
+.BR putctl1 (9)
+.TP
+.BR putq (9)
+.TP
+.BR qenable (9)
+.TP
+.BR qreply (9)
+.TP
+.BR qsize (9)
+.TP
+.BR RD (9)
+.TP
+.BR rmvq (9)
+.TP
+.BR SAMESTR (9)
+.TP
+.BR WR (9)
+.PD
+.PP
+.B "MP Queue Utility Functions"
+.TP
+.BR bcanputnext (9)
+.PD 0
+.TP
+.BR canputnext (9)
+.TP
+.BR freezestr (9)
+.TP
+.BR put (9)
+.TP
+.BR putnext (9)
+.TP
+.BR putnextctl1 (9)
+.TP
+.BR putnextctl (9)
+.TP
+.BR qprocsoff (9)
+.TP
+.BR qprocson (9)
+.TP
+.BR strqget (9)
+.TP
+.BR strqset (9)
+.TP
+.BR unfreezestr (9)
+.PD
+.PP
+.B "DDI/DKI Utility Functions"
+.TP
+.BR kmem_alloc (9)
+.PD 0
+.TP
+.BR kmem_free (9)
+.TP
+.BR kmem_zalloc (9)
+.TP
+.BR cmn_err (9)
+.TP
+.BR bcopy (9)
+.TP
+.BR bzero (9)
+.TP
+.BR copyin (9)
+.TP
+.BR copyout (9)
+.TP
+.BR delay (9)
+.TP
+.BR drv_getparm (9)
+.TP
+.BR drv_hztomsec (9)
+.TP
+.BR drv_hztousec (9)
+.TP
+.BR drv_msectohz (9)
+.TP
+.BR drv_priv (9)
+.TP
+.BR drv_usectohz (9)
+.TP
+.BR drv_usecwait (9)
+.TP
+.BR min (9)
+.TP
+.BR max (9)
+.TP
+.BR getmajor (9)
+.TP
+.BR getminor (9)
+.TP
+.BR makedevice (9)
+.TP
+.BR mknod (9)
+.TP
+.BR mount (9)
+.TP
+.BR strlog (9)
+.TP
+.BR timeout (9)
+.TP
+.BR umount (9)
+.TP
+.BR unlink (9)
+.TP
+.BR untimeout (9)
+.PD
+.PP
+.B "Enhanced Utility Functions"
+.TP
+.BR linkmsg (9)
+.PD 0
+.TP
+.BR putctl2 (9)
+.TP
+.BR putnextctl2 (9)
+.TP
+.BR weldq (9)
+.TP
+.BR unweldq (9)
+.PD
+.PP
+.B "Internal Functions"
+.TP
+.BR allocq (9)
+.PD 0
+.TP
+.BR bcanget (9)
+.TP
+.BR canget (9)
+.TP
+.BR freeq (9)
+.TP
+.BR qattach (9)
+.TP
+.IR qi_qclose (9)
+.TP
+.BR qdetach (9)
+.TP
+.IR qi_qopen (9)
+.TP
+.BR setq (9)
+.PD
+.PP
+.B Miscellaneous
+.TP
+.BR appq (9)
+.PD 0
+.TP
+.BR esbbcall (9)
+.TP
+.BR isdatablk (9)
+.TP
+.BR isdatamsg (9)
+.TP
+.BR kmem_zalloc_node (9)
+.TP
+.BR msgsize (9)
+.TP
+.BR qcountstrm (9)
+.TP
+.BR xmsgsize (9)
+.PD
+.\"
+.\"
+.SS "Device Numbering"
+.PP
+.BR "UNIX\(rg Device Numbering" :\-
+.PP
+.RS
+.ll -7n
+In versions of
+.I UNIX\(rg System V
+previous to
+.IR "Release 4" ,
+the major and minor device numbers were each 8 bit, and they were packed into a 16 bit word
+(usually a C Language SHORT variable).  Under
+.IR "UNIX\(rg System V Release 4" ,
+the device number are held in a
+.B dev_t
+variable, which is often implemented as a 32 bit integer.  The major device number is held as 14
+bits, and a further 18 bits are used for the minor device number.
+.B dev_t
+is often referred to as the \*(lqexpanded device type\*(rq, since it allows many more minor devices
+than before.
+.PP
+Many drivers were written for earlier releases, and may eventually be ported to
+.IR "UNIX\(rg System V Release 4" .
+In earlier releases, some manufacturers got around the 256 minor device number limit by using
+multiple major device numers for a device.  Devices were created with different major device numbers
+(the external major device number) but they all mapped to the same device driver entry in the device
+switch tables (the internal device number).  Even under this scheme, each major device could only
+support 256 minor devices, but the driver could support amny more.  This has been recognized in
+.IR "UNIX\(rg System V Relesae 4" ,
+and functions are provided to do this mapping; for example, the function
+.BR etoimajor ()
+and so on, give a machine independent interface to the device number mapping.
+.[
+magic
+.]
+.ll +7n
+.RE
+.PP
+(Actually, the major device number for
+.I UNIX\(rg System V Release 3.2
+were 7 bit instead of 8 bit.)
+.PP
+.BR "Linux Device Numbering" :\-
+Versions of the
+.B Linux
+kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit major device number and an 8
+bit minor device number grouped into a 16-bit combined device number.
+.B  Linux 2.6
+kernels (and some patched 2.4 kernels) now have larger device numbers.  These extended device
+numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits for
+the combined device number.
+.PP
+.BR "LiS Device Numbering" :\-
+.I LiS
+.[
+lis
+.]
+prior to the 2.18.0 release was incapable of providing an internal representation of the device
+number and the number of minor device numbers for a device driver was restricted to 256, just as in
+.IR "UNIX System V Release 3.2" .
+(In fact only 255, as the kernel reserved minor device number 255 for
+expansion.) Many
+.B OpenSS7
+device drivers written for
+.I LiS
+.[
+lis
+.]
+would allocate additional major device numbers if required.  Good examples of devices that require
+more than 255 minor device numbers are INET clone devices, SCTP streams, SS7 signalling link
+streams, MG media channels, etc.  These streams are often
+.BR I_PLINK ed
+under a multiplexing driver and do not even consume a system file descriptor.
+.PP
+.BR "Linux Fast-STREAMS Device Numbering" :\-
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+began with extended device numbering.  The
+.I specfs
+shadow special character device file system used by
+.B Linux Fast-STREAMS
+uses the
+.B inode
+number to hold the
+.B dev_t
+device number instead of the
+.IR inode->i_rdev ,
+which on older kernels is only a 16-bit
+.BR short .
+
+In earlier versions of
+.BR "Linux Fast-STREAMS" ,
+the internal device numbering is 16-bits for major device number and 16-bits for minor device
+number.  This will soon be changed to 12-bits for major device number and 20-bits for minor device
+number to accommodate the newer
+.B Linux
+scheme.
+
+On 2.6
+.B Linux
+kernels that support the newer extended device numbers, external device numbers and internal device
+numbers will be the same.  On 2.4
+.B Linux
+kernels with the older 16-bit device numbers, external device number and internal device numbers
+will differ.  In some situations, an internal device number can exists with no corresponding
+external device number (accessed only via a clone device or direct access to the mounted
+.I specfs
+shadow special character device file system).
+.PP
+.TS
+tab(:);
+lbcl.
+etoimajor:(9):change external to internal major device number
+getemajor:(9):tab get external major device number
+geteminor:(9):get external minor device number
+itoemajor:(9):change internal to external major device number
+.TE
+.PP
+.B Linux Fast-STREAMS
+uses several device numbering schemes intended to be compatible with
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and implementations based on
+.I SVR 4.2
+.[
+svr42
+.]
+including
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR LiS ,
+.[
+lis
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.IR UXP/V \(rg.
+.[
+uxpspg
+.]
+.\"
+.PP
+.B External (Real) Device Numbering
+.PP
+.B LfS
+provides real external device numbering using the functions
+.BR getemajor (9),
+.BR geteminor (9)
+and
+.BR makedevice (9).
+When used on a
+.I devp
+argument passed to the
+.IR qi_qopen (9)
+procedures of a
+.I STREAMS
+driver or module,
+.BR getemajor (9)
+and
+.BR geteminor (9)
+will return the real external major or minor device number.  The real external
+major or minor device number is the major or minor device number that is seen
+by user applications.
+.PP
+A number of administrative utilities are provided that assist with the
+assignment of device names and numbers and are useful in boot scripts:
+.\".TS
+.\"expand tab(:);
+.\"lclssss.
+.\"\fBautopush\fR(8):\-:T{
+.\"verify modules and establish autopush lists
+.\"T}
+.\"\fBinsf\fR(8):\-:T{
+.\"install special device files
+.\"T}
+.\"\fBscls\fR(8):\-:T{
+.\"list STREAMS drivers
+.\"T}
+.\"\fBstrinfo\fR(8):\-:T{
+.\"provide information on STREAMS drivers and modules
+.\"T}
+.\"\fBstrload\fR(8):\-:T{
+.\"load or unload STREAMS drivers and modules
+.\"T}
+.\"\fBstrsetup\fR(8):\- :T{
+.\"create STREAMS devices
+.\"T}
+.\".TE
+.TP \w'strsetup(8)\(em'u
+.BR autopush (8)
+\-\ verify modules and establish autopush lists
+.PD 0
+.TP
+.BR insf (8)
+\-\ install special device files
+.TP
+.BR scls (8)
+\-\ list
+.I STREAMS
+drivers
+.TP
+.BR strinfo (8)
+\-\ provide information on
+.I STREAMS
+drivers and modules
+.TP
+.BR strload (8)
+\-\ load or unload STREAMS drivers and modules
+.TP
+.BR strsetup (8)
+\-\ create
+.I STREAMS
+devices
+.PD
+.PP
+Another approach to establishment of dynamically allocated major device
+numbers is to use the
+.I LiS
+.[
+lis
+.]
+approach of creating minor device nodes using the
+.BR mknod (9)
+and
+.BR unlink (9)
+facilities provide by the
+.I LiS
+compatibility module.
+But this approach does not work well with demand loading of kernel modules
+because it relies on the
+.B Linux
+character device demand loading approach, or requires informing
+.I STREAMS
+of all devices and drivers when
+.I STREAMS
+is being compiled.
+.PP
+.B LfS
+supports the
+.B Linux
+character device module demand loading; however, the
+.B Linux
+mechanism requires prior knowledge of the character major device number.
+Some of the administrative utilities above can load kernel modules and
+established what major device number was assigned.  See the individual manual
+pages for more information.
+.\"
+.PP
+.B Internal (Extended) Device Numbering
+.PP
+Internal extended minor device number is a scheme whereby the
+.I STREAMS
+device driver does not have to be concerned with architectural limitations
+on the number or minor device numbers available to user applications
+(0 to 255 in
+.BR "Linux 2.4" ).
+Instead, the driver treats the major device number as a base internal device
+number against which a wide range of minor devices can be assigned (currently
+0 to 65535).
+For extenal applications, device numbering consists of multiple (real)
+external major device numbers that correspond to a single base internal major
+device number.  Internal extended device numbering is provided by the
+.BR getmajor (9),
+.BR getminor (9)
+and
+.BR makedevice (9)
+facilities.
+Conversions between external (real) major device numbers and internal (base)
+major device numbers can be performed with the
+.BR etoimajor (9)
+and
+.BR itoemajor (9)
+utilities provided by the
+.IR UnixWare \(rg
+compatibility module.
+.PP
+Extended device numbering further complicates the matter of dynamic assignment
+of major device numbers and makes it harder for boot and configuration scripts
+to properly create device nodes.
+.\"
+.PP
+.B Cloning
+.PP
+The
+.BR clone (4)
+driver supports traditional clone devices.  Traditional clone devices work by
+assigning the clone major device number and a unique minor device number to a
+\(lqclone\(rq device.  When this device is opened, the minor device number of
+the device is used as the new major device number and zero (0) is used as the
+minor device number, and the
+.IR qi_qopen (9)
+is chained to the
+.IR qi_qopen (9)
+procedure of the new
+.BR streamtab (9)
+structure resulting from looking up this newly created device number.
+.I sflag
+is always set to
+.B CLONEOPEN
+when the traditional clone driver opens a device.
+.PP
+.BR getemajor (9),
+.BR geteminor (9),
+.BR getmajor (9)
+and
+.BR getminor (9)
+still function as as normal on the resulting
+.I devp
+argument passed to the ultimate driver's
+.IR qi_qopen (9)
+procedure.  This is true both for base and extended major device numbers.
+The following table illustrates the situation
+(assuming that the major device number assigned to the
+.BR clone (4)
+device is 72):
+.PP
+.TS
+expand tab(;);
+c|c|c|c.
+_
+clone;external;internal;sflag
+_
+72:32;32:0;32:000;CLONEOPEN
+72:35;35:0;32:256;CLONEOPEN
+72:37;37:0;32:512;CLONEOPEN
+_
+.TE
+.PP
+If a driver wishes to assign an extended minor device number in response to a
+.BR CLONEOPEN ,
+it should use
+.BR makedevice (9)
+with the major number obtained with
+.BR getmajor (9)
+and an extended minor device number assigned by the driver.  In this way,
+extended minor device numbers are transparent to the operation of the
+.BR clone (4)
+driver and
+.BR CLONEOPEN .
+.\"
+.PP
+.B New Cloning
+.PP
+.B LfS
+supports the new cloning approach whereby a driver is permitted to alter the
+device number returned in the
+.I devp
+argument to
+.IR qi_qopen (9)
+even though
+.I sflag
+is set to
+.B DRVOPEN
+instead of
+.BR CLONEOPEN .
+The driver, at its discretion, can treat any minor device number as a new
+style clone device, although normally minor device number zero (0) is usually
+used as the clone minor.
+.PP
+The driver may either use an external (real) major device number or the
+internal (base) major device number.  That is, when calling
+.BR makedevice (9)
+to create the device to return to the
+.I devp
+argument to
+.IR qi_qopen (9),
+the driver can use an external (real) major device number (returned by
+.BR getemajor (9))
+combined with an assigned external (real) minor device number (from 0 to 255);
+or, it can use an internal (base) major device number (returned by
+.BR getmajor (9))
+combined with an assigned extended minor device number (from 0 to 65535).
+The latter approach is often easier to use.
+.\"
+.PP
+.B Named STREAMS Device
+.PP
+The
+.BR nsdev (4)
+driver provides for a Named
+.I STREAMS
+device.  This is a device numbering
+approach unique to
+.BR "Linux Fast-STREAMS" .
+The
+.BR nsdev (4)
+driver operates similar to the
+.BR clone (4)
+driver, however, the major number is derived from the prefix name of the device
+and the minor number is taken directly from the minor number of the
+.BR nsdev (4)
+device.
+.PP
+The following table summarizes the approach (assuming that the major device
+numbers assigned to the
+.BR nsdev (4)
+device are 74, 75, 76 and 77 and the major device numbers assigned to the
+.BR inet (4)
+driver are 32, 35 and 37):
+.PP
+.TS
+expand tab(;);
+cs|c|c|c.
+_
+nsdev;external;internal;sflag
+.T&
+lc|c|c|c.
+_
+inet;74:000;32:000;32:000;DRVOPEN
+inet.udp;74:017;32:017;32:017;DRVOPEN
+inet.99;74:099;32:099;32:099;DRVOPEN
+inet.512;76:000;37:000;32:512;DRVOPEN
+_
+.TE
+.PP
+The
+.BR nsdev (4)
+device also has the characteristic that if a device name with a major device
+number of the
+.BR nsdev (4)
+device is opened and there is no device loaded that corresponds to the prefix
+name of the device from which to obtain a major device number, the
+.BR nsdev (4)
+will attempt to load the
+.BI streams- prefix
+kernel module using
+.BR request_module (9)
+and try again: where,
+.I prefix
+is the prefix of the device name up to the first point character (corresponding to a
+digit \(lq.\(rq).
+So, in the example above, if the
+.RI \(lq inet \(rq
+driver was not loaded, but at attempt was made to open the
+.BR /dev/inet.99
+device,
+.I STREAMS
+would request the
+.B streams-inet
+kernel module be loaded.
+This approach simplifies kernel module loading as well as device numbering and
+makes it easier for boot scripts to initialize devices.
+.\"
+.PP
+.B Mountable specfs Filesystem
+.PP
+Another approach to creation and assignment of device numbers is the mountable
+.BR specfs (5)
+file system.  The
+.BR specfs (5)
+file system can be mounted to provide an in-kernel
+device directory similar to the
+.B Linux
+devfs file system and the
+.IR Solaris \(rg
+devices file system.
+The
+.BR specfs (5)
+file system should normally be mounted on the
+.B /dev/streams
+subdirectory by system initialization scripts using a command such as:
+.BR "mount -t specfs none /dev/streams" .
+See
+.BR mount (8)
+for more information.
+Once mounted over the
+.B /dev/streams
+subdirectory, subdirectories of
+.B /dev/streams
+corresponding to each loaded driver will appear.  So, for example, when the
+.BR inet (4)
+driver is loaded, the
+.RI \(lq inet \(rq
+subdirectory will appear at
+.BR /dev/streams/inet .
+Within each device subdirectory
+.BI /dev/streams/ devicename /\fR,
+each instance of the device will appear as a character device named with the
+instance number of the device and having the external (real) major and
+external (real) minor device number.
+.PP
+The mounted
+.BR specfs (5)
+file system also has the characteristic that if a device
+subdirectory
+.BI /dev/streams/ devname /
+does not exist, but an attempt is made to read such a directory,
+.B Linux Fast-STREAMS
+will attempt to load kernel module
+.BI streams- devname
+into the kernel with
+.BR request_module (9).
+If the load is successful, the kernel module will register and the
+subdirectory will be created and read.
+.PP
+Also, if an attempt is made to open a numbered file within a device
+subdirectory of
+.BI /dev/streams/ devname / nnnn
+where,
+.I nnnn
+is an octal, hexadecimal or decimal ASCII number,
+.I STREAMS
+will open the driver (call
+.IR qi_qopen (9)
+for driver
+.IR devname )
+with the instance number resulting from the conversion of the device name
+.I nnnn
+to an instance number.
+.PP
+These two characteristics permit symbolic links to be placed in the
+.B /dev
+directory that link to a device name and instance number in the
+.B /dev/streams
+directory.  An example is given in the table below:
+.PP
+.TS
+expand tab(;);
+l|c|c|c.
+_
+link;external;internal;sflag
+_
+/dev/tcp->streams/inet/36;30:36;30:36;DRVOPEN
+/dev/udp->streams/inet/39;30:39;30:39;DRVOPEN
+_
+.TE
+.PP
+In fact, it does not matter what the character device major or minor device
+number is of node in the
+.BR specfs (5)
+file system.  This is because the inode in the
+file system is directly associated with the
+.B streamtab (9)
+structure and instance number without using the normal
+.B Linux
+character device mechanisms.
+When a device instance exceeds the extended minor device numbering space
+assigned to a device driver in the
+.BR specfs (5)
+file system, device number displayed by
+.BR stat (2),
+.BR lstat (2)
+or
+.BR fstat (2)
+is chosen  by wrapping the instance number into the extended minor device
+numbering space.
+.PP
+This approach makes it unnecessary to statically assign major device numbers,
+or to dynamically assign major device numbers to devices in boot scripts, and
+is by far the easiest approach.
+All that is required by packages at installation is that they establish the
+necessary symbolic links on device name and instance number without concern
+for major device numbers.
+.\"
+.\"
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MP-STREAMS
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.\".SH BUGS
+.\".PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.SS "Porting from SVR 4.2 MP"
+.PP
+.B "Compatibilty functions for SVR 4.2 MP"
+.TP
+.BR itimeout (9)
+.PD 0
+.TP
+.BR LOCK (9)
+.TP
+.BR LOCK_ALLOC (9)
+.TP
+.BR LOCK_DEALLOC (9)
+.TP
+.BR major (9)
+.TP
+.BR makedev (9)
+.TP
+.BR minor (9)
+.TP
+.BR sleep (9)
+.TP
+.BR spl0 (9)
+.TP
+.BR spl1 (9)
+.TP
+.BR spl2 (9)
+.TP
+.BR spl3 (9)
+.TP
+.BR spl4 (9)
+.TP
+.BR spl5 (9)
+.TP
+.BR spl6 (9)
+.TP
+.BR spl7 (9)
+.TP
+.BR spl (9)
+.TP
+.BR splx (9)
+.TP
+.BR SV_ALLOC (9)
+.TP
+.BR SV_BROADCAST (9)
+.TP
+.BR SV_SIGNAL (9)
+.TP
+.BR SV_WAIT (9)
+.TP
+.BR SV_WAIT_SIG (9)
+.TP
+.BR TRYLOCK (9)
+.TP
+.BR UNLOCK (9)
+.TP
+.BR vtop (9)
+.TP
+.BR wakeup (9)
+.PD
+.\"
+.SS "Porting from AIX 5L Version 5.1"
+.PP
+.B "Compatibility Functions for AIX 5L Version 5.1"
+.TP
+.BR mi_bufcall (9)
+.PD 0
+.TP
+.BR mi_close_comm (9)
+.TP
+.BR mi_next_ptr (9)
+.TP
+.BR mi_open_comm (9)
+.TP
+.BR putctl2 (9)
+.TP
+.BR splstr (9)
+.TP
+.BR splx (9)
+.TP
+.BR str_install (9)
+.TP
+.BR unweldq (9)
+.TP
+.BR wantio (9)
+.TP
+.BR wantmsg (9)
+.TP
+.BR weldq (9)
+.PD
+.\"
+.SS "Porting from HP-UX 11.0i v2"
+.PP
+.\"
+.SS "Porting from OSF/1 1.2\(emDigital Unix"
+.PP
+.\"
+.SS "Porting from UnixWare 7.1.3 (OpenUnix 8)"
+.PP
+.\"
+.SS "Porting from Solaris 9/SunOS 5.9"
+.PP
+.\"
+.SS "Porting from SUPER-UX/SUX 1"
+.PP
+.\"
+.SS "Porting from UXP/V"
+.PP
+.\"
+.SS "Porting from Linux STREAMS/LiS 2.16.18"
+.PP
+.\"
+.\"
+.\".SH CONFORMANCE
+.\".PP
+.\"
+.\"
+.\".SH HISTORY
+.\".PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

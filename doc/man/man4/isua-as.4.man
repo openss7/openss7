@@ -1,0 +1,357 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ISUA-AS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B isua-as
+\- SS7 ISUP User Adaptation Layer (ISUA) Application Server (AS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.br
+.B #include <ss7/isupi.h>
+.br
+.B #include <ss7/isupi_ioctl.h>
+.br
+.B #include <sys/isua_ioct.h>
+.HP 12
+\fBint \fIisua_stream\fB = open(\fB\(lq\fI/dev/isua-sg1\fB\(rq, O_RDWR);
+.PD 0
+.HP
+\fBint \fIsctp_stream\fB = open(\fB\(lq\fI/dev/sctp_t\fB\(rq, O_RDWR);
+.HP
+\fBint \fImuxid\fB = ioctl(I_PLINK, (intptr_t) \fIsctp_stream\fB);
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The ISUA-AS is a multipelxing driver that implements the ASP side of the ISUA
+.[
+isua04
+.]
+protocol.
+Streams opened on the upper multipelx provide the
+.IR "ISDN User Part Interface (ISUPI)" ,
+.BR isupi (7).
+Streams linked under the lower multiplex provide the SCTP transport interface,
+.BR sctp_t (4).
+.\"
+.SS Configuration
+.PP
+When the ISUA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
+driver. Each SCTP Stream represents an association between a local ASP and a remote Signalling
+Gateway Process (SGP) on the same Signalling Gateway (SG).  Input-output ocntrols are used to
+configure each lower multiplex Stream.  Once a lower multiplex Stream is configured, the ISUA-AS
+driver attempts to form an SCTP association with the remote SGP, and to bring each ISUA association
+into the ASP Up state.  Should the association be dropped, the ASP-SGP relation is moved tot he ASP
+Down state and the ISUA-AS driver attempts to reconnect the association and bring it to the ASP Up
+state and activate all active interfaces.
+.PP
+Once configured, ISUP Streams can be opened on the upper multiplex.  These ISUP Streams are not
+associated with an ASP-SGP association until they are bound or connected.  When the
+.BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
+primitive is issued, the address contained in the request is composed of an SG identifier, and
+either an ISUP address (if the SG supports dynamic configuration), or a Routing Context (if the SG
+supports static configuration).  This information is sufficient for the ISUA-AS driver to determine
+the association (set) and Routing Key that is to be used to register the interface (AS).  When the
+.BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
+primitive is issued, the registered or assigned Routing Context is used to activate the interface
+with each SGP for the remote SG.
+.PP
+After the ISUP-User has been boun dor connected with
+.BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
+it can be linked beneath a ISUP-User multiplexing device driver (such as TCAP,
+.BR tcap (4)).
+.PP
+Configuration is performed using an ISUA-AS driver configuration utility.  This utility reads a
+configuration file used to define the objects necessary for configuration.  The configuration file
+contains entries that define ASP-SG relationships as follows:
+.TP
+.I sgid
+An integer number identifying the ASP-SG relation.  This is a number from 1 to 4096.
+.TP
+.I aspid
+The ASPID that is used to comunicated with each remote SGP in the SG.  This ASPID can be null (a
+single dash,
+.RB ` - ')
+indicating that no ASPID is to be used in communication with the remote SGP.  This ASPID corresponds
+also to the value zero
+.RB ( 0 ).
+.TP
+.I streams
+The number of SCTP streams that will be requested to each SGP in the SG.
+.TP
+.I local-endpoint
+The local endpoint address to which an SCTP association is bound to communicate with the remote SGP.
+This can take the form:
+\fIhostname\fR[\fB,\fIhostname\fR][\fB:\fIport\fR]
+or the form:
+\fIipaddress\fR[\fB,\fIipaddress\fR][\fB:\fIservice\fR]
+or combinations of hostnames and IP addresses and either port or service.  The special hostname
+consisting of a single star,
+.RB ` * ',
+can be used to indicate a wildcard address.  If the port or service is not specified, then a dynamic
+port will be allocated.  If the service is specified as
+.BR isua ,
+then the ISUA well-known port number will be used.
+.TP
+.I remote-endpoint
+The remote endpoint addess to which an SCTP association will connect to communicate with the remote
+SG.  This can take the form:
+\fIhostname\fR[\fB,\fIhostname\fR][\fB:\fIport\fR]
+or the form:
+\fIipaddress\fR[\fB,\fIipaddress\fR][\fB:\fIservice\fR]
+or combinations of hostnames and IP addresses and either port or service.  If the port or service is
+not specified, the ISUA well-known port number will be used.
+.TP
+.I options
+Contains a comma separated list of SG options, with no embedded whitespace.  The following options
+are defined:
+.RS
+.TP
+.B dynamic
+When included in the options, this keyword specifies that the SG requires dynamic registration.  If
+this option is not included, the SG requires static registration.
+.RE
+.PP
+The configuration utility, reads this configuration file and performs the following steps for each
+entry in the file:
+.IP 1. \w'0.\(em'u
+The utility opens an SCTP association by opening the
+.B /dev/sctp_t
+device.
+.IP 2.
+The utility opens a Stream on the ISUA-AS driver using the
+.B /dev/isua-as
+device and links the Stream for the SCTP association under the ISUA-AS multiplexing driver using the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control.
+.IP 3.
+The utility uses a single specialized ISUA-AS input-output control to associate the lower multiplex
+Stream with an SG (and local ASP).  The input-output control takes the information provided in the
+configuration file line entry, and the mulltiplexer identifier returned from the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control operation.  The ISUA-AS driver then creates a new ASP object if necessary and
+completes the SG object information as part of the lower multiplex Stream private structure.  The
+ISUA-AS driver also binds and connects the SCTP association and attempts to bring the ASP to the ASP
+Up state with the remote SG.
+.IP 4.
+The steps 1 through 3 above are repeated for each entry in the configuration file.
+.IP 5.
+The utility can also open and attach ISUP Streams and link them under an ISUP-User multiplexing
+driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+The ISUA-AS
+driver only directly supports the ASP-side of the ISUA protocol.  For the
+SG-side of the protocol, see
+.BR isua-sg (4).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.B ISUA-AS
+driver is implemented as a
+.I STREAMS
+multiplexing driver.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/isua-sg\fIn
+The
+.IR n 'th
+SG device.
+.TP
+.B /dev/streams/isua-sg/\fIn
+The
+.IR n 'th
+SG device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.TP
+.RB < ss7/isupi.h >
+Header file that defines the ISUP interface,
+.RB isupi (7).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR isua_as_ioctl (4),
+.BR isua_ioctl (4).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B isua-as
+driver has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production Linux distributions, kernels and target
+architectures, and is considered production grade by The OpenSS7 Project.  At the time of release,
+the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file \(lqPROBLEMS\(rq in the
+release for problem reporting guidelines.
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.B ISUA-AS
+is compatible with implementations based on
+draft-bidulock-sigtran-isua-04.
+.[
+isua04
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+draft-bidulock-sigtran-isua-04
+.[
+isua04
+.]
+is not a standard.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "draft-bidulock-sigtran-isua-04" .
+.[
+isua04
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B ISUA-AS
+driver was intially released for sigtran 0.9.2.2.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

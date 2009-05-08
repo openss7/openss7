@@ -1,0 +1,923 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRXNET 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.PP
+OpenSS7
+.I STREAMS
+add-on packages are separate add-on packages to the
+.B "Linux Fast-STREAMS"
+.[
+lfs
+.]
+release that provide additional functionality and protocol support not traditionally found on UNIX
+systems, or which have tranditionally fallen into the domain of valud-add system software, or, in
+this case, where functionality was optional or differently handled in a number of implementations.
+The
+.B @PACKAGE_TITLE@
+package is one of the several optional add-on packages that provide enhanced network protocol
+support beyond that provided by the base
+.I STREAMS
+package.  This package provides support for communications protocols based on the
+.IR "Transport Provider Interface (TPI)" ,
+.BR tpi (7),
+not provided by the base package.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, libraries, programs, init scripts, and daemons that implement networking
+protocols based on the transport layer of the OSI reference model.
+.PP
+The package builds and installs the following
+.I STREAMS
+modules (as kernel modules):
+.IP \(en \w'\(en\(em'u
+.B streams_timod.ko
+module
+.RI \(lq timod \(rq.
+.PD 0
+.IP \(en
+.B streams_tirdwr.ko
+module
+.RI \(lq tirdwr \(rq.
+.PD
+.PP
+The following are
+.I STREAMS
+modules installed by the
+.B @PACKAGE@
+package:
+.TP
+.BR tirdwr (4)
+The
+.BR tirdwr (4)
+module is a module that can be pushed over a Stream conforming to the
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+that provides a
+.BR read (2s)
+.BR write (2s)
+interface to the transport provider.
+See
+.BR tirdwr (4)
+for more information.
+.TP
+.BR timod (4)
+The
+.BR timod (4)
+module is a module that cooperates with the
+.BR xti (3)
+library and is pushed by the library over a Stream conforming to the
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+that provides XTI/TLI library access to the trasnport provider.
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I SVR 4.2 STREAMS
+driver, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I SVR 4.2 STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package is complete and has been in production use for both
+.I LiS
+and
+.I Linux Fast-STREAMS
+for a number of years.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package contains the following manual pages:
+.\"
+.HP
+.BR strxnet (5)\ \- \ 
+@PACKAGE_TITLE@ package.
+.PD 0
+.HP
+.BR strxnet_mknod (8)\ \- \ 
+create or remove
+.I STREAMS
+XNET device nodes.
+.PD
+.\"
+.SS "XTI Modules"
+.PP
+.HP
+.BR timod (4)\ \- \ 
+a
+.I STREAMS
+XTI/TLI compatibility interface.
+.PD 0
+.HP
+.BR tirdwr (4)\ \- \ 
+a
+.I STREAMS
+XTI/TLI read write compatiblity module.
+.PD
+.\"
+.SS "XTI/TLI Library"
+.PP
+.HP
+.BR libxnet (3)\ \- \ 
+XNS 5.2 XTI/TLI Library (libxnet).
+.PD 0
+.HP
+.BR xnet (3)\ \- \ 
+XNS 5.2 XTI/TLI Library (libxnet).
+.HP
+.BR xti (3)\ \- \ 
+XNS 5.2 XTI/TLI Library (libxnet).
+.HP
+.BR netbuf (3)\ \- \ 
+the XTI/TLI netbuf structure.
+.HP
+.BR t_accept (3)\ \- \ 
+accept a connection request.
+.HP
+.BR t_addleaf (3)\ \- \ 
+add a point to a point-to-multipoint connection.
+.HP
+.BR t_alloc (3)\ \- \ 
+allocate a library structure.
+.HP
+.BR t_bind (3)\ \- \ 
+bind to a transport endpoint.
+.HP
+.BR t_close (3)\ \- \ 
+close a transport endpoint.
+.HP
+.BR t_connect (3)\ \- \ 
+establish a transport connection.
+.HP
+.BR t_errlist (3)\ \- \ 
+describe an XTI/TLI library error.
+.HP
+.BR t_errno (3)\ \- \ 
+TLI error number.
+.HP
+.BR t_error (3)\ \- \ 
+print an error message.
+.HP
+.BR t_errstr (3)\ \- \ 
+describe an XTI/TLI library error.
+.HP
+.BR t_free (3)\ \- \ 
+free an XTI/TLI library structure.
+.HP
+.BR t_getinfo (3)\ \- \ 
+get protocol information.
+.HP
+.BR t_getprotaddr (3)\ \- \ 
+get protocol addresses.
+.HP
+.BR t_getstate (3)\ \- \ 
+get interface state.
+.HP
+.BR t_listen (3)\ \- \ 
+listen for a transport connection request.
+.HP
+.BR t_look (3)\ \- \ 
+look for a transport event.
+.HP
+.BR t_nerr (3)\ \- \ 
+describe an XTI/TLI library error.
+.HP
+.BR t_open (3)\ \- \ 
+open a transport endpoint.
+.HP
+.BR t_optmgmt (3)\ \- \ 
+manage transport options.
+.HP
+.BR t_rcv (3)\ \- \ 
+receive transport data.
+.HP
+.BR t_rcvconnect (3)\ \- \ 
+receive connection request confirmation.
+.HP
+.BR t_rcvdis (3)\ \- \ 
+receive abortive disconnect.
+.HP
+.BR t_rcvleafchange (3)\ \- \ 
+receive addition of point to point-to-multipoint connection.
+.HP
+.BR t_rcvopt (3)\ \- \ 
+receive unit data.
+.HP
+.BR t_rcvrel (3)\ \- \ 
+acknowledge orderly release request.
+.HP
+.BR t_rcvreldata (3)\ \- \ 
+acknowledge orderly release request with data.
+.HP
+.BR t_rcvudata (3)\ \- \ 
+receive unit data.
+.HP
+.BR t_rcvuderr (3)\ \- \ 
+receive unit data error.
+.HP
+.BR t_rcvv (3)\ \- \ 
+receive data and scatter.
+.HP
+.BR t_rcvvopt (3)\ \- \ 
+receive data with options and scatter.
+.HP
+.BR t_rcvvudata (3)\ \- \ 
+receive unit data and scatter.
+.HP
+.BR t_removeleaf (3)\ \- \ 
+remove a point from a point-to-multipoint connection.
+.HP
+.BR t_snd (3)\ \- \ 
+send transport data.
+.HP
+.BR t_snddis (3)\ \- \ 
+send abortive disconnect.
+.HP
+.BR t_sndopt (3)\ \- \ 
+send transport data with options.
+.HP
+.BR t_sndrel (3)\ \- \ 
+send orderly release.
+.HP
+.BR t_sndreldata (3)\ \- \ 
+send orderly release with data.
+.HP
+.BR t_sndudata (3)\ \- \ 
+send unit data.
+.HP
+.BR t_sndv (3)\ \- \ 
+gather and send data.
+.HP
+.BR t_sndvopt (3)\ \- \ 
+gather and send data with options.
+.HP
+.BR t_sndvudata (3)\ \- \ 
+gather and send unit data.
+.HP
+.BR t_strerror (3)\ \- \ 
+describe an XTI/TLI library error.
+.HP
+.BR t_sync (3)\ \- \ 
+synchronize XTI/TLI library with TLI provider.
+.HP
+.BR t_sysconf (3)\ \- \ 
+configure XTI/TLI library parameters.
+.HP
+.BR t_unbind (3)\ \- \ 
+unbind a transport endpoint.
+.PD
+.\"
+.\".SS "Sockets Library"
+.\".PP
+.\".HP
+.\".BR libsocket (3)\ \- \ 
+.\".PD 0
+.\".HP
+.\".BR accept (3)\ \- \ 
+.\".HP
+.\".BR bind (3)\ \- \ 
+.\".HP
+.\".BR connect (3)\ \- \ 
+.\".HP
+.\".BR getpeername (3)\ \- \ 
+.\".HP
+.\".BR getsockname (3)\ \- \ 
+.\".HP
+.\".BR getsockopt (3)\ \- \ 
+.\".HP
+.\".BR listen (3)\ \- \ 
+.\".HP
+.\".BR recv (3)\ \- \ 
+.\".HP
+.\".BR recvfrom (3)\ \- \ 
+.\".HP
+.\".BR recvmsg (3)\ \- \ 
+.\".HP
+.\".BR send (3)\ \- \ 
+.\".HP
+.\".BR sendmsg (3)\ \- \ 
+.\".HP
+.\".BR sendto (3)\ \- \ 
+.\".HP
+.\".BR setsockopt (3)\ \- \ 
+.\".HP
+.\".BR shutdown (3)\ \- \ 
+.\".HP
+.\".BR socket (3)\ \- \ 
+.\".HP
+.\".BR socketpair (3)\ \- \ 
+.\".HP
+.\".BR sockets (3)\ \- \ 
+.\".HP
+.\".BR sockmod (4)\ \- \ 
+.\".HP
+.\".BR socksys (4)\ \- \ 
+.\".HP
+.\".BR protosw (5)\ \- \ 
+.\".PD
+.\"
+.\".SS "NSL Library"
+.\".PP
+.\".HP
+.\".BR libxnsl (3)\ \- \ 
+.\".PD 0
+.\".HP
+.\".BR xnsl (3)\ \- \ 
+.\".HP
+.\".BR endnetconfig (3)\ \- \ 
+.\".HP
+.\".BR endnetpath (3)\ \- \ 
+.\".HP
+.\".BR freenetconfigent (3)\ \- \ 
+.\".HP
+.\".BR getnetconfig (3)\ \- \ 
+.\".HP
+.\".BR getnetconfigent (3)\ \- \ 
+.\".HP
+.\".BR getnetpath (3)\ \- \ 
+.\".HP
+.\".BR inetaddr (3)\ \- \ 
+.\".HP
+.\".BR nc_perror (3)\ \- \ 
+.\".HP
+.\".BR nc_sperror (3)\ \- \ 
+.\".HP
+.\".BR netconfig (3)\ \- \ 
+.\".HP
+.\".BR netdir (3)\ \- \ 
+.\".HP
+.\".BR netdir_free (3)\ \- \ 
+.\".HP
+.\".BR netdir_getbyaddr (3)\ \- \ 
+.\".HP
+.\".BR netdir_getbyname (3)\ \- \ 
+.\".HP
+.\".BR netdir_options (3)\ \- \ 
+.\".HP
+.\".BR netdir_perror (3)\ \- \ 
+.\".HP
+.\".BR netdir_sperror (3)\ \- \ 
+.\".HP
+.\".BR netpath (3)\ \- \ 
+.\".HP
+.\".BR setnetconfig (3)\ \- \ 
+.\".HP
+.\".BR setnetpath (3)\ \- \ 
+.\".HP
+.\".BR taddr2uaddr (3)\ \- \ 
+.\".HP
+.\".BR uaddr2taddr (3)\ \- \ 
+.\".HP
+.\".BR netconfig (5)\ \- \ 
+.\".HP
+.\".BR netdir (5)\ \- \ 
+.\".HP
+.\".BR test-xnsl (8)\ \- \ 
+.\".HP
+.\".BR test-xnsl_thr (8)\ \- \ 
+.\".PD
+.\"
+.SS "TPI Interface"
+.PP
+.HP
+.BR tpi (7)\ \- \ 
+Transport Provider Interface
+.PD 0
+.HP
+.BR T_ADDR_ACK (7)\ \- \ 
+protocol address acknowledgement.
+.HP
+.BR T_ADDR_REQ (7)\ \- \ 
+get protocol address request.
+.HP
+.BR T_BIND_ACK (7)\ \- \ 
+bind protocol address acknowledgement.
+.HP
+.BR T_BIND_REQ (7)\ \- \ 
+bind protocol address request.
+.HP
+.BR T_CAPABILITY_ACK (7)\ \- \ 
+protocol capability acknowledgement.
+.HP
+.BR T_CAPABILITY_REQ (7)\ \- \ 
+protocol capability acknowledgement.
+.HP
+.BR T_CONN_CON (7)\ \- \ 
+connection confirm.
+.HP
+.BR T_CONN_IND (7)\ \- \ 
+connect indication.
+.HP
+.BR T_CONN_REQ (7)\ \- \ 
+connect request.
+.HP
+.BR T_CONN_RES (7)\ \- \ 
+connection response.
+.HP
+.BR T_DATA_IND (7)\ \- \ 
+data indication.
+.HP
+.BR T_DATA_REQ (7)\ \- \ 
+data request.
+.HP
+.BR T_DISCON_IND (7)\ \- \ 
+disconnect indication.
+.HP
+.BR T_DISCON_REQ (7)\ \- \ 
+disconnect request.
+.HP
+.BR T_ERROR_ACK (7)\ \- \ 
+error acknowledgement.
+.HP
+.BR T_EXDATA_IND (7)\ \- \ 
+expedited data indication.
+.HP
+.BR T_EXDATA_REQ (7)\ \- \ 
+expedited data request.
+.HP
+.BR T_INFO_ACK (7)\ \- \ 
+protocol information acknowledgement.
+.HP
+.BR T_INFO_REQ (7)\ \- \ 
+get transport protocol parameter sizes.
+.HP
+.BR T_OK_ACK (7)\ \- \ 
+success acknowledgement.
+.HP
+.BR T_OPTDATA_IND (7)\ \- \ 
+data indication with options.
+.HP
+.BR T_OPTDATA_REQ (7)\ \- \ 
+data request with options.
+.HP
+.BR T_OPTMGMT_ACK (7)\ \- \ 
+options management acknowledgement.
+.HP
+.BR T_OPTMGMT_REQ (7)\ \- \ 
+options management.
+.HP
+.BR T_ORDREL_IND (7)\ \- \ 
+orderly release indication.
+.HP
+.BR T_ORDREL_REQ (7)\ \- \ 
+orderly release request.
+.HP
+.BR T_UDERROR_IND (7)\ \- \ 
+unit data error indication.
+.HP
+.BR T_UNBIND_REQ (7)\ \- \ 
+unbind protocol address request.
+.HP
+.BR T_UNITDATA_IND (7)\ \- \ 
+unit data indication.
+.HP
+.BR T_UNITDATA_REQ (7)\ \- \ 
+unit data request.
+.PD
+.\"
+.SS "Test Programs"
+.HP
+.BR test-timod (8)\ \- \ 
+a test suite executable for the
+.BR timod (4)
+.I STREAMS
+module.
+.PD 0
+.HP
+.BR test-tirdwr (8)\ \- \ 
+a test suite executable for the
+.BR tirdwr (4)
+.I STREAMS
+module.
+.HP
+.BR test-xnet (8)\ \- \ 
+a test suite executable for the
+.BR xnet (3)
+.I STREAMS
+library.
+.HP
+.BR test-xnet_thr (8)\ \- \ 
+a test suite executable for the
+.BR xnet (3)
+.I STREAMS
+library.
+.PD
+.PP
+In addition to these manual pages, the
+.B @PACKAGE_TITLE@
+package installs an
+.I Installation and Reference Manual
+as well as a reprint of the
+.I UNIX International
+Transport Provider Interface specification.
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.BR tirdwr (4)
+a
+.I STREAMS
+XTI/TLI read write compatibility module.
+.TP
+.BR timod (4)
+a
+.I STREAMS
+XTI/TLI compatibility interface.
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE_TITLE@
+package does not provide any drivers of devices of its own.  Other packages
+might define devices that autopush the
+.BR timod (4)
+or
+.BR tirdwr (4)
+modules.
+.\"
+.\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B Linux Fast-STREAMS
+base package.
+.TP
+.BR strcompat (5)
+The
+.B Linux Fast-STREAMS
+compatiblity modules package.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous release of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please rememaber that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architectures is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangle your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You possibly lose all the data on your system.
+Because this software stands a chance of crashing your kernel, the resulting
+unstable system could possibly destroy computer hardware or peripherals making
+them unusable.  You might void the warranty on any system on which you run
+this software.
+.B YOU HAVE BEEN WARNED.
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, and is considered production grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.
+Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR xti (3),
+.BR xnet (3),
+.BR timod (4),
+.BR tirdwr (4),
+.BR tpi (7),
+.BR strxnet_mknod (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B @PACKAGE@
+package is compatible with
+.I SVR 4.2
+and systems based on
+.I SVR 4.2
+such as
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+provides compatibility with all implementations of the XTI library in
+accordance with XNS 5.2
+.[
+xns
+.]
+specifications.
+.IP \(em
+The
+.BR tirdwr (4)
+module is compatibile with specifications for the module as implemented by
+.I SVR 4
+and implementations based on
+.IR "SVR 4" .
+Portable applications may use the interface to the
+.BR tirdwr (4)
+module directly.
+.IP \(em
+The
+.BR timod (4)
+module is designed to operated with the XTI/TLI library implementation
+provided in this package but might provide some compatibility with other
+implementations of the
+.BR timod (4)
+module.
+Portable applications will not rely on any particular behavior of the
+.BR timod (4)
+module and will only use XTI/TLI library functions for accessing the trasnport
+provider.
+.IP \(em
+The
+.BR tpi (7)
+interface is compatible with all implementations of the TPI interface in
+accordance with TPI.
+.[
+tpi revision 2.0.0
+.]
+Portable applications may use the interface to the
+Transport Provider Interface,
+.BR tpi (7),
+directly.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR TPI ,
+.[
+tpi revision 2.0.0
+.]
+.IR "XNS 5.2" ,
+.[
+xns 5.2
+.]
+.IR UNIX95 .
+Conformance is tested using the
+.BR test-timod (8),
+.BR test-tirdwr (8),
+.BR test-xnet "(8) and "
+.BR test-xnet_thr (8),
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B @PACKAGE_TITLE@
+originally started out as part of the
+.BR strinet (5)
+package and was originally written for
+.IR LiS .
+The library and the
+.BR timod (4)
+and
+.BR tirdwr (4)
+modules were split from the
+.BR strinet (5)
+package and placed in their own
+.BR strxnet (5)
+package.  NSL library and Socket library functions were added to the
+.BR strxnet (5)
+package initially, but subsequently split to separate
+.BR strsock (5)
+and
+.BR strnsl (5)
+packages.
+What remains in the
+.BR strxnet (5)
+package is the XTI/TLI library, header files, and cooperating
+.I STREAMS
+modules, also TPI interface header files and documentation.
+.PP
+The
+.B @PACKAGE_TITLE@
+package is a stable, production grade release.
+.\"
+.\"
+.SH "FUTURE DIRECTIONS"
+.PP
+The XTI/TLI library is a stable production release and is largely in
+maintenance mode.  No additional development is planned.  See the
+.RI \(lq TODO \(rq
+file in the release for detailed information.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

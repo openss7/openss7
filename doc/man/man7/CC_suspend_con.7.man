@@ -1,0 +1,1 @@
+.so man7/CC_SUSPEND_CON.7.man

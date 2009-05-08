@@ -1,0 +1,338 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH GETMID 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B getmid, modiD_t
+\- get the \fISTREAMS\fR module id for a name
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.BI "modID_t getmid(const char *" name ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I name
+The name of the module.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR getmid ()
+returns the module identifier for the named driver or module.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR getmid ()
+returns the module identifier of the driver or module corresponding to
+.I name 
+or, if no driver or module corresponds to
+.IR name ,
+.BR getmid ()
+returns zero (0).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR getmid ()
+returns the module identifier of the module corresponding to
+.IR name ,
+or zero (0)
+if
+.I name
+does not correspond to a module.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR getmid ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+When called from a blocking context,
+.BR getmid ()
+has the side-effect that the named module may be loaded by module name.  The
+kernel module demand loaded will have the module name or alias
+.RB \*(lq streams-\fI%s\fP \*(rq,
+where
+.RI \*(lq %s \*(rq
+is the name of the
+.I STREAMS
+module.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR getmid ()
+is MP-safe; however, it is the caller's responsibility to ensure that the
+module is not unloaded and reloaded with a different module id.  Normally
+.I STREAMS
+modules have statically assigned module identifiers, so this should not
+present a problem.
+.\"
+.\"
+.SH NOTICES
+.PP
+.PP
+.BR getmid ()
+first searches the character device table
+.RB ( cdevsw )
+for a
+.I STREAMS
+device with the same name, then the pushable
+.I STREAMS
+module table
+.RB ( fmodsw ).
+.PP
+The module name is held in the
+.I mi_idname
+member of the
+.BR module_info (9)
+structure pointed to by the
+.I qi_minfo
+of the
+.BR qinit (9)
+structure, which is usually hard coded for each driver or module.  The module
+name should be unique across drivers and modules.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR getadmin (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR getmid ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.PP
+.BR getmid ()
+is compatible with
+.I "SVR 4.2"
+.[
+svr4spg
+.]
+and systems based on
+.I "SVR 4.2"
+such as
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR UnixWare \(rg,
+and
+.IR UXP/V \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+show the return value of type
+.BR ushort_t ,
+and the type of
+.I name
+as
+.RB ( "char *" ).
+.IP \(em
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+document this function with return value
+of type
+.BR ushort .
+.IP \(em
+.IR LiS \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+and
+.IR SUPER-UX \(rg
+do not document this function.
+.IP \(em
+Under
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+the return value is of type
+.BR modID_t ,
+which reduces to
+.BR ushort ,
+and a
+.I name
+type of
+.RB ( "const char *" ).
+.IP \(em
+.BR getmid ()
+is provided for source compatibility with older versions of
+.IR STREAMS .
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2" ,
+.[
+svr42spg
+.]
+and
+.IR AIX \(rg ,
+.IR HP-UX \(rg ,
+.IR UnixWare \(rg 
+and
+.IR UXP/V \(rg
+documentation.
+.[
+aixspg
+.]
+.[
+hpuxspg
+.]
+.[
+uw7spg
+.]
+.[
+uxpdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR getmid ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR getmid ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

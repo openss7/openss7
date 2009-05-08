@@ -1,0 +1,357 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH FDETACH 2 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
+.\"
+.\"
+.SH NAME
+.B fdetach
+\- unname a \fISTREAMS\fR special file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.HP
+.BI "int fdetach(const char *" path );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I path
+the filesystem path from which to detach the
+.I STREAMS
+special file.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR fdetach ()
+detaches the open
+.I STREAMS
+special device file that was previously attached to path,
+.IR path ,
+in the filesystem with
+.BR fattach (2).
+All file operations on file descriptors subsequently opened on
+.IR path
+will operate on the file or directory that originally corresponded to
+.IR path .
+This continues until the
+.I STREAMS
+special file is attached again to
+.I path
+using the
+.BR fattach (2)
+utility.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon success,
+.BR fdetach ()
+will return zero
+.RB ( 0 ).
+.PP
+Upon failure,
+.BR fdetach ()
+will return minus one
+.RB ( -1 )
+and set
+.IR errno (3)
+as described under
+.RB \(lq ERRORS \(rq,
+below.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP \w'[\fBENAMETOOLONG\fR]\(em'u
+.RB [ EACCES ]
+Write access to the file specified by
+.I path
+is not allowed, or one of the directories in
+.I path
+did not allow search (execute) permission.
+.TP
+.RB [ EINVAL ]
+The
+.I path
+argument names a file that is not currently attached (has not had
+.BR fattach (2)
+called for it).
+.TP
+.RB [ ELOOP ]
+Symbolic links encountered resolving
+.I path
+form a loop, or too many (greater than
+.RB { SYMLOOP_MAX })
+symbolic links were encountered resolving
+.IR path .
+.TP
+.RB [ ENAMETOOLONG ]
+.I path
+was too long or a resolved symbolic link contained a pathname that was too
+long.
+.TP
+.RB [ ENOENT ]
+A directory component in
+.I path
+does not exists or is a dangling symbolic link.
+.TP
+.RB [ ENOTDIR ]
+A component used as a directory in
+.I path
+is not a directory.
+.TP
+.RB [ EPERM ]
+The effective user ID of the process is not the owner of the file specified by
+.I path
+and the process does not have appropriate privileges.
+.\"
+.\"
+.SH NOTICES
+.PP
+.SS Multi-Threading
+.PP
+.BR fdetach ()
+is thread-safe; however, performing
+.BR fdetach ()
+on a filesystem path will affect other processes or thread using that path.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR fdetach (3p),
+.BR fdetach (8),
+.BR fattach (3),
+.BR fdetach (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR fdetach ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR fdetach ()
+is compatible with
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg,
+and
+.IR UXP/V \(rg,
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.BR fdetach ()
+can be performed on any file to which the caller has ownership, write
+permission and sufficient privilege to execute
+.BR fdetach ().
+.IP \(em
+Under
+.BR LiS ,
+root privilege or
+.B CAP_SYS_ADMIN
+is required.
+.B @PACKAGE_TITLE@
+does not have this restriction.
+.IP \(em
+.BR fdetach ()
+makes no additional limitation on the number of
+.I STREAMS
+files that are attached.
+.IP \(em
+Under
+.BR LiS ,
+.BR fdetach ()
+limits number of
+.I STREAMS
+files attached to less than 256, because that is the maximum number of unnamed
+devices allowed by
+.BR mount (2).
+The same is true for
+.BR "@PACKAGE_TITLE@" .
+.PP
+.B @PACKAGE_TITLE@
+provide a system call for
+.I __NR_fattach
+that is used to implement this system call.  (glibc has prototypes for this system call.)
+In addition,
+.B @PACKAGE_TITLE@
+recognizes the
+.B I_LIS_FDETACH
+.BR streamio (7)
+input-output control used by
+.I LiS
+to emulate the
+.I __NR_fattach
+system call, permitting
+.I LiS
+libraries to be used with
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR SVID ,
+.[
+svid
+.]
+.BR XID ,
+.[
+xbd5
+.]
+.BR SUSv2 ,
+.[
+susv2
+.]
+.BR SUSv3 ,
+.[
+susv3
+.]
+.BR "POSIX 1003.1/2003" ;
+.[
+susv3
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR fdetach ()
+first appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,1 @@
+.so man3/t_open.3.man

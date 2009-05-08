@@ -1,0 +1,154 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-ISUP-OM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TEXTUAL-CONVENTION, enterprises
+	FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, RowStatus, RowPointer, AutonomousType, 
+    TimeInterval, DisplayString, TruthValue
+	FROM SNMPv2-TC
+    PerfCurrentCount, PerfIntervalCount, PerfTotalCount
+	FROM PerfHist-TC-MIB
+    HCPerfValidIntervals, HCPerfInvalidIntervals, HCPerfTimeElapsed,
+    HCPerfIntervalThreshold, HCPerfCurrentCount, HCPerfIntervalCount,
+    HCPerfTotalCount
+	FROM HC-PerfHist-TC-MIB
+    CommonLanguageName
+	FROM OPENSS7-TC
+    AdministrativeState, OperationalState, UsageState, ProceduralStatus, 
+    AvailabilityStatus, AlarmStatus, SimpleNameType
+	FROM OPENSS7-SMI-MIB
+    NEntitySystemTypes, NEntitySystemType
+	FROM OPENSS7-CLNS-MIB
+    Ss7ProtocolVariant
+	FROM OPENSS7-SS7-MIB
+    openss7
+	FROM OPENSS7-SMI;
+
+isupOmMIB MODULE-IDENTITY
+    LAST-UPDATED
+	"200812092229Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta  T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 mailto:bidulock@openss7.org"
+    DESCRIPTION
+	"The purpose of this MIB is to proivde SNMP support for the ISUP 
+	 operational measurements provided in ITU-T Q.752 and ANSI 
+	 T1.116.  There exists a draft GDMO specification for ANSI 
+	 T1.116.1 from which this MIB is based.  Strangely enough, no 
+	 GDMO is standardized for SS7 operational measurements.
+
+	 The objective of this MIB is to support both the reporting of 
+	 statistics obtained from Operational Measurements as well as 
+	 providing a mechanism to activate and report the results of OM 
+	 studies."
+    REVISION
+	"200812092229Z"
+    DESCRIPTION
+	"This is the initial revision of this MIB."
+    ::= { openss7 17 752 3 }
+
+ -- top level organization of the MIB
+
+isupOmNotifications	OBJECT IDENTIFIER ::= { isupOmMIB	 0 }
+isupOmObjects		OBJECT IDENTIFIER ::= { isupOmMIB	 1 }
+isupOmConformance	OBJECT IDENTIFIER ::= { isupOmMIB	 2 }
+
+isupOmTables		OBJECT IDENTIFIER ::= { isupOmObjects	 1 }
+isupOmScalars		OBJECT IDENTIFIER ::= { isupOmObjects	 2 }
+isupOmNotifs		OBJECT IDENTIFIER ::= { isupOmObjects	 3 }
+isupOmOids		OBJECT IDENTIFIER ::= { isupOmObjects	 4 }
+
+isupOmCompliance	OBJECT IDENTIFIER ::= { isupOmConformance 1 }
+isupOmGroups		OBJECT IDENTIFIER ::= { isupOmConformance 2 }
+isupOmCapabilities	OBJECT IDENTIFIER ::= { isupOmConformance 3 }
+
+-- (1.3.6.1.4.1.29591.17.752.3) openss7Q.752.3 (isupOmMIB)
+-- |__(0) isupOmNotifications
+-- |
+-- |__(1) isupOmObjects
+-- |  |__(1) isupOmTables
+-- |  |__(2) isupOmScalars
+-- |  |__(3) isupOmNotifs
+-- |  |__(4) isupOmOids
+-- |
+-- |__(2) isupOmConformance
+--    |__(1) isupOmCompliance
+--    |__(2) isupOmGroups
+--    |__(3) isupOmCapabilities
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

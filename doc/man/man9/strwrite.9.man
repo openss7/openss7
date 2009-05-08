@@ -1,0 +1,476 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRREAD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strwrite, strwritev
+\- perform a \fBwrite\fP(2s) operation on a Stream head
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strsubr.h>
+.HP
+.BI "ssize_t strwrite(struct file *" file ", char *" buf ", size_t " nbytes ", loff_t *" ppos );
+.HP
+.BI "ssize_t strwritev(struct file *", file ", const struct iovec *" iov ", unsigned long " count ", loff_t *" ppos );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The arguments for
+.BR strwrite ()
+are as follows:
+.TP \w'\fInbytes\fR\(em'u
+.I file
+a file pointer for a
+.I STREAMS
+file.
+.PD 0
+.TP
+.I buf
+a pointer to the user buffer from which to write.
+.TP
+.I nbytes
+the number of bytes to write from the buffer.
+.TP
+.I ppos
+the file position to which to write.
+.PD
+.PP
+The arguments for
+.BR strwritev ()
+are as follows:
+.TP \w'\fInbytes\fR\(em'u
+.I file
+a file pointer for a
+.I STREAMS
+file.
+.PD 0
+.TP
+.I iov
+a pointer to an array of
+.B iovec
+structures describing multiple user buffers from which to write.
+.TP
+.I count
+the number of
+.B iovec
+structures in the array pointed to by
+.IR iov .
+.TP
+.I ppos
+the file position to which to write.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strwrite ()
+and
+.BR strwritev ()
+perform
+.BR write (2s)
+functions on a Stream head.
+.BR strwrite ()
+is implemented with a call to
+.BR strwritev ().
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR strwrite ()
+and
+.BR strwritev ()
+return a zero or positive number of bytes written.  This number will not be greater than the number of
+bytes requested,
+.IR nbytes ,
+or the sum of the
+.I iov_len
+fields of the passed in
+.B iovec
+structures.
+.PP
+Upon failure,
+.BR strwrite ()
+and
+.BR strwritev ()
+return an appropriate negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+Upon failure,
+.BR strwrite ()
+and
+.BR strwritev ()
+return a negative error number, under the following conditions:
+.TP \w'[\fBERESTARTSYS\fR]\(em'u
+.RB [ EBADF ]
+.I file
+is not open for writing.
+.TP
+.RB [ EINVAL ]
+.I file
+refers to a Stream head
+.BR stdata (9)
+structure that is for a Stream that is linked (directly or indirectly) downstream from a
+multiplexing driver.
+(That is, the Stream had has the
+.B STPLEX
+bit set.)
+.TP
+.RB [ EIO ]
+.I file
+refers to a Stream head
+.BR stdata (9)
+structure that is for a Stream that has closed or is closing.  (That is, eith there is no longer a
+Stream head associated with
+.I file
+or the Stream head has the
+.B STRCLOSE
+bit set.)
+.TP
+.RB [ ERESTARTSYS ]
+A signal arrived before the
+.BR strwrite ()
+or
+.BR strwritev ()
+call blocked, interrupting completion of the system call.  No action has been taken nor write data
+transferred.
+.TP
+.RB [ EINTR ]
+A signal arrived after the call blocked, interrupting completion of the system call.  No action has
+been taken nor write data transferred.
+.TP
+.RB [ EAGAIN ]
+.I file
+is open for non-blocking operation (i.e. the
+.BR O_NONBLOCK " (or " O_NDELAY )
+file status flag is set), and the write operation would otherwise block awaiting the abatement of
+flow control on priority band zero
+.BR ( 0 ).
+.TP
+.RB [ EWOULDBLOCK ]
+Same as
+.RB [ EAGAIN ].
+.TP
+.RB [ ETIME ]
+.I file
+is open for blocking operation (i.e. the
+.BR O_NONBLOCK " (and " O_NDELAY )
+file status flag is clear), and the write operation blocked awaiting the abatement of flow control
+on priority band zero
+.BR ( 0 ),
+and the wait timed out.
+.PP
+Also, if the Stream head referenced by
+.I file
+has received a
+.BR M_ERROR (9)
+message indicating a write side error, then the write error from the message will be returned by
+.BR strwrite ()
+and
+.BR strwritev ()
+as a negative error number.
+.\"
+.PP
+When the
+.BR STRISFIFO " or " STRISPIPE
+flags are clear in the
+.I sd_flags
+member of the Stream head
+.BR stdata (9)
+structure associated with
+.IR file ,
+the behaviour of
+.BR strwrite ()
+and
+.BR strwritev ()
+is appropriate for
+.I STREAMS
+character device special files.  In that case, the following additional error conditions can occur:
+.TP \w'[\fBERESTARTSYS\fR]\(em'u
+.RB [ ENXIO ]
+.I file
+refers to a Stream head
+.BR stdata (9)
+structure that is for a Stream that has received a hangup
+.RB ( M_HANGUP (9))
+message.  (That is, the Stream head has the
+.BR STRHUP
+bit set.)
+.\"
+.PP
+When the
+.BR STRISFIFO " or " STRISPIPE
+flags are set in the
+.I sd_flags
+member of the Stream head
+.BR stdata (9)
+structure associated with
+.IR file ,
+the behaviour of
+.BR strwrite ()
+and
+.BR strwritev ()
+is appropriate for
+.IR STREAMS -based
+pipes and FIFOs.  In that case, the following additional error conditions can occur:
+.TP \w'[\fBERESTARTSYS\fR]\(em'u
+.RB [ EPIPE ]
+.I file
+refers to a Stream head
+.BR stdata (9)
+structure that is for a Stream that has received a hangup
+.RB ( M_HANGUP (9))
+message.  (That is, the Stream head has the
+.BR STRHUP
+bit set.)
+It is a typical implementation of
+.IR STREAMS -based
+pipes that a
+.BR M_HANGUP (9)
+message is sent to the other side before closing.
+.TP
+.RB [ EPIPE ]
+.I file
+refers to a
+.IR STREAMS -based
+FIFO and there are no process that have the FIFO open for read.
+.TP
+.RB [ EPIPE ]
+.I file
+refers to a
+.IR STREAMS -based
+pipe and the other end has disconnected, is has closed, or is closing, or in any event there is no
+process that has the other end of the pipe open for read.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR strwrite ()
+and
+.BR strwritev ()
+are called by the kernel in process context in response to a
+.BR write (2s)
+or
+.BR writev (2s)
+system call issued by a process.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strwrite ()
+and
+.BR strwritev ()
+are MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.IR AIX \(rg
+implements a
+.BR wantio (9)
+capability where a cooperating downstream driver or module can intercept file operations for
+.I STREAMS
+files and
+.IR STREAMS -based
+pipes and FIFOs.  If the
+.BR wantio (9)
+capability is utilized by a downstream driver or module, that module's provided
+.BR strwrite ()
+or
+.BR strwritev ()
+procedures will be used instead of those described here.  The procedures described here are still
+available to the cooperating driver or module for callout.  Use of the
+.BR wantio (9)
+capability will affect the behaviour of
+.BR write (2s),
+making it potentially incompatible.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR write (2s),
+.BR writev (2s),
+.BR stdata (9),
+.BR M_ERROR (9),
+.BR M_HANGUP (9),
+.BR wantio (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strwrite ()
+and
+.BR strwritev ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.\"
+.PP
+.BR strwrite ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+(This section is incomplete.)
+.\"
+.PP
+See
+.BR STREAMS (9)
+for more compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strwrite ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR strwrite ()
+first appeared in 
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

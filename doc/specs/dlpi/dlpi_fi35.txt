@@ -1,0 +1,53 @@
+                                                                                
+                              |                  |                              
+            DL_ATTACH ----\   |                  |   /----  DL_ATTACH           
+              request      \->|~   ~   ~   ~   ~ |<-/       request             
+                            / |  ~   ~   ~   ~   | \                            
+                           /  |                  |  \                           
+                DL_OK <---/   |                  |   \----  DL_OK               
+          acknowledge         |                  |          acknowledge         
+                              |                  |                              
+              DL_BIND ----\   |                  |   /----  DL_BIND             
+              request      \->|~   ~   ~   ~   ~ |<-/       request             
+                            / |  ~   ~   ~   ~   | \                            
+                           /  |                  |  \                           
+              DL_BIND <---/   |                  |   \----  DL_BIND             
+          acknowledge         |                  |          acknowledge         
+                              |                  |                              
+           DL_CONNECT ----\   |                  |          DL_CONNECT          
+              request      \->|- - - - - - - - - |------->  indication          
+                              |                  |                              
+                           /--| - - - - - - - - -|<-------  DL_CONNECT          
+           DL_CONNECT <---/   |                  | \        indication          
+              confirm         |                  |  \                           
+                              |                  |   \----  DL_OK               
+                              |                  |          acknowledge         
+                              |                  |                              
+              DL_DATA ----\   |                  |          DL_DATA             
+              request      \->|- - - - - - - - - |------->  indication          
+                              |                  |                              
+              DL_DATA         |                  |   /----  DL_DATA             
+           indication <-------| - - - - - - - - -|<-/       request             
+                              |                  |                              
+        DL_DISCONNECT ----\   |                  |                              
+              request      \->|- - - - - - - - - |------->  DL_DISCONNECT       
+                            / |                  |          indication          
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+            DL_UNBIND ----\   |                  |   /----  DL_UNBIND           
+              request      \->|~   ~   ~   ~   ~ |<-/       request             
+                            / |  ~   ~   ~   ~   | \                            
+                           /  |                  |  \                           
+                DL_OK <---/   |                  |   \----  DL_OK               
+          acknowledge         |                  |          acknowledge         
+                              |                  |                              
+            DL_DETACH ----\   |                  |   /----  DL_DETACH           
+              request      \->|~   ~   ~   ~   ~ |<-/       request             
+                            / |  ~   ~   ~   ~   | \                            
+                           /  |                  |  \                           
+                DL_OK <---/   |                  |   \----  DL_OK               
+          acknowledge         |                  |          acknowledge         
+                              |                  |                              
+                                                                                

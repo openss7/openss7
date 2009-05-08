@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+              DL_INFO ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+              DL_INFO <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

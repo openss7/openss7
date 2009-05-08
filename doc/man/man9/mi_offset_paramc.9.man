@@ -1,0 +1,1 @@
+.so man9/mi_offset_param.9.man

@@ -1,0 +1,77 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+center expand tab(:);
+lblblblblb
+lblblblblb
+lllll.
+_
+:Value:Value:Value:Value
+OM Attribute:Syntax:Length:Number:Initially
+=
+system-My-Type-Code:Enum(System-My-Type-Code):\(em:1:\(em
+authorization-Denied:Enum(Authorization-Denied):\(em:0-1:\(em
+authorization-Period:String(Octet):2:0-1:\(em
+control-Channel-Data:String(Octet):4:0-1:\(em
+denied-Authorization-Period:String(Octet):2:0-1:\(em
+digits:String(Digits):4-12:0-1:\(em
+digits:String(Digits):4-12:0-1:\(em
+mscid:String(Octet):3:0-1:\(em
+_
+\fIProfile\fP
+_
+authentication-Capability:String(Octet):1:0-1:\(em
+calling-Features-Indicator:String(Octet):2-4:0-1:\(em
+carrier-Digits:String(Digits):4-12:0-1:\(em
+dmh-Account-Code-Digits:String(Digits):4-12:0-1:\(em
+dmh-Alternate-Billing-Digits:String(Digits):4-12:0-1:\(em
+dmh-Billing-Digits:String(Digits):4-12:0-1:\(em
+geographic-Authorization:String(Octet):1:0-1:\(em
+message-Waiting-Notification-Count:String(Octet):2,4,...:0-1:\(em
+message-Waiting-Notification-Type:String(Octet):1:0-1:\(em
+redirecting-Number-String:String(Digits):4-20:0-1:\(em
+mobile-Directory-Number:String(Digits):4-12:0-1:\(em
+origination-Indicator:Enum(Origination-Indicator):\(em:0-1:\(em
+origination-Triggers:String(Octet):4:0-1:\(em
+paca-Indicator:String(Octet):1:0-1:\(em
+preferred-Language-Indicator:String(Octet):1:0-1:\(em
+restriction-Digits:String(Digits):4-12:0-1:\(em
+routing-Digits:String(Digits):4-12:0-1:\(em
+sms-Origination-Restrictions:String(Octet):1:0-1:\(em
+sms-Termination-Restrictions:String(Octet):1:0-1:\(em
+spini-PIN:String(Digits):4-12:0-1:\(em
+spini-Triggers:String(Octet):4:0-1:\(em
+termination-Restriction-Code:Enum(Termination-Restriction-Code):\(em:0-1:\(em
+termination-Triggers:String(Octet):2:0-1:\(em
+_
+received-Signal-Quality:String(Octet):1:0-1:\(em
+sender-Identification-Number:String(Digits):4-12:0-1:\(em
+sms-Message-Waiting-Indicator:Null:\(em:0-1:\(em
+system-Access-Data:String(Octet):5:0-1:\(em
+_
+.TE

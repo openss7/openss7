@@ -1,0 +1,620 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STR_INSTALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B str_install
+\- install or uninstall a \fISTREAMS\fP driver or module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _AIX_SOURCE
+.br
+.B #include <sys/streams.h>
+.br
+.B #include <sys/strconf.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "int str_install(int " cmd ", strconf_t *" conf );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I cmd
+specifies the action to perform.
+.I cmd
+can be one of the following values:
+.RS
+.TP 16
+.B STR_LOAD_DEV
+add a device
+.PD 0
+.TP
+.B STR_UNLOAD_DEV
+remove a device
+.TP
+.B STR_LOAD_MOD
+load a module
+.TP
+.B STR_UNLOAD_MOD
+unload a module
+.PD
+.RE
+.TP
+.I conf
+a pointer to a
+.BR strconf_t (9)
+structure specifying the characteristics of the driver or module upon which to
+perform the action.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.PP
+.I conf
+points to a
+.BR strconf_t (9)
+structure contains the following members:
+.sp
+.nf
+\fC\s-2\
+typedef struct {
+        char *sc_name;
+        struct streamtab *sc_str;
+        int sc_open_stylesc_flags;
+        int sc_major;
+        int sc_sqlevel;
+        caddr_t sc_sqinfo;
+} strconf_t;
+\s+2\fP
+.fi
+.TP
+.I sc_name
+Specifies the name of the driver or module.  For modules, this name is
+installed in the
+.B fmodsw
+table and is used for
+.BR I_PUSH
+operations (see
+.BR streamio (7)).
+For drivers, this name is used only for reporting with the
+.BR scls (8)
+and
+.BR strinfo (8)
+commands.
+.TP
+.I sc_str
+A pointer to the
+.BR streamtab (9)
+structure.
+.TP
+.I sc_open_stylesc_flags
+Gosh does that ever look like a typo!
+Specifies the style of the driver or module
+.IR qi_qopen (9)
+procedure and characteristics
+of the driver or module.  Possible values are:
+.RS
+.PP
+One of the following two flags must be set to indicate the style of
+the module's
+.IR qi_qopen (9)
+procedure:
+.TP
+.B STR_NEW_OPEN
+The
+.IR qi_qopen (9)
+syntax and semantics as used in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.TP
+.B STR_OLD_OPEN
+The
+.IR qi_qopen (9)
+syntax and semantics as used in
+.IR "SVR 3"
+.[
+svr3
+.]
+.PP
+If the module is multiprocessor-safe, the following flag should be added by
+using the bitwise OR operator:
+.TP
+.B STR_MPSAFE
+The driver or module was designed to be run on an MP system.
+.PP
+If the module uses callback functions that need to be protected against
+interrupts (non-interrupt-safe callback functions) for the
+.BR timeout (9)
+or
+.BR bufcall (9)
+callbacks, the following flag should be added by using the bitwise OR
+operator:
+.TP
+.B STR_QSAFETY
+Specifies that the driver or module uses non-interrupt-safe callback functions
+for the
+.BR timeout (9)
+or
+.BR bufcall (9)
+callbacks.
+(See also
+.BR itimeout (9).)
+This flag is automatically set by
+.I STREAMS
+if the module is not multiprocessor-safe.
+.TP
+.B STR_PERSTREAM
+Specifies that the module accepts to run at per-stream synchronization level.
+.TP
+.B STR_Q_NOTTOSPEC
+Specifies that the module is designed to run it's
+.IR qi_srvp (9)
+procedure under process context.
+By default
+.I STREAMS
+.IR qi_srvp (9)
+procedure run at interrupt context (softIRQ).  If the
+.I STREAMS
+module wants to execute its
+.IR qi_srvp (9)
+procedure under process context, it needs to set this flag.
+.TP
+.B STR_64BIT
+Specifies that the module is capable of supporting 64-bit data types.
+.TP
+.B STR_NEWCLONING
+Specifies that the driver
+.IR qi_qopen (9)
+uses new-style cloning.  Under this style, the
+driver
+.IR qi_qopen (9)
+does not check for
+.B CLONEOPEN
+and yet returns a new device number.
+.RE
+.TP
+.I sc_major
+Specifies the major number of the device.
+.TP
+.I sc_sqlevel
+Specifies the synchronization level to be used by
+.I STREAMS
+for the module.  There are seven levels of synchronization as follows:
+.RS
+.TP
+.BR SQLVL_NOP "\- No synchronization"
+Specifies that each queue can be accessed by more than one thread at the same
+time.  The protection of internal data and of
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedure against
+.BR timeout (9)
+or
+.BR bufcall (9)
+is done by the driver or module itself.  This synchronization level should be
+used essentially for multiprocessor-efficient modules.
+.TP
+.BR SQLVL_QUEUE "\- Queue level"
+Specifies that each queue can be accessed by only one thread at the same time.
+This is the finest synchronization level, and should only be used when the two
+sides of a queue pair do not share common data.
+.TP
+.BR SQLVL_QUEUEPAIR "\- Queue pair level"
+Specifies that each queue pair can be accessed by only one thread at the same
+time.
+.TP
+.BR SQLVL_MODULE "\- Module level"
+Specifies that all instances of a module can be accessed by only one thread at
+the same time.  This is the default value.
+.TP
+.BR SQLVL_ELSEWHERE "\- Arbitrary level"
+Specifies that a group of modules can be accessed by only one thread at the
+same time.  Usually, the group of modules is a set of cooperating modules, such
+as a protocol family.  The group is defined by using the same name in the
+.I sc_sqinfo
+field for each module in the group.
+.TP
+.BR SQLVL_GLOBAL "\- Global level"
+Specifies that all of
+.I STREAMS
+can be accessed by only one thread at the same time.  This option should
+normally be used only for debugging.
+.TP
+.BR SQLVL_DEFAULT "\- Default level"
+Specifies the default level, set to
+.BR SQLVL_MODULE .
+.RE
+.TP
+.I sc_sqinfo
+Specifies an optional group name.  This field is only used when the
+.BR SQLVL_ELSEWHERE
+arbitrary synchronization level is set; all modules having the same name belong
+to one group.  The name size is limited to eight
+.RB ( FMNAMESZ )
+characters.
+.IP
+The value of this member is a character string providing the name of the
+external synchronization.  The registration function matches this name against
+all existing external synchronization names.  If a match is found, that
+synchronization queue is shared with this module.  If no match is found, a new
+synchronization queue with the provided name is created.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR str_install ()
+succeeds, it returns zero (0);
+when it fails, it returns
+a non-zero (positive) error code.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR str_install ()
+fails, it returns one of the following (positive) error codes:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EBUSY ]
+The module is in use and cannot be unloaded.
+.TP
+.RB [ EEXIST ]
+The module already exists in the system.
+.TP
+.RB [ EINVAL ]
+An argument contains an invalid value.
+.TP
+.RB [ ENODEV ]
+The module could not be loaded.
+.TP
+.RB [ ENOENT ]
+The module is not present and cannot be unloaded.
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was available to complete the request.
+.TP
+.RB [ ENXIO ]
+.I STREAMS
+is currently locked.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR str_install ()
+should be called from User Context.
+.BR str_install ()
+is intended to be called by kernel module initialization routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR str_install ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR str_install ()
+is a
+.IR AIX \(rg-specific
+function:
+.B _AIX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_AIX
+or
+.B CONFIG_STREAMS_COMPAT_AIX_MODULE
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR str_install ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR str_install ()
+is compatible with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR AIX \(rg
+to support dynamic loading and unloading of kernel modules, each
+.I STREAMS
+driver or module provides a configuration procedure.  This procedure is called
+each time the extension is referenced in a load or unload operation.  The
+system provides a name and a device number when the module loads.
+.IP ""
+Under
+.B Linux
+it is necessary to hook into the
+.BR module_init (9)
+and
+.BR module_term (9)
+procedures and assign the
+.I name
+and
+.I dev
+number using
+.BR MOD_PARM (9).
+By convention, these module options are called
+.I name
+and
+.IR major .
+.IP ""
+A driver's
+.BR module_init (9)
+routine should assign
+.I name
+and
+.I major
+to the
+.B strconf_t
+structure and call
+.BR str_install ()
+with
+.BR STR_LOAD_DEV ;
+the
+.BR module_term (9)
+routine should call
+.BR str_install ()
+with
+.BR STR_UNLOAD_DEV .
+.IP ""
+A module's
+.BR module_init (9)
+routine should call
+.BR str_install ()
+with
+.BR STR_LOAD_MOD ;
+the
+.BR module_term (9)
+routine should call
+.BR str_install ()
+with
+.BR STR_UNLOAD_MOD .
+.IP \(em
+For
+.IR AIX \(rg
+.[
+aixspg
+.]
+the treatment of
+.B SQLVL_GLOBAL
+is different than others.  When
+.B SQLVL_GLOBAL
+is specified using this registration function, only one thread is allowed in all of STREAMS an
+Uniprocessor Emulation is effected.  Because
+.B SQLVL_GLOBAL
+is only used for testing, this should not present an incompatibility.
+.IP \(em
+.IR AIX \(rg
+.[
+aixspg
+.]
+does not provide much special exclusion for open and close routines beyond that provided by
+synchronization levels
+.BR SQLVL_MODULE ", " SQLVL_ELSEWHERE " or " SQLVL_GLOBAL .
+At
+.BR SQLVL_QUEUEPAIR " and " SQLVL_QUEUE ,
+.IR MacOT \(rg
+documentation indicates that the open or close routine is excluded at a minimum syncrhonization of
+.BR SQLVL_QUEUEPAIR
+regardless of whether the synchronization is at the granularity of a queue.
+The temptation was to have
+.B @PACKAGE_TITLE@
+effect this by setting an outer perimeter in these cases and making the outer perimeter exclusive
+for open and close.  This would set the granularity at the level of a module which could have a negative
+impact if one open routine sleeps waiting for another to wake it.
+Therefore, for
+.B @PACKAGE_TITLE@
+a special exclusive outer perimeter at the level of the queue pair is established when the inner
+perimeter is at the level of the queue.
+.IP \(em
+Use of
+.BR str_install ()
+requires different include file sequences on
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+than on
+.IR AIX \(rg.
+.IR AIX \(rg
+includes
+.B <pse/mi.h>
+and
+.B <sys/stream.h>
+only.
+.IP \(em
+On
+.IR AIX \(rg
+.[
+aixspg
+.]
+synchronization flags are not supported.  On
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+synchronization flags are fully supported.
+.IP \(em
+.BR str_install ()
+is provided for source level compatibility with
+.IR AIX \(rg
+for the purpose of porting
+.IR AIX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR AIX \(rg,
+binaries are incompatible.
+.IP \(em
+.BR str_install ()
+only provides functionality comparable to
+.IR AIX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR str_install ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+DDI documentation.
+.[
+aixdoc
+.]
+.[
+aixspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR str_install ()
+first appeared in
+.IR AIX \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

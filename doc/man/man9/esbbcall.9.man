@@ -1,0 +1,645 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ESBBCALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B esbbcall
+\- install a buffer callback for an extended \fISTREAMS\fR message block
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "bcid_t esbbcall(int " priority ", void (*" function ")(long), long " arg );
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\ priority\ 'u
+.I priority
+the priority of the request for a message block.
+.PD 0
+.TP
+.I function
+the function to call when a block of the requested priority is available.
+.TP
+.I arg
+the argument to pass the callback function.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+When allocation of a message block fails as a result of a failed call to
+.BR esballoc (9),
+the
+.IR qi_srvp (9)
+procedure should place a
+.I STREAMS
+message that invoked
+.BR esballoc (9)
+call back on the queue with
+.BR putbq (9)
+and call the
+.BR esbbcall ()
+function with the queue's
+.IR qi_srvp (9)
+procedure as the
+.I function
+argument and a pointer to the queue as the
+.I arg
+argument to the call.  The
+.I priority
+argument should be the same as the
+.I priority
+argument issued to the
+.BR esballoc (9).
+.PP
+In this way, the queue
+.IR qi_srvp (9)
+procedure will be recalled once there is
+sufficient memory to allocate the requested message block.
+.PP
+The arguments to
+.BR esbbcall ()
+are interpreted as follows:
+.TP \w'\ priority\ 'u
+.I priority
+The priority of the requested message.  The priority can be one of the
+following values:
+.RS
+.TP \w'\ BPRI_MED\ 'u
+.B BPRI_LO
+The message block needed is for a low priority buffer.
+.PD 0
+.TP
+.B BPRI_MED
+The message block needed is for a medium priority buffer.
+.TP
+.B BPRI_HI
+The message block needed is for a high priority buffer.
+.PD
+.PP
+The
+.I priority
+argument is ignored by
+.I SVR 4.2
+.[
+svr42
+.]
+and later
+.I STREAMS
+implementations.  This
+argument is only used by
+.I SVR 3
+.[
+svr3
+.]
+implementations.
+This should be the priority which was provided to the failed
+.BR esballoc (9)
+call.
+.RE
+.TP
+.I function
+The callback function to invoke when a buffer of the required size and message
+of the requested priority becomes available.  This is normally the
+.IR qi_srvp (9)
+procedure which failed a call to
+.BR esballoc (9)
+or it is a function pointer to
+.BR qenable (9).
+.TP
+.I arg
+The argument to pass to the callback function.  This is normally a pointer to
+the queue whose
+.IR qi_srvp (9)
+procedure failed the
+.BR esballoc (9).
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.SH RETURN
+.PP
+.BR esbbcall ()
+returns a
+.B bcid_t
+defined as follows:
+.nf
+\fC\s-2
+typedef int bcid_t;
+typedef int bufcall_id_t;
+\s+2\fP
+.fi
+.PP
+Upon success,
+.BR esbbcall ()
+returns
+a non-zero bufcall id and the specified
+.I function
+will be called with the specified
+.I arg
+at a later time when combined message data blocks become available.
+.PP
+Upon failure,
+.BR esbbcall ()
+returns zero (0) and no call will be generated to the specified
+.IR function .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR esbbcall ()
+encounters an error, it returns zero (0).
+.PP
+.BR esbbcall ()
+returns zero (0) when the function pointer to the callback function,
+.I function
+is
+.BR NULL ,
+or
+.BR esbbcall ()
+cannot allocate the necessary internal structures.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR esbbcall ()
+can be called from any context, including user context,
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9),
+.IR qi_srvp (9)
+procedures,
+.BR bufcall (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9)
+callbacks,
+and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR esbbcall ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR esbbcall ()
+callback function can execute at the same time as any
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+procedure,
+.BR bufcall (9),
+.BR esbbcall (),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9)
+callback,
+and interrupt service routines (on another processor).
+.PP
+However, the
+.BR esbbcall ()
+callback function will be serviced by the same thread as the thread from which
+the
+.BR esbbcall ()
+was issued.  Therefore, the callback function will not execute
+until after
+.BR esbbcall ()
+returns.
+Because the servicing thread and the current thread are the same, the
+.BR esbbcall ()
+callback will not be invoked until after the function that called
+.BR esbbcall ()
+returns.
+This means that it is safe to store the returned bufcall id in global
+variables accessed by the callback function.
+.PP
+This is the same for
+.BR qtimeout (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR bufcall (9)
+and
+.BR esbbcall ()
+functions.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR esbbcall ()
+is implemented by calling
+.BR bufcall (9)
+with a
+.I size
+argument of zero (0).
+That is,
+.BI esbbcall( priority ", " function ", " arg )
+calls
+.BI bufcall( 0 ", " priority ", " function ", " arg )\fR.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+It is typical to see
+.BR esbbcall ()
+used to merely enable a queue from a service procedure as follows:
+.nf
+\fC\s-2
+ 1  void
+ 2  xxx_free_func(long data)
+ 3  {
+ 4      kfree((void *) data);
+ 5  }
+ 6  
+ 7  int
+ 8  xxx_srvp(queue_t *q)
+ 9  {
+10      priv_t priv = q->q_ptr;
+11      mblk_t *mp, *dp;
+12  
+13      while ((mp = getq(q))) {
+14          unsigned char *buf;
+15          size_t size = msgdsize(mp);
+16          frtn_t free_rtn;
+17  
+18          priv->bufcall = 0;
+19  
+20          switch (mp->b_datap->db_type) {
+21  
+22          case M_PROTO:
+23  
+24              if (!(buf = kmalloc(size,
+25                                  GFP_ATOMIC |
+26                                  GFP_DMA))) {
+27                  putbq(q, mp);
+28                  priv->bufcall =
+29                      bufcall(size, BPRI_MED,
+30                              (void *) &qenable,
+31                              (long) q);
+32                  if (priv->bufcall == 0)
+33                      qenable(q);
+34                  return (0);
+35              }
+36  
+37              free_rtn.free_func = &xxx_free_func;
+38              free_rtn.free_arg = (long) buf;
+39  
+40              if (!(dp = esballoc(buf, size,
+41                                  BPRI_MED,
+42                                  &free_rtn))) {
+43                  putbq(q, mp);
+44                  xxx_free_func((long) buf);
+45                  priv->bufcall =
+46                      esbbcall(BPRI_MED,
+47                               (void *) &qenable,
+48                               (long) q);
+49                  if (priv->bufcall == 0)
+50                      qenable(q);
+51                  return (0);
+52              }
+53  
+54              putnext(q, dp);
+55              freemsg(mp);
+56              return (0);
+57  
+58          /* ... */
+59          }
+60      }
+61      return (0);
+62  }
+\s+2\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putbq (9),
+.BR esballoc (9),
+.BR unbufcall (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR esbbcall ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR esbbcall ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR esbbcall ()
+is provided by
+.B Linux Fast-STREAMS
+for compatibility with some implementations.
+.IR AIX \(rg,
+.IR OSF/1 \(rg
+and
+.IR UXP/V \(rg
+do not document this function.
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR LiS ,
+.IR MacOT \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+document this function.
+Portable
+.I STREAMS
+drivers concerned with portability to or from
+.IR AIX \(rg,
+.IR OSF/1 \(rg
+or
+.IR UXP/V \(rg
+will call
+.BR bufcall (9)
+with a
+.I size
+argument of zero, instead of calling
+.BR esbbcall ().
+.IP \(em
+.BR esbbcall ()
+allocates a
+.B strevent
+structure which is then linked into the
+.I strbcalls
+system variable and sets the
+.I strbcwait
+flag which causes
+.BR kmem_free (9)
+to set the
+.I qrunflag
+when memory becomes available.
+The bufcall list is thus scheduled to run on the next invocation of
+.BR runqueues (9).
+This procedure is consistent with that described for
+.IR "SVR 4" .
+.[
+magic
+.]
+.IP ""
+Under
+.IR LiS ,
+.BR esbbcall ()
+does not actually generate a callback function once a buffer of the
+appropriate size becomes available.  Instead,
+.I LiS
+starts a timer.  When the timer expires, the ability to allocate the necessary buffers is checked
+and the callback function invoked if it is now possible to allocate the necessary structure and
+buffers.  This is no entirely consistent with
+.I SVR 4.2
+.[
+svr42
+.]
+operation.
+.IP \(em
+.BR esbbcall ()
+implements a
+.B bcid_t
+hash table to
+.B strevent
+objects for speed.
+.B strevent
+objects expire once the event's callback function has run.
+.IP ""
+.I LiS
+builds a linked list of buffer call structures and assigns an integer id to each structure.
+Searches for unique buffer ids when ids are assigned and searches for buffer ids when
+.BR unbufcall (9)
+is called are linear searches that are slow and inefficient.  In fact, \*(lqThe Magic Garden\*(rq
+explains that in
+.I SVR 4
+.[
+svr4
+.]
+a
+.BR esbbcall ()
+results in the create of a
+.B strevent
+structure which is linked to the
+.I strbcalls
+system variable and sets the
+.I strbcwait
+flag which then causes
+.BR kmem_free (9)
+to set the
+.IR qrunflag .
+At no point in this process is an integer id assigned to the
+.B strevent
+structure.  This means that
+.I LiS
+meaninglessly assigns an integer id to the buffer call structure and the inefficiencies of linear
+searches are pointless.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_esbbcall ()
+.\"is provided for compatibility with
+.\".IR LiS .  See
+.\".BR liscompat (9).
+.\".BR lis_esbbcall ()
+.\"returns
+.\".BR int .
+.IP \(em
+Depending on the system,
+.BR esbbcall ()
+returns
+.BR int ", " bcid_t ", " bufcall_id_t " or even " toid_t .
+.B Linux Fast-STREAMS
+assigns a type of
+.B int
+to
+.BR bcid_t ", " bufcall_id_t " and " toid_t 
+to avoid compatibility issues.
+.IP \(em
+.IR IRIX \(rg
+documents
+.[
+irixdoc
+.]
+.BR esbbcall ()
+as returning
+.BR toid_t .
+.B Linux Fast-STREAMS
+also defines a
+.B toid_t
+as
+.BR int .
+See
+.BR timeout (9).
+.IP \(em
+.IR IRIX \(rg
+documents
+.[
+irixdoc
+.]
+that the callback function will be called with local
+.I STREAMS
+driver interrupts disabled.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR esbbcall ()
+appeared as part of
+.I "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR esbbcall ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

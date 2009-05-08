@@ -1,0 +1,1 @@
+.so man4/sdlm.4.man

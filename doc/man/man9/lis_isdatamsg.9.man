@@ -1,0 +1,1 @@
+.so man9/isdatamsg.9.man

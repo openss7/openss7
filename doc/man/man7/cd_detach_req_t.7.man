@@ -1,0 +1,1 @@
+.so man7/CD_DETACH_REQ.7.man

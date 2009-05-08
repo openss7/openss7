@@ -1,0 +1,467 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH A_PABORT_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "X/Open ASCE/Presentation (XAP)"
+.\"
+.\"
+.SH NAME
+.B A_PABORT_REQ
+\-  initiate a Presentation provider abort
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.B int ap_snd(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long " sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t *" ubuf ,
+.br
+.BI "int " flags ,
+.br
+.BI "unsigned long *" aperrno_p );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B A_PABORT_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to initiate a Presentation Layer provider abort.  This facility
+gives the user the option of aborting an association from the Presentation provider when an invalid
+PDU encoding is encountered.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B A_PABORT_REQ
+primitive and restrictions on its use.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+To send an
+.B A_PABORT_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below.
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+This arugment identifies the XAP Library instance being used.
+.TP
+.I sptype
+This argument must be set to
+.BR AP_A_PABORT_REQ .
+.TP
+.I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long rsn;  /* reason for abort        */
+long evt;  /* event that caused abort */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->rsn
+must be set to indicate the reason for the abort.  The possible values for
+.I cdata->rsn
+are as follows:
+.TP \w'\fBAP_INVAL_PPDU_PARM\fP\(em'u
+.B AP_INVAL_PPDU_PARM
+Abort due to an invalid presentation protocol data unit parameter.
+.PD 0
+.TP
+.B AP_NSPEC
+The reason for abort is not specified.
+.TP
+.B AP_RSN_NOVAL
+No value was supplied for this optional parameter.
+.TP
+.B AP_UNEXPT_PPDU
+Abort due to an unexpected presentation protocol data unit.
+.TP
+.B AP_UNEXPT_SSPRIM
+Abort dues to an unexpected session service primitive.
+.TP
+.B AP_UNREC_PPDU
+Abort dues to an unrecognized presentation protocol data unit.
+.TP
+.B AP_UNREC_PPDU_PARM
+Abort dues to an unrecognized presentation protocol data unit parameter.
+.PD
+.PP
+The
+.I cdata->evt
+field indicates which PPDU or Session primitive which triggered the abort.  The possible values for
+.I cdata->evt
+are as follows:
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
+.B AP_EVT_NOVAL
+No value was supplied for this optional parameter.
+.PD 0
+.TP
+.B AP_PEI_AC
+Alter context PPDU.
+.TP
+.B AP_PEI_ACA
+Alter context acknowledge PPDU.
+.TP
+.B AP_PEI_ARP
+Abnormal release provider PPDU.
+.TP
+.B AP_PEI_ARU
+Abnormal release user PPDU.
+.TP
+.B AP_PEI_CP
+Connect presentation PPDU.
+.TP
+.B AP_PEI_CPA
+Connect presentation accept PPDU.
+.TP
+.B AP_PEI_CPR
+Connect presentation reject PPDU.
+.TP
+.B AP_PEI_RS
+Resynchronize PPDU.
+.TP
+.B AP_PEI_RSA
+Resynchronize acknowledge PPDU.
+.TP
+.B AP_PEI_S_ACT_START_IND
+Session activity start indication.
+.TP
+.B AP_PEI_S_ACT_RESUME_IND
+Session activity resume indication.
+.TP
+.B AP_PEI_S_ACT_INT_IND
+Session activity interrupt indication.
+.TP
+.B AP_PEI_S_ACT_INT_CNF
+Session activity interrupt confirmation.
+.TP
+.B AP_PEI_S_ACT_DISC_IND
+Session activity discard indication.
+.TP
+.B AP_PEI_S_ACT_DISC_CNF
+Session activity discard confirmation.
+.TP
+.B AP_PEI_S_ACT_END_IND
+Session activity end indication.
+.TP
+.B AP_PEI_S_ACT_END_CNF
+Session activity end confirmation.
+.TP
+.B AP_PEI_S_P_EXCEPT_REP_IND
+Session provider exception report indication.
+.TP
+.B AP_PEI_S_U_EXCEPT_REP_IND
+Session user exception report indication.
+.TP
+.B AP_PEI_S_RELEASE_IND
+Session release indication.
+.TP
+.B AP_PEI_S_RELEASE_CNF
+Session release confirmation.
+.TP
+.B AP_PEI_S_SYNCMAJOR_IND
+Session syncrhonize-major indication.
+.TP
+.B AP_PEI_S_SYNCMAJOR_CNF
+Session syncrhonize-major confirmation
+.TP
+.B AP_PEI_S_SYNCMINOR_IND
+Session syncrhonize-minor indication.
+.TP
+.B AP_PEI_S_SYNCMINOR_CNF
+Session syncrhonize-minor confirmation
+.TP
+.B AP_PEI_S_TOKENGIVE_IND
+Session token give indication.
+.TP
+.B AP_PEI_S_TOKENPLEASE_IND
+Session token please indication.
+.TP
+.B AP_PEI_TC
+Capability data PPDU.
+.TP
+.B AP_PEI_TCC
+Capability data acknowledge PPDU.
+.TP
+.B AP_PEI_TD
+Presentation data PPDU.
+.TP
+.B AP_PEI_TE
+Expedited data PPDU.
+.TP
+.B AP_PEI_TTD
+Presentation typed data PPDU.
+.PD
+.RE
+.TP
+.I ubuf
+Since no data is sent on an
+.BR A_PABORT_REQ ,
+this value must be
+.BR NULL .
+.TP
+.I flags
+Not used.
+.TP
+.I aperrno_p
+This must point to a location that will be set to an error code if a failure occurs.
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is originated by the XAP interface client.
+.\"
+.\"
+.SH STATE
+.PP
+This primitive is valid in all states except
+.BR AP_UNBOUND " and " AP_IDLE .
+.PP
+The next state is
+.BR AP_IDLE .
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_snd (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_snd (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.PP
+In addition to those listed in the manual page for
+.BR ap_snd (3),
+the following error codes can be reported for this primitive:
+.TP \w'[\fBAP_BADCD_RSN\fP]\(em'u
+.RB [ AP_BADCD_EVT ]
+The value of
+.I cdata->evt
+is not valid.
+.TP
+.RB [ AP_BADCD_RSN ]
+The value of
+.I cdata->rsn
+is not valid.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_snd (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B A_PABORT_REQ
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B A_PABORT_REQ
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B A_PABORT_REQ
+first appeared in APLI.
+.[
+apli unix international
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI/XAP Library under the OpenSS7
+Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
