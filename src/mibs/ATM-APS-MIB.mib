@@ -1,0 +1,1525 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+ATM-APS-MIB DEFINITIONS ::= BEGIN 
+ 
+IMPORTS 
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, 
+        NOTIFICATION-TYPE, enterprises, Counter32, Unsigned32 
+                FROM SNMPv2-SMI 
+        NOTIFICATION-GROUP 
+                FROM SNMPv2-CONF 
+        TEXTUAL-CONVENTION, RowStatus, TimeInterval, TruthValue, 
+        DateAndTime 
+                FROM SNMPv2-TC 
+        MODULE-COMPLIANCE, OBJECT-GROUP 
+                FROM SNMPv2-CONF 
+        AtmVcIdentifier, AtmVpIdentifier 
+                FROM ATM-TC-MIB 
+        InterfaceIndex 
+                FROM IF-MIB; 
+ 
+ 
+atmfApsMIB MODULE-IDENTITY  
+    LAST-UPDATED    "200202120000Z"  
+    ORGANIZATION    "The ATM Forum."  
+    CONTACT-INFO          
+        "The ATM Forum 
+         Worldwide Headquarters 
+         Presidio of San Francisco 
+         Building 572B Ruger (surface) 
+         P.O. Box 29920 (mail) 
+         San Francisco, CA 94129-0920 USA 
+         Phone: +1.415.561.6275 
+         Email: info@atmforum.com" 
+    DESCRIPTION  
+        "The SNMP MIB module for ATM Automatic Protection Switching (APS) 
+         for the M4 NE View (af-nm-0184.000)"  
+ 
+    ::= { atmfAps 1 }  
+ 
+atmForum        OBJECT IDENTIFIER ::= { enterprises 353 }   
+atmForumNetworkManagement  OBJECT IDENTIFIER ::= { atmForum 5 }   
+ 
+atmfAps       OBJECT IDENTIFIER ::= { atmForumNetworkManagement 11 }  
+atmfApsMIBObjects  OBJECT IDENTIFIER ::= { atmfApsMIB 1 }   
+ 
+-- Textual Conventions  
+ 
+ 
+SignalId ::= TEXTUAL-CONVENTION 
+      STATUS      current  
+      DESCRIPTION 
+        "This object indicates if the associated table entry is 
+         of VP or VC type. When the table entry is of VP type the 
+         Vci column of the associated entry will either not be used  
+         or will be given a specified fixed value." 
+      SYNTAX INTEGER { 
+        vp (1), 
+        vc (2) 
+        }     
+ 
+AtmfApsFailToSwitchType ::= TEXTUAL-CONVENTION  
+      STATUS      current  
+      DESCRIPTION  
+        "This object defines which type of failure that is experienced 
+         when the ATM APS function fails to switch at an APS triggering 
+         event. In case the switching is successful this object will have 
+         the value 'none'. 
+ 
+         The different switch failure reasons are: 
+           - localFailToSwitchAtSfSd: 
+              This means that this APS End Point fails to switch when 
+              it experiences a signal fail or signal degrade at the 
+              working or protection entity. 
+           - localFailToSwitchAtWtr: 
+              This means that this APS End Point fails to switch back 
+              to the working entity when the wait to restore timer 
+              expires. 
+           - localFailToSwitchAtSwFarEnd: 
+              This means that this APS End Point fails to switch when 
+              a switch occurs at the remote end of the protected domain 
+              (at bi-directional protection switching)."  
+      SYNTAX INTEGER {  
+        none(1), 
+        localFailToSwitchAtSfSd (2),  
+        localFailToSwitchAtWtr (3), 
+        localFailToSwitchAtSwFarEnd (4) 
+       }  
+ 
+-- The ATM APS End Point Table 
+ 
+atmfApsConnGroup OBJECT IDENTIFIER ::= { atmfApsMIBObjects 1 }  
+ 
+atmfApsEpTable OBJECT-TYPE  
+    SYNTAX     SEQUENCE OF AtmfApsEpEntry  
+    MAX-ACCESS not-accessible  
+    STATUS     current  
+    DESCRIPTION  
+        "The table contains the configured ATM APS End Points within  
+         the network element."  
+    ::= { atmfApsConnGroup 1 }  
+ 
+atmfApsEpEntry OBJECT-TYPE  
+    SYNTAX     AtmfApsEpEntry  
+    MAX-ACCESS not-accessible  
+    STATUS     current  
+    DESCRIPTION  
+        "Each entry in this table specifies an ATM APS End Point which 
+         represents one end of a protected domain. The APS End Point 
+         may be related to one atmfApsWorkProtPairEntry if single protection, 
+         or to a number of atmfApsWorkProtPairEntry if group protection. 
+ 
+         To create a single protected connection the following steps shall 
+         be taken: 
+          - Create the working atmVclEntry or atmVplEntry, if it is not 
+            already existing (This VCL or VPL may at this stage already 
+            be cross connected). 
+          - Create the protection atmVclEntry or atmVplEntry  
+          - Create the atmfApsEpEntry specifying the protection scheme etc.  
+            and setting the atmfApsEpGroupIndicator to 'single'.  
+          - Create the atmfApsWpPairEntry pointing to the working and  
+            protection VCLs or VPLs using the index of this atmfApsEpEntry  
+            as part of the row index.  
+  
+         To create a protected group the following steps shall be taken:  
+          - (0) Create the atmfApsEpEntry specifying the protection scheme  
+            etc. and setting the atmfApsEpGroupIndicator to 'group'.  
+            The working and protection test trails shall also be specified  
+            here by setting the associated objects in the atmfApsEpEntry.   
+            These objects are: 
+              - atmfApsEpTestTrailSignalId 
+              - atmfApsEpTestTrailWorkingIf 
+              - atmfApsEpTestTrailWorkingVpi 
+              - atmfApsEpTestTrailWorkingVci 
+              - atmfApsEpTestTrailProtectionIf 
+              - atmfApsEpTestTrailProtectionVpi   
+              - atmfApsEpTestTrailProtectionVci 
+ 
+          - (1) Create the working atmVclEntry or atmVplEntry, if it is  
+            not already existing (This VCL or VPL may at this stage already  
+            be cross connected if it is not located at the end of the   
+            VCC or VPC). At group protection the working VCL or VPL must  
+            always be located at the same interface as the working test   
+            trail.  
+ 
+          - (2) Create the protection atmVclEntry or atmVplEntry. At group   
+            protection the protection VCL or VPL must always be located at  
+            the same interface as the protection test trail.  
+ 
+          - (3) Create a atmfApsWpPairEntry pointing to the working and  
+            protection VCLs or VPLs using the index of this atmfApsEpEntry  
+            as part of the row index.  
+ 
+          - Repeat step (1) to (3) for each connection that shall belong  
+            to the protected group  
+ 
+         To remove a single protected connection first remove the  
+         atmfApsWpPairEntry row (and the two associated atmVplEntry or  
+         atmVclEntry rows) and then remove the atmfApsEpEntry row. 
+ 
+         To remove a protected group first remove all atmfApsWpPairEntry  
+         rows of the group (and the associated atmVplEntry or atmVclEntry  
+         rows) and then remove the atmfApsEpEntry row. Removing of the  
+         atmfApsEpEntry row will also remove the test trails associated with  
+         it. 
+        " 
+    INDEX      { atmfApsEpIndex }   
+    ::= { atmfApsEpTable 1 }   
+ 
+AtmfApsEpEntry ::= SEQUENCE    
+    {   
+            atmfApsEpIndex                   Unsigned32,   
+            atmfApsEpProtScheme              INTEGER,   
+            atmfApsEpProtDirection           INTEGER,   
+            atmfApsEpProtMode                INTEGER,   
+            atmfApsEpGroupIndicator          INTEGER,   
+            atmfApsEpCouplIndicator          INTEGER,   
+            atmfApsEpTriggers	               BITS,   
+            atmfApsEpHoldOffTimer            Integer32,   
+            atmfApsEpWtrTimer                Integer32,   
+            atmfApsEpManualRequest           INTEGER,   
+            atmfApsEpApsRequestList          OCTET STRING,   
+            atmfApsEpCurrentK1Byte           Integer32,   
+            atmfApsEpCurrentK2Byte           Integer32,  
+            atmfApsEpSelectorStatus          INTEGER,   
+            atmfApsEpBridgeStatus            INTEGER,   
+            atmfApsEpAvailabilityStatus      INTEGER,   
+            atmfApsEpTestTrailSignalId       SignalId, 
+            atmfApsEpTestTrailWorkingIf      InterfaceIndex,   
+            atmfApsEpTestTrailWorkingVpi     AtmVpIdentifier,   
+            atmfApsEpTestTrailWorkingVci     AtmVcIdentifier,   
+            atmfApsEpTestTrailProtectionIf   InterfaceIndex,   
+            atmfApsEpTestTrailProtectionVpi  AtmVpIdentifier,   
+            atmfApsEpTestTrailProtectionVci  AtmVcIdentifier,   
+            atmfApsEpRowStatus               RowStatus   
+    }   
+ 
+atmfApsEpIndex OBJECT-TYPE   
+    SYNTAX     Unsigned32   
+    MAX-ACCESS read-only   
+    STATUS     current   
+    DESCRIPTION   
+        "An arbitrary integer uniquely identifying a APS End Point. This  
+         will be assigned when the APS End Point is created."   
+    ::= { atmfApsEpEntry 1 }   
+ 
+atmfApsEpProtScheme OBJECT-TYPE   
+    SYNTAX INTEGER {  
+      onePlusOne(1),  
+      oneColonOne(2)  
+      }  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "The protection scheme used for the APS End Point. The protection  
+         scheme is either of 1+1 or 1:1 type."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 2 }   
+ 
+atmfApsEpProtDirection OBJECT-TYPE   
+    SYNTAX INTEGER {  
+      uniDirectional(1),  
+      biDirectional(2)  
+      }  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute indicates if the protection switching is coordinated  
+         between the two APS End Points or not. If uni-directional switching  
+         is specified the two APS End Points may switch independently of each  
+         other. If bi-directional switching is specified switching of both  
+         ends will be coordinated through the ATM APS protocol. "   
+    REFERENCE   
+        "ITU-T Recommendation I.630"    
+    ::= { atmfApsEpEntry 3 }   
+ 
+atmfApsEpProtMode OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        revertive(1),  
+        nonRevertive(2)  
+        }  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute specifies if revertive or non-revertive switching   
+         shall apply for the APS End Point."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    DEFVAL     { nonRevertive }   
+    ::= { atmfApsEpEntry 4 }   
+ 
+atmfApsEpGroupIndicator OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        single(1),  
+        group(2)  
+        }  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute specifies if the APS End Point is used for protection  
+         of an individual (single) connection or for group protection."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    DEFVAL     { single }   
+    ::= { atmfApsEpEntry 5 }   
+ 
+atmfApsEpCouplIndicator OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        none(1),  
+        segmentEndPoint(2),  
+        endToEndPoint(3)  
+        }  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute denotes whether the associated Working and Protection  
+         ATM end points (VPLs or VCLs) are OAM flow end points or not. Valid   
+         values are 'none', 'end-to-end point' or 'segment end point'. Note  
+         that the value 'none' will be returned for group protection or for a  
+         non-intrusively monitored ATM APS connection."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 6 }   
+ 
+atmfApsEpTriggers OBJECT-TYPE   
+    SYNTAX BITS {  
+            endToEndAis(0),   
+            segmentAis(1),   
+            signalDegrade(2),   
+            lossOfSignal(3) 
+            }  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute specifies the triggers that are used for the  
+         protection switching mechanism. One or several triggers may be 
+         configured. To activate a specific trigger the corresponding bit  
+         of this attribute shall be set to 1. 
+ 
+         Note: The use of 'signal degrade' as an ATM APS triggering  
+         Condition is still for further study within ITU-T."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 7 }   
+ 
+atmfApsEpHoldOffTimer OBJECT-TYPE   
+    SYNTAX Integer32 (0..10000)  
+    UNITS "milliseconds" 
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute defines the duration of the hold-off timer in ATM APS.  
+         The value is specified in milliseconds starting at 0 milliseconds    
+         with a maximum of 10 seconds.   
+         The timer specifies the time from a lower layer impairment until the  
+         ATM layer protection switching function will be activated.  
+         The default value is 500 ms."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    DEFVAL     { 500 }   
+    ::= { atmfApsEpEntry 8 }   
+ 
+atmfApsEpWtrTimer OBJECT-TYPE   
+    SYNTAX Integer32 (1..30)  
+    UNITS "minutes"  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute defines the wait to restore time in minutes at   
+         revertive protection switching."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    DEFVAL     { 12 }   
+    ::= { atmfApsEpEntry 9 }   
+ 
+atmfApsEpManualRequest OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        noOp(1), 
+        setFreeze(2),  
+        clearFreeze(3), 
+        setLockoutOfProtection(4),  
+        clearLockoutOfProtection(5),  
+        setForcedSwitchForWorking(6),  
+        clearForcedSwitchForWorking(7),  
+        setManualSwitchForWorking(8), 
+        clearManualSwitchForWorking(9), 
+        setManualSwitchForProtection(10), 
+        clearManualSwitchForProtection(11), 
+        clearAll(12) 
+        }  
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute enables activation and clearing of the different  
+         manual requests that may be performed towards an APS End Point.  
+         The different requests that may be set or cleared are:  
+          - freeze :   
+              This will freeze the bridge/selector in the current position and  
+              thus prevent any protection switching for this APS End Point.  
+              This request may be combined with any of the requests below. 
+          - lockoutOfProtection :   
+              This prevents any protection switching from the working to the  
+              protection entity. If the traffic was routed to the protection  
+              entity it will be forced back to the working entity.  
+          - forcedSwitchForWorking :   
+              This will force the traffic from the working entity to the   
+              protection entity unless there are any higher priority requests. 
+          - manualSwitchForWorking :   
+              This will force the traffic from the working entity to the   
+              protection entity unless there are any higher priority requests.  
+              A signal fail or a signal degrade will have higher priority than  
+              this request.  
+          - manualSwitchForProtection :   
+              This will force the traffic from the protection entity to the   
+              working entity unless there are any higher priority requests.  
+              A signal fail or a signal degrade will have higher priority than  
+              this request. 
+ 
+         The clearAll action will clear all active manual requests through 
+         one set operation, thus avoiding clearing of each active request 
+         separately. The requests that will be cleared through the clearAll 
+         command are the 'Freeze', 'Lockout of protection', 'Forced switch for 
+         working', 'Manual switch for working' and 'Manual switch for 
+         protection'. Any active automatic requests (non operator initiated 
+         request) will not be affected by the clearAll command. 
+ 
+         When read this attribute will have the value 'noOp'. The active 
+         requests are instead displayed through the atmfApsEpApsRequestList 
+         attribute."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 10 }   
+ 
+atmfApsEpApsRequestList OBJECT-TYPE   
+    SYNTAX OCTET STRING  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute displays which local ATM APS requests   
+         (operator initiated or automatically initiated) that currently  
+         are active for the APS End Point. The list is sorted  
+         in priority order according to ITU-T I.630. I.e. the first octet in  
+         the list contains the identity of the request of the highest priority  
+         and so on. The identities of the different requests are coded as  
+         integers and defined as follows:  
+           - freeze(1)  
+           - lockoutOfProtection(2)  
+           - signalFailForProtection(3)  
+           - forcedSwitchForWorking(4)  
+           - signalFailForWorking(5)  
+           - signalDegradeForProtection(6)  
+           - signalDegradeForWorking(7)  
+           - manualSwitchForProtection(8)  
+           - manualSwitchForWorking(9)  
+           - waitToRestoreForWorking(10)  
+           - doNotRevertForWorking(11)  
+           - noRequest(12)"   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 11 }   
+ 
+atmfApsEpCurrentK1Byte OBJECT-TYPE   
+    SYNTAX Integer32 (0..255)  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute displays the value of the current K1 byte as received  
+         through the ATM APS protocol. The K1 byte is defined in ITU-T I.630." 
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 12 }   
+ 
+atmfApsEpCurrentK2Byte OBJECT-TYPE   
+    SYNTAX Integer32 (0..255)  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute displays the value of the current K2 byte as received  
+         through the ATM APS protocol. The K2 byte is defined in ITU-T I.630." 
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 13 }   
+ 
+atmfApsEpSelectorStatus OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        working(1),  
+        protection(2)  
+        }  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute indicates the selector status of the APS End Point.  
+         The attribute points out from which entity the incoming cell flow is 
+         received. Either it is coming from the working entity or from the  
+         protection entity."   
+    REFERENCE   
+        "ITU-T Recommendation I.630"   
+    ::= { atmfApsEpEntry 14 }   
+ 
+atmfApsEpBridgeStatus OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        working(1),  
+        protection(2),  
+        both(3)  
+        }  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute indicates the bridge status of the APS End Point.  
+         The attribute points out to which entity(ies) the outgoing cell flow  
+         is sent. Either it is sent to the working entity or to the protection 
+         Entity at 1:1 protection, or to both entities at 1+1 protection."  
+    ::= { atmfApsEpEntry 15 }   
+ 
+atmfApsEpAvailabilityStatus OBJECT-TYPE   
+    SYNTAX INTEGER {  
+        fullyOperational(1),  
+        degraded(2),  
+        disabled(3)  
+        }  
+    MAX-ACCESS read-only  
+    STATUS     current  
+    DESCRIPTION   
+        "This attribute indicates the availability status of the APS End   
+         Point. When the APS End Point cannot provide it's service this   
+         attribute will be set to 'disabled'. If either the working or   
+         protection entity is out of service the attribute will be set to   
+        'degraded'."    
+    ::= { atmfApsEpEntry 16 }   
+ 
+atmfApsEpTestTrailSignalId OBJECT-TYPE   
+    SYNTAX SignalId 
+    MAX-ACCESS read-create  
+    STATUS     current  
+    DESCRIPTION  
+        "This attribute indicates if the test trail is of VP or VC type. 
+ 
+         When the test trail is of VPC type (this object is set to 'vp'), 
+         the following objects have to be specified at test trail creation : 
+          -For the working test trail: 
+            atmfApsEpTestTrailWorkingIf 
+            atmfApsEpTestTrailWorkingVpi 
+ 
+          -For the protection test trail: 
+            atmfApsEpTestTrailProtectionIf 
+            atmfApsEpTestTrailProtectionVpi 
+ 
+         When the test trail is of VCC type (this object is set to 'vc'), 
+         the following objects have to be specified at test trail creation : 
+          -For the working test trail: 
+            atmfApsEpTestTrailWorkingIf 
+            atmfApsEpTestTrailWorkingVpi 
+            atmfApsEpTestTrailWorkingVci 
+ 
+          -For the protection test trail: 
+            atmfApsEpTestTrailProtectionIf 
+            atmfApsEpTestTrailProtectionVpi 
+            atmfApsEpTestTrailProtectionVci 
+        " 
+    ::= { atmfApsEpEntry 17 }    
+ 
+atmfApsEpTestTrailWorkingIf OBJECT-TYPE   
+      SYNTAX     InterfaceIndex   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+        "This object identifies the interface of the working test trail at  
+         group protection.   
+ 
+         NOTE: The test trail objects must be specified prior to creating  
+         any objects in the atmfApsWpPairTable at group protection.  
+ 
+         When a VCC test trail is created, the three objects :  
+              - atmfApsEpTestTrailWorkingIf  
+              - atmfApsEpTestTrailWorkingVpi  
+              - atmfApsEpTestTrailWorkingVci  
+         shall be included in one set operation so that the underlying  
+         VCC used to terminate the working test trail may be created.  
+ 
+         When a VPC test trail is created, the two objects : 
+              - atmfApsEpTestTrailWorkingIf  
+              - atmfApsEpTestTrailWorkingVpi  
+         shall be supplied in one set operation to create the test trail 
+         VPC." 
+      REFERENCE   
+        "ITU-T Recommendation I.630"  
+      ::= { atmfApsEpEntry 18 }   
+ 
+atmfApsEpTestTrailWorkingVpi OBJECT-TYPE   
+      SYNTAX     AtmVpIdentifier   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+        "This object identifies the VPI of the working test trail at group  
+         protection.         
+ 
+         NOTE: The test trail objects must be specified prior to creating  
+         any objects in the atmfApsWpPairTable at group protection."  
+      REFERENCE   
+        "ITU-T Recommendation I.630"  
+      ::= { atmfApsEpEntry 19 }   
+ 
+atmfApsEpTestTrailWorkingVci OBJECT-TYPE   
+      SYNTAX     AtmVcIdentifier   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+        "This object identifies the VCI of the working test trail at group  
+         protection. This object shall not be used when the test trail is of   
+         VPC type (when the atmfApsEpTestTrailSignalId is set to 'vp'). 
+ 
+         NOTE: The test trail objects must be specified prior to creating  
+         any objects in the atmfApsWpPairTable at group protection."   
+      REFERENCE   
+        "ITU-T Recommendation I.630"  
+      ::= { atmfApsEpEntry 20 }   
+ 
+atmfApsEpTestTrailProtectionIf OBJECT-TYPE   
+      SYNTAX     InterfaceIndex   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+        "This object identifies the interface of the protection test trail at  
+         group protection.  
+ 
+         NOTE: The test trail objects must be specified prior to creating  
+         any objects in the atmfApsWpPairTable at group protection. 
+ 
+         When a VCC test trail is created, all three objects :  
+              - atmfApsEpTestTrailProtectionIf  
+              - atmfApsEpTestTrailProtectionVpi  
+              - atmfApsEpTestTrailProtectionVci  
+         shall be included in one set operation so that the underlying  
+         VCC used to terminate the protection test trail may be created. 
+ 
+         When a VPC test trail is created, the two objects : 
+             - atmfApsEpTestTrailProtectionIf  
+ - atmfApsEpTestTrailProtectionVpi  
+         shall be supplied in one set operation to create the test trail 
+         VPC."  
+      REFERENCE   
+        "ITU-T Recommendation I.630"  
+      ::= { atmfApsEpEntry 21 }   
+ 
+atmfApsEpTestTrailProtectionVpi OBJECT-TYPE   
+      SYNTAX     AtmVpIdentifier   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+        "This object identifies the VPI of the protection test trail at group  
+         protection.  
+ 
+         NOTE: The test trail objects must be specified prior to creating  
+         any objects in the atmfApsWpPairTable at group protection."  
+      REFERENCE   
+        "ITU-T Recommendation I.630"  
+      ::= { atmfApsEpEntry 22 }   
+ 
+atmfApsEpTestTrailProtectionVci OBJECT-TYPE   
+      SYNTAX     AtmVcIdentifier   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+        "This object identifies the VCI of the protection test trail at group  
+         protection. This object shall not be used when the test trail is of   
+         VPC type (when the atmfApsEpTestTrailSignalId is set to 'vp').  
+ 
+         NOTE: The test trail objects must be specified prior to creating  
+         any objects in the atmfApsWpPairTable at group protection."  
+      REFERENCE   
+        "ITU-T Recommendation I.630"  
+      ::= { atmfApsEpEntry 23 }   
+ 
+atmfApsEpRowStatus  OBJECT-TYPE   
+      SYNTAX     RowStatus   
+      MAX-ACCESS read-create   
+      STATUS     current   
+      DESCRIPTION   
+          "Indicates the status of this row. The object is used according  
+           to the standard procedures for object creation/deletion. To  
+           destroy an entry in this table all the objects corresponding to  
+           it in the atmfApsWpPairTable must be destroyed first."   
+      ::= { atmfApsEpEntry 24 }   
+ 
+ 
+-- The ATM APS Working Protection Pair table  
+ 
+atmfApsWpPairTable OBJECT-TYPE   
+    SYNTAX     SEQUENCE OF AtmfApsWpPairEntry   
+    MAX-ACCESS not-accessible   
+    STATUS     current   
+    DESCRIPTION   
+        "The table contains the configured ATM APS working/protection pairs  
+         of the network element."   
+    ::= { atmfApsConnGroup 2 }   
+ 
+atmfApsWpPairEntry OBJECT-TYPE   
+    SYNTAX     AtmfApsWpPairEntry   
+    MAX-ACCESS not-accessible   
+    STATUS     current   
+    DESCRIPTION   
+        " Each entry in this table represents a protected   
+          VP or VC connection.  
+ 
+          In case of protection of a single connection there  
+          will be a one to one relationship between this entry  
+          and the corresponding atmfApsEpEntry.  
+ 
+          Several entries in this table may be related to one        
+          atmfApsEpEntry in case of group protection. In this  
+          case the entries will use the same atmfApsWpEpIndex.  
+ 
+          When a row in this table is created there must already  
+          exist two rows in the atmVclTable or atmVplTable  
+          that this entity may point at. These two entities shall  
+          be configured with the same traffic contract (traffic  
+          descriptors).   
+ 
+          The two entities shall also be of the same type:  
+            - if one Vpl is terminated (used for VC switching)  
+              the other Vpl shall be terminated as well.  
+            - if one Vcl is terminated the other Vcl shall be  
+              terminated as well.  
+            - if one Vcl/Vpl is intended for cross-connection  
+              the other Vcl/Vpl shall have the same property.  
+            - if one Vcl/Vpl is a segment end point the other  
+              shall also be a segment end point etc.  
+         "   
+    INDEX      { atmfApsWpEpIndex,   
+                 atmfApsWpPairWorkIf,  
+                 atmfApsWpPairWorkVpi,  
+                 atmfApsWpPairWorkVci,   
+                 atmfApsWpPairProtIf,   
+                 atmfApsWpPairProtVpi,  
+                 atmfApsWpPairProtVci }   
+    ::= { atmfApsWpPairTable 1 }   
+ 
+AtmfApsWpPairEntry ::= SEQUENCE    
+    {   
+            atmfApsWpEpIndex               Unsigned32,  
+            atmfApsWpPairWorkIf            InterfaceIndex,   
+            atmfApsWpPairWorkVpi           AtmVpIdentifier,   
+            atmfApsWpPairWorkVci           AtmVcIdentifier,   
+            atmfApsWpPairProtIf            InterfaceIndex,   
+            atmfApsWpPairProtVpi           AtmVpIdentifier,   
+            atmfApsWpPairProtVci           AtmVcIdentifier,  
+            atmfApsWpPairSignalId          SignalId,  
+            atmfApsWpPairRowStatus         RowStatus   
+    }   
+ 
+atmfApsWpEpIndex OBJECT-TYPE   
+    SYNTAX     Unsigned32   
+    MAX-ACCESS not-accessible   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the APS End Point to which this Working  
+         Protection Pair belongs."   
+    ::= { atmfApsWpPairEntry 1 }   
+ 
+atmfApsWpPairWorkIf OBJECT-TYPE   
+    SYNTAX     InterfaceIndex   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the interface of the working entity VP or VC." 
+    ::= { atmfApsWpPairEntry 2 }   
+ 
+atmfApsWpPairWorkVpi OBJECT-TYPE   
+    SYNTAX     AtmVpIdentifier   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the VPI of the working entity (VP or VC)."   
+    ::= { atmfApsWpPairEntry 3 }   
+ 
+atmfApsWpPairWorkVci OBJECT-TYPE   
+    SYNTAX     AtmVcIdentifier   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the VCI of the working entity if a protected  
+         VC. In case of VP protection (atmfApsWpPairSignalId is set  
+         to 'vp') this object shall have the value 0. "   
+    ::= { atmfApsWpPairEntry 4 }   
+ 
+atmfApsWpPairProtIf OBJECT-TYPE   
+    SYNTAX     InterfaceIndex   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the interface of the protection entity   
+         (VP or VC)."   
+    ::= { atmfApsWpPairEntry 5 }   
+ 
+atmfApsWpPairProtVpi OBJECT-TYPE   
+    SYNTAX     AtmVpIdentifier   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the VPI of the protection entity (VP or VC)."   
+    ::= { atmfApsWpPairEntry 6 }   
+ 
+atmfApsWpPairProtVci OBJECT-TYPE   
+    SYNTAX     AtmVcIdentifier   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the VCI of the protection entity if a  
+         protected VC. In case of VP protection (atmfApsWpPairSignalId  
+         is set to 'vp') this object shall have the value 0."   
+    ::= { atmfApsWpPairEntry 7 }  
+ 
+atmfApsWpPairSignalId OBJECT-TYPE   
+    SYNTAX     SignalId   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object indicates if the working-protection pair is of VP 
+         or VC type" 
+    ::= { atmfApsWpPairEntry 8 }  
+ 
+atmfApsWpPairRowStatus  OBJECT-TYPE   
+    SYNTAX     RowStatus   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "Indicates the status of this row. The object is used according  
+         to the standard procedures for object creation/deletion.  
+ 
+         Prior to creating an entry in this table an entry in the  
+         atmfApsEpTable must be created. There must also exist two  
+         entries in the atmVclTable or the atmVplTable (for the  
+         working and protection entity). "   
+    ::= { atmfApsWpPairEntry 9 }   
+ 
+ 
+-- The ATM APS Extra Traffic table  
+ 
+atmfApsExtraTrafTable OBJECT-TYPE   
+    SYNTAX     SEQUENCE OF AtmfApsExtraTrafEntry   
+    MAX-ACCESS not-accessible   
+    STATUS     current   
+    DESCRIPTION   
+        "The table contains the configured ATM APS Extra Traffic 
+         entities associated with the the network element."   
+    ::= { atmfApsConnGroup 3 }   
+ 
+atmfApsExtraTrafEntry OBJECT-TYPE   
+    SYNTAX     AtmfApsExtraTrafEntry   
+    MAX-ACCESS not-accessible   
+    STATUS     current   
+    DESCRIPTION   
+        " Each entry in this table represents a VP or VC  
+          connection used for extra traffic at 1:1 protection. 
+          The extra traffic entry is always configured to  
+          the protection interface. Several extra traffic  
+          connections may be associated with one atmfApsEpEntry 
+          (as long as their bandwidth does not exceed the 
+          bandwidth of the associated protection entity). 
+ 
+          The connection may be of VPL,VPC,VCL or VCC type.    
+ 
+          If the extra traffic connection is of VP type  
+          (atmfApsExTrafSignalId is set to 'vp') the  
+          VCI value shall be set to 0. The atmfApsEtrafProtectionIf 
+          and atmfApsExTrafVpi shall in this case point to an entry in the 
+          atmVplTable used for the extra traffic. 
+ 
+          If the extra traffic connection is of VC type the  
+          atmfApsEtrafProtectionIf, atmfApsExTrafVpi and atmfApsExTrafVci 
+          shall point to an entry in the atmVclTable used for the extra  
+          traffic.  
+         "   
+    INDEX      { atmfApsExTrafEpIndex,   
+                 atmfApsExTrafProtectionIf,  
+                 atmfApsExTrafVpi,  
+                 atmfApsExTrafVci }   
+    ::= { atmfApsExtraTrafTable 1 }   
+ 
+AtmfApsExtraTrafEntry ::= SEQUENCE    
+    {   
+            atmfApsExTrafEpIndex               Unsigned32,  
+            atmfApsExTrafProtectionIf          InterfaceIndex,   
+            atmfApsExTrafVpi                   AtmVpIdentifier,   
+            atmfApsExTrafVci                   AtmVcIdentifier,  
+            atmfApsExTrafSignalId              SignalId, 
+            atmfApsExTrafRowStatus             RowStatus   
+    }   
+ 
+atmfApsExTrafEpIndex OBJECT-TYPE   
+    SYNTAX     Unsigned32   
+    MAX-ACCESS not-accessible   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the APS End Point to which this Extra 
+         Traffic entity belongs."   
+    ::= { atmfApsExtraTrafEntry 1 }  
+ 
+atmfApsExTrafProtectionIf OBJECT-TYPE   
+    SYNTAX     InterfaceIndex   
+    MAX-ACCESS read-create 
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the interface index associated with 
+         the protection entity for which the extra traffic is configured."   
+    ::= { atmfApsExtraTrafEntry 2 }  
+ 
+atmfApsExTrafVpi OBJECT-TYPE   
+    SYNTAX     AtmVpIdentifier   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the VPI value of the Extra Traffic entity."   
+    ::= { atmfApsExtraTrafEntry 3 }  
+ 
+atmfApsExTrafVci OBJECT-TYPE   
+    SYNTAX     AtmVcIdentifier   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object identifies the VCI value of the Extra Traffic entity 
+         if it is a VC connection. If the Extra Traffic entity is of VP 
+         type (atmfApsExTrafSignalId is set to 'vp') this object shall  
+         have the value 0."   
+    ::= { atmfApsExtraTrafEntry 4 } 
+ 
+atmfApsExTrafSignalId OBJECT-TYPE   
+    SYNTAX     SignalId   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "This object indicates if this extra traffic entity is of VP 
+   or VC type."   
+    ::= { atmfApsExtraTrafEntry 5 }    
+ 
+atmfApsExTrafRowStatus OBJECT-TYPE   
+    SYNTAX     RowStatus   
+    MAX-ACCESS read-create   
+    STATUS     current   
+    DESCRIPTION   
+        "Indicates the status of this row. The object is used according  
+         to the standard procedures for object creation/deletion.  
+ 
+         Prior to creating an entry in this table an entry (or several at 
+         group protection ) in the atmfApsWpPairTable must be created. 
+         This is to allow identification of the protection interface and 
+         to enable check of the allocated bandwidth. 
+         There must also exist an entry in either the atmVclTable or the 
+         atmVplTable located at the protection interface to be associated 
+         with the extra traffic."  
+    ::= { atmfApsExtraTrafEntry 6 }  
+ 
+--  
+-- ATM APS Current Data tables  
+--  
+ 
+atmfApsStatisticsGroup OBJECT IDENTIFIER ::= { atmfApsMIBObjects 2 }   
+ 
+ 
+atmfApsCurrTable OBJECT-TYPE  
+     SYNTAX SEQUENCE OF AtmfApsCurrEntry  
+     MAX-ACCESS  not-accessible  
+     STATUS      current  
+     DESCRIPTION  
+         "The ATM APS Current Data statistics table.  
+ 
+          This table maintains statistics for the ATM APS End  
+          Points displaying data for the fifteen-minute interval   
+          currently being collected."  
+     ::= { atmfApsStatisticsGroup 1 }  
+ 
+atmfApsCurrEntry OBJECT-TYPE  
+     SYNTAX      AtmfApsCurrEntry  
+     MAX-ACCESS  not-accessible  
+     STATUS      current  
+     DESCRIPTION  
+          "An entry in the ATM APS Current Data table  
+           holds statistics for a specific ATM APS End Point.  
+ 
+           Each ATM APS End Point automatically has  
+           an entry in this table associated with it."  
+     INDEX  { atmfApsEpIndex }  
+     ::= { atmfApsCurrTable 1 }  
+ 
+AtmfApsCurrEntry ::= SEQUENCE {  
+     atmfApsCurrSuspect          TruthValue,  
+     atmfApsCurrElapsedTime      TimeInterval,  
+     atmfApsCurrSupprIntvls      Counter32,  
+     atmfApsCurrFailSwOnSfSd     Counter32,  
+     atmfApsCurrFailSwOnWtr      Counter32,  
+     atmfApsCurrFailSwNearEnd    Counter32,  
+     atmfApsCurrFailSwFarEnd     Counter32,  
+     atmfApsCurrSuccessSwitch    Counter32  
+          }  
+ 
+atmfApsCurrSuspect OBJECT-TYPE  
+     SYNTAX     TruthValue  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "If true, the statistics in this entry may be unreliable."  
+     ::= { atmfApsCurrEntry 1 }  
+ 
+atmfApsCurrElapsedTime OBJECT-TYPE  
+     SYNTAX     TimeInterval  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "Amount of time, measured in units of 0.01 second, that  
+          statistics for this entry (the current interval) have been  
+          counted."  
+     ::= { atmfApsCurrEntry 2 }  
+ 
+atmfApsCurrSupprIntvls OBJECT-TYPE  
+     SYNTAX     Counter32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "This attribute is non-zero only if the ATM NE is  
+          suppressing ATM APS History Data  
+          entry creation when the current interval terminates with  
+          'all-zeroes' performance measurements."  
+     ::= { atmfApsCurrEntry 3 }  
+ 
+atmfApsCurrFailSwOnSfSd OBJECT-TYPE  
+     SYNTAX     Counter32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           over after detection of Signal Degrade (SD) or Signal Fail (SF)."  
+     ::= { atmfApsCurrEntry 4 }  
+ 
+atmfApsCurrFailSwOnWtr OBJECT-TYPE  
+     SYNTAX     Counter32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           over after the wait-to-restore (WTR) timer has expired."  
+     ::= { atmfApsCurrEntry 5 }  
+ 
+atmfApsCurrFailSwNearEnd OBJECT-TYPE  
+     SYNTAX     Counter32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           at the near end after a switch at the far end for a protection   
+           entity configured for bi-directional protection switching."  
+     ::= { atmfApsCurrEntry 6 }  
+ 
+atmfApsCurrFailSwFarEnd OBJECT-TYPE  
+     SYNTAX     Counter32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           at the far end after a switch at the near end for a protection   
+           entity configured for bi-directional protection switching."  
+     ::= { atmfApsCurrEntry 7 }  
+ 
+atmfApsCurrSuccessSwitch OBJECT-TYPE  
+     SYNTAX     Counter32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has succeeded to do a   
+           switch at this end of the protected domain. The attribute  
+           counts switches from the working to the protection entity  
+           and vice versa."  
+     ::= { atmfApsCurrEntry 8 }  
+ 
+ 
+-- ATM APS History Data table  
+ 
+atmfApsHistTable OBJECT-TYPE  
+     SYNTAX SEQUENCE OF AtmfApsHistEntry  
+     MAX-ACCESS not-accessible  
+     STATUS     current  
+     DESCRIPTION  
+          "This managed entity contains all the previously collected  
+           ATM APS Current data for the APS End Point managed entities  
+ 
+           Each entry in this table corresponds to a 15 minute interval  
+           of collected data."  
+     ::= { atmfApsStatisticsGroup 2 }  
+ 
+atmfApsHistEntry OBJECT-TYPE  
+     SYNTAX     AtmfApsHistEntry  
+     MAX-ACCESS not-accessible  
+     STATUS     current  
+     DESCRIPTION  
+          "An entry in the ATM APS History Data table for an  
+           ATM APS End Point.  
+ 
+           Each APS End Point will automatically get entries 
+           in this table associated with it."  
+     INDEX    { atmfApsEpIndex,  
+                atmfApsHistIndex }  
+     ::= { atmfApsHistTable 1 }  
+ 
+AtmfApsHistEntry ::= SEQUENCE {  
+     atmfApsHistIndex            Integer32,  
+     atmfApsHistSuspect          TruthValue,  
+     atmfApsHistPeriodEndTime    DateAndTime,  
+     atmfApsHistSupprIntvls      Unsigned32,  
+     atmfApsHistFailSwOnSfSd     Unsigned32,  
+     atmfApsHistFailSwOnWtr      Unsigned32,  
+     atmfApsHistFailSwNearEnd    Unsigned32,  
+     atmfApsHistFailSwFarEnd     Unsigned32,  
+     atmfApsHistSuccessSwitch    Unsigned32  
+          }  
+ 
+atmfApsHistIndex OBJECT-TYPE  
+     SYNTAX     Integer32 (1..96)  
+     MAX-ACCESS not-accessible  
+     STATUS     current  
+     DESCRIPTION  
+          "A number between 1 and 96, which identifies the interval  
+          for which the set of statistics in this entry was  
+          collected.  
+ 
+          The interval identified by 1 is the most recently completed  
+          15 minute interval, and the interval identified by N is the  
+          interval immediately preceding the one identified by N-1."  
+     ::= { atmfApsHistEntry 1 }  
+ 
+atmfApsHistSuspect OBJECT-TYPE  
+     SYNTAX     TruthValue  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "If true, the statistics in this entry may be unreliable."  
+     ::= { atmfApsHistEntry 2 }  
+ 
+atmfApsHistPeriodEndTime OBJECT-TYPE  
+     SYNTAX     DateAndTime  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The date and time when the data of this entry was collected  
+           and put into this table."  
+     ::= { atmfApsHistEntry 3 }  
+ 
+atmfApsHistSupprIntvls OBJECT-TYPE  
+     SYNTAX     Unsigned32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "This attribute is non-zero only if the ATM NE is  
+          suppressing ATM APS History Data entry creation when 
+          the current interval terminates with 'all-zeroes'  
+          performance measurements."  
+     ::= { atmfApsHistEntry 4 }  
+ 
+atmfApsHistFailSwOnSfSd OBJECT-TYPE  
+     SYNTAX     Unsigned32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           over after detection of Signal Degrade (SD) or Signal Fail (SF)."  
+     ::= { atmfApsHistEntry 5 }  
+ 
+atmfApsHistFailSwOnWtr OBJECT-TYPE  
+     SYNTAX     Unsigned32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           over after the wait-to-restore (WTR) timer has expired."  
+     ::= { atmfApsHistEntry 6 }  
+ 
+atmfApsHistFailSwNearEnd OBJECT-TYPE  
+     SYNTAX     Unsigned32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           at the near end after a switch at the far end for a protection   
+           entity configured for bi-directional protection switching."  
+     ::= { atmfApsHistEntry 7 }  
+ 
+atmfApsHistFailSwFarEnd OBJECT-TYPE  
+     SYNTAX     Unsigned32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has failed to do a switch  
+           at the far end after a switch at the near end for a protection   
+           entity configured for bi-directional protection switching."  
+     ::= { atmfApsHistEntry 8 }  
+ 
+atmfApsHistSuccessSwitch OBJECT-TYPE  
+     SYNTAX     Unsigned32  
+     MAX-ACCESS read-only  
+     STATUS     current  
+     DESCRIPTION  
+          "The number of times the APS function has succeeded to do a   
+           switch at this end of the protected domain. The attribute  
+           counts switches from the working to the protection entity  
+           and vice versa."  
+     ::= { atmfApsHistEntry 9 }  
+ 
+ 
+ 
+-- ATM APS Traps   
+ 
+atmfApsMIBTrapsPrefix  OBJECT IDENTIFIER ::= { atmfApsMIB 2 }   
+atmfApsMIBTraps  OBJECT IDENTIFIER ::= { atmfApsMIBTrapsPrefix 0 }   
+ 
+ 
+-- ATM APS End Point notifications  
+ 
+ 
+atmfApsFailToSwitchInfo OBJECT-TYPE  
+    SYNTAX     AtmfApsFailToSwitchType   
+    MAX-ACCESS accessible-for-notify  
+    STATUS     current  
+    DESCRIPTION  
+         "If the ATM APS function fails to switch  
+          when a APS trigger occurs, this object will  
+          contain which type of failure that is   
+          experienced."  
+    ::= { atmfApsMIBTraps 9 }   
+ 
+ 
+atmfApsEpStatusChange  NOTIFICATION-TYPE   
+    OBJECTS    {   
+                 atmfApsEpIndex,  
+                 atmfApsEpApsRequestList,  
+                 atmfApsEpSelectorStatus,  
+                 atmfApsEpBridgeStatus,  
+                 atmfApsEpAvailabilityStatus  
+                }   
+    STATUS     current   
+    DESCRIPTION   
+        "This trap will be sent as soon as any of the status objects of the  
+         ATM APS End Point changes."   
+    ::= { atmfApsMIBTraps 1}   
+ 
+atmfApsEpProtSwFailNotif  NOTIFICATION-TYPE   
+    OBJECTS    {   
+                 atmfApsEpIndex,  
+                 atmfApsEpApsRequestList,  
+                 atmfApsEpSelectorStatus,  
+                 atmfApsEpBridgeStatus,  
+                 atmfApsEpAvailabilityStatus,  
+                 atmfApsFailToSwitchInfo  
+                }   
+    STATUS     current   
+    DESCRIPTION   
+        "This trap will be sent when a protection switching failure has 
+         occurred. The trap shall be sent in the following situations: 
+- At local failure to switch after detection of Signal Fail or 
+            Signal Degrade. 
+- At local failure to switch after expiration of the  
+  wait-to-restore timer. 
+          - At local failure to switch after a switch in the far end 
+           (at bi-directional protection switching). In this case the 
+            trap shall be sent after a time period allowing 3 lost 
+            OAM APS coordination cells.  
+         The atmfApsFailToSwitchInfo will indicate which of the faults 
+         above that has occurred."   
+    ::= { atmfApsMIBTraps 2}   
+ 
+ 
+ 
+-- Object creation and deletion notification traps 
+ 
+atmfApsEpCreated NOTIFICATION-TYPE  
+     OBJECTS   { atmfApsEpIndex }  
+     STATUS    current  
+     DESCRIPTION  
+          "Indicates that an ATM APS End Point managed entity has been  
+           created."  
+     ::= { atmfApsMIBTraps 3 }  
+ 
+atmfApsEpDeleted NOTIFICATION-TYPE  
+     OBJECTS   { atmfApsEpIndex }  
+     STATUS    current  
+     DESCRIPTION  
+          "Indicates that an ATM APS End Point managed entity has been  
+           deleted."  
+     ::= { atmfApsMIBTraps 4 }  
+ 
+atmfApsWpPairCreated NOTIFICATION-TYPE  
+     OBJECTS     
+        { atmfApsWpEpIndex }  
+     STATUS    current  
+     DESCRIPTION  
+          "Indicates that an ATM APS Working Protection Pair managed   
+           entity has been created."  
+     ::= { atmfApsMIBTraps 5 }  
+ 
+atmfApsWpPairDeleted NOTIFICATION-TYPE  
+     OBJECTS            
+        { atmfApsWpEpIndex }  
+     STATUS    current  
+     DESCRIPTION  
+          "Indicates that an ATM APS Working Protection Pair managed   
+           entity has been deleted."  
+     ::= { atmfApsMIBTraps 6 }  
+ 
+atmfApsExTrafCreated NOTIFICATION-TYPE  
+     OBJECTS     
+        { atmfApsExTrafEpIndex }  
+     STATUS    current  
+     DESCRIPTION  
+          "Indicates that an ATM APS Extra Traffic managed   
+           entity has been created."  
+     ::= { atmfApsMIBTraps 7 }  
+ 
+atmfApsExTrafDeleted NOTIFICATION-TYPE  
+     OBJECTS            
+        { atmfApsExTrafEpIndex }  
+     STATUS    current  
+     DESCRIPTION  
+          "Indicates that an ATM APS Extra Traffic managed   
+           entity has been deleted."  
+     ::= { atmfApsMIBTraps 8 }   
+ 
+ 
+ 
+-- conformance information   
+ 
+atmfApsMIBConformance   
+        OBJECT IDENTIFIER ::= { atmfApsMIB 3 }   
+ 
+atmfApsMIBCompliances   
+        OBJECT IDENTIFIER ::= { atmfApsMIBConformance 1 }   
+ 
+atmfApsMIBGroups   
+        OBJECT IDENTIFIER ::= { atmfApsMIBConformance 2 }   
+ 
+-- compliance statements   
+ 
+atmfApsMIBCompliance MODULE-COMPLIANCE   
+    STATUS     current   
+    DESCRIPTION   
+        "The compliance statement for entities which implement the   
+         ATM APS protection functionality."   
+    MODULE     -- this module   
+    MANDATORY-GROUPS   
+        { atmfApsEpGroup,  
+          atmfApsWpPairGroup,  
+          atmfApsCurrDataGroup,  
+          atmfApsHistDataGroup,  
+          atmfApsAlarmTCGroup,  
+          atmfApsNotificationsGroup  
+        }   
+ 
+    GROUP atmfApsExTrafGroup   
+    DESCRIPTION   
+        "This group shall be included when ATM APS Extra Traffic is supported"   
+ 
+ 
+    GROUP atmfApsEpTriggerGroup 
+    DESCRIPTION   
+        "This group shall be included when configuration of ATM APS trigger 
+         mechanism is supported."   
+ 
+    ::= { atmfApsMIBCompliances 1 }   
+ 
+ 
+-- units of conformance   
+ 
+atmfApsEpGroup  OBJECT-GROUP   
+    OBJECTS {   
+            atmfApsEpIndex,   
+            atmfApsEpProtScheme,   
+            atmfApsEpProtDirection,   
+            atmfApsEpProtMode,   
+            atmfApsEpGroupIndicator,   
+            atmfApsEpCouplIndicator,   
+            atmfApsEpHoldOffTimer,   
+            atmfApsEpWtrTimer,   
+            atmfApsEpManualRequest,   
+            atmfApsEpApsRequestList,   
+            atmfApsEpCurrentK1Byte,   
+            atmfApsEpCurrentK2Byte,  
+            atmfApsEpSelectorStatus,   
+            atmfApsEpBridgeStatus,   
+            atmfApsEpAvailabilityStatus, 
+            atmfApsEpTestTrailSignalId, 
+            atmfApsEpTestTrailWorkingIf,   
+            atmfApsEpTestTrailWorkingVpi,   
+            atmfApsEpTestTrailWorkingVci,   
+            atmfApsEpTestTrailProtectionIf,   
+            atmfApsEpTestTrailProtectionVpi,   
+            atmfApsEpTestTrailProtectionVci,   
+            atmfApsEpRowStatus   
+              }   
+    STATUS    current   
+    DESCRIPTION   
+        "A collection of objects required for the ATM APS End Point managed  
+         entity."   
+    ::= { atmfApsMIBGroups 1 }  
+ 
+atmfApsEpTriggerGroup  OBJECT-GROUP   
+    OBJECTS {   
+            atmfApsEpTriggers  
+            }   
+    STATUS    current   
+    DESCRIPTION   
+        "This group contains the optional objects that need to be implemented 
+         when configuration of ATM APS triggering mechanism is supported for 
+         the ATM APS End Point."  
+    ::= { atmfApsMIBGroups 2 }    
+ 
+atmfApsWpPairGroup  OBJECT-GROUP   
+    OBJECTS {  
+            atmfApsWpPairSignalId, 
+            atmfApsWpPairWorkIf,   
+            atmfApsWpPairWorkVpi,   
+            atmfApsWpPairWorkVci,   
+            atmfApsWpPairProtIf,   
+            atmfApsWpPairProtVpi,   
+            atmfApsWpPairProtVci,     
+            atmfApsWpPairRowStatus   
+            }   
+    STATUS    current   
+    DESCRIPTION   
+        "A collection of objects used in the ATM APS Working Protection  
+         Pair managed entity. "   
+    ::= { atmfApsMIBGroups 3 }   
+ 
+atmfApsExTrafGroup  OBJECT-GROUP   
+    OBJECTS { 
+            atmfApsExTrafSignalId,  
+            atmfApsExTrafProtectionIf,   
+            atmfApsExTrafVpi,   
+            atmfApsExTrafVci,        
+            atmfApsExTrafRowStatus   
+            }   
+    STATUS    current   
+    DESCRIPTION   
+        "A collection of objects used for the optional Extra Traffic 
+         managed entity. "   
+    ::= { atmfApsMIBGroups 4 }   
+ 
+atmfApsCurrDataGroup  OBJECT-GROUP   
+    OBJECTS {    
+            atmfApsCurrSuspect,  
+            atmfApsCurrElapsedTime,  
+            atmfApsCurrSupprIntvls,  
+            atmfApsCurrFailSwOnSfSd,  
+            atmfApsCurrFailSwOnWtr,  
+            atmfApsCurrFailSwNearEnd,  
+            atmfApsCurrFailSwFarEnd,  
+            atmfApsCurrSuccessSwitch  
+            }   
+    STATUS    current   
+    DESCRIPTION   
+        "A collection of objects used in the ATM APS Current Data  
+         managed entity. "   
+    ::= { atmfApsMIBGroups 5 }   
+ 
+atmfApsHistDataGroup  OBJECT-GROUP   
+    OBJECTS {    
+            atmfApsHistSuspect,  
+            atmfApsHistPeriodEndTime,  
+            atmfApsHistSupprIntvls,  
+            atmfApsHistFailSwOnSfSd,  
+            atmfApsHistFailSwOnWtr,  
+            atmfApsHistFailSwNearEnd,  
+            atmfApsHistFailSwFarEnd,  
+            atmfApsHistSuccessSwitch   
+            }   
+    STATUS    current   
+    DESCRIPTION   
+        "A collection of objects used in the ATM APS History Data  
+         managed entity. "   
+    ::= { atmfApsMIBGroups 6 }   
+ 
+atmfApsAlarmTCGroup OBJECT-GROUP   
+      OBJECTS {   
+        atmfApsFailToSwitchInfo }   
+      STATUS     current   
+      DESCRIPTION   
+        "Objects used in the atmfApsEpProtSwFailNotif notification."   
+      ::= { atmfApsMIBGroups 7 }   
+ 
+atmfApsNotificationsGroup  NOTIFICATION-GROUP  
+      NOTIFICATIONS   
+           { atmfApsWpPairDeleted,  
+             atmfApsWpPairCreated,  
+             atmfApsEpDeleted,  
+             atmfApsEpCreated,  
+             atmfApsExTrafDeleted,  
+             atmfApsExTrafCreated,  
+             atmfApsEpStatusChange, 
+             atmfApsEpProtSwFailNotif  
+           }  
+      STATUS     current  
+      DESCRIPTION  
+            "The ATM APS notification list."  
+      ::= { atmfApsMIBGroups 8 }  
+ 
+END 
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

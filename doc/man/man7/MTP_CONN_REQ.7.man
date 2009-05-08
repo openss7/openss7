@@ -1,0 +1,308 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MTP_CONN_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "MTP Interface (MTPI)"
+.SH NAME
+.B MTP_CONN_REQ
+\- associate with a remote MTP-SAP
+.SH SYNOPSIS
+.PP
+This message consist of one
+.BR M_PROTO
+message block formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct MTP_conn_req {
+    mtp_ulong mtp_primitive;
+    mtp_ulong mtp_addr_length;
+    mtp_ulong mtp_addr_offset;
+    mtp_ulong mtp_conn_flags;
+} MTP_conn_req_t;
+\fR\s+1
+.fi
+.SH DESCRIPTION
+.PP
+The MTP connection request is used by the MTP User to associate the requesting
+stream with a remote MTP-SAP.  As MTP is a connectionless protocol, this is a
+loose association.  This serves to place the stream in the
+.BR MTPS_DATA_XFER
+state and the stream is treated in connection oriented mode until it is
+disassociated with the remote MTP-SAP with the
+.BR MTP_DISCON_REQ (7)
+primitive.
+.PP
+Once in connection oriented mode, the MTP stream will only issue
+.BR MTP_STATUS_IND "(7), " MTP_PAUSE_IND "(7) and " MTP_RESUME_IND (7)
+primitives refering to the remote connected MTP address or MTP-SAP.
+Also, in connection oriented mode, the
+.BR MTP_TRANSFER_REQ (7)
+primitive does not require a destination MTP-SAP address.
+.PP
+Multiple MTP streams can be bound to the same local MTP-SAP with
+.BR MTP_BIND_REQ (7)
+yet can be successfully connected to different remote MTP-SAP addresses with
+.BR MTP_CONN_REQ .
+.SS Parameters
+.PP
+.TP
+.I mtp_primitive
+specifies the primitive type.  Always
+.BR MTP_CONN_REQ .
+.TP
+.I mtp_addr_length
+specifies the length of the address to which to associate the requesting
+pseudo-connection oriented stream.
+This address must specify an MTP-SAP.  See
+.BR mtpi (7)
+for a description of the MTP address format.
+.TP
+.I mtp_addr_offset
+specifies the offset of the address to which to associate the requesting
+pseudo-connection oriented stream, from the beginning of the
+.B M_PROTO
+message block.
+.TP
+.I mtp_conn_flags
+specifies the connection flags.  See
+.IR \*(lqFlags\*(rq ,
+below.
+.SS Flags
+.PP
+No flags are currently defined and the
+.I mtp_conn_flags
+field must be coded zero (0).
+.SS State
+.PP
+This primitive is valid in state
+.BR MTPS_IDLE .
+The new state is
+.BR MTPS_WACK_CREQ .
+.SS Modes
+.PP
+This primitive is valid in all modes.
+.SS Originator
+.PP
+This primitive is originated by the MTP User.
+.SS Rules
+.PP
+.IP \(em 4
+If no address is provided in the primitive (i.e.
+.I mtp_addr_length
+is zero (0)), then the MTP provider may assign an address to which to connect.
+If no address can be provided, the MTP provider will return an error.
+.IP \(em
+If the
+.I mtp_addr_length
+field is zero (0), then the
+.I mtp_addr_offset
+field is ignored by the MTP provider.
+.IP \(em
+When provider, the connection address must specify an individual signalling
+point code and user part.  That is, an MTP-SAP address must be specified.
+.SH RESPONSE
+.PP
+This primitive requires the MTP provider to acknowledge receipt of the
+primitive as follows:
+.HP
+.I Successful:
+On success, the MTP provider acknowledges the primitive with a
+.BR MTP_OK_ACK (7)
+primitive.  The resulting state is
+.BR MTPS_DATA_XFER .
+.HP
+.I Non-fatal Errors:
+On non-fatal failure, the MTP provider acknowledges the primitive with a
+.BR MTP_ERROR_ACK (7),
+including the error code for the failure.
+See
+.IR \*(lqERRORS\*(rq ,
+below.
+The state remains unchanged.
+.SH ERRORS
+.PP
+Non-fatal errors are returned in the
+.I MTPI_error
+field of the
+.BR MTP_ERROR_ACK (7)
+primitive.
+Applicable non-fatal errors are as follows:
+.TP
+.RB [ MSYSERR ]
+A
+.B Linux\(rg
+system error occured and the
+.IR errno (3)
+is indicated in the
+.I UNIX_error
+field of the
+.BR MTP_ERROR_ACK (7).
+.TP
+.RB [ MACCESS ]
+The MTP User did not have sufficient permissions to connect to the requested
+MTP-SAP.
+.TP
+.RB [ MBADADDR ]
+The address provided was poorly formatted or contained invalid information.
+The address must specify a particular remote MTP-SAP.
+.TP
+.RB [ MNOADDR ]
+No address was provided and the MTP provider could not assign an address.
+.TP
+.RB [ MBADPRIM ]
+The primitive is unknown to the MTP provider or was poorly formatted or
+contained invalid information.
+.TP
+.RB [ MOUTSTATE ]
+The primitive would place the interace out of state.
+.TP
+.RB [ MNOTSUPP ]
+The primitive is known to the MTP provider but is not supported by the MTP
+provider.
+.TP
+.RB [ MBADFLAG ]
+The
+.I mtp_conn_flags
+field was invalid.
+.\".TP
+.\".RB [ MBADOPT ]
+.SH "SEE ALSO"
+.PP
+.BR mtpi (7),
+.BR MTP_OK_ACK (7),
+.BR MTP_ERROR_ACK (7),
+.BR MTP_DISCON_REQ (7).
+.SH VERSIONS
+.PP
+The Message Transfer Part (MTP) Interface (MTPI) is unique to
+.BR OpenSS7 .
+This is Version 2 of the interface.
+.XX
+.[
+q700
+.]
+.[
+q701
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.[
+jtq704
+.]
+.[
+mtpi
+.]
+.[
+$LIST$
+.]
+.TI

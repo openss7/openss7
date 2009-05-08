@@ -1,0 +1,1 @@
+.so man7/CD_HALT_INPUT_REQ.7.man

@@ -1,0 +1,434 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.\"
+.\"
+.TH XTI-TCAP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "XTI/TLI Library Calls"
+.\"
+.\"
+.SH NAME
+.B xti_tcap
+\- X/Open Transport Interface \- Corregendum for Transaction Capabilities Application Part (TCAP)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_ss7.h>
+.br
+.B #include <xti_mtp.h>
+.br
+.B #include <xti_sccp.h>
+.br
+.B #include <xti_tcap.h>
+.br
+.B #include <xti_mosi.h>
+.\"
+.\"
+.HP
+.BI "int " tcap_xtistr " = t_open(" device ", " flags );
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This section describes the protocol-sepcific information that is relevant for TCAP
+.[
+q771
+.]
+.[
+tcapv2
+.]
+.[
+t1.114
+.]
+transport providers; it describes the protocol-specific information that is relevant when TCAP
+services
+.[
+q771
+.]
+are provided over an IP network using TUA
+.[
+tua-02
+.]
+.RB ( tua (4))
+or TALI
+.[
+TALI
+.]
+.RB ( tali (4));
+and it defines the data structure and constants required for TCAP transport provider that are
+exposed through the XTI/TLI
+.[
+xti revision 1.0
+.]
+.[
+xns99
+.]
+.B <xti_tcap.h>
+header file.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B XTI-TCAP
+is an
+.I X/Open Transport Interface
+.[
+xti revision 1.0
+.]
+.[
+xns99
+.]
+based interface with specific support of the Signalling System Number 7,
+Transaction Capabilities Application Part
+protocol.
+.[
+q771
+.]
+.[
+tcapv2
+.]
+.[
+t1.114
+.]
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+The TCAP address format is a
+.B t_sccp_addr_t
+structure as defined in
+.BR xti_sccp (3).
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+A TCAP transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offerming them only in the priviledged or
+read-only mode.  TUA transport providers only support a subset of the options
+defined here.
+.\"
+.\"
+.PP
+A TCAP conforming transport provider supports four levels of options.  These
+four level are described below.
+.\"
+.\"
+.SS T_SS7_SS7
+.PP
+Options within this level are specific to Signalling System No. 7 (SS7) and
+are common to all the protocol levels in SS7.  For more information see
+.BR xti_ss7 (3).
+.\"
+.\"
+.TP
+.B T_SS7_PVAR
+.TP
+.B T_SS7_MPLEV
+.TP
+.B T_SS7_DEBUG
+.TP
+.B T_SS7_CLUSTER
+.\"
+.\"
+.SS T_SS7_MTP
+.PP
+Options within this level are specific to the Message Transfer Part (MTP), yet
+are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.TP
+.B T_MTP_SLS
+.TP
+.B T_MTP_MP
+.\"
+.\"
+.SS T_SS7_SCCP
+.PP
+Options within this level are specific to the Signalling Connection Control
+Part (SCCP), yet are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.TP
+.B T_SCCP_SEQ_CTRL
+.TP
+.B T_SCCP_PRIORITY
+.TP
+.B T_SCCP_PCLASS
+.TP
+.B T_SCCP_IMPORTANCE
+.TP
+.B T_SCCP_RET_ERROR
+.\"
+.\"
+.SS T_SS7_TCAP
+.PP
+Options within this level are specific to the Transaction Capabilities
+Application Part, yeat are used by SS7 protocol levels representing MTP Users.
+.\"
+.\"
+.TP
+.B T_TCAP_OPCLASS
+.TP
+.B T_TCAP_APPCTX
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.\"
+.\"
+.SS t_accept\fR(3)
+.PP
+.\"
+.\"
+.SS t_bind\fR(3)
+.PP
+.\"
+.\"
+.SS t_close\fR(3)
+.PP
+.\"
+.\"
+.SS t_connect\fR(3)
+.PP
+.\"
+.\"
+.SS t_getinfo\fR(3)
+.PP
+.\"
+.\"
+.SS t_listen\fR(3)
+.PP
+.\"
+.\"
+.SS t_open\fR(3)
+.PP
+.\"
+.\"
+.SS t_optmgmt\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvconnect\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvdis\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcv\fR(3), \fBt_rcvv\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvreldata\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvudata\fR(3), \fBt_rcvvudata\fR(3)
+.PP
+.\"
+.\"
+.SS t_rcvuderr\fR(3)
+.PP
+.\"
+.\"
+.SS t_snddis\fR(3)
+.PP
+.\"
+.\"
+.SS t_snd\fR(3), \fBt_sndv\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndreldata\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndrel\fR(3)
+.PP
+.\"
+.\"
+.SS t_sndudata\fR(3), \fBt_sndvudata\fR(3)
+.PP
+.\"
+.\"
+.SS t_unbind\fR(3)
+.PP
+.\"
+.\"
+.SH CAVEATS
+.PP
+This manual page is incomplete.
+.\"
+.\"
+.SH DEVICES
+.PP
+There are number of TCAP devices providing the Transport Provider Interface
+that provide TCAP conforming TPI devices as follows:
+.\"
+.\"
+.TP
+.I /dev/tcap-tpi-cl ", " /dev/tcap-tpi-co
+For more information on the SS7 TCAP device, see
+.BR tcap (4).
+.\"
+.\"
+.TP
+.I /dev/tua-tpi-cl ", " /dev/tua-tpi-co
+For more information on the SIGTRAN TUA device, see
+.BR tua (4).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ss7 (3),
+.BR xti_mtp (3),
+.BR xti_sccp (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B XTI-TCAP
+driver is specific to the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
+.[
+xns99
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-TCAP interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

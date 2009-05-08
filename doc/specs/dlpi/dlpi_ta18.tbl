@@ -1,0 +1,81 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box tab(:);
+rb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb
+lb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb1|cb
+l1|c1|c1|c1|c1|c1|c1|c1|c1|c1|c1|c1|c1|c1|c1|c.
+PRIM Y:P1:P2:P3:P4:P5:P6:P7:P8:P9:P10:P11:P12:P13:P14:P15
+PRIM X (on queue):
+_
+\fBP1\fR DL_INFO_REQ
+_
+\fBP2\fR DL_ATTACH_REQ
+_
+\fBP3\fR DL_DETACH_REQ
+_
+\fBP4\fR DL_BIND_REQ
+_
+\fBP5\fR DL_UNBIND_REQ
+_
+\fBP6\fR DL_UNITDATA_REQ::::::1
+_
+\fBP7\fR DL_UDQOS_REQ
+_
+\fBP8\fR DL_CONNECT_REQ:::::::::::4
+_
+\fBP9\fR DL_CONNECT_TES:::::::::::3:1:1
+_
+\fBP10\fR DL_TOKEN_REQ
+_
+\fBP11\fR DL_DISCONNECT_REQ::::::::1
+_
+\fBP12\fR DL_DATA_REQ:::::::::::5:1:3:3
+_
+\fBP13\fR DL_RESET_REQ:::::::::::3
+_
+\fBP14\fR DL_RESET_RES:::::::::::3:1:1
+_
+\fBP15\fR DL_SUBS_BIND_REQ
+.TE
+.LP
+KEY:
+.TS
+tab(:);
+c|c
+c|l.
+Code:Interpretation
+_
+\(lq \(rq:Empty box indicates a scenario which cannot take place.
+1:Y has no precedence over X and should be placed on queue behind X.
+2:Y has precedence over X and may advance ahead of X.
+3:Y has precedence over X and X must be removed.
+4:Y has precedence over X and both X and Y must be removed.
+5:Y may have precedence over X (DLS provider's choice), and if so then X must be
+:removed.
+.TE

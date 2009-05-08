@@ -1,0 +1,280 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH COPYIN 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B copyin
+\- copy user data in from user space to kernel space.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/dki.h>
+.HP
+.BI "int copyin(const void *" from ", void *" to ", size_t " len );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I from
+a pointer to user memory where data is to be copied from.
+.PD 0
+.TP
+.I to
+a pointer to kernel memory where data is to be copied to.
+.TP
+.I len
+the length of the data to copy.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR DDI/DKI .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR copyin ()
+verifies that
+.I len
+bytes of memory at current user-space address
+.I from
+are valid for read and then copies those bytes to the kernel address
+.IR to .
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR copyin ()
+copies the requested bytes and
+returns zero (0).
+Upon failure,
+.BR copyin ()
+does nothing but return a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+Upon failure,
+.BR copyin ()
+does nothing but return an appropriate negative error number as follows:
+.TP \w'\ [EFAULT]\ 'u
+.RB [ EFAULT ]
+the buffer specified by
+.IR from " and " len
+extends outside the user's valid address space.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR copyin ()
+can only be called from user context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR copyin ()
+is MP-safe and does not require the holding of any global locks.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR copyin ()
+simply calls the Linux
+.BR copy_from_user (9)
+function, with the first two arguments reversed.
+If optimization is used, the call is inlined.
+.\"
+.\"
+.SH "SEE ALSO
+.PP
+.BR copyout (9),
+.BR copy_from_user (9),
+.BR copy_to_user (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR copyin ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR copyin ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR copyin ()
+runs faster than the LiS equivalent.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_copyin ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_copyin ()
+.\"calls
+.\".BR copyin ()
+.\"directly.
+.\".IP ""
+.\"Note that
+.\".BR lis_copyin ()
+.\"was deprecated as of
+.\".IR "LiS 2.18.0" .
+.\"See
+.\".BR lisdeprec (9)
+.\"for more information.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI.
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR copyin ()
+first appeared (for use by
+.I STREAMS
+devices) in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

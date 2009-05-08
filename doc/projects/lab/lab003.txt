@@ -1,0 +1,26 @@
+                                                                                
+                :    :                                                          
+              L :    :                                                          
+               L:    :                                                          
+                L    :                                                          
+                :L   :             _____                                        
+                : L  :            /     L           VoIP                        
+          SPOI  :  X=:==========={  MGC  }========= Signalling                  
+                : /  :            L_____/     SIP   Network                     
+                :/   :              ||       H.323                              
+                /    : A/E/F-Links  || VoIP   BICC                              
+               /:    :              || Control                                  
+              / : B/C/D-Links       || Network                                  
+                :    :              ||          MEGACO                          
+                :    :      ++======L7======++  H.248                           
+                :    :     _||_    _||_    _||_  MGCP                           
+              ==:====:====/    L==/    L==/    L                                
+          POP ==:====:====| MG |==| MG |==| MG |                                
+              ==:====:====L____/==L____/==L____/                                
+                :IMT :      ||      ||      ||                                  
+                :    :      ||      ||      ||      RTP     VoIP                
+                :    :      L7======L7======L7============= Bearer              
+                :    :                                      Network             
+               (B)  (A)                                                         
+                                                                                
+

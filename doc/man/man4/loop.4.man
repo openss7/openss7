@@ -1,0 +1,340 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH LOOP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B loop
+\- \fISTREAMS\fP loop-around pseudo-device driver
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B loop
+psuedo-device multiplexing driver is an implementation of the loop-around driver described in the
+.RI \(lq "UNIX\(rg System V Release 4 \- STREAMS Programmer's Guide" ,\(rq
+.[
+svr4spg
+.]
+with a number of exceptions and enhancments.  The primary purposes of the
+.B loop
+pseudo-device driver are: to provide a capability to the
+.BR test-streams (8)
+conformance and verification test program, for testing passing of STREAMS file descriptors across a
+pipe-like driver;
+and to provide an example of a pipe-like driver for the STREAM programmer.
+To avoid complications for testing, and to serve as a basic example, the driver is as simplistic as
+possible.
+.PP
+The
+.B loop
+pseudo-device driver has the following behaviour:
+.TP 3n
+.B "open\fR(2s)"
+When a
+.B loop
+STREAM is opened using
+.BR open (2s)
+a new
+.B loop
+STREAM is created.  The newly created STREAM is not associated with any other STREAM.
+Issuing the
+.B LOOP_SET
+input-output control is necessary, to associate the loop STREAM with another one,
+before data can be written to or read from the STREAM.  Any attempt to send data on the STREAM
+before it is associated with another will result in an
+.BR M_ERROR (9)
+message being sent upstream causing all further read, write or control operations on the stream to
+fail with error
+.RB [ ENXIO ].
+.TP
+.B LOOP_SET
+The
+.BR LOOP_SET
+input-output control described under
+.RI \(lq IOCTLS ,\(rq
+below, is used to connect the upstream and downstream flow between the requesting STREAM and a
+specified STREAM.  Once connected in this fashion, data can be passed in either direction.
+.TP
+.B "putpmsg\fR(2s), \fPgetpmsg\fR(2s)"
+Data is passed in either direction using the
+.BR putpmsg (2s)
+or
+.BR getpmsg (2s)
+calls as normal.  The
+.B loop
+driver coordinates
+.I STREAMS
+flow control across the driver by explicitly enabling service procedures of the feeding side when
+the accepting side is back-enabled.
+.TP
+.B "close\fR(2s)"
+When an STREAM is closed using the
+.BR close (2s)
+system call, the STREAM is dismantled.
+If the upper STREAM remains connected to another STREAM (due to a previous call to
+.BR LOOP_SET ),
+the connection will be broken and a
+.BR M_HANGUP (9)
+message will be sent to the other STREAM.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B loop
+pseudo-device loop-around driver is an implementation of the loop-around driver described in the
+.RI \(lq "UNIX\(rg System V Release 4 \- STREAMS Programmer's Guide" ,\(rq
+.[
+svr4spg
+.]
+with a number of considerations as follows:
+.IP \(bu \w'\(bu\(em'u
+The
+.I SVR4
+driver does not implement input-output controls other than
+.BR LOOP_SET .
+In contrast,
+.B loop
+implements a set of input-output controls compatible with the
+.I LiS
+.[
+lis
+.]
+loop-around driver for use in testing.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.TP
+.B LOOP_SET
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B loop
+driver is used by the
+.BR test-streams (8)
+conformance and verification test program to test passing of file descriptors across a
+pipe-like driver.  Much of its behaviour is specific to testing and cannot be altered without
+impacting the ability of the
+.BR test-streams (8)
+conformance and verification test program results.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B loop
+is implemented as described in the
+.IR "SVR4 SPG" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.\".SH EXAMPLES
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/sloop
+The external filesystem
+.I STREAMS
+loop device.
+.TP
+.BR /dev/streams/loop ", " /devices/loop
+The
+.BR specfs (5)
+shadow special filesystem
+.I STREAMS
+loop device.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mux (4),
+.BR nullmod (4),
+.BR test-streams (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B loop
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+provides the
+.B loop
+pseudo-device driver for testing and compatibility with
+.IR LiS ,
+.[
+LiS
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Although this driver is described in the
+.IR "SVR4 SPG"
+.[
+svr4spg
+.]
+as a driver example, most
+.I STREAMS
+implementations do not actually provide such a driver.
+.IP \(em
+.B loop
+is provided primarily for use by the
+.BR test-streams (8)
+conformance and verification test program, and as an example of a pipe-like driver with flow
+control supported across the driver.  It should not be used by portable
+.I STREAMS
+modules, driver or applications programs.
+.PP
+See
+.IR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR4
+.[
+svr4spg
+.]
+and LiS
+.[
+lis
+.]
+documentation.
+Conformance is verified using the
+.BR test-loop (8)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B loop
+is described as an example loop-around driver in the
+.IR "SVR4 SPG" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

@@ -1,0 +1,780 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_BIND_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_BIND_REQ (dl_bind_req_t)
+\- requests the DLS provider bind a DLSAP to the stream.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one
+.BR M_PROTO (9)
+message block, which contains the following structure.
+.sp
+.nf
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_sap;
+    t_uscalar_t  dl_max_conind;
+    ushort       dl_service_mode;
+    ushort       dl_conn_mgmt;
+    t_uscalar_t  dl_xidtest_flg;
+} dl_bind_req_t;
+\f(CW\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.B DL_BIND_REQ
+requests the DLS provider bind a DLSAP to the stream.  The DLS user must
+identify the address of the DLSAP to be bound to the stream.
+Forconnection-mode service, the DLS user also indicates whether it will accept
+incoming connection requests on the stream.  Finally, the request directs the
+DLS provider to activate the stream associated with the DLSAP.
+.PP
+A stream is viewed as active when the DLS provider may transmit and receive
+protocol data units destined to or originating from the stream.  The PPA
+associated with each stream must be initialized upon completion of the
+processing of the
+.B DL_BIND_REQ
+(see PPA Initialization/De-initialization
+.BR dlpi (7)).
+More specifically, the DLS user is ensured that the PPA is initialized
+when the
+.BR DL_BIND_ACK (7)
+is received.  If the PPA cannot be initialized, the
+.B DL_BIND_REQ
+will fail.
+.PP
+DLPI supports the ability to associate several Streams with a single DLSAP,
+where each Stream may be a unique data link connection endpoint.  However, not
+all DLS providers can support such configurations because some DLS providers may
+have no mechanism beyond the DLSAP address for distinguishing multiple
+connections.  In such cases, the provider will restrict the DLS user to one
+Stream per DLSAP.
+.PP
+In some instances it is expected that a given service may be accessed thorugh
+any one of several DLSAPs.  To handle this scenario, a separate Stream would be
+required for each possible destination DLSAP, regardless of whether any DLS user
+actually requested a connection to that DLSAP.  To obviate the need for tying up
+system resource for all possible destination DLSAPs, a \(lqconnection
+management stream\(rq utility is defined in DLPI.  A connection management
+Stream is one that receives any connect requests that are not destined for
+currently bound DLSAPs apable of receiving connect indications.  With this
+mechanism, a special listener management Stream to the DLS provider that will
+retrieve all connect requests arriving through a particular PPA.  In the model,
+then, there may be a connection management Stream per PPA.
+.PP
+A stream may be bound as a "connection management" stream, such that it will
+receive all connect requests that arrive through a given PPA (see
+Connection Management Stream
+.BR dlpi (7)).
+In this case, the
+.I dl_sap
+will be ignored.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+The
+.B dl_bind_req_t
+structure contains the following members:
+.TP
+.I dl_primitive
+conveys
+.BR DL_BIND_REQ .
+.TP
+.I dl_sap
+conveys sufficient information to identify the DLSAP that will be bound to
+the DLPI stream (see DLPI Addressing
+.BR dlpi (7)
+for a description of DLSAP
+addresses).  The format of this information is specific to a given DLS
+provider, and may contain the full DLSAP address or some portion of that
+address sufficient to uniquely identify the DLSAP in question.  The full
+address of the bound DLSAP will be returned in the
+.BR DL_BIND_ACK (7).
+.RS
+.PP
+The following rules are used by the DLS provider when binding a DLSAP address:
+.IP - 3
+The DLS provider must define and manage its DLSAP address space.
+.IP -
+DLPI allows the same DLSAP to be bound to multiple streams, but a given DLS
+provider may need to restrict its address space to allow one stream per DLSAP.
+.IP -
+The DLS provider may not be able to bind the specified DLSAP address for one
+of the following reasons:
+.RS
+.IP "1." 4
+the DLS provider may statically associate a specific DLSAP with each
+stream
+.IP 2.
+the DLS provider may only support one stream per DLSAP and the DLS user
+attempted to bind a DLSAP that was already bound to another stream.
+.PP
+In case of reason 1, the value of
+.I dl_sap
+is ignored by the DLS provider
+and the
+.BR DL_BIND_ACK (7)
+returns the DLSAP address that is already associated with
+the stream.  In case of reason 2, if the DLS provider cannot bind the given
+DLSAP to the stream, it may attempt to choose an alternate DLSAP and
+return that on the
+.BR DL_BIND_ACK (7).
+If an alternate DLSAP cannot be chosen, the
+DLS provider will return a
+.BR DL_ERROR_ACK (7)
+and set
+.I dl_errno
+to
+.BR DL_NOADDR .
+.RE
+.PP
+Because of the provider-specific nature of the DLSAP address, DLS user
+software that is to be protocol independent should avoid hard-coding this
+value.  The DLS user should retrieve the necessary DLSAP address from some
+other entity (such as a management entity or higher layer protocol entity)
+and insert it without inspection into the
+.BR DL_BIND_REQ .
+.RE
+.TP
+.I dl_max_conind
+conveys the maximum number of outstanding
+.BR DL_CONNECT_IND (7)
+messages
+allowed on the DLPI stream.  If the value is zero, the stream cannot accept
+any
+.BR DL_CONNECT_IND (7)
+messages.  If greater than zero, the DLS user will accept
+.BR DL_CONNECT_IND (7)
+messages up to the given value before having to
+respond with a
+.BR DL_CONNECT_RES (7)
+or a
+.BR DL_DISCONNECT_REQ (7)
+(see Multi-threaded Connection Establishment
+.BR dlpi (7)
+for details on how this value is used to support multi-threaded connect
+processing).  The DLS provider may not be able to support the value supplied in
+.IR dl_max_conind ,
+as specified by the following rules:
+.RS
+.IP - 3
+If the provider cannot support the specified number of outstanding
+connect indications, it should set the value down to a number it can support.
+.IP -
+Only one stream that is bound to the indicated DLSAP may have an allowed
+number of maximum outstanding connect indications greater than zero.  If a
+.BR DL_BIND_REQ (7)
+specifies a value greater than zero, but another stream has already bound
+itself to the DLSAP with a value greater than zero, the DLS provider will fail
+the request, setting
+.I dl_errno
+to
+.B DL_BOUND
+on the
+.BR DL_ERROR_ACK (7).
+.IP -
+If a stream with
+.I dl_max_conind
+greater than zero is used to accept a connection, the stream will be found
+busy during the duration of the connection, and no other streams may be bound
+to the same DLSAP with a value
+of
+.I dl_max_conind
+greater than zero.  This restriction prevents more than one stream bound to
+the same DLSAP from receiving connect indications and accepting connections.
+Accepting a connection on such a stream is only allowed if there is just a
+single outstanding connect indication being processed.
+.IP -
+A DLS user should always be able to request a
+.I dl_max_conind
+value of zero, since this indicates to the DLS provider that the stream will
+only be used to originate connect requests.
+.IP -
+A stream with a negotiated value of
+.I dl_max_conind
+that is greater than zero may not originate connect requests.  This field is
+ignored in connectionless-mode service.
+.RE
+.TP
+.I dl_service_mode
+conveys the desired mode of service for this stream, and may contain one of
+the following:
+.RS
+.TP
+.B DL_CODLS
+Selects connection-oriented data link service only.  The connection-oriented
+mode primitives will be accepted.  In addition, an arbitrary number of streams
+may bind to the same
+.I dl_sap
+on the same PPA provided the
+.I dl_max_conind
+is zero.  Only one Stream may bind to the same
+.I dl_sap
+on the same PPA when the
+.I dl_max_conind
+is non-zero.
+No incoming connectionless traffic will be sent up this Stream, and will be
+routed to a
+.B DL_CLDLS
+Stream, or discarded.
+.TP
+.B DL_CLDLS
+Selects connectionless data link service only.  The connection-oriented mode
+primitives will not be accepted.  This mode selects exclusive control of
+connectionless traffic.  All connectionless traffic from any remote station
+address to this
+.I dl_sap
+even if another Stream is currently connected on the same
+.IR dl_sap .
+Only one stream per PPA may bind
+.BR DL_CLDLS .
+.TP
+.BR DL_CLDLS | DL_CODLS
+Selects the connection-oriented mode service augmented with connectionless mode
+service.  An arbitrary number of Streams may bind to the same
+.I dl_sap
+on the same interface.  This mode is mutually exclusive with Streams bound with
+.BR DL_CLDLS .
+.TP
+.B DL_ACLDLS
+Selects the acknowledged connectionless data link service only.  The same
+restrictions that apply to the connectionless mode service apply to this
+service.
+.TP
+.BR DL_ACLDLS | DL_CLDLS
+Selects the acknowledged connectionless data link service augmented with the
+connectionless mode service.  The same restrictions that apply to the
+connectionless mode service apply to this combined service.
+.TP
+.B DL_HP_RAWDLS
+Selects raw-mode service.
+.PP
+If the DLS provider does not support the requested service mode, a
+.BR DL_ERROR_ACK (7)
+will be generated, specifying
+.BR DL_UNSUPPORTED .
+.RE
+.TP
+.I dl_conn_mgmt
+if non-zero, indicates that the stream is the "connection management"
+stream for the PPA to which the stream is attached.  When an incoming connect
+request arrives, the DLS provider will first look for a stream bound with
+.I dl_max_conind
+greater than zero that is associated with the destination DLSAP.  If such a
+stream is found, the connect indication will be issued on that stream.
+Otherwise, the DLS provider will issue the connect indication on the
+"connection management" stream for that PPA, if one exists.  Only one
+"connection management" stream is allowed per PPA, so an attempt to bind a
+second connection management stream on a PPA will fail with the DLPI error set
+to
+.BR DL_BOUND .
+When
+.I dl_conn_mgmt
+is non-zero, the
+value of
+.I dl_sap
+will be ignored.  In connectionless-mode service,
+.I dl_conn_mgmt
+is ignored by the DLS provider.
+.TP
+.I dl_xidtest_flg
+indicates to the DLS Provider that XID and/or TEST responses for this
+stream are to be automatically generated by the DLS Provider.  The DLS
+Provider will not generate
+.BR DL_XID_IND (7)
+and/or
+.BR DL_TEST_IND (7),
+and will error a
+.BR DL_XID_REQ (7)
+and/or
+.BR DL_TEST_REQ (7).
+If the DLS Provider does not support automatic handling of XID and/or TEST
+responses, a
+.BR DL_ERROR_ACK (7)
+will be generated, specifying
+.BR DL_NOAUTO ", " DL_NOXIDAUTO " or " DL_NOTESTAUTO .
+If the Provider receives an XID or TEST request from the DLS User, a
+.BR DL_ERROR_ACK (7)
+will be generated specifying
+.BR DL_XIDAUTO " or " DL_TESTAUTO
+respectively.
+.RS
+.PP
+The dl_xidtest_flg contains a bit-mask specifying zero or more of the
+following values:
+.TP
+.B DL_AUTO_XID
+automatically respond to XID commands
+.TP
+.B DL_AUTO_TEST
+automatically respond to TEST commands.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+The message is valid in state
+.BR DL_UNBOUND .
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state is
+.BR DL_BIND_PENDING .
+.\"
+.\"
+.SH RESPONSE
+If the bind request is successful,
+.BR DL_BIND_ACK (7)
+is sent to the DLS user
+resulting in state
+.BR DL_IDLE .
+.PP
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting
+state is unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+The DLPI error returned in a
+.BR DL_ERROR_ACK (7)
+primitive may be one of the following:
+.TP 16
+.B DL_ACCESS
+The DLS user did not have proper permission to use the requested
+DLSAP address.
+.TP
+.B DL_BADADDR
+The DLSAP address information was invalid or was in an incorrect
+format.
+.TP
+.B DL_BOUND
+The DLS user attempted to bind a second stream to a DLSAP with
+.I dl_max_conind
+greater than zero, or the DLS user attempted to bind a second
+"connectionmanagement" stream to a PPA.
+.TP
+.B DL_INITFAILED
+Automatic initialization of the PPA failed.
+.TP
+.B DL_NOTINIT
+The PPA had not been initialized prior to this request.
+.TP
+.B DL_NOADDR
+The DLS provider could not allocate a DLSAP address for this stream.
+.TP
+.B DL_NOAUTO
+Automatic handling of XID and TEST responses not supported.
+.TP
+.B DL_NOTESTAUTO
+Automatic handling of TEST response not supported.
+.TP
+.B DL_NOXIDAUTO
+Automatic handling of XID response not supported.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in the
+.BR DL_ERROR_ACK (7).
+.TP
+.B DL_UNSUPPORTED
+The DLS provider does not support requested service mode on this stream.
+.PP
+See
+.BR DL_ERROR_ACK (7)
+for a description of specific Linux error codes applicable to DLPI.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_BIND_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.[
+aixx25
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.\"
+.IP \(em \w'\(em\(em'u
+The
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field is
+.IR HP-UX \(rg-specific,
+.[
+hpuxdlpi
+.]
+and will be ignored by portable DLS Users.
+.\"
+.IP \(em
+When specified, the
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field requests that the DLS Provider place the Stream in a raw mode of
+operation.
+See also,
+.BR DL_HP_RAWDATA_REQ "(7) and " DL_HP_RAWDATA_IND (7).
+.\"
+.IP \(em
+.B DL_HP_RAWDLS
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.\"
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+documents the UNIX error codes (listed as Linux error codes above).  Other
+implementations do not document these codes.  Portable programs will not rely
+upon the specific value of a Linux error code for proper operation.
+.\"
+.IP \(em
+.IR Solaris \(rg
+.[
+soldoc11
+.]
+provides a connectionless-only DLPI driver for LAN classes, and for this
+provider the
+.I dl_service_mode
+must be set to
+.BR DL_CLDLS .
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+provides a connection-oriented only DLPI driver for LLC2 and LAPB classes, and
+for this provider the
+.I dl_service_mode
+must be set to
+.BR DL_CODLS .
+.\"
+.IP \(em
+.IR AIX \(rg
+.[
+aixdlpi
+.]
+and
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+provide a combined connectionless and connection-oriented DLPI driver for LAN,
+LLC2 and LAPB classes.
+.B @PACKAGE_TITLE@
+provides a connectionless only DLPI driver for LAN classes,
+.BR ldl (4),
+a combined connectionless and connection-oriented DLPI driver for LLC2 and
+LAPB,
+.BR llc2 (4)
+and
+.BR lapb (4),
+and is, therefore, compatible with all three implementations.
+.\"
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+specifies that the
+.I dl_sap
+field contains a one-byte, non-zero, individual SSAP for LLC2, and zero (0) for
+LAPB.  Also, it notes that multiple Streams may be bound to the same SAP, but
+only one listening Stream is allowed per SAP.
+.IR AIX \(rg
+.[
+aixcpc Version 6.1
+.]
+documents that for LLC2 operation, this is an LSAP an cannot be the null SAP
+(0x00), a group SAP (B'XXXXXXX1'), the name discovery SAP (0xFC), nor the
+gloabl SAP (0xFF).  Also that the value is 0 for master and 1 for slave for
+SDLC operation.
+.B @PACKAGE_TITLE@
+supports a one-byte, non-zero, individual LSAP for LLC2, and any LSAP for LLC1.
+Also supported is a two-byte Ethertype (>1536 decimal) for DL_CLDS on LAN
+media.  Portable applications will set this value to zero (0) when LSAP
+addressing is not required.
+.\"
+.IP \(em
+.IR AIX \(rg
+.[
+aixdlpi
+.]
+specifies that the
+.I dl_conn_mgmt
+field is ignored.
+.B @PACKAGE_TITLE@
+honors the setting of this field.  When porting applications from
+.IR AIX \(rg,
+care should be taken that this field is always set to zero (0).
+.\"
+.IP \(em
+.IR AIX \(rg
+.[
+aixdlpi
+.]
+expands on the description of combined service modes as described for the
+.I dl_service_mode
+field above.
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and DLPI,
+.[
+dlpi revision 2.0.0
+.]
+document that service mode field,
+.I dl_service_mode
+may only be single-valued.
+.B @PACKAGE_TITLE@
+supports multiple values in the
+.I dl_service_mode
+field in support for porting applications from
+.IR AIX \(rg.
+Programs ported from
+.IR Solstice \(rg,
+.IR HP-UX \(rg
+and other implementations strictly based on DLPI will simply not set multiple
+values in this field.
+.\"
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+states that the
+.I dl_xidtest_flg
+is only valid for LLC2.
+Under
+.BR "@PACKAGE_TITLE@" ,
+the
+.I dl_xidtest_flg
+field is valid for all providers and service modes.
+.IP \(em
+.IR AIX \(rg,
+.[
+aixx25
+.]
+states that for LAPB the
+.I dl_sap
+byte 1 is 1 for master station and 0 for slave station and byte 2 contains the
+logical line number, and bytes 3 and 4 contain zero (0), where byte 1 is the
+most significant byte of the 
+.B ulong
+and byte 4 is the least significant.
+It also indicates that
+.IR dl_max_conind ", " dl_service_mode ", " dl_conn_mgmt " and " dl_xidtest_flg
+must all be set to zero.
+.RS
+To support porting of
+.IR AIX \(rg
+applications to
+.IR Linux \(rg,
+.B @PACKAGE_TITLE@
+also support this SAP addressing (as well as supporting the value zero (0) in
+the
+.I dl_service_mode
+for LAPB).
+.RE
+.\"
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

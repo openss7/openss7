@@ -1,0 +1,1 @@
+.so man9/qi_qadmin.9.man

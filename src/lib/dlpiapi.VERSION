@@ -1,0 +1,4 @@
+DLPIAPI_1.0 {
+	__dlpi_*;
+	_dlpi_*;
+};

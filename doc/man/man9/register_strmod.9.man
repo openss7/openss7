@@ -1,0 +1,431 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH REGISTER_STRMOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_strmod
+\- register a \fISTREAMS\fR module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int register_strmod(modID_t " modid ", struct fmodsw *" fmod );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'modid\(em'u
+.I modid
+a module identification number containing the module identifier to register.
+.TP
+.I fmod
+A pointer to a
+.BR fmodsw (9)
+structure indicating the characteristics of the module.
+The following members of the
+.BR fmodsw (9)
+structure, pointed to by
+.IR fmod ,
+are significant:
+.RS
+.TP \w'f_sqinfo\(em'u
+.I f_name
+the name of the module.  This name is use to register the
+.I STREAMS
+module.
+.TP
+.I f_str
+a pointer to the
+.BR streamtab (9)
+structure describing the
+.I STREAMS
+module.
+.TP
+.I f_flag
+flags indicating options associated with the module.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqlvl
+synchronization queue level.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqinfo
+synchronization queue info.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_kmod
+a pointer to the kernel module
+.RB "(typically " THIS_MODULE )
+to be incremented when a the module is opened or
+.I STREAMS
+subsystem resource allocations are made,
+and decremented when the module is closed or
+.I STREAMS
+subsystems resources are freed.
+.RE
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_strmod ()
+registers the
+.I STREAMS
+module described by the
+.BR fmodsw (9)
+structure,
+.IR fmod ,
+against the module identification number specified by
+.IR modid .
+.PP
+When
+.IR modid
+is non-zero, the specified module id will be used for registration.
+The
+.IR modid
+can also be set to zero (0) to indicate that the
+.I STREAMS
+executive should assign an available module identification number.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR register_strmod ()
+is provided to register
+.I STREAMS
+modules written for
+.BR "@PACKAGE_TITLE@" .
+.BR register_strmod ()
+is also used internally to support the other
+.I STREAMS
+configuration and initialization mechanisms.  For other implementation
+specific module registration functions provided by
+.BR "@PACKAGE_TITLE@" ,
+see
+.BR str_install_AIX (9),
+.BR str_install_HPUX (9),
+.BR lis_register_strmod (9),
+.BR strmod_add (9).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_strmod ()
+registers the
+.I STREAMS
+module described by
+.I fmod
+and returns a positive number returning the specified or assigned module
+identification number.  Upon failure,
+.BR register_strmod ()
+does not effect registration and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_strmod ()
+fails to register the specified
+.I STREAMS
+module, it returns an appropriate negative error number as follows:
+.TP \w'[EINVAL]\(em'u
+.RB [ EINVAL ]
+.I fmod
+is
+.BR NULL .
+.TP
+.RB [ EINVAL ]
+.I fmod->f_name
+is
+.BR NULL .
+.TP
+.RB [ EINVAL ]
+.I fmod->f_name
+contains an invalid name.
+.TP
+.RB [ EBUSY ]
+the requested module identification number
+.I modid
+already has a 
+.BR fmodsw (9)
+structure other than
+.I fmod
+registered against it.
+.TP
+.RB [ ENXIO ]
+.I modid
+was zero (0) requesting dynamic allocation of a module identification number
+and no module identification numbers are available for allocation.
+.TP
+.RB [ ENOSYS ]
+MP syncrhonization was requested but is not supported.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_strmod ()
+can be called from any blocking context.
+.BR register_strmod ()
+is intended to be called from the
+.BR module_init ()
+procedure of a kernel module associated with the
+.I STREAMS
+module.
+.BR register_strmod ()
+may be called from the
+.IR qi_qopen (9)
+routine of another
+.I STREAMS
+module.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strmod ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_strmod ()
+when loading must call
+.BR unregister_strmod (9)
+before unloading.
+.BR unregister_strmod (9)
+must be called with the same value of
+.I fmod
+with which
+.BR register_strmod ()
+was called.
+.PP
+Modules registered with
+.BR register_strmod ()
+will appear in
+.BR /proc/streams/modules .
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR unregister_strmod (9),
+.BR register_strdev (9),
+.BR unregister_strdev (9),
+.BR str_install_AIX (9),
+.BR str_install_HPUX (9),
+.BR lis_register_strmod (9),
+.BR strmod_add (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_strmod ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_strmod ()
+is a
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+implementation specific function, with the following compatibility
+considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixspg
+.]
+uses the function
+.BR str_install_AIX (9)
+with the
+.B STR_LOAD_MOD
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+uses the function
+.BR str_install_HPUX (9)
+with the
+.B STR_IS_MODULE
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.I LiS
+.[
+lis
+.]
+uses the function
+.BR lis_register_strmod (9)
+to register modules.
+.IP \(em
+.IR OSF/1 \(rg
+uses the function
+.BR strmod_add (9)
+with the
+.B STR_IS_MODULE
+flag to register
+.I STREAMS
+modules.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and unregistration of
+.I STREAMS
+modules is implementation specific and not subject to standardization.
+.BR register_strmod ()
+is a
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strmod ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE@
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,330 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_ERROR_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_ERROR_ACK (dl_error_ack_t)
+\- informs the DLS user that a previously issued request or response
+was invalid.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one
+.BR M_PCPROTO (9)
+message block, which contains the following structure.
+.sp
+.nf
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_error_primitive;
+    t_uscalar_t  dl_errno;
+    t_uscalar_t  dl_unix_errno;
+} dl_error_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.B DL_ERROR_ACK
+informs the DLS user that a previously issued request or response was invalid.
+It conveys the identity of the primitive in error, a DLPI error code, and if
+appropriate, a Linux system error code.  Whenever this primitive is generated,
+it indicates that the DLPI state is identical to what it was before the
+erroneous request or response.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+The
+.B dl_error_ack_t
+structure contains the following members:
+.TP
+.I dl_primitive
+conveys
+.BR DL_ERROR_ACK .
+.TP
+.I dl_error_prim
+identifies the primitive in error.
+.TP
+.I dl_errno
+conveys the DLPI error code associated with the failure.  See the individual
+request or response for the error codes that are applicable.  In addition to
+those errors, the following errors may be reported:
+.RS
+.TP \w'\fBDL_BADPRIM\fP\(em'u
+.B DL_BADPRIM
+An unrecognized primitive was issued by the DLS user.
+.TP
+.B DL_NOTSUPPORTED
+A recognized but unsupported primitive was issued by the DLS user.
+.RE
+.TP
+.I dl_unix_errno
+conveys the Linux system error code associated with the failure.  This value
+should be non-zero only when
+.I dl_errno
+is set to
+.BR DL_SYSERR .
+It is used to report Linux system failures that prevent the processing of a
+given request or response.
+See the individual request or response reference page for the error codes that
+are applicable.  In addition to those errors, the following errors may be
+reported:
+.RS
+.TP \w'\fBDL_BADPRIM\fP\(em'u
+.RB [ EPERM ]
+Fine-grained permission for the request or response is incorrect.  That is, the
+primitive is recognized and supported by the DLS Provider but the requesting
+DLS User Stream does not have sufficient permissions for the DLS Provider to
+satisfy the request.
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was available to satisfy the request.
+The request or response may be successful if the DLS User reissues the request
+or response primitive at a later time when resources become available.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were available to satisfy the request.
+The request or response may be successful if the DLS User reissues the request
+or response primitive at a later time when resources become available.
+.TP
+.RB [ ENOSR ]
+Insufficient STREAMS resources were available to satisfy the request.
+The request or response may be successful if the DLS User reissues the request
+or response primitive at a later time when resources become available.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occurred and the DLS user should reissue the request or
+response.
+.TP
+.RB [ EBUSY ]
+The control information in the request or response primitive has already been
+subjected to the control request or response, or the driver is unabled to
+handle the request due to some other transient condition.
+.TP
+.RB [ EINVAL ]
+One of the parameters of the request for which there is no prescribed DLPI
+error code has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+Unsupported request, event or call.  The DLS provider recognizes and supportes
+the request or response primitive, however, the specific request or response is
+not supported by the DLS provider or data link protocol.
+.TP
+.RB [ ENOLINK ]
+The interface (Physical Point of Attachment (PPA) or underlying driver or
+device) is not connected and no prescribed DLPI error code is applicable.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface (Phsyical Point of Attachment (PPA) or
+underlying driver or device) is no longer installed on the system.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+The message is valid in every state where an acknowledgement or
+confirmation of a previous request or response is pending.
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state is that from which the acknowledged request or response
+was generated.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_ERROR_ACK
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The DLPI standard does not proscribe the use of specific Linux error codes.
+.B @PACKAGE_TITLE@
+details the use of Linux error codes with regard to DLPI primitives for the
+purpose of clarification of the implementation.
+.B @PACKAGE_TITLE@
+is largely compatible with
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+in this regard.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

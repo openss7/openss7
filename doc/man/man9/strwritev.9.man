@@ -1,0 +1,1 @@
+.so man9/strwrite.9.man

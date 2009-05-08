@@ -1,0 +1,480 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH TEST-SCTP_NC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B test-sctp_nc
+\- a simple client test program for the sctp(4) STREAMS driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBtest-sctp_nc\fR [\fIoptions\fR]
+.PD 0
+.HP 12
+\fBtest-sctp_nc\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBtest-sctp_nc\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBtest-sctp_nc\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B test-sctp_nc
+is a simple client test program for the
+.BR sctp (4)
+.I STREAMS
+driver.  It is intended to be used with the
+.BR test-sctp_ns (8)
+server program.
+.PP
+When
+.B test-sctp_nc
+executes, it opens an NPI Stream on device
+.B /dev/sctp_n
+and binds it to the
+.I LOCAL-HOST
+address and
+.I PORT
+port number.  It then connects
+to the
+.I REMOTE-HOST
+address and
+.I PORT
+port number,
+where it is expected that the corresponding
+.BR test-sctp_ns (8)
+program is running.
+.PP
+Once connected, the program enters a
+.BR poll (2)
+loop and begins writing messages of length
+.I LENGTH
+continuously.
+Every
+.I REPORT-TIME
+seconds, the program will print a report line that shows the throughput that
+was acheived on the write side.
+The program runs indefinitely (until interrupted from the controlling
+terminal).
+.PP
+The report output is formatted as described under
+.RI \(lq "OUTPUT FORMAT" \(rq,
+below.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B test-sctp_nc
+options fall into several categories as detailed in the subsections below.  If
+.B test-sctp_nc
+is executed without any options, it will execute the test and report progress.
+.\"
+.SS Command Options
+.PP
+These command options determine whether the program is run or whether an informative function is
+performed instead.  If none of these command options are specified, then it is assumed that the test
+test program is to be executed.  Options
+.BR --help ", " --version " and " --copying
+will override the program execution.
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.\"
+.SS General Options
+.PP
+The following options are applicable to all command options.  For other than test case command
+options, these general options must appear ahead of the command option.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fP, \fB--verbose\fP [\fILEVEL\fP]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.\"
+.SS Test Program Options
+.PP
+The following options are only applicable if test program execution is in
+effect.  That is, these options are only effective if the test program is
+being executed and are used to modify the manner in which the test program is
+executed or results reported.
+.TP
+\fB-p\fP, \fB--port\fP \fIPORT\fP
+Specifies both the local and remote port number to use,
+.IR PORT .
+The default port number if this option is not specified is port
+.B 18000
+for the local port and
+.B 18001
+for the remote port.
+.TP
+\fB-l\fP, \fB--loc_host\fP \fILOCAL-HOST\fP
+Specifies the
+.I LOCAL-HOST
+to which to bind.
+.I LOCAL-HOST
+is of the format
+.IR host [: port ],
+where
+.I host
+can be either a host name or a numbers and dots IP address.  By default, the
+local host to which to bind is
+.B 127.0.0.1
+and the port number is port
+.BR 18000 ,
+or the port number specified by the
+.B -p
+option.
+.TP
+\fB-r\fP, \fB--rem_host\fP \fIREMOTE-HOST\fP
+Specifies the
+.I REMOTE-HOST
+to which to connect.
+.I REMOTE-HOST
+is of the format
+.IR host [: port ],
+where
+.I host
+can be either a host name or a numbers and dots IP address.  By default, the
+remote host to which to connect is
+.B 127.0.0.1
+and the port number is port
+.BR 18001 ,
+or the port number specified by the
+.B -p
+option.
+.TP
+\fB-t\fP, \fB--rep_time\fP \fIREPORT-TIME\fP
+Specifies the
+.I REPORT-TIME
+in seconds between reports.  A report line will be generated each
+.I REPORT-TIME
+seconds until the test program terminates.  The default is one
+.RB ( 1 )
+second.
+.TP
+\fB-w\fP, \fB--length\fP \fILENGTH\fP
+Specifies the
+.I LENGTH
+of the message that are transmitted in bytes.  The default is
+.B 64
+bytes.
+.\"
+.\"
+.SH "OUTPUT FORMAT"
+.PP
+While
+.B test-sctp_nc
+is running, it generates an output report line once every
+.I REPORT-TIME
+interval.  Each output line is of the format:
+.sp
+.RS
+.nf
+\fC\s-1\
+Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld
+\s+1\fP
+.fi
+.RE
+.PP
+The fields of the output report line are interpreted as follows:
+.TP \w'\fIsent\fP\(em'u
+.I sent
+provides a simple count of the number of messages sent during the interval.
+.TP
+.I recv
+provides a simple count of the number of messages received during the
+interval.
+.TP
+.I tot
+provides the total of the number of messages sent and received during the
+interval.
+.TP
+.I dif
+provides the difference between the number of message sent and the number of
+messages received.
+.TP
+.I tput
+provides a throughput calculation which is the number of bytes sent and
+received during the interval, and is the simple product of the message length
+and the total number of message sent and received.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occurred and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B test-sctp_nc
+is a very simplistic test program.  You probably do not want to use this
+program.  It would be better to use the OpenSS7 Modified Netperf package
+.RB ( netperf )
+to perform any performance testing.  The only disadvantage of the
+.BR netperf (1)
+program is that its invokes the Transport Provider Interface,
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+instead of the Network Provider Interface,
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following is a simple example on the use of
+.B test-sctp_nc
+and
+.BR test-sctp_ns (8).
+.PP
+On one terminal of a host supporting STREAMS
+.BR sctp_n (4),
+execute the following:
+.sp
+.RS
+.nf
+\fC\s-1\
+$> test-sctp_ns --length=256
+\s+1\fP
+.fi
+.RE
+.PP
+On another terminal of the same host
+execute the following:
+.sp
+.RS
+.nf
+\fC\s-1\
+$> test-sctp_nc --length=256
+\s+1\fP
+.fi
+.RE
+.PP
+Note that the server program should be executed first.
+.PP
+Both programs will continue to run and output a report line until they are
+interrupted from the keyboard.
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B test-sctp_nc
+program opens the
+.B /dev/sctp_n
+device that provides a Network Provider Interface.
+.[
+npi revision 2.0.0
+.]
+See
+.BR sctp_n (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/@PACKAGE@/test-sctp_nc
+contains the
+.B test-sctp_nc
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sctp (4),
+.BR sctp_n (4),
+.BR test-sctp_ns (8),
+.BR poll (2),
+.BR netperf (1),
+.BR npi (7),
+.BR tpi (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B test-sctp_nc
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B test-sctp_nc
+is compatible with
+.BR test-sctp_ns (8).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B test-sctp_nc
+is a simple test program and is not subject to standardization.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B test-sctp_nc
+is one of the original test programs provided with the
+.I @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

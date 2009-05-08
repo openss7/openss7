@@ -1,0 +1,2036 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+
+ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Integer32, Unsigned32, Gauge32,
+   TimeTicks, Counter32, Counter64,
+   IpAddress, Opaque, mib-2,
+   zeroDotZero
+       FROM SNMPv2-SMI                 -- [RFC2578]
+   DateAndTime,
+   RowStatus, RowPointer,
+   TEXTUAL-CONVENTION
+       FROM SNMPv2-TC                  -- [RFC2579]
+   SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB         -- [RFC3411]
+   InetAddressType, InetAddress
+       FROM INET-ADDRESS-MIB           -- [RFC3291]
+   MODULE-COMPLIANCE, OBJECT-GROUP,
+   NOTIFICATION-GROUP
+       FROM SNMPv2-CONF                -- [RFC2580]
+   ZeroBasedCounter32
+       FROM RMON2-MIB;                 -- [RFC2021]
+
+  alarmMIB MODULE-IDENTITY
+      LAST-UPDATED "200409090000Z"  -- September 09, 2004
+      ORGANIZATION "IETF Distributed Management Working Group"
+      CONTACT-INFO
+           "WG EMail: disman@ietf.org
+           Subscribe: disman-request@ietf.org
+           http://www.ietf.org/html.charters/disman-charter.html
+
+           Chair:     Randy Presuhn
+                      randy_presuhn@mindspring.com
+
+           Editors:   Sharon Chisholm
+                      Nortel Networks
+                      PO Box 3511 Station C
+                      Ottawa, Ont.  K1Y 4H7
+                      Canada
+                      schishol@nortelnetworks.com
+
+                      Dan Romascanu
+                      Avaya
+                      Atidim Technology Park, Bldg. #3
+                      Tel Aviv, 61131
+                      Israel
+                      Tel: +972-3-645-8414
+                      Email: dromasca@avaya.com"
+      DESCRIPTION
+           "The MIB module describes a generic solution
+           to model alarms and to store the current list
+           of active alarms.
+
+           Copyright (C) The Internet Society (2004).  The
+           initial version of this MIB module was published
+           in RFC 3877.  For full legal notices see the RFC
+           itself.  Supplementary information may be available on:
+           http://www.ietf.org/copyrights/ianamib.html"
+      REVISION    "200409090000Z"  -- September 09, 2004
+      DESCRIPTION
+          "Initial version, published as RFC 3877."
+      ::= { mib-2 118 }
+
+alarmObjects OBJECT IDENTIFIER ::= { alarmMIB 1 }
+
+alarmNotifications OBJECT IDENTIFIER ::= { alarmMIB 0 }
+
+alarmModel OBJECT IDENTIFIER ::= { alarmObjects 1 }
+
+alarmActive  OBJECT IDENTIFIER ::= { alarmObjects 2 }
+
+alarmClear OBJECT IDENTIFIER ::= { alarmObjects 3 }
+
+-- Textual Conventions
+
+ -- ResourceId is intended to be a general textual convention
+ -- that can be used outside of the set of MIBs related to
+ -- Alarm Management.
+
+ResourceId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+            "A unique identifier for this resource.
+
+            The type of the resource can be determined by looking
+            at the OID that describes the resource.
+
+            Resources must be identified in a consistent manner.
+            For example, if this resource is an interface, this
+            object MUST point to an ifIndex and if this resource
+            is a physical entity [RFC2737], then this MUST point
+            to an entPhysicalDescr, given that entPhysicalIndex
+            is not accessible.  In general, the value is the
+            name of the instance of the first accessible columnar
+            object in the conceptual row of a table that is
+            meaningful for this resource type, which SHOULD
+            be defined in an IETF standard MIB."
+    SYNTAX         OBJECT IDENTIFIER
+
+ -- LocalSnmpEngineOrZeroLenStr is intended to be a general
+ -- textual convention that can be used outside of the set of
+ -- MIBs related to Alarm Management.
+
+  LocalSnmpEngineOrZeroLenStr ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+          "An SNMP Engine ID or a zero-length string.  The
+           instantiation of this textual convention will provide
+           guidance on when this will be an SNMP Engine ID and
+           when it will be a zero lengths string"
+      SYNTAX         OCTET STRING (SIZE(0 | 5..32))
+
+-- Alarm Model
+
+alarmModelLastChanged  OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The value of sysUpTime at the time of the last
+         creation, deletion or modification of an entry in
+         the alarmModelTable.
+
+         If the number and content of entries has been unchanged
+         since the last re-initialization of the local network
+         management subsystem, then the value of this object
+         MUST be zero."
+      ::= { alarmModel 1 }
+
+alarmModelTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AlarmModelEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of information about possible alarms on the system,
+        and how they have been modelled."
+   ::= { alarmModel 2 }
+
+alarmModelEntry OBJECT-TYPE
+   SYNTAX      AlarmModelEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entries appear in this table for each possible alarm state.
+       This table MUST be persistent across system reboots."
+   INDEX       { alarmListName, alarmModelIndex, alarmModelState }
+   ::= { alarmModelTable 1 }
+
+AlarmModelEntry ::= SEQUENCE {
+   alarmModelIndex                 Unsigned32,
+   alarmModelState                 Unsigned32,
+   alarmModelNotificationId        OBJECT IDENTIFIER,
+   alarmModelVarbindIndex          Unsigned32,
+   alarmModelVarbindValue          Integer32,
+   alarmModelDescription           SnmpAdminString,
+   alarmModelSpecificPointer       RowPointer,
+   alarmModelVarbindSubtree        OBJECT IDENTIFIER,
+   alarmModelResourcePrefix        OBJECT IDENTIFIER,
+   alarmModelRowStatus             RowStatus
+   }
+
+alarmModelIndex OBJECT-TYPE
+   SYNTAX     Unsigned32 (1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "An integer that acts as an alarm Id
+       to uniquely identify each alarm
+       within the named alarm list. "
+   ::= { alarmModelEntry 1 }
+
+alarmModelState OBJECT-TYPE
+   SYNTAX  Unsigned32 (1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS       current
+   DESCRIPTION
+        "A value of 1 MUST indicate a clear alarm state.
+        The value of this object MUST be less than the
+        alarmModelState of more severe alarm states for
+        this alarm.  The value of this object MUST be more
+        than the alarmModelState of less severe alarm states
+        for this alarm."
+    ::= { alarmModelEntry 2 }
+
+alarmModelNotificationId OBJECT-TYPE
+   SYNTAX      OBJECT IDENTIFIER
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The NOTIFICATION-TYPE object identifier of this alarm
+       state transition.  If there is no notification associated
+       with this alarm state, the value of this object MUST be
+       '0.0'"
+   DEFVAL { zeroDotZero }
+   ::= { alarmModelEntry 3 }
+
+alarmModelVarbindIndex  OBJECT-TYPE
+   SYNTAX  Unsigned32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+     "The index into the varbind listing of the notification
+     indicated by alarmModelNotificationId which helps
+     signal that the given alarm has changed state.
+     If there is no applicable varbind, the value of this
+     object MUST be zero.
+
+     Note that the value of alarmModelVarbindIndex acknowledges
+     the existence of the first two obligatory varbinds in
+     the InformRequest-PDU and SNMPv2-Trap-PDU (sysUpTime.0
+     and snmpTrapOID.0).  That is, a value of 2 refers to
+     the snmpTrapOID.0.
+
+     If the incoming notification is instead an SNMPv1 Trap-PDU,
+     then an appropriate value for sysUpTime.0 or snmpTrapOID.0
+     shall be determined by using the rules in section 3.1 of
+     [RFC3584]"
+     DEFVAL { 0 }
+    ::= { alarmModelEntry 4 }
+
+alarmModelVarbindValue OBJECT-TYPE
+   SYNTAX  Integer32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+     "The value that the varbind indicated by
+     alarmModelVarbindIndex takes to indicate
+     that the alarm has entered this state.
+
+     If alarmModelVarbindIndex has a value of 0, so
+     MUST alarmModelVarbindValue.
+     "
+     DEFVAL { 0 }
+    ::= { alarmModelEntry 5 }
+
+alarmModelDescription OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+      "A brief description of this alarm and state suitable
+      to display to operators."
+   DEFVAL { "" }
+   ::= { alarmModelEntry 6 }
+
+alarmModelSpecificPointer OBJECT-TYPE
+   SYNTAX     RowPointer
+   MAX-ACCESS read-create
+   STATUS     current
+   DESCRIPTION
+     "If no additional, model-specific Alarm MIB is supported by
+      the system the value of this object is `0.0'and attempts
+      to set it to any other value MUST be rejected appropriately.
+
+      When a model-specific Alarm MIB is supported, this object
+      MUST refer to the first accessible object in a corresponding
+      row of the model definition in one of these model-specific
+      MIB and attempts to set this object to { 0 0 } or any other
+      value MUST be rejected appropriately."
+   DEFVAL { zeroDotZero }
+   ::= { alarmModelEntry 7 }
+
+  alarmModelVarbindSubtree  OBJECT-TYPE
+     SYNTAX  OBJECT IDENTIFIER
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+       "The name portion of each VarBind in the notification,
+        in order, is compared to the value of this object.
+        If the name is equal to or a subtree of the value
+        of this object, for purposes of computing the value
+        of AlarmActiveResourceID the 'prefix' will be the
+        matching portion, and the 'indexes' will be any
+        remainder.  The examination of varbinds ends with
+        the first match.  If the value of this object is 0.0,
+        then the first varbind, or in the case of v2, the
+        first varbind after the timestamp and the trap
+        OID, will always be matched.
+       "
+      DEFVAL { zeroDotZero }
+     ::= { alarmModelEntry 8 }
+
+  alarmModelResourcePrefix  OBJECT-TYPE
+     SYNTAX  OBJECT IDENTIFIER
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+       "The value of AlarmActiveResourceId is computed
+        by appending any indexes extracted in accordance
+        with the description of alarmModelVarbindSubtree
+        onto the value of this object.  If this object's
+        value is 0.0, then the 'prefix' extracted is used
+        instead.
+       "
+     DEFVAL { zeroDotZero }
+     ::= { alarmModelEntry 9 }
+
+alarmModelRowStatus OBJECT-TYPE
+   SYNTAX     RowStatus
+   MAX-ACCESS read-create
+   STATUS     current
+   DESCRIPTION
+    "Control for creating and deleting entries.  Entries may be
+    modified while active.  Alarms whose alarmModelRowStatus is
+    not active will not appear in either the alarmActiveTable
+    or the alarmClearTable.  Setting this object to notInService
+    cannot be used as an alarm suppression mechanism.  Entries
+    that are notInService will disappear as described in RFC2579.
+
+    This row can not be modified while it is being
+    referenced by a value of alarmActiveModelPointer.  In these
+    cases, an error of `inconsistentValue' will be returned to
+    the manager.
+
+    This entry may be deleted while it is being
+    referenced by a value of alarmActiveModelPointer.  This results
+    in the deletion of this entry and entries in the active alarms
+    referencing this entry via an alarmActiveModelPointer.
+
+    As all read-create objects in this table have a DEFVAL clause,
+    there is no requirement that any object be explicitly set
+    before this row can become active.  Note that a row consisting
+    only of default values is not very meaningful."
+   ::= { alarmModelEntry 10 }
+
+-- Active Alarm Table --
+
+alarmActiveLastChanged  OBJECT-TYPE
+   SYNTAX      TimeTicks
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The value of sysUpTime at the time of the last
+       creation or deletion of an entry in the alarmActiveTable.
+       If the number of entries has been unchanged since the
+       last re-initialization of the local network management
+       subsystem, then this object contains a zero value."
+   ::= { alarmActive 1 }
+
+ alarmActiveOverflow  OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "active alarms"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The number of active alarms that have not been put into
+         the alarmActiveTable since system restart as a result
+         of extreme resource constraints."
+     ::= { alarmActive 5 }
+
+alarmActiveTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AlarmActiveEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of Active Alarms entries."
+   ::= { alarmActive 2 }
+
+alarmActiveEntry OBJECT-TYPE
+   SYNTAX      AlarmActiveEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entries appear in this table when alarms are raised.  They
+        are removed when the alarm is cleared.
+
+        If under extreme resource constraint the system is unable to
+        add any more entries into this table, then the
+        alarmActiveOverflow statistic will be increased by one."
+   INDEX       { alarmListName, alarmActiveDateAndTime,
+                 alarmActiveIndex }
+   ::= { alarmActiveTable 1 }
+
+AlarmActiveEntry ::= SEQUENCE {
+   alarmListName                    SnmpAdminString,
+   alarmActiveDateAndTime           DateAndTime,
+   alarmActiveIndex                 Unsigned32,
+   alarmActiveEngineID              LocalSnmpEngineOrZeroLenStr,
+   alarmActiveEngineAddressType     InetAddressType,
+   alarmActiveEngineAddress         InetAddress,
+   alarmActiveContextName           SnmpAdminString,
+   alarmActiveVariables             Unsigned32,
+   alarmActiveNotificationID        OBJECT IDENTIFIER,
+   alarmActiveResourceId            ResourceId,
+   alarmActiveDescription           SnmpAdminString,
+   alarmActiveLogPointer            RowPointer,
+   alarmActiveModelPointer          RowPointer,
+   alarmActiveSpecificPointer       RowPointer }
+
+alarmListName OBJECT-TYPE
+   SYNTAX     SnmpAdminString (SIZE(0..32))
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The name of the list of alarms.  This SHOULD be the same as
+    nlmLogName if the Notification Log MIB [RFC3014] is supported.
+    This SHOULD be the same as, or contain as a prefix, the
+    applicable snmpNotifyFilterProfileName if the
+    SNMP-NOTIFICATION-MIB DEFINITIONS [RFC3413] is supported.
+
+    An implementation may allow multiple named alarm lists, up to
+    some implementation-specific limit (which may be none).  A
+    zero-length list name is reserved for creation and deletion
+    by the managed system, and MUST be used as the default log
+    name by systems that do not support named alarm lists."
+   ::= { alarmActiveEntry 1 }
+
+alarmActiveDateAndTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The local date and time when the error occurred.
+
+       This object facilitates retrieving all instances of
+       alarms that have been raised or have changed state
+       since a given point in time.
+
+       Implementations MUST include the offset from UTC,
+       if available.  Implementation in environments in which
+       the UTC offset is not available is NOT RECOMMENDED."
+   ::= { alarmActiveEntry 2 }
+
+alarmActiveIndex OBJECT-TYPE
+   SYNTAX     Unsigned32 (1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "A strictly monotonically increasing integer which
+       acts as the index of entries within the named alarm
+       list.  It wraps back to 1 after it reaches its
+       maximum value."
+   ::= { alarmActiveEntry 3 }
+
+alarmActiveEngineID OBJECT-TYPE
+   SYNTAX      LocalSnmpEngineOrZeroLenStr
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The identification of the SNMP engine at which the alarm
+        originated.  If the alarm is from an SNMPv1 system this
+        object is a zero length string."
+   ::= { alarmActiveEntry 4 }
+
+alarmActiveEngineAddressType OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+    "This object indicates what type of address is stored in
+    the alarmActiveEngineAddress object - IPv4, IPv6, DNS, etc."
+   ::= { alarmActiveEntry 5 }
+
+alarmActiveEngineAddress OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+    "The address of the SNMP engine on which the alarm is
+    occurring.
+
+    This object MUST always be instantiated, even if the list
+    can contain alarms from only one engine."
+   ::= { alarmActiveEntry 6 }
+
+alarmActiveContextName OBJECT-TYPE
+   SYNTAX      SnmpAdminString (SIZE(0..32))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name of the SNMP MIB context from which the alarm came.
+        For SNMPv1 alarms this is the community string from the Trap.
+        Note that care MUST be taken when selecting community
+        strings to ensure that these can be represented as a
+        well-formed SnmpAdminString.  Community or Context names
+        that are not well-formed SnmpAdminStrings will be mapped
+        to zero length strings.
+
+        If the alarm's source SNMP engine is known not to support
+        multiple contexts, this object is a zero length string."
+   ::= { alarmActiveEntry 7 }
+
+alarmActiveVariables OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The number of variables in alarmActiveVariableTable for this
+       alarm."
+   ::= { alarmActiveEntry 8 }
+
+alarmActiveNotificationID OBJECT-TYPE
+   SYNTAX      OBJECT IDENTIFIER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The NOTIFICATION-TYPE object identifier of the alarm
+       state transition that is occurring."
+   ::= { alarmActiveEntry 9 }
+
+alarmActiveResourceId    OBJECT-TYPE
+   SYNTAX      ResourceId
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object identifies the resource under alarm.
+
+      If there is no corresponding resource, then
+      the value of this object MUST be 0.0."
+   ::= { alarmActiveEntry 10 }
+
+alarmActiveDescription    OBJECT-TYPE
+   SYNTAX      SnmpAdminString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object provides a textual description of the
+      active alarm.  This text is generated dynamically by the
+      notification generator to provide useful information
+      to the human operator.  This information SHOULD
+      provide information allowing the operator to locate
+      the resource for which this alarm is being generated.
+      This information is not intended for consumption by
+      automated tools."
+   ::= { alarmActiveEntry 11 }
+
+alarmActiveLogPointer OBJECT-TYPE
+   SYNTAX     RowPointer
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "A pointer to the corresponding row in a
+       notification logging MIB where the state change
+       notification for this active alarm is logged.
+       If no log entry applies to this active alarm,
+       then this object MUST have the value of 0.0"
+   ::= { alarmActiveEntry 12 }
+
+alarmActiveModelPointer OBJECT-TYPE
+   SYNTAX     RowPointer
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "A pointer to the corresponding row in the
+       alarmModelTable for this active alarm.  This
+       points not only to the alarm model being
+       instantiated, but also to the specific alarm
+       state that is active."
+   ::= { alarmActiveEntry 13 }
+
+alarmActiveSpecificPointer OBJECT-TYPE
+   SYNTAX     RowPointer
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+     "If no additional, model-specific, Alarm MIB is supported by
+     the system this object is `0.0'.  When a model-specific Alarm
+     MIB is supported, this object is the instance pointer to the
+     specific model-specific active alarm list."
+   ::= { alarmActiveEntry 14 }
+
+-- Active Alarm Variable Table --
+
+alarmActiveVariableTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AlarmActiveVariableEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of variables to go with active alarm entries."
+   ::= { alarmActive 3 }
+
+alarmActiveVariableEntry OBJECT-TYPE
+   SYNTAX      AlarmActiveVariableEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entries appear in this table when there are variables in
+       the varbind list of a corresponding alarm in
+       alarmActiveTable.
+
+       Entries appear in this table as though
+       the trap/notification had been transported using a
+       SNMPv2-Trap-PDU, as defined in [RFC3416] - i.e., the
+       alarmActiveVariableIndex 1 will always be sysUpTime
+       and alarmActiveVariableIndex 2 will always be
+       snmpTrapOID.
+
+       If the incoming notification is instead an SNMPv1 Trap-PDU and
+       the value of alarmModelVarbindIndex is 1 or 2, an appropriate
+       value for sysUpTime.0 or snmpTrapOID.0 shall be determined
+       by using the rules in section 3.1 of [RFC3584]."
+   INDEX   {  alarmListName, alarmActiveIndex,
+              alarmActiveVariableIndex }
+   ::= { alarmActiveVariableTable 1 }
+
+AlarmActiveVariableEntry ::= SEQUENCE {
+   alarmActiveVariableIndex                 Unsigned32,
+   alarmActiveVariableID                    OBJECT IDENTIFIER,
+   alarmActiveVariableValueType             INTEGER,
+   alarmActiveVariableCounter32Val          Counter32,
+   alarmActiveVariableUnsigned32Val         Unsigned32,
+   alarmActiveVariableTimeTicksVal          TimeTicks,
+   alarmActiveVariableInteger32Val          Integer32,
+   alarmActiveVariableOctetStringVal        OCTET STRING,
+   alarmActiveVariableIpAddressVal          IpAddress,
+   alarmActiveVariableOidVal                OBJECT IDENTIFIER,
+   alarmActiveVariableCounter64Val          Counter64,
+   alarmActiveVariableOpaqueVal             Opaque }
+
+alarmActiveVariableIndex OBJECT-TYPE
+   SYNTAX     Unsigned32 (1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "A strictly monotonically increasing integer, starting at
+       1 for a given alarmActiveIndex, for indexing variables
+       within the active alarm variable list. "
+   ::= { alarmActiveVariableEntry 1 }
+
+alarmActiveVariableID OBJECT-TYPE
+   SYNTAX     OBJECT IDENTIFIER
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "The alarm variable's object identifier."
+   ::= { alarmActiveVariableEntry 2 }
+
+alarmActiveVariableValueType OBJECT-TYPE
+   SYNTAX      INTEGER {
+         counter32(1),
+         unsigned32(2),
+         timeTicks(3),
+         integer32(4),
+         ipAddress(5),
+         octetString(6),
+         objectId(7),
+         counter64(8),
+         opaque(9)
+         }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The type of the value.  One and only one of the value
+       objects that follow is used for a given row in this table,
+       based on this type."
+   ::= { alarmActiveVariableEntry 3 }
+
+alarmActiveVariableCounter32Val OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'counter32'."
+   ::= { alarmActiveVariableEntry 4 }
+
+alarmActiveVariableUnsigned32Val OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'unsigned32'."
+   ::= { alarmActiveVariableEntry 5 }
+
+alarmActiveVariableTimeTicksVal OBJECT-TYPE
+   SYNTAX      TimeTicks
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'timeTicks'."
+   ::= { alarmActiveVariableEntry 6 }
+
+alarmActiveVariableInteger32Val OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'integer32'."
+   ::= { alarmActiveVariableEntry 7 }
+
+alarmActiveVariableOctetStringVal OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE(0..65535))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'octetString'."
+   ::= { alarmActiveVariableEntry 8 }
+
+alarmActiveVariableIpAddressVal OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'ipAddress'."
+   ::= { alarmActiveVariableEntry 9 }
+
+alarmActiveVariableOidVal OBJECT-TYPE
+   SYNTAX      OBJECT IDENTIFIER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'objectId'."
+   ::= { alarmActiveVariableEntry 10 }
+
+alarmActiveVariableCounter64Val OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'counter64'."
+   ::= { alarmActiveVariableEntry 11 }
+
+alarmActiveVariableOpaqueVal OBJECT-TYPE
+   SYNTAX      Opaque (SIZE(0..65535))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value when alarmActiveVariableType is 'opaque'.
+
+       Note that although RFC2578 [RFC2578] forbids the use
+       of Opaque in 'standard' MIB modules, this particular
+       usage is driven by the need to be able to accurately
+       represent any well-formed notification, and justified
+       by the need for backward compatibility."
+   ::= { alarmActiveVariableEntry 12 }
+
+-- Statistics --
+
+alarmActiveStatsTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AlarmActiveStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "This table represents the alarm statistics
+         information."
+  ::= { alarmActive 4 }
+
+alarmActiveStatsEntry OBJECT-TYPE
+      SYNTAX  AlarmActiveStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Statistics on the current active alarms."
+      INDEX   { alarmListName }
+
+  ::= {  alarmActiveStatsTable 1 }
+
+AlarmActiveStatsEntry ::=
+      SEQUENCE {
+           alarmActiveStatsActiveCurrent  Gauge32,
+           alarmActiveStatsActives        ZeroBasedCounter32,
+           alarmActiveStatsLastRaise      TimeTicks,
+           alarmActiveStatsLastClear      TimeTicks
+                }
+
+alarmActiveStatsActiveCurrent OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS  current
+      DESCRIPTION
+         "The total number of currently active alarms on the system."
+       ::= { alarmActiveStatsEntry 1 }
+
+alarmActiveStatsActives OBJECT-TYPE
+      SYNTAX ZeroBasedCounter32
+      MAX-ACCESS read-only
+      STATUS  current
+      DESCRIPTION
+         "The total number of active alarms since system restarted."
+       ::= { alarmActiveStatsEntry 2 }
+
+alarmActiveStatsLastRaise  OBJECT-TYPE
+   SYNTAX      TimeTicks
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The value of sysUpTime at the time of the last
+       alarm raise for this alarm list.
+       If no alarm raises have occurred since the
+       last re-initialization of the local network management
+       subsystem, then this object contains a zero value."
+ ::= { alarmActiveStatsEntry 3 }
+
+alarmActiveStatsLastClear  OBJECT-TYPE
+   SYNTAX      TimeTicks
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The value of sysUpTime at the time of the last
+       alarm clear for this alarm list.
+       If no alarm clears have occurred since the
+       last re-initialization of the local network management
+       subsystem, then this object contains a zero value."
+ ::= { alarmActiveStatsEntry 4 }
+
+-- Alarm Clear
+
+alarmClearMaximum OBJECT-TYPE
+ SYNTAX Unsigned32
+ MAX-ACCESS read-write
+ STATUS current
+ DESCRIPTION
+   "This object specifies the maximum number of cleared
+   alarms to store in the alarmClearTable.  When this
+   number is reached, the cleared alarms with the
+   earliest clear time will be removed from the table."
+ ::= { alarmClear 1 }
+
+alarmClearTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF AlarmClearEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "This table contains information on
+         cleared alarms."
+  ::= { alarmClear 2 }
+
+alarmClearEntry OBJECT-TYPE
+      SYNTAX  AlarmClearEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Information on a cleared alarm."
+      INDEX   { alarmListName, alarmClearDateAndTime,
+alarmClearIndex }
+
+  ::= {  alarmClearTable 1 }
+
+AlarmClearEntry ::=
+      SEQUENCE {
+   alarmClearIndex                 Unsigned32,
+   alarmClearDateAndTime           DateAndTime,
+   alarmClearEngineID              LocalSnmpEngineOrZeroLenStr,
+   alarmClearEngineAddressType     InetAddressType,
+   alarmClearEngineAddress         InetAddress,
+   alarmClearContextName           SnmpAdminString,
+   alarmClearNotificationID        OBJECT IDENTIFIER,
+   alarmClearResourceId            ResourceId,
+   alarmClearLogIndex              Unsigned32,
+   alarmClearModelPointer          RowPointer
+   }
+
+alarmClearIndex OBJECT-TYPE
+   SYNTAX     Unsigned32 (1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "An integer which acts as the index of entries within
+       the named alarm list.  It wraps back to 1 after it
+       reaches its maximum value.
+
+       This object has the same value as the alarmActiveIndex that
+       this alarm instance had when it was active."
+   ::= { alarmClearEntry 1 }
+
+alarmClearDateAndTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The local date and time when the alarm cleared.
+
+       This object facilitates retrieving all instances of
+       alarms that have been cleared since a given point in time.
+
+       Implementations MUST include the offset from UTC,
+       if available.  Implementation in environments in which
+       the UTC offset is not available is NOT RECOMMENDED."
+   ::= { alarmClearEntry 2 }
+
+alarmClearEngineID OBJECT-TYPE
+   SYNTAX      LocalSnmpEngineOrZeroLenStr
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The identification of the SNMP engine at which the alarm
+        originated.  If the alarm is from an SNMPv1 system this
+        object is a zero length string."
+   ::= { alarmClearEntry 3 }
+
+alarmClearEngineAddressType OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+    "This object indicates what type of address is stored in
+    the alarmActiveEngineAddress object - IPv4, IPv6, DNS, etc."
+   ::= { alarmClearEntry 4 }
+
+alarmClearEngineAddress OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+    "The Address of the SNMP engine on which the alarm was
+    occurring.  This is used to identify the source of an SNMPv1
+    trap, since an alarmActiveEngineId cannot be extracted from the
+    SNMPv1 trap PDU.
+
+    This object MUST always be instantiated, even if the list
+    can contain alarms from only one engine."
+   ::= { alarmClearEntry 5 }
+
+alarmClearContextName OBJECT-TYPE
+   SYNTAX      SnmpAdminString (SIZE(0..32))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The name of the SNMP MIB context from which the alarm came.
+       For SNMPv1 traps this is the community string from the Trap.
+       Note that care needs to be taken when selecting community
+       strings to ensure that these can be represented as a
+       well-formed SnmpAdminString.  Community or Context names
+       that are not well-formed SnmpAdminStrings will be mapped
+       to zero length strings.
+
+       If the alarm's source SNMP engine is known not to support
+       multiple contexts, this object is a zero length string."
+   ::= { alarmClearEntry 6 }
+
+alarmClearNotificationID OBJECT-TYPE
+   SYNTAX      OBJECT IDENTIFIER
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The NOTIFICATION-TYPE object identifier of the alarm
+       clear."
+   ::= { alarmClearEntry 7 }
+
+alarmClearResourceId    OBJECT-TYPE
+   SYNTAX      ResourceId
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This object identifies the resource that was under alarm.
+
+      If there is no corresponding resource, then
+      the value of this object MUST be 0.0."
+   ::= { alarmClearEntry 8 }
+
+alarmClearLogIndex OBJECT-TYPE
+   SYNTAX     Unsigned32 (0..4294967295)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "This number MUST be the same as the log index of the
+       applicable row in the notification log MIB, if it exists.
+       If no log index applies to the trap, then this object
+       MUST have the value of 0."
+   ::= { alarmClearEntry 9 }
+
+alarmClearModelPointer OBJECT-TYPE
+   SYNTAX     RowPointer
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "A pointer to the corresponding row in the
+       alarmModelTable for this cleared alarm."
+   ::= { alarmClearEntry 10 }
+
+-- Notifications
+
+alarmActiveState NOTIFICATION-TYPE
+ OBJECTS     { alarmActiveModelPointer,
+               alarmActiveResourceId }
+ STATUS      current
+ DESCRIPTION
+    "An instance of the alarm indicated by
+    alarmActiveModelPointer has been raised
+    against the entity indicated by
+    alarmActiveResourceId.
+
+    The agent must throttle the generation of
+    consecutive alarmActiveState traps so that there is at
+    least a two-second gap between traps of this
+    type against the same alarmActiveModelPointer and
+    alarmActiveResourceId.  When traps are throttled,
+    they are dropped, not queued for sending at a future time.
+
+    A management application should periodically check
+    the value of alarmActiveLastChanged to detect any
+    missed alarmActiveState notification-events, e.g.,
+    due to throttling or transmission loss."
+ ::= { alarmNotifications 2 }
+
+alarmClearState NOTIFICATION-TYPE
+   OBJECTS     { alarmActiveModelPointer,
+                 alarmActiveResourceId }
+   STATUS      current
+   DESCRIPTION
+     "An instance of the alarm indicated by
+     alarmActiveModelPointer has been cleared against
+     the entity indicated by alarmActiveResourceId.
+
+    The agent must throttle the generation of
+    consecutive alarmActiveClear traps so that there is at
+    least a two-second gap between traps of this
+    type against the same alarmActiveModelPointer and
+    alarmActiveResourceId.  When traps are throttled,
+    they are dropped, not queued for sending at a future time.
+
+    A management application should periodically check
+    the value of alarmActiveLastChanged to detect any
+    missed alarmClearState notification-events, e.g.,
+    due to throttling or transmission loss."
+   ::= { alarmNotifications 3 }
+
+-- Conformance
+
+alarmConformance OBJECT IDENTIFIER ::= { alarmMIB 2 }
+
+alarmCompliances OBJECT IDENTIFIER ::= { alarmConformance 1 }
+
+alarmCompliance MODULE-COMPLIANCE
+      STATUS  current
+      DESCRIPTION
+          "The compliance statement for systems supporting
+          the Alarm MIB."
+      MODULE -- this module
+          MANDATORY-GROUPS {
+           alarmActiveGroup,
+           alarmModelGroup
+          }
+      GROUP       alarmActiveStatsGroup
+       DESCRIPTION
+           "This group is optional."
+      GROUP       alarmClearGroup
+       DESCRIPTION
+           "This group is optional."
+      GROUP       alarmNotificationsGroup
+       DESCRIPTION
+           "This group is optional."
+   ::= { alarmCompliances 1 }
+
+alarmGroups OBJECT IDENTIFIER ::= { alarmConformance 2 }
+
+alarmModelGroup OBJECT-GROUP
+   OBJECTS {
+       alarmModelLastChanged,
+       alarmModelNotificationId,
+       alarmModelVarbindIndex,
+       alarmModelVarbindValue,
+       alarmModelDescription,
+       alarmModelSpecificPointer,
+       alarmModelVarbindSubtree,
+       alarmModelResourcePrefix,
+       alarmModelRowStatus
+      }
+    STATUS   current
+    DESCRIPTION
+               "Alarm model group."
+    ::= { alarmGroups 1}
+
+alarmActiveGroup OBJECT-GROUP
+        OBJECTS {
+           alarmActiveLastChanged,
+           alarmActiveOverflow,
+           alarmActiveEngineID,
+           alarmActiveEngineAddressType,
+           alarmActiveEngineAddress,
+           alarmActiveContextName,
+           alarmActiveVariables,
+           alarmActiveNotificationID,
+           alarmActiveResourceId,
+           alarmActiveDescription,
+           alarmActiveLogPointer,
+           alarmActiveModelPointer,
+           alarmActiveSpecificPointer,
+           alarmActiveVariableID,
+           alarmActiveVariableValueType,
+           alarmActiveVariableCounter32Val,
+           alarmActiveVariableUnsigned32Val,
+           alarmActiveVariableTimeTicksVal,
+           alarmActiveVariableInteger32Val,
+           alarmActiveVariableOctetStringVal,
+           alarmActiveVariableIpAddressVal,
+           alarmActiveVariableOidVal,
+           alarmActiveVariableCounter64Val,
+           alarmActiveVariableOpaqueVal
+          }
+          STATUS   current
+          DESCRIPTION
+               "Active Alarm list group."
+          ::= { alarmGroups 2}
+
+    alarmActiveStatsGroup  OBJECT-GROUP
+          OBJECTS  {
+                   alarmActiveStatsActives,
+                   alarmActiveStatsActiveCurrent,
+                   alarmActiveStatsLastRaise,
+                   alarmActiveStatsLastClear
+                    }
+          STATUS   current
+          DESCRIPTION
+               "Active alarm summary group."
+          ::= { alarmGroups 3}
+
+alarmClearGroup  OBJECT-GROUP
+          OBJECTS  {
+   alarmClearMaximum,
+   alarmClearEngineID,
+   alarmClearEngineAddressType,
+   alarmClearEngineAddress,
+   alarmClearContextName,
+   alarmClearNotificationID,
+   alarmClearResourceId,
+   alarmClearLogIndex,
+   alarmClearModelPointer
+                    }
+          STATUS   current
+          DESCRIPTION
+               "Cleared alarm group."
+          ::= { alarmGroups 4}
+
+alarmNotificationsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS { alarmActiveState, alarmClearState }
+   STATUS        current
+   DESCRIPTION
+           "The collection of notifications that can be used to
+           model alarms for faults lacking pre-existing
+           notification definitions."
+   ::= { alarmGroups 6 }
+
+END
+
+
+IANA-ITU-ALARM-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, mib-2
+       FROM SNMPv2-SMI          -- [RFC2578]
+   TEXTUAL-CONVENTION
+       FROM SNMPv2-TC;          -- [RFC2579]
+
+ ianaItuAlarmNumbers MODULE-IDENTITY
+     LAST-UPDATED "200409090000Z"  -- September 09, 2004
+     ORGANIZATION "IANA"
+     CONTACT-INFO
+         "Postal:    Internet Assigned Numbers Authority
+                     Internet Corporation for Assigned Names
+                     and Numbers
+                     4676 Admiralty Way, Suite 330
+                     Marina del Rey, CA 90292-6601
+                     USA
+
+         Tel:    +1  310-823-9358
+         E-Mail: iana@iana.org"
+     DESCRIPTION
+         "The MIB module defines the ITU Alarm
+         textual convention for objects expected to require
+         regular extension.
+
+         Copyright (C) The Internet Society (2004).  The
+         initial version of this MIB module was published
+         in RFC 3877.  For full legal notices see the RFC
+         itself.  Supplementary information may be available on:
+         http://www.ietf.org/copyrights/ianamib.html"
+      REVISION    "200409090000Z"  -- September 09, 2004
+      DESCRIPTION
+          "Initial version, published as RFC 3877."
+     ::= { mib-2 119 }
+
+IANAItuProbableCause ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "ITU-T probable cause values.  Duplicate values defined in
+         X.733 are appended with X733 to ensure syntactic uniqueness.
+         Probable cause value 0 is reserved for special purposes.
+
+         The Internet Assigned Number Authority (IANA) is responsible
+         for the assignment of the enumerations in this TC.
+         IANAItuProbableCause value of 0 is reserved for special
+         purposes and MUST NOT be assigned.
+
+         Values of IANAItuProbableCause in the range 1 to 1023 are
+         reserved for causes that correspond to ITU-T probable cause.
+
+         All other requests for new causes will be handled on a
+         first-come, first served basis and will be assigned
+         enumeration values starting with 1025.
+
+         Request should  come in the form of well-formed
+         SMI [RFC2578] for enumeration names that are unique and
+         sufficiently descriptive.
+
+         While some effort will be taken to ensure that new probable
+         causes do not conceptually duplicate existing probable
+         causes it is acknowledged that the existence of conceptual
+         duplicates in the starting probable cause list is an known
+         industry reality.
+
+         To aid IANA in the administration of probable cause names
+         and values, the OPS Area Director will appoint one or more
+         experts to help review requests.
+
+         See http://www.iana.org"
+    REFERENCE
+        "ITU Recommendation M.3100, 'Generic Network Information
+            Model', 1995
+         ITU Recommendation X.733, 'Information Technology - Open
+            Systems Interconnection - System Management: Alarm
+            Reporting Function', 1992
+         ITU Recommendation X.736, 'Information Technology - Open
+            Systems Interconnection - System Management: Security
+            Alarm Reporting Function', 1992"
+
+    SYNTAX         INTEGER
+            {
+            -- The following probable causes were defined in M.3100
+             aIS  (1),
+             callSetUpFailure  (2),
+             degradedSignal  (3),
+             farEndReceiverFailure  (4),
+             framingError  (5),
+             lossOfFrame (6),
+             lossOfPointer  (7),
+             lossOfSignal  (8),
+             payloadTypeMismatch (9),
+             transmissionError (10),
+             remoteAlarmInterface (11),
+             excessiveBER  (12),
+             pathTraceMismatch  (13),
+             unavailable  (14),
+             signalLabelMismatch (15),
+             lossOfMultiFrame (16),
+             receiveFailure (17),
+             transmitFailure (18),
+             modulationFailure (19),
+             demodulationFailure (20),
+             broadcastChannelFailure (21),
+             connectionEstablishmentError (22),
+             invalidMessageReceived (23),
+             localNodeTransmissionError (24),
+             remoteNodeTransmissionError (25),
+             routingFailure (26),
+
+ --Values 27-50 are reserved for communications alarm related
+ --probable causes
+ -- The following are used with equipment alarm.
+
+             backplaneFailure (51),
+             dataSetProblem  (52),
+             equipmentIdentifierDuplication  (53),
+             externalIFDeviceProblem  (54),
+             lineCardProblem (55),
+             multiplexerProblem  (56),
+             nEIdentifierDuplication  (57),
+             powerProblem  (58),
+             processorProblem  (59),
+             protectionPathFailure  (60),
+             receiverFailure  (61),
+             replaceableUnitMissing  (62),
+             replaceableUnitTypeMismatch (63),
+             synchronizationSourceMismatch  (64),
+             terminalProblem   (65),
+             timingProblem   (66),
+             transmitterFailure  (67),
+             trunkCardProblem  (68),
+             replaceableUnitProblem  (69),
+             realTimeClockFailure (70),
+ --An equipment alarm to be issued if the system detects that the
+ --real time clock has failed
+             antennaFailure (71),
+             batteryChargingFailure (72),
+             diskFailure (73),
+             frequencyHoppingFailure (74),
+             iODeviceError (75),
+             lossOfSynchronisation (76),
+             lossOfRedundancy (77),
+             powerSupplyFailure (78),
+             signalQualityEvaluationFailure (79),
+             tranceiverFailure (80),
+             protectionMechanismFailure (81),
+             protectingResourceFailure (82),
+ -- Values 83-100 are reserved for equipment alarm related probable
+ -- causes
+ -- The following are used with environmental alarm.
+             airCompressorFailure  (101),
+             airConditioningFailure  (102),
+             airDryerFailure   (103),
+             batteryDischarging  (104),
+             batteryFailure   (105),
+             commercialPowerFailure  (106),
+             coolingFanFailure  (107),
+             engineFailure  (108),
+             fireDetectorFailure  (109),
+             fuseFailure  (110),
+             generatorFailure  (111),
+             lowBatteryThreshold (112),
+             pumpFailure  (113),
+             rectifierFailure  (114),
+             rectifierHighVoltage  (115),
+             rectifierLowFVoltage  (116),
+             ventilationsSystemFailure  (117),
+             enclosureDoorOpen  (118),
+             explosiveGas  (119),
+             fire (120),
+             flood   (121),
+             highHumidity  (122),
+             highTemperature  (123),
+             highWind  (124),
+             iceBuildUp  (125),
+             intrusionDetection  (126),
+             lowFuel  (127),
+             lowHumidity  (128),
+             lowCablePressure  (129),
+             lowTemperatue  (130),
+             lowWater  (131),
+             smoke  (132),
+             toxicGas  (133),
+             coolingSystemFailure (134),
+             externalEquipmentFailure (135),
+             externalPointFailure (136),
+ -- Values 137-150 are reserved for environmental alarm related
+ -- probable causes
+ -- The following are used with Processing error alarm.
+             storageCapacityProblem (151),
+             memoryMismatch  (152),
+             corruptData  (153),
+             outOfCPUCycles   (154),
+             sfwrEnvironmentProblem  (155),
+             sfwrDownloadFailure  (156),
+             lossOfRealTimel (157),
+ --A processing error alarm to be issued after the system has
+ --reinitialised.  This will indicate
+ --to the management systems that the view they have of the managed
+ --system may no longer
+ --be valid.  Usage example: The managed
+ --system issues this alarm after a reinitialization with severity
+ --warning to inform the
+ --management system about the event.  No clearing notification will
+ --be sent.
+             applicationSubsystemFailure (158),
+             configurationOrCustomisationError (159),
+             databaseInconsistency (160),
+             fileError (161),
+             outOfMemory (162),
+             softwareError (163),
+             timeoutExpired (164),
+             underlayingResourceUnavailable (165),
+             versionMismatch (166),
+ --Values 168-200 are reserved for processing error alarm related
+ -- probable causes.
+             bandwidthReduced (201),
+             congestion (202),
+             excessiveErrorRate (203),
+             excessiveResponseTime (204),
+             excessiveRetransmissionRate (205),
+             reducedLoggingCapability (206),
+             systemResourcesOverload (207 ),
+             -- The following were defined X.733
+             adapterError (500),
+             applicationSubsystemFailture (501),
+             bandwidthReducedX733 (502),
+             callEstablishmentError (503),
+             communicationsProtocolError (504),
+             communicationsSubsystemFailure (505),
+             configurationOrCustomizationError (506),
+             congestionX733 (507),
+             coruptData (508),
+             cpuCyclesLimitExceeded (509),
+             dataSetOrModemError (510),
+             degradedSignalX733 (511),
+             dteDceInterfaceError (512),
+             enclosureDoorOpenX733 (513),
+             equipmentMalfunction (514),
+             excessiveVibration (515),
+             fileErrorX733 (516),
+             fireDetected (517),
+             framingErrorX733 (518),
+             heatingVentCoolingSystemProblem (519),
+             humidityUnacceptable (520),
+             inputOutputDeviceError (521),
+             inputDeviceError (522),
+             lanError (523),
+             leakDetected (524),
+             localNodeTransmissionErrorX733 (525),
+             lossOfFrameX733 (526),
+             lossOfSignalX733 (527),
+             materialSupplyExhausted (528),
+             multiplexerProblemX733 (529),
+             outOfMemoryX733 (530),
+             ouputDeviceError (531),
+             performanceDegraded (532),
+             powerProblems (533),
+             pressureUnacceptable (534),
+             processorProblems (535),
+             pumpFailureX733 (536),
+             queueSizeExceeded (537),
+             receiveFailureX733 (538),
+             receiverFailureX733 (539),
+             remoteNodeTransmissionErrorX733 (540),
+             resourceAtOrNearingCapacity (541),
+             responseTimeExecessive (542),
+             retransmissionRateExcessive (543),
+             softwareErrorX733 (544),
+             softwareProgramAbnormallyTerminated (545),
+             softwareProgramError (546),
+             storageCapacityProblemX733 (547),
+             temperatureUnacceptable (548),
+             thresholdCrossed (549),
+             timingProblemX733 (550),
+             toxicLeakDetected (551),
+             transmitFailureX733 (552),
+             transmiterFailure (553),
+             underlyingResourceUnavailable (554),
+             versionMismatchX733 (555),
+             -- The following are defined in X.736
+             authenticationFailure (600),
+             breachOfConfidentiality (601),
+             cableTamper (602),
+             delayedInformation (603),
+             denialOfService (604),
+             duplicateInformation (605),
+             informationMissing (606),
+             informationModificationDetected (607),
+             informationOutOfSequence (608),
+             keyExpired (609),
+             nonRepudiationFailure (610),
+             outOfHoursActivity (611),
+             outOfService (612),
+             proceduralError (613),
+             unauthorizedAccessAttempt (614),
+             unexpectedInformation (615),
+
+             other (1024)
+             }
+
+IANAItuEventType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+            "The ITU event Type values.
+
+            The Internet Assigned Number Authority (IANA) is
+            responsible for the assignment of the enumerations
+            in this TC.
+
+            Request should  come in the form of well-formed
+            SMI [RFC2578] for enumeration names that are unique
+            and sufficiently descriptive.
+
+            See http://www.iana.org "
+    REFERENCE
+           "ITU Recommendation X.736, 'Information Technology - Open
+            Systems Interconnection - System Management: Security
+            Alarm Reporting Function', 1992"
+    SYNTAX         INTEGER
+           {
+           other (1),
+           communicationsAlarm (2),
+           qualityOfServiceAlarm (3),
+           processingErrorAlarm (4),
+           equipmentAlarm (5),
+           environmentalAlarm (6),
+           integrityViolation (7),
+           operationalViolation (8),
+           physicalViolation (9),
+           securityServiceOrMechanismViolation (10),
+           timeDomainViolation (11)
+           }
+
+END
+
+
+ITU-ALARM-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, mib-2
+       FROM SNMPv2-SMI         -- [RFC2578]
+   TEXTUAL-CONVENTION
+       FROM SNMPv2-TC;         -- [RFC2579]
+
+  ituAlarmTc MODULE-IDENTITY
+      LAST-UPDATED "200409090000Z"  -- September 09, 2004
+      ORGANIZATION "IETF Distributed Management Working Group"
+      CONTACT-INFO
+         " WG EMail: disman@ietf.org
+           Subscribe: disman-request@ietf.org
+           http://www.ietf.org/html.charters/disman-charter.html
+
+           Chair:     Randy Presuhn
+                      randy_presuhn@mindspring.com
+
+           Editors:   Sharon Chisholm
+                      Nortel Networks
+                      PO Box 3511 Station C
+                      Ottawa, Ont.  K1Y 4H7
+                      Canada
+                      schishol@nortelnetworks.com
+
+                      Dan Romascanu
+                      Avaya
+                      Atidim Technology Park, Bldg. #3
+                      Tel Aviv, 61131
+                      Israel
+                      Tel: +972-3-645-8414
+                      Email: dromasca@avaya.com"
+      DESCRIPTION
+         "This MIB module defines the ITU Alarm
+         textual convention for objects not expected to require
+         regular extension.
+
+         Copyright (C) The Internet Society (2004).  The
+         initial version of this MIB module was published
+         in RFC 3877.  For full legal notices see the RFC
+         itself.  Supplementary information may be available on:
+         http://www.ietf.org/copyrights/ianamib.html"
+      REVISION    "200409090000Z"  -- September 09, 2004
+      DESCRIPTION
+          "Initial version, published as RFC 3877."
+     ::= { mib-2 120 }
+
+ItuPerceivedSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+            "ITU perceived severity values"
+    REFERENCE
+           "ITU Recommendation M.3100, 'Generic Network Information
+            Model', 1995
+            ITU Recommendation X.733, 'Information Technology - Open
+            Systems Interconnection - System Management: Alarm
+            Reporting Function', 1992"
+    SYNTAX         INTEGER
+           {
+           cleared (1),
+           indeterminate (2),
+           critical (3),
+           major (4),
+           minor (5),
+           warning (6)
+           }
+
+ItuTrendIndication ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+            "ITU trend indication values for alarms."
+    REFERENCE
+           "ITU Recommendation M.3100, 'Generic Network Information
+            Model', 1995
+            ITU Recommendation X.733, 'Information Technology - Open
+            Systems Interconnection - System Management: Alarm
+            Reporting Function', 1992"
+    SYNTAX         INTEGER
+      {
+      moreSevere (1),
+      noChange (2),
+      lessSevere (3)
+      }
+
+END
+
+
+ITU-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE,
+   Gauge32, mib-2
+       FROM SNMPv2-SMI                -- [RFC2578]
+   AutonomousType, RowPointer
+       FROM SNMPv2-TC                 -- [RFC2579]
+   SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB        -- [RFC3411]
+   alarmListName, alarmModelIndex,
+   alarmActiveDateAndTime, alarmActiveIndex
+       FROM ALARM-MIB                 -- [RFC3877]
+   ItuPerceivedSeverity,
+   ItuTrendIndication
+       FROM ITU-ALARM-TC-MIB          -- [RFC3877]
+   IANAItuProbableCause,
+   IANAItuEventType
+       FROM IANA-ITU-ALARM-TC-MIB     -- [RFC3877]
+   MODULE-COMPLIANCE, OBJECT-GROUP
+       FROM SNMPv2-CONF               -- [RFC2580]
+   ZeroBasedCounter32
+       FROM RMON2-MIB;                -- [RFC2021]
+
+  ituAlarmMIB MODULE-IDENTITY
+      LAST-UPDATED "200409090000Z"  -- September 09, 2004
+      ORGANIZATION "IETF Distributed Management Working Group"
+      CONTACT-INFO
+	   "WG EMail: disman@ietf.org
+	   Subscribe: disman-request@ietf.org
+	   http://www.ietf.org/html.charters/disman-charter.html
+
+	   Chair:     Randy Presuhn
+		      randy_presuhn@mindspring.com
+
+	   Editors:   Sharon Chisholm
+		      Nortel Networks
+		      PO Box 3511 Station C
+		      Ottawa, Ont.  K1Y 4H7
+		      Canada
+		      schishol@nortelnetworks.com
+
+		      Dan Romascanu
+		      Avaya
+		      Atidim Technology Park, Bldg. #3
+		      Tel Aviv, 61131
+		      Israel
+		      Tel: +972-3-645-8414
+		      Email: dromasca@avaya.com"
+      DESCRIPTION
+	      "The MIB module describes ITU Alarm information
+	      as defined in ITU Recommendation M.3100 [M.3100],
+	      X.733 [X.733] and X.736 [X.736].
+
+	      Copyright (C) The Internet Society (2004).  The
+	      initial version of this MIB module was published
+	      in RFC 3877.  For full legal notices see the RFC
+	      itself.  Supplementary information may be available on:
+	      http://www.ietf.org/copyrights/ianamib.html"
+      REVISION    "200409090000Z"  -- September 09, 2004
+      DESCRIPTION
+	  "Initial version, published as RFC 3877."
+      ::= { mib-2 121 }
+
+ituAlarmObjects OBJECT IDENTIFIER ::= { ituAlarmMIB 1 }
+
+ituAlarmModel OBJECT IDENTIFIER ::= { ituAlarmObjects 1 }
+
+ituAlarmActive  OBJECT IDENTIFIER ::= { ituAlarmObjects 2 }
+
+ituAlarmTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF ItuAlarmEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of ITU Alarm information for possible alarms
+       on the system."
+   ::= { ituAlarmModel 1 }
+
+ituAlarmEntry OBJECT-TYPE
+   SYNTAX      ItuAlarmEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entries appear in this table whenever an entry is created
+	in the alarmModelTable with a value of alarmModelState in
+	the range from 1 to 6.  Entries disappear from this table
+	whenever the corresponding entries are deleted from the
+	alarmModelTable, including in cases where those entries
+	have been deleted due to local system action.  The value of
+	alarmModelSpecificPointer has no effect on the creation
+	or deletion of entries in this table.  Values of
+	alarmModelState map to values of ituAlarmPerceivedSeverity
+	as follows:
+
+	  alarmModelState -> ituAlarmPerceivedSeverity
+		 1        ->         clear (1)
+		 2        ->         indeterminate (2)
+		 3        ->         warning (6)
+		 4        ->         minor (5)
+		 5        ->         major (4)
+		 6        ->         critical (3)
+
+	All other values of alarmModelState MUST NOT appear
+	in this table.
+
+	This table MUST be persistent across system reboots."
+   INDEX       { alarmListName, alarmModelIndex,
+		ituAlarmPerceivedSeverity }
+   ::= { ituAlarmTable 1 }
+
+ItuAlarmEntry ::= SEQUENCE {
+   ituAlarmPerceivedSeverity     ItuPerceivedSeverity,
+   ituAlarmEventType             IANAItuEventType,
+   ituAlarmProbableCause         IANAItuProbableCause,
+   ituAlarmAdditionalText        SnmpAdminString,
+   ituAlarmGenericModel          RowPointer }
+
+ituAlarmPerceivedSeverity OBJECT-TYPE
+   SYNTAX  ItuPerceivedSeverity
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+	    "ITU perceived severity values."
+    REFERENCE
+	"ITU Recommendation M.3100, 'Generic Network Information
+	    Model', 1995
+	 ITU Recommendation X.733, 'Information Technology - Open
+	    Systems Interconnection - System Management: Alarm
+	    Reporting Function', 1992"
+    ::= { ituAlarmEntry 1 }
+
+ituAlarmEventType OBJECT-TYPE
+   SYNTAX       IANAItuEventType
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+	    "Represents the event type values for the alarms"
+    REFERENCE
+	"ITU Recommendation M.3100, 'Generic Network Information
+	    Model', 1995
+	 ITU Recommendation X.733, 'Information Technology - Open
+	    Systems Interconnection - System Management: Alarm
+	    Reporting Function', 1992
+	 ITU Recommendation X.736, 'Information Technology - Open
+	    Systems Interconnection - System Management: Security
+	    Alarm Reporting Function', 1992"
+    ::= { ituAlarmEntry 2 }
+
+ituAlarmProbableCause OBJECT-TYPE
+   SYNTAX      IANAItuProbableCause
+   MAX-ACCESS  read-write
+   STATUS       current
+   DESCRIPTION
+	    "ITU probable cause values."
+    REFERENCE
+	"ITU Recommendation M.3100, 'Generic Network Information
+	    Model', 1995
+	 ITU Recommendation X.733, 'Information Technology - Open
+	    Systems Interconnection - System Management: Alarm
+	    Reporting Function', 1992
+	 ITU Recommendation X.736, 'Information Technology - Open
+	    Systems Interconnection - System Management: Security
+	    Alarm Reporting Function', 1992"
+    ::= { ituAlarmEntry 3 }
+
+ituAlarmAdditionalText OBJECT-TYPE
+   SYNTAX  SnmpAdminString
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+	    "Represents the additional text field for the alarm."
+    REFERENCE
+	"ITU Recommendation M.3100, 'Generic Network Information
+	    Model', 1995
+	 ITU Recommendation X.733, 'Information Technology - Open
+	    Systems Interconnection - System Management: Alarm
+	    Reporting Function', 1992"
+    ::= { ituAlarmEntry 4}
+
+ituAlarmGenericModel OBJECT-TYPE
+   SYNTAX     RowPointer
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+   "This object points to the corresponding
+    row in the alarmModelTable for this alarm severity.
+
+    This corresponding entry to alarmModelTable could also
+    be derived by performing the reverse of the mapping
+    from alarmModelState to ituAlarmPerceivedSeverity defined
+    in the description of ituAlarmEntry to determine the
+    appropriate { alarmListName, alarmModelIndex, alarmModelState }
+    for this { alarmListName, alarmModelIndex,
+    ituAlarmPerceivedSeverity }."
+   ::= { ituAlarmEntry 5 }
+
+-- ITU Active Alarm Table --
+
+ituAlarmActiveTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF ItuAlarmActiveEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of ITU information for active alarms entries."
+   ::= { ituAlarmActive 1 }
+
+ituAlarmActiveEntry OBJECT-TYPE
+   SYNTAX      ItuAlarmActiveEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entries appear in this table when alarms are active.  They
+       are removed when the alarm is no longer occurring."
+   INDEX       { alarmListName, alarmActiveDateAndTime,
+		alarmActiveIndex }
+   ::= { ituAlarmActiveTable 1 }
+
+ItuAlarmActiveEntry ::= SEQUENCE {
+    ituAlarmActiveTrendIndication       ItuTrendIndication,
+    ituAlarmActiveDetector              AutonomousType,
+    ituAlarmActiveServiceProvider       AutonomousType,
+    ituAlarmActiveServiceUser           AutonomousType
+    }
+
+ituAlarmActiveTrendIndication OBJECT-TYPE
+   SYNTAX      ItuTrendIndication
+   MAX-ACCESS  read-only
+   STATUS       current
+   DESCRIPTION
+	    "Represents the trend indication values for the alarms."
+    REFERENCE
+	"ITU Recommendation M.3100, 'Generic Network Information
+	    Model', 1995
+	 ITU Recommendation X.733, 'Information Technology - Open
+	    Systems Interconnection - System Management: Alarm
+	    Reporting Function', 1992"
+    ::= { ituAlarmActiveEntry 1 }
+
+ituAlarmActiveDetector OBJECT-TYPE
+   SYNTAX AutonomousType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Represents the SecurityAlarmDetector object."
+    REFERENCE
+	"ITU Recommendation X.736, 'Information Technology - Open
+	    Systems Interconnection - System Management: Security
+	    Alarm Reporting Function', 1992"
+   ::= { ituAlarmActiveEntry 2 }
+
+ituAlarmActiveServiceProvider OBJECT-TYPE
+   SYNTAX AutonomousType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Represents the ServiceProvider object."
+    REFERENCE
+	"ITU Recommendation X.736, 'Information Technology - Open
+	    Systems Interconnection - System Management: Security
+	    Alarm Reporting Function', 1992"
+   ::= { ituAlarmActiveEntry 3 }
+
+ituAlarmActiveServiceUser OBJECT-TYPE
+   SYNTAX AutonomousType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Represents the ServiceUser object."
+    REFERENCE
+	"ITU Recommendation X.736, 'Information Technology - Open
+	    Systems Interconnection - System Management: Security
+	    Alarm Reporting Function', 1992"
+   ::= { ituAlarmActiveEntry 4 }
+
+-- Statistics and Counters
+
+ituAlarmActiveStatsTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF ItuAlarmActiveStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+	 "This table represents the ITU alarm statistics
+	 information."
+  ::= { ituAlarmActive 2 }
+
+ituAlarmActiveStatsEntry OBJECT-TYPE
+      SYNTAX  ItuAlarmActiveStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+	 "Statistics on the current active ITU alarms."
+      INDEX   { alarmListName }
+
+  ::= {  ituAlarmActiveStatsTable 1 }
+
+ItuAlarmActiveStatsEntry ::=
+ SEQUENCE {
+   ituAlarmActiveStatsIndeterminateCurrent Gauge32,
+   ituAlarmActiveStatsCriticalCurrent      Gauge32,
+   ituAlarmActiveStatsMajorCurrent         Gauge32,
+   ituAlarmActiveStatsMinorCurrent         Gauge32,
+   ituAlarmActiveStatsWarningCurrent       Gauge32,
+   ituAlarmActiveStatsIndeterminates       ZeroBasedCounter32,
+   ituAlarmActiveStatsCriticals            ZeroBasedCounter32,
+   ituAlarmActiveStatsMajors               ZeroBasedCounter32,
+   ituAlarmActiveStatsMinors               ZeroBasedCounter32,
+   ituAlarmActiveStatsWarnings             ZeroBasedCounter32
+ }
+
+ituAlarmActiveStatsIndeterminateCurrent OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the current number of active alarms with a
+	ituAlarmPerceivedSeverity of indeterminate."
+   ::= { ituAlarmActiveStatsEntry 1 }
+
+ituAlarmActiveStatsCriticalCurrent OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the current number of active alarms with a
+	ituAlarmPerceivedSeverity of critical."
+   ::= { ituAlarmActiveStatsEntry 2 }
+
+ituAlarmActiveStatsMajorCurrent OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the current number of active alarms with a
+	ituAlarmPerceivedSeverity of major."
+   ::= { ituAlarmActiveStatsEntry 3 }
+
+ituAlarmActiveStatsMinorCurrent OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the current number of active alarms with a
+	ituAlarmPerceivedSeverity of minor."
+   ::= { ituAlarmActiveStatsEntry 4 }
+
+ituAlarmActiveStatsWarningCurrent OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the current number of active alarms with a
+	ituAlarmPerceivedSeverity of warning."
+   ::= { ituAlarmActiveStatsEntry 5 }
+
+ituAlarmActiveStatsIndeterminates OBJECT-TYPE
+   SYNTAX      ZeroBasedCounter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the total number of active alarms with a
+	ituAlarmPerceivedSeverity of indeterminate since system
+	restart."
+   ::= { ituAlarmActiveStatsEntry 6 }
+
+ituAlarmActiveStatsCriticals OBJECT-TYPE
+   SYNTAX      ZeroBasedCounter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the total number of active alarms with a
+	ituAlarmPerceivedSeverity of critical since system restart."
+   ::= { ituAlarmActiveStatsEntry 7 }
+
+ituAlarmActiveStatsMajors OBJECT-TYPE
+   SYNTAX      ZeroBasedCounter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the total number of active alarms with a
+	ituAlarmPerceivedSeverity of major since system restart."
+   ::= { ituAlarmActiveStatsEntry 8 }
+
+ituAlarmActiveStatsMinors OBJECT-TYPE
+   SYNTAX      ZeroBasedCounter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the total number of active alarms with a
+	ituAlarmPerceivedSeverity of minor since system restart."
+   ::= { ituAlarmActiveStatsEntry 9 }
+
+ituAlarmActiveStatsWarnings OBJECT-TYPE
+   SYNTAX      ZeroBasedCounter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "A count of the total number of active alarms with a
+	ituAlarmPerceivedSeverity of warning since system restart."
+   ::= { ituAlarmActiveStatsEntry 10 }
+
+-- Conformance
+
+ituAlarmConformance OBJECT IDENTIFIER ::= { ituAlarmMIB 2 }
+ituAlarmCompliances  OBJECT IDENTIFIER ::= { ituAlarmConformance 1 }
+
+ituAlarmCompliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+	  "The compliance statement for systems supporting
+	  the ITU Alarm MIB."
+   MODULE -- this module
+       MANDATORY-GROUPS {
+	   ituAlarmGroup
+	   }
+   GROUP       ituAlarmServiceUserGroup
+       DESCRIPTION
+	   "This group is optional."
+   GROUP       ituAlarmSecurityGroup
+       DESCRIPTION
+	   "This group is optional."
+   GROUP       ituAlarmStatisticsGroup
+       DESCRIPTION
+	   "This group is optional."
+  ::= { ituAlarmCompliances 1 }
+
+ituAlarmGroups OBJECT IDENTIFIER ::= { ituAlarmConformance 2 }
+
+ituAlarmGroup OBJECT-GROUP
+ OBJECTS {
+	   ituAlarmEventType,
+	   ituAlarmProbableCause,
+	   ituAlarmGenericModel
+	 }
+ STATUS   current
+ DESCRIPTION
+	       "ITU alarm details list group."
+ ::= { ituAlarmGroups 1}
+
+ituAlarmServiceUserGroup OBJECT-GROUP
+ OBJECTS {
+	   ituAlarmAdditionalText,
+	   ituAlarmActiveTrendIndication
+	 }
+ STATUS current
+ DESCRIPTION
+	 "The use of these parameters is a service-user option."
+ ::= { ituAlarmGroups 2 }
+
+ituAlarmSecurityGroup OBJECT-GROUP
+  OBJECTS {
+	  ituAlarmActiveDetector,
+	  ituAlarmActiveServiceProvider,
+	  ituAlarmActiveServiceUser
+	 }
+  STATUS current
+  DESCRIPTION
+	 "Security Alarm Reporting Function"
+    REFERENCE
+	"ITU Recommendation X.736, 'Information Technology - Open
+	    Systems Interconnection - System Management: Security
+	    Alarm Reporting Function', 1992"
+  ::= { ituAlarmGroups 3 }
+
+ituAlarmStatisticsGroup OBJECT-GROUP
+  OBJECTS {
+	 ituAlarmActiveStatsIndeterminateCurrent,
+	 ituAlarmActiveStatsCriticalCurrent,
+	 ituAlarmActiveStatsMajorCurrent,
+	 ituAlarmActiveStatsMinorCurrent,
+	 ituAlarmActiveStatsWarningCurrent,
+	 ituAlarmActiveStatsIndeterminates,
+	 ituAlarmActiveStatsCriticals,
+	 ituAlarmActiveStatsMajors,
+	 ituAlarmActiveStatsMinors,
+	 ituAlarmActiveStatsWarnings
+	  }
+  STATUS current
+  DESCRIPTION
+    "ITU Active Alarm Statistics."
+  ::= { ituAlarmGroups 4 }
+
+END

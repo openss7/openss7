@@ -1,0 +1,4676 @@
+--@@ GDMOCHECK $Revision: 0.9.2.5 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Tue Dec 23 23:13:16 MST 2008
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "X.283.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "Q.751.1.gdmo" >--
+--< GDMO.Document "ITU-T Rec. Q.751.2 (1992)"
+--  { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) } >--
+--< GDMO.Namespace itut_q751_2 >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Alias "ITU-T Rec. Q.751.2 (1992)" "CCITT Rec. Q.751.2 (1992)",
+--  "ITU-T Recommendation Q.751.2 (1992)",
+--  "CCITT Recommendation Q.751.2 (1992)" >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile: Q.751.2.gdmo,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-12-24 16:35:02 $
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date: 2008-12-24 16:35:02 $ by $Author: brian $
+--  
+--  =============================================================================
+--  >--
+MODULE "ITU-T Rec. Q.751.2 (1992)" { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) }
+
+-- 
+-- 7 Formal specification
+-- This clause contains the formal definition of management information of the Network Element part
+-- of SCCP. GDMO is used to describe the management information model.
+-- 7.1 Managed object classes definitions
+-- 7.1.1 concernedArea
+concernedArea MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		concernedAreaPackage PACKAGE
+			BEHAVIOUR
+				concernedAreaBhv BEHAVIOUR
+					DEFINED AS
+						"A concernedArea contains a list of remote SCCP's (mtpAccessPoints) to be 
+						informed of local (primary broadcast) or remote (secondary broadcast) sccp 
+						subsystem status changes, or to be informed of the SCCP status after completion 
+						of SCCP Restart.";;
+			ATTRIBUTES
+				concernedAreaId GET SET-BY-CREATE,
+				remoteSCCPList GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		concernedAreaNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 1 };
+--NOTE  The local distribution of the status changes among different subsystems is not related to the concernedArea
+-- and is application specific.
+
+
+-- 7.1.2 endNodeEntitySetWithoutSSN
+endNodeEntitySetWithoutSSN MANAGED OBJECT CLASS
+	DERIVED FROM
+		sccpEntitySet;
+	CHARACTERIZED BY
+		endNodeEntitySetWithoutSSNPackage PACKAGE
+			BEHAVIOUR
+				endNodeEntitySetWithoutSSNBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class is an sccpEntitySet that identifies SCCP end nodes. 
+						Because of this, the entitySetSapPointer attribute is only allowed to refer to 
+						instances of the sccpLinkage class. A subsystem number is not specified by this 
+						entity set, but routing is on SSN.";;;;
+REGISTERED AS { sccpObjectClass 2 };
+
+
+-- 7.1.3 endNodeEntitySetWithSSN
+endNodeEntitySetWithSSN MANAGED OBJECT CLASS
+	DERIVED FROM
+		sccpEntitySet;
+	CHARACTERIZED BY
+		endNodeEntitySetWithSSNPackage PACKAGE
+			BEHAVIOUR
+				endNodeEntitySetWithSSNBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class is an sccpEntitySet that identifies SCCP Access 
+						Points. Because of this, the SAP pointer attribute is only allowed to refer to 
+						instances of the sccpAccessPoint class.";;;;
+REGISTERED AS { sccpObjectClass 3 };
+
+
+-- 7.1.4 gtConversionRule
+gtConversionRule MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		gtConversionRulePackage PACKAGE
+			BEHAVIOUR
+				gtConversionRuleBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class defines the rules that can be used to change the 
+						global title in a called party address. The conversion can replace all parts of 
+						the global title with a new value. If the addressInfoConversionRulePackage is 
+						present, it specifies how address elements can be inserted, replaced, passed 
+						transparently, or deleted from the (old) GTAI into a new GTAI. The procedures 
+						for Global Title Conversion are described in 7.3/Q.715. Only those parts of the 
+						GT information are modified that have a corresponding new value identified by 
+						instances of this class. In case an attribute representing GT information is 
+						present but is not to be used for converting Global Titles, it has value NULL. 
+						As a result, the particular part of the Global Title will not be overwritten.";;
+			ATTRIBUTES
+				gtConversionRuleId GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		addressInfoConversionRulePackage
+			PRESENT IF
+				"an instance supports it",
+		newEncodingSchemePackage
+			PRESENT IF
+				"an instance supports it",
+		newNatureOfAddressPackage
+			PRESENT IF
+				"an instance supports it",
+		newNumberingPlanPackage
+			PRESENT IF
+				"an instance supports it",
+		newTranslationTypePackage
+			PRESENT IF
+				"an instance supports it",
+		gtConversionRuleNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 4 };
+--NOTE 1  The application of gtConversionRule to calling party addresses conversions is for further study.
+--NOTE 2  The translationType managed object also offers a mechanism to modify global title translation types. That
+-- mechanism should not be used in parallel with the gtConversionRule managed object.
+
+
+-- 7.1.5 gtRule
+gtRule MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		gtRulePackage PACKAGE
+			BEHAVIOUR
+				gtRuleBhv BEHAVIOUR
+					DEFINED AS
+						"A Global Title Rule is selected based on the (matching) Global Title Address 
+						Information and possibly the Encoding Scheme. If there is no matching 
+						Translation Rule for a given Global Title, then a Routing Failure notification 
+						with the reason 'no translation for an address of this nature' is emitted by the 
+						SCRC. The Global Title Rule points to the Entity Set resulting from the Global 
+						Title Translation. The Global Title Conversion Rule pointer refers to an 
+						optional Global Title Conversion Rule that may modify the Global Title. The new 
+						Routing Indicator is implicitly set according the sccpEntitySet pointed to. The 
+						administrativeState attribute can have the following states: locked and 
+						unlocked.";;
+			ATTRIBUTES
+				gtRuleId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
+				gtAddressInformation GET SET-BY-CREATE,
+				gtConvRulePointer GET-REPLACE,
+				gtEncodingScheme GET SET-BY-CREATE,
+				sccpEntitySetPointer GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		gtRuleNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 5 };
+--NOTE  The new Routing Indicator is implicitly set according the sccpEntitySet pointed to.
+
+
+-- 7.1.6 gtTranslator
+gtTranslator MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		gtTranslatorPackage PACKAGE
+			BEHAVIOUR
+				gtTranslatorBhv BEHAVIOUR
+					DEFINED AS
+						"The Global Title Translator is selected on a combination of the values of the 
+						Nature of Address, the Translation Type, and the Numbering Plan (if available). 
+						As a consequence, the Global Title Translator is modelled as a class with three 
+						characteristic attributes: Nature of Address, Translation Type, and Numbering 
+						Plan. If an Global Title address field is not used, it has value NULL. The 
+						gtIndicator attribute is read-only and is derived from the combination of Nature 
+						of Address, the Translation Type, and Numbering Plan used. If for a given 
+						combination no Global Title Translator exists, a Routing Failure notification 
+						with the reason 'no translation for an address of this nature' is emitted by the 
+						SCRC. The administrativeState attribute can have the following states: locked 
+						and unlocked.";;
+			ATTRIBUTES
+				gtTranslatorId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
+				gtIndicator GET,
+				gtNatureOfAddress GET SET-BY-CREATE,
+				gtNumberingPlan GET SET-BY-CREATE,
+				gtTranslationType GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		gtTranslatorNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 6 };
+
+
+-- 7.1.7 managedSwitchingElement managed object class
+-- This managed object class can be found in Recommendation Q.751.1.
+-- 7.1.8 mtpAccessPoint managed object class (Message Transfer Part)
+-- This managed object class can be found in Recommendation Q.751.1.
+-- 7.1.9 mtpSignPoint managed object class (Message Transfer Part)
+-- This managed object class can be found in Recommendation Q.751.1.
+-- 7.1.10 relayNodeEntitySet
+relayNodeEntitySet MANAGED OBJECT CLASS
+	DERIVED FROM
+		sccpEntitySet;
+	CHARACTERIZED BY
+		relayNodeEntitySetPackage PACKAGE
+			BEHAVIOUR
+				relayNodeEntitySetBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class is an sccpEntitySet that identifies SCCP relay nodes, 
+						i.e. MTP Access Points. Because of this, the entitySetSapPointer attribute is 
+						only allowed to refer to instances of the sccpLinkage class. The ssn attribute 
+						allows to optionally set the subsystem number as a result of a Global Title 
+						Translation, if routing is done on Global title and DPC to a relay node";;;;
+	CONDITIONAL PACKAGES
+		ssnPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 7 };
+
+
+-- 7.1.11 sccp
+sccp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":networkEntity;
+	CHARACTERIZED BY
+		sccpMOCPackage PACKAGE
+			BEHAVIOUR
+				sccpMOCPackageBhv BEHAVIOUR
+					DEFINED AS
+						"The sccp managed object class is the placeholder for all SCCP related managed 
+						objects. No specific management aspects have been identified.
+
+						The communicationsEntiyId is used for naming.
+
+						The localSapNames attribute contains a set of distinguished names of SCCP SAPs 
+						at which services are provided to the entity.
+
+						The systemTypes attribute is a set-valued attribute with possible values: End 
+						System (ES) indicates an SCCP destination node, Intermediate System indicates an 
+						SCCP relay node.
+
+						The networkEntityTitles attribute unambiguously identifies the name of the SCCP 
+						in an end or intermediate node. The value may be entered by a system management 
+						operation or it may be derived by some local means, for example by auto 
+						configuration.
+
+						The communicationsAlarm can have the following probable causes:
+
+						Probable Cause = LocalSccpUnavailable which represents measurements Q.752/8.1 
+						measurement Q.752/8.3 (SpecificProblems = Failure, Maintenance, Congestion) 
+						(PerceivedSeverity = Major/Minor/Warning) and measurement Q.752/8.4 
+						(PerceivedSeverity = Cleared),
+
+						Probable Cause = SubsystemOoSgranted which represents measurement Q.752/8.6, and
+
+						Probable Cause = SubsystemOoSdenied which represents measurement Q.752/8.7.";;
+			ATTRIBUTES
+				sccpVersion GET,
+				lUDTandLUDTSSupported GET,
+				coordChangeTimer GET-REPLACE,
+				ingnoreSSTTimer GET-REPLACE,
+				maxStatInfoTimer GET-REPLACE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":communicationsAlarm,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it",
+		sccpNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 8 };
+
+
+-- 7.1.12 sccpAccessPoint
+sccpAccessPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":nSAP;
+	CHARACTERIZED BY
+		sccpAccessPointPkg PACKAGE
+			BEHAVIOUR
+				sccpAccessPointBhv BEHAVIOUR
+					DEFINED AS
+						"The sap2Address attribute contains the address of the sccpAccessPoint. The 
+						address contains the SubSystem Number (SSN). The sap2Address is of type SET OF 
+						OCTETSTRING. For sccpAccessPoints, the set size is 1. The sapId attribute is 
+						used in naming instances of the sccpAccessPoint managed object class.
+
+						The userEntityNames attribute contains the distinguished names of the managed 
+						objects that represent the user entities that are using the sccpAccessPoint, 
+						i.e. instances of the SCCP subsystem.
+
+						The providerEntityNames attribute contains the distinguished names of the 
+						managed objects that represent the provider entities that are supporting the 
+						sccpAccessPoint, i.e. the instance of the SCCP.
+
+						The status of the sccpAccessPoint is represented by the availability status 
+						attribute. A subsystem can have the status: allowed, the sccpAccessPoint is 
+						reachable and is functioning normally (availability status = available) 
+						prohibited, the sccpAccessPoint not reachable (availability status = 
+						unavailable) congested (availability status = degraded)
+
+						The optional (national network provider option) ssAvailableAfterSpRestart 
+						attribute holds the default subsystem status as described in the procedure of 
+						5.2.3/Q.714.
+
+						The concernedAreaPointer specifies the concerned area to be used by SCCP 
+						Management for primary broadcast in case this access point is local. In case of 
+						a remote access point, the pointed concerned area will be used by SCCP 
+						Management for the secondary broadcast. The concernedAreaPointer has value 
+						'NULL' if no concerned area is pointed at.
+
+						The sccpLinkagePointer specifies the sccpLinkage that is associated with remote 
+						sccpAccessPoints only. In case of a local sccpAccessPoint, the 
+						sccpLinkagePointer has value NULL. A remote sccpAccessPoint cannot be created 
+						without a valid pointer to an sccpLinkage.
+
+						The qualityofServiceAlarm can have the following probable cause:
+
+						ProbableCause = TooLargeForSegmentation which represents measurement Q.752/7.14 
+						(PerceivedSeverity = Major/Minor/Warning).
+
+						ProbableCause = subsystemProhibited which represents measurement Q.752/8.11 and 
+						Q.752/8.12 (PerceivedSeverity = Major/Minor/Warning/Cleared).
+
+						The communicationsAlarm can have the following probable causes:
+
+						ProbableCause = sccpCongested which represents measurement Q.752/8.8 
+						(PerceivedSeverity = Major/Minor/Warning). The congestion level is given as a 
+						parameter of the notification.
+
+						ProbableCause = localSubsystemProhibited which represents measurements Q.752/8.9 
+						and Q.752/8.10 (PerceivedSeverity = Major/Minor/Warning/Cleared)";;
+			ATTRIBUTES
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
+				concernedAreaPointer GET-REPLACE,
+				sccpLinkagePointer GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":communicationsAlarm
+					congestionLevel,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		ssAvailableAfterSpRestartPackage
+			PRESENT IF
+				"The national network provider option as described in 5.2.3/Q.714 is supported",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it",
+		sccpAccessPointNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 9 };
+
+
+-- 7.1.13 sccpEntitySet
+sccpEntitySet MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		sccpEntitySetPackage PACKAGE
+			BEHAVIOUR
+				sccpEntitySetBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class identifies the set of access points that result from a 
+						global title translation. This set may contain one or two access points. The 
+						distribution of SCCP traffic over the entities in the set depends on the value 
+						of the sharingmode attribute:
+
+						In case of value 'solitary', there can only be one access point in the set.
+
+						In case of value 'dupliDominant', the second entity is a backup for the first 
+						entity, according to the procedure described in clause 5/Q.714.
+
+						In case of value 'dupliReplacement', the second entity is standby for backup for 
+						the first entity, but after change over, the primary and backup roles are 
+						swapped according to the procedure described in clause 5/Q.714. In this case, 
+						also the value of the entitySetSapPointer changes.
+
+						If the sccpEntitySetLoadsharingPackage is present, sharing mode can also take 
+						the value 'dupliLoadshared'. In this case, the load is shared over the entities 
+						in the set according to the algorithm referred to by the loadSharingAlgPointer 
+						attribute.
+
+						This managed object class is not instantiable, it is only a superclass for the 
+						instantiable subclasses endNodeEntitySetWithoutSSN, endNodeEntitySetWithSSN and 
+						relayNodeEntitySet.";;
+			ATTRIBUTES
+				sccpEntitySetId GET SET-BY-CREATE,
+				entitySetSapPointer GET-REPLACE ADD-REMOVE,
+				sharingMode GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		sccpEntitySetLoadsharingPackage
+			PRESENT IF
+				"an instance supports it",
+		entitySetNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 10 };
+--NOTE 1  The sharing mode value 'duplicatedReplacement' was defined for the 1993 version of SCCP but removed in
+-- the 1996 version.
+--NOTE 2  The availability of an sccpEntitySet can be derived from the availability of the individual entities in the set.
+-- It is assumed that this is done at the network management level.
+
+
+-- 7.1.14 sccpLinkage
+sccpLinkage MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		sccpLinkagePackage PACKAGE
+			BEHAVIOUR
+				sccpLinkageBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class stores data about the specific capabilities of the 
+						underlying MTP access point. It is analogue to the generic managed object class 
+						linkage that is described in Recommendation X.283. For this managed object class 
+						subclasses may be specified for vendor-specific additions.
+
+						The sN-SAP attribute indicates a relationship to the underlying MTP access 
+						point.
+
+						The operationalProtocols attribute indicates the protocol classes actually 
+						supported by this MTP network. The 'versions' field of the attribute is always 
+						'empty'.
+
+						The concernedAreaPointer specifies the concerned area to be used for 
+						broadcasting the SCCP status after completion of SCCP Restart. It has value 
+						'NULL' if no concerned area is pointed at.";;
+			ATTRIBUTES
+				sccpLinkageId GET SET-BY-CREATE,
+				"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":operationalProtocols GET,
+				"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":sN-SAP GET;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		congestionPackage
+			PRESENT IF
+				"an instance supports it and only if the access point is local",
+		localSccpLinkagePackage
+			PRESENT IF
+				"an instance represents a local sccpLinkage",
+		sccpLinkageNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 11 };
+
+
+-- 7.1.15 sclc
+sclc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":cLNS;
+	CHARACTERIZED BY
+		sclcPackage PACKAGE
+			BEHAVIOUR
+				sclcPackageBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains the management information concerning the 
+						SCCP connectionless services. The managed object class is derived from ISO/IEC 
+						10733 cLNS.
+
+						The following states of the administrative state are appropriate: locked and 
+						unlocked.
+
+						The operationalSystemType attribute is an attribute with possible values: End 
+						System (ES) indicates an SCCP destination node, Intermediate System indicates an 
+						SCCP relay node. If the operationalSystemType equals 'Destination Node' it 
+						indicates that the system shall perform no forwarding operations upon non-local 
+						SCCP messages. A value of 'Intermediate Node' indicates that the system is 
+						permitted to perform forwarding operations, but the decision to forward 
+						individual SCCP messages or not to forward them, shall be taken on the basis of 
+						the available routing information.
+
+						If the managed object is created by management operation, the initial value of 
+						the operationalSystemType shall be specified in the CMIP create. Otherwise, the 
+						value shall be determined in an implementation specific manner. The value shall 
+						be one of those present in the systemTypes attribute of the superior SCCP 
+						managed object.
+
+						The set of connectionless network protocols supported by this instance of the 
+						sclc protocol machine is represented by the supportedProtocols attribute. For 
+						the connectionless protocol, it can be either class 0 or 1, or both.
+
+						The qualityofServiceAlarm can have the following probable causes:
+
+						ProbableCause = ReassemblyTimeOut which represents measurement Q.752/7.10 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = SegmentOutOfOrder which represents measurement Q.752/7.11 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = NoReassemblySpace which represents measurement Q.752/7.12 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = NoSegmentationSupport which represents measurement Q.752/7.19 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = SegmentationFailure which represents measurement Q.752/7.20 
+						(PerceivedSeverity = Major/Minor/Warning), and
+
+						ProbableCause = ReassemblyFailure which represents measurement Q.752/7.21 
+						(PerceivedSeverity = Major/Minor/Warning).";;
+			ATTRIBUTES
+				initialValueReassTimer GET-REPLACE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it",
+		sclcNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 12 };
+
+
+-- 7.1.16 scoc
+--NOTE  The following managed object class is for further study.
+scoc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":cONS;
+	CHARACTERIZED BY
+		scocPackage PACKAGE
+			BEHAVIOUR
+				scocPackageBhv BEHAVIOUR
+					DEFINED AS
+						"The following states of the administrative state are appropriate: locked and 
+						unlocked.
+
+						The operationalSystemType attribute is an attribute with possible values: End 
+						System (ES) indicates an SCCP destination node, Intermediate System indicates an 
+						SCCP relay node. The operationalSystemType indicates the system role in which 
+						this instance is operating. A value of 'Destination Node' indicates that the 
+						system shall perform no forwarding operations upon non-local SCCP messages. A 
+						value of Intermediate Node indicates that the system is permitted to perform 
+						forwarding operations, but the decision to forward individual SCCP messages or 
+						not to forward them, shall be taken on the basis of the available routing 
+						information.
+
+						If the MO is created by management operation, the initial value of the 
+						operationalSystemType shall be specified in the CMIP create. Otherwise, the 
+						value shall be determined in an implementation specific manner. The value shall 
+						be one of those present in the systemTypes attribute of the superior SCCP 
+						managed object.
+
+						The set of connection-oriented network protocols supported by this instance of 
+						the scoc protocol machine is represented by the supportedProtocols attribute. 
+						For the connectionoriented protocol, it can be either class 2 or 3, or both.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":supportedProtocols GET;;;
+	CONDITIONAL PACKAGES
+		scocNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 13 };
+
+
+-- 7.1.17 scrc
+scrc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		scrcPackage PACKAGE
+			BEHAVIOUR
+				scrcPackageBhv BEHAVIOUR
+					DEFINED AS
+						"The scrc managed object class contains the management information concerning the 
+						SCCP routing control.
+
+						The qualityofServiceAlarm can have the following probable causes:
+
+						ProbableCause = NoTranslatorForAddress which represents measurement Q.752/7.1 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = NoRuleForAddress which represents measurement Q.752/7.2 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = PointCodeNotAvailable which represents measurement Q.752/7.31 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = PointCodeCongested which represents measurement Q.752/7.4 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = SubsystemUnavailable which represents measurement Q.752/7.5 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = SubsystemCongested which represents measurement Q.752/7.6 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = UnequipedSubsystem which represents measurement Q.752/7.7 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = SyntaxErrorDetected which represents measurement Q.752/7.8 
+						(PerceivedSeverity = Major/Minor/Warning),
+
+						ProbableCause = RoutingFailureNoReasonOrUnqualified which represents measurement 
+						Q.752/7.9 (PerceivedSeverity = Major/Minor/Warning), and
+
+						ProbableCause = HopCounterViolation which represents measurement Q.752/7.13 
+						(PerceivedSeverity = Major/Minor/Warning).";;
+			ATTRIBUTES
+				scrcId GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it",
+		scrcNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 14 };
+
+
+-- 7.1.18 srvt
+srvt MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		srvtPackage PACKAGE
+			BEHAVIOUR
+				srvtBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object represents the management information of the SCCP Routing 
+						Verification Test. This test is described in Recommendation Q.753. The SCCP 
+						Routing Verification Test (srvt) is used to test the Global Title Translation 
+						service of the SCCP.";;
+			ATTRIBUTES
+				sccpRouteTestId GET SET-BY-CREATE,
+				dSRVT GET,
+				nSRVT GET-REPLACE;
+			ACTIONS
+				startSccpRouteTest;
+			NOTIFICATIONS
+				sccpRouteTestResult;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChange notification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992o is supported by an instance of this class",
+		srvtNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 15 };
+
+
+-- 7.2 Package definitions
+concernedAreaNamePackage PACKAGE
+	ATTRIBUTES
+		concernedAreaName GET-REPLACE;
+REGISTERED AS { sccpPackage 1 };
+
+
+congestionPackage PACKAGE
+	ATTRIBUTES
+		attackTimerValue GET-REPLACE,
+		decayTimerValue GET-REPLACE,
+		nrOfRestrictionLevels
+			DEFAULT VALUE SCCPDefinedTypesModule.nrOfRestrictionLevelsDefault
+			GET-REPLACE,
+		nrOfSubLevels
+			DEFAULT VALUE SCCPDefinedTypesModule.nrOfSubLevelsDefault
+			GET-REPLACE,
+		cLS
+			DEFAULT VALUE SCCPDefinedTypesModule.cLSDefault
+			GET-REPLACE,
+		congestionTimerValue GET-REPLACE,
+		p
+			DEFAULT VALUE SCCPDefinedTypesModule.pDefault
+			GET SET-BY-CREATE,
+		importanceLevel-CR GET-REPLACE,
+		importanceLevel-CC GET-REPLACE,
+		importanceLevel-CREF GET-REPLACE,
+		importanceLevel-DT1 GET-REPLACE,
+		importanceLevel-DT2 GET-REPLACE,
+		importanceLevel-AK GET-REPLACE,
+		importanceLevel-IT GET-REPLACE,
+		importanceLevel-ED GET-REPLACE,
+		importanceLevel-EA GET-REPLACE,
+		importanceLevel-RSR GET-REPLACE,
+		importanceLevel-RSC GET-REPLACE,
+		importanceLevel-ERR GET-REPLACE,
+		importanceLevel-RLC GET-REPLACE,
+		importanceLevel-RLSD GET-REPLACE,
+		importanceLevel-UDT GET-REPLACE,
+		importanceLevel-UDTS GET-REPLACE,
+		importanceLevel-XUDT GET-REPLACE,
+		importanceLevel-XUDTS GET-REPLACE,
+		importanceLevel-LUDT GET-REPLACE,
+		importanceLevel-LUDTS GET-REPLACE,
+		rLM GET-REPLACE,
+		rSLM GET-REPLACE;
+REGISTERED AS { sccpPackage 2 };
+--NOTE 1  For recommended values of the importanceLevel attributes, see 2.6.2/Q.714.
+--NOTE 2  Caution should be taken when modifying the importance levels. Co-ordination within and in between
+
+
+-- different networks might be required.
+addressInfoConversionRulePackage PACKAGE
+	ATTRIBUTES
+		addressInfoConversionRule GET-REPLACE;
+REGISTERED AS { sccpPackage 3 };
+
+
+entitySetNamePackage PACKAGE
+	ATTRIBUTES
+		entitySetName GET-REPLACE;
+REGISTERED AS { sccpPackage 4 };
+
+
+gtConversionRuleNamePackage PACKAGE
+	ATTRIBUTES
+		gtConversionRuleName GET-REPLACE;
+REGISTERED AS { sccpPackage 5 };
+
+
+gtRuleNamePackage PACKAGE
+	ATTRIBUTES
+		gtRuleName GET-REPLACE;
+REGISTERED AS { sccpPackage 6 };
+
+
+gtTranslatorNamePackage PACKAGE
+	ATTRIBUTES
+		gtTranslatorName GET-REPLACE;
+REGISTERED AS { sccpPackage 7 };
+
+
+localSccpLinkagePackage PACKAGE
+	ATTRIBUTES
+		concernedAreaPointer GET-REPLACE,
+		lowerLimitForSegmentation GET-REPLACE,
+		upperLimitForSegmentation GET-REPLACE;
+REGISTERED AS { sccpPackage 8 };
+
+
+newEncodingSchemePackage PACKAGE
+	ATTRIBUTES
+		newEncodingScheme GET-REPLACE;
+REGISTERED AS { sccpPackage 9 };
+
+
+newNatureOfAddressPackage PACKAGE
+	ATTRIBUTES
+		newNatureOfAddress GET-REPLACE;
+REGISTERED AS { sccpPackage 10 };
+
+
+newNumberingPlanPackage PACKAGE
+	ATTRIBUTES
+		newNumberingPlan GET-REPLACE;
+REGISTERED AS { sccpPackage 11 };
+
+
+newTranslationTypePackage PACKAGE
+	ATTRIBUTES
+		newTranslationType GET-REPLACE;
+REGISTERED AS { sccpPackage 12 };
+
+
+sccpAccessPointNamePackage PACKAGE
+	ATTRIBUTES
+		sccpAccessPointName GET-REPLACE;
+REGISTERED AS { sccpPackage 13 };
+
+
+sccpEntitySetLoadsharingPackage PACKAGE
+	ATTRIBUTES
+		loadSharingAlgPointer GET-REPLACE;
+REGISTERED AS { sccpPackage 14 };
+
+
+sccpLinkageNamePackage PACKAGE
+	ATTRIBUTES
+		sccpLinkageName GET-REPLACE;
+REGISTERED AS { sccpPackage 15 };
+
+
+sccpNamePackage PACKAGE
+	ATTRIBUTES
+		sccpName GET-REPLACE;
+REGISTERED AS { sccpPackage 16 };
+
+
+sclcNamePackage PACKAGE
+	ATTRIBUTES
+		sclcName GET-REPLACE;
+REGISTERED AS { sccpPackage 17 };
+
+
+scocNamePackage PACKAGE
+	ATTRIBUTES
+		scocName GET-REPLACE;
+REGISTERED AS { sccpPackage 18 };
+
+
+scrcNamePackage PACKAGE
+	ATTRIBUTES
+		scrcName GET-REPLACE;
+REGISTERED AS { sccpPackage 19 };
+
+
+srvtNamePackage PACKAGE
+	ATTRIBUTES
+		srvtName GET-REPLACE;
+REGISTERED AS { sccpPackage 20 };
+
+
+ssAvailableAfterSpRestartPackage PACKAGE
+	ATTRIBUTES
+		ssAvailableAfterSpRestart
+			DEFAULT VALUE SCCPDefinedTypesModule.ssAvailableAfterSpRestartDefault
+			GET-REPLACE;
+REGISTERED AS { sccpPackage 21 };
+
+
+ssnPackage PACKAGE
+	ATTRIBUTES
+		ssn GET-REPLACE;
+REGISTERED AS { sccpPackage 22 };
+
+
+-- 7.3 Parameter definitions
+congestionLevel PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX SCCPDefinedTypesModule.CongestionLevel;
+REGISTERED AS { sccpParameter 1 };
+
+
+-- 7.4 Attribute definitions
+-- addressInfoConversionRule
+addressInfoConversionRule ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AddressInfoConversionRule;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		addressInfoConversionRuleBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies how address elements can be inserted, replaced, passed 
+				transparently, or deleted from the (old) GTAI into a new GTAI.";;
+REGISTERED AS { sccpAttribute 1 };
+
+
+-- attackTimerValue
+attackTimerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AttackTimerValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		attackTimerValueBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter Ta, as described in 
+				5.2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 2 };
+
+
+-- cLS
+cLS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.CLS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cLSBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter CLS, as described in 
+				5.2.7/Q.714.";;
+REGISTERED AS { sccpAttribute 3 };
+
+
+-- concernedAreaId
+concernedAreaId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		concernedAreaIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 4 };
+
+
+-- concernedAreaName
+concernedAreaName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 5 };
+
+
+-- concernedAreaPointer
+concernedAreaPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.PointerOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		concernedAreaPointerBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for referring to instances of concernedArea. It has value 
+				'NULL' if no concerned area is pointed at.";;
+REGISTERED AS { sccpAttribute 6 };
+
+
+-- congestionTimerValue
+congestionTimerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.CongestionTimerValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		congestionTimerValueBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter Tcon, as described in 
+				5.2.7/Q.714.";;
+REGISTERED AS { sccpAttribute 7 };
+
+
+-- coordChangeTimer
+coordChangeTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.TcoordChg;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		coordChangeTimerBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the initial value of timer tCoordChg: waiting for 
+				grant for subsystem to go out of service, as defined in 5.3.5.2/Q.714.";;
+REGISTERED AS { sccpAttribute 8 };
+
+
+-- decayTimerValue
+decayTimerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.DecayTimerValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		decayTimerValueBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter Td, as described in 
+				5.2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 9 };
+
+
+-- dSRVT
+dSRVT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.DSRVT;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dSRVTBhv BEHAVIOUR
+			DEFINED AS
+				"The estimated maximum delay between relay points DSRVT as described in 
+				3.2.2.5/Q.753. This value is needed for the calculation of the SRVT Guard Timer 
+				T2.";;
+REGISTERED AS { sccpAttribute 10 };
+
+
+-- entitySetName
+entitySetName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 11 };
+
+
+-- entitySetSapPointer
+entitySetSapPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.EntitySetSapPointer;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		entitySetSapPointerBhv BEHAVIOUR
+			DEFINED AS
+				"The entitySetSapPointer attribute refers to the access point(s) contained in the 
+				SCCP entity set. For the mtp access points, this is to be done by refering to 
+				sccpLinkage's.";;
+REGISTERED AS { sccpAttribute 12 };
+
+
+-- gtAddressInformation
+gtAddressInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtAddressInformation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtAddressInformationBhv BEHAVIOUR
+			DEFINED AS
+				"The globalTitleAddressInformation attribute contains the value of the Global 
+				Title address information, as indicated in 3.4.2/Q.713.";;
+REGISTERED AS { sccpAttribute 13 };
+
+
+-- gtConversionRuleId
+gtConversionRuleId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtConversionRuleIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 14 };
+
+
+-- gtConversionRuleName
+gtConversionRuleName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 15 };
+
+
+-- gtConvRulePointer
+gtConvRulePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.PointerOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtConvRulePointerBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute refers to a Global Title conversion rule.";;
+REGISTERED AS { sccpAttribute 16 };
+
+
+-- gtEncodingScheme
+gtEncodingScheme ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtEncodingScheme;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtEncodingSchemeBhv BEHAVIOUR
+			DEFINED AS
+				"The encoding scheme is a part of the Global Title that identifies the encoding 
+				scheme of the Global Title Address Information. For example, BCD with an odd 
+				number of digits or BCD with an even number of digits.";;
+REGISTERED AS { sccpAttribute 17 };
+
+
+-- gtIndicator
+gtIndicator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtIndicator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtIndicatorBhv BEHAVIOUR
+			DEFINED AS
+				"The global title indicator indicates what type of global title is used 
+				(3.4/Q.713).";;
+REGISTERED AS { sccpAttribute 18 };
+
+
+-- gtNatureOfAddress
+gtNatureOfAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtNatureOfAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtNatureOfAddressBhv BEHAVIOUR
+			DEFINED AS
+				"The nature of address attribute is single valued. The nature of address includes 
+				values for 'international number', 'subscriber number', etcetera 
+				(3.4.2.3/Q.713).";;
+REGISTERED AS { sccpAttribute 19 };
+
+
+-- gtNumberingPlan
+gtNumberingPlan ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtNumberingPlan;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtNumberingPlanBhv BEHAVIOUR
+			DEFINED AS
+				"The numbering plan attribute is single valued. The numbering plan indicates how 
+				the global title address information is constructed from different parts (e.g. 
+				country codes, subscriber number or national significant number) according to 
+				the syntax and semantic defined for that particular numbering plan (see 
+				2.4.2.1/Q.714).";;
+REGISTERED AS { sccpAttribute 20 };
+
+
+-- gtRuleId
+gtRuleId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtRuleIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 21 };
+
+
+-- gtRuleName
+gtRuleName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 22 };
+
+
+-- gtTranslationType
+gtTranslationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtTranslationType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtTranslationTypeBhv BEHAVIOUR
+			DEFINED AS
+				"The translation type attribute is single valued.";;
+REGISTERED AS { sccpAttribute 23 };
+
+
+-- gtTranslatorId
+gtTranslatorId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtTranslatorIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 24 };
+
+
+-- gtTranslatorName
+gtTranslatorName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 25 };
+
+
+-- importanceLevel-AK
+importanceLevel-AK ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 26 };
+
+
+-- importanceLevel-CC
+importanceLevel-CC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 27 };
+
+
+-- importanceLevel-CR
+importanceLevel-CR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 28 };
+
+
+-- importanceLevel-CREF
+importanceLevel-CREF ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 29 };
+
+
+-- importanceLevel-DT1
+importanceLevel-DT1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 30 };
+
+
+-- importanceLevel-DT2
+importanceLevel-DT2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 31 };
+
+
+-- importanceLevel-EA
+importanceLevel-EA ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 32 };
+
+
+-- importanceLevel-ED
+importanceLevel-ED ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 33 };
+
+
+-- importanceLevel-ERR
+importanceLevel-ERR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 34 };
+
+
+-- importanceLevel-IT
+importanceLevel-IT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 35 };
+
+
+-- importanceLevel-LUDT
+importanceLevel-LUDT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 36 };
+
+
+-- importanceLevel-LUDTS
+importanceLevel-LUDTS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 37 };
+
+
+-- importanceLevel-RLC
+importanceLevel-RLC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 38 };
+
+
+-- importanceLevel-RLSD
+importanceLevel-RLSD ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 39 };
+
+
+-- importanceLevel-RSC
+importanceLevel-RSC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 40 };
+
+
+-- importanceLevel-RSR
+importanceLevel-RSR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 41 };
+
+
+-- importanceLevel-UDT
+importanceLevel-UDT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 42 };
+
+
+-- importanceLevel-UDTS
+importanceLevel-UDTS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 43 };
+
+
+-- importanceLevel-XUDT
+importanceLevel-XUDT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 44 };
+
+
+-- importanceLevel-XUDTS
+importanceLevel-XUDTS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 45 };
+
+
+-- ingnoreSSTTimer
+ingnoreSSTTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.TignoreSST;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ingnoreSSTTimerBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the initial value of timer TignoreSST: delay for 
+				sub-system between receiving grant to go out of service and actually going out 
+				of service, as defined in 3.5.2/Q.714.";;
+REGISTERED AS { sccpAttribute 46 };
+
+
+-- initialValueReassTimer
+initialValueReassTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.InitialValueReassTimer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		initialValueReassTimerBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the initial value of Reassembly Timers, when they are 
+				created.";;
+REGISTERED AS { sccpAttribute 47 };
+
+
+-- loadSharingAlgPointer
+loadSharingAlgPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.Pointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		loadSharingAlgPointerBhv BEHAVIOUR
+			DEFINED AS
+				"The loadSharingAlgPointer attribute refers to the load sharing algorithm that 
+				must be applied if the sharing mode of an entity set is duplicated-loadshared.";;
+REGISTERED AS { sccpAttribute 48 };
+
+
+-- lowerLimitForSegmentation
+lowerLimitForSegmentation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.LowerLimitForSegmentation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lowerLimitForSegmentationBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a number of octets. If the length of the user data 
+				exceeds this length then it depends on the status of the network whether the 
+				message is segmented or not. The attribute corresponds to the parameter Z as 
+				described in 4.1.1.1.1/Q.714. The value of this attribute shall obey the 
+				relation 150 <= lowerLimitForSegmentation <= upperLimitForSegmentation, as 
+				described in 4.1.1.1.1/Q.714.";;
+REGISTERED AS { sccpAttribute 49 };
+
+
+-- lUDTandLUDTSSupported
+lUDTandLUDTSSupported ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.LUDTandLUDTSSupported;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		lUDTandLUDTSSupportedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the implementation supports LUDT(S) messages.";;
+REGISTERED AS { sccpAttribute 50 };
+
+
+-- maxStatInfoTimer
+maxStatInfoTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.MaxStatInfoTimer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxStatInfoTimerBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the maximum value of timer TstatInfo: delay between 
+				requests for subsystem status information, as defined in 5.3.4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 51 };
+
+
+-- newEncodingScheme
+newEncodingScheme ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtEncodingScheme;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		newEncodingSchemeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the new ES.";;
+REGISTERED AS { sccpAttribute 52 };
+
+
+-- newNatureOfAddress
+newNatureOfAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtNatureOfAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		newNatureOfAddressBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the new NAI.";;
+REGISTERED AS { sccpAttribute 53 };
+
+
+-- newNumberingPlan
+newNumberingPlan ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtNumberingPlan;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		newNumberingPlanBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the new NP.";;
+REGISTERED AS { sccpAttribute 54 };
+
+
+-- newTranslationType
+newTranslationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtTranslationType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		newTranslationtypeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the new TT.";;
+REGISTERED AS { sccpAttribute 55 };
+
+
+-- nrOfRestrictionLevels
+nrOfRestrictionLevels ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.NrOfRestrictionLevels;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nrOfRestrictionLevelsBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter N, as described in 
+				5.2.7/Q.714.";;
+REGISTERED AS { sccpAttribute 56 };
+
+
+-- nrOfSubLevels
+nrOfSubLevels ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.NrOfSubLevels;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nrOfSubLevelsBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter M, as described in 
+				5.2.7/Q.714.";;
+REGISTERED AS { sccpAttribute 57 };
+
+
+-- nSRVT
+nSRVT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.NSRVT;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nSRVTBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute equals to the value of NSRVT as described in 3.2.2.5/Q.753.";;
+REGISTERED AS { sccpAttribute 58 };
+
+
+-- p
+p ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.P;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		pBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the congestion control parameter P, as described in 
+				5.2.7/Q.714.";;
+REGISTERED AS { sccpAttribute 59 };
+
+
+-- remoteSCCPList
+remoteSCCPList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.RemoteSCCPList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		remoteSCCPListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models a list of remote MTP Access Points all belonging to the 
+				same MTP network.";;
+REGISTERED AS { sccpAttribute 60 };
+
+
+-- rLM
+rLM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.RLM;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rLMBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the restriction level parameter RLm as defined in 
+				5.2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 61 };
+
+
+-- rSLM
+rSLM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.RSLM;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rSLMBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the restriction sub-level parameter RSLm as defined in 
+				5.2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 62 };
+
+
+-- sccpAccessPointName
+sccpAccessPointName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 63 };
+
+
+-- sccpEntitySetId
+sccpEntitySetId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sccpEntitySetIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 64 };
+
+
+-- sccpEntitySetPointer
+sccpEntitySetPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.Pointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sccpEntitySetPointerBhv BEHAVIOUR
+			DEFINED AS
+				"The sccpEntitySetPointer attribute refers to the SCCP entity set resulting from 
+				the global title translation.";;
+REGISTERED AS { sccpAttribute 65 };
+
+
+-- sccpLinkageId
+sccpLinkageId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sccpLinkageIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 66 };
+
+
+-- sccpLinkageName
+sccpLinkageName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 67 };
+
+
+-- sccpLinkagePointer
+sccpLinkagePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.Pointer;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 68 };
+
+
+-- sccpName
+sccpName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 69 };
+
+
+-- sccpRouteTestId
+sccpRouteTestId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sccpRouteTestIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 70 };
+
+
+-- sccpVersion
+sccpVersion ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SccpVersion;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		sccpVersionBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is single-valued. It refers to the recommendation on which the 
+				SCCP implementation is based.";;
+REGISTERED AS { sccpAttribute 71 };
+
+
+-- sclcName
+sclcName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 72 };
+
+
+-- scocName
+scocName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 73 };
+
+
+-- scrcId
+scrcId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scrcIdBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { sccpAttribute 74 };
+
+
+-- scrcName
+scrcName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 75 };
+
+
+-- sharingMode
+sharingMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SharingMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sharingModeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute models the sharing mode of the SCCP Entity Set. Possible values 
+				are: solitary, duplicated-replacement, duplicated-dominant, and 
+				duplicated-loadshared.";;
+REGISTERED AS { sccpAttribute 76 };
+
+
+-- srvtName
+srvtName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 77 };
+
+
+-- ssAvailableAfterSpRestart
+ssAvailableAfterSpRestart ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SsAvailableAfterSpRestart;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 78 };
+
+
+-- ssn
+ssn ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SSN;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ssnBhv BEHAVIOUR
+			DEFINED AS
+				"The ssn attribute represents the subsystem number.";;
+REGISTERED AS { sccpAttribute 79 };
+
+
+-- upperLimitForSegmentation
+upperLimitForSegmentation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.UpperLimitForSegmentation;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		upperLimitForSegmentationBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a number of octets. If the length of the user data 
+				exceeds this length then the message is always segmented. The attribute 
+				corresponds to the parameter Y as described in 4.1.1.1.1/Q.714. The value of 
+				this attribute shall obey the relation lowerLimitForSegmentation <= 
+				upperLimitForSegmentation <= 3952, as described in 4.1.1.1.1/Q.714.";;
+REGISTERED AS { sccpAttribute 80 };
+
+
+-- 7.5 Action definitions
+startSccpRouteTest ACTION
+	WITH INFORMATION SYNTAX SCCPDefinedTypesModule.ConfirmedAction;
+	WITH REPLY SYNTAX SCCPDefinedTypesModule.ConfirmedAction;
+REGISTERED AS { sccpAction 1 };
+
+
+-- 7.6 Notification definitions
+sccpRouteTestResult NOTIFICATION
+	BEHAVIOUR
+		mtpRouteTestResultBhv BEHAVIOUR
+			DEFINED AS
+				"This notification carries the result of an SCCP route verification test, as 
+				described in 3.2/Q.753.";;
+	WITH INFORMATION SYNTAX SCCPDefinedTypesModule.EventReport;
+REGISTERED AS { sccpNotification 1 };
+
+
+-- 7.7 Naming binding definitions
+-- NOTE  The names of the namebindings are composed by concatenation of the names of the involved classes
+-- in the following order: superior-subordinate. This order might differ from that of other GDMO based models.
+-- gtTranslator-gtRule
+gtTranslator-gtRule NAME BINDING
+	SUBORDINATE OBJECT CLASS gtRule AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS gtTranslator AND SUBCLASSES;
+	WITH ATTRIBUTE
+		gtRuleId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 1 };
+
+
+-- managedElement-managedSwitchingElement
+managedElement-managedSwitchingElement NAME BINDING
+	SUBORDINATE OBJECT CLASS "ITU-T Recommendation Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Rec. M.3100 (1995)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. M.3100 (1995)":managedElementId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 2 };
+--NOTE 1  As an alternative to using this name binding, one could consider global (location transparent) naming. It is
+-- left to the users of this model to define additional name bindings that accomplish this.
+
+
+-- managedSwitchingElement-sccp
+managedSwitchingElement-sccp NAME BINDING
+	SUBORDINATE OBJECT CLASS sccp AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.723 (1993)":communicationsEntityId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 3 };
+
+
+-- sccp-sclc
+sccp-sclc NAME BINDING
+	SUBORDINATE OBJECT CLASS sclc AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccp AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":clProtocolMachineId;
+	BEHAVIOUR
+		sccp-sclc-B BEHAVIOUR
+			DEFINED AS
+				"This name binding shall be used when the sclc MO is created automatically by the 
+				operation of the system and when the sclc MO is created by management 
+				operations.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 4 };
+
+
+-- sccp-scoc
+sccp-scoc NAME BINDING
+	SUBORDINATE OBJECT CLASS scoc AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccp AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":coProtocolMachineId;
+	BEHAVIOUR
+		sccp-scoc-B BEHAVIOUR
+			DEFINED AS
+				"This name binding shall be used when the scoc MO is created automatically by the 
+				operation of the system and when the scoc MO is created by management 
+				operations.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 5 };
+
+
+-- sccp-scrc
+sccp-scrc NAME BINDING
+	SUBORDINATE OBJECT CLASS scrc AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccp AND SUBCLASSES;
+	WITH ATTRIBUTE
+		scrcId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 6 };
+
+
+-- sccp-srvt
+sccp-srvt NAME BINDING
+	SUBORDINATE OBJECT CLASS srvt AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccp AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sccpRouteTestId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 7 };
+
+
+-- scrc-concernedArea
+scrc-concernedArea NAME BINDING
+	SUBORDINATE OBJECT CLASS concernedArea AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc AND SUBCLASSES;
+	WITH ATTRIBUTE
+		concernedAreaId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 8 };
+--NOTE 2  The number of concernedArea instances is implementation-dependent.
+
+
+-- scrc-gtConversionRule
+scrc-gtConversionRule NAME BINDING
+	SUBORDINATE OBJECT CLASS gtConversionRule AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc AND SUBCLASSES;
+	WITH ATTRIBUTE
+		gtConversionRuleId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 9 };
+
+
+-- scrc-gtTranslator
+scrc-gtTranslator NAME BINDING
+	SUBORDINATE OBJECT CLASS gtTranslator AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc AND SUBCLASSES;
+	WITH ATTRIBUTE
+		gtTranslatorId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 10 };
+
+
+-- scrc-sccpAccessPoint
+scrc-sccpAccessPoint NAME BINDING
+	SUBORDINATE OBJECT CLASS sccpAccessPoint AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.723 (1993)":sapId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 11 };
+
+
+-- scrc-sccpEntitySet
+scrc-sccpEntitySet NAME BINDING
+	SUBORDINATE OBJECT CLASS sccpEntitySet AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sccpEntitySetId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 12 };
+
+
+-- scrc-sccpLinkage
+scrc-sccpLinkage NAME BINDING
+	SUBORDINATE OBJECT CLASS sccpLinkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sccpLinkageId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 13 };
+
+-- Q.751.2 Appendix C SCCP Operational Measurements
+--
+-- C.3 Managed Object Class definitions
+-- crefMessagesReceivedCounts
+crefMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		crefMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				crefMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the CREF messages received from MTP. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				crefMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.8
+			;;
+REGISTERED AS { sccpObjectClass 16 };
+
+
+-- crefMessagesSentCounts
+crefMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		crefMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				crefMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the CREF messages sent to MTP. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				crefMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.6
+			;;
+REGISTERED AS { sccpObjectClass 17 };
+
+
+-- crMessagesReceivedCounts
+crMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		crMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				crMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the CR messages received from MTP plus ISDN-UP embedded 
+						CRs. The preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				crMessagesReceived;-- Measurement Q.752/9bis.7
+			;;
+REGISTERED AS { sccpObjectClass 18 };
+
+
+-- crMessagesSentCounts
+crMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		crMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				crMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the CR messages sent to MTP plus ISDN-UP embedded CRs. 
+						The preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				crMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.5
+			;;
+REGISTERED AS { sccpObjectClass 19 };
+
+
+-- dt1FromSourceSSNCounts
+dt1FromSourceSSNCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		dt1FromSourceSSNCountsPkg PACKAGE
+			BEHAVIOUR
+				dt1FromSourceSSNCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the DT1 messages sent to MTP per source SSN. The 
+						preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				dt1MessagesFromSourceSSN GET SET-BY-CREATE;-- Measurement Q.752/9.10
+			;;
+REGISTERED AS { sccpObjectClass 20 };
+
+
+-- dt1ToSinkSSNCounts
+dt1ToSinkSSNCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		dt1ToSinkSSNCountsPkg PACKAGE
+			BEHAVIOUR
+				dt1ToSinkSSNCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the DT1 messages received from MTP per sink SSN. The 
+						preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				dt1MessagesToSinkSSN GET SET-BY-CREATE;-- Measurement Q.752/9.9
+			;;
+REGISTERED AS { sccpObjectClass 21 };
+
+
+-- dt2FromSourceSSNCounts
+dt2FromSourceSSNCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		dt2FromSourceSSNCountsPkg PACKAGE
+			BEHAVIOUR
+				dt2FromSourceSSNCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the DT1 messages sent to MTP per source SSN. The 
+						preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				dt2MessagesFromSourceSSN GET SET-BY-CREATE;-- Measurement Q.752/9.12
+			;;
+REGISTERED AS { sccpObjectClass 22 };
+
+
+-- dt2ToSinkSSNCounts
+dt2ToSinkSSNCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		dt2ToSinkSSNCountsPkg PACKAGE
+			BEHAVIOUR
+				dt2ToSinkSSNCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the DT1 messages received from MTP per sink SSN. The 
+						preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				dt2MessagesToSinkSSN GET SET-BY-CREATE;-- Measurement Q.752/9.11
+			;;
+REGISTERED AS { sccpObjectClass 23 };
+
+
+-- edFromSourceSSNCounts
+edFromSourceSSNCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		edFromSourceSSNCountsPkg PACKAGE
+			BEHAVIOUR
+				edFromSourceSSNCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the ED messages sent to MTP per source SSN. The 
+						preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				edMessagesFromSourceSSN GET SET-BY-CREATE;-- Measurement Q.752/9.13
+			;;
+REGISTERED AS { sccpObjectClass 24 };
+
+
+-- edToSinkSSNCounts
+edToSinkSSNCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		edToSinkSSNCountsPkg PACKAGE
+			BEHAVIOUR
+				edToSinkSSNCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the ED messages received from MTP per sink SSN. The 
+						preferred granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				edMessagesToSinkSSN GET SET-BY-CREATE;-- Measurement Q.752/9.14
+			;;
+REGISTERED AS { sccpObjectClass 25 };
+
+
+-- errMessagesReceivedCounts
+errMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		errMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				errMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the ERR messages received from MTP. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				errMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.12
+			;;
+REGISTERED AS { sccpObjectClass 26 };
+
+
+-- errMessagesSentCounts
+errMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		errMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				errMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the ERR messages sent to MTP. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				errMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.11
+			;;
+REGISTERED AS { sccpObjectClass 27 };
+
+
+-- localSCCPAvailability
+localSCCPAvailability MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		localSCCPAvailabilityPkg PACKAGE
+			BEHAVIOUR
+				localSCCPAvailabilityBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class provides information on the availability of the local 
+						SCCP. The preferred granularityPeriod of this permanent measurement is 30 
+						minutes. The attribute localSCCPUnavailabilityDuration provides the duration of 
+						the local SCCP unavailability situation (all reasons). Start of an 
+						unavailability situation is notified by the localSCCPUnavailability 
+						notification, which is contained in the sccp managed object class.";;
+			ATTRIBUTES
+				localSCCPUnavailabilityDuration GET SET-BY-CREATE;-- Measurement Q.752/8.5
+			;;
+REGISTERED AS { sccpObjectClass 28 };
+
+
+-- ludtMessagesReceivedCounts
+ludtMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		ludtMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				ludtMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the LUDT messages Received. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ludtMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.19
+			;;
+REGISTERED AS { sccpObjectClass 29 };
+
+
+-- ludtMessagesSentCounts
+ludtMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		ludtMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				ludtMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the LUDT messages sent. The preferred granularityPeriods 
+						are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ludtMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.17
+			;;
+REGISTERED AS { sccpObjectClass 30 };
+
+
+-- ludtsMessagesReceivedCounts
+ludtsMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		ludtsMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				ludtsMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the LUDTS messages received. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ludtsMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.20
+			;;
+REGISTERED AS { sccpObjectClass 31 };
+
+
+-- ludtsMessagesSentCounts
+ludtsMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		ludtsMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				ludtsMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the LUDTS messages sent. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				ludtsMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.18
+			;;
+REGISTERED AS { sccpObjectClass 32 };
+
+
+-- messagesToBackupCounts
+messagesToBackupCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		messagesToBackupCountsPkg PACKAGE
+			BEHAVIOUR
+				messagesToBackupCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the messages sent to a back-up subsystem (attribute 
+						SSN). The preferred granularityPeriods are 5 minutes and 30 minutes. Instances 
+						of this class are created for every ssn. This measurement refers only to those 
+						messages which would normally have been routed to a sub-system but because of a 
+						change in the translation process (e.g. due to a routing failure towards that 
+						sub-system), are directed to a back-up sub-system. The measurement is only 
+						applicable at replicated nodes with translation capabilities.";;
+			ATTRIBUTES
+				ssn GET SET-BY-CREATE,
+				messagesToBackupSSN GET SET-BY-CREATE;-- Measurement Q.752/9.8
+			;;
+REGISTERED AS { sccpObjectClass 33 };
+
+
+-- originatedMessagesPerSSNMeasurement
+originatedMessagesPerSSNMeasurement MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		originatedMessagesPerSSNMeasurementPkg PACKAGE
+			BEHAVIOUR
+				originatedMessagesPerSSNMeasurementBhv BEHAVIOUR
+					DEFINED AS
+						"This obligated, permanent measurement counts the total number of messages for a 
+						given protocol class (spc attribute, values 0 and 1 only) originating from a 
+						given subsystem (ssn attribute). Instances of this class are created for every 
+						spc-ssn value combinations. The
+						preferred granularityPeriods are 5 minutes and 30 minutes. The total number of 
+						messages is independent from the fact whether the message could be handled or 
+						not.";;
+			ATTRIBUTES
+				"ITU-T Recommendation Q.751.1 (1995)":pointCode GET SET-BY-CREATE,
+				ssn GET SET-BY-CREATE,
+				messagesOriginatedPerSSN-SPC GET SET-BY-CREATE;-- Measurement Q.752/9.6
+			;;
+REGISTERED AS { sccpObjectClass 34 };
+
+
+-- reassemblyErrorData
+reassemblyErrorData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7FirstAndIntervalCurrentData;
+	CHARACTERIZED BY
+		reassemblyErrorDataPkg PACKAGE
+			BEHAVIOUR
+				reassemblyErrorDataBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains the reassembly error data. The preferred 
+						granularityPeriod is 30 minutes. The attributes are read-only. The attributes 
+						are related to the qualityofServiceAlarm in the sclc managed object class. An 
+						attribute is incremented if a qualityofServiceAlarm happens with the 
+						corresponding value for the probableCause.";;
+			ATTRIBUTES
+				reassemblyTimerExpired GET SET-BY-CREATE,-- Measurement Q.752/7.10
+				segmentReceivedOutOfSequence GET SET-BY-CREATE,-- Measurement Q.752/7.11
+				noReassemblyResources GET SET-BY-CREATE,-- Measurement Q.752/7.12
+				reassemblyFailed GET SET-BY-CREATE;-- Measurement Q.752/7.21
+			;;
+REGISTERED AS { sccpObjectClass 35 };
+
+
+-- receivedMessagesPerSSNMeasurement
+receivedMessagesPerSSNMeasurement MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		receivedMessagesPerSSNMeasurementPkg PACKAGE
+			BEHAVIOUR
+				receivedMessagesPerSSNMeasurementBhv BEHAVIOUR
+					DEFINED AS
+						"This obligated, permanent measurement counts the total number of messages for a 
+						given protocol class (spc attribute, values 0 and 1 only) to be delivered to a 
+						given subsystem (ssn attribute). Instances of this class are created for every 
+						spc-ssn value combinations. The preferred granularityPeriods are 5 minutes and 
+						30 minutes. The total number of messages is independent from the fact whether 
+						the message could be handled or not.";;
+			ATTRIBUTES
+				"ITU-T Recommendation Q.751.1 (1995)":pointCode GET SET-BY-CREATE,
+				ssn GET SET-BY-CREATE,
+				messagesReceivedOrTerminatedPerSSN-SPC GET SET-BY-CREATE;-- Measurement Q.752/9.7
+			;;
+REGISTERED AS { sccpObjectClass 36 };
+
+
+-- routingFailureData
+routingFailureData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7FirstAndIntervalCurrentData;
+	CHARACTERIZED BY
+		oblRoutingFailureDataPkg PACKAGE
+			BEHAVIOUR
+				oblRoutingFailureDataBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains the obligated routing failure data. The 
+						preferred granularityPeriod is 30 minutes. The attributes are read-only. The 
+						attributes are related to the qualityofServiceAlarm in the scrc managed object 
+						class. An attribute is incremented if a qualityofServiceAlarm happens with the 
+						corresponding value for the probableCause.";;
+			ATTRIBUTES
+				noTranslForNatureAddress GET SET-BY-CREATE,-- Measurement Q.752/7.1
+				noTranslForSpecificAddress GET SET-BY-CREATE,-- Measurement Q.752/7.2
+				noPointCodeAvailable GET SET-BY-CREATE,-- Measurement Q.752/7.3
+				networkCongestion GET SET-BY-CREATE,-- Measurement Q.752/7.4
+				subSystemFailure GET SET-BY-CREATE,-- Measurement Q.752/7.5
+				subSystemCongestion GET SET-BY-CREATE,-- Measurement Q.752/7.6
+				userUnequipped GET SET-BY-CREATE,-- Measurement Q.752/7.7
+				unknownOrUnqualifiedRoutingFailure GET SET-BY-CREATE,-- Measurement Q.752/7.9
+				violationOfHopCounter GET SET-BY-CREATE;-- Measurement Q.752/7.13
+			;;
+REGISTERED AS { sccpObjectClass 37 };
+
+
+-- rsrMessagesReceivedCounts
+rsrMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		rsrMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				rsrMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the RSR messages received from MTP. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				rsrMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.10
+			;;
+REGISTERED AS { sccpObjectClass 38 };
+
+
+-- rsrMessagesSentCounts
+rsrMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		rsrMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				rsrMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the RSR messages sent to MTP. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				rsrMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.9
+			;;
+REGISTERED AS { sccpObjectClass 39 };
+
+
+-- sccpMessagesCounts
+sccpMessagesCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		sccpMessageCountsPkg PACKAGE
+			BEHAVIOUR
+				sccpMessagesCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts sccp messages as received by scrc. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes. The total number of messages is 
+						independent from the fact whether the message could be delivered or not.";;
+			ATTRIBUTES
+				messagesHandled GET SET-BY-CREATE,-- Measurement Q.752/9.3
+				messagesForLocalSubsystems GET SET-BY-CREATE,-- Measurement Q.752/9.4
+				messagesRequiringGTTranslation GET SET-BY-CREATE;-- Measurement Q.752/9.5
+			;;
+REGISTERED AS { sccpObjectClass 40 };
+
+
+-- sccpSyntaxErrorData
+sccpSyntaxErrorData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7FirstAndIntervalCurrentData;
+	CHARACTERIZED BY
+		sccpSyntaxErrorDataPkg PACKAGE
+			BEHAVIOUR
+				sccpSyntaxErrorDataBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains the obligated syntax error data. The 
+						preferred granularityPeriod is 30 minutes. The attribute is read-only.";;
+			ATTRIBUTES
+				sccpSyntaxErrorList GET SET-BY-CREATE;-- Measurement Q.752/7.8
+			;;
+REGISTERED AS { sccpObjectClass 41 };
+
+
+-- segmentationErrorData
+segmentationErrorData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7FirstAndIntervalCurrentData;
+	CHARACTERIZED BY
+		segmentationErrorDataPkg PACKAGE
+			BEHAVIOUR
+				segmentationErrorDataBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains segmentation error data. The preferred 
+						granularityPeriod is 30 minutes. The attributes are read-only. The attributes 
+						are related to the qualityofServiceAlarm in the sclc managed object class. An 
+						attribute is incremented if a qualityofServiceAlarm happens with the 
+						corresponding value for the probableCause.";;
+			ATTRIBUTES
+				segmentationNotSupported GET SET-BY-CREATE,-- Measurement Q.752/7.19
+				segmentationFailed GET SET-BY-CREATE;-- Measurement Q.752/7.20
+			;;
+REGISTERED AS { sccpObjectClass 42 };
+
+
+-- segmentationImpossibleData
+segmentationImpossibleData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7FirstAndIntervalCurrentData;
+	CHARACTERIZED BY
+		segmentationImpossibleDataPkg PACKAGE
+			BEHAVIOUR
+				segmentationImpossibleDataBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains segmentation error data. The preferred 
+						granularityPeriod is 30 minutes. The attributes are read-only. The attributes 
+						are related to the qualityofServiceAlarm in the sccpAccessPoint managed object 
+						class. An attribute is incremented if a qualityofServiceAlarm happens with the 
+						corresponding value for the probableCause.";;
+			ATTRIBUTES
+				messageTooLarge GET SET-BY-CREATE;-- Measurement Q.752/7.14
+			;;
+REGISTERED AS { sccpObjectClass 43 };
+
+
+-- subsystemProhibitedData
+subsystemProhibitedData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7FirstAndIntervalCurrentData;
+	CHARACTERIZED BY
+		subsystemProhibitedDataPkg PACKAGE
+			BEHAVIOUR
+				subsystemProhibitedDataBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object class contains the subsystem error data. The preferred 
+						granularityPeriod is 30 minutes. The attributes are read-only. The attributes 
+						are related tothe qualityofServiceAlarm in the sccpAccessPoint managed object 
+						class. An attribute is incremented if a qualityofServiceAlarm happens with the 
+						corresponding value for the probableCause.";;
+			ATTRIBUTES
+				subsystemProhibited GET SET-BY-CREATE;-- Measurement Q.752/8.11
+			;;
+REGISTERED AS { sccpObjectClass 44 };
+
+
+-- udtMessagesReceivedCounts
+udtMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		udtMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				udtMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the UDT messages received. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				udtMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.3
+			;;
+REGISTERED AS { sccpObjectClass 45 };
+
+
+-- udtMessagesSentCounts
+udtMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		udtMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				udtMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the UDT messages sent. The preferred granularityPeriods 
+						are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				udtMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.1
+			;;
+REGISTERED AS { sccpObjectClass 46 };
+
+
+-- udtsMessagesReceivedCounts
+udtsMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		udtsMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				udtsMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the UDTS messages received. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				udtsMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.4
+			;;
+REGISTERED AS { sccpObjectClass 47 };
+
+
+-- udtsMessagesSentCounts
+udtsMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		udtsMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				udtsMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the UDTS messages sent. The preferred granularityPeriods 
+						are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				udtsMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.2
+			;;
+REGISTERED AS { sccpObjectClass 48 };
+
+
+-- xudtMessagesReceivedCounts
+xudtMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		xudtMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				xudtMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the XUDT messages Received. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				xudtMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.15
+			;;
+REGISTERED AS { sccpObjectClass 49 };
+
+
+-- xudtMessagesSentCounts
+xudtMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		xudtMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				xudtMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the XUDT messages sent. The preferred granularityPeriods 
+						are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				xudtMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.13
+			;;
+REGISTERED AS { sccpObjectClass 50 };
+
+
+-- xudtsMessagesReceivedCounts
+xudtsMessagesReceivedCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		xudtsMessagesReceivedCountsPkg PACKAGE
+			BEHAVIOUR
+				xudtsMessagesReceivedCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the XUDTS messages Received. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				xudtsMessagesReceived GET SET-BY-CREATE;-- Measurement Q.752/9bis.16
+			;;
+REGISTERED AS { sccpObjectClass 51 };
+
+
+-- xudtsMessagesSentCounts
+xudtsMessagesSentCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation Q.751.1 (1995)":ss7CurrentData;
+	CHARACTERIZED BY
+		xudtsMessagesSentCountsPkg PACKAGE
+			BEHAVIOUR
+				xudtsMessagesSentCountsBhv BEHAVIOUR
+					DEFINED AS
+						"This measurement counts the XUDTS messages sent. The preferred 
+						granularityPeriods are 5 minutes and 30 minutes.";;
+			ATTRIBUTES
+				xudtsMessagesSent GET SET-BY-CREATE;-- Measurement Q.752/9bis.14
+			;;
+REGISTERED AS { sccpObjectClass 52 };
+
+
+-- C.4 Attribute definitions
+-- crefMessagesReceived
+crefMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		crefMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.8: the total number of CREF 
+				messages received. See also 3.2/Q.714.";;
+REGISTERED AS { sccpAttribute 81 };
+
+
+-- crefMessagesSent
+crefMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		crefMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.6: the total number of CREF 
+				messages sent. See also 3.2/Q.714.";;
+REGISTERED AS { sccpAttribute 82 };
+
+
+-- crMessagesReceived
+crMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		crMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.7: the total number of CR 
+				messages received. See also 3.1/Q.714.";;
+REGISTERED AS { sccpAttribute 83 };
+
+
+-- crMessagesSent
+crMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		crMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.5: the total number of CR 
+				messages sent. See also 3.1/Q.714.";;
+REGISTERED AS { sccpAttribute 84 };
+
+
+-- dt1MessagesFromSourceSSN
+dt1MessagesFromSourceSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		dt1MessagesFromSourceSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.10: the total number of DT1 
+				messages sent to per source SSN. See also 3.5/Q.714.";;
+REGISTERED AS { sccpAttribute 85 };
+
+
+-- dt1MessagesToSinkSSN
+dt1MessagesToSinkSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		dt1MessagesToSinkSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.9: the total number of DT1 
+				received from MTP per sink SSN. See also 3.5/Q.714.";;
+REGISTERED AS { sccpAttribute 86 };
+
+
+-- dt2MessagesFromSourceSSN
+dt2MessagesFromSourceSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		dt2MessagesFromSourceSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.12: the total number DT2 sent to 
+				per source SSN. See also 3.5/Q.714.";;
+REGISTERED AS { sccpAttribute 87 };
+
+
+-- dt2MessagesToSinkSSN
+dt2MessagesToSinkSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		dt2MessagesToSinkSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.11: the total number DT2 messages 
+				received from MTP per sink SSN. See also 3.5/Q.714.";;
+REGISTERED AS { sccpAttribute 88 };
+
+
+-- edMessagesFromSourceSSN
+edMessagesFromSourceSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		edMessagesFromSourceSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.13: the total number of ED 
+				messages sent to per source SSN. See also 3.6/Q.714.";;
+REGISTERED AS { sccpAttribute 89 };
+
+
+-- edMessagesToSinkSSN
+edMessagesToSinkSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		edMessagesToSinkSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.14: the total number of ED 
+				messages received from MTP per sink SSN. See also 3.6/Q.714.";;
+REGISTERED AS { sccpAttribute 90 };
+
+
+-- errMessagesReceived
+errMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		errMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.12: the total number of ERR 
+				messages received. See also 3.10/Q.714.";;
+REGISTERED AS { sccpAttribute 91 };
+
+
+-- errMessagesSent
+errMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		errMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.11: the total number of ERR 
+				messages sent. See also 3.10/Q.714.";;
+REGISTERED AS { sccpAttribute 92 };
+
+
+-- localSCCPUnavailabilityDuration
+localSCCPUnavailabilityDuration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.Seconds;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localSCCPUnavailabilityDurationBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/8.5";;
+REGISTERED AS { sccpAttribute 93 };
+
+
+-- ludtMessagesReceived
+ludtMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		ludtMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.19: the total number of LUDT 
+				messages received. See also 4.1/Q.714.";;
+REGISTERED AS { sccpAttribute 94 };
+
+
+-- ludtMessagesSent
+ludtMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		ludtMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.17: the total number of LUDT 
+				messages sent. See also 4.1/Q.714.";;
+REGISTERED AS { sccpAttribute 95 };
+
+
+-- ludtsMessagesReceived
+ludtsMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		ludtsMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.20: the total number of LUDTS 
+				messages sent. See also 4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 96 };
+
+
+-- ludtsMessagesSent
+ludtsMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		ludtsMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis18: the total number of LUDTS 
+				messages sent. See also 4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 97 };
+
+
+-- messagesForLocalSubsystems
+messagesForLocalSubsystems ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messagesForLocalSubsystemsBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.4: the total number of messages 
+				intended for local subsystems. See also 2.3/Q.714.";;
+REGISTERED AS { sccpAttribute 98 };
+
+
+-- messagesHandled
+messagesHandled ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messagesHandledBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.3: the total number of messages 
+				handled from local or remote systems. It is assumed that a message transiting an 
+				SCCP relay point is counted only once. See also 2.3/Q.714.";;
+REGISTERED AS { sccpAttribute 99 };
+
+
+-- messagesOriginatedPerSSN-SPC
+messagesOriginatedPerSSN-SPC ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messagesOriginatedPerSSN-SPCBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.6. See also 1.1.2/Q.714.";;
+REGISTERED AS { sccpAttribute 100 };
+
+
+-- messagesReceivedOrTerminatedPerSSN-SPC
+messagesReceivedOrTerminatedPerSSN-SPC ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messagesReceivedOrTerminatedPerSSN-SPCBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.7. See also 1.1.2/Q.714.";;
+REGISTERED AS { sccpAttribute 101 };
+
+
+-- messagesRequiringGTTranslation
+messagesRequiringGTTranslation ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messagesRequiringGTTranslationBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.5: the total number of messages 
+				that require global title translation. The total number of messages is 
+				independent from the fact whether the global title in the message could be 
+				translated or not. This measurement is only required at SCCP nodes with global 
+				title translation capabilities. See also 2.3/Q.714.";;
+REGISTERED AS { sccpAttribute 102 };
+
+
+-- messagesToBackupSSN
+messagesToBackupSSN ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messagesToBackupSSNBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9.8: the total number of messages 
+				that have been sent to a back-up subsystem. See also 5.3.2/Q.714.";;
+REGISTERED AS { sccpAttribute 103 };
+
+
+-- messageTooLarge
+messageTooLarge ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		messageTooLargeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.14. It counts the segmentation 
+				errors caused by user data that is too large to be segmented. See also 
+				4.1.1.1.1/Q.714.";;
+REGISTERED AS { sccpAttribute 104 };
+
+
+-- networkCongestion
+networkCongestion ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		networkCongestionBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.4. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 105 };
+
+
+-- noPointCodeAvailable
+noPointCodeAvailable ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		noPointCodeAvailableBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.3. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 106 };
+
+
+-- noReassemblyResources
+noReassemblyResources ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		noReassemblyResourcesBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.12. It counts the failed 
+				reassembly processes that result from a lack of resources. See also 
+				4.1.1.2.3.4/Q.714.";;
+REGISTERED AS { sccpAttribute 107 };
+
+
+-- noTranslForNatureAddress
+noTranslForNatureAddress ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		noTranslForNatureAddressBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.1. It counts the failed Global 
+				Title translations that result from the fact that the type of address is unknown 
+				to the translation function. This
+				measurement is only required at SCCP nodes with global title translation 
+				capabilities. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 108 };
+
+
+-- noTranslForSpecificAddress
+noTranslForSpecificAddress ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		noTranslForSpecificAddressBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.2. It counts the failed Global 
+				Title translations that result from the fact that although the type of address 
+				is known to the translation function, this specific address is not. This 
+				measurement is only required at SCCP nodes with global title translation 
+				capabilities. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 109 };
+
+
+-- reassemblyFailed
+reassemblyFailed ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		reassemblyFailedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.21. See also 4.1.1.1/Q.714.";;
+REGISTERED AS { sccpAttribute 110 };
+
+
+-- reassemblyTimerExpired
+reassemblyTimerExpired ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		reassemblyTimerExpiredBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.10. It counts the failed 
+				reassembly processes caused by the expiration of the reassembly timer. See also 
+				4.1.1.2.3.2/Q.714.";;
+REGISTERED AS { sccpAttribute 111 };
+
+
+-- rsrMessagesReceived
+rsrMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		rsrMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.10: the total number of RSR 
+				messages received. See also 3.7/Q.714.";;
+REGISTERED AS { sccpAttribute 112 };
+
+
+-- rsrMessagesSent
+rsrMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		rsrMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.9: the total number of RSR 
+				messages sent. See also 3.7/Q.714.";;
+REGISTERED AS { sccpAttribute 113 };
+
+
+-- sccpSyntaxErrorList
+sccpSyntaxErrorList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SccpSyntaxErrorList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sccpSyntaxErrorListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.8: the syntax errors as identified 
+				in section 3.10/X.714. See also 4.3/Q.714.";;
+REGISTERED AS { sccpAttribute 114 };
+
+
+-- segmentationFailed
+segmentationFailed ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		segmentationFailedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.20. See also 4.1.1.1/Q.714.";;
+REGISTERED AS { sccpAttribute 115 };
+
+
+-- segmentationNotSupported
+segmentationNotSupported ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		segmentationNotSupportedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.19. See also 4.1.1.1/Q.714.";;
+REGISTERED AS { sccpAttribute 116 };
+
+
+-- segmentReceivedOutOfSequence
+segmentReceivedOutOfSequence ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		segmentReceivedOutOfSequenceBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.11. It counts the data segments 
+				that are not received in sequence. See also 4.1.1.2.3.2/Q.714.";;
+REGISTERED AS { sccpAttribute 117 };
+
+
+-- subSystemCongestion
+subSystemCongestion ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		subSystemCongestionBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.6 (this measurement is for further 
+				study). See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 118 };
+
+
+-- subSystemFailure
+subSystemFailure ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		subSystemFailureBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.5. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 119 };
+
+
+-- subsystemProhibited
+subsystemProhibited ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		subsystemProhibitedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/8.11.";;
+REGISTERED AS { sccpAttribute 120 };
+
+
+-- udtMessagesReceived
+udtMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		udtMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.3: the total number of UDT 
+				messages received. See also 4.1/Q.714.";;
+REGISTERED AS { sccpAttribute 121 };
+
+
+-- udtMessagesSent
+udtMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		udtMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.1: the total number of UDT 
+				messages sent. See also 4.1/Q.714.";;
+REGISTERED AS { sccpAttribute 122 };
+
+
+-- udtsMessagesReceived
+udtsMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		udtsMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.4: the total number of UDTS 
+				messages sent. See also 4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 123 };
+
+
+-- udtsMessagesSent
+udtsMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		udtsMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.2: the total number of UDTS 
+				messages sent. See also 4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 124 };
+
+
+-- unknownOrUnqualifiedRoutingFailure
+unknownOrUnqualifiedRoutingFailure ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		unknownOrUnqualifiedRoutingFailureBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.9. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 125 };
+
+
+-- userUnequipped
+userUnequipped ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		userUnequippedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.7. See also 2.4/Q.714.";;
+REGISTERED AS { sccpAttribute 126 };
+
+
+-- violationOfHopCounter
+violationOfHopCounter ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		violationOfHopCounterBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/7.13. It counts the routing failures 
+				caused by the expiration of the Hop Counter. See also 2.3.1.3/Q.714.";;
+REGISTERED AS { sccpAttribute 127 };
+
+
+-- xudtMessagesReceived
+xudtMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		xudtMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.15: the total number of XUDT 
+				messages received. See also 4.1/Q.714.";;
+REGISTERED AS { sccpAttribute 128 };
+
+
+-- xudtMessagesSent
+xudtMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		xudtMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.13: the total number of XUDT 
+				messages sent. See also 4.1/Q.714.";;
+REGISTERED AS { sccpAttribute 129 };
+
+
+-- xudtsMessagesReceived
+xudtsMessagesReceived ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		xudtsMessagesReceivedBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.16: the total number of XUDTS 
+				messages received. See also 4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 130 };
+
+
+-- xudtsMessagesSent
+xudtsMessagesSent ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":counter;
+	BEHAVIOUR
+		xudtsMessagesSentBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents measurement Q.752/9bis.14: the total number of XUDTS 
+				messages sent. See also 4.2/Q.714.";;
+REGISTERED AS { sccpAttribute 131 };
+
+
+-- C.5 Naming binding definitions
+-- sccp-localSCCPAvailability
+sccp-localSCCPAvailability NAME BINDING
+	SUBORDINATE OBJECT CLASS localSCCPAvailability;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccp;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 14 };
+
+
+-- sccpAccessPoint-segmentationImpossibleData
+sccpAccessPoint-segmentationImpossibleData NAME BINDING
+	SUBORDINATE OBJECT CLASS segmentationImpossibleData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccpAccessPoint;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 15 };
+
+
+-- sccpAccessPoint-subsystemProhibitedData
+sccpAccessPoint-subsystemProhibitedData NAME BINDING
+	SUBORDINATE OBJECT CLASS subsystemProhibitedData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccpAccessPoint;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 16 };
+
+
+-- sclc-originatedMessagesPerSSNMeasurement
+sclc-originatedMessagesPerSSNMeasurement NAME BINDING
+	SUBORDINATE OBJECT CLASS originatedMessagesPerSSNMeasurement;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sclc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 17 };
+
+
+-- sclc-reassemblyErrorData
+sclc-reassemblyErrorData NAME BINDING
+	SUBORDINATE OBJECT CLASS reassemblyErrorData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sclc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 18 };
+
+
+-- sclc-receivedMessagesPerSSNMeasurement
+sclc-receivedMessagesPerSSNMeasurement NAME BINDING
+	SUBORDINATE OBJECT CLASS receivedMessagesPerSSNMeasurement;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sclc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 19 };
+
+
+-- sclc-segmentationErrorData
+sclc-segmentationErrorData NAME BINDING
+	SUBORDINATE OBJECT CLASS segmentationErrorData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sclc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 20 };
+
+
+-- scoc-dt1FromSourceSSNCounts
+scoc-dt1FromSourceSSNCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS dt1FromSourceSSNCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scoc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 21 };
+
+
+-- scoc-dt1ToSinkSSNCounts
+scoc-dt1ToSinkSSNCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS dt1ToSinkSSNCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scoc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 22 };
+
+
+-- scoc-dt2FromSourceSSNCounts
+scoc-dt2FromSourceSSNCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS dt2FromSourceSSNCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scoc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 23 };
+
+
+-- scoc-dt2ToSinkSSNCounts
+scoc-dt2ToSinkSSNCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS dt2ToSinkSSNCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scoc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 24 };
+
+
+-- scoc-edFromSourceSSNCounts
+scoc-edFromSourceSSNCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS edFromSourceSSNCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scoc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 25 };
+
+
+-- scoc-edToSinkSSNCounts
+scoc-edToSinkSSNCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS edToSinkSSNCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scoc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 26 };
+
+
+-- scrc-crefMessagesReceivedCounts
+scrc-crefMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS crefMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 27 };
+
+
+-- scrc-crefMessagesSentCounts
+scrc-crefMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS crefMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 28 };
+
+
+-- scrc-crMessagesReceivedCounts
+scrc-crMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS crMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 29 };
+
+
+-- scrc-crMessagesSentCounts
+scrc-crMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS crMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 30 };
+
+
+-- scrc-errMessagesReceivedCounts
+scrc-errMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS errMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 31 };
+
+
+-- scrc-errMessagesSentCounts
+scrc-errMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS errMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 32 };
+
+
+-- scrc-ludtMessagesReceivedCounts
+scrc-ludtMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS ludtMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 33 };
+
+
+-- scrc-ludtMessagesSentCounts
+scrc-ludtMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS ludtMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 34 };
+
+
+-- scrc-ludtsMessagesReceivedCounts
+scrc-ludtsMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS ludtsMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 35 };
+
+
+-- scrc-ludtsMessagesSentCounts
+scrc-ludtsMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS ludtsMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 36 };
+
+
+-- scrc-messagesToBackupCounts
+scrc-messagesToBackupCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS messagesToBackupCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 37 };
+
+
+-- scrc-routingFailureData
+scrc-routingFailureData NAME BINDING
+	SUBORDINATE OBJECT CLASS routingFailureData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 38 };
+
+
+-- scrc-rsrMessagesReceivedCounts
+scrc-rsrMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS rsrMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 39 };
+
+
+-- scrc-rsrMessagesSentCounts
+scrc-rsrMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS rsrMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 40 };
+
+
+-- scrc-sccpMessagesCounts
+scrc-sccpMessagesCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS sccpMessagesCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 41 };
+
+
+-- scrc-sccpSyntaxErrorData
+scrc-sccpSyntaxErrorData NAME BINDING
+	SUBORDINATE OBJECT CLASS sccpSyntaxErrorData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 42 };
+
+
+-- scrc-udtMessagesReceivedCounts
+scrc-udtMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS udtMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 43 };
+
+
+-- scrc-udtMessagesSentCounts
+scrc-udtMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS udtMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 44 };
+
+
+-- scrc-udtsMessagesReceivedCounts
+scrc-udtsMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS udtsMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 45 };
+
+
+-- scrc-udtsMessagesSentCounts
+scrc-udtsMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS udtsMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 46 };
+
+
+-- scrc-xudtMessagesReceivedCounts
+scrc-xudtMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS xudtMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 47 };
+
+
+-- scrc-xudtMessagesSentCounts
+scrc-xudtMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS xudtMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 48 };
+
+
+-- scrc-xudtsMessagesReceivedCounts
+scrc-xudtsMessagesReceivedCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS xudtsMessagesReceivedCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 49 };
+
+
+-- scrc-xudtsMessagesSentCounts
+scrc-xudtsMessagesSentCounts NAME BINDING
+	SUBORDINATE OBJECT CLASS xudtsMessagesSentCounts;
+	NAMED BY
+	SUPERIOR OBJECT CLASS scrc;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
+REGISTERED AS { sccpNameBinding 50 };
+
+-- Q.751.2 Appendix I - SCCP Managed Objects for further study
+-- 1.1 CallingPartyAddress
+
+-- I.1.2 callingPartyAddress (formal part)
+callingPartyAddress MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		callingPartyAddressPackage PACKAGE
+			BEHAVIOUR
+				callingPartyAddressBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object defines the Global Title Address for the Calling Party Address (CGA) 
+						that can optionally be associated to a local SCCP Access Point. This GT address is only used 
+						for the generation of the CGA, if the SCCP user does not specify the GT Address himself.";;
+			ATTRIBUTES
+				callingPartyAddressId GET SET-BY-CREATE,
+				gtAddressInformation GET SET-BY-CREATE,
+				gtEncodingScheme GET SET-BY-CREATE,
+				gtNatureOfAddress GET SET-BY-CREATE,
+				gtNumberingPlan GET SET-BY-CREATE,
+				gtTranslationType GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		callingPartyAddressNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 53 };
+
+
+callingPartyAddressNamePackage PACKAGE
+	ATTRIBUTES
+		callingPartyAddressName GET-REPLACE;
+REGISTERED AS { sccpPackage 23 };
+
+-- callingPartyAddressId
+callingPartyAddressId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 132 };
+
+
+-- callingPartyAddressName
+callingPartyAddressName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 133 };
+
+
+-- sccpAccessPoint-callingPartyAddress
+sccpAccessPoint-callingPartyAddress NAME BINDING
+	SUBORDINATE OBJECT CLASS callingPartyAddress AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccpAccessPoint AND SUBCLASSES;
+	WITH ATTRIBUTE
+		callingPartyAddressId;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 51 };
+-- I.2 TranslationType
+-- I.2.2 translationType (formal part)
+
+
+-- I.2 TranslationType
+-- I.2.2 translationType (formal part)
+translationType MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		translationTypePackage PACKAGE
+			BEHAVIOUR
+				translationTypeBhv BEHAVIOUR
+					DEFINED AS
+						"This object class allows to associate a generic gtTranslationType (contained in the 
+						gtTranslator) with a gtTranslationTypeLocal, that is, a GT translation type that is valid only 
+						in a single network (if contained by a local sccpLinkage) or for a specific mtp access point 
+						only (if contained by remote sccpLinkage). In the case where a conflicting translation type 
+						association exists for both a local sccpLinkage and a remote sccpLinkage, the remote 
+						sccpLinkage association prevails.";;
+			ATTRIBUTES
+				gtTranslationType GET SET-BY-CREATE,
+				gtTranslationTypeLocal GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2 : 1992e are supported by an instance of this class",
+		translationTypeNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { sccpObjectClass 54 };
+--NOTE  The gtConversionRule managed object also offers a mechanism to modify global title translation types.
+--That mechanism should not be used in parallel with the translationType managed object.
+
+
+translationTypeNamePackage PACKAGE
+	ATTRIBUTES
+		translatorTypeName GET-REPLACE;
+REGISTERED AS { sccpPackage 24 };
+
+
+-- gtTranslationTypeLocal
+gtTranslationTypeLocal ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.GtTranslationType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		gtTranslationTypeLocalBhv BEHAVIOUR
+			DEFINED AS
+				"The translation type attribute is single valued.";;
+REGISTERED AS { sccpAttribute 134 };
+
+
+-- translatorTypeName
+translatorTypeName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { sccpAttribute 135 };
+
+
+-- sccpLinkage-translationType
+sccpLinkage-translationType NAME BINDING
+	SUBORDINATE OBJECT CLASS translationType AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sccpLinkage AND SUBCLASSES;
+	WITH ATTRIBUTE
+		gtTranslationType;
+	CREATE;
+	DELETE;
+REGISTERED AS { sccpNameBinding 52 };
+
+END
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log: Q.751.2.gdmo,v $
+--  Revision 0.9.2.5  2008-12-24 16:35:02  brian
+--  - gdmo updates
+--
+--  Revision 0.9.2.4  2007/12/15 20:20:37  brian
+--  - updates
+--  
+--  Revision 0.9.2.3  2007/09/29 14:28:07  brian
+--  - update gdmos and asns
+--  
+--  Revision 0.9.2.2  2007/09/09 22:58:48  brian
+--  - updates for namespace
+--  
+--  Revision 0.9.2.1  2007/09/06 10:58:59  brian
+--  - added new gdmo files
+--  
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "ITU-T Rec. Q.751.2 (1992)"
+--  { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x283::networkEntity
+--@@ |  |  +- itut_q751_2::sccp
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x283::cLNS
+--@@ |  |  +- itut_q751_2::sclc
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x283::cONS
+--@@ |  |  +- itut_q751_2::scoc
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ |  +- itut_x283::nSAP
+--@@ |  |  +- itut_q751_1::mtpAccessPoint
+--@@ |  |  +- itut_q751_2::sccpAccessPoint
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x283::networkConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x283::networkSubsystem
+--@@ +- iso_10589_2::adjacency
+--@@ +- iso_10589_2::virtualAdjacency
+--@@ +- iso_10589_2::destination
+--@@ |  +- iso_10589_2::destinationSystem
+--@@ |  +- iso_10589_2::destinationArea
+--@@ +- iso_10589_2::reachableAddress
+--@@ +- itut_x283::linkage
+--@@ +- itut_x283::x25PLE
+--@@ |  +- itut_x283::x25PLE_DTE
+--@@ |  +- itut_x283::x25PLE_DCE
+--@@ +- itut_x283::x25PLEIVMO
+--@@ |  +- itut_x283::x25PLEIVMO_DTE
+--@@ |  +- itut_x283::x25PLEIVMO_DCE
+--@@ +- itut_x283::virtualCircuit
+--@@ |  +- itut_x283::virtualCircuit_DTE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DTE
+--@@ |  |  +- itut_x283::virtualCall_DTE
+--@@ |  +- itut_x283::virtualCircuit_DCE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DCE
+--@@ |  |  +- itut_x283::virtualCall_DCE
+--@@ +- itut_x283::virtualCallIVMO
+--@@ +- itut_x283::dSeriesCounts
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  +- itut_q751_1::ss7CurrentData
+--@@ |  |  |  +- itut_q751_1::all5And30MinSignallingLinkDurationData
+--@@ |  |  |  +- itut_q751_1::handledMSUsOpcDpcSioMeasurement
+--@@ |  |  |  +- itut_q751_1::handledOctetsOpcDpcSioMeasurement
+--@@ |  |  |  +- itut_q751_1::handledOctetsSIOMeasurement
+--@@ |  |  |  +- itut_q751_1::oblSignallingLinkDurationData
+--@@ |  |  |  |  +- itut_q751_1::all30MinSignallingLinkDurationData
+--@@ |  |  |  +- itut_q751_1::oblSignallingLinkUtilizationData
+--@@ |  |  |  |  +- itut_q751_1::allSignallingLinkUtilizationData
+--@@ |  |  |  +- itut_q751_1::oblSignallingPointUtilizationData
+--@@ |  |  |  |  +- itut_q751_1::allSignallingPointUtilizationData
+--@@ |  |  |  +- itut_q751_1::receivedOctetsOPCMeasurement
+--@@ |  |  |  +- itut_q751_1::receivedOctetsOpcSioMeasurement
+--@@ |  |  |  +- itut_q751_1::routeSetInformationData
+--@@ |  |  |  +- itut_q751_1::signallingLinkSetDurationData
+--@@ |  |  |  +- itut_q751_1::ss7FirstAndIntervalCurrentData
+--@@ |  |  |  |  +- itut_q751_1::signallingLinkCongestionData
+--@@ |  |  |  |  +- itut_q751_1::signallingPointData
+--@@ |  |  |  |  +- itut_q751_2::reassemblyErrorData
+--@@ |  |  |  |  +- itut_q751_2::routingFailureData
+--@@ |  |  |  |  +- itut_q751_2::sccpSyntaxErrorData
+--@@ |  |  |  |  +- itut_q751_2::segmentationErrorData
+--@@ |  |  |  |  +- itut_q751_2::segmentationImpossibleData
+--@@ |  |  |  |  +- itut_q751_2::subsystemProhibitedData
+--@@ |  |  |  +- itut_q751_1::transmittedOctetsDPCMeasurement
+--@@ |  |  |  +- itut_q751_1::transmittedOctetsDpcSioMeasurement
+--@@ |  |  |  +- itut_q751_2::crefMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::crefMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::crMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::crMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::dt1FromSourceSSNCounts
+--@@ |  |  |  +- itut_q751_2::dt1ToSinkSSNCounts
+--@@ |  |  |  +- itut_q751_2::dt2FromSourceSSNCounts
+--@@ |  |  |  +- itut_q751_2::dt2ToSinkSSNCounts
+--@@ |  |  |  +- itut_q751_2::edFromSourceSSNCounts
+--@@ |  |  |  +- itut_q751_2::edToSinkSSNCounts
+--@@ |  |  |  +- itut_q751_2::errMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::errMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::localSCCPAvailability
+--@@ |  |  |  +- itut_q751_2::ludtMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::ludtMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::ludtsMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::ludtsMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::messagesToBackupCounts
+--@@ |  |  |  +- itut_q751_2::originatedMessagesPerSSNMeasurement
+--@@ |  |  |  +- itut_q751_2::receivedMessagesPerSSNMeasurement
+--@@ |  |  |  +- itut_q751_2::rsrMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::rsrMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::sccpMessagesCounts
+--@@ |  |  |  +- itut_q751_2::udtMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::udtMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::udtsMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::udtsMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::xudtMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::xudtMessagesSentCounts
+--@@ |  |  |  +- itut_q751_2::xudtsMessagesReceivedCounts
+--@@ |  |  |  +- itut_q751_2::xudtsMessagesSentCounts
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ |  +- itut_q751_1::ss7FirstAndIntervalThresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ |  |  |  +- itut_q751_1::managedSwitchingElement
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_q751_1::lsTimersProfile
+--@@ +- itut_q751_1::mtpL2ProtocolProfile
+--@@ +- itut_q751_1::mtpLevel3
+--@@ +- itut_q751_1::mtpSignPoint
+--@@ +- itut_q751_1::signDataLinkTp
+--@@ +- itut_q751_1::signLinkSetTp
+--@@ +- itut_q751_1::signLinkTp
+--@@ +- itut_q751_1::slTimersProfile
+--@@ +- itut_q751_1::spTimersProfile
+--@@ +- itut_q751_1::signRouteNePart
+--@@ +- itut_q751_1::signRouteSetNePart
+--@@ +- itut_q751_1::signTerm
+--@@ +- itut_q751_1::stpScreeningTable
+--@@ +- itut_q751_1::stpScreeningTableLine
+--@@ +- itut_q751_1::mtpRouteVerifTest
+--@@ +- itut_q751_2::concernedArea
+--@@ +- itut_q751_2::gtConversionRule
+--@@ +- itut_q751_2::gtRule
+--@@ +- itut_q751_2::gtTranslator
+--@@ +- itut_q751_2::sccpEntitySet
+--@@ |  +- itut_q751_2::endNodeEntitySetWithoutSSN
+--@@ |  +- itut_q751_2::endNodeEntitySetWithSSN
+--@@ |  +- itut_q751_2::relayNodeEntitySet
+--@@ +- itut_q751_2::sccpLinkage
+--@@ +- itut_q751_2::scrc
+--@@ +- itut_q751_2::srvt
+--@@ +- itut_q751_2::callingPartyAddress
+--@@ +- itut_q751_2::translationType
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x283::networkSubsystem
+--@@ |  >- itut_x283::networkEntity
+--@@ |  |  >- itut_x283::cLNS
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
+--@@ |  |  |  >- itut_x283::linkage
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  >- itut_x283::cLNS +++
+--@@ |  |  >- itut_x283::cONS
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::networkConnection
+--@@ |  |  >- itut_x283::cONS +++
+--@@ |  >- itut_x283::networkEntity +++
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::x25PLEIVMO
+--@@ |  >- itut_x283::x25PLE
+--@@ |  |  >- itut_x283::virtualCallIVMO
+--@@ |  >- itut_x283::x25PLE +++
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_x283::x25PLE_DTE
+--@@ >- itut_x283::permanentVirtualCircuit_DTE
+--@@ >- itut_x283::virtualCall_DTE
+--@@ itut_x283::x25PLE_DCE
+--@@ >- itut_x283::permanentVirtualCircuit_DCE
+--@@ >- itut_x283::virtualCall_DCE
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ >- itut_x283::virtualCall_DCE +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q751_1::managedSwitchingElement
+--@@ |  |  >- itut_q751_1::mtpSignPoint
+--@@ |  |  |  >- itut_q751_1::signRouteSetNePart
+--@@ |  |  |  |  >- itut_q751_1::signRouteNePart
+--@@ |  |  |  |  >- itut_q751_1::routeSetInformationData
+--@@ |  |  |  >- itut_q751_1::mtpAccessPoint
+--@@ |  |  |  >- itut_q751_1::mtpLevel3
+--@@ |  |  |  >- itut_q751_1::signDataLinkTp
+--@@ |  |  |  >- itut_q751_1::signLinkSetTp
+--@@ |  |  |  |  >- itut_q751_1::signLinkTp
+--@@ |  |  |  |  |  >- itut_q751_1::all5And30MinSignallingLinkDurationData
+--@@ |  |  |  |  |  >- itut_q751_1::oblSignallingLinkDurationData
+--@@ |  |  |  |  |  >- itut_q751_1::oblSignallingLinkUtilizationData
+--@@ |  |  |  |  |  >- itut_q751_1::signallingLinkCongestionData
+--@@ |  |  |  |  >- itut_q751_1::signallingLinkSetDurationData
+--@@ |  |  |  >- itut_q751_1::stpScreeningTable
+--@@ |  |  |  |  >- itut_q751_1::stpScreeningTableLine
+--@@ |  |  |  >- itut_q751_1::handledMSUsOpcDpcSioMeasurement
+--@@ |  |  |  >- itut_q751_1::handledOctetsOpcDpcSioMeasurement
+--@@ |  |  |  >- itut_q751_1::handledOctetsSIOMeasurement
+--@@ |  |  |  >- itut_q751_1::oblSignallingPointUtilizationData
+--@@ |  |  |  >- itut_q751_1::receivedOctetsOPCMeasurement
+--@@ |  |  |  >- itut_q751_1::receivedOctetsOpcSioMeasurement
+--@@ |  |  |  >- itut_q751_1::signallingPointData
+--@@ |  |  |  >- itut_q751_1::transmittedOctetsDPCMeasurement
+--@@ |  |  |  >- itut_q751_1::transmittedOctetsDpcSioMeasurement
+--@@ |  |  |  >- itut_q751_1::mtpRouteVerifTest
+--@@ |  |  >- itut_q751_1::signTerm
+--@@ |  |  >- itut_q751_1::lsTimersProfile
+--@@ |  |  >- itut_q751_1::mtpL2ProtocolProfile
+--@@ |  |  >- itut_q751_1::slTimersProfile
+--@@ |  |  >- itut_q751_1::spTimersProfile
+--@@ |  |  >- itut_q751_2::sccp
+--@@ |  |  |  >- itut_q751_2::sclc
+--@@ |  |  |  |  >- itut_q751_2::originatedMessagesPerSSNMeasurement
+--@@ |  |  |  |  >- itut_q751_2::reassemblyErrorData
+--@@ |  |  |  |  >- itut_q751_2::receivedMessagesPerSSNMeasurement
+--@@ |  |  |  |  >- itut_q751_2::segmentationErrorData
+--@@ |  |  |  >- itut_q751_2::scoc
+--@@ |  |  |  |  >- itut_q751_2::dt1FromSourceSSNCounts
+--@@ |  |  |  |  >- itut_q751_2::dt1ToSinkSSNCounts
+--@@ |  |  |  |  >- itut_q751_2::dt2FromSourceSSNCounts
+--@@ |  |  |  |  >- itut_q751_2::dt2ToSinkSSNCounts
+--@@ |  |  |  |  >- itut_q751_2::edFromSourceSSNCounts
+--@@ |  |  |  |  >- itut_q751_2::edToSinkSSNCounts
+--@@ |  |  |  >- itut_q751_2::scrc
+--@@ |  |  |  |  >- itut_q751_2::concernedArea
+--@@ |  |  |  |  >- itut_q751_2::gtConversionRule
+--@@ |  |  |  |  >- itut_q751_2::gtTranslator
+--@@ |  |  |  |  |  >- itut_q751_2::gtRule
+--@@ |  |  |  |  >- itut_q751_2::sccpAccessPoint
+--@@ |  |  |  |  |  >- itut_q751_2::segmentationImpossibleData
+--@@ |  |  |  |  |  >- itut_q751_2::subsystemProhibitedData
+--@@ |  |  |  |  |  >- itut_q751_2::callingPartyAddress
+--@@ |  |  |  |  >- itut_q751_2::sccpEntitySet
+--@@ |  |  |  |  >- itut_q751_2::sccpLinkage
+--@@ |  |  |  |  |  >- itut_q751_2::translationType
+--@@ |  |  |  |  >- itut_q751_2::crefMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::crefMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::crMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::crMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::errMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::errMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::ludtMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::ludtMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::ludtsMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::ludtsMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::messagesToBackupCounts
+--@@ |  |  |  |  >- itut_q751_2::routingFailureData
+--@@ |  |  |  |  >- itut_q751_2::rsrMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::rsrMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::sccpMessagesCounts
+--@@ |  |  |  |  >- itut_q751_2::sccpSyntaxErrorData
+--@@ |  |  |  |  >- itut_q751_2::udtMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::udtMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::udtsMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::udtsMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::xudtMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::xudtMessagesSentCounts
+--@@ |  |  |  |  >- itut_q751_2::xudtsMessagesReceivedCounts
+--@@ |  |  |  |  >- itut_q751_2::xudtsMessagesSentCounts
+--@@ |  |  |  >- itut_q751_2::srvt
+--@@ |  |  |  >- itut_q751_2::localSCCPAvailability
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

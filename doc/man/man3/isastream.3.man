@@ -1,0 +1,1 @@
+.so man2/isastream.2.man

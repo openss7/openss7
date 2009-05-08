@@ -1,0 +1,46 @@
+                                                                                
+           /--------\                                      /--------\           
+           | Stream |                                      | Stream |           
+           |  Head  |                                      |  Head  |           
+           \--------/                                      \--------/           
+             |    ^                         TS User          |    ^             
+   TCI  - - -|- - | - - - - - - - - - -,- - - - - - - - - - -|- - | - -  TPI    
+         ____V____|____               ,     TS Provider  ____V____|____         
+        |              |             ,                  |              |        
+        |     SS7      |            ,                   |      OSI     |        
+        | TCAP(Level 6)|           ,                    |   Transport  |        
+        |   Services   |          ,                     |   Services   |        
+        |______________|         ,                      |______________|        
+   TRI  - - -|- - ^ - - - - - - -           NS User                             
+   SCCPI- - -|- - | - - - - - - - - - -,- - - - - - - - - - -|- - | - -  NPI    
+         ____V____|____               ,     NS Provider  ____V____|____         
+        |              |             ,                  |              |        
+        |     SS7      |            ,                   |      OSI     |        
+        | SCCP(Level 4)|           ,                    |    Network   |        
+        |   Services   |          ,                     |   Services   |        
+        |______________|         ,                      |______________|        
+        - - -|- - ^ - - - - - - -           DL User                             
+   MTPI - - -|- - | - - - - - - - - - -,- - - - - - - - - - -|- - | - -  DLPI   
+         ____V____|____               ,     DL Provider  ____V____|____         
+        |              |             ,                  |              |        
+        |     SS7      |            ,                   |      OSI     |        
+        | MTP (Level 3)|           ,                    |   Data Link  |        
+        |   Services   |          ,                     |   Services   |        
+        |______________|         ,                      |______________|        
+        - - -|- - ^ - - - - - - -           CD User                             
+   SLI  - - -|- - | - - - - - - - - - -,- - - - - - - - - - -|- - | - -  CDI    
+         ____V____|____               ,     CD Provider  ____V____|____         
+        |              |             ,                  |              |        
+        |     SS7      |            ,                   |      OSI     |        
+        | Sign. Link   |           ,               DKI  | Data Terminal|        
+        |   Services   |          ,                     |   Services   |        
+        |______________|         ,                      |______________|        
+        - - -|- - ^ - - - - - - -                                               
+   SDTI - - -|- - | - - - - - - -                                               
+         ____V____|____                                                         
+        |              |                                                        
+        |     SS7      |                                                        
+        | Data Terminal|                                                        
+        |   Services   |                                                        
+        |______________|                                                        
+                                                                                

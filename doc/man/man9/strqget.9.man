@@ -1,0 +1,805 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STRQGET 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B strqget
+\- gets information about a \fISTREAMS\fR message queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int strqget(queue_t *" q ", qfields_t " what ", unsigned char " band ", long *" val );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue for which to retrieve parameters.
+.PD 0
+.TP
+.I what
+which parameter to retrieve.
+.TP
+.I band
+the queue band for which to retrieve parameters.
+.TP
+.I val
+the pointer to where the retrieved value is to be placed.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR strqget ()
+returns the value or pointer requested by
+.I what
+for the queue pointed to by
+.I q
+and band specified by
+.I band
+into the memory area pointed to by
+.IR val .
+The attribute retrieved can be either a scalar or a pointer.
+.PP
+When
+.I band
+is zero,
+.BR strqget ()
+will retrieve the attribute specified by
+.I what
+for the queue.
+When
+.I band
+is non-zero (between 1 and 255),
+.BR strqget ()
+will retrieve the attribute specified by
+.I what
+for the queue band specified by
+.IR band .
+.PP
+The argument
+.I what
+specifies which queue (or queue band if
+.I band
+is non-zero) attribute is to be retrieved.
+.I what
+can be one of the following values:
+.TP \w'\(emQMAXPSZ\(em'u
+.B QHIWAT
+Gets the high water mark associated with the
+.PD 0
+.I q
+or queue
+.IR band .
+.TP
+.B QLOWAT
+Gets the low water mark associated with the
+.I q
+or queue
+.IR band .
+.TP
+.B QCOUNT
+Gets the count of bytes associated with the
+.I q
+or queue
+.IR band .
+.TP
+.B QFIRST
+Gets the first message pointer associated with the
+.I q
+or queue
+.IR band .
+.TP
+.B QLAST
+Gets the last message pointer associated with the
+.I q
+or queue
+.IR band .
+.TP
+.B QFLAG
+Gets the flags associated with the
+.I q
+or queue
+.IR band .
+.TP \w'\(emQMAXPSZ\(em'u
+.PD 0
+.B QMAXPSZ
+Gets the maximum packet size associated with the
+.IR q .
+For this operation
+.I band
+must be zero (0).
+.TP
+.B QMINPSZ
+Gets the minimum packet size associated with the
+.IR q .
+For this operation
+.I band
+must be zero (0).
+.PD
+.PP
+.BR strqget ()
+provides a mechanism whereby a
+.IR STREAMS (4)
+driver or module can access information
+about a queue or queue band without directly accessing the
+.B queue
+or
+.B qband
+structures.
+Values retrieved by
+.BR strqget ()
+are equivalent to directly accessing the
+.B queue
+or
+.B qband
+structure members described below.
+.PP
+The
+.B queue
+structure contains at least the following members:
+.HP
+.BI "ulong " q_hiwat
+\- the high water mark for the queue.
+.PD 0
+.HP
+.BI "ulong " q_lowat
+\- the low water mark for the queue.
+.HP
+.BI "ulong " q_count
+\- the count of the number of bytes in the queue.
+.HP
+.BI "struct msgb *" q_first
+\- the first message in the queue.
+.HP
+.BI "struct msgb *" q_last
+\- the last message in the queue.
+.HP
+.BI "ulong " q_flag
+\- the flags associated with the queue, see
+.BR "\*(lqQueue Flags\*(rq" ,
+above.
+.HP
+.BI "long " q_maxpsz
+\- the maximum message size accepted by the queue.
+.HP
+.BI "long " q_minpsz
+\- the minimum message size accepted by the queue.
+.PD
+.PP
+The
+.B qband
+structure contains at least the following members:
+.HP
+.BI "ulong " qb_hiwat
+\- the high water mark for the band.
+.PD 0
+.HP
+.BI "ulong " qb_lowat
+\- the low water mark for the band.
+.HP
+.BI "ulong " qb_count;
+\- the count of the number of bytes in the band.
+.HP
+.BI "struct msgb *" qb_first
+\- the first message in the band.
+.HP
+.BI "struct msgb *" qb_last
+\- the last message in the band.
+.HP
+.BI "ulong " qb_flag
+\- the flags associated with the band, see
+.BR "\*(lqQueue Band Flags\*(rq" ,
+above.
+.PD
+.\"
+.\"
+.\"
+.SS "Queue Flags"
+.PP
+When
+.BR strqget ()
+is called with
+.I what
+set to
+.B QFLAG
+and
+.I band
+is set to zero (0),
+.BR strqget ()
+returns the queue flags in the area pointed to by
+.IR val .
+The queue flags in the area pointed to by
+.I val
+can contain the following flags:
+.TP \w'QSVCBUSY\(em'u
+.B QENAB
+set when the queue is enabled.
+.PD 0
+.TP
+.B QWANTR
+set when the previous queue wants to read.
+.TP
+.B QWANTW
+set when the previous queue wants to write.
+.TP
+.B QFULL
+set when the queue is full.  The queue is full when the count of bytes in the queue was greater than
+the high water mark for the queue, yet has not subsided to less than or equal to the low water marke
+for the queue.
+.TP
+.B QREADR
+set when the queue is the reader.
+.TP
+.B QUSE
+set when the queue is not free.
+.TP
+.B QNOENB
+set when the queue is not to be enabled.
+.\"
+.\" non standard
+.\"
+.TP
+.B QUP
+set when the queue uses uni-processor emulation.
+.TP
+.B QBACK
+set when the queue is a back-enabled queue.
+.TP
+.B QOLD
+set when the queue supports the old
+.I SVR 3
+.[
+svr3spg
+.]
+style open/close.
+.TP
+.B QHLIST
+set when the stream head has scan listed the queue.
+.TP
+.B QTOENAB
+set when the stream is to be enabled.
+.TP
+.B QSYNCH
+set when the queue is synchornized.
+.TP
+.B QSAFE
+set when the queue requires safe callbacks
+.RI ( STREAMS
+driver interrupts disabled).
+.TP
+.B QWELDED
+wet when the queue is welded.
+.TP
+.B QSVCBUSY
+set when the queue
+.IR qi_srvp (9)
+procedure is running.
+.TP
+.B QWCLOSE
+set when the queue is in close wait.
+.TP
+.B QPROCS
+set when
+.BR qprocsoff (9)
+has been called, or
+.BR qprocson (9)
+has yet to be called for the queue.
+.\"
+.PD
+.\"
+.\"
+.SS "Queue Band Flags"
+.PP
+When
+.BR strqget ()
+is called with
+.I what
+set to
+.B QFLAG
+and
+.I band
+is set between 1 and 255,
+.BR strqget ()
+returns the queue band flags associated with
+.I band
+in the area pointed to by
+.IR val .
+The queue band flags in the area pointed to by
+.I val
+can contain the following flags:
+.TP \w'QB_WANTW\(em'u
+.B QB_FULL
+set when the queue band is full.  The queue band is full when the count of the
+bytes in the queue band was greater than the high water mark for the queue
+band, and has not yet dropped to zero or below the low water mark for the queue.
+.PD 0
+.TP
+.B QB_WANTW
+set when the previous queue wants to write to this queue band.
+.\"
+.\" UnixWare/Solaris
+.\"
+.TP
+.B QB_BACK
+set when the queue band is back-enabled.
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.BR strqget ()
+is the proper transparent and implementation independent method for accessing members of the
+.BR queue (9)
+and
+.BR qband (9)
+structures.
+.PP
+.BR strqget ()
+will attempt to allocate a
+.BR qband (9)
+structure for bands that are accessed for which a
+.BR qband (9)
+structure does not yet exist.
+This means that
+.BR strqget ()
+can be used to allocate queue bands so that subsequent calls to
+.BR appq (9),
+.BR insq (9),
+.BR putq (9)
+and
+.BR putbq (9)
+will not fail for the allocated band.
+.PP
+.BR strqget ()
+can be called in a driver or module initialization routine to ensure that
+.BR appq (9),
+.BR insq (9),
+.BR putq (9)
+and
+.BR putbq (9)
+will never fail for the allocated queue band.  This is useful if
+.BR appq (9),
+.BR insq (9),
+.BR putq (9)
+or
+.BR putbq (9)
+are called from interrupt service routine context.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR strqget ()
+returns zero (0) and places the appropriate value in the
+memory area pointed to by
+.IR val .
+.PP
+Upon failure,
+.BR strqget ()
+returns a non-zero error number.
+The memory area pointed to by
+.I val
+remains unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR strqget ()
+fails,
+it returns one of the following errors:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EINVAL ]
+The value pointer
+.I val
+is
+.BR NULL ;
+the queue pointer
+.I q
+is
+.BR NULL;
+.I q
+does not point to a valid queue structure;
+.BR QMAXPSZ " or " QMINPSZ
+was specified for
+.I what
+and
+.I band
+was non-zero;
+.I what
+is not a valid queue or queue band attribute.
+.TP
+.RB [ ENOMEM ]
+the queue band specified in
+.I band
+does not exist and a
+.BR qband (9)
+structure could not be immediately allocated.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR strqget ()
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strqget ()
+is MP-safe.
+.PP
+Calling
+.BR strqget ()
+on a queue and stream previously frozen with
+.BR freezestr (9)
+could result in single-party deadlock.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR strqget ()
+uses recursive read-write locks on the stream head, so calls to
+.BR strqget ()
+on a stream frozen with
+.BR freezestr (9)
+will not result in single-party deadlock.  Also, failure to call
+.BR freezestr (9)
+on the stream will not cause
+.BR strqget ()
+to panic because the head lock is still taken.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qband (9),
+.BR freezestr (9),
+.BR strqset (9),
+.BR appq (9),
+.BR insq (9),
+.BR putq (9),
+.BR putbq (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR strqget ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strqget ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR strqget ()
+returns some specialized flags, such as the queue flags
+.BR QUP ,
+.BR QBACK ,
+.BR QOLD ,
+.BR QHLIST ,
+.BR QTOENAB ,
+.BR QSYNCH ,
+.BR QSAFE ,
+.BR QWELDED ,
+.BR QSVCBUSY
+and
+.BR QWCLOSE ,
+and the queue band flag
+.BR QB_BACK .
+.I LiS
+defines a number of queue flags that are not elsewhere defined, yet returns those flags from a call
+to
+.BR strqget ().
+.[
+lis
+.]
+.I LiS
+should mask off its private flags when returning flags from a call to
+.BR strqget ().
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will mask the queue flags returned by
+.BR strqget ()
+with
+.BR "( QENAB | QWANTR | QWANTW | QFULL | QREADR | QUSE | QNOENB )" ,
+and queue band flags with
+.BR "( QB_FULL | QB_WANTW )" .
+.IP \(em
+.IR "SVR 4.2 MP" ,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR strqget ().
+.[
+uslspg
+.]
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will freeze the stream with
+.BR freezestr (9)
+before calling
+.BR strqget ().
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR strqget ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+also lists
+.BR strqget ()
+as a utility that cannot be called from user functions or
+.RI non- STREAMS
+code; that is, contexts asynchronous to the Stream containing
+.IR q .
+.IP ""
+.IR HP-UX \(rg
+compatible drivers and modules will not call
+.BR strqget ()
+from outside of a
+.BR qinit (9)
+routine for the queue pair of
+.IR q .
+.IP \(em
+.IR AIX \(rg
+documents arguments
+.I q
+and
+.I band
+as
+.B register
+arguments.
+.[
+aixdoc
+.]
+.IP \(em
+.BR strqget ()
+will allocate a queue band structure for the band argument,
+.IR band ,
+if one does not already exist.
+.IR HP-UX \(rg,
+.IR SUPER-UX \(rg,
+.IR UXP/V \(rg
+and
+.I LiS
+indicate that
+.BR strqget ()
+and
+.BR strqset (9)
+will cause
+.BR qband (9)
+allocation to occur if executed for a queue band,
+.IR band ,
+that does not currently exist.
+.[
+hpuxspg
+.]
+.[
+suxspg
+.]
+.[
+uxpspg
+.]
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules can assume that a call to
+.BR strqget ()
+with a band,
+.IR band ,
+for a queue band structure
+.BR qband (9),
+that has not yet been allocated, will cause the allocation of the queue band structure.
+That is, drivers can assume that a successful call to
+.BR strqget ()
+for a given queue band,
+.IR band ,
+will ensure that
+.BR appq (9),
+.BR insq (9),
+.BR putq (9)
+and
+.BR putbq (9)
+will always succeed for the queue band,
+.IR band .
+.IP \(em
+.BR strqget ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
+.I LiS
+will return
+.RB [ EINVAL ]
+when it cannot allocate a
+.BR qband (9)
+structure instead of
+.RB [ ENOMEM ].
+.\".IP \(em
+.\"Symbol
+.\".BR lis_strqget ()
+.\"is provided for compatibility with LiS.  See
+.\".BR liscompat (9).
+.\".BR lis_strqget ()
+.\"calls
+.\".BR strqget ()
+.\"directly.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strqget ()
+first appeared in
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

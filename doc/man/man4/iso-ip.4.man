@@ -1,0 +1,426 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ISO-IP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B ISO-IP, ISO-UDP
+\- ISO CLNS over IP
+.\"
+.\"
+.SH DESCRIPTION
+.B ISO-IP
+is an implementation of an ISO CLNP
+.[
+ISO/IEC 8473-1 : 1993
+.]
+Subnetwork Convergence Function Protocol directly over the services of IP
+.[
+rfc793
+.]
+or between networks using the User Datagram Protocol (UDP),
+.[
+rfc768
+.]
+as defined for experimental use in RFC 1070.
+.[
+rfc1070
+.]
+.PP
+.B ISO-IP
+provides for simple and straightforward encapsulation of CLNS NPDUs in IP
+packets or UDP datagrams.
+.PP
+For providing the ISO CLNS using IP, the IP protocol number
+.B 80
+has been assigned;
+.[
+rfc1070
+.]
+using UDP, the UDP well-known port number
+.B 147
+has been assigned.
+.[
+rfc1070
+.]
+.\"
+.\"
+.SH USAGE
+.PP
+For a Connectionless-mode Network Service Provider
+.[
+x213
+.]
+using IP and protocol number
+.B 80
+providing the Network Provider Interface (NPI),
+.BR npi (7),
+.[
+NPI Revision 2.0.0
+.]
+the
+.I STREAMS
+pseudo-device driver
+.B /dev/iso-ip
+can be opened.
+.PP
+For a Connectionless-mode Network Service Provider
+.[
+x213
+.]
+using UDP and port number
+.B 147
+providing the Network Provider Interface (NPI),
+.BR npi (7),
+.[
+NPI Revision 2.0.0
+.]
+the
+.I STREAMS
+pseudo-device driver
+.B /dev/iso-udp
+can be opened.
+.PP
+Either Stream can be used directly, or bound and linked underneath the
+.BR tp4 (4)
+driver to provide Connectionless-mode Network Services for Transport Protocol
+Class 4 operation.
+.\"
+.\"
+.SH INTERFACE
+.PP
+Both forms of the Network Service Provider provide the
+.IR STREAMS -based
+Service Interface specified in the Network Provider Interface.
+.[
+NPI Revision 2.0.0
+.]
+.\"
+.\"
+.SH ADDRESSES
+.PP
+Address format is as described in RFC 986
+.[
+rfc986
+.]
+and superseded by RFC 1069.
+.[
+rfc1069
+.]
+.\"
+.\"
+.SH OPTIONS
+.PP
+.PP
+Quality of service parameters are as described in RFC 1070.
+.[
+rfc1070
+.]
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+.TP
+.BR N_INFO_REQ "(7), " N_INFO_ACK (7)
+.TP
+.BR N_BIND_REQ "(7), " N_BIND_ACK "(7), " N_ERROR_ACK (7)
+.TP
+.BR N_OPTMGMT_REQ "(7), " N_OK_ACK "(7), " N_ERROR_ACK (7)
+.TP
+.BR N_UNITDATA_REQ "(7), " N_UNITDATA_IND "(7), " N_UDERROR_IND (7)
+.TP
+.BR N_UNBIND_REQ "(7), " N_OK_ACK "(7), " N_ERROR_ACK (7)
+.\"
+.\"
+.SH NOTICES
+.PP
+Both RFCs
+.[
+rfc1069
+.]
+.[
+rfc1070
+.]
+are described as
+.IR Experimental .
+The RFC Editor lists both with status
+.IR UNKNOWN .
+Neither of these RFCs propose a standard. Use of these protocols in the
+DARPA Internet is not recommended.
+.PP
+Nevertheless, the
+.B ISO-IP
+version of the protocol provides a good mechanism for transporting CLNS over
+LANs; the
+.B ISO-UDP
+version, transporting CLNS between LANs over an Internetwork using existing IP
+bridges, switches and routers.
+.PP
+.B ISO-IP
+and
+.B ISO-UDP
+have the advantages that they reuse exsiting IP network management and
+internetwork routing; i.e, they do not require the use of X.75 packet data
+switches, or ES-IS/IS-IS routing protocols.  (Well, ES-IS, RFC 995,
+.[
+rfc995
+.]
+is still
+required; and
+IS-IS, RFC 1142
+.[[
+rfc1142
+.]].)
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B /dev/iso-ip
+can be implemented as a pushable
+.I STREAMS
+module, named
+.RI \(lq iso-ip \(rq,
+that can be pushed over an
+.BR np_ip (4)
+NPI Stream or
+.BR rawip2 (4)
+TPI Stream using
+.BR autopush (8).
+.PP
+.B /dev/iso-udp
+can be implemented as a pushable
+.I STREAMS
+module, named
+.RI \(lq iso-udp \(rq,
+that can be pushed over an
+.BR np_udp (4)
+NPI Stream or
+.BR udp2 (4)
+TPI Stream using
+.BR autopush (8).
+.PP
+Each module implements the the SNAcP intermediate layer as described in
+RFC 1070
+.[
+rfc1070
+.]
+and presents a standard CONS NPI interface,
+.BR npi (7),
+to the user.
+Additional modules, such as
+.BR tp4 (4)
+could be pushed over this Stream to provide ISO Transport Class 4.
+.[
+ISO/IEC 8073
+.]
+Since the module must provide a Network Provider Interface to the trasnport
+layer, it would be expedient to implement the module over the NP-IP or NP-UDP
+pseudo-device drivers, as they use the same service interface.
+.PP
+A file as described in RFC 1070
+.[
+rfc1070
+.]
+to identify first hop ES and IS is required to prime the SNAcP file is
+required, and an implementation of RFC 995
+.[
+rfc995
+.]
+ES-IS and RFC 1142
+.[
+rfc1142
+.]
+IS-IS, are probably also necessary.  The iso-ip and iso-udp probably need to
+implement a control Stream usable by an ES-IS daemon implementing RFC 995, and
+an IS-IS daemon implementing RFC 1142 is probably also required.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/eno_is
+a file containing a list of first-hop IP addresses or host names of
+Intermediate Systems for use by SNAcP and ES-IS and IS-IS.
+.TP
+.B /etc/eno_es
+a file containing a list of first-hop IP addresses or host names of End
+Systems for use by SNAcP and ES-IS and IS-IS.
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B iso-ip
+a pushable module to be pushed over np-ip.
+.TP
+.B iso-udp
+a pushable module to be pushed over np-udp.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/np_ip
+the NP-IP device for accessing IP protocol 80 for IP ISO-grams.
+.TP
+.B /dev/np_udp
+the NP-UDP device for accessing UDP port 147 for UDP ISO-grams.
+.TP
+.B /dev/es_is
+an ES-IS pseudo-device for linking iso-ip and iso-udp Streams for ES-IS node
+advertisements.
+.TP
+.B /dev/is_is
+an IS-IS pseudo-device for linking iso-ip and iso-udp Streams for IS-IS node
+advertisements.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR XOL (7),
+.BR XOT (7),
+.BR ISOT (7),
+.BR ITOT (7),
+.BR ISO-TP4 (7).
+.\"
+.\"
+.SH BUGS
+.PP
+None of this is implemented yet.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+RFC 1070,
+.[
+rfc1070
+.]
+RFC 995,
+.[
+rfc995
+.]
+RFC 1142.
+.[
+rfc1142
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+These modules and drivers are new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

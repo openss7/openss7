@@ -1,0 +1,1114 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH @PACKAGE_UCNAME@ 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.PP
+.BR "Linux Fast-STREAMS" ,
+.BR streams (5),
+consists of a base package that provides basic
+.I SVR 4.2 STREAMS
+capabilities for
+.B Linux
+and a number of separate add-on packages.
+.PP
+OpenSS7
+.I STREAMS
+add-on packages provide additional functionality and protocol support not traditionally found on
+UNIX systems, or which have traditionally fallen into the domain of value-add system software, or,
+in this case, where functionality was optional or differently handled in a number of
+implementations.
+.PP
+The
+.B @PACKAGE_TITLE@
+package is one of the several optional add-on packages that provide support for ISDN and is
+part of the thrust of the
+.IR "OpenSS7 Project" .
+.[
+%T The OpenSS7 Project
+%O http://www.openss7.org
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, libraries, programs, init scripts, and daemons that
+implement the
+.I STREAMS
+ISDN subsystem.
+.PP
+The package builds and installs the following
+.I STREAMS
+modules and drivers (as kernel modules):
+.IP \(en \w'\(en\(em'u
+.B streams_lapd.ko
+driver
+.IR /dev/lapd .
+.PD 0
+.IP \(en
+.B streams_isdn.ko
+driver
+.IR /dev/isdn .
+.PD
+.PP
+The following are
+.I STREAMS
+modules installed by the
+.B @PACKAGE@
+package:
+.TP
+.BR lapd (4)
+The
+.BR lapd (4)
+driver is a multiplexing pseudo-device driver that links
+.BR hdlc (4)
+Streams beneath it.  It uses the Communications Device Interface (CDI),
+.BR cdi (7),
+at its lower multiplex boundary and the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+at its upper multiplex boundary.
+.TP
+.BR isdn (4)
+The
+.BR isdn (4)
+driver is a multiplexing pseudo-device driver that links
+.BR lapd (4)
+or
+.BR iua (4)
+Streams beneath it.  It uses the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+at its lower multiplex boundary and the Call Control Interface (CCI),
+.BR cci (7),
+at its upper multiplex boundary.
+.TP
+.BR capi (4)
+The
+.BR capi (4)
+driver is an implementation of the Common ISDN API (CAPI), Version 2.0.
+.[
+capi20
+.]
+This driver provides
+.I STREAMS
+access
+(both
+.IR STREAMS -based
+CAPI as well as the
+Call Control Interface (CCI),
+.BR cci (7))
+to
+.B Linux
+CAPI devices as well as providing Linux CAPI access to
+.BR isdn (4),
+.BR dass (4)
+and
+.BR dpnss (4)
+devices.
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR dass (4)
+The
+.BR dass (4)
+driver is a DASS
+.[
+dass2
+.]
+version of the
+.BR isdn (4)
+driver.
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR dpnss (4)
+The
+.BR dpnss (4)
+driver is a DPNSS
+.[
+dpnss1
+.]
+version of the
+.BR isdn (4)
+driver.
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR gr303 (4)
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR v52 (4)
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR idlc (4)
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR lapf (4)
+.PP
+The
+.B @PACKAGE@
+package also provides the following service interface definitions:
+.TP
+.BR cci (7)
+The
+Call Control Interface (CCI),
+.BR cci (7),
+is a call control interface for use by ISDN, ISUP, H.323, SIPT and BICC,
+developed by the OpenSS7 Project.  Because
+.BR strisdn (5)
+is the first add-on package in the dependency chain to require the Call
+Control Interface, it also provides the interface.  This interface is also
+used by the
+.BR strss7 (5),
+.BR sigtran (5)
+and
+.BR strvoip (5)
+add-on packages.
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I SVR 4.2 STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package represents ISDN components that were previously part of the
+.BR strss7 (5)
+package, but which were separated into this package at the end of 2006.  Although this manual page
+documents all commercial components in the
+.BR strisdn (5)
+package, not all components have been released publicly.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package contains the following manual pages:
+.HP
+.BR @PACKAGE@ (5)\ \-\ 
+.B @PACKAGE_TITLE@
+package.
+.PD 0
+.HP
+.BR @PACKAGE@_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+VOIP device nodes.
+.PD
+.\"
+.PP
+.HP
+.BR capi (4)\ \-\ 
+Common ISDN API (CAPI) Device Driver.
+.PD 0
+.HP
+.BR capi_ioctl (4)\ \-\ 
+COMMON-ISDN-API (CAPI) - IO Controls.
+.HP
+.BR dass (4)\ \-\ 
+OpenSS7 ISDN Devices.
+.HP
+.BR dl_gr303 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dl_lapd (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dl_lapf (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dl_v52 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dpnss (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR gr303 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR gr303_ioctl (4)\ \-\ 
+common IO controls for GR.303 devices.
+.HP
+.BR idlc (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR ISDN (4)\ \-\ 
+OpenSS7 ISDN Devices.
+.HP
+.BR isdn (4)\ \-\ 
+Integrated Services Digital Network (ISDN) Driver.
+.HP
+.BR isdn_undoc (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR lapd (4)\ \-\ 
+Link Access Procedure\(ewD-Channel (LAPD) Driver.
+.HP
+.BR lapf (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR q921 (4)\ \-\ 
+Link Access Procedure\(ewD-Channel (LAPD) Driver.
+.HP
+.BR q922 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR q931 (4)\ \-\ 
+Integrated Services Digital Network (ISDN) Driver.
+.HP
+.BR v52 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR v5 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR v5_ioctl (4)\ \-\ 
+common IO controls for V5.2 devices.
+.PD
+
+.HP
+.BR capi (7)\ \-\ 
+Linux CAPI 2.0 Interface.
+.PD 0
+.HP
+.BR cci (7)\ \-\ 
+Call Control Interface.
+.HP
+.BR cci_capi (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_dass (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_gr303 (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_idlc (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_isdn (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.PD
+
+.HP
+.BR CC_ADDR_ACK (7)\ \-\ 
+provide call control address information.
+.PD 0
+.HP
+.BR CC_ADDR_REQ (7)\ \-\ 
+request call control address information.
+.HP
+.BR CC_ALERTING_IND (7)\ \-\ 
+called CCS User alerted indication.
+.HP
+.BR CC_ALERTING_REQ (7)\ \-\ 
+called CCS user alerted request.
+.HP
+.BR CC_BIND_ACK (7)\ \-\ 
+bind protocol address acknowledgement.
+.HP
+.BR CC_BIND_REQ (7)\ \-\ 
+bind protocol address request.
+.HP
+.BR CC_BLOCKING_CON (7)\ \-\ 
+circuit management blocking confirmation.
+.HP
+.BR CC_BLOCKING_IND (7)\ \-\ 
+circuit management blocking indication.
+.HP
+.BR CC_BLOCKING_REQ (7)\ \-\ 
+circuit management blocking request.
+.HP
+.BR CC_BLOCKING_RES (7)\ \-\ 
+circuit management blocking response.
+.HP
+.BR CC_CALL_FAILURE_IND (7)\ \-\ 
+call failure indication.
+.HP
+.BR CC_CALL_REATTEMPT_IND (7)\ \-\ 
+call reattempt indication.
+.HP
+.BR CC_CONNECT_IND (7)\ \-\ 
+connection indication.
+.HP
+.BR CC_CONNECT_REQ (7)\ \-\ 
+connection request.
+.HP
+.BR CC_CONT_CHECK_IND (7)\ \-\ 
+continuity check indication.
+.HP
+.BR CC_CONT_CHECK_REQ (7)\ \-\ 
+continuity check request.
+.HP
+.BR CC_CONT_REPORT_IND (7)\ \-\ 
+continuity report indication.
+.HP
+.BR CC_CONT_REPORT_REQ (7)\ \-\ 
+continuity report request.
+.HP
+.BR CC_CONT_TEST_IND (7)\ \-\ 
+continuity test indication.
+.HP
+.BR CC_CONT_TEST_REQ (7)\ \-\ 
+continuity test request.
+.HP
+.BR CC_DATALINK_FAILURE_IND (7)\ \-\ 
+datalink failure indication.
+.HP
+.BR CC_DISCONNECT_IND (7)\ \-\ 
+disconnect indication.
+.HP
+.BR CC_DISCONNECT_REQ (7)\ \-\ 
+disconnect request.
+.HP
+.BR CC_ERROR_ACK (7)\ \-\ 
+error acknowledgement.
+.HP
+.BR CC_ERROR_IND (7)\ \-\ 
+error indication.
+.HP
+.BR CC_FACILITY_IND (7)\ \-\ 
+facility indication.
+.HP
+.BR CC_FACILITY_REQ (7)\ \-\ 
+facility request.
+.HP
+.BR CC_FORWXFER_IND (7)\ \-\ 
+forward transfer indication.
+.HP
+.BR CC_FORWXFER_REQ (7)\ \-\ 
+forward transfer request.
+.HP
+.BR CC_HOLD_CON (7)\ \-\ 
+hold confirm.
+.HP
+.BR CC_HOLD_IND (7)\ \-\ 
+hold indication.
+.HP
+.BR CC_HOLD_REQ (7)\ \-\ 
+hold request.
+.HP
+.BR CC_HOLD_RES (7)\ \-\ 
+hold response.
+.HP
+.BR CC_IBI_IND (7)\ \-\ 
+in-band information indication.
+.HP
+.BR CC_IBI_REQ (7)\ \-\ 
+in-band information request.
+.HP
+.BR CC_INFO_ACK (7)\ \-\ 
+information acknowledgement.
+.HP
+.BR CC_INFO_REQ (7)\ \-\ 
+information request.
+.HP
+.BR CC_INFORMATION_IND (7)\ \-\ 
+information indication.
+.HP
+.BR CC_INFORMATION_REQ (7)\ \-\ 
+information request.
+.HP
+.BR CC_INFO_TIMEOUT_IND (7)\ \-\ 
+information timeout indication.
+.HP
+.BR CC_MAINT_IND (7)\ \-\ 
+maintenance indication.
+.HP
+.BR CC_MORE_INFO_IND (7)\ \-\ 
+more information indication.
+.HP
+.BR CC_MORE_INFO_REQ (7)\ \-\ 
+more information request.
+.HP
+.BR CC_NOTIFY_IND (7)\ \-\ 
+call control notification indication.
+.HP
+.BR CC_NOTIFY_REQ (7)\ \-\ 
+call control notification request.
+.HP
+.BR CC_OK_ACK (7)\ \-\ 
+successful receipt acknowledgement.
+.HP
+.BR CC_OPTMGMT_ACK (7)\ \-\ 
+options management acknowledgement.
+.HP
+.BR CC_OPTMGMT_REQ (7)\ \-\ 
+options management request.
+.HP
+.BR CC_PROCEEDING_IND (7)\ \-\ 
+call proceeding indication.
+.HP
+.BR CC_PROCEEDING_REQ (7)\ \-\ 
+call proceeding request.
+.HP
+.BR CC_PROGRESS_IND (7)\ \-\ 
+call progress indication.
+.HP
+.BR CC_QUERY_CON (7)\ \-\ 
+circuit query confirmation.
+.HP
+.BR CC_PROGRESS_REQ (7)\ \-\ 
+call progress request.
+.HP
+.BR CC_QUERY_IND (7)\ \-\ 
+circuit query indication.
+.HP
+.BR CC_QUERY_REQ (7)\ \-\ 
+circuit query request.
+.HP
+.BR CC_QUERY_RES (7)\ \-\ 
+circuit query response.
+.HP
+.BR CC_REGISTER_IND (7)\ \-\ 
+registration indication.
+.HP
+.BR CC_REGISTER_REQ (7)\ \-\ 
+registration request.
+.HP
+.BR CC_REJECT_IND (7)\ \-\ 
+call reject indication.
+.HP
+.BR CC_REJECT_REQ (7)\ \-\ 
+call reject request.
+.HP
+.BR CC_RELEASE_CON (7)\ \-\ 
+call release confirmation.
+.HP
+.BR CC_RELEASE_IND (7)\ \-\ 
+call release indication.
+.HP
+.BR CC_RELEASE_REQ (7)\ \-\ 
+call release request.
+.HP
+.BR CC_RELEASE_RES (7)\ \-\ 
+call release response.
+.HP
+.BR CC_RESET_CON (7)\ \-\ 
+circuit reset confirmation.
+.HP
+.BR CC_RESET_IND (7)\ \-\ 
+circuit reset indication.
+.HP
+.BR CC_RESET_REQ (7)\ \-\ 
+circuit reset request.
+.HP
+.BR CC_RESET_RES (7)\ \-\ 
+circuit reset response.
+.HP
+.BR CC_RESTART_CON (7)\ \-\ 
+interface restart confirmation.
+.HP
+.BR CC_RESTART_REQ (7)\ \-\ 
+interface restart request.
+.HP
+.BR CC_RESUME_CON (7)\ \-\ 
+call resume confirmation.
+.HP
+.BR CC_RESUME_IND (7)\ \-\ 
+call resume indication.
+.HP
+.BR CC_RESUME_REJECT_IND (7)\ \-\ 
+call resume reject indication.
+.HP
+.BR CC_RESUME_REJECT_REQ (7)\ \-\ 
+call resume reject request..
+.HP
+.BR CC_RESUME_REQ (7)\ \-\ 
+call resume request.
+.HP
+.BR CC_RESUME_RES (7)\ \-\ 
+call resume response.
+.HP
+.BR CC_RETRIEVE_CON (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_RETRIEVE_IND (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_RETRIEVE_REQ (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_RETRIEVE_RES (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_SETUP_COMPLETE_IND (7)\ \-\ 
+call setup complete indication.
+.HP
+.BR CC_SETUP_COMPLETE_REQ (7)\ \-\ 
+call setup complete request.
+.HP
+.BR CC_SETUP_CON (7)\ \-\ 
+call setup confirmation.
+.HP
+.BR CC_SETUP_IND (7)\ \-\ 
+call setup indication.
+.HP
+.BR CC_SETUP_REQ (7)\ \-\ 
+call setup request.
+.HP
+.BR CC_SETUP_RES (7)\ \-\ 
+call setup response.
+.HP
+.BR CC_START_RESET_IND (7)\ \-\ 
+call control start reset indication.
+.HP
+.BR CC_STATUS_IND (7)\ \-\ 
+call control status indication.
+.HP
+.BR CC_STOP_IND (7)\ \-\ 
+call control stop indication.
+.HP
+.BR CC_STOP_REQ (7)\ \-\ 
+call control stop request.
+.HP
+.BR CC_SUSPEND_CON (7)\ \-\ 
+call suspend confirmation.
+.HP
+.BR CC_SUSPEND_IND (7)\ \-\ 
+call suspend indication.
+.HP
+.BR CC_SUSPEND_REJECT_IND (7)\ \-\ 
+call suspend reject indication.
+.HP
+.BR CC_SUSPEND_REJECT_REQ (7)\ \-\ 
+call suspend reject request.
+.HP
+.BR CC_SUSPEND_REQ (7)\ \-\ 
+call suspend request.
+.HP
+.BR CC_SUSPEND_RES (7)\ \-\ 
+call suspend response.
+.HP
+.BR CC_UNBIND_REQ (7)\ \-\ 
+unbind protocol address request.
+.HP
+.BR CC_UNBLOCKING_CON (7)\ \-\ 
+circuit unblocking confirmation.
+.HP
+.BR CC_UNBLOCKING_IND (7)\ \-\ 
+circuit unblocking indication.
+.HP
+.BR CC_UNBLOCKING_REQ (7)\ \-\ 
+circuit unblocking request.
+.HP
+.BR CC_UNBLOCKING_RES (7)\ \-\ 
+circuit unblocking response.
+.PD
+
+.HP
+.BR dlpi_dass (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.PD 0
+.HP
+.BR dlpi_gr303 (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR dlpi_lapd (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR dlpi_lapf (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR isdn_undoc (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR isdni (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR npi_q933 (7)\ \-\ 
+.PD
+
+.HP
+.BR isdn (8)\ \-\ 
+undocumented commands.
+.PD 0
+.HP
+.BR isdn_undoc (8)\ \-\ 
+undocumented commands.
+.HP
+.BR isdnconfd (8)\ \-\ 
+undocumented commands.
+.HP
+.BR strisdn_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+ISDN device nodes.
+.HP
+.BR test-isdn (8)\ \-\ 
+test suite executable for
+.BR ch (4)
+.I STREAMS
+module.
+.PD
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+modules:
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+devices:
+.\"
+.\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR "Linux Fast-STREAMS" ,
+.BR streams (5),
+development environment and run-time necessary for all package components.
+.TP
+.BR strcompat (5)
+The
+.B @PACKAGE@
+package requires the avilability of the
+.BR strcompat (5)
+development environment and run-time necessary for most of the package
+components.  Most
+.B @PACKAGE@
+components use the helper functions from the OpenSS7 Compatibility Module or
+the Mentat Portable STREAMS Compatibility Module.
+.TP
+.BR strxns (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strxns (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR cdi (7),
+.BR dlpi (7),
+or
+.BR npi (7)
+definitions available in this package.
+.TP
+.BR strxnet (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strxnet (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR tpi (7)
+definitions available in the package.
+.TP
+.BR strnsl (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strnsl (5)
+development environment and run-time necessary for some package components.
+Some package components provide
+.BR netconfig (5)
+definitions.
+.TP
+.BR strsock (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strsock (5)
+development environment and run-time necessary for some package components.
+Some package components provide
+.BR sock2path (5)
+definitions.
+.TP
+.BR strinet (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strinet (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR tcp (4),
+or
+.BR udp (4)
+protocol drivers from the
+.BR strinet (5)
+package.
+.TP
+.BR strsctp (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strsctp (5)
+deveopment environment and run-time necessary for all SIGTRAN components.
+(All SIGTRAN components use SCTP.)
+.[
+rfc2960
+.]
+.TP
+.BR striso (5)
+The
+.B @PACKAGE@
+package requires the avialability of the
+.BR striso (5)
+development environment and run-time necessary for some package components.
+Also, the
+.BR striso (5)
+package provides components upon which the
+.BR strisdn (5)
+package depend.
+.PP
+The easiest way to satisfy all of the package dependencies for the
+.B @PACKAGE_TITLE@
+package is to obtain it as part of the
+.IR "OpenSS7 Master Package" ,
+.BR openss7 (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous releases of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please remember that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architecturs is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" ,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangel your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You could possibly lose all the data on your
+system.  Because this software stands a chance of crashing your kernel, the
+resulting unstable system could possibly destroy computer hardware or
+peripherals making them unusable.  You might void the warranty on any system
+on which you run this fotware.
+.BR "YOU HAVE BEEN WARNED" .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, but is considered alpha
+grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ISDN (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Application programming interfaces for ISDN and other modules
+and drivers have not been standardized by a formal standards body.  For the
+most part, ISDN implementations have used proprietary interfaces for accessing
+the various protocol layers of the ISDN stack.
+.PP
+The
+.I OpenSS7 Project
+also uses project-specific (but open) interfaces at a number of layers where a standard
+is lacking.  Nevertheless, standard service interfaces are used for a number of
+layers in the ISDN components and even in the upper level ISDN components.
+These standardized service interfaces are based on the
+Communications Device Interface (CDI),
+.BR cdi (7),
+the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+and the Call Control Interface (CCI),
+.BR cci (7).
+.PP
+.I OpenSS7 Project
+ISDN components use the same interfaces as are provided for use by SS7/ISDN
+components at the same protocol level.  This makes
+.I OpenSS7 Project
+ISDN components automatically compatible with OpenSS7 SS7
+and ISDN components.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+In general, there are few conformance specifications to which to test ISDN
+components.  Nevertheless, a few exist as follows:
+.IP \(bu \w'\(bu\(em'u
+.IP \(bu
+.PP
+For additional description of conformance and validation test suites and the
+standards to which the tests are performed, see the manual page for the
+appropriate protocol driver or module.
+.\"
+.\"
+.SH HISTORY
+.PP
+The contents of the
+.B @PACKAGE@
+package were formerly part of the
+.BR strss7 (5)
+package.  As of
+.BR "@PACKAGE@-@VERSION@" ,
+the ISDN components were moved out of the
+.BR strss7 (5)
+package into this
+.BR strisdn (5)
+package.  This package now contains all of the ISDN components released by
+.IR "The OpenSS7 Project" ,
+along with associated documentation.
+.PP
+In the initial release of the
+.BR strisdn (5)
+package, only ISDN modules and drivers that have been fully revalidated on
+.B Linux Fast-STREAMS
+were initially released.  The remaining components present on the CVS archive and formerly part of the commercial
+.BR strss7 (5)
+releases, will be publicly released in releases subsequent to
+.B @PACKAGE@-@VERSION@
+as they are revalidated.
+.\"
+.\"
+.SH STATUS
+.PP
+The
+.B @PACKAGE_TITLE@
+package is
+.I production
+grade on
+.B Linux Fast-STREAMS
+for the modules and drivers included in the public release.  Not all OpenSS7
+project ISDN modules and drivers have been included in the release
+distribution.  The OpenSS7 Project is in the process of revalidating all
+package modules and drivers for use on
+.BR "Linux Fast-STREAMS" .
+As a result, additional release components will be strapped into the package
+once full validation test suites are developed and run against each
+component.
+.PP
+In particular, the following modules and drivers are currently missing from
+the public release:
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

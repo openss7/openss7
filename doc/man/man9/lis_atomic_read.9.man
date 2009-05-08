@@ -1,0 +1,1 @@
+.so man9/ATOMIC_INT_READ.9.man

@@ -1,0 +1,39 @@
+
+
+GMI-AttributeModule {joint-iso-ccitt ms(9) smi(3) part5(5) asn1Module(2) gmiAttributeModule(0) }
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+IMPORTS
+GroupObjects, ManagementExtension
+FROM Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2)
+1}
+RelativeDistinguishedName
+FROM InformationFramework {joint-iso-ccitt ds(5) modules(1)
+informationFramework(1)}
+;-- End of IMPORTS
+ActionInfo ::= SET OF ManagementExtension
+ActionReply ::= SET OF ManagementExtension
+ApplicationProcessId ::= GraphicString
+ApplicationProcessTitle ::= CHOICE {
+directory [0] SEQUENCE OF RelativeDistinguishedName,
+oid [1] OBJECT IDENTIFIER,
+notKnown NULL }
+CommunicationsEntityId ::= GraphicString
+CommunicationsInformation ::= SEQUENCE {
+informationType InformationType,
+informationData InformationData OPTIONAL }
+ConnectionId ::= GraphicString
+GenericCounter ::= INTEGER
+Generic64BitCounter ::= INTEGER (0..18446744073709551615)
+InformationType ::= OBJECT IDENTIFIER
+InformationData ::= SET OF ManagementExtension
+ProtocolMachineId ::= GraphicString
+Sap1Address ::= INTEGER
+Sap2Address ::= SET OF OCTET STRING
+SapId ::= GraphicString
+SubsystemId ::= GraphicString
+Timer ::= SEQUENCE {
+exponent [1] INTEGER (-62..63),
+mantissa [2] INTEGER (0..65535) }
+END
+
+

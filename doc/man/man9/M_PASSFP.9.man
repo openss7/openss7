@@ -1,0 +1,368 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M_PASSFP 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_PASSFP
+\- \fISTREAMS\fP pass file pointer message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_PASSFP
+message block is a
+.BR datab (9)
+structure and associated data buffer that contains structured data.
+.PP
+An
+.B M_PASSFP
+message is a normal priority message that consists of a single
+.B M_PASSFP
+message block.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B M_PASSFP
+message is used internally by
+.I STREAMS
+to pass a file pointer from the
+Stream head
+at one end of a
+.IR STREAMS -based
+.BR pipe (4)
+to the
+Stream head
+at the other end of the same
+.IR STREAMS -based
+.BR pipe (4).
+.PP
+The message is generated as a result of an
+.BR I_SENDFD (7)
+command to an
+.BR ioctl (2s)
+system call issued by a user level process to the sending
+Stream head.
+.I STREAMS
+places the
+.B M_PASSFP
+message directly on the destination
+Stream head's
+read queue to be retreived by an
+.BR I_RECVFD (7)
+command to the
+.BR ioctl (2s)
+system call.
+The message is placed without passing it through the
+Stream
+(i.e., it is not seen by any drivers or modules in the
+Stream).
+This message should never be present on any queue except the read queue of a
+Stream head.
+Consequently, drivers and modules do not need to recognize this message, and it can be ignored by
+driver and module developers.
+.PP
+There are several reasons why the
+.B M_PASSFP
+message is placed directly on the opposite
+Stream head:
+.IP (1) \w'(0)\(em'u
+The message contains a reference to a file pointer (file table entry) within the kernel and must not
+be freed without also releasing this reference.
+.IP (2)
+The message must not be altered by modules in the
+Stream.
+.IP (3)
+Although the message contents are structured, the contents rely on implementation specifics of the
+Stream head.
+Therefore, the message is of no use to a portable driver or module.
+.PP
+Because the
+.B M_PASSFP
+message is placed directly on the opposite
+Stream head,
+although it is message of normal priority, it is treated as a high priority message.
+.\"
+.B M_PASSFP
+messages can be generated directly by a user level process with the
+.BR I_SENDFD (7)
+.BR ioctl (2s).
+.B M_PASSFP
+messages can be consumed directly by a user level process with the
+.BR I_RECVFD (7)
+.BR ioctl (2s).
+.B M_PASSFP
+messages should not be generated by drivers or modules.
+.B M_PASSFP
+messages arriving at a driver or module can be discarded (ignored and freed).
+.\"
+.\"
+.SH USAGE
+.PP
+There is one standard module (besides the
+Stream head)
+that needs to generate an pass a
+.B M_PASSFP
+message.  That module is
+.BR connld (4).
+The
+.BR connld (4)
+module must pass a file pointer to the
+Stream head
+opposite to the one that is is pushed over, on each open of the
+Stream.
+The
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+implementation of the
+.B M_PASSFP
+message is detailed below, under
+.RI \(lq IMPLEMENTATION \(rg
+as documentation for this module and any other module that needs to perform a similar task.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.PP
+Under
+.BR "@PACKAGE_TITLE@" ,
+.[
+lfs
+.]
+the
+.B M_PASSFP
+message contains (indirectly)
+a file pointer (that is, a pointer to a
+.B file
+structure as defined in
+.RB < linux/fs.h >).
+The
+Stream head
+allocates the message block using the
+.BR esballoc (9)
+utility instead of
+.BR allocb (9).
+The free routine and argument to the free routine are special.  The free routine argument is the
+file pointer, and the free routine simply releases the reference to the file pointer.
+Rather than pointing into the data buffer,
+.I b_rptr
+points to the free routing argument contained in the
+data block,
+.BR datab (9),
+structure, and
+.I b_wptr
+points one byte past the argument.
+.PP
+In this way,
+.B M_PASSFP
+messages sitting on a
+Stream head
+read queue can be flushed as normal, using the
+.BR flushq (9)
+utility, and the reference to each file pointer will be released.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datab (9),
+.BR msgb (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_PASSFP
+.I STREAMS
+message is compatible with
+.IR "SVR 4.2 MP STREAMS" ,
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Contents of the
+.B M_PASSFP
+message and implementation of the
+.BR sth (4)
+and
+.BR connld (4)
+modules are, by nature, implementation specific.  Neither can be implemented in a fully portable
+manner.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not expect the
+.B M_PASSFP
+message to appear on their queues, and will never generate an
+.B M_PASSFP
+message.
+.IP \(em
+.B M_PASSFP
+has a different constant value on
+older versions of
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and older versions of
+.IR LiS .
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.[
+lis
+.]
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP STREAMS" .
+.[
+svr42spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_PASSFP
+message first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

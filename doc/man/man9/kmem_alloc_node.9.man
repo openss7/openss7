@@ -1,0 +1,1 @@
+.so man9/kmem_alloc.9.man

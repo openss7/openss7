@@ -1,0 +1,1551 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-TCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Q751
+	FROM OPENSS7-SMI
+    AdministrativeState, AvailabilityStatus, OperationalState, 
+    ProceduralStatus, SimpleNameType, UsageState, 
+    attributeValueChangeNotificationPackage, communicationsAlarmPackage, 
+    createDeleteNotificationsPackage, tmnObjectInstance, 
+    tmnPerceivedSeverity, tmnProbableCause
+        FROM OPENSS7-SMI-MIB
+    sccpNetworkEntityId
+	FROM OPENSS7-SCCP-MIB
+    mtpMsId, MtpCongestionLevel, MtpLinkFailureReason, MtpUserPartStatus, 
+    NetworkPointCode
+	FROM OPENSS7-MTP-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
+        FROM SNMPv2-SMI
+    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
+    TimeInterval, TruthValue
+        FROM SNMPv2-TC;
+
+tcapMIB MODULE-IDENTITY
+    LAST-UPDATED "200810092250Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "This is a MIB providing management information is 
+         accordance with ITU-T Rec. Q.751.1, ITU-T Rec. 
+         Q.2751.1, ANSI T1.116.1."
+    REVISION	"200810092250Z"
+    DESCRIPTION
+	"First release of this module."
+    ::= { openss7Q751 4 }
+
+PresentationRequirements ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a set of presentation requirements."
+    REFERENCE
+	"ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION ASN module, 
+	     Presentation-requirements."
+    SYNTAX BITS {
+	contextManagement(0),
+	restoration(1)
+    }
+
+PresentationSelectorValue ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of a presentation layer selector."
+    REFERENCE
+	"ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION ASN module, 
+	     Presentation-selector."
+    SYNTAX OCTET STRING
+
+SessFUs ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of session layer functional units."
+    REFERENCE
+	"ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AtributeModule: 
+	     SessFUs."
+    SYNTAX BITS {
+	halfDuplex(0),
+	duplex(1),
+	expeditedData(2),
+	minorSynchronize(3),
+	majorSynchronize(4),
+	resynchronize(5),
+	activityManagement(6),
+	negotiatedRelease(7),
+	capabilityData(8),
+	exceptions(9),
+	typedData(10)
+    }
+
+SessOptSupport ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of session layer options."
+    REFERENCE
+	"ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AttributeModule: 
+	     SessOptSupport."
+    SYNTAX BITS {
+	segmenting(0)
+    }
+
+SessionSelectorValue ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of a session layer selector."
+    REFERENCE
+	"ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AttributeModule: 
+	     SessionSelectorValue."
+    SYNTAX OCTET STRING (SIZE(0..16))
+
+SessionProtVer ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of session layer protocol versions."
+    REFERENCE
+	"ITU-T Rec. X.287 | ISO/IEC 10165-8, UL-AttributeModule: 
+	     SessionProtVer."
+    SYNTAX BITS {
+	version1(0),
+	version2(1)
+    }
+
+AbstractSyntax ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides specification of a presentation layer abstract 
+	 syntax."
+    REFERENCE
+	"ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION: 
+	     Abstract-syntax."
+    SYNTAX OBJECT IDENTIFIER
+
+TransferSyntax ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides specification of a presentation layer transfer 
+	 syntax."
+    REFERENCE
+	"ITU-T Rec. X.226 | ISO/IEC 8823, 8823-PRESENTATION: 
+	     Tranfer-syntax."
+    SYNTAX OBJECT IDENTIFIER
+    
+ApplicationContextName ::= TEXTUAL-CONVENTION
+    DESCRIPTION
+	"Provides a specification of an application context name with 
+	 the syntax of an OBJECT IDENTIFIER.   Fields using this
+
+tcapNotifications OBJECT IDENTIFIER
+    ::= { tcapMIB 0 }
+
+tcapSpecificExtensions OBJECT IDENTIFIER
+    ::= { tcapMIB 1 }
+
+tcapDefaults OBJECT IDENTIFIER
+    ::= { tcapMIB 2 }
+
+tcapObjectClass OBJECT IDENTIFIER
+    ::= { tcapMIB 3 }
+
+-- ====================================================================
+
+aCSE OBJECT IDENTIFIER
+    ::= { tcapObjectClass 1 }
+
+    -- DERIVED FROM aso
+	-- communiationsEntityId
+	-- asoTitle
+	-- asoQualifier
+	-- operationalState
+	-- aso-aso NAME BINDING
+	-- aso-asoEntity NAME BINDING
+    -- acseFUinitiator
+    -- acseEditionsSupported
+    -- acseFUresponder
+
+acseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AcseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, aCSE MOC."
+    ::= { aCSE 1 }
+
+acseEntry OBJECT-TYPE
+    SYNTAX AcseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, aCSE MO."
+    INDEX {
+	systemId,
+	subsystemId,
+	applicationProcessId,
+	asoEntityId,
+	asoId
+    }
+    ::= { acseTable 1 }
+
+AcseEntry ::=
+    SEQUENCE {
+	acseFUinitiator				Opaque,
+	acseEditionsSupported			Opaque,
+	acseFUresponder				Opaque,
+	acseRowStatus				RowStatus
+    }
+
+-- ====================================================================
+
+acseAssociation OBJECT IDENTIFIER
+    ::= { tcapObjectClass 2 }
+
+    -- DERIVED FROM asoInvocation
+	-- connectionId
+	-- invocationOfPointer
+	-- asoInvocation-asoInvocation NAME BINDING
+	-- asoInvocation-apInvocation NAME BINDING
+    -- callingAEtitle
+    -- acseFUinUse
+    -- applContextInUse
+    -- parentASOinvoc
+    -- calledAEtitlePackage PACKAGE
+	-- calledAEtitle
+
+acseAssociationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AcseAssociationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { acseAssociation 1 }
+
+acseAssociationEntry OBJECT-TYPE
+    SYNTAX AcseAssociationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    INDEX {
+	systemId,
+	applicationSubsystemId,
+	apInvocationId,
+	asoInvocationId
+    }
+    ::= { acseAssociationTable 1 }
+
+AcseAssociationEntry ::=
+    SEQUENCE {
+	acseAssociationCallingAEtitle		OCTET STRING,
+	acseAssociationFUinUse			BITS,
+	acseAssociationApplContextInUse		OBJECT IDENTIFIER,
+	acseAssociationParentAsoinvoc		RowPointer,
+	acseAssociationCalledAEtitle		OCTET STRING,
+	acseAssociationRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+apInvocation OBJECT IDENTIFIER
+    ::= { tcapObjectClass 3 }
+
+    -- apInvocationId
+    -- invocationOfPointer
+    -- apInvocation-applicationSubsystem NAME BINDING
+
+apInvocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ApInvocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This subclass of Rec. X.721 | ISO/IEC 10165-2 : 1992 : top 
+	 holds reference information about an Application Process 
+	 Invocation. It specializes by adding the following attributes:
+
+	 - apInvocationId;
+
+	 - invocationOfPointer.
+
+	 The apInvocationId attribute serves as the naming attribute for 
+	 instances of this class. The invocationOfPointer attribute 
+	 identifies the specific Application Process (using the 
+	 distinguished name, DN, of an instance of the Rec. X.723 | 
+	 ISO/IEC 10165-5 : 1994 : applicationProcess managed object 
+	 class) of which the instance of this class is an invocation."
+    REFERENCE
+	""
+    ::= { apInvocation 1 }
+
+apInvocationEntry OBJECT-TYPE
+    SYNTAX ApInvocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	applicationSubsystemId,
+	apInvocationId
+    }
+    ::= { apInvocationTable 1 }
+
+ApInvocationEntry ::=
+    SEQUENCE {
+	apInvocationId				SimpleNameType,
+	apInvocationOfPointer			RowPointer,
+	apInvocationRowStatus			RowStatus
+    }
+
+-- ====================================================================
+
+applicationEntity OBJECT IDENTIFIER
+    ::= { tcapObjectClass 4 }
+
+    -- DERIVED FROM asoEntity
+	-- DERIVED FROM communicationsEntity
+	    -- communicationsEntityId
+	    -- localSapNames
+	    -- operationalState
+	    -- communicationsEntity-subsystem NAME BINDING
+	-- DERIVED FROM aso
+	    -- communiationsEntityId
+	    -- asoTitle
+	    -- asoQualifier
+	    -- operationalState
+	    -- aso-aso NAME BINDING
+	    -- aso-asoEntity NAME BINDING
+	-- applContextNameSupport
+	-- asoEntity-applicationProcess NAME BINDING
+
+-- ====================================================================
+
+applicationEntityInvocation OBJECT IDENTIFIER
+    ::= { tcapObjectClass 5 }
+
+    -- DERIVED FROM singlePeerConnection
+	-- connectionId
+	-- underlyingConnectionNames
+	-- singlePeerConnectionP2 PACKAGE
+	    -- supportedConnectionNames
+	-- singlePeerConnection-coProtocolMachine NAME BINDING
+    -- DERIVED FROM asoInvocation
+	-- connectionId
+	-- invocationOfPointer
+	-- asoInvocation-asoInvocation NAME BINDING
+	-- asoInvocation-apInvocation NAME BINDING
+
+applicationEntityInvocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ApplicationEntityInvocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This subclass of Rec. X.723 | ISO/IEC 10165-5 : 1994, 
+	 singlePeerConnection, and asoInvocation represents an 
+	 invocation of an application entity. It adds no additional 
+	 attributes.
+
+	 The inherited Rec. X.723 | ISO/IEC 10165-5 : 1994, connectionId 
+	 attribute, serves as the naming attribute for instances of this 
+	 class, and represents the application entity (AE) invocation 
+	 id. The inherited attribute Rec. X.723 | ISO/IEC 10165-5 : 
+	 1994, underlyingConnectionNames, identifies the supporting 
+	 services or connections, which for instances of this class is a 
+	 presentation address (the distinguished name of an object 
+	 instance representing a presentation invocation). The inherited 
+	 invocationOfPointer attribute identifies the application entity 
+	 of which an instance of this class is an invocation."
+    REFERENCE
+	"ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, 
+	     applicationEntityInvocation MOC.
+	 ITU-T Rec. X.723 (1994) | ISO/IEC 10165-5 : 1994, 
+	     singlePeerConnection MOC."
+    ::= { applicationEntityInvocation 1 }
+
+applicationEntityInvocationEntry OBJECT-TYPE
+    SYNTAX ApplicationEntityInvocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, 
+	     applicationEntityInvocation MO.
+	 ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+	     singlePeerConnection MO."
+    INDEX {
+	systemId,
+	applicationSubsystemId,
+	apInvocationId,
+    }
+    ::= { applicationEntityInvocationTable 1 }
+
+ApplicationEntityInvocationEntry ::=
+    SEQUENCE {
+	applicationEntityInvocationUnderlyingConnectionNames		Opaque,
+	applicationEntityInvocationSupportedConnectionNames		Opaque,
+	applicationEntityInvocationInvocationOfPointer			RowPointer,
+	applicationEntityInvocationRowStatus				RowStatus
+    }
+
+-- ====================================================================
+
+applicationSubsystem OBJECT IDENTIFIER
+    ::= { tcapObjectClass 6 }
+
+    -- DERIVED FROM subsystem
+	-- subsystemId
+	-- subsystem-system NAME BINDING
+
+applicationSubsystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ApplicationSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { applicationSubsystem 1 }
+
+applicationSubsystemEntry OBJECT-TYPE
+    SYNTAX ApplicationSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	subsystemId
+    }
+    ::= { applicationSubsystemTable 1 }
+
+ApplicationSubsystemEntry ::=
+    SEQUENCE {
+    }
+
+-- ====================================================================
+
+applicationProcess OBJECT IDENTIFIER
+    ::= { tcapObjectClass 7 }
+
+    -- applicationProcessId
+    -- applicationProcessTitle
+    -- supportEntityNames
+    -- operationalState
+    -- applicationProcess-system NAME BINDING (applicationProcessId)
+    -- ap-applicationSubsystem NAME BINDING (applicationProcessId)
+
+applicationProcessTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ApplicationProcessEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { applicationProcess 1 }
+
+applicationProcessEntry OBJECT-TYPE
+    SYNTAX ApplicationProcessEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId, -- applicationProcess-system NAME BINDING (applicationProcessId)
+	subsystemId, -- subsystem-system NAME BINDING
+	applicationProcessId -- ap-applicationSubsystem NAME BINDING (applicationProcessId)
+    }
+    ::= { applicationProcessTable 1 }
+
+ApplicationProcessEntry ::=
+    SEQUENCE {
+	applicationProcessId			SimpleNameType,
+	applicationProcessTitle			OBJECT IDENTIFIER,
+	applicationProcessSupportEntityNames	Unsigned32,
+	applicationProcessOperationalState	OperationalState,
+	applicationProcessRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+aso OBJECT IDENTIFIER
+    ::= { tcapObjectClass 8 }
+
+    -- communicationsEntityId
+    -- asoTitle
+    -- asoQualifier
+    -- operationalState
+    -- aso-aso NAME BINDING (communicationsEntityId)
+    -- aso-asoEntity NAME BINDING (communicationsEntityId)
+
+asoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AsoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This subclass of Rec. X.721 | ISO/IEC 10165-2 : 1992, top, 
+	 holds reference information about an ASO, which is a collection 
+	 of two or more ASOs (including specialized ASOs, e.g., ASEs) 
+	 together with a Control Function that moderates the 
+	 interactions of the component ASEs and ASOs with the service 
+	 provided and the supporting service. An ASO contains one or 
+	 more ASEs/ASOs that provide for data transfer phase of 
+	 communication. An ASO may also contain an ASE that provides for 
+	 the establishment phase of communication. An ASO association 
+	 can only be established to an ASO that provides for both the 
+	 establishment and data transfer phases.
+
+	 This managed object class is non-instantiable. Subclasses of 
+	 this class provide information about specific ASOs including 
+	 the information about the Controlling Function. The information 
+	 about the Control Function may only be specified via the 
+	 behaviour definitions of subclasses of this class, but can be 
+	 made visible via attributes of the subclass if needed.
+
+	 It specializes by adding the following attributes:
+
+	 - Rec. X.723 | ISO/IEC 10165-5 : 1994, communicationsEntityId;
+
+	 - asoTitle;
+
+	 - asoQualifier;
+
+	 - Rec. X.721 | ISO/IEC 10165-2 : 1992, operationalState.
+
+	 The attribute Rec. X.723 | ISO/IEC 10165-5 : 1994, 
+	 communicationsEntityId, serves as the naming attribute for 
+	 instances of this class. The ASO Name is formed by 
+	 concatenating the asoTitle and the asoQualifier. The 
+	 operationalState is used to indicate whether instances of this 
+	 class are enabled or disabled, the syntax and semantics of 
+	 which are defined in Rec. X.721 | ISO/IEC 10165-2 and Rec.  
+	 X.731 | ISO/IEC 10164-2."
+    REFERENCE
+	""
+    ::= { aso 1 }
+
+asoEntry OBJECT-TYPE
+    SYNTAX AsoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	subsystemId,
+	applicationProcessId,
+	asoEntityId,
+	asoId
+    }
+    ::= { asoTable 1 }
+
+AsoEntry ::=
+    SEQUENCE {
+	asoId					SimpleNameType,
+	asoTitle				OBJECT IDENTIFIER,
+	asoQualifier				OBJECT IDENTIFIER,
+	asoOperationalState			OperationalState,
+	asoRowStatus				RowStatus
+    }
+
+-- ====================================================================
+
+asoEntity OBJECT IDENTIFIER
+    ::= { tcapObjectClass 9 }
+
+    -- DERIVED FROM communicationsEntity
+	-- communicationsEntityId
+	-- localSapNames
+	-- operationalState
+	-- communicationsEntity-subsystem NAME BINDING
+    -- DERIVED FROM aso
+	-- communiationsEntityId
+	-- asoTitle
+	-- asoQualifier
+	-- operationalState
+	-- aso-aso NAME BINDING
+	-- aso-asoEntity NAME BINDING
+    -- applContextNameSupport
+    -- asoEntity-applicationProcess NAME BINDING
+
+asoEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AsoEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { asoEntity 1 }
+
+asoEntityEntry OBJECT-TYPE
+    SYNTAX AsoEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	subsystemId,
+	applicationProcessId,
+	asoEntityId
+    }
+    ::= { asoEntityTable 1 }
+
+AsoEntityEntry ::=
+    SEQUENCE {
+	asoEntityId				SimpleNameType,
+	asoEntityLocalSapNames			Opaque,
+	asoEntityOperationalState		OperationalState,
+	asoEntityTitle				OBJECT IDENTIFIER,
+	asoEntityQualifier			OBJECT IDENTIFIER,
+	asoEntityApplicationContextNameSupport	Opaque,
+	asoEntityRowStatus			RowStatus
+    }
+
+-- ====================================================================
+
+asoInvocation OBJECT IDENTIFIER
+    ::= { tcapObjectClass 10 }
+
+    -- connectionId
+    -- invocationOfPointer
+    -- asoInvocation-asoInvocation NAME BINDING
+    -- asoInvocation-apInvocation NAME BINDING
+
+asoInvocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AsoInvocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { asoInvocation 1 }
+
+asoInvocationEntry OBJECT-TYPE
+    SYNTAX AsoInvocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	applicationSubsystemId,
+	apInvocationId,
+	asoInvocationId,
+    }
+    ::= { asoInvocationTable 1 }
+
+AsoInvocationEntry ::=
+    SEQUENCE {
+	asoInvocationId				SimpleNameType,
+	asoInvocationOfPointer			RowPointer,
+	asoInvocationRowStatus			RowStatus
+    }
+
+-- ====================================================================
+
+monoULConnection OBJECT IDENTIFIER
+    ::= { tcapObjectClass 11 }
+
+    -- DERIVED FROM applicationEntityInvocation
+	-- DERIVED FROM singlePeerConnection
+	    -- connectionId
+	    -- underlyingConnectionNames
+	    -- singlePeerConnectionP2 PACKAGE
+		-- supportedConnectionNames
+	    -- singlePeerConnection-coProtocolMachine NAME BINDING
+	-- DERIVED FROM asoInvocation
+	    -- connectionId
+	    -- invocationOfPointer
+	    -- asoInvocation-asoInvocation NAME BINDING
+	    -- asoInvocation-apInvocation NAME BINDING
+    -- DERIVED FROM presentationConnection
+	-- DERIVED FROM singlePeerConnection
+	    -- connectionId
+	    -- underlyingConnectionNames
+	    -- singlePeerConnectionP2 PACKAGE
+		-- supportedConnectionNames
+	    -- singlePeerConnection-coProtocolMachine NAME BINDING
+	-- presFUinUse
+	-- presContextInUse
+    -- DERIVED FROM sessionConnection
+	-- DERIVED FROM singlePeerConnection
+	    -- connectionId
+	    -- underlyingConnectionNames
+	    -- singlePeerConnectionP2 PACKAGE
+		-- supportedConnectionNames
+	    -- singlePeerConnection-coProtocolMachine NAME BINDING
+	-- sessProtInUse
+	-- sessFUinUse
+	-- PACKAGE maxTSDUsizePackage
+	    -- maxTSDUsize
+
+monoULConnectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MonoULConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { monoULConnection 1 }
+
+monoULConnectionEntry OBJECT-TYPE
+    SYNTAX MonoULConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	applicationSubsystemId,
+	apInvocationId,
+    }
+    ::= { monoULConnectionTable 1 }
+
+MonoULConnectionEntry ::=
+    SEQUENCE {
+	monoULConnectionRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+monoULEntity OBJECT IDENTIFIER
+    ::= { tcapObjectClass 12 }
+
+    -- DERIVED FROM applicationEntity
+	-- DERIVED FROM asoEntity
+	    -- DERIVED FROM communicationsEntity
+		-- communicationsEntityId
+		-- localSapNames
+		-- operationalState
+		-- communicationsEntity-subsystem NAME BINDING
+	    -- DERIVED FROM aso
+		-- communiationsEntityId
+		-- asoTitle
+		-- asoQualifier
+		-- operationalState
+		-- aso-aso NAME BINDING
+		-- aso-asoEntity NAME BINDING
+	    -- applContextNameSupport
+	    -- asoEntity-applicationProcess NAME BINDING
+    -- DERIVED FROM presentationEntity
+	-- DERIVED FROM communicationsEntity
+	    -- communicationsEntityId
+	    -- localSapNames
+	    -- operationalState
+	    -- communicationsEntity-subsystem NAME BINDING
+    -- DERIVED FROM sessionEntity
+	-- DERIVED FROM communicationsEntity
+	    -- communicationsEntityId
+	    -- localSapNames
+	    -- operationalState
+	    -- communicationsEntity-subsystem NAME BINDING
+    -- DERIVED FROM presentationCopm
+	-- DERIVED FROM coProtocolMachine
+	    -- coProtocolMachineId
+	    -- operationalState
+	    -- coProtocolMachine-entity NAME BINDING
+	-- presFUsupport
+	-- abstrSyntaxSupport
+	-- transfSynstaxSupport
+    -- DERIVED FROM sessionCopm
+	-- DERIVED FROM coProtocolMachine
+	    -- coProtocolMachineId
+	    -- operationalState
+	    -- coProtocolMachine-entity NAME BINDING
+	-- sessProtVerSupport
+	-- sessFUsupport
+	-- sessOptSupport
+    -- presSelectorValue
+    -- sessionSelectorValue
+
+monoULEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MonoULEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { monoULEntity 1 }
+
+monoULEntityEntry OBJECT-TYPE
+    SYNTAX MonoULEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+    }
+    ::= { monoULEntityTable 1 }
+
+MonoULEntityEntry ::=
+    SEQUENCE {
+    }
+
+-- ====================================================================
+
+monolithicUpperLayerSubsystem OBJECT IDENTIFIER
+    ::= { tcapObjectClass 13 }
+
+    -- DERIVED FROM sessionSubsystem
+	-- DERIVED FROM subsystem
+	    -- subsystemId
+	    -- subsystem-system NAME BINDING
+    -- DERIVED FROM presentationSubsystem
+	-- DERIVED FROM subsystem
+	    -- subsystemId
+	    -- subsystem-system NAME BINDING
+    -- DERIVED FROM applicationSubsystem
+	-- DERIVED FROM subsystem
+	    -- subsystemId
+	    -- subsystem-system NAME BINDING
+
+monolithicUpperLayerSubsystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MonolithicUpperLayerSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { monolithicUpperLayerSubsystem 1 }
+
+monolithicUpperLayerSubsystemEntry OBJECT-TYPE
+    SYNTAX MonolithicUpperLayerSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	monoULsubsystemId
+    }
+    ::= { monolithicUpperLayerSubsystemTable 1 }
+
+MonolithicUpperLayerSubsystemEntry ::=
+    SEQUENCE {
+	monolithicUpperLayerSubsystemId			SimpleNameType,
+	monolithicUpperLayerSubssytemRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+pSap OBJECT IDENTIFIER
+    ::= { tcapObjectClass 14 }
+
+    -- DERIVED FROM sap1
+	-- sapId
+	-- sap1Address
+	-- userEntitynames
+	-- sap1-communicationsEntity NAME BINDING
+
+pSapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PSapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { pSap 1 }
+
+pSapEntry OBJECT-TYPE
+    SYNTAX PSapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+    }
+    ::= { pSapTable 1 }
+
+PSapEntry ::=
+    SEQUENCE {
+	pSapId					SimpleNameType,
+	pSapSap1Address				OCTET STRING,
+	pSapUserEntityNames			OCTET STRING,
+	pSapRowStatus				RowStatus
+    }
+
+-- ====================================================================
+
+presentationConnection OBJECT IDENTIFIER
+    ::= { tcapObjectClass 15 }
+
+    -- DERIVED FROM singlePeerConnection
+	-- connectionId
+	-- underlyingConnectionNames
+	-- singlePeerConnectionP2 PACKAGE
+	    -- supportedConnectionNames
+	-- singlePeerConnection-coProtocolMachine NAME BINDING
+    -- presFUinUse
+    -- presContextInUse
+
+presentationConnectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PresentationConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { presentationConnection 1 }
+
+presentationConnectionEntry OBJECT-TYPE
+    SYNTAX PresentationConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	presentationSubsystemId,
+	presentationEntityId,
+	presentationCopmId,
+	presentationConnectionId
+    }
+    ::= { presentationConnectionTable 1 }
+
+PresentationConnectionEntry ::=
+    SEQUENCE {
+	presentationConnectionId		SimpleNameType,
+	presentationConnectionUnderlyingConnectionNames OCTET STRING,
+	presentationConnectionSupportedConnectionNames OCTET STRING,
+	presentationConnectionPresFUinUse	BITS,
+	presentationConnectionPresContextInUse	OBJECT IDENTIFIER,
+	presentationCOnnectionRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+presentationCopm OBJECT IDENTIFIER
+    ::= { tcapObjectClass 16 }
+
+    -- DERIVED FROM coProtocolMachine
+	-- coProtocolMachineId
+	-- operationalState
+	-- coProtocolMachine-entity NAME BINDING
+    -- presFUsupport
+    -- abstrSyntaxSupport
+    -- transfSynstaxSupport
+
+presentationCopmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PresentationCopmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { presentationCopm 1 }
+
+presentationCopmEntry OBJECT-TYPE
+    SYNTAX PresentationCopmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	presentationSubsystemId,
+	presentationEntityId,
+	presentationCopmId
+    }
+    ::= { presentationCopmTable 1 }
+
+PresentationCopmEntry ::=
+    SEQUENCE {
+	presentationCopmId			SimpleNameType,
+	presentationCopmOperationalState	OperationalState,
+	presentationCopmPresFUsupport		BITS,
+	presentationCopmabstrSyntaxSupport	Opaque,
+	presentationCopmtransSyntaxSupport	Opaque,
+	presentationCopmRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+presentationEntity OBJECT IDENTIFIER
+    ::= { tcapObjectClass 17 }
+
+    -- DERIVED FROM communicationsEntity
+	-- communicationsEntityId
+	-- localSapNames
+	-- operationalState
+	-- communicationsEntity-subsystem NAME BINDING
+
+presentationEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PresentationEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { presentationEntity 1 }
+
+presentationEntityEntry OBJECT-TYPE
+    SYNTAX PresentationEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	presentationSubsystemId,
+	presentationEntityId
+    }
+    ::= { presentationEntityTable 1 }
+
+PresentationEntityEntry ::=
+    SEQUENCE {
+	presentationEntityId			SimpleNameType,
+	presentationEntityLocalSapNames		OCTET STRING,
+	presentationEntityOperationalState	OperationalState,
+	presentationEntityRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+presentationSubsystem OBJECT IDENTIFIER
+    ::= { tcapObjectClass 18 }
+
+    -- DERIVED FROM subsystem
+	-- subsystemId
+	-- subsystem-system NAME BINDING
+
+presentationSubsystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PresentationSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { presentationSubsystem 1 }
+
+presentationSubsystemEntry OBJECT-TYPE
+    SYNTAX PresentationSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	presentationSubsystemId
+    }
+    ::= { presentationSubsystemTable 1 }
+
+PresentationSubsystemEntry ::=
+    SEQUENCE {
+	presentationSubsystemId			SimpleNameType,
+	presentationSubsystemRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+sSap OBJECT IDENTIFIER
+    ::= { tcapObjectClass 19 }
+
+    -- DERIVED FROM sap1
+	-- sapId
+	-- sap1Address
+	-- userEntitynames
+	-- sap1-communicationsEntity NAME BINDING
+
+sSapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SSapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sSap 1 }
+
+sSapEntry OBJECT-TYPE
+    SYNTAX SSapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+    }
+    ::= { sSapTable 1 }
+
+SSapEntry ::=
+    SEQUENCE {
+	sSapId					SimpleNameType,
+	sSapSap1Address				OCTET STRING,
+	sSapUserEntityNames			OCTET STRING,
+	sSapRowStatus				RowStatus
+    }
+
+-- ====================================================================
+
+sessionConnection OBJECT IDENTIFIER
+    ::= { tcapObjectClass 20 }
+
+    -- DERIVED FROM singlePeerConnection
+	-- connectionId
+	-- underlyingConnectionNames
+	-- singlePeerConnectionP2 PACKAGE
+	    -- supportedConnectionNames
+	-- singlePeerConnection-coProtocolMachine NAME BINDING
+    -- sessProtInUse
+    -- sessFUinUse
+    -- PACKAGE maxTSDUsizePackage
+	-- maxTSDUsize
+
+sessionConnectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SessionConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sessionConnection 1 }
+
+sessionConnectionEntry OBJECT-TYPE
+    SYNTAX SessionConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	sessionSubsystemId,
+	sessionEntityId,
+	sessionCopmId,
+	sessionConnectionId
+    }
+    ::= { sessionConnectionTable 1 }
+
+SessionConnectionEntry ::=
+    SEQUENCE {
+	sessionConnectionId			SimpleNameType,
+	sessionConnectionUnderlyingConnectionNames OCTET STRING,
+	sessionConnectionSupportedConnectionNames OCTET STRING,
+	sessionConnectionSessProtInUse		BITS,
+	sessionConnectionSessFUinUse		BITS,
+	sessionConnectionMaxTSDUsize		Unsigned32,
+	sessionCOnnectionRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+sessionCopm OBJECT IDENTIFIER
+    ::= { tcapObjectClass 21 }
+
+    -- DERIVED FROM coProtocolMachine
+	-- coProtocolMachineId
+	-- operationalState
+	-- coProtocolMachine-entity NAME BINDING
+    -- sessProtVerSupport
+    -- sessFUsupport
+    -- sessOptSupport
+
+sessionCopmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SessionCopmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sessionCopm 1 }
+
+sessionCopmEntry OBJECT-TYPE
+    SYNTAX SessionCopmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	sessionSubsystemId,
+	sessionEntityId,
+	sessionCopmId
+    }
+    ::= { sessionCopmTable 1 }
+
+SessionCopmEntry ::=
+    SEQUENCE {
+	sessionCopmId			SimpleNameType,
+	sessionCopmOperationalState	OperationalState,
+	sessionCopmSessProtVerSupport	BITS,
+	sessionCopmSessFUsupport	BITS,
+	sessionCopmOptSupport		BITS,
+	sessionCopmRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+sessionEntity OBJECT IDENTIFIER
+    ::= { tcapObjectClass 22 }
+
+    -- DERIVED FROM communicationsEntity
+	-- communicationsEntityId
+	-- localSapNames
+	-- operationalState
+	-- communicationsEntity-subsystem NAME BINDING
+
+sessionEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SessionEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sessionEntity 1 }
+
+sessionEntityEntry OBJECT-TYPE
+    SYNTAX SessionEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	sessionSubsystemId,
+	sessionEntityId
+    }
+    ::= { sessionEntityTable 1 }
+
+SessionEntityEntry ::=
+    SEQUENCE {
+	sessionEntityId				SimpleNameType,
+	sessionEntityLocalSapNames		OCTET STRING,
+	sessionEntityOperationalState		OperationalState,
+	sessionEntityRowStatus			RowStatus
+    }
+
+-- ====================================================================
+
+sessionSubsystem OBJECT IDENTIFIER
+    ::= { tcapObjectClass 23 }
+
+    -- DERIVED FROM subsystem
+	-- subsystemId
+	-- subsystem-system NAME BINDING
+
+sessionSubsystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SessionSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { sessionSubsystem 1 }
+
+sessionSubsystemEntry OBJECT-TYPE
+    SYNTAX SessionSubsystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	systemId,
+	sessionSubsystemId
+    }
+    ::= { sessionSubsystemTable 1 }
+
+SessionSubsystemEntry ::=
+    SEQUENCE {
+	sessionSubsystemId			SimpleNameType,
+	sessionSubsystemRowStatus		RowStatus
+    }
+
+-- ====================================================================
+-- ====================================================================
+-- ====================================================================
+-- ====================================================================
+-- ====================================================================
+
+tcapEntity OBJECT IDENTIFIER
+    ::= { tcapObjectClass 24 }
+
+-- ====================================================================
+
+tcapEntityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapEntity 1 }
+
+tcapEntityEntry OBJECT-TYPE
+    SYNTAX	TcapEntityEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	    mtpMsId,		-- shared index
+	    tcapEntityId	-- index
+    }
+    ::= { tcapEntityTable 1 }
+
+TcapEntityEntry ::=
+    SEQUENCE {
+	tcapEntityId				Unsigned32,
+	tcapEntityRowStatus			RowStatus
+    }
+
+tcapEntityId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible -- index
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapEntityEntry 1 }
+
+tcapEntityRowStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapEntityEntry 2 }
+
+
+-- ====================================================================
+
+tcapAccessPoint OBJECT IDENTIFIER
+    ::= { tcapObjectClass 25 }
+
+-- ====================================================================
+
+tcapAccessPointTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapAccessPointEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+
+tcapAccessPointEntry OBJECT-TYPE
+    SYNTAX TcapAccessPointEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	    mtpMsId,
+	    tcapEntityId,
+	    tcapAccessPointId
+	}
+
+TcapAccessPointEntry ::=
+    SEQUENCE {
+	tcapAccessPointId			Unsigned32,
+	tcapAccessPointRowStatus		RowStatus
+    }
+
+-- ====================================================================
+
+tcapLinkage OBJECT IDENTIFIER
+    ::= { tcapObjectClass 26 }
+
+-- ====================================================================
+
+tcapLinkageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TcapLinkageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapLinkage 1  }
+
+tcapLinkageEntry OBJECT-TYPE
+    SYNTAX TcapLinkageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX {
+	    mtpMsId,
+	    sccp
+	}
+    ::= { tcapLinkageTable 1 }
+
+TcapLinkageEntry ::=
+    SEQUENCE {
+	tcapLinkageRowStatus			RowStatus
+    }
+
+tcapLinkageRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { tcapLinkageEntry 1 }
+
+-- ====================================================================
+
+tcapParameters OBJECT IDENTIFIER
+    ::= { tcapMIB 4 }
+
+tcapScalars OBJECT IDENTIFIER
+    ::= { tcapMIB 5 }
+
+tcapTcUserId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { tcapScalars 1 }
+
+tcapApplicationEntityId OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    ::= { tcapScalars 2 }
+
+tcapPackage OBJECT IDENTIFIER
+    ::= { tcapMIB 6 }
+
+tcapCompliances OBJECT IDENTIFIER
+    ::= { tcapMIB 7 }
+
+END -- end of modules OPENSS7-TCAP-MIB
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

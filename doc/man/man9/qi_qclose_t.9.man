@@ -1,0 +1,1 @@
+.so man9/qi_qclose.9.man

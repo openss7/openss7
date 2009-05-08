@@ -1,0 +1,71 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb1|cb1|cb1|cb
+l1|l1|l1|l.
+STATE:DLPI STATE:DESCRIPTION:SERVICE
+:::TYPE
+_
+0) UNATTACHED:DL_UNATTACHED:T{
+.hy 0
+.ad l
+Stream opened but PPA not attached
+T}:ALL
+1) ATTACH PEND:DL_ATTACH_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_DETACH_REQ
+T}:ALL
+3) UNBOUND:DL_UNBOUND:T{
+.hy 0
+.ad l
+Stream is attached but not bound to a DLSAP
+T}:ALL
+4) BIND PEND:DL_BIND_PENDING:T{
+.hy 0
+.ad l
+Te DSL user is waiting for an acknowledgement of a DL_BIND_REQ
+T}:ALL
+5) UNBIND PEND:DL_UNBIND_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_UNBIND_REQ
+T}:ALL
+6) IDLE:DL_IDLE:T{
+.hy 0
+.ad l
+The stream is bound and activated for use - connection establishment or
+connectionless data transfer may take place.
+T}:ALL
+7) UDQOS PEND:DL_UDQOS_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of DL_UDQOS_REQ
+T}:DL_CODLS
+.TE

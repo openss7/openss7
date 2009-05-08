@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+              DL_TEST ----\   |                  |           DL_TEST            
+              request      \->|- - - - - - - - - |------->   indication         
+                              |                  |                              
+                           /--| ~   ~   ~   ~   ~|<-------   DL_TEST            
+              DL_TEST <---/   |   ~   ~   ~   ~  |           response           
+              confirm         |                  |                              
+                              |                  |                              
+                                                                                

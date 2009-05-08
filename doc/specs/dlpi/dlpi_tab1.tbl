@@ -1,0 +1,69 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|cb|cbss
+l|l|lss.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Local Management
+T}:T{
+.hy 0
+.ad l
+Information Reporting
+T}:T{
+.hy 0
+.ad l
+DL_INFO_REQ, DL_INFO_ACK, DL_ERROR_ACK
+T}
+:_:_
+:Attach:T{
+.hy 0
+.ad l
+DL_ATTACH_REQ, DL_DETACH_REQ, DL_OK_ACK, DL_ERROR_ACK
+T}
+:_:_
+:Bind:T{
+.hy 0
+.ad l
+DL_BIND_REQ, DL_BIND_ACK, DL_SUBS_BIND_REQ, DL_SUBS_BIND_ACK, DL_UNBIND_REQ, DL_SUBS_UNBIND_REQ, DL_OK_ACK, DL_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Other
+T}:T{
+.hy 0
+.ad l
+DL_ENABLMULTI_REQ, DL_DISABMULTI_REQ, DL_PROMISCON_REQ, DL_PROMISCOFF_REQ, DL_OK_ACK, DL_ERROR_ACK
+T}
+.TE

@@ -1,0 +1,11 @@
+                                                                                
+                              |                  |                              
+           N_DATA_REQ ----\   |                  |                              
+    with receipt conf. set \->|- - - - - - - - - |------->   N_DATA_IND         
+                              |                  |     with receipt conf. set   
+                              |                  |                              
+                              |                  |                              
+                           /--| - - - - - - - - -|<-------   N_DATACK_RES       
+         N_DATACK_IND <---/   |                  |                              
+                              |                  |                              
+                                                                                

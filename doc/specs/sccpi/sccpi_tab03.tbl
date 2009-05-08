@@ -1,0 +1,74 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+|l|l|lw(3.25i)|.
+_
+STATE:SERVICE:PRIMITIVES
+=
+T{
+Connection
+.br
+Establishment
+T}:T{
+Connection
+.br
+Establishment
+T}:T{
+.hy 0
+.ad l
+N_CONN_REQ, N_CONN_IND, N_CONN_RES, N_CONN_CON, N_OK_ACK, N_ERROR_ACK
+T}
+=
+Data Transfer:Data Transfer:T{
+.hy 0
+.ad l
+N_DATA_REQ, N_DATA_IND
+T}
+:_:_
+:Error Management:T{
+.hy 0
+.ad l
+N_NOTICE_IND, N_RESET_IND, N_DISCON_IND
+T}
+=
+T{
+Connection
+.br
+Release
+T}:T{
+Connection
+.br
+Release
+T}:T{
+.hy 0
+.ad l
+N_DISCON_REQ, N_DISCON_IND, N_OK_ACK, N_ERROR_ACK
+T}
+_
+.TE

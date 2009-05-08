@@ -1,0 +1,124 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 19 01:23:31 MDT 2007
+--@@ 
+--< GDMO.Document "ETSI EN 300 304"
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) } >--
+MODULE "ETSI EN 300 304" { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) }
+--< ASN1.Version 1994 PrETS5
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) asn1Module(2) prETS5(0) } >--
+PrETS5 { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) asn1Module(2) prETS5(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORT Everything
+prETS300304 OBJECT IDENTIFIER ::= { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) }
+etsObjectClass OBJECT IDENTIFIER ::= { prETS300304 managedObjectClass(3) }
+etsPackage OBJECT IDENTIFIER ::= { prETS300304 package(4) }
+etsParameter OBJECT IDENTIFIER ::= { prETS300304 parameter(5) }
+etsNameBinding OBJECT IDENTIFIER ::= { prETS300304 nameBinding(6) }
+etsAttribute OBJECT IDENTIFIER ::= { prETS300304 attribute(7) }
+etsAction OBJECT IDENTIFIER ::= { prETS300304 action(9) }
+etsNotification OBJECT IDENTIFIER ::= { prETS300304 notification(10) }
+END
+
+--< ASN1.Version 1994 PrETS12
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) asn1Module(2) prETS12(3) } >--
+PrETS12 { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) asn1Module(2) prETS12(3) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+Version
+	FROM ASN1DefinedTypesModule { ccitt(0) recommendation(0) m(13) m3100(3100) informationModel(0) asn1Module(2) asn1DefinedTypesModule(0) }
+RDNSequence
+	FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
+ObjectInstance
+	FROM CMIP-1 { joint-iso-ccitt(2) ms(9) cmip(1) modules(0) protocol(3) }
+SwitchStatus, FromAndToProtectionUnit
+	FROM SDHProtASN1 { itu-t recommendation(0) g(7) g774(774) hyphen(127) prot(3) informationModel(0) asn1Module(2) sdhmsp(0) };
+Connector ::= SEQUENCE {
+	connectorType PrintableString,
+	connectorLocation PrintableString,
+	supporting ListOfLocalDistinguishedName }
+EquipmentActual ::= CHOICE {
+	noType NULL,
+	type EquipmentType }
+EquipmentAutoSwitchReason ::= CHOICE {
+	waitToRestore [0] NULL,
+	equipmentFailure [1] NULL }
+EquipmentExpected ::= CHOICE {
+	noType NULL,
+	type EquipmentType }
+EquipmentProtectionStatus ::= SET OF CHOICE {
+	noRequest [0] NULL,
+	doNotRevert [1] NULL,
+	manualSwitch [2] SEQUENCE {
+		switchStatus [0] SwitchStatus,
+		protectionUnitsSwitched [1] FromAndToProtectionUnit },
+	autoSwitch [3] SEQUENCE {
+		switchStatus [0] SwitchStatus,
+		protectionUnitsSwitched [1] FromAndToProtectionUnit,
+		autoSwitchReason [2] EquipmentAutoSwitchReason },
+	forcedSwitch [4] SEQUENCE {
+		switchStatus [0] SwitchStatus,
+		protectionUnitsSwitched [1] FromAndToProtectionUnit },
+	lockout [5] SwitchStatus }
+EquipmentProtectionStatusParameter ::= SEQUENCE {
+	oldProtectionStatus EquipmentProtectionStatus,
+	newProtectionStatus EquipmentProtectionStatus }
+EquipmentType ::= PrintableString
+ListOfLocalDistinguishedName ::= SET OF RDNSequence
+PhysicalConnectorList ::= SET OF Connector
+PhysicalInstance ::= CHOICE {
+	unknownInstance NULL,
+	instance PrintableString }
+ProtectionUnitPointer ::= CHOICE {
+	pointer SET OF ObjectInstance,
+	null NULL }
+END-- end of ASN1DefinedTypesModule
+
+
+--< ASN1.Version 1994 PrETS13
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) asn1Module(2) prETS13(4) } >--
+PrETS13 { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) asn1Module(2) prETS13(4) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+NameType
+	FROM ASN1DefinedTypesModule { ccitt(0) recommendation(0) m(13) m3100(3100) informationModel(0) asn1Module(2) asn1DefinedTypesModule(0) }
+ObjectInstance, RelativeDistinguishedName
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
+Boolean ::= BOOLEAN
+CurrentTimingSourcePointer ::= CHOICE {
+	pointer [0] ObjectInstance,
+	internalOscillator [1] NULL }
+Integer ::= INTEGER
+OutputTimingSourcePointer ::= ObjectInstance
+PoweredEquipmentPtrList ::= SET OF ObjectInstance
+PowerSource ::= INTEGER
+SyncProtectionStatus ::= CHOICE {
+	noRequest [0] NULL,
+	autoSwitch [1] RelativeDistinguishedName,
+	manualSwitch [2] RelativeDistinguishedName,
+	forcedSwitch [3] RelativeDistinguishedName,
+	lockout [4] NULL,
+	failure [5] NULL }
+-- In the SyncProtectionStatus syntax, autoSwitch, manualSwitch and forcedSwitch will contain the RDN of the synchronisation protection unit which has been switched from.
+SyncProtectionStatusParameter ::= SEQUENCE {
+	toProtectionStatus SyncProtectionStatus,
+	fromProtectionStatus SyncProtectionStatus OPTIONAL }
+END
+
+END
+--< GDMO.EndDocument "ETSI EN 300 304"
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

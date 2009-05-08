@@ -1,0 +1,627 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SPX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B spx, pipe
+\- \fISTREAMS\fR bi-directional pipe device
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The software pipes obtained by the system call
+.BR pipe (2s)
+are not necessarily bidirectional.
+.[
+xbd5
+.]
+.[
+susv2
+.]
+.[
+susv3
+.]
+The
+.B spx
+.I STREAMS
+pseudo-device driver provide a mechanism for obtaining
+.IR STREAMS -based
+pipes that are bidirectional in nature.
+.PP
+The
+.B spx
+pseudo-device driver is a regular
+.I STREAMS
+device driver.
+.PP
+Because the
+.BR open (2s)
+system call only returns one file descriptor, the following procedure is used
+to create two file descriptors with a connected
+.IR STREAMS -based
+pipe between them:
+.IP (1) \w'(000)'u
+Open
+.B /dev/spx
+an obtain a first file descriptor.  At this point there is only half of the
+pipe available.
+This step obtains
+.IR fd [0].
+.IP (2)
+Open
+.B /dev/spx
+again to obtain a second file descriptor.  At this point there are two
+unconnected stream heads.
+This step obtains
+.IR fd [2].
+.IP (2)
+Call
+.BR ioctl (2s)
+with the
+.B I_FDINSERT
+command (see
+.BR streamio (7))
+to associate
+.IR fd [0]
+with
+.IR fd [1].
+This can either be accomplished by performing an
+.B I_FDINSERT
+with
+.IR fd [1]
+on the stream returned as
+.IR fd [0];
+or, with
+.IR fd [0]
+on
+.IR fd [1].
+The data part of the
+.B I_FDINSERT
+command is ignored, and the control part of the
+.B I_FDINSERT
+command contains only the file descriptor translated to a queue pointer.
+This step connects
+.IR fd [0]
+to
+.IR fd [1]
+for a fully connected,
+.IR STREAMS -based,
+bi-directional pipe.
+.\"
+.SS Characteristics
+.PP
+Following are some characteristics of
+.IR STREAMS -based
+pips that cause their behaviour to differ from that of
+regular
+.I STREAMS
+character special device files:
+.IP \(bu \w'\(bu\(em'u
+.IR STREAMS -based
+pipes cannot be clone opened.
+But see
+.BR connld (4).
+.IP \(bu
+.IR STREAMS -based
+pipes have both ends open for both read and write.
+.IP \(bu
+When a
+.IR STREAMS -based
+pipe is hung up, or the other end of the
+.IR STREAMS -based
+pipe is closed, write and write-like operations return
+.RB [ EPIPE ]
+and generate a
+.RI { SIGPIPE }
+signal to the caller, instead of simply returning
+.RB [ ENXIO ]
+as is the case for regular
+.I STREAMS
+devices.
+This is true for
+.BR write (2s),
+.BR writev (2s),
+.BR putmsg (2),
+.BR putpmsg (2s),
+and
+.BR streamio (7)
+input-output controls that write messages to the
+.IR Stream ,
+such as
+.BR I_FDINSERT (7).
+.IP \(bu
+By default, when an asynchronous write error occurs, and a write or write-like operation is
+performed,
+.IR STREAMS -based
+pipes will generate
+.RI { SIGPIPE }
+to the caller in addition to returning the error from the asynchronous write error message.  This
+behavior can be suppressed by clearing the
+.B SNDPIPE
+option using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behavior for regular
+.I STREAMS
+character special files.
+.IP \(bu
+By default, attempting to write a zero-length data message to a
+.BR STREAMS -based
+pipe with
+.BR write (2s),
+.BR writev (2s),
+.BR putmsg (2),
+or
+.BR putpmsg (2s),
+will succeed, return zero, but no message will be generated.  Generation of the message can be
+enabled by setting the
+.B SNDZERO
+option using the
+.BR I_SWROPT (7)
+input-output control.  This is the reverse of the default behaviour for regular
+.I STREAMS
+character special files.
+.IP \(bu
+.IR STREAMS -based
+pipes break large writes down into independent data messages of 4096 bytes or less.  Writes of less
+than or equal to 4096 bytes are guaranteed atomic.  Writes of greater than 4096 byes are not
+guaranteed atomic.  This is default behaviour of all
+.I STREAMS
+character special files, unless altered by the driver.
+.IP \(bu
+An end of a
+.IR STREAMS -based
+pipes that has no modules pushed, even when full and blocked on write, will not block on close as
+described under
+.BR I_SETCLTIME (7),
+because there is no driver write queue.
+.IP \(bu
+.BR I_LIST (7)
+will not report a count for a driver
+on either end of a
+.IR STREAMS -based
+pipe
+.RI ( STREAMS -based
+pipes have no driver).
+.IP \(bu
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+and
+.BR I_PUNLINK (7),
+will always fail with error
+.RB [ EINVAL ]
+on a
+.IR STREAMS -based
+pipe.
+.IP \(bu
+.BR I_SENDFD (7)
+and
+.BR I_RECVFD (7)
+will operate on a
+.IR STREAMS -based
+pipe (whereas they fail on a regular
+.I STREAMS
+character special file).
+.\"
+.\"
+.SH USAGE
+.PP
+The characteristics of bi-directional
+.IR STREAMS -based
+pipes,
+by comparison to
+SVR 3
+.[
+svr3
+.]
+style pipes is as follows:
+.IP \(bu 2
+.IR STREAMS -based
+pipes
+are bi-directional.  Both sides are opened for both read and write.  Data
+written to one end of the pipe can be read by the other.  Both ends of the
+pipe can have data written and read.
+.IP \(bu 2
+.IR STREAMS -based
+pipes
+can have modules pushed and popped from either side of the pipe.  However, before pushing a
+.I STREAMS
+module on either side of the
+.IR STREAMS -based
+pipe, the
+.BR pipemod (4)
+module should be pushed on one end of the
+.IR STREAMS -based
+pipe to reverse the sense of
+.BR M_FLUSH (9)
+bits for proper flushing of the pipe.
+.IP \(bu 2
+.IR STREAMS -based
+pipes
+can have the
+.BR connld (4)
+module can be pushed onto one end of the pipe.
+.IP \(bu 2
+.IR STREAMS -based
+pipes
+have controllable flow control and minimum and maximum packet size characteristics.
+.IP \(bu 2
+.IR STREAMS -based
+pipes
+permit the use of the
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR putmsg (2)
+and
+.BR putpmsg (2s)
+system calls on the pipe ends.
+.IP \(bu 2
+.IR STREAMS -based
+pipes
+permit the use of
+.I STREAMS
+IO controls on either pipe end.  See
+.BR streamio (7).
+.\"
+.\"
+.SH NOTICES
+.PP
+Although an
+.BR stat (2)
+on the
+.B /dev/spx
+device node will show the node as being a character special device with a
+device number corresponding to the
+.B spx
+driver, an
+.BR fstat (2)
+on the file descriptor resulting from an
+.BR open (2s)
+call on
+.B /dev/spx
+will indicate that the file is a fifo.  This is rather normal
+.IR UNIX \(rg
+behaviour.
+.PP
+Depending on
+.IR Linux \(rg
+kernel configuration parameters, it might not be necessary to go to this
+extent to create a
+.IR STREAMS -based
+bidirectional pipe.  When kernel
+configuration parameter
+.B CONFIG_STREAMS_PIPES_REPLACE
+is set, then the SVR 3
+.[
+svr3
+.]
+pipe approach used by
+.IR Linux \(rg
+will be replaced with a bi-directional
+.IR STREAMS -based
+pipe.  Then, a simple
+call to
+.BR pipe (2s)
+will return a bidirectional pipe and it is not necessary to open the
+.B spx
+driver to obtain one.
+.PP
+When first opened, a
+.B spx
+device behaves similar to an Echo Device,
+.BR echo (4).
+.PP
+Under
+.B @PACKAGE_TITLE@
+it is possible to make all
+.B Linux
+system pipes
+.IR STREAMS -based.
+This must be done when the package is configured and will be effected when the
+.I STREAMS
+pipe kernel module is loaded.  Once the kernel module is loaded all pipes subsequently opened with
+the
+.BR pipe (2s)
+system call will be
+.IR STREAMS -based.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B spx
+is not implemented as a normal
+.I STREAMS
+driver: it is implemented as a shadow special device node under
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.B Linux Fast-STREAMS
+shadow special devices nodes call
+.BR pipe_open ()
+from
+.BR cdev_open ()
+instead of
+.BR spec_open ()
+permitting the
+.B pipe
+device to intercept and redirect the open call to the appropriate device.
+This is consistent with the descriptions for the internal
+.BR pipe_open ()
+under
+.IR "SVR 4" .
+.[
+magic
+.]
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of how to open a
+.IR STREAMS -based
+pipe:
+.sp
+.nf
+\fC\s-1\
+int
+spipe(int *fd)
+{
+    int fds[2];
+    long ptr;
+    struct strfdinsert fdi;
+    if ((fds[0] = open("/dev/spx", O_RDWR)) < 0)
+        return (-1);
+    if ((fds[1] = open("/dev/spx", O_RDWR)) < 0) {
+        close(fds[0]);
+        return (-1);
+    }
+    fdi.ctlbuf.maxlen = fdi.ctlbuf.len = sizeof(ptr);
+    fdi.ctlbuf.buf = (caddr_t) &ptr;
+    fdi.databuf.maxlen = fdi.databuf.len = -1;
+    fdi.databuf.buf = NULL;
+    fdi.filedes = fds[0];
+    fdi.offset = 0;
+    fdi.flags = RS_NORM;
+    if (ioctl(fds[0], I_FDINSERT, &fdi) < 0) {
+        close(fds[0]);
+        close(fds[1]);
+        return (-1);
+    }
+    fd[0] = fds[0];
+    fd[1] = fds[1];
+    return (0);
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/spx
+The external filesystem
+.I STREAMS
+pipe device.
+.TP
+.BR /dev/streams/spx ", " /devices/spx
+The
+.BR specfs (5)
+shadow special filesystem
+.I STREAMS
+pipe deivce.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR pipe (2s),
+.BR open (2s),
+.BR ioctl (2s),
+.BR streamio (7),
+.BR pipemod (4),
+.BR connld (4),
+.BR echo (4),
+.BR getmsg (2),
+.BR getpmsg (2s),
+.BR putmsg (2),
+.BR putpmsg (2s),
+.BR stat (2),
+.BR fstat (2).
+.\"
+.\"
+.SH BUGS
+.PP
+.B spx
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+provides the
+.B spx
+device for compatibility with
+.IR UnixWare \(rg
+7 and
+.IR AIX \(rg.
+.IR Solaris \(rg
+and
+.I LiS
+.[
+LiS
+.]
+do not provide an
+.B spx
+driver.
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+provides a
+.B spx
+driver.
+The use of the
+.B spx
+driver under
+.IR AIX \(rg
+is not well documented.
+.IP \(em
+.IR UnixWare \(rg
+provides a
+.B spx
+driver.
+The use of the
+.B spx
+driver under
+.IR UnixWare \(rg
+is not well documented.
+.IP \(em
+.I LiS
+.IP \(em
+.IR UnixWare \(rg
+documentation
+.[
+uw7doc
+.]
+describes naming an unnamed pipe by making a device node with the device
+number returned by a call to
+.BR stat (2)
+on one end of the pipe.
+Although this technique also works with
+.BR "Linux Fast-STREAMS" ,
+we recommend using
+.BR fattach (2)
+instead.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+and
+.IR UnixWare \(rg
+7.1.1
+documentation.
+Conformance is verified using the
+.BR test-pipe (8)
+verification test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B spx
+appears in
+.IR AIX \(rg
+and
+.IR UnixWare \(rg
+7.1.1.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

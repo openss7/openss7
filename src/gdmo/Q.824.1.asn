@@ -1,0 +1,281 @@
+--< ASN1.Version 1994 CAISDNModule
+--  {itu-t(0) recommendation(0) q(17) ca(824) dot(127) isdn(1) informationModel(0) asn1Modules(2) >--
+-- 13 Type Definitions
+CAISDNModule {itu-t(0) recommendation(0) q(17) ca(824) dot(127) isdn(1) informationModel(0) asn1Modules(2)
+cAISDNModule(0)}
+DEFINITIONS ::= BEGIN
+-- EXPORTS Everything;
+IMPORTS
+InterceptTreatmentTerm,
+NumberOfBChannels,
+DirectoryNumber,
+DirectoryNumberList
+FROM CACommonModule {itu-t(0) recommendation(0) q(17) ca(824) dot(127) common(0) informationModel(0)
+asn1Modules(2) cACommonModule(0)}
+UsageState,
+OperationalState
+FROM Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1}
+k,
+n1,
+n2,
+sequenceModulus,
+t1Timer,
+t2Timer,
+t3Timer,
+t4Timer
+FROM DLM {joint-iso-ccitt network-layer(15) management(0) asn1Module(2) 0}
+dBitModification,
+defaultPacketSize,
+defaultThroughputClass,
+defaultWindowSize,
+extendedPacketSequencing,
+fastSelectAcceptance,
+flowControlParameterNegotiation,
+nonStandardDefaultPacketSizes,
+nonStandardDefaultWindowSizes,
+onlineFacilityRegistration,
+packetRetransmission,
+throughputClassNegotiation
+FROM NLM {joint-iso-ccitt network-layer(13) management(0) nLM(2) asn1Module(2) 0}
+ObjectInstance,
+ObjectClass
+FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+AlarmStatus,
+Boolean,
+ChannelNumber,
+NameType,
+ObjectList,
+Pointer,
+PointerOrNull
+FROM ASN1DefinedTypesModule {ccitt recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2)
+asn1DefinedTypesModule(0)};
+q824-1InformationModel OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) q(17) ca(824) dot(127) isdn(1)
+informationModel(0)}
+cAISDNObjectClass OBJECT IDENTIFIER ::= {q824-1InformationModel managedObjectClass(3)}
+cAISDNPackage OBJECT IDENTIFIER ::= {q824-1InformationModel package(4)}
+cAISDNParameter OBJECT IDENTIFIER ::= {q824-1InformationModel parameter(5)}
+cAISDNAttribute OBJECT IDENTIFIER ::= {q824-1InformationModel attribute(7)}
+cAISDNNameBinding OBJECT IDENTIFIER ::= {q824-1InformationModel nameBinding(6)}
+cAISDNAction OBJECT IDENTIFIER ::= {q824-1InformationModel action(9)}
+-- default value definitions --
+false Boolean ::= FALSE
+true Boolean ::= TRUE
+null NULL ::= NULL
+minusOne INTEGER ::= 1
+emptySet AccessChannelPtrList ::= { }
+two INTEGER ::= 2
+baud9600 ThruputClass ::= baud9600
+size128 PacketSize ::= size128
+dte84 DTECompatibility ::= dte84
+linkOptionDefault LinkOption ::= dynamic :{callControlTEItotal 64
+callControlTEIsw 63
+packTEItotal 64
+packTEIsw 63}
+-- supporting productions --
+DTECompatibility ::= ENUMERATED {
+dte80 (0),
+dte84 (1),
+dte88 (2),
+dte93 (3)
+}
+AccessChannelPtrList ::= SET OF ObjectInstance
+ActiveTerminalList ::= SET OF SEQUENCE {
+spid [0] ServiceProfileIdentifier,
+tei [1] TerminalEndPointIdentifier,
+usid [2] UserServiceId }
+AppearanceInfo ::= SEQUENCE {
+callAppearanceId CallAppearanceIdentifier,
+defaultBearerService BearerService}
+AssignmentOfTimeslots ::= ENUMERATED {
+fixed (0),
+floating (1),
+flexible (2)}
+BearerServiceList ::= SET OF BearerService
+BearerService ::= ENUMERATED {
+speech(0),
+audio3D1(1),
+audio7(2),
+audioComb(3),
+cmd56(4),
+cmd64(5),
+cmdComb(6)}
+BitRateOfPrimaryRateInterface ::= ENUMERATED{
+bitRate1544 (0),
+bitRate2048 (1)}
+CallAppearanceIdentifier ::= INTEGER
+CallingPartyDefaultDirectoryNumber ::= CHOICE {
+noDefault NULL,
+directoryNumber DirectoryNumber, -- ALL Bearer Services
+perBearerService SET OF SEQUENCE {
+directoryNumber DirectoryNumber,
+bearerService BearerService}}
+CallingPartyValidDirectoryNumberList ::= SET OF DirectoryNumber
+ChangeDirectoryNumberRequest ::= SEQUENCE {
+oldDirectoryNumberName ObjectInstance,
+oldDirectoryNumberIntercept InterceptTreatmentTerm,
+newDirectoryNumberName ObjectInstance}
+ChannelSelection ::= ENUMERATED {byNetwork (0), byUser (1)}
+CopyISDNAccessCommandDescription ::= SEQUENCE {
+sourceAPPName ObjectInstance,
+tpNameList SET OF ObjectInstance}
+CopyISDNServiceCommandDescription ::= SEQUENCE {
+sourceCustomerProfileName ObjectInstance,
+accessPortName ObjectInstance,
+resourceDescription SET OF SEQUENCE {
+sourceDirectoryNumber ObjectInstance,
+newDirectoryNumber ObjectInstance}}
+CopyISDNTerminalCommandDescription ::= SEQUENCE {
+sourceTerminalName ObjectInstance,
+aPPName ObjectInstance,
+sPId IA5String (SIZE(1..18))}
+CreatedInstancesName ::= SET OF ObjectInstance
+DChannelT3xx ::= INTEGER -- number of seconds
+DeletedInstancesName ::= SET OF ObjectInstance
+DirectoryNumberAppearanceIdentifierList ::= SEQUENCE {
+directoryNumber DirectoryNumber,
+COMPONENTS OF AppearanceInfo}
+DirectoryNumberReference ::= SEQUENCE {dnr INTEGER (1..128),
+dn DirectoryNumber,
+bs BearerService}
+Dynamic ::= SEQUENCE {
+callControlTEItotal INTEGER, -- total number of TEIs that can be assigned to signalling
+callControlTEIsw FlexType,
+packTEItotal INTEGER, -- total number of TEIs that can be assigned to the packet.
+packTEIsw FlexType}
+EstablishISDNAccessRequest ::= CHOICE {
+servicePackageISDNAccess [0] ServicePackageISDNAccessDescription,
+copyISDNAccessCommand [1] CopyISDNAccessCommandDescription }
+EstablishISDNServiceRequest ::= CHOICE {
+servicePackageISDN [0] ServicePackageISDNDescription,
+copyISDNServiceCommand [1] CopyISDNServiceCommandDescription }
+EstablishISDNTerminalRequest ::= CHOICE {
+servicePackageISDNTerminal [0] ServicePackageISDNTerminalDescription,
+copyISDNTerminalCommand [1] CopyISDNTerminalCommandDescription }
+FlexType ::= CHOICE {
+switchAssigned INTEGER,
+uncontrolled NULL}
+MasterFeatureList ::= GraphicString(SIZE(1 .. 7))
+FeatureActivatorValue ::= INTEGER(0..16383)
+FeatureActivatorsAllDirectoryNumber ::= SET OF SEQUENCE {
+featureActivatorValue FeatureActivatorValue,
+masterFeatureList MasterFeatureList}
+FeatureActivatorsPerDirectoryNumber ::= SET OF SEQUENCE {
+featureActivatorValue FeatureActivatorValue,
+directoryNumberReference INTEGER(1..128),
+masterFeatureList MasterFeatureList}
+FeatureIndicatorsAllDirectoryNumber ::= SET OF SEQUENCE {
+featureActivatorValue FeatureActivatorValue,
+masterFeatureList MasterFeatureList}
+FeatureIndicatorsPerDirectoryNumber ::= SET OF SEQUENCE {
+featureActivatorValue FeatureActivatorValue,
+directoryNumberReference INTEGER(1..128),
+masterFeatureList MasterFeatureList}
+InterfaceType ::= ENUMERATED {
+basic (0),
+primary (1)
+}
+LinkOption ::= CHOICE {fixed NULL, dynamic Dynamic}
+MaxBitsPerInformationFrame::= INTEGER
+MaxCombinedThruputClass ::= CHOICE {
+maxCombinedThruput MaxCombinedThruput,
+null NULL}
+MaxCombinedThruput ::= ENUMERATED {
+baud16000 (0),
+baud18000 (1),
+baud20000 (2),
+baud22000 (3),
+baud24000 (4),
+baud26000 (5),
+baud28000 (6),
+baud30000 (7),
+baud32000 (8),
+baud64000 (9),
+baud72000 (10),
+baud80000 (11),
+baud88000 (12),
+baud96000 (13),
+baud104000 (14),
+baud112000 (15),
+baud120000 (16),
+baud128000 (17)
+}
+MaxNumberOfCallReference ::= INTEGER
+MaxTransmissionAttempts ::= INTEGER
+NotificationClass ::= ENUMERATED {
+noNotificationClass(1), -- without notification
+conditionalNotificationClass(2), -- with conditional notification
+unconditionalNotificationClass(3)}
+NumberOfDChannelLinks ::= INTEGER (1..256)
+PacketSize ::= ENUMERATED {
+size16 (0),
+size32 (1),
+size64 (2),
+size128 (3),
+size256 (4),
+size512 (5),
+size1024 (6),
+size2048 (7),
+size4096 (8)}
+PossibleServicePackages SERVICE-PACKAGE-SPECIFIC-DATA ::= {...}
+PrimaryIC ::= IA5String
+RemoveISDNAccessRequest ::= ObjectInstance
+RemoveISDNServiceRequest ::= SEQUENCE {
+directoryNumberName ObjectInstance,
+bearerServiceName ObjectInstance}
+RemoveISDNTerminalRequest ::= ObjectInstance
+RetrieveCustomerServiceRequest ::= SEQUENCE {
+tpName [0] ObjectInstance OPTIONAL,
+directoryNumber [1] ObjectInstance OPTIONAL,
+partyLineIdentifier [2] PartyLineIdentifier OPTIONAL
+-- PartyLineIdentifier is a parameter required to identify a particular customer when muliple customers are
+-- provided service on a single analog line.
+}
+RetrieveCustomerServiceReply ::= SET OF ObjectInstance
+SemiPermAccessPacketHandlerDefaultDirectoryNumber ::= SET OF
+SEQUENCE { defaultDirectoryNumber DirectoryNumber,
+bChannel ChannelNumber}
+ServiceProfileIdentifier ::= CHOICE {
+null NULL,
+spid IA5String(SIZE(3 .. 20))}
+ServicePackageISDNAccessDescription ::= SEQUENCE {
+servicePackageName ObjectInstance,
+accessPortName ObjectInstance}
+ServicePackageISDNDescription ::= SEQUENCE {
+servicePackageName
+SERVICE-PACKAGE-SPECIFIC-DATA. & servicePackageName ({PossibleServicePackages}),
+accessPortName ObjectInstance,
+serviceDescription SET OF SEQUENCE {
+templateDirectoryNumberName ObjectInstance,
+directoryNumberName ObjectInstance,
+serviceRequestInfo
+SERVICE-PACKAGE-SPECIFIC-DATA. & ServiceRequestInfo ({PossibleServicePackages}
+{@service PackageName}) OPTIONAL}}
+ServicePackageISDNTerminalDescription ::= SEQUENCE {
+servicePackageName ObjectInstance,
+aPPName ObjectInstance,
+sPId IA5String (SIZE(1..18)),
+terminalConfigurationName ObjectInstanceOPTIONAL}
+TerminalEndPointIdentifier ::= CHOICE { auto NULL,
+non-Auto INTEGER(0...126)}
+TerminalLimit ::= INTEGER(0..62)
+TerminalServiceProfilePtrList ::= SET OF ObjectInstance
+ThruputClass ::= ENUMERATED {
+baud75 (0),
+baud150 (1),
+baud300 (2),
+baud600 (3),
+baud1200 (4),
+baud2400 (5),
+baud4800 (6),
+baud9600 (7),
+baud19200 (8),
+baud48000 (9),
+baud56000 (10),
+baud64000 (11)}
+TSPID ::= IA5String (SIZE(1..18))
+UserServiceId ::= CHOICE {
+null NULL,
+uid INTEGER(0 .. 126)}
+WindowSize ::= CHOICE {lowRange [0] INTEGER(1..7),
+highRange [1] INTEGER(61..167)}
+END -- Type definitions --

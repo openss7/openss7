@@ -1,0 +1,710 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH FMODSW 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B fmodsw
+\- the SVR4 \fISTREAMS\fR module switch table structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The
+.B fmodsw
+structure is formatted as follows:
+.nf
+\fC\s-2
+struct fmodsw {
+        struct list_head f_list;        /* list of all structures */
+        struct list_head f_hash;        /* list of module hashes in slot */
+        const char *f_name;             /* module name */
+        struct streamtab *f_str;        /* pointer to streamtab for module */
+        uint f_flag;                    /* module flags */
+        uint f_modid;                   /* module id */
+        atomic_t f_count;               /* open count */
+        int f_sqlvl;                    /* q sychronization level */
+        const char *f_sqinfo;           /* elsewhere sychronization info */
+        struct syncq *f_syncq;          /* synchronization queue */
+        struct module *f_kmod;          /* kernel module */
+};
+\s+2\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B fmodsw
+structure contains the following members that
+are common with the
+.BR devnode (9)
+and
+.BR cdevsw (9)
+structures (a pointer to a
+.BR devnode (9)
+or
+.BR cdevsw (9)
+structure can always be cast to a pointer to a
+.B fmodsw
+structure):
+.TP \w'\ f_majors\ 'u
+.I f_list
+Provides a list of all
+.B fmodsw
+structures under the control of the
+.I STREAMS
+executive.
+This field must not be populated nor accessed directly by the
+.I STREAMS
+module.
+.TP
+.I f_hash
+A list of all
+.B fmodsw
+entries in the same hash slot.
+.B fmodsw
+entries are hashed for fast lookup by
+.I f_modid .
+This field must not be populated nor accessed directly by the
+.I STREAMS
+module.
+.TP
+.I f_name
+The name of the
+.I STREAMS
+module.  This is the name that will be used for the
+.BR specfs (5)
+directory entry.  If the
+.I STREAMS
+module is a loadable kernel module, the kernel module name must also be the concatenation of
+.RI \(lq streams- \(rq
+and this name for module demand loading to work correctly.  This name should also appear in the
+.I f_str->st_rdinit->qi_minfo->mi_idname
+member of the
+.BR module_info (9)
+structure.
+.IP ""
+Most registration functions require that this member be populated by the caller:
+it should be set to point to a constant static character string prior to the call to a registration
+function.
+.TP
+.I f_str
+A pointer to a
+.BR streamtab (9)
+structure specifying the
+.I STREAMS
+characteristics for the module.  This
+.BR streamtab (9)
+structure contains the stream head
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedures as well as the initial read queue high and low water marks.
+.IP ""
+Most registration functions require that this member be populated by the caller:
+it should be set to point to the
+.BR streamtab (9)
+structure that properly describes the
+.I STREAMS
+module.  Members (and subtending structures) of the
+.BR streamtab (9)
+structure should not be modified directly while the module is registered.
+.TP
+.I f_flag
+See
+.IR \*(lqFlags\*(rq ,
+below.
+.TP
+.I f_modid
+Contains the module id for this module.  This member is not populated by the caller of a
+registration function, but is set by the registration function at registration time.  After
+registration has been performed, this is the module id that was assigned to the module.
+.TP
+.I f_count
+The number of opens of this module.  This value must be set to zero before
+registration.
+.TP
+.I f_sqlvl
+Synchronization queue level, can be one of the following:
+.BR SQLVL_DEFAULT ,
+.BR SQLVL_GLOBAL ,
+.BR SQLVL_ELSEWHERE ,
+.BR SQLVL_MODULE ,
+.BR SQLVL_QUEUEPAIR ,
+.BR SQLVL_QUEUE ,
+.BR SQLVL_NOP " or "
+.BR SQLVL_PERSTREAM .
+For additional information on these synchronization levels, see
+.BR mp-streams (9).
+.IP ""
+These synchronization levels are not normally populated by the caller of a registration function,
+and this member should be allowed to default to zero
+.RB ( 0 ),
+which is the same as
+.BR SQLVL_DEFAULT .
+Synchronization should, instead, be specified using the
+.I f_flag
+member.
+An exception to this rule is when a synchronization level of
+.BR SQLVL_GLOBAL " or " SQLVL_ELSEWHERE
+is desired, which are not supported by the flags in the
+.I f_flag
+member.
+.TP
+.I f_sqinfo
+When member
+.I d_sqlvl
+is set to
+.BR SQLVL_ELSEWHERE ,
+this member specifies the character string name of the external synchronization to use.  It is
+ignored otherwise.
+This field is populated by the caller of the registration function to communicate to it which
+synchronization queue to populate against the
+.I f_syncq
+member.
+.TP
+.I f_syncq
+A pointer to a synchronization queue,
+.BR syncq (9)
+structure the describes the outer barrier for synchronization.  This member is only significant when
+member
+.I f_sqlvl
+is set to
+.BR SQLVL_DEFAULT ", " SQLVL_MODULE " or " SQLVL_ELSEWHERE .
+This member is not set by the caller to a registration function (it is overwritten by the
+registration function).  The registration function is responsible for locating the outer barrier
+based on other information and populating this pointer.  This member should not be directly
+manipulated by the
+.I STREAMS
+module.
+.TP
+.I f_kmod
+The loadable kernel module (see
+.BR kmod (9))
+to which this
+.B fmodsw
+structure belongs.  This kernel module (when non-null) will have its usage
+count incremented when stream heads are opened or other reference is made to
+the
+.B fmodsw
+entry.  In addition, this kernel module will have its usage count decremented
+when the reference to the
+.B fmodsw
+structure is released.
+When the structure is used to call a registration function by a loadable kernel module, this member
+should be populated with the value of
+.BR THIS_MODULE .
+.\"
+.\"
+.SS Flags
+.PP
+The following flags are used in the
+.I f_flag
+member and are expected to be populated by the
+.I STREAMS
+driver prior to a call to a registration function:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.\".B D_REOPEN
+.\"The driver or module can return a device number other than its own and the stream head must reopen
+.\"that device number.
+.\".TP
+.B D_CLONE
+Ignored for modules.
+.\".TP
+.\".B D_LIS
+.\"Attempt to be LiS compatible with this module.
+.PP
+The following flags are
+.IR Solaris \(rg
+compatible:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_MP
+specifies that the module is MP-safe.  When this flag is set, all other synchronization flags
+(inner perimeter, outer perimeter,
+.BR D_SAFE " and " D_UP )
+are ignored.
+.IP ""
+For more information on this  flag, or any of the synchronization flags, see
+.BR mp-streams (9).
+.PP
+The following inner perimeter flags are
+.IR Solaris \(rg
+compatible:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_MTPERMOD
+specifies that an inner perimeter exists and that the inner perimeter encircles all queue pairs in the
+module.
+Only one of
+.BR D_MTPERMOD ,
+.BR D_MTQPAIR " and " M_MTPERQ
+may be set.
+Only one of
+.BR D_MTPERMOD " and " D_MTOUTPERIM
+may be set.
+.TP
+.B D_MTQPAIR
+specifies that an inner perimeter exists and that the inner perimeter encircles each queue pair in the
+module.
+Only one of
+.BR D_MTPERMOD ,
+.BR D_MTQPAIR " and " M_MTPERQ
+may be set.
+.TP
+.B D_MTPERQ
+specifies that an inner perimeter exists and that the inner perimeter encircles each queue in the module.
+Only one of
+.BR D_MTPERMOD ,
+.BR D_MTQPAIR " and " M_MTPERQ
+may be set.
+.TP
+.B D_MTPUTSHARED
+specifies that the
+.IR qi_putp (9)
+procedure will enter the inner perimeter (if it exists) shared instead of
+(the default) exclusive.
+This flag has no effect if none of
+.BR D_MTPERMOD ,
+.BR D_MTQPAIR " or " D_MTPERQ
+are set (i.e. there is no inner perimeter).
+.PP
+The following outer perimeter flags are
+.IR Solaris \(rg
+compatible:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_MTOUTPERIM
+specifies that an outer perimeter exists and that the outer perimeter encircles all queue pairs in the module.
+Only one of
+.BR D_MTPERMOD " and " D_MTOUTPERIM
+may be set.
+.TP
+.B D_MTOCEXCL
+specifies that the
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+procedures will enter the outer perimeter (if it exists) exclusive instead of
+(the default) entering the outer perimeter shared and the inner perimeter exclusive.
+This flag has no effect if
+.B D_MTOTEPERIM
+is not set (i.e. there is no outer perimeter).
+.PP
+THe following flags are provided for
+.IR AIX \(rg
+compatibility:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_SAFE
+The module requires safe (local interrupts disabled) callbacks.
+.TP
+.B D_UP
+The module requests per-stream synchronization for uni-processor emulation.
+(This capability is not yet supported.)
+.PP
+THe following flags are provided for
+.IR OSF \(rg
+compatibility:
+.TP \w'\ D_MTOUTPERIM\ 'u
+.B D_64BIT
+The module handles 64-bit offsets.
+(This capability is not yet supported.)
+.TP
+.B D_NEW
+The module has an
+.I SVR 4
+prototype
+.IR qi_qopen (9)
+and
+.IR qi_qclose (9)
+procedure instead of
+.I SVR 3
+ones.
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+does not support
+.I SVR 3
+opens.  If this flag is not set, it is always implied.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B fmodsw
+structure is allocated by a caller of the
+.B @PACKAGE_TITLE@
+module registration function,
+.BR register_strmod (9).
+The
+.I STREAMS
+driver can call the
+.BR register_strmod (9)
+function as part of its initialization, or can use one of the registration compatibility function
+that will dynamically allocate a
+.B fmodsw
+structure for the caller.
+.PP
+The direct caller of the
+.BR register_strmod (9)
+registration function
+can allocate the structure statically or dynamically, but should ensure that all members
+are zeroed and only populate the
+.IR f_name ", " f_str ", " f_flag " and " f_kmod
+members as follows:
+.TP \w'f_kmod\(em'u
+.I f_name
+A pointer to a character string giving the name of the pushable module.
+.TP
+.I f_str
+A pointer to the
+.BR streamtab (9)
+structure describing the
+.I STREAMS
+module.
+.TP
+.I f_flag
+Flags specifying the synchronization required by the module.
+.TP
+.I f_kmod
+A pointer to
+.BR THIS_MODULE ,
+to keep kernel modules from unloading while the
+.I STREAMS
+module is in use.
+.PP
+After the registration function has been called, no members of the structure or subtending
+structures should be directly accessed nor manipulated by the
+.I STREAMS
+module.
+Dynamically allocated structures cannot be freed until after the corresponding unregistration
+function,
+.BR unregister_strmod (9),
+has been called.
+.PP
+See the registration function manual page,
+.BR register_strmod (9),
+for more information.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.B @PACKAGE_TITLE@
+registration functions are called from blocking context and are intended to be called from a
+.I STREAMS
+module's initialization or termination functions.  These structures must reside in pinned (kernel)
+memory where they are directly accessible by the
+.I STREAMS
+executive.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+The
+.B fmodsw
+table is protected by the
+.B fmodsw_lock
+reader-writer lock.  This structure should never be manipulated directly
+after it has been registered with a registration function and before it has
+been unregistered with a unregistration function.
+It is permissible, however, after registration, to read the values of some members (such as
+.IR f_modid ).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.IR "SVR 4" ,
+as described in
+.RI \(lq "The Magic Garden Explained" \(rq,
+allocates an array of
+.B fmodsw
+structures (the module switch table), to represent
+.I STREAMS
+modules in the
+.IR UNIX \(rg
+system.
+.B @PACKAGE_TITLE@
+uses dynamic allocation and a hash list
+of
+.B fmodsw
+structures, instead of an array,
+greatly reducing the memory footprint of
+.BR "@PACKAGE_TITLE@" .
+.PP
+This reduction is particularly noticeable when
+.BR "@PACKAGE_TITLE@"
+is compared to
+.IR LiS :
+.[
+lis
+.]
+.I LiS
+allocates a large array of similar
+.B cdevsw
+and
+.B fmodsw
+structures to represent
+.I STREAMS
+character devices and modules, swallowing up an excessive and whopping 600,000 bytes of BSS.
+In contrast, the BSS for
+.B @PACKAGE_TITLE@
+is about 1400 bytes.
+.\"
+.\"
+.SH NOTICES
+.PP
+If a
+.I STREAMS
+driver or module wishes to register as both a
+.I STREAMS
+pushable module and a
+.I STREAMS
+device or pseudo-device driver, it should use separate and distinct
+.BR fmodsw " and " cdevsw (9)
+structures that are registered separately.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+See
+.BR register_strmod (9)
+for an example use of the
+.B fmodsw
+structure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR devnode (9),
+.BR cdevsw (9),
+.BR specfs (5),
+.BR module_info (9),
+.BR streamtab (9),
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.BR mp-streams (9),
+.BR syncq (9),
+.BR kmod (9),
+.BR register_strmod (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B fmodsw
+structure is compatible with the descriptions of internal structures for
+.IR "SVR 4" ,
+.[
+svr4
+.]
+.[
+magic
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B fmodsw
+structure is implementation-specific and should not be manipulated directly by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+While roughly comparable to other implementations, the
+.B fmodsw
+structure contains members not present in other implementations and does not contain members present
+in other implementations.  Members with the same name may have a different function or other subtle
+differences.
+.IP \(em
+Because the
+.B fmodsw
+structure is dependent on
+.B @PACKAGE_TITLE@
+internal implementation specifics, it is not binary compatible.
+.IP \(em
+Any use supported by the
+.B fmodsw
+structure on other systems for purposes other than
+.I STREAMS
+are explicitly not supported by
+.BR "@PACKAGE_TITLE@" .
+.IP \(em
+.I "SVR 4.2"
+.[
+svr42
+.]
+did not standardize on a registration procedure, and most implementations use different methods.
+A
+.I STREAMS
+driver or module can avoid having directly knowledge of this structure by using on of the
+registration function compatible with another
+.I STREAMS
+implementation.
+.IP ""
+(Registration functions compatible with
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+are provided as part of the
+.I STREAMS
+compatibility package,
+.BR strcompat (5)).
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+There are no standards for this structure.
+.B @PACKAGE_TITLE@
+roughly conforms to
+.I "SVR 4.2"
+.[
+svr42
+.]
+and the descriptions of
+.I "SVR 4"
+internals.
+.[
+magic
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B fmodsw
+table and structure first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

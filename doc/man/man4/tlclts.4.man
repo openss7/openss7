@@ -1,0 +1,1 @@
+.so man4/ticlts.4.man

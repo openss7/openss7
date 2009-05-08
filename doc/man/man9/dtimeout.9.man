@@ -1,0 +1,375 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DTIMEOUT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B dtimeout
+\- start a timer for a specified processor
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.B #define _UW7_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "typedef void " timo_fcn_t "(caddr_t arg);
+.HP
+.BI "toid_t dtimeout(timo_fcn_t *" timo_fcn ", caddr_t " arg ", long " ticks ", pl_t " pl ", processorid_t " cpu );
+.HP
+.BI "toid_t dtimeout(void (*" timo_fcn ")(), void *" arg ", long " ticks ", pl_t " pl ", processorid_t " cpu ", void *" arg2 ", void *" arg3 ", void *" arg4 );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\ timo_fcn\ 'u
+.I timo_fcn
+the function to call on expiry.
+.PD 0
+.TP
+.I arg
+the argument to pass to the callback function.
+.TP
+.I ticks
+the number of ticks to wait before expiry.
+.TP
+.I pl
+the priority level at which to run the call-out function.
+.TP
+.I cpu
+the cpu on which to execute the call-out function.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR dtimeout ()
+starts a timer with duration
+.I ticks
+number of system clock ticks, that,  upon expiry will invoke the supplied
+timeout function callback
+.I timo_fcn
+(if the
+.I timo_fcn
+function pointer is
+.RB non- NULL )
+with the supplied argument
+.IR arg ,
+at the specified priority level
+.IR pl ,
+and on the specified processor
+.IR cpu .
+The timeout call-out function
+.I timo_fcn
+is a function returning
+.B void
+and taking a single
+.B caddr_t
+argument as follows:
+.sp
+.nf
+.BI "typedef void timo_fcn_t(caddr_t " arg );
+.fi
+.PP
+The call-out function
+.I timo_fcn
+will be executed at some time greater than or equal to the interval specified
+in the
+.I ticks
+argument on the specified
+.I cpu
+and at the specified priority level
+.IR pl .
+.PP
+The
+.B toid_t
+timeout identifier returned by
+.BR dtimeout ()
+is suitable to be used by 
+.BR untimeout (9)
+to cancel the timeout function call-out.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR dtimeout ()
+returns a
+.B toid_t
+defined as follows:
+.sp
+.nf
+.B typedef int toid_t;
+.B typedef int timout_id_t;
+.fi
+.PP
+Upon success,
+.BR dtimeout ()
+returns a non-zero timeout id and the timeout is scheduled.
+Upon failure,
+.BR dtimeout ()
+returns a zero timeout id and no timeout is scheduled.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR dtimeout ()
+fails, it returns a zero (0) timeout id.
+.BR dtimeout ()
+fails when it cannot allocate the internal structures for the timeout, when
+the arguments are invalid, or the timeout cannot otherwise be scheduled on the
+specified processor.  If it is important that a timeout be scheduled with
+assurance, the return value should always be checked.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR dtimeout ()
+can be called from any context including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR dtimeout ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR dtimeout ()
+call-out function is asynchronous and can execute at the same time as any user
+context, module procedure, call-out, callback, soft interrupt or interrupt
+service routine not masked by the
+.I pl
+argument.
+In addition, for sufficiently small
+.I tick
+values, the call-out function may execute before the call to
+.BR dtimeout ()
+returns.
+However, the callback function will be serviced on the CPU specified.
+.\"
+.\"
+.SH NOTICES
+.PP
+For architectural independence,
+.I STREAMS
+drivers and modules should not specify the
+.I ticks
+argument directly, but should use the
+.BR drv_usectohz (9)
+and
+.BR drv_hztousec (9)
+DKI functions.  The Linux
+.B HZ
+define or some other quantum independent conversion function to convert to and
+from microseconds or some other absolute unit of time.
+.PP
+.B toid_t
+and
+.B timout_id_t
+should eb treated as an opaque type that can be tested for equality to zero.
+The value should not otherwise be manipulated.
+.B @PACKAGE_TITLE@
+implements timeout id values internally as a pointer to a
+.B strevent
+structure containing a Linux timer.  on 64-bit architectures,
+.B strevent
+structures are allocated in low or high memory only so that pointers can be
+converted to integers and visa versa.
+.B @PACKAGE_TITLE@
+also includes a version field in the least significant bits of the pointer to
+handle late calls to
+.BR untimeout (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR untimeout (9),
+.BR timeout (9),
+.BR qtimeout (9),
+.BR quntimeout (9),
+.BR drv_usectohz (9),
+.BR drv_hztousec (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR dtimeout ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR dtimeout ()
+is compatible with
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.I "SVR 4"
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+allows a
+.B TO_PERIODIC
+flag to be logically ORed with the
+.I ticks
+argument to indicate a periodic timer.
+.IP \(em
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+declares
+.BR dtimeout ()
+with the second form with a callback function taking 4 arguments as defined in the second
+declaration under
+.RI \(lq SYNOPSIS \(rq
+above.  Portable
+.I STREAMS
+drivers and modules will not use this function.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR dtimeout ()
+first appeared in
+.IR "SVR 4 MP" .
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

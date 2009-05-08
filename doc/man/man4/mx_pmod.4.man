@@ -1,0 +1,1 @@
+.so man4/mx-pmod.4.man

@@ -1,0 +1,1321 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SUNCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B suncompat
+\- Solaris \fISTREAMS\fR Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B @PACKAGE_TITLE@
+provides a compatibility module,
+.BR streams-suncompat.o ,
+that provides compatibility functions that smooth porting of drivers from the
+.I Mac OpenTransport 1.5r2
+.I STREAMS
+environment to
+.BR "@PACKAGE_TITLE@" .
+The functions provided by this compatibility module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Many of the functions that are provided by
+.IR Solaris \(rg
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "@PACKAGE_TITLE@" .
+Other
+.IR Solaris \(rg-specific
+functions are provided by the
+.B streams-suncompat.o
+compatibility kernel module.
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.B Linux Fast STREAMS
+are as follows:
+.PD 0
+.BR adjmsg (9)
+.BR allocb (9)
+.BR ASSERT (9)
+.BR backq (9)
+.BR bcanput (9)
+.BR bcanputnext (9)
+.BR bcmp (9)
+.BR bcopy (9)
+.BR bufcall (9)
+.BR bzero (9)
+.BR canput (9)
+.BR canputnext (9)
+.BR cmn_err (9)
+.BR copyb (9)
+.BR copyin (9)
+.BR copymsg (9)
+.BR copyout (9)
+.BR datamsg (9)
+.BR delay (9)
+.BR drv_getparm (9)
+.BR drv_hztousec (9)
+.BR drv_priv (9)
+.BR drv_usectohz (9)
+.BR drv_usecwait (9)
+.BR dupb (9)
+.BR dupmsg (9)
+.BR enableok (9)
+.BR esballoc (9)
+.BR esbbcall (9)
+.BR flushband (9)
+.BR flushq (9)
+.BR freeb (9)
+.BR freemsg (9)
+.BR freezestr (9)
+.BR getmajor (9)
+.BR getminor (9)
+.BR getq (9)
+.BR insq (9)
+.BR kmem_alloc (9)
+.BR kmem_free (9)
+.BR kmem_zalloc (9)
+.BR linkb (9)
+.BR linkblk (9)
+.BR makedevice (9)
+.BR max (9)
+.BR min (9)
+.BR msgdsize (9)
+.BR msgpullup (9)
+.BR noenable (9)
+.BR OTHERQ (9)
+.BR pullupmsg (9)
+.BR put (9)
+.BR putbq (9)
+.BR putctl1 (9)
+.BR putctl (9)
+.BR putnext (9)
+.BR putnextctl1 (9)
+.BR putnextctl (9)
+.BR putq (9)
+.BR qenable (9)
+.BR qprocsoff (9)
+.BR qprocson (9)
+.BR qreply (9)
+.BR qsize (9)
+.BR RD (9)
+.BR rmalloc (9)
+.BR rmallocmap (9)
+.BR rmallocmap_wait (9)
+.BR rmalloc_wait (9)
+.BR rmfree (9)
+.BR rmfreemap (9)
+.BR rmvb (9)
+.BR rmvq (9)
+.BR SAMESTR (9)
+.BR strqget (9)
+.BR strqset (9)
+.BR testb (9)
+.BR timeout (9)
+.BR uiomove (9)
+.BR unbufcall (9)
+.BR unfreezestr (9)
+.BR unlinkb (9)
+.BR untimeout (9)
+.BR WR (9)
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B @PACKAGE_TITLE@
+.IR Solaris \(rg
+compatibility module,
+.BR streams-suncompat.o ,
+are as follows:
+.PD 0
+.HP
+.BR cv_broadcast (9)\ \-\ \c
+
+.HP
+.BR cv_destroy (9)\ \-\ \c
+
+.HP
+.BR cv_init (9)\ \-\ \c
+
+.HP
+.BR cv_signal (9)\ \-\ \c
+
+.HP
+.BR cv_timedwait (9)\ \-\ \c
+
+.HP
+.BR cv_timedwait_sig (9)\ \-\ \c
+
+.HP
+.BR cv_wait (9)\ \-\ \c
+
+.HP
+.BR cv_wait_sig (9)\ \-\ \c
+
+.HP
+.BR ddi_add_intr (9)\ \-\ \c
+
+.HP
+.BR ddi_add_softintr (9)\ \-\ \c
+
+.HP
+.BR ddi_binding_name (9)\ \-\ \c
+
+.HP
+.BR ddi_btop (9)\ \-\ \c
+
+.HP
+.BR ddi_btopr (9)\ \-\ \c
+
+.HP
+.BR ddi_check_acc_handle (9)\ \-\ \c
+
+.HP
+.BR ddi_check_dma_handle (9)\ \-\ \c
+
+.HP
+.BR ddi_copyin (9)\ \-\ \c
+
+.HP
+.BR ddi_copyout (9)\ \-\ \c
+
+.HP
+.BR ddi_create_minor_node (9)\ \-\ \c
+
+.HP
+.BR ddi_device_acc_attr (9)\ \-\ \c
+
+.HP
+.BR ddi_device_copy (9)\ \-\ \c
+
+.HP
+.BR ddi_device_zero (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_compare (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_free (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_init (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_register (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_sizeof (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_str_decode (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_str_encode (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_str_free (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_unregister (9)\ \-\ \c
+
+.HP
+.BR ddi_devid_valid (9)\ \-\ \c
+
+.HP
+.BR ddi_dev_is_needed (9)\ \-\ \c
+
+.HP
+.BR ddi_dev_is_sid (9)\ \-\ \c
+
+.HP
+.BR ddi_devmap_segmap (9)\ \-\ \c
+
+.HP
+.BR ddi_dev_nintrs (9)\ \-\ \c
+
+.HP
+.BR ddi_dev_nregs (9)\ \-\ \c
+
+.HP
+.BR ddi_dev_regsize (9)\ \-\ \c
+
+.HP
+.BR ddi_dev_report_fault (9)\ \-\ \c
+
+.HP
+.BR ddi_driver_major (9)\ \-\ \c
+
+.HP
+.BR ddi_driver_name (9)\ \-\ \c
+
+.HP
+.BR ddi_enter_critical (9)\ \-\ \c
+
+.HP
+.BR ddi_exit_critical (9)\ \-\ \c
+
+.HP
+.BR ddi_ffs (9)\ \-\ \c
+
+.HP
+.BR ddi_fls (9)\ \-\ \c
+
+.HP
+.BR ddi_get16 (9)\ \-\ \c
+
+.HP
+.BR ddi_get32 (9)\ \-\ \c
+
+.HP
+.BR ddi_get64 (9)\ \-\ \c
+
+.HP
+.BR ddi_get8 (9)\ \-\ \c
+
+.HP
+.BR ddi_getb (9)\ \-\ \c
+
+.HP
+.BR ddi_get_cred (9)\ \-\ \c
+
+.HP
+.BR ddi_get_devstate (9)\ \-\ \c
+
+.HP
+.BR ddi_get_driver_private (9)\ \-\ \c
+
+.HP
+.BR ddi_get_iblock_cookie (9)\ \-\ \c
+
+.HP
+.BR ddi_getiminor (9)\ \-\ \c
+
+.HP
+.BR ddi_get_instance (9)\ \-\ \c
+
+.HP
+.BR ddi_get_kt_did (9)\ \-\ \c
+
+.HP
+.BR ddi_getl (9)\ \-\ \c
+
+.HP
+.BR ddi_get_lbolt (9)\ \-\ \c
+
+.HP
+.BR ddi_getll (9)\ \-\ \c
+
+.HP
+.BR ddi_getlongprop (9)\ \-\ \c
+
+.HP
+.BR ddi_getlongprop_buf (9)\ \-\ \c
+
+.HP
+.BR ddi_get_name (9)\ \-\ \c
+
+.HP
+.BR ddi_get_parent (9)\ \-\ \c
+
+.HP
+.BR ddi_get_pid (9)\ \-\ \c
+
+.HP
+.BR ddi_getprop (9)\ \-\ \c
+
+.HP
+.BR ddi_getproplen (9)\ \-\ \c
+
+.HP
+.BR ddi_get_soft_iblock_cookie (9)\ \-\ \c
+
+.HP
+.BR ddi_get_soft_state (9)\ \-\ \c
+
+.HP
+.BR ddi_get_time (9)\ \-\ \c
+
+.HP
+.BR ddi_getw (9)\ \-\ \c
+
+.HP
+.BR ddi_idevice_cookie (9)\ \-\ \c
+
+.HP
+.BR ddi_in_panic (9)\ \-\ \c
+
+.HP
+.BR ddi_intr_hilevel (9)\ \-\ \c
+
+.HP
+.BR ddi_iomin (9)\ \-\ \c
+
+.HP
+.BR ddi_log_sysevent (9)\ \-\ \c
+
+.HP
+.BR ddi_map_regs (9)\ \-\ \c
+
+.HP
+.BR ddi_mem_alloc (9)\ \-\ \c
+
+.HP
+.BR ddi_mem_free (9)\ \-\ \c
+
+.HP
+.BR ddi_node_name (9)\ \-\ \c
+
+.HP
+.BR ddi_ptob (9)\ \-\ \c
+
+.HP
+.BR ddi_remove_intr (9)\ \-\ \c
+
+.HP
+.BR ddi_remove_minor_node (9)\ \-\ \c
+
+.HP
+.BR ddi_remove_softintr (9)\ \-\ \c
+
+.HP
+.BR ddi_removing_power (9)\ \-\ \c
+
+.HP
+.BR ddi_report_dev (9)\ \-\ \c
+
+.HP
+.BR ddi_root_node (9)\ \-\ \c
+
+.HP
+.BR ddi_set_driver_private (9)\ \-\ \c
+
+.HP
+.BR ddi_slaveonly (9)\ \-\ \c
+
+.HP
+.BR ddi_soft_state (9)\ \-\ \c
+
+.HP
+.BR ddi_soft_state_fini (9)\ \-\ \c
+
+.HP
+.BR ddi_soft_state_free (9)\ \-\ \c
+
+.HP
+.BR ddi_soft_state_init (9)\ \-\ \c
+
+.HP
+.BR ddi_soft_state_zalloc (9)\ \-\ \c
+
+.HP
+.BR ddi_trigger_softintr (9)\ \-\ \c
+
+.HP
+.BR ddi_umem_alloc (9)\ \-\ \c
+
+.HP
+.BR ddi_umem_free (9)\ \-\ \c
+
+.HP
+.BR ddi_umem_iosetup (9)\ \-\ \c
+
+.HP
+.BR ddi_umem_lock (9)\ \-\ \c
+
+.HP
+.BR ddi_umem_unlock (9)\ \-\ \c
+
+.HP
+.BR ddi_unmap_regs (9)\ \-\ \c
+
+.HP
+.BR _fini (9)\ \-\ \c
+
+.HP
+.BR getinfo (9)\ \-\ \c
+
+.HP
+.BR identify (9)\ \-\ \c
+
+.HP
+.BR _info (9)\ \-\ \c
+
+.HP
+.BR _init (9)\ \-\ \c
+
+.HP
+.BR IOC_CONVERT_FROM (9)\ \-\ \c
+
+.HP
+.BR mod_info (9)\ \-\ \c
+
+.HP
+.BR mod_install (9)\ \-\ \c
+
+.HP
+.BR mod_remove (9)\ \-\ \c
+
+.HP
+.BR mutex (9)\ \-\ \c
+
+.HP
+.BR mutex_destroy (9)\ \-\ \c
+
+.HP
+.BR mutex_enter (9)\ \-\ \c
+
+.HP
+.BR mutex_exit (9)\ \-\ \c
+
+.HP
+.BR mutex_init (9)\ \-\ \c
+
+.HP
+.BR mutex_owned (9)\ \-\ \c
+
+.HP
+.BR mutex_tryenter (9)\ \-\ \c
+
+.HP
+.BR ptob (9)\ \-\ \c
+
+.HP
+.BR qbufcall (9)\ \-\ \c
+
+.HP
+.BR qtimeout (9)\ \-\ \c
+
+.HP
+.BR queclass (9)\ \-\ \c
+
+.HP
+.BR qunbufcall (9)\ \-\ \c
+
+.HP
+.BR quntimeout (9)\ \-\ \c
+
+.HP
+.BR qwait (9)\ \-\ \c
+
+.HP
+.BR qwait_sig (9)\ \-\ \c
+
+.HP
+.BR qwriter (9)\ \-\ \c
+
+.HP
+.BR rw_destroy (9)\ \-\ \c
+
+.HP
+.BR rw_downgrade (9)\ \-\ \c
+
+.HP
+.BR rw_enter (9)\ \-\ \c
+
+.HP
+.BR rw_exit (9)\ \-\ \c
+
+.HP
+.BR rw_init (9)\ \-\ \c
+
+.HP
+.BR rwlock (9)\ \-\ \c
+
+.HP
+.BR rw_read_locked (9)\ \-\ \c
+
+.HP
+.BR rw_tryenter (9)\ \-\ \c
+
+.HP
+.BR rw_tryupgrade (9)\ \-\ \c
+
+.HP
+.BR sema_destroy (9)\ \-\ \c
+
+.HP
+.BR sema_init (9)\ \-\ \c
+
+.HP
+.BR sema_p (9)\ \-\ \c
+
+.HP
+.BR semaphore (9)\ \-\ \c
+
+.HP
+.BR sema_p_sig (9)\ \-\ \c
+
+.HP
+.BR sema_tryp (9)\ \-\ \c
+
+.HP
+.BR sema_v (9)\ \-\ \c
+
+.HP
+.BR snprintf (9)\ \-\ \c
+
+.HP
+.BR sprintf (9)\ \-\ \c
+
+.HP
+.BR stoi (9)\ \-\ \c
+
+.HP
+.BR strcasecmp (9)\ \-\ \c
+
+.HP
+.BR strchr (9)\ \-\ \c
+
+.HP
+.BR strcmp (9)\ \-\ \c
+
+.HP
+.BR strcpy (9)\ \-\ \c
+
+.HP
+.BR strlen (9)\ \-\ \c
+
+.HP
+.BR strlog (9)\ \-\ \c
+
+.HP
+.BR strncasecmp (9)\ \-\ \c
+
+.HP
+.BR strncmp (9)\ \-\ \c
+
+.HP
+.BR strncpy (9)\ \-\ \c
+
+.HP
+.BR swab (9)\ \-\ \c
+
+.PD
+.\"
+.SS "\fIMPS\fP\fR\(rg\fP Transport Functions"
+.PP
+.IR Solaris \(rg
+exposes a number of symbols from the underlying Mentat
+.IR MPS \(rg
+TCP/IP implementation that are also documented in the
+.IR Solaris \(rg
+documentation.
+These transport functions are
+.B not
+part of the
+.B @PACKAGE_TITLE@
+package:
+.HP
+.BR mi_tpi_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_OK_ACK (7)
+or
+.BR T_ERROR_ACK (7)
+.PD 0
+.HP
+.BR mi_tpi_conn_con (9)\ \-\ \c
+generate a
+.BR T_CONN_CON (7)
+.HP
+.BR mi_tpi_conn_ind (9)\ \-\ \c
+generate a
+.BR T_CONN_IND (7)
+.HP
+.BR mi_tpi_conn_req (9)\ \-\ \c
+generate a
+.BR T_CONN_REQ (7)
+.HP
+.BR mi_tpi_data_ind (9)\ \-\ \c
+generate a
+.BR T_DATA_IND (7)
+.HP
+.BR mi_tpi_data_req (9)\ \-\ \c
+generate a
+.BR T_DATA_REQ (7)
+.HP
+.BR mi_tpi_discon_ind (9)\ \-\ \c
+generate a
+.BR T_DISCON_IND (7)
+.HP
+.BR mi_tpi_discon_req (9)\ \-\ \c
+generate a
+.BR T_DISCON_REQ (7)
+.HP
+.BR mi_tpi_err_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_ERROR_ACK (7)
+.HP
+.BR mi_tpi_exdata_ind (9)\ \-\ \c
+generate a
+.BR T_EXDATA_IND (7)
+.HP
+.BR mi_tpi_exdata_req (9)\ \-\ \c
+generate a
+.BR T_EXDATA_REQ (7)
+.HP
+.BR mi_tpi_info_req (9)\ \-\ \c
+generate a
+.BR T_INFO_REQ (7)
+.HP
+.BR mi_tpi_ok_ack_alloc (9)\ \-\ \c
+allocate a
+.BR T_OK_ACK (7)
+.HP
+.BR mi_tpi_ordrel_ind (9)\ \-\ \c
+generate a
+.BR T_ORDREL_IND (7)
+.HP
+.BR mi_tpi_ordrel_req (9)\ \-\ \c
+generate a
+.BR T_ORDREL_REQ (7)
+.HP
+.BR mi_tpi_uderror_ind (9)\ \-\ \c
+generate a
+.BR T_UDERROR_IND (7)
+.HP
+.BR mi_tpi_unitdata_ind (9)\ \-\ \c
+generate a
+.BR T_UNITDATA_IND (7)
+.HP
+.BR mi_tpi_unitdata_req (9)\ \-\ \c
+generate a
+.BR T_UNITDATA_REQ (7)
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+For usage an example of the various functions, see the individual manual pages.
+.\"
+.\"
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+These functions can be executed from various contexts as described in each separate manual page.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Most of these functions are MP-safe; however,
+see the manual page for the individual function for detailed information.
+.\"
+.\"
+.SH NOTICES
+.PP
+These are
+.IR Solaris \(rg-specific
+functions:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+or
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+defined,
+.IR Solaris \(rg
+compatibility will become part of the
+.B @PACKAGE_TITLE@
+.I streams
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined,
+.IR Solaris \(rg
+compatibility will be placed in a separate
+.I streams-suncompat
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR Solaris \(rg-specific
+functions loads.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Core functions are implemented within the
+.B @PACKAGE_TITLE@
+framework.
+.IR Solaris \(rg-specific
+functions are implemented as described in the separate manual pages describing each facility.
+.\"
+.\"
+.\".SH IOCTLS
+.\".PP
+.\"
+.\"
+.\".SH SYSCTLS
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.PP
+Compatibility functions:
+.BR cv_broadcast (9),
+.BR cv_destroy (9),
+.BR cv_init (9),
+.BR cv_signal (9),
+.BR cv_timedwait (9),
+.BR cv_timedwait_sig (9),
+.BR cv_wait (9),
+.BR cv_wait_sig (9),
+.BR ddi_add_intr (9),
+.BR ddi_add_softintr (9),
+.BR ddi_binding_name (9),
+.BR ddi_btop (9),
+.BR ddi_btopr (9),
+.BR ddi_check_acc_handle (9),
+.BR ddi_check_dma_handle (9),
+.BR ddi_copyin (9),
+.BR ddi_copyout (9),
+.BR ddi_create_minor_node (9),
+.BR ddi_device_copy (9),
+.BR ddi_device_zero (9),
+.BR ddi_devid_compare (9),
+.BR ddi_devid_free (9),
+.BR ddi_devid_init (9),
+.BR ddi_devid_register (9),
+.BR ddi_devid_sizeof (9),
+.BR ddi_devid_str_decode (9),
+.BR ddi_devid_str_encode (9),
+.BR ddi_devid_str_free (9),
+.BR ddi_devid_unregister (9),
+.BR ddi_devid_valid (9),
+.BR ddi_dev_is_needed (9),
+.BR ddi_dev_is_sid (9),
+.BR ddi_devmap_segmap (9),
+.BR ddi_dev_nintrs (9),
+.BR ddi_dev_nregs (9),
+.BR ddi_dev_regsize (9),
+.BR ddi_dev_report_fault (9),
+.BR ddi_dma_addr_bind_handle (9),
+.BR ddi_dma_addr_setup (9),
+.BR ddi_dma_alloc_handle (9),
+.BR ddi_dma_buf_bind_handle (9),
+.BR ddi_dma_buf_setup (9),
+.BR ddi_dma_burstsizes (9),
+.BR ddi_dma_coff (9),
+.BR ddi_dma_curwin (9),
+.BR ddi_dma_devalign (9),
+.BR ddi_dmae_1stparty (9),
+.BR ddi_dmae (9),
+.BR ddi_dmae_alloc (9),
+.BR ddi_dmae_disable (9),
+.BR ddi_dmae_enable (9),
+.BR ddi_dmae_getattr (9),
+.BR ddi_dmae_getcnt (9),
+.BR ddi_dmae_getlim (9),
+.BR ddi_dmae_prog (9),
+.BR ddi_dmae_release (9),
+.BR ddi_dmae_stop (9),
+.BR ddi_dma_free (9),
+.BR ddi_dma_free_handle (9),
+.BR ddi_dma_get_attr (9),
+.BR ddi_dma_getwin (9),
+.BR ddi_dma_htoc (9),
+.BR ddi_dma_mem_alloc (9),
+.BR ddi_dma_mem_free (9),
+.BR ddi_dma_movwin (9),
+.BR ddi_dma_nextcookie (9),
+.BR ddi_dma_nextseg (9),
+.BR ddi_dma_nextwin (9),
+.BR ddi_dma_numwin (9),
+.BR ddi_dma_segtocookie (9),
+.BR ddi_dma_set_sbus64 (9),
+.BR ddi_dma_setup (9),
+.BR ddi_dma_sync (9),
+.BR ddi_dma_unbind_handle (9),
+.BR ddi_driver_major (9),
+.BR ddi_driver_name (9),
+.BR ddi_enter_critical (9),
+.BR ddi_exit_critical (9),
+.BR ddi_ffs (9),
+.BR ddi_fls (9),
+.BR ddi_get16 (9),
+.BR ddi_get32 (9),
+.BR ddi_get64 (9),
+.BR ddi_get8 (9),
+.BR ddi_getb (9),
+.BR ddi_get_cred (9),
+.BR ddi_get_devstate (9),
+.BR ddi_get_driver_private (9),
+.BR ddi_get_iblock_cookie (9),
+.BR ddi_getiminor (9),
+.BR ddi_get_instance (9),
+.BR ddi_get_kt_did (9),
+.BR ddi_getl (9),
+.BR ddi_get_lbolt (9),
+.BR ddi_getll (9),
+.BR ddi_getlongprop (9),
+.BR ddi_getlongprop_buf (9),
+.BR ddi_get_name (9),
+.BR ddi_get_parent (9),
+.BR ddi_get_pid (9),
+.BR ddi_getprop (9),
+.BR ddi_getproplen (9),
+.BR ddi_get_soft_iblock_cookie (9),
+.BR ddi_get_soft_state (9),
+.BR ddi_get_time (9),
+.BR ddi_getw (9),
+.BR ddi_in_panic (9),
+.BR ddi_intr_hilevel (9),
+.BR ddi_io_get16 (9),
+.BR ddi_io_get32 (9),
+.BR ddi_io_get64 (9),
+.BR ddi_io_get8 (9),
+.BR ddi_io_getb (9),
+.BR ddi_io_getl (9),
+.BR ddi_io_getw (9),
+.BR ddi_iomin (9),
+.BR ddi_iopb_alloc (9),
+.BR ddi_iopb_free (9),
+.BR ddi_io_put16 (9),
+.BR ddi_io_put32 (9),
+.BR ddi_io_put64 (9),
+.BR ddi_io_put8 (9),
+.BR ddi_io_putb (9),
+.BR ddi_io_putl (9),
+.BR ddi_io_putw (9),
+.BR ddi_io_rep_get16 (9),
+.BR ddi_io_rep_get32 (9),
+.BR ddi_io_rep_get64 (9),
+.BR ddi_io_rep_get8 (9),
+.BR ddi_io_rep_getb (9),
+.BR ddi_io_rep_getl (9),
+.BR ddi_io_rep_getw (9),
+.BR ddi_io_rep_put16 (9),
+.BR ddi_io_rep_put32 (9),
+.BR ddi_io_rep_put64 (9),
+.BR ddi_io_rep_put8 (9),
+.BR ddi_io_rep_putb (9),
+.BR ddi_io_rep_putl (9),
+.BR ddi_io_rep_putw (9),
+.BR ddi_log_sysevent (9),
+.BR ddi_mapdev (9),
+.BR ddi_mapdev_intercept (9),
+.BR ddi_mapdev_nointercept (9),
+.BR ddi_map_regs (9),
+.BR ddi_mem_alloc (9),
+.BR ddi_mem_free (9),
+.BR ddi_mem_get16 (9),
+.BR ddi_mem_get32 (9),
+.BR ddi_mem_get64 (9),
+.BR ddi_mem_get8 (9),
+.BR ddi_mem_getb (9),
+.BR ddi_mem_getl (9),
+.BR ddi_mem_getll (9),
+.BR ddi_mem_getw (9),
+.BR ddi_mem_put16 (9),
+.BR ddi_mem_put32 (9),
+.BR ddi_mem_put64 (9),
+.BR ddi_mem_put8 (9),
+.BR ddi_mem_putb (9),
+.BR ddi_mem_putl (9),
+.BR ddi_mem_putll (9),
+.BR ddi_mem_putw (9),
+.BR ddi_mem_rep_get16 (9),
+.BR ddi_mem_rep_get32 (9),
+.BR ddi_mem_rep_get64 (9),
+.BR ddi_mem_rep_get8 (9),
+.BR ddi_mem_rep_getb (9),
+.BR ddi_mem_rep_getl (9),
+.BR ddi_mem_rep_getll (9),
+.BR ddi_mem_rep_getw (9),
+.BR ddi_mem_rep_put16 (9),
+.BR ddi_mem_rep_put32 (9),
+.BR ddi_mem_rep_put64 (9),
+.BR ddi_mem_rep_put8 (9),
+.BR ddi_mem_rep_putb (9),
+.BR ddi_mem_rep_putl (9),
+.BR ddi_mem_rep_putll (9),
+.BR ddi_mem_rep_putw (9),
+.BR ddi_mmap_get_model (9),
+.BR ddi_model_convert_from (9),
+.BR ddi_node_name (9),
+.BR ddi_peek16 (9),
+.BR ddi_peek32 (9),
+.BR ddi_peek64 (9),
+.BR ddi_peek8 (9),
+.BR ddi_peek (9),
+.BR ddi_peekc (9),
+.BR ddi_peekd (9),
+.BR ddi_peekl (9),
+.BR ddi_peeks (9),
+.BR ddi_poke16 (9),
+.BR ddi_poke32 (9),
+.BR ddi_poke64 (9),
+.BR ddi_poke8 (9),
+.BR ddi_poke (9),
+.BR ddi_pokec (9),
+.BR ddi_poked (9),
+.BR ddi_pokel (9),
+.BR ddi_pokes (9),
+.BR ddi_prop_create (9),
+.BR ddi_prop_exists (9),
+.BR ddi_prop_free (9),
+.BR ddi_prop_get_int64 (9),
+.BR ddi_prop_get_int (9),
+.BR ddi_prop_lookup (9),
+.BR ddi_prop_lookup_byte_array (9),
+.BR ddi_prop_lookup_int64_array (9),
+.BR ddi_prop_lookup_int_array (9),
+.BR ddi_prop_lookup_string (9),
+.BR ddi_prop_lookup_string_array (9),
+.BR ddi_prop_modify (9),
+.BR ddi_prop_op (9),
+.BR ddi_prop_remove (9),
+.BR ddi_prop_remove_all (9),
+.BR ddi_prop_undefine (9),
+.BR ddi_prop_update (9),
+.BR ddi_prop_update_byte_array (9),
+.BR ddi_prop_update_int64 (9),
+.BR ddi_prop_update_int64_array (9),
+.BR ddi_prop_update_int (9),
+.BR ddi_prop_update_string (9),
+.BR ddi_prop_update_string_array (9),
+.BR ddi_ptob (9),
+.BR ddi_put16 (9),
+.BR ddi_put32 (9),
+.BR ddi_put64 (9),
+.BR ddi_put8 (9),
+.BR ddi_putb (9),
+.BR ddi_putl (9),
+.BR ddi_putll (9),
+.BR ddi_putw (9),
+.BR ddi_regs_map_free (9),
+.BR ddi_regs_map_setup (9),
+.BR ddi_remove_intr (9),
+.BR ddi_remove_minor_node (9),
+.BR ddi_remove_softintr (9),
+.BR ddi_removing_power (9),
+.BR ddi_rep_get16 (9),
+.BR ddi_rep_get32 (9),
+.BR ddi_rep_get64 (9),
+.BR ddi_rep_get8 (9),
+.BR ddi_rep_getb (9),
+.BR ddi_rep_getl (9),
+.BR ddi_rep_getll (9),
+.BR ddi_rep_getw (9),
+.BR ddi_report_dev (9),
+.BR ddi_rep_put16 (9),
+.BR ddi_rep_put32 (9),
+.BR ddi_rep_put64 (9),
+.BR ddi_rep_put8 (9),
+.BR ddi_rep_putb (9),
+.BR ddi_rep_putl (9),
+.BR ddi_rep_putll (9),
+.BR ddi_rep_putw (9),
+.BR ddi_root_node (9),
+.BR ddi_segmap (9),
+.BR ddi_segmap_setup (9),
+.BR ddi_set_driver_private (9),
+.BR ddi_slaveonly (9),
+.BR ddi_soft_state (9),
+.BR ddi_soft_state_fini (9),
+.BR ddi_soft_state_free (9),
+.BR ddi_soft_state_init (9),
+.BR ddi_soft_state_zalloc (9),
+.BR ddi_trigger_softintr (9),
+.BR ddi_umem_alloc (9),
+.BR ddi_umem_free (9),
+.BR ddi_umem_lock (9),
+.BR ddi_umem_unlock (9),
+.BR ddi_unmap_regs (9),
+.BR _fini (9),
+.BR getinfo (9),
+.BR identify (9),
+.BR _info (9),
+.BR _init (9),
+.BR IOC_CONVERT_FROM (9),
+.BR mod_info (9),
+.BR mod_install (9),
+.BR mod_remove (9),
+.BR mutex (9),
+.BR mutex_destroy (9),
+.BR mutex_enter (9),
+.BR mutex_exit (9),
+.BR mutex_init (9),
+.BR mutex_owned (9),
+.BR mutex_tryenter (9),
+.BR ptob (9),
+.BR qbufcall (9),
+.BR qtimeout (9),
+.BR queclass (9),
+.BR qunbufcall (9),
+.BR quntimeout (9),
+.BR qwait (9),
+.BR qwait_sig (9),
+.BR qwriter (9),
+.BR rw_destroy (9),
+.BR rw_downgrade (9),
+.BR rw_enter (9),
+.BR rw_exit (9),
+.BR rw_init (9),
+.BR rwlock (9),
+.BR rw_read_locked (9),
+.BR rw_tryenter (9),
+.BR rw_tryupgrade (9),
+.BR sema_destroy (9),
+.BR sema_init (9),
+.BR sema_p (9),
+.BR semaphore (9),
+.BR sema_p_sig (9),
+.BR sema_tryp (9),
+.BR sema_v (9),
+.BR snprintf (9),
+.BR sprintf (9),
+.BR stoi (9),
+.BR strcasecmp (9),
+.BR strchr (9),
+.BR strcmp (9),
+.BR strcpy (9),
+.BR strlen (9),
+.BR strlog (9),
+.BR strncasecmp (9),
+.BR strncmp (9),
+.BR strncpy (9),
+.BR swab (9).
+.PP
+Transport functions:
+.BR mi_tpi_ack_alloc (9),
+.BR mi_tpi_conn_con (9),
+.BR mi_tpi_conn_ind (9),
+.BR mi_tpi_conn_req (9),
+.BR mi_tpi_data_ind (9),
+.BR mi_tpi_data_req (9),
+.BR mi_tpi_discon_ind (9),
+.BR mi_tpi_discon_req (9),
+.BR mi_tpi_err_ack_alloc (9),
+.BR mi_tpi_exdata_ind (9),
+.BR mi_tpi_exdata_req (9),
+.BR mi_tpi_info_req (9),
+.BR mi_tpi_ok_ack_alloc (9),
+.BR mi_tpi_ordrel_ind (9),
+.BR mi_tpi_ordrel_req (9),
+.BR mi_tpi_uderror_ind (9),
+.BR mi_tpi_unitdata_ind (9),
+.BR mi_tpi_unitdata_req (9),
+.BR mps_become_writer (9),
+.BR mps_intr_disable (9),
+.BR mps_intr_enable (9).
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.IR Solaris \(rg
+compatibility suite has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+These are
+.IR Solaris \(rg-specific
+functions and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+These functions
+are provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.IP \(em
+These functions
+only provide functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+these functions
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Solaris \(rg
+DDI documentation.
+.[
+soldoc
+.]
+.[
+solspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR Solaris \(rg.
+Functions with name starting with
+.I mi_
+are probably Mentat, Inc. functions that goe all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

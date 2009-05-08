@@ -1,0 +1,360 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_TIMER_MOVE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_timer_move
+\- move a \fISTREAMS\fR timer message to a new queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "void mi_timer_move(queue_t *" q ", mblk_t *" mp ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+a pointer to the target queue to which to move the timer message.
+.PD 0
+.TP
+.I mp
+a pointer to the timer message to move.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_timer_move ()
+changes the target queue to which the timer message will be put with
+.BR putq (9)
+when the timer expires.
+.BR mi_timer_move ()
+can be called for a running timer or a timer that is any state of running,
+queued, or idle.
+If the timer is running, when it expires it will be queued to the new queue
+instead of the previous one.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_timer_move ()
+can be used to have one queue inherit one or more timers associated with
+another queue.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_timer_move ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_timer_move ()
+is always successful.  If passed
+.B NULL
+or invalid pointers as arguments, or pointers to invalid structures, the
+kernel may become destabilized and a kernel panic may ensue.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_timer_move ()
+can be called from any context, however, it is intended to be called from
+within a
+.I STREAMS
+driver or module
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure, or
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routine.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_timer_move ()
+is MP-safe.  It uses atomic exchanges to guarantee atomicity of timer state.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_timer_move ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+If the timer associated with the message is not running, the new target queue
+is simply saved in the timer structure.  If the timer is running but has not
+yet expired, it is cancelled and rescheduled on the new queue.  If the timer
+has expired and the timer message is already queued to the old queue, the
+message is removed from that queue and placed on the new queue.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_timer_move ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_timer_move ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_timer_move ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR zzz ()
+function should be used in its stead.
+.IP \(em
+.BR mi_timer_move ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_timer_move ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_timer_move ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_timer_move ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_timer_move ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_timer_move ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_timer_move ()
+appears in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

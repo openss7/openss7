@@ -1,0 +1,719 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_COPYIN_N 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_copyin_n
+\- copy data from a user buffer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "void mi_copyin_n(queue_t *" q ", mblk_t *" mp ", size_t " offset ", size_t " len );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'offset\ \ 'u
+.I q
+the current write-side queue whose
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
+.BR mi_copyin_n ()
+is being called.
+.TP
+.I mp
+a pointer to the message block that contains the
+.BR M_IOCDATA (9)
+message being processed.  This is the message that was passed to the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
+.BR mi_copyin_n ()
+is invoked.
+.TP
+.I offset
+an offset into the original user-space memory extent from the previous
+.BR mi_copyin (9)
+operation from which data will be copied.
+message.
+.TP
+.I len
+the number of bytes to copy in from user space.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_copyin_n ()
+is one of a set of helper functions that supports both
+.B TRANSPARENT
+and
+.IR I_STR (7)
+input-output controls (see
+.BR ioctl (2s)
+and
+.BR streamio (7)).
+These helper functions include:
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_done (9),
+.BR MI_COPY_CASE (9),
+.BR mi_copy_set_rval (9)
+and
+.BR mi_copy_state (9).
+.PP
+.BR mi_copyin_n ()
+is used in close conjunction with
+.BR mi_copyin (9)
+to copy data from a user-space to the kernel.  When a driver or module
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure first receives a
+.BR M_IOCTL (9)
+message, the
+.BR mi_copyin (9)
+function is used, if necessary, to generate an upstream
+.BR M_COPYIN (9)
+request to the stream head.
+In the event that the entire length of the data to be copied in is not known when the first
+.BR mi_copyin (9)
+operation is generated,
+.BR mi_copyin_n ()
+may be used to copyin additional portions of the original user memory extent.
+.PP
+Copying in each memory extent begins with a call to
+.BR mi_copyin (9).
+.BR mi_copyin (9)
+defines the
+.IR uaddr ,
+or base address of the memory extent and the length,
+.IR len ,
+of the first portion to copy in.
+.BR mi_copyin_n ()
+then copies in additional segments, each starting at
+.I uaddr
+plus the offset argument,
+.IR offset ,
+and each segment is of the length supplied to the
+.BR mi_copyin_n ()
+call in the
+.I len
+argument.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_copyin_n ()
+is only used in conjunction with the other
+.I mi_copy
+helper functions:
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_done (9),
+.BR MI_COPY_CASE (9),
+.BR mi_copy_set_rval (9)
+and
+.BR mi_copy_state (9).
+.PP
+.BR mi_copyin (9)
+must be called before any call to
+.BR mi_copyin_n ()
+for the same input-output control operation.
+A call to
+.BR mi_copyin_n ()
+specifies an offset and length for a memory extent contained within a buffer described in the
+preceding
+.BR mi_copyin (9)
+call.  As such, it is normally only used when it is not known what the complete length of the user
+buffer is until the inital portion of the buffer has been copied in.  For example, the initial
+portion of the buffer copied in with
+.BR mi_copyin (9),
+might contain an element that indicates the number of elements in an array following the initial
+portion.  After the intial portion has been copied with
+.BR mi_copyin (9),
+.BR mi_copyin_n ()
+can be called to copy in the remainder of the elements in the complex structure.
+.PP
+When the entire size of the input memory extent to be copied in from the user is known, a call to
+.BR mi_copyin (9)
+for each memory extent is used and there is no need for the
+.BR mi_copyin_n ()
+utility.
+Only when the memory extents need to be copied in variable sized segments, the sizes of which are
+not all known until some have been copied in, is the
+.BR mi_copyin_n ()
+uiltity useful.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_copyin_n ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_copyin_n ()
+fails when passed invalid pointers.  When
+.BR mi_copyin_n ()
+fails, it panics the kernel.
+.PP
+If
+.BR mi_copyin_n ()
+suffers an internal failure, it will close the input-output control operation with a suitable error
+code.  The error codes returned by
+.BR mi_copyin_n ()
+to the
+.BR ioctl (2s)
+operation in
+.IR errno (3),
+are as follows:
+.TP \w'[\fBENOBUFS\fR]\ \ 'u
+.RB [ EPROTO ]
+.BR mi_copyin_n ()
+was called on an 
+.BR M_IOCTL (9)
+message block before calling
+.BR mi_copyin (9).
+.TP
+.RB [ EPROTO ]
+.BR mi_copyin_n ()
+was called for a message block other than an
+.BR M_IOCDATA (9)
+message block.
+.TP
+.RB [ EPROTO ]
+.BR mi_copyin_n ()
+was called for an
+.BR M_IOCDATA (9)
+message block that did not belong to an operation that was begun with
+.BR mi_copyin (9)
+or
+.BR mi_copyout (9).
+.TP
+.RB [ EPROTO ]
+.BR mi_copyout (9)
+was called before
+.BR mi_copyin_n ().
+.TP
+.RB [ EINVAL ]
+The amount of implicit data provided by the user on the call to an
+.IR I_STR (7)
+input-output control was insufficient to satisfy the
+.BR mi_copyin_n ()
+request.
+.TP
+.RB [ ENOSR ]
+A message block could not be allocated to satisfy the request.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+The following example illustrates the use of
+.BR mi_copyin_n ().
+In the example, the user passes a variable length data structure to the
+.BR ioctl (2s)
+call as either a
+.B TRANSPARENT
+or
+.RB non- TRANSPARENT
+input output control.
+The example is taken directly from the
+.BR strapush (9)
+structure that is used by the
+.BR sad (4)
+driver.  The
+.BR strapush (9)
+structure is defined as follows:
+.PP
+.nf
+\fC\s-1
+struct strapush {
+    unsigned int sap_cmd;
+    major_t sap_major;
+    minor_t sap_minor;
+    minor_t sap_lastminor;
+    unsigned int sap_npush;
+    char sap_list[MAXAPUSH][FMNAMSZ + 1];
+};
+\s+1\fP
+.fi
+.PP
+This structure is used to set an autopush list using the
+.B SAD_SAP
+input output control on the
+.BR sad (4)
+driver.  The
+.BR sad (4)
+driver specifications require the caller to pass the entire array to the
+.B SAD_SAP
+input output control, regardless of the number of significant elements in the array; however, for
+the purpose of this example, we assume that this restriction is relaxed and the caller can provide
+a structure sized to only the significant number of elements.
+.PP
+Following is a write-side queue
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedure fragment that will perform the necessary
+actions using
+.BR mi_copyin_n ()
+to copy in the variable sized structure:
+.PP
+.nf
+\fC\s-1
+int process_write(queue_t *q, mblk_t *mp)
+{
+    switch (mp->b_datap->db_type) {
+    case M_IOCTL:
+    {
+        struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
+        switch (iocp->ioc_cmd) {
+        case SAD_SAP:
+        {
+            struct strapush *s = NULL;
+            size_t len = sizeof(*s)
+                - sizeof(s->sap_list);
+            mi_copyin(q, mp, NULL, len);
+            break;
+        }
+        }
+    }
+    case M_IOCDATA:
+    {
+        struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
+        switch (iocp->ioc_cmd) {
+        case SAD_SAP:
+        {
+            struct strapush *s = mp->b_cont->b_rptr;
+            mblk_t *bp = NULL;
+            switch (mi_copy_state(q, mp, &bp)) {
+            case -1:
+                break;
+            case MI_COPY_CASE(MI_COPY_IN, 1):
+            {
+                size_t len = s->sap_npush * (FMNAMSZ + 1);
+                size_t ofs = sizeof(*s)
+                    - sizeof(s->sap_list);
+                /* save initial elements in priv */
+                mi_copyin_n(q, mp, ofs, len);
+                break;
+            }
+            case MI_COPY_CASE(MI_COPY_IN, 2):
+            {
+                /* process remaining elements */
+                mi_copy_done(q, mp, 0);
+                break;
+            }
+            }
+            break;
+        }
+        }
+    }
+    }
+    return 0;
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_copyin_n ()
+can be called from any context.  Internal operations use non-blocking allocation functions.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_copyin_n ()
+is MP-safe.  The caller is responsible for ensuring that it has exclusive access to the passed in
+message pointer.  When properly invoked from within the write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure,
+this is normally the case.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_copyin_n ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.PP
+.B mi_copyin_n ()
+is directly manipulates
+.BR iocblk (9),
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures contained in the message block.  Private state information and accumulated data is
+chained off of the
+.IR cq_private " and " cp_private
+members of the
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures.
+Because of this, it is important that once one of these helper functions is used to begin an
+.BR M_IOCTL (9)
+sequence, that the remaining help functions be used also, instead of directly manipulating the
+structures.  Messages and their contained structures should be passed to the helper functions
+without being manipulated in any way by the caller.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_copyin_n ()
+is used for both
+.IR I_STR (7)
+and
+.B TRANSPARENT
+input output controls where the size of the data passed by the user is not known until the initial
+portion of the passed in data is copied in.
+For
+.RB non- TRANSPARENT
+.RI ( I_STR (7))
+input output controls, this is not a problem, because the length of the passed in data is provided
+directly by the user (see
+.BR streamio (7)).
+Nevertheless,
+.BR mi_copyin_n ()
+is intended to remove differences between
+.B TRANSPARENT
+and
+.IR I_STR (7)
+input-output controls.
+.IR I_STR (7)
+input-output controls implicitly copy an entire buffer area on input;
+.B TRANSPARENT
+input-output controls must explicitly copy each portion.
+.IR I_STR (7)
+input-output controls do not provide a user address to the driver;
+.B TRANPARENT
+input-output controls do.
+For the
+.BR copyin (9)
+operation, the differences between the two are avoided by only referring to an
+offset from the beginning of the original data buffer.
+.PP
+The sequence of events for a
+.B TRANSPARENT
+input-output contorl are as follows:
+.BR mi_copyin (9)
+is called on the original
+.BR M_IOCTL (9)
+message to copy in a portion of the user buffer.  This results in an
+.BR M_COPYIN (9)
+message being issued upstream and the return of an
+.BR M_IOCDATA (9)
+message downstream.
+Additional memory extents from the user buffer are then copied in with calls
+to
+.BR mi_copyin_n ().
+Each call to
+.BR mi_copyin_n ()
+generates another
+.BR M_COPYIN (9)
+message upstream and results in another
+.BR M_IOCDATA (9)
+message being returned downstream.
+.PP
+The sequence of events for an
+.IR I_STR (7)
+input-output control are as follows:
+.BR mi_copyin (9)
+is called on the original
+.BR M_IOCTL (9)
+message to copy in a portion of the user buffer.  This is copied from the
+message block attached to the input-output control message that contains the
+implicit
+.BR copyin (9)
+of the entire user buffer.  The
+.BR mi_copyin (9)
+function simulates the
+.B TRANSPARENT
+situation by placing an appropriate
+.BR M_IOCDATA (9)
+message block on the write queue containing the information.
+Subsequent calls to
+.BR mi_copyin_n ()
+are used to copy additional memory extents from the buffer containing the
+implicit copy in from the original
+.BR M_IOCTL (9)
+message block.  Additional
+.BR M_IOCDATA (9)
+messages are simulated and placed on the write queue.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_copy_done (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_set_rval (9),
+.BR mi_copy_state (9),
+.BR MI_COPY_CASE (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_copyin_n ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_copyin_n ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_copyin_n ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common message utility functions
+should be used in its stead.
+.IP \(em
+.BR mi_copyin_n ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_copyin_n ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_copyin_n ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_copyin_n ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_copyin_n ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_copyin_n ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_copyin_n ()
+appears in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

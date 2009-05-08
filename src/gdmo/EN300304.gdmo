@@ -1,0 +1,1904 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 19 01:18:16 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "G.774.gdmo" >--
+--< GDMO.Include "G.774.3.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ETSI EN 300 304"
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) } >--
+--< GDMO.Namespace etsi_304 >--
+MODULE "ETSI EN 300 304" { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) }
+
+ets_upstreamConnectivityPointer-vc4TTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc4TTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc4TTPSourceR1,
+		vc4TTPBidirectionalR1,
+		au4CTPSinkR1,
+		au4CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	ACCORDING TO RULE
+	SET SIZE(1) OF
+	CHOICE {
+		vc4TTPSourceR1,
+		vc4TTPBidirectionalR1,
+		au4CTPSinkR1,
+		au4CTPBidirectionalR1 };;
+
+
+ets_downstreamConnectivityPointer-vc4TTPSourceR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc4TTPSourceR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc4TTPSinkR1,
+		vc4TTPBidirectionalR1,
+		au4CTPSource,
+		au4CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSource,
+			au4CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSource,
+			au4CTPBidirectionalR1 } };;
+-- ITU-T Recommendation G.702 2 Mbit/s connection termination point
+
+
+p12CTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		p12CTPSinkPkg PACKAGE
+			BEHAVIOUR
+				p12CTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This managed object class terminates a G.702 2 Mbit/s connection and includes 
+						the lower order path adaptation function (LPA).*;;
+			ATTRIBUTES
+				p12CTPId GET;;;
+REGISTERED AS { etsObjectClass 13 };
+
+
+p12CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		p12CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				p12CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a G.702 2 Mbit/s connection*;;
+			ATTRIBUTES
+				p12CTPId GET;;;
+REGISTERED AS { etsObjectClass 2 };
+
+
+p12CTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		p12CTPSink,
+		p12CTPSource;
+REGISTERED AS { etsObjectClass 3 };
+-- G702 34 Mbit/s connection termination point
+
+
+p31CTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		p31CTPSinkPkg PACKAGE
+			BEHAVIOUR
+				p31CTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This managed object class terminates a G.702 34 Mbit/s connection and includes 
+						the lower order path adaptation function (LPA).*;;
+			ATTRIBUTES
+				p31CTPId GET;;;
+REGISTERED AS { etsObjectClass 4 };
+
+
+p31CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		p31CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				p31CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a G.702 34Mbit/s connection.*;;
+			ATTRIBUTES
+				p31CTPId GET;;;
+REGISTERED AS { etsObjectClass 5 };
+
+
+p31CTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		p31CTPSink,
+		p31CTPSource;
+REGISTERED AS { etsObjectClass 6 };
+-- G702 140 Mbit/s connection termination point
+
+
+p4CTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		p4CTPSinkPkg PACKAGE
+			BEHAVIOUR
+				p4CTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This managed object class terminates a G.702 140 Mbit/s connection and includes 
+						the lower order path adaptation function (LPA).*;;
+			ATTRIBUTES
+				p4CTPId GET;;;
+REGISTERED AS { etsObjectClass 7 };
+
+
+p4CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		p4CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				p4CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a G.702 140 Mbit/s connection.*;;
+			ATTRIBUTES
+				p4CTPId GET;;;
+REGISTERED AS { etsObjectClass 8 };
+
+
+p4CTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		p4CTPSink,
+		p4CTPSource;
+REGISTERED AS { etsObjectClass 9 };
+-- G.702 2Mbit/s Connection Termination Point Identification
+
+
+p12CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS8.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		p12CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used as an RDN for naming instances of the p12CTP object 
+				classes.;;
+REGISTERED AS { etsAttribute 1 };
+-- G.702 34Mbit/s Connection Termination Point Identification
+
+
+p31CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS8.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		p31CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used as an RDN for naming instances of the p31CTP object 
+				classes.;;
+REGISTERED AS { etsAttribute 2 };
+-- G.702 140Mbit/s Connection Termination Point Identification
+
+
+p4CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS8.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		p4CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used as an RDN for naming instances of the p4CTP object 
+				classes.;;
+REGISTERED AS { etsAttribute 3 };
+
+
+p12CTPSource-G774vc12TTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS p12CTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc12TTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		p12CTPId;
+	BEHAVIOUR
+		p12CTPSource-vc12TTPSource BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.;;
+REGISTERED AS { etsNameBinding 20 };
+
+
+p12CTPSink-G774vc12TTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS p12CTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc12TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		p12CTPId;
+	BEHAVIOUR
+		p12CTPSink-vc12TTPSinkR1 BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.;;
+REGISTERED AS { etsNameBinding 21 };
+
+
+p31CTPSource-G774vc3TTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS p31CTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		p31CTPId;
+	BEHAVIOUR
+		p31CTPSource-vc3TTPSourceR1 BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.;;
+REGISTERED AS { etsNameBinding 22 };
+
+
+p31CTPSink-G774vc3TTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS p31CTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		p31CTPId;
+	BEHAVIOUR
+		p31CTPSink-vc3TTPSinkR1 BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.;;
+REGISTERED AS { etsNameBinding 23 };
+
+
+p4CTPSource-G774vc4TTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS p4CTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		p4CTPId;
+	BEHAVIOUR
+		p4CTPSource-vc4TTPSourceR1 BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.;;
+REGISTERED AS { etsNameBinding 24 };
+
+
+p4CTPSink-G774vc4TTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS p4CTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		p4CTPId;
+	BEHAVIOUR
+		p4CTPSink-vc4TTPSinkR1 BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object may be automatically instantiated when the 
+				superior managed object is instantiated, according to the make-up and mode of 
+				operation of the equipment.;;
+REGISTERED AS { etsNameBinding 25 };
+
+
+etsCrossConnection-fabric NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100":crossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":fabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100":crossConnectionId;
+	BEHAVIOUR
+		etsCrossConnection-fabricBehaviour BEHAVIOUR
+			DEFINED AS
+				*The value of the fromTermination attribute in the crossConnection object shall 
+				not be NULL. When an instance of crossConnection is deleted, the following 
+				attributes will be affected. The crossConnectionObjectPointer attributes in the 
+				termination points or in the gtp objects that were pointing to the deleted 
+				crossConnection instance shall be set to point to the Fabric responsible for the 
+				connection of the termination points. The counters in the appropriate TP Pool 
+				objects (if applicable) shall be updated. The connectivityPointer attributes in 
+				the disconnected termination points shall be set to NULL. Deleting a 
+				crossConnection object instance has no effect on the composition of any GTP*;;
+REGISTERED AS { etsNameBinding 16 };
+
+
+etsCrossConnection-mpCrossConnection NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100":crossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":mpCrossConnection AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100":crossConnectionId;
+	BEHAVIOUR
+		etsCrossConnection-mpCrossConnectionBehaviour BEHAVIOUR
+			DEFINED AS
+				*The value of the fromTermination attribute in the crossConnection object must be 
+				NULL. When an instance of crossConnection is deleted, the following attributes 
+				will be affected. The crossConnectionObjectPointer attributes in the termination 
+				points or in the gtp objects that were pointing to the deleted crossConnection 
+				instance shall be set to point to the Fabric responsible for the connection of 
+				the termination points. The counters in the appropriate TP Pool objects (if 
+				applicable) shall be updated. The connectivityPointer attributes in the 
+				disconnected termination points shall be set to NULL. Deleting the last 
+				cross-Connection contained in a multipoint cross connection object has the 
+				effect of also deleting the multipoint cross connection object instance (and 
+				updating the appropriate pointers). Deleting a crossConnection object instance 
+				has no effect on the composition of any GTP*;;
+REGISTERED AS { etsNameBinding 17 };
+
+
+equipmentProtectionGroup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774.3: 1994":protectionGroupR1;
+	CHARACTERIZED BY
+		equipmentProtectionGroupPkg PACKAGE
+			BEHAVIOUR
+				equipmentProtectionGroupBeh;
+			NOTIFICATIONS
+				"ITU-T Rec. G.774.3 : 2001":protectionSwitchReportingR1
+					equipmentProtectionStatusParameter;;;
+REGISTERED AS { etsObjectClass 14 };
+
+
+equipmentProtectionGroupBeh BEHAVIOUR
+	DEFINED AS
+		" This object class is used specifically for representing an equipment protection 
+		 group in a protection system.
+		The invokeProtection action switches always from protectedUnit to 
+		protectingUnit.
+		Either no or all equipmentProtectionUnits within an equipmentProtectionGroup 
+		shall have the priorityPkg package.";
+
+
+equipmentProtectionUnit MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. G.774.3 : 2001":protectionUnit;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1992":createDeleteNotificationsPackage,
+		equipmentProtectionUnitPkg PACKAGE
+			BEHAVIOUR
+				equipmentProtectionUnitBeh;
+			ATTRIBUTES
+				equipmentProtectionStatus GET;;;
+REGISTERED AS { etsObjectClass 15 };
+
+
+equipmentProtectionUnitBeh BEHAVIOUR
+	DEFINED AS
+		" This object class is specific to equipment protection systems. Instances of 
+		 this object class are used to represent a relationship between a functional 
+		 object and an equipment.
+		equipmentProtectionUnits are self-instanciated by the agent according to the 
+		equipment protection schemes adopted by the NE. An equipmentProtectionUnit 
+		instance is deleted when the sdhEquipment instance pointed to by the 
+		unreliableResourcePointer attribute are deleted, and is created again if the 
+		sdhEquipment are instantiated with the appropriate equipmentExpected attribute 
+		value.
+		The reliableResourcePointer inherited by the protectionUnit superclass can be 
+		optionally an empty set for instances of this object class.
+		The agent can also create and delete instances of the equipmentProtectionUnit in 
+		order to reflect local modifications in the equipment protection schemes.
+		The attributeValueChange notification shall only be used to notify changes of 
+		the priority attribute.";
+
+
+sdhEquipmentR MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":equipment;
+	CHARACTERIZED BY
+		"Recommendation M.3100":administrativeOperationalStatesPackage,
+		"Recommendation M.3100":attributeValueChangeNotificationPackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":currentProblemListPackage,
+		"Recommendation M.3100":locationNamePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":equipmentsEquipmentAlarmPackage,
+		"Recommendation X.721":availabilityStatusPackage,
+		sdhEquipmentPackage PACKAGE
+			BEHAVIOUR
+				sdhEquipmentBehaviour BEHAVIOUR
+					DEFINED AS
+						*The equipment object may be instantiated or exist without the presence of the 
+						physical resources. In this case the operational state shall be "disabled" and 
+						the availability status attribute shall contain the value "notInstalled".
+
+						When the resource is physically removed, the corresponding equipment object is 
+						not automatically deleted.
+
+						The equipmentExpected attribute shall be provided at instantiation time. The 
+						create request shall fail if the value of this attribute is unacceptable to the 
+						NE, and the failure reason shall indicate this mismatch in the response.
+
+						When there is a mismatch in the contents of the equipmentActual and the 
+						equipment Expected attribute, an equipmentAlarm notification with probable cause 
+						"replaceableUnitTypeMis
+
+						match" shall be raised. This checking is only performed if the 
+						availabilityStatus does not contain the value "notInstalled". The 
+						equipmentExpected value of "NULL" (no type) does not match any other value than 
+						NULL for equipmentActual. Changes in the value of the equipmentExpected 
+						attribute can only be achieved by object deletion and creation.
+
+						The "Recommendation M.3100":versionPackage package is not used.
+
+						The protectionUnitPointer attribute is used to point to a 
+						equipmentProtectionUnit within a equipmentProtectionGroup if the equipment is 
+						protectet. Otherwise the Pointer is null. One equipment could participate in 
+						several equipmentProtectionUnits at the same time.*;;
+			ATTRIBUTES
+				"Recommendation M.3100":version GET,
+				equipmentExpected GET,
+				equipmentActual GET,
+				specificPhysicalInstance GET,
+				physicalConnectorList GET,
+				protectionUnitPointer GET;;;
+REGISTERED AS { etsObjectClass 16 };
+
+
+equipmentActual ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS12.EquipmentActual;
+	BEHAVIOUR
+		equipmentActualBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute contains the equipment type of the equipment actually present. 
+				The "EquipmentType" value is a vendor-specific identification of a particular 
+				set or class of equipment, where all the set members have equivalent capability.;;
+REGISTERED AS { etsAttribute 4 };
+
+
+equipmentExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS12.EquipmentExpected;
+	BEHAVIOUR
+		equipmentExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute contains the equipment type requested at object creation. The 
+				"EquipmentType" value is a vendor-specific identification of a particular set or 
+				class of equipment, where all the set members have equivalent capability.;;
+REGISTERED AS { etsAttribute 5 };
+
+
+equipmentProtectionStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS12.EquipmentProtectionStatus;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		equipmentProtectionStatusBeh;
+REGISTERED AS { etsAttribute 12 };
+
+
+equipmentProtectionStatusBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is used to indicate the status of the protection switch in a 
+		protectionUnit instance.
+
+		The remainder of this behaviour provides the allowable equipmentProtectionStatus 
+		attribute values for protected and protecting units for both revertive and 
+		non-revertive systems.
+
+		The following allowable equipmentProtectionStatus values are associated with 
+		each protected unit:
+
+		No Request: No switch request is present on the unit.
+
+		Manual Switch to Protecting Complete: The unit has completed a Manual Switch.
+
+		Automatic Switch Pending: The unit has a failure condition present and the 
+		protecting unit is unavailable.
+
+		Automatic Switch Complete: The unit has completed an Automatic Switch to the 
+		protecting unit due to failure condition.
+
+		Force Switch Complete, Automatic Switch Pending: The unit has completed a Force 
+		Switch. Additionally, the unit has an automatic switch pending.
+
+		Automatic Switch Complete, Wait-to-Restore: The unit has completed an Automatic 
+		Switch to the protecting unit. (revertive case only)
+
+		Force Switch Complete: The unit has completed a Force Switch to the protecting 
+		unit.
+
+		Protected Unit Lockout Completed: The unit has been locked out from the 
+		protecting unit.
+
+		Additionally the non-revertive protected protection unit has the following 
+		status values:
+
+		Do Not Revert: The protected unit has been switched to the protecting unit and 
+		the request to do so has been released. The switch to the protecting unit is 
+		maintained.
+
+		The following allowable protectionStatus values are associated with each 
+		protecting unit:
+
+		No Request: No request is present on the protecting unit.
+
+		Manual Switch to Protecting Unit Complete: The protected unit has completed a 
+		Manual Switch.
+
+		Automatic Switch Complete to Protecting Unit: The protected unit has completed 
+		an automatic switch to the protecting unit.
+
+		Automatic Switch Complete to Protecting Unit, Wait to Restore: The unit has 
+		completed an Automatic Switch to the protecting unit. (revertive case only)
+
+		Protecting Unit Failed: The protecting unit has a failure condition present.
+
+		Force Switch Complete to Protecting Unit: The unit has completed a Force Switch 
+		of a protected unit to the protecting unit.
+
+		Protecting Unit Locked Out: The protecting unit has been locked out.
+
+		Additionally, the non-revertive protecting unit has the following values:
+
+		Do Not Revert: The protected unit has been switched to the protecting unit and 
+		the request to do so has been released. The switch to the protecting unit is 
+		maintained.
+
+		Manual Switch to Protected Unit Complete: The unit has completed a Manual Switch 
+		from the protecting unit to the protected unit.";
+
+
+physicalConnectorList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS12.PhysicalConnectorList;
+	BEHAVIOUR
+		physicalConnectorListBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used to relate external cabling to the appropriate transport 
+				objects. There is an entry per connector.;;
+REGISTERED AS { etsAttribute 7 };
+
+
+protectionUnitPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS12.ProtectionUnitPointer;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { etsAttribute 13 };
+
+
+specificPhysicalInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS12.PhysicalInstance;
+	BEHAVIOUR
+		specificPhysicalInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute contains the unique identifier of the physical equipment (e.g. 
+				serial number). This may be a manufacturer dependent serial numbes or other 
+				unique identifier (or unknownInstance where the actual instance may not be 
+				determined from the actual equipment);;
+REGISTERED AS { etsAttribute 6 };
+-- [ for information only.
+-- Version  ::= 
+-- Defined in M.3100, is used to present sufficient information to uniquely identify the "equipmentActual" for the purpose of repair or reordering.
+-- ]
+
+
+equipmentProtectionStatusParameter PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PrETS12.EquipmentProtectionStatusParameter;
+	BEHAVIOUR
+		equipmentProtectionStatusParameterBeh;
+REGISTERED AS { etsParameter 1 };
+
+
+equipmentProtectionStatusParameterBeh BEHAVIOUR
+	DEFINED AS
+		"This parameter is included in the additional info parameters of the protection 
+		switching reporting notification.
+
+		This notification is sent by the protection group according to the following 
+		rules. There are several cases:
+
+		The switch from protected to protecting or protecting to protected has been done 
+		without preempting an existing switch. In this case the old and new values of 
+		the Protection Status attribute of the protecting channel shall be reported in 
+		the notification by means of the oldProtectionStatus and newProtectionStatus 
+		parameters respectively.
+
+		A switch is perfomed by preemting an existing one. In this case the old and new 
+		values of the Protection Status attribute of the protecting unit shall be 
+		reported in the notification by means of the oldProtectionStatus and 
+		newProtectionStatus parameters respectively.
+
+		An autoswitch condition exists on an equipment but the auto-switch cannot be 
+		served due to the unavailability of the equipment that otherwise protects it. In 
+		this case the oldProtectionStatus and newProtectionStatus parameters refer to 
+		the protection status attribute value of the equipment on which the autoswitch 
+		condition arises. The exception is when the equipment is already forced or 
+		locked out, in which case no notification is sent.
+
+		A working equipment (protected unit) has been locked out or released from 
+		lockout without modifying any existing switch. In this case the 
+		oldProtectionStatus and newProtectionStatus parameters refer to the protection 
+		status attribute value of the working equipment which has been locked out.
+
+		A protection equipment (protecting unit) has been lockout or released from 
+		lockout without modifying the existing switch. In this case the 
+		oldProtectionStatus and newProtectionStatus parameters refer to the protection 
+		status attribute value of the protection equipment which has been lockout.
+
+		The protectionSwitchReportingR1 is not sent when the automatic switch condition 
+		is toggling between the equipment failure and WTR condition. While in the 
+		lockout of forced switch state no notification is sent except for ending of 
+		release failure.";
+
+
+powerSupply MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		powerSupplyPackage PACKAGE
+			BEHAVIOUR
+				powerSupplyBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						The power supply object class is used to control the power supply sources within 
+						the SDHNE. There shall be one instance for each of the power supply sources.;;
+			ATTRIBUTES
+				powerSupplyId GET,
+				powerSource GET,
+				poweredEquipmentPtrList GET,
+				"Recommendation X.721":operationalState GET,
+				"Recommendation M.3100":supportedByObjectList GET;
+			NOTIFICATIONS
+				"Recommendation X.721":attributeValueChange,
+				"Recommendation X.721":stateChange;;;
+REGISTERED AS { etsObjectClass 11 };
+
+
+syncProtectionGroup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774.3: 1994":protectionGroupR1;
+	CHARACTERIZED BY
+		syncProtectionGroupPkg PACKAGE
+			BEHAVIOUR
+				syncProtectionGroupBeh;
+			NOTIFICATIONS
+				"ITU-T Rec. G.774.3 : 2001":protectionSwitchReportingR1
+					syncProtectionStatusParameter;;;
+	CONDITIONAL PACKAGES
+		squelchStatusPkg
+			PRESENT IF
+				*an instance represents the T4 selection function*,
+		squelchThresholdsPkg
+			PRESENT IF
+				*an instance represents the T4 selection function and the SSM algorithm is
+				supported*,
+		sSMActivePackage
+			PRESENT IF
+				*activation/deactivation of the SSM algorithm is supported*;
+REGISTERED AS { etsObjectClass 17 };
+
+
+syncProtectionGroupBeh BEHAVIOUR
+	DEFINED AS
+		"This object class is specific to synchronisation protection. The 
+		creation/deletion of a syncProtectionGroup is performed by the NE depending upon 
+		its synchronisation protection capabilities (intrinsic knowledge of the NE). The 
+		operationalState attribute reflects only the switch capabilities of the 
+		protection scheme(i.e. it becomes disabled when the NE has detected that it can 
+		no longer perform switch operations (automatic or manual)).
+
+		The manual switch operation can be performed among timing sources with the same 
+		or different priority and, when the SSM algorithm is active, with the same 
+		quality. A manual switch request between two timing sources with different 
+		quality levels and SSM algorithm is active will be rejected.
+
+		The forced switch operation can be performed among any timing sources, 
+		independently of the priority and quality levels.
+
+		All protectionUnits work in the protecting mode.
+
+		The protectionSwitchReportingR1 notification is sent by the synchronisation 
+		protection group according to the following rules. There are several cases:
+
+		A switch from one protecting unit to another has occurred. In this case the new 
+		values of the protection status attributes of the protecting units which have 
+		been switched to and from shall be reported in the notification by means of the 
+		toProtectionStatus and fromProtectionStatus parameters respectively.
+
+		A protecting unit has a failure or a clearing of a failure without causing a 
+		switch. In this case the fromProtectionStatus parameter is not used and the 
+		toProtectionStatus parameter refers to the protection status attribute value of 
+		the protecting unit which has a failure or a clearing of a failure. The 
+		exception is when the protecting unit is already forced or locked out, in which 
+		case no notification is sent.
+
+		A protecting unit has been locked out or released from lockout without causing a 
+		switch. In this case the fromProtectionStatus parameter is not used and the 
+		toProtectionStatus parameter refers to the protection status attribute value of 
+		the protecting unit which has been locked out or released from lockout.
+
+		A protecting unit has been manually switch or released from manual switch 
+		without causing a switch. In this case the fromProtectionStatus parameter is not 
+		used and the toProtectionStatus parameter refers to the protection status 
+		attribute value of the protecting unit which has been manually switch or 
+		released from manual switch.
+
+		A protecting unit has been forced switch or released from forced switch without 
+		causing a switch. In this case the fromProtectionStatus parameter is not used 
+		and the toProtectionStatus parameter refers to the protection status attribute 
+		value of the protecting unit which has been forced switch or released from 
+		forced switch.
+
+		While in the lockout or forced switch state, no notifications are sent";
+
+
+syncProtectionUnit MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. G.774.3 : 2001":protectionUnit;
+	CHARACTERIZED BY
+		"Recommendation M.3100: 1992":createDeleteNotificationsPackage,
+		syncProtectionUnitPkg PACKAGE
+			BEHAVIOUR
+				syncProtectionUnitBeh;
+			ATTRIBUTES
+				syncProtectionStatus GET;;;
+	CONDITIONAL PACKAGES
+		sSMQualityPackage
+			PRESENT IF
+				*the timing source has a SSM quality level*;
+REGISTERED AS { etsObjectClass 18 };
+
+
+syncProtectionUnitBeh BEHAVIOUR
+	DEFINED AS
+		"This object class is specific to synchronisation protection. Instances of this 
+		object class are used to represent a relationship between a timing source and 
+		the timing generator(or a timing physical termination). All instances of this 
+		object class will act in the protecting role (i.e. there will not be a 
+		syncProtectionUnit with the protecting attribute set to FALSE), in order to 
+		ensure the consistency of the priority list.
+
+		This object class can be created by the OS or the NE. When it is created by the 
+		OS, the OS must provide a value for the attribute unreliableResourcePointer.";
+
+
+timingGenerator MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		timingGeneratorPackage PACKAGE
+			BEHAVIOUR
+				timingGeneratorBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						For the selection of the timing sources a 1:n protection like mechanism is used.
+
+						Each protectionUnit in the protectionGroup has a pointer, the 
+						unreliableResourcePointer, which points to the related TP (see figure A.15).
+
+						The currentTimingSourcePointer points to the timing source currently in use. A 
+						value of NULL of this attribute indicates the use of the internal oscillator. In 
+						that case, the unreliableResourcePointer of the corresponding protectionUnit 
+						also points to NULL.
+
+						The reliableResourcePointer of the protectionUnit related to the currently used 
+						timing source points to the timingGenerator. The reliableResourcePointers of the 
+						other protectionUnits related to timing sources which are not currently in use 
+						are pointing to NULL.
+
+						To select a special instance of a possible timing source, the OS has to use the 
+						invokeProtection action of the protectionGroup.
+
+						Only one instance of this object class shall be created.;;
+			ATTRIBUTES
+				timingGeneratorId GET,
+				currentTimingSourcePointer GET,
+				"Recommendation X.721":operationalState GET,
+				"Recommendation M.3100":supportedByObjectList GET;
+			NOTIFICATIONS
+				"Recommendation X.721":attributeValueChange,
+				"Recommendation X.721":stateChange;;;
+REGISTERED AS { etsObjectClass 12 };
+
+
+timingPhysicalTerminationBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		timingPhysicalTerminationSink,
+		timingPhysicalTerminationSource;
+	CHARACTERIZED BY
+		timingPhysicalTerminationBidirectionalPkg PACKAGE
+			BEHAVIOUR
+				timingPhysicalTerminationBidirectionalBehaviour;;;
+REGISTERED AS { etsObjectClass 19 };
+
+
+timingPhysicalTerminationBidirectionalBehaviour BEHAVIOUR
+	DEFINED AS
+		"This object class originates and terminates the 2 MHz signal.";
+
+
+timingPhysicalTerminationSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		timingPhysicalTerminationSinkPkg PACKAGE
+			BEHAVIOUR
+				timingPhysicalTerminationSinkBehaviour;
+			ATTRIBUTES
+				timingPhysicalTerminationId GET,
+				"Recommendation X.721: 1992":operationalState GET,
+				"Recommendation M.3100: 1992":supportedByObjectList GET;
+			NOTIFICATIONS
+				"Recommendation X.721: 1992":objectCreation,
+				"Recommendation X.721: 1992":objectDeletion,
+				"Recommendation X.721: 1992":stateChange,
+				"Recommendation X.721: 1992":attributeValueChange;;;
+	CONDITIONAL PACKAGES
+		"Recommendation M.3100: 1992":tmnCommunicationsAlarmInformationPackage
+			PRESENT IF
+				"There are alarms associated with the timingPhysicalTermination",
+		"Recommendation M.3100: 1992":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { etsObjectClass 20 };
+
+
+timingPhysicalTerminationSinkBehaviour BEHAVIOUR
+	DEFINED AS
+		"This managed object represents the external 2 MHz input interface (reference 
+		point T3 in the Recommendation G.783). This object class terminates (receives) 
+		the 2 MHz signal. The probable causes which are reported by a 
+		communicationsAlarm notification are lossOfSignal and degradedSignal.";
+
+
+timingPhysicalTerminationSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721: 1992":top;
+	CHARACTERIZED BY
+		timingPhysicalTerminationSourcePkg PACKAGE
+			BEHAVIOUR
+				timingPhysicalTerminationSourceBeh;
+			ATTRIBUTES
+				timingPhysicalTerminationId GET,
+				"Recommendation X.721: 1992":operationalState GET,
+				"Recommendation M.3100: 1992":supportedByObjectList GET,
+				outputTimingSourcePointer GET;
+			NOTIFICATIONS
+				"Recommendation X.721: 1992":objectCreation,
+				"Recommendation X.721: 1992":objectDeletion,
+				"Recommendation X.721: 1992":stateChange,
+				"Recommendation X.721: 1992":attributeValueChange;;;
+REGISTERED AS { etsObjectClass 21 };
+
+
+timingPhysicalTerminationSourceBeh BEHAVIOUR
+	DEFINED AS
+		"This managed object represents the external 2 MHz output interface (reference 
+		point T4 in the Recommendation G.783). This object class originates (transmits) 
+		the 2 MHz signal.";
+
+
+sSMActivePackage PACKAGE
+	ATTRIBUTES
+		sSMActive GET-REPLACE;
+REGISTERED AS { etsPackage 1 };
+
+
+sSMQualityPackage PACKAGE
+	ATTRIBUTES
+		sSMQuality GET-REPLACE;
+REGISTERED AS { etsPackage 2 };
+
+
+squelchStatusPkg PACKAGE
+	ATTRIBUTES
+		squelchStatus GET;
+REGISTERED AS { etsPackage 3 };
+
+
+squelchThresholdsPkg PACKAGE
+	ATTRIBUTES
+		squelchT0Threshold GET-REPLACE,
+		squelchT1Threshold GET-REPLACE;
+REGISTERED AS { etsPackage 4 };
+
+
+currentTimingSourcePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.CurrentTimingSourcePointer;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { etsAttribute 10 };
+
+
+outputTimingSourcePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.OutputTimingSourcePointer;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { etsAttribute 14 };
+
+
+poweredEquipmentPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.PoweredEquipmentPtrList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		poweredEquipmentPtrListBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used to point to the equipment object instances which are 
+				powered by a powerSupply instance.;;
+REGISTERED AS { etsAttribute 11 };
+
+
+powerSource ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.PowerSource;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		powerSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used to display the voltage of a power source.;;
+REGISTERED AS { etsAttribute 9 };
+
+
+powerSupplyId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		powerSupplyIdBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used as an RDN for naming instances of the powerSupply object 
+				classes.;;
+REGISTERED AS { etsAttribute 8 };
+
+
+sSMActive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sSMActiveBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether or not the SSM algorithm is active(active = 
+				TRUE).";;
+REGISTERED AS { etsAttribute 15 };
+
+
+sSMQuality ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.Integer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sSMQualityBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the quality(0 to 15) of the timing source. Set 
+				operations on this attribute are not allowed for interfaces that carry quality 
+				information. When active, the SSM algorithm gives priority to the quality 
+				indications before considering priority indications attached to the protection 
+				units.";;
+REGISTERED AS { etsAttribute 16 };
+
+
+squelchStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		squelchStatusBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the selected input (either T0 or T1) to the T4 
+				selection proces is squelched or not (squelched = TRUE).";;
+REGISTERED AS { etsAttribute 17 };
+
+
+squelchT0Threshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.Integer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		squelchT0ThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the quality (0..15) of the T0 output below which the T0 
+				output is squelched";;
+REGISTERED AS { etsAttribute 18 };
+
+
+squelchT1Threshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.Integer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		squelchT1ThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the quality (0..15) of the T1 reference selected by 
+				selector A below which the T1 reference is squelched";;
+REGISTERED AS { etsAttribute 19 };
+
+
+syncProtectionStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.SyncProtectionStatus;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		syncProtectionStatusBeh;
+REGISTERED AS { etsAttribute 20 };
+
+
+syncProtectionStatusBeh BEHAVIOUR
+	DEFINED AS
+		"This attribute is used to indicate the status of the protection switch in a 
+		protectionUnit instance.
+
+		The remainder of this behaviour provides the allowable syncProtectionStatus 
+		attribute values for protecting units.
+
+		No Request: No request is present on the protecting unit.
+
+		Manual Switch Complete to Protecting Unit: A Manual Switch has been completed to 
+		this protecting unit.
+
+		Force Switch Complete to Protecting Unit: A Force Switch has been completed to 
+		this protecting unit.
+
+		Automatic Switch Complete to Protecting Unit: An Automatic Switch has been 
+		completed to this protecting unit.
+
+		Protecting Unit Failed: The protecting unit has a failure condition present.
+
+		Protecting Unit Locked Out: The protecting unit has been locked out.";
+
+
+timingGeneratorId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		timingGeneratorIdBehaviour BEHAVIOUR
+			DEFINED AS
+				This attribute is used as an RDN for naming instances of the timingGenerator 
+				object classes.;;
+REGISTERED AS { etsAttribute 22 };
+
+
+timingPhysicalTerminationId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX PrETS13.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		timingPhysicalTerminationIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The timingPhysicalTerminationId is an attribute type whose distinguished value 
+				can be used as an RDN when naming an instance of the timingPhysicalTermination 
+				object class.";;
+REGISTERED AS { etsAttribute 21 };
+
+
+powerSupply-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS powerSupply;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
+	WITH ATTRIBUTE
+		powerSupplyId;
+	BEHAVIOUR
+		powerSupply-sdhNEBehaviour BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.;;
+REGISTERED AS { etsNameBinding 18 };
+
+
+syncProtectionUnit-syncProtectionGroup NAME BINDING
+	SUBORDINATE OBJECT CLASS syncProtectionUnit;
+	NAMED BY
+	SUPERIOR OBJECT CLASS syncProtectionGroup;
+	WITH ATTRIBUTE
+		"ITU-T Rec. G.774.3 : 2001":protectionUnitId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { etsNameBinding 26 };
+
+
+timingGenerator-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS timingGenerator;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
+	WITH ATTRIBUTE
+		timingGeneratorId;
+	BEHAVIOUR
+		timingGenerator-sdhNEBehaviour BEHAVIOUR
+			DEFINED AS
+				The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.;;
+REGISTERED AS { etsNameBinding 19 };
+
+
+timingPhysicalTerminationBidirectional-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS timingPhysicalTerminationBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
+	WITH ATTRIBUTE
+		timingPhysicalTerminationId;
+	BEHAVIOUR
+		timingPhysicalTerminationBidirectional-sdhNEBeh BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.";;
+REGISTERED AS { etsNameBinding 27 };
+
+
+timingPhysicalTerminationSink-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS timingPhysicalTerminationSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
+	WITH ATTRIBUTE
+		timingPhysicalTerminationId;
+	BEHAVIOUR
+		timingPhysicalTerminationSink-sdhNEBeh BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.";;
+REGISTERED AS { etsNameBinding 28 };
+
+
+timingPhysicalTerminationSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS timingPhysicalTerminationSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
+	WITH ATTRIBUTE
+		timingPhysicalTerminationId;
+	BEHAVIOUR
+		timingPhysicalTerminationSource-sdhNEBeh BEHAVIOUR
+			DEFINED AS
+				"The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.";;
+REGISTERED AS { etsNameBinding 29 };
+
+
+syncProtectionStatusParameter PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX PrETS13.SyncProtectionStatusParameter;
+	BEHAVIOUR
+		syncProtectionStatusParameterBeh;
+REGISTERED AS { etsParameter 2 };
+
+
+syncProtectionStatusParameterBeh BEHAVIOUR
+	DEFINED AS
+		"This parameter is included in the additional info parameters of the protection 
+		switching reporting notification.";
+
+END
+--< GDMO.EndDocument "ETSI EN 300 304"
+--  { ccitt(0) identified-organization(4) etsi(0) ets304(304) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ |  +- etsi_304::equipmentProtectionGroup
+--@@ |  +- etsi_304::syncProtectionGroup
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ |  +- etsi_304::equipmentProtectionUnit
+--@@ |  +- etsi_304::syncProtectionUnit
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ |  +- etsi_304::sdhEquipmentR
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ |  +- itut_g774::sdhNE
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- etsi_304::p12CTPBidirectional
+--@@ |  |  |  +- etsi_304::p31CTPBidirectional
+--@@ |  |  |  +- etsi_304::p4CTPBidirectional
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- etsi_304::p12CTPSink
+--@@ |  |  |  +- etsi_304::p12CTPBidirectional
+--@@ |  |  +- etsi_304::p31CTPSink
+--@@ |  |  |  +- etsi_304::p31CTPBidirectional
+--@@ |  |  +- etsi_304::p4CTPSink
+--@@ |  |  |  +- etsi_304::p4CTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- etsi_304::p12CTPBidirectional
+--@@ |  |  |  +- etsi_304::p31CTPBidirectional
+--@@ |  |  |  +- etsi_304::p4CTPBidirectional
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- etsi_304::p12CTPSource
+--@@ |  |  |  +- etsi_304::p12CTPBidirectional
+--@@ |  |  +- etsi_304::p31CTPSource
+--@@ |  |  |  +- etsi_304::p31CTPBidirectional
+--@@ |  |  +- etsi_304::p4CTPSource
+--@@ |  |  |  +- etsi_304::p4CTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- etsi_304::powerSupply
+--@@ +- etsi_304::timingGenerator
+--@@ +- etsi_304::timingPhysicalTerminationSink
+--@@ |  +- etsi_304::timingPhysicalTerminationBidirectional
+--@@ +- etsi_304::timingPhysicalTerminationSource
+--@@ |  +- etsi_304::timingPhysicalTerminationBidirectional
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q822::thresholdData
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ etsi_304::syncProtectionGroup
+--@@ >- etsi_304::syncProtectionUnit
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- etsi_304::p12CTPSink
+--@@ >- itut_g774::vc12TTPSource
+--@@ |  >- etsi_304::p12CTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- etsi_304::p31CTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ |  >- etsi_304::p31CTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- etsi_304::p4CTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ |  >- etsi_304::p4CTPSource
+--@@ >- etsi_304::powerSupply
+--@@ >- etsi_304::timingGenerator
+--@@ >- etsi_304::timingPhysicalTerminationBidirectional
+--@@ >- etsi_304::timingPhysicalTerminationSink
+--@@ >- etsi_304::timingPhysicalTerminationSource
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

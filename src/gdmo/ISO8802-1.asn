@@ -1,0 +1,81 @@
+-- A.7 ASN.1 productions
+IEEE802CommonDefinitions
+{iso(1) member-body(2) us(840) ieee802dot1partF(10011) asn1Module(2)
+commondefinitions(0) version1(0)} DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+IMPORTS SetInfoStatus FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0)
+protocol(3)};
+-- EXPORTS everything
+MACAddress ::= OCTETSTRING -- Minimum length 6 octets
+-- If the MAC address is a 48-bit address the length of the octet string shall be 6 octets.
+-- If the MAC address is a 60-bit address the length of the octet string shall be 8 octets.
+-- The octet encoding is derived from the hexadecimal display representation order for the
+-- MAC address. AB-CD-EF-GH-IJ-KL for the 48-bit address format; AB-CD-EF-GH-IJ-KL-MN-OP
+-- for the 60-bit address format. The octets are encoded as follows: The first pair of
+-- hexadecimal digits, AB, are encoded in the first octet. The second pair, CD, is encoded
+-- in the second octet, etc. (See 6.2, MAC address attribute, for definition of
+-- 60-bit hexadecimal display format.)
+ResourceInfo ::= SEQUENCE {
+manufacturerOUI [0] ManufacturerOUI OPTIONAL,
+manufacturerName [1] ManufacturerName OPTIONAL,
+manufacturerProductName [2] ManufacturerProductName OPTIONAL,
+manufacturerProductVersion [3] ManufacturerProductVersion OPTIONAL }
+-- ResourceInfo provides a means of indicating, in data readable
+-- from a managed object, information that identifies the source of the
+-- implementation.
+ManufacturerOUI ::= OCTETSTRING
+-- ManufacturerOUI takes the value of an organizationally unique
+-- identifier, as defined in 5.1 of IEEE Std 802-1990.
+-- When encoded as an OCTETSTRING, the encoding of
+-- the value field of the OCTETSTRING shall comply with
+-- the representation defined in 5.1.2 of IEEE Std 802-1990.
+-- Inasmuch as multiple OUI assignments are possible
+-- for a given manufacturer and no public registry of such assignments
+-- exists, methods for application of the OUI as a globally unique
+-- manufacturer identifier is outside the scope of this standard.
+ManufacturerName ::= PRINTABLE STRING
+-- ManufacturerName is a printable string used to identify the
+-- manufacturer of the resource. Global assignment of unique name
+-- strings is outside the scope of this standard. Maximum string
+-- length is 128 octets.
+ManufacturerProductName ::= PRINTABLE STRING
+-- ManufacturerProductName is a printable string used to identify the
+-- manufacturerPs product name of the resource. Maximum string
+-- length is 128 octets.
+ManufacturerProductVersion ::= PRINTABLE STRING
+-- ManufacturerProductVersion is a printable string used to identify the
+-- manufacturerPs product version of the resource. Maximum string
+-- length is 128 octets.
+ResourceTypeIDName ::= GRAPHIC STRING {"RTID"}
+SeverityIndGaugeThreshold::= SET OF SEQUENCE {
+severityIndNotifyLow SeverityIndThreshold,
+severityIndNotifyHigh SeverityIndThreshold
+}
+SeverityIndThreshold ::= SEQUENCE {
+threshold ObservedValue,
+notifyonoff BOOLEAN,
+severityIndication PerceivedSeverity OPTIONAL
+-- shall be present if notifyonoff is TRUE
+}
+ScannerID ::= GraphicString
+-- A range of time period units from picoseconds to days. No implication
+-- is to be inferred as to the degree of resolution required within the implementation of
+-- an attribute that is to be represented as a time period. Likewise, no restriction is
+-- imposed on the method (i.e., time period units) by which time period is represented
+-- within the implementation of a managed object. Implementations are not required to
+-- support all time period values.
+TimePeriod ::= CHOICE {
+days [0] IMPLICIT INTEGER,
+hours [1] IMPLICIT INTEGER,
+minutes [2] IMPLICIT INTEGER,
+seconds [3] IMPLICIT INTEGER,
+millisecs [4] IMPLICIT INTEGER,
+microsecs [5] IMPLICIT INTEGER,
+nanosecs [6] IMPLICIT INTEGER,
+picosecs [7] IMPLICIT INTEGER
+}
+DerivedGaugeNotCurrentType ::= SEQUENCE {
+currentTime [5] IMPLICIT GeneralizedTime OPTIONAL,
+setInfoList [6] IMPLICIT SET OF SetInfoStatus }
+END
+

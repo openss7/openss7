@@ -1,0 +1,488 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ENABLEOK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B enableok
+\- allows a \fISTREAMS\fP message queue to be scheduled
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "void enableok(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue upon which to permit enabling.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR enableok ()
+clears the
+.B QNOENB
+flag on the specified queue,
+.IR q .
+This tells the
+.I STREAMS
+scheduler that the queue,
+.IR q ,
+can be scheduled for
+.BR runqueues (9).
+.PP
+.BR enableok ()
+is typically used to re-enable a queue after it has been disabled with
+.BR noenable (9).
+.PP
+If
+.BR enableok ()
+has been called for a queue and
+.BR noenable (9)
+has not subsequently been called for the same queue a second call to
+.BR enableok ()
+will have no effect.
+.PP
+Queues that have their
+.B QNOENB
+flag clear will enable the
+.IR qi_srvp (9)
+procedure under all normal queue enabling
+situations, as follows:
+.IP \- \w'\-\(em'u
+the queue is explicity enabled with
+.BR qenable (9);
+.PD 0
+.IP \-
+the queue is back-enabled;
+.IP \-
+an arriving message becomes the first message on the queue;
+.IP \-
+a message arrives and the
+.B QWANTR
+flag is set.
+.PD
+.PP
+See also
+.BR noenable (9).
+.PP
+Note that
+.BR enableok ()
+does not schedule the queue's
+.IR qi_srvp (9)
+procedure regardless of the state of the queue: it simply clears the
+.B QNOENB
+flag.  It takes further actions (as listed above) to cause the queue's
+.IR qi_srvp (9)
+procedure to be scheduled.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR enableok ()
+can be used in conjunction with
+.BR noenable (9)
+to temporarily suspend queue
+.IR qi_srvp (9)
+procedure processing for a queue for
+normal priority messages.
+.BR noenable (9)
+permits data messages to be enqueued without invoking the queue's
+.IR qi_srvp (9)
+procedure.  A call to
+.BR enableok ()
+will then reverse the situation and restore normal queue scheduling.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR enableok ()
+clears the
+.B QNOENB
+flag and returns void.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR enableok ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR enableok ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR enableok ()
+is MP-safe.
+No global locks need to be held across the call to
+.BR enableok ().
+.BR enableok ()
+takes a recursive freeze lock that can be acquired by the caller when the
+Stream
+is frozen.
+If another thread has the
+Stream
+frozen with
+.BR freezestr (9),
+the calling processor will spin until the
+Stream
+is thawed by
+.BR unfreezestr (9).
+If one thread enables a queue with
+.BR enableok ()
+and another disables the queue with
+.BR noenable (9),
+there will be a race condition on the
+.B QNOENB
+flag.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR enableok ()
+does not place the queue on the current
+.BR runqueues (9)
+schedule list.  It only clears the
+.B QNOENB
+flag to indicate whether the queue should be subsequently scheduled.  To add a
+queue to the current run list, use
+.BR qenable (9).
+.\"
+.\"
+.SH EXAMPLE
+.PP
+.BR enableok (9)
+can be used to re-enable a queue after a call to
+.BR noenable (9).
+The following
+.BR qrestart ()
+function will restart a disabled queue:
+.sp
+.nf
+\fC\s-2\
+void qrestart(queue_t *q)
+{
+	enableok(q);
+	if (q->q_first)
+		qenable(q);
+}
+\s+2\fP
+.fi
+.PP
+Note that
+.BR enableok ()
+does not place the queue on the
+.BR runqueues ()
+list.  It takes
+.BR qenable (9)
+to do that.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR canenable (9),
+.BR enableok (9),
+.BR freezestr (9),
+.BR noenable (9),
+.BR noneable (9),
+.BR qenable (9),
+.BR runqueues (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR enableok ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR enableok ()
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR enableok ()
+may be called on a stream frozen with
+.BR freezestr (9),
+but it is not recommended.
+.BR enableok ()
+uses atomic bit operations and uses a recursive freeze lock permitting it to be called while the
+Stream
+is frozen with
+.BR freezestr (9)
+by the caller.
+.IP ""
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+do not permit
+.BR enableok ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.IR Solaris \(rg
+.[
+solspg
+.]
+permits
+.BR enableok ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Under
+.IR LiS ,
+.[
+lis
+.]
+.BR enableok ()
+takes the queue spin lock and uses normal bit operations to set the flag.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not invoke
+.BR enableok ()
+on a stream that has previously been frozen with
+.BR freezestr (9).
+.RB ( "@PACKAGE_TITLE@"
+.[
+lfs
+.]
+includes an assertion to enforce this in the SMP environment.)
+.IP \(em
+.BR enableok ()
+called with an invalid
+.I q
+argument will have an undefined result.
+In referenced versions of
+.I LiS
+.[
+LiS
+.]
+the result is undefined in the same situations due to an
+.I LiS
+coding error.  Repaired versions of
+.I LiS
+will make
+.BR enableok ()
+fail silently in these situations, which is largely unacceptable because it masks errors.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not invoke
+.BR enableok ()
+with an invalid
+.I q
+argument.
+Portable
+.I STREAMS
+drivers and modules will use
+.B @PACKAGE_TITLE@
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.IP \(em
+.BR enableok ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
+.I LiS
+incorrectly schedules a queue that would have otherwise been enabled had
+.BR nonenable (9)
+not been in effect, whenever
+.BR enableok ()
+is called.  This is not consistent with
+.I SVR 4
+descriptions of treatment of the
+.B QNOENB
+flag and is an
+.I LiS
+bug.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will use
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+instead of
+.IR LiS .
+.\".IP \(em
+.\"Symbol
+.\".BR lis_safe_enableok ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_safe_enableok ()
+.\"calls
+.\".BR enableok ()
+.\"directly.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR enableok ()
+appears as part of
+.I "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR enableok ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

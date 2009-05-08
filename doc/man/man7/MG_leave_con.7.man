@@ -1,0 +1,1 @@
+.so man7/MG_LEAVE_CON.7.man

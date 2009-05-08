@@ -1,0 +1,52 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+r1|c1|c1|c1|c1|c1|c1|c1|c
+c1|c1|c1|c1|c1|c1|c1|c1|c
+c1|c1|c1|c1|c1|c1|c1|c1|c
+l1|c1|c1|c1|c1|c1|c1|c1|c.
+STATES:IDLE:DATA-:USER:PROV:RESET_RES:DISCON 11:DISCON 12: DISCON 13
+::XFER:RESET:RESET:PEND:PEND:PEND:PEND
+:::PEND:PEND::::
+EVENTS:6:11:12:13:14:17:18:19
+_
+DISCON_REQ:\-:17:18:19:\-:\-:\-:\-
+DATA_REQ:\-:11:\-:\-:\-:\-:\-:\-
+RESET_REQ:\-:12:\-:\-:\-:\-:\-:\-
+RESET_RES:\-:\-:\-:14:\-:\-:\-:\-
+DISCON_IND1:\-:6:6:6:\-:\-:\-:\-
+(outcnt == 0):
+_
+DATA_IND:\-:11:\-:\-:\-:\-:\-:\-
+RESET_IND:\-:13:\-:\-:\-:\-:\-:\-
+RESET_CON:\-:\-:11:\-:\-:\-:\-:\-
+OK_ACK1:\-:\-:\-:\-:11:6:6:6
+(outcnt == 0):
+ERROR_ACK:\-:\-:11:\-:13:11:12:13
+.TE

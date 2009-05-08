@@ -1,0 +1,1 @@
+.so man9/rmalloc.9.man

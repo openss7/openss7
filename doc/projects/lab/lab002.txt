@@ -1,0 +1,22 @@
+                                                                                
+                :     :    _____   _____                                        
+                :     :   /     L /     L           VoIP                        
+                :     :   | ASP |{  MGC  }=L7====== Signalling                  
+                :     :   L_____/ L_____/     SIP   Network                     
+                :     :     ||      ||       H.323                              
+                :     :     L7      L7 VoIP   BICC                              
+                :     :     ||      || Control                                  
+                :     : SUA ||      || Network                                  
+                :     :M3UA ||      ||          MEGACO                          
+                :M2PA :M2UA L7      L7======L7  H.248                           
+                :     :    _||_    _||_    _||_  MGCP                           
+         SPOI ==:=====:===/    L  /    L  /    L                                
+              ==:=====:===| SG |==| MG |==| MG |                                
+          POP ==:=====:===L____/==L____/==L____/                                
+                : IMT :             ||      ||                                  
+                :     :             ||      ||      RTP     VoIP                
+                :     :             L7======L7============= Bearer              
+                :     :                                     Network             
+               (B)   (A)                                                        
+                                                                                
+

@@ -1,0 +1,48 @@
+.\" N-NOTICE vim: ft=nroff
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+cbs
+rb|c
+lb|cb
+lb|c.
+N-NOTICE
+_
+TPI Primitive:\s-1T_UDERROR_IND\s+1
+_
+Parameter:Indication
+=
+.TH
+Called address:DEST_*
+Calling address:(implied)
+Sequence control:OPT_*
+Importance:OPT_*
+Reason for return:ERROR_type
+User data:M_DATA
+.TE

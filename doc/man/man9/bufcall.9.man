@@ -1,0 +1,643 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH BUFCALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B bufcall
+\- install a buffer callback
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "bcid_t bufcall(unsigned " size ", int " pri ", void (*" func ")(long), long " arg );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\ func\ 'u
+.I size
+The size of the requested data buffer.
+.TP
+.I pri
+The priority of the requested message.  The priority can be one of the
+following values:
+.sp
+.TS
+tab(:);
+lblss.
+BPRI_LO:T{
+requests a low priority buffer.
+T}
+BPRI_MED:T{
+requests a medium priority buffer.
+T}
+BPRI_HI:T{
+requests a high priority buffer.
+T}
+BPRI_WAITOK:T{
+requests a low priority buffer and can block.
+T}
+.TE
+.sp
+The
+.I pri
+argument is ignored by
+.I SVR 4.2
+.[
+svr42
+.]
+and later implementations.
+.TP
+.I func
+The callback function to call when a buffer of the requested size and message of the
+requested priority becomes available.  This is normally the
+.IR qi_srvp (9)
+procedure
+which failed a call to
+.BR allocb (9)
+or it is a function pointer to
+.BR qenable (9).
+.TP
+.I arg
+The argument to pass to the callback function.  This is normally a pointer to
+the queue whose
+.IR qi_srvp (9)
+procedure failed the
+.BR allocb (9).
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.\".PP
+.\".BR bufcall ()
+.\"is provided to assis in the event of a block allocation failure.  If
+.\".BR allocb (9)
+.\"returns
+.\".BR NULL ,
+.\"indicating that a message block is not currently available,
+.\".BR bufcall ()
+.\"may be invoked.
+.\".PP
+.\".BR bufcall ()
+.\"arranges for
+.\".B (*func)(arg)
+.\"to be called when a buffer of
+.\".I size
+.\"bytes is avialable.
+.\".I pri
+.\"is as described in
+.\".BR allocb (9).
+.\"When
+.\".I func
+.\"is called, it has no user context.  It cannot reference the current
+.\".B task_struct
+.\"structure, and must return without sleeping.
+.\".BR bufcall ()
+.\"does not guarantee that the desired buffer will be available when
+.\".I func
+.\"is called since interrupt processing may require it.
+.\".PP
+.\".BR bufcall ()
+.\"returns
+.\".B 1
+.\"on success, indicating that the request has been successfully recorded, and
+.\".B 0
+.\"on failure.  On a failure return,
+.\".I func
+.\"will never be called.  A failure indicates a (temporary) inability to allocate required internal
+.\"data structures.
+.PP
+When allocation of a buffer fails as a result of a failed call to
+.BR allocb (9),
+the
+.IR qi_srvp (9)
+procedure should place the message that invoked the
+.BR allocb (9)
+call back on the queue with
+.BR putbq (9)
+and call the
+.BR bufcall ()
+function with the queue's
+.IR qi_srvp (9)
+procedure as the
+.I func
+argument and a pointer to the queue as the
+.I arg
+argument to the call.
+The
+.I size
+and
+.I pri
+arguments should be the same as the
+.I size
+and
+.I pri
+arguments that were issued to
+.BR allocb (9).
+.PP
+In this way, the queue
+.IR qi_srvp (9)
+procedure will be recalled once there is
+sufficient memory to allocate the requested buffer and message blocks.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR bufcall ()
+returns a
+.B bcid_t
+defined as follows:
+.nf
+\fC\s-2
+typedef long bcid_t;
+typedef long bufcall_id_t;
+\s+1\fP
+.fi
+.PP
+Upon success,
+.BR bufcall ()
+returns a non-zero bufcall id and the specified
+.I func
+will be called with the specified
+.I arg
+at a later time when buffers of the necessary
+.I size
+become available.
+.PP
+Upon failure,
+.BR bufcall ()
+returns zero (0) and no call will be generated to the specified
+.IR func .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR bufcall ()
+encounters an error, it returns zero (0).
+.PP
+.BR bufcall ()
+returns zero (0) when the function pointer to the callback function,
+.I func
+is
+.BR NULL ,
+or
+.BR bufcall ()
+cannot allocate the necessary internal structures.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bufcall ()
+can be called from any context, including user context,
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9),
+.IR qi_srvp (9)
+procedures,
+.BR bufcall (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9)
+callbacks,
+and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bufcall ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR bufcall ()
+callback function could execute at the same time as any
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9),
+or
+.IR qi_srvp (9)
+procedure,
+.BR bufcall (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9)
+callback or interrupt service routine.
+.PP
+Nevertheless, the
+.BR bufcall ()
+callback function will be serviced by the same thread as the thread from which
+the
+.BR bufcall ()
+was issued.  Therefore, the callback function will not execute
+until after
+.BR bufcall ()
+returns.
+Because the servicing thread and the current thread are the same, the
+.BR bufcall ()
+callback will not be invoked until after the function that called
+.BR bufcall ()
+returns.
+This means that it is safe to store the returned bufcall id in global
+variables accessed by the callback function.
+This is the same situation for
+.BR qtimeout (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR bufcall (9)
+and
+.BR esbbcall (9)
+functions.
+.PP
+However, if the
+.BR bufcall ()
+was generated from a 
+.IR qi_qopen (9),
+.IR qi_qclose (9),
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure, or was generated from within a 
+.BR mi_bufcall (9),
+.BR qbufcall (9),
+.BR qtimeout (9),
+callback, or other
+queue referenced
+.BR bufcall (),
+.BR esbbcall (9),
+.BR timeout (9),
+callback, then the
+.I STREAMS
+executive is aware of the queue to which the callback function is to be
+referenced and will generate a buffer call internally that is referenced
+against the queue within whose synchronization context the call was invoked.
+This makes the
+.BR bufcall ()
+function safer than the normal
+.I "SVR 4.2 MP"
+equivalent.
+.PP
+See
+.BR mp-streams (9)
+for additional information.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR bcid_t " and " bufcall_id_t
+should be treated as an opaque type that can be tested to equality to zero.
+The value should not otherwise be manipulated.
+.B Linux Fast-STREAMS
+implements buffer call id values internally as a manipulated pointer to a
+.B strevent
+structure containing a Linux timer.  On 64-bit architectures, and to maintain
+forward portability, this value should never be stored as an
+.BR int ,
+nor converted to any integer type with less bits than a pointer (although
+this will work until physical memory addresses exceed 40 bits).
+.PP
+All outstanding buffer calls allocated with
+.BR bufcall ()
+must be cancelled with a call to
+.BR unbufcall (9)
+before invalidating any of the references passed as an argument to the
+callback function.  When the argument is a
+.BR queue (9)
+pointer, all outstanding buffer calls must be cancelled with
+.BR unbufcall (9)
+before the queue is deallocated (i.e. before returning from the
+.IR qi_qclose (9))
+procedure.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+It is typical to see
+.BR bufcall ()
+used to merely enable a queue from a
+.IR qi_srvp (9)
+procedure as follows:
+.nf
+\fC\s-2
+int xxx_srvp(queue_t *q)
+{
+   mblk_t *mp, *dp;
+   while ((mp = get(q))) {
+      switch (mp->b_datap->db_type) {
+      case M_PROTO:
+	 if ((dp = allocb(somesize, BPRI_MED)) == NULL) {
+	    putbq(mp);
+	    bufcall(somesize, BPRI_MED, (void *) qenable,
+		    (long) q);
+	    return (0);
+	 }
+      ...
+      }
+   }
+   return (0);
+}
+\s+2\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putbq (9),
+.BR allocb (9),
+.BR unbufcall (9),
+.BR qbufcall (9),
+.BR qunbufcall (9),
+.BR mp-streams (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR bufcall ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bufcall ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4"
+.[
+svr4spg
+.]
+with the folllowing portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR bufcall ()
+allocates a
+.B strevent
+structure which is then linked into the
+.I strbcalls
+system variable and set the
+.I strbcwait
+flag which causes
+.BR kmem_free (9)
+to set the
+.IR qrunflag .
+The bufcall list is thus scheduled to run on the next invocation of
+.BR runqueues (9).
+This procedure is consistent with that described for
+.IR "SVR 4" .
+.[
+magic
+.]
+.IP ""
+Under
+.IR LiS ,
+.BR bufcall ()
+does not actually generate a callback function once a buffer of the
+appropriate size becomes available.  Instead
+.I LiS
+starts a timer.  When the timer expires, the ability to allocate the necessary
+buffers is checked and the callback function invoked if it is now possible to
+allocate the necessary structures and buffers.  This is not entirely
+consistent with
+.I SVR 4.2
+.[
+svr42
+.]
+operation.
+.\"
+.\"
+.IP \(em
+.BR bufcall ()
+implements a
+.B bcid_t
+hash table to
+.B strevent
+objects for speed.
+.B strevent
+objects expire once the event's callback function has run.
+.IP ""
+.I LiS
+builds a linked list of buffer call structures and assigns an integer id
+to each structure.  Searches for unique buffer ids when ids are assigned and
+searches for buffer ids when
+.BR unbufcall (9)
+is called are linear searches that are slow and inefficient.  In fact,
+\*(lqThe Magic Garden\*(rq explains that in SVR 4.2
+.[
+svr42
+.]
+a
+.BR bufcall ()
+results in the creation of a
+.B strevent
+structure which is linked to the
+.I strbcalls
+system variable
+and sets the
+.I strbcwait
+flag which then causes
+.BR kmem_free ()
+to set the
+.IR qrunflag .
+At no point in this process is an integer id assigned to the
+.B strevent
+structure.  This means that
+.I LiS
+meaninglessly assigns an integer id to the buffer call structure and the
+inefficiencies of linear searches are pointless.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_bufcall ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_bufcall ()
+.\"returns
+.\".BR int .
+.IP \(em
+Depending on the system,
+.BR bufcall ()
+returns
+.BR int ", " bcid_t ", " bufcall_id_t " or even " toid_t .
+.B Linux Fast-STREAMS
+assigns a type of
+.B long
+to
+.BR bcid_t ", " bufcall_id_t " and " toid_t
+to avoid compatibility issues (but internally the id is only significant to 32-bits on most
+architectures).
+.IP \(em
+.IR IRIX \(rg
+documents
+.[
+irixdoc
+.]
+.BR bufcall ()
+as returning a
+.BR toid_t .
+.B Linux Fast-STREAMS
+also defines a
+.B toid_t
+as
+.BR int .
+See
+.BR timeout (9).
+.IP \(em
+.IR IRIX \(rg
+documents
+.[
+irixdoc
+.]
+that the callback function will be called with local
+.I STREAMS
+driver interrupts disabled.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR bufcall ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR bufcall ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

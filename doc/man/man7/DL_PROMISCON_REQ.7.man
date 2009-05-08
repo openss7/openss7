@@ -1,0 +1,630 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_PROMISCON_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_PROMISCON_REQ (dl_promiscon_req_t)
+\- this primitive requests the DLS Provider to enable promiscuous mode on
+a per Stream basis, either at the physical level or at the SAP level.
+.\"
+.\"
+.SH INTERFACE
+.PP
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The message consists of one
+.BR M_PROTO (9)
+message block, which contains the following structure.
+.sp
+.nf
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_level;
+} dl_promiscon_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive requests the DLS Provider to enable promiscuous mode on a
+per Stream basis, either at the physical level or at the SAP level.
+.PP
+The DL Provider will route all received messages on the media to the DLS
+User until either a
+.BR DL_DETACH_REQ (7)
+or a
+.BR DL_PROMISCOFF_REQ (7)
+is received or the
+Stream is closed.
+.PP
+The DLS User uses the supported primitives
+.RB ( DL_ATTACH_REQ "(7), " DL_BIND_REQ "(7), " DL_ENABMULTI_REQ "(7), " DL_PROMISCON_REQ )
+to define a set of enabled physical and SAP address components on a per Stream
+basis.  It is invalid for a DLS Provider to even send upstream a data message
+for which the DLS User on that Stream has not requested.  The burden is on the
+provider to enforce by any means that it chooses, the isolation of SAP and
+physical address space effects on a per-Stream basis.
+.PP
+When the DLS user requests promiscuous mode at the physical level
+.RB ( DL_PROMISC_PHYS ),
+the DLS user receives a copy of every packet on the wire for all SAPs.  This has
+the same effect (for the local Stream) as though the DLS user could set a
+wildcard physical address with the
+.BR DL_SET_PHYS_ADDR_REQ (7)
+primitive.
+.PP
+When the DLS user requests promiscuous mode at the SAP level
+.RB ( DL_PROMISC_SAP ),
+the DLS user receives a copy of every packet on the wire directed to that user
+(physical address, broadcast address or enabled multicast address) that matches
+any SAP for that interface.  This has the same effect as though the DLS user
+could bind to a wildcard SAP with the
+.BR DL_BIND_REQ (7)
+primitive.
+.PP
+When the DLS user requests promiscuous mode for all multicast addresses
+.RB ( DL_PROMISC_MULTI ),
+the DLS user receives all packets on the wire that have either a multicast or
+group destination address, including broadcast addresses.  This has the same
+effect as though the DLS user could enable a wildcard multicast address with the
+.BR DL_ENABMULTI_REQ (7)
+primitive.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+The
+.B dl_promiscon_req_t
+structure contains the following members:
+.TP
+.I dl_primitive
+conveys
+.BR DL_PROMISCON_REQ .
+.TP
+.I dl_level
+indicates promiscuous mode at the physical or SAP level:
+.RS
+.TP
+.B DL_PROMISC_PHYS
+indicates promiscuous mode at the physical level
+.TP
+.B DL_PROMISC_SAP
+indicates promiscuous mode at the SAP level
+.TP
+.B DL_PROMISC_MULTI
+indicates promiscuous mode for all multicast addresses.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+.PP
+The message is valid in any state when there is no pending
+acknowledgement.
+.\"
+.\"
+.SH "NEW STATE"
+.PP
+The resulting state is unchanged.
+.\"
+.\"
+.SH RESPONSE
+.PP
+If enabling of promiscuous mode is successful, a
+.BR DL_OK_ACK (7)
+is returned.  Otherwise, a
+.BR DL_ERROR_ACK (7)
+is returned.
+.\"
+.\"
+.SH ERRORS
+.TP
+.B DL_NOTSUPPORTED
+Primitive is known but not supported by the DLS Provider
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state
+.TP
+.B DL_SYSERR
+A System error has occurred and the Linux System error is indicated in
+the
+.BR DL_ERROR_ACK (7).
+.TP
+.B DL_UNSUPPORTED
+Requested service is not supplied by the provider.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DL_PROMISCOFF_REQ (7),
+.BR DL_OK_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_PROMISCON_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates, in the
+.RI \(lq "Promiscuous Mode Clarifications" ,\(rq
+that if
+.B DL_PROMISC_PHYS
+is enabled before the Stream has been bound with
+.BR DL_BIND_REQ (7),
+the DLS user will receive all traffic on the wire regardless of SAP or address.
+If enabled after the Stream has been bound, the DLS user receives all traffic
+on the wire that matches the protocol(s) to which the DLS user has been bound.
+This includes protocols bound with the
+.BR DL_SUBS_BIND_REQ (7)
+primitive.
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates, in the
+.B DL_PROMISCON_REQ
+reference page, that
+.BR DL_PROMISC_PHYS ,
+before or after the Stream has been bound, the DLPI user receives all traffic
+on the wire regardless of protocol or physical address.
+.IR AIX \(rg
+documentation
+.[
+aixdlpi
+.]
+indicates that if the DLS user enables promiscuous mode at the physical
+level, the DLS user receives a copy of every packet on the wire for all SAPs.
+.IR AIX \(rg
+does not distinguish between whether the Stream is set to promiscuous mode
+before the Stream is bound or not.
+.RS
+.PP
+As there appears to be a conflict in the
+.IR HP-UX \(rg
+documentation, and the one conflicting behaviour is consistent with the
+.IR AIX \(rg
+description,
+.B @PACKAGE_TITLE@
+also exhibits the
+.IR AIX \(rg
+behaviour, described above under
+.RI \(lq DESCRIPTION ,\(rq
+for compatibility with porting both
+.IR AIX \(rg
+and
+.IR HP-UX \(rg
+DLPI applications to
+.BR "Linux Fast-STREAMS" .
+Care should be taken when porting
+.IR HP-UX \(rg
+drivers that rely upon a different action taken when promiscuous mode is set
+after the bind, that the promiscous mode is always set before the bind.
+.PP
+Portable DLPI drivers, modules and applications will always set the promiscuous
+mode before any bind.
+.RE
+.IP \(em
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates, in the
+.RI \(lq "Promiscuous Mode Clarifications" ,\(rq
+that if
+.B DL_PROMISC_SAP
+is enabled before the Stream has been bound with
+.BR DL_BIND_REQ (7),
+the DLS user receives all traffic destined for this interface (physical
+address, broadcast addresses or bound mulitcast addresses) that matches any SAP
+enable on that interface.  If enabled after the Stream has been bound, the DLS
+user receives only those packets originally destined for the interface that
+match one of the protocol(s) bound on the promiscuous Stream.
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates, in the
+.B DL_PROMISCON_REQ
+reference page, that
+.BR DL_PROMISC_SAP ,
+before or after the Stream has been bound, the DLPI user receives all traffic
+destined for this interface (physical addresses, broadcast addresses or bound
+multicast addresses) that matches any protocol enabled on that interface.
+.IR AIX \(rg
+documentation
+.[
+aixdlpi
+.]
+indicates that if the DLS user enables promiscuous mode at the SAP level, the
+DLS user receives a copy of every packet on the wire directed to that user for
+all SAPs.
+.IR AIX \(rg
+does not distinguish between whether the Stream is set to promiscuous mode
+before the Stream is bound or not.
+.RS
+.PP
+As there appears to be a conflict in the
+.IR HP-UX \(rg
+documentation, and the one conflicting behaviour is consistent with the
+.IR AIX \(rg
+description,
+.B @PACKAGE_TITLE@
+also exhibits the
+.IR AIX \(rg
+behaviour, described above under
+.RI \(lq DESCRIPTION ,\(rq
+for compatibility with porting both
+.IR AIX \(rg
+and
+.IR HP-UX \(rg
+DLPI applications to
+.BR "Linux Fast-STREAMS" .
+Care should be taken when porting
+.IR HP-UX \(rg
+drivers that rely upon a different action taken when promiscuous mode is set
+after the bind, that the promiscous mode is always set before the bind.
+.PP
+Portable DLPI drivers, modules and applications will always set the promiscuous
+mode before any bind.
+.RE
+.IP \(em
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates, in the
+.RI \(lq "Promiscuous Mode Clarifications" ,\(rq
+that if
+.B DL_PROMISC_MULTI
+is enabled before the Stream has been bound with
+.BR DL_BIND_REQ (7),
+the DLS user receives all multicast packets on the wire regardless of the SAP.
+After the Stream has been bound, the DLS user receives all multicast packets
+that match one of the protocol(s) bound on the promiscuous Stream.
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates, in the
+.B DL_PROMISCON_REQ
+reference page, that
+.BR DL_PROMISC_MULTI ,
+before or after the Stream has been bound, the DLPI user receives all
+multicast packets on the wire regardless of the protocol it is destined for.
+.IR AIX \(rg
+documentation
+.[
+aixdlpi
+.]
+indicates that if the DLS user enables the promiscuous mode for all multicast
+addresses, the DLS user receives all packets on the wire that have either a
+multicast or group destination address, including broadcast addresses.
+.IR AIX \(rg
+does not distinguish between whether the Stream is set to promiscuous mode
+before the Stream is bound or not.
+.RS
+.PP
+As there appears to be a conflict in the
+.IR HP-UX \(rg
+documentation, and the one conflicting behaviour is consistent with the
+.IR AIX \(rg
+description,
+.B @PACKAGE_TITLE@
+also exhibits the
+.IR AIX \(rg
+behaviour, described above under
+.RI \(lq DESCRIPTION ,\(rq
+for compatibility with porting both
+.IR AIX \(rg
+and
+.IR HP-UX \(rg
+DLPI applications to
+.BR "Linux Fast-STREAMS" .
+Care should be taken when porting
+.IR HP-UX \(rg
+drivers that rely upon a different action taken when promiscuous mode is set
+after the bind, that the promiscous mode is always set before the bind.
+.PP
+Portable DLPI drivers, modules and applications will always set the promiscuous
+mode before any bind.
+.RE
+.IP \(em
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdlpi
+.]
+indicates that only one promiscuous mode can be enabled on a given Stream at any
+point in time.  This does not appear to be consistent with the DLPI standard
+that places no such restriction on promiscuous modes.  For example, setting
+promiscuous mode at the SAP level
+.RB ( DL_PROMISC_SAP )
+and for multicast addresses
+.RB ( DL_PROMISC_MULTI )
+makes sense, whereas setting promiscuous mode at the physical level
+.RB ( DL_PROMISC_PHYS )
+obviously temporarily overrides any setting of other promiscuous modes.
+.RS
+.PP
+For maximum compatibility with DLPI implementations that support multiple
+promiscuous modes,
+.B @PACKAGE_TITLE@
+also supports multiple promiscuous modes.  This is compatible with
+.IR HP-UX \(rg
+in that
+.IR HP-UX \(rg
+drivers, modules and applications do not expect to be able to set multiple
+promiscuous modes.  Care should be taken, however, when porting
+.IR HP-UX \(rg
+drivers, modules and applications that they do not rely upon error
+acknowledgements should an attempt be made to set multiple promiscuous modes on
+a Stream.
+.PP
+Portable DLPI drivers, modules and applications will not attempt to set more
+than one promiscuous mode on a given Stream.
+.RE
+.IP \(em
+.IR AIX \(rg
+documentation
+.[
+aixdlpi
+.]
+indicates that should the DLS user issue a duplicate request (that is,
+attempts to enable at a
+.I dl_level
+that is already enabled), the DLS provider issues a
+.BR DL_OK_ACK (7)
+primitive, ignores the duplicate request and does not generate a non-fatal
+error.
+.RS
+.PP
+For compatibility when porting
+.IR AIX \(rg
+drivers, modules and applications to
+.BR "Linux Fast-STREAMS" ,
+and because there is no DLPI error condition for this case,
+.B @PACKAGE_TITLE@
+ignores duplicate requests in the same fashion as
+.IR AIX \(rg.
+Care should be taken when porting drivers, modules and applications from other
+DLPI implementations that they do not rely upon an error being returned in
+response to an attempt to set a promiscuous mode repeatedly without first
+clearing the mode setting.
+.PP
+Portable DLPI drivers, modules and applications will not attempt to multiply set
+a promiscous mode without first clearing that mode with either
+.BR DL_PROMISCOFF_REQ (7)
+or
+.BR DL_DETACH_REQ (7).
+.RE
+.IP \(em
+.IR AIX \(rg
+X.25 and LLC2
+.[
+aixlink
+.]
+does not support this primitive.
+.IR Solstice \(rg
+X.25 and LLC2
+.[
+solx25pg
+.]
+does not support this primitive.
+Nowhere is there documentation that provides support for promiscuous modes on
+connection-oriented mode or acknowledged connectionless mode DLS providers.
+The DLPI specification appears to be consistent with this behavior (as there is
+a special \(lqconnection management stream\(rg that can accept connection
+indications for a default DLSAP).
+.RS
+.PP
+In support of porting
+.IR AIX \(rg
+and
+.IR Solstice \(rg " X.25
+drivers, modules and applications to
+.BR "Linux Fast-STREAMS" ,
+this primitive is not supported for solely connection-oriented mode or
+acknowledged connectionless mode Streams.
+.PP
+Portable DLPI drivers, modules and applications will not issue this primitive on
+a Stream with a DLS provider that supports only a connection-orented nor
+acknowledged connectionless mode.  (Note that for
+.IR AIX \(rg
+compatibility,
+.B @PACKAGE_TITLE@
+supports multiplex data link service modes on a single Stream.)
+.RE
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

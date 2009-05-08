@@ -1,0 +1,43 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center expand tab(:);
+rb|lbw(2.0i)|cb|cb|nb|nb
+r|lw(2.0i)|c|c|n|n.
+Key:Description:Start Date:End Date:Duration:Slack
+=
+Stage 3:MTP3 Integration:2004/11/01:2004/11/03::
+:SCCP Integration:2004/11/08:2004/11/10::
+:TCAP Integration:2004/11/15:2004/11/17::
+:MAP Implementation:2004/11/22:2004/11/24::
+:HLR Application:2004/11/22:2004/11/25::
+:_:_:_:_:_
+:Development and Implementation:2004/11/01:2004/11/25:24:14
+_
+Gate 3:Code Review:2004/12/06:2004/12/07:1:11
+.TE

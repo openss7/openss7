@@ -1,0 +1,1 @@
+.so man8/ss7_undoc.8.man

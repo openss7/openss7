@@ -1,0 +1,1 @@
+.so man7/WAN.7.man

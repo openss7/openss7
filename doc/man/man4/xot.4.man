@@ -1,0 +1,358 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH XOT 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B XOT
+\- Cisco X.25 over TCP (XOT)
+.\"
+.\"
+.SH DESCRIPTION
+.B XOT
+is an implementation of X.25 PLP over TCP (XOT) as described in RFC 1613.
+.[
+rfc1613
+.]
+The RFC describes use of ISO 8881
+.[
+ISO/IEC 8881:1989
+.]
+X.25
+.[
+x25
+.]
+Packet Layer Protocol over TCP (XOT) using independent TCP connections
+to Registered TCP Port Number 1998 as VCs.
+.PP
+Although RFC 1613
+.[
+rfc1613
+.]
+is rather old, and was originally Cisco-specific,
+.B XOT
+is currently supported by a number of big-iron UNIX vendors, such as
+Compaq/DEC and IBM.
+.\"
+.\"
+.SH USAGE
+.PP
+Not yet implemented, but here is a stab at explaining the design:
+.PP
+The following steps would be taken:
+.IP 1. \w'0.\(em'u
+An X.25 PLP connection manager opens a connection management Stream on the
+X.25 PLP multiplexing driver, configures routing tables to indicate that the
+remote interface available to
+.B XOT
+are available for demand connections.
+.IP 2.
+When the X.25 PLP driver wishes to form an SVC to route a call or the user
+opens an
+.BR npi (7)
+Stream on the X.25 PLP driver and attempts to listen on or connect a VC, the
+X.25 PLP driver informs the connection manager that a DLPI Stream is required.
+.IP 3.
+The connection manager takes the information about the request,
+opens a
+.BR tcp (4)
+Stream to the host providing the remote interface on IANA registered port
+number 1998.
+.IP 4.
+The connection manager then pushes the
+.B XOT
+module onto the
+.BR tcp (4)
+Stream.i
+.IP 5.
+Using information in the X.25 PLP connection request, the connection
+manager then configures the
+.B XOT
+Stream using input-output controls or DLPI primitives.
+.IP 6.
+The connection manager links the resulting
+.BR dlpi (7)
+stream beneath the X.25 PLP multiplexing driver, configures the link as
+normal, and response to the configuration request on the connection management
+Stream.
+.IP 7.
+The X.25 PLP multiplexing driver starts using the DLPI stream just as though
+it was a local X.25 LAPB or X.25 LLC2 data link.
+The
+.B XOT
+module intercepts information from the X.25 PLP to affet the convergence
+functions described in RFC 1613.
+.[
+rfc1613
+.]
+.PP
+Another approach would be to move the connection manager Stream one level down
+to a
+.B XOT
+multiplexing driver.  In this case, the first step is to open
+.B XOT
+streams and to link and configure them beneath the X.25 PLP driver. When
+network connections are attempted on the Stream, the XOT driver intercepts the
+X.25 PLP packets and peforms VC requests to the connection manager.  The
+connection manager then opens and configures
+.BR tcp (4)
+Streams and links them beneath the XOT multiplexing driver on demand.  That
+would probably work better.  Also, this is not too much different than what
+would need to be done when providing X.25 PLP using ISDN LAPB in the circuit
+switched mode.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The service interface to the
+.B xot
+module is the
+.I Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.\"
+.\"
+.SH ADDRESSES
+.PP
+The
+.B xot
+address format is a
+DLPI interface id.
+.\"
+.\"
+.SH OPTIONS
+.PP
+All OSI DLPI options apply but perhaps not all can be supported by TCP.
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+.BR dlpi (7)
+connection-oriented primitives.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.BR dlpi (7)
+defined input-output controls.
+.\"
+.\"
+.SH NOTICES
+.PP
+This module is yet to be implemented.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Implementing
+.B xot
+may be somewhat cumbersome.  A problem is that RFC 1613
+.[
+rfc1613
+.]
+specifies that each X.25 SVC or PVC must use a different TCP connection to
+port 1998.
+With
+.B xot
+implemented as a pushable module that can be pushed over a
+.BR tcp (4)
+Stream (which might also be implemented as a tcp module pushed over an tpi-tcp
+Stream), one new Stream must be opened for each SVC.
+Now, this might also be the case for CONS over LAN as well as X.25 DLPI
+implementations, where the DLPI type II Stream is bound to an interface and
+used to create a new SVC with DL_CONNECT_REQ.
+.PP
+A problem with such an approach is that some sort of connection manager
+(daemon) needs to sit listening for requests from the network layer for an SVC
+and then open a XOT Stream and link it under a multiplexing driver, or the
+user of the network connection must do so themselves.
+.\"
+.\"
+.SH FILES
+.TP
+.BI /lib/modules/ "`uname -r`" /openss7/streams_xot.ko
+the kernel module for the
+.B xot
+.I STREAMS
+module
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B xot
+is a
+.I STREAMS
+pushable module named
+.RI \(lq xot \(rq.
+.\"
+.\"
+.SH DEVICES
+.TP
+.B /dev/tcp
+The TCP device over which
+.B xot
+is pushed.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR XOL (7),
+.BR ISOT (7),
+.BR ITOT (7),
+.BR ISO-IP (7),
+.BR ISO-TP4 (7).
+.\"
+.\"
+.SH BUGS
+.PP
+This manpage and the implementation is incomplete.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None.  I know of no other
+.I STREAMS
+or
+.I Sockets
+implementations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+RFC 1613,
+.[
+rfc1613
+.]
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+X.25,
+.[
+x25
+.]
+X.25 PLP.
+.[
+ISO/IEC 8881:1989
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B xot
+module is new to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

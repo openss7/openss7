@@ -1,0 +1,399 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M2PA 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B m2pa, m2pa_sl, m2pa_cd, m2pa_dl
+\- SS7 MTP2 Peer-to-peer User Adaptation Layer (M2PA)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/lmi.h>
+.br
+.B #include <sys/lmi_ioctl.h>
+.br
+.B #include <sys/sli.h>
+.br
+.B #include <sys/sli_ioctl.h>
+.br
+.B #include <sys/m2pa_ioctl.h>
+.HP
+.BI "int " m2pa_stream " = open(" \(lq/dev/sctp_n\(rq ", " flags );
+.HP
+.IB retval " = ioctl(" \fRI_PUSH\fP ", " \fR\(lqm2pa\(rq\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B M2PA
+is an implementation of the SS7 MTP2 Peer-to-peer User Adaptation Layer (M2PA)
+defined in RFC 4165.
+.[
+m2pa-rfc
+.]
+.B M2PA
+provides the services of the
+.BR sl (4)
+over an IP network using Stream Control Transmission Protocol,
+.BR sctp (4),
+as defined in RFC 2960.
+.[
+rfc2960
+.]
+.PP
+.B M2PA
+is implemented as a
+.IR STREAMS (4)
+pushable module.
+The
+.B m2pa
+module is pushed over an
+.BR sctp (4)
+NPI stream using the
+.IR I_PUSH (7)
+command of
+.BR streamio (7),
+to provide transport of direct SL services
+.[
+q703
+.]
+.[
+en 300 008-1
+.]
+.[
+t1.111
+.]
+to
+.BR M2PA .
+Once pushed, the streams must be configured using
+.BR lmi_ioctl (4)
+and
+.BR sli_ioctl (4).
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.I m2pa-sl
+Provides a pushable module that can be pushed over an
+.BR sctp_n (4)
+Stream and presents the Signalling Link Interface (SLI),
+.BR sli (7),
+service interface at its upper boundary.
+.TP
+.IR m2pa-cd
+Provides a pushable module that can be pushed over an
+.BR sctp_n (4)
+Stream and presents the Communications Device Interface (CDI),
+.BR cdi (7),
+service interface at its upper boundary.
+.TP
+.IR m2pa-dl
+Provides a pushable module that can be pushed over an
+.BR sctp_n (4)
+Stream and presents the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+service interface at its upper boundary.
+.\"
+.\"
+.SH DEVICES
+.PP
+.B M2PA
+provides the following stream types that are directly compatible with the
+stream types provided by
+.BR sl (4).
+.TP
+.I /dev/m2pa-sl
+This devices provides the
+.B SL
+protocol service interface using the SL-primitives of the Signalling Link
+Interface described in
+.BR sli (7).
+This interface is suitable for use with other SS7 modules and drivers.
+Because
+.B m2pa_sl
+is a pushable module and not a device driver, the
+.I /dev/m2pa-sl
+device is formed by specifying an
+.BR autopush (8)
+specification for the
+.B m2pa_sl
+module over an minor device number of a
+.BR sctp_n (4)
+Stream.
+.TP
+.I /dev/m2pa-cd
+This devices provides the
+.B CD
+protocol service interface using the CD-primitives of the Communications Data
+Interface, described in
+.BR cdi (7).
+This interface is suitable for use with other modules and drivers expecting a
+.BR cdi (7)
+interface.
+Because
+.B m2pa_cd
+is a pushable module and not a device driver, the
+.I /dev/m2pa-cd
+device is formed by specifying an
+.BR autopush (8)
+specification for the
+.B m2pa_cd
+module over an minor device number of a
+.BR sctp_n (4)
+Stream.
+.TP
+.I /dev/m2pa-dl
+This devices provides the
+.B DL
+protocol service interface using the DL-primitives of the Data Link Provider
+Interface, described in
+.BR dlpi (7).
+This interface is suitable for use with other modules and drivers expecting a
+.BR dlpi (7)
+interface.
+Because
+.B m2pa_dl
+is a pushable module and not a device driver, the
+.I /dev/m2pa-dl
+device is formed by specifying an
+.BR autopush (8)
+specification for the
+.B m2pa_dl
+module over an minor device number of a
+.BR sctp_n (4)
+Stream.
+.PP
+All devices are implemented as a device from the
+.BR sctp_n (4)
+driver, with an
+.BR autopush (8)
+specification pushing the appropriate
+.B M2PA
+module.
+.\"
+.\"
+.SH NOTICES
+.PP
+Other combinations are possible.  Modules can be pushed to convert between the
+SLI, CDI and DLPI interfaces.
+.\"
+.\"
+.SH IOCTLS
+.PP
+All interfaces support a set of management input-output controls using the
+.BR ioctl (2)
+system call on the
+.IR m2pa_stream .
+These management controls are documented in
+.BR lmi_ioctl (4)
+and
+.BR sli_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <sys/lmi.h> ,
+.BR <sys/lmi_ioctl.h> ,
+.BR <sys/sli.h> ,
+.BR <sys/sli_ioctl.h> ,
+.BR <sys/cdi.h> ,
+.BR <sys/dlpi.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sl (4),
+.BR sctp (4),
+.IR STREAMS (4),
+.IR I_PUSH (7),
+.BR streamio (7),
+.BR lmi_ioctl (4),
+.BR sli_ioctl (4),
+.BR sctp_n (4),
+.BR sli (7),
+.BR cdi (7),
+.BR dlpi (7),
+.BR autopush (8),
+.BR ioctl (2),
+.BR test-m2pa (8),
+.BR SIGTRAN (4),
+.BR sigtran (5),
+.BR ss7 (8),
+.BR sigtran (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B M2PA
+devices are compatible with the Signalling Link Interface (SLI),
+.BR sli (7),
+Communications Device Interface (CDI),
+.BR cdi (7),
+and Data Link Provider Interface (DLPI),
+.BR dlpi (7).
+Compatibility is tested using the
+.BR test-m2pa (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "RFC 4165" ,
+.[
+rfc4165
+.]
+.IR Q.703 ,
+.[
+q703
+.]
+.IR "ETSI MTP Version 2" ,
+.[
+en 300 008-1
+.]
+.IR "ANSI T1.111.3" ,
+.[
+t1.111
+.]
+.IR M2PA-TEST ,
+.[
+test-m2pa-07
+.]
+.IR DLPI .
+.[
+dlpi revision 2.0.0
+.]
+Conformance is tested using the
+.BR test-m2pa (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M2PA
+modules are specific to the
+.B OpenSS7
+stack.  This is Version 3 of the interface.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

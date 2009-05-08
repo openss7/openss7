@@ -1,0 +1,629 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH NLI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
+.SH NAME
+.B NLI, nli
+\- Network Layer Interface (NLI)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <errno.h>
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <stdint.h>
+.br
+.B #include <netx25/x25_proto.h>
+.br
+.B #include <netx25/x25_control.h>
+.br
+.B #include <sys/snet/x25_proto.h>
+.br
+.B #include <sys/snet/x25_control.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The Network Layer Interface (NLI) is a service primitive interface to the X.25
+Packet Layer Protocol (X25-PLP) developed by Spider Systems, Ltd. (now part of
+Emmerson Power) for use by applications in controlling X.25 Packet Layer
+Protocol software.  The service primitive interface was widely used on
+VxWorks, other embedded RTOS,
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Sun Microsystems SunLink starting with version 8.0 and Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+and other mainstream UNIX operating systems and embedded systems for
+communications.
+.PP
+The interface is not provided as a programming library, as is XTI, but as
+defined service primitives to be exchanged with the X.25 PLP driver using
+standard STREAMS
+.BR getpmsg (2s)
+and
+.BR putpmsg (2s)
+system calls.  Although a user level library could be easily constructed from
+these service primtives, in the same way that XTI was built from TPI, it does
+not seem to have happened and applications appear to have wound up using the
+NLI directly.
+.PP
+.B @PACKAGE_TITLE@
+and other \fBOpenSS7\fP applications, drivers and modules provide primarily a
+Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+for devices at this level; however, a compatibility module,
+.BR s_nli (4),
+is provided to convert between NPI and SpiderX.25 NLI interface for the purposes
+of porting SpiderX.25 compatible applications, drivers and modules to
+\fBLinux\fP.
+.\"
+.\"
+.SH ADDRESSES
+.PP
+In call requests and responses, it is necessary to specify the X.25 addresses
+associated with the connection.  These addresses consist of the called, calling
+and responding addresses.  A common structure is used for these addresses.  The
+addressing format used by this stricture provides the following information:
+.IP \(bu \w'\(bu\(em'u
+the subnetwork (data link) on which outgoing Connect Requests are to be
+sent and on which incoming Connect Indications arrive;
+.IP \(bu
+Network Service Access Points (NSAP) and Subnetwork Point of Attachments
+(SNPA), or Data Terminal Equipment (DTE) addresses and Link Service Access
+Points (LSAP); and,
+.IP \(bu
+optional formats for the encoding of addresses (NSAP).
+.PP
+Addresses are represent using an \fBxaddrf\fP structure.  The \fBxaddrf\fP
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define NSAPMAXISZE 20
+
+struct xaddrf {
+    union {
+        uint32_t link_id;
+        uint32_t sn_id;
+    };
+    unsigned char aflags;
+    struct lsapformat DTE_MAC;
+    unsigned char nsap_len;
+    unsigned char NSAP[NSAPMAXSIZE];
+};
+\s+1\fP
+.fi
+.TP
+.I link_id
+Holds the link number as a \fBuint32_t\fP.  By default, \fIlink_id\fP has a
+valud of \fB0xFF\fP.  When \fIlink_id\fP is \fB0xFF\fP, Solstice
+X.25 attempts to match the valled address with an entry in a routing
+configuration file.  If it cannot find a match, it routes the call over the
+lowest numbered WAN link.
+.TP
+.I sn_id
+The subnetwork identifier, selected by the system administrator.  It
+identifies the subnetwork required for a Connect Request, or on which a
+Connect Indication arrived.  The
+.I sn_id
+field holds a representation of the one byte string subnetwork identifier as
+an \fBunsigned long\fP.  The X.25 library routine
+.BR snidtox25 (3)
+can be used to conver the character subnetwork identifier to an unsigned long.
+.RS
+.PP
+Note that in some implementations, the \fIsn_id\fP field is
+declared as \fBunsigned long\fP; however, this causes complications for 32-bit
+applications running over a 64-bit kernel: i.e., it requires that the data model
+of the application be known to the kernel module and conversions be supported.
+Therefore, this field appears in the header file as the 32- vs.  64-bit agnostic
+\fBuint32_t\fP.
+.RE
+.TP
+.I aflags
+Specifies the options required (or used) by the subnetwork to encode and
+interpret addresses.  It may have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lbnls.
+NSAP_ADDR:0x00:\fINSAP\fP is OSI-encoded NSAP address.
+EXT_ADDR:0x01:\fINSAP\fP is non-OSI-encoded extended address.
+PVC_LCI:0x02:\fINSAP\fP is a PVC number.
+PVC_LCI:0x02:\fIDTE_MAC\fP is the LCI of a PVC.
+.TE
+.PP
+When the \fINSAP\fP field is empty, \fIaflags\fP takes the value zero
+(0).
+See
+.BR x25addr (5),
+.BR stox25 (3),
+.BR x25tos (3),
+and
+.BR gexhostent (3),
+manual pages for details about the X.25 address format.
+.RE
+.TP
+.I DTE_MAC
+The DTE address, or LSAP as two BCD digits per byte, right justified, or the
+\fBPVC_LCI\fP as three BCD digits with two digits per byte, right
+justified.
+Holds the DTE address, the Medium Access Control plus Service Access Point
+(MAC+SAP) address or the LCI.  This is binary.  The \fBlsapformat\fP structure
+is define below.
+.TP
+.I nsap_len
+This indicates the length of the NSAP, if any (and where appropriate), in
+semi-octets.
+.TP
+.I NSAP
+This carries the NSAP or address extension (see field
+.IR aflags )
+when present as indicated by
+.IR nsap_len .
+This is binary.
+.PP
+.nf
+\f(CW\s-1\
+#define LSAPMAXSIZE 9
+
+struct lsapformat {
+    unsigned char lsap_len;
+    unsigned char lsap_add[LSAPMAXSIZE];
+};
+\s+1\fP
+.fi
+.PP
+The fields in the
+.B lsapformat
+structure are defined as follows:
+.TP
+.I lsap_len
+This gives the length of the DTE address, the MAC+SAP address, or the LCI in
+semi-octets.  For example, for Ethernet, the length is always 14 to indicate
+the MAC (12) plus SAP (2).  The SAP always follows the MAC address.  The DTE
+can be up to 15 decimal digits unless X.25(88) and TOA/NPI (Type Of
+Address/Numbering Plan Identification) addressing is being used, when it can
+be up to 17 decimal digits.  For an LCI the length is 3.
+.TP
+.I lsap_add
+This holds the DTE, MAC+SAP or LCI, when present, as indicated by
+.IR lsap_len .
+This is binary.
+.\"
+.\"
+.SH QUALITY OF SERVICE
+.PP
+Negotiable X.25 facilities are supported by the PLP driver.  This section
+describes the request and negotiation of these facilities, and the data
+structures used by the NLI primitives.
+.PP
+The facilities are broken down into two groups:
+.PP
+.IP 1. \w'1.\(em'u
+those required for Connection-Oriented Network Service (CONS) support, and
+.PD 0
+.IP 2.
+those requried for non-OSI procedures (X.29, for example).
+.PD
+.PP
+The CONS quality of service (QOS) parameters supported are the following:
+.IP \(bu \w'\(bu\(em'u
+Throughput Class
+.PD 0
+.IP \(bu
+Minimum Throughput Class
+.IP \(bu
+Target Transit Delay
+.IP \(bu
+Maximum Acceptable Transit Delay
+.IP \(bu
+Use of Expedited Data
+.IP \(bu
+Protection
+.IP \(bu
+Receipt Acknolwedgement
+.PD
+.PP
+The CONS quality of service structure used in NLI primitives is described in
+.BR qosformat (5).
+.PP
+Non-OSI X.25 Facilities are supported as follows.
+Although these are non-OSI facilities, they are also negotiable with CONS.  For
+those NLI applications that require them, the non-OSI facilities supported are
+as follows:
+.IP \(bu \w'\(bu\(em'u
+non-OSI extended addressing;
+.PD 0
+.IP \(bu
+X.25 fast select request/indication with no restriction on response;
+.IP \(bu
+X.25 fast select reqeust/indication with restriction on response;
+.IP \(bu
+X.25 reverse charging;
+.IP \(bu
+X.25 packet size negotiation;
+.IP \(bu
+X.25 window size negotiation;
+.IP \(bu
+X.25 network user identification;
+.IP \(bu
+X.25 recognized private operating agency selection;
+.IP \(bu
+X.25 closed user groups;
+.IP \(bu
+X.25 call deflection; and,
+.IP \(bu
+X.25 programmable facilities.
+.PD
+.PP
+The X.25 quality of service structure used in NLI primitives is described in
+.BR extraformat (5).
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+The primtives provided by the Network Layer Interface are as follows:
+.PP
+.TS
+tab(:);
+llls
+lblbls.
+Prim./Manpage:Structure:Description
+_
+N_CI\fR(7):xcallf:Connect Request/Indication.
+N_CC\fR(7):xccnff:Connect Response/Confirmation.
+N_Data\fR(7):xdataf:Data.
+N_DAck\fR(7):xdatacf:Data Acknowledgement.
+N_EData\fR(7):xeadataf:Expedited Data.
+N_EAck\fR(7):xedatacf:Expedited Data Acknowledgement.
+.\"DTflow\fR(7)::
+N_RI\fR(7):xrstf:Reset Request/Indication.
+N_RC\fR(7):xrscf:Reset Response/Confirmation.
+N_DI\fR(7):xdiscf:Disconnect Request/Indication.
+N_DC\fR(7):xdcnff:Disconnect Confirmation.
+N_Abort\fR(7):xabortf:Abort Indication.
+N_Xlisten\fR(7):xlistenf:Listen Request/Response.
+N_Xelisten\fR(7):xlistenf:Extended Listen Request/Response.
+N_Xcanlis\fR(7):xcanlisf:Listen Cancel Request/Response.
+N_PVC_ATTACH\fR(7):pvcattf:PVC Attach.
+N_PVC_DETACH\fR(7):pvcdetf:PVC Detach.
+.\"M_CParmReref\fR(7)::
+.\"M_CParmUnref\fR(7)::
+.\"M_CircuitId\fR(7)::
+_
+.TE
+.PP
+Each primitive is documented in its own manual page.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The input-output controls provided by the Network Layer Interface are as
+follows:
+.PP
+.TS
+tab(:);
+llls
+llbls.
+Ioctl/Manpage:Structure:Description
+_
+\fBN_snident\fP(7):xll_reg:Identify subnetwork.
+\fBN_snmode\fP(7):snoptformat:Adjust subscription mode.
+\fBN_snconfig\fP(7):wlcfg:Configure data link.
+\fBN_snread\fP(7):wlcfg:Read data link configuration.
+\fBN_getstats\fP(7):(array):Get global stats.
+\fBN_zerostats\fP(7):(array):Zero global stats.
+\fBN_putpvcmap\fP(7):pvcmapf:Put a PVC map.
+\fBN_getpvcmap\fP(7):pvcmapf:Get a PVC map.
+\fBN_getVCstatus\fP(7):vcstatusf:Get VC stats.
+\fBN_getnliversion\fP(7):nliformat:Get NLI version.
+\fBN_traceon\fP(7)::Turn tracing on.
+\fBN_traceoff\fP(7)::Turn tracing off.
+\fBN_nuimsg\fP(7)::Network user info message.
+\fBN_nuiput\fP(7):nui_put:Put ntwk user info.
+\fBN_nuidel\fP(7):nui_del:Delete ntwk user info.
+\fBN_nuiget\fP(7):nui_get:Get ntwk user info.
+\fBN_nuimget\fP(7):nui_mget:Multiple get ntwk user info.
+\fBN_nuireset\fP(7):nui_reset:Reset ntwk user info.
+\fBN_zeroVCstats\fP(7):vcstatusf:Zero
+\fBN_putx32map\fP(7)::Put X.32 map.
+\fBN_getx32map\fP(7)::Get X.32 map.
+\fBN_getSNIDstats\fP(7):persnidstats:Get per-subnet stats.
+\fBN_zeroSNIDstats\fP(7):persnidstats:Zero per-subnet stats.
+\fBN_setQOSDATPRI\fP(7):qosdatpri:Set QoS data priority.
+\fBN_resetQOSDATPRI\fP(7)::Reset QoS data priority.
+_
+.TE
+.PP
+Each input-output control is documented in its own manual page.
+.\"
+.\"
+.SH NOTICES
+.PP
+The Spider Network Layer Interface (NLI) is a proprietary interface without
+a \fIformal\fP standard (although its widespread use makes it an \fIipso
+facto\fP standard).  The Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+should be used in its stead.
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE_TITLE@
+implementation of the NLI has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR getpmsg (2s),
+.BR putpmsg (2s),
+.BR x25 (4),
+.BR s_npi (4),
+.BR npi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B NLI
+interface is compatible with SpiderX25,
+and implementations based on SpiderX25, such as
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+and others, with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Many implementations of SpiderX.25 used under license have deviated from binary
+compatibility with the original interface specifications, both in the form and
+style of primitives and in the form of input-output controls supported.
+.RS
+.PP
+Many implementations also provide their own extensions to the interface which
+are incompatible with all other implementations.  May of these extensions are
+purportedly in support of vendor-specific hardware, or systems.
+.PP
+.B @PACKAGE_TITLE@
+attempts to maintain \fIsource\fP compatibilty with the core features provided
+by most implementations, but compatibility with all features of all
+implementations is not possible.
+Your mileage may vary.
+.RE
+.IP \(em
+.B @PACKAGE_TITLE@
+provides a core \fIsource\fP compatible implementations of the SpiderWAN
+interface for the purposes of porting legacy NLI applications, drivers and
+modules to \fBLinux\fP with a minimal porting effort.
+While \fIsource\fP compatibility with core features is attempted, \fIbinary\fP
+compatibility is not attempted.  Any binary compatibility experienced could be
+broken in a subsequent release.
+.RS
+.PP
+New applications should use the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+instead.
+.RE
+.PP
+For additional compatibility considerations, see
+.BR x25 (4),
+.BR s_nli (4),
+.BR s_npi (4),
+.BR npi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms in its core features to the NLI as documented in
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Network Layer Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77

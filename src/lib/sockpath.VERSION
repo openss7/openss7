@@ -1,0 +1,3 @@
+SOCKPATH_1.0 {
+	__sockpath_*;
+};

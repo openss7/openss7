@@ -1,0 +1,48 @@
+
+-- NMF 040-1 3.1.1
+--< ASN1.AnyTypeTableRef DefiningModule.ObjectSet.field Module.AnyType >--
+
+-- NMF 040-1 3.1.2
+--< ASN1.ConstraintFunction >--
+--< ASN1.ConstraintFunction Module >--
+--< ASN1.ConstraintFunction Module.Type function-name >--
+
+-- NMF 040-1 3.1.3
+--< ASN1.DeferDecoding type >-
+
+-- NMF 040-1 3.1.4
+--< ASN1.FileNameExtension headerExtension codeExtension >--
+
+
+-- NMF 040-1 3.1.5
+--< ASN1.FileNamePrefix prefix >--
+
+-- NMF 040-1 3.1.6
+--< ASN1.FileNameSuffix suffix >--
+
+-- NMF 040-1 3.1.7
+--< ASN1.HugeInteger MyModule.MyBigInteger >--
+
+-- NMF 040-1 3.1.8
+--< ASN1.Nickname asn1name nickname >--
+
+-- NMF 040-1 3.1.9
+--< ASN1.PDU type [,type] ... >--
+
+-- NMF 040-1 3.1.10
+--< ASN1.RealRepresentation representation [type] [, type] ... >--
+
+-- NMF 040-1 3.1.11
+--< ASN1.Remove item [, item] ... >--
+
+-- NMF 040-1 3.1.12
+--< ASN1.RetainEncoding type >--
+
+-- NMF 040-1 3.1.13
+--< ASN1.ValueInFile type minSize >--
+
+-- NMF 040-1 3.1.14
+--< ASN1.Version version moduleName [oid] >--
+
+-- NMF 040-1 3.1.15
+--< ASN1.WorkingSet1 WSName [asn1Name [, asn1Name]] ... >--

@@ -1,0 +1,158 @@
+IEEE802-2-LLCDefinitions {iso(1) member-body(2) us(840) ieee802-2(10032)
+llcdefinitions(1) version1(0)}
+DEFINITIONS ::= BEGIN
+IMPORTS
+MACAddress, ResourceInfo, ManufacturerOUI, ManufacturerName,
+ManufacturerProductName, ManufacturerProductVersion
+FROM IEEE802CommonDefinitions {iso(1) member-body(2) us(840)
+ieee802-1F(10011) asn1Module(2) commondefinitions(0) version1(0)}
+; -- End of IMPORTS
+AcknowledgeTimeoutValue ::= INTEGER
+AgingEnabled ::= BOOLEAN
+AgingValue ::= INTEGER
+AvgBufferUseSize ::= INTEGER
+BufferSize ::= INTEGER
+BusyStateTimeoutValue::= INTEGER
+CorrelatorData ::= LSAPPairName
+CorrelatorRspData ::= OCTET STRING
+Counter ::= SEQUENCE {
+counterInitTime [0] TimeStamp,
+counterValue [1] CounterN }
+CounterN ::= INTEGER -- by convention, range 0 to +2(**N)-1 note that
+-- ASN.1 encodes the INTEGER type as
+-- a signed number
+Counter2 ::= INTEGER -- 64 bit counter
+EnabledType2Reset ::= BOOLEAN
+EventCounter ::= SEQUENCE {
+thresholdValue [0] IMPLICIT CounterN,
+resetValue [1] IMPLICIT CounterN,
+thresholdInitTime [2] TimeStamp,
+counterValue [3] IMPLICIT CounterN,
+counterInitTime [4] TimeStamp }
+FlushRIF ::= LSAPPairID
+KStep ::= INTEGER
+LLCClessName ::= GraphicString
+LLCConnectionlessAckName ::= GraphicString
+LLCConnectionName ::= GraphicString
+LLCConnection2Event ::= CHOICE {
+pdusDiscarded1 [1] CounterN,
+pdusDiscarded2 [2] CounterN,
+pduRetransmissions [3] CounterN,
+acknowledgeTimeout [4] AcknowledgeTimeoutValue,
+busyStateTimeout [5] BusyStateTimeoutValue,
+rejectTimeout [6] RejectTimeoutValue,
+pBitTimeout [7] PBitTimeoutValue,
+type2Violation [8] CounterN,
+retransmissions [10] CounterN }
+LLCClessACKEvent ::= CHOICE {
+type3Violation [0] CounterN,
+retransmissions [1] CounterN,
+noResponse [2] CounterN }
+LLCName ::= GraphicString
+LLCSAPName ::= GraphicString
+LLCServices ::= BIT STRING {
+type1 (0),
+type2 (1),
+type3Initiate (2),
+type3ReceiveData (3),
+type3ReturnData (4) }
+LLCStationEvent ::= CHOICE {
+pdusDiscarded [0] CounterN,
+bufferProblems [1] NULL }
+LocalTime ::= SEQUENCE {
+numberOfStationRestarts [0] IMPLICIT INTEGER,
+timeSinceLastRestart [1] IMPLICIT CounterN } --N=15
+LSAP ::= OCTET STRING
+LSAPId ::= INTEGER -- 0 - 127
+LSAPPairID ::= SEQUENCE {
+localLSAP [0] IMPLICIT LSAP,
+localAddress [1] IMPLICIT MACAddress,
+remoteLSAP [2] IMPLICIT LSAP,
+remoteAddress [3] IMPLICIT MACAddress }
+LSAPPairName ::= SEQUENCE {
+lsapId [0] LSAPId, -- remote LSAPId
+mACAddr [1] MACAddress } -- remote MAC Address
+-- MACAddress ::= OCTET STRING minimum length 6 octets
+MACPriority ::= INTEGER -- 0 to 7
+MACServiceClass ::= INTEGER {
+requestWithNoResponse(0),
+requestWithResponse(1),
+response(2) }
+MaxBufferUseSize ::= INTEGER
+MaximumLLCInformationFieldSize ::= INTEGER
+MaximumLSAPsConfigured ::= INTEGER
+MaxSendWindowSize ::= INTEGER
+MaximumPDUN3 ::= INTEGER
+MaximumRetransmissions ::= INTEGER
+MaximumRetryCount ::= INTEGER
+MaximumRouteDescriptors ::= INTEGER
+MaximumResponseTime ::= INTEGER
+MinimumPDUSize ::= INTEGER
+NumberOfActiveLSAPs ::= INTEGER
+OptTolIPDU ::= BOOLEAN
+PBitTimeoutValue ::= INTEGER
+RDEEnabled ::= BOOLEAN
+RDEHold ::= BOOLEAN
+RDEReplace ::= BOOLEAN
+ReadCounters ::= SEQUENCE {
+discardCounter [0] IMPLICIT CounterN,
+nsrPDUCounter [1] IMPLICIT Counter2,
+rsrSelectCounter [2] IMPLICIT CounterN,
+srfPDUCounter [3] IMPLICIT Counter2,
+queryCounter [4] IMPLICIT CounterN }
+ReceiveVariableLifetime ::= INTEGER
+ReceiveWindowSize ::= INTEGER
+ReinitializeData ::= NULL
+ReinitializeResponse ::= NULL
+RejectTimeoutValue ::= INTEGER
+ResetOnTestEnabled ::= BOOLEAN
+RIF ::= SEQUENCE {
+routingControl [0] RoutingControl,
+routingDescriptors [1] SET OF RoutingDescriptors }
+Route ::= SEQUENCE {
+routingControl [0] IMPLICIT RoutingControl,
+routingDescriptors [1] IMPLICIT RoutingDescriptors }
+RoutingControl ::= OCTET STRING(SIZE(2))
+RoutingDescriptors ::= OCTET STRING(SIZE(2))
+SAPDATA ::= LLCServices
+SendWindowSize ::= INTEGER
+Status ::= INTEGER {
+up (0),
+down (1),
+other (2) }
+STRIndicator ::= BIT STRING {
+nsr (0),
+ste (1) }
+SupportedServicesTypes ::= LLCServices
+TESTSentCommand ::= TESTType
+TESTType ::= SEQUENCE {
+sourceLSAP [0] IMPLICIT LSAPId,
+sourceMAC [1] IMPLICIT MACAddress OPTIONAL,
+-- determined by MAC when TEST is sent
+destinationLSAP [2] IMPLICIT LSAPId,
+destinationMAC [3] IMPLICIT MACAddress,
+priority [4] IMPLICIT MACPriority OPTIONAL,
+serviceClass [5] IMPLICIT MACServiceClass OPTIONAL,
+information [6] IMPLICIT OCTET STRING }
+TimeStamp ::= CHOICE {
+generalTime [0] GeneralizedTime,
+utcTime [1] UTCTime,
+localTime [2] LocalTime }
+TransmitVariableLifetime ::= INTEGER
+Type3AcknowledgeTimeoutValue ::= INTEGER
+Type3ReceiveResources ::= BOOLEAN
+UserData ::= ANY
+XIDSentCommand ::= XIDType
+XIDType ::= SEQUENCE {
+sourceLSAP [0] IMPLICIT LSAPId,
+sourceMAC [1] IMPLICIT MACAddress OPTIONAL,
+-- determined by MAC when TEST is sent
+destinationLSAP [2] IMPLICIT LSAPId,
+destinationMAC [3] IMPLICIT MACAddress,
+priority [4] IMPLICIT MACPriority OPTIONAL,
+serviceClass [5] IMPLICIT MACServiceClass OPTIONAL,
+typesSupported [6] IMPLICIT LLCServices OPTIONAL,
+sendWindowSize [7] IMPLICIT SendWindowSize OPTIONAL }
+VersionNumber ::= INTEGER
+END
+

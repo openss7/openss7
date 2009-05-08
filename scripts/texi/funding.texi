@@ -1,0 +1,424 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: funding.texi,v 0.9.2.37 2009-04-29 12:36:55 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2008-2009  Monavacon Limited <www.monoavacon.com>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2009-04-29 12:36:55 $ by $Author: brian $
+@c
+@c =========================================================================
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{@uref{http://www.fsf.org/,, Free Software Foundation}},
+the @cite{@uref{http://www.kernel.org/,, Linux Kernel Community}}, and the open source software
+movement at large.
+
+@node Sponsors
+@unnumberedsubsec Sponsors
+@cindex sponsors
+
+Funding for completion of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package was
+provided in part by:
+
+@multitable @columnfractions .05 .02 .93
+@item @tab @bullet{} @tab @uref{http://www.monavacon.com/,, Monavacon Limited}
+@item @tab @bullet{} @tab @uref{http://www.openss7.com/,, OpenSS7 Corporation}
+@end multitable
+
+@noindent
+Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was provided by:
+
+@multitable @columnfractions .05 .02 .43 .05 .02 .43
+@item @tab @bullet{} @tab @uref{http://www.monavacon.com/,, Monavacon Limited}
+@tab @tab @bullet{} @tab @uref{http://www.openss7.com/,, OpenSS7 Corporation}
+@item @tab @bullet{} @tab @uref{http://www.airnet.com/,, AirNet Communications}
+@tab @tab @bullet{} @tab @uref{http://www.comverse.com/,, Comverse Ltd.}
+@item @tab @bullet{} @tab @uref{http://www.eservglobal.com/,, eServGlobal (NZ) Pty Ltd.}
+@tab @tab @bullet{} @tab @uref{http://www.excel.com/,, Excel Telecommunications}
+@item @tab @bullet{} @tab @uref{http://www.francetelecom.fr/,, France Telecom}
+@tab @tab @bullet{} @tab @uref{http://www.geolink.com/,, GeoLink SA}
+@item @tab @bullet{} @tab @uref{http://www.hob.de/,, HOB International}
+@tab @tab @bullet{} @tab @uref{http://www.lmco.com/,, Lockheed Martin Co.}
+@item @tab @bullet{} @tab @uref{http://www.motorola.com/,, Motorola}
+@tab @tab @bullet{} @tab @uref{http://www.netcentrex.com/,, NetCentrex S. A.}
+@item @tab @bullet{} @tab @uref{http://www.newnet.com/,, Newnet Communications, Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.nortel.com/,, Nortel Networks}
+@item @tab @bullet{} @tab @uref{http://www.pt.com/,, Peformance Technologies, Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.sonus.com/,, Sonus Networks Inc.}
+@item @tab @bullet{} @tab @uref{http://www.ss8.com/,, SS8 Networks Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.sysmaster.com/,, SysMaster Corporation}
+@item @tab @bullet{} @tab @uref{http://www.tecore.com/,, TECORE}
+@tab @tab @bullet{} @tab @uref{http://www.tumsan.fi/,, Tumsan Oy}
+@item @tab @bullet{} @tab @uref{http://www.verisign.com/,, Verisign}
+@tab @tab @bullet{} @tab @uref{http://www.vodare.com/,, Vodare Ltd.}
+@end multitable
+
+@node Contributors
+@unnumberedsubsec Contributors
+@cindex contributors
+
+The primary contributor to the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list of notable
+contributors to @uref{http://www.openss7.org/,, The OpenSS7 Project}:
+
+@multitable @columnfractions .05 .45 .05 .45
+@item @tab @minus{} Per Berquist
+@tab @tab @minus{} Kutluk Testicioglu
+@item @tab @minus{} John Boyd
+@tab @tab @minus{} John Wenker
+@item @tab @minus{} Chuck Winters
+@tab @tab @minus{} Angel Diaz
+@item @tab @minus{} Peter Courtney
+@iftex
+@tab @tab @minus{} J@'er@'emy Compostella
+@end iftex
+@ifnottex
+@tab @tab @minus{} Jérémy Compostella
+@end ifnottex
+@item @tab @minus{} Tom Chandler
+@tab @tab @minus{} Sylvain Chouleur
+@item @tab @minus{} Gurol Ackman
+@tab @tab @minus{} Christophe Nolibos
+@item @tab @minus{} Pierre Crepieux
+@tab @tab @minus{} Bryan Shupe
+@item @tab @minus{} Christopher Lydick
+@tab @tab @minus{} D. Milanovic
+@item @tab @minus{} Omer Tunali
+@tab @tab @minus{} Others
+@end multitable
+
+@node Supporters
+@unnumberedsubsec Supporters
+@cindex supporters
+
+Over the years a number of organizations have provided continued support in the
+form of assessment, inspection, testing, validation and certification.
+
+@menu
+* Telecommunications::
+* Aerospace and Military::
+* Financial, Business and Security.Financial:
+* Education, Health Care and Nuclear Power.Education:
+@end menu
+
+@node Telecommunications
+@unnumberedsubsubsec Telecommunications
+
+@multitable @columnfractions .05 .02 .43 .05 .02 .43
+@item @tab @bullet{} @tab @uref{http://www.2its.com/,, Integrated Telecom Solutions}
+@tab @tab @bullet{} @tab @uref{http://www.aastra.com/,, AASTRA}
+@item @tab @bullet{} @tab @uref{http://www.accuris-networks.com/,, Accuris Networks}
+@tab @tab @bullet{} @tab @uref{http://www.aculab.com/,, Aculab}
+@item @tab @bullet{} @tab @uref{http://www.adax.com/,, Adax}
+@tab @tab @bullet{} @tab @uref{http://www.aepona.com/,, AEPONA}
+@item @tab @bullet{} @tab @uref{http://www.airnet.com/,, AirNet Communications}
+@tab @tab @bullet{} @tab @uref{http://www.airwidesolutions.com/,, Airwide Solutions}
+@item @tab @bullet{} @tab @uref{http://www.alacre.com/,, Alacre}
+@tab @tab @bullet{} @tab @uref{http://www.alcatel.com/,, Alcatel}
+@item @tab @bullet{} @tab @uref{http://www.alcatel-lucent.com/,, Alcatel-Lucent}
+@tab @tab @bullet{} @tab @uref{http://www.altobridge.com/,, Altobridge}
+@item @tab @bullet{} @tab @uref{http://www.anam.com/,, Anam}
+@tab @tab @bullet{} @tab @uref{http://www.apertio.com/,, Apertio (now Nokia)}
+@item @tab @bullet{} @tab @uref{http://www.aptalaska.com/,, Alaska Power & Telephone}
+@tab @tab @bullet{} @tab @uref{http://www.aricent.com/,, Aricent}
+@item @tab @bullet{} @tab @uref{http://www.artesyncp.com/,, Artesyn (now Emerson)}
+@tab @tab @bullet{} @tab @uref{http://www.arthus-tech.com/,, Arthus Technologies}
+@item @tab @bullet{} @tab @uref{http://www.bhartitelesoft.com/,, Bharti Telesoft}
+@tab @tab @bullet{} @tab @uref{http://www.bubblemotion.com/,, BubbleMotion}
+@item @tab @bullet{} @tab @uref{http://www.ccpu.com/,, Continuous Computing (Trillium)}
+@tab @tab @bullet{} @tab @uref{http://www.cellnext.com/,, Cellnext Solutions Limited}
+@item @tab @bullet{} @tab @uref{http://www.cisco.com/,, Cisco}
+@tab @tab @bullet{} @tab @uref{http://www.codentnetworks.com/,, Codent Networks}
+@item @tab @bullet{} @tab @uref{http://www.cogeco.ca/,, Cogeco Cable Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.comverse.com/,, Comverse Ltd.}
+@item @tab @bullet{} @tab @uref{http://www.condornetworks.com/,, Condor Networks}
+@tab @tab @bullet{} @tab @uref{http://www.coraltele.com/,, Coral Telecom}
+@item @tab @bullet{} @tab @uref{http://www.corecess.com/,, Corecess}
+@tab @tab @bullet{} @tab @uref{http://www.corelatus.com/,, Corelatus}
+@item @tab @bullet{} @tab @uref{http://www.cosini.com/,, Cosini}
+@tab @tab @bullet{} @tab @uref{http://www.dataconnection.com/,, Data Connection}
+@item @tab @bullet{} @tab @uref{http://www.datacraft-asia.com/,, Datacraft}
+@tab @tab @bullet{} @tab @uref{http://www.datatekcorp.com/,, Datatek Applications Inc.}
+@item @tab @bullet{} @tab @uref{http://www.datatronics.es/,, Datatronics}
+@tab @tab @bullet{} @tab @uref{http://www.dialogic.com/,, Dialogic}
+@item @tab @bullet{} @tab @uref{http://www.digium.com/,, Digium}
+@tab @tab @bullet{} @tab @uref{http://www.druidsoftware.com/,, Druid Software}
+@item @tab @bullet{} @tab @uref{http://www.dtag.de/,, DTAG (Deutsche Telecom AG)}
+@tab @tab @bullet{} @tab @uref{http://www.empirix.com/,, Empirix}
+@item @tab @bullet{} @tab @uref{http://www.engageinc.com/,, Engage Communication Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.ericsson.com/,, Ericsson}
+@item @tab @bullet{} @tab @uref{http://www.eservglobal.com/,, eServGlobal (NZ) Pty Ltd.}
+@tab @tab @bullet{} @tab @uref{http://www.etsi.org/,, ETSI}
+@item @tab @bullet{} @tab @uref{http://www.excel.com/,, Excel Telecommunications}
+@tab @tab @bullet{} @tab @uref{http://www.flextronicssoftware.com/,, Flextronics (now Aricent)}
+@item @tab @bullet{} @tab @uref{http://www.francetelecom.fr/,, France Telecom}
+@tab @tab @bullet{} @tab @uref{http://www.geminimobile.com/,, Gemini Mobile Technologies}
+@item @tab @bullet{} @tab @uref{http://www.geolink.com/,, Geolink (now SeaMobile)}
+@tab @tab @bullet{} @tab @uref{http://www.globaledgesoft.com/,, Global Edge}
+@item @tab @bullet{} @tab @uref{http://www.huawei.com/,, Huawei}
+@tab @tab @bullet{} @tab @uref{http://www.ibsyscanada.com/,, IBSYS Canada}
+@item @tab @bullet{} @tab @uref{http://www.integralaccess.com/,, Integral Access (now Telco Systems)}
+@tab @tab @bullet{} @tab @uref{http://www.integrat.com/,, Integrat Mobile Aggregation Services}
+@item @tab @bullet{} @tab @uref{http://www.kineto.com/,, Kineto Wireless}
+@tab @tab @bullet{} @tab @uref{http://www.lucent.com/,, Lucent}
+@item @tab @bullet{} @tab @uref{http://www.maestrocomms.com/,, Maestro Communications}
+@tab @tab @bullet{} @tab @uref{http://www.mci.com/,, MCI}
+@item @tab @bullet{} @tab @uref{http://www.mindspeed.com/,, Mindspeed}
+@tab @tab @bullet{} @tab @uref{http://www.mobis-s.com/,, Mobis}
+@item @tab @bullet{} @tab @uref{http://www.mobixell.com/,, Mobixell}
+@tab @tab @bullet{} @tab @uref{http://www.motivity.ca/,, Motivity Telecom, Inc.}
+@item @tab @bullet{} @tab @uref{http://www.motorola.com/,, Motorola}
+@tab @tab @bullet{} @tab @uref{http://www.mpathix.com/,, Mpathix Inc.}
+@item @tab @bullet{} @tab @uref{http://www.m-wise.com/,, m-Wise Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.myriadgroup.com/,, Myriad Group}
+@item @tab @bullet{} @tab @uref{http://www.net2phone.com/,, Net2Phone} 
+@tab @tab @bullet{} @tab @uref{http://www.netcentrex.com/,, NetCentrex S. A.}
+@item @tab @bullet{} @tab @uref{http://www.nettest.com/,, NetTest A/S (now Anritsu)} 
+@tab @tab @bullet{} @tab @uref{http://www.neuvatel.com/,, NeuvaTel PCS} 
+@item @tab @bullet{} @tab @uref{http://www.newnet.com/,, Newnet Communications, Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.nmss.com/,, NMS (now Dialogic)} 
+@item @tab @bullet{} @tab @uref{http://www.noblesys.com/,, Noble Systems Corporation} 
+@tab @tab @bullet{} @tab @uref{http://www.nokia.com/,, Nokia} 
+@item @tab @bullet{} @tab @uref{http://www.nortelnetworks.com/,, Nortel Networks} 
+@tab @tab @bullet{} @tab @uref{http://www.onebox.com/,, j2 Global Communications, Inc.} 
+@item @tab @bullet{} @tab @uref{http://www.onmobile.com/,, OnMobile} 
+@tab @tab @bullet{} @tab @uref{http://www.orange.co.uk/,, Orange} 
+@item @tab @bullet{} @tab @uref{http://www.ouroboros.fr/,, Ouroboros} 
+@tab @tab @bullet{} @tab @uref{http://www.p3-group.com/,, P3 Solutions GmbH} 
+@item @tab @bullet{} @tab @uref{http://www.primaltech.com/,, Primal Technologies Inc.} 
+@tab @tab @bullet{} @tab @uref{http://www.propolys.com/,, Propolys Pte Ltd.} 
+@item @tab @bullet{} @tab @uref{http://www.pt.com/,, Peformance Technologies, Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.pulsevoice.com/,, Pulse Voice Inc.} 
+@item @tab @bullet{} @tab @uref{http://www.rcom.com/,, Reliance Communications} 
+@tab @tab @bullet{} @tab @uref{http://www.roamwareinc.com/,, Roamware Inc.} 
+@item @tab @bullet{} @tab @uref{http://www.sonorys.at/,, SONORYS Technology GmbH} 
+@tab @tab @bullet{} @tab @uref{http://www.sonus.com/,, Sonus Networks Inc.}
+@item @tab @bullet{} @tab @uref{http://www.spider.com/,, Spider Ltd. (now Emerson)} 
+@tab @tab @bullet{} @tab @uref{http://www.ss8.com/,, SS8 Networks Inc.}
+@item @tab @bullet{} @tab @uref{http://www.steadycom.com/,, Oasis Systems}
+@tab @tab @bullet{} @tab @uref{http://www.stratus.com/,, Stratus}
+@item @tab @bullet{} @tab @uref{http://www.stratus.com/,, Stratus Technologies Bermuda Ltd.}
+@tab @tab @bullet{} @tab @uref{http://www.swapcom.fr/,, Sicap AG}
+@item @tab @bullet{} @tab @uref{http://www.switchlab.com/,, Switchlab Ltd.}
+@tab @tab @bullet{} @tab @uref{http://www.synap.se/,, Synapse Mobile Networks SA}
+@item @tab @bullet{} @tab @uref{http://www.sysmaster.com/,, SysMaster Corporation}
+@tab @tab @bullet{} @tab @uref{http://www.tatacommunications.com/,, Tata Communications}
+@item @tab @bullet{} @tab @uref{http://www.tecore.com/,, Tecore}
+@tab @tab @bullet{} @tab @uref{http://www.teknotelecom.com/,, Tekno Telecom LLC}
+@item @tab @bullet{} @tab @uref{http://www.telcordia.com/,, Telcordia}
+@tab @tab @bullet{} @tab @uref{http://www.telecomitalia.it/,, Telecom Italia}
+@item @tab @bullet{} @tab @uref{http://www.teledesign.co.uk/,, Teledesign}
+@tab @tab @bullet{} @tab @uref{http://www.telemetrics.com/,, Telemetrics Inc.}
+@item @tab @bullet{} @tab @uref{http://www.telnor.com/,, Telnor}
+@tab @tab @bullet{} @tab @uref{http://www.te-systems.de/,, TE-Systems}
+@item @tab @bullet{} @tab @uref{http://www.ti.com/,, Texas Instruments Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.tumsan.fi/,, Tumsan Oy}
+@item @tab @bullet{} @tab @uref{http://www.ulticom.com/,, Ulticom}
+@tab @tab @bullet{} @tab @uref{http://www.vanu.com/,, Vanu Inc.}
+@item @tab @bullet{} @tab @uref{http://www.vector-communications.net/,, Vecto Communications SRL}
+@tab @tab @bullet{} @tab @uref{http://www.veraznetworks.com/,, Veraz Networks}
+@item @tab @bullet{} @tab @uref{http://www.verisign.com/,, VeriSign}
+@tab @tab @bullet{} @tab @uref{http://www.vodare.com/,, Vodare Ltd.}
+@item @tab @bullet{} @tab @uref{http://www.vsenet.de/,, VSE NET GmbH}
+@tab @tab @bullet{} @tab @uref{http://www.wanware.com/,, The Software Group Limited}
+@item @tab @bullet{} @tab @uref{http://www.wingcon.com/,, WINGcon GmbH}
+@tab @tab @bullet{} @tab @uref{http://www.wipro.com/,, Wipro Technologies}
+@item @tab @bullet{} @tab @uref{http://www.xentel.com/,, Xentel Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.ycom.ch/,, YCOM SA}
+@item @tab @bullet{} @tab @uref{http://www.zte.com.cn/,, ZTE Corporation}
+@end multitable
+
+@node Aerospace and Military
+@unnumberedsubsubsec Aerospace and Military
+
+@multitable @columnfractions .05 .02 .43 .05 .02 .43
+@item @tab @bullet{} @tab @uref{http://www.advtechme.com/,, Advanced Technologies}
+@tab @tab @bullet{} @tab @uref{http://www.altobridge.com/,, Altobridge}
+@item @tab @bullet{} @tab @uref{http://www.altobridge.com/,, Altobridge}
+@tab @tab @bullet{} @tab @uref{http://www.bbn.com/,, BBN (Bolt@comma{} Beranek@comma{} and Neuman)}
+@item @tab @bullet{} @tab @uref{http://www.arinc.com/,, ARINC}
+@tab @tab @bullet{} @tab @uref{http://www.boldonjames.com/,, Boldon James}
+@item @tab @bullet{} @tab @uref{http://www.atos-origin.com/,, ATOS Origin}
+@tab @tab @bullet{} @tab @uref{http://www.lmco.com/,, Lockheed Martin Co.}
+@item @tab @bullet{} @tab @uref{http://www.boeing.com/,, Boeing}
+@tab @tab @bullet{} @tab @uref{http://www.ngc.com/,, Northrop Grumman Corporation}
+@item @tab @bullet{} @tab @uref{http://www.boldonjames.com/,, Boldon James}
+@tab @tab @bullet{} @tab @uref{http://www.qinetiq.com/,, QinetiQ}
+@item @tab @bullet{} @tab @uref{http://www.crna-n.aviation-civile.gouv.fr/,, CRNA}
+@tab @tab @bullet{} @tab @uref{http://www.saabgroup.com/,, SAAB}
+@item @tab @bullet{} @tab @uref{http://www.dgac.fr/,, DSNA-DGAC}
+@iftex
+@footnote{La Direction des Services de la Navigation A@'erienne - La Direction G@'en@'eral de l'Aviation Civile}
+@end iftex
+@ifnottex
+@footnote{La Direction des Services de la Navigation Aérienne - La Direction Général de l'Aviation Civile}
+@end ifnottex
+@tab @tab @bullet{} @tab @uref{http://www.sandia.gov/,, Sandia National Laboratories}
+@item @tab @bullet{} @tab @uref{http://www.dlr.de/,, DLR}
+@iftex
+@footnote{Deutsches Zentrum f@"ur Luft- unde Raumfarht}
+@end iftex
+@ifnottex
+@footnote{Deutsches Zentrum für Luft- unde Raumfarht}
+@end ifnottex
+@tab @tab @bullet{} @tab @uref{http://www.thalesgroup.com/,, Thales}
+@item @tab @bullet{} @tab @uref{http://www.dsna-dti.aviation-civile.gouv.fr/,, DSNA-DTI}
+@tab @tab @bullet{} @tab @uref{http://www.wpafb.af.mil/,, Wright-Patterson Air Force Base}
+@item @tab @bullet{} @tab @uref{http://www.egis-avia.com/,, Egis-Avia (Sofreavia)}
+@item @tab @bullet{} @tab @uref{http://www.metaslash.com/,, MetaSlash, Inc.}
+@item @tab @bullet{} @tab @uref{http://www.sofreavia.fr/,, Sofreavia}
+@item @tab @bullet{} @tab @uref{http://www.tc.faa.gov/,, FAA WJHTC}@footnote{Federal Aviation Administration - William J. Hughes Technical Center}
+@item @tab @bullet{} @tab @uref{http://www.thalesatm.com/,, Thales ATM/Air Systems}
+@end multitable
+
+@node Financial
+@unnumberedsubsubsec Financial, Business and Security
+
+@multitable @columnfractions .05 .02 .43 .05 .02 .43
+@item @tab @bullet{} @tab @uref{http://www.alebra.com/,, Alebra}
+@tab @tab @bullet{} @tab @uref{http://www.alebra.com/,, Alebra}
+@item @tab @bullet{} @tab @uref{http://www.atdesk.com/,, Automated Trading Desk (now Citi)}
+@tab @tab @bullet{} @tab @uref{http://www.boldonjames.com/,, Boldon James}
+@item @tab @bullet{} @tab @uref{http://www.bancocredicoop.coop/,, Banco Credicoop}
+@tab @tab @bullet{} @tab @uref{http://www.fujitsu-siemens.com/,, Fujitsu-Seimens}
+@item @tab @bullet{} @tab @uref{http://www.bemac.com/,, BeMac}
+@tab @tab @bullet{} @tab @uref{http://www.futuresoft.com/,, FutureSoft}
+@item @tab @bullet{} @tab @uref{http://www.boldonjames.com/,, Boldon James}
+@tab @tab @bullet{} @tab @uref{http://www.gsx.com/,, GSX}
+@item @tab @bullet{} @tab @uref{http://www.cybersource.com/,, CyberSource Corporation}
+@tab @tab @bullet{} @tab @uref{http://www.hob.de/,, HOB International}
+@item @tab @bullet{} @tab @uref{http://www.fujitsu-siemens.com/,, Fujitsu-Seimens}
+@tab @tab @bullet{} @tab @uref{http://www.hp.com/,, HP (Hewlett-Packard)}
+@item @tab @bullet{} @tab @uref{http://www.futuresoft.com/,, FutureSoft}
+@tab @tab @bullet{} @tab @uref{http://www.ibm.com/,, IBM}
+@item @tab @bullet{} @tab @uref{http://www.gcom.com/,, Gcom, Inc.}
+@item @tab @bullet{} @tab @uref{http://www.gsx.com/,, GSX}
+@item @tab @bullet{} @tab @uref{http://www.hob.de/,, HOB International}
+@item @tab @bullet{} @tab @uref{http://www.hp.com/,, HP (Hewlett-Packard)}
+@item @tab @bullet{} @tab @uref{http://www.ibm.com/,, IBM}
+@item @tab @bullet{} @tab @uref{http://www.lightbridge.com/,, Lightbride (now CyberSource)}
+@item @tab @bullet{} @tab @uref{http://www.mastercard.com/,, MasterCard}
+@tab @tab @bullet{} @tab @uref{http://www.alertlogic.com/,, Alert Logic}
+@item @tab @bullet{} @tab @uref{http://www.netex.com/,, Network Executive Software Inc.}
+@tab @tab @bullet{} @tab @uref{http://www.apani.com/,, Apani}
+@item @tab @bullet{} @tab @uref{http://www.packetware.com/,, Packetware Inc.} 
+@tab @tab @bullet{} @tab @uref{http://www.bemac.com/,, BeMac}
+@item @tab @bullet{} @tab @uref{http://www.packetware.com/,, Packetware Inc.} 
+@tab @tab @bullet{} @tab @uref{http://www.ercom.fr/,, ERCOM}
+@item @tab @bullet{} @tab @uref{http://www.prism.com/,, Prism Holdings Ltd.} 
+@tab @tab @bullet{} @tab @uref{http://www.hitech.com/,, Hitech Systems}
+@item @tab @bullet{} @tab @uref{http://www.s2systems.com/,, S2 Systems (now ACI)} 
+@tab @tab @bullet{} @tab @uref{http://www.imetrik.com/,, iMETRIK}
+@item @tab @bullet{} @tab @uref{http://www.symicron.com/,, Symicron Computer Communications Limited}
+@tab @tab @bullet{} @tab @uref{http://www.intrado.com/,, Intrado Inc.}
+@end multitable
+
+@node Education
+@unnumberedsubsubsec Education, Health Care and Nuclear Power
+
+@multitable @columnfractions .05 .02 .43 .05 .02 .43
+@item @tab @bullet{} @tab @uref{http://www.computer.org/,, IEEE Computer Society}
+@tab @tab @bullet{} @tab @uref{http://www.ateb.com/,, Ateb}
+@item @tab @bullet{} @tab @uref{http://www.enst.fr/,, ENST}
+@iftex
+@footnote{Ecole Nationale Sup@'erieure des T@'el@'ecommunications}
+@end iftex
+@ifnottex
+@footnote{Ecole Nationale Supérieure des Télécommunications}
+@end ifnottex
+@tab @tab @bullet{} @tab @uref{http://www.mandexin.com/,, Mandexin Systems Corporation}
+@item @tab @bullet{} @tab @uref{http://www.htw-saarland.de/,, HTW-Saarland}
+@iftex
+@footnote{Hochschule f@"ur Technik und Wirtschaft des Saarlandes}
+@end iftex
+@ifnottex
+@footnote{Hochschule für Technik und Wirtschaft des Saarlandes}
+@end ifnottex
+@item @tab @bullet{} @tab @uref{http://www.k-state.edu/,, Kansas State University}
+@tab @tab @bullet{} @tab @uref{http://www.areva-np.com/,, Areva NP}
+@item @tab @bullet{} @tab @uref{http://www.uncc.edu/,, University of North Carolina Charlotte}
+@tab @tab @bullet{} @tab @uref{http://www.cern.com/,, European Organization for Nuclear Research}
+@end multitable
+
+@node Agencies
+@unnumberedsubsec Agencies
+@cindex agencies
+
+It would be difficult for the OpenSS7 Project to attain the conformance and
+certifications that it has without the free availability of specifications
+documents and standards from standards bodies and industry associations.  In
+particular, the following:
+
+@multitable @columnfractions .05 .02 .93
+@item @tab @bullet{} @tab @uref{http://www.3gpp.org/,, 3GPP (Third Generation Partnership Project)}
+@item @tab @bullet{} @tab @uref{http://www.atmforum.org/,, ATM Forum}
+@item @tab @bullet{} @tab @uref{http://www.eia.org/,, EIA/TIA (Electronic Industries Alliance)}
+@item @tab @bullet{} @tab @uref{http://www.etsi.org/,, ETSI (European Telecommunications Standards Institute)}
+@item @tab @bullet{} @tab @uref{http://www.icao.org/,, ICAO (International Civil Aviation Organization)}
+@item @tab @bullet{} @tab @uref{http://www.ieee.org/,, IEEE (Institute of Electrical and Electronic Engineers)}
+@item @tab @bullet{} @tab @uref{http://www.ietf.org/,, IETF (The Internet Engineering Task Force)}
+@item @tab @bullet{} @tab @uref{http://www.iso.org/,, ISO (International Organization for Standardization)}
+@item @tab @bullet{} @tab @uref{http://www.itu.int/,, ITU (International Telecommunications Union)}
+@item @tab @bullet{} @tab @uref{http://www.msforum.org/,, Mulutiservices Forum}
+@item @tab @bullet{} @tab @uref{http://www.opengroup.org/,, The Open Group}
+@end multitable
+
+Of these, ICAO, ISO, IEEE and EIA have made at least some documents publicly
+available.  ANSI is notably missing from the list: at one time draft documents
+were available from ANSI (ATIS), but that was curtailed some years ago.
+Telecordia does not release any standards publicly.  Hopefully these
+organizations will see the light and realize, as the others have, that to remain
+current as a standards organization in today's digital economy requires
+providing individuals with free access to documents.
+

@@ -1,0 +1,422 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_CONTROL_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_CONTROL_ACK (dl_control_ack_t)
+\- acknowledge control of the underlying driver
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0
+.]
+.IR Solaris \(rg-specific.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one
+.BR M_PCPROTO (9)
+message block, which contains the following structure:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_operation;
+    t_uscalar_t dl_type;
+    t_uscalar_t dl_key_offset;
+    t_uscalar_t dl_key_length;
+    t_uscalar_t dl_data_offset;
+    t_uscalar_t dl_data_length;
+} dl_control_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B DL_CONTROL_ACK
+is an acknowledgement of the extensible
+.BR DL_CONTROL_REQ (7)
+primitive that sends down control information to the DLS provider.  The
+.B DL_CONTROL_ACK
+primitive is issued by the DLS provider in response to a successful control
+operation invoked with a
+.BR DL_CONTROL_REQ (7)
+primitive.
+.\"
+.\"
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_CONTROL_ACK .
+.TP
+.I dl_operation
+Conveys the operation that this primitive acknowledges and is the same value as
+in the field of the same name in the corresponding
+.BR DL_CONTROL_REQ (7)
+primitive to which this primitive is a response.  This field can have one of
+the following values:
+.RS
+.TP
+.B DL_CO_ADD
+A new entry was added for
+.RI < type >
+and
+.RI < key >
+with data
+.RI < data >.
+.TP
+.B DL_CO_DELETE
+An entry with
+.RI < type >
+and
+.RI < key >
+and data
+.RI < data >
+was deleted.
+.TP
+.B DL_CO_FLUSH
+All entries of type
+.RI < type >
+were deleted.
+.TP
+.B DL_CO_GET
+The data for
+.RI < type >
+and
+.RI < key >
+was retrieved and appears in the data
+.RI < data >.
+.TP
+.B DL_CO_UPDATE
+An existing entry was updated for
+.RI < type >
+and
+.RI < key >
+with data
+.RI < data >.
+.TP
+.B DL_CO_SET
+An existing entry was updated for
+.RI < type >
+and
+.RI < key >
+with data
+.RI < data >,
+or a new
+entry was added for
+.RI < type >
+and
+.RI < key >
+with data
+.RI < data >.
+.RE
+.TP
+.I dl_type
+Conveys the
+.RI < type >
+of control and is the same value as in the field of the same
+name in the corresponding
+.BR DL_CONTROL_REQ (7)
+primitive to which this primitive is a response.  This field can have one of
+the following values:
+.RS
+.TP
+.B DL_CT_IPSEC_AH
+The
+.RI < key >
+is the Security Parameters Index (SPI) and destination IP address
+using a
+.B dl_ct_ipsec_key_t
+structure, the
+.RI < data >
+is keyring material conveyed using a
+.B dl_ct_ipsec_t
+structure.
+.TP
+.B DL_CT_IPSEC_ESP
+The
+.RI < key >
+is the Security Parameters Index (SPI) and destination transport
+address using a
+.B dl_ct_ipsec_key_t
+structure, the
+.RI < data >
+is keyring material conveyed using a
+.B dl_ct_ipsec_t
+structure.
+.RE
+.TP
+.IR dl_key_offset ", " dl_key_length
+These two fields together descrie an area in the
+.BR M_PCPROTO (9)
+message block of byte-length
+.I dl_key_length
+beginning
+.I dl_key_offset
+bytes from the beginning of the
+.BR M_PCPROTO (9)
+message block.  This area defines the
+.RI < key >
+for the control acknowledgement.
+.RS
+.PP
+When
+.RI < type >
+is
+.BR DL_CT_IPSEC_AH " or " DL_CT_IPSEC_ESP ,
+this area contains a
+.B dl_ct_ipsec_key_t
+structure.  The format of this structure is defined in the
+.BR DL_CONTROL_REQ (7)
+manual page.
+.RE
+.TP
+.IR dl_data_offset ", " dl_data_length
+These two fields together descrie an area in the
+.BR M_PCPROTO (9)
+message block of byte-length
+.I dl_data_length
+beginning
+.I dl_data_offset
+bytes from the beginning of the
+.BR M_PCPROTO (9)
+message block.  This area defines the
+.RI < data >
+for the control acknowledgement.
+.RS
+.PP
+When
+.RI < type >
+is
+.BR DL_CT_IPSEC_AH " or " DL_CT_IPSEC_ESP ,
+this area contains a
+.B dl_ct_ipsec_t
+structure.  The format of this structure is defined in the
+.BR DL_CONTROL_REQ (7)
+manual page.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
+.SH STATE
+The message is valid in any state
+.B DL_UNATTACHED ,
+and then only in response to a corresponding
+.BR DL_CONTROL_REQ (7)
+primitive.
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state remains the same.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B DL_CONTROL_ACK
+is a
+.IR Solaris \(rg-specific
+primitive.  It might be necessary to define C preprocessor symbol
+.BR _SUN_SOURCE
+before including the
+.RB < sys/dlpi.h >
+header file,
+or it might be necessary to include the
+.RB < sys/dlpi_sun.h >
+header file,
+to expose the declarations and structures associated with this primitive.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DL_CONTROL_REQ (7),
+.BR DL_CAPABILITY_REQ (7),
+.BR DL_CAPABILITY_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B DL_CONTROL_ACK
+is compatible with
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_CONTROL_ACK
+is a
+.IR Solaris \(rg-specific
+primitive that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+.B DL_CONTROL_ACK
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR Solaris \(rg,
+and for porting DLS Providers and Users from
+.IR Solaris \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface
+.[
+dlpi revision 2.0.0
+.]
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+.B DL_CONTROL_ACK
+was first documented in
+.IR Solaris \(rg .
+.[
+soldoc11
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2
+

@@ -1,0 +1,541 @@
+#!/bin/bash
+#
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+# All Rights Reserved.
+#
+# Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
+# permissions.
+#
+# Redhat chkconfig init script conventions
+#
+# streams:	start and stop streams subsystem
+# chkconfig:	2345 01 98
+# lockfile:	/var/lock/subsys/streams
+# config:	/etc/sysconfig/streams
+# probe:	true
+# hide:		false
+# license:	GPL
+# description:	The SPECFS is a special shadow filesystem used for Linux \
+#		Fast-STREAMS.  The purpose of this init script is to detect \
+#		whether the specfs is supported for the running kernel, and if \
+#		it is, to configure and load the kernel module associated with \
+#		the special filesystem.  This STREAMS init script is part of \
+#		Linux Fast-STREAMS.  It is responsible for ensuring that the \
+#		necessary STREAMS character devices are present in the /dev \
+#		directory and that the STREAMS subsystem is configured and \
+#		loaded.
+#
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: streams
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: start and stop streams subsystem
+# License: GPL
+# Description:	The SPECFS is a special shadow filesystem used for Linux
+#	Fast-STREAMS.  The purpose of this init script is to detect whether the
+#	specfs is supported for the running kernel, and if it is, to configure
+#	and load the kernel module associated with the special filesystem.  This
+#	STREAMS init script is part of Linux Fast-STREAMS.  It is responsible
+#	for ensuring that the necessary STREAMS character devices are present in
+#	the /dev directory and that the STREAMS subsystem is configured and
+#	loaded.
+### END INIT INFO
+
+# Source init script functions library.
+init_mode="standalone"
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
+fi
+
+case "$init_mode" in
+    (chkconfig)
+	;;
+    (insserv)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $?
+	}
+	;;
+    (standalone|*)
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
+
+name='streams'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+mknod="${name}_mknod"
+
+if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+
+if test -z "$STREAMS_MKNOD" ; then
+    for STREAMS_MKNOD in \
+	./${mknod} /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod}; do
+	if [ -x $STREAMS_MKNOD ] ; then
+	    break
+	else
+	    STREAMS_MKNOD=
+	fi
+    done
+fi
+
+# Specify defaults
+
+[ -n "$STREAMS_PRELOAD"       ] || STREAMS_PRELOAD="streams"
+[ -n "$STREAMS_DRIVERS"       ] || STREAMS_DRIVERS="streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nuls streams-pipe streams-sad streams-sfx streams-spx streams-pty streams-socksys"
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES="streams-bufmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat streams-ldterm streams-pckt streams-ptem streams-ttcompat streams-sockmod"
+[ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES="yes"
+[ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES="yes"
+[ -n "$STREAMS_MOUNTSPECFS"   ] || STREAMS_MOUNTSPECFS="yes"
+[ -n "$STREAMS_MOUNTPOINT"    ] || STREAMS_MOUNTPOINT="/dev/streams"
+[ -n "$SPECFS_MOUNTPOINT" ] || SPECFS_MOUNTPOINT="/dev/streams"
+[ -n "$SPECFS_UID"        ] || SPECFS_UID=
+[ -n "$SPECFS_GID"        ] || SPECFS_GID=
+[ -n "$SPECFS_MODE"       ] || SPECFS_MODE=
+[ -n "$SPECFS_OPTIONS"    ] || SPECFS_OPTIONS=
+
+# Source redhat and/or debian config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES="no"
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES="no"
+
+RETVAL=0
+
+umask 077
+
+function modprobe_action() {
+	module=$1
+	shift
+	modname=$module
+	case $module in
+	(streams-aixcompat)
+	    modname=$"AIX(R) 5L Version 5.1 Portable STREAMS Environment"
+	    ;;
+	(streams-hpuxcompat)
+	    modname=$"HP-UX(R) 11.0i v2 STREAMS/UX"
+	    ;;
+	(streams-irixcompat)
+	    modname=$"IRIX(R) 6.5.17"
+	    ;;
+	(streams-liscompat)
+	    modname=$"Linux(R) STREAMS 2.18.4"
+	    ;;
+	(streams-maccompat)
+	    modname=$"Mac(R) OS 9 Open Transport"
+	    ;;
+	(streams-mpscompat)
+	    modname=$"MPS(R) Mentat Portable Streams"
+	    ;;
+	(streams-osfcompat)
+	    modname=$"Digital(R) UNIX (OSF/1.2)"
+	    ;;
+	(streams-suncompat)
+	    modname=$"Solaris(R) 9/SunOS(R) 5.9"
+	    ;;
+	(streams-svr3compat)
+	    modname=$"UNIX(R) System V Release 3.2"
+	    ;;
+	(streams-svr4compat)
+	    modname=$"UNIX(R) System V Release 4.2"
+	    ;;
+	(streams-uw7compat)
+	    modname=$"UnixWare(R) 7.1.3"
+	    ;;
+	esac
+	action $"Loading kernel module $modname:" \
+	    modprobe -k -q -- $module
+}
+
+build_options() {
+    # Build up the options string
+    [ -n "$SPECFS_UID" ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
+    [ -n "$SPECFS_GID" ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
+    [ -n "$SPECFS_MODE" ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
+    [ "$1" = remount ] && \
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
+}
+
+startmount() {
+    if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems >/dev/null 2>&1 ; then
+	    action $"Loading kernel module specfs: " \
+		modprobe -k -q -- specfs
+	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+	if [ ! -d "$SPECFS_MOUNTPOINT" ] ; then
+	    action $"Creating mountpoint $SPECFS_MOUNTPOINT: " \
+		mkdir -p -- "$SPECFS_MOUNTPOINT"
+	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+	if ! mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+	    build_options
+	    action $"Mounting SPECFS filesystem on $SPECFS_MOUNTPOINT: " \
+		mount -t specfs ${SPECFS_OPTIONS} -- specfs "$SPECFS_MOUNTPOINT"
+	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    fi
+    touch $lockfile
+    return 0
+}
+
+startmodules() {
+    modules=
+    for module in $STREAMS_PRELOAD ; do
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    modprobe_action \
+		$module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
+    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+	action $"Reconfiguring kernel parameters: " \
+	    sysctl -e -p /etc/sysctl.conf || :
+    fi
+    if [ -f /etc/${name}.conf ] ; then
+	action $"Configuring STREAMS parameters: " \
+	    sysctl -e -p /etc/${name}.conf || :
+    fi
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	action $"Making STREAMS devices: " \
+	    $STREAMS_MKNOD
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+start() {
+    startmount
+    RETVAL=$?; [ $RETVAL -eq 0 ] && touch $lockfile
+    startmodules
+    RETVAL=$?
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing SPECFS modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
+}
+
+stopmodules() {
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	action $"Removing STREAMS devices: " \
+	    $STREAMS_MKNOD --remove
+	RETVAL=$?
+    fi
+    modules=
+    for module in $STREAMS_PRELOAD $STREAMS_DRIVERS $STREAMS_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
+    return $RETVAL
+}
+
+stopmount() {
+    mount | grep ' on [^[:space:]]* type specfs' 2>/dev/null | \
+    while read -a tokens ; do
+	SPECFS_MOUNTPOINT="${tokens[2]}"
+	action $"Unmounting SPECFS filesystem from $SPECFS_MOUNTPOINT: " \
+	    umount -- $SPECFS_MOUNTPOINT
+    done
+    egrep '^(streams|specfs[[:space:]])' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    return $RETVAL
+}
+
+stop() {
+    stopmodules
+    RETVAL=$?; [ $RETVAL -eq 0 ] || return $RETVAL
+    stopmount
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reloadmount() {
+    [ -n "$SPECFS_MOUNTPOINT" ] || return 0
+    build_options remount
+    action $"Remounting SPECFS on $SPECFS_MOUNTPOINT: " \
+	mount -t specfs ${SPECFS_OPTIONS} -- specfs $SPECFS_MOUNTPOINT
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+
+reload() {
+    stopmodules
+    reloadmount
+    startmodules
+    return $?
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	$1 || RETVAL=$?
+	;;
+    (status)
+	# First check for mount
+	if grep '\<specfs\>' /etc/mtab >/dev/null 2>&1 ; then
+	    # mounted
+	    if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+		# mounted in the right place
+		echo $"$name ($SPECFS_MOUNTPOINT) is mounted..."
+		RETVAL=0
+		LOADED='yes'
+		for module in $STREAMS_PRELOAD $STREAMS_DRIVERS $STREAMS_MODULES ; do
+		    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+			LOADED='no'
+			break
+		    fi
+		done
+		if [ ":$LOADED" = ":yes" ] ; then
+		    if true ; then
+			echo $"$name is running..."
+			RETVAL=0
+		    fi
+		else
+		    if [ -f $lockfile ] ; then
+			echo $"$name is stopped but sybsys locked"
+			RETVAL=2
+		    else
+			echo $"$name is stopped"
+			RETVAL=3
+		    fi
+		fi
+	    else
+		# mounted in the wrong place
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    echo $"$name is mounted in wrong place"
+		    RETVAL=1
+		else
+		    echo $"$name should not be mounted"
+		    RETVAL=1
+		fi
+	    fi
+	else
+	    # See if lockfile exists
+	    if [ -f $lockfile ] ; then
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    echo $"$name not mounted but subsys locked"
+		    RETVAL=2
+		else
+		    echo $"$name is not mounted..."
+		    RETVAL=0
+		fi
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
+	;;
+    (force-reload|try-restart|condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	if grep '\<specfs\>' /etc/mtab >/dev/null 2>&1 ; then
+	    # mounted
+	    if mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
+		# mounted in the right place
+		if [ ! -f $lockfile ] ; then
+		    # mounted in the right place but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # mounted in the right place and subsystem locked
+		    for file in $config ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# mounted, but in the wrong place (or should not be mounted), need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unmounted
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if [ -n "$SPECFS_MOUNTPOINT" ] ; then
+		    # unmounted (wrong) but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	LOADED='yes'
+	for module in $STREAMS_PRELOAD $STREAMS_DRIVERS $STREAMS_MODULES ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    # loaded
+	    if true ; then
+		if [ ! -f $lockfile ] ; then
+		    # loaded, but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # loaded and subsystem locked
+		    for file in $config /etc/$name.conf ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# loaded, but with wrong options, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unloaded
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if true ; then
+		    # unloaded but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# -----------------------------------------------------------------------------
+#
+# $Log$
+# =============================================================================
+
+# vim: ft=sh sw=4 tw=80

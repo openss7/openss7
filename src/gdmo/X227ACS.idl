@@ -1,0 +1,305 @@
+// File: X227ACS.idl
+#ifndef _X227ACS_IDL_
+#define _X227ACS_IDL_
+//
+// ASN.1 Module name: ACSE-1
+// ASN.1 Module OID: 2.2.0.0.1
+// ASN.1 Module nickname: X227ACS
+//
+#include <ASN1Types.idl>
+#include X501Inf.idl
+module X227ACS {
+// definitions imported from: X501Inf
+typedef X501Inf::NameType
+NameType;
+typedef X501Inf::RelativeDistinguishedNameType
+RelativeDistinguishedNameType;
+// Assignments mapping
+const ASN1_ObjectIdentifier acse_as_id =
+2.2.1.0.1;
+const ASN1_ObjectIdentifier aCSE_id =
+2.2.3.1.1;
+typedef ASN1_BitString AARQ_apduProtocol_versionType;
+union AARQ_apduProtocol_versionTypeOpt
+switch (boolean) {
+case TRUE: AARQ_apduProtocol_versionType value;
+};
+typedef AARQ_apduProtocol_versionTypeOpt AARQ_apduProtocol_versionTypeDef;
+typedef ASN1_ObjectIdentifier Application_context_nameType;
+typedef NameType AP_title_form1Type;
+typedef ASN1_ObjectIdentifier AP_title_form2Type;
+enum AP_titleTypeChoice { form1Choice, form2Choice };
+union AP_titleType
+switch(AP_titleTypeChoice) {
+case form1Choice:
+AP_title_form1Type form1;
+case form2Choice:
+AP_title_form2Type form2;
+};
+union AP_titleTypeOpt
+switch (boolean) {
+case TRUE: AP_titleType value;
+};
+typedef RelativeDistinguishedNameType AE_qualifier_form1Type;
+typedef ASN1_Integer AE_qualifier_form2Type;
+enum AE_qualifierTypeChoice { form1Choice_1, form2Choice_1 };
+union AE_qualifierType
+switch(AE_qualifierTypeChoice) {
+case form1Choice_1:
+AE_qualifier_form1Type form1;
+case form2Choice_1:
+AE_qualifier_form2Type form2;
+};
+union AE_qualifierTypeOpt
+switch (boolean) {
+case TRUE: AE_qualifierType value;
+};
+typedef ASN1_Integer AP_invocation_identifierType;
+union AP_invocation_identifierTypeOpt
+switch (boolean) {
+case TRUE: AP_invocation_identifierType value;
+};
+typedef ASN1_Integer AE_invocation_identifierType;
+union AE_invocation_identifierTypeOpt
+switch (boolean) {
+case TRUE: AE_invocation_identifierType value;
+};
+typedef ASN1_BitString ACSE_requirementsType;
+union ACSE_requirementsTypeOpt
+switch (boolean) {
+case TRUE: ACSE_requirementsType value;
+};
+typedef ASN1_ObjectIdentifier Mechanism_nameType;
+union Mechanism_nameTypeOpt
+switch (boolean) {
+case TRUE: Mechanism_nameType value;
+};
+struct Authentication_valueOtherType {
+Mechanism_nameType other_mechanism_name;
+ASN1_DefinedAny other_mechanism_value; // defined
+by:other_mechanism_name
+};
+enum Authentication_valueTypeChoice { charstringChoice,
+bitstringChoice, externalChoice, otherChoice };
+union Authentication_valueType
+switch(Authentication_valueTypeChoice) {
+case charstringChoice:
+ASN1_GraphicString charstring;
+case bitstringChoice:
+ASN1_BitString bitstring;
+case externalChoice:
+ASN1_External external;
+case otherChoice:
+Authentication_valueOtherType other;
+};
+union Authentication_valueTypeOpt
+switch (boolean) {
+case TRUE: Authentication_valueType value;
+};
+typedef ASN1_GraphicString Implementation_dataType;
+union Implementation_dataTypeOpt
+switch (boolean) {
+case TRUE: Implementation_dataType value;
+};
+typedef sequence <ASN1_External>
+Association_informationType;
+union Association_informationTypeOpt
+switch (boolean) {
+case TRUE: Association_informationType value;
+};
+struct AARQ_apduType {
+AARQ_apduProtocol_versionTypeDef protocol_version;
+Application_context_nameType application_context_name;
+AP_titleTypeOpt called_AP_title;
+AE_qualifierTypeOpt called_AE_qualifier;
+AP_invocation_identifierTypeOpt called_AP_invocation_identifier;
+AE_invocation_identifierTypeOpt called_AE_invocation_identifier;
+AP_titleTypeOpt calling_AP_title;
+AE_qualifierTypeOpt calling_AE_qualifier;
+AP_invocation_identifierTypeOpt calling_AP_invocation_identifier;
+AE_invocation_identifierTypeOpt calling_AE_invocation_identifier;
+ACSE_requirementsTypeOpt sender_acse_requirements;
+Mechanism_nameTypeOpt mechanism_name;
+Authentication_valueTypeOpt calling_authentication_value;
+Implementation_dataTypeOpt implementation_information;
+Association_informationTypeOpt user_information;
+};
+typedef ASN1_BitString AARE_apduProtocol_versionType;
+union AARE_apduProtocol_versionTypeOpt
+switch (boolean) {
+case TRUE: AARE_apduProtocol_versionType value;
+};
+typedef AARE_apduProtocol_versionTypeOpt AARE_apduProtocol_versionTypeDef;
+typedef ASN1_Integer Associate_resultType;
+typedef ASN1_Integer Associate_source_diagnosticAcse_service_userType;
+typedef ASN1_Integer Associate_source_diagnosticAcse_service_providerType;
+enum Associate_source_diagnosticTypeChoice {
+acse_service_userChoice, acse_service_providerChoice };
+union Associate_source_diagnosticType
+switch(Associate_source_diagnosticTypeChoice) {
+case acse_service_userChoice:
+Associate_source_diagnosticAcse_service_userType acse_service_user;
+case acse_service_providerChoice:
+Associate_source_diagnosticAcse_service_providerType
+acse_service_provider;
+};
+struct AARE_apduType {
+AARE_apduProtocol_versionTypeDef protocol_version;
+Application_context_nameType application_context_name;
+Associate_resultType result;
+Associate_source_diagnosticType result_source_diagnostic;
+AP_titleTypeOpt responding_AP_title;
+AE_qualifierTypeOpt responding_AE_qualifier;
+AP_invocation_identifierTypeOpt responding_AP_invocation_identifier;
+AE_invocation_identifierTypeOpt responding_AE_invocation_identifier;
+ACSE_requirementsTypeOpt responder_acse_requirements;
+Mechanism_nameTypeOpt mechanism_name;
+Authentication_valueTypeOpt responding_authentication_value;
+Implementation_dataTypeOpt implementation_information;
+Association_informationTypeOpt user_information;
+};
+typedef ASN1_Integer Release_request_reasonType;
+union Release_request_reasonTypeOpt
+switch (boolean) {
+case TRUE: Release_request_reasonType value;
+};
+struct RLRQ_apduType {
+Release_request_reasonTypeOpt reason;
+Association_informationTypeOpt user_information;
+};
+typedef ASN1_Integer Release_response_reasonType;
+union Release_response_reasonTypeOpt
+switch (boolean) {
+case TRUE: Release_response_reasonType value;
+};
+struct RLRE_apduType {
+Release_response_reasonTypeOpt reason;
+Association_informationTypeOpt user_information;
+};
+typedef ASN1_Integer ABRT_sourceType;
+enum ABRT_diagnosticType { no_reason_given, protocol_error,
+authentication_mechanism_name_not_recognized,
+authentication_mechanism_name_required,
+authentication_failure, authentication_required };
+union ABRT_diagnosticTypeOpt
+switch (boolean) {
+case TRUE: ABRT_diagnosticType value;
+};
+struct ABRT_apduType {
+ABRT_sourceType abort_source;
+ABRT_diagnosticTypeOpt abort_diagnostic;
+Association_informationTypeOpt user_information;
+};
+enum ACSE_apduTypeChoice { aarqChoice, aareChoice, rlrqChoice,
+rlreChoice, abrtChoice };
+union ACSE_apduType
+switch(ACSE_apduTypeChoice) {
+case aarqChoice:
+AARQ_apduType aarq;
+case aareChoice:
+AARE_apduType aare;
+case rlrqChoice:
+RLRQ_apduType rlrq;
+case rlreChoice:
+RLRE_apduType rlre;
+case abrtChoice:
+ABRT_apduType abrt;
+};
+const unsigned long version1 =
+0;
+const unsigned long version1_1 =
+0;
+const ABRT_sourceType acse_service_user =
+0;
+const ABRT_sourceType acse_service_provider =
+1;
+const unsigned long authentication =
+0;
+typedef NameType AE_title_form1Type;
+typedef ASN1_ObjectIdentifier AE_title_form2Type;
+enum AE_titleTypeChoice { form1Choice_2, form2Choice_2 };
+union AE_titleType
+switch(AE_titleTypeChoice) {
+case form1Choice_2:
+AE_title_form1Type form1;
+case form2Choice_2:
+AE_title_form2Type form2;
+};
+const Associate_resultType accepted =
+0;
+const Associate_resultType rejected_permanent =
+1;
+const Associate_resultType rejected_transient =
+2;
+const Associate_source_diagnosticAcse_service_userType null =
+0;
+const Associate_source_diagnosticAcse_service_userType no_reason_given_1 =
+1;
+const Associate_source_diagnosticAcse_service_userType
+application_context_name_not_supported =
+2;
+const Associate_source_diagnosticAcse_service_userType
+calling_AP_title_not_recognized =
+3;
+const Associate_source_diagnosticAcse_service_userType
+calling_AP_invocation_identifier_not_recognized =
+4;
+const Associate_source_diagnosticAcse_service_userType
+calling_AE_qualifier_not_recognized =
+5;
+const Associate_source_diagnosticAcse_service_userType
+calling_AE_invocation_identifier_not_recognized =
+6;
+const Associate_source_diagnosticAcse_service_userType
+called_AP_title_not_recognized =
+7;
+const Associate_source_diagnosticAcse_service_userType
+called_AP_invocation_identifier_not_recognized =
+8;
+const Associate_source_diagnosticAcse_service_userType
+called_AE_qualifier_not_recognized =
+9;
+const Associate_source_diagnosticAcse_service_userType
+called_AE_invocation_identifier_not_recognized =
+10;
+const Associate_source_diagnosticAcse_service_userType
+authentication_mechanism_name_not_recognized_1 =
+11;
+const Associate_source_diagnosticAcse_service_userType
+authentication_mechanism_name_required_1 =
+12;
+const Associate_source_diagnosticAcse_service_userType authentication_failure_1 =
+13;
+const Associate_source_diagnosticAcse_service_userType
+authentication_required_1 =
+14;
+const Associate_source_diagnosticAcse_service_providerType null_1 =
+0;
+const Associate_source_diagnosticAcse_service_providerType no_reason_given_2 =
+1;
+const Associate_source_diagnosticAcse_service_providerType
+no_common_acse_version =
+2;
+const Release_request_reasonType normal =
+0;
+const Release_request_reasonType urgent =
+1;
+const Release_request_reasonType user_defined =
+30;
+const Release_response_reasonType normal_1 =
+0;
+const Release_response_reasonType not_finished =
+1;
+const Release_response_reasonType user_defined_1 =
+30;
+// Complex constants declaration.
+interface ConstValues {
+// ** Generated values for <AARQ_apduType::protocol_version>:
+AARQ_apduProtocol_versionType protocol_versionDefault();
+// returns: {(ASN.1: version1)}
+// ** Generated values for <AARE_apduType::protocol_version>:
+AARE_apduProtocol_versionType protocol_versionDefault_1();
+// returns: {(ASN.1: version1)}
+};
+};
+#endif /* _X227ACS_IDL_ */

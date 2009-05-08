@@ -1,0 +1,741 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH A_ASSOC_CNF 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "ACSE/Presentation Library Interface (APLI)"
+.\"
+.\"
+.SH NAME
+.B A_ASSOC_CNF
+\- indicate an ACSE A-ASSOCIATE confirmation
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.B int ap_rcv(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B A_ASSOC_CNF
+primitive is used in conjunction with
+.BR ap_rcv (3)
+and the XAP Library environment to confirm the establishment of an association
+between two application entities.
+.PP
+Refer to the table in the manual page description for
+.BR ap_rcv (3)
+for information concerning the effects of receiving the
+.B A_ASSOC_CNF
+primitive and restrictions on its use.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below.
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+This argument, returned from a call to
+.BR ap_open (3),
+identifies the APLI or XAP Library instance being used.
+.TP
+.I sptype
+The
+.B unsinged long
+pointed to by this argument will be set to
+.BR AP_A_ASSOC_CNF .
+.TP
+.I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long res;               /* result of request      */
+long res_src;           /* source of result       */
+long diag;              /* reason (if rejected)   */
+ap_a_assoc_env_t *env;  /* environment attributes */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->res
+will be set to indicate the result of the association request.  The possible
+values for
+.I cdata->res
+are as follows:
+.TP \w'\fBAP_TRAN_SERV_PROV\fP\(em'u
+.B AP_ACCEPT
+Accept the association.
+.PD 0
+.TP
+.B AP_REJ_PERM
+Association permanently rejected.
+.TP
+.B AP_REJ_TRAN
+Association temporarily rejected.
+.PD
+.PP
+The argument
+.I cdata->res_src
+indicates the source of the result and will be one of the following:
+.TP \w'\fBAP_TRAN_SERV_PROV\fP\(em'u
+.B AP_ACSE_SERV_USER
+ACSE service user.
+.PD 0
+.TP
+.B AP_ACSE_SERV_PROV
+ACSE service provider.
+.TP
+.B AP_PRES_SERV_PROV
+Presentation service provider.
+.TP
+.B AP_SESS_SERV_PROV
+Session service provider.
+.TP
+.B AP_TRAN_SERV_PROV
+Transport service provider.
+.PD
+.PP
+The argument
+.I cdata->diag
+is not meaningful when the value of
+.I cdata->res
+is
+.BR AP_ACCEPT .
+When the value of
+.I cdata->res
+is either
+.BR AP_REJ_PERM " or " AP_REJ_TRAN ,
+the possible values for this argument depend upon the source of the result.
+If the source of the result is
+.BR AP_ACSE_SERV_USER ,
+.I cdata->diag
+will be one of the following:
+.TP \w'\fBAP_LCL_LIM_EXCEEDED\fP\(em'u
+.B AP_CLD_AEID_NREC
+Called AE invocation identifier not recognized.
+.PD 0
+.TP
+.B AP_CLD_AEQ_NREC
+Called AE qualifier not recognized.
+.TP
+.B AP_CLD_APID_NREC
+Called AP invocation identifier not recognized.
+.TP
+.B AP_CLD_APT_NREC
+Called AP Title not recognized.
+.TP
+.B AP_CLG_AEID_NREC
+Calling AE invocation identifier not recognized.
+.TP
+.B AP_CLG_AEQ_NREC
+Calling AE qualifier not recognized.
+.TP
+.B AP_CLG_APID_NREC
+Calling AP invocation identifier not recognized.
+.TP
+.B AP_CLG_APT_NREC
+Calling AP Title not recognized.
+.TP
+.B AP_CNTX_NAME_NSUP
+Calling application context name not supported.
+.TP
+.B AP_NRSN
+No reason given.
+.TP
+.B AP_NULL
+Null.
+.PD
+.PP
+If the source of the result is
+.BR AP_ACSE_SERV_PROV ,
+.I cdata->diag
+will be one of:
+.TP \w'\fBAP_LCL_LIM_EXCEEDED\fP\(em'u
+.B AP_NCMN_ACSE_VER
+No common version of the ACSE supported.
+.PD 0
+.TP
+.B AP_NRSN
+No reason given.
+.TP
+.B AP_NULL
+Null.
+.PD
+.PP
+If the source of the result is
+.BR AP_PRES_SERV_PROV ,
+.I cdata->diag
+will be one of:
+.TP \w'\fBAP_LCL_LIM_EXCEEDED\fP\(em'u
+.B AP_CLD_PADDR_UNK
+Called presentation address unknown.
+.PD 0
+.TP
+.B AP_DFCN_NSUP
+Default context not supported.
+.TP
+.B AP_DIAG_NOVAL
+No value was specified for this optional parameter.
+.TP
+.B AP_LCL_LIM_EXCEEDED
+Local limit exceeded.
+.TP
+.B AP_NO_PSAP_AVAIL
+No PSAP available.
+.TP
+.B AP_NRSN
+No reason given.
+.TP
+.B AP_NULL
+Null.
+.TP
+.B AP_PRES_VER_NSUP
+Protocol version not supported.
+.TP
+.B AP_SESS_PROV
+Could not establish session connection.
+.TP
+.B AP_TEMP_CONGESTION
+Temporary congestion.
+.TP
+.B AP_UDATA_NREAD
+User data not readable.
+.PD
+.PP
+If the source of the result is
+.BR AP_SESS_SERV_PROV ,
+.I cdata->diag
+will be one of:
+.TP \w'\fBAP_LCL_LIM_EXCEEDED\fP\(em'u
+.B AP_CLD_SADDR_UNK
+Called session address unknown.
+.PD 0
+.TP
+.B AP_NRSN
+No reason given.
+.TP
+.B AP_NULL
+Null.
+.TP
+.B AP_SESS_PICS_ERROR
+Implementation restriction state in the PICS.
+.TP
+.B AP_SESS_VER_NSUP
+Proposed protocol versions not supported.
+.TP
+.B AP_SPM_CONGESTION
+SPM congestion at connect time.
+.TP
+.B AP_SSUSER_NATT
+SS-user not attached to SSAP.
+.TP
+.B AP_TRAN_PROV
+Could not establish transport connection.
+.PD
+.PP
+If the source of the result is
+.BR AP_TRAN_SERV_PROV ,
+.I cdata->diag
+will be one of:
+.TP \w'\fBAP_LCL_LIM_EXCEEDED\fP\(em'u
+.B AP_CLD_TADDR_UNK
+Called transport address unknown.
+.PD 0
+.TP
+.B AP_DUPSRCREF
+Duplicate source reference for the same pair of NSAPs.
+.TP
+.B AP_HPLENINV
+Head or parameter length invalid.
+.TP
+.B AP_MISMATCHREF
+Mismatched references.
+.TP
+.B AP_NORMDISCON
+Normal disconnect initiated by the TS-user.
+.TP
+.B AP_NRSN
+No reason given.
+.TP
+.B AP_REFONNETCON
+Connection refused on this network connection.
+.TP
+.B AP_REFOVERFLOW
+Reference overflow.
+.TP
+.B AP_TE_CONGESTION
+Remote transport entity congestion at connect request time.
+.TP
+.B AP_TRAN_NEGFAIL
+Connection negotiation failed (e.g., proposed classes not supported).
+.TP
+.B AP_TRAN_PERROR
+Transport protocol error.
+.TP
+.B AP_TSAP_CONGESTION
+Congestion at TSAP.
+.TP
+.B AP_TSUSER_NATT
+Session entity not attached to TSAP.
+.PD
+.PP
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the
+.I cdata->diag
+argument will be set to
+.B AP_DIAG_NOVAL
+by the library.
+.PP
+The
+.I cdata->env
+argument can be used to retrieve the values of the XAP environment attributes
+that correspond to parameters of the A-ASSOCIATE confirmation service.  If the
+.B AP_COPYENV
+attribute in the XAP environment is
+.IR false ,
+these values will not be returned in the
+.I cdata
+argument and
+.I cdata->env
+will be set to
+.BR NULL
+when
+.BR ap_rcv (3)
+returns.  If
+.B AP_COPYENV
+is
+.IR true ,
+the XAP library will allocate a
+.B ap_a_assoc_env_t
+structure and any necessary substructures and return a pointer to it in
+.IR cdata->env .
+The caller can release the storage allocated for the
+.B ap_a_assoc_env_t
+structure and its substructures by passing a pointer to
+.I cdata
+to
+.BR ap_free (3).
+The following elements of the
+.B ap_a_assoc_env_t
+structure are used for this primitive:
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+unsigned long mask;             /* bit mask         */
+ap_objid_t cntx_name;           /* AP_CNTX_NAME     */
+ap_aei_api_id_t rsp_aeid;       /* AP_RSP_AEID      */
+ap_aeq_t rsp_aeq;               /* AP_RSP_AEQ       */
+ap_aei_api_id_t rsp_apid;       /* AP_RSP_APID      */
+ap_apt_t rsp_apt;               /* AP_RSP_APT       */
+ap_paddr_t rem_paddr;           /* AP_REM_PADDR     */
+ap_cdrl_t pcdrl;                /* AP_PCDRL         */
+long dpcr;                      /* AP_DPCR          */
+ap_qos_t qos;                   /* AP_QOS           */
+unsigned long a_version_sel;    /* AP_ACSE_SEL      */
+unsigned long p_version_sel;    /* AP_PRES_SEL      */
+unsigned long s_version_sel;    /* AP_SESS_SEL      */
+unsigned long afu_sel;          /* AP_AFU_SEL       */
+unsigned long pfu_sel;          /* AP_PFU_SEL       */
+unsigned long sfu_sel;          /* AP_SFU_SEL       */
+ap_conn_id_t *cld_conn_id;      /* AP_CLD_CONN_ID   */
+unsigned long init_sync_pt;     /* AP_INIT_SYNC_PT  */
+unsigned long init_tokens;      /* AP_INIT_TOKENS   */
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I mask
+element of this structure is a bit maks indicating which parameters associated
+with this primitive were received.  Values for this field are formed by OR'ing
+together zero or more of the flags listed in the table below.  When a bit is
+set, the specified parameter was received.  Otherwise, the parameter was not
+received and the corresponding field in the
+.B ap_a_assoc_env_t
+structure is not set.
+.PP
+.TS
+center box tab(:);
+cb|cb|cb
+lb|l|li.
+flag:parameter:field
+_
+AP_CNTX_NAME_BIT:Application Context Name:cntx_name
+AP_RSP_AEID_BIT:Responding AE Invocation-identifier:rsp_aeid
+AP_RSP_AEQ_BIT:Responding AE Qualifier:rsp_aeq
+AP_RSP_APID_BIT:Responding AP Invocation-identifier:rsp_apid
+AP_RSP_APT_BIT:Responding AP Title:rsp_apt
+AP_REM_PADDR_BIT:Called Presentation Address:rem_paddr
+AP_PCDRL_BIT:Presentation Context Defintion Result List:pcdrl
+AP_DPCR_BIT:Default Presentation Context Result List:dpcr
+AP_QOS_BIT:Quality of Service:qos
+AP_A_VERSION_SEL_BIT:ACSE Version Selector:a_version_sel
+AP_P_VERSION_SEL_BIT:Presentation Version Selector:p_version_sel
+AP_S_VERSION_SEL_BIT:Session Version Selector:s_version_sel
+AP_AFU_SEL_BIT:ACSE Requirements:afu_sel
+AP_PFU_SEL_BIT:Presentation Requirements:pfu_sel
+AP_SFU_SEL_BIT:Session Requirements:sfu_sel
+AP_CLD_CONN_ID_BIT:Session-connection identifier:clg_conn_id
+AP_INIT_SYNC_PT_BIT:Initial Synch. Serial Point Number:init_sync_pt
+AP_INIT_TOKENS_BIT:Initial Token Assignment:init_tokens
+.TE
+.RE
+.TP
+.I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_rcv (3).
+.RS
+.PP
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the contents of
+.I ubuf
+buffer(s) is assumed to be a value of type SET encoded according to the Basic
+Encoding Rules for ASN.1.
+.[
+iso 8825-2
+.]
+If the association was accepted, the SET value will have an implicit
+context-specific tag with a value of 1 (i.e., [1] IMPLICIT).  If the
+association was rejected, the SET value is assumed to have been encoded with
+the universal SET tag (i.e., [UNIVERSAL 17]).  Refer to the ISO Presentation
+Layer protocol definition (reference ISO 8823)
+.[
+iso 8823
+.]
+for further information concerning the encoding of these values.
+.RE
+.TP
+.I flags
+The
+.I flags
+argument is used to control certain aspects of primitive processing as
+described in the manual page for
+.BR ap_rcv (3).
+.TP
+.I aperrno_p
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if failure has occurred.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The following attributes may change as a result of receiving the
+.B A_ASSOC_CNF
+primitive based on information contained in the received APDU associated with
+the confirmation:
+.BR AP_ACSE_SEL ,
+.BR AP_AFU_SEL ,
+.BR AP_CNTX_NAME ,
+.BR AP_DCS ,
+.BR AP_INIT_SYNC_PT ,
+.BR AP_INIT_TOKENS ,
+.BR AP_PFU_SEL ,
+.BR AP_PCDRL ,
+.BR AP_PRES_SEL ,
+.BR AP_QOS ,
+.BR AP_REM_ADDR ,
+.BR AP_SESS_SEL ,
+.BR AP_SFU_SEL ,
+.BR AP_STATE ,
+.BR AP_TOKENS_AVAIL ,
+.BR AP_TOKENS_OWNED .
+.\"
+.\"
+.SH MODES
+.PP
+This primitive is valid both in
+.RI \(lq Normal \(rq
+and
+.RI \(lq X.410-1984 \(rq
+mode.
+.[
+x410 1984
+.]
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is issued by the XAP interface service.
+.\"
+.\"
+.SH STATE
+.PP
+The
+.B A_ASSOC_CNF
+primitive is only issued by the AP provider in the
+.B AP_WASSOCcnf_ASSOCreq
+(waiting for an A-ASSOCIATE.Confirm having issued an A-ASSOCIATE.Request)
+state.
+.PP
+The new state of the XAP instance is:
+upon successful connection,
+.BR AP_DATA_XFER ;
+upon unsuccessful connection,
+.BR AP_IDLE .
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.SH NOTICES
+.PP
+Two conformant XAP Library implementations may return different source and
+diagnostic combinations under the same conditions.  For example, an
+implementation might return either
+.BR AP_PRES_SERV_PROV " and " AP_SESS_PROV ,
+or
+.BR AP_TRAN_SERV_PROV " and " AP_NRSN ,
+if an association could not be established because of an unspecified porblem
+that occurred while trying to set up the supporting transport connection.
+Moreover, because the use of reason codes is not well standardized, an
+application may receive different source and diagnostic combinations under the
+same conditions when attempting to establish an association to different OSI
+implementations through a single XAP Library implementation.  Consequently,
+users are cautioned against placing dependencies on specific source and
+diagnostic combinations in their applications.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_rcv (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B A_ASSOC_CNF
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B A_ASSOC_CNF
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B A_ASSOC_CNF
+first appeared in APLI.
+.[
+apli unix international
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI/XAP Library under the OpenSS7 Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

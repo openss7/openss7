@@ -1,0 +1,1 @@
+.so man4/undoc.4.man

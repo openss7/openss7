@@ -1,0 +1,2340 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+ATM-TRACE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32,
+        NOTIFICATION-TYPE, enterprises
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, TimeStamp, TruthValue
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        PnniNodeId, PnniPortId, pnniIfEntry
+                FROM PNNI-MIB
+        AtmAddr, AtmConnCastType, AtmConnKind, AtmServiceCategory,
+        AtmVcIdentifier, AtmVpIdentifier, AtmTrafficDescrParamIndex
+                FROM ATM-TC-MIB
+        InterfaceIndex, InterfaceIndexOrZero
+                FROM IF-MIB;
+
+
+atmTraceMIB MODULE-IDENTITY
+    LAST-UPDATED    "0002220000Z"
+    ORGANIZATION    "The ATM Forum."
+    CONTACT-INFO
+        "The ATM Forum
+        2570 West El Camino Real, Suite 304
+        Mountain View, CA 94040-1313 USA
+        Phone: +1 650-949-6700
+        Fax:   +1 415-949-6705
+        info@atmforum.com"
+    DESCRIPTION
+        "The MIB module for ATM path and connection trace."
+    REVISION        "0002220000Z"
+    DESCRIPTION
+        "Initial version of the MIB for ATM path and
+        connection trace."
+    ::= { atmfTrace 1 }
+
+atmForum        OBJECT IDENTIFIER ::= { enterprises 353 }
+
+atmForumNetworkManagement  OBJECT IDENTIFIER ::= { atmForum 5 }
+
+atmfSignalling   OBJECT IDENTIFIER ::= { atmForumNetworkManagement 9 }
+
+atmfTrace       OBJECT IDENTIFIER ::= { atmfSignalling 2 }
+
+
+atmTraceMIBObjects  OBJECT IDENTIFIER ::= { atmTraceMIB 1 }
+
+
+-- Textual Conventions
+
+CallReference ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION 
+        "The 24-bit Call Reference used by signalling
+        to identify a connection.  The Call Reference is structured in
+        two parts.  The most significant bit represents the Call
+        Reference Flag and the 23 least significant bits represent the
+        Call Reference Value.  For the same call, the Call Reference
+        Value is identical on both sides of an interface while the Call
+        Reference Flag is different.  For the side originating the Call
+        Reference, the Call Reference Flag is set to '0' while it is
+        set to '1' for the side not originating the Call Reference.
+
+        The distinguished value zero indicates that no Call Reference
+        value was returned in the trace transit list."
+    REFERENCE
+        "ITU-T Recommendation Q.2931 Section 4.3"
+    SYNTAX     Integer32 (0..16777215)
+
+AtmEndPointReference ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION 
+        "For point-to-multipoint SVCs and the switched connection legs
+        of point-to-multipoint Soft PVCs, the 16-bit Endpoint Reference
+        used by signalling to identify a leaf of the
+        point-to-multipoint connection.  The Endpoint Reference is
+        structured in two parts.  The most significant bit represents
+        the Endpoint Reference Flag and the 15 least significant bits
+        represent the Endpoint Reference Value.  For the same call and
+        leaf, the Endpoint Reference Value is identical on both sides
+        of an interface while the Endpoint Reference Flag is different.
+        For the side originating the endpoint reference, the Endpoint
+        Reference Flag is set to '0' while it is set to '1' for the
+        side not originating the Endpoint Reference.
+
+        For the permanent connection legs at the root of
+        point-to-multipoint Soft PVCs, the value used to identify a
+        leaf in the atmSoftPVccLeafReference object or the
+        atmSoftPVpcLeafReference object from the ATM-SOFT-PVC-MIB.
+
+        For the permanent connection legs at the leaf end of
+        point-to-multipoint Soft PVCs, the value 1 shall be used
+        (consistent with the values used for atmSoftPVccLeafReference
+        and atmSoftPVpcLeafReference in the ATM-SOFT-PVC-MIB).
+
+        The distinguished value -1 indicates that no Endpoint Reference
+        value was returned in the Trace transit list."
+    REFERENCE
+        "ITU-T Recommendation Q.2971 Section 8.2.1,
+        ATM Forum PNNI v1.0 Addendum (Soft PVC MIB), af-pnni-0066.000"
+    SYNTAX     Integer32 (-1..65535)
+
+AtmTraceRecordIndex ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "The value of this object identifies a row in the
+        atmTraceRecordTable.  The distinguished value zero signifies
+        that no row has been identified."
+    SYNTAX     Integer32 (0..2147483647)
+
+AtmTraceOwnerString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS     current
+    DESCRIPTION
+        "This data type is used to model an administratively
+        assigned name of the owner of a resource.  This
+        information is taken from the NVT ASCII character set.
+        It is suggested that this name contain one or more of
+        the following: ASCII form of the manager station's
+        transport address, management station name (e.g.,
+        domain name), network management personnel's name,
+        location, or phone number.  In some cases the agent
+        itself will be the owner of an entry.  In these cases,
+        this string shall be set to a string starting with
+        'monitor'.
+
+        SNMP access control is articulated entirely in terms
+        of the contents of MIB views; access to a particular
+        SNMP object instance depends only upon its presence
+        or absence in a particular MIB view and never upon
+        its value or the value of related object instances.
+        Thus, objects of this type afford resolution of
+        resource contention only among cooperating managers;
+        they realize no access control function with respect
+        to uncooperative parties."
+    SYNTAX     OCTET STRING (SIZE(0..127))
+
+
+-- This MIB contains six tables and a number of scalars.  The tables
+-- are:
+--   Trace Connection Table - trigger connection trace
+--   Trace Path Test Table - trigger a test connection or party
+--   Trace Path Filter Table - trigger path trace by filtering calls
+--   Trace Filter Record Table - correlate records with filters
+--   Trace Record Table - overall info about a connection or party
+--   Trace Info Table - detailed trace info for a connection or party
+--   Trace Interface Table - specify certain PNNI interfaces as
+--                           trace destination interfaces
+
+
+atmTraceBaseGroup OBJECT IDENTIFIER ::= {atmTraceMIBObjects 1}
+
+atmTraceFilterControl OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         enable(1),
+                         disable(2)
+                         }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object enables or disables the path trace filtering
+        feature in the ATM device.  When this object is modified
+        from 'enable' to 'disable' the records in the
+        atmTraceRecordTable are not removed but filtering is
+        stopped in the device."
+    DEFVAL     { disable }
+    ::= { atmTraceBaseGroup 1 }
+
+atmTraceMaxConcurrentRequests OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of concurrent active path or connection
+        trace requests (i.e., connections or parties for which trace
+        information gathering has been initiated, but for which no
+        reply has been received yet) that are allowed by the agent.  A
+        value of 0 for this object implies that there is no limit on
+        the number of concurrent active requests."
+    ::= { atmTraceBaseGroup 2 }
+
+atmTraceAvailableRequests OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of new path or connection trace requests that can
+        be initiated on the agent at this moment in time.  This is
+        equal to the maximum number of concurrent active path or
+        connection trace requests that are allowed by the agent (i.e.,
+        atmTraceMaxConcurrentRequests), minus the current number of
+        active path or connection trace requests."
+    ::= { atmTraceBaseGroup 3 }
+
+atmTraceTransitListMaximumSize OBJECT-TYPE
+    SYNTAX     Integer32 (1466..65535)
+    UNITS      "octets"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum size in octets of the Trace transit list
+        information element generated in any signalling message."
+    DEFVAL     { 1466 }
+    ::= { atmTraceBaseGroup 4 }
+
+
+atmTraceConnGroup OBJECT IDENTIFIER ::= { atmTraceMIBObjects 2 }
+
+atmTraceConnTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTraceConnEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table whose entries describe existing connections and
+        parties to be traced or in the process of being traced."
+    ::= { atmTraceConnGroup 1 }
+
+atmTraceConnEntry OBJECT-TYPE
+    SYNTAX     AtmTraceConnEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry in this table specifies an existing connection or
+        party to be traced, in the process of being traced, or that
+        has recently been traced.  The results of the connection trace
+        are returned in the atmTraceRecordTable and the
+        atmTraceInfoTable.
+
+        A management station wishing to create an entry should first
+        create the associated instance of the row status and row
+        owner objects, using a value of atmTraceConnIndex that is not
+        currently in use.  It must also, either in the same or in
+        successive PDUs, create the associated instance of the objects
+        that identify the connection to be traced.  It should also
+        modify the default values for the other configuration objects
+        if the defaults are not appropriate.
+
+        Once the appropriate instances of all the configuration
+        objects have been created, either by an explicit SNMP
+        set request or by default, the row status should be set
+        to active to initiate the request.  Note that this entire
+        procedure may be initiated via a single set request which
+        specifies a row status of createAndGo as well as specifies
+        valid values for the non-defaulted configuration objects.
+
+        After the connection trace completes, the management
+        station should retrieve the values of the status objects of
+        interest from the atmTraceRecordTable, and should then delete
+        the entry.  In order to prevent old entries from clogging the
+        table, entries will be aged out, but an entry will not be
+        deleted within 5 minutes of the last activity."
+    INDEX      { atmTraceConnIndex }
+    ::= { atmTraceConnTable 1 }
+
+AtmTraceConnEntry ::= SEQUENCE 
+    {
+            atmTraceConnIndex            Integer32,
+            atmTraceConnOwner            AtmTraceOwnerString,
+            atmTraceConnTraceSourceIf    InterfaceIndex,
+            atmTraceConnOrigConnType     INTEGER,
+            atmTraceConnOrigVpi          AtmVpIdentifier,
+            atmTraceConnOrigVci          AtmVcIdentifier,
+            atmTraceConnEndPtRef         AtmEndPointReference,
+            atmTraceConnCallRef          CallReference,
+            atmTraceConnOrigDlci         Integer32,         
+            atmTraceConnOrigDirection    INTEGER,
+            atmTraceConnTraceConnId      TruthValue,
+            atmTraceConnTraceCallRef     TruthValue,
+            atmTraceConnPassAlongRequest TruthValue,
+            atmTraceConnFailTimeout      Integer32,
+            atmTraceConnAgeTimeout       Integer32,
+            atmTraceConnRestart          INTEGER,
+            atmTraceConnTrapOnCompletion TruthValue, 
+            atmTraceConnRecordIndex      AtmTraceRecordIndex,
+            atmTraceConnRowStatus        RowStatus
+    }
+
+atmTraceConnIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An arbitrary integer uniquely identifying a connection
+        trace request."
+    ::= { atmTraceConnEntry 1 }
+
+atmTraceConnOwner OBJECT-TYPE
+    SYNTAX     AtmTraceOwnerString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The entity that configured this entry."
+    ::= { atmTraceConnEntry 2 }
+
+atmTraceConnTraceSourceIf OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The interface at which the connection trace is originated.
+        This object must be specified."
+    ::= { atmTraceConnEntry 3 }
+
+atmTraceConnOrigConnType OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                         other(1),
+                         atmVcc(2),
+                         atmVpc(3),
+                         atmCOBISigConn(4),
+                         frameRelayVc(5)
+                         }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of connection at the trace source interface."
+    DEFVAL     { atmVcc }
+    ::= { atmTraceConnEntry 4 }
+
+atmTraceConnOrigVpi OBJECT-TYPE
+    SYNTAX     AtmVpIdentifier
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates the VPI value of the existing connection on the
+        trace source interface.
+
+        This object only applies when atmTraceConnOrigConnType is set
+        to 'atmVcc' or 'atmVpc'.  When this is the case, either this
+        object or atmTraceConnCallRef must be specified.  When the
+        atmTraceConnCallRef object is specified, this object may not
+        be set."
+    ::= { atmTraceConnEntry 5 }
+
+atmTraceConnOrigVci  OBJECT-TYPE
+    SYNTAX     AtmVcIdentifier
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates the VCI value of the existing connection on the
+        trace source interface.
+
+        This object only applies when atmTraceConnOrigConnType is set
+        to 'atmVcc'.  When this is the case, either this
+        object or atmTraceConnCallRef must be specified.  When the
+        atmTraceConnCallRef object is specified, this object may not
+        be set."
+    ::= { atmTraceConnEntry 6 }
+
+atmTraceConnEndPtRef  OBJECT-TYPE
+    SYNTAX     AtmEndPointReference
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The Endpoint Reference value identifying a leaf of an
+        existing point-to-multipoint connection. 
+
+        This object does not apply when the connection is not a point-
+        to-multipoint connection."
+    ::= { atmTraceConnEntry 7 }
+
+atmTraceConnCallRef      OBJECT-TYPE
+    SYNTAX     CallReference
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates the call reference value of the existing connection
+        on the trace source interface.
+
+        For CO-BI connections, the value of this object must be
+        specified.  For other types of connections, either this object
+        or the connection identifier objects (atmTraceConnOrigVpi,
+        atmTraceConnOrigVpi and atmTraceConnOrigVci, or
+        atmTraceConnOrigDlci, as appropriate for the connection type)
+        must be specified.  When any of atmTraceConnOrigVpi,
+        atmTraceConnOrigVci, or atmTraceConnOrigDlci are specified,
+        this object may not be set."
+    ::= { atmTraceConnEntry 8 }
+
+atmTraceConnOrigDlci         OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates the DLCI value of the existing connection on the
+        trace source interface.
+
+        This object only applies when atmTraceConnOrigConnType is set
+        to 'frameRelayVc'.  When this is the case, either this
+        object or atmTraceConnCallRef must be specified.  When the
+        atmTraceConnCallRef object is specified, this object may not
+        be set."
+    ::= { atmTraceConnEntry 9 }
+
+atmTraceConnOrigDirection    OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                         incoming(1),
+                         outgoing(2)
+                         }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the connection trace is to proceed in the
+        incoming direction from the trace source interface, or in the
+        outgoing direction from the trace source interface."
+    DEFVAL     { incoming }
+    ::= { atmTraceConnEntry 10 }
+
+atmTraceConnTraceConnId      OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the connection trace shall include
+        connection identifier (e.g. VPI/VCI, DLCI) information."
+    DEFVAL     { false }
+    ::= { atmTraceConnEntry 11 }
+
+atmTraceConnTraceCallRef     OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the connection trace shall include
+        call reference information, and endpoint reference information
+        for point-to-multipoint connections."
+    DEFVAL     { false }
+    ::= { atmTraceConnEntry 12 }
+
+atmTraceConnPassAlongRequest OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the 'pass along request' bit shall be set
+        in the Trace transit list information element.  When this
+        object is set to 'true' and systems that do not support
+        connection trace are present in the network, gaps may occur
+        between successive entries in the atmTraceInfoTable identifying
+        logical nodes and logical ports traversed by this
+        connection or party."
+    DEFVAL     { true }
+    ::= { atmTraceConnEntry 13 }
+
+atmTraceConnFailTimeout      OBJECT-TYPE
+    SYNTAX     Integer32 (0..100)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The number of seconds left before the connection trace is
+        declared to have failed.  After this timer expires the value
+        of this object will be zero and the atmTraceConnRecordIndex
+        will also remain at zero.  If the timer expires and
+        atmTraceConnTrapOnCompletion is set to 'true', an
+        atmTraceConnCompletion trap will be generated."
+    DEFVAL     { 30 }
+    ::= { atmTraceConnEntry 14 }
+
+atmTraceConnAgeTimeout       OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The number of seconds left for this entry to age out.
+        On expiry of this timer the display records in the
+        atmTraceRecordTable and atmTraceInfoTable corresponding to this
+        entry are deleted, as well as the atmTraceConnEntry.
+
+        When the management station modifies this object, 
+        the currently running timer, if any, is aborted and a timer is 
+        started with the new value of this object. The value '-1' will 
+        indicate an infinite timeout value. "
+    DEFVAL     { 600 }
+    ::= { atmTraceConnEntry 15 }
+
+atmTraceConnRestart      OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         restart(1),
+                         noop(2)
+                         }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "When the value is set to 'restart', the record for this
+        connection trace is cleared and the connection trace is
+        initiated.
+
+        When the value is set to 'noop' no operation is performed.
+        When read, the value 'noop' is returned."
+    DEFVAL     { noop }
+    ::= { atmTraceConnEntry 16 }
+
+atmTraceConnTrapOnCompletion OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Specifies whether an atmTraceConnCompletion trap shall be
+        issued on completion of the connection trace.  If such a trap
+        is desired, it is the responsibility of the management entity
+        to ensure that the SNMP administrative model is configured in
+        such a way as to allow the trap to be delivered."
+    DEFVAL     { false }
+    ::= { atmTraceConnEntry 17 }
+
+atmTraceConnRecordIndex OBJECT-TYPE
+    SYNTAX     AtmTraceRecordIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of this object identifies the row in the
+        atmTraceRecordTable that was generated by this connection
+        trace.  The distinguished value zero indicates that no
+        reply has been received yet or that no reply was received
+        before expiry of atmTraceConnFailTimeout, so no record has been
+        generated."
+    ::= { atmTraceConnEntry 18 }
+
+atmTraceConnRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Used to create and delete entries in this table.  When a row
+        is activated, a connection trace is initiated."
+    ::= { atmTraceConnEntry 19 }
+
+
+atmTracePathTestGroup OBJECT IDENTIFIER ::= { atmTraceMIBObjects 3 }
+
+atmTracePathTestTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTracePathTestEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table whose entries describe test connections and parties
+        initiated to determine paths across the network.  Typically
+        these connections and parties are cleared when the trace
+        destination node is reached, but the entry may be configured
+        to leave the connections up using the
+        atmTracePathTestClearCallAtTDest object."
+    ::= { atmTracePathTestGroup 1 }
+
+atmTracePathTestEntry OBJECT-TYPE
+    SYNTAX     AtmTracePathTestEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry in this table specifies a test connection or test
+        party that is initiated in order to determine a path across
+        the network.  Typically the connection or party is cleared when
+        the trace destination node is reached, but the entry may be
+        configured to leave the connections up using the
+        atmTracePathTestClearCallAtTDest object.  The results of the
+        path trace are returned in the atmTraceFilterRecordTable, the
+        atmTraceRecordTable, and the atmTraceInfoTable.
+
+        A management station wishing to create an entry should first
+        create the associated instance of the row status and row
+        owner objects, using a value of atmTracePathTestIndex that is
+        not currently in use.  It must also, either in the same or
+        in successive PDUs, create the associated instance of the
+        address objects.  It should also modify the default values
+        for the other configuration objects if the defaults are not
+        appropriate.
+
+        Once the appropriate instance of all the configuration
+        objects have been created, either by an explicit SNMP
+        set request or by default, the row status should be set
+        to active to initiate the request.  Note that this entire
+        procedure may be initiated via a single set request which
+        specifies a row status of createAndGo as well as specifies
+        valid values for the non-defaulted configuration objects.
+
+        After the test connection or party completes, the management
+        station should retrieve the values of the status objects of
+        interest from the atmTraceRecordTable, and should then delete
+        the entry.  In order to prevent old entries from clogging the
+        table, entries will be aged out, but an entry will not be
+        deleted within 5 minutes of completing."
+    INDEX      { atmTracePathTestIndex }
+    ::= { atmTracePathTestTable 1 }
+
+AtmTracePathTestEntry ::= SEQUENCE 
+    {
+            atmTracePathTestIndex            Integer32,
+            atmTracePathTestOwner            AtmTraceOwnerString,
+            atmTracePathTestConnType         INTEGER,
+            atmTracePathTestConnCastType     AtmConnCastType,
+            atmTracePathTestTraceSourceIf    InterfaceIndex,
+            atmTracePathTestP2MpNewConn      TruthValue,
+            atmTracePathTestOrigVpi          AtmVpIdentifier,
+            atmTracePathTestOrigVci          AtmVcIdentifier,
+            atmTracePathTestCalledParty      AtmAddr,
+            atmTracePathTestCallingParty     AtmAddr,
+            atmTracePathTestRxTrafDescrIndex AtmTrafficDescrParamIndex,
+            atmTracePathTestTxTrafDescrIndex AtmTrafficDescrParamIndex,
+            atmTracePathTestClearCallAtTDest TruthValue,
+            atmTracePathTestTraceCrankback   TruthValue,
+            atmTracePathTestTraceConnId      TruthValue,
+            atmTracePathTestTraceCallRef     TruthValue,
+            atmTracePathTestPassAlongRequest TruthValue,
+            atmTracePathTestAgeTimeout       Integer32,
+            atmTracePathTestRestart          INTEGER,
+            atmTracePathTestTrapOnCompletion TruthValue,
+            atmTracePathTestRecordIndex      AtmTraceRecordIndex,
+            atmTracePathTestRowStatus        RowStatus
+    }
+
+atmTracePathTestIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An arbitrary integer uniquely identifying a test connection
+        or test party."
+    ::= { atmTracePathTestEntry 1 }
+
+atmTracePathTestOwner OBJECT-TYPE
+    SYNTAX     AtmTraceOwnerString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The entity that configured this entry."
+    ::= { atmTracePathTestEntry 2 }
+
+atmTracePathTestConnType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         other(1),
+                         atmVcc(2),
+                         atmVpc(3),
+                         atmCOBISigConn(4)
+                         }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the test connection is a virtual channel
+        connection, a virtual path connection, or a connection-
+        oriented bearer-independent signalling connection."
+    DEFVAL     { atmVcc }
+    ::= { atmTracePathTestEntry 3 }
+
+atmTracePathTestConnCastType  OBJECT-TYPE
+    SYNTAX     AtmConnCastType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The connection topology type (e.g. point-to-point or
+        point-to-multipoint) of the test connection or party."
+    DEFVAL     { p2p }
+    ::= { atmTracePathTestEntry 4 }
+
+atmTracePathTestTraceSourceIf OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The interface at which the test connection or test party is
+        originated."
+    ::= { atmTracePathTestEntry 5 }
+
+atmTracePathTestP2MpNewConn  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the test party for a point-to-multipoint
+        connection is initiated on an existing branch (indicated by
+        setting this object to 'false') or whether it is the first
+        party of a new connection (indicated by setting this object
+        to 'true').
+
+        This object does not apply when atmTracePathTestConnCastType
+        is set to 'p2p'."
+    DEFVAL     { false }
+    ::= { atmTracePathTestEntry 6 }
+
+atmTracePathTestOrigVpi  OBJECT-TYPE
+    SYNTAX     AtmVpIdentifier
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "When atmTracePathTestConnCastType is set to 'p2mpRoot' and
+        atmTracePathTestP2MpNewConn is set to 'false' (i.e. path trace
+        of a new party on an existing connection is requested),
+        this object indicates the VPI value of the existing connection
+        on the trace source interface.
+
+        When atmTracePathTestClearCallAtTDest is set to 'true' and
+        either
+        - atmTracePathTestConnCastType is 'p2p', or
+        - atmTracePathTestConnCastType is 'p2mpRoot' and
+          atmTracePathTestP2MpNewConn is set to 'true',
+        this object is not applicable.
+
+        When atmTracePathTestClearCallAtTDest is set to 'false', this
+        object indicates the VPI value to be used for the active
+        connection.  Note that if the VPI/VCI can be assigned at the
+        other side of the interface, there may be some possibility of
+        VPI/VCI collision for SETUP messages received on this
+        interface, when the other side of the interface does not know
+        that this VPI/VCI value is being used."
+    DEFVAL     { 0 }
+    ::= { atmTracePathTestEntry 7 }
+
+atmTracePathTestOrigVci  OBJECT-TYPE
+    SYNTAX     AtmVcIdentifier
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "When atmTracePathTestConnCastType is set to 'p2mpRoot' and
+        atmTracePathTestP2MpNewConn is set to 'false' (i.e. path trace
+        of a new party on an existing connection is requested),
+        this object indicates the VCI value of the existing connection
+        on the trace source interface.
+
+        When atmTracePathTestClearCallAtTDest is set to 'true' and
+        either
+        - atmTracePathTestConnCastType is 'p2p', or
+        - atmTracePathTestConnCastType is 'p2mpRoot' and
+          atmTracePathTestP2MpNewConn is set to 'true',
+        this object is not applicable.
+
+        When atmTracePathTestClearCallAtTDest is set to 'false', this
+        object indicates the VCI value to be used for the active
+        connection.  Note that if the VPI/VCI can be assigned at the
+        other side of the interface, there may be some possibility of
+        VPI/VCI collision for SETUP messages received on this
+        interface, when the other side of the interface does not know
+        that this VPI/VCI value is being used.
+
+        If atmTracePathTestConnType is set to a value other than
+        'atmVcc', this value is set to zero."
+    DEFVAL     { 0 }
+    ::= { atmTracePathTestEntry 8 }
+
+atmTracePathTestCalledParty     OBJECT-TYPE
+    SYNTAX     AtmAddr
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The called party number towards which the test connection or
+        test party is to be initiated."
+    ::= { atmTracePathTestEntry 9 }
+
+atmTracePathTestCallingParty    OBJECT-TYPE
+    SYNTAX     AtmAddr
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The calling party number used for the test connection or test
+        party."
+    DEFVAL     { "" }
+    ::= { atmTracePathTestEntry 10 }
+
+atmTracePathTestRxTrafDescrIndex  OBJECT-TYPE
+    SYNTAX     AtmTrafficDescrParamIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of this object identifies the row of the ATM
+        Traffic Descriptor Table which applies to the receive
+        direction of this test connection (from the point of view
+        of the trace source interface).
+
+        This object does not apply when the value of
+        atmTracePathTestP2MpNewConn is 'false'."
+    DEFVAL     { 0 }
+    ::= { atmTracePathTestEntry 11 }
+
+atmTracePathTestTxTrafDescrIndex  OBJECT-TYPE
+    SYNTAX     AtmTrafficDescrParamIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of this object identifies the row of the ATM
+        Traffic Descriptor Table which applies to the transmit
+        direction of this test connection (from the point of view
+        of the trace source interface).
+
+        This object does not apply when the value of
+        atmTracePathTestP2MpNewConn is 'false'."
+    DEFVAL     { 0 }
+    ::= { atmTracePathTestEntry 12 }
+
+atmTracePathTestClearCallAtTDest OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the test connection or party shall be
+        cleared when the trace destination node is reached.  When this
+        is set to 'false', the test connection/party shall be cleared
+        when the entry is deleted using the atmTracePathTestRowStatus
+        object."
+    DEFVAL     { true }
+    ::= { atmTracePathTestEntry 13 }
+
+atmTracePathTestTraceCrankback   OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the path trace shall include crankback
+        information.  When this is set to false, as a consequence of
+        the signalling procedures for path trace, trace information
+        will only be returned if the connection or party succeeds."
+    DEFVAL     { false }
+    ::= { atmTracePathTestEntry 14 }
+
+atmTracePathTestTraceConnId      OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the path trace shall include
+        connection identifier (e.g. VPI/VCI, DLCI) information."
+    DEFVAL     { false }
+    ::= { atmTracePathTestEntry 15 }
+
+atmTracePathTestTraceCallRef     OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the path trace shall include
+        call reference information, and endpoint reference information
+        for point-to-multipoint connections."
+    DEFVAL     { false }
+    ::= { atmTracePathTestEntry 16 }
+
+atmTracePathTestPassAlongRequest OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the 'pass along request' bit shall be set
+        in the Trace transit list information element.  When this
+        object is set to 'true' and systems that do not support path
+        trace are present in the network, gaps may occur between
+        successive entries in the atmTraceInfoTable identifying logical
+        nodes and logical ports traversed by this connection or party.
+        When this object is set to 'false', trace information might not
+        be returned unless all systems along the path support the path
+        trace functionality."
+    DEFVAL     { true }
+    ::= { atmTracePathTestEntry 17 }
+
+atmTracePathTestAgeTimeout       OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The number of seconds left for this entry to age out.
+        On expiry of this timer the display records in the
+        atmTraceRecordTable and the atmTraceInfoTable corresponding to
+        this entry are deleted, as well as the atmTracePathTestEntry.
+
+        When the management station modifies this object, 
+        the currently running timer, if any, is aborted and a timer is 
+        started with the new value of this object. The value '-1' will 
+        indicate an infinite timeout value. "
+    DEFVAL     { 600 }
+    ::= { atmTracePathTestEntry 18 }
+
+atmTracePathTestRestart      OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         restart(1),
+                         noop(2)
+                         }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "When the value is set to 'restart', the test record for this
+        connection is cleared and the test connection or party is
+        initiated.
+
+        When the value is set to 'noop' no operation is performed.
+        When read, the value 'noop' is returned."
+    DEFVAL    { noop }
+    ::= { atmTracePathTestEntry 19 }
+
+atmTracePathTestTrapOnCompletion OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Specifies whether an atmTracePathTestCompletion trap shall be
+        issued on completion of the path trace.  If such a trap
+        is desired, it is the responsibility of the management entity
+        to ensure that the SNMP administrative model is configured in
+        such a way as to allow the trap to be delivered."
+    DEFVAL     { false }
+    ::= { atmTracePathTestEntry 20 }
+
+atmTracePathTestRecordIndex OBJECT-TYPE
+    SYNTAX     AtmTraceRecordIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of this object identifies the row in the
+        atmTraceRecordTable that was generated by this test
+        connection or party.  The distinguished value zero indicates
+        that no reply has been received yet, so no record has been
+        generated."
+    ::= { atmTracePathTestEntry 21 }
+
+atmTracePathTestRowStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Used to create and delete entries in this table.  When a row
+        is activated, a test connection or test party is initiated.
+        When the row is deleted, the test connection or test party is
+        cleared (if it has not already been cleared) and the
+        corresponding entry in the atmTraceRecordTable is deleted."
+    ::= { atmTracePathTestEntry 22 }
+
+
+atmTraceFilterGroup OBJECT IDENTIFIER ::= { atmTraceMIBObjects 4 }
+
+atmTraceFilterTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTraceFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table whose entries describe the filtering criteria
+        for recording of path trace information."
+    ::= { atmTraceFilterGroup 1 }
+
+atmTraceFilterEntry OBJECT-TYPE
+    SYNTAX     AtmTraceFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry in this table corresponds to a filtering criteria
+        based on which path trace is initiated for connections and
+        parties in the process of being established.  This selection
+        criteria is applied against all connections and parties
+        generated or detectedat this ATM device.  Only connections and
+        parties being established which match against all of the
+        entry's criteria are recorded in the atmTraceRecordTable.
+
+        A new entry can be created by specifying a atmTraceFilterIndex
+        value that is currently not being used and also using an
+        appropriate value (createAndGo or createAndWait) for the
+        atmTraceFilterRowStatus object.
+
+        If a particular connection or party matches multiple entries in
+        the atmTraceFilterTable then multiple entries will be created
+        in the atmTraceRecordTable for each of the matched entries in
+        the atmTraceFilterTable."
+    INDEX      { atmTraceFilterIndex }
+    ::= { atmTraceFilterTable 1 }
+
+AtmTraceFilterEntry ::= SEQUENCE 
+    {
+            atmTraceFilterIndex                Integer32,
+            atmTraceFilterOwner                AtmTraceOwnerString,
+            atmTraceFilterConnKind             BITS,
+            atmTraceFilterConnCastType         BITS,
+            atmTraceFilterServiceCategory      BITS,
+            atmTraceFilterInIf                 InterfaceIndexOrZero,
+            atmTraceFilterOutIf                InterfaceIndexOrZero,
+            atmTraceFilterCallingPartyPrefix   AtmAddr,
+            atmTraceFilterCallingPartyLength   Integer32,
+            atmTraceFilterCalledPartyPrefix    AtmAddr,
+            atmTraceFilterCalledPartyLength    Integer32,
+            atmTraceFilterClearCallAtTDest     TruthValue,
+            atmTraceFilterTraceCrankback       TruthValue,
+            atmTraceFilterTraceConnId          TruthValue,
+            atmTraceFilterTraceCallRef         TruthValue,
+            atmTraceFilterPassAlongRequest     TruthValue,
+            atmTraceFilterMaxRecords           Integer32,
+            atmTraceFilterRecordCountDown      Integer32,
+            atmTraceFilterStopTimeout          Integer32,
+            atmTraceFilterAgeTimeout           Integer32,
+            atmTraceFilterPurge                INTEGER,
+            atmTraceFilterTrapEnable           TruthValue,
+            atmTraceFilterNumMatches           Counter32,
+            atmTraceFilterRowStatus            RowStatus
+    }
+
+atmTraceFilterIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..50)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An arbitrary integer uniquely identifying a filtering
+        criteria."
+    ::= { atmTraceFilterEntry 1 }
+
+atmTraceFilterOwner OBJECT-TYPE
+    SYNTAX     AtmTraceOwnerString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The entity that configured this entry."
+    ::= { atmTraceFilterEntry 2 }
+
+atmTraceFilterConnKind  OBJECT-TYPE
+    SYNTAX     BITS {
+                      other(0),
+                      svcAndSpvcNotInitiator(1),
+                      spvcInitiator(2),
+                      svpAndSpvpNotInitiator(3),
+                      spvpInitiator(4),
+                      atmCOBISigConn(5)
+                      }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object enables the user to track the paths of switched
+        virtual channel/path connections, soft permanent virtual
+        channel/path connections initiated by this node, and soft
+        permanent virtual channel/path connections initiated by
+        other nodes."
+    ::= { atmTraceFilterEntry 3 }
+
+atmTraceFilterConnCastType OBJECT-TYPE
+     SYNTAX     BITS {
+                      p2p(0),
+                      p2mp(1)
+                      }
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object restricts the scope of the filter based on the
+          type of topology of connections (point-to-point or
+          point-to-multipoint)."
+     ::= { atmTraceFilterEntry 4 }
+
+atmTraceFilterServiceCategory OBJECT-TYPE
+    SYNTAX     BITS {
+                      cbr(0),
+                      rtVbr(1),
+                      nrtVbr(2),
+                      abr(3),
+                      ubr(4),
+                      gfr(5),
+                      other(6)
+                      }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object restricts the scope of the filter to calls
+        belonging to service categories represented by this object."
+    ::= { atmTraceFilterEntry 5 }
+
+atmTraceFilterInIf  OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object restricts the scope of the filter to calls which
+        enter the ATM device through the port represented by this
+        object, or are initiated at this port (e.g. Soft PVCs).
+        It has the value 0, or the ifIndex value of an ATM Interface.
+        The value zero indicates that the scope of the filter is not
+        restricted by the incoming port."
+    DEFVAL     { 0 }
+    ::= { atmTraceFilterEntry 6 }
+
+atmTraceFilterOutIf OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object restricts the scope of the filter to calls which
+        exit the ATM device through the port represented by this
+        object.  It has the value 0, or the ifIndex value of an ATM
+        interface.  The value zero indicates that the scope of the
+        filter is not restricted by the outgoing port."
+    DEFVAL     { 0 }
+    ::= { atmTraceFilterEntry 7 }
+
+atmTraceFilterCallingPartyPrefix     OBJECT-TYPE
+    SYNTAX     AtmAddr
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The combination of this object and the corresponding instance
+        of atmTraceFilterCallingPartyLength is one selection criteria
+        for this record.  To match this selection criteria, a
+        connection setup must have a Calling Party Address which has
+        an initial part (of length atmTraceFilterCalledPartyLength
+        bits) equal in value to atmTraceFilterCallingParty.  When the
+        default value for the object is retained then the call will
+        match this filtering criteria for any calling address in the
+        call, or if the calling party number is not present in the
+        call.  The value must be padded with zeros from
+        atmTraceFilterCallingPartyLength to the full length of the
+        address (8 octets for E.164 numbers and 20 octets for AESAs)."
+    DEFVAL     { "" }
+    ::= { atmTraceFilterEntry 8 }
+
+atmTraceFilterCallingPartyLength OBJECT-TYPE
+    SYNTAX     Integer32 (1..160)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the number of bits in
+        atmTraceFilterCallingParty that shall be used when matching
+        against the calling party of a new call setup."
+    DEFVAL     { 152 }
+    ::= { atmTraceFilterEntry 9 }
+
+atmTraceFilterCalledPartyPrefix      OBJECT-TYPE
+    SYNTAX     AtmAddr
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The combination of this object and the corresponding instance 
+        of atmTraceFilterCalledPartyLength is one selection criteria 
+        for this record.  To match this selection criteria, a
+        connection setup must have a called party address which has 
+        an initial part (of length atmTraceFilterCalledPartyLength
+        bits) equal in value to 
+        atmTraceFilterCalledParty. When the default value for
+        the object is retained then the call will match this 
+        filtering criteria for any called address in the call.
+        The value must be padded with zeros from
+        atmTraceFilterCalledPartyLength to the full length of the
+        address (8 octets for E.164 numbers and 20 octets for AESAs)."
+    DEFVAL     {""}
+    ::= { atmTraceFilterEntry 10 }
+
+atmTraceFilterCalledPartyLength  OBJECT-TYPE
+    SYNTAX     Integer32 (1..160)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the number of bits in
+        atmTraceFilterCalledParty that shall be used when matching
+        against the called party of a new call setup."
+    DEFVAL     { 152 }
+    ::= { atmTraceFilterEntry 11 }
+
+atmTraceFilterClearCallAtTDest OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the connection or party shall be cleared
+        when the trace destination node is reached."
+    DEFVAL     { false }
+    ::= { atmTraceFilterEntry 12 }
+
+atmTraceFilterTraceCrankback   OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the path trace shall include
+        crankback information.  When this is set to false, as a
+        consequence of the signalling procedures for path trace, trace
+        information will only be returned if the connection or party
+        succeeds."
+    DEFVAL     { false }
+    ::= { atmTraceFilterEntry 13 }
+
+atmTraceFilterTraceConnId      OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the path trace shall include
+        connection identifier (e.g. VPI/VCI, DLCI) information."
+    DEFVAL     { false }
+    ::= { atmTraceFilterEntry 14 }
+
+atmTraceFilterTraceCallRef     OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the path trace shall include
+        call reference information, and endpoint reference information
+        for point-to-multipoint connections."
+    DEFVAL     { false }
+    ::= { atmTraceFilterEntry 15 }
+
+atmTraceFilterPassAlongRequest OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the 'pass along request' bit shall be set
+        in the Trace transit list information element.  When this
+        object is set to 'true' and systems that do not support path
+        trace are present in the network, gaps may occur between
+        successive entries in the atmTraceInfoTable identifying logical
+        nodes and logical ports traversed by this connection or party.
+        When this object is set to 'false', trace information might not
+        be returned unless all systems along the path support the path
+        trace functionality."
+    DEFVAL     { true }
+    ::= { atmTraceFilterEntry 16 }
+
+atmTraceFilterMaxRecords       OBJECT-TYPE
+    SYNTAX     Integer32 (-1..214783647)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of entries that are desired in the 
+        atmTraceRecordTable on behalf of this filter.  The agent will
+        not create more than this number of entries in the table, but
+        may choose to further limit the number of entries for this
+        filter in the atmTraceRecordTable for any reason including
+        the lack of resources.  The agent will however dedicate
+        resources for a minimum number of entries in the
+        atmTraceRecordTable, to take care of temporary memory
+        allocation failures in the system.  In case of memory
+        allocation failures the agent will utilize these dedicated
+        resources for the creation of the new entries.  If memory
+        resource failures continue and the dedicated resources are
+        exhausted then the records in the atmTraceRecordTable are
+        pruned such that the oldest entries are removed to make way
+        for the new entries.
+
+        A value '-1' will indicate no upper limit for the number of 
+        records stored. The manager can set this object to -1 if
+        overwriting of records is not desired. The new value for 
+        this object will take effect immediately. 
+
+        If this object is set to a value less than the number of
+        entries that is currently present in the atmTraceRecordTable
+        corresponding to this entry, then the oldest entries in the
+        atmTraceRecordTable will be deleted so that their number
+        equals the new value of this object.
+
+        If the value of this object is changed from -1 to any other 
+        positive value then the entries will be pruned such that only
+        the first n records collected for this entry are retained in
+        the atmTraceRecordTable, n being the new value of this object."
+    DEFVAL     { 20 }
+    ::= { atmTraceFilterEntry 17 }
+    
+atmTraceFilterRecordCountDown      OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The number of entries left to be collected in the
+        atmTraceRecordTable before filtering is disabled for this
+        entry. The display records in the atmTraceRecordTable
+        corresponding to this entry are retained.  The management
+        station can restart filtering for this entry by setting this
+        object to a positive value (subject to atmTraceFilterRowStatus
+        being 'active' and atmTraceFilterStopTimeout having a positive
+        value or being set to '-1'). When the object is set to zero,
+        filtering is stopped for this entry. When the management
+        station modifies this object, the current value is replaced and
+        the agent counts down from the new value of this object.
+
+        The value '-1' indicates that filtering will not be
+        automatically disabled based on the number of entries collected
+        in the atmTraceRecordTable."
+    DEFVAL     { -1 }
+    ::= { atmTraceFilterEntry 18 }
+
+atmTraceFilterStopTimeout       OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The number of seconds left for this entry to collect records.
+        On expiry of this timer filtering is disabled for this entry. 
+        The display records in the atmTraceRecordTable corresponding 
+        to this entry are retained. When the timer expires the object 
+        will have a value zero. The management station can restart
+        filtering for this entry by setting this object to a positive
+        value (subject to atmTraceFilterRowStatus being 'active' and
+        atmTraceFilterRecordCountDown having a positive value or being
+        set to '-1').  When the object is set to zero, filtering is
+        stopped for this entry. When the management station modifies
+        this object, the currently running timer, if any, is aborted
+        and a timer is started with the new value of this object. The
+        value '-1' will indicate an infinite timeout value."
+    DEFVAL     { 600 }
+    ::= { atmTraceFilterEntry 19 }
+
+atmTraceFilterAgeTimeout       OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The number of seconds left for this entry to age out.
+        On expiry of this timer the display records in the
+        atmTraceFilterRecordTable, atmTraceRecordTable and the
+        atmTraceInfoTable corresponding to this entry are deleted,
+        as well as the atmTraceFilterEntry.
+
+        When the management station modifies this object, 
+        the currently running timer, if any, is aborted and a timer is 
+        started with the new value of this object. The value '-1' will 
+        indicate an infinite timeout value. "
+    DEFVAL     { 600 }
+    ::= { atmTraceFilterEntry 20 }
+
+atmTraceFilterPurge OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         purge(1),
+                         noop(2)
+                         }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The object provides a facility for the user to purge the
+        records in the atmTraceRecordTable corresponding to this entry.
+        When the value  is set to 'purge', the records in the 
+        atmTraceRecordTable corresponding to this entry are purged.  
+        When the value is set to 'noop' no operation is performed. When
+        read, the value 'noop' is returned."
+    DEFVAL     { noop }
+    ::= { atmTraceFilterEntry 21 }
+
+atmTraceFilterTrapEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Specifies whether an atmTraceFilterTrap shall be issued the
+        next time a record is added to the atmTraceRecordTable and the
+        atmTraceFilterRecordTable corresponding to this filter.  This
+        object automatically resets itself to 'false' each time a trap
+        is generated for this filter.  This object must be reset to
+        'true' before another atmTracePathFilter trap can be generated
+        for this filter entry.
+
+        If such a trap is desired, it is the responsibility of the
+        management entity to ensure that the SNMP administrative model
+        is configured in such a way as to allow the trap to be
+        delivered."
+    DEFVAL     { false }
+    ::= { atmTraceFilterEntry 22 }
+
+atmTraceFilterNumMatches OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A monotonically increasing counter to keep track of the
+        number of calls or parties that matched this entry for
+        the entire lifetime of this entry. "
+    ::= { atmTraceFilterEntry 23 }
+
+atmTraceFilterRowStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Indicates the status of this row. Used according to the row
+        installation and removal conventions. This object can be used 
+        to temporarily inactivate an entry in the table. When this
+        object is set to a value 'notInService' filtering is stopped
+        for the corresponding row. Any records that have been stored in
+        the atmTraceRecordTable and the atmTraceFilterRecordTable
+        corresponding to this entry will not be released. Any writeable
+        objects in the row can be modified when the row is active. All
+        values will take effect immediately. When this object is set to
+        'destroy', all corresponding records in the
+        atmTraceFilterRecordTable and the atmTraceRecordTable are
+        deleted."
+    ::= { atmTraceFilterEntry 24 }
+
+
+atmTraceFilterRecordTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTraceFilterRecordEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table that lists which trace records have been
+        returned for which trace filters.  This table also lists
+        the connection characteristics for each connection record,
+        other than those values returned in the Trace transit list
+        information element."
+    ::= { atmTraceFilterGroup 2 }
+
+atmTraceFilterRecordEntry OBJECT-TYPE
+    SYNTAX     AtmTraceFilterRecordEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing the index of a record associated with
+        a given trace filter.  This table also lists some of the
+        connection characteristics."
+    INDEX      { atmTraceFilterIndex,
+                 atmTraceFilterRecordIndex }
+    ::= { atmTraceFilterRecordTable 1 }
+
+AtmTraceFilterRecordEntry ::= SEQUENCE
+    {
+            atmTraceFilterRecordIndex            AtmTraceRecordIndex,
+            atmTraceFilterRecordConnKind         AtmConnKind,
+            atmTraceFilterRecordConnCastType     AtmConnCastType,
+            atmTraceFilterRecordServiceCategory  AtmServiceCategory,
+            atmTraceFilterRecordInIf             InterfaceIndex,
+            atmTraceFilterRecordOutIf            InterfaceIndexOrZero,
+            atmTraceFilterRecordCallingParty     AtmAddr,
+            atmTraceFilterRecordCalledParty      AtmAddr
+            }
+
+atmTraceFilterRecordIndex OBJECT-TYPE
+    SYNTAX     AtmTraceRecordIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The value of this object identifies a row in the
+        atmTraceRecordTable that was generated by the trace filter
+        identified by atmTraceFilterIndex."
+    ::= { atmTraceFilterRecordEntry 1 }
+
+atmTraceFilterRecordConnKind  OBJECT-TYPE
+    SYNTAX     AtmConnKind
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object represents the use of call control (e.g.
+        switched virtual connection or soft permanent virtual
+        connection) of the connection or party on the incoming
+        interface."
+    ::= { atmTraceFilterRecordEntry 2 }
+
+atmTraceFilterRecordConnCastType  OBJECT-TYPE
+    SYNTAX     AtmConnCastType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object represents the type of topology of the 
+        connection (point-to-point or point-to-multipoint) on
+        the incoming interface."
+    ::= { atmTraceFilterRecordEntry 3 }
+
+atmTraceFilterRecordServiceCategory OBJECT-TYPE
+    SYNTAX     AtmServiceCategory
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object represents the service category used by the call."
+    ::= { atmTraceFilterRecordEntry 4 }
+
+atmTraceFilterRecordInIf OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The IfIndex of the incoming port on which this call was
+        received by the ATM device."
+    ::= { atmTraceFilterRecordEntry 5 }
+
+atmTraceFilterRecordOutIf OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The IfIndex of the outgoing port, if available, through which
+        this call was routed to the network.  The distinguished value
+        zero indicates that the call was rejected before any outgoing
+        interface was chosen."
+    ::= { atmTraceFilterRecordEntry 6 }
+
+atmTraceFilterRecordCallingParty     OBJECT-TYPE
+    SYNTAX       AtmAddr
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Indicates the ATM adddress of the calling party in the
+        connection or party."
+    ::= { atmTraceFilterRecordEntry 7 }
+
+atmTraceFilterRecordCalledParty      OBJECT-TYPE
+    SYNTAX       AtmAddr
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Indicates the ATM address of the called party in the
+        connection or party."
+    ::= { atmTraceFilterRecordEntry 8 }
+
+
+atmTraceRecordGroup OBJECT IDENTIFIER ::= { atmTraceMIBObjects 5 }
+
+atmTraceRecordTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTraceRecordEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table and the atmTraceInfoTable are used to display
+        the path or connection trace results.  Trace
+        information that is not repeated at each hop
+        is shown in this table."
+    ::= { atmTraceRecordGroup 1 }
+
+atmTraceRecordEntry OBJECT-TYPE
+    SYNTAX     AtmTraceRecordEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry representing a trace record for one new or existing
+        connection or party."
+    INDEX      { atmTraceRecordIndex }
+    ::= { atmTraceRecordTable 1 }
+
+AtmTraceRecordEntry ::=
+    SEQUENCE {
+          atmTraceRecordIndex                    AtmTraceRecordIndex,
+          atmTraceRecordStatus                   INTEGER,
+          atmTraceRecordCause                    Integer32,        
+          atmTraceRecordDiags                    OCTET STRING,        
+          atmTraceRecordTraceSourcePortId        PnniPortId,
+          atmTraceRecordTraceSourceDlci          Integer32,
+          atmTraceRecordTraceDestVpi             AtmVpIdentifier,
+          atmTraceRecordTraceDestVci             AtmVcIdentifier,
+          atmTraceRecordTraceDestCallRef         CallReference,
+          atmTraceRecordTraceDestEndPtRef        AtmEndPointReference,
+          atmTraceRecordTraceDestDlci            Integer32,
+          atmTraceRecordTimeStamp                TimeStamp
+    }
+
+atmTraceRecordIndex OBJECT-TYPE
+    SYNTAX     AtmTraceRecordIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An arbitrary integer used to distinguish between multiple
+        trace records. "
+    ::= { atmTraceRecordEntry 1 }
+
+atmTraceRecordStatus OBJECT-TYPE
+    SYNTAX    INTEGER {
+                        traceInProgress(1),
+                        traceCompletedNormally(2),
+                        traceIncomplete(3),
+                        traceExceededIELengthLimitations(4),
+                        traceExceededMessageLengthLimitations(5),
+                        traceLackResource(6)
+                        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The returned trace status for this connection or party."
+    ::= { atmTraceRecordEntry 2 }
+                        
+atmTraceRecordCause      OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object identifies the reason for the call failure.  When
+        the call succeeds, the distinguished value zero is returned.
+        When a PNNI Crankback information element is included in the
+        last call clearing message, this object contains the crankback
+        cause.  In all other cases, the values are the same as the
+        cause code values defined for the Cause information element."
+    REFERENCE
+        "ATM Forum's UNI3.0/3.1 Specification. "
+    ::= { atmTraceRecordEntry 3 }
+
+atmTraceRecordDiags      OBJECT-TYPE   
+    SYNTAX     OCTET STRING(SIZE(0..17))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object contains the contents of the diagnostics fields 
+        from the Cause information element.  When the value of 
+        atmTraceRecordCause is 49, 'Quality of Service unavailable', 
+        the diagnostics are taken from the PNNI Crankback information 
+        element instead of the Cause information element."
+    REFERENCE
+        "ATM Forum's UNI3.0/3.1 Specification. "
+    ::= { atmTraceRecordEntry 4 }
+
+atmTraceRecordTraceSourcePortId   OBJECT-TYPE
+    SYNTAX     PnniPortId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The PNNI logical port ID identifying the trace source
+        interface.  The distinguished value zero indicates that no
+        trace source port ID was returned in the Trace transit list."
+    ::= { atmTraceRecordEntry 5 }
+
+atmTraceRecordTraceSourceDlci     OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The DLCI used on the trace source interface.  The
+        distinguished value zero indicates that no DLCI was included in
+        the Trace transit list for the trace source interface."
+    ::= { atmTraceRecordEntry 6 }
+
+atmTraceRecordTraceDestVpi      OBJECT-TYPE
+    SYNTAX     AtmVpIdentifier
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The VPI used on the preceding side of the trace destination
+        interface.  The value zero is returned if no VPI was
+        included in the Trace transit list for the trace destination
+        interface."
+    ::= { atmTraceRecordEntry 7 }
+
+atmTraceRecordTraceDestVci      OBJECT-TYPE
+    SYNTAX     AtmVcIdentifier
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The VCI used on the trace destination interface.  The
+        distinguished value zero indicates that no VCI was included in
+        the Trace transit list for the trace destination interface."
+    ::= { atmTraceRecordEntry 8 }
+
+atmTraceRecordTraceDestCallRef OBJECT-TYPE
+    SYNTAX     CallReference
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The call reference used on the trace destination interface."
+    ::= { atmTraceRecordEntry 9 }
+
+atmTraceRecordTraceDestEndPtRef  OBJECT-TYPE
+    SYNTAX     AtmEndPointReference
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The endpoint reference used on the trace destination
+        interface."
+     ::= { atmTraceRecordEntry 10 }
+
+atmTraceRecordTraceDestDlci   OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The DLCI used on the trace destination interface.  The
+        distinguished value zero indicates that no DLCI was included in
+        the Trace transit list for the trace destination interface."
+    ::= { atmTraceRecordEntry 11 }
+
+atmTraceRecordTimeStamp          OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The time at which this record entry was created."
+    ::= { atmTraceRecordEntry 12 }
+
+
+atmTraceInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTraceInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table in which the detailed trace information (i.e.,
+        logical nodes, logical ports, VPI/VCIs, and Call/Endpoint
+        References) of traced connections or parties are recorded."
+    ::= { atmTraceRecordGroup 2}
+
+atmTraceInfoEntry OBJECT-TYPE
+    SYNTAX     AtmTraceInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Trace information for one hop of an existing or new connection
+        or party.  This lists the nodes and ports traversed by the
+        connection or party.  VPI/VCIs and Call/Endpoint References
+        may also be included in this entry.  Each entry contains
+        trace information added by one node.  If there are gaps in the
+        Trace transit list due to the use of the Pass along request
+        flag and the presence of nodes that do not support trace, the
+        gaps will be between successive entries in this table.  Since
+        the entries in this table are linked to the entries of the
+        atmTraceRecordTable, the entries are added and removed from the
+        table as and when the corresponding entries in the
+        atmTraceRecordTable are added and removed."
+    INDEX      { atmTraceRecordIndex,
+                 atmTraceInfoSequenceIndex }
+    ::= { atmTraceInfoTable 1 }
+
+AtmTraceInfoEntry ::=
+    SEQUENCE {
+            atmTraceInfoSequenceIndex         Integer32,
+            atmTraceInfoNodeId                PnniNodeId,
+            atmTraceInfoOutgoingPortId        PnniPortId,
+            atmTraceInfoIncomingVpi           AtmVpIdentifier,
+            atmTraceInfoIncomingVci           AtmVcIdentifier,
+            atmTraceInfoIncomingCallRef       CallReference,
+            atmTraceInfoIncomingEndPtRef      AtmEndPointReference,
+            atmTraceInfoRefusalIndicator      TruthValue,
+            atmTraceInfoCrankBackRcvdAtDest   TruthValue,
+            atmTraceInfoCrankBackGap          TruthValue,
+            atmTraceInfoCrankBackIndicator    TruthValue,
+            atmTraceInfoCrankBackBlockedTransitType  INTEGER,
+            atmTraceInfoCrankBackBlockedTransitInfo  OCTET STRING,
+            atmTraceInfoCrankBackCause        Integer32
+    }
+
+atmTraceInfoSequenceIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..200)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An index into the list of logical nodes / logical ports
+        traversed by the connection or party.  The logical nodes and
+        logical ports are given in order, as specified by this index."
+    ::= { atmTraceInfoEntry 1 }
+
+atmTraceInfoNodeId OBJECT-TYPE
+    SYNTAX     PnniNodeId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The node ID of a logical node traversed by the connection
+        or party."
+    ::= { atmTraceInfoEntry 2 }
+
+atmTraceInfoOutgoingPortId OBJECT-TYPE
+    SYNTAX     PnniPortId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The port ID of the logical node identified in
+        atmTraceInfoNodeId that identifies the logical port
+        used to progress this connection or party towards the
+        called party."
+    ::= { atmTraceInfoEntry 3 }
+
+atmTraceInfoIncomingVpi  OBJECT-TYPE
+    SYNTAX     AtmVpIdentifier
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The VPI used on the succeeding side of the incoming interface
+        of the node identified by atmTraceInfoNodeId.  The value zero
+        is returned if no VPI was included in the Trace transit list.
+        If there are no gaps in the Trace transit list, this is the
+        VPI used on the other side of the interface identified by the
+        atmTraceInfoNodeId and atmTraceInfoPortId under the previous
+        atmTraceInfoSequenceIndex."
+    ::= { atmTraceInfoEntry 4 }
+
+atmTraceInfoIncomingVci  OBJECT-TYPE
+    SYNTAX     AtmVcIdentifier
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The VCI used on the incoming interface of the node identified
+        by atmTraceInfoNodeId.  The distinguished value zero indicates
+        that no VCI was included in the Trace transit list.
+        If there are no gaps in the Trace transit list, this is the
+        VCI used on the interface identified by the atmTraceInfoNodeId
+        and atmTraceInfoPortId under the previous
+        atmTraceInfoSequenceIndex."
+    ::= { atmTraceInfoEntry 5 }
+
+atmTraceInfoIncomingCallRef  OBJECT-TYPE
+    SYNTAX     CallReference
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Call Reference used on the incoming interface of the node
+        identified by atmTraceInfoNodeId.
+        If there are no gaps in the Trace transit list, this is the
+        call reference used on the interface identified by the
+        atmTraceInfoNodeId and atmTraceInfoPortId under the previous
+        atmTraceInfoSequenceIndex."
+    ::= { atmTraceInfoEntry 6 }
+
+atmTraceInfoIncomingEndPtRef  OBJECT-TYPE
+    SYNTAX     AtmEndPointReference
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Endpoint Reference used on the incoming interface of the
+        node identified by atmTraceInfoNodeId.
+        If there are no gaps in the Trace transit list, this is the
+        endpoint reference used on the interface identified by the
+        atmTraceInfoNodeId and atmTraceInfoPortId under the previous
+        atmTraceInfoSequenceIndex."
+    ::= { atmTraceInfoEntry 7 }
+
+atmTraceInfoRefusalIndicator  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the node identified by the
+        atmTraceInfoNodeId refused to participate in this trace."
+    ::= { atmTraceInfoEntry 8 }
+
+atmTraceInfoCrankBackRcvdAtDest  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether a crankback was received at the node
+        identified by the atmTraceInfoNodeId, when that node is the
+        trace destination node and the trace destination interface
+        is not a PNNI interface."
+    ::= { atmTraceInfoEntry 9 }
+
+atmTraceInfoCrankBackGap  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates that the trace was propagated beyond the node
+        identified by the atmTraceInfoNodeId, but was cranked back,
+        and no trace information was returned by the node initiating
+        crankback."
+    ::= { atmTraceInfoEntry 10 }
+
+atmTraceInfoCrankBackIndicator     OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether crankback information (octet group 16 of
+        the Trace transit list information element) is present after
+        the node identified by the atmTraceInfoNodeId, but before the
+        next node identified in the Trace transit list information
+        element."
+    ::= { atmTraceInfoEntry 11 }
+
+atmTraceInfoCrankBackBlockedTransitType   OBJECT-TYPE
+    SYNTAX     INTEGER  {
+                          blockedIncomingLink(1),
+                          blockedNode(2),
+                          blockedOutgoingLink(3)
+                          }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object identifies the type of blockage in case of a
+        blocked call at the node identified by the atmTraceInfoNodeId.
+        This object does not apply if the value of
+        atmTraceInfoCrankBackIndicator is 'false'."
+    ::= { atmTraceInfoEntry 12 }
+
+atmTraceInfoCrankBackBlockedTransitInfo   OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object does not apply if the value of
+        atmTraceInfoCrankBackIndicator is 'false'.
+
+        When the value of atmTraceInfoCrankBackIndicator is 'true',
+        this object includes the contents of the Blocked Transit
+        Trace Information field from the Trace transit list
+        Information element."
+    REFERENCE
+        "PNNI Addendum for Path and Connection Trace Version 1.0,
+        Section 3.1"
+    ::= { atmTraceInfoEntry 13 }
+
+atmTraceInfoCrankBackCause   OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object returns the PNNI crankback cause.  This object
+        does not apply if atmTraceInfoCrankBackIndicator is set to
+        'false'."
+    ::= { atmTraceInfoEntry 14 }
+
+
+atmTraceIfGroup OBJECT IDENTIFIER ::= { atmTraceMIBObjects 6 }
+
+atmTraceIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AtmTraceIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table is used to specify trace-related properties of a
+        PNNI interface (e.g. whether a PNNI interface allows tracing
+        over that interface)."
+::= { atmTraceIfGroup 1 }
+
+atmTraceIfEntry OBJECT-TYPE
+    SYNTAX     AtmTraceIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry representing the trace-related properties of a
+        PNNI interface."
+    AUGMENTS   { pnniIfEntry }
+    ::= { atmTraceIfTable 1 }
+
+AtmTraceIfEntry ::=
+    SEQUENCE {
+          atmTraceIfTraceBoundary            TruthValue
+    }
+
+atmTraceIfTraceBoundary  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When this is a PNNI interface, indicates whether path
+        and connection trace will be terminated or refused for
+        outgoing or incoming, respectively, connections or parties on
+        this interface.
+
+        This object has no effect when this is not a PNNI interface."
+    DEFVAL     { false }
+    ::= { atmTraceIfEntry 1 }
+
+
+-- Path and Connection Trace Traps
+
+atmTraceMIBTrapsPrefix  OBJECT IDENTIFIER ::= { atmTraceMIB 2 }
+atmTraceMIBTraps  OBJECT IDENTIFIER ::= { atmTraceMIBTrapsPrefix 0 }
+
+atmTraceConnCompletion  NOTIFICATION-TYPE
+    OBJECTS    {
+                 atmTraceConnRecordIndex
+                 }
+    STATUS     current
+    DESCRIPTION
+        "An atmTraceConnCompletion trap is sent when enabled and either
+        a TRACE CONNECTION ACKNOWLEDGE message is received at the trace
+        source node, or after atmTraceConnFailTimeout has passed
+        without any response (i.e., the connection trace fails)."
+    ::= { atmTraceMIBTraps 1 }
+
+atmTracePathTestCompletion  NOTIFICATION-TYPE
+    OBJECTS    {
+                 atmTracePathTestRecordIndex
+                 }
+    STATUS     current
+    DESCRIPTION
+        "An atmTracePathTestCompletion trap is sent when enabled and
+        the test connection or test party becomes active on the
+        trace source interface, or is cleared across the trace source
+        interface."
+    ::= { atmTraceMIBTraps 2 }
+
+atmTracePathFilterTrap  NOTIFICATION-TYPE
+    OBJECTS    {
+                 atmTraceFilterRecordConnKind
+                 }
+    STATUS     current
+    DESCRIPTION
+        "An atmTracePathFilter trap is sent when the trap is enabled
+        and a record is added to the atmTraceRecordTable and the
+        atmTraceFilterRecordTable corresponding to this filter.  The
+        atmTraceFilterTrapEnable object must be reset to 'true' before
+        another atmTracePathFilter trap can be generated by the agent
+        for this filter entry."
+    ::= { atmTraceMIBTraps 3 }
+
+
+-- conformance information
+
+atmTraceMIBConformance
+        OBJECT IDENTIFIER ::= { atmTraceMIB 3 }
+
+atmTraceMIBCompliances
+        OBJECT IDENTIFIER ::= { atmTraceMIBConformance 1 }
+
+atmTraceMIBGroups
+        OBJECT IDENTIFIER ::= { atmTraceMIBConformance 2 }
+
+-- compliance statements
+
+atmTraceMIBCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement the
+        PNNI Addendum for Path and Connection Trace Version 1.0.
+
+        Groups of objects required to support certain functionality
+        are identified by the suffix MandatoryGroup.
+
+        Groups of optional objects are identified by the suffix
+        OptionalGroup."
+    MODULE     -- this module
+    MANDATORY-GROUPS
+        { atmTraceMIBMandatoryGroup
+          }
+
+    GROUP atmTraceConnAndPathFilterMandatoryGroup
+    DESCRIPTION
+        "Required if connection trace or path trace using
+        filtering of new connection and party establishment messages
+        is supported."
+
+    GROUP atmTracePathMandatoryGroup
+    DESCRIPTION
+        "Required if path trace is supported."
+
+    GROUP atmTraceConnMandatoryGroup
+    DESCRIPTION
+        "Required if connection trace is supported."
+
+    GROUP atmTracePathTestMandatoryGroup
+    DESCRIPTION
+        "Required if path trace using test connections and parties is
+        supported."
+
+    GROUP atmTracePathFilterMandatoryGroup
+    DESCRIPTION
+        "Required if path trace is supported using filtering of
+        new connection and party establishment messages."
+
+    OBJECT atmTraceTransitListMaximumSize
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Maximum size of the Trace transit list information element
+        larger than 1466 octets is optional."
+
+    OBJECT atmTraceConnOrigConnType
+    SYNTAX INTEGER { atmVcc(2) }
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "The ability to trace connections other than ATM VCCs
+        (e.g. ATM VPCs, bearer-independent ATM connections,
+        frame relay connections) is optional."
+
+    OBJECT atmTraceConnOrigDirection
+    SYNTAX INTEGER { incoming(1) }
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "The ability to trace connections and parties starting from the
+        outgoing interface of a device is optional."
+
+    OBJECT atmTracePathTestConnType
+    SYNTAX INTEGER { atmVcc(2) }
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "The ability to generate test connections for path trace other
+        than ATM VCCs (e.g. ATM VPCs, bearer-independent ATM
+        connections) is optional."
+
+    OBJECT atmTracePathTestClearCallAtTDest
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "The ability to generate test connections and parties that
+        remain active after the path trace is completed is optional."
+
+    OBJECT atmTraceFilterClearCallAtTDest
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "The ability to indicate call clearing at the trace destination
+        node for calls that match a certain filter at the trace source
+        node is optional."
+
+    ::= { atmTraceMIBCompliances 1 }
+
+
+-- units of conformance
+
+atmTraceMIBMandatoryGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceMaxConcurrentRequests,
+              atmTraceAvailableRequests,
+              atmTraceTransitListMaximumSize,
+              atmTraceRecordStatus, 
+              atmTraceRecordTraceSourcePortId,
+              atmTraceRecordTimeStamp,
+              atmTraceInfoNodeId,
+              atmTraceInfoOutgoingPortId,
+              atmTraceInfoRefusalIndicator
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of objects required when path or connection
+        trace is supported."
+    ::= { atmTraceMIBGroups 1 }
+
+atmTraceMIBOptionalGroup  OBJECT-GROUP
+    OBJECTS { 
+              atmTraceRecordTraceSourceDlci
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of optional objects used for path and connection
+        trace."
+    ::= { atmTraceMIBGroups 2 }
+
+atmTraceConnAndPathFilterMandatoryGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceRecordTraceDestVpi,
+              atmTraceRecordTraceDestVci,
+              atmTraceRecordTraceDestCallRef,
+              atmTraceRecordTraceDestEndPtRef,
+              atmTraceRecordTraceDestDlci,
+              atmTraceInfoIncomingVpi,
+              atmTraceInfoIncomingVci,
+              atmTraceInfoIncomingCallRef,
+              atmTraceInfoIncomingEndPtRef
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of objects required when supporting connection
+        trace or path trace using filtering of new connection and party
+        establishment messages."
+    ::= { atmTraceMIBGroups 3 }
+
+atmTracePathMandatoryGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceRecordCause,        
+              atmTraceRecordDiags,
+              atmTraceInfoCrankBackRcvdAtDest,
+              atmTraceInfoCrankBackGap,
+              atmTraceInfoCrankBackIndicator,
+              atmTraceInfoCrankBackBlockedTransitType,
+              atmTraceInfoCrankBackBlockedTransitInfo,
+              atmTraceInfoCrankBackCause
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of objects required when supporting path trace."
+    ::= { atmTraceMIBGroups 4 }
+
+atmTraceConnMandatoryGroup  OBJECT-GROUP
+    OBJECTS { 
+              atmTraceConnOwner,
+              atmTraceConnTraceSourceIf,
+              atmTraceConnOrigConnType,
+              atmTraceConnOrigVpi,
+              atmTraceConnOrigVci,
+              atmTraceConnEndPtRef,
+              atmTraceConnOrigDirection,
+              atmTraceConnTraceConnId,
+              atmTraceConnTraceCallRef,
+              atmTraceConnPassAlongRequest,
+              atmTraceConnFailTimeout,
+              atmTraceConnAgeTimeout,
+              atmTraceConnRestart,
+              atmTraceConnRecordIndex,
+              atmTraceConnRowStatus
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of objects required when connection trace is
+        supported."
+    ::= { atmTraceMIBGroups 5 }
+
+atmTraceConnOptionalGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceConnCallRef,
+              atmTraceConnOrigDlci,         
+              atmTraceConnTrapOnCompletion
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of optional objects used for connection trace."
+    ::= { atmTraceMIBGroups 6 }
+
+atmTracePathTestMandatoryGroup  OBJECT-GROUP
+    OBJECTS { 
+              atmTracePathTestOwner,
+              atmTracePathTestConnType,
+              atmTracePathTestConnCastType,
+              atmTracePathTestTraceSourceIf,
+              atmTracePathTestP2MpNewConn,
+              atmTracePathTestOrigVpi,
+              atmTracePathTestOrigVci,
+              atmTracePathTestCalledParty,
+              atmTracePathTestTxTrafDescrIndex,
+              atmTracePathTestRxTrafDescrIndex,
+              atmTracePathTestClearCallAtTDest,
+              atmTracePathTestTraceCrankback,
+              atmTracePathTestPassAlongRequest,
+              atmTracePathTestAgeTimeout,
+              atmTracePathTestRestart,
+              atmTracePathTestRecordIndex,
+              atmTracePathTestRowStatus
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of objects required when path trace using test
+        connections and test parties is supported."
+    ::= { atmTraceMIBGroups 7 }
+
+atmTracePathTestOptionalGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTracePathTestCallingParty,
+              atmTracePathTestTraceConnId,
+              atmTracePathTestTraceCallRef,
+              atmTracePathTestTrapOnCompletion
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of optional objects used for path trace using
+        test connections and test parties."
+    ::= { atmTraceMIBGroups 8 }
+
+atmTracePathFilterMandatoryGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceFilterControl,
+              atmTraceFilterOwner,
+              atmTraceFilterConnKind,
+              atmTraceFilterInIf,
+              atmTraceFilterCalledPartyPrefix,
+              atmTraceFilterCalledPartyLength,
+              atmTraceFilterClearCallAtTDest,
+              atmTraceFilterTraceCrankback,
+              atmTraceFilterTraceConnId,
+              atmTraceFilterTraceCallRef,
+              atmTraceFilterPassAlongRequest,
+              atmTraceFilterMaxRecords,
+              atmTraceFilterStopTimeout,
+              atmTraceFilterAgeTimeout,
+              atmTraceFilterPurge,
+              atmTraceFilterNumMatches,
+              atmTraceFilterRowStatus,
+              atmTraceFilterRecordConnKind,
+              atmTraceFilterRecordConnCastType,
+              atmTraceFilterRecordServiceCategory,
+              atmTraceFilterRecordInIf,
+              atmTraceFilterRecordOutIf,
+              atmTraceFilterRecordCallingParty,
+              atmTraceFilterRecordCalledParty
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of objects required when path trace is supported
+        using filtering of new connection and party establishment
+        messages."
+    ::= { atmTraceMIBGroups 9 }
+
+atmTracePathFilterOptionalGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceFilterConnCastType,
+              atmTraceFilterServiceCategory,         
+              atmTraceFilterOutIf,
+              atmTraceFilterCallingPartyPrefix,
+              atmTraceFilterCallingPartyLength,
+              atmTraceFilterRecordCountDown,
+              atmTraceFilterTrapEnable
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of optional objects used for path trace using
+        filtering of new connection and party establishment
+        messages."
+    ::= { atmTraceMIBGroups 10 }
+
+atmTraceIfOptionalGroup  OBJECT-GROUP
+    OBJECTS {
+              atmTraceIfTraceBoundary
+              }
+    STATUS    current
+    DESCRIPTION
+        "A collection of optional objects used to configure PNNI
+        interfaces to refuse incoming and terminate outgoing
+        path and connection traces."
+    ::= { atmTraceMIBGroups 11 }
+
+atmTraceNotificationOptionalGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+                    atmTraceConnCompletion,
+                    atmTracePathTestCompletion,
+                    atmTracePathFilterTrap
+                    }
+    STATUS    current
+    DESCRIPTION
+        "A collection of optional notifications used for path and
+        connection trace."
+    ::= { atmTraceMIBGroups 12 }
+
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

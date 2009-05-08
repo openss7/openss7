@@ -1,0 +1,3845 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: npi_sccp.texi,v 0.9.2.4 2009-05-01 04:50:31 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2009-05-01 04:50:31 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename npi_sccp.info
+@include texi/args.texi
+@set MANUAL_TITLE Network Provider Interface
+@set MANUAL_TYPE Addendum for SCCP Conformance
+@settitle @value{MANUAL_TITLE}
+
+@dircategory OpenSS7
+@direntry
+* NPI-SCCP: (npi_sccp).		NPI Addendum for SCCP
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Network Provider Interface
+@set MANUAL_TYPE Addendum for SCCP Conformance
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
+
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT
+THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Network Provider Interface
+@set MANUAL_TYPE Addendum for SCCP Conformance
+
+@set PART Signalling Connection Control
+@set LONG Signalling Connection Control Part
+@set SHORT SCCP
+@set INTERFACE NPI-SCCP
+
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subsubheading Abstract
+This document specifies an (unofficial) addendum to the Network Provider Interface (NPI)
+Specification (@pxref{NPI,,NPI}) for SS7 Signalling Connection Control Part (SCCP)
+(@pxref{Q.711,,Q.711}) conformance in support of the SCCP to SCCP User primitive interface
+(@pxref{Q.711,,Q.711}).  It supports the user-level XNS/NPI abstraction (@pxref{XNS,,XNS}) of the
+Signalling Connection Control Part User interface as well as providing a basis for SCCP User
+protocols using the services of the SS7 Signalling Connection Control Part.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+
+@subsubheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@noindent
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU
+Free Documentation License, Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of
+the license is included in the section entitled @ref{GNU Free Documentation License}.
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@strong{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{[\name\]}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@var{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{[\name\]}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@var{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@macro mobj{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* Protocol Addressing::
+* Quality of Service::
+* Supported Services::
+* Rules for Conformance::
+* Extension Primitives::
+* @value{INTERFACE} Input-Output Controls::
+* @value{INTERFACE} Management Information Base::
+@c * Addendum for @value{SHORT} Conformance::
+* Mapping @value{INTERFACE} Primitives::
+@c * State/Event Tables::
+@c * Precedence Tables::
+@c * Allowable Sequence of @value{INTERFACE} Primitives::
+@c * Precedence of @value{INTERFACE} Primitives::
+@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
+@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
+* @value{INTERFACE} Header Files::
+* @value{INTERFACE} Library::
+* @value{INTERFACE} Drivers and Modules::
+* @value{INTERFACE} Utilities::
+@c * @value{INTERFACE} File Formats::
+* @value{INTERFACE} Compatibility and Porting::
+* Glossary::
+* Acronyms::
+* References::
+* Licenses::
+@c @iftex
+@c * Indices::
+@c @end iftex
+@c @ifnottex
+* Index::
+@c @end ifnottex
+@end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
+@node Preface
+@unnumbered Preface
+
+@section Notice
+
+Software in this document and related software is released under the AGPL (@pxref{GNU Affero General
+Public License}).  Please note, however, that there are different licensing terms for some of the
+manual package and some of the documentation.  Consult permission notices contained in the
+documentation of those components for more information.
+
+This document is released under the FDL (@pxref{GNU Free Documentation License}) with no invariant
+sections, no front-cover texts and no back-cover texts.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
+(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
+components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+
+@subsection Purpose
+@cpindex STREAMS
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
+
+@subsection Intent
+
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@subsection Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+A current version of this specification is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @file{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/repos/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@subsection Version Control
+
+@noindent
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
+@cite{OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this
+release of the document, minor changes may be made prior to products conforming to the interfaces
+being made available.  @cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed herein.
+
+@smallexample
+@verbatim
+$Log: npi_sccp.texi,v $
+Revision 0.9.2.4  2009-05-01 04:50:31  brian
+- update documentation for release
+
+Revision 0.9.2.3  2009-04-30 06:07:38  brian
+- more documentation updates for release
+
+Revision 0.9.2.2  2008-11-26 12:01:34  brian
+- updated to FDL 1.3
+
+Revision 0.9.2.1  2008-11-17 14:04:32  brian
+- added documentation and conversion modules
+
+@end verbatim
+@end smallexample
+
+@section ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this maual is controlled.  An opaque (printed,
+postscript or portable document format) version of this manual is a @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+
+@noindent
+@strong{@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation
+including all implied warranties of merchantability, fitness for a particular purpose,
+non-infrincement, or title; that the contents of the manual are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action or contract, negligence or other tortious action, arising out
+of or in connection with any use of this documentation or the performance or implementation of the
+contents thereof.}
+
+@subsection U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Aquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granded herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplerment
+to the FAR (or any successor regulations).
+
+@section Acknowledgements
+
+@url{http://www.openss7.org/,The OpenSS7 Project} was funded in part by:
+
+@itemize @bullet
+@item @url{http://www.monavacon.com/,Monavacon Limited}
+@item @url{http://www.openss7.com/,OpenSS7 Corporation}
+@end itemize
+
+Thanks to the subscribers to and sponsors of @url{http://www.openss7.org/, The OpenSS7 Project}.
+Without their support, open software like this would not be possible.
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @url{http://www.fsf.org/,Free Software Foundation}, the
+@url{http://www.kernel.org/,Linux Kernel Community}, and the open source software movement at large.
+
+@node Introduction
+@chapter Introduction
+@cpindex STREAMS
+
+This document describes the protocol-specific information that is relevant to for SS7 Signalling
+Connection Control Part (SCCP).@footnote{See reference @ref{Q.714,,Q.714}, @ref{T1.112,,T1.112}.}
+This document also describes the protocol-specific information that is relevant when SCCP network
+services are provided over an IP network.@footnote{See reference @ref{M3UA,,M3UA}.}
+
+In general, this document describes the characteristics that the SCCP and M3UA NSP have in common,
+with notes indicating where they differ.
+
+This document also defines the data structures and constants required for SCCP and
+M3UA.@footnote{See reference @ref{M3UA,,M3UA}.} NSP which are exposed through the
+@file{<sys/npi_sccp.h>} header file.
+
+@menu
+* Overview::
+* Protocol Address::
+* Connection and Connectionless Modes::
+* Sending Data of Zero Octets::
+* Quality of Service Parameters::
+@end menu
+
+@node Overview
+@section Overview
+
+In general, it is not too difficult to map the Signalling Connection Control Part (SCCP) service
+interface as described in Q.711 (@pxref{Q.711,,Q.711}) to the NPI (@pxref{NPI,,NPI}).  This is
+because the NPI is based on X.213 (@pxref{X.213,,X.213}) as is Q.711.  SCCP does, however, have a
+number of specialized service interface primitives described in Q.711 (@pxref{Q.711,,Q.711}) that
+are not provided for directly in the NPI.  There as two ways to accomodate this extra functionality
+provided by the SCCP: either by overloading existing NPI primitives as described under @ref{NPI-SCCP
+Rules for Conformance}, or by offering new NPI primitives as described under @ref{Extension
+Primitives}.  One reason for taking the former approach is so that general purpose NPI modules and
+applications libraries may be used without extension.  One reason for taking the latter approach is
+to remain true to the Q.711 service primitive interface specification.
+
+The former approach is referred to as the @cite{NPI-SCCP} addendum specification and is described in
+this document.  The later approach is referred to as the @cite{SCCPI} interface specification and is
+described in a separate document.
+
+@node Protocol Address
+@section Protocol Address
+
+In an SCCP environment, the protocol address is the SCCP-SAPI which identifies the SS7 network, SS7
+Signalling Point Code within the SS7 network, and the SCCP-User identifier (Subsystem Number).
+
+@node Connection and Connectionless Modes
+@section Connection and Connectionless Modes
+
+@subsection Connection-Oriented Mode
+
+The Signalling Connection Control Part NSP supports connection-oriented mode for SCCP-User protocols
+that form an association between two SCCP-Users in an end-to-end exchange.  This includes
+TUP,@footnote{See reference @ref{Q.721,,Q.721}.} ISUP,@footnote{See reference @ref{Q.761,,Q.761}.}
+BTNUP, BICC and other call control protocols.
+
+The Signalling Connection Control Part does not support a true connection-oriented mode.  When
+associations are formed with @prim{N_CONN_REQ}, no protocol messages are exchanged between the local and
+remote SCCP users and the @prim{N_CONN_REQ} primitive will always succeed unless the remote SCCP user is
+not known to the NSP.  Because of this, it is not possible for the Signalling Connection Control
+Part to accept incoming connections; @prim{N_CONN_IND} primitives will not be issued by the NSP.
+
+@subsection Connection-less Mode
+
+The Signalling Connection Control Part NSP supports connection-less mode for SCCP-User protocols
+that form one-to-many or many-to-one or many-to-many associations and are not restricted to an
+end-to-end exchange at SCCP.  This includes SCCP, MTUP, and other SCCP Users of a connection-less
+nature.
+
+@node Sending Data of Zero Octets
+@section Sending Data of Zero Octets
+
+The Signalling Connection Control Part, both in connection-oriented mode and in connection-less
+mode, does not permit sending a NSDU of zero octets.  So, in connection-less mode, if the number of
+M_DATA block bytes is zero, the @prim{N_UNITDATA_REQ} primitive will always fail with the NPI_error in the
+N_ERROR_ACK set to NBADDATA.  In connection-oriented mode, if the number of M_DATA block bytes is
+zero, the N_DATA_REQ primitive will always fail with the NPI_error in the N_ERROR_ACK set to
+NBADDATA.  if either the N_MORE_DATA_FLAG is not set in the DATA_xfer_flags, or the N_MORE_DATA_FLAG
+flag is not set and the preceding N_DATA_REQ primitive completed a NSDU (that is, the call has
+requested sending a zero byte NSDU).
+
+@node Quality of Service Parameters
+@section Quality of Service Parameters
+
+The quality of service structures are specific to SCCP.  All quality of service parameters are
+association-related, that is, they are options with end-to-end significance.  They may be negotiated
+in the NPI state NS_IDLE, and are read-only in all other sates except NS_UNBND.
+
+@subsection Quality of Service Structures
+
+SCCP-NPI provides quality of service structure selection for data, connection requests, information,
+and range information.  The SCCP specific quality of service structures are discussed in detail
+below.
+
+@node Protocol Addressing
+@chapter Protocol Addressing
+
+This section describes the formats and rules for the Network Provider Interface that are specific to
+the Signalling Connection Control Part.  This section must be used along with the generic Network
+Provider Interface Specification when implementing a NSP that will be configured with the SS7
+Signalling Connection Control Part.
+
+@menu
+* Protocol Address::
+@end menu
+
+@node Protocol Address
+@section Protocol Address
+
+The network address is used in the @prim{N_BIND_REQ}, @prim{N_BIND_ACK}, @prim{N_CONN_REQ},
+@prim{N_CONN_CON}, @prim{N_UNITDATA_REQ}, @prim{N_UNITDATA_IND}, and @prim{N_UDERROR_IND}
+primitives.
+
+@unnumberedsubsec Format
+
+The SCCP network protocol address uses a sockaddr struct to support sockets compatibility libraries
+consistent with the SCCP XTI/TLI interface.
+
+The network protocol address is formatted as follows:
+
+@smallexample
+@verbatim
+typedef struct sccp_addr {
+        uint ni;                        /* network indicator */
+        uint ri;                        /* routing indicator */
+        uint pc;                        /* point code (-1 not present) */
+        uint ssn;                       /* subsystem number (0 not present) */
+        uint gtt;                       /* type of global title */
+        uint tt;                        /* translation type */
+        uint es;                        /* encoding scheme */
+        uint nplan;                     /* numbering plan */
+        uint nai;                       /* nature of address indicator */
+        uint alen;                      /* address length */
+        uint8_t addr[0];                /* address digits */
+        /* followed by address bytes */
+} sccp_addr_t;
+
+#define SCCP_MAX_ADDR_LENGTH 32
+
+#define SCCP_RI_DPC_SSN         0       /* route on DPC/SSN */
+#define SCCP_RI_GT              1       /* route on GT */
+
+#define SCCP_GTTTYPE_NONE       0       /* no GT */
+#define SCCP_GTTTYPE_NAI        1       /* NAI only */
+#define SCCP_GTTTYPE_TT         2       /* TT only */
+#define SCCP_GTTTYPE_NP         3       /* TT, ES, NPLAN */
+#define SCCP_GTTTYPE_NP_NAI     4       /* TT, ES, NPLAN and NAI */
+@end verbatim
+@end smallexample
+
+@unnumberedsubsec Parameters
+
+@table @member
+@item sccp_family
+Specifies the SCCP socket address family.  The address family is always AF_SCCP.
+@item sccp_ni
+Specifies the network indicator which specifies the SS7 network to which the address belongs.  A
+given SCCP entity can belong to multiple SS7 networks, particularly when acting as a gateway between
+networks.  The network indicator specifies to which network the SCCP-SAPI belongs.
+@item sccp_ri
+Specifies which components of the address are to be used for routing.  The @member{sccp_ri} can be one
+of the following values:
+@table @pval
+@item N_SCCP_RI_DPC_SSN
+Specifies that routing is to be performed on destination point code (DPC) and subsystem number (SSN).
+@item N_SCCP_RI_GT
+Specifies that routing is to be performed on global title (GT).
+@end table
+@item sccp_pc
+Specifies the signalling point code of the SCCP provider entity.  The point code is normally coded
+as a 14-bit value, right justified in the @member{sccp_pc} field, which identifies the SCCP entity.
+Non-significant bits are coded zero (@samp{0}).
+@item sccp_ssn
+Specifies the subsystem number of the SCCP provider entity.  The subsystem number is normally coded
+as an 8-bit value.  The @member{sccp_ssn} can take on one of the following values, each of which
+corresponds to an SCCP user at the SCCP entity:
+@table @pval
+@item N_SCCP_SSN_UNKNOWN
+Subsystem number not known/not used.
+@item N_SCCP_SSN_SCMG
+SCCP management.
+@item N_SCCP_SSN_RESERVED
+Reserved for ITU-T allocation.
+@item N_SCCP_SSN_ISUP
+ISDN user part.
+@item N_SCCP_SSN_OMAP
+OMAP (Operation, Maintenance and Administration Part)
+@item N_SCCP_SSN_MAP
+MAP (Mobile Application Part)
+@item N_SCCP_SSN_HLR
+HLR (Home Location Register)
+@item N_SCCP_SSN_VLR
+VLR (Visitor Location Register)
+@item N_SCCP_SSN_MSC
+MSC (Mobile Switching Centre)
+@item N_SCCP_SSN_EIC
+EIC (Equipment Identifier Centre)
+@item N_SCCP_SSN_AUC
+AUC (Authentication Centre)
+@item N_SCCP_SSN_ISDN_SS
+ISDN supplementary services.
+@item N_SCCP_SSN_RESERVED2
+Reserved for international use.
+@item N_SCCP_SSN_BISDN
+Broadband ISDN edge-to-edge applications.
+@item N_SCCP_SSN_TC_TEST
+TC test responder.
+@item ...
+Other values from @samp{0} to 255.
+@end table
+@item sccp_gtt
+Specifies the type of global title included in the address.  This field can be one of the following
+values:
+@table @pval
+@item N_SCCP_GTTTYPE_NONE
+The global title is not included in the address.
+@item N_SCCP_GTTTYPE_NAI
+The global title includes the nature of address indication (NAI) only.
+@item N_SCCP_GTTTYPE_TT
+The global title includes the translation type (TT) only.
+@item N_SCCP_GTTTYPE_NP
+The global title includes the translation type (TT), encoding scheme (ES), and numbering plan (NPLAN).
+@item N_SCCP_GTTTYPE_NP_NAI
+The global title includes the translation type (TT), encoding scheme (ES), and numbering plan
+(NPLAN), and nature of address indicator (NAI).
+@item ...
+@end table
+@item sccp_tt
+Specifies the translation type (TT).
+@item sccp_es
+Specifies the encoding scheme (ES).  Encoding scheme can be one of the following values:
+@table @pval
+@item N_SCCP_ES_UNKNOWN
+Unknown encoding scheme.
+@item N_SCCP_ES_BCD_ODD
+BCD encoding scheme, odd number of digits.
+@item N_SCCP_ES_BCD_EVEN
+BCD encoding scheme, even number of digits.
+@item N_SCCP_ES_NATIONAL_SPECIFIC
+National specific encoding scheme.
+@item ...
+Other values from @samp{0} to 15.
+@end table
+@item sccp_nplan
+Specifies the numbering plan (NPLAN).  The @member{sccp_nplan} field can be one of the following:
+@table @pval
+@item N_SCCP_NPLAN_UNKNOWN
+Unknown.
+@item N_SCCP_NPLAN_ISDN
+ISDN/telephony numbering plan (Recommendations E.163 and E.164).
+@item N_SCCP_NPLAN_GENERIC
+Generic numbering plan.
+@item N_SCCP_NPLAN_DATA
+Data numbering plan (Recommendation X.121).
+@item N_SCCP_NPLAN_TELEX
+Telex numbering plan (Recommendation F.69).
+@item N_SCCP_NPLAN_MARITIME
+Maritime mobile numbering plan (Recommendations E.210, E.211).
+@item N_SCCP_NPLAN_LAND_MOBILE
+Land mobile numbering plan (Recommendation E.212).
+@item N_SCCP_NPLAN_ISDN_MOBILE
+ISDN/mobile numbering plan (Recommendation E.214).
+@item N_SCCP_NPLAN_PRIVATE
+Private network-specific numbering plan.
+@end table
+@item sccp_nai
+Specifies the nature of address indicator (NAI).
+@item sccp_alen
+Specifies the length of the address signals.
+@item sccp_addr
+Specifies the address signals.
+@end table
+
+@node Quality of Service
+@chapter Quality of Service
+
+@menu
+* SCCP Quality of Service Overview::
+* SCCP Quality of Service Formats::
+* NPI Connection Modes::
+@end menu
+
+@node SCCP Quality of Service Overview
+@section SCCP Quality of Service Overview
+
+@node SCCP Quality of Service Formats
+@section SCCP Quality of Service Formats
+
+The SCCP provides the following quality of service structures:
+
+@smallexample
+@verbatim
+typedef union {
+        np_ulong n_qos_type;
+        N_qos_sel_data_sccp_t sel_data;
+        N_qos_sel_conn_sccp_t sel_conn;
+        N_qos_sel_info_sccp_t sel_info;
+        N_qos_range_info_sccp_t range_info;
+        N_qos_sel_infr_sccp_t sel_infr;
+} N_qos_sccp_t;
+@end verbatim
+@end smallexample
+
+@page
+@subsection Data Quality of Service Selection
+
+Quality of Service parameters for data transmission are conveyed to the NSP using the
+@type{N_qos_sel_data_sccp_t} structure.  This data structure is used in conjunction with the
+@prim{N_OPTMGMT_REQ} primitive to alter the selected data options that will apply to subsequent
+@prim{N_UNITDATA_REQ} primitive data transmissions.@footnote{When altering the data transmission
+quality of service parameters, care should be taken to issue the @prim{N_OPTMGMT_REQ} primtive with
+a message type of @msg{M_PROTO} instead of @msg{M_PCPROTO} lest the options management primitive
+overtake data in the Stream that was to be transmitted with the old settings.}
+
+@menu
+* N_QOS_SEL_DATA_SCCP::
+@end menu
+
+@node N_QOS_SEL_DATA_SCCP
+@subsubsection N_QOS_SEL_DATA_SCCP
+
+@subsubheading Format
+The @type{N_qos_sel_data_sccp_t} structure is formatted as follows:
+@smallexample
+@verbatim
+#define N_QOS_SEL_DATA_SCCP     0x0901
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_DATA_SCCP */
+        np_ulong protocol_class;        /* protocol class */
+        np_ulong option_flags;          /* options flags (return option) */
+        np_ulong sequence_selection;    /* selected SLS value */
+        np_ulong message_priority;      /* MTP message priority */
+        np_ulong importance;            /* importance */
+} N_qos_sel_data_sccp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+@table @member
+@item n_qos_type
+Specifies or indicates the quality of service parameter structure type.  Always N_QOS_SEL_DATA_SCCP.
+@item protocol_class
+Specifies or indicates the protocol class of the data.  The @member{protocol_class} field can have
+one of the following values:
+@table @pval
+@item N_QOS_PCLASS_0
+Protocol class @samp{0}.
+@item N_QOS_PLCASS_1
+Protocol class @samp{1}.
+@end table
+@item option_flags
+Specifies or indicates the options flags associated with the data.  The @member{options_flags} field
+can be a bitwise OR of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option is not selected.
+@item 1
+Return on error option is selected.
+@end table
+@item sequence_selection
+Specifies or indicates the @dfn{Signalling Link Selection} associated with the transmitted or
+received data.
+@item message_priority
+Specifies or indicates the @dfn{Message Priority} associated with the transmitted or received data.
+@item importance
+Specifies or indicates the @dfn{Importance} associated with the transmitted or received data.
+@end table
+
+@page
+@subsection Connection Quality of Service Selection
+
+@menu
+* N_QOS_SEL_CONN_SCCP::
+@end menu
+
+@node N_QOS_SEL_CONN_SCCP
+@subsubsection N_QOS_SEL_CONN_SCCP
+
+@subsubheading Format
+The @type{N_qos_sel_conn_sccp_t} structure is formatted as follows:
+@smallexample
+@verbatim
+#define N_QOS_SEL_CONN_SCCP     0x0902
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_CONN_SCCP */
+        np_ulong protocol_class;        /* protocol class 2 or 3 */
+        np_ulong option_flags;          /* options flags (return option) */
+        np_ulong sequence_selection;    /* selected SLS value */
+        np_ulong message_priority;      /* MTP message priority */
+        np_ulong importance;            /* importance */
+} N_qos_sel_conn_sccp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+@table @member
+@item n_qos_type
+ always N_QOS_SEL_CONN_SCCP */
+@item protocol_class
+Specifies or indicates the protocol class associated with the connection request or indication.  The
+@member{protocol_class} field can have one of the following values:
+@table @pval
+@item N_QOS_PCLASS_2
+Protocol class @samp{2}.
+@item N_QOS_PCLASS_3
+Protocol class @samp{3}.
+@end table
+@item option_flags
+Specifies or indicates the options flags associated with the data.  The @member{options_flags} field
+can be a bitwise OR of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option is not selected.
+@item 1
+Return on error option is selected.
+@end table
+@item sequence_selection
+Specifies or indicates the @dfn{Signalling Link Selection} associated with the connection.
+@item message_priority
+Specifies or indicates the @dfn{Message Priority} associated with the connection.
+@item importance
+Specifies or indicates the @dfn{Importance} associated with the connection.
+@end table
+
+@page
+@subsection Information Quality of Service Selection and Range
+
+@menu
+* N_QOS_SEL_INFO_SCCP::
+* N_QOS_RANGE_INFO_SCCP::
+@end menu
+
+@node N_QOS_SEL_INFO_SCCP
+@subsubsection N_QOS_SEL_INFO_SCCP
+
+@subsubheading Format
+The @type{N_qos_sel_info_sccp_t} structure is formatted as follows:
+@smallexample
+@verbatim
+#define N_QOS_SEL_INFO_SCCP     0x0903
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_INFO_SCCP */
+        np_ulong protocol_class;        /* protocol class */
+        np_ulong option_flags;          /* options flags (return option) */
+        np_ulong sequence_selection;    /* selected SLS value */
+        np_ulong message_priority;      /* MTP message priority */
+        np_ulong importance;            /* importance */
+} N_qos_sel_info_sccp_t;
+@end verbatim
+@end smallexample
+
+@page
+@node N_QOS_RANGE_INFO_SCCP
+@subsubsection N_QOS_RANGE_INFO_SCCP
+
+@subsubheading Format
+The @type{N_qos_range_info_sccp_t} structure is formatted as follows:
+@smallexample
+@verbatim
+#define N_QOS_RANGE_INFO_SCCP   0x0904
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_RANGE_INFO_SCCP */
+        np_ulong protocol_classes;      /* protocol class */
+        np_ulong sequence_selection;    /* SLS range */
+} N_qos_range_info_sccp_t;
+@end verbatim
+@end smallexample
+
+@page
+@subsection Information Quality of Service Indication
+
+@menu
+* N_QOS_SEL_INFR_SCCP::
+@end menu
+
+@node N_QOS_SEL_INFR_SCCP
+@subsubsection N_QOS_SEL_INFR_SCCP
+
+@subsubheading Format
+The @type{N_qos_sel_infr_sccp_t} structure is formatted as follows:
+@smallexample
+@verbatim
+#define N_QOS_SEL_INFR_SCCP     0x0905
+typedef struct {
+        np_ulong n_qos_type;            /* always N_QOS_SEL_INFR_SCCP */
+        np_ulong protocol_class;        /* protocol class */
+        np_ulong option_flags;          /* options flags (return option) */
+        np_ulong sequence_selection;    /* selected SLS value */
+        np_ulong message_priority;      /* MTP message priority */
+        np_ulong importance;            /* importance */
+} N_qos_sel_infr_sccp_t;
+@end verbatim
+@end smallexample
+
+@page
+@subsection Data Quality of Service Selection
+
+@subsubheading N_QOS_SEL_DATA_MTP
+
+This quality of service structure type is used when selecting quality of service parameters on a
+message by message basis with the @prim{N_OPTMGMT_REQ} primitive before issuing an N_DATA_REQ or
+@prim{N_UNITDATA_REQ} primitive.
+
+@subsubheading Format
+The @type{N_qos_sel_data_mtp_t} structure is formatted as follows:
+@smallexample
+@verbatim
+#define N_QOS_SEL_DATA_MTP      0x0801
+typedef struct {
+        ulong n_qos_type;               /* always N_QOS_SEL_DATA_MTP */
+        ulong sls;                      /* signalling link selection */
+        ulong mp;                       /* message priority */
+} N_qos_sel_data_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Specifies or indicates the quality of service structure type.  This field is always coded
+N_QOS_SEL_DATA_MTP.
+@item sls
+Specifies the value of the Signalling Link Selection field to use in outgoing SCCP messages, or
+indicates the value of the Signalling Link Selection field that was received in incoming SCCP
+messages.
+@item mp
+Specifies the value of the Messae Priority field to use in outgoing SCCP messages, or indicates the
+value of the Message Priority field that was received in incoming SCCP messages.
+@end table
+
+@page
+@subsubheading N_QOS_SEL_INFO_MTP
+
+This quality of service structure type is used when selecting quality of service parameters for
+information with the N_INFO_ACK primitive.
+
+@smallexample
+@verbatim
+#define N_QOS_SEL_INFO_MTP      0x0803
+typedef struct {
+        ulong n_qos_type;               /* always N_QOS_SEL_INFO_MTP */
+        ulong pvar;                     /* protocol variant */
+        ulong popt;                     /* protocol options */
+        ulong sls;                      /* signalling link selection */
+        ulong mp;                       /* message priority */
+} N_qos_sel_info_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Indicates the quality of service structure type.  This field is always coded N_QOS_SEL_INFO_MTP.
+@item pvar
+Indicates the SCCP protocol variant associated with the stream.
+@item popt
+Indicates the SCCP protocol options associated with the stream.
+@item sls
+Indicates the default Signalling Link Selection value to be used on outgoing messages not specifying
+a SLS value.
+@item mp
+Indicates the default Message Priority value to be used on outgoing messages not specifying a MP
+value.
+@end table
+
+@page
+@subsubsection Information Quality of Service Range
+
+@subsubheading N_QOS_RANGE_INFO_MTP
+
+This quality of service structure type is used when indicating the range quality of service
+parameters for information with the N_INFO_ACK primitive.
+
+@subsubheading Format
+
+@smallexample
+@verbatim
+#define N_QOS_RANGE_INFO_MTP    0x0804
+typedef struct {
+        ulong n_qos_type;               /* always N_QOS_RANGE_INFO_MTP */
+        ulong sls_range;                /* signalling link selection mask */
+        ulong mp_range;                 /* message priority mask */
+} N_qos_range_info_mtp_t;
+@end verbatim
+@end smallexample
+
+@subsubheading Fields
+
+@table @member
+@item n_qos_type
+Indicates the quality of service structure type.  This field is always coded N_QOS_RANGE_INFO_MTP.
+@item sls_range
+Indicates a bit mask that indicates the range of the SLS field.
+@item mp_range
+Indicates a bit mask that indicates the range of the MP field.
+@end table
+
+@node NPI Connection Modes
+@section NPI Connection Modes
+
+@node Supported Services
+@chapter Supported Services
+
+@menu
+* Local Management Services::
+* Connection-Oriented Mode Services::
+* Connectionless Mode Services::
+* SCCP Management Services::
+@end menu
+
+@node Local Management Services
+@section Local Management Services
+
+@menu
+* Acknowledgement Service::
+* Information Service::
+* Options Management Service::
+* Bind Service::
+@end menu
+
+@node Acknowledgement Service
+@subsection Acknowledgement Service
+
+The NPI acknowledgement service is supported unchanged.
+
+@node Information Service
+@subsection Information Service
+
+The NPI information service is supported unchanged.
+
+@node Options Management Service
+@subsection Options Management Service
+
+The NPI options management service is supported unchanged.  The NPI-SCCP supports the Quality of
+Service structure types described under @ref{Quality of Service}.
+
+@node Bind Service
+@subsection Bind Service
+
+The NPI bind service is supported with minor alterations as follows:
+
+@enumerate
+@item For the protocol addresses supported by NPI-SCCP, see @ref{Protocol Addressing}.
+@item SCCP provides both a connection-less and connection-oriented mode service.  When binding an
+SCCP address, is is necessary to specify whether the bind is to the connection-less or
+connection-oriented mode service.  For the services supported by an SCCP provider,
+@pxref{N_INFO_ACK,,N_INFO_ACK}.  For alterations to the bind service, see @ref{N_BIND_REQ,,N_BIND_REQ}.
+@end enumerate
+
+@node Connection-Oriented Mode Services
+@section Connection-Oriented Mode Services
+
+NPI-SCCP supports connection-oriented modes services for temporary and permanent signalling
+connections for SCCP Protocol Classes 2 and 3.  An SCCP provider conforming to this specification
+may also, as an implementation option, provide support for a pseudo-connection-oriented service for
+SCCP Protocol Classes 0 and 1.
+
+@menu
+* Signalling Connection Establishment Service::
+* Signalling Connection Request Service::
+* Normal Data Transfer Service::
+* Expedited Data Transfer Service::
+* Reset Service::
+* Inform Service::
+* Signalling Connection Release Service::
+@end menu
+
+@node Signalling Connection Establishment Service
+@subsection Signalling Connection Establishment Service
+
+@subsubheading N-CONNECT
+
+The SCCP signalling connection establishment service offered by the @dfn{N-CONNECT} primitives of
+ITU-T Recommendation Q.711 are provided directly by the @prim{N_CONN_REQ}, @prim{N_CONN_IND},
+@prim{N_CONN_RES} and @prim{N_CONN_CON} primitives of the NPI.  NPI-SCCP defines some additional
+connection flags for use in these primitives and defines the Quality of Service parameter structures
+in @ref{Quality of Service}.
+
+As is the fashion for NPI, some of the addresses (called address, calling address or responding
+address) are implied by the address that is bound to the Stream with the bind service.
+
+@node Signalling Connection Request Service
+@subsection Signalling Connection Request Service
+
+@subsubheading N-REQUEST, N-REPLY
+
+The SCCP connection request service for embedded ISUP Type 1 and Type 2 requests is supported in the
+NPI by overloading the @prim{N_CONN_REQ} and @prim{N_INFO_ACK} primitives.
+
+The @prim{N_CONN_REQ} primitive is used to implement the @dfn{N-REQUEST request} and @dfn{N-REQUEST2
+request} of the SCCP as described in ITU-T Recommendation Q.711, by adding an addition flag to the
+@parm{CONN_flags} field in the @prim{N_CONN_REQ} primitive to specify that an @dfn{N-REQUEST} is to
+be performed instead of an @dfn{N-CONNECT}.
+
+The @prim{N_INFO_ACK} primitive can then be used to implement the @dfn{N-REPLY} primitive of ITU-T
+Recommendation Q.711 by obtaining the reply information in the @parm{QOS_length} and
+@parm{QOS_offset} fields of the primitive.  A Quality of Service parameter structure type supporting
+the reply information is defined in @ref{Quality of Service}.
+
+For alterations to the @prim{N_CONN_REQ} primitive, see @ref{N_CONN_REQ,,N_CONN_REQ}.  For
+alterations to the @prim{N_INFO_ACK} primitive, see @ref{N_INFO_ACK,,N_INFO_ACK}.
+
+@node Normal Data Transfer Service
+@subsection Normal Data Transfer Service
+
+@subsubheading N-DATA
+
+The normal data transfer service is implemented largely unaltered.  However, the SCCP @dfn{N-DATA
+request} primitive requires the ability to specify the @dfn{importance} parameter for the primitive.
+NPI-SCCP accomplishes this in two ways: one by overloading the @parm{DATA_xfer_flags} field of the
+@dfn{N_DATA_REQ} primitive, and another by providing a Quality of Service parameter for use as a
+default if the flags are not specified. @xref{N_DATA_REQ,,N_DATA_REQ}.
+
+@node Expedited Data Transfer Service
+@subsection Expedited Data Transfer Service
+
+@subsubheading N-EXPEDITED-DATA
+
+SCCP only supports the expedited data transfer service in SCCP Protocol Class 3.  However, for SCCP
+Protocol Class 3 operation, the service is implemented largely unaltered.
+@xref{N_EXDATA_REQ,,N_EXDATA_REQ}.  Although SCCP does support the negotiation of SCCP Protocol
+Class, it does not support the separate end-to-end negotiation of expedited data selection.
+@xref{N_CONN_REQ,,N_CONN_REQ}, and @ref{N_INFO_ACK,,N_INFO_ACK}.
+
+@node Reset Service
+@subsection Reset Service
+
+@subsubheading N-RESET
+
+SCCP only supports the reset service in SCCP Protocol Class 3.  In SCCP Protocol Class 2 an attempt
+to reset the connection with an @dfn{N-RESET request} will result in an @dfn{N-DISCONNECT indication}.
+Otherwise, the NPI reset service is implemented largely unaltered.
+
+@node Inform Service
+@subsection Inform Service
+
+@subsubheading N-INFORM
+
+SCCP supports the inform service for connection-oriented protocol classes (2 and 3).  The inform
+service can be used to communicate changes in SCCP user or provider failure, congestion or
+anticipated Quality of Service for a given connection.
+
+Under NPI-SCCP, the @dfn{N-INFORM request} primitive is issued by the SCCP user to inform the SCCP
+provider of a change in SCCP user failure, congestion or change in Quality of Service.  The
+@dfn{N-INFORM indication} primitive is issued by the SCCP provider to inform the SCCP user of a
+change in SCCP provider failure, congestion or change in Quality of Service.
+
+The SCCP inform service can be overloaded on top of the NPI reset and option management services.  A
+specialize set of @parm{RESET_reason} values are provided for this purpose.
+
+@node Signalling Connection Release Service
+@subsection Signalling Connection Release Service
+
+@subsubheading N-DISCONNECT
+
+The NPI disconnect service supports the SCCP signalling connection release service largely unaltered
+and the SCCP @dfn{N-DISCONNECT} primitives map directly onto those of NPI.
+
+@node Connectionless Mode Services
+@section Connectionless Mode Services
+
+@menu
+* Unit Data Transfer Service::
+* Notice Service::
+@end menu
+
+@node Unit Data Transfer Service
+@subsection Unit Data Transfer Service
+
+@subsubheading N-UNIT-DATA
+
+The NPI unit data transfer service supports the SCCP unit data transfer service largely unaltered.
+The SCCP @dfn{N-UNIT-DATA request} primitive requires the ability to specify options and Quality of
+Service parameters that are not provided for directly in the @prim{N_UNITDATA_REQ} primitive.  The
+@cite{OpenSS7 Project} overloads the @parm{RESERVED_length} fields of the @prim{N_UNITDATA_REQ}
+as @parm{QOS_length} and @parm{QOS_offset} fields for passing Quality of Service parameters and
+options with the request.
+
+@node Notice Service
+@subsection Notice Service
+
+@subsubheading N-NOTICE
+
+@node SCCP Management Services
+@section SCCP Management Services
+
+@menu
+* User Status Service::
+* Signalling Point Status Service::
+* Coordination Service::
+@end menu
+
+@node User Status Service
+@subsection User Status Service
+
+@subsubheading N-STATE
+
+@node Signalling Point Status Service
+@subsection Signalling Point Status Service
+
+@subsubheading N-PCSTATE
+
+@node Coordination Service
+@subsection Coordination Service
+
+@subsubheading N-COORD
+
+@node Rules for Conformance
+@chapter Rules for Conformance
+
+@menu
+* Local Management Primitives::
+* CONS Connection Establishment::
+* CONS Normal Data Transfer::
+* CONS Receipt Confirmation Service::
+* CONS Expedited Data Transfer Service::
+* CONS Reset Service::
+* CONS Network Connection Release::
+* CLNS::
+@end menu
+
+@node Local Management Primitives
+@section Local Management Primitives
+
+@menu
+* N_INFO_REQ::
+* N_INFO_ACK::
+* N_BIND_REQ::
+* N_BIND_ACK::
+* N_UNBIND_REQ::
+* N_OPTMGMT_REQ::
+* N_ERROR_ACK::
+* N_OK_ACK::
+@end menu
+
+@node N_INFO_REQ
+@subsection N_INFO_REQ
+
+@page
+@node N_INFO_ACK
+@subsection N_INFO_ACK
+
+@unnumberedsubsubsec Parameters
+
+@table @parm
+@item NSDU_size
+Indicates the maximum size of the Network Service Data Unit in octets.
+@item ENSDU_size
+Indicates the maximum size of the Expedited Network Service Data Unit in octets.
+@item CDATA_size
+Indicates the maximum size of data included in the @prim{N_CONN_REQ}, @prim{N_CONN_IND},
+@prim{N_CONN_RES} and @prim{N_CONN_CON} primitives.
+@item DDATA_size
+Indicates the maximum size of data included in the @prim{N_DISCON_REQ} or @prim{N_DISCON_IND}
+primitives.
+@item ADDR_size
+Indicates the maximum size of an address.  This is the size of the @type{sockaddr_sccp} structure.
+@item ADDR_length
+Indicates the length of the associated protocol address.
+@item ADDR_offset
+Indicates the offset of the associated protocol address from the beginning of the @msg{M_PCPROTO}
+message block.
+@item QOS_length
+Indicates the length of the selected quality of service parameters.
+@item QOS_offset
+Indicates the offset of the selected quality of service parameters from the beginning of the
+@msg{M_PCPROTO} message block.
+@item QOS_range_length
+Indicates the length of the range of quality of service parameters.
+@item QOS_range_offset
+Indicates the offset of the range of quality of service parameters from the beginning of the
+@msg{M_PCPROTO} message block.
+@item OPTIONS_flags
+Indicates the options flags.
+@item NIDU_size
+Indicates the maximum size of the Network Interface Data Unit in octets.
+@item SERV_type
+Indicates the service type.  The service type can be one of the following:
+@table @pval
+@item CLNS
+Indicates that the NSP is in Connection-less mode for the current Stream.
+@item CONS
+Indicates that the NSP is in Connection-oriented mode for the current Stream.
+@end table
+@item CURRENT_state
+Indicates the current state of the NSP.  The current states can be one of the following:
+@table @psta
+@item NS_UNBND
+Indicates that the interface is not bound to a network address.
+@item NS_WACK_BREQ
+Indicates that the interface is pending local acknowledgment for an @prim{N_BIND_REQ} primitive.
+@item NS_WACK_UREQ
+Indicates that the interface is pending local acknowledgment for an @prim{N_UNBIND_REQ} primitive.
+@item NS_IDLE
+Indicates that the interface is idle.
+@item NS_WACK_OPTREQ
+Indicates that the interface is pending local acknowledgment for an @prim{N_OPTMGMT_REQ} primitive.
+@item NS_WACK_RRES
+Indicates that the interface is pending local acknowledgment for an @prim{N_RESET_RES} primitive.
+@item NS_WCON_CREQ
+Indicates that the interface is awaiting confirmation of an @prim{N_CONN_REQ} primitive.
+@item NS_WRES_CIND
+Indicates that the interface is awaiting response to an outstanding @prim{N_CONN_IND} primitive.
+@item NS_WACK_CRES
+Indicates that the interface is pending local acknowledgment for an @prim{N_CONN_RES} primitive.
+@item NS_DATA_XFER
+Indicates that the interface is in data transfer.
+@item NS_WCON_RREQ
+Indicates that the interface is awaiting confirmation to an outstanding @prim{N_RESET_REQ}
+primitive.
+@item NS_WRES_RIND
+Indicates that the interface is awaiting response to an outstanding @prim{N_RESET_IND} primitive.
+@item NS_WACK_DREQ6
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WRES_RIND} state.
+@item NS_WACK_DREQ7
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WRES_CIND} state.
+@item NS_WACK_DREQ9
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_DATA_XFER} state.
+@item NS_WACK_DREQ10
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WCON_RREQ} state.
+@item NS_WACK_DREQ11
+Indicates that the interface is pending local acknowledgment for an @prim{N_DISCON_REQ} primitive
+and was previously in the @psta{NS_WRES_RIND} state.
+@end table
+@item PROVIDER_type
+Indicates the type of NS provider.  The value of this field can be one of the following:
+@table @pval
+@item N_SNICFP
+The provider is a subnetwork independent convergence function/protocol sub-layer of the network
+layer.
+@item N_SUBNET
+The provider is a subnetwork.
+@end table
+@item NODU_size
+Indicates the Network Optimal Data Unit size in octets.
+@item PROTOID_length
+Indicates the length of the bound protocol identifiers.
+@item PROTOID_offset
+Indicates the offset of the bound protocol identifiers from the beginning of the @msg{M_PCPROTO}
+message block.
+@item NPI_version
+Indicates the version of the NPI interface.
+@end table
+
+@unnumberedsubsubsec Rules
+
+@b{Rules for sizes:}
+
+@enumerate
+@item
+SCCP conforming NSP will return a value of @pval{N_INVALID} (@samp{-1UL}) for the @parm{ETSDU_size}
+data size, indicating that the NSP does not support expedited data transfer.
+@item
+SCCP conforming NSP will return the same defined value in the @parm{NSDU_size}, @parm{CDATA_size}
+and @parm{DDATA_size} fields.  This value is the maximum size of a NSU SDU that can be guaranteed
+transferred by the NSP.  The exact value of these fields will depend on the signalling links
+supported by the SCCP provider.
+@item
+SCCP conforming NSP will return zero (@samp{0}), @pval{N_INVALID} (@samp{-1UL}) or the same value as
+@parm{NSDU_size} in the @parm{CDATA_size} and field.  When the SCCP provider returns a value of zero
+(@samp{0}) or @pval{N_INVALID} (@samp{-1UL}) for @parm{CDATA_size}, it is indicating that connection
+data is not permitted with the @prim{N_CONN_REQ} primitive.  When the SCCP provider returns the same
+value as @parm{NSDU_size}, it is indicating that normal data is permitted with the @prim{N_CONN_REQ}
+primitive.
+@item
+SCCP conforming NSP will return zero (@samp{0}), @pval{N_INVALID} (@samp{-1UL}) or the same value as
+@parm{NSDU_size} in the @parm{DDATA_size} and field.  When the SCCP provider returns a value of zero
+(@samp{0}) or @pval{N_INVALID} (@samp{-1UL}) for @parm{DDATA_size}, it is indicating that
+disconnection data is not permitted with the @prim{N_DISCON_REQ} primitive.  When the SCCP provider
+returns the same value as @parm{NSDU_size}, it is indicating that normal data is permitted with the
+@prim{N_DISCON_REQ} primitive.
+@item
+SCCP conforming NSP will return a value in the @parm{NIDU_size} field that is less than or equal to
+the @parm{NSDU_size} field, but must not be set to @pval{N_INVALID} (@samp{-1UL}) or zero
+(@samp{0}).@footnote{Typically, the @parm{NIDU_size} will be the same value of the @parm{NSDU_size}
+for normal SS7 links.  For ATM and High-Speed SS7 liks, the @parm{NIDU_size} will typically be
+smaller than the @parm{NSDU_size} when the maximum SIF size supported by the link is greater than
+the maximum size of an M_DATA message block.}
+@item
+SCCP conforming NSP will return a value in the @parm{NODU_size} field that is less than or equal to
+the @parm{NSDU_size} field, but must not be set to @pval{N_INVALID} (@samp{-1UL}) or zero
+(@samp{0}).@footnote{Typically the @parm{NODU_size} field will be equal to the @parm{NIDU_size}
+field.}
+@item
+SCCP conforming NSP will return the size of the sockaddr structure in the @parm{ADDR_size} field.
+@end enumerate
+
+@b{Rules for provider type:}
+
+@enumerate
+@item
+When the stream is bound and @pval{MTP_CONNECTION_ORIENTED} or @pval{MTP_CONNECTIONLESS} flags were
+set in the @prim{N_BIND_REQ}, the service type will be set according to the requested service type.
+(See @ref{N_BIND_REQ} and @ref{N_BIND_ACK}.)
+@item
+When neither @pval{MTP_CONNECTION_ORIENTED} nor @pval{MTP_CONNECTIONLESS} flags are set in the
+@prim{N_BIND_REQ}, or the stream is unbound, the SCCP conforming NSP will return a service type of
+@pval{CLNS} when bound to non-call-related SCCP Users.  The SCCP conforming NSP will return a
+service type of @pval{CLNS} for the following SCCP Users:
+@itemize @bullet
+@item
+SCCP---Signalling Connection Control Part
+@item
+MTUP---SCCP Test User Part
+@item
+GCP---Gateway Control Protocol
+@item
+Any other non-call-related SCCP User specified by the appropriate specification.
+@end itemize
+@item
+When neither @pval{MTP_CONNECTION_ORIENTED} nor @pval{MTP_CONNECTIONLESS} flags are set in the
+@prim{N_BIND_REQ}, or the stream is unbound, the SCCP conforming NSP will return a service type of CONS
+when bound to call related SCCP Users.  The SCCP conforming NSP will return a service type of CONS
+for the following SCCP Users:
+@itemize @bullet
+@item
+TUP---Telephone User Part
+@item
+NUP---Network User Part
+@item
+ISUP---ISDN User Part
+@item
+DUP---Data User Part
+@item
+B-ISDN---Broadband ISDN User Part
+@item
+S-ISDN---Satellite ISDN User Part
+@item
+SPNE UP---Signal Processing Network Equipment User Part
+@item
+AAL2 STC---AAL Type 2 STC
+@item
+BICC---Bearer Independent Call Control
+@item
+Any other call-related SCCP User specified by the appropriate specification.
+@end itemize
+@item
+SCCP conforming NSP will not return a service type of COTS_ORD.
+@end enumerate
+
+@b{Rules for flags:}
+
+@enumerate
+@item
+Because the SCCP does not support receipt confirmation, the SCCP conforming NSP will not set the
+@pval{REC_CONF_OPT} flag in the @parm{OPTIONS_flags} field.
+@item
+Because the SCCP does not support expedited data, the SCCP conforming NSP will not set the
+@pval{EX_DATA_OPT} flag in the @parm{OPTIONS_flags} field.
+@end enumerate
+
+@b{Rules for states:}
+
+@enumerate
+@item
+Because SCCP only supports pseudo-connections, the SCCP conforming NSP will never return a
+@parm{CURRENT_state} of @psta{NS_WRES_CIND}, @psta{NS_WACK_CRES}, @psta{NS_WACK_DREQ6},
+@psta{NS_WACK_DREQ7} or @psta{NS_WACK_DREQ11}.
+@item
+Because SCCP does not support the reset service from the SCCP-User, the SCCP conforming NSP will
+never return a @parm{CURRENT_state} of @psta{NS_WCON_RREQ}.
+@end enumerate
+
+@b{Rules for Quality of Service Parameters:}
+
+@enumerate
+@item
+SCCP conforming NSP will retrun an @pval{N_QOS_SEL_INFO_MTP} structure indicated in the
+@parm{QOS_length} and @parm{QOS_offset} fields.
+@item
+SCCP conforming NSP will return an @pval{N_QOS_RANGE_INFO_MTP} structure indicated in the
+@parm{QOS_range_length} and @parm{QOS_range_offset} fields.
+@end enumerate
+
+@page
+@node N_BIND_REQ
+@subsection N_BIND_REQ
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_BIND_ACK
+@subsection N_BIND_ACK
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_UNBIND_REQ
+@subsection N_UNBIND_REQ
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_OPTMGMT_REQ
+@subsection N_OPTMGMT_REQ
+
+@unnumberedsubsubsec Parameters
+@table @parm
+@item QOS_length
+Specifies the length of the Quality of Service Parameter values.
+@item QOS_offset
+Specifies the offset of the Quality of Service Parameter values from the beginning of the
+@msg{M_PROTO} or @msg{M_PCPROTO} message block.
+@item OPTMGMT_flags
+Specifies the options management flags associated with the request (see ``Flags'' below).
+@end table
+
+@unnumberedsubsubsec Flags
+@table @pval
+@item DEFAULT_RC_SEL
+Specifies if default receipt confirmation is selected.
+@end table
+
+@unnumberedsubsubsec Quality of Service Parameters
+@table @member
+@item n_qos_type
+Specifies the QOS structure type.  For the @prim{N_OPTMGMT_REQ} primitive, the SCCP conforming NSP
+will demand a structure type of @pval{N_QOS_SEL_DATA_SCCP}.
+@item protocol_class
+Specifies or indicates the protocol class of the data.  The @member{protocol_class} field can have
+one of the following values:
+@table @pval
+@item N_QOS_PCLASS_0
+Protocol class @samp{0}.
+@item N_QOS_PLCASS_1
+Protocol class @samp{1}.
+@end table
+@item option_flags
+Specifies or indicates the options flags associated with the data.  The @member{options_flags} field
+can be a bitwise OR of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option is not selected.
+@item 1
+Return on error option is selected.
+@end table
+@item sequence_selection
+Specifies or indicates the @dfn{Signalling Link Selection} associated with the transmitted or
+received data.
+@item message_priority
+Specifies or indicates the @dfn{Message Priority} associated with the transmitted or received data.
+@item importance
+Specifies or indicates the @dfn{Importance} associated with the transmitted or received data.
+@end table
+
+@unnumberedsubsubsec Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+When the purpose of issuing the primtiive is for the NSU to set the QOS parameters for all
+subsequently queued data transmissions, the primitive should be issued as an @msg{M_PROTO} message,
+and the issuer must await acknowledgement before issuing any other primitives.
+@item
+When the purpose of issuing the primitive is for the NSU to set the QOS parameters for all data
+transmissions (including those in queue), the primitive should be issued as an @msg{M_PCPROTO}
+message, and the issuer must await acknowledgement before issuing any other primitives.
+@end enumerate
+
+@b{Rules for QOS parameters:}
+
+@enumerate
+@item
+The QOS parameters use for any subsequent @prim{N_DATA_REQ} or @prim{N_UNITDATA_REQ} primitive will
+be the values set with the @prim{N_OPTMGMT_REQ} primitive.
+@item
+For the @member{message_priority} QOS parameter to have any effect, the NSU must be bound to a
+Stream supporting a protocol variant that provides for @dfn{Message Priority} (e.g. ANSI
+@ref{T1.111,,T1.111}.)
+@item
+Options for data transfer set with this primitive will only be valid for request or indication
+primitives issued after this primitive is successfully acknowledged.
+@end enumerate
+
+@page
+@node N_ERROR_ACK
+@subsection N_ERROR_ACK
+
+@unnumberedsubsubsec Parameters
+@multitable @columnfractions .2 .8
+@item @parm{ERROR_prim} @tab
+Indicates the primitive that was in error.
+@item @parm{NPI_error} @tab
+Indicates the NPI error that occurred.
+@item @parm{UNIX_error} @tab
+When @parm{NPI_error} is @perr{NSYSERR}, @parm{UNIX_error} indicates the UNIX system error that
+occurred.
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@b{Rules for error primitive:}
+@enumerate
+@item
+NPI-SCCP extends the error primitives that can be indicated in the @parm{ERROR_prim} field of the
+@prim{N_ERROR_ACK} primitive.  The @parm{ERROR_prim} field can include the following additional
+values:
+@multitable @columnfractions .2 .8
+@item @prim{N_INFORM_REQ} @tab Inform request. (@xref{N_INFORM_REQ,,N_INFORM_REQ}.)
+@item @prim{N_COORD_REQ} @tab Coordinate request. (@xref{N_COORD_REQ,,N_COORD_REQ}.)
+@item @prim{N_COORD_RES} @tab Coordinate response. (@xref{N_COORD_RES,,N_COORD_RES}.)
+@item @prim{N_STATE_REQ} @tab State request. (@xref{N_STATE_REQ,,N_STATE_REQ}.)
+@end multitable
+@item
+In addition, the SCCP conforming NSP may issue an @prim{N_ERROR_ACK} primitive with a value in the
+@parm{ERROR_prim} field as follows:
+@multitable @columnfractions .2 .8
+@item @prim{N_NOTICE_IND} @tab Notice indication. (@xref{N_NOTICE_IND,,N_NOTICE_IND}.)
+@item @prim{N_INFORM_IND} @tab Inform indication. (@xref{N_INFORM_IND,,N_INFORM_IND}.)
+@item @prim{N_COORD_IND} @tab Coordinate indication. (@xref{N_COORD_IND,,N_COORD_IND}.)
+@item @prim{N_COORD_CON} @tab Coordinate confirmation. (@xref{N_COORD_CON,,N_COORD_CON}.)
+@item @prim{N_STATE_IND} @tab State indication. (@xref{N_STATE_IND,,N_STATE_IND}.)
+@item @prim{N_PCSTATE_IND} @tab Point Code State indication. (@xref{N_PCSTATE_IND,,N_PCSTATE_IND}.)
+@item @prim{N_TRAFFIC_IND} @tab Traffic indication. (@xref{N_TRAFFIC_IND,,N_TRAFFIC_IND}.)
+@end multitable
+@end enumerate
+
+@b{Rules for issuing primitive:}
+@enumerate
+@item
+The rules for issuing the @prim{N_ERROR_ACK} primitive are the same as in the NPI (@ref{NPI,,NPI}).
+@item
+The @prim{N_ERROR_ACK} primitive can also be issued under the circumstances described under
+@ref{Extension Primitives}.  In these situations, the primitive will have one of the
+extended @parm{ERROR_prim} values described above.
+@end enumerate
+
+@page
+@node N_OK_ACK
+@subsection N_OK_ACK
+
+@unnumberedsubsubsec Parameters
+@multitable @columnfractions .2 .8
+@item @parm{CORRECT_prim} @tab
+Indicates the primitive that was received successfully.
+@end multitable
+
+@unnumberedsubsubsec Rules
+@b{Rules for correct primitive:}
+@enumerate
+@item
+NPI-SCCP extends the correct primitives that can be indicated in the @parm{CORRECT_prim} field of
+the @prim{N_OK_ACK} primitive.  The @parm{CORRECT_prim} field can include the following additional
+values:
+@multitable @columnfractions .2 .8
+@item @prim{N_INFORM_REQ} @tab Inform request. (@xref{N_INFORM_REQ,,N_INFORM_REQ}.)
+@item @prim{N_COORD_REQ} @tab Coordinate request. (@xref{N_COORD_REQ,,N_COORD_REQ}.)
+@item @prim{N_COORD_RES} @tab Coordinate response. (@xref{N_COORD_RES,,N_COORD_RES}.)
+@item @prim{N_STATE_REQ} @tab State request. (@xref{N_STATE_REQ,,N_STATE_REQ}.)
+@end multitable
+@end enumerate
+
+@b{Rules for issuing primitive:}
+@enumerate
+@item
+The rules for issuing the @prim{N_OK_ACK} primitive are the same as in the NPI (@ref{NPI,,NPI}).
+@item
+The @prim{N_OK_ACK} primitive can also be issued under the circumstances described under
+@ref{Extension Primitives}.  In these situations, the primitive will have one of the
+extended @parm{CORRECT_prim} values described above.
+@end enumerate
+
+@page
+@node CONS Connection Establishment
+@section CONS Connection Establishment
+
+@menu
+* N_CONN_REQ::
+* N_CONN_IND::
+* N_CONN_RES::
+* N_CONN_CON::
+@end menu
+
+@node N_CONN_REQ
+@subsection N_CONN_REQ
+
+The @prim{N_CONN_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711 N-CONNECT
+request} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{DEST_length} @tab
+Specifies the length of the destination address.
+@item @parm{DEST_offset} @tab
+Specifies the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{CONN_flags} @tab
+Specifies the connection option flags.  (See ``Flags'' below.)
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@unnumberedsubsubsec Flags
+
+@multitable @columnfractions .2 .8
+@item @pval{REC_CONF_OPT} @tab
+Specifies that the receipt confirmation option is to be selected on the connection.
+@item @pval{EX_DATA_OPT} @tab
+Sepcifies that the expedited data option is to be selected on the connection.
+@end multitable
+
+@unnumberedsubsubsec Quality of Service Parameters
+
+@multitable @columnfractions .2 .8
+@item @member{n_qos_type} @tab
+Specifies the type of Quality of Service parameter structure to use.  Always
+@pval{N_QOS_SEL_CONN_SCCP}.
+@item @member{protocol_class} @tab
+Specifies the protocol class.  This field can be one of the following values:
+@table @pval
+@item N_QOS_PCLASS_0
+Specifies protocol class 0 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_1
+Specifies protocol class 1 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_2
+Specifies protocol class 2 (connection-oriented mode without flow control or expedited data.)
+@item N_QOS_PCLASS_3
+Specifies protocol class 3 (connection-oriented mode with flow control and supporting expedited
+data.)
+@end table
+@item @member{option_flags} @tab
+Specifies or indicates the options flags for the connection.  The @member{option_flags} field can be
+a bitwise OR of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option is not selected.
+@item 1
+Return on error option is selected.
+@end table
+@item @member{sequence_selection} @tab
+Specifies the @dfn{Signalling Link Selection} associated with the connection.
+@item @member{message_priority} @tab
+Specifies the @dfn{Message Priority} associated with the connection.
+@item @member{importance} @tab
+Specifies the @dfn{Importance} associated with the connection.
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+Because the source address is implied by the Stream upon which the primitive is issued, the Stream
+must be bound to a specific SCCP address and not bound with the @pval{DEFAULT_LISTENER} flag set in
+the @prim{N_BIND_REQ} primitive.
+@end enumerate
+
+@b{Rules for flags:}
+
+@enumerate
+@item
+SCCP does not support receipt confirmation; therefore, it is an error to specify the
+@pval{REC_CONF_OPT} option in @parm{CONN_flags}.  The SCCP conforming provider is permitted to
+ignore this flag.
+@item
+SCCP only supports expedited data in protocol class 3; therefore, it is an error to specify the
+@pval{EX_DATA_OPT} option in @parm{CONN_flags} unless the @member{protocol_class} indicated in the
+Quality of Service parameters is @pval{N_QOS_PCLASS_3}.
+@item
+SCCP supports passing the @dfn{Importance} of the connection request.  This is passed in the
+connection flags using the @samp{N_SCCP_SET_IMPORTANCE(flags,importance)} macro.
+@end enumerate
+
+@b{Rules for Quality of Service parameters:}
+
+@enumerate
+@item
+Only one value can be set in @member{protocol_class}.  When set to @pval{N_QOS_PCLASS_0} or
+@pval{N_QOS_PCLASS_1}, the resulting connection will be a pseudo-connection-oriented protocol
+connection.  When set to @pval{N_QOS_PCLASS_2} or @pval{N_QOS_PCLASS_3}, the resulting connection
+will be a true connection-oriented protocol connection.
+@item
+Some SCCP providers may restrict the range of protocol classes that is available for connection.
+The range of protocol classes available for a connection request will be present in the
+@parm{QOS_range_length} and @parm{QOS_range_offset} fields of the @parm{N_INFO_ACK} primitive.  See
+@ref{N_INFO_ACK,,N_INFO_ACK},
+and @ref{N_QOS_RANGE_INFO_SCCP,,N_QOS_RANGE_INFO_SCCP}.
+@item
+For protocol class 2 or 3 connections, the @member{options_flags} field is coded zero (@samp{0}) or
+@pval{QOS_UNKNOWN} and is ignored by the provider.  For protocol class 0 or 1 pseudo-connections,
+this field can take on one of the values listed above, where: @samp{0} indicates that unit data
+messages are to be sent without the return on error options, and @samp{1} indicates that unit data
+messages are to be sent with the return on error option.
+@item
+The @member{sequence_selection} field is coded zero (@samp{0}) or @pval{QOS_UNKNOWN} and is ignored
+by the provider.  The @dfn{Signalling Link Selection} associated with the connection is selected by
+the provider.  For protocol class 0 pseudo-connections, an new @dfn{Signalling Link Selection} will
+be generated for each transmitted message.  For protocol class 1 pseudo-connections and protocol
+class 2 or 3  connection, a @dfn{Signalling Link Selection} will be assigned upon successful receipt
+of the connection request.
+@item
+The @member{message_priority} field is coded to the message priority that will be assigned to
+messages transmitted with the @prim{N_DATA_REQ} primitive.  The range of message priority that may
+be selected for a given connection is provided by the @parm{QOS_range_length} and
+@parm{QOS_range_offset} fields of the @prim{N_INFO_ACK} primitive.  See
+@ref{N_INFO_ACK,,N_INFO_ACK},
+and @ref{N_QOS_RANGE_INFO_SCCP,,N_QOS_RANGE_INFO_SCCP}.
+@item
+The @member{importance} field is coded to the importance that will be assigned to messages
+transmitted with the @prim{N_DATA_REQ} primitive when an importance is not provided in the
+@parm{DATA_xfer_flags} field of that primitive.  The range of importance that may be selected for a
+given connection is provided in the @parm{QOS_range_length} and @parm{QOS_range_offset} fields of
+the @prim{N_INFO_ACK} primitive.  See @ref{N_INFO_ACK,,N_INFO_ACK},
+and @ref{N_QOS_RANGE_INFO_SCCP,,N_QOS_RANGE_INFO_SCCP}.
+@end enumerate
+
+@b{Rules for data:}
+
+@enumerate
+@item
+SCCP does not have the same restriction on data associated with the connection request as does
+X.213 (which only allows 128 bytes of connection data).  The maximum amount of data that can be
+associated with the connection request is returned in the @parm{CDATA_size} field of the
+@prim{N_INFO_ACK} primitive.
+@end enumerate
+
+@page
+@node N_CONN_IND
+@subsection N_CONN_IND
+
+The @prim{N_CONN_IND} primitive is used to implement the @dfn{Q.711 N-CONNECT indication} primitive
+of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{DEST_length} @tab
+Indicates the length of the destination address.
+@item @parm{DEST_offset} @tab
+Indicates the offset of the destination address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SRC_length} @tab
+Indicates the length of the source address.
+@item @parm{SRC_offset} @tab
+Indicates the offset of the source address address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SEQ_number} @tab
+Indicates the sequence number identifying the outstanding connection indication.
+@item @parm{CONN_flags} @tab
+Indicates the connection options flags associated with the connection indication.
+@item @parm{QOS_length} @tab
+Indicates the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Indicates the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@unnumberedsubsubsec Quality of Service Parameters
+
+@multitable @columnfractions .2 .8
+@item @member{n_qos_type} @tab
+Indicates the type of Quality of Service parameter structure to use.  Always
+@pval{N_QOS_SEL_CONN_SCCP}.
+@item @member{protocol_class} @tab
+Indicates the protocol class.  This field can be one of the following values:
+@table @pval
+@item N_QOS_PCLASS_0
+Specifies protocol class 0 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_1
+Specifies protocol class 1 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_2
+Specifies protocol class 2 (connection-oriented mode without flow control or expedited data.)
+@item N_QOS_PCLASS_3
+Specifies protocol class 3 (connection-oriented mode with flow control and supporting expedited
+data.)
+@end table
+@item @member{option_flags} @tab
+Indicates the options flags for the connection.  The @member{option_flags} field can be a bitwise OR
+of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option was not selected.
+@item 1
+Return on error option was selected.
+@end table
+@item @member{sequence_selections} @tab
+Indicates the @dfn{Signalling Link Selection} associated with the connection.
+@item @member{message_priority} @tab
+Indicates the @dfn{Message Priority} associated with the connection.
+@item @member{importance} @tab
+Indicates the @dfn{Importance} associated with the connection.
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@page
+@node N_CONN_RES
+@subsection N_CONN_RES
+
+The @prim{N_CONN_RES} primitive is used by the NPI-SCCP to implement the @dfn{Q.711 N-CONNECT
+response} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{TOKEN_value} @tab
+Specifies the token value of the Stream upon which the connection is to be accepted, or zero
+(@samp{0}) when the connection is to be accepted on the same Stream as the connection indication
+(upon which the @prim{N_CONN_RES} primitive is issued).
+@item @parm{RES_length} @tab
+Specifies the length of the responding address.
+@item @parm{RES_offset} @tab
+Specifies the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{SEQ_number} @tab
+Specifies the sequence number of an outstanding connection indication and is used to identify the
+indictation to which this @prim{N_CONN_RES} pirmitive responds.
+@item @parm{CONN_flags} @tab
+Specifies the connection options flags associated with the accepted connection.
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@unnumberedsubsubsec Quality of Service Parameters
+
+@multitable @columnfractions .2 .8
+@item @member{n_qos_type} @tab
+Specifies the type of Quality of Service parameter structure to use.  Always
+@pval{N_QOS_SEL_CONN_SCCP}.
+@item @member{protocol_class} @tab
+Indicates the protocol class.  This field can be one of the following values:
+@table @pval
+@item N_QOS_PCLASS_0
+Specifies protocol class 0 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_1
+Specifies protocol class 1 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_2
+Specifies protocol class 2 (connection-oriented mode without flow control or expedited data.)
+@item N_QOS_PCLASS_3
+Specifies protocol class 3 (connection-oriented mode with flow control and supporting expedited
+data.)
+@end table
+@item @member{option_flags} @tab
+Indicates the options flags for the connection.  The @member{option_flags} field can be a bitwise OR
+of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option was not selected.
+@item 1
+Return on error option was selected.
+@end table
+@item @member{sequence_selections} @tab
+Indicates the @dfn{Signalling Link Selection} associated with the connection.
+@item @member{message_priority} @tab
+Indicates the @dfn{Message Priority} associated with the connection.
+@item @member{importance} @tab
+Indicates the @dfn{Importance} associated with the connection.
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@page
+@node N_CONN_CON
+@subsection N_CONN_CON
+
+The @prim{N_CONN_CONN} primitive is used by the NPI-SCCP to implement the @dfn{Q.711 N-CONNECT
+confirmation} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{RES_length} @tab
+Specifies the length of the responding address.
+@item @parm{RES_offset} @tab
+Specifies the offset of the responding address from the beginning of the @msg{M_PROTO} message
+block.
+@item @parm{CONN_flags} @tab
+Specifies the connection options flags associated with the accepted connection.
+@item @parm{QOS_length} @tab
+Specifies the length of the Quality of Service parameters.
+@item @parm{QOS_offset} @tab
+Specifies the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
+message block.
+@end multitable
+
+@unnumberedsubsubsec Quality of Service Parameters
+
+@multitable @columnfractions .2 .8
+@item @member{n_qos_type} @tab
+Indicates the type of Quality of Service parameter structure to use.  Always
+@pval{N_QOS_SEL_CONN_SCCP}.
+@item @member{protocol_class} @tab
+Indicates the protocol class.  This field can be one of the following values:
+@table @pval
+@item N_QOS_PCLASS_0
+Specifies protocol class 0 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_1
+Specifies protocol class 1 (pseudo-connection oriented mode).
+@item N_QOS_PCLASS_2
+Specifies protocol class 2 (connection-oriented mode without flow control or expedited data.)
+@item N_QOS_PCLASS_3
+Specifies protocol class 3 (connection-oriented mode with flow control and supporting expedited
+data.)
+@end table
+@item @member{option_flags} @tab
+Indicates the options flags for the connection.  The @member{option_flags} field can be a bitwise OR
+of zero or more of the following values:
+@table @pval
+@item 0
+Return on error option was not selected.
+@item 1
+Return on error option was selected.
+@end table
+@item @member{sequence_selections} @tab
+Indicates the @dfn{Signalling Link Selection} associated with the connection.
+@item @member{message_priority} @tab
+Indicates the @dfn{Message Priority} associated with the connection.
+@item @member{importance} @tab
+Indicates the @dfn{Importance} associated with the connection.
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@page
+@node CONS Normal Data Transfer
+@section CONS Normal Data Transfer
+
+@menu
+* N_DATA_REQ::
+* N_DATA_IND::
+@end menu
+
+@node N_DATA_REQ
+@subsection N_DATA_REQ
+
+The @prim{N_DATA_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711 N-DATA
+request} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{DATA_xfer_flags} @tab
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@page
+@node N_DATA_IND
+@subsection N_DATA_IND
+
+The @prim{N_DATA_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711 N-DATA
+indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{DATA_xfer_flags} @tab
+@end multitable
+
+@unnumberedsubsubsec Rules
+
+@page
+@node CONS Receipt Confirmation Service
+@section CONS Receipt Confirmation Service
+
+@menu
+* N_DATACK_REQ::
+* N_DATACK_IND::
+@end menu
+
+@node N_DATACK_REQ
+@subsection N_DATACK_REQ
+
+The @prim{N_DATACK_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-DATA-ACKNOWLEDGE request} primitive of the SCCP:
+
+@unnumberedsubsubsec Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+SCCP does not support receipt confirmation; therefore, this primitive is not supported by the SCCP
+conforming NSP.
+@end enumerate
+
+@page
+@node N_DATACK_IND
+@subsection N_DATACK_IND
+
+The @prim{N_DATACK_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-DATA-ACKNOWLEDGE indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Rules
+
+@b{Rules for issuing primitive:}
+
+@enumerate
+@item
+SCCP does not support receipt confirmation; therefore, this primitive is not supported by the SCCP
+conforming NSP and will never be issued by the SCCP conforming NSP.
+@end enumerate
+
+@page
+@node CONS Expedited Data Transfer Service
+@section CONS Expedited Data Transfer Service
+
+@menu
+* N_EXDATA_REQ::
+* N_EXDATA_IND::
+@end menu
+
+@node N_EXDATA_REQ
+@subsection N_EXDATA_REQ
+
+The @prim{N_EXDATA_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-EXPEDITED-DATA request} primitive of the SCCP:
+
+@unnumberedsubsubsec Rules
+
+@page
+@node N_EXDATA_IND
+@subsection N_EXDATA_IND
+
+The @prim{N_EXDATA_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-EXPEDITED-DATA indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Rules
+
+@page
+@node CONS Reset Service
+@section CONS Reset Service
+
+@menu
+* N_RESET_REQ::
+* N_RESET_IND::
+* N_RESET_RES::
+* N_RESET_CON::
+@end menu
+
+@node N_RESET_REQ
+@subsection N_RESET_REQ
+
+The @prim{N_RESET_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-RESET request} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{RESET_reason} @tab
+Specifies the cause of the reset.  (The source of the reset is always the Network Service User.)
+@end multitable
+
+@unnumberedsubsubsec Cause
+
+@table @pval
+@item N_SCCP_RESC_END_USER_ORIGINATED
+Reset by remote end user.
+@item N_SCCP_RESC_SCCP_USER_ORIGINATED
+Reset by remote SCCP.
+@item N_SCCP_RESC_MESSAGE_OUT_OF_ORDER_INCORRECT_PS
+Reset by local SCCP: message out of order: incorrect P(S).
+@item N_SCCP_RESC_MESSAGE_OUT_OF_ORDER_INCORRECT_PR
+Reset by local SCCP: message out of order: incorrect P(R).
+@item N_SCCP_RESC_REMOTE_PROC_ERROR_MESSAGE_OUT_OF_WINDOW
+Reset by local SCCP: remote procedure error: message out of window.
+@item N_SCCP_RESC_REMOTE_PROC_ERROR_INCORRECT_PS_AFTER_INIT
+Reset by local SCCP: remote procedure error: incorrect P(S) after initialization.
+@item N_SCCP_RESC_REMOTE_PROC_ERROR_GENERAL
+Reset by local SCCP: remote procedure error: general.
+@item N_SCCP_RESC_REMOTE_END_USER_OPERATIONAL
+Reset by local SCCP: remote end user operational.
+@item N_SCCP_RESC_NETWORK_OPERATIONAL
+Reset by local SCCP: network operational.
+@item N_SCCP_RESC_ACCESS_OPERATIONAL
+Reset by local SCCP: access operational.
+@item N_SCCP_RESC_NETWORK_CONGESTION
+Reset by local SCCP: network congestion.
+@item N_SCCP_RESC_NOT_OBTAINABLE
+Reset by local SCCP: not obtainable.
+@item N_SCCP_RESC_UNQUALIFIED
+Reset by local SCCP: unqualified.
+@end table
+@unnumberedsubsubsec Rules
+
+@page
+@node N_RESET_IND
+@subsection N_RESET_IND
+
+The @prim{N_RESET_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-RESET indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+
+@multitable @columnfractions .2 .8
+@item @parm{RESET_orig} @tab
+Indicates the source of the reset.
+@item @parm{RESET_reason} @tab
+Indicates the cause of the reset.
+@end multitable
+
+@unnumberedsubsubsec Cause
+@table @pval
+@item N_SCCP_RESC_END_USER_ORIGINATED
+Reset by remote end user.
+@item N_SCCP_RESC_SCCP_USER_ORIGINATED
+Reset by remote SCCP.
+@item N_SCCP_RESC_MESSAGE_OUT_OF_ORDER_INCORRECT_PS
+Reset by local SCCP: message out of order: incorrect P(S).
+@item N_SCCP_RESC_MESSAGE_OUT_OF_ORDER_INCORRECT_PR
+Reset by local SCCP: message out of order: incorrect P(R).
+@item N_SCCP_RESC_REMOTE_PROC_ERROR_MESSAGE_OUT_OF_WINDOW
+Reset by local SCCP: remote procedure error: message out of window.
+@item N_SCCP_RESC_REMOTE_PROC_ERROR_INCORRECT_PS_AFTER_INIT
+Reset by local SCCP: remote procedure error: incorrect P(S) after initialization.
+@item N_SCCP_RESC_REMOTE_PROC_ERROR_GENERAL
+Reset by local SCCP: remote procedure error: general.
+@item N_SCCP_RESC_REMOTE_END_USER_OPERATIONAL
+Reset by local SCCP: remote end user operational.
+@item N_SCCP_RESC_NETWORK_OPERATIONAL
+Reset by local SCCP: network operational.
+@item N_SCCP_RESC_ACCESS_OPERATIONAL
+Reset by local SCCP: access operational.
+@item N_SCCP_RESC_NETWORK_CONGESTION
+Reset by local SCCP: network congestion.
+@item N_SCCP_RESC_NOT_OBTAINABLE
+Reset by local SCCP: not obtainable.
+@item N_SCCP_RESC_UNQUALIFIED
+Reset by local SCCP: unqualified.
+@end table
+@unnumberedsubsubsec Rules
+
+@page
+@node N_RESET_RES
+@subsection N_RESET_RES
+
+The @prim{N_RESET_RES} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-RESET response} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_RESET_CON
+@subsection N_RESET_CON
+
+The @prim{N_RESET_CON} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-RESET confirmation} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node CONS Network Connection Release
+@section CONS Network Connection Release
+
+@menu
+* N_DISCON_REQ::
+* N_DISCON_IND::
+@end menu
+
+@node N_DISCON_REQ
+@subsection N_DISCON_REQ
+
+The @prim{N_DISCON_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-DISCONNECT request} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_DISCON_IND
+@subsection N_DISCON_IND
+
+The @prim{N_DISCON_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-DISCONNECT indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Release Causes
+@table @pval
+@item N_SCCP_RELC_END_USER_ORIGINATED
+Network connection released by remote SCCP: end user normal.
+@item N_SCCP_RELC_END_USER_BUSY
+Network connection released by remote SCCP: end user busy.
+@item N_SCCP_RELC_END_USER_FAILURE
+Network connection released by remote SCCP: end user failure.
+@item N_SCCP_RELC_SCCP_USER_ORIGINATED
+Network connection released by remote SCCP: SCCP user.
+@item N_SCCP_RELC_REMOTE_PROCEDURE_ERROR
+Network connection released by local SCCP: remote procedure error.
+@item N_SCCP_RELC_INCONSISTENT_CONNECTION_DATA
+Network connection released by local SCCP: inconsistent connection data from remote.
+@item N_SCCP_RELC_ACCESS_FAILURE
+Network connection released by local SCCP: remote access failure.
+@item N_SCCP_RELC_ACCESS_CONGESTION
+Network connection released by local SCCP: remote access congestion.
+@item N_SCCP_RELC_SUBSYSTEM_FAILURE
+Network connection released by local SCCP: remote subsystem failure.
+@item N_SCCP_RELC_SUBSYSTEM_CONGESTION
+Network connection released by local SCCP: remote subsystem congestion.
+@item N_SCCP_RELC_MTP_FAILURE
+Network connection released by local SCCP: MTP failure.
+@item N_SCCP_RELC_NETWORK_CONGESTION
+Network connection released by local SCCP: MTP network congestion.
+@item N_SCCP_RELC_EXPIRATION_OF_RESET_TIMER
+Network connection released by local SCCP: expiration of reset timer.
+@item N_SCCP_RELC_EXPIRATION_OF_RECEIVE_INACTIVITY_TIMER
+Network connection released by local SCCP: expiration of receive inactivity timer.
+@item N_SCCP_RELC_RESERVED
+Network connection released by local SCCP: reserved.
+@item N_SCCP_RELC_UNQUALIFIED
+Network connection released: unqualified.
+@item N_SCCP_RELC_SCCP_FAILURE
+Network connection released by local SCCP: remote SCCP failure.
+@end table
+@unnumberedsubsubsec Refusal Causes
+@table @pval
+@item N_SCCP_REFC_END_USER_ORIGINATED
+Network connection refused by remote end user.
+@item N_SCCP_REFC_END_USER_CONGESTION
+Network connection refused by remote SCCP: end user congestion.
+@item N_SCCP_REFC_END_USER_FAILURE
+Network connection refused by remote SCCP: end user failure.
+@item N_SCCP_REFC_SCCP_USER_ORIGINATED
+Network connection refused by remote SCCP: SCCP originated.
+@item N_SCCP_REFC_DESTINATION_ADDRESS_UNKNOWN
+Network connection refused by local SCCP: destination address unknown.
+@item N_SCCP_REFC_DESTINATION_INACCESSIBLE
+Network connection refused by local SCCP: destination inaccessible.
+@item N_SCCP_REFC_NETWORK_RESOURCE_QOS_NOT_AVAIL_PERM
+Network connection refused by local SCCP: QOS not available permanent.
+@item N_SCCP_REFC_NETWORK_RESOURCE_QOS_NOT_AVAIL_TRANS
+Network connection refused by local SCCP: QOS not available transient.
+@item N_SCCP_REFC_ACCESS_FAILURE
+Network connection refused by local SCCP: remote SCCP access failure.
+@item N_SCCP_REFC_ACCESS_CONGESTION
+Network connection refused by local SCCP: remote SCCP access congestion.
+@item N_SCCP_REFC_SUBSYSTEM_FAILURE
+Network connection refused by local SCCP: remote subsystem failure.
+@item N_SCCP_REFC_SUBSYSTEM_CONGESTION
+Network connection refused by local SCCP: remote subsystem congestion.
+@item N_SCCP_REFC_EXPIRATION_OF_NC_ESTAB_TIMER
+Network connection refused by local SCCP: NC establishment timer expiry.
+@item N_SCCP_REFC_INCOMPATIBLE_USER_DATA
+Network connection refused by local SCCP: incompatible user data from remote.
+@item N_SCCP_REFC_RESERVED
+Network connection refused by local SCCP: reserved.
+@item N_SCCP_REFC_UNQUALIFIED
+Network connection refused by local SCCP: unqualified.
+@item N_SCCP_REFC_SCCP_HOP_COUNTER_VIOLATION
+Network connection refused by local SCCP: SCCP hop counter violation.
+@item N_SCCP_REFC_SCCP_FAILURE
+Network connection refused by local SCCP: SCCP failure.
+@item N_SCCP_REFC_NO_ADDRESS_TYPE_TRANSLATION
+Network connection refused by local SCCP: no address type translation.
+@item N_SCCP_REFC_UNEQUIPPED_USER
+Network connection refused by local SCCP: unequipped user.
+@end table
+@unnumberedsubsubsec Rules
+
+@page
+@node CLNS
+@section CLNS
+
+@menu
+* N_UNITDATA_REQ::
+* N_UNITDATA_IND::
+* N_UDERROR_IND::
+@end menu
+
+@node N_UNITDATA_REQ
+@subsection N_UNITDATA_REQ
+
+The @prim{N_UNITDATA_REQ} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-UNIT-DATA request} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_UNITDATA_IND
+@subsection N_UNITDATA_IND
+
+The @prim{N_UNITDATA_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-UNIT-DATA indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Rules
+
+@page
+@node N_UDERROR_IND
+@subsection N_UDERROR_IND
+
+The @prim{N_UNITDATA_IND} primitive is used by the NPI-SCCP to implement the @dfn{Q.711
+N-UNIT-DATA-ERROR indication} primitive of the SCCP:
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Error Types
+@table @pval
+@item N_SCCP_RETC_NO_ADDRESS_TYPE_TRANSLATION
+Unit data returned: no address type translation.
+@item N_SCCP_RETC_NO_ADDRESS_TRANSLATION
+Unit data returned: not address translation.
+@item N_SCCP_RETC_SUBSYSTEM_CONGESTION
+Unit data returned: subsystem congestion.
+@item N_SCCP_RETC_SUBSYSTEM_FAILURE
+Unit data returned: subsystem failure.
+@item N_SCCP_RETC_UNEQUIPPED_USER
+Unit data returned: unequipped user.
+@item N_SCCP_RETC_MTP_FAILURE
+Unit data returned: MTP failure.
+@item N_SCCP_RETC_NETWORK_CONGESTION
+Unit data returned: MTP network congestion.
+@item N_SCCP_RETC_UNQUALIFIED
+Unit data returned: unqualified.
+@item N_SCCP_RETC_MESSAGE_TRANSPORT_ERROR
+Unit data returned: message transport error.
+@item N_SCCP_RETC_LOCAL_PROCESSING_ERROR
+Unit data returned: local processing error.
+@item N_SCCP_RETC_NO_REASSEMBLY_AT_DESTINATION
+Unit data returned: no reassembly at destination.
+@item N_SCCP_RETC_SCCP_FAILURE
+Unit data returned: SCCP failure.
+@item N_SCCP_RETC_SCCP_HOP_COUNTER_VIOLATION
+Unit data returned: SCCP hop counter violation.
+@item N_SCCP_RETC_SEGMENTATION_NOT_SUPPORTED
+Unit data returned: segmentation not supported.
+@item N_SCCP_RETC_SEGMENTATION_FAILURE
+Unit data returned: segmentation failure.
+@item N_SCCP_RETC_MESSAGE_CHANGE_FAILURE
+Unit data returned: message change failure.
+@item N_SCCP_RETC_INVALID_INS_ROUTING_REQUEST
+Unit data returned: INS routing request.
+@item N_SCCP_RETC_INVALID_INSI_ROUTING_REQUEST
+Unit data returned: INSI routing request.
+@item N_SCCP_RETC_UNAUTHORIZED_MESSAGE
+Unit data returned: unauthorized message.
+@item N_SCCP_RETC_MESSAGE_INCOMPATIBILITY
+Unit data returned: message incompatibility.
+@item N_SCCP_RETC_CANNOT_PERFORM_ISNI_CONSTRAINED_ROUTING
+Unit data returned: cannot perform ISNI constrained routing.
+@item N_SCCP_RETC_REDUNDANT_ISNI_CONSTRAINED_ROUTING_INFO
+Unit data returned: redundant ISNI constrained routing information.
+@item N_SCCP_RETC_UNABLE_TO_PERFORM_ISNI_IDENTIFICATION
+Unit data returned: unable to perform ISDNI identification.
+@end table
+@unnumberedsubsubsec Rules
+
+@node Extension Primitives
+@chapter Extension Primitives
+
+@menu
+* SCCP Notice Service::
+* SCCP Inform Service::
+* SCCP Coordination Service::
+* SCCP State Service::
+* SCCP PC State Service::
+* SCCP Traffic Service::
+@end menu
+
+@node SCCP Notice Service
+@section SCCP Notice Service
+
+@menu
+* N_NOTICE_IND::
+@end menu
+
+@node N_NOTICE_IND
+@subsection N_NOTICE_IND
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_NOTICE_IND    32
+typedef struct {
+        np_ulong PRIM_type;             /* always N_NOTICE_IND */
+        np_ulong DEST_length;           /* address data was sent to */
+        np_ulong DEST_offset;
+        np_ulong SRC_length;            /* address data was sent from */
+        np_ulong SRC_offset;
+        np_ulong QOS_length;            /* QOS parameters data was sent with */
+        np_ulong QOS_offset;
+        np_ulong RETURN_cause;          /* reason for return of data */
+} N_notice_ind_t;
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node SCCP Inform Service
+@section SCCP Inform Service
+
+@menu
+* N_INFORM_REQ::
+* N_INFORM_IND::
+@end menu
+
+@node N_INFORM_REQ
+@subsection N_INFORM_REQ
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_INFORM_REQ    33
+typedef struct {
+        np_ulong PRIM_type;             /* always N_INFORM_REQ */
+        np_ulong QOS_length;            /* qos parameters */
+        np_ulong QOS_offset;
+        np_ulong REASON;                /* inform reason */
+} N_inform_req_t;
+
+/* Inform reasons for use with N_INFORM_REQ */
+#define N_SCCP_INFR_NSU_FAILURE         4
+#define N_SCCP_INFR_NSU_CONGESTION      5
+#define N_SCCP_INFR_NSU_QOS_CHANGE      6
+
+/* Inform reasons for use with N_INFORM */
+#define N_SCCP_INFR_UNSPECIFIED         7
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Reasons
+@table @pval
+@item N_SCCP_INFR_NSU_FAILURE
+Network Service User failure.
+@item N_SCCP_INFR_NSU_CONGESTION
+Network Service User congestion.
+@item N_SCCP_INFR_NSU_QOS_CHANGE
+Network Service User quality of service change.
+@item N_SCCP_INFR_UNSPECIFIED
+Reason unspecified or unknown.
+@end table
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node N_INFORM_IND
+@subsection N_INFORM_IND
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_INFORM_IND    34
+typedef struct {
+        np_ulong PRIM_type;             /* always N_INFORM_IND */
+        np_ulong QOS_length;            /* qos parameters */
+        np_ulong QOS_offset;
+        np_ulong REASON;                /* inform reason */
+} N_inform_ind_t;
+
+/* Inform reasons for use with N_INFORM_IND */
+#define N_SCCP_INFR_NSP_FAILURE         1
+#define N_SCCP_INFR_NSP_CONGESTION      2
+#define N_SCCP_INFR_NSP_QOS_CHANGE      3
+
+/* Inform reasons for use with N_INFORM */
+#define N_SCCP_INFR_UNSPECIFIED         7
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Reasons
+@table @pval
+@item N_SCCP_INFR_NSP_FAILURE
+Network Service Provider failure.
+@item N_SCCP_INFR_NSP_CONGESTION
+Network Service Provider congestion.
+@item N_SCCP_INFR_NSP_QOS_CHANGE
+Network Service Provider quality of service change.
+@item N_SCCP_INFR_UNSPECIFIED
+Reason unspecified or unknown.
+@end table
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node SCCP Coordination Service
+@section SCCP Coordination Service
+
+@menu
+* N_COORD_REQ::
+* N_COORD_IND::
+* N_COORD_RES::
+* N_COORD_CON::
+@end menu
+
+@node N_COORD_REQ
+@subsection N_COORD_REQ
+
+Note that the @prim{N_OPTMGMT_REQ}, @prim{N_RESET_REQ} or @prim{N_DISCON_REQ} primitive may also be
+used provide the @dfn{N-COORD Request} primitive.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_COORD_REQ     35
+typedef struct {
+        np_ulong PRIM_type;             /* alwyas N_COORD_REQ */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+} N_coord_req_t;
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node N_COORD_IND
+@subsection N_COORD_IND
+
+Note that the @prim{N_UDERROR_IND}, @prim{N_RESET_IND} or @prim{N_DISCON_IND} primitive may also be
+used provide the @dfn{N-COORD Indication} primitive.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_COORD_IND     37
+typedef struct {
+        np_ulong PRIM_type;             /* alwyas N_COORD_IND */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong SMI;                   /* subsystem multiplicity indicator */
+} N_coord_ind_t;
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node N_COORD_RES
+@subsection N_COORD_RES
+
+Note that the @prim{N_OPTMGMT_REQ}, @prim{N_RESET_RES} or @prim{N_DISCON_REQ} primitive may also be
+used provide the @dfn{N-COORD Response} primitive.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_COORD_RES     36
+typedef struct {
+        np_ulong PRIM_type;             /* always N_COORD_RES */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+} N_coord_res_t;
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node N_COORD_CON
+@subsection N_COORD_CON
+
+Note that the @prim{N_UDERROR_IND}, @prim{N_RESET_CON} or @prim{N_DISCON_IND} primitive may also be
+used provide the @dfn{N-COORD Confirmation} primitive.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_COORD_CON     38
+typedef struct {
+        np_ulong PRIM_type;             /* always N_COORD_CON */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong SMI;                   /* subsystem multiplicity indicator */
+} N_coord_con_t;
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node SCCP State Service
+@section SCCP State Service
+
+@menu
+* N_STATE_REQ::
+* N_STATE_IND::
+@end menu
+
+@node N_STATE_REQ
+@subsection N_STATE_REQ
+
+Note that the @prim{N_BIND_REQ}, @prim{N_UNBIND_REQ}, @prim{N_CONN_REQ}, @prim{N_RESET_REQ} and
+@prim{N_DISCON_REQ} primitives may be used to provide the @dfn{N-STATE Request} primitive.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_STATE_REQ     39
+typedef struct {
+        np_ulong PRIM_type;             /* always N_STATE_REQ */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong STATUS;                /* user status */
+} N_state_req_t;
+
+#define N_SCCP_STATUS_USER_IN_SERVICE                   1
+#define N_SCCP_STATUS_USER_OUT_OF_SERVICE               2
+#define N_SCCP_STATUS_REMOTE_SCCP_AVAILABLE             3
+#define N_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE           4
+#define N_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED            5
+#define N_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE          6
+#define N_SCCP_STATUS_REMOTE_SCCP_CONGESTED(_x)         (7 + _x)
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Status
+@table @pval
+@item N_SCCP_STATUS_USER_IN_SERVICE
+User in service.
+@item N_SCCP_STATUS_USER_OUT_OF_SERVICE
+User out of service.
+@item N_SCCP_STATUS_REMOTE_SCCP_AVAILABLE
+Remote SCCP available.
+@item N_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE
+Remote SCCP unavailable.
+@item N_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED
+Remote SCCP unequipped.
+@item N_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE
+Remote SCCP inaccessible.
+@item N_SCCP_STATUS_REMOTE_SCCP_CONGESTED(n)
+Remote SCCP congested at level ``n''.
+@end table
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node N_STATE_IND
+@subsection N_STATE_IND
+
+Note that the @prim{N_UDERROR_IND}, @prim{N_RESET_IND}, or @prim{N_DISCON_IND} primitives can also
+be used to provide the @dfn{N-STATE Indication}.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_STATE_IND     40
+typedef struct {
+        np_ulong PRIM_type;             /* always N_STATE_IND */
+        np_ulong ADDR_length;           /* affected subsystem */
+        np_ulong ADDR_offset;
+        np_ulong STATUS;                /* user status */
+        np_ulong SMI;                   /* subsystem multiplicity indicator */
+} N_state_ind_t;
+
+#define N_SCCP_STATUS_USER_IN_SERVICE                   1
+#define N_SCCP_STATUS_USER_OUT_OF_SERVICE               2
+#define N_SCCP_STATUS_REMOTE_SCCP_AVAILABLE             3
+#define N_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE           4
+#define N_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED            5
+#define N_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE          6
+#define N_SCCP_STATUS_REMOTE_SCCP_CONGESTED(_x)         (7 + _x)
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Status
+@table @pval
+@item N_SCCP_STATUS_USER_IN_SERVICE
+User in service.
+@item N_SCCP_STATUS_USER_OUT_OF_SERVICE
+User out of service.
+@item N_SCCP_STATUS_REMOTE_SCCP_AVAILABLE
+Remote SCCP available.
+@item N_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE
+Remote SCCP unavailable.
+@item N_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED
+Remote SCCP unequipped.
+@item N_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE
+Remote SCCP inaccessible.
+@item N_SCCP_STATUS_REMOTE_SCCP_CONGESTED(n)
+Remote SCCP congested at level ``n''.
+@end table
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node SCCP PC State Service
+@section SCCP PC State Service
+
+@menu
+* N_PCSTATE_IND::
+@end menu
+
+@node N_PCSTATE_IND
+@subsection N_PCSTATE_IND
+
+Note that the @prim{N_UDERROR_IND}, @prim{N_RESET_IND}, or @prim{N_DISCON_IND} primitives can also
+be used to provide the @dfn{N-PCSTATE Indication}.
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_PCSTATE_IND   41
+typedef struct {
+        np_ulong PRIM_type;             /* always N_PCSTATE_IND */
+        np_ulong ADDR_length;           /* affected point code */
+        np_ulong ADDR_offset;
+        np_ulong STATUS;                /* status */
+} N_pcstate_ind_t;
+
+#define N_SCCP_STATUS_SIGNALLING_POINT_INACCESSIBLE     16
+#define N_SCCP_STATUS_SIGNALLING_POINT_CONGESTED(_x)    (17 + _x)
+#define N_SCCP_STATUS_SIGNALLING_POINT_ACCESSIBLE       26
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Status
+@table @pval
+@item N_SCCP_STATUS_SIGNALLING_POINT_INACCESSIBLE
+Signalling point inaccessible.
+@item N_SCCP_STATUS_SIGNALLING_POINT_CONGESTED(n)
+Signalling point congested at level ``n''.
+@item N_SCCP_STATUS_SIGNALLING_POINT_ACCESSIBLE 
+Signalling point accessible.
+@end table
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@page
+@node SCCP Traffic Service
+@section SCCP Traffic Service
+
+@menu
+* N_TRAFFIC_IND::
+@end menu
+
+@node N_TRAFFIC_IND
+@subsection N_TRAFFIC_IND
+
+@unnumberedsubsubsec Format
+@smallexample
+@verbatim
+#define N_TRAFFIC_IND   42
+typedef struct {
+        np_ulong PRIM_type;             /* always N_TRAFFIC_IND */
+        np_ulong ADDR_length;           /* affected user */
+        np_ulong ADDR_offset;
+        np_ulong TRAFFIC_mix;           /* traffic mix */
+} N_traffic_ind_t;
+
+#define N_SCCP_TMIX_ALL_PREFFERED_NO_BACKUP     1
+#define N_SCCP_TMIX_ALL_PREFERRED_SOME_BACKUP   2
+#define N_SCCP_TMIX_ALL_PREFERRED_ALL_BACKUP    3
+#define N_SCCP_TMIX_SOME_PREFERRED_NO_BACKUP    4
+#define N_SCCP_TMIX_SOME_PREFERRED_SOME_BACKUP  5
+#define N_SCCP_TMIX_NO_PREFERRED_NO_BACKUP      6
+#define N_SCCP_TMIX_ALL                         7
+#define N_SCCP_TMIX_SOME                        8
+#define N_SCCP_TMIX_NONE                        9
+@end verbatim
+@end smallexample
+
+@unnumberedsubsubsec Parameters
+@unnumberedsubsubsec Traffic Mix
+@table @pval
+@item N_SCCP_TMIX_ALL_PREFFERED_NO_BACKUP
+@item N_SCCP_TMIX_ALL_PREFERRED_SOME_BACKUP
+@item N_SCCP_TMIX_ALL_PREFERRED_ALL_BACKUP
+@item N_SCCP_TMIX_SOME_PREFERRED_NO_BACKUP
+@item N_SCCP_TMIX_SOME_PREFERRED_SOME_BACKUP
+@item N_SCCP_TMIX_NO_PREFERRED_NO_BACKUP
+@item N_SCCP_TMIX_ALL
+@item N_SCCP_TMIX_SOME
+@item N_SCCP_TMIX_NONE
+@end table
+@unnumberedsubsubsec State
+@unnumberedsubsubsec Rules
+
+@node @value{INTERFACE} Input-Output Controls
+@chapter @value{INTERFACE} Input-Output Controls
+
+@node @value{INTERFACE} Management Information Base
+@chapter @value{INTERFACE} Management Information Base
+
+@node Mapping @value{INTERFACE} Primitives
+@appendix Mapping @value{INTERFACE} Primitives
+
+@menu
+* Mapping NPI Primitives to ITU-T X.213::
+* Mapping NPI Primitives to ITU-T Q.711::
+* Mapping NPI Primitives to ETSI EN 300 009-1::
+* Mapping NPI Primitives to ANSI T1.112::
+@end menu
+
+@node Mapping NPI Primitives to ITU-T X.213
+@section Mapping NPI Primitives to ITU-T X.213
+
+@menu
+* Mapping of X.213 CONS Connect/Disconnect Primitives to NPI::
+* Mapping of X.213 CONS Data Transfer Primitives to NPI::
+* Mapping of X.213 CLNS Data Transfer Primitives to NPI::
+@end menu
+
+@node Mapping of X.213 CONS Connect/Disconnect Primitives to NPI
+@subsection Mapping of X.213 CONS Connect/Disconnect Primitives to NPI
+
+The mapping of NPI CONS connection and disconnection primitives and their associated data fields to
+ITU-T X.213 is illustrated in @tabref{A-1}.
+
+@tabfig{npi_sccp_taba1,A-1,Mapping NPI CONS Connect/Disconnect Primitives to ITU-T X.213}
+
+@tabref{A-1} illustrates that the Network Provider Interace (NPI) Revision 2.0.0 interface is
+completely consistent with the X.213 connection and disconnection services.  Note that the
+@dfn{N-CONNECT request} relies on the X.213 option for the @dfn{Source address} to be implied by the
+connection interface identity (i.e. Stream).
+
+@node Mapping of X.213 CONS Data Transfer Primitives to NPI
+@subsection Mapping of X.213 CONS Data Transfer Primitives to NPI
+
+The mapping of NPI CONS data transfer primitives and their associated data fields to ITU-T X.213 is
+illustrated in @tabref{A-2}.
+
+@tabfig{npi_sccp_taba2,A-2,Mapping NPI CONS Data Transfer Primitives to ITU-T X.213}
+
+@tabref{A-2} illustrates that the Network Provider Interace (NPI) Revision 2.0.0 interface is
+completely consistent with the X.213 Connection mode data transfer services.
+
+@node Mapping of X.213 CLNS Data Transfer Primitives to NPI
+@subsection Mapping of X.213 CLNS Data Transfer Primitives to NPI
+
+The mapping of NPI CLNS data transfer primitives and their associated data fields to ITU-T X.213 is
+illustrated in @tabref{A-3}.
+
+@tabfig{npi_sccp_taba3,A-3,Mapping NPI CLNS Data Transfer Primitives to ITU-T X.213}
+
+@tabref{A-3} illustrates several deficiencies with the Network Provider Interface (NPI) Revision
+2.0.0 interface:
+
+@enumerate
+@item
+The @dfn{Quality of Service parameter set} is not included in the @prim{N_UNITDATA_REQ} primitive.
+
+This causes problems in performance in that when @prim{N_UNITDATA_REQ} primitives are sent that must
+have differing quality of service, a separate @prim{N_OPTMGMT_REQ} primitive must be issued to alter
+the QOS characteristics before issuing the @prim{N_UNITDATA_REQ} primitive.  This can make it
+necessary that two primitive are necessary for each data transmission.  Worse, when the
+@prim{N_OPTMGMT_REQ} primitive is issued it is required that the NS user await the @prim{N_OK_ACK}
+primitive before issuing any other primitives, meaning the outgoing queueing must clear before the
+message may be sent.
+
+To circumvent this deficiency, the @cite{OpenSS7 Project} uses the @parm{RESERVED_field[0]} and
+@parm{RESERVED_field[1]} as @parm{QOS_length} and @parm{QOS_offset} respectively.  This is
+compatible with implementations expecting the old behavior, because @parm{QOS_length} and
+@parm{QOS_offset} will simply be coded zero (@samp{0}).
+
+This is particularly important for SCCP as SCCP sets the @dfn{Protocol Class}, @dfn{Message
+Priority}, @dfn{Importance} and @dfn{Sequence Control} on each and every unit data transmission.
+@item
+The @dfn{Quality of Service parameter set} is not included in the @prim{N_UNITDATA_IND} primitive.
+
+Although this is not consistent with X.213 and the Network Provider Interface (NPI) Revision 2.0.0
+provides no way of retrieving the Quality of Service parameter set that was associated with the
+receive unit data, it does not cause much problems.  The NPI does provide an @pval{ERROR_type} field
+that can be used to indicate that congestion was experienced by this unit data during its delivery.
+@item
+The @dfn{Source address} is not included in the @prim{N_UNITDATA_REQ} primtiive, but is implied by
+the interface (which is not provided for in the X.213 specification).
+
+Although this is not consistent with X.213, the Network Provider Interface (NPI) Revision 2.0.0
+provides the @prim{N_BIND_REQ} and @prim{N_BIND_ACK} primitives to set the implied source address
+for sent packets.  This works when the NSP is bound to an explicit address, or which the source
+address can be implied by routing (as in the case of IP networks where the source address can be
+obtained from the address assigned to the outgoing interface).  The problem comes in when the
+@pval{DEFAULT_DESTINATION} flag is passed without and NSAP in the @prim{N_BIND_REQ}.  These Streams
+cannot be permitted to send messages if the NSP cannot determine the source address for the
+transmission.
+@end enumerate
+
+@page
+@node Mapping NPI Primitives to ITU-T Q.711
+@section Mapping NPI Primitives to ITU-T Q.711
+
+@menu
+* Mapping of Q.711 CONS Connect/Disconnect Primitives to NPI::
+* Mapping of Q.711 CONS Data Transfer Primitives to NPI::
+* Mapping of Q.711 CLNS Data Transfer Primitives to NPI::
+* Mapping of Q.711 Management Primitives to NPI::
+@end menu
+
+@node Mapping of Q.711 CONS Connect/Disconnect Primitives to NPI
+@subsection Mapping of Q.711 CONS Connect/Disconnect Primitives to NPI
+
+The mapping of NPI CONS connection and disconnection primitives and their associated data fields to
+ITU-T Q.711 is illustrated in @tabref{A-4}.
+
+@tabfig{npi_sccp_taba4,A-4,Mapping NPI CONS Connect/Disconnect Primitives to ITU-T Q.711}
+
+Note that, as illustrated in @tabref{A-4}, there are several considerations for the Network Provider
+Interface (NPI) Revision 2.0.0 specification when applied to SCCP:
+
+@enumerate
+@item
+SCCP service primitives include a @dfn{Connection Identifier} that identifies the connection.  In
+some instances (during connection establishment), this connection identifier is explicitly
+included in the NPI primitives in the @parm{SEQ_number} field.  For @prim{N_CONN_REQ} and
+@prim{N_CONN_CON}, the @dfn{Connection Identifier} is implied by the Stream upon which the primitive
+is issued.
+@item
+SCCP shows @dfn{Expedited data} selection as only present in the @dfn{N-CONNECT request} and
+@dfn{N-CONNECT response} primitives.  For NPI the @dfn{Expedited data} selection can also be
+indicated on the @dfn{N-CONNECT indication} and @dfn{N-CONNECT confirmation} primitives.
+@item
+SCCP allows the user to pass an @dfn{Importance} parameter in the @dfn{N-CONNECT request},
+@dfn{N-CONNECT response} and @dfn{N-DISCONNECT request} primitives and optionally indicates
+@dfn{Importance} in the @dfn{N-CONNECT indication}, @dfn{N-CONNECT confirmation} and
+@dfn{N-DISCONNECT indication} primitives.  For @dfn{N-CONNECT}, NPI Revision 2.0.0 can either pass
+@dfn{Importance} as a QOS parameter or in the @parm{CONN_flags} field.  For @dfn{N-DISCONNECT
+indication}, NPI Revision 2.0.0 can pass @dfn{Importance} in the @parm{DISCON_reason} field when the
+importance as the cause of the disconnect.  NPI Revision 2.0.0 has no good way of passing the
+@dfn{Importance} parameter in the @prim{N_DISCON_REQ} primitive.
+@end enumerate
+
+@page
+@node Mapping of Q.711 CONS Data Transfer Primitives to NPI
+@subsection Mapping of Q.711 CONS Data Transfer Primitives to NPI
+
+The mapping of NPI CONS data transfer primitives and their associated data fields to ITU-T Q.711 is
+illustrated in @tabref{A-5}.
+
+@tabfig{npi_sccp_taba5,A-5,Mapping NPI CONS Data Transfer Primitives to ITU-T Q.711}
+
+Note that as illustrated in @tabref{A-5}, there are several considerations for the Newtork Provider
+Interface (NPI) Revision 2.0.0 specification when applied to SCCP:
+
+@enumerate
+@item
+SCCP service primtiives include a @dfn{Connection Identifier} that identifies the connection.  In the
+case of data transfer, the @dfn{Connection Identifier} is always implied by the Stream upon which
+the primitive is issued.
+@item
+Note that SCCP does not provide receipt confirmation and therefore does not support the
+@dfn{N-DATA-ACKNOWLEDGE request} and @dfn{N-DATA-ACKNOWLEDGE indication} primitives of X.213.
+Therefore, there is no mapping of these primitives to the @prim{N_DATACK_REQ} and
+@prim{N_DATACK_IND} primitives of NPI Revision 2.0.0.
+@item
+NPI Revision 2.0.0 does not have a proper mechanism for transferring the @dfn{Importance} parameters
+on @prim{N_DATA_REQ} primitives.  This specification accomplishes the passing of @dfn{Importance} on
+@prim{N_DATA_REQ} primitives by encoding the @dfn{Importance} parameter into the
+@parm{DATA_xfer_flags} field.
+@end enumerate
+
+The mapping of NPI CONS primitives and their associated data fields to ITU-T Q.711 is
+illustrated in @tabref{A-5b}.
+
+@tabfig{npi_sccp_taba5b,A-5b,Mapping NPI CONS Primitives to ITU-T Q.711}
+
+Note that as illustrated in @tabref{A-5b} there are several considerations for the Network Provider
+Interface (NPI) Revision 2.0.0 specification when applied to SCCP:
+
+@enumerate
+@item
+SCCP provide an @dfn{N-INFORM request} and @dfn{N-INFORM indication} primitive that is not provided
+by X.213.  These primitives are used to communicate changes in availablility and expected Quality of
+Service between the connection-oriented SCCP-User and the SCCP during data transfer on a connection.
+
+To inform the SCCP of a change in experienced Quality of Service at the SCCP-User for a connection,
+the @prim{N_OPTMGMT_REQ} primitive with the appropriate QOS structure type can be used.  To inform
+the SCCP of a change in congestion at the SCCP-User for a connection, the @prim{N_RESET_REQ}
+primitive with the appropriate @parm{RESET_reason} can be used: this reset request will not result
+in the flushing of the Stream.  To inform the SCCP of a failure at the SCCP-User for a connection,
+the @prim{N_DISCON_REQ} primitive with the appropriate @parm{DISCON_reason} can be used.
+
+The SCCP may inform the SCCP-User of a change in congestion by using a @prim{N_RESET_IND} primitive
+with the appropriate @parm{RESET_reason}: this reset indication will not result in the flushing of
+the Stream.  To inform the SCCP of a failure at the SCCP for a connection, the @prim{N_DISCON_IND}
+primitive with the appropriate @parm{DISCON_reason} can be used, or in exceptional circumstances, a
+@msg{M_HANGUP} or @msg{M_ERROR} message can be issued.  To inform the SCCP of a change in Quality of
+Service parameters at the SCCP for a connection, the @prim{N_RESET_IND} primitive can be issued with
+an appropriate @parm{RESET_reason}.  The SCCP-User may then issue a @prim{N_INFO_REQ} primitive to
+obtain the new QOS range supported by the SCCP in the @prim{N_INFO_ACK} response.
+@end enumerate
+
+@page
+@node Mapping of Q.711 CLNS Data Transfer Primitives to NPI
+@subsection Mapping of Q.711 CLNS Data Transfer Primitives to NPI
+
+The mapping of NPI CLNS data transfer primitives and their associated data fields to ITU-T Q.711 is
+illustrated in @tabref{A-6}.
+
+@tabfig{npi_sccp_taba6,A-6,Mapping NPI CLNS Data Transfer Primitives to ITU-T Q.711}
+
+Note that as illustrated in @tabref{A-6} there are several considerations for the Network Provider
+Interface (NPI) Revision 2.0.0 specification when applied to SCCP:
+
+@enumerate
+@item
+NPI Revision 2.0.0 does not have a usable way of setting the per-primitive @dfn{Quality of Service
+parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance} using the
+@prim{N_UNITDATA_REQ} primtive.  The @cite{OpenSS7 Project} uses the @parm{RESERVED_field[0]} and
+@parm{RESERVED_field[1]} in the @prim{N_UNITDATA_REQ} primitive as though they were a
+@parm{QOS_length} and @parm{QOS_offset} field, respectively, to pass the @dfn{Quality of Service
+parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance}.
+
+@item
+NPI Revision 2.0.0 does not have a usable way of indicating per-primitive @dfn{Quality of Service
+parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance} using the
+@prim{N_UNITDATA_IND} primitive.  The @cite{OpenSS7 Project} uses the @parm{ERROR_type}, which is
+already defined as a bit-field, to pass @dfn{Sequence control}, @dfn{Return option}, and
+@dfn{Importance} information.
+
+@item
+NPI Revision 2.0.0 does not have a usable way of indicating @dfn{Importance} in the
+@prim{N_UDERROR_IND} primitive.  The @cite{OpenSS7 Project} uses the @parm{ERROR_type} to encode the
+@dfn{Importance} for those errors for which it is important (user congestion, SCCP congestion).
+
+@end enumerate
+
+@page
+@node Mapping of Q.711 Management Primitives to NPI
+@subsection Mapping of Q.711 Management Primitives to NPI
+
+The mapping of NPI CONS and CLNS primitives and their associated data fields to ITU-T Q.711 is
+illustrated in @tabref{A-7}.
+
+@tabfig{npi_sccp_taba7,A-7,Mapping NPI CONS and CLNS Primitives to ITU-T Q.711}
+
+@page
+@node Mapping NPI Primitives to ETSI EN 300 009-1
+@section Mapping NPI Primitives to ETSI EN 300 009-1
+
+@page
+@node Mapping NPI Primitives to ANSI T1.112
+@section Mapping NPI Primitives to ANSI T1.112
+
+@node @value{INTERFACE} Header Files
+@appendix @value{INTERFACE} Header Files
+
+Applications using the Network Provider Interface (NPI) for Signalling Connection Control Part
+(SCCP) need to include several system header files:
+
+@menu
+* Protocol Primitive Header::
+* Input-Output Control Header::
+@end menu
+
+@node Protocol Primitive Header
+@section Protocol Primitive Header
+
+@multitable @columnfractions .2 .8
+@item @header{errno.h} @tab
+Provides UNIX system error number definitions.
+@item @header{sys/types.h} @tab
+Provides C types used by the header files.
+@item @header{sys/ioctl.h} @tab
+Provides types and declarations associated with the @manref{ioctl(2)} system call.
+@item @header{sys/npi.h} @tab
+Provides the base Network Provider Interface (NPI) definitions and declarations.
+@item @header{sys/npi_mtp.h} @tab
+Provides the SS7 Message Transfer Part (MTP) definitions and declarations.
+@item @header{sys/npi_sccp.h} @tab
+Provides the SS7 Signalling Connection Control Part (SCCP) definitions and declarations.
+@end multitable
+
+@menu
+* Protocol Primitive Header Listing::
+@end menu
+
+@node Protocol Primitive Header Listing
+@subsection Protocol Primitive Header Listing
+
+@smallformat
+@verbatiminclude npi_sccp.h
+@end smallformat
+
+@page
+@node Input-Output Control Header
+@section Input-Output Control Header
+
+@multitable @columnfractions .2 .8
+@item @header{errno.h} @tab
+Provides UNIX system error number definitions.
+@item @header{sys/types.h} @tab
+Provides C types used by the header files.
+@item @header{sys/ioctl.h} @tab
+Provides types and declarations associated with the @manref{ioctl(2)} system call.
+@item @header{sys/npi.h} @tab
+Provides the base Network Provider Interface (NPI) definitions and declarations.
+@item @header{sys/npi_mtp.h} @tab
+Provides the SS7 Message Transfer Part (MTP) definitions and declarations.
+@item @header{sys/npi_sccp.h} @tab
+Provides the SS7 Signalling Connection Control Part (SCCP) definitions and declarations.
+@item @header{sys/sccp_ioctl.h} @tab
+Provides the SS7 Signalling Connection Control Part (SCCP) input-output control definitions and
+declarations.
+@end multitable
+
+Note that the input-output control defintions are the same as those provided by the Signalling
+Connection Control Part interface (SCCPI) described in a separate document.
+
+@node @value{INTERFACE} Library
+@appendix @value{INTERFACE} Library
+
+Because this Addendum provides an SCCP interface that conforms to the Network Provider Interface
+(NPI) Revision 2.0.0, it can use the libraries provided for use by the NPI.  In particular, the
+@manref{libnpiapi(3)} library can be used.
+
+@node @value{INTERFACE} Drivers and Modules
+@appendix @value{INTERFACE} Drivers and Modules
+
+@menu
+* TCI Module::
+* TRI Driver and Module::
+* SCCP Multiplexing Driver::
+* SUA Application Server Driver and Module::
+* NPI Conversion Module::
+* TPI Conversion Module::
+@end menu
+
+The Signalling Connection Contorl Part Interface (SCCPI) is used to provide services to a number of
+@cite{STREAMS} drivers and modules in addition to user-space applications.
+@cite{@value{PACKAGE_TITLE}} provides a range of @cite{STREAMS} multiplexing drivers, pseudo-device
+drivers, and pushable modules that complement the SS7 Signalling Connection Control Part driver that
+provides the Signalling Connection Control Part Interface (SCCPI) at its upper layer.
+
+@node TCI Module
+@section TCI Module
+
+The @dfn{TCI Module} is a pushable @dfn{STREAMS} module that provide the Component Handling sublayer
+of the Transaction Capabilities Application Part (TCAP).  It implements the Transaction Component
+Interface (TCI) at its upper boundary and utilized the Transaction Interface (TRI) at its lower
+boundary.
+
+@node TRI Driver and Module
+@section TRI Driver and Module
+
+The @dfn{TRI Driver and Mdoule} is a @dfn{STREAMS} multiplexing driver or pushable module that links
+or pushes Streams conforming to the Signalling Connection Control Part Interface (SCCPI) and provide
+an upper boundary that conforms to the Transaction Interace (TRI).  It implements the Transaction
+Handling sublayer of the Transaction Capabilities Application Part (TCAP) protocol.  The module is
+more appropriate for Streams that service an entire SCCP subsystem, whereas the multiplexing driver
+is appropriate for Streams that handle only a subset of the Application Contexts available for a
+given SCCP subsystem.
+
+@node SCCP Multiplexing Driver
+@section SCCP Multiplexing Driver
+
+The SCCP Multiplexing Driver is the primary driver that provides SCCP functionality within the
+@cite{@value{PACKAGE_TITLE}}.  It accepts Message Transfer Part (MTP) Streams linked beneath the
+multiplexing driver that support the Message Transfer Part Interface (MTPI), such as is provided by
+the MTP Mutiplexing Driver or the the M3UA Application Server drivers and modules.
+
+@node SUA Application Server Driver and Module
+@section SUA Application Server Driver and Module
+
+The Signalling Connection Control Part (SCCP) User Adaptation (SUA) Application Server driver and
+module are @cite{STREAMS} modules that provide the Signalling Connection Control Part Interface
+(SCCPI) at their upper layer.  It accepts Stream Control Transmission Protocol (SCTP) Streams linked
+or pushed beneath the driver or module, that provide connectivity to a remote Signalling Gateway
+(SG) or IP Signalling Point (IPSP).
+
+@node NPI Conversion Module
+@section NPI Conversion Module
+
+The @dfn{NPI Conversion Module} is a specific-purpose pushable @dfn{STREAMS} module that can be
+pushed over any Stream conforming to the Signalling Connection Control Part Interface (SCCPI) and
+converts that Stream to an NPI-SCCP service interface conforming to this Addendum.  In the
+@cite{@value{PACKAGE_TITLE}}, this module can be pushed over either an SCCP multiplexing driver
+Stream or an SUA AS driver or module Stream.  The sole purpose of this module is to convert the
+Stream to the NPI specification so that the SCCP Stream can be used by external applications.
+
+A minor device number on the SCCP driver is defined that will @manref{autopush(8)} this module.
+
+Similarly, a minor device number on the SUA driver is also defined.
+
+@node TPI Conversion Module
+@section TPI Conversion Module
+
+The @dfn{TPI Conversion Module} is a general-purpose pushable @dfn{STREAMS} module that can be
+pushed over any Stream conforming to the Network Provider Interface (NPI) and coverts that Stream to
+an XTI-SCCP service interface conforming to the XTI-SCCP specification.  This permits the SCCP
+Stream to be used by external applications using the XTI/TLI Library (@manref{libxnet(3)}).
+
+A minor device number on the SCCP driver is defined that will @manref{autopush(8)} the @dfn{NPI
+Conversion Module} and then push the general-purpose @dfn{TPI Conversion Module} that is part of the
+@file{strxnet} package.  The @dfn{NPI Conversion Module} provides (by registration) option
+conversion assistance to this module.
+
+Similarly, a minor device number on the SUA driver is also defined.
+
+@node @value{INTERFACE} Utilities
+@appendix @value{INTERFACE} Utilities
+
+In general, any of the utilities provided by the underlying SCCP or SUA provider that support
+input-output controls defined in the SCCPI specification can be used on SCCP or SUA Streams upon
+which the @dfn{NPI Conversion Module} has been pushed to conform to this Addendum.  The @dfn{NPI
+Conversion Module} passes input-output controls transparently to the underlying SCCP module.
+
+Therefore, this specification does not define any utilities of its own.
+
+@c @node @value{INTERFACE} File Formats
+@c @appendix @value{INTERFACE} File Formats
+@c 
+@node @value{INTERFACE} Compatibility and Porting
+@appendix @value{INTERFACE} Compatibility and Porting
+
+@node License
+@unnumbered License
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+
+The text of the manual are licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@include texi/fdl13.texi
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+@item Signalling Data Link Service Data Unit
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+@item Data transfer
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+@item SDL provider
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+@item SDL user
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+@item Local management
+The phase in connection and connectionless modes in which a SDL user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+@item PPA
+The point at which a system attaches itself to a physical communications medium.
+@item PPA identifier
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISDNI} @tab ISDN Interface
+@item @dfn{ISDN} @tab Integrated Services Digital Network
+@item @dfn{ISO} @tab International Organization for Standardization
+@item @dfn{ISUPI} @tab ISUP Interface
+@item @dfn{ISUP} @tab ISDN User Part
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{MTPI} @tab Message Transfer Part Interface
+@item @dfn{MTP} @tab Message Transfer Part 
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SCCPI} @tab Signalling Connection Control Part Interface
+@item @dfn{SCCP} @tab Signalling Connection Control Part
+@item @dfn{SDLI} @tab Signalling Data Link Interface
+@item @dfn{SDL} @tab Signalling Data Link
+@item @dfn{SDTI} @tab Signalling Data Terminal Interface
+@item @dfn{SDT} @tab Signalling Data Terminal
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLI} @tab Signalling Link Interface
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SL} @tab Signalling Link
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TCAP} @tab Transaction Capabilities Application Part
+@item @dfn{TCI} @tab Transaction Component Interface
+@item @dfn{TC} @tab Component Handling Sub-Layer
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
+@item @dfn{TRI} @tab Transaction Interface
+@item @dfn{TR} @tab Transaction Handling Sub-Layer
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
+@end multitable
+
+@node References
+@unnumbered References
+
+@table @asis
+
+@item [NPI]
+@anchor{NPI}
+@uref{http://www.openss7.org/specs/npi.pdf,,@b{NPI Revision 2.0.0}},
+@cite{Network Provider Interface Specification},
+August 17, 1992,
+(Parsippany, New Jersey), UNIX International.
+
+@item [Q.714]
+@anchor{Q.714}
+@uref{http://www.itu.int/rec/T-REC-Q.714/,,@b{ITU-T Recommendation Q.714 (1993)}},
+@cite{Signalling Connection Control Part Procedures},
+White Book,
+March 1993,
+(Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+
+@item [Q.711]
+@anchor{Q.711}
+@uref{http://www.itu.int/rec/T-REC-Q.711/,,@b{ITU-T Recommendation Q.711 (1993)}},
+@cite{Functional Description of Signalling Connection Control Part},
+White Book,
+March 1993,
+(Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+
+@item [Q.713]
+@anchor{Q.713}
+@uref{http://www.itu.int/rec/T-REC-Q.713/,,@b{ITU-T Recommendation Q.713 (1993)}},
+@cite{Signalling Connection Control Part Formats and Codes},
+White Book,
+March 1993,
+(Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+
+@item [XNS]
+@anchor{XNS}
+@uref{http://www.opengroup.org/onlinepubs/,,@b{XNS Issue 5.2 Draft 2.0}},
+@cite{Technical Standard: Network Services (XNS)},
+[ISBN 1-85912-241-8],
+Open Group Publication,
+1999,
+@uref{http://www.opengroup.org/,,The Open Group}.
+
+@item [T1.111]
+@anchor{T1.111}
+@b{ANSI T1.111},
+@cite{Signalling System No. 7 --- Message Transfer Part},
+[ISBN 1-84912-241-8],
+1992,
+@uref{http://www.ansi.org/,,American National Standards Institute}.
+
+@item [T1.112]
+@anchor{T1.112}
+@b{ANSI T1.112},
+@cite{Signalling System No. 7 --- Signalling Connection Control Part},
+[ISBN 1-84912-241-8],
+1992,
+@uref{http://www.ansi.org/,,American National Standards Institute}.
+
+@item [X.213]
+@anchor{X.213}
+@uref{http://www.itu.int/rec/T-REC-X.213/,,@b{ITU-T Recommendation X.213 (1986)}},
+[@b{ISO/IEC 8348}],
+@cite{Network Service Definition for Open Systems Interconnection (OSI) for CCITT Applications},
+Blue Book,
+1986,
+(Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+
+@item [ISO8348]
+@anchor{ISO8348}
+@b{ISO/IEC 8348 : 1987},
+[@uref{http://www.itu.int/rec/T-REC-X.213/,,@b{ITU-T Recommendation X.213}}],
+@cite{Information Processing Systems---Data Communications---Network Service Definition},
+April 15, 1987,
+(Geneva), ISO/IEC,
+@uref{http://www.iso.org/,,International Organization for Standardization},
+@uref{http://www.iec.org/,,International Engineering Consortium}.
+
+@item [ISO8348/AD1]
+@anchor{ISO8348/AD1}
+@b{ISO/IEC 8348/AD1 : 1987},
+[@uref{http://www.itu.int/rec/T-REC-X.213/,,@b{ITU-T Recommendation X.213, Amd. 1}}],
+@cite{Information Processing Systems---Data Communications---Network Service Definition---Addendum 1: Connectionless Mode Transmission},
+April 15, 1987,
+(Geneva), ISO/IEC,
+@uref{http://www.iso.org/,,International Organization for Standardization},
+@uref{http://www.iec.org/,,International Engineering Consortium}.
+
+@item [ISO8473]
+@anchor{ISO8473}
+@b{ISO/IEC 8473 : 1987},
+[@uref{http://www.itu.int/rec/T-REC-X.233/,,@b{ITU-T Recommendation X.233}}],
+[@uref{http://www.itu.int/rec/T-REC-X.622/,,@b{ITU-T Recommendation X.622}}],
+[@uref{http://www.itu.int/rec/T-REC-X.623/,,@b{ITU-T Recommendation X.623}}],
+@cite{Information Processing Systems---Data Communications Protocol for Providing the Connectionless Mode Network Service},
+SC6 N4542,
+(Geneva), ISO/IEC,
+@uref{http://www.iso.org/,,International Organization for Standardization},
+@uref{http://www.iec.org/,,International Engineering Consortium}.
+
+@item [ISO8208]
+@anchor{ISO8208}
+@b{ISO/IEC 8208 : 1987},
+[@uref{http://www.itu.int/rec/T-REC-X.25/,,@b{ITU-T Recommendation X.25}}],
+[@uref{http://www.itu.int/rec/T-REC-X.75/,,@b{ITU-T Recommendation X.75}}],
+@cite{Information Processing Systems---X.25 Packet Level Protocol for Data Terminal Equipment},
+September 15, 1987,
+(Geneva), ISO/IEC,
+@uref{http://www.iso.org/,,International Organization for Standardization},
+@uref{http://www.iec.org/,,International Engineering Consortium}.
+
+@item [ISO8878]
+@anchor{ISO8878}
+@b{ISO/IEC 8878 : 1987},
+[@uref{http://www.itu.int/rec/T-REC-X.223/,,@b{ITU-T Recommendation X.223}}],
+@cite{Information Processing Systems---Data Communications---Use of X.25 to Provide the OSI Connection-Mode Network Service},
+September 1, 1987,
+(Geneva), ISO/IEC,
+@uref{http://www.iso.org/,,International Organization for Standardization},
+@uref{http://www.iec.org/,,International Engineering Consortium}.
+
+@item [SVID]
+@anchor{SVID}
+@cite{System V Interface Definition}, Issue 2, Volume 3.
+
+@item [X.210]
+@anchor{X.210}
+@uref{http://www.itu.int/rec/T-REC-X.210/,,@b{ITU-T Recommendation X.210}},
+[@b{ISO/IEC 10731 : 1994}],
+@cite{Information Technology---Open Systems Interconnection---Basic reference model: Conventions for the definition of OSI services},
+Red Book, 1984,
+(Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}. 
+(Previously ``CCITT Recommendation'').
+
+@end table
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+invariant sections, no front-cover texts and no back-cover texts.  Please note, however, that it is
+just plain wrong to modify statements of, or attribute statements to, the Author or @cite{OpenSS7
+Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@c @iftex
+@c @node Indices
+@c @unnumbered Indices
+@c @end iftex
+
+@c @ifnottex
+@c @c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@c @end ifnottex
+
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * MIB Object Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node MIB Object Index
+@c @section MIB Object Index
+@c @printindex mo
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
+@end ifnotplaintext
+
+@page
+@shortcontents
+@page
+@contents
+@bye

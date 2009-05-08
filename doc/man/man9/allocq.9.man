@@ -1,0 +1,460 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH ALLOCQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B allocq, mi_allocq
+\- allocate a \fISTREAMS\fP queue pair
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.B queue_t *allocq(void);
+.PP
+.B #define _MAC_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/pse.h>
+.HP
+.BI "queue_t *mi_allocq(struct streamtab *" st );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I st
+a pointer to the
+.BR streamtab (9)
+structure used to represent the
+.I STREAMS
+driver or module to which the queue pair will belong.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Allocate a new
+.BR NULL -initialized
+queue pair,
+.BR queue (9).
+Queue pairs allocated with
+.BR allocq ()
+can be freed with
+.BR freeq (9).
+.PP
+Queue pairs allocated with
+.BR allocq ()
+will have no
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.IR qi_qopen (9),
+or
+.IR qi_qclose (9),
+procedures associated with either
+queue, will have zero maximum and minimum packet sizes and high and low water
+marks; and will have no synchronization queues associated with the queue pair.
+.\"
+.SS /proc File System
+.PP
+A
+.BR queue (9)
+structure pair is dynamically allocated for every instance of a Stream head, driver or module,
+within a Stream.
+.BR allocq ()
+monitors the number of
+.BR queue (9)
+structure pairs currently allocated, and the high water mark for allocations since the last reboot.
+The counts and high water mark can be viewed in
+.BR proc (5)
+file system under
+.BR /proc/streams/strinfo .
+See
+.BR strinfo (5)
+for details. 
+.\"
+.\"
+.SH USAGE
+.PP
+.PP
+Although this function is documented as an internal function of
+.IR "SVR 4" ,
+.[
+magic
+.]
+.BR allocq ()
+is not normally called directly by
+.I STREAMS
+drivers or modules.  This function is normally internal to the
+.I STREAMS
+subsystem, yet,
+.B @PACKAGE_TITLE@
+provides an exported version of this function for use by drivers and modules
+so that private queue pairs can be allocated.
+.PP
+All
+.B @PACKAGE_TITLE@
+queue functions (e.g., 
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9))
+are designed to allow them to be executed on a detached queue pair.  This function can be used to
+allocate a private queue pair for use as a message buffer by
+.I STREAMS
+drivers and modules.  The queue pair is not linked into any stream and no message size or water
+marks or queue procedures are associated with the queue.
+.PP
+Message sizes, water marks and procedures can be associated with a private queue pair using
+.BR setq (9).
+.PP
+The queue can also be pushed onto or removed from a stream using
+.BR qattach (9)
+and
+.BR qdetach (9).
+.\"
+.\"
+.SH RETURN
+Upon success,
+.BR allocq ()
+returns the newly allocated queue pair as a pointer to the read queue of the
+pair.
+.PP
+Upon failure,
+.BR allocq ()
+returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR allocq ()
+encounters and error, it fails and returns
+.BR NULL .
+.BR allocq ()
+fails when there is insufficient
+.B queinfo
+cache memory available to allocate the queue pair.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR allocq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR allocq ()
+is MP-safe.  The caller has exclusive access to the returned queue pair.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although this function is documented as an internal function of
+.IR "SVR 4" ,
+.[
+magic
+.]
+.BR allocq ()
+it is not normally called directly by
+.I STREAMS
+modules or drivers.  This function is normally internal to the
+.I STREAMS
+scheduler, yet,
+.B @PACKAGE_TITLE@
+provides an exported version of this function for use by modules and drivers
+so that private queue pairs can be allocated.
+.PP
+All
+.B @PACKAGE_TITLE@
+queue functions (e.g., 
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9))
+can be executed on a detached queue pair.  This function can be used to
+allocate a private queue pair for use as a message buffer by
+.I STREAMS
+modules and drivers.  The queue pair is not linked into any stream and no
+message size or water marks or queue procedures are associated with the queue.
+.PP
+Message sizes, water marks and procedures can be associated with a private
+queue pair using
+.BR setq (9).
+.PP
+The queue can also be pushed onto or removed from a stream using
+.BR qattach (9)
+and
+.BR qdetach (9).
+.PP
+This function should not be used by portable
+.I STREAMS
+drivers or modules.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freeq (9),
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9),
+.BR setq (9),
+.BR proc (5),
+.BR strinfo (5),
+.BR qattach (9),
+.BR qdetach (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR allocq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR allocq ()
+is compatible with
+.I SVR 4.2 MP
+and systems based on
+.I SVR
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.\"Symbol
+.\".BR lis_allocq ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\".BR lis_allocq ()
+.\"simply calls
+.\".BR allocq ()
+.\"directly.
+.\".IP ""
+.\"Note that
+.\".BR lis_allocq ()
+.\"was deprecated as of
+.\".IR "LiS 2.18.0" .
+.\"See
+.\".BR lisdeprec (9)
+.\"for more information.
+.\".IP \(em
+.BR mi_allocq ()
+is provided for compatibility with
+.IR MacOT \(rg.
+.BR mi_allocq ()
+simply calls
+.BR allocq ()
+directly, ignoring the
+.I st
+argument.
+.IP \(em
+.BR allocq ()
+should not be called by normal
+.I STREAMS
+drivers or modules and is implementation specific.
+.IP \(em
+This function is not exported by
+.IR "SVR 4.2 MP DDI/DKI " or
+any other UNIX directly.
+It is declared in some earlier
+.I SVR 3
+.I <sys/stream.h>
+header files.
+.IP \(em
+Source and binary compatibility is not guaranteed, even from version to version and release to
+release.
+.PP
+See
+.BR liscompat (9),
+.BR maccompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Although
+.BR allocq ()
+appears in some early
+.I AT&T
+header files, it is not documented in the
+.IR "SVR 4.2 STREAMS Programmer's Guide" .
+.[
+svr42spg
+.]
+.PP
+.BR allocq ()
+is compliant with the description of the internal
+.BR allocq ()
+function in
+.I SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.PP
+.BR mi_allocq ()
+is compatible with
+.IR MacOT \(rg.
+.[
+macdoc
+.]
+.[
+macspg
+.]
+There is very little documentation avilable on
+.BR mi_allocq ().
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR allocq ()
+is an internal
+.I "SVR 4"
+.I STREAMS
+function described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.PP
+.BR allocq ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.PP
+.BR mi_allocq ()
+is likely the equivalent
+.I Mentat
+function.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

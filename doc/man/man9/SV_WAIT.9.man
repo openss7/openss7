@@ -1,0 +1,521 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SV_WAIT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B SV_WAIT, SV_WAIT_SIG
+\- wait on a sychronization variable or signal
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SVR4_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/ksynch.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+void \fBSV_WAIT\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
+.HP
+int \fBSV_WAIT_SIG\fR(sv_t *\fIsvp\fR, int \fIpriority\fR, lock_t *\fIlkp\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I svp
+A pointer to the synchronization variable upon which to wait.
+.TP
+.I priority
+A hint to scheduler concerning the priority with which the caller will run
+after waking.  The priority values are:
+.RS
+.TP \w'\ pridisk\ 'u
+.B pridisk
+A priority for a disk driver.
+.PD 0
+.TP
+.B prinet
+A priority for a network driver.
+.TP
+.B pritty
+A priority for a terminal driver (including
+.IR STREAMS ).
+.TP
+.B pritape
+A priority for a tape driver.
+.TP
+.B prihi
+A high priority.
+.TP
+.B primed
+A medium priority.
+.TP
+.B prilo
+A lo priority.
+.PD
+.RE
+.TP
+.I lkp
+A locked basic lock that will be released before blocking.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+wait on the synchronization variable referenced by the
+.I svp
+argument.
+The calling process will sleep inside
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+until signalled by
+.BR SV_BROADCAST (9)
+or
+.BR SV_SIGNAL (9)
+for the synchronization variable referenced by
+.I svp
+by another thread of execution.
+.BR SV_WAIT_SIG ()
+will also wake when the calling process receives a signal.
+.PP
+A priority may be specified with the
+.I priority
+argument that is a hint to the scheduler at which priority level the process
+will run after exiting from the
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+call.  This priority level is not set by
+.BR SV_WAIT (),
+or
+.BR SV_WAIT_SIG (),
+but is merely a hint to the scheduler as to what priority to assign to the
+task relative to other processes.
+.PP
+The basic lock indicated by the
+.I lkp
+argument must be held by the caller when calling
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ().
+This lock will be released internally and interrupt priority set to
+.B plbase
+after the process is placed on the wait queue, but before the context
+switching to another process.  Upon return from
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG (),
+the lock is not held and the interrupt priority is set to
+.BR plbase .
+This procedure ensures that signals and wake-ups on the synchronization variable
+are not lost.
+.PP
+The process will not be interrupted by signals while sleeping inside
+.BR SV_WAIT ().
+The process will be interrupted by signals while sleeping inside
+.BR SV_WAIT_SIG ().
+.\"
+.\"
+.SH USAGE
+.PP
+Within the scope of
+.IR STREAMS ,
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+is typically used within a
+.IR qi_qopen (9)
+procedure to wait on some condition before continuing
+.I STREAMS
+module initialization actions.  One typical usage is to call
+.BR qprocson (9)
+to enable
+.IR qi_putp (9)
+and
+.IR qi_srvp (9)
+procedures, send a message downstream and await a response.  Either the
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure would include a call to
+.BR SV_SIGNAL (9)
+to wake the process to continue the
+.IR qi_qopen (9)
+procedure.
+See
+.RI \(lq EXAMPLES \(rq,
+below.
+.PP
+An alternative to using
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+are the
+.IR Solaris \(rg
+DDI
+.[
+solspg
+.]
+.BR qwait (9)
+or
+.BR qwait_sig (9)
+functions.
+.PP
+The primary difference between
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+is that
+.BR SV_WAIT ()
+cannot be interrupted by signals and
+.BR SV_WAIT_SIG ()
+can.
+If it cannot be guaranteed that the condition will ever occur and there
+remains a possibility that the process will sleep forever, then
+.BR SV_WAIT_SIG ()
+is a better choice than
+.BR SV_WAIT ().
+When
+.BR SV_WAIT_SIG ()
+is interrupted by a signal in the
+.I STREAMS
+module
+.IR qi_qopen (9)
+procedure, the caller should exit the procedure with the error
+.RB [ EINTR ].
+.\"
+.\"
+.SH RETURN
+.PP
+.BR SV_WAIT ()
+returns void.
+.BR SV_WAIT_SIG ()
+returns false (zero) if the call was not interrupted by a signal and
+true (one) if the call was interrupted by a signal.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are always successful.  If incorrect arguments are supplied, the result will
+be indeterminate.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR SV_WAIT ()
+or
+.BR SV_WAIT_SIG ()
+can be called from user context.  For
+.I STREAMS
+this means from withing a kernel module
+.BR init_module (9)
+or
+.BR term_module (9)
+routine, or from within a
+.I STREAMS
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are MP-safe.  However, is the caller's responsibility to ensure that the
+appropriate basic lock is supplied to the call.
+.\"
+.\"
+.SH NOTICES
+.PP
+Calls to
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+should be written so as to be able to tolerate false wake-ups.  The condition
+that initiated the sleep on the synchronization variable should be rechecked
+on exit to ensure that the condition has been cleared.
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are
+.IR "SVR 4.2" -specific
+functions:
+.B _SVR4_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SVR4
+or
+.B CONFIG_STREAMS_COMPAT_SVR4_MODULE
+defined.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SV_BROADCAST (9),
+.BR SV_SIGNAL (9),
+.IR qi_qopen (9),
+.BR qprocson (9),
+.IR qi_putp (9),
+.IR qi_srvp (9),
+.BR qwait (9),
+.BR init_module (9),
+.BR term_module (9),
+.IR qi_qclose (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+documents its implementation of
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+somewhat differently than that of
+.IR "SVR 4.2" .
+See
+.IR HP-UX \(rg
+documentation
+.[
+hpuxdoc
+.]
+for more information.
+.IP \(em
+.I LiS
+does not provide these functions.
+.IP \(em
+.IR Solaris \(rg
+provides the related functions
+.BR qwait (9)
+and
+.BR qwait_sig (9).
+.IP \(em
+Under
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+the
+.I priority
+argument, which is a scheduler hint, is ignored.
+.B Linux
+does not schedule in the same manner as
+.IR "SVR 4.2 MP" .
+.IP \(em
+Under
+.B Linux
+a interrupt priority of
+.B plbase
+corresponds to interrupts enabled.
+.IP \(em
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+are provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2"
+DDI documentation.
+.[
+uw7doc
+.]
+.[
+uslspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR SV_WAIT ()
+and
+.BR SV_WAIT_SIG ()
+first appeared in
+.IR "SVR 4.2"
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

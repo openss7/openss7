@@ -1,0 +1,590 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH M2UACONF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B m2uaconf
+\- M2UA Configuration Utility
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+\fBm2uaconf\fR [\fIoptions\fR] [{\fB-g\fR|\fB--get\fR} [{\fICLEI\fR|\fIPPA\fR} [\fI...\fR]]]
+.PD 0
+.HP
+\fBm2uaconf\fR [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR} [{\fICLEI\fR|\fIPPA\fR} [\fI...\fR]]
+.HP
+\fBm2uaconf\fR [\fIoptions\fR] {\fB-a\fR|\fB--add\fR} \fICLEI\fR \fIPPA\fR \fIarguments\fR \fI...\fR
+.HP
+\fBm2uaconf\fR [\fIoptoins\fR] {\fB-f\fR|\fB--file\fR} [\fIFILENAME\fR]
+.HP
+\fBm2uaconf\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBm2uaconf\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBm2uaconf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B m2uaconf
+is a configuration utility for the M2UA-AS driver,
+.BR m2ua_as (4),
+and the SL-MUX multiplexing driver,
+.BR sl-mux (4).
+Its purpose is to form Signalling Link Streams using the M2UA-AS driver, connect the M2UA link
+configure the link, and link the SL stream under the SL-MUX multiplexing driver, configure the
+lower SL Stream, and then wait in the background watching for updates to the configuration file and
+apply updates as they occur.
+.PP
+The
+.B m2uaconf
+utility is intended to be run at system startup from a System V intiialization script, and at any
+time that reconfiguration is being performed.  Once the configuration of the M2UA-AS and SL-MUX
+drivers is complete, applications programs can open, attach, enmable and use Signalling Link Streams
+opened on the driver.
+.PP
+The purpose of the SL-MUX driver is to provide a unified interface for accessing signalling links of
+a number of forms and from a number of various drivers.  Signalling links could corespond to a
+device driver, or could be M2UA signalling links, M2PA signalling links, or other implementations.
+Each type of signalling link requries some additional configuration before they can be used and will
+be linked under the SL-MUX by a separate configuration utility.  The
+.B m2uaconf
+utility is the utility used for the M2UA-AS driver.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B m2uaconf
+provides the following command-line options:
+.SS "Command Options"
+.PP
+One of the following mutually exclusive command options must be specified.  If no command options
+are specified,
+.B m2uaconf
+will act as though the
+.B -g
+option was specified and print the configuration for all M2UA PPAs.
+.TP
+[{\fB-g\fP|\fB--get\fP} [{\fICLEI\fP|\fIPPA\fP} [\fI...\fR]]]
+Get and display the configuration information associated with a specific set of CLEI or PPA, or get
+and display information for all PPAs (if no arguments are specified).  The information is displayed
+in the same format as contained in the
+.BR slconf (5)
+configuration file.  This option can be used to obtain information about specific M2UA signalling
+links, as well as providing the ablity to regenerate the
+.B m2ua
+entries in the
+.BR slconf (5)
+configuration file.
+(See
+.RI \(lq EXAMPLES ,\(rq
+below.)
+.RS
+.PP
+Arguments consist of a whitespace separated list of one or more of the following arguments:
+.TP
+.I CLEI
+A Common Language Equipment Identifier (CLEI) specifying a signalling link for which to display
+information.
+.TP
+.I PPA
+A global Physical Point of Attachment (PPA) specifying a signalling link for which to display
+information.
+.PP
+If no arguments are supplied, the
+.B m2uaconf
+utility will display information for all signalling links of type
+.BR m2ua .
+.RE
+.TP
+{\fB-r\fP|\fB--remove\fP} [{\fICLEI\fP|\fIPPA\fP} [\fI...\fR]]
+Remove signalling links from the SL-MUX multiplexer for a specific set of CLEI or PPA, or remove
+signalling links for all PPAs (if no arguments are specified).
+This option can be used by configuration scripts to remove specific M2UA signalling links from the SL-MUX driver.
+.RS
+.PP
+Arguments consist of a whitespace separated list of one or more of the following arguments:
+.TP
+.I CLEI
+A Common Language Equipment Identifier (CLEI) specifying a signalling link to remove.
+.TP
+.I PPA
+A global Physical Point of Attachment (PPA) specifying a signalling link to remove.
+.PP
+If no arguments are supplied, the
+.B m2uaconf
+utility will remove all signalling links of type
+.BR m2ua .
+.RE
+.TP
+{\fB-a\fP|\fB--add\fP} \fICLEI\fP \fIPPA\fP \fIarguments\fR \fI...\fR
+Add signalling links to the SL-MUX multiplexer for a specific signalling link.  The format of the
+arguments are the same as for the
+.B sl
+entry in the
+.BR slconf (5)
+configuration file.
+This option can be used by configuration scripts to add specific M2UA signalling links to the SL-MUX driver.
+.RS
+.PP
+Arguments consist of the following fields separated by whitespace:
+.TP
+.I clei
+The Common Language Equipment Identifier (CLEI) to associate with the added signalling link.
+.TP
+.I ppa
+The global Physical Point of Attachment (PPA) to associated with the added signalling link.
+.TP
+.I profile
+Specifies thes signalling link profile to use, or the special value,
+.RB \(lq default ,\(rq
+specifying that the default signalling link profile is acceptable for the signalling lnik.  The
+named profile, if other than
+.RB \(lq default ,\(rq
+must exist in the
+.BR slconf (5)
+configuration file.
+.TP
+.I type
+Always
+.BR m2ua .
+.TP
+.I device
+Specifies the device driver to open to create a signalling link Stream.  Typically
+\(lq\fB/dev/m2ua-as\fINN\fR,\(rq
+for the M2UA-AS driver,
+where
+.I NN
+is the number of the ASP-SG relation to which the signalling link corresponds.
+for the M2UA-AS driver.
+.TP
+.I modules
+Modules to push on the opened Stream to form the signalling link.  Typically null
+.RB ( - )
+for the M2UA-AS driver.
+.\".TP
+.\".I version
+.\"Always
+.\".BR rfc3331
+.\"specifying RFC 3331.
+.\".[
+.\"rfc3331
+.\".]
+.TP
+.I sdli
+Specifies the Signalling Data Link Interface value (16-bit integer value) to be used to identify
+the signalling data link to external entities.
+.TP
+.I sdti
+Specifies the Signalling Data Terminal Interface value (16-bit integer value) to be used to identify
+the signalling data terminal to external entities.
+.TP
+.I iid
+Specifies the interface identifier (either integer or text) to be used to identify the signalling
+link to the Signalling Gateway.
+If both integer and text Interface Identifiers are to be specified, this field is a comma separated
+list consisting of integer IID and text IID.
+.TP
+.I mode
+Specifies the traffic mode type for the application server.  This value can be one of the following
+values:
+.BR override ", " loadshare " or " broadcast .
+.TP
+.I sdl-profile
+.TP
+.I sdt-profile
+.RE
+.TP
+{\fB-f\fP|\fB--file\fP} [\fIFILENAME\fR]
+Add, remove, and configure signalling links according to the signalling links configuration
+specified in the file,
+.IR FILENAME .
+If no
+.I FILENAME
+argument is specified, the default configuration file at
+.B /etc/sysconfig/slconfd
+is read.
+The file specified by
+.I FILENAME
+must be in
+.BR slconf (5)
+format, and on the
+.B m2ua
+.I type
+entries are processed by the
+.B m2uaconf
+utility.
+.TP
+{\fB-h\fP|\fB--help\fP|\fB-?\fP|\fB--?\fP}
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+{\fB-V\fP|\fB--version\fP}
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+{\fB-C\fP|\fB--copying\fP}
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The file format is as described in
+.BR slconf (5),
+with the additional fields defined for devices of type
+.B m2ua .
+Signalling link specification line entries in the file consist of the following fields:
+.PP
+.B sl
+.RI < clei >
+.RI < global-ppa >
+.RI < profile >
+.RI < type >
+.RI < device >
+.RI < modules >
+.RI < version >
+.RI < sdli >
+.RI < sdti >
+.RI < iid >
+.RI < sdl-profile >
+.RI < sdt-profile >
+.PP
+Where,
+.TP
+.B sl
+is the selector indicating that this is a signalling link definition entry.
+.TP
+.I clei
+is a Common Language Equipment Identifier (CLEI) to be associated with this signalling link.
+.TP
+.I global-ppa
+is a global Physical Point of Attachment (PPA) to be associated with this signalling link.
+.TP
+.I profile
+is a signalling link protocol parameters profile used to configure this signalling link.  The
+profile must either be the default entry,
+.RI \(lq default ,\(rq
+or must be defined in the
+.BR slconf (5)
+configuration file.
+.TP
+.I type
+Always
+.BR m2ua .
+.TP
+.I device
+is the device to open to create a signalling link Stream.  For the M2UA the device is normally
+\(lq\fB/dev/m2ua-as\fINN\fR,\(lq
+where
+.I NN
+is the number of the ASP-SG relation to which the signalling link corresponds.
+.TP
+.I modules
+is the modules to push over the open device Stream necessary to create a signalling link Stream
+supporting the Signalling Link Interface (SLI),
+.BR sli (7).
+This field is a comma-separated list of module names, with no intervening whitespace.  Modules are
+pushed in the order in which they appear in the list.  For M2UA, the module list is normally null
+and is specified as a single dash,
+.RB ` - '.
+.TP
+.I version
+is the protocol version for M2UA.  This field can be one of the following:
+.RS
+.TP \w'\fBrfc3332\fR\(em'u
+.B rfc3331
+RFC 3331
+.[
+rfc3331
+.]
+.RE
+.TP
+.I sdli
+is the Signalling Data Link Identifier that is used to identify (to external entities) the physical
+signalling data link.  This number is a 16-bit integer and many be Circuit Identification Code
+(CIC).
+.TP
+.I sdti
+is the Signalling Data Terminal Identifier that is used to identify (to external entities) the
+termination of the signalling data link on a signalling terminal.
+.TP
+.I iid
+is the interface identifier use to identify the signalling link to the remote Signalling Gateway.
+When the above value,
+.IR sdli " and " sdti
+are defined, and this field is specified as default by using a single dash,
+.RB ` - ',
+and the SG supports dynamic configuration, then the
+.IR sdli " and " sdti
+fields will be used in a link key to register the signalling link with the remote Signalling Gateway
+and obtain a dynamically registered Interface Identifier.
+When an integer Interface Identifier is used, it should be the same as the global PPA.  When a text
+Interface Identifier is used, it should be the same as the CLEI.
+.TP
+.I mode
+is the traffic mode type for the signalling link interface.  The traffic mode type can take on
+values as follows:
+.BR override ", " loadshare " or " broadcast .
+.TP
+.I sdl-profile
+is the signalling data link parameters profile to configure the signalling data link.  The profile
+must either be the default entry consisting of a single dash,
+.RB ` - ',
+or must be defined in the
+.BR slconf (5)
+configuration file.  It is also possible to place the parameter definitions in-line, or
+modifications some parameter definitions, enclosed in braces,
+.RB ( {} )
+following either the profile name, or by themselves.
+.TP
+.I sdt-profile
+is the signalling data terminal parameters profile to configure the signalling data terminal.  The profile
+must either be the default entry consisting of a single dash,
+.RB ` - ',
+or must be defined in the
+.BR slconf (5)
+configuration file.  It is also possible to place the parameter definitions in-line, or
+modifications some parameter definitions, enclosed in braces,
+.RB ( {} )
+following either the profile name, or by themselves.
+.PP
+When the
+.B -f
+option is specified,
+.B m2uaconf
+opens the configuration file,
+.IR FILENAME ,
+and reads the entries line by line.  Each entry is independent of other entries.  For each entry of
+.I type
+.BR m2ua ,
+.BR m2uaconf
+performs the following actions:
+.IP 1. \w'0.\(em'u
+The utility opens the device specified in the
+.I device
+field (typically,
+.BR /dev/m2ua_as )
+using the
+.BR open (2s)
+system call.  The utility then pushes the modules specified in the
+.I modules
+field (typically null) using the
+.IR I_PUSH (7)
+input-output control.
+.IP 2.
+The utility configures the signalling link using signalling link input-output controls in accordance
+with the
+.IR profile ", " sdt-profile " and " sdl-profile
+values, using
+.BR sli_ioctl (4),
+.BR sdti_ioctl (4)
+and
+.BR sdli_ioctl (4)
+input-output controls.
+(Note that M2UA is incapable of providing the signalling link protocol values at the SG side of the
+connection to the ASP side.)
+.IP 3.
+The utility attaches the signalling link using the concatenation of the Signalling Data Link
+Identifier,
+.IR sdli ,
+and the Signalling Data Terminal Identifier,
+.IR sdti ,
+as a Physical Point of Attachment,
+.IR lmi_ppa ,
+in a
+.BR LMI_ATTACH_REQ (7)
+primitive.
+.IP 4.
+The utility links the resulting signalling link Stream under the SL-MUx multiplexing driver using
+the
+.IR I_PLINK (7)
+input-output control and closes the file descriptor for the Stream.
+.IP 5.
+The utility uses the SL-MUX specific input-output controls to assign the
+.IR clei ", " global-ppa " and " type
+values to the linked signalling link.  Streams opened on the SL-MUX driver can then attach to this
+Signalling Link using the global PPA or CLEI for the signalling link.
+.PP
+Once the
+.B m2uaconf
+utility has linked and configured all of the signalling link Streams specified on the command line,
+or in the configuration file, it watches the configuration file for changes and effects those
+changes when they occur.  Changes are effected by linking additional signalling links or unlinking
+existing signalling links to alter the configuration of the SL-MUX to match that of the altered
+configuration file.
+.\"
+.\"
+.SH SIGNALS
+.PP
+.TP
+.RI { SIGHUP }
+This signal causes the
+.B m2uaconf
+utility to reread the configuration file.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1) indicates that an
+error occurred and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message is printed on
+.IR stderr .
+.PP
+The
+.B --quiet
+options suppresses the printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.B m2uaconf
+has not known bugs.
+Report problems to
+.RI < bugs@openss7.org >.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m2ua-as (4),
+.BR sl-mux (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B m2uaconf
+is an OpenSS7-specific configuration command.  Because this command is used at startup and is
+transparent to the SL-User opening SL streams, compatibility is not an issue.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Configuration is not subject to standardization.
+The utility conforms to OpenSS7 project specifications, coding and options standards.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B m2uaconf
+configuration utility was first released in sigtran 0.9.2.2.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

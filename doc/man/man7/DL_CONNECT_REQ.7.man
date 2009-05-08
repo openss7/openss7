@@ -1,0 +1,406 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH DL_CONNECT_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_CONNECT_REQ (dl_connect_req_t)
+\- requests the DLS provider establish a data link connection with a
+remote DLS user.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one
+.BR M_PROTO (9)
+message block containing the structure shown below.
+.sp
+.nf
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_dest_addr_length;
+    t_uscalar_t  dl_dest_addr_offset;
+    t_uscalar_t  dl_qos_length;
+    t_uscalar_t  dl_qos_offset;
+    t_uscalar_t  dl_growth;
+} dl_connect_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.B DL_CONNECT_REQ
+requests the DLS provider establish a data link connection with a remote DLS
+user.  The request contains the DLSAP address of the remote (called) DLS user
+and quality of service parameters to be negotiated during connection
+establishment.
+.\"
+.\"
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_CONNECT_REQ .
+.TP
+.I dl_dest_addr_length
+conveys the length of the DLSAP address that identifies the DLS user with whom
+a connection is to be established.  If the called user is implemented using
+DLPI, this address is the full DLSAP address returned on the
+.BR DL_BIND_ACK (7).
+.TP
+.I dl_dest_addr_offset
+conveys the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the destination DLSAP address begins.
+.TP
+.I dl_qos_length
+conveys the length of the quality of service (QOS) parameter values
+desired by the DLS user initiating a connection.  The desired QOS values
+are conveyed in the appropriate structure defined in
+.IR "\*(lqQOS Data Structures" . \*(rq
+A full specification of these QOS parameters and rules for
+negotiating their values is presented in
+.IR "\*(lqQuality of Data Link Service" . \*(rq
+If the DLS user does not wish to specify a particular QOS value, the value
+.B DL_QOS_DONT_CARE
+may be specified.  If the DLS user does not care to specify any QOS parameter
+values, this field may be set to zero.
+.TP
+.I dl_qos_offset
+conveys the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the quality of service parameters begin.
+.TP
+.I dl_growth
+defines a growth field for future enhancements to this primitive.  Its
+value must be set to zero.
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+.B DL_CODLS
+mode.
+.\"
+.\"
+.SH STATE
+The message is valid in state
+.BR DL_IDLE .
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state is
+.BR DL_OUTCON_PENDING .
+.\"
+.\"
+.SH RESPONSE
+There is no immediate response to the connect request.  However, if the
+connect request is accepted by the called DLS user,
+.BR DL_CONNECT_CON (7)
+is sent to the calling DLS user, resulting in state
+.BR DL_DATAXFER .
+If the connect request is rejected by the called DLS user, the called DLS user
+cannot be reached, or the DLS provider and/or called DLS user do not agree on
+the specified quality of service, a
+.BR DL_DISCONNECT_IND (7)
+is sent to the calling DLS user, resulting in state
+.BR DL_IDLE .
+If the request is erroneous, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting state is unchanged.
+.\"
+.\"
+.SH ERRORS
+.TP 12
+.B DL_ACCESS
+The DLS user did not have proper permission to use the requested
+DLSAP address.
+.TP
+.B DL_BADADDR
+The destination DLSAP address was in an incorrect format or contained
+invalid information.
+.TP
+.B DL_BADQOSPARAM
+The quality of service parameters contained invalid values.
+.TP
+.B DL_BADQOSTYPE
+The quality of service structure type was not supported by the DLS provider.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in
+the
+.BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_CONNECT_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc11
+.]
+does not support connection-oriented service mode directly.
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+only supports connection-oriented service mode.
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+documents that LLC2 uses the 7-byte
+.B llc_dladdr
+structure for destination addresses and LAPB uses the 21-byte
+.B pstnformat
+structure for destination addresses (see
+.BR DL_BIND_ACK (7)
+for a description of these structures).
+The LAPB
+.B pstnformat
+is only used for dial-up data link connections (i.e., LAPB over modem), and
+then contains the dial string.
+.RS
+.PP
+.IR AIX \(rg
+.[
+aixdlpi
+.]
+permits MAC+DSAP address formats for LLC2, but also permits MAC address (where
+the DSAP is implied by the first bound LSAP).
+.IR AIX \(rg
+.[
+aixlink
+.]
+does not support addresses for LAPB and
+.IR dl_dest_addr_length " and " dl_dest_addr_offset
+must be set to zero (0).
+.PP
+For maximum compatibility,
+.B @PACKAGE_TITLE@
+use MAC+DSAP formatting for LLC2 as
+.IR Solstice \(rg
+and
+.IR AIX \(rg
+where the DSAP is optional in the same manner as
+.IR AIX \(rg.
+It also supports
+8-byte MAC addresses for token ring and the 21-byte
+.B pstnformat
+dial string for dial-up LAPB.  It also supports a less than 21-byte free
+formatted dial string for LAPB (basically the
+.B pstnformat
+structure minus the length indicator and without including the length of
+insiginificant octets).
+.RE
+.IP \(em
+Neither
+.IR AIX \(rg
+.[
+aixdlpi
+.]
+.[
+aixlink
+.]
+nor
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+support QOS parameters and both
+.IR dl_qos_length " and " dl_qos_offset
+must be zero (0).
+.B @PACKAGE_TITLE@
+supports OSI data link QOS parameters defined for DLPI,
+.BR DL_QOS_CO_RANGE1 " and " DL_QOS_CO_SEL1 ,
+where the range is used with the
+.BR DL_CONNECT_REQ "(7) and " DL_CONNECT_IND (7)
+primitives and the selection is used with the
+.BR DL_CONNECT_RES "(7) and " DL_CONNECT_CON (7)
+primitives.  The
+.BR DL_CONNECT_CON (7)
+primitive will not contain a selection unless the
+.BR DL_CONNECT_REQ (7)
+primitive contained a range.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+and the OSI Data Link Service Definition.
+.[
+x212
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2

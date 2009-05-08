@@ -1,0 +1,326 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MSGUTIL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B msgutil
+\- \fISTREAMS\fR message utilities
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.sp
+.PD 0
+.HP
+.BI "int msgsize(mblk_t *" mp );
+.HP
+.BI "int msgdsize(mblk_t *" mp );
+.HP
+.BI "int xmsgsize(mblk_t *" mp );
+.HP
+.BI "int adjmsg(mblk_t *" mp ", int " len );
+.HP
+.BI "mblk_t *" mp " = copyb(mblk_t *" mp );
+.HP
+.BI "mblk_t *" mp " = copymsg(mblk_t *" mp );
+.HP
+.BI "mblk_t *" mp " = dupb(mblk_t *" mp );
+.HP
+.BI "mblk_t *" mp " = dupmsg(mblk_t *" mp );
+.HP
+.BI "void linkb(mblk_t *" mp );
+.HP
+.BI "mblk_t *" mp " = unlinkb(mblk_t *" mp );
+.HP
+.BI "int pullupmsg(mblk_t *" mp ", int " len );
+.HP
+.BI "int msgpullup(mblk_t *" mp ", int " len );
+.HP
+.BI "mblk_t *" mp " = rmvb(mblk_t *" mp ", mblk_t *" bp );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This man page describes the
+.I STREAMS
+message utility functions.
+.TP
+\fBmsgsize\fR
+calculates and returns the aggregated sizes of all of the
+message blocks in the message block chain pointed to by \fImp\fR (in bytes).
+.TP
+\fBmsgdsize\fR
+calculates and returns the aggregated sizes of all of the
+\fBM_DATA\fR blocks in the message block chain pointed to by \fImp\fR (in
+bytes).
+.TP
+\fBxmsgsize\fR
+calculates and the returns the aggregated sizes of all of the
+blocks in the message block chain which are of the same block type as the
+first block in the chain pointed to by \fImp\fR (in bytes).
+.TP
+\fBmsgsize\fR
+reads the available space (in contrast to used space) in each
+message block for the calculation.
+\fBmsgdsize\fR and \fBxmsgsize\fR reads the used space (in contrast to
+available space) in each message block for the calculation.
+.TP
+\fBadjmsg\fR
+trims the absolute value of \fIlen\fR bytes from a message.
+
+If \fIlen\fR is positive, \fIlen\fR bytes will be trimmed from the head of the
+message.  If \fIlen\fR is greater than the aggregate sizes of the blocks of
+the same type at the beginning of \fImp\fR, \fBadjmsg\fR fails.
+
+If \fIlen\fR is negative, \fI-len\fR bytes will be trimmed from the tail of
+the message.  If \fI-len\fR is greater than the aggregate sizes of the blocks
+of the same type at the end of \fImp\fR, \fBadjmsg\fR fails.
+
+Any message blocks whose resulting sizes are zero are not removed from the
+message, but have their \fIb_rptr\fR set to their \fIb_wptr\fR.
+.TP
+\fBcopyb\fR
+.TP
+\fBcopymsg\fR
+.TP
+\fBdupb\fR
+.TP
+\fBdupmsg\fR
+.PP
+.TP
+\fBlinkb\fR
+.TP
+\fBunlinkb\fR
+.PP
+.TP
+\fBpullupmsg\fR
+.TP
+\fBmsgpullup\fR
+.PP
+.TP
+\fBrmvb\fR
+Remove the message block pointed to by \fIbp\fR from the message pointed to by
+\fImp\fR.  When successful, it returns a pointer to the modified message, or
+\fBNULL\fR if \fIbp\fR was the only block in \fImp\fR.  When \fIbp\fR is not
+in message \fImp\fR, \fBrmvb\fR fails and returns \fI(mblk_t *)-1\fR.
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+\fBmsgsize\fR, \fBmsgdsize\fR and \fBxmsgsize\fR return the aggregated sizes
+of the message blocks counted in bytes.  Only positive values will be
+returned.  If there are no messages of the particular type, the function
+returns zero.
+
+\fBadjmsg\fR returns non-zero on success and zero on failure.
+.\"
+.\"
+.SH ERRORS
+.PP
+\fBmsgsize\fR, \fBmsgdsize\fR and \fBxmsgsize\fR always succeed.
+.\"
+.\"
+.SH CONTEXT
+.PP
+Message utility functions
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Message utility functions are MP-safe; however, it is the responsibility of
+the caller to ensure exclusive access to the passed in message(s).  Exclusive
+access to a message can normally be ensured by taking the message off of a
+message queue as part of a
+.IR qi_srvp (9)
+procedure, or working with a message passed into a
+.IR qi_putp (9)
+procedure.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR msgsize (9),
+.BR msgdsize (9),
+.BR xmsgsize (9),
+.BR adjmsg (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR linkb (9),
+.BR unlinkb (9),
+.BR pullupmsg (9),
+.BR msgpullup (9),
+.BR rmvb (9)
+.\"
+.\"
+.SH BUGS
+.PP
+These functions should probably return \fIsize_t\fR instead of \fIint\fR.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These message functions are source-level compatible with
+.IR "SVR 4.2 DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg
+and
+LiS
+.[
+LiS
+.]
+with the exceptions noted in the individual manual pages.
+.BR lis_ -prefixed
+symbols are provided for compatibility with LiS.  See
+.BR liscompat (9).
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 DDI/DKI" ,
+.[
+usldk
+.]
+.IR "SVID" ,
+.[
+svid
+.]
+.IR "XID" .
+.[
+xbd5
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these message utility functions first appeared
+in
+.IR "SVR 4 DDI/DKI" .
+.[
+svr4dk
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

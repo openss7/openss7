@@ -1,0 +1,1 @@
+.so man4/iso-lan.4.man

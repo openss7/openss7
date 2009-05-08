@@ -1,0 +1,271 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: help.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.16 $) $Date: 2008-04-28 09:30:19 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+##
+## =============================================================================
+
+##
+## A little bit different approach: we want this information included at the top
+## of the makefile, so we put it here in comments.  The help target processes
+## the makefile fragment to make README-help and then cats README-help.  We use
+## the special comment leader '#@ ' so we know what to extract.  Include this
+## file at the top of any Makefile.am that you want to have the help target.
+##
+
+#!
+#! Automake has many targets, not all of which are obvious to the causal user.
+#! In addition, OpenSS7 automake files have additional rules added to make
+#! maintaining and releasing a package somewhat easier.  This list of targets
+#! provides some help with what targets can be invoked, what they do, and what
+#! they hope to acheive.  The available targets are as follows:
+#!
+#!
+#! User Targets:
+#! -------------
+#!
+#! The following are normal targets intended to be invoked by installers of the
+#! package.  They are concerned with compiling, checking the compile,
+#! installing, checking the installation, and uninstalling the package.
+#!
+#! [all]:
+#!     Compiles the package.  This si performed after configuring the source
+#!     with 'configure'.  We provide a makefile stub so that if the package has
+#!     not had autoreconf run (such as when checked out from CVS, the package
+#!     will attempt to run 'autoreconf -fiv'.
+#!
+#!     All openss7 packages are configured without maintainer mode and without
+#!     dependency tracking by default.  This speeds compiling of the package for
+#!     one-time builds.  This also means that if you are developing using the
+#!     source package (edit-compile-test cycle), changes made to source files
+#!     will not cause the automatic rebuilding due to dependencies.  There are
+#!     two ways to enable dependency tracking: specify --enable-maintainer-mode
+#!     to 'configure'; or, specify --enable-dependency-tracking to 'configure'.
+#!     I use the former during my edit-compile-test cycle.
+#!
+#!     This target does not require root privilege.
+#!
+#! check:
+#!     All openss7 packages provide check scripts for the check target.  This
+#!     step is performed after compiling the package and will run all of the
+#!     check programs against the compiled binaries.  Which checks are performed
+#!     depends on whether --enable-maintainer-mode was specified to configure.
+#!     If in maintainer mode, checks that assist with the release of the package
+#!     will be run (such as checking that all manual pages load properly and
+#!     that they have required sections.)  We recommend running the check stage
+#!     before installing, because it catches problems that might keep the
+#!     installed package from functioning properly.
+#!
+#!     Another way to enable the greater set of checks, without invoking
+#!     maintainer mode, is to specify --enable-checks to 'configure'.
+#!
+#!     This target does not require root privilege.
+#!
+#! install:
+#!     The install target installs the package.  This target also performs some
+#!     actions similar to the pre- and post-install scripts used by packaging
+#!     tools such as rpm or deb.
+#!
+#!     This target requires root privilege.
+#!
+#! installcheck:
+#!     All openss7 packages provide test scripts for the installcheck target.
+#!     Test scripts are created and run using autotest (part of the autoconf
+#!     package).  Which test suites are run and how extensive they are depends
+#!     on whether --enable-maintainer-mode was specified to 'configure'.  When
+#!     in maintainer mode, all test suites will be run.  When not in maintainer
+#!     mode, only a few post-install checks will be performed, but the test
+#!     suites themselves will be installed in @libexecdir@/@PACKAGE@ for later
+#!     use.
+#!
+#!     This target might require root privilege.  Tests requiring root privilege
+#!     will be skipped when run as a regular user.  Tests requiring regular
+#!     account privileges will be skipped when run as root.
+#!
+#! retest:
+#!     To complement the installcheck target above, all openss7 packages provide
+#!     the retest target as a means to rerun failed conformance testsuite test
+#!     cases.  The retest target is provided because some test cases in the
+#!     testsuites have delicate timing considerations that allow them to fail
+#!     sporadically.  Invoking this target will retest the failed cases until
+#!     no cases that are not expected failures remain.
+#!
+#!     As with installcheck, this target might require root privilege.  Tests
+#!     requiring root privilege will be skpped when run as a regular user.
+#!     Tests requiring regular account privileges will be skipped when run as
+#!     root.
+#!
+#! uninstall:
+#!     This target will reverse the steps taken to install the package.  This
+#!     target also performs pre- and post- erase scripts used by packaging tools
+#!     such as rpm or deb.  You need to have a configured build directory from
+#!     which to execute this target, however, you do not need to have compiled
+#!     any of the files in that build directory.
+#!
+#!     This target requires root privilege.
+#!
+#! remove:
+#!     This target is like `uninstall' with the exception that it uninstalls in
+#!     the reverse order that installation was performed.
+#!
+#! Configure Options:
+#! ------------------
+#!
+#! There are also some configure script options that change the behaviour of
+#! some of the targets.  These options are as follows:
+#!
+#!
+#! Maintainer Targets:
+#! -------------------
+#!
+#! The following targets are targets intended for use by maintainers of the
+#! package, or those responsible for rerelease and packaging of a derivative
+#! work of the package.  Some of these targets are only effective when
+#! maintainer mode has been invoked (--enable-maintainer-mode specified to
+#! 'configure'.)
+#!
+#! dist:
+#!     Creates a distribution package (tarball) in the top level build
+#!     directory.  OpenSS7 packages distribute two archives: a gzip tar archive
+#!     and a bzip tar archive.  These archives will have the name
+#!     @PACKAGE@-@VERSION@.tar.gz and @PACKAGE@-@VERSION@.tar.bz2
+#!
+#!     This target does not require root privilege.
+#!
+#! distcheck:
+#!     This target is intended for use when releasing the package.  It creates
+#!     the tar archives above and then unpacks the tarball in a source
+#!     directory, configures in a separate build directory, compiles the
+#!     package, installs the package in a separate install directory, tests the
+#!     install package to ensure that some components work, and, finally, uses
+#!     the unpacked source tree to build another tarball.  If you have added or
+#!     removed files from the package, this is a good way to ensure that
+#!     everything is still kosher for release.
+#!
+#!     This target does not require root privilege.
+#!
+#!
+#! Clean Targets:
+#! --------------
+#!
+#! mostlyclean:
+#!     Cleans out most of the files from the compile stage.  This target is
+#!     helpful if you have not enabled dependency tracking and need to recompile
+#!     with changes.
+#!
+#! clean:
+#!     Cleans all the files from the build directory generated during the `make
+#!     [all]' phase.  It does not, however, remove files from the directory left
+#!     there from the `configure' run.  Use the `distclean' target to remove
+#!     those too.
+#!
+#! distclean:
+#!     This target cleans out the directories left behind by distcheck and
+#!     removes all the `configure' and generated files from the build directory.
+#!     This will effectively remove all the files in the build directory, with
+#!     the except of files that belong to you or some other process.
+#!
+#! maintainer-clean:
+#!     This target not only removes files from the build directory, it removes
+#!     generated files from the source directory as well.  Care should be taken
+#!     when invoking this target, because it removes files generated by the
+#!     maintainer and distributed with the archive that might require special
+#!     tools to regenerate.  These special tools might only be available to the
+#!     maintainer (but they aren't).  It also means that you probably need a
+#!     full blown Linux system to rebuild the package.
+#!
+
+help: ./README-make
+	@cat $<
+
+MY_PHONY += help
+
+README-make: Makefile
+	@grep '^#!' Makefile | sed -e 's|^#!||' > $@
+
+EXTRA_DIST  += README-make
+CLEANFILES  += README-make
+ALL_LOCAL   += README-make
+
+##
+# Place configure --help specific instructions in INSTALL-$(PACKAGE)
+##
+INSTALL-$(PACKAGE): $(top_srcdir)/configure
+	$(top_srcdir)/configure --help=recursive > $@
+
+EXTRA_DIST  += INSTALL-$(PACKAGE)
+CLEANFILES  += INSTALL-$(PACKAGE)
+ALL_LOCAL   += INSTALL-$(PACKAGE)
+
+## =============================================================================
+##
+## $Log: help.am,v $
+## Revision 0.9.2.16  2008-04-28 09:30:19  brian
+## - updated headers for release
+##
+## Revision 0.9.2.15  2007/12/15 20:19:28  brian
+## - updates
+##
+## Revision 0.9.2.14  2007/08/12 17:31:06  brian
+## - updated headers
+##
+## Revision 0.9.2.13  2007/01/08 09:37:10  brian
+## - got manual pages building and instaling separately
+##
+## Revision 0.9.2.12  2006/03/22 09:54:44  brian
+## - spelling
+##
+## Revision 0.9.2.11  2006/03/08 00:04:59  brian
+## - added help for remove target
+##
+## Revision 0.9.2.10  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

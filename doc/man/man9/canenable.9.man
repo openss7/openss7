@@ -1,0 +1,495 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH CANENABLE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B canenable
+\- test whether a \fISTREAMS\fR message queue can be scheduled.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int canenable(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue to test whether placing a (normal) message on the queue can result in scheduling of the
+queue.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR canenable ()
+tests whether the queue pointed to by
+.I q
+can be enabled
+.RI ( qi_srvp (9)
+procedure scheduled for execution by
+.BR runqueues (9))
+by placing a (normal) message on the queue.
+.PP
+If the queue,
+.IR q ,
+has been disabled with
+.BR noenable (9),
+setting the the
+.B QNOENB
+flag in the
+.I q_flag
+member of the
+.BR queue (9)
+strucuture, then this utility will return
+.IR false
+.RB ( 0 ).
+If the queue,
+.IR q ,
+has been enabled with
+.BR enableok (9),
+clearing the
+.B QNOENB
+flag in the
+.I q_flag
+member of the
+.BR queue (9)
+structure, then this utility will return
+.I true
+.RB ( 1 ).
+.\"
+.\"
+.SH USAGE
+.PP
+This function is typically called before a call to
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9)
+when the caller wishes to determine whether
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9)
+can result in the scheduling of the queue's
+.IR qi_srvp (9)
+procedure.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR canenable ()
+returns true (1) if the queue pointed to by
+.I q
+can be enabled with
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9),
+or back-enabled by the previous queue.
+.BR canenable ()
+returns false (0) if the queue pointed to by
+.I q
+cannot be enabled with
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9),
+or back-enabled by the previous queue.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR canenable ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR canenable ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+It is normally called from a
+.I STREAMS
+synchronous context [see
+.BR mp-streams (9)],
+that is, within
+.IR q 's
+.IR qi_putp (9)
+put procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR canenable ()
+is not MP-safe.
+Consideration should be given that the condition tested may change before the return value is used
+if
+.BR noenable (9),
+.BR enableok (9),
+.BR qprocson (9)
+or
+.BR qprocsoff (9)
+are allowed to execute concurrent with
+.BR canenable ().
+.\"
+.\"
+.SH NOTICES
+.PP
+It is questionable whether
+.BR canenable ()
+is usable in a Symmetric Multi-Processor (SMP) environment.
+.BR canenable ()
+tests atomic flags in the
+.BR queue (9)
+structure flags word that can be altered by other processors immediately
+prior to, or subsequent to, the call to
+.BR canenable ().
+Therefore, there is always a race condition possible between
+.BR canenable ()
+and
+.BR noenable (9),
+.BR enableok (9),
+.BR qprocson (9),
+.BR qprocsoff (9),
+(or other utilities affecting the
+.B QNOENB
+flag in the
+.BR queue (9)
+flags word) on SMP systems.
+.PP
+.BR canenable ()
+might have some limited use on UP systems where interrupts can be locked out
+across the call, or on SMP systems where the Stream is frozen by
+.BR freezestr (9).
+.PP
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR canenable ().
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR canenable ()
+simply returns the result of testing the
+.B QNOENB
+bit.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR qenable (9),
+.BR noenable (9),
+.BR enableok (9),
+.BR qprocson (9),
+.BR qprocsoff (9),
+.BR freezestr (9),
+.IR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR canenable ()
+has no known bugs, but see the limitations under
+.RI \(lq MP-STREAMS \(rq,
+above.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR canenable ()
+is compatible with
+.IR "SVR 4.0"
+.[
+svr4dk
+.]
+and implementations compatible with
+.IR "SVR 3.2"
+.[
+svr3spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR canenable ()
+is an
+.I SVR 3 STREAMS
+.[
+svr3spg
+.]
+macro that never made it to the
+.I DDI/DKI
+.[
+usldk
+.]
+and has little use on an Symmetric Multi-Processor (SMP) system.  This function is deprecated and is
+only maintained for backwards compatibility to
+.I SVR 3
+for single threaded drivers (e.g. ones with synchronization level
+.BR SQLVL_ELSEWHERE " or " SQLVL_GLOBAL ).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR canenable ().
+.IP \(em
+None of
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR OSF/1 \(rg,
+.IR MacOT \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+.IR UnixWare \(rg
+or
+.IR UXP/V \(rg
+document
+.BR canenable ().
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR canenable ().
+.IP \(em
+.BR canenable ()
+is an
+.B extern inline
+function call.
+.I SVR 3.2
+implements
+.BR canenable ()
+as a macro.
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not try to take a function pointer to
+.BR canenable ().
+.IP \(em
+A call to
+.BR canenable ()
+with a
+.B NULL
+.I q
+or with a
+.RB non- NULL
+.I q
+that points to other than a valid
+.B queue_t
+structure is invalid and the result is undefined.
+When
+.I LiS
+.BR canenable ()
+encounters such an error, it will return false (0).
+.IP ""
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR canenable ()
+with invalid queue pointers.
+.IP \(em
+.BR canenable ()
+is provided for source level compatibility with
+.I SVR 3
+for the purpose of porting
+.I SVR 3
+drivers to
+.B Linux .
+Because internal structures and definitions for
+.B "@PACKAGE_TITLE@"
+.[
+@PACKAGE_TITLE@
+.]
+differ from that of
+.IR "SVR 3" ,
+binaries are incompatible.
+.IP \(em
+.BR canenable ()
+only provides functionality comparable to
+.I SVR 3
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR canenable ()
+in support of
+.RB non- STREAMS
+devices are not supported.
+.\".IP \(em
+.\"Symbol
+.\".BR lis_safe_canenable ()
+.\"is provided for compatibility with
+.\".IR LiS .
+.\"See
+.\".BR liscompat (9).
+.\".BR lis_safe_canenable ()
+.\"simply calls
+.\".BR canenable ()
+.\"directly.
+.\".IP ""
+.\"Portable
+.\".I STREAMS
+.\"drivers and modules will not access these symbols.  Portable
+.\".I STREAMS
+.\"drivers and modules will use
+.\".B "@PACKAGE_TITLE@"
+.\"instead of
+.\".IR LiS .
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+Additional compatibility is available using the
+.I STREAMS Compatibility Modules
+.BR strcompat (5)
+package for
+.I LiS
+and
+.BR "@PACKAGE_TITLE@" .
+See
+.BR svr3compat (9),
+.BR liscompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR canenable ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

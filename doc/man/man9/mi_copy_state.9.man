@@ -1,0 +1,545 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_COPY_STATE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_copy_state
+\- current state of the input-output control process
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "int mi_copy_state(queue_t *" q ", mblk_t *" mp ", mblk_t **" mpp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the current write-side queue whose
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
+.BR mi_copy_state ()
+is being called.
+.TP
+.I mp
+a pointer to the message block that contains the
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message being processed.  This is the message that was passed to the write-side
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure within which
+.BR mi_copy_state ()
+is invoked.
+.TP
+.I mpp
+a pointer to a
+.B mblk_t *
+into which the pointer to the just copied in data (if applicable) is placed.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_copy_state ()
+is one of a set of helper functions that support transparent input-output controls (see
+.BR ioctl (2s)
+and
+.BR streamio (9))
+that includes
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_done (9),
+.BR MI_COPY_CASE (9),
+.BR mi_copy_set_rval (9)
+and
+.BR mi_copy_state (9).
+.PP
+.BR mi_copy_state ()
+checks the result of the previous copy in or copy out operation.  If the previous operation was
+successful,
+.BR mi_copy_state ()
+determines and returns the state of the current ioctl operation.  If the previous
+operation was unsuccessful, or if an internal error occurs,
+.BR mi_copy_state ()
+places a suitable error code in an
+.BR M_IOCNAK (9)
+message and passed it upstream to terminate the input output control operation.  Whenever
+.BR mi_copy_state ()
+terminates the input output control operation in this fashion, it returns minus one
+.RB ( -1 ).
+.PP
+When successful,
+.BR mi_copy_state ()
+also prepares the message for processing by other
+.B mi_copy
+helper functions by pulling up the data blocks attached the message with
+.BR pullup (9).
+If the pullup operation fails an
+.BR M_IOCNAK (9)
+message is passed upstream to terminate the input output control operation with error code
+.B ENOMEM
+and returns minus one
+.RB ( -1 ).
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_copy_state ()
+is sued in conjunction with other
+.B mi_copy
+helper functions, and is used to relieve the
+.I STREAMS
+module writer of the burden of tracking input output control operation state.
+.PP
+.BR mi_copy_state ()
+determines the current state of the input output control operation, and is used as the argument of a
+switch statement with
+.BR MI_COPY_STATE (9)
+used to generate case labels for the switch statement.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_copy_state ()
+succeeds, it returns the state of the input-output control session for the passed in message pointer,
+.IR mp ;
+when it fails,
+it returns minus one
+.RB ( -1 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_copy_state ()
+fails when passed invalid pointers.  When
+.BR mi_copy_state ()
+fails, it panics the kernel.
+.PP
+When
+.BR mi_copy_state ()
+suffers and internal failure, it
+issues a
+.BR M_IOCNAK (9)
+message upstream with a suitable error code to terminate the intput output control operation and
+returns minus one
+.RB ( -1 ).
+The error codes returned by
+to the
+.BR ioctl (2s)
+operation in
+.BR errno (3),
+are as follows:
+.TP \w'ENOBUFS\ \ 'u
+.B EPROTO
+.BR mi_copy_state ()
+was passed an invalid argument, or the passed in message block was of an invalid format.
+.TP
+.B ENOSR
+.BR mi_copy_state (),
+or the stream head, could not allocate a
+.I STREAMS
+resource
+to complete the operation.
+.TP
+.B ENOMEM
+.BR mi_copy_state (),
+or the stream head, could not allocate 
+memory to
+complete the operation.
+This occues when
+.BR mi_copy_state ()
+failed to pull up the data blocks associated with the call.
+.TP
+.B ENOBUFS
+.BR mi_copy_state (),
+or the stream head, could not allocate 
+a buffer
+to complete the operation.
+.PP
+Also, any error returned by the stream head in a
+.BR M_IOCDATA (9)
+response
+.RI ( cp->cp_rval )
+can also be returned to the
+.BR ioctl (2s)
+system call.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+See
+.BR mi_copyin (9)
+and
+.BR mi_copyout (9)
+for examples of the usage of
+.BR mi_copy_state ().
+.PP
+.nf
+\fC\s-1
+mblk_t *db;
+switch (mp->b_datap->db_type) {
+
+case M_IOCDATA:
+    switch (mi_copy_state(q, mp, &db)) {
+
+    case -1:
+	/* the last operation failed or mi_copy_state failed internally */
+	return (0);
+
+    case MI_COPY_STATE(MI_COPY_IN, 1):
+	/* the operation was found successful by mi_copy_state above */
+	/* process the first copy in operation */
+	/* db already points to the mblk with the copied in data */
+	mi_copyin_n(q, mp, copy_offset, copy_len)
+	    return (0);
+
+    case MI_COPY_STATE(MI_COPY_IN, 2):
+	/* the operation was found successful by mi_copy_state above */
+	/* process the second copy in operation */
+	/* db already points to the mblk with the copied in data */
+	if (db = mi_copyout_alloc(q, mp, uaddr, copy_len, 1)) {
+	    /* place second data to be copied out into db */
+	}
+	if (db = mi_copyout_alloc(q, mp, uaddr, copy_len, 1)) {
+	    /* place first data to be copied out into db */
+	    mi_copyout(q, mp);
+	}
+	return (0);
+
+    case MI_COPY_STATE(MI_COPY_OUT, 1):
+	/* the operation was found successful by mi_copy_state above */
+	/* process second copy out operation */
+	mi_copyout(q, mp);
+	return (0);
+
+    case MI_COPY_STATE(MI_COPY_OUT, 2):
+	/* the operation was found successful by mi_copy_state above */
+	/* end the operation */
+	mi_copy_done(q, mp, 0);
+	return (0);
+    }
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_copy_state ()
+can be called from
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_copy_state ()
+is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
+in message blocks.  This is normally the case when the function is called from the
+.I STREAMS
+driver or module write-side queue
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_copy_state ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B mi_copy_state ()
+is implemented by directly manipulating the
+.BR iocblk (9),
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures contained in the message block.  Private state information and accumulated data is
+chained off of the
+.IR cq_private " and " cp_private
+members of the
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures.
+Because of this, it is important that once one of these helper functions is used to begin an
+.BR M_IOCTL (9)
+sequence, that the remaining help functions be used also, instead of directly manipulating the
+structures.  Messages and their contained structures should be passed to the helper functions
+without being manipulated in any way by the caller.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_copy_done (9),
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_set_rval (9),
+.BR MI_COPY_CASE (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_copy_state ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_copy_state ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_copy_state ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common private variables
+should be used in its stead.
+.IP \(em
+.BR mi_copy_state ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_copy_state ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_copy_state ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_copy_state ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_copy_state ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_copy_state ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_copy_state ()
+appears in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

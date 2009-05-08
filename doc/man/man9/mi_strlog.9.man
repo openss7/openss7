@@ -1,0 +1,433 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_STRLOG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_strlog
+\- generate a \fISTREAMS\fR log message
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "int mi_strlog(queue_t *" q ", char " level ", ushort " flags ", char *" fmt ", " ... ");
+.HP
+.BI "int mi_vstrlog(queue_t *" q ", char " level ", ushort " flags ", char *" fmt ", va_list " args ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+specifies the read queue associated with the driver or module instance.
+.PD 0
+.TP
+.I level
+specifies the priority level.
+.TP
+.I flags
+log flags specifying the severity and options associated with the
+.I STREAMS
+log.
+.TP
+.I fmt
+provides the
+.BR printf (3)-style
+format string.
+.TP
+.I ...
+provides the arguments for the
+.BR printf (3)-style
+format string for
+.BR mi_strlog ().
+.TP
+.I args
+provides the arguments for the
+.BR printf (3)-style
+format string for
+.BR mi_vstrlog ().
+.PD
+.PP
+.BR mi_vstrlog ()
+is a
+.B va_list
+version of
+.BR mi_strlog ().
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_strlog ()
+is an
+.IR MPS \(rg-specific
+interface to the
+.I STREAMS
+.BR log (4)
+error and trace logger,
+see
+.BR strlog (9).
+The
+.I q
+argument, when
+.RB non- NULL ,
+is used to look up the module identifier which is passed to
+.BR vstrlog (9)
+in the
+.I mid
+argument.
+The
+.I sid
+argument passed to
+.BR vstrlog (9)
+is always zero
+.RB ( 0 ).
+The remaining arguments,
+.IR level ,
+.IR flags ,
+.IR fmt ,
+and
+.IR args ,
+are passed without modification to
+.BR vstrlog (9).
+.\"
+.\"
+.SH USAGE
+.PP
+Although on some platforms
+.BR mi_strlog ()
+might support more format strings than are supported by
+.BR strlog (9),
+this is not the case for
+.BR "@PACKAGE_TITLE@" .
+Therefore,
+.BR mi_strlog ()
+is equivalent to
+.BI strlog( q->q_qinfo->qi_minfo->mi_idnum ", 0, " level ", " flags ", " fmt ", " ... ").
+In fact, a macro defintiion to that effect would be better.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_strlog ()
+succeeds, it returns 
+.BR true  " (1);
+when it fails, it returns
+.BR false " (0).
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_strlog ()
+fails under the same circumstances as
+.BR strlog (9)
+(when the message has not been seen by all the readers).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_strlog ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_strlog ()
+is MP-safe, however, see
+.BR strlog (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_strlog ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Some implementation of
+.BR mi_strlog (9)
+perform complete formatting of the buffer and then pass the formatted output
+buffer to
+.BR strlog (9).
+The purpose of this, I suppose, is that
+.BR mi_iprintf ()
+supports some
+.BR printf (9)
+format strings that are not supported traditionally by
+.BR strlog (9).
+.BR "@PACKAGE_TITLE@" ,
+however, supports all format strings and neither needs to have the buffer
+preformatted, nor would it be very efficient.
+.BR mi_strlog (9)
+on
+.BR "@PACKAGE_TITLE@" ,
+therefore, passes the format string and arguments to
+.BR vstrlog (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_strlog ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_strlog ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+See
+.BR strlog (9)
+for a detailed discussion on supported conversion specifiers.
+.IP \(em
+.BR mi_strlog ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR strlog (9)
+function should be used in its stead.
+.IP \(em
+.BR mi_strlog ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.BR "@PACKAGE_TITLE@"
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_strlog ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_strlog ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation,
+.[
+macotr
+.]
+.[
+macspg
+.]
+.IR AIX \(rg
+documentation.
+.[
+aixcpc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_strlog ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_strlog ()
+is a
+Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.BR mi_strlog ()
+appears in
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR AIX \(rg.
+.[
+aixcpc
+.]
+An undocumented version of
+.BR mi_strlog ()
+appears in
+.IR Solaris \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

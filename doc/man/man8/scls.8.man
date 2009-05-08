@@ -1,0 +1,594 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaning to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SCLS 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B scls
+\- produces a list of module and driver names
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBscls\fR [\fIoptions\fR] [{\fB-c\fR|\fB--count\fR}|{\fB-l\fR|\fB--long\fR}|{\fB-b\fR|\fB--both\fR}] [\fImodule\fR ...]
+.PD 0
+.HP 12
+\fBscls\fR {{\fB-h\fR|\fB--help\fR}|{\fB-V\fR|\fB--version\fR}|{\fB-C\fR|\fB--copying\fR}}
+.PD
+.\"
+.\"
+.SH OPTIONS
+.PP
+When issued without the
+.BR -c " or " -l
+options,
+.B scls
+lists the specified driver or module name if it is loaded on the
+.I STREAMS
+system, or, if no
+.I module
+name is specified, the names of all of the drivers and modules currently
+loaded on the
+.I STREAMS
+system.
+.TP
+\fB-l\fR, \fB--long\fR [\fImodule\fR ...]
+Produces a listing that shows the extension type, major number, and
+information pertaining to the
+.BR module_info (9)
+structure, for each
+.I module
+name listed, or, if no
+.I module
+name is specified, all modules on the system.
+.TP
+\fB-c\fR, \fB--count\fR
+Produces a listing showing the number of times an interface routine was
+called for each
+.I module
+name listed, or, if no
+.I module
+name is specified, all modules on the system.  Information is obtained from
+the
+.BR module_stat (9)
+structure if one is specified for the module.
+.TP
+\fB-b\fR, \fB--both\fR
+Produces a listing showing both the information from the \fB--long\fR format
+and the \fB--count\fR format for each
+.I module
+name listed, or, if no
+.I module
+name is psecified, all modules on the system.  Information is obtained 
+from the
+.BR module_info (9)
+and
+.BR module_stat (0)
+structure (if one is specified) for the module.
+.TP
+\fB-a\fR, \fB--all\fR
+Used in conjunction with
+\fB-c\fR, \fB-l\fR or \fB-b\fR.
+Normally
+.B scls
+only prints information only for the upper multiplex write queue (that is, the
+.I st_wrinit
+member of the
+.BR streamtab (9)
+structure).
+The
+.B -a
+option causes it to display information for all queues.
+.TP
+\fB-r\fR, \fB--reset\fR
+All statistics are reset after collection.  This is statistics for all STREAMS
+modules and drivers, not just those listed as
+.IR module .
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase or specify the verbosity level of the output.  This option may be
+repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B scls
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B scls
+displays versions information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B scls
+displays copying and copyright information on
+.I stdout
+and exits.
+.PP
+The
+.BR -c " and " -l
+options are mutually exclusive.
+.\"
+.\"
+.SH AGRUMENTS
+.PP
+.TP
+[\fImodule\fR \fI...\fR]
+specifies the
+.I STREAMS
+modules names of interest, or it no
+.I module
+is specified, refers to all of the
+.I STREAMS
+modules loaded on the system.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B scls
+command provides a method for the caller to query the current
+.I STREAMS
+configuration.  Options can be used to produce enhanced lists.  Any further
+parameters on the command line are module or driver names, and the output
+produced is for only those names.
+.\"
+.\"
+.SH FORMAT
+.PP
+The format of the output without the
+.BR -c " or " -l
+options is
+.sp
+.RB < name >,
+where
+.RS
+.TP 12
+.RB < name >
+is the name of the driver or module
+.RI ( %9s ).
+.RE
+.PP
+The format of the output with the
+.B -l
+option is
+.sp
+.\".RB < name "> <" type "> <" major "> <" mi_idnum "> <" mi_idname "> <" mi_minpsz "> <" mi_maxpsz "> <" mi_hiwat "> <" mi_lowat >,
+.RB < name "> <" type "> <" major "> <" mi_idnum "> <" mi_minpsz "> <" mi_maxpsz "> <" mi_hiwat "> <" mi_lowat >,
+where
+.RS
+.TP 12
+.RB < name >
+is the name of the driver or module
+.RI ( %9s ).
+.PD 0
+.TP
+.RB < type >
+The module type.  This is either: \(lqmodule\(rq or \(lqdriver\(rq.
+.TP
+.RB < major >
+The major device number
+.RI ( %5d )
+when
+.I type
+is \(lqDriver\(rq, and a space otherwise.
+.TP
+.RB < mi_idnum >
+The module ID number for the module
+.RI ( %5d ).
+.\".TP
+.\".RB < mi_idname >
+.\"The module name.
+.TP
+.RB < mi_minpsz >
+The minimum packet size accepted
+.RI ( %6ld ).
+.TP
+.RB < mi_maxpsz >
+The maximum packet size accepted
+.RI ( %6ld ).
+.TP
+.RB < mi_hiwat >
+The (initial) high water mark for the queue pair
+.RI ( %6ld ).
+.TP
+.RB < mi_lowat >
+The (initial) low water mark for the queue pair
+.RI ( %6ld ).
+.PD
+.RE
+.PP
+The format of the output with the
+.B -c
+option is
+.sp
+.RB < name "> <" ms_pcnt "> <" ms_scnt "> <" ms_ocnt "> <" ms_acnt "> <" ms_flags >,
+where
+.RS
+.TP 12
+.RB < name >
+is the name of the driver or module
+.RI ( %9s ).
+.PD 0
+.TP
+.RB < ms_pcnt >
+The number of calls to the module's
+.BR putp (9)
+procedure
+.RI ( %8ld ).
+.TP
+.RB < ms_scnt >
+The number of calls to the module's
+.BR srvp (9)
+procedure
+.RI ( %8ld ).
+.TP
+.RB < ms_ocnt >
+The number of calls to the module's
+.BR qopen (9)
+procedure
+.RI ( %8ld ).
+.TP
+.RB < ms_acnt >
+The number of calls to the module's
+.BR qadmin (9)
+procedure
+.RI ( %8ld ).
+.TP
+.RB < ms_flags >
+Boolean statistics flags
+.RI ( %8x ).
+.PD
+.RE
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful;
+one (1) indicates that an error occurred and a diagnostic messages is 
+printed to
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors may result from inadequate permissions, inability to open the
+.BR nuls (4)
+driver, inability to push the
+.BR sc (4)
+module.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B scls
+command requires the
+.BR sc (4)
+.I STREAMS
+module and the
+.BR nuls (4)
+.I STREAMS
+driver.
+If either one is not available, the
+.B scls
+command will not be successful.
+.\".PP
+.\"Note that only the module information and module statistics associated with the write side of the
+.\"upper multiplexer will be displayed for a module or driver.  A module or driver that has more than
+.\"one
+.\".BR module_info (9)
+.\"or
+.\".BR module_stat (9)
+.\"structure in its definition, will only display the information associated with the
+.\".I st_wrinit
+.\"member of the
+.\".BR streamtab (9)
+.\"structure.
+See
+.BR sc (4),
+.BR module_info (9),
+.BR module_stat (9),
+.BR streamtab (9)
+for more information.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of the output of the
+.B scls
+command without options:
+.RS
+.nf
+\fC\s-1
+#> scls
+spx      
+sfx      
+sad      
+pipe     
+nuls     
+nsdev    
+mux      
+loop     
+log      
+fifo     
+echo     
+clone    
+inet     
+rawip2   
+udp2     
+ip_to_dlp
+link-driv
+np_ip    
+sc       
+tirdwr   
+timod    
+testmod  
+pipemod  
+nullmod  
+connld   
+bufmod   
+ip_strms 
+sth      
+\s+1\fP
+.fi
+.RE
+.PP
+Following is an example of the output of the
+.B scls
+command with the
+.B -l
+option:
+.RS
+.nf
+\fC\s-1
+#> scls -l sth sc mux
+sth       module         1      0   4096   5120   1024
+sc        module         6      0   4096   5120   1024
+mux       driver 236   236      0   4096   5120   1024
+\s+1\fP
+.fi
+.RE
+.PP
+Following is an example of the output of the
+.B scls
+command with the
+.B -c
+option:
+.RS
+.nf
+\fC\s-1
+#> scls -c sc timod tirdwr mux
+sc              19        0        0        0        0        0
+timod            0        0        0        0        0        0
+tirdwr           0        0        0        0        0        0
+mux              0        0        0        0        0        0
+\s+1\fP
+.fi
+.RE
+.PP
+Following is an example of the output of the
+.B scls
+command with the
+.B -a
+option:
+.RS
+.nf
+\fC\s-1
+#> scls -c -a sth timod sc
+sth              0        0        0        0        0        0 : wr
+                46        0       12       11        0        0 : rd
+timod            0        0        0        0        0        0 : wr
+                 0        0        0        0        0        0 : rd
+sc              47        0        0        0        0        0 : wr
+                 0        0       12       11        0        0 : rd
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR sc (4)
+.I STREAMS
+configuration module.
+.TP
+.B /dev/nuls
+.I STREAMS
+null device, see
+.BR nuls (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/scls
+contains the
+.B scls
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sc (4),
+.BR nuls (4),
+.BR strinfo (8),
+.BR strload (8),
+.BR strsetup (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B scls
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.IR AIX \(rg.
+This is an
+.IR AIX \(rg-specific
+command.
+.B scls
+is provided in
+.I @PACKAGE_TITLE@
+for compatibility with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+does not document long options.
+.IP \(em
+.IR AIX \(rg
+does not document the
+.BR -b ", " -a ", " -r ", " -q ", " -v ", " -h ", " -V " or " -C
+options.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+The format of the output from the
+.B scls
+command with the
+.BR -c " or " -l
+options may be different from that of
+.IR AIX \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+documentation.
+.[
+aixdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B scls
+first appeared in
+.IR AIX \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
