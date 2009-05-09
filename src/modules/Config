@@ -1,0 +1,287 @@
+## =============================================================================
+## 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date$ by $Author$
+##
+## =============================================================================
+
+## Driver specifications
+## -----------------------------------------------------------
+##	name	    prefix	major	n-minors    n-majors
+
+## Module specifications
+## -----------------------------------------------------------
+##	name	    prefix
+module	aal1	    aal1
+module	aal2	    aal2
+module	aal5	    aal5
+module	bufmod	    bufmod
+module	cd	    cd
+module	cd-daed	    cd_daed
+module	cd-hdlc	    cd_hdlc
+module	cdpmod	    cdpmod
+module	ch-pmod	    ch_pmod
+module	ch-sdl	    ch_sdl
+module	cmot	    cmot
+module	connld	    connld
+module	dlaix	    dlaix
+module	hdlc	    hdlc
+module	ip_strms    ip_to_streams
+module	isot	    isot
+module	itot	    itot
+module	ldterm	    ldterm
+module	lpp	    lpp
+module	m2pa-sl	    m2pa_sl
+module	m2tp	    m2tp
+module	m2ua-as	    m2ua_as
+module	m3ua-as	    m3ua_as
+module	mtp3b	    mtp3b
+module  mtp-mod	    mtp_mod
+module	mtp-npi	    mtp_npi
+module	mtp-tpi	    mtp_tpi
+module	mx-pmod	    mx_pmod
+module	mx-sdl	    mx_sdl
+module	npi-sccp    npi_sccp
+module	nullmod	    nullmod
+module	pckt	    pckt
+module	phys	    phys
+module	pipemod	    pipemod
+module	ptem	    ptem
+module	sccp-mod    sccp_mod
+module	s-cdi	    s_cdi
+module	sc	    sc
+#module	sdlold	    sdlo
+module	sdl-pmod    sdl_pmod
+module	sdl-sctp    sdl_sctp
+module	sdl	    sdl
+module	sdt-pmod    sdt_pmod
+module	sdt-sctp    sdt_sctp
+module	sdt	    sdt
+module	sdt-tpi	    sdt_tpi
+module	slpmod	    slpmod
+module	sl-sctp	    sl_sctp
+module	sl	    sl
+module	sl-tpi	    sl_tpi
+module	sm_mod	    sm_mod
+module	sockmod	    sockmod
+module	spm	    spm
+module	sscopmce    sscopmce
+module	sscop	    sscop
+module	sth	    sth
+module	tcap-mod    tcap_mod
+module	tc-mod	    tc_mod
+module	tcpns	    tcpns
+module	testmod	    testmod
+module	timod	    timod
+module	tirdwr	    tirdwr
+module	tpi-sccp    tpi_sccp
+module	tr-mod	    tr_mod
+module	ttcompat    ttcompat
+module	xot	    xot
+
+## Object name specifications
+## -----------------------------------------------------------
+##	type	name	    object name
+objname	module	aal1	    aal1
+objname	module	aal2	    aal2
+objname	module	aal5	    aal5
+objname	module	bufmod	    bufmod
+objname	module	cd	    cd
+objname	module	cd-daed	    cd_daed
+objname	module	cd-hdlc	    cd_hdlc
+objname	module	cdpmod	    cdpmod
+objname	module	ch-pmod	    ch_pmod
+objname	module	ch-sdl	    ch_x400p
+objname	module	cmot	    cmot
+objname	module	connld	    connld
+objname	module	dlaix	    dlaix
+objname	module	hdlc	    hdlc
+objname	module	ip_strms    ip_strm_mod
+objname	module	isot	    isot
+objname	module	itot	    itot
+objname	module	ldterm	    ldterm
+objname	module	lpp	    lpp
+objname	module	m2pa-sl	    m2pa_sl
+objname	module	m2tp	    m2tp
+objname	module	m2ua-as	    m2ua_as
+objname	module	m2ua	    m2ua
+objname	module	m3ua-as	    m3ua_as
+objname	module	m3ua	    m3ua
+objname	module	mg	    mg
+objname	module	mtp3b	    mtp3b
+objname module	mtp-mod	    mtp_mod
+objname	module	mtp-npi	    mtp_npi
+objname	module	mtp-tpi	    mtp_tpi
+objname	module	mx-pmod	    mx_pmod
+objname	module	mx-sdl	    mx_sdl
+objname	module	npi-sccp    npi_sccp
+objname	module	nullmod	    nullmod
+objname	module	pckt	    pckt
+objname	module	phys	    phys
+objname	module	pipemod	    pipemod
+objname	module	ptem	    ptem
+objname	module	sccp-mod    sccp_mod
+objname	module	s-cdi	    s_cdi
+objname	module	sc	    sc
+#objname	module	sdlold	    sdl
+objname	module	sdl-pmod    sdl_pmod
+objname	module	sdl-sctp    sdl_sctp
+objname	module	sdl	    sdl_ch
+objname	module	sdt-pmod    sdt_pmod
+objname	module	sdt-sctp    sdt_sctp
+objname	module	sdt	    sdt
+objname	module	sdt-tpi	    sdt_tpi
+objname	module	slpmod	    slpmod
+objname	module	sl-sctp	    sl_sctp
+objname	module	sl	    sl
+objname	module	sl-tpi	    sl_tpi
+objname	module	sm_mod	    sm_mod
+objname	module	sockmod	    sockmod
+objname	module	spm	    spm
+objname	module	sscopmce    sscopmce
+objname	module	sscop	    sscop
+objname	module	sth	    sth
+objname	module	tcap-mod    tcap_mod
+objname	module	tc-mod	    tc_mod
+objname	module	tcpns	    tcpns
+objname	module	testmod	    testmod
+objname	module	timod	    timod
+objname	module	tirdwr	    tirdwr
+objname	module	tpi-sccp    tpi_sccp
+objname	module	tr-mod	    tr_mod
+objname	module	ttcompat    ttcompat
+objname	module	tua	    tua
+objname	module	xot	    xot
+objname	module	zaptel	    zaptel
+
+##
+## Loadable specifications
+## -----------------------------------------------------------
+##		name
+loadable	aal1
+loadable	aal2
+loadable	aal5
+loadable	bufmod
+#loadable	cd
+loadable	cd-daed
+loadable	cd-hdlc
+loadable	cdpmod
+loadable	ch-pmod
+#loadable	ch_x400p
+loadable	cmot
+loadable	connld
+loadable	dlaix
+#loadable	hdlc
+loadable	ip_strm_mod
+loadable	isot
+loadable	itot
+loadable	ldterm
+loadable	lpp
+loadable	m2pa_sl
+loadable	m2tp
+#loadable	m2ua
+#loadable	m2ua_as
+#loadable	m3ua
+#loadable	m3ua_as
+#loadable	mg
+loadable	mtp3b
+loadable	mtp_mod
+loadable	mtp_npi
+loadable	mtp_tpi
+loadable	mx-pmod
+loadable	mx_sdl
+loadable	npi_sccp
+loadable	nullmod
+loadable	pckt
+loadable	phys
+loadable	pipemod
+loadable	ptem
+loadable	sc
+loadable	sccp_mod
+loadable	s-cdi
+loadable	sdl
+loadable	sdl_ch
+loadable	sdl_pmod
+loadable	sdl_sctp
+loadable	sdt
+loadable	sdt_pmod
+loadable	sdt_sctp
+loadable	sdt_tpi
+loadable	sl
+loadable	slpmod
+loadable	sl_sctp
+loadable	sl_tpi
+loadable	sm_mod
+loadable	sockmod
+loadable	spm
+#loadable	sscop
+loadable	sscopmce
+#loadable	sth
+loadable	tcap_mod
+loadable	tc_mod
+loadable	tcpns
+loadable	testmod
+loadable	timod
+loadable	tirdwr
+loadable	tpi_sccp
+loadable	tr_mod
+loadable	ttcompat
+#loadable	tua
+loadable	xot
+loadable	zaptel
+
+##   Node specifications
+## -----------------------------------------------------------
+##	name		    type    perm    major	minor
+
+## =============================================================================
+##
+## $Log$
+## =============================================================================
+## vim: ft=conf comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

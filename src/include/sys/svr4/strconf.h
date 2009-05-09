@@ -83,7 +83,7 @@
 #warning "_SVR4_SOURCE not defined but SVR4 strconf.h included"
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 

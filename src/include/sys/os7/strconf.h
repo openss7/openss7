@@ -83,7 +83,7 @@
 #warning "_OS7_SOURCE not defined but OS7 strconf.h included"
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_OS7) || defined(CONFIG_STREAMS_COMPAT_OS7_MODULE)
 

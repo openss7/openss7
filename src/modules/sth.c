@@ -3912,7 +3912,7 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 	return strpoll_slow(file, poll);
 }
 
-EXPORT_SYMBOL(strpoll);
+EXPORT_SYMBOL_GPL(strpoll);
 
 STATIC __hot_in unsigned int
 _strpoll(struct file *file, struct poll_table_struct *poll)
@@ -5093,7 +5093,7 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	return strread_slow(file, buf, nbytes, ppos);
 }
 
-EXPORT_SYMBOL(strread);
+EXPORT_SYMBOL_GPL(strread);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -5364,7 +5364,7 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 	return strwrite_slow(file, buf, nbytes, ppos);
 }
 
-EXPORT_SYMBOL(strwrite);
+EXPORT_SYMBOL_GPL(strwrite);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -5595,7 +5595,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	return (-ESPIPE);
 }
 
-EXPORT_SYMBOL(strsendpage);
+EXPORT_SYMBOL_GPL(strsendpage);
 
 STATIC __unlikely ssize_t
 _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more)
@@ -5765,7 +5765,7 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	return strputpmsg_slow(file, ctlp, datp, band, flags);
 }
 
-EXPORT_SYMBOL(strputpmsg);
+EXPORT_SYMBOL_GPL(strputpmsg);
 
 STATIC streams_fastcall __hot_put int
 _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
@@ -6087,7 +6087,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	return strgetpmsg_slow(file, ctlp, datp, bandp, flagsp);
 }
 
-EXPORT_SYMBOL(strgetpmsg);
+EXPORT_SYMBOL_GPL(strgetpmsg);
 
 STATIC streams_fastcall __hot_get int
 _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
@@ -10135,7 +10135,7 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	return strioctl_slow(file, cmd, arg);
 }
 
-EXPORT_SYMBOL(strioctl);
+EXPORT_SYMBOL_GPL(strioctl);
 
 streams_noinline __hot long
 _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
@@ -10201,7 +10201,7 @@ register_ioctl32(unsigned int cmd)
 	return ((void *) (long) (-1));
 }
 
-EXPORT_SYMBOL(register_ioctl32);
+EXPORT_SYMBOL_GPL(register_ioctl32);
 
 __unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
@@ -10211,7 +10211,7 @@ unregister_ioctl32(void *opaque)
 	return;
 }
 
-EXPORT_SYMBOL(unregister_ioctl32);
+EXPORT_SYMBOL_GPL(unregister_ioctl32);
 
 #else				/* defined HAVE_COMPAT_IOCTL */
 /*
@@ -10514,7 +10514,7 @@ register_ioctl32(unsigned int cmd)
 	return ((void *) t);
 }
 
-EXPORT_SYMBOL(register_ioctl32);
+EXPORT_SYMBOL_GPL(register_ioctl32);
 
 /**
  *  unregister_ioctl32: - register ioctl for 32bit compatibility
@@ -10531,7 +10531,7 @@ unregister_ioctl32(void *opaque)
 	}
 }
 
-EXPORT_SYMBOL(unregister_ioctl32);
+EXPORT_SYMBOL_GPL(unregister_ioctl32);
 
 #endif				/* defined HAVE_COMPAT_IOCTL */
 #else				/* defined WITH_32BIT_CONVERSION */
@@ -10544,7 +10544,7 @@ register_ioctl32(unsigned int cmd)
 	return ((void *) (long) (-1));
 }
 
-EXPORT_SYMBOL(register_ioctl32);
+EXPORT_SYMBOL_GPL(register_ioctl32);
 
 __unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
@@ -10554,7 +10554,7 @@ unregister_ioctl32(void *opaque)
 	return;
 }
 
-EXPORT_SYMBOL(unregister_ioctl32);
+EXPORT_SYMBOL_GPL(unregister_ioctl32);
 
 #endif				/* defined WITH_32BIT_CONVERSION */
 
@@ -10590,7 +10590,7 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #endif
 };
 
-EXPORT_SYMBOL(strm_f_ops);
+EXPORT_SYMBOL_GPL(strm_f_ops);
 
 /**
  *  strwput: - stream head write queue put procedure
@@ -10665,7 +10665,7 @@ strwput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-EXPORT_SYMBOL(strwput);
+EXPORT_SYMBOL_GPL(strwput);
 
 /**
  *  strwsrv: - STREAM head write queue service procedure
@@ -10734,7 +10734,7 @@ strwsrv(queue_t *q)
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
  || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
  || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL(strwsrv);
+EXPORT_SYMBOL_GPL(strwsrv);
 #endif
 
 /*
@@ -11403,7 +11403,7 @@ strrput(queue_t *q, mblk_t *mp)
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
  || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
  || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL(strrput);
+EXPORT_SYMBOL_GPL(strrput);
 #endif
 
 streamscall __hot_in int
@@ -11423,7 +11423,7 @@ strrsrv(queue_t *q)
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
  || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
  || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL(strrsrv);
+EXPORT_SYMBOL_GPL(strrsrv);
 #endif
 
 /* 
@@ -11513,7 +11513,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (err > 0 ? -err : err);
 }
 
-EXPORT_SYMBOL(str_open);
+EXPORT_SYMBOL_GPL(str_open);
 
 /**
  *  str_close: - STREAMS qclose procedure for stream heads
@@ -11533,7 +11533,7 @@ str_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-EXPORT_SYMBOL(str_close);
+EXPORT_SYMBOL_GPL(str_close);
 
 /* 
  *  -------------------------------------------------------------------------

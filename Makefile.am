@@ -84,6 +84,7 @@ if RPM_BUILD_USER
 ## These are for ptys and should be part of the strutil or strio package.
 ##
 bin_PROGRAMS			=
+
 if CONFIG_STREAMS_UTILS
 bin_PROGRAMS			+= \
 				  strchg \
@@ -91,8 +92,9 @@ bin_PROGRAMS			+= \
 				  strreset
 endif
 
-sbin_PROGRAMS			= \
-				  @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			=
+
+sbin_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 if CONFIG_STREAMS_SAD
 sbin_PROGRAMS			+= autopush
 endif
@@ -118,14 +120,16 @@ if CONFIG_STREAMS_PIPE_MODULE
 sbin_PROGRAMS			+= fattach fdetach
 endif
 if CONFIG_STREAMS_UTILS
-sbin_PROGRAMS			+= \
-				  insf \
-				  strvf
+sbin_PROGRAMS			+= insf strvf
 endif
 
 if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= streamsd
 endif
+
+sbin_PROGRAMS			+= ldlconfig
+
+sbin_PROGRAMS			+= initsock soconfig
 
 #dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
 
@@ -142,7 +146,9 @@ dist_sbin_SCRIPTS		+= \
 				  src/util/strsetup
 endif
 
-pkglibexec_PROGRAMS		= testlog
+pkglibexec_PROGRAMS		=
+
+pkglibexec_PROGRAMS		+= testlog
 if CONFIG_STREAMS_STH
 pkglibexec_PROGRAMS		+= test-streams
 endif
@@ -227,7 +233,15 @@ endif
 if CONFIG_STREAMS_SC_MODULE
 pkglibexec_PROGRAMS		+= test-sc
 endif
+pkglibexec_PROGRAMS		+= test-tty
+pkglibexec_PROGRAMS		+= ldltest test-np_ip test-ip
+pkglibexec_PROGRAMS		+= test-tirdwr test-timod test-xnet test-xnet_thr
+pkglibexec_PROGRAMS		+= test-xnsl test-xnsl_thr
+pkglibexec_PROGRAMS		+= test-sockpath test-socket test-socklib test-sockmod test-socksys
+pkglibexec_PROGRAMS		+= test-inet_raw test-inet_udp test-inet_tcp test-inet_sctp
+pkglibexec_PROGRAMS		+= test-sctp test-sctp_n test-sctp_n2 test-sctp_nc test-sctp_ns test-sctp_t test-etsi_n test-etsi_t test-interop
 
+EXTRA_PROGRAMS			+=
 
 #LFS_EXTRA_TESTS		= 
 #LFS_EXTRA_TOOLS		= @PACKAGE_TARNAME@_mknod
@@ -236,7 +250,17 @@ endif
 
 lib_LTLIBRARIES			= libstreams.la \
 				  libLiS.la \
-				  libpLiS.la
+				  libpLiS.la \
+				  libcdiapi.la \
+				  libdlpiapi.la \
+				  libnpiapi.la \
+				  libdlpi.la \
+				  libxnet.la \
+				  libxnsl.la \
+				  inetaddr.la \
+				  libsockpath.la \
+				  libsocket.la \
+				  libsocklib.la
 
 lib32_LTLIBRARIES		=
 
@@ -256,7 +280,21 @@ noinst_LIBRARIES		= \
 				libLfS-specfs.a \
 				libLfS-streams.a \
 				libLfS-drivers.a \
-				libLfS-modules.a
+				libLfS-modules.a \
+				libCOMPATlink.a \
+				libCOMPATmods.a \
+				libTTYlink.a \
+				libTTYmods.a \
+				libTTYdrvs.a \
+				libXNSmods.a \
+				libXNSdrvs.a \
+				libXNETmods.a \
+				libSOCKlink.a \
+				libSOCKmods.a \
+				libSOCKdrvs.a \
+				libINETmods.a \
+				libSCTPsctp.a \
+				libSCTPtest.a
 
 libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.h \
@@ -266,14 +304,22 @@ libLfS_specfs_a_SOURCES		= \
 				src/kernel/strargs.h
 
 if CONFIG_STREAMS_SEPARATE_COMPILE
+## CONFIG_STREAMS_SEPARATE_COMPILE
+
 libLfS_specfs_a_SOURCES		+= \
 				src/kernel/strspecfs.c \
 				src/kernel/strlookup.c \
 				src/kernel/strattach.c \
 				src/kernel/strpipe.c
+
+## CONFIG_STREAMS_SEPARATE_COMPILE
 else
+## !CONFIG_STREAMS_SEPARATE_COMPILE
+
 libLfS_specfs_a_SOURCES		+= \
 				src/kernel/specfs.c
+
+## !CONFIG_STREAMS_SEPARATE_COMPILE
 endif
 
 libLfS_specfs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) \
@@ -297,6 +343,8 @@ libLfS_streams_a_SOURCES	= \
 				src/kernel/strargs.h
 
 if CONFIG_STREAMS_SEPARATE_COMPILE
+## CONFIG_STREAMS_SEPARATE_COMPILE
+
 libLfS_streams_a_SOURCES	+= \
 				src/kernel/strmain.c \
 				src/kernel/strreg.c \
@@ -306,9 +354,15 @@ libLfS_streams_a_SOURCES	+= \
 				src/kernel/strsyms.c \
 				src/kernel/strutil.c \
 				src/kernel/strsad.c
+
+## CONFIG_STREAMS_SEPARATE_COMPILE
 else
+## !CONFIG_STREAMS_SEPARATE_COMPILE
+
 libLfS_streams_a_SOURCES	+= \
 				src/kernel/streams.c
+
+## !CONFIG_STREAMS_SEPARATE_COMPILE
 endif
 
 ##if CONFIG_STREAMS_STH
@@ -470,6 +524,357 @@ streams.o: stamp-verobjs
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
+EXTRA_libCOMPATlink_a_SOURCES 	= \
+				  src/kernel/os7compat.c \
+				  src/kernel/svr3compat.c \
+				  src/kernel/svr4compat.c \
+				  src/kernel/mpscompat.c \
+				  src/kernel/suncompat.c \
+				  src/kernel/uw7compat.c \
+				  src/kernel/osfcompat.c \
+				  src/kernel/aixcompat.c \
+				  src/kernel/hpuxcompat.c \
+				  src/kernel/irixcompat.c \
+				  src/kernel/liscompat.c \
+				  src/kernel/maccompat.c
+
+libCOMPATlink_a_SOURCES		= \
+				  src/include/sys/os7/allocb.h \
+				  src/include/sys/os7/bufpool.h \
+				  src/include/sys/os7/bufq.h \
+				  src/include/sys/os7/compat.h \
+				  src/include/sys/os7/debug.h \
+				  src/include/sys/os7/lock.h \
+				  src/include/sys/os7/priv.h \
+				  src/include/sys/os7/queue.h \
+				  src/include/sys/os7/timer.h
+
+libCOMPATlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_COMPAT_OS7
+libCOMPATlink_a_SOURCES		+= src/kernel/os7compat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/os7/ddi.h src/include/sys/os7/strconf.h src/include/sys/os7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR3
+libCOMPATlink_a_SOURCES		+= src/kernel/svr3compat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/svr3/ddi.h src/include/sys/svr3/strconf.h src/include/sys/svr3/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+libCOMPATlink_a_SOURCES		+= src/kernel/svr4compat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/svr4/ddi.h src/include/sys/svr4/strconf.h src/include/sys/svr4/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+libCOMPATlink_a_SOURCES		+= src/kernel/mpscompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/mps/ddi.h src/include/sys/mps/strconf.h src/include/sys/mps/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+libCOMPATlink_a_SOURCES		+= src/kernel/suncompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/sunddi.h src/include/sys/strsun.h src/include/sys/sun/ddi.h src/include/sys/sun/strconf.h src/include/sys/sun/strsun.h src/include/sys/sun/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+libCOMPATlink_a_SOURCES		+= src/kernel/uw7compat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/uw7/ddi.h src/include/sys/uw7/strconf.h src/include/sys/uw7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+libCOMPATlink_a_SOURCES		+= src/kernel/osfcompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/osf/ddi.h src/include/sys/osf/strconf.h src/include/sys/osf/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+libCOMPATlink_a_SOURCES		+= src/kernel/aixcompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/aix/ddi.h src/include/sys/aix/strconf.h src/include/sys/aix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+libCOMPATlink_a_SOURCES		+= src/kernel/hpuxcompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/hpux/ddi.h src/include/sys/hpux/strconf.h src/include/sys/hpux/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+libCOMPATlink_a_SOURCES		+= src/kernel/irixcompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/irix/ddi.h src/include/sys/irix/strconf.h src/include/sys/irix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+libCOMPATlink_a_SOURCES		+= src/kernel/liscompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/lis/ddi.h src/include/sys/lis/strconf.h src/include/sys/lis/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+libCOMPATlink_a_SOURCES		+= src/kernel/maccompat.c
+libCOMPATlink_a_DEPENDENCIES	+= src/include/sys/mac/ddi.h src/include/sys/mac/strconf.h src/include/sys/mac/stream.h
+endif
+
+libCOMPATlink_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCOMPATlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libCOMPATlink_a_OBJECTS):	$(libCOMPATlink_a_SOURCES) $(libCOMPATlink_a_DEPENDENCIES)
+
+EXTRA_libCOMPATmods_a_SOURCES	= \
+				  src/kernel/os7compat.c \
+				  src/kernel/svr3compat.c \
+				  src/kernel/svr4compat.c \
+				  src/kernel/mpscompat.c \
+				  src/kernel/suncompat.c \
+				  src/kernel/uw7compat.c \
+				  src/kernel/osfcompat.c \
+				  src/kernel/aixcompat.c \
+				  src/kernel/hpuxcompat.c \
+				  src/kernel/irixcompat.c \
+				  src/kernel/liscompat.c \
+				  src/kernel/maccompat.c
+
+libCOMPATmods_a_SOURCES		= \
+				  src/include/sys/os7/allocb.h \
+				  src/include/sys/os7/bufpool.h \
+				  src/include/sys/os7/bufq.h \
+				  src/include/sys/os7/compat.h \
+				  src/include/sys/os7/debug.h \
+				  src/include/sys/os7/lock.h \
+				  src/include/sys/os7/priv.h \
+				  src/include/sys/os7/queue.h \
+				  src/include/sys/os7/timer.h
+
+libCOMPATmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/os7compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/os7/ddi.h src/include/sys/os7/strconf.h src/include/sys/os7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/svr3compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/svr3/ddi.h src/include/sys/svr3/strconf.h src/include/sys/svr3/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/svr4compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/svr4/ddi.h src/include/sys/svr4/strconf.h src/include/sys/svr4/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/mpscompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/mps/ddi.h src/include/sys/mps/strconf.h src/include/sys/mps/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/suncompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/sunddi.h src/include/sys/strsun.h src/include/sys/sun/ddi.h src/include/sys/sun/strconf.h src/include/sys/sun/strsun.h src/include/sys/sun/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/uw7compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/uw7/ddi.h src/include/sys/uw7/strconf.h src/include/sys/uw7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/osfcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/osf/ddi.h src/include/sys/osf/strconf.h src/include/sys/osf/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/aixcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/aix/ddi.h src/include/sys/aix/strconf.h src/include/sys/aix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/hpuxcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/hpux/ddi.h src/include/sys/hpux/strconf.h src/include/sys/hpux/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/irixcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/irix/ddi.h src/include/sys/irix/strconf.h src/include/sys/irix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/liscompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/lis/ddi.h src/include/sys/lis/strconf.h src/include/sys/lis/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/maccompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/mac/ddi.h src/include/sys/mac/strconf.h src/include/sys/mac/stream.h
+endif
+
+libCOMPATmods_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCOMPATmods_a_CFLAGS		= $(KERNEL_CFLAGS) -Wno-deprecated-declarations -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
+
+$(libCOMPATmods_a_OBJECTS):	$(libCOMPATmods_a_DEPENDENCIES)
+
+EXTRA_libTTYlink_a_SOURCES	= 
+libTTYlink_a_SOURCES		= 
+libTTYlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libTTYlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libTTYlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libTTYlink_a_OBJECTS):	$(libTTYlink_a_SOURCES) $(libTTYlink_a_DEPENDENCIES)
+
+EXTRA_libTTYmods_a_SOURCES	= src/modules/pckt.c \
+				  src/modules/ptem.c \
+				  src/modules/ttcompat.c \
+				  src/modules/ldterm.c
+libTTYmods_a_SOURCES		= $(EXTRA_libTTYmods_a_SOURCES)
+libTTYmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libTTYmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libTTYmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libTTYmods_a_OBJECTS):	$(libTTYmods_a_DEPENDENCIES)
+
+EXTRA_libTTYdrvs_a_SOURCES	= src/drivers/pty.c 
+libTTYdrvs_a_SOURCES		= $(EXTRA_libTTYdrvs_a_SOURCES)
+libTTYdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libTTYdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libTTYdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libTTYdrvs_a_OBJECTS):	$(libTTYdrvs_a_DEPENDENCIES)
+
+EXTRA_libXNSmods_a_SOURCES 	= src/modules/debug.h \
+				  src/modules/ip_strm_mod.c \
+				  src/modules/ip_strm_mod.h
+nodist_libXNSmods_a_SOURCES	= $(EXTRA_libXNSmods_a_SOURCES)
+libXNSmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNSmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+nodist_EXTRA_libXNSdrvs_a_SOURCES = src/drivers/debug.h \
+				  src/drivers/ip_to_dlpi.c \
+				  src/drivers/ldl.c \
+				  src/drivers/np_ip.c
+dist_EXTRA_libXNSdrvs_a_SOURCES = \
+				  src/drivers/cd.c \
+				  src/drivers/dl.c \
+				  src/drivers/dl.h \
+				  src/drivers/dl_ip.c \
+				  src/drivers/dlp.c \
+				  src/drivers/ip.c \
+				  src/drivers/nf.c \
+				  src/drivers/np.c \
+				  src/drivers/np.h
+nodist_libXNSdrvs_a_SOURCES	= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
+libXNSdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
+libXNSdrvs_a_CPPFLAGS		= -I$(top_builddir)/src/drivers $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS) -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
+libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
+
+EXTRA_libXNETmods_a_SOURCES 	= src/modules/tirdwr.c \
+				  src/modules/timod.c
+nodist_libXNETmods_a_SOURCES	= $(EXTRA_libXNETmods_a_SOURCES)
+libXNETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libXNETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libXNETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libXNETmods_a_OBJECTS):	$(libXNETmods_a_DEPENDENCIES)
+
+EXTRA_libSOCKlink_a_SOURCES	= src/modules/sockmod.c \
+				  src/drivers/socksys.c
+libSOCKlink_a_SOURCES		= 
+libSOCKlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSOCKlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libSOCKlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libSOCKlink_a_OBJECTS):	$(libSOCKlink_a_SOURCES) $(libSOCKlink_a_DEPENDENCIES)
+
+EXTRA_libSOCKmods_a_SOURCES	= src/modules/sockmod.c
+libSOCKmods_a_SOURCES		= src/modules/sockmod.c
+libSOCKmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSOCKmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libSOCKmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libSOCKmods_a_OBJECTS):	$(libSOCKmods_a_DEPENDENCIES)
+
+EXTRA_libSOCKdrvs_a_SOURCES	= src/drivers/socksys.c
+libSOCKdrvs_a_SOURCES		= src/drivers/socksys.c
+libSOCKdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSOCKdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libSOCKdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libSOCKdrvs_a_OBJECTS):	$(libSOCKdrvs_a_DEPENDENCIES)
+
+nodist_EXTRA_libINETmods_a_SOURCES = \
+				  src/drivers/inet.c \
+				  src/drivers/udp.c \
+				  src/drivers/rawip.c \
+				  src/drivers/tcp.c
+dist_EXTRA_libINETmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
+nodist_libINETmods_a_SOURCES	= $(nodist_EXTRA_libINETmods_a_SOURCES)
+libINETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/udp_hooks.h
+libINETmods_a_CPPFLAGS		= -I$(top_builddir)/src/drivers $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libINETmods_a_OBJECTS):	$(libINETmods_a_DEPENDENCIES)
+
+nodist_EXTRA_libSCTPtest_a_SOURCES = \
+				  src/modules/tpiperf.c
+nodist_libSCTPtest_a_SOURCES	= $(nodist_EXTRA_libSCTPtest_a_SOURCES)
+libSCTPtest_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPtest_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSCTPtest_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libSCTPtest_a_OBJECTS):	$(libSCTPtest_a_DEPENDENCIES)
+
+sctp_source_FILES		= \
+				  src/drivers/sctp.c \
+				  src/drivers/sctp_cache.c \
+				  src/drivers/sctp_cookie.c \
+				  src/drivers/sctp_hash.c \
+				  src/drivers/sctp_input.c \
+				  src/drivers/sctp_msg.c \
+				  src/drivers/sctp_n.c \
+				  src/drivers/sctp_output.c \
+				  src/drivers/sctp_route.c \
+				  src/drivers/sctp_t.c \
+				  src/drivers/sctp_md5.c \
+				  src/drivers/sctp_hmac_md5.c \
+				  src/drivers/sctp_sha1.c \
+				  src/drivers/sctp_hmac_sha1.c \
+				  src/drivers/sctp_crc32c.c \
+				  src/drivers/sctp_md5.h \
+				  src/drivers/sctp_hmac_md5.h \
+				  src/drivers/sctp_sha1.h \
+				  src/drivers/sctp_hmac_sha1.h \
+				  src/drivers/sctp_crc32c.h \
+				  src/drivers/sctp_cache.h \
+				  src/drivers/sctp_cookie.h \
+				  src/drivers/sctp_defs.h \
+				  src/drivers/sctp.h \
+				  src/drivers/sctp_hash.h \
+				  src/drivers/sctp_input.h \
+				  src/drivers/sctp_msg.h \
+				  src/drivers/sctp_n.h \
+				  src/drivers/sctp_output.h \
+				  src/drivers/sctp_route.h \
+				  src/drivers/sctp_t.h
+sctp2_source_FILES		= \
+				  src/drivers/sctp2.c \
+				  src/drivers/sctp_compat.h \
+				  src/drivers/sctp_md5.c \
+				  src/drivers/sctp_md5.h \
+				  src/drivers/sctp_hmac_md5.c \
+				  src/drivers/sctp_hmac_md5.h \
+				  src/drivers/sctp_sha1.c \
+				  src/drivers/sctp_sha1.h \
+				  src/drivers/sctp_hmac_sha1.c \
+				  src/drivers/sctp_hmac_sha1.h \
+				  src/drivers/sctp_adler32.c \
+				  src/drivers/sctp_adler32.h \
+				  src/drivers/sctp_crc32c.c \
+				  src/drivers/sctp_crc32c.h
+if WITH_SCTP
+## WITH_SCTP
+nodist_libSCTPsctp_a_SOURCES	= $(sctp_source_FILES)
+## WITH_SCTP
+endif
+if WITH_SCTP2
+## WITH_SCTP2
+nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
+## WITH_SCTP2
+endif
+libSCTPsctp_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/sctp_hooks.h
+libSCTPsctp_a_CPPFLAGS		= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/drivers \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
+libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libSCTPsctp_a_OBJECTS):	$(libSCTPsctp_a_DEPENDENCIES)
+
+if WITH_KO_MODULES
+streams_sctp.o: $(libSCTPsctp_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
+streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
+	$(LD) -r -o $@ $^
+endif
+
 ## RPM_BUILD_KERNEL
 endif
 ## PKG_BUILD_ARCH
@@ -491,8 +896,45 @@ EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS)
-KERNEL_MODULES			= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS)
+KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) \
+				  $(libLfS_streams_a_OBJECTS) \
+				  $(libLfS_drivers_a_OBJECTS) \
+				  $(libLfS_modules_a_OBJECTS) \
+				  $(libCOMPATlink_a_OBJECTS) \
+				  $(libCOMPATmods_a_OBJECTS) \
+				  $(libTTYlink_a_OBJECTS) \
+				  $(libTTYmods_a_OBJECTS) \
+				  $(libTTYdrvs_a_OBJECTS) \
+				  $(libXNSmods_a_OBJECTS) \
+				  $(libXNSdrvs_a_OBJECTS) \
+				  $(libXNETmods_a_OBJECTS) \
+				  $(libSOCKlink_a_OBJECTS) \
+				  $(libSOCKmods_a_OBJECTS) \
+				  $(libSOCKdrvs_a_OBJECTS) \
+				  $(libINETmods_a_OBJECTS) \
+				  $(libSCTPtest_a_OBJECTS) \
+				  $(libSCTPsctp_a_OBJECTS)
+KERNEL_MODULES			= specfs.o \
+				  streams.o \
+				  $(libLfS_drivers_a_OBJECTS) \
+				  $(libLfS_modules_a_OBJECTS) \
+				  $(libCOMPATmods_a_OBJECTS) \
+				  $(libTTYmods_a_OBJECTS) \
+				  $(libTTYdrvs_a_OBJECTS) \
+				  $(libXNSmods_a_OBJECTS) \
+				  $(libXNSdrvs_a_OBJECTS) \
+				  $(libXNETmods_a_OBJECTS) \
+				  $(libSOCKmods_a_OBJECTS) \
+				  $(libSOCKdrvs_a_OBJECTS) \
+				  $(libINETmods_a_OBJECTS) \
+				  $(libSCTPtest_a_OBJECTS)
+
+if WITH_KO_MODULES
+KERNEL_MODULES			+= streams_sctp.o
+else
+KERNEL_MODULES			+= streams-sctp.o
+endif
+
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
@@ -523,7 +965,28 @@ endif
 ## Rules for building libraries
 ##
 LIBRARY_VERSION_FILES		= \
-				  src/lib/streams.VERSION
+				src/lib/streams.VERSION \
+				src/lib/cdiapi.VERSION \
+				src/lib/dlpiapi.VERSION \
+				src/lib/npiapi.VERSION \
+				src/lib/dlpi.VERSION \
+				src/lib/xnet.VERSION \
+				src/lib/xnsl.VERSION \
+				src/lib/socklib.VERSION \
+				src/lib/socket.VERSION \
+				src/lib/sockpath.VERSION \
+				src/lib/apli.VERSION \
+				src/lib/osi.VERSION \
+				src/lib/sx25.VERSION \
+				src/lib/xap_rose.VERSION \
+				src/lib/xap.VERSION \
+				src/lib/xds.VERSION \
+				src/lib/xftam.VERSION \
+				src/lib/xmap.VERSION \
+				src/lib/xmp.VERSION \
+				src/lib/xom.VERSION \
+				src/lib/xtcap.VERSION
+
 include am/libraries.am
 
 if RPM_BUILD_USER
@@ -545,14 +1008,10 @@ libstreams_la_SOURCES		= \
 				src/lib/strlog.c \
 				src/lib/streams.h
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/src/lib/streams.VERSION
-libstreams_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
+libstreams_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
 libstreams_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
-##if USING_IOCTL_GETPMSG_PUTPMSG
-libstreams_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
-##else
-##libstreams_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
-##endif
 
 libLiS_la_SOURCES		= \
 				src/lib/testcancel.c \
@@ -567,14 +1026,10 @@ libLiS_la_SOURCES		= \
 				src/lib/strlog.c \
 				src/lib/streams.h
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/src/lib/streams.VERSION
-libLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
+libLiS_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
 libLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
-##if USING_IOCTL_GETPMSG_PUTPMSG
-libLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
-##else
-##libLiS_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
-##endif
 
 libpLiS_la_SOURCES		= \
 				src/lib/testcancel.c \
@@ -588,14 +1043,138 @@ libpLiS_la_SOURCES		= \
 				src/lib/strlog.c \
 				src/lib/streams.h
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/src/lib/streams.VERSION
-libpLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
+libpLiS_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
 libpLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
-##if USING_IOCTL_GETPMSG_PUTPMSG
-libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
-##else
-##libpLiS_la_LDFLAGS		+= -version-info 0:0:0 -export-dynamic
-##endif
+
+libcdiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/cdiapi.c \
+				  src/include/cdiapi.h \
+				  gettext.h
+libcdiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/cdiapi.VERSION
+libcdiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/cdiapi.VERSION
+libcdiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libcdiapi_la_CFLAGS		= $(USER_CFLAGS)
+libcdiapi_la_LIBADD		= libstreams.la
+
+libdlpiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/dlpiapi.c \
+				  src/include/dlpiapi.h \
+				  gettext.h
+libdlpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/dlpiapi.VERSION
+libdlpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpiapi.VERSION
+libdlpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libdlpiapi_la_CFLAGS		= $(USER_CFLAGS)
+libdlpiapi_la_LIBADD		= libstreams.la
+
+libnpiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/npiapi.c \
+				  src/include/npiapi.h \
+				  gettext.h
+libnpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/npiapi.VERSION
+libnpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/npiapi.VERSION
+libnpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libnpiapi_la_CFLAGS		= $(USER_CFLAGS)
+libnpiapi_la_LIBADD		= libstreams.la
+
+libdlpi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/dlpi.c \
+				  src/include/libdlpi.h \
+				  gettext.h
+libdlpi_la_DEPENDENCIES		= $(top_srcdir)/src/lib/dlpi.VERSION
+libdlpi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpi.VERSION
+libdlpi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libdlpi_la_CFLAGS		= $(USER_CFLAGS)
+libdlpi_la_LIBADD		= libstreams.la
+
+libxnet_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/xnet.c \
+				  gettext.h
+libxnet_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnet.VERSION
+libxnet_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnet.VERSION
+libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
+libxnet_la_CFLAGS		= $(USER_CFLAGS)
+libxnet_la_LIBADD		= libstreams.la
+
+libxnsl_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/netselect.c \
+				  src/lib/netselect.h \
+				  src/lib/netdir.c \
+				  src/lib/netdir_inet.c \
+				  src/include/netconfig.h \
+				  src/include/netdir.h \
+				  src/include/sys/netconfig.h \
+				  gettext.h
+libxnsl_la_DEPENDENCIES		= $(top_srcdir)/src/lib/xnsl.VERSION
+libxnsl_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnsl.VERSION \
+				  -ldl
+libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libxnsl_la_CFLAGS		= $(USER_CFLAGS)
+libxnsl_la_LIBADD		= libstreams.la libxnet.la
+
+inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
+				  src/include/netdir.h \
+				  src/include/netconfig.h \
+				  src/include/sys/netconfig.h
+inetaddr_la_DEPENDENCIES	= libxnsl.la
+inetaddr_la_LDFLAGS		= -module -avoid-version \
+				  -shared
+inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -DNETDIR_STRONG_DEFS
+inetaddr_la_CFLAGS		= $(USER_CFLAGS)
+inetaddr_la_LIBADD		= libstreams.la libxnet.la libxnsl.la
+
+libsockpath_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/sockpath.c \
+				  src/lib/sockpath.h \
+				  src/include/sockdb.h \
+				  src/include/sys/sockpath.h
+libsockpath_la_DEPENDENCIES	= src/lib/sockpath.VERSION
+libsockpath_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sockpath.VERSION
+libsockpath_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libsockpath_la_CFLAGS		= $(USER_CFLAGS)
+libsockpath_la_LIBADD		=
+
+libsocket_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/socket.c \
+				  gettext.h
+libsocket_la_DEPENDENCIES	= src/lib/socket.VERSION
+libsocket_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socket.VERSION \
+				  -static -lc -shared
+libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libsocket_la_CFLAGS		= $(USER_CFLAGS)
+libsocket_la_LIBADD		= libstreams.la
+
+libsocklib_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/socklib.c \
+				  gettext.h
+libsocklib_la_DEPENDENCIES	= src/lib/socklib.VERSION
+libsocklib_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socklib.VERSION \
+				  -static -lc -shared
+libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libsocklib_la_CFLAGS		= $(USER_CFLAGS)
+libsocklib_la_LIBADD		= libstreams.la libxnet.la libxnsl.la libsockpath.la
 
 strMIB_la_SOURCES		= \
 				  src/snmp/strMIB.c \
@@ -768,110 +1347,327 @@ test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDFLAGS		=
 test_clone_LDADD		= libstreams.la
 test_clone_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-clone"'
-test_clone_CFLAGS		= $(LFS_CFLAGS)
+test_clone_CFLAGS		= $(USER_CFLAGS)
 
 test_connld_SOURCES		= src/test/test-connld.c
 test_connld_LDFLAGS		=
 test_connld_LDADD		= libstreams.la
 test_connld_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-connld"'
-test_connld_CFLAGS		= $(LFS_CFLAGS)
+test_connld_CFLAGS		= $(USER_CFLAGS)
 
 test_echo_SOURCES		= src/test/test-echo.c
 test_echo_LDFLAGS		=
 test_echo_LDADD			= libstreams.la
 test_echo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-echo"'
-test_echo_CFLAGS		= $(LFS_CFLAGS)
+test_echo_CFLAGS		= $(USER_CFLAGS)
 
 test_fifo_SOURCES		= src/test/test-fifo.c
 test_fifo_LDFLAGS		=
 test_fifo_LDADD			= libstreams.la
 test_fifo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-fifo"'
-test_fifo_CFLAGS		= $(LFS_CFLAGS)
+test_fifo_CFLAGS		= $(USER_CFLAGS)
 
 test_log_SOURCES		= src/test/test-log.c
 test_log_LDFLAGS		=
 test_log_LDADD			= libstreams.la
 test_log_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-log"'
-test_log_CFLAGS			= $(LFS_CFLAGS)
+test_log_CFLAGS			= $(USER_CFLAGS)
 
 test_loop_SOURCES		= src/test/test-loop.c
 test_loop_LDFLAGS		=
 test_loop_LDADD			= libstreams.la
 test_loop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-loop"'
-test_loop_CFLAGS		= $(LFS_CFLAGS)
+test_loop_CFLAGS		= $(USER_CFLAGS)
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_LDFLAGS		=
 test_nsdev_LDADD		= libstreams.la
 test_nsdev_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-nsdev"'
-test_nsdev_CFLAGS		= $(LFS_CFLAGS)
+test_nsdev_CFLAGS		= $(USER_CFLAGS)
 
 test_mux_SOURCES		= src/test/test-mux.c
 test_mux_LDFLAGS		=
 test_mux_LDADD			= libstreams.la
 test_mux_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-mux"'
-test_mux_CFLAGS			= $(LFS_CFLAGS)
+test_mux_CFLAGS			= $(USER_CFLAGS)
 
 test_nuls_SOURCES		= src/test/test-nuls.c
 test_nuls_LDFLAGS		=
 test_nuls_LDADD			= libstreams.la
 test_nuls_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-nuls"'
-test_nuls_CFLAGS		= $(LFS_CFLAGS)
+test_nuls_CFLAGS		= $(USER_CFLAGS)
 
 test_pipe_SOURCES		= src/test/test-pipe.c
 test_pipe_LDFLAGS		=
 test_pipe_LDADD			= libstreams.la
 test_pipe_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-pipe"'
-test_pipe_CFLAGS		= $(LFS_CFLAGS)
+test_pipe_CFLAGS		= $(USER_CFLAGS)
 
 perftest_SOURCES		= src/test/perftest.c
 perftest_LDFLAGS		=
 perftest_LDADD			= libstreams.la
 perftest_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"perftest"'
-perftest_CFLAGS			= $(LFS_CFLAGS)
+perftest_CFLAGS			= $(USER_CFLAGS)
 
 perftestn_SOURCES		= src/test/perftest.c
 perftestn_LDFLAGS		= 
 perftestn_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNATIVE_PIPES -DNAME='"perftestn"'
-perftestn_CFLAGS		= $(LFS_CFLAGS)
+perftestn_CFLAGS		= $(USER_CFLAGS)
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
 test_pipemod_LDFLAGS		=
 test_pipemod_LDADD		= libstreams.la
 test_pipemod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-pipemode"'
-test_pipemod_CFLAGS		= $(LFS_CFLAGS)
+test_pipemod_CFLAGS		= $(USER_CFLAGS)
 
 test_sad_SOURCES		= src/test/test-sad.c
 test_sad_LDFLAGS		=
 test_sad_LDADD			= libstreams.la
 test_sad_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sad"'
-test_sad_CFLAGS			= $(LFS_CFLAGS)
+test_sad_CFLAGS			= $(USER_CFLAGS)
 
 test_sc_SOURCES			= src/test/test-sc.c
 test_sc_LDFLAGS			=
 test_sc_LDADD			= libstreams.la
 test_sc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sc"'
-test_sc_CFLAGS			= $(LFS_CFLAGS)
+test_sc_CFLAGS			= $(USER_CFLAGS)
 
 test_streams_SOURCES		= src/test/test-streams.c
 test_streams_LDFLAGS		=
 test_streams_LDADD		= libstreams.la
 test_streams_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-streams"'
-test_streams_CFLAGS		= $(LFS_CFLAGS)
+test_streams_CFLAGS		= $(USER_CFLAGS)
 
 testlog_SOURCES			= src/test/testlog.c
 testlog_LDFLAGS			=
 testlog_LDADD			= libstreams.la
 testlog_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"testlog"'
-testlog_CFLAGS			= $(LFS_CFLAGS)
+testlog_CFLAGS			= $(USER_CFLAGS)
+
+test_tty_SOURCES		= src/test/test-tty.c
+test_tty_LDFLAGS		=
+test_tty_LDADD			= libstreams.la
+test_tty_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-tty"'
+test_tty_CFLAGS			= $(USER_CFLAGS)
+##test_tty_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+ldlconfig_SOURCES		= src/util/ldlconfig.c
+ldlconfig_LDFLAGS		=
+ldlconfig_LDADD			= libstreams.la
+ldlconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ldlconfig"'
+ldlconfig_CFLAGS		= $(USER_CFLAGS)
+
+ldltest_SOURCES			= src/test/ldltest.c
+ldltest_LDFLAGS			=
+ldltest_LDADD			= libstreams.la
+ldltest_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ldltest"'
+ldltest_CFLAGS			= $(USER_CFLAGS)
+
+test_np_ip_SOURCES		= src/test/test-np_ip.c
+test_np_ip_LDFLAGS		=
+test_np_ip_LDADD		= libstreams.la
+test_np_ip_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-np_ip"'
+test_np_ip_CFLAGS		= $(USER_CFLAGS)
+
+test_ip_SOURCES			= src/test/test-ip.c
+test_ip_LDFLAGS			=
+test_ip_LDADD			= libstreams.la
+test_ip_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-ip"'
+test_ip_CFLAGS			= $(USER_CFLAGS)
+
+test_tirdwr_SOURCES		= src/test/test-tirdwr.c
+test_tirdwr_LDFLAGS		=
+test_tirdwr_LDADD		= libstreams.la libxnet.la
+test_tirdwr_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-tirdwr"'
+test_tirdwr_CFLAGS		= $(USER_CFLAGS)
+test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_timod_SOURCES		= src/test/test-timod.c
+test_timod_LDFLAGS		=
+test_timod_LDADD		= libstreams.la libxnet.la
+test_timod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-timod"'
+test_timod_CFLAGS		= $(USER_CFLAGS)
+test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_xnet_SOURCES		= src/test/test-xnet.c
+test_xnet_LDFLAGS		=
+test_xnet_LDADD			= libstreams.la libxnet.la
+test_xnet_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-xnet"'
+test_xnet_CFLAGS		= $(USER_CFLAGS)
+test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_xnet_thr_SOURCES		= src/test/test-xnet.c
+test_xnet_thr_LDADD		= libstreams.la libxnet.la
+test_xnet_thr_LDFLAGS		= -lpthread
+test_xnet_thr_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-xnet_thr"' -D_REENTRANT
+test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
+test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_xnsl_SOURCES		= src/test/test-xnsl.c
+test_xnsl_LDADD			= libstreams.la libxnet.la libxnsl.la
+test_xnsl_LDFLAGS		= 
+test_xnsl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-xnsl"'
+test_xnsl_CFLAGS		= $(USER_CFLAGS)
+test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
+test_xnsl_thr_LDADD		= libstreams.la libxnet.la libxnsl.la
+test_xnsl_thr_LDFLAGS		= -lpthread
+test_xnsl_thr_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-xnsl_thr"' -D_REENTRANT
+test_xnsl_thr_CFLAGS		= $(USER_CFLAGS)
+test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sockpath_SOURCES		= src/test/test-sockpath.c
+test_sockpath_LDADD		= libstreams.la libsockpath.la
+test_sockpath_LDFLAGS		=
+test_sockpath_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sockpath"'
+test_sockpath_CFLAGS		= $(USER_CFLAGS)
+test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_socket_SOURCES		= src/test/test-socket.c
+test_socket_LDADD		= libstreams.la libsocket.la
+test_socket_LDFLAGS		=
+test_socket_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-socket"'
+test_socket_CFLAGS		= $(USER_CFLAGS)
+test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_socklib_SOURCES		= src/test/test-socklib.c
+test_socklib_LDADD		= libstreams.la libsocklib.la
+test_socklib_LDFLAGS		=
+test_socklib_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-socklib"'
+test_socklib_CFLAGS		= $(USER_CFLAGS)
+test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sockmod_SOURCES		= src/test/test-sockmod.c
+test_sockmod_LDADD		= libstreams.la libsocklib.la
+test_sockmod_LDFLAGS		=
+test_sockmod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sockmod"'
+test_sockmod_CFLAGS		= $(USER_CFLAGS)
+test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_socksys_SOURCES		= src/test/test-socksys.c
+test_socksys_LDADD		= libstreams.la libsocket.la
+test_socksys_LDFLAGS		=
+test_socksys_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-socksys"'
+test_socksys_CFLAGS		= $(USER_CFLAGS)
+test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+initsock_SOURCES		= src/util/initsock.c
+initsock_LDADD			= libstreams.la
+initsock_LDFLAGS		=
+initsock_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"initsock"'
+initsock_CFLAGS			= $(USER_CFLAGS)
+initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+soconfig_SOURCES		= src/util/soconfig.c
+soconfig_LDADD			= libstreams.la
+soconfig_LDFLAGS		=
+soconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"soconfig"'
+soconfig_CFLAGS			= $(USER_CFLAGS)
+soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_inet_raw_SOURCES		= src/test/test-inet_raw.c
+test_inet_raw_LDADD		= libstreams.la
+test_inet_raw_LDFLAGS		=
+test_inet_raw_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-inet_raw"'
+test_inet_raw_CFLAGS		= $(USER_CFLAGS)
+test_inet_raw_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_inet_udp_SOURCES		= src/test/test-inet_udp.c
+test_inet_udp_LDADD		= libstreams.la
+test_inet_udp_LDFLAGS		=
+test_inet_udp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-inet_udp"'
+test_inet_udp_CFLAGS		= $(USER_CFLAGS)
+test_inet_udp_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
+test_inet_tcp_LDADD		= libstreams.la
+test_inet_tcp_LDFLAGS		=
+test_inet_tcp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-inet_tcp"'
+test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
+test_inet_tcp_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_inet_sctp_SOURCES		= src/test/test-inet_sctp.c
+test_inet_sctp_LDADD		= libstreams.la
+test_inet_sctp_LDFLAGS		=
+test_inet_sctp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-inet_sctp"'
+test_inet_sctp_CFLAGS		= $(USER_CFLAGS)
+test_inet_sctp_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sctp_SOURCES		= src/test/test-sctp.c
+test_sctp_LDADD			= libstreams.la
+test_sctp_LDFLAGS		=
+test_sctp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp"'
+test_sctp_CFLAGS		= $(USER_CFLAGS)
+test_sctp_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sctp_n_SOURCES		= src/test/test-sctp_n.c
+test_sctp_n_LDADD		= libstreams.la
+test_sctp_n_LDFLAGS		=
+test_sctp_n_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_n"'
+test_sctp_n_CFLAGS		= $(USER_CFLAGS)
+test_sctp_n_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
+test_sctp_n2_LDADD		= libstreams.la
+test_sctp_n2_LDFLAGS		=
+test_sctp_n2_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_n2"'
+test_sctp_n2_CFLAGS		= $(USER_CFLAGS)
+test_sctp_n2_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
+test_sctp_nc_LDADD		= libstreams.la
+test_sctp_nc_LDFLAGS		=
+test_sctp_nc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_nc"'
+test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
+test_sctp_nc_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
+test_sctp_ns_LDADD		= libstreams.la
+test_sctp_ns_LDFLAGS		=
+test_sctp_ns_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_ns"'
+test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
+test_sctp_ns_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_sctp_t_SOURCES		= src/test/test-sctp_t.c
+test_sctp_t_LDADD		= libstreams.la
+test_sctp_t_LDFLAGS		=
+test_sctp_t_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_t"'
+test_sctp_t_CFLAGS		= $(USER_CFLAGS)
+test_sctp_t_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_etsi_n_SOURCES		= src/test/test-etsi_n.c
+test_etsi_n_LDADD		= libstreams.la
+test_etsi_n_LDFLAGS		=
+test_etsi_n_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-etsi_n"'
+test_etsi_n_CFLAGS		= $(USER_CFLAGS)
+test_etsi_n_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_etsi_t_SOURCES		= src/test/test-etsi_t.c
+test_etsi_t_LDADD		= libstreams.la
+test_etsi_t_LDFLAGS		=
+test_etsi_t_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-etsi_t"'
+test_etsi_t_CFLAGS		= $(USER_CFLAGS)
+test_etsi_t_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_interop_SOURCES		= src/test/test-interop.c
+test_interop_LDADD		= libstreams.la
+test_interop_LDFLAGS		=
+test_interop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-interop"'
+test_interop_CFLAGS		= $(USER_CFLAGS)
+test_interop_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 ## PKG_BUILD_ARCH
 endif
 ## RPM_BUILD_USER
 endif
 
+EXPORT_SRCFILES			=
+
 if CONFIG_STREAMS_SEPARATE_COMPILE
-EXPORT_SRCFILES			= \
+## CONFIG_STREAMS_SEPARATE_COMPILE
+
+EXPORT_SRCFILES			+= \
 				  src/kernel/strattach.c \
 				  src/kernel/strlookup.c \
 				  src/kernel/strpipe.c \
@@ -889,10 +1685,16 @@ endif
 if CONFIG_STREAMS_STH
 EXPORT_SRCFILES			+= src/modules/sth.c
 endif
+
+## CONFIG_STREAMS_SEPARATE_COMPILE
 else
-EXPORT_SRCFILES			= \
+## !CONFIG_STREAMS_SEPARATE_COMPILE
+
+EXPORT_SRCFILES			+= \
 				  src/kernel/specfs.c \
 				  src/kernel/streams.c
+
+## !CONFIG_STREAMS_SEPARATE_COMPILE
 endif
 
 if CONFIG_STREAMS_CLONE_MODULE
@@ -902,8 +1704,85 @@ if CONFIG_STREAMS_STH_MODULE
 EXPORT_SRCFILES			+= src/modules/sth.c
 endif
 
+if CONFIG_STREAMS_COMPAT_AIX
+EXPORT_SRCFILES			+= src/kernel/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+EXPORT_SRCFILES			+= src/kernel/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+EXPORT_SRCFILES			+= src/kernel/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+EXPORT_SRCFILES			+= src/kernel/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+EXPORT_SRCFILES			+= src/kernel/maccompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+EXPORT_SRCFILES			+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_OS7
+EXPORT_SRCFILES			+= src/kernel/os7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+EXPORT_SRCFILES			+= src/kernel/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+EXPORT_SRCFILES			+= src/kernel/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR3
+EXPORT_SRCFILES			+= src/kernel/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+EXPORT_SRCFILES			+= src/kernel/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+EXPORT_SRCFILES			+= src/kernel/uw7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_SRCFILES			+= src/kernel/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+EXPORT_SRCFILES			+= src/kernel/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+EXPORT_SRCFILES			+= src/kernel/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SRCFILES			+= src/kernel/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+EXPORT_SRCFILES			+= src/kernel/maccompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+EXPORT_SRCFILES			+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+EXPORT_SRCFILES			+= src/kernel/os7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+EXPORT_SRCFILES			+= src/kernel/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_SRCFILES			+= src/kernel/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+EXPORT_SRCFILES			+= src/kernel/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+EXPORT_SRCFILES			+= src/kernel/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_SRCFILES			+= src/kernel/uw7compat.c
+endif
+
+EXPORT_VERFILES			=
+
 if CONFIG_STREAMS_SEPARATE_COMPILE
-EXPORT_VERFILES			= \
+## CONFIG_STREAMS_SEPARATE_COMPILE
+
+EXPORT_VERFILES			+= \
 				  $(PKGINCL)/versions/strattach.ver \
 				  $(PKGINCL)/versions/strlookup.ver \
 				  $(PKGINCL)/versions/strpipe.ver \
@@ -920,10 +1799,16 @@ endif
 if CONFIG_STREAMS_STH
 EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
 endif
+
+## CONFIG_STREAMS_SEPARATE_COMPILE
 else
-EXPORT_VERFILES			= \
+## CONFIG_STREAMS_SEPARATE_COMPILE
+
+EXPORT_VERFILES			+= \
 				  $(PKGINCL)/versions/specfs.ver \
 				  $(PKGINCL)/versions/streams.ver
+
+## CONFIG_STREAMS_SEPARATE_COMPILE
 endif
 
 if CONFIG_STREAMS_CLONE_MODULE
@@ -931,6 +1816,79 @@ EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
 endif
 if CONFIG_STREAMS_STH_MODULE
 EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
+endif
+
+if CONFIG_STREAMS_COMPAT_AIX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OS7
+EXPORT_VERFILES			+= $(PKGINCL)/versions/os7compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR3
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/os7compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
 endif
 
 GENKSYMS_CPPFLAGS		= \
@@ -951,6 +1909,51 @@ include am/genksyms.am
 ## Rules for generating STREAMS configuration
 ##
 include am/strconf.am
+
+INET_MKDEV			= scripts/inet_mkdev
+INET_RMDEV			= scripts/inet_rmdev
+
+if PKG_BUILD_ARCH
+if RPM_BUILD_USER
+## these go with the utilities package
+dist_sbin_SCRIPTS 		+= $(INET_MKDEV) $(INET_RMDEV)
+endif
+endif
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
+EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+
+if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
+
+install-inet-devices: $(INET_MKDEV)
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)' ; \
+		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV) ; \
+	fi
+
+uninstall-inet-devices: $(INET_RMDEV)
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)' ; \
+		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
+	fi
+
+## RPM_BUILD_KERNEL
+else
+## ! RPM_BUILD_KERNEL
+
+install-inet-devices:
+
+uninstall-inet-devices:
+
+## ! RPM_BUILD_KERNEL
+endif
+
+INSTALL_EXEC_HOOK += install-inet-devices
+
+UNINSTALL_HOOK += uninstall-inet-devices
+
+.PHONY: install-inet-devices uninstall-inet-devices
 
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
@@ -987,7 +1990,8 @@ if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/specfs.sh \
-				  src/util/init/streams.sh
+				  src/util/init/streams.sh \
+				  src/util/init/@PACKAGE_LCNAME@.sh
 if CONFIG_STREAMS_LOG
 dist_initrd_SCRIPTS		+= src/util/init/strace.sh \
 				   src/util/init/strerr.sh
@@ -1003,7 +2007,8 @@ else
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/specfs \
-				  src/util/init/streams
+				  src/util/init/streams \
+				  src/util/init/@PACKAGE_LCNAME@
 if CONFIG_STREAMS_LOG
 dist_initrd_SCRIPTS		+= src/util/init/strace \
 				   src/util/init/strerr
@@ -1017,7 +2022,9 @@ endif
 endif
 
 dist_sysconf_DATA		= \
-				  src/util/sysconfig/streams.conf
+				  src/util/sysconfig/streams.conf \
+				  src/util/sysconfig/@PACKAGE_LCNAME@.conf \
+				  src/util/sysconfig/sock2path
 if CONFIG_STREAMS_UTILS
 dist_sysconf_DATA		+= \
 				  strsetup.conf \
@@ -1026,7 +2033,8 @@ endif
 
 dist_config_DATA		= \
 				  src/util/sysconfig/specfs \
-				  src/util/sysconfig/streams
+				  src/util/sysconfig/streams \
+				  src/util/sysconfig/@PACKAGE_LCNAME@
 if CONFIG_STREAMS_LOG
 dist_config_DATA		+= src/util/sysconfig/strace \
 				   src/util/sysconfig/strerr
@@ -1157,6 +2165,12 @@ endif
 ## Rules for init scripts
 ##
 include am/init.am
+
+##
+## Rules for net config files
+##
+include am/netconfig.am
+include am/sock2path.am
 
 ##
 ## Rules for lsms

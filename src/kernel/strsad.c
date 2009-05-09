@@ -431,7 +431,7 @@ apush_set(struct strapush *sap)
 	return (-EINVAL);
 }
 
-EXPORT_SYMBOL(apush_set);
+EXPORT_SYMBOL_GPL(apush_set);
 
 streams_fastcall int
 apush_lst(struct strapush *sap)
@@ -484,7 +484,7 @@ apush_lst(struct strapush *sap)
 	return (-ENODEV);
 }
 
-EXPORT_SYMBOL(apush_lst);	/* strconf.h LfS specific */
+EXPORT_SYMBOL_GPL(apush_lst);	/* strconf.h LfS specific */
 
 streams_fastcall int
 apush_get(struct strapush *sap)
@@ -537,7 +537,7 @@ apush_get(struct strapush *sap)
 	return (-ENODEV);
 }
 
-EXPORT_SYMBOL(apush_get);	/* strconf.h LiS specific */
+EXPORT_SYMBOL_GPL(apush_get);	/* strconf.h LiS specific */
 
 streams_fastcall int
 apush_vml(struct str_list *slp)
@@ -545,7 +545,7 @@ apush_vml(struct str_list *slp)
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
 }
 
-EXPORT_SYMBOL(apush_vml);
+EXPORT_SYMBOL_GPL(apush_vml);
 
 /**
  *  autopush: - perform autopush operations on a newly opened stream

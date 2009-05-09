@@ -144,8 +144,8 @@ static int show_timeout = 0;
 
 //static int show_data = 1;
 
-static int last_prim = 0;
-static int last_event = 0;
+int last_prim = 0;
+int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -327,7 +327,7 @@ check_time(const char *t, long i, long lo, long hi)
 }
 #endif
 
-static int
+int
 time_event(int child, int event)
 {
 	static const char *msgs[] = {
@@ -2090,7 +2090,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -2117,7 +2117,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {
@@ -2951,7 +2951,7 @@ test_case_3_7(int child)
 		goto failure;
 	state++;
 	if (ctrl.len != sizeof(lc))
-		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+		fprintf(stderr, "Control size is %d, should be %zu\n", ctrl.len, sizeof(lc));
 	state++;
 	if (data.len != 17)
 		fprintf(stderr, "Data size is %d, should be %d\n", data.len, 17);
@@ -3003,7 +3003,7 @@ test_case_3_8(int child)
 		goto failure;
 	state++;
 	if (ctrl.len != sizeof(lc))
-		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+		fprintf(stderr, "Control size is %d, should be %zu\n", ctrl.len, sizeof(lc));
 	state++;
 	if (data.len != 17)
 		fprintf(stderr, "Data size is %d, should be %d\n", data.len, 17);
@@ -3055,7 +3055,7 @@ test_case_3_9(int child)
 		goto failure;
 	state++;
 	if (ctrl.len != sizeof(lc))
-		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+		fprintf(stderr, "Control size is %d, should be %zu\n", ctrl.len, sizeof(lc));
 	state++;
 	if (data.len != 17)
 		fprintf(stderr, "Data size is %d, should be %d\n", data.len, 17);
@@ -3125,7 +3125,7 @@ test_case_4_x_1(int child)
 		goto failure;
 	state++;
 	if (ctrl.len != sizeof(lc))
-		fprintf(stderr, "Control size is %d, should be %d\n", ctrl.len, sizeof(lc));
+		fprintf(stderr, "Control size is %d, should be %zu\n", ctrl.len, sizeof(lc));
 	state++;
 	pstrlog(stdout, &ctrl, &data);
 	state++;

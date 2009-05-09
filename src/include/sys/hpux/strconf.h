@@ -83,7 +83,7 @@
 #warning "_HPUX_SOURCE not defined but HPUX strconf.h included"
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
 

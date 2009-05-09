@@ -83,7 +83,7 @@
 #warning "_UW7_SOURCE not defined but UW7 strconf.h included"
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
 

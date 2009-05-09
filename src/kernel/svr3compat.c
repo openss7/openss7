@@ -106,14 +106,14 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 __SVR3_EXTERN_INLINE major_t emajor(dev_t dev);
 
-EXPORT_SYMBOL(emajor);		/* uw7/ddi.h */
+EXPORT_SYMBOL_GPL(emajor);		/* uw7/ddi.h */
 __SVR3_EXTERN_INLINE minor_t eminor(dev_t dev);
 
-EXPORT_SYMBOL(eminor);		/* uw7/ddi.h */
+EXPORT_SYMBOL_GPL(eminor);		/* uw7/ddi.h */
 
 __SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t bsize, int type, uint bpri);
 
-EXPORT_SYMBOL(alloc_proto);	/* svr3/ddi.h */
+EXPORT_SYMBOL_GPL(alloc_proto);	/* svr3/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
 static

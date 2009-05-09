@@ -83,7 +83,7 @@
 #warning "_SUN_SOURCE not defined but SUN stream.h included."
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 

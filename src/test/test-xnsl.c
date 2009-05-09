@@ -5581,15 +5581,15 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-\n\
-    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
-    incorporated here by reference.\n\
-\n\
-    See `%1$s --copying' for copying permission.\n\
+Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
+Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", argv[0], ident);
+", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
 }
 
 void

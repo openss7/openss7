@@ -4945,7 +4945,7 @@ postamble_1_idle(int child)
 }
 
 /* preamble and postamble for the NS_DATA_XFER state. */
-static int
+int
 postamble_1_data_xfer(int child)
 {
 	int failed = -1;
@@ -4972,7 +4972,7 @@ postamble_1_data_xfer(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
-static int
+int
 postamble_1_refuse(int child)
 {
 	int failed = -1;
@@ -5064,7 +5064,7 @@ preamble_1_wres_cind_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-static int
+int
 preamble_1_data_xfer_conn(int child)
 {
 	if (preamble_1_wres_cind_conn(child) != __RESULT_SUCCESS)
@@ -5083,7 +5083,7 @@ preamble_1_data_xfer_conn(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-static int
+int
 preamble_1_data_xfer_resp(int child)
 {
 	if (preamble_1_wres_cind_resp(child) != __RESULT_SUCCESS)
@@ -5093,7 +5093,7 @@ preamble_1_data_xfer_resp(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-static int
+int
 preamble_1_data_xfer_list(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + 0);

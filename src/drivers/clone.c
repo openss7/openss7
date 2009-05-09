@@ -431,7 +431,7 @@ register_strdev(struct cdevsw *cdev, major_t major)
 	return (err);
 }
 
-EXPORT_SYMBOL(register_strdev);
+EXPORT_SYMBOL_GPL(register_strdev);
 
 /**
  *  unregister_strdev: - unregister previously registered STREAMS device
@@ -471,7 +471,7 @@ unregister_strdev(struct cdevsw *cdev, major_t major)
 	return unregister_cmajor(cdev, major);
 }
 
-EXPORT_SYMBOL(unregister_strdev);
+EXPORT_SYMBOL_GPL(unregister_strdev);
 
 /* 
  *  -------------------------------------------------------------------------

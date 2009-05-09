@@ -61,7 +61,7 @@
 
 #define __OPTIMIZE__ 1
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -116,7 +116,7 @@ typedef void irqreturn_t;
 #endif
 
 #ifndef EXPORT_SYMBOL_NOVERS
-#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL(__sym)
+#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL_GPL(__sym)
 #endif
 
 #ifdef LIS

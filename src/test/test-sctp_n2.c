@@ -109,6 +109,10 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <getopt.h>
 #endif
 
+#include <sys/testmod.h>
+
+#include <linux/limits.h>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

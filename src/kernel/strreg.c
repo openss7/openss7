@@ -449,7 +449,7 @@ register_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL(register_strmod);
+EXPORT_SYMBOL_GPL(register_strmod);
 
 /**
  *  unregister_strmod:
@@ -485,7 +485,7 @@ unregister_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL(unregister_strmod);
+EXPORT_SYMBOL_GPL(unregister_strmod);
 
 /**
  *  register_strdrv:	- register STREAMS driver to specfs

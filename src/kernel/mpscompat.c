@@ -118,7 +118,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
  */
 __MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len);
 
-EXPORT_SYMBOL(mi_bcmp);
+EXPORT_SYMBOL_GPL(mi_bcmp);
 
 /**
  * mi_alloc: - kmem_alloc() replacement
@@ -127,7 +127,7 @@ EXPORT_SYMBOL(mi_bcmp);
  */
 __MPS_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
 
-EXPORT_SYMBOL(mi_alloc);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_alloc);	/* mps/ddi.h */
 
 /**
  * mi_alloc_sleep: - kmem_alloc() replacement
@@ -136,7 +136,7 @@ EXPORT_SYMBOL(mi_alloc);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
 
-EXPORT_SYMBOL(mi_alloc_sleep);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_alloc_sleep);	/* mps/ddi.h */
 
 /**
  * mi_zalloc: - kmem_zalloc() replacement
@@ -144,7 +144,7 @@ EXPORT_SYMBOL(mi_alloc_sleep);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
 
-EXPORT_SYMBOL(mi_zalloc);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_zalloc);	/* mps/ddi.h */
 
 /*
  * mi_zalloc_sleep: - kmem_zalloc() replacement
@@ -152,7 +152,7 @@ EXPORT_SYMBOL(mi_zalloc);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
 
-EXPORT_SYMBOL(mi_zalloc_sleep);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_zalloc_sleep);	/* mps/ddi.h */
 
 /**
  * mi_free: - kmem_free() replacement
@@ -160,7 +160,7 @@ EXPORT_SYMBOL(mi_zalloc_sleep);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE void mi_free(void *ptr);
 
-EXPORT_SYMBOL(mi_free);		/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_free);		/* mps/ddi.h */
 
 /*
  *  =========================================================================
@@ -232,7 +232,7 @@ mi_open_grab(caddr_t ptr)
 	return (ptr);
 }
 
-EXPORT_SYMBOL(mi_open_grab);
+EXPORT_SYMBOL_GPL(mi_open_grab);
 
 noinline void mi_unbufcall(struct mi_comm *mi);
 noinline void mi_wakepriv(struct mi_comm *mi);
@@ -277,7 +277,7 @@ mi_close_put(caddr_t ptr)
 	return (ptr);
 }
 
-EXPORT_SYMBOL(mi_close_put);
+EXPORT_SYMBOL_GPL(mi_close_put);
 
 /**
  * mi_open_size: - obtain size of open structure
@@ -293,7 +293,7 @@ mi_open_size(size_t size)
 	return (size + sizeof(struct mi_comm));
 }
 
-EXPORT_SYMBOL(mi_open_size);
+EXPORT_SYMBOL_GPL(mi_open_size);
 
 /**
  * mi_open_obj: - initialize open structure
@@ -325,7 +325,7 @@ mi_open_obj(void *obj, size_t size, kmem_cachep_t cachep)
 	return (mi_to_ptr(mi));
 }
 
-EXPORT_SYMBOL(mi_open_obj);
+EXPORT_SYMBOL_GPL(mi_open_obj);
 
 /**
  * mi_close_obj: - obtain an pointer to the object to free
@@ -342,7 +342,7 @@ mi_close_obj(caddr_t ptr)
 	return ((caddr_t) ptr_to_mi(ptr));
 }
 
-EXPORT_SYMBOL(mi_close_obj);
+EXPORT_SYMBOL_GPL(mi_close_obj);
 
 /**
  * mi_close_size: - obtain size of close structure
@@ -358,7 +358,7 @@ mi_close_size(caddr_t ptr)
 	return (mi_open_size(mi->mi_size));
 }
 
-EXPORT_SYMBOL(mi_close_size);
+EXPORT_SYMBOL_GPL(mi_close_size);
 
 __MPS_EXTERN caddr_t
 mi_open_alloc_cache(kmem_cachep_t cachep, int flag)
@@ -370,7 +370,7 @@ mi_open_alloc_cache(kmem_cachep_t cachep, int flag)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_open_alloc_cache);
+EXPORT_SYMBOL_GPL(mi_open_alloc_cache);
 
 /**
  * mi_close_free_cache: - free a private structure
@@ -387,7 +387,7 @@ mi_close_free_cache(kmem_cachep_t cachep, caddr_t ptr)
 	mi_close_put(ptr);
 }
 
-EXPORT_SYMBOL(mi_close_free_cache);
+EXPORT_SYMBOL_GPL(mi_close_free_cache);
 
 static caddr_t
 mi_open_alloc_flag(size_t size, int flag)
@@ -409,7 +409,7 @@ mi_open_alloc(size_t size)
 	return mi_open_alloc_flag(size, KM_NOSLEEP);
 }
 
-EXPORT_SYMBOL(mi_open_alloc);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_open_alloc);	/* mps/ddi.h */
 
 /*
  *  MI_OPEN_ALLOC_SLEEP
@@ -421,7 +421,7 @@ mi_open_alloc_sleep(size_t size)
 	return mi_open_alloc_flag(size, KM_SLEEP);
 }
 
-EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_open_alloc_sleep);	/* mps/ddi.h */
 
 /**
  * mi_first_ptr: - get the first pointer from a head list
@@ -438,7 +438,7 @@ mi_first_ptr(caddr_t *mi_head)
 	return (mi_to_ptr(mi));
 }
 
-EXPORT_SYMBOL(mi_first_ptr);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_first_ptr);	/* mps/ddi.h */
 
 /**
  * mi_first_dev_ptr: - get first device pointer from a head list
@@ -457,7 +457,7 @@ mi_first_dev_ptr(caddr_t *mi_head)
 	return (mi_to_ptr(mi));
 }
 
-EXPORT_SYMBOL(mi_first_dev_ptr);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_first_dev_ptr);	/* mps/ddi.h */
 
 /**
  * mi_next_ptr: - get the next pointer in head list
@@ -473,7 +473,7 @@ mi_next_ptr(caddr_t ptr)
 	return (mi_to_ptr(mi));
 }
 
-EXPORT_SYMBOL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
+EXPORT_SYMBOL_GPL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
 
 /**
  * mi_next_dev_ptr: - get the next device pointer in head list
@@ -493,7 +493,7 @@ mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 	return (mi_to_ptr(mi));
 }
 
-EXPORT_SYMBOL(mi_next_dev_ptr);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_next_dev_ptr);	/* mps/ddi.h */
 
 /**
  * mi_prev_ptr: - get the previous element in head list
@@ -511,7 +511,7 @@ mi_prev_ptr(caddr_t ptr)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_prev_ptr);	/* mps/ddi.h, aix/ddi.h */
+EXPORT_SYMBOL_GPL(mi_prev_ptr);	/* mps/ddi.h, aix/ddi.h */
 
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
 
@@ -601,7 +601,7 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_open_link);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_open_link);	/* mps/ddi.h */
 
 /**
  * mi_open_detached: - detached open
@@ -611,7 +611,7 @@ EXPORT_SYMBOL(mi_open_link);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
 
-EXPORT_SYMBOL(mi_open_detached);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_open_detached);	/* mps/ddi.h */
 
 /**
  * mi_attach: - attach a private structure to a queue
@@ -633,7 +633,7 @@ mi_attach(queue_t *q, caddr_t ptr)
 	spin_unlock_irqrestore(&mi->mi_lock, flags);
 }
 
-EXPORT_SYMBOL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
+EXPORT_SYMBOL_GPL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
 
 /**
  * mi_open_comm: - perform qi_qopen() housekeeping
@@ -647,7 +647,7 @@ EXPORT_SYMBOL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
  */
 __MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp,
 				     int flag, int sflag, cred_t *credp);
-EXPORT_SYMBOL(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
+EXPORT_SYMBOL_GPL(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
 
 /**
  * mi_close_unlink: - unlink a private structure
@@ -671,7 +671,7 @@ mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 	}
 }
 
-EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_close_unlink);	/* mps/ddi.h */
 
 /**
  * mi_close_free: - free a private structure
@@ -686,7 +686,7 @@ mi_close_free(caddr_t ptr)
 	mi_close_put(ptr);
 }
 
-EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_close_free);	/* mps/ddi.h */
 
 /**
  * mi_detach: - detach a private structure from a queue pair
@@ -716,7 +716,7 @@ mi_detach(queue_t *q, caddr_t ptr)
 	}
 }
 
-EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_detach);	/* mps/ddi.h */
 
 /**
  * mi_close_detached: - close a detached private structure
@@ -725,7 +725,7 @@ EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE void mi_close_detached(caddr_t *mi_head, caddr_t ptr);
 
-EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_close_detached);	/* mps/ddi.h */
 
 /**
  * mi_close_comm: - perform common qi_qclose() housekeeping
@@ -734,7 +734,7 @@ EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
  */
 __MPS_EXTERN_INLINE int mi_close_comm(caddr_t *mi_head, queue_t *q);
 
-EXPORT_SYMBOL(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
+EXPORT_SYMBOL_GPL(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
 
 /**
  * mi_open_detached_cache: - detached open
@@ -744,7 +744,7 @@ EXPORT_SYMBOL(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
  */
 __MPS_EXTERN_INLINE caddr_t mi_open_detached_cache(caddr_t *mi_head, kmem_cachep_t cachep,
 						   dev_t *devp);
-EXPORT_SYMBOL(mi_open_detached_cache);
+EXPORT_SYMBOL_GPL(mi_open_detached_cache);
 
 /**
  * mi_open_comm_cache: - perform qi_qopen() housekeeping
@@ -758,7 +758,7 @@ EXPORT_SYMBOL(mi_open_detached_cache);
  */
 __MPS_EXTERN_INLINE int mi_open_comm_cache(caddr_t *mi_head, kmem_cachep_t cachep, queue_t *q,
 					   dev_t *devp, int flag, int sflag, cred_t *credp);
-EXPORT_SYMBOL(mi_open_comm_cache);
+EXPORT_SYMBOL_GPL(mi_open_comm_cache);
 
 /**
  * mi_close_detached_cache: - close a detached cached private structure
@@ -768,7 +768,7 @@ EXPORT_SYMBOL(mi_open_comm_cache);
  */
 __MPS_EXTERN_INLINE void mi_close_detached_cache(caddr_t *mi_head, kmem_cachep_t cachep,
 						 caddr_t ptr);
-EXPORT_SYMBOL(mi_close_detached_cache);
+EXPORT_SYMBOL_GPL(mi_close_detached_cache);
 
 /**
  * mi_close_comm_cache: - perform common qi_qclose() housekeeping
@@ -778,7 +778,7 @@ EXPORT_SYMBOL(mi_close_detached_cache);
  */
 __MPS_EXTERN_INLINE int mi_close_comm_cache(caddr_t *mi_head, kmem_cachep_t cachep, queue_t *q);
 
-EXPORT_SYMBOL(mi_close_comm_cache);
+EXPORT_SYMBOL_GPL(mi_close_comm_cache);
 
 struct mi_iocblk {
 	caddr_t mi_caddr;		/* uaddr of TRANSPARENT ioctl, NULL for I_STR */
@@ -892,7 +892,7 @@ mi_acquire(caddr_t ptr, queue_t *q)
 	return (likely(__mi_acquire(mi, q, bit)) ? ptr : NULL);
 }
 
-EXPORT_SYMBOL(mi_acquire);
+EXPORT_SYMBOL_GPL(mi_acquire);
 
 /**
  * mi_acquire_sleep: - lock a private structure or wait
@@ -954,7 +954,7 @@ mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *fl
 	return (ptr);
 }
 
-EXPORT_SYMBOL(mi_acquire_sleep);
+EXPORT_SYMBOL_GPL(mi_acquire_sleep);
 
 /**
  * mi_acquire_sleep_nosignal: - lock a private structure or wait
@@ -1002,7 +1002,7 @@ mi_acquire_sleep_nosignal(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned
 	return (ptr);
 }
 
-EXPORT_SYMBOL(mi_acquire_sleep_nosignal);
+EXPORT_SYMBOL_GPL(mi_acquire_sleep_nosignal);
 
 static inline fastcall void
 __mi_release(struct mi_comm *mi)
@@ -1025,7 +1025,7 @@ mi_release(caddr_t ptr)
 	__mi_release(ptr_to_mi(ptr));
 }
 
-EXPORT_SYMBOL(mi_release);
+EXPORT_SYMBOL_GPL(mi_release);
 
 /**
  * mi_unlock: - unlock a private structure
@@ -1039,7 +1039,7 @@ mi_unlock(caddr_t ptr)
 	return mi_release(ptr);
 }
 
-EXPORT_SYMBOL(mi_unlock);
+EXPORT_SYMBOL_GPL(mi_unlock);
 
 __MPS_EXTERN caddr_t
 mi_trylock(queue_t *q)
@@ -1047,7 +1047,7 @@ mi_trylock(queue_t *q)
 	return mi_acquire((caddr_t) q->q_ptr, q);
 }
 
-EXPORT_SYMBOL(mi_trylock);
+EXPORT_SYMBOL_GPL(mi_trylock);
 
 __MPS_EXTERN caddr_t
 mi_sleeplock(queue_t *q)
@@ -1058,7 +1058,7 @@ mi_sleeplock(queue_t *q)
 	return (ptr);
 }
 
-EXPORT_SYMBOL(mi_sleeplock);
+EXPORT_SYMBOL_GPL(mi_sleeplock);
 
 /*
  *  =========================================================================
@@ -1111,7 +1111,7 @@ mi_bufcall(queue_t *q, int size, int priority)
 	}
 }
 
-EXPORT_SYMBOL(mi_bufcall);
+EXPORT_SYMBOL_GPL(mi_bufcall);
 
 /*
  *  =========================================================================
@@ -1136,7 +1136,7 @@ mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 	return (mp);
 }
 
-EXPORT_SYMBOL(mi_reuse_proto);
+EXPORT_SYMBOL_GPL(mi_reuse_proto);
 
 __MPS_EXTERN mblk_t *
 mi_reallocb(mblk_t *mp, size_t size)
@@ -1161,11 +1161,11 @@ mi_reallocb(mblk_t *mp, size_t size)
 	return (mp);
 }
 
-EXPORT_SYMBOL(mi_reallocb);
+EXPORT_SYMBOL_GPL(mi_reallocb);
 
 __MPS_EXTERN_INLINE mblk_t *mi_allocb(queue_t *q, size_t size, int priority);
 
-EXPORT_SYMBOL(mi_allocb);	/* mps/stream.h */
+EXPORT_SYMBOL_GPL(mi_allocb);	/* mps/stream.h */
 
 /*
  *  =========================================================================
@@ -1254,7 +1254,7 @@ mi_copy_done(queue_t *q, mblk_t *mp, int err)
 	qreply(q, mp);
 }
 
-EXPORT_SYMBOL(mi_copy_done);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_copy_done);	/* mps/ddi.h */
 
 /**
  * mi_copyin: - perform explicit or implicit copyin() operation
@@ -1353,7 +1353,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 	}
 }
 
-EXPORT_SYMBOL(mi_copyin);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_copyin);	/* mps/ddi.h */
 
 /**
  * mi_copyin_n: - perform subsequent copyin operation
@@ -1416,7 +1416,7 @@ mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 	}
 }
 
-EXPORT_SYMBOL(mi_copyin_n);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_copyin_n);	/* mps/ddi.h */
 
 /**
  * mi_copyout_alloc: - allocate a message block for a copyout operation
@@ -1484,7 +1484,7 @@ mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_
 	return (db);
 }
 
-EXPORT_SYMBOL(mi_copyout_alloc);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_copyout_alloc);	/* mps/ddi.h */
 
 /**
  * mi_copyout: - perform a pending copyout operation and possible close input-output control
@@ -1535,7 +1535,7 @@ mi_copyout(queue_t *q, mblk_t *mp)
 	return;
 }
 
-EXPORT_SYMBOL(mi_copyout);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_copyout);	/* mps/ddi.h */
 
 /**
  * mi_copy_state: - determine the state of an input-output control operation
@@ -1583,7 +1583,7 @@ mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	return (-1);
 }
 
-EXPORT_SYMBOL(mi_copy_state);	/* mps/ddi.h */
+EXPORT_SYMBOL_GPL(mi_copy_state);	/* mps/ddi.h */
 
 /**
  * mi_copy_set_rval: - set the input-output control operation return value
@@ -1616,7 +1616,7 @@ mi_copy_set_rval(mblk_t *mp, int rval)
 	return;
 }
 
-EXPORT_SYMBOL(mi_copy_set_rval);
+EXPORT_SYMBOL_GPL(mi_copy_set_rval);
 
 /*
  *  =========================================================================
@@ -1793,7 +1793,7 @@ mi_timer_alloc_MAC(queue_t *q, size_t size)
 	return (mp);
 }
 
-EXPORT_SYMBOL(mi_timer_alloc_MAC);
+EXPORT_SYMBOL_GPL(mi_timer_alloc_MAC);
 
 /**
  * mi_timer: - start or restart a timer (MacOT variety)
@@ -1808,7 +1808,7 @@ mi_timer_MAC(mblk_t *mp, clock_t msec)
 	mi_timer_ticks(mp, drv_msectohz(msec));
 }
 
-EXPORT_SYMBOL(mi_timer_MAC);
+EXPORT_SYMBOL_GPL(mi_timer_MAC);
 
 __MPS_EXTERN int
 mi_timer_requeue(mblk_t *mp)
@@ -1859,7 +1859,7 @@ mi_timer_requeue(mblk_t *mp)
 	return (rval);
 }
 
-EXPORT_SYMBOL(mi_timer_requeue);
+EXPORT_SYMBOL_GPL(mi_timer_requeue);
 
 /**
  * mi_timer_cancel: - cancel a timer message (MacOT variety)
@@ -1918,7 +1918,7 @@ mi_timer_cancel(mblk_t *mp)
 	return (rval);
 }
 
-EXPORT_SYMBOL(mi_timer_cancel);
+EXPORT_SYMBOL_GPL(mi_timer_cancel);
 
 /**
  * mi_timer_q_switch: - switch target queues for a timer (MacOT variety)
@@ -1946,7 +1946,7 @@ mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
 	}
 }
 
-EXPORT_SYMBOL(mi_timer_q_switch);
+EXPORT_SYMBOL_GPL(mi_timer_q_switch);
 
 /*
  *  OpenSolaris variety
@@ -1964,7 +1964,7 @@ mi_timer_alloc_SUN(size_t size)
 	return mi_timer_alloc_MAC(NULL, size);
 }
 
-EXPORT_SYMBOL(mi_timer_alloc_SUN);
+EXPORT_SYMBOL_GPL(mi_timer_alloc_SUN);
 
 /**
  *  mi_timer_ticks: - start a timer -- OpenSS7 variety
@@ -2024,7 +2024,7 @@ mi_timer_ticks(mblk_t *mp, clock_t ticks)
 	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
 
-EXPORT_SYMBOL(mi_timer_ticks);
+EXPORT_SYMBOL_GPL(mi_timer_ticks);
 
 /**
  *  mi_timer_SUN: - start a timer -- OpenSolaris variety
@@ -2059,7 +2059,7 @@ mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 	}
 }
 
-EXPORT_SYMBOL(mi_timer_SUN);
+EXPORT_SYMBOL_GPL(mi_timer_SUN);
 
 /**
  * mi_timer_stop: - stop a timer (OpenSolaris variety)
@@ -2074,7 +2074,7 @@ mi_timer_stop(mblk_t *mp)
 	mi_timer_cancel(mp);
 }
 
-EXPORT_SYMBOL(mi_timer_stop);
+EXPORT_SYMBOL_GPL(mi_timer_stop);
 
 /**
  * mi_timer_move: - move a timer message to different queue (OpenSolaris variety)
@@ -2153,7 +2153,7 @@ mi_timer_move(queue_t *q, mblk_t *mp)
 	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
 
-EXPORT_SYMBOL(mi_timer_move);
+EXPORT_SYMBOL_GPL(mi_timer_move);
 
 /*
  *  Common
@@ -2240,7 +2240,7 @@ mi_timer_valid(mblk_t *mp)
 	return (rval);
 }
 
-EXPORT_SYMBOL(mi_timer_valid);
+EXPORT_SYMBOL_GPL(mi_timer_valid);
 
 /**
  * mi_timer_running: - is the timer running
@@ -2255,7 +2255,7 @@ mi_timer_running(mblk_t *mp)
 	return (state == TB_ACTIVE || state == TB_RESCHEDULED);
 }
 
-EXPORT_SYMBOL(mi_timer_running);
+EXPORT_SYMBOL_GPL(mi_timer_running);
 
 /**
  * mi_timer_cond: - start timer if not already running
@@ -2313,7 +2313,7 @@ mi_timer_cond(mblk_t *mp, clock_t ticks)
 	return (rtn);
 }
 
-EXPORT_SYMBOL(mi_timer_cond);
+EXPORT_SYMBOL_GPL(mi_timer_cond);
 
 /**
  * mi_timer_remain: - return remaining time on timer
@@ -2346,7 +2346,7 @@ mi_timer_remain(mblk_t *mp)
 	return (rval);
 }
 
-EXPORT_SYMBOL(mi_timer_remain);
+EXPORT_SYMBOL_GPL(mi_timer_remain);
 
 /**
  * mi_timer_free: - free a timer message (Common)
@@ -2389,7 +2389,7 @@ mi_timer_free(mblk_t *mp)
 	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
 
-EXPORT_SYMBOL(mi_timer_free);
+EXPORT_SYMBOL_GPL(mi_timer_free);
 
 __MPS_EXTERN queue_t *
 mi_allocq(struct streamtab *st)
@@ -2406,7 +2406,7 @@ mi_allocq(struct streamtab *st)
 #endif
 }
 
-EXPORT_SYMBOL(mi_allocq);
+EXPORT_SYMBOL_GPL(mi_allocq);
 
 __MPS_EXTERN void
 mi_freeq(queue_t *q)
@@ -2419,7 +2419,7 @@ mi_freeq(queue_t *q)
 #endif
 }
 
-EXPORT_SYMBOL(mi_freeq);
+EXPORT_SYMBOL_GPL(mi_freeq);
 
 __MPS_EXTERN int
 mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
@@ -2439,7 +2439,7 @@ mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 	return (result);
 }
 
-EXPORT_SYMBOL(mi_strlog);
+EXPORT_SYMBOL_GPL(mi_strlog);
 
 #define _MI_FLAG_ZEROPAD	(1<<0)
 #define _MI_FLAG_SIGN		(1<<1)
@@ -2851,7 +2851,7 @@ mi_mpprintf(mblk_t *mp, char *fmt, ...)
 	return (count);
 }
 
-EXPORT_SYMBOL(mi_mpprintf);
+EXPORT_SYMBOL_GPL(mi_mpprintf);
 
 /**
  * mi_mpprintf_nr: - printf to a message block removing previous newline
@@ -2878,7 +2878,7 @@ mi_mpprintf_nr(mblk_t *mp, char *fmt, ...)
 	return (count);
 }
 
-EXPORT_SYMBOL(mi_mpprintf_nr);
+EXPORT_SYMBOL_GPL(mi_mpprintf_nr);
 
 /*
  *  =========================================================================
@@ -2913,7 +2913,7 @@ mi_set_sth_hiwat(queue_t *q, size_t size)
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_set_sth_hiwat);
+EXPORT_SYMBOL_GPL(mi_set_sth_hiwat);
 
 /**
  * mi_set_sth_lowat: - set Stream Head low water mark
@@ -2940,7 +2940,7 @@ mi_set_sth_lowat(queue_t *q, size_t size)
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_set_sth_lowat);
+EXPORT_SYMBOL_GPL(mi_set_sth_lowat);
 
 /**
  * mi_set_sth_maxblk: - set Stream Head maximum block size
@@ -2968,7 +2968,7 @@ mi_set_sth_maxblk(queue_t *q, ssize_t size)
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_set_sth_maxblk);
+EXPORT_SYMBOL_GPL(mi_set_sth_maxblk);
 
 /**
  * mi_set_sth_coyopt: - set Stream Head copy options
@@ -2996,7 +2996,7 @@ mi_set_sth_copyopt(queue_t *q, int copyopt)
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_set_sth_copyopt);
+EXPORT_SYMBOL_GPL(mi_set_sth_copyopt);
 
 /**
  * mi_set_sth_wroff: - set Stream Head write offset
@@ -3022,7 +3022,7 @@ mi_set_sth_wroff(queue_t *q, size_t size)
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_set_sth_wroff);
+EXPORT_SYMBOL_GPL(mi_set_sth_wroff);
 
 /*
  *  =========================================================================
@@ -3043,7 +3043,7 @@ mi_sprintf(char *buf, char *fmt, ...)
 	return result;
 }
 
-EXPORT_SYMBOL(mi_sprintf);
+EXPORT_SYMBOL_GPL(mi_sprintf);
 
 __MPS_EXTERN int
 mi_strcmp(const caddr_t cp1, const caddr_t cp2)
@@ -3051,7 +3051,7 @@ mi_strcmp(const caddr_t cp1, const caddr_t cp2)
 	return strcmp(cp1, cp2);
 }
 
-EXPORT_SYMBOL(mi_strcmp);
+EXPORT_SYMBOL_GPL(mi_strcmp);
 
 __MPS_EXTERN int
 mi_strlen(const caddr_t str)
@@ -3059,7 +3059,7 @@ mi_strlen(const caddr_t str)
 	return strlen(str);
 }
 
-EXPORT_SYMBOL(mi_strlen);
+EXPORT_SYMBOL_GPL(mi_strlen);
 
 __MPS_EXTERN long
 mi_strtol(const caddr_t str, caddr_t *ptr, int base)
@@ -3067,7 +3067,7 @@ mi_strtol(const caddr_t str, caddr_t *ptr, int base)
 	return simple_strtol(str, ptr, base);
 }
 
-EXPORT_SYMBOL(mi_strtol);
+EXPORT_SYMBOL_GPL(mi_strtol);
 
 /*
  *  =========================================================================
@@ -3092,7 +3092,7 @@ mi_offset_param(mblk_t *mp, size_t offset, size_t len)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_offset_param);
+EXPORT_SYMBOL_GPL(mi_offset_param);
 
 /*
  *  MI_OFFSET_PARAMC
@@ -3120,7 +3120,7 @@ mi_offset_paramc(mblk_t *mp, size_t offset, size_t len)
 	return (result);
 }
 
-EXPORT_SYMBOL(mi_offset_paramc);
+EXPORT_SYMBOL_GPL(mi_offset_paramc);
 
 /*
  *  =========================================================================
@@ -3150,7 +3150,7 @@ mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 #endif
 }
 
-EXPORT_SYMBOL(mps_become_writer);
+EXPORT_SYMBOL_GPL(mps_become_writer);
 
 /*
  *  MPS_INTR_DISABLE
@@ -3165,7 +3165,7 @@ mps_intr_disable(pl_t * plp)
 	*plp = flags;
 }
 
-EXPORT_SYMBOL(mps_intr_disable);
+EXPORT_SYMBOL_GPL(mps_intr_disable);
 
 /*
  *  MPS_INTR_ENABLE
@@ -3179,7 +3179,7 @@ mps_intr_enable(pl_t pl)
 	local_irq_restore(flags);
 }
 
-EXPORT_SYMBOL(mps_intr_enable);
+EXPORT_SYMBOL_GPL(mps_intr_enable);
 
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
 static

@@ -502,10 +502,9 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 static void
 my_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, va_list args)
 {
-	static int sequence = 10000;
 	struct log_ctl *lp = (typeof(lp)) ctrl.buf;
 	struct timeval tv;
-	int err, pri, band, flag;
+	int pri, band, flag;
 
 	if (flags & SL_WARN)
 		pri = LOG_WARNING;

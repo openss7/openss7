@@ -62,6 +62,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <linux/version.h>
 #include <linux/compiler.h>
 #include <linux/types.h>
+#include <linux/string.h>
 
 #include "sctp_sha1.h"
 
