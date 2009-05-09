@@ -86,7 +86,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _INIT_SCRIPTS
     _RPM_SPEC
     _DEB_DPKG
-AC_CONFIG_FILES([debian/openss7-core.postinst
+    AC_CONFIG_FILES([debian/openss7-core.postinst
 		     debian/openss7-core.postrm
 		     debian/openss7-core.preinst
 		     debian/openss7-core.prerm
@@ -107,6 +107,9 @@ AC_CONFIG_FILES([debian/openss7-core.postinst
 		     src/util/modutils/openss7
 		     src/include/sys/openss7/version.h
 		     Module.mkvars])
+    AC_CONFIG_HEADERS([src/drivers/ip_hooks.h
+		       src/drivers/sctp_hooks.h
+		       src/drivers/udp_hooks.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
@@ -593,15 +596,6 @@ dnl--------------------------------------------------------------------------
 	    [enable_compat_lis='module'])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS], [test ":${enable_compat_lis:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE], [test ":${enable_compat_lis:-module}" = :module])
-dnl--------------------------------------------------------------------------
-    AC_ARG_ENABLE([compat-lfs],
-	AS_HELP_STRING([--enable-compat-lfs],
-	    [enable source compatibility with LiS variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_lfs="$enableval"],
-	    [enable_compat_lfs='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS], [test ":${enable_compat_lfs:-module}" = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE], [test ":${enable_compat_lfs:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-mac],
 	AS_HELP_STRING([--enable-compat-mac],
@@ -3448,12 +3442,8 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS LiS compatibility])
-	if test :$os7_cv_package = :LiS ; then
-	    enable_compat_lis='not required'
-	else
-	    if test ":${enable_compat_lis:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-		enable_compat_lis='yes'
-	    fi
+	if test ":${enable_compat_lis:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_lis='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_lis:-module}])
     case "${enable_compat_lis:-module}" in
@@ -3476,38 +3466,6 @@ dnl----------------------------------------------------------------------------
 		modules written for LiS will require porting in more respects.
 		This symbol determines whether compatibility will be compiled as
 		a loadable module to Linux Fast-STREAMS.])
-	    ;;
-    esac
-dnl----------------------------------------------------------------------------
-    AC_MSG_CHECKING([for STREAMS LfS compatibility])
-	if test :$os7_cv_package = :LfS ; then
-	    enable_compat_lfs='not required'
-	else
-	    if test ":${enable_compat_lfs:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-		enable_compat_lfs='yes'
-	    fi
-	fi
-    AC_MSG_RESULT([${enable_compat_lfs:-module}])
-    case "${enable_compat_lfs:-module}" in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LFS], [], [When defined,
-		Linux STREAMS will attempt to be as compatible as possible
-		(without replicating any bugs) with the LfS release so that
-		STREAMS drivers and modules written for LfS will compile with
-		Linux STREAMS.  When undefined, STREAMS drivers and modules
-		written for LfS will require porting in more respects.  This
-		symbol determines whether compatibility will be compiled and
-		linkable with Linux STREAMS.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LFS_MODULE], [], [When
-		defined, Linux STREAMS will attempt to be as compatible as
-		possible (without replicating any bugs) with the LfS release so
-		that STREAMS drivers and modules written for LfS will compile
-		with Linux STREAMS.  When undefined, STREAMS drivers and modules
-		written for LfS will require porting in more respects.  This
-		symbol determines whether compatibility will be compiled as a
-		loadable module to Linux STREAMS.])
 	    ;;
     esac
 dnl----------------------------------------------------------------------------
@@ -3642,18 +3600,20 @@ AC_DEFUN([_OS7_CONFIG], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_STRCONF], [dnl
     AC_REQUIRE([_LINUX_KERNEL])
-    AC_CACHE_CHECK([for strconf major device number base], [strconf_cv_majbase], [dnl
+    strconf_prefix='os7'
+    os7_cv_stem='Config'
+    AC_CACHE_CHECK([for strconf major device number base], [os7_cv_majbase], [dnl
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
-	    strconf_cv_majbase=2001
+	    os7_cv_majbase=2001
 	else
-	    strconf_cv_majbase=231
+	    os7_cv_majbase=231
 	fi
     ])
-    AC_CACHE_CHECK([for strconf module id base], [strconf_cv_midbase], [dnl
-	strconf_cv_midbase=5001
+    AC_CACHE_CHECK([for strconf module id base], [os7_cv_midbase], [dnl
+	os7_cv_midbase=5001
     ])
-    strconf_cv_sconfig='src/include/sys/config.h'
-    strconf_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
+    os7_cv_sconfig='src/include/sys/config.h'
+    os7_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
     _STRCONF
 ])# _OS7_STRCONF
 # =============================================================================

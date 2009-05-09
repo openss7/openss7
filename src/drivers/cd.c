@@ -268,7 +268,7 @@ cd_register_device(struct streamtab *str, major_t major, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL(cd_register_device);
+EXPORT_SYMBOL_GPL(cd_register_device);
 
 int
 cd_unregister_device(struct streamtab *str, major_t major, minor_t minor)
@@ -305,7 +305,7 @@ cd_unregister_device(struct streamtab *str, major_t major, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL(cd_unregister_device);
+EXPORT_SYMBOL_GPL(cd_unregister_device);
 
 /*
  *  STREAMS Open and Close

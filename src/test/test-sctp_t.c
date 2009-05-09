@@ -109,6 +109,10 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <getopt.h>
 #endif
 
+#include <sys/testmod.h>
+
+#include <linux/limits.h>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -181,6 +185,7 @@ static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
 
+static int last_prim = 0;
 static int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;

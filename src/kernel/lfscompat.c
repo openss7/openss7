@@ -125,11 +125,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
 __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp);
 
-EXPORT_SYMBOL(appq);
+EXPORT_SYMBOL_GPL(appq);
 
 __LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len);
 
-EXPORT_SYMBOL(bcmp);
+EXPORT_SYMBOL_GPL(bcmp);
 
 __LFS_EXTERN int
 bcanget(queue_t *q, int band)
@@ -186,11 +186,11 @@ EXPORT_SYMBOL_GPL(canget);
 /* LiS 2.18.0 deprecated these for some reason... */
 __LFS_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
 
-EXPORT_SYMBOL(copyin);
+EXPORT_SYMBOL_GPL(copyin);
 
 __LFS_EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
 
-EXPORT_SYMBOL(copyout);
+EXPORT_SYMBOL_GPL(copyout);
 
 __LFS_EXTERN int
 drv_getparm(const unsigned int parm, void *value_p)
@@ -256,47 +256,47 @@ drv_getparm(const unsigned int parm, void *value_p)
 	}
 }
 
-EXPORT_SYMBOL(drv_getparm);
+EXPORT_SYMBOL_GPL(drv_getparm);
 
 __LFS_EXTERN_INLINE int drv_priv(cred_t *crp);
 
-EXPORT_SYMBOL(drv_priv);
+EXPORT_SYMBOL_GPL(drv_priv);
 
 __LFS_EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
 
-EXPORT_SYMBOL(drv_hztomsec);
+EXPORT_SYMBOL_GPL(drv_hztomsec);
 
 __LFS_EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
 
-EXPORT_SYMBOL(drv_hztousec);
+EXPORT_SYMBOL_GPL(drv_hztousec);
 
 __LFS_EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
 
-EXPORT_SYMBOL(drv_msectohz);
+EXPORT_SYMBOL_GPL(drv_msectohz);
 
 __LFS_EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
 
-EXPORT_SYMBOL(drv_usectohz);
+EXPORT_SYMBOL_GPL(drv_usectohz);
 
 __LFS_EXTERN_INLINE void drv_usecwait(unsigned long usec);
 
-EXPORT_SYMBOL(drv_usecwait);
+EXPORT_SYMBOL_GPL(drv_usecwait);
 
 __LFS_EXTERN_INLINE void delay(unsigned long ticks);
 
-EXPORT_SYMBOL(delay);
+EXPORT_SYMBOL_GPL(delay);
 
 __LFS_EXTERN_INLINE int enableq(queue_t *q);
 
-EXPORT_SYMBOL(enableq);
+EXPORT_SYMBOL_GPL(enableq);
 
 __LFS_EXTERN_INLINE qi_qadmin_t getadmin(modID_t modid);
 
-EXPORT_SYMBOL(getadmin);
+EXPORT_SYMBOL_GPL(getadmin);
 
 __LFS_EXTERN_INLINE modID_t getmid(const char *name);
 
-EXPORT_SYMBOL(getmid);
+EXPORT_SYMBOL_GPL(getmid);
 
 __LFS_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
 
@@ -304,51 +304,51 @@ EXPORT_SYMBOL_GPL(linkmsg);
 
 __LFS_EXTERN_INLINE int pcmsg(unsigned char type);
 
-EXPORT_SYMBOL(pcmsg);
+EXPORT_SYMBOL_GPL(pcmsg);
 
 __LFS_EXTERN_INLINE int datamsg(unsigned char type);
 
-EXPORT_SYMBOL(datamsg);
+EXPORT_SYMBOL_GPL(datamsg);
 
 __LFS_EXTERN_INLINE int ctlmsg(unsigned char type);
 
-EXPORT_SYMBOL(ctlmsg);
+EXPORT_SYMBOL_GPL(ctlmsg);
 
 __LFS_EXTERN_INLINE int isdatablk(dblk_t *db);
 
-EXPORT_SYMBOL(isdatablk);
+EXPORT_SYMBOL_GPL(isdatablk);
 
 __LFS_EXTERN_INLINE int isdatamsg(mblk_t *mp);
 
-EXPORT_SYMBOL(isdatamsg);
+EXPORT_SYMBOL_GPL(isdatamsg);
 
 __LFS_EXTERN_INLINE int putctl(queue_t *q, int type);
 
-EXPORT_SYMBOL(putctl);
+EXPORT_SYMBOL_GPL(putctl);
 
 __LFS_EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
 
-EXPORT_SYMBOL(putctl1);
+EXPORT_SYMBOL_GPL(putctl1);
 
 __LFS_EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2);
 
-EXPORT_SYMBOL(putctl2);
+EXPORT_SYMBOL_GPL(putctl2);
 
 __LFS_EXTERN_INLINE int putnextctl(queue_t *q, int type);
 
-EXPORT_SYMBOL(putnextctl);
+EXPORT_SYMBOL_GPL(putnextctl);
 
 __LFS_EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
 
-EXPORT_SYMBOL(putnextctl1);
+EXPORT_SYMBOL_GPL(putnextctl1);
 
 __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
 
-EXPORT_SYMBOL(putnextctl2);
+EXPORT_SYMBOL_GPL(putnextctl2);
 
 __LFS_EXTERN_INLINE void setq(queue_t *q, struct qinit *rinit, struct qinit *wrinit);
 
-EXPORT_SYMBOL(setq);
+EXPORT_SYMBOL_GPL(setq);
 
 #if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
@@ -506,7 +506,7 @@ strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 	return (result);
 }
 
-EXPORT_SYMBOL(strlog);
+EXPORT_SYMBOL_GPL(strlog);
 
 /*
  *  The following are from src/include/sys/lfs/strconf.h
@@ -518,7 +518,7 @@ EXPORT_SYMBOL_GPL(register_strnod);
 
 __LFS_EXTERN_INLINE int register_strdev(struct cdevsw *cdev, major_t major);
 
-EXPORT_SYMBOL(register_strdev);
+EXPORT_SYMBOL_GPL(register_strdev);
 
 __LFS_EXTERN_INLINE int register_strdrv(struct cdevsw *cdev);
 
@@ -526,7 +526,7 @@ EXPORT_SYMBOL_GPL(register_strdrv);
 
 __LFS_EXTERN_INLINE int register_strmod(struct _fmodsw *fmod);
 
-EXPORT_SYMBOL(register_strmod);
+EXPORT_SYMBOL_GPL(register_strmod);
 
 __LFS_EXTERN_INLINE int register_strsync(struct _fmodsw *fmod);
 
@@ -538,7 +538,7 @@ EXPORT_SYMBOL_GPL(unregister_strnod);
 
 __LFS_EXTERN_INLINE int unregister_strdev(struct cdevsw *cdev, major_t major);
 
-EXPORT_SYMBOL(unregister_strdev);
+EXPORT_SYMBOL_GPL(unregister_strdev);
 
 __LFS_EXTERN_INLINE int unregister_strdrv(struct cdevsw *cdev);
 
@@ -546,7 +546,7 @@ EXPORT_SYMBOL_GPL(unregister_strdrv);
 
 __LFS_EXTERN_INLINE int unregister_strmod(struct _fmodsw *fmod);
 
-EXPORT_SYMBOL(unregister_strmod);
+EXPORT_SYMBOL_GPL(unregister_strmod);
 
 __LFS_EXTERN_INLINE void unregister_strsync(struct _fmodsw *fmod);
 
@@ -554,15 +554,15 @@ EXPORT_SYMBOL_GPL(unregister_strsync);
 
 __LFS_EXTERN_INLINE int apush_get(struct strapush *sap);
 
-EXPORT_SYMBOL(apush_get);
+EXPORT_SYMBOL_GPL(apush_get);
 
 __LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
 
-EXPORT_SYMBOL(apush_set);
+EXPORT_SYMBOL_GPL(apush_set);
 
 __LFS_EXTERN_INLINE int apush_vml(struct str_list *slp);
 
-EXPORT_SYMBOL(apush_vml);
+EXPORT_SYMBOL_GPL(apush_vml);
 
 __LFS_EXTERN_INLINE int autopush_del(struct strapush *sap);
 

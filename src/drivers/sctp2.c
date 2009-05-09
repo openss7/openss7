@@ -88,6 +88,11 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define SCTP_SPLASH	SCTP_DESCRIP	"\n" \
 			SCTP_REVISION
 
+#if defined CONFIG_STREAMS_SCTP_N_MODULE || defined CONFIG_STREAMS_SCTP_T_MODULE
+#undef SCTP_CONFIG_MODULE
+#define SCTP_CONFIG_MODULE
+#endif
+
 #ifdef LINUX
 #ifdef SCTP_CONFIG_MODULE
 MODULE_AUTHOR(SCTP_CONTACT);

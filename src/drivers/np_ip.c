@@ -661,6 +661,7 @@ np_dupmsg(queue_t *q, mblk_t *bp)
  */
 
 /* State flags */
+#ifndef NSF_UNBND
 #define NSF_UNBND	(1 << NS_UNBND		)
 #define NSF_WACK_BREQ	(1 << NS_WACK_BREQ	)
 #define NSF_WACK_UREQ	(1 << NS_WACK_UREQ	)
@@ -681,6 +682,7 @@ np_dupmsg(queue_t *q, mblk_t *bp)
 #define NSF_WACK_DREQ10	(1 << NS_WACK_DREQ10	)
 #define NSF_WACK_DREQ11	(1 << NS_WACK_DREQ11	)
 #define NSF_NOSTATES	(1 << NS_NOSTATES	)
+#endif
 
 /* State masks */
 #define NSM_ALLSTATES	(NSF_NOSTATES - 1)

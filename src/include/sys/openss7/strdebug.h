@@ -73,7 +73,7 @@
  *  Kernel 2.4, 2.6 module compatibility.
  */
 #ifndef EXPORT_SYMBOL_NOVERS
-#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL(__sym)
+#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL_GPL(__sym)
 #endif
 
 /*

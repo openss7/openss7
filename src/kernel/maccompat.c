@@ -334,7 +334,7 @@ mpnotify(mblk_t *mp, mpnotify_func_t func, caddr_t arg)
 	return (0);
 }
 
-EXPORT_SYMBOL(mpnotify);
+EXPORT_SYMBOL_GPL(mpnotify);
 
 #ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
 static

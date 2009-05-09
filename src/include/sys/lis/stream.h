@@ -94,7 +94,7 @@
 #warning "_LIS_SOURCE not defined but LIS stream.h included."
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_LIS || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 

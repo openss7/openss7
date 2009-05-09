@@ -83,7 +83,7 @@
 #warning "_MAC_SOURCE not defined but MAC stream.h included."
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_MAC || defined CONFIG_STREAMS_COMPAT_MAC_MODULE
 

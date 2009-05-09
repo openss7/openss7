@@ -185,8 +185,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  -------------------------------------------------------------------------
  */
 
-#define NAME "test-xnet"
-
 static const char *lpkgname = "OpenSS7 XTI/TLI Library";
 
 /* static const char *spkgname = "XNET"; */

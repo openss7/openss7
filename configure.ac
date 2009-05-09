@@ -238,6 +238,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/xcc/Makefile
 		 doc/specs/xmap/Makefile
 		 intl/Makefile
+		 lib32/Makefile
 		 po/Makefile.in
 		 scripts/texi/args.texi
 		 src/Makefile

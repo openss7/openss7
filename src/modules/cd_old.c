@@ -259,7 +259,7 @@ cd_free_priv(queue_t *q)
 	return;
 }
 
-//EXPORT_SYMBOL(cd_free_priv);
+//EXPORT_SYMBOL_GPL(cd_free_priv);
 /* gcc 4.0 can't handle forward declarations of inline functions */
 STATIC int ch_info_req_slow(struct ch *ch, queue_t *q);
 extern struct str *
@@ -349,7 +349,7 @@ cd_alloc_priv(queue_t *q, struct str **stp, dev_t *devp, cred_t *crp, ulong type
 	return ((struct str *) cd);
 }
 
-//EXPORT_SYMBOL(cd_alloc_priv);
+//EXPORT_SYMBOL_GPL(cd_alloc_priv);
 
 /*
  *  ========================================================================

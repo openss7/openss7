@@ -691,7 +691,7 @@ allocq(void)
 	return (rq);
 }
 
-EXPORT_SYMBOL(allocq);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(allocq);		/* include/sys/openss7/stream.h */
 
 streams_noinline streams_fastcall void sd_release(struct stdata **sdp);
 STATIC void __freestr(struct stdata *sd);
@@ -763,7 +763,7 @@ freeq(queue_t *rq)
 	freeq_fast(rq);
 }
 
-EXPORT_SYMBOL(freeq);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(freeq);		/* include/sys/openss7/stream.h */
 
 /* queue gets and puts */
 BIG_STATIC streams_fastcall __hot_out queue_t *
@@ -2178,7 +2178,7 @@ bufcall(unsigned size, int priority, void streamscall streamscall (*function) (l
 	return __bufcall(NULL, size, priority, function, arg);
 }
 
-EXPORT_SYMBOL(bufcall);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(bufcall);		/* include/sys/openss7/stream.h */
 
 /**
  *  esbbcall:	- schedule a buffer callout
@@ -2189,7 +2189,7 @@ EXPORT_SYMBOL(bufcall);		/* include/sys/openss7/stream.h */
 __STRSCHD_EXTERN_INLINE bcid_t esbbcall(int priority, void streamscall (*function) (long),
 					long arg);
 
-EXPORT_SYMBOL(esbbcall);	/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(esbbcall);	/* include/sys/openss7/stream.h */
 
 /**
  *  unbufcall:	- cancel a buffer callout
@@ -2262,7 +2262,7 @@ unbufcall(register bcid_t bcid)
 	return;
 }
 
-EXPORT_SYMBOL(unbufcall);	/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(unbufcall);	/* include/sys/openss7/stream.h */
 
 /*
  *  __timeout:	- generate a timeout callback
@@ -2302,7 +2302,7 @@ timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 
-EXPORT_SYMBOL(timeout);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(timeout);		/* include/sys/openss7/stream.h */
 
 /**
  *  untimeout:	- cancel a timeout callback
@@ -2384,7 +2384,7 @@ untimeout(toid_t toid)
 	return (-1);
 }
 
-EXPORT_SYMBOL(untimeout);	/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(untimeout);	/* include/sys/openss7/stream.h */
 
 /*
  *  __weldq:	- weld two queue pairs together
@@ -2460,7 +2460,7 @@ weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_
 	return __weldq(q1, q2, q3, q4, func, arg, protq);
 }
 
-EXPORT_SYMBOL(weldq);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(weldq);		/* include/sys/openss7/stream.h */
 
 /**
  *  unweldq:	- unweld two queue pairs from each other
@@ -2499,7 +2499,7 @@ unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
 	return __unweldq(q1, NULL, q3, NULL, func, arg, protq);
 }
 
-EXPORT_SYMBOL(unweldq);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(unweldq);		/* include/sys/openss7/stream.h */
 
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
@@ -3329,7 +3329,7 @@ streams_schedule(void)
 #endif
 }
 
-EXPORT_SYMBOL(streams_schedule);
+EXPORT_SYMBOL_GPL(streams_schedule);
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /**
@@ -3595,7 +3595,7 @@ put(queue_t *q, mblk_t *mp)
 	return;
 }
 
-EXPORT_SYMBOL(put);
+EXPORT_SYMBOL_GPL(put);
 
 /**
  *  putnext:	- put a message on the queue next to this one
@@ -3669,7 +3669,7 @@ putnext(queue_t *q, mblk_t *mp)
 	_trace();
 }
 
-EXPORT_SYMBOL(putnext);		/* include/sys/openss7/stream.h */
+EXPORT_SYMBOL_GPL(putnext);		/* include/sys/openss7/stream.h */
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /**
@@ -4574,7 +4574,7 @@ kmem_alloc(size_t size, int flags)
 	return kmem_alloc_slow(size, flags);
 }
 
-EXPORT_SYMBOL(kmem_alloc);	/* include/sys/openss7/kmem.h */
+EXPORT_SYMBOL_GPL(kmem_alloc);	/* include/sys/openss7/kmem.h */
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -4596,7 +4596,7 @@ kmem_zalloc(size_t size, int flags)
 	return (mem);
 }
 
-EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/openss7/kmem.h */
+EXPORT_SYMBOL_GPL(kmem_zalloc);	/* include/sys/openss7/kmem.h */
 
 /**
  *  kmem_free:	- free memory
@@ -4615,7 +4615,7 @@ kmem_free(void *addr, size_t size)
 		raise_bufcalls();
 }
 
-EXPORT_SYMBOL(kmem_free);	/* include/sys/openss7/kmem.h */
+EXPORT_SYMBOL_GPL(kmem_free);	/* include/sys/openss7/kmem.h */
 
 /**
  *  kmem_alloc_node: - allocate memory
@@ -4629,7 +4629,7 @@ kmem_alloc_node(size_t size, int flags, cnodeid_t node)
 	return kmalloc(size, GFP_KERNEL);
 }
 
-EXPORT_SYMBOL(kmem_alloc_node);	/* include/sys/openss7/kmem.h */
+EXPORT_SYMBOL_GPL(kmem_alloc_node);	/* include/sys/openss7/kmem.h */
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -4647,7 +4647,7 @@ kmem_zalloc_node(size_t size, int flags, cnodeid_t node)
 	return (mem);
 }
 
-EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/openss7/kmem.h */
+EXPORT_SYMBOL_GPL(kmem_zalloc_node);	/* include/sys/openss7/kmem.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -5275,7 +5275,7 @@ runqueues(void)
 #endif
 }
 
-EXPORT_SYMBOL(runqueues);	/* include/sys/openss7/strsubr.h */
+EXPORT_SYMBOL_GPL(runqueues);	/* include/sys/openss7/strsubr.h */
 
 /* 
  *  -------------------------------------------------------------------------
@@ -5388,7 +5388,7 @@ allocstr(void)
 	return (sd);
 }
 
-EXPORT_SYMBOL(allocstr);	/* include/sys/openss7/strsubr.h */
+EXPORT_SYMBOL_GPL(allocstr);	/* include/sys/openss7/strsubr.h */
 
 STATIC __unlikely void
 __freestr(struct stdata *sd)
@@ -5495,7 +5495,7 @@ freestr(struct stdata *sd)
 	sd_put(&sd);
 }
 
-EXPORT_SYMBOL(freestr);		/* include/sys/openss7/strsubr.h */
+EXPORT_SYMBOL_GPL(freestr);		/* include/sys/openss7/strsubr.h */
 
 /* 
  *  -------------------------------------------------------------------------

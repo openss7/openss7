@@ -111,7 +111,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/sad.h>
 
 #ifdef LFS
-#include "include/sys/config.h"
+#include "src/include/sys/config.h"
 #endif
 
 #ifdef LIS
@@ -159,7 +159,7 @@ static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
 
-static int last_event = 0;
+int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -387,7 +387,7 @@ check_time(int child, const char *t, long beg, long lo, long hi)
 }
 #endif
 
-static int
+int
 time_event(int child, int event)
 {
 	static const char *msgs[] = {
@@ -2136,7 +2136,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -2163,7 +2163,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {

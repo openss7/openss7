@@ -83,7 +83,7 @@
 #warning "_MPS_SOURCE not defined but MPS stream.h included."
 #endif
 
-#include <sys/strcompat/config.h>
+#include <sys/openss7/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_MPS || defined CONFIG_STREAMS_COMPAT_MPS_MODULE
 
