@@ -512,6 +512,15 @@ test_interop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=
 test_interop_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 test_interop_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 
+pkglibexec32_PROGRAMS		+= test-chan
+
+test_chan_SOURCES		= $(top_srcdir)/src/test/test-chan.c
+test_chan_LDADD			= libstreams.la
+test_chan_LDFLAGS		=
+test_chan_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-chan"'
+test_chan_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_chan_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
 lib32_LTLIBRARIES		+= libstreams.la
 
 libstreams_la_SOURCES		= $(top_srcdir)/src/lib/testcancel.c \
@@ -721,10 +730,38 @@ strMIB_la_SOURCES		= $(top_srcdir)/src/snmp/strMIB.c \
 				  $(top_srcdir)/src/snmp/strExtMIB.h
 strMIB_la_DEPENDENCIES		= libstreams.la
 strMIB_la_LDFLAGS		= -module -avoid-version
-				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+				  -shared $(SNMP_LDFLAGS)
 strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
+
+#if WITH_SNMP_AGENT
+#snmpdlmod32_LTLIBRARIES	+= mxMIB.la
+#endif
+EXTRA_LTLIBRARIES		= mxMIB.la
+
+mxMIB_la_SOURCES		= $(top_srcdir)/src/snmp/ds0Bundle.c \
+				  $(top_srcdir)/src/snmp/ds0Bundle.h \
+				  $(top_srcdir)/src/snmp/ds0.c \
+				  $(top_srcdir)/src/snmp/ds0.h \
+				  $(top_srcdir)/src/snmp/ds1EXT.c \
+				  $(top_srcdir)/src/snmp/ds1EXT.h \
+				  $(top_srcdir)/src/snmp/mxMIB.c \
+				  $(top_srcdir)/src/snmp/mxMIB.h \
+				  $(top_srcdir)/src/snmp/phyMIB.c \
+				  $(top_srcdir)/src/snmp/phyMIB.h \
+				  $(top_srcdir)/src/snmp/x400pMIB.c \
+				  $(top_srcdir)/src/snmp/x400pMIB.h \
+				  $(top_srcdir)/src/snmp/ds_agent.h \
+				  $(top_srcdir)/src/snmp/header_complex.h \
+				  $(top_srcdir)/src/snmp/mib_modules.h \
+				  $(top_srcdir)/src/snmp/struct.h \
+				  $(top_srcdir)/src/snmp/util_funcs.h
+mxMIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
+				  -shared $(SNMP_LDFLAGS)
+mxMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+mxMIB_la_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
+mxMIB_la_LIBADD			= libstreams.la $(SNMP_LDADD)
 
 ## RPM_BUILD_USER
 endif

@@ -131,6 +131,11 @@ sbin_PROGRAMS			+= ldlconfig
 
 sbin_PROGRAMS			+= initsock soconfig
 
+EXTRA_PROGRAMS			+= chand
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= chand
+endif
+
 #dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
 
 dist_sbin_SCRIPTS		=
@@ -240,6 +245,7 @@ pkglibexec_PROGRAMS		+= test-xnsl test-xnsl_thr
 pkglibexec_PROGRAMS		+= test-sockpath test-socket test-socklib test-sockmod test-socksys
 pkglibexec_PROGRAMS		+= test-inet_raw test-inet_udp test-inet_tcp test-inet_sctp
 pkglibexec_PROGRAMS		+= test-sctp test-sctp_n test-sctp_n2 test-sctp_nc test-sctp_ns test-sctp_t test-etsi_n test-etsi_t test-interop
+pkglibexec_PROGRAMS		+= test-chan
 
 EXTRA_PROGRAMS			+=
 
@@ -268,6 +274,7 @@ snmpdlmod_LTLIBRARIES		=
 
 if WITH_SNMP_AGENT
 snmpdlmod_LTLIBRARIES		+= strMIB.la
+snmpdlmod_LTLIBRARIES		+= mxMIB.la
 endif
 
 ## RPM_BUILD_USER
@@ -294,7 +301,10 @@ noinst_LIBRARIES		= \
 				libSOCKdrvs.a \
 				libINETmods.a \
 				libSCTPsctp.a \
-				libSCTPtest.a
+				libSCTPtest.a \
+				libCHANlink.a \
+				libCHANmods.a \
+				libCHANdrvs.a
 
 libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.h \
@@ -875,6 +885,32 @@ streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
 endif
 
+EXTRA_libCHANlink_a_SOURCES	= 
+libCHANlink_a_SOURCES		= src/modules/ch_pmod.c \
+				  src/modules/mx_pmod.c \
+				  config.h strconf.h
+libCHANlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libCHANlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCHANlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libCHANlink_a_OBJECTS):	$(libCHANlink_a_DEPENDENCIES)
+
+EXTRA_libCHANmods_a_SOURCES	=
+libCHANmods_a_SOURCES		= 
+libCHANmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libCHANmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libCHANmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libCHANmods_a_OBJECTS):	$(libCHANmods_a_DEPENDENCIES)
+
+EXTRA_libCHANdrvs_a_SOURCES	=
+libCHANdrvs_a_SOURCES		=
+libCHANdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libCHANdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libCHANdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libCHANdrvs_a_OBJECTS):	$(libCHANdrvs_a_DEPENDENCIES)
+
 ## RPM_BUILD_KERNEL
 endif
 ## PKG_BUILD_ARCH
@@ -913,7 +949,10 @@ KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) \
 				  $(libSOCKdrvs_a_OBJECTS) \
 				  $(libINETmods_a_OBJECTS) \
 				  $(libSCTPtest_a_OBJECTS) \
-				  $(libSCTPsctp_a_OBJECTS)
+				  $(libSCTPsctp_a_OBJECTS) \
+				  $(libCHANlink_a_OBJECTS) \
+				  $(libCHANmods_a_OBJECTS) \
+				  $(libCHANdrvs_a_OBJECTS)
 KERNEL_MODULES			= specfs.o \
 				  streams.o \
 				  $(libLfS_drivers_a_OBJECTS) \
@@ -927,7 +966,10 @@ KERNEL_MODULES			= specfs.o \
 				  $(libSOCKmods_a_OBJECTS) \
 				  $(libSOCKdrvs_a_OBJECTS) \
 				  $(libINETmods_a_OBJECTS) \
-				  $(libSCTPtest_a_OBJECTS)
+				  $(libSCTPtest_a_OBJECTS) \
+				  $(libCHANlink_a_OBJECTS) \
+				  $(libCHANmods_a_OBJECTS) \
+				  $(libCHANdrvs_a_OBJECTS)
 
 if WITH_KO_MODULES
 KERNEL_MODULES			+= streams_sctp.o
@@ -1188,10 +1230,32 @@ strMIB_la_SOURCES		= \
 				  src/snmp/util_funcs.h
 strMIB_la_DEPENDENCIES		= libstreams.la
 strMIB_la_LDFLAGS		= -module -avoid-version \
-				  -shared $(STREAMS_LDFLAGS) $(SNMP_LDFLAGS)
+				  -shared $(SNMP_LDFLAGS)
 strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS)
 strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
+
+mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
+				  src/snmp/ds0Bundle.h \
+				  src/snmp/ds0.c \
+				  src/snmp/ds0.h \
+				  src/snmp/ds1EXT.c \
+				  src/snmp/ds1EXT.h \
+				  src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
+				  src/snmp/phyMIB.c \
+				  src/snmp/phyMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+mxMIB_la_LDFLAGS		= -module -avoid-version \
+				  -shared $(SNMP_LDFLAGS)
+mxMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+mxMIB_la_CFLAGS			= $(USER_CFLAGS)
+mxMIB_la_LIBADD			= libstreams.la $(SNMP_LDADD)
+
 
 EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
@@ -1656,6 +1720,36 @@ test_interop_LDFLAGS		=
 test_interop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-interop"'
 test_interop_CFLAGS		= $(USER_CFLAGS)
 test_interop_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+test_chan_SOURCES		= src/test/test-chan.c
+test_chan_LDADD			= libstreams.la
+test_chan_LDFLAGS		=
+test_chan_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-chan"'
+test_chan_CFLAGS		= $(USER_CFLAGS)
+test_chan_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+chand_SOURCES			= src/snmp/chand.c \
+				  src/snmp/chand.h \
+				  src/snmp/ds0Bundle.c \
+				  src/snmp/ds0Bundle.h \
+				  src/snmp/ds0.c \
+				  src/snmp/ds0.h \
+				  src/snmp/ds1EXT.c \
+				  src/snmp/ds1EXT.h \
+				  src/snmp/mxMIB.c \
+				  src/snmp/mxMIB.h \
+				  src/snmp/phyMIB.c \
+				  src/snmp/phyMIB.h \
+				  src/snmp/ds_agent.h \
+				  src/snmp/header_complex.h \
+				  src/snmp/mib_modules.h \
+				  src/snmp/struct.h \
+				  src/snmp/util_funcs.h
+chand_LDADD			= libstreams.la $(SNMP_LDADD)
+chand_LDFLAGS			= $(SNMP_LDFLAGS)
+chand_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"chand"'
+chand_CFLAGS			= $(USER_CFLAGS)
+chand_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 ## PKG_BUILD_ARCH
 endif
