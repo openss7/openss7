@@ -54,7 +54,7 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = carrier cnam hlr lab mg sbc sg ssg sgp ss voip
+SUBDIRS = carrier cnam hlr lab mg sg ssg sgp ss voip
 
 # bs cbc mgc sbc
 

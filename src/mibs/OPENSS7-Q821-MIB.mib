@@ -316,7 +316,7 @@ managementOperationsScheduleTable OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. Q.821 (2000) managementOperationsSchedule 
              MOC."
-    :;= { managementOperationsSchedule 1 }
+    ::= { managementOperationsSchedule 1 }
 
 managementOperationsScheduleEntry OBJECT-TYPE
     SYNTAX      ManagementOperationsScheduleEntry
@@ -330,7 +330,7 @@ managementOperationsScheduleEntry OBJECT-TYPE
     INDEX   {
         mosScheduleId -- index
     }
-    :;= { managementOperationsScheduleTable 1 }
+    ::= { managementOperationsScheduleTable 1 }
 
 ManagementOperationsScheduleEntry ::=
     SEQUENCE {
@@ -364,7 +364,7 @@ mosAdministrativeState OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) administrativeState ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 1 }
+    ::= { managementOperationsScheduleEntry 1 }
 
 mosAffectedObjectInstance OBJECT-TYPE
     SYNTAX      RowPointer
@@ -375,7 +375,7 @@ mosAffectedObjectInstance OBJECT-TYPE
     REFERENCE
         "ITU-T Rec. Q.821 (2000) affectedObjectClass and 
              affectedObjectInstances ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 2 }
+    ::= { managementOperationsScheduleEntry 2 }
 
 mosBeginTime OBJECT-TYPE
     SYNTAX      DateAndTime
@@ -385,7 +385,7 @@ mosBeginTime OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) beginTime ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 3 }
+    ::= { managementOperationsScheduleEntry 3 }
 
 mosDestinationAddress OBJECT-TYPE
     SYNTAX      IpAddress
@@ -395,7 +395,7 @@ mosDestinationAddress OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) destinationAddress ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 4 }
+    ::= { managementOperationsScheduleEntry 4 }
 
 mosEndTime OBJECT-TYPE
     SYNTAX      DateAndTime
@@ -405,7 +405,7 @@ mosEndTime OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) endTime ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 5 }
+    ::= { managementOperationsScheduleEntry 5 }
 
 mosInterval OBJECT-TYPE
     SYNTAX      TimeInterval
@@ -415,7 +415,7 @@ mosInterval OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) interval ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 6 }
+    ::= { managementOperationsScheduleEntry 6 }
 
 mosScheduleId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -425,7 +425,7 @@ mosScheduleId OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) scheduleId ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 7 }
+    ::= { managementOperationsScheduleEntry 7 }
 
 mosOperationalState OBJECT-TYPE
     SYNTAX      OperationalState
@@ -435,7 +435,7 @@ mosOperationalState OBJECT-TYPE
         ""
     REFERENCE
         "ITU-T Rec. Q.821 (2000) operationalState ATTRIBUTE."
-    ::= { managmentOperationsScheduleEntry 8 }
+    ::= { managementOperationsScheduleEntry 8 }
 
 mosStorageType OBJECT-TYPE
     SYNTAX      StorageType
@@ -445,7 +445,7 @@ mosStorageType OBJECT-TYPE
         ""
     REFERENCE
         "STD 58 StorageType TEXTUAL-CONVENTION."
-    ::= { managmentOperationsScheduleEntry 9 }
+    ::= { managementOperationsScheduleEntry 9 }
 
 mosRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -455,7 +455,7 @@ mosRowStatus OBJECT-TYPE
         ""
     REFERENCE
         "STD 58 RowStatus TEXTUAL-CONVENTION."
-    ::= { managmentOperationsScheduleEntry 10 }
+    ::= { managementOperationsScheduleEntry 10 }
 
 
 enhancedCurrentAlarmSummaryControl OBJECT IDENTIFIER

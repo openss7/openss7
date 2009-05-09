@@ -59,15 +59,15 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= lab.texi
+info_TEXINFOS		+= sgp.texi
 
-lab_TEXINFOS		= \
+sgp_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
 if AMDEP
-lab_TEXINFOS		+= \
+sgp_TEXINFOS		+= \
 			  texi/args.texi
 endif
 endif
@@ -75,7 +75,7 @@ endif
 EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \
 			  $(info_TEXINFOS) \
-			  $(lab_TEXINFOS)
+			  $(sgp_TEXINFOS)
 
 
 if PKG_BUILD_INDEP

@@ -77,14 +77,10 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
-#ifdef LFS
 #include <sys/strsubr.h>
-#endif
 #include <sys/ddi.h>
 
-#ifdef LFS
 #include "sys/config.h"
-#endif
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
@@ -99,10 +95,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 			MUX_CONTACT	"\n"
 #define MUX_SPLASH	MUX_DEVICE	" - " \
 			MUX_REVISION	"\n"
-
-#if defined LIS && defined MODULE
-#define CONFIG_STREAMS_MUX_MODULE MODULE
-#endif
 
 #ifdef CONFIG_STREAMS_MUX_MODULE
 MODULE_AUTHOR(MUX_CONTACT);
@@ -119,28 +111,13 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 
 #ifndef CONFIG_STREAMS_MUX_NAME
-#ifdef LIS
-#define CONFIG_STREAMS_MUX_NAME MUX__DRV_NAME
-#endif
-#ifdef LFS
 #error CONFIG_STREAMS_MUX_NAME must be defined.
 #endif
-#endif
 #ifndef CONFIG_STREAMS_MUX_MAJOR
-#ifdef LIS
-#define CONFIG_STREAMS_MUX_MAJOR MUX__CMAJOR_0
-#endif
-#ifdef LFS
 #error CONFIG_STREAMS_MUX_MAJOR must be defined.
 #endif
-#endif
 #ifndef CONFIG_STREAMS_MUX_MODID
-#ifdef LIS
-#define CONFIG_STREAMS_MUX_MODID MUX__ID
-#endif
-#ifdef LFS
 #error CONFIG_STREAMS_MUX_MODID must be defined.
-#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_MUX_MODID;
@@ -169,22 +146,13 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-mux driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR) "-*");
 MODULE_ALIAS("/dev/mux");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mux");
 MODULE_ALIAS("/dev/streams/mux/*");
 MODULE_ALIAS("/dev/streams/clone/mux");
 #endif
-#endif
 
-#ifdef LIS
-#define STRMINPSZ   0
-#define STRMAXPSZ   4096
-#define STRHIGH	    5120
-#define STRLOW	    1024
-#endif
-
-STATIC struct module_info mux_minfo = {
+static struct module_info mux_minfo = {
 	.mi_idnum = CONFIG_STREAMS_MUX_MODID,
 	.mi_idname = CONFIG_STREAMS_MUX_NAME,
 	.mi_minpsz = STRMINPSZ,
@@ -198,17 +166,6 @@ static struct module_stat mux_uwstat __attribute__ ((__aligned__(SMP_CACHE_BYTES
 static struct module_stat mux_lrstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat mux_lwstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-#ifdef LIS
-
-#define QSVCBUSY QRUNNING
-
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-#endif
-
 /* private structures */
 struct mux {
 	struct mux *next;		/* list linkage */
@@ -220,7 +177,7 @@ struct mux {
 };
 
 /* blank structure for use by I_UNLINK/I_PUNLINK */
-STATIC struct mux no_mux = {
+static struct mux no_mux = {
 	.next = NULL,
 	.prev = &no_mux.next,
 	.other = NULL,
@@ -229,9 +186,9 @@ STATIC struct mux no_mux = {
 	.dev = 0,
 };
 
-STATIC rwlock_t mux_lock = RW_LOCK_UNLOCKED;
-STATIC struct mux *mux_opens = NULL;
-STATIC struct mux *mux_links = NULL;
+static rwlock_t mux_lock = RW_LOCK_UNLOCKED;
+static struct mux *mux_opens = NULL;
+static struct mux *mux_links = NULL;
 
 /*
  *  Locking
@@ -271,11 +228,7 @@ STATIC struct mux *mux_links = NULL;
 #define MUX_UP 1
 #define MUX_DOWN 2
 
-#ifdef LIS
-#define streamscall _RP
-#endif
-
-STATIC streamscall int
+static streamscall int
 mux_uwput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr, *bot;
@@ -498,7 +451,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-STATIC streamscall int
+static streamscall int
 mux_lrput(queue_t *q, mblk_t *mp)
 {
 	struct mux *mux = q->q_ptr;
@@ -576,7 +529,7 @@ mux_lrput(queue_t *q, mblk_t *mp)
  *  Note: This would be more efficient if we kept a separate list of feeding STREAMS instead of
  *  walking the entire list of upper STREAMS.
  */
-STATIC streamscall int
+static streamscall int
 mux_lwsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
@@ -604,7 +557,7 @@ mux_lwsrv(queue_t *q)
  *  The upper write service procedure is invoked only by the lower write serivce procedure when the
  *  lower write queue is back enabled.  This causes the backlog to clear.
  */
-STATIC streamscall int
+static streamscall int
 mux_uwsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
@@ -640,7 +593,7 @@ mux_uwsrv(queue_t *q)
  *  Note: This would be more efficient if we kept a separate list of feeding STREAMS instead of
  *  walking the entire list of upper STREAMS.
  */
-STATIC streamscall int
+static streamscall int
 mux_ursrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
@@ -674,7 +627,7 @@ mux_ursrv(queue_t *q)
  *  head after unlinking, or to be processed by an upper read queue after connection across the
  *  multiplexer.
  */
-STATIC streamscall int
+static streamscall int
 mux_lrsrv(queue_t *q)
 {
 	struct mux *mux = q->q_ptr;
@@ -700,7 +653,7 @@ mux_lrsrv(queue_t *q)
 	return (0);
 }
 
-STATIC streamscall int
+static streamscall int
 mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct mux *mux, **muxp = &mux_opens;
@@ -765,7 +718,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (ENXIO);
 }
 
-STATIC streamscall int
+static streamscall int
 mux_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct mux *p;
@@ -784,7 +737,7 @@ mux_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-STATIC struct qinit mux_urqinit = {
+static struct qinit mux_urqinit = {
 	.qi_srvp = mux_ursrv,
 	.qi_qopen = mux_open,
 	.qi_qclose = mux_close,
@@ -792,35 +745,34 @@ STATIC struct qinit mux_urqinit = {
 	.qi_mstat = &mux_urstat,
 };
 
-STATIC struct qinit mux_uwqinit = {
+static struct qinit mux_uwqinit = {
 	.qi_putp = mux_uwput,
 	.qi_srvp = mux_uwsrv,
 	.qi_minfo = &mux_minfo,
 	.qi_mstat = &mux_uwstat,
 };
 
-STATIC struct qinit mux_lrqinit = {
+static struct qinit mux_lrqinit = {
 	.qi_putp = mux_lrput,
 	.qi_srvp = mux_lrsrv,
 	.qi_minfo = &mux_minfo,
 	.qi_mstat = &mux_lrstat,
 };
 
-STATIC struct qinit mux_lwqinit = {
+static struct qinit mux_lwqinit = {
 	.qi_srvp = mux_lwsrv,
 	.qi_minfo = &mux_minfo,
 	.qi_mstat = &mux_lwstat,
 };
 
-STATIC struct streamtab mux_info = {
+static struct streamtab mux_info = {
 	.st_rdinit = &mux_urqinit,
 	.st_wrinit = &mux_uwqinit,
 	.st_muxrinit = &mux_lrqinit,
 	.st_muxwinit = &mux_lwqinit,
 };
 
-#ifdef LFS
-STATIC struct cdevsw mux_cdev = {
+static struct cdevsw mux_cdev = {
 	.d_name = CONFIG_STREAMS_MUX_NAME,
 	.d_str = &mux_info,
 	.d_flag = D_MP,
@@ -828,10 +780,9 @@ STATIC struct cdevsw mux_cdev = {
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 	.d_kmod = THIS_MODULE,
 };
-#endif
 
 #ifdef CONFIG_STREAMS_MUX_MODULE
-STATIC
+static
 #endif
 int __init
 mux_init(void)
@@ -844,31 +795,20 @@ mux_init(void)
 	printk(KERN_INFO MUX_SPLASH);
 #endif
 	mux_minfo.mi_idnum = modid;
-#ifdef LFS
 	if ((err = register_strdev(&mux_cdev, major)) < 0)
 		return (err);
-#endif
-#ifdef LIS
-	if ((err = register_strdev(major, &mux_info, 255, CONFIG_STREAMS_MUX_NAME)) < 0)
-		return (err);
-#endif
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
 }
 
 #ifdef CONFIG_STREAMS_MUX_MODULE
-STATIC
+static
 #endif
 void __exit
 mux_exit(void)
 {
-#ifdef LFS
 	unregister_strdev(&mux_cdev, major);
-#endif
-#ifdef LIS
-	lis_unregister_strdev(major);
-#endif
 }
 
 #ifdef CONFIG_STREAMS_MUX_MODULE

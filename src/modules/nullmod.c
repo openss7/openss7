@@ -78,14 +78,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
-#ifdef LFS
 #include <sys/strsubr.h>
-#endif
 #include <sys/ddi.h>
-
-#ifdef LFS
-#include "sys/config.h"
-#endif
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
@@ -100,10 +94,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 				NULLMOD_CONTACT		"\n"
 #define NULLMOD_SPLASH		NULLMOD_DEVICE		" - " \
 				NULLMOD_REVISION	"\n"
-
-#if defined LIS && defined MODULE
-#define CONFIG_STREAMS_NULLMOD_MODULE MODULE
-#endif
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
 MODULE_AUTHOR(NULLMOD_CONTACT);
@@ -120,18 +110,10 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 
 #ifndef CONFIG_STREAMS_NULLMOD_NAME
-#ifdef LIS
-#define CONFIG_STREAMS_NULLMOD_NAME NULLMOD__MOD_NAME
-#else
 #error "CONFIG_STREAMS_NULLMOD_NAME must be defined."
 #endif
-#endif
 #ifndef CONFIG_STREAMS_NULLMOD_MODID
-#ifdef LIS
-#define CONFIG_STREAMS_NULLMOD_MODID NULLMOD__ID
-#else
 #error "CONFIG_STREAMS_NULLMOD_MODID must be defined."
-#endif
 #endif
 
 modID_t modid = CONFIG_STREAMS_NULLMOD_MODID;
@@ -144,17 +126,8 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for NULLMOD.");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULLMOD_MODID));
 MODULE_ALIAS("streams-module-nullmod");
-#endif
-#endif
-
-#ifdef LIS
-#define STRMINPSZ	0
-#define STRMAXPSZ	4096
-#define STRHIGH		5120
-#define STRLOW		1024
 #endif
 
 STATIC struct module_info nullmod_minfo = {
@@ -176,14 +149,6 @@ STATIC struct module_stat nullmod_wstat __attribute__ ((__aligned__(SMP_CACHE_BY
  *
  *  -------------------------------------------------------------------------
  */
-
-#ifdef LIS
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-#endif
 
 /*
  *  Test Case 1: allocb()  Test allocation and freeing of message blocks.
@@ -285,10 +250,6 @@ testcase_10(union ioctypes *ioc, mblk_t *dp)
  *
  *  -------------------------------------------------------------------------
  */
-
-#ifdef LIS
-#define streamscall _RP
-#endif
 
 STATIC streamscall int
 nullmod_wput(queue_t *q, mblk_t *mp)
@@ -424,16 +385,13 @@ STATIC struct streamtab nullmod_info = {
 	.st_wrinit = &nullmod_winit,
 };
 
-#ifdef LFS
 STATIC struct fmodsw nullmod_fmod = {
 	.f_name = CONFIG_STREAMS_NULLMOD_NAME,
 	.f_str = &nullmod_info,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
-#endif
 
-#ifdef LFS
 struct nullmod_ioctl {
 	unsigned int cmd;
 	void *opaque;
@@ -476,7 +434,6 @@ nullmod_register_ioctl32(void)
 	}
 	return (0);
 }
-#endif				/* LFS */
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
 STATIC
@@ -492,27 +449,14 @@ nullmod_init(void)
 	printk(KERN_INFO NULLMOD_SPLASH);
 #endif
 	nullmod_minfo.mi_idnum = modid;
-#ifdef LFS
 	if ((err = nullmod_register_ioctl32()) < 0)
 		return (err);
 	if ((err = register_strmod(&nullmod_fmod)) < 0) {
 		nullmod_unregister_ioctl32();
 		return (err);
 	}
-#endif
-#ifdef LIS
-	if ((err = lis_register_strmod(&nullmod_info, CONFIG_STREAMS_NULLMOD_NAME)) < 0)
-		return (err);
-#endif
 	if (modid == 0 && err > 0)
 		modid = err;
-#ifdef LIS
-	if ((err = lis_register_module_qlock_option(modid, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&nullmod_info);
-		nullmod_unregister_ioctl32();
-		return (err);
-	}
-#endif
 	return (0);
 }
 
@@ -522,13 +466,8 @@ STATIC
 void __exit
 nullmod_exit(void)
 {
-#ifdef LFS
 	unregister_strmod(&nullmod_fmod);
 	nullmod_unregister_ioctl32();
-#endif
-#ifdef LIS
-	lis_unregister_strmod(&nullmod_info);
-#endif
 }
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE

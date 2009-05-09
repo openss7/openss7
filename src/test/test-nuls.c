@@ -1598,7 +1598,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(want));
+		print_string_state(child, msgs, event_string(child, want));
 }
 
 void

@@ -283,46 +283,46 @@ uninstall-manpages: uninstall-man
 
 clean-manpages:
 	@$(ECHO) "D: Making $@ in `pwd`"
-	@if test -n "$(man_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man_MANS)" ; \
-		rm -f -- $(man_MANS) ; \
-	fi ; \
-	if test -n "$(man1_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man1_MANS)" ; \
-		rm -f -- $(man1_MANS) ; \
-	fi ; \
-	if test -n "$(man2_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man2_MANS)" ; \
-		rm -f -- $(man2_MANS) ; \
-	fi ; \
-	if test -n "$(man3_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man3_MANS)" ; \
-		rm -f -- $(man3_MANS) ; \
-	fi ; \
-	if test -n "$(man4_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man4_MANS)" ; \
-		rm -f -- $(man4_MANS) ; \
-	fi ; \
-	if test -n "$(man5_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man5_MANS)" ; \
-		rm -f -- $(man5_MANS) ; \
-	fi ; \
-	if test -n "$(man6_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man6_MANS)" ; \
-		rm -f -- $(man6_MANS) ; \
-	fi ; \
-	if test -n "$(man7_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man7_MANS)" ; \
-		rm -f -- $(man7_MANS) ; \
-	fi ; \
-	if test -n "$(man8_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man8_MANS)" ; \
-		rm -f -- $(man8_MANS) ; \
-	fi ; \
-	if test -n "$(man9_MANS)" ; then \
-		$(ECHO) "rm -f -- $(man9_MANS)" ; \
-		rm -f -- $(man9_MANS) ; \
-	fi ;
+	@list="$(man_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man1_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man2_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man3_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man4_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man5_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man6_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man7_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man8_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done ; \
+	list="$(man9_MANS)" ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done
 
 distclean-manpages:
 	@$(ECHO) "D: Making $@ in `pwd`"
