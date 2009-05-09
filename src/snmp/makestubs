@@ -52,8 +52,10 @@
 # =============================================================================
 
 MIBDIRS=../mibs:/usr/share/snmp/mibs
-MIBFILES=../mibs/OPENSS7-DL-MIB.mib:../mibs/OPENSS7-LAPB-MIB.mib:../mibs/OPENSS7-LLC2-MIB.mib:../mibs/OPENSS7-M2PA-MIB.mib:../mibs/OPENSS7-M2UA-ASP-MIB.mib:../mibs/OPENSS7-M2UA-MIB.mib:../mibs/OPENSS7-M3UA-ASP-MIB.mib:../mibs/OPENSS7-M3UA-SGP-MIB.mib:../mibs/OPENSS7-METRIC-MIB.mib:../mibs/OPENSS7-SIGTRAN-MIB.mib:../mibs/OPENSS7-SIGTRAN-TC.mib:../mibs/OPENSS7-SMI-MIB.mib:../mibs/OPENSS7-STREAMS-EXT-MIB.mib:../mibs/OPENSS7-STREAMS-MIB.mib:../mibs/OPENSS7-TMN-TC.mib:../mibs/x25-1.mib
-MIBS=+OPENSS7-DL-MIB:OPENSS7-LAPB-MIB:OPENSS7-LLC2-MIB:OPENSS7-M2PA-MIB:OPENSS7-M2UA-ASP-MIB:OPENSS7-M2UA-MIB:OPENSS7-M3UA-ASP-MIB:OPENSS7-M3UA-SGP-MIB:OPENSS7-METRIC-MIB:OPENSS7-SIGTRAN-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-STREAMS-EXT-MIB:OPENSS7-STREAMS-MIB:OPENSS7-TMN-TC:OPENSS7-X25-PLP-MIB:OPENSS7-X25-PLP-MIB
+MIBFILES=
+#MIBFILES=../mibs/OPENSS7-DL-MIB.mib:../mibs/OPENSS7-LAPB-MIB.mib:../mibs/OPENSS7-LLC2-MIB.mib:../mibs/OPENSS7-M2PA-MIB.mib:../mibs/OPENSS7-M2UA-ASP-MIB.mib:../mibs/OPENSS7-M2UA-MIB.mib:../mibs/OPENSS7-M3UA-ASP-MIB.mib:../mibs/OPENSS7-M3UA-SGP-MIB.mib:../mibs/OPENSS7-METRIC-MIB.mib:../mibs/OPENSS7-SIGTRAN-MIB.mib:../mibs/OPENSS7-SIGTRAN-TC.mib:../mibs/OPENSS7-SMI-MIB.mib:../mibs/OPENSS7-STREAMS-EXT-MIB.mib:../mibs/OPENSS7-STREAMS-MIB.mib:../mibs/OPENSS7-TMN-TC.mib
+#MIBS=+OPENSS7-DL-MIB:OPENSS7-LAPB-MIB:OPENSS7-LLC2-MIB:OPENSS7-M2PA-MIB:OPENSS7-M2UA-ASP-MIB:OPENSS7-M2UA-MIB:OPENSS7-M3UA-ASP-MIB:OPENSS7-M3UA-SGP-MIB:OPENSS7-METRIC-MIB:OPENSS7-SIGTRAN-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-STREAMS-EXT-MIB:OPENSS7-STREAMS-MIB:OPENSS7-TMN-TC:OPENSS7-X25-PLP-MIB:OPENSS7-X25-PLP-MIB
+MIBS=ALL
 
 export MIBS
 export MIBDIRS
@@ -98,132 +100,132 @@ check: \
 	x400pMIB.tree \
 	x400pMIB.tree
 
-cdr2MIB.tree: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
-cdr2MIB.tree: mibs/OPENSS7-CDR2-MIB.mib
+#cdr2MIB.tree: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
+cdr2MIB.tree: ../mibs/OPENSS7-CDR2-MIB.mib
 	snmptranslate -Tp OPENSS7-CDR2-MIB::cdr2MIB >cdr2MIB.tree
 
-dlMIB.tree: mibs/OPENSS7-DL-MIB.mib mibs/OPENSS7-SMI-MIB.mib mibs/OPENSS7-TMN-TC.mib
-	snmptranslate -Tp OPENSS7-DL-MIB::dlMIB 2>&1 | tee $@
+dlMIB.tree: ../mibs/OPENSS7-DL-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	snmptranslate -Tp OPENSS7-DL-MIB::dlMIB >$@
 
-ds0Bundle.tree: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
-ds0Bundle.tree: mibs/RFC2494-EXT-MIB.mib
+#ds0Bundle.tree: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle.tree: ../mibs/RFC2494-EXT-MIB.mib
 	snmptranslate -Tp DS0BUNDLE-MIB::ds0Bundle >ds0Bundle.tree
 
-ds0.tree: MIBS+=DS0-MIB:PerfHist-TC-MIB
-ds0.tree: mibs/RFC2494-MIB.txt
+#ds0.tree: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0.tree: ../mibs/RFC2494-MIB.txt
 	snmptranslate -Tp DS0-MIB::ds0>ds0.tree
 
-ds1EXT.tree: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
-ds1EXT.tree: mibs/RFC4805-EXT-MIB.mib
+#ds1EXT.tree: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT.tree: ../mibs/RFC4805-EXT-MIB.mib
 	snmptranslate -Tp DS1-EXT-MIB::ds1EXT >ds1EXT.tree
 
-ds1EXT.tree: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
-ds1EXT.tree: mibs/RFC4805-MIB.txt
-	snmptranslate -Tp DS1-EXT-MIB::ds1EXT >ds1EXT.tree
+##ds1EXT.tree: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+#ds1EXT.tree: ../mibs/RFC4805-MIB.txt
+#	snmptranslate -Tp DS1-EXT-MIB::ds1EXT >ds1EXT.tree
 
-ds1.tree: MIBS+=DS1-MIB:PerfHist-TC-MIB
-ds1.tree: mibs/RFC4805-MIB.txt
+#ds1.tree: MIBS+=DS1-MIB:PerfHist-TC-MIB
+ds1.tree: ../mibs/RFC4805-MIB.txt
 	snmptranslate -Tp DS1-MIB::ds1>ds1.tree
 
-gmiMIB.tree: MIBS+=OPENSS7-GMI-MIB:OPENSS7-TC
-gmiMIB.tree: mibs/OPENSS7-GMI-MIB.mib
+#gmiMIB.tree: MIBS+=OPENSS7-GMI-MIB:OPENSS7-TC
+gmiMIB.tree: ../mibs/OPENSS7-GMI-MIB.mib
 	snmptranslate -Tp OPENSS7-GMI-MIB::gmiMIB >gmiMIB.tree
 
-lapbMIB.tree: mibs/OPENSS7-LAPB-MIB.mib mibs/OPENSS7-SMI-MIB.mib mibs/OPENSS7-TMN-TC.mib
-	snmptranslate -Tp OPENSS7-LAPB-MIB::lapbMIB 2>&1 | tee $@
+lapbMIB.tree: ../mibs/OPENSS7-LAPB-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	snmptranslate -Tp OPENSS7-LAPB-MIB::lapbMIB >$@
 
-llcMIB.tree: mibs/OPENSS7-LLC2-MIB.mib mibs/OPENSS7-SMI-MIB.mib mibs/OPENSS7-TMN-TC.mib
-	snmptranslate -Tp OPENSS7-LLC2-MIB::llcMIB 2>&1 | tee $@
+llcMIB.tree: ../mibs/OPENSS7-LLC2-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	snmptranslate -Tp OPENSS7-LLC2-MIB::llcMIB >$@
 
-m2paMIB.tree: mibs/OPENSS7-M2PA-MIB.mib
-	snmptranslate -Tp OPENSS7-M2PA-MIB::m2paMIB 2>&1 | tee $@
+m2paMIB.tree: ../mibs/OPENSS7-M2PA-MIB.mib
+	snmptranslate -Tp OPENSS7-M2PA-MIB::m2paMIB >$@
 
-m2uaAspMIB.tree: mibs/OPENSS7-M2UA-ASP-MIB.mib
-	snmptranslate -Tp OPENSS7-M2UA-ASP-MIB::m2uaAspMIB 2>&1 | tee $@
+m2uaAspMIB.tree: ../mibs/OPENSS7-M2UA-ASP-MIB.mib
+	snmptranslate -Tp OPENSS7-M2UA-ASP-MIB::m2uaAspMIB >$@
 
-m2uaMIB.tree: mibs/OPENSS7-M2UA-MIB.mib
-	snmptranslate -Tp OPENSS7-M2UA-MIB::m2uaMIB 2>&1 | tee $@
+m2uaMIB.tree: ../mibs/OPENSS7-M2UA-MIB.mib
+	snmptranslate -Tp OPENSS7-M2UA-MIB::m2uaMIB >$@
 
-m3uaAspMIB.tree: mibs/OPENSS7-M3UA-ASP-MIB.mib
-	snmptranslate -Tp OPENSS7-M3UA-ASP-MIB::m3uaAspMIB 2>&1 | tee $@
+m3uaAspMIB.tree: ../mibs/OPENSS7-M3UA-ASP-MIB.mib
+	snmptranslate -Tp OPENSS7-M3UA-ASP-MIB::m3uaAspMIB >$@
 
-m3uaSgpMIB.tree: mibs/OPENSS7-M3UA-SGP-MIB.mib
-	snmptranslate -Tp OPENSS7-M3UA-SGP-MIB::m3uaSgpMIB 2>&1 | tee $@
+m3uaSgpMIB.tree: ../mibs/OPENSS7-M3UA-SGP-MIB.mib
+	snmptranslate -Tp OPENSS7-M3UA-SGP-MIB::m3uaSgpMIB >$@
 
-metricMIB.tree: mibs/OPENSS7-METRIC-MIB.mib
-	snmptranslate -Tp OPENSS7-METRIC-MIB::metricMIB 2>&1 | tee $@
+metricMIB.tree: ../mibs/OPENSS7-METRIC-MIB.mib
+	snmptranslate -Tp OPENSS7-METRIC-MIB::metricMIB >$@
 
-mtpMIB.tree: MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB.tree: mibs/OPENSS7-MTP-MIB.mib
+#mtpMIB.tree: MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpMIB.tree: ../mibs/OPENSS7-MTP-MIB.mib
 	snmptranslate -Tp OPENSS7-MTP-MIB::mtpMIB >mtpMIB.tree
 
-mtpOmMIB.tree: MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB.tree: mibs/OPENSS7-MTP-OM-MIB2.mib
+#mtpOmMIB.tree: MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB.tree: ../mibs/OPENSS7-MTP-OM-MIB2.mib
 	snmptranslate -Tp OPENSS7-MTP-OM-MIB2::mtpOmMIB >mtpOmMIB.tree
 
-mxMIB.tree: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-mxMIB.tree: mibs/OPENSS7-MX-MIB.mib
+#mxMIB.tree: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB.tree: ../mibs/OPENSS7-MX-MIB.mib
 	snmptranslate -Tp OPENSS7-MX-MIB::mxMIB >mxMIB.tree
 
-mxMIB.tree: MIBS+=OPENSS7-MX-MIB:PerfHist-TC-MIB
-mxMIB.tree: mibs/OPENSS7-MX-MIB.mib
-	snmptranslate -Tp OPENSS7-MX-MIB::mxMIB >mxMIB.tree
+##mxMIB.tree: MIBS+=OPENSS7-MX-MIB:PerfHist-TC-MIB
+#mxMIB.tree: ../mibs/OPENSS7-MX-MIB.mib
+#	snmptranslate -Tp OPENSS7-MX-MIB::mxMIB >mxMIB.tree
 
-phyMIB.tree: MIBS+=OPENSS7-PHY-MIB
-phyMIB.tree: mibs/OPENSS7-PHY-MIB.mib
+#phyMIB.tree: MIBS+=OPENSS7-PHY-MIB
+phyMIB.tree: ../mibs/OPENSS7-PHY-MIB.mib
 	snmptranslate -Tp OPENSS7-PHY-MIB::phyMIB >phyMIB.tree
 
-sccpMIB.tree: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
-sccpMIB.tree: mibs/OPENSS7-SCCP-MIB.mib
+#sccpMIB.tree: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
+sccpMIB.tree: ../mibs/OPENSS7-SCCP-MIB.mib
 	snmptranslate -Tp OPENSS7-SCCP-MIB::sccpMIB >sccpMIB.tree
 
-sccpOmMIB.tree: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-sccpOmMIB.tree: mibs/OPENSS7-SCCP-OM-MIB.mib
+#sccpOmMIB.tree: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+sccpOmMIB.tree: ../mibs/OPENSS7-SCCP-OM-MIB.mib
 	snmptranslate -Tp OPENSS7-SCCP-OM-MIB::sccpOmMIB >sccpOmMIB.tree
 
-sigtranMIB.tree: mibs/OPENSS7-SIGTRAN-MIB.mib
-	snmptranslate -Tp OPENSS7-SIGTRAN-MIB::sigtranMIB 2>&1 | tee $@
+sigtranMIB.tree: ../mibs/OPENSS7-SIGTRAN-MIB.mib
+	snmptranslate -Tp OPENSS7-SIGTRAN-MIB::sigtranMIB >$@
 
-slMIB.tree: MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-slMIB.tree: mibs/OPENSS7-SL-MIB.mib
+#slMIB.tree: MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+slMIB.tree: ../mibs/OPENSS7-SL-MIB.mib
 	snmptranslate -Tp OPENSS7-SL-MIB::slMIB >slMIB.tree
 
-smiMIB.tree: MIBS+=OPENSS7-SMI-MIB:OPENSS7-TC
-smiMIB.tree: mibs/OPENSS7-SMI-MIB.mib
+#smiMIB.tree: MIBS+=OPENSS7-SMI-MIB:OPENSS7-TC
+smiMIB.tree: ../mibs/OPENSS7-SMI-MIB.mib
 	snmptranslate -Tp OPENSS7-SMI-MIB::smiMIB >smiMIB.tree
 
-ss7MIB.tree: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
-ss7MIB.tree: mibs/OPENSS7-SS7-MIB.mib
+#ss7MIB.tree: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
+ss7MIB.tree: ../mibs/OPENSS7-SS7-MIB.mib
 	snmptranslate -Tp OPENSS7-SS7-MIB::ss7MIB >ss7MIB.tree
 
-ss7OmMIB.tree: MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-ss7OmMIB.tree: mibs/OPENSS7-SS7-OM-MIB.mib
+#ss7OmMIB.tree: MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+ss7OmMIB.tree: ../mibs/OPENSS7-SS7-OM-MIB.mib
 	snmptranslate -Tp OPENSS7-SS7-OM-MIB::ss7OmMIB >ss7OmMIB.tree
 
-strExtMIB.tree: mibs/OPENSS7-STREAMS-EXT-MIB.mib
-	snmptranslate -Tp OPENSS7-STREAMS-EXT-MIB::strExtMIB 2>&1 | tee $@
+strExtMIB.tree: ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
+	snmptranslate -Tp OPENSS7-STREAMS-EXT-MIB::strExtMIB >$@
 
-strMIB.tree: mibs/OPENSS7-STREAMS-MIB.mib
-	snmptranslate -Tp OPENSS7-STREAMS-MIB::strMIB 2>&1 | tee $@
+strMIB.tree: ../mibs/OPENSS7-STREAMS-MIB.mib
+	snmptranslate -Tp OPENSS7-STREAMS-MIB::strMIB >$@
 
-tcapMIB.tree: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
-tcapMIB.tree: mibs/OPENSS7-TCAP-MIB.mib
+#tcapMIB.tree: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
+tcapMIB.tree: ../mibs/OPENSS7-TCAP-MIB.mib
 	snmptranslate -Tp OPENSS7-TCAP-MIB::tcapMIB >tcapMIB.tree
 
-tcapOmMIB.tree: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
-tcapOmMIB.tree: mibs/OPENSS7-TCAP-OM-MIB.mib
+#tcapOmMIB.tree: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
+tcapOmMIB.tree: ../mibs/OPENSS7-TCAP-OM-MIB.mib
 	snmptranslate -Tp OPENSS7-TCAP-OM-MIB::tcapOmMIB >tcapOmMIB.tree
 
-x25MIB.tree: ../mibs/x25-1.mib
-	snmptranslate -Tp OPENSS7-X25-PLP-MIB::x25PLPMIB 2>&1 | tee $@
+x25MIB.tree: ../mibs/OPENSS7-X25-PLP-MIB.mib
+	snmptranslate -Tp OPENSS7-X25-PLP-MIB::x25-PLP-MIB >$@
 
-x400pMIB.tree: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-x400pMIB.tree: mibs/OPENSS7-X400P-MIB.mib
+#x400pMIB.tree: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+x400pMIB.tree: ../mibs/OPENSS7-X400P-MIB.mib
 	snmptranslate -Tp OPENSS7-X400P-MIB::x400pMIB >x400pMIB.tree
 
-x400pMIB.tree: MIBS+=OPENSS7-X400P-MX-MIB
-x400pMIB.tree: mibs/OPENSS7-X400P-MX-MIB.mib
-	snmptranslate -Tp OPENSS7-X400P-MX-MIB::x400pMIB >x400pMIB.tree
+##x400pMIB.tree: MIBS+=OPENSS7-X400P-MX-MIB
+#x400pMIB.tree: ../mibs/OPENSS7-X400P-MX-MIB.mib
+#	snmptranslate -Tp OPENSS7-X400P-MX-MIB::x400pMIB >x400pMIB.tree
 
 simple: \
 	cdr2MIB_simple.c cdr2MIB_simple.h \
@@ -257,152 +259,152 @@ simple: \
 	x25MIB_simple.c x25MIB_simple.h \
 	x400pMIB_simple.c x400pMIB_simple.h
 
-cdr2MIB_simple.c cdr2MIB_simple.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
-cdr2MIB_simple.c cdr2MIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-CDR2-MIB.mib
+#cdr2MIB_simple.c cdr2MIB_simple.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
+cdr2MIB_simple.c cdr2MIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-CDR2-MIB.mib
 	./mib2c -c ./mib2c.conf -f cdr2MIB_simple cdr2MIB
 	indent -nhnl cdr2MIB_simple.[ch]
 
-dlMIB_simple.c dlMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-DL-MIB.mib
+dlMIB_simple.c dlMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-DL-MIB.mib
 	./mib2c -c ./mib2c.conf -f dlMIB_simple dlMIB
 	indent -nhnl dlMIB_simple.[ch]
 
-ds0Bundle_simple.c ds0Bundle_simple.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
-ds0Bundle_simple.c ds0Bundle_simple.h: mib2c mib2c.conf mibs/RFC4805-EXT-MIB.mib
+#ds0Bundle_simple.c ds0Bundle_simple.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle_simple.c ds0Bundle_simple.h: mib2c mib2c.conf ../mibs/RFC4805-EXT-MIB.mib
 	./mib2c -c ./mib2c.conf -f ds0Bundle_simple ds0Bundle
 	indent -nhnl ds0Bundle_simple.[ch]
 
-ds0_simple.c ds0_simple.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
-ds0_simple.c ds0_simple.h: mib2c mib2c.conf mibs/RFC4805-MIB.txt
+#ds0_simple.c ds0_simple.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0_simple.c ds0_simple.h: mib2c mib2c.conf ../mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.conf -f ds0_simple ds0
 	indent -nhnl ds0_simple.[ch]
 
-ds1EXT_simple.c ds1EXT_simple.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
-ds1EXT_simple.c ds1EXT_simple.h: mib2c mib2c.conf mibs/RFC4805-EXT-MIB.mib
+#ds1EXT_simple.c ds1EXT_simple.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT_simple.c ds1EXT_simple.h: mib2c mib2c.conf ../mibs/RFC4805-EXT-MIB.mib
 	./mib2c -c ./mib2c.conf -f ds1EXT_simple ds1EXT
 	indent -nhnl ds1EXT_simple.[ch]
 
-ds1_simple.c ds1_simple.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
-ds1_simple.c ds1_simple.h: mib2c mib2c.conf mibs/RFC4805-MIB.txt
+#ds1_simple.c ds1_simple.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
+ds1_simple.c ds1_simple.h: mib2c mib2c.conf ../mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.conf -f ds1_simple ds1
 	indent -nhnl ds1_simple.[ch]
 
-lapbMIB_simple.c lapbMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-LAPB-MIB.mib
+lapbMIB_simple.c lapbMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-LAPB-MIB.mib
 	./mib2c -c ./mib2c.conf -f lapbMIB_simple lapbMIB
 	indent -nhnl lapbMIB_simple.[ch]
 
-llcMIB_simple.c llcMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-LLC2-MIB.mib
+llcMIB_simple.c llcMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-LLC2-MIB.mib
 	./mib2c -c ./mib2c.conf -f llcMIB_simple llcMIB
 	indent -nhnl llcMIB_simple.[ch]
 
-m2paMIB_simple.c m2paMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M2PA-MIB.mib
+m2paMIB_simple.c m2paMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-M2PA-MIB.mib
 	./mib2c -c ./mib2c.conf -f m2paMIB_simple m2paMIB
 	indent -nhnl m2paMIB_simple.[ch]
 
-m2uaAspMIB_simple.c m2uaAspMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M2UA-ASP-MIB.mib
+m2uaAspMIB_simple.c m2uaAspMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-M2UA-ASP-MIB.mib
 	./mib2c -c ./mib2c.conf -f m2uaAspMIB_simple m2uaAspMIB
 	indent -nhnl m2uaAspMIB_simple.[ch]
 
-m2uaMIB_simple.c m2uaMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M2UA-MIB.mib
+m2uaMIB_simple.c m2uaMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-M2UA-MIB.mib
 	./mib2c -c ./mib2c.conf -f m2uaMIB_simple m2uaMIB
 	indent -nhnl m2uaMIB_simple.[ch]
 
-m3uaAspMIB_simple.c m3uaAspMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M3UA-ASP-MIB.mib
+m3uaAspMIB_simple.c m3uaAspMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-M3UA-ASP-MIB.mib
 	./mib2c -c ./mib2c.conf -f m3uaAspMIB_simple m3uaAspMIB
 	indent -nhnl m3uaAspMIB_simple.[ch]
 
-m3uaSgpMIB_simple.c m3uaSgpMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-M3UA-SGP-MIB.mib
+m3uaSgpMIB_simple.c m3uaSgpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-M3UA-SGP-MIB.mib
 	./mib2c -c ./mib2c.conf -f m3uaSgpMIB_simple m3uaSgpMIB
 	indent -nhnl m3uaSgpMIB_simple.[ch]
 
-metricMIB_simple.c metricMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-METRIC-MIB.mib
+metricMIB_simple.c metricMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-METRIC-MIB.mib
 	./mib2c -c ./mib2c.conf -f metricMIB_simple metricMIB
 	indent -nhnl metricMIB_simple.[ch]
 
-mtpMIB_simple.c mtpMIB_simple.h: MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB_simple.c mtpMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-MIB.mib
+#mtpMIB_simple.c mtpMIB_simple.h: MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpMIB_simple.c mtpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-MTP-MIB.mib
 	./mib2c -c ./mib2c.conf -f mtpMIB_simple mtpMIB
 	indent -nhnl mtpMIB_simple.[ch]
 
-mtpOmMIB_simple.c mtpOmMIB_simple.h: MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB_simple.c mtpOmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MTP-OM-MIB2.mib
+#mtpOmMIB_simple.c mtpOmMIB_simple.h: MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB_simple.c mtpOmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-MTP-OM-MIB2.mib
 	./mib2c -c ./mib2c.conf -f mtpOmMIB_simple mtpOmMIB
 	indent -nhnl mtpOmMIB_simple.[ch]
 
-mxMIB_simple.c mxMIB_simple.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-mxMIB_simple.c mxMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MX-MIB.mib
+#mxMIB_simple.c mxMIB_simple.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB_simple.c mxMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MIB.mib
 	./mib2c -c ./mib2c.conf -f mxMIB_simple mxMIB
 	indent -nhnl mxMIB_simple.[ch]
 
-mxMIB_simple.c mxMIB_simple.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
-mxMIB_simple.c mxMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-MX-MIB.mib
-	./mib2c -c ./mib2c.conf -f mxMIB_simple mxMIB
-	indent -nhnl mxMIB_simple.[ch]
+##mxMIB_simple.c mxMIB_simple.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
+#mxMIB_simple.c mxMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-MX-MIB.mib
+#	./mib2c -c ./mib2c.conf -f mxMIB_simple mxMIB
+#	indent -nhnl mxMIB_simple.[ch]
 
-phyMIB_simple.c phyMIB_simple.h: MIBS=+OPENSS7-PHY-MIB
-phyMIB_simple.c phyMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-PHY-MIB.mib
+#phyMIB_simple.c phyMIB_simple.h: MIBS=+OPENSS7-PHY-MIB
+phyMIB_simple.c phyMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-PHY-MIB.mib
 	./mib2c -c ./mib2c.conf -f phyMIB_simple phyMIB
 	indent -nhnl phyMIB_simple.[ch]
 
-sccpMIB_simple.c sccpMIB_simple.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
-sccpMIB_simple.c sccpMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SCCP-MIB.mib
+#sccpMIB_simple.c sccpMIB_simple.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
+sccpMIB_simple.c sccpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SCCP-MIB.mib
 	./mib2c -c ./mib2c.conf -f sccpMIB_simple sccpMIB
 	indent -nhnl sccpMIB_simple.[ch]
 
-sccpOmMIB_simple.c sccpOmMIB_simple.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-sccpOmMIB_simple.c sccpOmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SCCP-OM-MIB.mib
+#sccpOmMIB_simple.c sccpOmMIB_simple.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+sccpOmMIB_simple.c sccpOmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SCCP-OM-MIB.mib
 	./mib2c -c ./mib2c.conf -f sccpOmMIB_simple sccpOmMIB
 	indent -nhnl sccpOmMIB_simple.[ch]
 
-sigtranMIB_simple.c sigtranMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+sigtranMIB_simple.c sigtranMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SIGTRAN-MIB.mib
 	./mib2c -c ./mib2c.conf -f sigtranMIB_simple sigtranMIB
 	indent -nhnl sigtranMIB_simple.[ch]
 
-slMIB_simple.c slMIB_simple.h: MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-slMIB_simple.c slMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SL-MIB.mib
+#slMIB_simple.c slMIB_simple.h: MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+slMIB_simple.c slMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SL-MIB.mib
 	./mib2c -c ./mib2c.conf -f slMIB_simple slMIB
 	indent -nhnl slMIB_simple.[ch]
 
-ss7MIB_simple.c ss7MIB_simple.h: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
-ss7MIB_simple.c ss7MIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SS7-MIB.mib
+#ss7MIB_simple.c ss7MIB_simple.h: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
+ss7MIB_simple.c ss7MIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SS7-MIB.mib
 	./mib2c -c ./mib2c.conf -f ss7MIB_simple ss7MIB
 	indent -nhnl ss7MIB_simple.[ch]
 
-ss7OmMIB_simple.c ss7OmMIB_simple.h: MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-ss7OmMIB_simple.c ss7OmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-SS7-OM-MIB.mib
+#ss7OmMIB_simple.c ss7OmMIB_simple.h: MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+ss7OmMIB_simple.c ss7OmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SS7-OM-MIB.mib
 	./mib2c -c ./mib2c.conf -f ss7OmMIB_simple ss7OmMIB
 	indent -nhnl ss7OmMIB_simple.[ch]
 
-strExtMIB_simple.c strExtMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-STREAMS-EXT-MIB.mib
+strExtMIB_simple.c strExtMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
 	./mib2c -c ./mib2c.conf -f strExtMIB_simple strExtMIB
 	indent -nhnl strExtMIB_simple.[ch]
 
-strMIB_simple.c strMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-STREAMS-MIB.mib
+strMIB_simple.c strMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.conf -f strMIB_simple strMIB
 	indent -nhnl strMIB_simple.[ch]
 
-tcapMIB_simple.c tcapMIB_simple.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
-tcapMIB_simple.c tcapMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-TCAP-MIB.mib
+#tcapMIB_simple.c tcapMIB_simple.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
+tcapMIB_simple.c tcapMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-TCAP-MIB.mib
 	./mib2c -c ./mib2c.conf -f tcapMIB_simple tcapMIB
 	indent -nhnl tcapMIB_simple.[ch]
 
-tcapOmMIB_simple.c tcapOmMIB_simple.h: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
-tcapOmMIB_simple.c tcapOmMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-TCAP-OM-MIB.mib
+#tcapOmMIB_simple.c tcapOmMIB_simple.h: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
+tcapOmMIB_simple.c tcapOmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-TCAP-OM-MIB.mib
 	./mib2c -c ./mib2c.conf -f tcapOmMIB_simple tcapOmMIB
 	indent -nhnl tcapOmMIB_simple.[ch]
 
-x25MIB_simple.c x25MIB_simple.h: mib2c mib2c.conf ../mibs/x25-1.mib
-	./mib2c -c ./mib2c.conf -f x25MIB_simple x25PLPMIB
+x25MIB_simple.c x25MIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X25-PLP-MIB.mib
+	./mib2c -c ./mib2c.conf -f x25MIB_simple x25-PLP-MIB
 	indent -nhnl x25MIB_simple.[ch]
 
-x400pMIB_simple.c x400pMIB_simple.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-X400P-MIB.mib
+#x400pMIB_simple.c x400pMIB_simple.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X400P-MIB.mib
 	./mib2c -c ./mib2c.conf -f x400pMIB_simple x400pMIB
 	indent -nhnl x400pMIB_simple.[ch]
 
-x400pMIB_simple.c x400pMIB_simple.h: MIBS=+OPENSS7-X400P-MX-MIB
-x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf mibs/OPENSS7-X400P-MX-MIB.mib
-	./mib2c -c ./mib2c.conf -f x400pMIB_simple x400pMIB
-	indent -nhnl x400pMIB_simple.[ch]
+##x400pMIB_simple.c x400pMIB_simple.h: MIBS=+OPENSS7-X400P-MX-MIB
+#x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X400P-MX-MIB.mib
+#	./mib2c -c ./mib2c.conf -f x400pMIB_simple x400pMIB
+#	indent -nhnl x400pMIB_simple.[ch]
 
 storage: \
 	ds0Bundle_storage.c ds0Bundle_storage.h \
@@ -434,162 +436,162 @@ storage: \
 	x25MIB_storage.c x25MIB_storage.h \
 	x400pMIB_storage.c x400pMIB_storage.h
 
-cdr2MIB_storage.c cdr2MIB_storage.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
-cdr2MIB_storage.c cdr2MIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-CDR2-MIB.mib
+#cdr2MIB_storage.c cdr2MIB_storage.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
+cdr2MIB_storage.c cdr2MIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-CDR2-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f cdr2MIB_storage cdr2MIB
 	indent -nhnl cdr2MIB_storage.[ch]
 
-dlMIB_storage.c dlMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-DL-MIB.mib
+dlMIB_storage.c dlMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-DL-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f dlMIB_storage dlMIB
 	indent -nhnl dlMIB_storage.[ch]
 
-ds0Bundle_storage.c ds0Bundle_storage.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
-ds0Bundle_storage.c ds0Bundle_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-EXT-MIB.mib
+#ds0Bundle_storage.c ds0Bundle_storage.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle_storage.c ds0Bundle_storage.h: mib2c mib2c.storage.conf ../mibs/RFC4805-EXT-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ds0Bundle_storage ds0Bundle
 	indent -nhnl ds0Bundle_storage.[ch]
 
-ds0_storage.c ds0_storage.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
-ds0_storage.c ds0_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-MIB.txt
+#ds0_storage.c ds0_storage.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0_storage.c ds0_storage.h: mib2c mib2c.storage.conf ../mibs/RFC4805-MIB.txt
+	./mib2c -c ./mib2c.storage.conf -f ds0_storage ds0
+	indent -nhnl ds0_storage.[ch]
 
-./mib2c -c ./mib2c.storage.conf -f ds0_storage ds0; indent -nhnl ds0_storage.[ch]
-
-ds1EXT_storage.c ds1EXT_storage.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
-ds1EXT_storage.c ds1EXT_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-EXT-MIB.mib
+#ds1EXT_storage.c ds1EXT_storage.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT_storage.c ds1EXT_storage.h: mib2c mib2c.storage.conf ../mibs/RFC4805-EXT-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ds1EXT_storage ds1EXT
 	indent -nhnl ds1EXT_storage.[ch]
 
-ds1_storage.c ds1_storage.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
-ds1_storage.c ds1_storage.h: mib2c mib2c.storage.conf mibs/RFC4805-MIB.txt
+#ds1_storage.c ds1_storage.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
+ds1_storage.c ds1_storage.h: mib2c mib2c.storage.conf ../mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.storage.conf -f ds1_storage ds1
 	indent -nhnl ds1_storage.[ch]
 
-gmiMIB_storage.c gmiMIB_storage.h: MIBS+=OPENSS7-GMI-MIB:OPENSS7-TC
-gmiMIB_storage.c gmiMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-GMI-MIB.mib
+#gmiMIB_storage.c gmiMIB_storage.h: MIBS+=OPENSS7-GMI-MIB:OPENSS7-TC
+gmiMIB_storage.c gmiMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-GMI-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f gmiMIB_storage gmiMIB
 	indent -nhnl gmiMIB_storage.[ch]
 
-lapbMIB_storage.c lapbMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-LAPB-MIB.mib
+lapbMIB_storage.c lapbMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-LAPB-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f lapbMIB_storage lapbMIB
 	indent -nhnl lapbMIB_storage.[ch]
 
-llcMIB_storage.c llcMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-LLC2-MIB.mib
+llcMIB_storage.c llcMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-LLC2-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f llcMIB_storage llcMIB
 	indent -nhnl llcMIB_storage.[ch]
 
-m2paMIB_storage.c m2paMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M2PA-MIB.mib
+m2paMIB_storage.c m2paMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-M2PA-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f m2paMIB_storage m2paMIB
 	indent -nhnl m2paMIB_storage.[ch]
 
-m2uaAspMIB_storage.c m2uaAspMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M2UA-ASP-MIB.mib
+m2uaAspMIB_storage.c m2uaAspMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-M2UA-ASP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f m2uaAspMIB_storage m2uaAspMIB
 	indent -nhnl m2uaAspMIB_storage.[ch]
 
-m2uaMIB_storage.c m2uaMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M2UA-MIB.mib
+m2uaMIB_storage.c m2uaMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-M2UA-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f m2uaMIB_storage m2uaMIB
 	indent -nhnl m2uaMIB_storage.[ch]
 
-m3uaAspMIB_storage.c m3uaAspMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M3UA-ASP-MIB.mib
+m3uaAspMIB_storage.c m3uaAspMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-M3UA-ASP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f m3uaAspMIB_storage m3uaAspMIB
 	indent -nhnl m3uaAspMIB_storage.[ch]
 
-m3uaSgpMIB_storage.c m3uaSgpMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-M3UA-SGP-MIB.mib
+m3uaSgpMIB_storage.c m3uaSgpMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-M3UA-SGP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f m3uaSgpMIB_storage m3uaSgpMIB
 	indent -nhnl m3uaSgpMIB_storage.[ch]
 
-metricMIB_storage.c metricMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-METRIC-MIB.mib
+metricMIB_storage.c metricMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-METRIC-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f metricMIB_storage metricMIB
 	indent -nhnl metricMIB_storage.[ch]
 
-mtpMIB_storage.c mtpMIB_storage.h:MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB_storage.c mtpMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-MIB.mib
+#mtpMIB_storage.c mtpMIB_storage.h:MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpMIB_storage.c mtpMIB_storage.h:mib2c mib2c.storage.conf ../mibs/OPENSS7-MTP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f mtpMIB_storage mtpMIB
 	indent -nhnl mtpMIB_storage.[ch] 
 
-mtpOmMIB_storage.c mtpOmMIB_storage.h:MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB_storage.c mtpOmMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-MTP-OM-MIB2.mib
+#mtpOmMIB_storage.c mtpOmMIB_storage.h:MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB_storage.c mtpOmMIB_storage.h:mib2c mib2c.storage.conf ../mibs/OPENSS7-MTP-OM-MIB2.mib
 	./mib2c -c ./mib2c.storage.conf -f mtpOmMIB_storage mtpOmMIB
 	indent -nhnl mtpOmMIB_storage.[ch]
 
-mxMIB_storage.c mxMIB_storage.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-mxMIB_storage.c mxMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-MX-MIB.mib
+#mxMIB_storage.c mxMIB_storage.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB_storage.c mxMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-MX-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f mxMIB_storage mxMIB
 	indent -nhnl mxMIB_storage.[ch]
 
-mxMIB_storage.c mxMIB_storage.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
-mxMIB_storage.c mxMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-MX-MIB.mib
-	./mib2c -c ./mib2c.storage.conf -f mxMIB_storage mxMIB
-	indent -nhnl mxMIB_storage.[ch]
+##mxMIB_storage.c mxMIB_storage.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
+#mxMIB_storage.c mxMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-MX-MIB.mib
+#	./mib2c -c ./mib2c.storage.conf -f mxMIB_storage mxMIB
+#	indent -nhnl mxMIB_storage.[ch]
 
-phyMIB_storage.c phyMIB_storage.h: MIBS=+OPENSS7-PHY-MIB
-phyMIB_storage.c phyMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-PHY-MIB.mib
+#phyMIB_storage.c phyMIB_storage.h: MIBS=+OPENSS7-PHY-MIB
+phyMIB_storage.c phyMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-PHY-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f phyMIB_storage phyMIB
 	indent -nhnl phyMIB_storage.[ch]
 
-sccpMIB_storage.c sccpMIB_storage.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-sccpMIB_storage.c sccpMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SCCP-MIB.mib
-./mib2c -c ./mib2c.storage.conf -f sccpMIB_storage OPENSS7-SCCP-MIB::sccpMIB
+#sccpMIB_storage.c sccpMIB_storage.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+sccpMIB_storage.c sccpMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SCCP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f sccpMIB_storage OPENSS7-SCCP-MIB::sccpMIB
 	indent -nhnl sccpMIB_storage.[ch]
 
-sccpOmMIB_storage.c sccpOmMIB_storage.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-sccpOmMIB_storage.c sccpOmMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SCCP-OM-MIB.mib
+#sccpOmMIB_storage.c sccpOmMIB_storage.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+sccpOmMIB_storage.c sccpOmMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SCCP-OM-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f sccpOmMIB_storage sccpOmMIB
 	indent -nhnl sccpOmMIB_storage.[ch]
 
-sigtranMIB_storage.c sigtranMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+sigtranMIB_storage.c sigtranMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SIGTRAN-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f sigtranMIB_storage sigtranMIB
 	indent -nhnl sigtranMIB_storage.[ch]
 
-slMIB_storage.c slMIB_storage.h:MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-slMIB_storage.c slMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-SL-MIB.mib
+#slMIB_storage.c slMIB_storage.h:MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+slMIB_storage.c slMIB_storage.h:mib2c mib2c.storage.conf ../mibs/OPENSS7-SL-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f slMIB_storage slMIB
 	indent -nhnl slMIB_storage.[ch]
 
-smiMIB_storage.c smiMIB_storage.h: MIBS+=OPENSS7-SMI-MIB:OPENSS7-TC
-smiMIB_storage.c smiMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-SMI-MIB.mib
+#smiMIB_storage.c smiMIB_storage.h: MIBS+=OPENSS7-SMI-MIB:OPENSS7-TC
+smiMIB_storage.c smiMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SMI-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f smiMIB_storage smiMIB
 	indent -nhnl smiMIB_storage.[ch]
 
-ss7MIB_storage.c ss7MIB_storage.h:MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
-ss7MIB_storage.c ss7MIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-SS7-MIB.mib
+#ss7MIB_storage.c ss7MIB_storage.h:MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
+ss7MIB_storage.c ss7MIB_storage.h:mib2c mib2c.storage.conf ../mibs/OPENSS7-SS7-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ss7MIB_storage ss7MIB
 	indent -nhnl ss7MIB_storage.[ch]
 
-ss7OmMIB_storage.c ss7OmMIB_storage.h:MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-ss7OmMIB_storage.c ss7OmMIB_storage.h:mib2c mib2c.storage.conf mibs/OPENSS7-SS7-OM-MIB.mib
+#ss7OmMIB_storage.c ss7OmMIB_storage.h:MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+ss7OmMIB_storage.c ss7OmMIB_storage.h:mib2c mib2c.storage.conf ../mibs/OPENSS7-SS7-OM-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f ss7OmMIB_storage ss7OmMIB
 	indent -nhnl ss7OmMIB_storage.[ch]
 
-strExtMIB_storage.c strExtMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-STREAMS-EXT-MIB.mib
+strExtMIB_storage.c strExtMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f strExtMIB_storage strExtMIB
 	indent -nhnl strExtMIB_storage.[ch]
 
-strMIB_storage.c strMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-STREAMS-MIB.mib
+strMIB_storage.c strMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f strMIB_storage strMIB
 	indent -nhnl strMIB_storage.[ch]
 
-tcapMIB_storage.c tcapMIB_storage.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
-tcapMIB_storage.c tcapMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-TCAP-MIB.mib
+#tcapMIB_storage.c tcapMIB_storage.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
+tcapMIB_storage.c tcapMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-TCAP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f tcapMIB_storage tcapMIB
 	indent -nhnl tcapMIB_storage.[ch]
 
-tcapOmMIB_storage.c tcapOmMIB_storage.h: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
-tcapOmMIB_storage.c tcapOmMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-TCAP-OM-MIB.mib
+#tcapOmMIB_storage.c tcapOmMIB_storage.h: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
+tcapOmMIB_storage.c tcapOmMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-TCAP-OM-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f tcapOmMIB_storage tcapOmMIB
 	indent -nhnl tcapOmMIB_storage.[ch]
 
-x25MIB_storage.c x25MIB_storage.h: mib2c mib2c.storage.conf ../mibs/x25-1.mib
-	./mib2c -c ./mib2c.storage.conf -f x25MIB_storage x25PLPMIB
+x25MIB_storage.c x25MIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-X25-PLP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f x25MIB_storage x25-PLP-MIB
 	indent -nhnl x25MIB_storage.[ch]
 
-x400pMIB_storage.c x400pMIB_storage.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-X400P-MIB.mib
+#x400pMIB_storage.c x400pMIB_storage.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-X400P-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f x400pMIB_storage x400pMIB
 	indent -nhnl x400pMIB_storage.[ch]
 
-x400pMIB_storage.c x400pMIB_storage.h: MIBS=+OPENSS7-X400P-MX-MIB
-x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf mibs/OPENSS7-X400P-MX-MIB.mib
-	./mib2c -c ./mib2c.storage.conf -f x400pMIB_storage x400pMIB
-	indent -nhnl x400pMIB_storage.[ch]
+##x400pMIB_storage.c x400pMIB_storage.h: MIBS=+OPENSS7-X400P-MX-MIB
+#x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-X400P-MX-MIB.mib
+#	./mib2c -c ./mib2c.storage.conf -f x400pMIB_storage x400pMIB
+#	indent -nhnl x400pMIB_storage.[ch]
 
 openss7: \
 	cdr2MIB_openss7.c cdr2MIB_openss7.h \
@@ -606,152 +608,152 @@ openss7: \
 	strMIB_openss7.c strMIB_openss7.h \
 	x25MIB_openss7.c x25MIB_openss7.h
 
-cdr2MIB_openss7.c cdr2MIB_openss7.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
-cdr2MIB_openss7.c cdr2MIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-CDR2-MIB.mib
+#cdr2MIB_openss7.c cdr2MIB_openss7.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
+cdr2MIB_openss7.c cdr2MIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-CDR2-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f cdr2MIB_openss7 cdr2MIB
 	indent -nhnl cdr2MIB_openss7.[ch]
 
-dlMIB_openss7.c dlMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-DL-MIB.mib
+dlMIB_openss7.c dlMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-DL-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f dlMIB_openss7 dlMIB
 	indent -nhnl dlMIB_openss7.[ch]
 
-ds0Bundle_openss7.c ds0Bundle_openss7.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
-ds0Bundle_openss7.c ds0Bundle_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-EXT-MIB.mib
+#ds0Bundle_openss7.c ds0Bundle_openss7.h: MIBS+=DS0BUNDLE-MIB:PerfHist-TC-MIB
+ds0Bundle_openss7.c ds0Bundle_openss7.h: mib2c mib2c.openss7.conf ../mibs/RFC4805-EXT-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ds0Bundle_openss7 ds0Bundle
 	indent -nhnl ds0Bundle_openss7.[ch]
 
-ds0_openss7.c ds0_openss7.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
-ds0_openss7.c ds0_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-MIB.txt
+#ds0_openss7.c ds0_openss7.h: MIBS+=DS0-MIB:PerfHist-TC-MIB
+ds0_openss7.c ds0_openss7.h: mib2c mib2c.openss7.conf ../mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.openss7.conf -f ds0_openss7 ds0
 	indent -nhnl ds0_openss7.[ch]
 
-ds1EXT_openss7.c ds1EXT_openss7.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
-ds1EXT_openss7.c ds1EXT_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-EXT-MIB.mib
+#ds1EXT_openss7.c ds1EXT_openss7.h: MIBS+=DS1-EXT-MIB:PerfHist-TC-MIB
+ds1EXT_openss7.c ds1EXT_openss7.h: mib2c mib2c.openss7.conf ../mibs/RFC4805-EXT-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ds1EXT_openss7 ds1EXT
 	indent -nhnl ds1EXT_openss7.[ch]
 
-ds1_openss7.c ds1_openss7.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
-ds1_openss7.c ds1_openss7.h: mib2c mib2c.openss7.conf mibs/RFC4805-MIB.txt
+#ds1_openss7.c ds1_openss7.h: MIBS+=DS1-MIB:PerfHist-TC-MIB
+ds1_openss7.c ds1_openss7.h: mib2c mib2c.openss7.conf ../mibs/RFC4805-MIB.txt
 	./mib2c -c ./mib2c.openss7.conf -f ds1_openss7 ds1
 	indent -nhnl ds1_openss7.[ch]
 
-lapbMIB_openss7.c lapbMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-LAPB-MIB.mib
+lapbMIB_openss7.c lapbMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-LAPB-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f lapbMIB_openss7 lapbMIB
 	indent -nhnl lapbMIB_openss7.[ch]
 
-llcMIB_openss7.c llcMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-LLC2-MIB.mib
+llcMIB_openss7.c llcMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-LLC2-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f llcMIB_openss7 llcMIB
 	indent -nhnl llcMIB_openss7.[ch]
 
-m2paMIB_openss7.c m2paMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M2PA-MIB.mib
+m2paMIB_openss7.c m2paMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-M2PA-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f m2paMIB_openss7 m2paMIB
 	indent -nhnl m2paMIB_openss7.[ch]
 
-m2uaAspMIB_openss7.c m2uaAspMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M2UA-ASP-MIB.mib
+m2uaAspMIB_openss7.c m2uaAspMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-M2UA-ASP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f m2uaAspMIB_openss7 m2uaAspMIB
 	indent -nhnl m2uaAspMIB_openss7.[ch]
 
-m2uaMIB_openss7.c m2uaMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M2UA-MIB.mib
+m2uaMIB_openss7.c m2uaMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-M2UA-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f m2uaMIB_openss7 m2uaMIB
 	indent -nhnl m2uaMIB_openss7.[ch]
 
-m3uaAspMIB_openss7.c m3uaAspMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M3UA-ASP-MIB.mib
+m3uaAspMIB_openss7.c m3uaAspMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-M3UA-ASP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f m3uaAspMIB_openss7 m3uaAspMIB
 	indent -nhnl m3uaAspMIB_openss7.[ch]
 
-m3uaSgpMIB_openss7.c m3uaSgpMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-M3UA-SGP-MIB.mib
+m3uaSgpMIB_openss7.c m3uaSgpMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-M3UA-SGP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f m3uaSgpMIB_openss7 m3uaSgpMIB
 	indent -nhnl m3uaSgpMIB_openss7.[ch]
 
-metricMIB_openss7.c metricMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-METRIC-MIB.mib
+metricMIB_openss7.c metricMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-METRIC-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f metricMIB_openss7 metricMIB
 	indent -nhnl metricMIB_openss7.[ch]
 
-mtpMIB_openss7.c mtpMIB_openss7.h:MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpMIB_openss7.c mtpMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-MIB.mib
+#mtpMIB_openss7.c mtpMIB_openss7.h:MIBS+=OPENSS7-MTP-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpMIB_openss7.c mtpMIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-MTP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f mtpMIB_openss7 mtpMIB
 	indent -nhnl mtpMIB_openss7.[ch]
 
-mtpOmMIB_openss7.c mtpOmMIB_openss7.h:MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-mtpOmMIB_openss7.c mtpOmMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-MTP-OM-MIB2.mib
+#mtpOmMIB_openss7.c mtpOmMIB_openss7.h:MIBS+=OPENSS7-MTP-OM-MIB2:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+mtpOmMIB_openss7.c mtpOmMIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-MTP-OM-MIB2.mib
 	./mib2c -c ./mib2c.openss7.conf -f mtpOmMIB_openss7 mtpOmMIB
 	indent -nhnl mtpOmMIB_openss7.[ch]
 
-mxMIB_openss7.c mxMIB_openss7.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-mxMIB_openss7.c mxMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-MX-MIB.mib
+#mxMIB_openss7.c mxMIB_openss7.h: MIBS+=OPENSS7-MX-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+mxMIB_openss7.c mxMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-MX-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f mxMIB_openss7 mxMIB
 	indent -nhnl mxMIB_openss7.[ch]
 
-mxMIB_openss7.c mxMIB_openss7.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
-mxMIB_openss7.c mxMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-MX-MIB.mib
-	./mib2c -c ./mib2c.openss7.conf -f mxMIB_openss7 mxMIB
-	indent -nhnl mxMIB_openss7.[ch]
+##mxMIB_openss7.c mxMIB_openss7.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
+#mxMIB_openss7.c mxMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-MX-MIB.mib
+#	./mib2c -c ./mib2c.openss7.conf -f mxMIB_openss7 mxMIB
+#	indent -nhnl mxMIB_openss7.[ch]
 
-phyMIB_openss7.c phyMIB_openss7.h: MIBS=+OPENSS7-PHY-MIB
-phyMIB_openss7.c phyMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-PHY-MIB.mib
+#phyMIB_openss7.c phyMIB_openss7.h: MIBS=+OPENSS7-PHY-MIB
+phyMIB_openss7.c phyMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-PHY-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f phyMIB_openss7 phyMIB
 	indent -nhnl phyMIB_openss7.[ch]
 
-sccpMIB_openss7.c sccpMIB_openss7.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
-sccpMIB_openss7.c sccpMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-SCCP-MIB.mib
+#sccpMIB_openss7.c sccpMIB_openss7.h: MIBS+=OPENSS7-SCCP-MIB:OPENSS7-TC
+sccpMIB_openss7.c sccpMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-SCCP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f sccpMIB_openss7 sccpMIB
 	indent -nhnl sccpMIB_openss7.[ch]
 
-sccpOmMIB_openss7.c sccpOmMIB_openss7.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-sccpOmMIB_openss7.c sccpOmMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-SCCP-OM-MIB.mib
+#sccpOmMIB_openss7.c sccpOmMIB_openss7.h: MIBS+=OPENSS7-SCCP-OM-MIB:OPENSS7-SCCP-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+sccpOmMIB_openss7.c sccpOmMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-SCCP-OM-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f sccpOmMIB_openss7 sccpOmMIB
 	indent -nhnl sccpOmMIB_openss7.[ch]
 
-sigtranMIB_openss7.c sigtranMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+sigtranMIB_openss7.c sigtranMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-SIGTRAN-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f sigtranMIB_openss7 sigtranMIB
 	indent -nhnl sigtranMIB_openss7.[ch]
 
-slMIB_openss7.c slMIB_openss7.h:MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-slMIB_openss7.c slMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-SL-MIB.mib
+#slMIB_openss7.c slMIB_openss7.h:MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+slMIB_openss7.c slMIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-SL-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f slMIB_openss7 slMIB
 	indent -nhnl slMIB_openss7.[ch]
 
-ss7MIB_openss7.c ss7MIB_openss7.h:MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
-ss7MIB_openss7.c ss7MIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-SS7-MIB.mib
+#ss7MIB_openss7.c ss7MIB_openss7.h:MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
+ss7MIB_openss7.c ss7MIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-SS7-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ss7MIB_openss7 ss7MIB
 	indent -nhnl ss7MIB_openss7.[ch]
 
-ss7OmMIB_openss7.c ss7OmMIB_openss7.h:MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
-ss7OmMIB_openss7.c ss7OmMIB_openss7.h:mib2c mib2c.openss7.conf mibs/OPENSS7-SS7-OM-MIB.mib
+#ss7OmMIB_openss7.c ss7OmMIB_openss7.h:MIBS+=OPENSS7-SS7-OM-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+ss7OmMIB_openss7.c ss7OmMIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-SS7-OM-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ss7OmMIB_openss7 ss7OmMIB
 	indent -nhnl ss7OmMIB_openss7.[ch]
 
-strExtMIB_openss7.c strExtMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-STREAMS-EXT-MIB.mib
+strExtMIB_openss7.c strExtMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f strExtMIB_openss7 strExtMIB
 	indent -nhnl strExtMIB_openss7.[ch]
 
-strMIB_openss7.c strMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-STREAMS-MIB.mib
+strMIB_openss7.c strMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f strMIB_openss7 strMIB
 	indent -nhnl strMIB_openss7.[ch]
 
-tcapMIB_openss7.c tcapMIB_openss7.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
-tcapMIB_openss7.c tcapMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-TCAP-MIB.mib
+#tcapMIB_openss7.c tcapMIB_openss7.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
+tcapMIB_openss7.c tcapMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-TCAP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f tcapMIB_openss7 tcapMIB
 	indent -nhnl tcapMIB_openss7.[ch]
 
-tcapOmMIB_openss7.c tcapOmMIB_openss7.h: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
-tcapOmMIB_openss7.c tcapOmMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-TCAP-OM-MIB.mib
+#tcapOmMIB_openss7.c tcapOmMIB_openss7.h: MIBS+=OPENSS7-TCAP-OM-MIB:OPENSS7-TC
+tcapOmMIB_openss7.c tcapOmMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-TCAP-OM-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f tcapOmMIB_openss7 tcapOmMIB
 	indent -nhnl tcapOmMIB_openss7.[ch]
 
-x25MIB_openss7.c x25MIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/x25-1.mib
-	./mib2c -c ./mib2c.openss7.conf -f x25MIB_openss7 x25PLPMIB
+x25MIB_openss7.c x25MIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X25-PLP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f x25MIB_openss7 x25-PLP-MIB
 	indent -nhnl x25MIB_openss7.[ch]
 
-x400pMIB_openss7.c x400pMIB_openss7.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-MIB.mib
+#x400pMIB_openss7.c x400pMIB_openss7.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400P-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f x400pMIB_openss7 x400pMIB
 	indent -nhnl x400pMIB_openss7.[ch]
 
-x400pMIB_openss7.c x400pMIB_openss7.h: MIBS=+OPENSS7-X400P-MX-MIB
-x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-MX-MIB.mib
-	./mib2c -c ./mib2c.openss7.conf -f x400pMIB_openss7 x400pMIB
-	indent -nhnl x400pMIB_openss7.[ch]
+##x400pMIB_openss7.c x400pMIB_openss7.h: MIBS=+OPENSS7-X400P-MX-MIB
+#x400pMIB_openss7.c x400pMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400P-MX-MIB.mib
+#	./mib2c -c ./mib2c.openss7.conf -f x400pMIB_openss7 x400pMIB
+#	indent -nhnl x400pMIB_openss7.[ch]
 
 master: \
 	chand_master.c chand_master.h \
@@ -759,21 +761,21 @@ master: \
 	ss7confd_master.c ss7confd_master.h \
 	streamsd_master.c streamsd_master.h
 
-chand_master.c chand_master.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
-chand_master.c chand_master.h: mib2c mib2c.master.conf mibs/OPENSS7-MX-MIB.mib
+#chand_master.c chand_master.h: MIBS=+OPENSS7-MX-MIB:PerfHist-TC-MIB
+chand_master.c chand_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-MX-MIB.mib
 	./mib2c -c ./mib2c.master.conf -f chand_master mxMIB
 	indent -nhnl chand_master.[ch]
 
-sigtrand_master.c sigtrand_master.h: mib2c mib2c.master.conf mibs/OPENSS7-SIGTRAN-MIB.mib
+sigtrand_master.c sigtrand_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-SIGTRAN-MIB.mib
 	./mib2c -c ./mib2c.master.conf -f sigtrand_master sigtranMIB
 	indent -nhnl sigtrand_master.[ch]
 
-ss7confd_master.c ss7confd_master.h: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
-ss7confd_master.c ss7confd_master.h: mib2c mib2c.master.conf mibs/OPENSS7-SS7-MIB.mib
+#ss7confd_master.c ss7confd_master.h: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
+ss7confd_master.c ss7confd_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-SS7-MIB.mib
 	./mib2c -c ./mib2c.master.conf -f ss7confd_master ss7MIB
 	indent -nhnl ss7confd_master.[ch]
 
-streamsd_master.c streamsd_master.h: mib2c mib2c.master.conf mibs/OPENSS7-STREAMS-MIB.mib
+streamsd_master.c streamsd_master.h: mib2c mib2c.master.conf ../mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.master.conf -f streamsd_master strMIB
 	indent -nhnl streamsd_master.[ch]
 
@@ -807,8 +809,8 @@ tables:
 	./mib2c -c ./mib2c.storage.conf strApshTable
 	indent -nhnl str*Table.[ch]
 
-x400pCardTable.c x400pCardTable.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
-x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf mibs/OPENSS7-X400P-MIB.mib
+#x400pCardTable.c x400pCardTable.h: MIBS+=OPENSS7-X400P-MIB:OPENSS7-SMI-MIB:OPENSS7-TC
+x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400P-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f x400pCardTable x400pCardTable
 	indent -nhnl x400pCardTable.[ch]
 

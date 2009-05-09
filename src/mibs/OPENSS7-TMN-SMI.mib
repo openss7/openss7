@@ -74,7 +74,7 @@ IMPORTS
     AdditionalInformation, AdditionalText, AdministrativeState, 
     AdministrativeState, AlarmStatus, AlarmType, 
     AttributeIdentifierList, AttributeList, 
-    AttributeValueChangeDefiniiton, AvailabilityStatus, 
+    AttributeValueChangeDefinition, AvailabilityStatus, 
     AvailabilityStatus, BackedUpStatus, BackUpObject, 
     ControlStatus, CorrelatedNotifications, 
     EventDiscriminatorConstruct, EventForwardingDestination, 
@@ -3590,7 +3590,7 @@ discriminatorDurationStartTime OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
-    ::= { descriminatorDurationEntry 1 }
+    ::= { discriminatorDurationEntry 1 }
 
 discriminatorDurationStopTime OBJECT-TYPE
     SYNTAX	DateAndTime
@@ -3600,7 +3600,7 @@ discriminatorDurationStopTime OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
-    ::= { descriminatorDurationEntry 2 }
+    ::= { discriminatorDurationEntry 2 }
 
 discriminatorDurationStorageType OBJECT-TYPE
     SYNTAX	StorageType
@@ -3610,7 +3610,7 @@ discriminatorDurationStorageType OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
-    ::= { descriminatorDurationEntry 3 }
+    ::= { discriminatorDurationEntry 3 }
 
 discriminatorDurationRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
@@ -3620,7 +3620,7 @@ discriminatorDurationRowStatus OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.721 | ISO/IEC 10165-2, discriminator MOC."
-    ::= { descriminatorDurationEntry 4 }
+    ::= { discriminatorDurationEntry 4 }
 
 
 -- discriminatorTable side-table
@@ -3651,7 +3651,7 @@ discriminatorDailySchedulingEntry OBJECT-TYPE
 	    discriminatorIntervalStart, -- index
 	    discriminatorIntervalEnd -- index
 	}
-    ::= { discriminatorDailyScheduleTable 1 }
+    ::= { discriminatorDailySchedulingTable 1 }
 
 DiscriminatorDailySchedulingEntry ::=
     SEQUENCE {
@@ -4181,7 +4181,7 @@ logNumberOfRecords OBJECT-TYPE
 
 -- logAlarmPackage PACKAGE
 logCapacityAlarmThreshold OBJECT-TYPE
-    SYNTAX	OCTET STRING, -- SET OF INTEGER(0..100)
+    SYNTAX	OCTET STRING -- SET OF INTEGER(0..100)
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION

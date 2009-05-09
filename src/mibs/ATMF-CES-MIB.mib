@@ -74,7 +74,7 @@ atmForum
     OBJECT IDENTIFIER ::= { enterprises 353 }
 atmForumNetworkManagement
     OBJECT IDENTIFIER ::= { atmForum 5 }
-atmCESmib
+atmfCESmib
     OBJECT IDENTIFIER ::= { atmForumNetworkManagement 2 }
 
 atmfDS1E1CESmib MODULE-IDENTITY

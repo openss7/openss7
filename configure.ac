@@ -103,6 +103,7 @@ AC_ARG_VAR([LD], [Linker loader command])
 LT_PATH_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_MKDIR_P
 AC_PROG_LEX
 AC_PROG_YACC
 
@@ -130,7 +131,8 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/mount.h sys/socket.h sys/time.h syslog.h termios.h unistd.h values.h wchar.h]) 
+AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/mount.h sys/socket.h sys/time.h sys/timeb.h syslog.h termios.h unistd.h values.h wchar.h]) 
+
 
 
 dnl
@@ -186,7 +188,8 @@ AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero clock_gettime getcwd gethostbyaddr gethostbyname gethostname gethrtime gettimeofday inet_ntoa localtime_r mempcpy memset munmap nl_langinfo pow pstat_getdynamic select setlocale socket sqrt stpcpy strcasecmp strchr strcspn strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul uname]) 
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm atexit bzero clock_gettime getcwd gethostbyaddr gethostbyname gethostname gethrtime gettimeofday inet_ntoa localeconv localtime_r mempcpy memset munmap nl_langinfo pow pstat_getdynamic select setlocale socket sqrt stpcpy strcasecmp strchr strcspn strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul uname])
+
 
 
 AC_OPENSS7
@@ -235,31 +238,10 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/xcc/Makefile
 		 doc/specs/xmap/Makefile
 		 intl/Makefile
-		 lib32/Makefile
 		 po/Makefile.in
 		 scripts/texi/args.texi
-		 src/gdmo/Makefile
-		 src/include/Makefile
 		 src/Makefile
-		 src/modules/Makefile
-		 src/modules/cd/streams.conf
-		 src/modules/dl/streams.conf
-		 src/modules/h225/streams.conf
-		 src/modules/inet/streams.conf
-		 src/modules/isdn/streams.conf
-		 src/modules/m2pa/streams.conf
-		 src/modules/m2tp/streams.conf
-		 src/modules/m2ua/streams.conf
-		 src/modules/m3ua/streams.conf
-		 src/modules/mg/streams.conf
-		 src/modules/sctp/streams.conf
-		 src/modules/ss7ip/streams.conf
-		 src/modules/ss7sctp/streams.conf
-		 src/modules/sua/streams.conf
-		 src/modules/tali/streams.conf
-		 src/modules/ti/streams.conf
-		 src/modules/tua/streams.conf
-		 tests/Makefile])
+		 src/include/Makefile])
 
 _OPENSS7_OUTPUT
 

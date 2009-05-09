@@ -75,10 +75,10 @@ m4_include([m4/agent.m4])
 
 
 # =============================================================================
-# AC_OS7
+# AC_OPENSS7
 # -----------------------------------------------------------------------------
-AC_DEFUN([AC_OS7], [dnl
-    _OPENSS7_PACKAGE([OpenSS7], [OpenSS7 Master Package])
+AC_DEFUN([AC_OPENSS7], [dnl
+    _OPENSS7_PACKAGE([OpenSS7], [OpenSS7])
     _OS7_OPTIONS
     _AUTOPR
     _MAN_CONVERSION
@@ -117,6 +117,7 @@ AC_CONFIG_FILES([debian/openss7-core.postinst
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _OS7_SETUP
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-DLFS=1'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
@@ -142,7 +143,7 @@ dnl	fi
     _AGENT
     _AUTOTEST
     _DOXY
-])# AC_OS7
+])# AC_OPENSS7
 # =============================================================================
 
 # =============================================================================
@@ -1073,8 +1074,7 @@ dnl----------------------------------------------------------------------------
 	pm_message_t,
 	struct sockaddr_storage,
 	struct inet_protocol,
-	struct net_protocol
-    ], [:], [:], [
+	struct net_protocol], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1166,8 +1166,7 @@ dnl----------------------------------------------------------------------------
 	struct task_struct.namespace.sem,
 	struct task_struct.pgrp,
 	struct task_struct.session,
-	struct task_struct.signal
-    ], [:], [:], [
+	struct task_struct.signal], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1229,8 +1228,7 @@ dnl----------------------------------------------------------------------------
 	skb_linearize,
 	__symbol_get,
 	__symbol_put,
-	sysctl_ip_default_ttl
-    ])
+	sysctl_ip_default_ttl])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_EXPORTS([
 	add_wait_queue,
@@ -1306,8 +1304,7 @@ dnl----------------------------------------------------------------------------
 	sysctl_jiffies,
 	sysctl_local_port_range,
 	unregister_sysctl_table,
-	__wake_up
-    ], [], [dnl
+	__wake_up], [], [dnl
 	    AC_MSG_WARN([
 **** 
 **** Linux kernel symbol ']LK_Export[' should be exported but it
@@ -1405,8 +1402,7 @@ dnl----------------------------------------------------------------------------
 	udp_prot,
 	__xfrm_policy_check,
 	xfrm_policy_delete,
-	__xfrm_sk_clone_policy,
-    ]) # _LINUX_KERNEL_SYMBOLS
+	__xfrm_sk_clone_policy]) # _LINUX_KERNEL_SYMBOLS
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
@@ -3656,7 +3652,7 @@ AC_DEFUN([_OS7_STRCONF], [dnl
     AC_CACHE_CHECK([for strconf module id base], [strconf_cv_midbase], [dnl
 	strconf_cv_midbase=5001
     ])
-    strconf_cv_sconfig='include/sys/config.h'
+    strconf_cv_sconfig='src/include/sys/config.h'
     strconf_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
     _STRCONF
 ])# _OS7_STRCONF
