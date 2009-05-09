@@ -16,7 +16,7 @@ hold.tar.bz2
 *.info
 *.info-*
 INSTALL
-intl/
+intl
 LICENSES
 *.log
 LSM
