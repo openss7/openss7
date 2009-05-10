@@ -85,197 +85,24 @@ if RPM_BUILD_USER
 ##
 bin_PROGRAMS			=
 
-if CONFIG_STREAMS_UTILS
-bin_PROGRAMS			+= \
-				  strchg \
-				  strconf \
-				  strreset
-endif
-
 sbin_PROGRAMS			=
-
-sbin_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
-if CONFIG_STREAMS_SAD
-sbin_PROGRAMS			+= autopush
-endif
-if CONFIG_STREAMS_SAD_MODULE
-sbin_PROGRAMS			+= autopush
-endif
-if CONFIG_STREAMS_LOG
-sbin_PROGRAMS			+= strace strerr
-endif
-if CONFIG_STREAMS_LOG_MODULE
-sbin_PROGRAMS			+= strace strerr
-endif
-if CONFIG_STREAMS_SC
-sbin_PROGRAMS			+= scls strinfo
-endif
-if CONFIG_STREAMS_SC_MODULE
-sbin_PROGRAMS			+= scls strinfo
-endif
-if CONFIG_STREAMS_PIPE
-sbin_PROGRAMS			+= fattach fdetach
-endif
-if CONFIG_STREAMS_PIPE_MODULE
-sbin_PROGRAMS			+= fattach fdetach
-endif
-if CONFIG_STREAMS_UTILS
-sbin_PROGRAMS			+= insf strvf
-endif
-
-if WITH_SNMP_AGENT
-sbin_PROGRAMS			+= streamsd
-endif
-
-sbin_PROGRAMS			+= ldlconfig
-
-sbin_PROGRAMS			+= initsock soconfig
-
-EXTRA_PROGRAMS			+= chand
-if WITH_SNMP_AGENT
-sbin_PROGRAMS			+= chand
-endif
 
 #dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
 
 dist_sbin_SCRIPTS		=
-if CONFIG_STREAMS_LOG
-dist_sbin_SCRIPTS		+= src/util/strclean
-endif
-if CONFIG_STREAMS_LOG_MODULE
-dist_sbin_SCRIPTS		+= src/util/strclean
-endif
-if CONFIG_STREAMS_UTILS
-dist_sbin_SCRIPTS		+= \
-				  src/util/strload \
-				  src/util/strsetup
-endif
 
 pkglibexec_PROGRAMS		=
-
-pkglibexec_PROGRAMS		+= testlog
-if CONFIG_STREAMS_STH
-pkglibexec_PROGRAMS		+= test-streams
-endif
-if CONFIG_STREAMS_STH_MODULE
-pkglibexec_PROGRAMS		+= test-streams
-endif
-if CONFIG_STREAMS_CLONE
-pkglibexec_PROGRAMS		+= test-clone
-endif
-if CONFIG_STREAMS_CLONE_MODULE
-pkglibexec_PROGRAMS		+= test-clone
-endif
-if CONFIG_STREAMS_CONNLD
-pkglibexec_PROGRAMS		+= test-connld
-endif
-if CONFIG_STREAMS_CONNLD_MODULE
-pkglibexec_PROGRAMS		+= test-connld
-endif
-if CONFIG_STREAMS_ECHO
-pkglibexec_PROGRAMS		+= test-echo
-endif
-if CONFIG_STREAMS_ECHO_MODULE
-pkglibexec_PROGRAMS		+= test-echo
-endif
-if CONFIG_STREAMS_FIFO
-pkglibexec_PROGRAMS		+= test-fifo
-endif
-if CONFIG_STREAMS_FIFO_MODULE
-pkglibexec_PROGRAMS		+= test-fifo
-endif
-if CONFIG_STREAMS_LOG
-pkglibexec_PROGRAMS		+= test-log
-endif
-if CONFIG_STREAMS_LOG_MODULE
-pkglibexec_PROGRAMS		+= test-log
-endif
-if CONFIG_STREAMS_LOOP
-pkglibexec_PROGRAMS		+= test-loop
-endif
-if CONFIG_STREAMS_LOOP_MODULE
-pkglibexec_PROGRAMS		+= test-loop
-endif
-if CONFIG_STREAMS_NSDEV
-pkglibexec_PROGRAMS		+= test-nsdev
-endif
-if CONFIG_STREAMS_NSDEV_MODULE
-pkglibexec_PROGRAMS		+= test-nsdev
-endif
-if CONFIG_STREAMS_MUX
-pkglibexec_PROGRAMS		+= test-mux
-endif
-if CONFIG_STREAMS_MUX_MODULE
-pkglibexec_PROGRAMS		+= test-mux
-endif
-if CONFIG_STREAMS_NULS
-pkglibexec_PROGRAMS		+= test-nuls
-endif
-if CONFIG_STREAMS_NULS_MODULE
-pkglibexec_PROGRAMS		+= test-nuls
-endif
-if CONFIG_STREAMS_PIPE
-pkglibexec_PROGRAMS		+= test-pipe perftest perftestn
-endif
-if CONFIG_STREAMS_PIPE_MODULE
-pkglibexec_PROGRAMS		+= test-pipe perftest perftestn
-endif
-if CONFIG_STREAMS_PIPEMOD
-pkglibexec_PROGRAMS		+= test-pipemod
-endif
-if CONFIG_STREAMS_PIPEMOD_MODULE
-pkglibexec_PROGRAMS		+= test-pipemod
-endif
-if CONFIG_STREAMS_SAD
-pkglibexec_PROGRAMS		+= test-sad
-endif
-if CONFIG_STREAMS_SAD_MODULE
-pkglibexec_PROGRAMS		+= test-sad
-endif
-if CONFIG_STREAMS_SC
-pkglibexec_PROGRAMS		+= test-sc
-endif
-if CONFIG_STREAMS_SC_MODULE
-pkglibexec_PROGRAMS		+= test-sc
-endif
-pkglibexec_PROGRAMS		+= test-tty
-pkglibexec_PROGRAMS		+= ldltest test-np_ip test-ip
-pkglibexec_PROGRAMS		+= test-tirdwr test-timod test-xnet test-xnet_thr
-pkglibexec_PROGRAMS		+= test-xnsl test-xnsl_thr
-pkglibexec_PROGRAMS		+= test-sockpath test-socket test-socklib test-sockmod test-socksys
-pkglibexec_PROGRAMS		+= test-inet_raw test-inet_udp test-inet_tcp test-inet_sctp
-pkglibexec_PROGRAMS		+= test-sctp test-sctp_n test-sctp_n2 test-sctp_nc test-sctp_ns test-sctp_t test-etsi_n test-etsi_t test-interop
-pkglibexec_PROGRAMS		+= test-chan
-
-EXTRA_PROGRAMS			+=
 
 #LFS_EXTRA_TESTS		= 
 #LFS_EXTRA_TOOLS		= @PACKAGE_TARNAME@_mknod
 
 #LDADD				= libstreams.la
 
-lib_LTLIBRARIES			= libstreams.la \
-				  libLiS.la \
-				  libpLiS.la \
-				  libcdiapi.la \
-				  libdlpiapi.la \
-				  libnpiapi.la \
-				  libdlpi.la \
-				  libxnet.la \
-				  libxnsl.la \
-				  inetaddr.la \
-				  libsockpath.la \
-				  libsocket.la \
-				  libsocklib.la
+lib_LTLIBRARIES			=
 
 lib32_LTLIBRARIES		=
 
 snmpdlmod_LTLIBRARIES		=
-
-if WITH_SNMP_AGENT
-snmpdlmod_LTLIBRARIES		+= strMIB.la
-snmpdlmod_LTLIBRARIES		+= mxMIB.la
-endif
 
 ## RPM_BUILD_USER
 endif
@@ -304,7 +131,19 @@ noinst_LIBRARIES		= \
 				libSCTPtest.a \
 				libCHANlink.a \
 				libCHANmods.a \
-				libCHANdrvs.a
+				libCHANdrvs.a \
+				libX25mods.a \
+				libX25drvs.a \
+				libISOmods.a \
+				libISOdrvs.a \
+				libISDNlink.a \
+				libISDNmods.a \
+				libISDNdrvs.a \
+				libATMlink.a \
+				libATMmods.a \
+				libATMdrvs.a \
+				libSS7mods.a \
+				libSS7drvs.a
 
 libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.h \
@@ -911,6 +750,223 @@ libCHANdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libCHANdrvs_a_OBJECTS):	$(libCHANdrvs_a_DEPENDENCIES)
 
+nodist_EXTRA_libX25mods_a_SOURCES = \
+				  src/modules/cdpmod.c \
+				  src/modules/dlaix.c
+dist_EXTRA_libX25mods_a_SOURCES = \
+				  src/modules/cdpmod.c \
+				  src/modules/dlaix.c
+nodist_libX25mods_a_SOURCES	= $(nodist_EXTRA_libX25mods_a_SOURCES)
+libX25mods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libX25mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libX25mods_a_CFLAGS		= $(KERNEL_CFLAGS)
+libX25mods_a_OBJECTS:		$(libX25mods_a_DEPENDENCIES)
+
+nodist_EXTRA_libX25drvs_a_SOURCES = \
+				  src/drivers/x25-llc2.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
+dist_EXTRA_libX25drvs_a_SOURCES = \
+				  src/drivers/x25-llc2.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
+nodist_libX25drvs_a_SOURCES	= $(nodist_EXTRA_libX25drvs_a_SOURCES)
+libX25drvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libX25drvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libX25drvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libX25drvs_a_OBJECTS:		$(libX25drvs_a_DEPENDENCIES)
+
+nodist_EXTRA_libISOmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
+dist_EXTRA_libISOmods_a_SOURCES = \
+				  src/modules/cmot.c \
+				  src/modules/isot.c \
+				  src/modules/itot.c \
+				  src/modules/lpp.c \
+				  src/modules/tcpns.c \
+				  src/modules/xot.c
+nodist_libISOmods_a_SOURCES	= $(nodist_EXTRA_libISOmods_a_SOURCES)
+libISOmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libISOmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libISOmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libISOmods_a_OBJECTS):	$(libISOmods_a_DEPENDENCIES)
+
+nodist_EXTRA_libISOdrvs_a_SOURCES = \
+				  src/drivers/clns.c \
+				  src/drivers/x25-lapb.c
+#				  src/drivers/x25-plp.c
+dist_EXTRA_libISOdrvs_a_SOURCES = \
+				  src/drivers/clns.c \
+				  src/drivers/tp.c \
+				  src/drivers/x25-lapb.c
+#				  src/drivers/x25-plp.c
+nodist_libISOdrvs_a_SOURCES	= $(nodist_EXTRA_libISOdrvs_a_SOURCES)
+libISOdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libISOdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libISOdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libISOdrvs_a_OBJECTS):	$(libISOdrvs_a_DEPENDENCIES)
+
+## =====================================================================
+
+EXTRA_libISDNlink_a_SOURCES	= 
+libISDNlink_a_SOURCES		=
+libISDNlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libISDNlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libISDNlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libISDNlink_a_OBJECTS):	$(libISDNlink_a_DEPENDENCIES)
+
+## =====================================================================
+
+EXTRA_libISDNmods_a_SOURCES	=
+libISDNmods_a_SOURCES		=
+libISDNmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libISDNmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libISDNmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libISDNmods_a_OBJECTS):	$(libISDNmods_a_DEPENDENCIES)
+
+## =====================================================================
+
+EXTRA_libISDNdrvs_a_SOURCES	=
+libISDNdrvs_a_SOURCES		=
+libISDNdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libISDNdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libISDNdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libISDNdrvs_a_OBJECTS):	$(libISDNdrvs_a_DEPENDENCIES)
+
+## =====================================================================
+
+EXTRA_libATMlink_a_SOURCES	= 
+libATMlink_a_SOURCES		=
+libATMlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libATMlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libATMlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+$(libATMlink_a_OBJECTS):	$(libATMlink_a_DEPENDENCIES)
+
+## =====================================================================
+
+EXTRA_libATMmods_a_SOURCES	=
+libATMmods_a_SOURCES		= src/modules/phys.c src/modules/aal1.c src/modules/aal2.c src/modules/aal5.c src/modules/sscop.c src/modules/sscopmce.c
+libATMmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libATMmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libATMmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+libATMmods_a_OBJECTS:		$(libATMmods_a_DEPENDENCIES)
+
+## =====================================================================
+
+EXTRA_libATMdrvs_a_SOURCES	=
+libATMdrvs_a_SOURCES		= src/drivers/atm.c
+libATMdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libATMdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libATMdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libATMdrvs_a_OBJECTS:		$(libATMdrvs_a_DEPENDENCIES)
+
+## =====================================================================
+
+nodist_EXTRA_libSS7mods_a_SOURCES	= \
+				  src/modules/mtp_npi.c \
+				  src/modules/mtp_tpi.c \
+				  src/modules/sccp_mod.c \
+				  src/modules/npi_sccp.c \
+				  src/modules/tpi_sccp.c \
+				  src/modules/tr_mod.c \
+				  src/modules/tc_mod.c \
+				  src/modules/sdl.c \
+				  src/modules/spm.c \
+				  src/modules/sdl_pmod.c \
+				  src/modules/sdl_ch.c \
+				  src/modules/sdt.c \
+				  src/modules/sdt_pmod.c \
+				  src/modules/sl.c \
+				  src/modules/sm_mod.c \
+				  src/modules/slpmod.c
+
+nodist_libSS7mods_a_SOURCES	= $(nodist_EXTRA_libSS7mods_a_SOURCES)
+
+#nodist_EXTRA_libSS7mods_a_SOURCES	= \
+#				  src/modules/tcap/tc.c \
+#				  src/modules/tcap/tr.c \
+#				  src/modules/isdn/isdn.c \
+#				  src/modules/lm/lm.c \
+#				  src/modules/lm/lm.h \
+#				  src/modules/m2ua/m2ua.c \
+#				  src/modules/mg/mg.c \
+#				  src/modules/mx/mx_sdl.c \
+#				  src/modules/x400p-ss7/sl_x400p.c \
+#				  src/modules/x400p-ss7/sl_x100p.c \
+#				  src/modules/x400p-ss7/sdt_x400p.c \
+#				  src/modules/x400p-ss7/sdl_x400p.c \
+#				  src/modules/x400p-ss7/ch_x400p.c \
+#				  src/modules/x400p-ss7/mx_x400p.c \
+#				  src/modules/x400p-ss7/x400p_mx.c \
+#				  src/modules/cd/cd.c \
+#				  src/modules/cd/cd.h \
+#				  src/modules/cd/cd_daed.c \
+#				  src/modules/cd/cd_hdlc.c \
+#				  src/modules/dl/dl.c \
+#				  src/modules/dl/dl_dua.c \
+#				  src/modules/dl/dl_gr303.c \
+#				  src/modules/dl/dl_gr303ua.c \
+#				  src/modules/dl/dl_gsma.c \
+#				  src/modules/dl/dl_h225.c \
+#				  src/modules/dl/dl_iua.c \
+#				  src/modules/dl/dl_lapb.c \
+#				  src/modules/dl/dl_lapd.c \
+#				  src/modules/dl/dl_lapf.c \
+#				  src/modules/dl/dl_v52.c \
+#				  src/modules/dl/dl_v5ua.c \
+#				  src/modules/hdlc/hdlc.c \
+#				  src/modules/acb56/sdl_acb56.c \
+#				  src/modules/acb56/sdt_acb56.c \
+#				  src/modules/acb56/sl_acb56.c \
+#				  src/modules/h225/h225.c \
+#				  src/modules/m2tp/m2tp.c \
+#				  src/modules/sdl/cdi.c \
+#				  src/modules/sdl/cdi_mod.c \
+#				  src/modules/sdt/sdtmux.c \
+#				  src/modules/sl/slm.c \
+#				  src/modules/sscop/sscop.c \
+#				  src/modules/sscop/sscop2.c \
+#				  src/modules/x400p-ss7/crc.c
+
+libSS7mods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSS7mods_a_CPPFLAGS		= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/drivers \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS) -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
+$(libSS7mods_a_OBJECTS):	$(libSS7mods_a_DEPENDENCIES)
+
+## =====================================================================
+
+nodist_EXTRA_libSS7drvs_a_SOURCES = \
+				  src/drivers/mtp.c \
+				  src/drivers/mtp_min.c \
+				  src/drivers/isup.c \
+				  src/drivers/sccp.c \
+				  src/drivers/tcap.c \
+				  src/drivers/sdlm.c \
+				  src/drivers/sl_min.c \
+				  src/drivers/sl_mux.c \
+				  src/drivers/x400p-ss7.c \
+				  src/drivers/x100p-ss7.c \
+				  src/drivers/sl_x400p.c \
+				  src/drivers/sl_x100p.c \
+				  src/drivers/v400pfw.h \
+				  src/drivers/v401pfw.h \
+				  src/drivers/x400pfw.h
+
+nodist_libSS7drvs_a_SOURCES	= $(nodist_EXTRA_libSS7drvs_a_SOURCES)
+libSS7drvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSS7drvs_a_CPPFLAGS		= -I$(top_builddir)/src/modules -I$(top_srcdir)/src/modules \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libSS7drvs_a_CFLAGS		= $(KERNEL_CFLAGS) -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
+$(libSS7drvs_a_OBJECTS):	$(libSS7drvs_a_DEPENDENCIES)
+
+## =====================================================================
+
 ## RPM_BUILD_KERNEL
 endif
 ## PKG_BUILD_ARCH
@@ -952,7 +1008,17 @@ KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) \
 				  $(libSCTPsctp_a_OBJECTS) \
 				  $(libCHANlink_a_OBJECTS) \
 				  $(libCHANmods_a_OBJECTS) \
-				  $(libCHANdrvs_a_OBJECTS)
+				  $(libCHANdrvs_a_OBJECTS) \
+				  $(libX25mods_a_OBJECTS) \
+				  $(libX25drvs_a_OBJECTS) \
+				  $(libISOmods_a_OBJECTS) \
+				  $(libISOdrvs_a_OBJECTS) \
+				  $(libISDNlink_a_OBJECTS) \
+				  $(libISDNmods_a_OBJECTS) \
+				  $(libISDNdrvs_a_OBJECTS) \
+				  $(libATMlink_a_OBJECTS) \
+				  $(libATMmods_a_OBJECTS) \
+				  $(libATMdrvs_a_OBJECTS)
 KERNEL_MODULES			= specfs.o \
 				  streams.o \
 				  $(libLfS_drivers_a_OBJECTS) \
@@ -969,8 +1035,15 @@ KERNEL_MODULES			= specfs.o \
 				  $(libSCTPtest_a_OBJECTS) \
 				  $(libCHANlink_a_OBJECTS) \
 				  $(libCHANmods_a_OBJECTS) \
-				  $(libCHANdrvs_a_OBJECTS)
-
+				  $(libCHANdrvs_a_OBJECTS) \
+				  $(libX25mods_a_OBJECTS) \
+				  $(libX25drvs_a_OBJECTS) \
+				  $(libISOmods_a_OBJECTS) \
+				  $(libISOdrvs_a_OBJECTS) \
+				  $(libISDNmods_a_OBJECTS) \
+				  $(libISDNdrvs_a_OBJECTS) \
+				  $(libATMmods_a_OBJECTS) \
+				  $(libATMdrvs_a_OBJECTS)
 if WITH_KO_MODULES
 KERNEL_MODULES			+= streams_sctp.o
 else
@@ -1037,6 +1110,8 @@ if RPM_BUILD_USER
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
+lib_LTLIBRARIES			+= libstreams.la
+
 libstreams_la_SOURCES		= \
 				src/lib/testcancel.c \
 				src/lib/putpmsg.c \
@@ -1054,6 +1129,8 @@ libstreams_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
 libstreams_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS)
+
+lib_LTLIBRARIES			+= libLiS.la
 
 libLiS_la_SOURCES		= \
 				src/lib/testcancel.c \
@@ -1073,6 +1150,8 @@ libLiS_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
 libLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS)
 
+lib_LTLIBRARIES			+= libpLiS.la
+
 libpLiS_la_SOURCES		= \
 				src/lib/testcancel.c \
 				src/lib/putpmsg.c \
@@ -1090,6 +1169,8 @@ libpLiS_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
 libpLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS)
 
+lib_LTLIBRARIES			+= libcdiapi.la
+
 libcdiapi_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/cdiapi.c \
 				  src/include/cdiapi.h \
@@ -1101,6 +1182,8 @@ libcdiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
 				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libcdiapi_la_CFLAGS		= $(USER_CFLAGS)
 libcdiapi_la_LIBADD		= libstreams.la
+
+lib_LTLIBRARIES			+= libdlpiapi.la
 
 libdlpiapi_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/dlpiapi.c \
@@ -1114,6 +1197,8 @@ libdlpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
 libdlpiapi_la_CFLAGS		= $(USER_CFLAGS)
 libdlpiapi_la_LIBADD		= libstreams.la
 
+lib_LTLIBRARIES			+= libnpiapi.la
+
 libnpiapi_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/npiapi.c \
 				  src/include/npiapi.h \
@@ -1125,6 +1210,8 @@ libnpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
 				  $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libnpiapi_la_CFLAGS		= $(USER_CFLAGS)
 libnpiapi_la_LIBADD		= libstreams.la
+
+lib_LTLIBRARIES			+= libdlpi.la
 
 libdlpi_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/dlpi.c \
@@ -1138,6 +1225,8 @@ libdlpi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
 libdlpi_la_CFLAGS		= $(USER_CFLAGS)
 libdlpi_la_LIBADD		= libstreams.la
 
+lib_LTLIBRARIES			+= libxnet.la
+
 libxnet_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/xnet.c \
 				  gettext.h
@@ -1149,6 +1238,8 @@ libxnet_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
 				  -I$(top_srcdir)/include/xti -I$(top_builddir)/include/xti
 libxnet_la_CFLAGS		= $(USER_CFLAGS)
 libxnet_la_LIBADD		= libstreams.la
+
+lib_LTLIBRARIES			+= libxnsl.la
 
 libxnsl_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/netselect.c \
@@ -1168,6 +1259,8 @@ libxnsl_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
 libxnsl_la_CFLAGS		= $(USER_CFLAGS)
 libxnsl_la_LIBADD		= libstreams.la libxnet.la
 
+lib_LTLIBRARIES			+= inetaddr.la
+
 inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
 				  src/include/netdir.h \
 				  src/include/netconfig.h \
@@ -1180,6 +1273,8 @@ inetaddr_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
 				  -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS)
 inetaddr_la_LIBADD		= libstreams.la libxnet.la libxnsl.la
+
+lib_LTLIBRARIES			+= libsockpath.la
 
 libsockpath_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/sockpath.c \
@@ -1194,6 +1289,8 @@ libsockpath_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
 libsockpath_la_CFLAGS		= $(USER_CFLAGS)
 libsockpath_la_LIBADD		=
 
+lib_LTLIBRARIES			+= libsocket.la
+
 libsocket_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socket.c \
 				  gettext.h
@@ -1206,6 +1303,8 @@ libsocket_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
 libsocket_la_CFLAGS		= $(USER_CFLAGS)
 libsocket_la_LIBADD		= libstreams.la
 
+lib_LTLIBRARIES			+= libsocklib.la
+
 libsocklib_la_SOURCES		= src/lib/pthread.c \
 				  src/lib/socklib.c \
 				  gettext.h
@@ -1217,6 +1316,26 @@ libsocklib_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
 				  $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libsocklib_la_CFLAGS		= $(USER_CFLAGS)
 libsocklib_la_LIBADD		= libstreams.la libxnet.la libxnsl.la libsockpath.la
+
+lib_LTLIBRARIES			+= libsx25.la
+
+libsx25_la_SOURCES		= src/lib/padent.c \
+				  src/lib/x25config.c \
+				  src/lib/xhostent.c \
+				  src/include/netx25/x25_control.h \
+				  src/include/netx25/x25_proto.h \
+				  src/include/netx25/xnetdb.h
+libsx25_la_DEPENDENCIES		= src/lib/sx25.VERSION
+libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sx25.VERSION
+libsx25_la_CPPFLAGS		= -I$(top_srcdir)/src/lib -I$(top_builddir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libsx25_la_CFLAGS		= $(USER_CFLAGS)
+libsx25_la_LIBADD		= libstreams.la
+
+if WITH_SNMP_AGENT
+snmpdlmod_LTLIBRARIES		+= strMIB.la
+endif
 
 strMIB_la_SOURCES		= \
 				  src/snmp/strMIB.c \
@@ -1234,6 +1353,10 @@ strMIB_la_LDFLAGS		= -module -avoid-version \
 strMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS)
 strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
+
+if WITH_SNMP_AGENT
+snmpdlmod_LTLIBRARIES		+= mxMIB.la
+endif
 
 mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
 				  src/snmp/ds0Bundle.h \
@@ -1263,74 +1386,127 @@ EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 #sbin_PROGRAMS			= streams $(LFS_EXTRA_TOOLS)
 
 strchg_SOURCES			= src/util/strchg.c
-strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strchg_LDFLAGS			=
 strchg_LDADD			= libstreams.la
 strchg_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strchg"'
 strchg_CFLAGS			= $(USER_CFLAGS)
+strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_UTILS
+bin_PROGRAMS			+= strchg
+endif
 
 strconf_SOURCES			= src/util/strconf.c
-strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strconf_LDFLAGS			=
 strconf_LDADD			= libstreams.la
 strconf_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strconf"'
 strconf_CFLAGS			= $(USER_CFLAGS)
+strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_UTILS
+bin_PROGRAMS			+= strconf
+endif
 
 strreset_SOURCES		= src/util/strreset.c
-strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strreset_LDFLAGS		=
 strreset_LDADD			= libstreams.la
 strreset_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strreset"'
 strreset_CFLAGS			= $(USER_CFLAGS)
+strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_UTILS
+bin_PROGRAMS			+= strreset
+endif
 
 autopush_SOURCES		= src/util/autopush.c
-autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 autopush_LDFLAGS		=
 autopush_LDADD			= libstreams.la
 autopush_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"autopush"'
 autopush_CFLAGS			= $(USER_CFLAGS)
+autopush_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_SAD
+sbin_PROGRAMS			+= autopush
+endif
+if CONFIG_STREAMS_SAD_MODULE
+sbin_PROGRAMS			+= autopush
+endif
 
 fattach_SOURCES			= src/util/fattach.c
-fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fattach_LDFLAGS			=
 fattach_LDADD			= libstreams.la
 fattach_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"fattach"'
 fattach_CFLAGS			= $(USER_CFLAGS)
+fattach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_PIPE
+sbin_PROGRAMS			+= fattach
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+sbin_PROGRAMS			+= fattach
+endif
 
 fdetach_SOURCES			= src/util/fdetach.c 
-fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 fdetach_LDFLAGS			=
 fdetach_LDADD			= libstreams.la
 fdetach_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"fdetach"'
 fdetach_CFLAGS			= $(USER_CFLAGS)
+fdetach_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_PIPE
+sbin_PROGRAMS			+= fdetach
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+sbin_PROGRAMS			+= fdetach
+endif
 
 insf_SOURCES			= src/util/insf.c
-insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 insf_LDFLAGS			=
 insf_LDADD			= libstreams.la
 insf_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"insf"'
 insf_CFLAGS			= $(USER_CFLAGS)
+insf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_UTILS
+sbin_PROGRAMS			+= insf
+endif
 
 scls_SOURCES			= src/util/scls.c
-scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 scls_LDFLAGS			=
 scls_LDADD			= libstreams.la
 scls_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"scls"'
 scls_CFLAGS			= $(USER_CFLAGS)
+scls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_SC
+sbin_PROGRAMS			+= scls
+endif
+if CONFIG_STREAMS_SC_MODULE
+sbin_PROGRAMS			+= scls
+endif
 
 strace_SOURCES			= src/util/strace.c
-strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strace_LDFLAGS			=
 strace_LDADD			= libstreams.la
 strace_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strace"'
 strace_CFLAGS			= $(USER_CFLAGS)
+strace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_LOG
+sbin_PROGRAMS			+= strace
+endif
+if CONFIG_STREAMS_LOG_MODULE
+sbin_PROGRAMS			+= strace
+endif
 
 ##strclean_SOURCES		= src/util/strclean.c
-##strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 ##strclean_LDFLAGS		=
 ##strclean_LDADD		= libstreams.la
 ##strclean_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strclean"'
 ##strclean_CFLAGS		= $(USER_CFLAGS)
+##strclean_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+#sbin_PROGRAMS			+= strclean
 
 ##@srcdir@/src/util/strclean.c:
 ##	touch $@
@@ -1338,26 +1514,49 @@ strace_CFLAGS			= $(USER_CFLAGS)
 ##@srcdir@/src/util/strclean: @srcdir@/src/util/strclean.c
 ##	touch $@
 
+if CONFIG_STREAMS_LOG
+dist_sbin_SCRIPTS		+= src/util/strclean
+endif
+if CONFIG_STREAMS_LOG_MODULE
+dist_sbin_SCRIPTS		+= src/util/strclean
+endif
+
 strerr_SOURCES			= src/util/strerr.c
-strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strerr_LDFLAGS			=
 strerr_LDADD			= libstreams.la
 strerr_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strerr"'
 strerr_CFLAGS			= $(USER_CFLAGS)
+strerr_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_LOG
+sbin_PROGRAMS			+= strerr
+endif
+if CONFIG_STREAMS_LOG_MODULE
+sbin_PROGRAMS			+= strerr
+endif
 
 strinfo_SOURCES			= src/util/strinfo.c
-strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strinfo_LDFLAGS			=
 strinfo_LDADD			= libstreams.la
 strinfo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strinfo"'
 strinfo_CFLAGS			= $(USER_CFLAGS)
+strinfo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_SC
+sbin_PROGRAMS			+= strinfo
+endif
+if CONFIG_STREAMS_SC_MODULE
+sbin_PROGRAMS			+= strinfo
+endif
 
 ##strload_SOURCES		= src/util/strload.c
-##strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 ##strload_LDFLAGS		=
 ##strload_LDADD			= libstreams.la
 ##strload_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strload"'
 ##strload_CFLAGS		= $(USER_CFLAGS)
+##strload_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+#sbin_PROGRAMS			+= strload
 
 ##@srcdir@/src/util/strload.c:
 ##	touch $@
@@ -1365,12 +1564,18 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 ##@srcdir@/src/util/strload: @srcdir@/src/util/strload.c
 ##	touch $@
 
+if CONFIG_STREAMS_UTILS
+dist_sbin_SCRIPTS		+= src/util/strload
+endif
+
 ##strsetup_SOURCES		= src/util/strsetup.c
-##strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 ##strsetup_LDFLAGS		=
 ##strsetup_LDADD		= libstreams.la
 ##strsetup_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strsetup"'
 ##strsetup_CFLAGS		= $(USER_CFLAGS)
+##strsetup_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+#sbin_PROGRAMS			+= strsetup
 
 ##@srcdir@/src/util/strsetup.c:
 ##	touch $@
@@ -1378,18 +1583,28 @@ strinfo_CFLAGS			= $(USER_CFLAGS)
 ##@srcdir@/src/util/strsetup: @srcdir@/src/util/strsetup.c
 ##	touch $@
 
+if CONFIG_STREAMS_UTILS
+dist_sbin_SCRIPTS		+= src/util/strsetup
+endif
+
 strvf_SOURCES			= src/util/strvf.c
-strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 strvf_LDFLAGS			=
 strvf_LDADD			= libstreams.la
 strvf_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"strvf"'
 strvf_CFLAGS			= $(USER_CFLAGS)
+strvf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_UTILS
+sbin_PROGRAMS			+= strvf
+endif
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c
-@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"@PACKAGE_TARNAME@_mknod"'
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
 streamsd_SOURCES		= src/snmp/streamsd.c \
 				  src/snmp/streamsd.h \
@@ -1406,107 +1621,243 @@ streamsd_LDFLAGS		= $(SNMP_LDFLAGS)
 streamsd_LDADD			= libstreams.la $(SNMP_LDADD)
 streamsd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"streamsd"'
 streamsd_CFLAGS			= $(USER_CFLAGS)
+streamsd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= streamsd
+endif
 
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_LDFLAGS		=
 test_clone_LDADD		= libstreams.la
 test_clone_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-clone"'
 test_clone_CFLAGS		= $(USER_CFLAGS)
+test_clone_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_CLONE
+pkglibexec_PROGRAMS		+= test-clone
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+pkglibexec_PROGRAMS		+= test-clone
+endif
 
 test_connld_SOURCES		= src/test/test-connld.c
 test_connld_LDFLAGS		=
 test_connld_LDADD		= libstreams.la
 test_connld_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-connld"'
 test_connld_CFLAGS		= $(USER_CFLAGS)
+test_connld_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_CONNLD
+pkglibexec_PROGRAMS		+= test-connld
+endif
+if CONFIG_STREAMS_CONNLD_MODULE
+pkglibexec_PROGRAMS		+= test-connld
+endif
 
 test_echo_SOURCES		= src/test/test-echo.c
 test_echo_LDFLAGS		=
 test_echo_LDADD			= libstreams.la
 test_echo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-echo"'
 test_echo_CFLAGS		= $(USER_CFLAGS)
+test_echo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_ECHO
+pkglibexec_PROGRAMS		+= test-echo
+endif
+if CONFIG_STREAMS_ECHO_MODULE
+pkglibexec_PROGRAMS		+= test-echo
+endif
 
 test_fifo_SOURCES		= src/test/test-fifo.c
 test_fifo_LDFLAGS		=
 test_fifo_LDADD			= libstreams.la
 test_fifo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-fifo"'
 test_fifo_CFLAGS		= $(USER_CFLAGS)
+test_fifo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_FIFO
+pkglibexec_PROGRAMS		+= test-fifo
+endif
+if CONFIG_STREAMS_FIFO_MODULE
+pkglibexec_PROGRAMS		+= test-fifo
+endif
 
 test_log_SOURCES		= src/test/test-log.c
 test_log_LDFLAGS		=
 test_log_LDADD			= libstreams.la
 test_log_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-log"'
 test_log_CFLAGS			= $(USER_CFLAGS)
+test_log_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_LOG
+pkglibexec_PROGRAMS		+= test-log
+endif
+if CONFIG_STREAMS_LOG_MODULE
+pkglibexec_PROGRAMS		+= test-log
+endif
 
 test_loop_SOURCES		= src/test/test-loop.c
 test_loop_LDFLAGS		=
 test_loop_LDADD			= libstreams.la
 test_loop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-loop"'
 test_loop_CFLAGS		= $(USER_CFLAGS)
+test_loop_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_LOOP
+pkglibexec_PROGRAMS		+= test-loop
+endif
+if CONFIG_STREAMS_LOOP_MODULE
+pkglibexec_PROGRAMS		+= test-loop
+endif
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_LDFLAGS		=
 test_nsdev_LDADD		= libstreams.la
 test_nsdev_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-nsdev"'
 test_nsdev_CFLAGS		= $(USER_CFLAGS)
+test_nsdev_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_NSDEV
+pkglibexec_PROGRAMS		+= test-nsdev
+endif
+if CONFIG_STREAMS_NSDEV_MODULE
+pkglibexec_PROGRAMS		+= test-nsdev
+endif
 
 test_mux_SOURCES		= src/test/test-mux.c
 test_mux_LDFLAGS		=
 test_mux_LDADD			= libstreams.la
 test_mux_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-mux"'
 test_mux_CFLAGS			= $(USER_CFLAGS)
+test_mux_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_MUX
+pkglibexec_PROGRAMS		+= test-mux
+endif
+if CONFIG_STREAMS_MUX_MODULE
+pkglibexec_PROGRAMS		+= test-mux
+endif
 
 test_nuls_SOURCES		= src/test/test-nuls.c
 test_nuls_LDFLAGS		=
 test_nuls_LDADD			= libstreams.la
 test_nuls_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-nuls"'
 test_nuls_CFLAGS		= $(USER_CFLAGS)
+test_nuls_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_NULS
+pkglibexec_PROGRAMS		+= test-nuls
+endif
+if CONFIG_STREAMS_NULS_MODULE
+pkglibexec_PROGRAMS		+= test-nuls
+endif
 
 test_pipe_SOURCES		= src/test/test-pipe.c
 test_pipe_LDFLAGS		=
 test_pipe_LDADD			= libstreams.la
 test_pipe_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-pipe"'
 test_pipe_CFLAGS		= $(USER_CFLAGS)
+test_pipe_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_PIPE
+pkglibexec_PROGRAMS		+= test-pipe
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+pkglibexec_PROGRAMS		+= test-pipe
+endif
 
 perftest_SOURCES		= src/test/perftest.c
 perftest_LDFLAGS		=
 perftest_LDADD			= libstreams.la
 perftest_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"perftest"'
 perftest_CFLAGS			= $(USER_CFLAGS)
+perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_PIPE
+pkglibexec_PROGRAMS		+= perftest
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+pkglibexec_PROGRAMS		+= perftest
+endif
 
 perftestn_SOURCES		= src/test/perftest.c
 perftestn_LDFLAGS		= 
 perftestn_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNATIVE_PIPES -DNAME='"perftestn"'
 perftestn_CFLAGS		= $(USER_CFLAGS)
+perftestn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_PIPE
+pkglibexec_PROGRAMS		+= perftestn
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+pkglibexec_PROGRAMS		+= perftestn
+endif
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
 test_pipemod_LDFLAGS		=
 test_pipemod_LDADD		= libstreams.la
-test_pipemod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-pipemode"'
+test_pipemod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-pipemod"'
 test_pipemod_CFLAGS		= $(USER_CFLAGS)
+test_pipemod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_PIPEMOD
+pkglibexec_PROGRAMS		+= test-pipemod
+endif
+if CONFIG_STREAMS_PIPEMOD_MODULE
+pkglibexec_PROGRAMS		+= test-pipemod
+endif
 
 test_sad_SOURCES		= src/test/test-sad.c
 test_sad_LDFLAGS		=
 test_sad_LDADD			= libstreams.la
 test_sad_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sad"'
 test_sad_CFLAGS			= $(USER_CFLAGS)
+test_sad_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_SAD
+pkglibexec_PROGRAMS		+= test-sad
+endif
+if CONFIG_STREAMS_SAD_MODULE
+pkglibexec_PROGRAMS		+= test-sad
+endif
 
 test_sc_SOURCES			= src/test/test-sc.c
 test_sc_LDFLAGS			=
 test_sc_LDADD			= libstreams.la
 test_sc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sc"'
 test_sc_CFLAGS			= $(USER_CFLAGS)
+test_sc_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_SC
+pkglibexec_PROGRAMS		+= test-sc
+endif
+if CONFIG_STREAMS_SC_MODULE
+pkglibexec_PROGRAMS		+= test-sc
+endif
 
 test_streams_SOURCES		= src/test/test-streams.c
 test_streams_LDFLAGS		=
 test_streams_LDADD		= libstreams.la
 test_streams_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-streams"'
 test_streams_CFLAGS		= $(USER_CFLAGS)
+test_streams_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_STH
+pkglibexec_PROGRAMS		+= test-streams
+endif
+if CONFIG_STREAMS_STH_MODULE
+pkglibexec_PROGRAMS		+= test-streams
+endif
 
 testlog_SOURCES			= src/test/testlog.c
 testlog_LDFLAGS			=
 testlog_LDADD			= libstreams.la
 testlog_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"testlog"'
 testlog_CFLAGS			= $(USER_CFLAGS)
+testlog_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= testlog
 
 test_tty_SOURCES		= src/test/test-tty.c
 test_tty_LDFLAGS		=
@@ -1515,29 +1866,43 @@ test_tty_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"te
 test_tty_CFLAGS			= $(USER_CFLAGS)
 ##test_tty_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-tty
+
 ldlconfig_SOURCES		= src/util/ldlconfig.c
 ldlconfig_LDFLAGS		=
 ldlconfig_LDADD			= libstreams.la
 ldlconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ldlconfig"'
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
+ldlconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ldlconfig
 
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_LDFLAGS			=
 ldltest_LDADD			= libstreams.la
 ldltest_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ldltest"'
 ldltest_CFLAGS			= $(USER_CFLAGS)
+ldltest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= ldltest
 
 test_np_ip_SOURCES		= src/test/test-np_ip.c
 test_np_ip_LDFLAGS		=
 test_np_ip_LDADD		= libstreams.la
 test_np_ip_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-np_ip"'
 test_np_ip_CFLAGS		= $(USER_CFLAGS)
+test_np_ip_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-np_ip
 
 test_ip_SOURCES			= src/test/test-ip.c
 test_ip_LDFLAGS			=
 test_ip_LDADD			= libstreams.la
 test_ip_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-ip"'
 test_ip_CFLAGS			= $(USER_CFLAGS)
+test_ip_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-ip
 
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_LDFLAGS		=
@@ -1546,12 +1911,16 @@ test_tirdwr_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='
 test_tirdwr_CFLAGS		= $(USER_CFLAGS)
 test_tirdwr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-tirdwr
+
 test_timod_SOURCES		= src/test/test-timod.c
 test_timod_LDFLAGS		=
 test_timod_LDADD		= libstreams.la libxnet.la
 test_timod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-timod"'
 test_timod_CFLAGS		= $(USER_CFLAGS)
 test_timod_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-timod
 
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_LDFLAGS		=
@@ -1560,12 +1929,16 @@ test_xnet_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"t
 test_xnet_CFLAGS		= $(USER_CFLAGS)
 test_xnet_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-xnet
+
 test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_LDADD		= libstreams.la libxnet.la
 test_xnet_thr_LDFLAGS		= -lpthread
 test_xnet_thr_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-xnet_thr"' -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS)
 test_xnet_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-xnet_thr
 
 test_xnsl_SOURCES		= src/test/test-xnsl.c
 test_xnsl_LDADD			= libstreams.la libxnet.la libxnsl.la
@@ -1574,12 +1947,16 @@ test_xnsl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"t
 test_xnsl_CFLAGS		= $(USER_CFLAGS)
 test_xnsl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-xnsl
+
 test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
 test_xnsl_thr_LDADD		= libstreams.la libxnet.la libxnsl.la
 test_xnsl_thr_LDFLAGS		= -lpthread
 test_xnsl_thr_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-xnsl_thr"' -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS)
 test_xnsl_thr_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-xnsl_thr
 
 test_sockpath_SOURCES		= src/test/test-sockpath.c
 test_sockpath_LDADD		= libstreams.la libsockpath.la
@@ -1588,12 +1965,16 @@ test_sockpath_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME
 test_sockpath_CFLAGS		= $(USER_CFLAGS)
 test_sockpath_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-sockpath
+
 test_socket_SOURCES		= src/test/test-socket.c
 test_socket_LDADD		= libstreams.la libsocket.la
 test_socket_LDFLAGS		=
 test_socket_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-socket"'
 test_socket_CFLAGS		= $(USER_CFLAGS)
 test_socket_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-socket
 
 test_socklib_SOURCES		= src/test/test-socklib.c
 test_socklib_LDADD		= libstreams.la libsocklib.la
@@ -1602,12 +1983,16 @@ test_socklib_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=
 test_socklib_CFLAGS		= $(USER_CFLAGS)
 test_socklib_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-socklib
+
 test_sockmod_SOURCES		= src/test/test-sockmod.c
 test_sockmod_LDADD		= libstreams.la libsocklib.la
 test_sockmod_LDFLAGS		=
 test_sockmod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sockmod"'
 test_sockmod_CFLAGS		= $(USER_CFLAGS)
 test_sockmod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-sockmod
 
 test_socksys_SOURCES		= src/test/test-socksys.c
 test_socksys_LDADD		= libstreams.la libsocket.la
@@ -1616,12 +2001,16 @@ test_socksys_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=
 test_socksys_CFLAGS		= $(USER_CFLAGS)
 test_socksys_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-socksys
+
 initsock_SOURCES		= src/util/initsock.c
 initsock_LDADD			= libstreams.la
 initsock_LDFLAGS		=
 initsock_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"initsock"'
 initsock_CFLAGS			= $(USER_CFLAGS)
 initsock_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= initsock
 
 soconfig_SOURCES		= src/util/soconfig.c
 soconfig_LDADD			= libstreams.la
@@ -1630,12 +2019,16 @@ soconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"so
 soconfig_CFLAGS			= $(USER_CFLAGS)
 soconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+sbin_PROGRAMS			+= soconfig
+
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
 test_inet_raw_LDADD		= libstreams.la
 test_inet_raw_LDFLAGS		=
 test_inet_raw_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-inet_raw"'
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 test_inet_raw_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-inet_raw
 
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
 test_inet_udp_LDADD		= libstreams.la
@@ -1644,12 +2037,16 @@ test_inet_udp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME
 test_inet_udp_CFLAGS		= $(USER_CFLAGS)
 test_inet_udp_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-inet_udp
+
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_LDADD		= libstreams.la
 test_inet_tcp_LDFLAGS		=
 test_inet_tcp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-inet_tcp"'
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 test_inet_tcp_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-inet_tcp
 
 test_inet_sctp_SOURCES		= src/test/test-inet_sctp.c
 test_inet_sctp_LDADD		= libstreams.la
@@ -1658,12 +2055,16 @@ test_inet_sctp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAM
 test_inet_sctp_CFLAGS		= $(USER_CFLAGS)
 test_inet_sctp_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-inet_sctp
+
 test_sctp_SOURCES		= src/test/test-sctp.c
 test_sctp_LDADD			= libstreams.la
 test_sctp_LDFLAGS		=
 test_sctp_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp"'
 test_sctp_CFLAGS		= $(USER_CFLAGS)
 test_sctp_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-sctp
 
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
 test_sctp_n_LDADD		= libstreams.la
@@ -1672,12 +2073,16 @@ test_sctp_n_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='
 test_sctp_n_CFLAGS		= $(USER_CFLAGS)
 test_sctp_n_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-sctp_n
+
 test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
 test_sctp_n2_LDADD		= libstreams.la
 test_sctp_n2_LDFLAGS		=
 test_sctp_n2_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_n2"'
 test_sctp_n2_CFLAGS		= $(USER_CFLAGS)
 test_sctp_n2_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-sctp_n2
 
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_LDADD		= libstreams.la
@@ -1686,12 +2091,16 @@ test_sctp_nc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS)
 test_sctp_nc_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-sctp_nc
+
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
 test_sctp_ns_LDADD		= libstreams.la
 test_sctp_ns_LDFLAGS		=
 test_sctp_ns_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-sctp_ns"'
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS)
 test_sctp_ns_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-sctp_ns
 
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
 test_sctp_t_LDADD		= libstreams.la
@@ -1700,12 +2109,16 @@ test_sctp_t_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='
 test_sctp_t_CFLAGS		= $(USER_CFLAGS)
 test_sctp_t_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-sctp_t
+
 test_etsi_n_SOURCES		= src/test/test-etsi_n.c
 test_etsi_n_LDADD		= libstreams.la
 test_etsi_n_LDFLAGS		=
 test_etsi_n_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-etsi_n"'
 test_etsi_n_CFLAGS		= $(USER_CFLAGS)
 test_etsi_n_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-etsi_n
 
 test_etsi_t_SOURCES		= src/test/test-etsi_t.c
 test_etsi_t_LDADD		= libstreams.la
@@ -1714,6 +2127,8 @@ test_etsi_t_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='
 test_etsi_t_CFLAGS		= $(USER_CFLAGS)
 test_etsi_t_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-etsi_t
+
 test_interop_SOURCES		= src/test/test-interop.c
 test_interop_LDADD		= libstreams.la
 test_interop_LDFLAGS		=
@@ -1721,12 +2136,16 @@ test_interop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=
 test_interop_CFLAGS		= $(USER_CFLAGS)
 test_interop_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
+pkglibexec_PROGRAMS		+= test-interop
+
 test_chan_SOURCES		= src/test/test-chan.c
 test_chan_LDADD			= libstreams.la
 test_chan_LDFLAGS		=
 test_chan_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-chan"'
 test_chan_CFLAGS		= $(USER_CFLAGS)
 test_chan_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-chan
 
 chand_SOURCES			= src/snmp/chand.c \
 				  src/snmp/chand.h \
@@ -1750,6 +2169,565 @@ chand_LDFLAGS			= $(SNMP_LDFLAGS)
 chand_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"chand"'
 chand_CFLAGS			= $(USER_CFLAGS)
 chand_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= chand
+if WITH_SNMP_AGENT
+sbin_PROGRAMS			+= chand
+endif
+
+ifrdlci_SOURCES			= src/util/ifrdlci.c
+ifrdlci_LDADD			= libstreams.la
+ifrdlci_LDFLAGS			=
+ifrdlci_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ifrdlci"'
+ifrdlci_CFLAGS			= $(USER_CFLAGS)
+ifrdlci_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ifrdlci
+
+ifrstat_SOURCES			= src/util/ifrstat.c
+ifrstat_LDADD			= libstreams.la
+ifrstat_LDFLAGS			=
+ifrstat_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ifrstat"'
+ifrstat_CFLAGS			= $(USER_CFLAGS)
+ifrstat_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ifrstat
+
+ifrtune_SOURCES			= src/util/ifrtune.c
+ifrtune_LDADD			= libstreams.la
+ifrtune_LDFLAGS			=
+ifrtune_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ifrtune"'
+ifrtune_CFLAGS			= $(USER_CFLAGS)
+ifrtune_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ifrtune
+
+ixemap_SOURCES			= src/util/ixemap.c
+ixemap_LDADD			= libstreams.la
+ixemap_LDFLAGS			=
+ixemap_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ixemap"'
+ixemap_CFLAGS			= $(USER_CFLAGS)
+ixemap_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ixemap
+
+ixetune_SOURCES			= src/util/ixetune.c
+ixetune_LDADD			= libstreams.la
+ixetune_LDFLAGS			=
+ixetune_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ixetune"'
+ixetune_CFLAGS			= $(USER_CFLAGS)
+ixetune_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ixetune
+
+linkadd_SOURCES			= src/util/linkadd.c
+linkadd_LDADD			= libstreams.la
+linkadd_LDFLAGS			=
+linkadd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linkadd"'
+linkadd_CFLAGS			= $(USER_CFLAGS)
+linkadd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linkadd
+
+linkdel_SOURCES			= src/util/linkdel.c
+linkdel_LDADD			= libstreams.la
+linkdel_LDFLAGS			=
+linkdel_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linkdel"'
+linkdel_CFLAGS			= $(USER_CFLAGS)
+linkdel_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linkdel
+
+linklist_SOURCES		= src/util/linklist.c
+linklist_LDADD			= libstreams.la
+linklist_LDFLAGS		=
+linklist_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linklist"'
+linklist_CFLAGS			= $(USER_CFLAGS)
+linklist_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linklist
+
+linkreset_SOURCES		= src/util/linkreset.c
+linkreset_LDADD			= libstreams.la
+linkreset_LDFLAGS		=
+linkreset_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linkreset"'
+linkreset_CFLAGS		= $(USER_CFLAGS)
+linkreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linkreset
+
+linkstart_SOURCES		= src/util/linkstart.c
+linkstart_LDADD			= libstreams.la
+linkstart_LDFLAGS		=
+linkstart_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linkstart"'
+linkstart_CFLAGS		= $(USER_CFLAGS)
+linkstart_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linkstart
+
+linkstate_SOURCES		= src/util/linkstate.c
+linkstate_LDADD			= libstreams.la
+linkstate_LDFLAGS		=
+linkstate_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linkstate"'
+linkstate_CFLAGS		= $(USER_CFLAGS)
+linkstate_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linkstate
+
+linkstop_SOURCES		= src/util/linkstop.c
+linkstop_LDADD			= libstreams.la
+linkstop_LDFLAGS		=
+linkstop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"linkstop"'
+linkstop_CFLAGS			= $(USER_CFLAGS)
+linkstop_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= linkstop
+
+lltune_SOURCES			= src/util/lltune.c
+lltune_LDADD			= libstreams.la
+lltune_LDFLAGS			=
+lltune_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"lltune"'
+lltune_CFLAGS			= $(USER_CFLAGS)
+lltune_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= lltune
+#sbin_PROGRAMS			+= lltune
+
+mlptune_SOURCES			= src/util/mlptune.c
+mlptune_LDADD			= libstreams.la
+mlptune_LDFLAGS			=
+mlptune_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"mlptune"'
+mlptune_CFLAGS			= $(USER_CFLAGS)
+mlptune_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= mlptune
+
+nuimap_SOURCES			= src/util/nuimap.c
+nuimap_LDADD			= libstreams.la
+nuimap_LDFLAGS			=
+nuimap_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"nuimap"'
+nuimap_CFLAGS			= $(USER_CFLAGS)
+nuimap_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= nuimap
+
+pvcmap_SOURCES			= src/util/pvcmap.c
+pvcmap_LDADD			= libstreams.la
+pvcmap_LDFLAGS			=
+pvcmap_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"pvcmap"'
+pvcmap_CFLAGS			= $(USER_CFLAGS)
+pvcmap_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= pvcmap
+
+vcstat_SOURCES			= src/util/vcstat.c
+vcstat_LDADD			= libstreams.la
+vcstat_LDFLAGS			=
+vcstat_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"vcstat"'
+vcstat_CFLAGS			= $(USER_CFLAGS)
+vcstat_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= vcstat
+
+wantune_SOURCES			= src/util/wantune.c
+wantune_LDADD			= libstreams.la
+wantune_LDFLAGS			=
+wantune_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"wantune"'
+wantune_CFLAGS			= $(USER_CFLAGS)
+wantune_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= wantune
+
+x25diags_SOURCES		= src/util/x25diags.c
+x25diags_LDADD			= libstreams.la
+x25diags_LDFLAGS		=
+x25diags_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25diags"'
+x25diags_CFLAGS			= $(USER_CFLAGS)
+x25diags_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25diags
+
+x25file_SOURCES			= src/util/x25file.c
+x25file_LDADD			= libstreams.la
+x25file_LDFLAGS			=
+x25file_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25file"'
+x25file_CFLAGS			= $(USER_CFLAGS)
+x25file_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25file
+
+x25info_SOURCES			= src/util/x25info.c
+x25info_LDADD			= libstreams.la
+x25info_LDFLAGS			=
+x25info_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25info"'
+x25info_CFLAGS			= $(USER_CFLAGS)
+x25info_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25info
+
+x25netd_SOURCES			= src/util/x25netd.c
+x25netd_LDADD			= libstreams.la
+x25netd_LDFLAGS			=
+x25netd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25netd"'
+x25netd_CFLAGS			= $(USER_CFLAGS)
+x25netd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25netd
+
+x25route_SOURCES		= src/util/x25route.c
+x25route_LDADD			= libstreams.la
+x25route_LDFLAGS		=
+x25route_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25route"'
+x25route_CFLAGS			= $(USER_CFLAGS)
+x25route_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25route
+
+x25stat_SOURCES			= src/util/x25stat.c
+x25stat_LDADD			= libstreams.la
+x25stat_LDFLAGS			=
+x25stat_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25stat"'
+x25stat_CFLAGS			= $(USER_CFLAGS)
+x25stat_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25stat
+
+x25trace_SOURCES		= src/util/x25trace.c
+x25trace_LDADD			= libstreams.la
+x25trace_LDFLAGS		=
+x25trace_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25trace"'
+x25trace_CFLAGS			= $(USER_CFLAGS)
+x25trace_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x25trace
+
+x25tune_SOURCES			= src/util/x25tune.c
+x25tune_LDADD			= libstreams.la
+x25tune_LDFLAGS			=
+x25tune_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x25tune"'
+x25tune_CFLAGS			= $(USER_CFLAGS)
+x25tune_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= x25tune
+#sbin_PROGRAMS			+= x25tune
+
+x32map_SOURCES			= src/util/x32map.c
+x32map_LDADD			= libstreams.la
+x32map_LDFLAGS			=
+x32map_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x32map"'
+x32map_CFLAGS			= $(USER_CFLAGS)
+x32map_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x32map
+
+asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h
+asn_LDADD			= 
+asn_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"asn"'
+asn_CFLAGS			= $(USER_CFLAGS)
+asn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= asn
+#bin_PROGRAMS			+= asn
+
+gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l gdmoyac.h
+gdmo_LDADD			= 
+gdmo_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"gdmo"'
+gdmo_CFLAGS			= $(USER_CFLAGS)
+gdmo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+bin_PROGRAMS			+= gdmo
+
+test_isdn_SOURCES		= src/test/test-isdn.c
+test_isdn_LDADD			= libstreams.la
+test_isdn_LDFLAGS		=
+test_isdn_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-isdn"'
+test_isdn_CFLAGS		= $(USER_CFLAGS)
+test_isdn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-isdn
+
+test_atm_SOURCES		= src/test/test-atm.c
+test_atm_LDADD			= libstreams.la
+test_atm_LDFLAGS		=
+test_atm_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-atm"'
+test_atm_CFLAGS			= $(USER_CFLAGS)
+test_atm_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-atm
+
+ss7statsd_SOURCES		= src/util/ss7statsd.c
+ss7statsd_LDADD			= libstreams.la
+ss7statsd_LDFLAGS		=
+ss7statsd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ss7statsd"'
+ss7statsd_CFLAGS		= $(USER_CFLAGS)
+ss7statsd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ss7statsd
+
+slconfig_SOURCES		= src/util/slconf_yac.y \
+				  src/util/slconf_lex.l \
+				  src/util/slconf.c \
+				  slconf_yac.h
+slconfig_LDADD			= libstreams.la
+slconfig_LDFLAGS		=
+slconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"slconfig"'
+slconfig_CFLAGS			= $(USER_CFLAGS)
+slconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= slconfig
+#sbin_PROGRAMS			+= slconfig
+
+mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
+				  src/util/mtpconf_lex.l \
+				  mtpconf_yac.h
+mtpconfig_LDADD			= libstreams.la
+mtpconfig_LDFLAGS		=
+mtpconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"mtpconfig"'
+mtpconfig_CFLAGS		= $(USER_CFLAGS)
+mtpconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= mtpconfig
+
+x400config_SOURCES		= src/util/x400yac.y \
+				  src/util/x400lex.l \
+				  src/util/x400config.h \
+				  x400yac.h
+x400config_LDADD		= libstreams.la
+x400config_LDFLAGS		=
+x400config_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"x400config"'
+x400config_CFLAGS		= $(USER_CFLAGS)
+x400config_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= x400config
+
+sdlconfig_SOURCES		= src/util/sdlconf.c \
+				  src/util/sdlyac.y \
+				  src/util/sdllex.l \
+				  sdlyac.h
+sdlconfig_LDADD			= libstreams.la
+sdlconfig_LDFLAGS		=
+sdlconfig_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"sdlconfig"'
+sdlconfig_CFLAGS		= $(USER_CFLAGS)
+sdlconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= sdlconfig
+
+slconfd_SOURCES			= src/util/slconfd.c
+slconfd_LDADD			= libstreams.la
+slconfd_LDFLAGS			=
+slconfd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"slconfd"'
+slconfd_CFLAGS			= $(USER_CFLAGS)
+slconfd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= slconfd
+
+slmon_SOURCES			= src/util/slmon.c
+slmon_LDADD			= libstreams.la
+slmon_LDFLAGS			=
+slmon_CPPFLAGS			= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"slmon"'
+slmon_CFLAGS			= $(USER_CFLAGS)
+slmon_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= slmon
+
+ss7capd_SOURCES			= src/util/ss7capd.c
+ss7capd_LDADD			= libstreams.la
+ss7capd_LDFLAGS			=
+ss7capd_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"ss7capd"'
+ss7capd_CFLAGS			= $(USER_CFLAGS)
+ss7capd_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+sbin_PROGRAMS			+= ss7capd
+
+test_sl_SOURCES			= src/test/test-sl.c
+test_sl_LDADD			= libstreams.la
+test_sl_LDFLAGS			=
+test_sl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test_sl"'
+test_sl_CFLAGS			= $(USER_CFLAGS)
+test_sl_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-sl
+
+test_tcpc_SOURCES		= src/test/test-tcpc.c
+test_tcpc_LDADD			= libstreams.la
+test_tcpc_LDFLAGS		=
+test_tcpc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-tcpc"'
+test_tcpc_CFLAGS		= $(USER_CFLAGS)
+test_tcpc_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-tcpc
+
+test_tcps_SOURCES		= src/test/test-tcps.c
+test_tcps_LDADD			= libstreams.la
+test_tcps_LDFLAGS		=
+test_tcps_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-tcps"'
+test_tcps_CFLAGS		= $(USER_CFLAGS)
+test_tcps_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-tcps
+
+test_udpc_SOURCES		= src/test/test-udpc.c
+test_udpc_LDADD			= libstreams.la
+test_udpc_LDFLAGS		=
+test_udpc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-udpc"'
+test_udpc_CFLAGS		= $(USER_CFLAGS)
+test_udpc_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-udpc
+
+test_udps_SOURCES		= src/test/test-udps.c
+test_udps_LDADD			= libstreams.la
+test_udps_LDFLAGS		=
+test_udps_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-udps"'
+test_udps_CFLAGS		= $(USER_CFLAGS)
+test_udps_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-udps
+
+test_q784_SOURCES		= src/test/test-q784.c
+test_q784_LDADD			= libstreams.la
+test_q784_LDFLAGS		=
+test_q784_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-q784"'
+test_q784_CFLAGS		= $(USER_CFLAGS)
+test_q784_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= test-q784
+#pkglibexec_PROGRAMS		+= test-q784
+
+test_m2pa_SOURCES		= src/test/test-m2pa.c
+test_m2pa_LDADD			= libstreams.la
+test_m2pa_LDFLAGS		=
+test_m2pa_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-m2pa"'
+test_m2pa_CFLAGS		= $(USER_CFLAGS)
+test_m2pa_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-m2pa
+
+#perftest_SOURCES		= src/test/perftest.c
+#perftest_LDADD			= libstreams.la
+#perftest_LDFLAGS		=
+#perftest_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"perftest"'
+#perftest_CFLAGS		= $(USER_CFLAGS)
+#perftest_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+#pkglibexec_PROGRAMS		+= perftest
+
+test_q781_SOURCES		= src/test/test-q781.c
+test_q781_LDADD			= libstreams.la
+test_q781_LDFLAGS		=
+test_q781_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-q781"'
+test_q781_CFLAGS		= $(USER_CFLAGS)
+test_q781_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-q781
+
+test_q781_pipe_SOURCES		= src/test/test-q781-pipe.c
+test_q781_pipe_LDADD		= libstreams.la
+test_q781_pipe_LDFLAGS		=
+test_q781_pipe_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-q781-pipe"'
+test_q781_pipe_CFLAGS		= $(USER_CFLAGS)
+test_q781_pipe_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-q781-pipe
+
+test_x100p_SOURCES		= src/test/test-x100p.c
+test_x100p_LDADD		= libstreams.la
+test_x100p_LDFLAGS		=
+test_x100p_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x100p"'
+test_x100p_CFLAGS		= $(USER_CFLAGS)
+test_x100p_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x100p
+
+test_x400p_SOURCES		= src/test/test-x400p.c
+test_x400p_LDADD		= libstreams.la
+test_x400p_LDFLAGS		=
+test_x400p_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p"'
+test_x400p_CFLAGS		= $(USER_CFLAGS)
+test_x400p_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p
+
+test_usage_SOURCES		= src/util/usage.c
+test_usage_LDADD		= libstreams.la
+test_usage_LDFLAGS		=
+test_usage_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-usage"'
+test_usage_CFLAGS		= $(USER_CFLAGS)
+test_usage_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-usage
+
+test_x400p_cap2_SOURCES		= src/test/test-x400p-cap2.c
+test_x400p_cap2_LDADD		= libstreams.la
+test_x400p_cap2_LDFLAGS		=
+test_x400p_cap2_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-cap2"'
+test_x400p_cap2_CFLAGS		= $(USER_CFLAGS)
+test_x400p_cap2_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-cap2
+
+test_x400p_cap_SOURCES		= src/test/test-x400p-cap.c
+test_x400p_cap_LDADD		= libstreams.la
+test_x400p_cap_LDFLAGS		=
+test_x400p_cap_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-cap"'
+test_x400p_cap_CFLAGS		= $(USER_CFLAGS)
+test_x400p_cap__DEPENDENCIE		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-cap
+
+test_x400p_hsl_SOURCES		= src/test/test-x400p-hsl.c
+test_x400p_hsl_LDADD		= libstreams.la
+test_x400p_hsl_LDFLAGS		=
+test_x400p_hsl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-hsl"'
+test_x400p_hsl_CFLAGS		= $(USER_CFLAGS)
+test_x400p_hsl_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-hsl
+
+test_x400p_perf_SOURCES		= src/test/test-x400p-perf.c
+test_x400p_perf_LDADD		= libstreams.la
+test_x400p_perf_LDFLAGS		=
+test_x400p_perf_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-perf"'
+test_x400p_perf_CFLAGS		= $(USER_CFLAGS)
+test_x400p_perf_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-perf
+
+test_x400p_sdl_SOURCES		= src/test/test-x400p-sdl.c
+test_x400p_sdl_LDADD		= libstreams.la
+test_x400p_sdl_LDFLAGS		=
+test_x400p_sdl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-sdl"'
+test_x400p_sdl_CFLAGS		= $(USER_CFLAGS)
+test_x400p_sdl_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-sdl
+
+test_x400p_sdt2_SOURCES		= src/test/test-x400p-sdt2.c
+test_x400p_sdt2_LDADD		= libstreams.la
+test_x400p_sdt2_LDFLAGS		=
+test_x400p_sdt2_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-sdt2"'
+test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS)
+test_x400p_sdt2_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-sdt2
+
+test_x400p_sdt_SOURCES		= src/test/test-x400p-sdt.c
+test_x400p_sdt_LDADD		= libstreams.la
+test_x400p_sdt_LDFLAGS		=
+test_x400p_sdt_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-sdt"'
+test_x400p_sdt_CFLAGS		= $(USER_CFLAGS)
+test_x400p_sdt_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-sdt
+
+test_x400p_sl_SOURCES		= src/test/test-x400p-sl.c
+test_x400p_sl_LDADD		= libstreams.la
+test_x400p_sl_LDFLAGS		=
+test_x400p_sl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p-sl"'
+test_x400p_sl_CFLAGS		= $(USER_CFLAGS)
+test_x400p_sl_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+pkglibexec_PROGRAMS		+= test-x400p-sl
 
 ## PKG_BUILD_ARCH
 endif

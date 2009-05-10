@@ -1260,7 +1260,7 @@ pt_decode_msg(unsigned char *buf)
 		FFLUSH(stdout);
 		break;
 	default:
-		printf("   !(unknown %ld)\n", p->sdt_primitive);
+		printf("   !(unknown %d)\n", p->sdt_primitive);
 		FFLUSH(stdout);
 		break;
 	}
@@ -1413,7 +1413,7 @@ iut_decode_msg(unsigned char *buf)
 		FFLUSH(stdout);
 		break;
 	default:
-		printf("                                  !(unknown %ld)\n", p->sl_primitive);
+		printf("                                  !(unknown %d)\n", p->sl_primitive);
 		FFLUSH(stdout);
 		break;
 	}
@@ -7492,7 +7492,7 @@ test_9_3(void)
 		return INCONCLUSIVE;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	printf("(N1=%u, N2=%u, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
 		switch (state) {
@@ -7577,7 +7577,7 @@ test_9_4(void)
 	n = iutconf.sl.N2 / (msu_len + h) + 1;
 	if (msu_len > iutconf.sdt.m)
 		return INCONCLUSIVE;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	printf("(N1=%u, N2=%u, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
 		switch (state) {
@@ -7668,7 +7668,7 @@ test_9_5(void)
 	}
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	printf("(N1=%u, N2=%u, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
 		switch (state) {
@@ -7761,7 +7761,7 @@ test_9_6(void)
 	}
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
+	printf("(N1=%u, N2=%u, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
 	for (;;) {
 		switch (state) {
@@ -9843,12 +9843,12 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			int ppalen = ctrl->len - sizeof(p->info_ack);
 
 			printf("LMI_INFO_ACK:\n");
-			printf("Version = 0x%08lx\n", p->info_ack.lmi_version);
-			printf("State = %lu\n", p->info_ack.lmi_state);
-			printf("Max sdu = %lu\n", p->info_ack.lmi_max_sdu);
-			printf("Min sdu = %lu\n", p->info_ack.lmi_min_sdu);
-			printf("Header len = %lu\n", p->info_ack.lmi_header_len);
-			printf("PPA style = %lu\n", p->info_ack.lmi_ppa_style);
+			printf("Version = 0x%08x\n", p->info_ack.lmi_version);
+			printf("State = %u\n", p->info_ack.lmi_state);
+			printf("Max sdu = %u\n", p->info_ack.lmi_max_sdu);
+			printf("Min sdu = %u\n", p->info_ack.lmi_min_sdu);
+			printf("Header len = %u\n", p->info_ack.lmi_header_len);
+			printf("PPA style = %u\n", p->info_ack.lmi_ppa_style);
 			printf("PPA length = %u\n", ppalen);
 			FFLUSH(stdout);
 			print_ppa((ppa_t *) p->info_ack.lmi_ppa_addr);
@@ -9857,45 +9857,45 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 		case LMI_OK_ACK:
 		{
 			printf("LMI_OK_ACK:\n");
-			printf("Correct primitive = %lu\n", p->ok_ack.lmi_correct_primitive);
-			printf("State = %lu\n", p->ok_ack.lmi_state);
+			printf("Correct primitive = %u\n", p->ok_ack.lmi_correct_primitive);
+			printf("State = %u\n", p->ok_ack.lmi_state);
 			FFLUSH(stdout);
 		}
 			return (p->lmi_primitive);
 		case LMI_ERROR_ACK:
 		{
 			printf("LMI_ERROR_ACK:\n");
-			printf("Error number = %lu\n", p->error_ack.lmi_errno);
+			printf("Error number = %u\n", p->error_ack.lmi_errno);
 			printf("Error string = %s\n", strerror(p->error_ack.lmi_errno));
-			printf("Reason number = %lu\n", p->error_ack.lmi_reason);
+			printf("Reason number = %u\n", p->error_ack.lmi_reason);
 			printf("Reason string = %s\n", lmi_strreason(p->error_ack.lmi_reason));
-			printf("Error primitive = %lu\n", p->error_ack.lmi_error_primitive);
-			printf("State = %lu\n", p->error_ack.lmi_state);
+			printf("Error primitive = %u\n", p->error_ack.lmi_error_primitive);
+			printf("State = %u\n", p->error_ack.lmi_state);
 			FFLUSH(stdout);
 		}
 			return (p->lmi_primitive);
 		case LMI_ERROR_IND:
 		{
 			printf("LMI_ERROR_IND:\n");
-			printf("Error number = %lu\n", p->error_ind.lmi_errno);
+			printf("Error number = %u\n", p->error_ind.lmi_errno);
 			printf("Error string = %s\n", strerror(p->error_ind.lmi_errno));
-			printf("Reason number = %lu\n", p->error_ind.lmi_reason);
+			printf("Reason number = %u\n", p->error_ind.lmi_reason);
 			printf("Reason string = %s\n", lmi_strreason(p->error_ind.lmi_reason));
-			printf("State = %lu\n", p->error_ind.lmi_state);
+			printf("State = %u\n", p->error_ind.lmi_state);
 			FFLUSH(stdout);
 		}
 			return (p->lmi_primitive);
 		case LMI_ENABLE_CON:
 		{
 			printf("LMI_ENABLE_CON:\n");
-			printf("State = %lu\n", p->enable_con.lmi_state);
+			printf("State = %u\n", p->enable_con.lmi_state);
 			FFLUSH(stdout);
 		}
 			return (p->lmi_primitive);
 		case LMI_DISABLE_CON:
 		{
 			printf("LMI_DISABLE_CON:\n");
-			printf("State = %lu\n", p->enable_con.lmi_state);
+			printf("State = %u\n", p->enable_con.lmi_state);
 			FFLUSH(stdout);
 		}
 			return (p->lmi_primitive);
@@ -9917,18 +9917,18 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			case SL_LINK_CONGESTED_IND:
 			{
 				printf("SL_LINK_CONGESTED_IND:\n");
-				printf("  timestamp = %lu\n", l->link_cong_ind.sl_timestamp);
-				printf("  cong stat = %lu\n", l->link_cong_ind.sl_cong_status);
-				printf("  disc stat = %lu\n", l->link_cong_ind.sl_disc_status);
+				printf("  timestamp = %u\n", l->link_cong_ind.sl_timestamp);
+				printf("  cong stat = %u\n", l->link_cong_ind.sl_cong_status);
+				printf("  disc stat = %u\n", l->link_cong_ind.sl_disc_status);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
 			case SL_LINK_CONGESTION_CEASED_IND:
 			{
 				printf("SL_LINK_CONGESTION_CEASED_IND:\n");
-				printf("  timestamp = %lu\n", l->link_cong_ceased_ind.sl_timestamp);
-				printf("  cong stat = %lu\n", l->link_cong_ceased_ind.sl_cong_status);
-				printf("  disc stat = %lu\n", l->link_cong_ceased_ind.sl_disc_status);
+				printf("  timestamp = %u\n", l->link_cong_ceased_ind.sl_timestamp);
+				printf("  cong stat = %u\n", l->link_cong_ceased_ind.sl_cong_status);
+				printf("  disc stat = %u\n", l->link_cong_ceased_ind.sl_disc_status);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -9954,7 +9954,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			case SL_BSNT_IND:
 			{
 				printf("SL_BSNT_IND:\n");
-				printf("  bsnt = %lu\n", l->bsnt_ind.sl_bsnt);
+				printf("  bsnt = %u\n", l->bsnt_ind.sl_bsnt);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -9967,22 +9967,22 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			case SL_OUT_OF_SERVICE_IND:
 			{
 				printf("SL_OUT_OF_SERVICE_IND:\n");
-				printf("  timestamp = %lu\n", l->out_of_service_ind.sl_timestamp);
-				printf("  reason    = %lu\n", l->out_of_service_ind.sl_reason);
+				printf("  timestamp = %u\n", l->out_of_service_ind.sl_timestamp);
+				printf("  reason    = %u\n", l->out_of_service_ind.sl_reason);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
 			case SL_REMOTE_PROCESSOR_OUTAGE_IND:
 			{
 				printf("SL_REMOTE_PROCESSOR_OUTAGE_IND:\n");
-				printf("  timestamp = %lu\n", l->rem_proc_out_ind.sl_timestamp);
+				printf("  timestamp = %u\n", l->rem_proc_out_ind.sl_timestamp);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
 			case SL_REMOTE_PROCESSOR_RECOVERED_IND:
 			{
 				printf("SL_REMOTE_PROCESSOR_RECOVERED_IND:\n");
-				printf("  timestamp = %lu\n", l->rem_proc_recovered_ind.sl_timestamp);
+				printf("  timestamp = %u\n", l->rem_proc_recovered_ind.sl_timestamp);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -9994,7 +9994,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 				return (l->sl_primitive);
 			default:
 			{
-				printf("Unrecognized primitive %lu!\n", l->sl_primitive);
+				printf("Unrecognized primitive %u!\n", l->sl_primitive);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);

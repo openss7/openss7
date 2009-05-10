@@ -257,12 +257,12 @@ do_lmi_get_msg(int fd)
 				int ppalen = ctrl.len - sizeof(p->info_ack);
 
 				printf("LMI_INFO_ACK:\n");
-				printf("Version = 0x%08lx\n", p->info_ack.lmi_version);
-				printf("State = %lu\n", p->info_ack.lmi_state);
-				printf("Max sdu = %lu\n", p->info_ack.lmi_max_sdu);
-				printf("Min sdu = %lu\n", p->info_ack.lmi_min_sdu);
-				printf("Header len = %lu\n", p->info_ack.lmi_header_len);
-				printf("PPA style = %lu\n", p->info_ack.lmi_ppa_style);
+				printf("Version = 0x%08x\n", p->info_ack.lmi_version);
+				printf("State = %u\n", p->info_ack.lmi_state);
+				printf("Max sdu = %u\n", p->info_ack.lmi_max_sdu);
+				printf("Min sdu = %u\n", p->info_ack.lmi_min_sdu);
+				printf("Header len = %u\n", p->info_ack.lmi_header_len);
+				printf("PPA style = %u\n", p->info_ack.lmi_ppa_style);
 				printf("PPA length = %d\n", ppalen);
 				printf("  card = %d\n", (*((ushort *) (&p->info_ack + 1)) >> 12) & 0xf);
 				printf("  span = %d\n", (*((ushort *) (&p->info_ack + 1)) >> 8) & 0xf);
@@ -271,33 +271,33 @@ do_lmi_get_msg(int fd)
 			}
 			case LMI_OK_ACK:
 				printf("LMI_OK_ACK:\n");
-				printf("Correct primitive = %ld\n", p->ok_ack.lmi_correct_primitive);
-				printf("State = %ld\n", p->ok_ack.lmi_state);
+				printf("Correct primitive = %d\n", p->ok_ack.lmi_correct_primitive);
+				printf("State = %d\n", p->ok_ack.lmi_state);
 				return;
 			case LMI_ERROR_ACK:
 				printf("LMI_ERROR_ACK:\n");
-				printf("Error number = %lu\n", p->error_ack.lmi_errno);
+				printf("Error number = %u\n", p->error_ack.lmi_errno);
 				printf("Error string = %s\n", strerror(p->error_ack.lmi_errno));
-				printf("Reason number = %lu\n", p->error_ack.lmi_reason);
+				printf("Reason number = %u\n", p->error_ack.lmi_reason);
 				printf("Reason string = %s\n", lmi_strreason(p->error_ack.lmi_reason));
-				printf("Error primitive = %lu\n", p->error_ack.lmi_error_primitive);
-				printf("State = %lu\n", p->error_ack.lmi_state);
+				printf("Error primitive = %u\n", p->error_ack.lmi_error_primitive);
+				printf("State = %u\n", p->error_ack.lmi_state);
 				return;
 			case LMI_ERROR_IND:
 				printf("LMI_ERROR_IND:\n");
-				printf("Error number = %lu\n", p->error_ind.lmi_errno);
+				printf("Error number = %u\n", p->error_ind.lmi_errno);
 				printf("Error string = %s\n", strerror(p->error_ind.lmi_errno));
-				printf("Reason number = %lu\n", p->error_ind.lmi_reason);
+				printf("Reason number = %u\n", p->error_ind.lmi_reason);
 				printf("Reason string = %s\n", lmi_strreason(p->error_ind.lmi_reason));
-				printf("State = %lu\n", p->error_ind.lmi_state);
+				printf("State = %u\n", p->error_ind.lmi_state);
 				goto do_get_again;
 			case LMI_ENABLE_CON:
 				printf("LMI_ENABLE_CON:\n");
-				printf("State = %lu\n", p->enable_con.lmi_state);
+				printf("State = %u\n", p->enable_con.lmi_state);
 				return;
 			case LMI_DISABLE_CON:
 				printf("LMI_DISABLE_CON:\n");
-				printf("State = %lu\n", p->enable_con.lmi_state);
+				printf("State = %u\n", p->enable_con.lmi_state);
 				return;
 			case LMI_STATS_IND:
 				printf("LMI_STATS_IND:\n");
@@ -335,7 +335,7 @@ do_lmi_get_msg(int fd)
 					int i;
 					uint8_t *c = (uint8_t *) data.buf;
 
-					printf("Message[%d x %lu]: ", data.len, s->rc_signal_unit_ind.sdt_count);
+					printf("Message[%d x %u]: ", data.len, s->rc_signal_unit_ind.sdt_count);
 					for (i = 0; i < data.len; i++, c++)
 						printf("%02X ", *c);
 					printf("\n");
@@ -360,7 +360,7 @@ do_lmi_get_msg(int fd)
 				printf("SDT_TXC_TRANSMISSION_REQUEST_IND:\n");
 				return;
 			default:
-				printf("Unrecognized response primitive %ld!\n", (long) p->lmi_primitive);
+				printf("Unrecognized response primitive %d!\n", p->lmi_primitive);
 				goto do_get_again;
 			}
 		}
@@ -660,29 +660,29 @@ sdl_config(int fd)
 
 	sdt_ioctl(fd, SDL_IOCGCONFIG, buf, sizeof(sdl_config_t));
 	printf("Config:\n");
-	printf("  ifflags       = %lu\n", c->ifflags);
-	printf("  iftype        = %lu\n", c->iftype);
-	printf("  ifrate        = %lu\n", c->ifrate);
-	printf("  ifgtype       = %lu\n", c->ifgtype);
-	printf("  ifgrate       = %lu\n", c->ifgrate);
-	printf("  ifgcrc        = %lu\n", c->ifgcrc);
-	printf("  ifmode        = %lu\n", c->ifmode);
-	printf("  ifclock       = %lu\n", c->ifclock);
-	printf("  ifcoding      = %lu\n", c->ifcoding);
-	printf("  ifframing     = %lu\n", c->ifframing);
-	printf("  ifleads       = %lu\n", c->ifleads);
-	printf("  ifalarms      = %lu\n", c->ifalarms);
-	printf("  ifrxlevel     = %lu\n", c->ifrxlevel);
-	printf("  iftxlevel     = %lu\n", c->iftxlevel);
-	printf("  ifsync        = %lu\n", c->ifsync);
-	printf("  ifsyncsrc[0]  = %lu\n", c->ifsyncsrc[0]);
-	printf("  ifsyncsrc[1]  = %lu\n", c->ifsyncsrc[1]);
-	printf("  ifsyncsrc[2]  = %lu\n", c->ifsyncsrc[2]);
-	printf("  ifsyncsrc[3]  = %lu\n", c->ifsyncsrc[3]);
+	printf("  ifflags       = %u\n", c->ifflags);
+	printf("  iftype        = %u\n", c->iftype);
+	printf("  ifrate        = %u\n", c->ifrate);
+	printf("  ifgtype       = %u\n", c->ifgtype);
+	printf("  ifgrate       = %u\n", c->ifgrate);
+	printf("  ifgcrc        = %u\n", c->ifgcrc);
+	printf("  ifmode        = %u\n", c->ifmode);
+	printf("  ifclock       = %u\n", c->ifclock);
+	printf("  ifcoding      = %u\n", c->ifcoding);
+	printf("  ifframing     = %u\n", c->ifframing);
+	printf("  ifleads       = %u\n", c->ifleads);
+	printf("  ifalarms      = %u\n", c->ifalarms);
+	printf("  ifrxlevel     = %u\n", c->ifrxlevel);
+	printf("  iftxlevel     = %u\n", c->iftxlevel);
+	printf("  ifsync        = %u\n", c->ifsync);
+	printf("  ifsyncsrc[0]  = %u\n", c->ifsyncsrc[0]);
+	printf("  ifsyncsrc[1]  = %u\n", c->ifsyncsrc[1]);
+	printf("  ifsyncsrc[2]  = %u\n", c->ifsyncsrc[2]);
+	printf("  ifsyncsrc[3]  = %u\n", c->ifsyncsrc[3]);
 	sdt_ioctl(fd, SDL_IOCGSTATEM, buf, sizeof(sdl_statem_t));
 	printf("State:\n");
-	printf("  tx_state      = %lu\n", s->tx_state);
-	printf("  rx_state      = %lu\n", s->rx_state);
+	printf("  tx_state      = %u\n", s->tx_state);
+	printf("  rx_state      = %u\n", s->rx_state);
 }
 
 void
@@ -695,33 +695,33 @@ sdt_config(int fd)
 	printf("Getting configuration\n");
 	sdt_ioctl(fd, SDT_IOCGCONFIG, buf, sizeof(sdt_config_t));
 	printf("Config:\n");
-	printf("  t8  = %lu\n", c->t8);
-	printf("  Tin = %lu\n", c->Tin);
-	printf("  Tie = %lu\n", c->Tie);
-	printf("  T   = %lu\n", c->T);
-	printf("  D   = %lu\n", c->D);
-	printf("  Te  = %lu\n", c->Te);
-	printf("  De  = %lu\n", c->De);
-	printf("  Ue  = %lu\n", c->Ue);
-	printf("  N   = %lu\n", c->N);
-	printf("  m   = %lu\n", c->m);
-	printf("  b   = %lu\n", c->b);
+	printf("  t8  = %u\n", c->t8);
+	printf("  Tin = %u\n", c->Tin);
+	printf("  Tie = %u\n", c->Tie);
+	printf("  T   = %u\n", c->T);
+	printf("  D   = %u\n", c->D);
+	printf("  Te  = %u\n", c->Te);
+	printf("  De  = %u\n", c->De);
+	printf("  Ue  = %u\n", c->Ue);
+	printf("  N   = %u\n", c->N);
+	printf("  m   = %u\n", c->m);
+	printf("  b   = %u\n", c->b);
 	sdt_ioctl(fd, SDT_IOCGSTATEM, buf, sizeof(sdt_statem_t));
 	printf("State:\n");
-	printf("  aerm_state.. = %lu\n", s->aerm_state);
-	printf("    aborted_proving.... = %lu\n", s->aborted_proving);
-	printf("    Ca................. = %lu\n", s->Ca);
-	printf("    Ti................. = %lu\n", s->Ti);
-	printf("  suerm_state. = %lu\n", s->suerm_state);
-	printf("    Cs................. = %lu\n", s->Cs);
-	printf("    Ns................. = %lu\n", s->Ns);
-	printf("  eim_state... = %lu\n", s->eim_state);
-	printf("    Ce................. = %lu\n", s->Ce);
-	printf("    su_received........ = %lu\n", s->su_received);
-	printf("    interval_error..... = %lu\n", s->interval_error);
-	printf("  daedt_state. = %lu\n", s->daedt_state);
-	printf("  daedr_state. = %lu\n", s->daedr_state);
-	printf("    octet_counting_mode = %lu\n", s->octet_counting_mode);
+	printf("  aerm_state.. = %u\n", s->aerm_state);
+	printf("    aborted_proving.... = %u\n", s->aborted_proving);
+	printf("    Ca................. = %u\n", s->Ca);
+	printf("    Ti................. = %u\n", s->Ti);
+	printf("  suerm_state. = %u\n", s->suerm_state);
+	printf("    Cs................. = %u\n", s->Cs);
+	printf("    Ns................. = %u\n", s->Ns);
+	printf("  eim_state... = %u\n", s->eim_state);
+	printf("    Ce................. = %u\n", s->Ce);
+	printf("    su_received........ = %u\n", s->su_received);
+	printf("    interval_error..... = %u\n", s->interval_error);
+	printf("  daedt_state. = %u\n", s->daedt_state);
+	printf("  daedr_state. = %u\n", s->daedr_state);
+	printf("    octet_counting_mode = %u\n", s->octet_counting_mode);
 	sdl_config(fd);
 }
 
@@ -734,15 +734,15 @@ sdl_stats(int fd)
 	printf("Attempting stats collection\n");
 	sdt_ioctl(fd, SDL_IOCGSTATS, buf, sizeof(sdl_stats_t));
 	printf("Stats:\n");
-	printf("  rx_octets............ = %lu\n", s->rx_octets);
-	printf("  tx_octets............ = %lu\n", s->tx_octets);
-	printf("  rx_overruns.......... = %lu\n", s->rx_overruns);
-	printf("  tx_underruns......... = %lu\n", s->tx_underruns);
-	printf("  rx_buffer_overflows.. = %lu\n", s->rx_buffer_overflows);
-	printf("  tx_buffer_overflows.. = %lu\n", s->tx_buffer_overflows);
-	printf("  lead_cts_lost........ = %lu\n", s->lead_cts_lost);
-	printf("  lead_dcd_lost........ = %lu\n", s->lead_dcd_lost);
-	printf("  carrier_lost......... = %lu\n", s->carrier_lost);
+	printf("  rx_octets............ = %u\n", s->rx_octets);
+	printf("  tx_octets............ = %u\n", s->tx_octets);
+	printf("  rx_overruns.......... = %u\n", s->rx_overruns);
+	printf("  tx_underruns......... = %u\n", s->tx_underruns);
+	printf("  rx_buffer_overflows.. = %u\n", s->rx_buffer_overflows);
+	printf("  tx_buffer_overflows.. = %u\n", s->tx_buffer_overflows);
+	printf("  lead_cts_lost........ = %u\n", s->lead_cts_lost);
+	printf("  lead_dcd_lost........ = %u\n", s->lead_dcd_lost);
+	printf("  carrier_lost......... = %u\n", s->carrier_lost);
 }
 
 void
@@ -754,32 +754,32 @@ sdt_stats(int fd)
 	printf("Attempting stats collection\n");
 	sdt_ioctl(fd, SDT_IOCGSTATS, buf, sizeof(sdt_stats_t));
 	printf("Stats:\n");
-	printf("  tx_bytes............. = %lu\n", s->tx_bytes);
-	printf("  tx_sus............... = %lu\n", s->tx_sus);
-	printf("  tx_sus_repeated...... = %lu\n", s->tx_sus_repeated);
-	printf("  tx_underruns......... = %lu\n", s->tx_underruns);
-	printf("  tx_aborts............ = %lu\n", s->tx_aborts);
-	printf("  tx_buffer_overflows.. = %lu\n", s->tx_buffer_overflows);
-	printf("  tx_sus_in_error...... = %lu\n", s->tx_sus_in_error);
-	printf("  rx_bytes............. = %lu\n", s->rx_bytes);
-	printf("  rx_sus............... = %lu\n", s->rx_sus);
-	printf("  rx_sus_compressed.... = %lu\n", s->rx_sus_compressed);
-	printf("  rx_overruns.......... = %lu\n", s->rx_overruns);
-	printf("  rx_aborts............ = %lu\n", s->rx_aborts);
-	printf("  rx_buffer_overflows.. = %lu\n", s->rx_buffer_overflows);
-	printf("  rx_sus_in_error...... = %lu\n", s->rx_sus_in_error);
-	printf("  rx_sync_transitions.. = %lu\n", s->rx_sync_transitions);
-	printf("  rx_bits_octet_counted = %lu\n", s->rx_bits_octet_counted);
-	printf("  rx_crc_errors........ = %lu\n", s->rx_crc_errors);
-	printf("  rx_frame_errors...... = %lu\n", s->rx_frame_errors);
-	printf("  rx_frame_overflows... = %lu\n", s->rx_frame_overflows);
-	printf("  rx_frame_too_long.... = %lu\n", s->rx_frame_too_long);
-	printf("  rx_frame_too_short... = %lu\n", s->rx_frame_too_short);
-	printf("  rx_residue_errors.... = %lu\n", s->rx_residue_errors);
-	printf("  rx_length_error...... = %lu\n", s->rx_length_error);
-	printf("  carrier_cts_lost..... = %lu\n", s->carrier_cts_lost);
-	printf("  carrier_dcd_lost..... = %lu\n", s->carrier_dcd_lost);
-	printf("  carrier_lost......... = %lu\n", s->carrier_lost);
+	printf("  tx_bytes............. = %u\n", s->tx_bytes);
+	printf("  tx_sus............... = %u\n", s->tx_sus);
+	printf("  tx_sus_repeated...... = %u\n", s->tx_sus_repeated);
+	printf("  tx_underruns......... = %u\n", s->tx_underruns);
+	printf("  tx_aborts............ = %u\n", s->tx_aborts);
+	printf("  tx_buffer_overflows.. = %u\n", s->tx_buffer_overflows);
+	printf("  tx_sus_in_error...... = %u\n", s->tx_sus_in_error);
+	printf("  rx_bytes............. = %u\n", s->rx_bytes);
+	printf("  rx_sus............... = %u\n", s->rx_sus);
+	printf("  rx_sus_compressed.... = %u\n", s->rx_sus_compressed);
+	printf("  rx_overruns.......... = %u\n", s->rx_overruns);
+	printf("  rx_aborts............ = %u\n", s->rx_aborts);
+	printf("  rx_buffer_overflows.. = %u\n", s->rx_buffer_overflows);
+	printf("  rx_sus_in_error...... = %u\n", s->rx_sus_in_error);
+	printf("  rx_sync_transitions.. = %u\n", s->rx_sync_transitions);
+	printf("  rx_bits_octet_counted = %u\n", s->rx_bits_octet_counted);
+	printf("  rx_crc_errors........ = %u\n", s->rx_crc_errors);
+	printf("  rx_frame_errors...... = %u\n", s->rx_frame_errors);
+	printf("  rx_frame_overflows... = %u\n", s->rx_frame_overflows);
+	printf("  rx_frame_too_long.... = %u\n", s->rx_frame_too_long);
+	printf("  rx_frame_too_short... = %u\n", s->rx_frame_too_short);
+	printf("  rx_residue_errors.... = %u\n", s->rx_residue_errors);
+	printf("  rx_length_error...... = %u\n", s->rx_length_error);
+	printf("  carrier_cts_lost..... = %u\n", s->carrier_cts_lost);
+	printf("  carrier_dcd_lost..... = %u\n", s->carrier_dcd_lost);
+	printf("  carrier_lost......... = %u\n", s->carrier_lost);
 	sdl_stats(fd);
 }
 

@@ -85,6 +85,7 @@ scripts/install-sh
 scripts/ltmain.sh
 scripts/missing
 scripts/texinfo.tex
+scripts/ylwrap
 .*.swo
 .*.swp
 tags
