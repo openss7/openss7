@@ -1419,9 +1419,6 @@ dl_info_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1470,9 +1467,6 @@ dl_attach_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1490,9 +1484,6 @@ dl_detach_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1512,9 +1503,6 @@ dl_bind_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1532,9 +1520,6 @@ dl_unbind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1554,9 +1539,6 @@ dl_subs_bind_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1574,9 +1556,6 @@ dl_subs_unbind_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1670,9 +1649,6 @@ dl_connect_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1690,9 +1666,6 @@ dl_connect_res(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1712,9 +1685,6 @@ dl_token_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1732,9 +1702,6 @@ dl_disconnect_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1754,9 +1721,6 @@ dl_phys_addr_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1775,9 +1739,6 @@ dl_set_phys_addr_req(struct dl *dl, queue_t *q, mblk_t *mp)
       badprim:
 	err = DL_BADPRIM;
 	goto error;
-      outstate:
-	err = DL_OUTSTATE;
-	goto error;
       tooshort:
 	err = -EMSGSIZE;
 	goto error;
@@ -1795,9 +1756,6 @@ dl_get_statistics_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = DL_BADPRIM;
-	goto error;
-      outstate:
-	err = DL_OUTSTATE;
 	goto error;
       tooshort:
 	err = -EMSGSIZE;
@@ -1822,9 +1780,6 @@ cd_info_ack(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1842,9 +1797,6 @@ cd_ok_ack(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1864,9 +1816,6 @@ cd_error_ack(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1884,9 +1833,6 @@ cd_enable_con(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1906,9 +1852,6 @@ cd_disable_con(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1926,9 +1869,6 @@ cd_error_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1948,9 +1888,6 @@ cd_unitdata_ack(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -1968,9 +1905,6 @@ cd_unitdata_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
@@ -1990,9 +1924,6 @@ cd_bad_frame_ind(struct cd *cd, queue_t *q, mblk_t *mp)
       badprim:
 	err = CD_NOTSUPP;
 	goto error;
-      outstate:
-	err = CD_OUTSTATE;
-	goto error;
       tooshort:
 	err = CD_PROTOSHORT;
 	goto error;
@@ -2010,9 +1941,6 @@ cd_modem_sig_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 	goto badprim;
       badprim:
 	err = CD_NOTSUPP;
-	goto error;
-      outstate:
-	err = CD_OUTSTATE;
 	goto error;
       tooshort:
 	err = CD_PROTOSHORT;

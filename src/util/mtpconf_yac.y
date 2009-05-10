@@ -510,7 +510,7 @@ helpon(YYSTYPE what)
 	return;
 }
 
-static void
+void
 copying(int argc, char *argv[])
 {
 	if (!output)
@@ -557,7 +557,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-static void
+void
 version(int argc, char *argv[])
 {
 	if (!output)
@@ -579,7 +579,7 @@ See `%1$s --copying' for copying permissions.\n\
 ", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
 }
 
-static void
+void
 usage(int argc, char *argv[])
 {
 	if (!output)

@@ -651,7 +651,6 @@ check_time(const char *t, long i, long lo, long hi)
 	fflush(stdout);
 	if (dlo - tol <= itv && itv <= dhi + tol)
 		return __RESULT_SUCCESS;
-      failure:
 	return __RESULT_FAILURE;
 }
 

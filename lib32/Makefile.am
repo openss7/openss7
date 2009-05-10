@@ -521,6 +521,138 @@ test_chan_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"t
 test_chan_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 test_chan_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
 
+pkglibexec32_PROGRAMS		+= test-isdn
+
+test_isdn_SOURCES		= $(top_srcdir)/src/test/test-isdn.c
+test_isdn_LDADD			= libstreams.la
+test_isdn_LDFLAGS		=
+test_isdn_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-isdn"'
+test_isdn_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_isdn_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-atm
+
+test_atm_SOURCES		= $(top_srcdir)/src/test/test-atm.c
+test_atm_LDADD			= libstreams.la
+test_atm_LDFLAGS		=
+test_atm_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-atm"'
+test_atm_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_atm_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p
+
+test_x400p_SOURCES		= $(top_srcdir)/src/test/test-x400p.c
+test_x400p_LDADD		= libstreams.la
+test_x400p_LDFLAGS		=
+test_x400p_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-x400p"'
+test_x400p_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+pkglibexec32_PROGRAMS		+= test-usage
+## WITH_SNMP_AGENT
+endif
+
+test_usage_SOURCES		= $(top_srcdir)/src/util/usage.c
+test_usage_LDADD		= libstreams.la
+test_usage_LDFLAGS		=
+test_usage_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME='"test-usage"'
+test_usage_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_usage_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-q781-pipe
+
+test_q781_pipe_SOURCES		= $(top_srcdir)/src/test/test-q781-pipe.c
+test_q781_pipe_LDADD		= libstreams.la
+test_q781_pipe_LDFLAGS		=
+test_q781_pipe_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x781-pipe\"
+test_q781_pipe_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_q781_pipe_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+EXTRA_PROGRAMS			+= test-q784
+#pkglibexec32_PROGRAMS		+= test-q784
+
+test_q784_SOURCES		= $(top_srcdir)/src/test/test-q784.c
+test_q784_LDADD			= libstreams.la
+test_q784_LDFLAGS		=
+test_q784_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x784\"
+test_q784_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_q784_DEPENDENCIES		= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-cap2
+
+test_x400p_cap2_SOURCES		= $(top_srcdir)/src/test/test-x400p-cap2.c
+test_x400p_cap2_LDADD		= libstreams.la
+test_x400p_cap2_LDFLAGS		=
+test_x400p_cap2_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-cap2\"
+test_x400p_cap2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_cap2_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-cap
+
+test_x400p_cap_SOURCES		= $(top_srcdir)/src/test/test-x400p-cap.c
+test_x400p_cap_LDADD		= libstreams.la
+test_x400p_cap_LDFLAGS		=
+test_x400p_cap_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-cap\"
+test_x400p_cap_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_cap_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-hsl
+
+test_x400p_hsl_SOURCES		= $(top_srcdir)/src/test/test-x400p-hsl.c
+test_x400p_hsl_LDADD		= libstreams.la
+test_x400p_hsl_LDFLAGS		=
+test_x400p_hsl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-hsl\"
+test_x400p_hsl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_hsl_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-perf
+
+test_x400p_perf_SOURCES		= $(top_srcdir)/src/test/test-x400p-perf.c
+test_x400p_perf_LDADD		= libstreams.la
+test_x400p_perf_LDFLAGS		=
+test_x400p_perf_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-perf\"
+test_x400p_perf_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_perf_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-sdl
+
+test_x400p_sdl_SOURCES		= $(top_srcdir)/src/test/test-x400p-sdl.c
+test_x400p_sdl_LDADD		= libstreams.la
+test_x400p_sdl_LDFLAGS		=
+test_x400p_sdl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sdl\"
+test_x400p_sdl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_sdl_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-sdt2
+
+test_x400p_sdt2_SOURCES		= $(top_srcdir)/src/test/test-x400p-sdt2.c
+test_x400p_sdt2_LDADD		= libstreams.la
+test_x400p_sdt2_LDFLAGS		=
+test_x400p_sdt2_CPPFLAGS	= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sdt2\"
+test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_sdt2_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-sdt
+
+test_x400p_sdt_SOURCES		= $(top_srcdir)/src/test/test-x400p-sdt.c
+test_x400p_sdt_LDADD		= libstreams.la
+test_x400p_sdt_LDFLAGS		=
+test_x400p_sdt_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sdt\"
+test_x400p_sdt_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_sdt_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+pkglibexec32_PROGRAMS		+= test-x400p-sl
+
+test_x400p_sl_SOURCES		= $(top_srcdir)/src/test/test-x400p-sl.c
+test_x400p_sl_LDADD		= libstreams.la
+test_x400p_sl_LDFLAGS		=
+test_x400p_sl_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sl\"
+test_x400p_sl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+test_x400p_sl_DEPENDENCIES	= $(CONFIG_HEADER) $(top_builddir)/$(STRCONF_CONFIG)
+
+EXTRA_LTLIBRARIES		=
 lib32_LTLIBRARIES		+= libstreams.la
 
 libstreams_la_SOURCES		= $(top_srcdir)/src/lib/testcancel.c \
@@ -719,10 +851,25 @@ libsocklib_la_CPPFLAGS		= $(LIB_INCLUDES) $(USER_CPPFLAGS)
 libsocklib_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libsocklib_la_LIBADD		= libstreams.la libxnet.la libxnsl.la libsockpath.la
 
+lib32_LTLIBRARIES		+= libsx25.la
+
+libsx25_la_SOURCES		= $(top_srcdir)/src/lib/padent.c \
+				  $(top_srcdir)/src/lib/x25config.c \
+				  $(top_srcdir)/src/lib/xhostent.c \
+				  $(top_srcdir)/src/include/netx25/x25_control.h \
+				  $(top_srcdir)/src/include/netx25/x25_proto.h \
+				  $(top_srcdir)/src/include/netx25/xnetdb.h
+libsx25_la_DEPENDENCIES		= $(top_srcdir)/src/lib/sx25.VERSION
+libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sx25.VERSION
+libsx25_la_CPPFLAGS		= $(LIB_INCLUDES) $(USER_CPPFLAGS)
+libsx25_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+libsx25_la_LIBADD		= libstreams.la
+
 #if WITH_SNMP_AGENT
 #snmpdlmod32_LTLIBRARIES	+= strMIB.la
 #endif
-EXTRA_LTLIBRARIES		= strMIB.la
+EXTRA_LTLIBRARIES		+= strMIB.la
 
 strMIB_la_SOURCES		= $(top_srcdir)/src/snmp/strMIB.c \
 				  $(top_srcdir)/src/snmp/strMIB.h \
@@ -738,7 +885,7 @@ strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
 #if WITH_SNMP_AGENT
 #snmpdlmod32_LTLIBRARIES	+= mxMIB.la
 #endif
-EXTRA_LTLIBRARIES		= mxMIB.la
+EXTRA_LTLIBRARIES		+= mxMIB.la
 
 mxMIB_la_SOURCES		= $(top_srcdir)/src/snmp/ds0Bundle.c \
 				  $(top_srcdir)/src/snmp/ds0Bundle.h \
@@ -762,6 +909,37 @@ mxMIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
 mxMIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
 mxMIB_la_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 mxMIB_la_LIBADD			= libstreams.la $(SNMP_LDADD)
+
+#if WITH_SNMP_AGENT
+#snmpdlmod32_LTLIBRARIES	+= ss7MIB.la
+#endif
+EXTRA_LTLIBRARIES		+= ss7MIB.la
+
+ss7MIB_la_SOURCES		= $(top_srcdir)/src/snmp/ss7MIB.c \
+				  $(top_srcdir)/src/snmp/ss7MIB.h \
+				  $(top_srcdir)/src/snmp/mtpMIB.c \
+				  $(top_srcdir)/src/snmp/mtpMIB.h \
+				  $(top_srcdir)/src/snmp/mtpOmMIB.c \
+				  $(top_srcdir)/src/snmp/mtpOmMIB.h \
+				  $(top_srcdir)/src/snmp/sccpMIB.c \
+				  $(top_srcdir)/src/snmp/sccpMIB.h \
+				  $(top_srcdir)/src/snmp/sccpOmMIB.c \
+				  $(top_srcdir)/src/snmp/sccpOmMIB.h \
+				  $(top_srcdir)/src/snmp/tcapMIB.c \
+				  $(top_srcdir)/src/snmp/tcapMIB.h \
+				  $(top_srcdir)/src/snmp/tcapOmMIB.c \
+				  $(top_srcdir)/src/snmp/tcapOmMIB.h \
+				  $(top_srcdir)/src/snmp/ds_agent.h \
+				  $(top_srcdir)/src/snmp/header_complex.h \
+				  $(top_srcdir)/src/snmp/mib_modules.h \
+				  $(top_srcdir)/src/snmp/struct.h \
+				  $(top_srcdir)/src/snmp/util_funcs.h
+ss7MIB_la_DEPENDENCIES		=
+ss7MIB_la_LDFLAGS		= -module -avoid-version $(MACHINE_FLAGS) \
+				  -shared $(SNMP_LDFLAGS)
+ss7MIB_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+ss7MIB_la_CFLAGS		= $(USER_CFLAGS)
+ss7MIB_la_LIBADD		= $(STREAMS_LDADD) $(SNMP_LDADD)
 
 ## RPM_BUILD_USER
 endif

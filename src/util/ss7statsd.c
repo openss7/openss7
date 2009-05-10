@@ -1617,7 +1617,7 @@ main(int argc, char *argv[])
 			verbose++;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv));
+			help(argc, argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			version(argc, argv);

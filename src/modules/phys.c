@@ -640,11 +640,11 @@ cd_ok_ack(struct cd *cd, queue_t *q, mblk_t *msg, cd_ulong prim)
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		switch ((state = cd_get_state(cd))) {
-		case CD_ATTACH_PENDING:
+		case CD_UNATTACHED:
 			prim = CD_ATTACH_REQ;
 			state = CD_DISABLED;
 			break;
-		case CD_DETACH_PENDING:
+		case CD_DISABLED:
 			prim = CD_DETACH_REQ;
 			state = CD_UNATTACHED;
 			break;
@@ -693,10 +693,10 @@ cd_error_ack(struct cd *cd, queue_t *q, mblk_t *msg, ch_ulong prim, ch_long erro
 
 	if (likely(!!(mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		switch ((state = cd_get_state(cd))) {
-		case CD_ATTACH_PENDING:
+		case CD_UNATTACHED:
 			state = CD_UNATTACHED;
 			break;
-		case CD_DETACH_PENDING:
+		case CD_DISABLED:
 			state = CD_DISABLED;
 			break;
 		case CD_ENABLE_PENDING:
@@ -1197,7 +1197,7 @@ cd_info_req(struct cd *cd, queue_t *q, mblk_t *mp)
  *
  * Requests that the Stream be attached to a 32-bit PPA address.  This 32-bit PPA address is the
  * same as the 32-bit PPA address used by the CH Stream beneath.  If the CD interface is in the
- * correct state, simply pass the request on setting the state to CD_ATTACH_PENDING.
+ * correct state, simply pass the request on setting the state to CD_UNATTACHED.
  */
 noinline fastcall __unlikely int
 cd_attach_req(struct cd *cd, queue_t *q, mblk_t *mp)
@@ -1213,7 +1213,7 @@ cd_attach_req(struct cd *cd, queue_t *q, mblk_t *mp)
 		goto notsupp;
 	/* remember PPA for later */
 	cd->ppa = p->cd_ppa;
-	cd_set_state(cd, CD_ATTACH_PENDING);
+	cd_set_state(cd, CD_UNATTACHED);
 	cd_set_pending(cd, CD_ATTACH_REQ);
 	return ch_attach_req(cd->ch, q, mp, cd->ppa);
       notsupp:
@@ -1241,7 +1241,7 @@ cd_detach_req(struct cd *cd, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (unlikely(cd->info.cd_ppa_style != CD_STYLE2))
 		goto notsupp;
-	cd_set_state(cd, CD_DETACH_PENDING);
+	cd_set_state(cd, CD_DISABLED);
 	cd_set_pending(cd, CD_DETACH_REQ);
 	return ch_detach_req(cd->ch, q, mp);
       notsupp:
