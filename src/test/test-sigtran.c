@@ -115,6 +115,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <netdb.h>
 #endif
 
+#include <sys/testmod.h>
+
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
 #include <ss7/sdli.h>
@@ -212,7 +214,7 @@ int show_fisus = 1;
 static int show_msus = 1;
 #endif
 
-static int last_event = 0;
+int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 int last_prio = 0;
@@ -647,7 +649,7 @@ check_time(int child, const char *t, long beg, long lo, long hi)
 }
 #endif
 
-static int
+int
 time_event(int child, int event)
 {
 	static const char *msgs[] = {
