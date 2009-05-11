@@ -117,6 +117,7 @@
 #define sctp_set_bit(nr,addr)	__set_bit(nr,addr)
 #define sctp_clr_bit(nr,addr)	__clear_bit(nr,addr)
 
+#include <net/sock.h>
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>

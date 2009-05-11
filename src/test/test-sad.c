@@ -111,7 +111,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/sad.h>
 
 #ifdef LFS
-#include "src/include/sys/config.h"
+#include "sys/openss7/config.h"
 #endif
 
 #ifdef LIS
