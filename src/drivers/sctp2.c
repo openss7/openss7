@@ -5559,7 +5559,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
-#if 1
+#if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
 #else
@@ -5724,7 +5724,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
-#if 1
+#if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
 #else
@@ -14213,7 +14213,7 @@ sctp_init_struct(struct sctp *sp)
 	sp->sndlowat = sctp_defaults.xti.sndlowat;
 	/* ip defaults */
 	sp->inet.tos = sctp_defaults.ip.tos;
-#if 1
+#if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 	sp->inet.ttl = sysctl_ip_default_ttl;
 #else
