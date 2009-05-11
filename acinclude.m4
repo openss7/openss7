@@ -79,6 +79,7 @@ m4_include([m4/agent.m4])
 # -----------------------------------------------------------------------------
 AC_DEFUN([AC_OPENSS7], [dnl
     _OPENSS7_PACKAGE([OpenSS7], [OpenSS7])
+    PKGINCL="src/include/sys/${PACKAGE_LCNAME}"
     _OS7_OPTIONS
     _AUTOPR
     _MAN_CONVERSION
@@ -112,6 +113,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
 		       src/drivers/udp_hooks.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
+    USER_CPPFLAGS="${USER_CPPFLAGS}${USER_CPPFLAGS:+ }-DNAME=\\\"\`echo [\$][@] | sed -e 's,^[[^-]]*-,,;s,\.o,,'\`\\\""
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _LINUX_KERNEL
@@ -126,10 +128,10 @@ AC_DEFUN([AC_OPENSS7], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
     if test :${linux_cv_k_ko_modules:-no} = :no ; then
 	PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
-dnl	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-dnl	    PKG_MODFLAGS="${PKG_MODFLAGS}${PKG_MODFLAGS:+ }"'-include ${top_builddir}/${MODVERSIONS_H}'
+	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	    PKG_MODFLAGS="${PKG_MODFLAGS}${PKG_MODFLAGS:+ }"'-include ${top_builddir}/${MODVERSIONS_H}'
 dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include'
-dnl	fi
+	fi
     fi
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
     AC_SUBST([USER_CPPFLAGS])dnl
