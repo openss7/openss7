@@ -1,0 +1,383 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-multisg-04.me,v 0.9.2.3 2005/10/17 11:53:46 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2005/10/17 11:53:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.4
+.ds date October\ 16,\ 2005
+.ds expiry April\ 2006
+.nr levels 0
+.so ../draft2.me
+.bp
+.sz \n(pp
+.he 'Internet Draft'UA MULTI-SG'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+.sz \n(pp
+\fB\
+Multiple Signalling Gateway Support
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-multisg-04.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S 2005 \*[expiry]
+.uh "Abstract"
+.pp
+This Internet-Draft describes \fB\)Load Selection\fR for Signalling User
+Adaptation Protocols,
+.[
+m3ua
+%Z 1
+.]
+.[
+sua
+%Z 2
+.]
+.[
+isua
+%Z 2
+.]
+.[
+tua
+%Z 2
+.]
+which permits an Application Server Processes (ASP) to indicate its placement
+within an Application Server and permits an Signalling Gateway (SG) to
+distribute traffic over ASPs in Application Servers under Application Server
+Process (ASP) control.
+.uh "Contents"
+.pp
+A complete table of contents, list of tables and illustrations, and change
+history appears at the end of this document.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft provides parameters and procedures in extension to the
+parameters and procedures of the Signalling User Adaptation Layers
+(UAs),
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+for the purpose of supporting Application Servers interworking with multiple
+Signalling Gateways to the SS7 Network.
+.pp
+UA implementations with \fB\)Multiple SG Support\fR are intended to be
+compatible with UA implementations not supporting this configuration.
+.pp
+\fB\)MULTI-SG\fR is only applicable to Signalling Gateway (SG)-Application
+Server Process (ASP) configurations in which ASP are supporting Application
+Server (AS) connectivity to an SS7 network via multiple SGs.\*#
+.(d
+.ip \*#
+This is commonly referred to within the SIGTRAN WG as the "backhaul" case.
+.)d
+\fB\)MULTI-SG\fR is not applicable to configurations of IPSPs working in a
+point-to-point network without relay points.\*#
+.(d
+.ip \*#
+This is commonly referred to within the SIGTRAN WG as the "peer-to-peer" case.
+.)d
+.sh 2 "Terminology"
+.pp
+\fB\)Multiple SG Support (MULTI-SG)\fR supplements the terminology used in the
+UA documents
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+by adding the following terms:
+.lp
+\fI\)Multiple SG Support (MULTI-SG)\fR \-
+.ix +\n(iiu
+the parameters and procedures provided in this document.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+%Z 1
+.]
+SS7 Signalling User Adaptation Layers
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+supporting the concept of a \fI\)Routing Context\fR.
+.sh 2 "Overview"
+.pp
+\fB\)MULTI-SG\fR provides procedures in addition to the UA procedures\*#
+.(d
+.ip \*#
+See Section 4 of M3UA, SUA and TUA.
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+.)d
+that provides for seamless interworking of SS7 Network Management with
+Application Server Processes (ASPs) supporting Application Servers (AS) to
+multiple Signalling Gateways (SGs).
+\fB\)MULTI-SG\fR procedures provide support for the following functions not
+provided for in the existing UA documents:
+.bu
+Support for fail-over of SCTP associations between Signalling Gateways (SGs).
+.bu
+Support for rerouting of traffic destined to Signalling Endpoints (SEP)
+in SS7 Network between Signalling Gateways (SGs).
+.bu
+Support for seamless interworking with SS7 Changeback
+.[
+q704
+%Z 2
+.]
+procedures towards the SS7 Network for rerouting of traffic between SGs
+for elminating message mis-sequencing across the interworking point between
+the SS7 and IP networks.
+.pp
+\fB\)MUTLI-SG\fR supplements the procedures for the diversion of traffic
+during fail-over or restoration of ASPs, SGPs and IPSPs already provided for
+in \fI\)"Correlation Id and Heartbeat Procedures (CORID) Supporting Lossless
+Fail-Over between SCTP Associations"\fR.
+.[
+corid
+%Z 2
+.]
+The benefits of \fB\)MULTI-SG\fR can, nevertheless, be supported indepedent
+from \fB\)CORID\fR
+.[
+corid
+.]
+.sh 3 "Multiple SGs"
+.pp
+No procedures are described which provide for reduction of message loss,
+duplication or mis-sequencing in multiple SG configurations in the existing UA
+procedures.
+.sh 4 "Fail-over of routesets between SGs"
+.pp
+.sh 4 "Redirection of routesets between SGs"
+.pp
+.sh 2 "Sample Configurations"
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+                 |
+   SS7                          IP
+   Network       |              Network
+             _______________                _______     ____
+            |    |   _______|        ______|       |   /    \\
+            |       |       |_______|  ____|  ASP  |  |      |
+ B/D-Links  |    |  |  SGP  |________  |   |_______|  |      |
+ ___________| STP SG|_______|        | |    _______   |      |
+           /|    |  |       |__   o  | | __|       |  |  AS  |
+          / |       |  SGP  |__   o  | | __|  ASP  |  |      |
+   \\     /  |    |  |_______|     o  | |   |_______|  |      |
+    \\   /   |_______________|        | |    _______   |      |
+     \\ / C-   |                   o  | | __|       |   \\____/
+      X  Links|  |                o  | | __|  ASP  |    ____
+     / \\     _|_____________      o  | |   |_______|   /    \\
+    /   \\   |    |   _______|        | |    _______   |      |
+   /     \\  |       |       |__   o  | | __|       |  |      |
+          \\ |    |  |  SGP  |__   o  | | __|  ASP  |  |      |
+ __________\\| STP SG|_______|     o  | |   |_______|  |  AS  |
+            |    |  |       |________|_|    _______   |      |
+            |       |  SGP  |_______ |_____|       |  |      |
+            |    |  |_______|       |______|  ASP  |  |      |
+            |_______________| SCTP         |_______|   \\___ /
+                 |            Associations
+
+                 |
+.fi
+.sz +2
+.)c
+.#f "Example (A) Sample Multiple-SG Configuration"
+.)b
+.pp
+A typical Example (A) configuration multiple Signalling Gateways is
+illustrated in \fI\)\*(&f\n(&p\fR.  In this configuration a number of Application
+Server Processes (ASPs) serving a number of Application Servers (ASs) are connected
+to two Signalling Gateways (SGs).  The SGs appear as mated SS7 Signalling
+Transfer Points (STPs)
+.[
+q705
+%Z 2
+.]
+to the SS7 Network.  Traffic originating at Signalling Endpoints (SEP) in the
+SS7 network and directed toward SEP in the IP network (i.e., Application
+Servers) is loadshared over the STPs by the Signalling Link Selection (SLS)
+.[
+q704
+.]
+value associated with each message.  Traffic originating at the SEP in the IP
+network (i.e, AS) is loadshared over the SGs in the same fashion.
+.#e
+.sh 1 "Conventions"
+.#C
+.#e
+.sh 1 "Protocol Elements"
+.sh 2 "Parameters"
+.sh 2 "Messages"
+.#e
+.sh 1 "Procedures"
+.sh 2 "AS and ASP State Maintenance"
+.sh 3 "ASP State"
+.sh 3 "AS State"
+.sh 3 "ASP Up Procedures"
+.sh 3 "ASP Down Procedures"
+.sh 3 "ASP Active Procedures"
+.sh 3 "ASP Inactive Procedures"
+.sh 3 "Notify Procedures"
+.#e
+.sh 1 "Examples"
+.#e
+.sh 1 "Security"
+.pp
+\fB\)Load Selection\fR does not introduce any new security risks or
+considerations that are not already inherent in the UA
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+Please see the SIGTRAN Security document
+.[
+sigsec
+%Z 1
+.]
+for security considerations and recommendations that are applicable to each of
+these UAs.
+.#e
+.sh 1 "IANA Considerations"
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Change History" 0
+.lp
+This section will be deleted once this memo is finalized.
+.sh 2 "Changes from Version 0.3 to Version 0.4" 0 4
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.(b L
+.\".uh "Acknowledgments"
+.\".pp
+.\"The authors would like to thank
+.\"for their valuable comments and suggestions.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2005

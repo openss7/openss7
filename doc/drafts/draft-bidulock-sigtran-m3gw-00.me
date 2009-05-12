@@ -1,0 +1,113 @@
+.de $0
+.(x 0
+\\$2 \\$1
+.)x
+..
+.m1 1
+.m2 3
+.m3 3
+.m4 0
+.pl 10.0i
+.po 0
+.ll 7.2i
+.lt 7.2i
+.fo "'Bidulock'Version 0.0'FORMFEED[Page %]'"
+.he "'Internet Draft'SS7 MTP3 Gateway Architecture'October 2000'"
+.hy 6
+.ad b
+.ta 3
+\".na
+.ba 3n
+.nr so -3n
+.nr ii 3n
+.nr pi 3n
+.nf
+Network Working Group                               Brian F. G. Bidulock
+INTERNET-DRAFT                                   Inet Technologies, Inc.
+.fi
+.sp 1
+Expires in six months                                       October 2000
+.sp 3
+.ce 2
+SS7 MTP3 Gateway Architecture
+<draft-bidulock-sigtran-m3gw-00.txt>
+.sp 3
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and
+may be updated, replaced, or obsoleted by other documents at any time.  It
+is inappropriate to use Internet-Drafts as reference material or to cite
+them other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet Draft defines an interworking architecture and function for
+providing seamless and transparent interworking between the SS7 newtork and
+and IP network at SS7 Level 3 (MTP - Message Transfer Part) for providing IP
+host-based MTP User Parts within an IP network.  This architecture permits IP
+hosts performing an MTP User Part function to appears as though they are
+normal SEPs (Signalling End Points) or STPs (Signalling Transfer Points)
+withing the SS7 network, while acting normally within the IP domain.  The
+gateway function described here is an SG (Signalling Gateway) interworking
+function which provides this capability at the boundary of the SS7 and IP
+networks.  This specifiction is independent of IP transport, however
+candidates are UDP, TCP, RDP, RUDP, and SCTP.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.lp
+A need has been identified for providing seamless and transparent interworking
+between SS7 and IP networks for the purposes of placing application in the IP
+domain which service the SS7 domain.  This would permit IP host applications
+whcih are located in the IP domain to provide services into an SS7 network as
+though they we a part of that SS7 network.  The intention of this MTP3 Gateway
+Architecture is as follows:
+.bu To remove as much of the SS7 specific tasks away from the IP host and
+permit the application to only be concerned with IP related routing and tasks.
+.bu To define an interworking function and interface to permit SGs (Signalling
+Gateways) acting as SEPs (Signalling End Points) or STPs (Signalling Transfer
+Points) to remain conformant to SS7 specifications without compromising the IP
+network philosophy.
+.sh 2 "Terminology"
+.ip "Signalling Gateway (SG)"
+.ip "Signalling End Point (SEP)"
+An SEP (Signalling End Point) is an SS7 SP (Signalling Point) which originates
+and terminates MTP (Message Transfer Part) User traffic.
+.ip "Signalling Transfer Point (STP)"
+An STP (Signalling Transfer Point) is an SS7 SP (Signalling Point) which can
+forward or relay SS7 MTP messages which are destined to an SS7 SP (Signalling
+Point) which is distant or remote from the point in question.
+.sh 2 "Abbreviations"
+.ip SS7
+Signalling System No. 7
+.ip MTP
+Message Transfer Part
+.ip SCCP
+Signalling Connection Control Part
+.ip ISDN
+Integrated Services Digital Network
+.ip ISUP
+ISDN (Integrated Services Digital Network) User Part
+.sh 2 "M3GW Overview"
+.sh 3 "M3GW Architecture"
+
+.(b L F
+.ce 1
+TABLE OF CONTENTS
+.xp 0
+.)b

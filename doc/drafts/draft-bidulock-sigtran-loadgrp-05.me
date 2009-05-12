@@ -1,0 +1,2289 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-loadgrp-05.me,v 0.9.2.1 2007/02/03 15:47:25 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2007/02/03 15:47:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.5
+.ds date February\ 3,\ 2007
+.ds expiry August\ 2007
+.nr levels 0
+.so ../draft4.me
+.bp
+.sz \n(tp
+.he 'Internet Draft'UA LOADGRP'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+Intended status: PROPOSED STANDARD;;\*[date]
+.bl 1
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+.sz \n(tp
+\fB\
+Load Grouping Extension
+for
+Signalling User Adaptation Layers
+
+<draft-bidulock-sigtran-loadgrp-05.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S 2007 \*[expiry]
+.uh "Abstract"
+.pp
+This Internet-Draft describes an extension parameter and procedure to the
+Signalling User Adaptation Protocols,
+.[
+iuarfc
+%Z 1
+.]
+.[
+duarfc
+%Z 2
+.]
+.[
+v5uarfc
+%Z 2
+.]
+.[
+gr303ua00
+%Z 2
+.]
+.[
+m2uarfc
+%Z 1
+.]
+.[
+m3uarfc
+%Z 1
+.]
+.[
+suarfc
+%Z 1
+.]
+.[
+isua04
+%Z 2
+.]
+.[
+tua05
+%Z 2
+.]
+based on the Stream Transmission Control Protocol (SCTP)
+.[
+rfc2960
+%Z 1
+.]
+which permits an Application Server Processes (ASP) to indicate its placement
+within a Load Group and permits an Signalling Gateway (SG) to distribute
+traffic over Load Groups under Application Server Process (ASP) control.
+.pp
+The described procedure provides for Override, Load-share and Broadcast
+traffic mode operation within a Load Group consisting of one or more
+Application Server Processes (ASPs) resulting in a mixture of traffic modes
+within an Application Server (AS).  The parameters and procedures described
+here supplement the \fI\)UA Load Selection\fR
+.[
+loadsel05
+%Z 2
+.]
+extension parameters and procedures for improved distribution of traffic over
+ASPs and Signalling Gateway Processes (SGPs).
+.uh "Contents"
+.pp
+A complete table of contents, list of illustrations and tables, and a change
+history, are included at the end of this document.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft provides the \fI\)Load Distribution\fR parameter and
+associated procedures in extension to the parameters and procedures of the
+Signalling User Adaptation Layers (UAs),
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+and the \fI\)UA Load Selection\fR
+.[
+loadsel05
+.]
+extension, for the purpose of permitting Application Server Process control
+over grouping of ASPs into Application Servers as part of the procedures of
+these UA protocols.
+.pp
+This \fI\)Load Grouping\fR extension is intended to be compatible with UA
+implementations not supporting this extension.
+.sh 2 "Abbreviations"
+.lp
+.ix +\n(iiu
+.TS
+tab(:);
+li1c0lssss.
+AS:\(em:Application Server.
+ASP:\(em:Application Server Process.
+IANA:\(em:Internet Assigned Numbers Authority
+I-D:\(em:Internet-Draft
+IETF:\(em:Internet Engineering Task Force
+IP:\(em:Internet Protocol.
+IPSP:\(em:IP Signalling Point.
+SCCP:\(em:Signalling Connection Control Part.
+SCTP:\(em:Stream Control Transmission Protocol.
+SG:\(em:Signalling Gateway.
+SGP:\(em:Signalling Gateway Process.
+SIGTRAN:\(em:IETF Signalling Transport WG
+SPP:\(em:Signalling Peer Process.
+SS7:\(em:Signalling System No. 7.
+SUA:\(em:SS7 SCCP-User Adaptation Layer.
+TCAP:\(em:Transaction Capabilities Application Part.
+TUA:\(em:SS7 TCAP-User Adaptation Layer.
+UA:\(em:User Adaptation Layer.
+WG:\(em:Working Group
+.TE
+.sh 2 "Terminology"
+.pp
+\fI\)LOADGRP\fR supplements the terminology used in the UA documents
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+and the \fI\)UA Load Selection\fR
+.[
+loadsel05
+.]
+extension by adding the following terms:
+.lp
+\fI\)Load Distribution (LD)\fR \-
+.ix +\n(iiu
+a \fI\)Traffic Mode Type\fR which is applicable within a Load Group.
+.lp
+\fI\)Load Group (LG)\fR \-
+.ix +\n(iiu
+a group of ASPs that share the same traffic distribution within an Application
+Server.  An ASP is permitted to belong to more than one Load Group for
+a given AS.
+.lp
+\fI\)Load Selector (LS)\fR \-
+.ix +\n(iiu
+an identifier that uniquely identifies a Load Group within an
+Application Server.  This identifier is only guaranteed unique within the
+scope of an Application Server and must be combined with a \fI\)Routing
+Context\fR or (set of) \fI\)Interface Identifier(s)\fR to uniquely define a
+Load Group at a Signalling Gateway.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc2960
+.]
+Signalling User Adaptation Layers.
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.sh 2 "Overview"
+.pp
+Existing UA procedures with regard to traffic distribution and ASP traffic
+management provide a mechanism to select the algorithm for coordinating state
+and distributing traffic over a number of Application Server Processes (ASPs)
+serving an Application Server.  These existing procedures provide only
+simplified distribution approaches which are not amenable to large scale
+systems that need to adapt to dynamic traffic loading or need live
+reconfiguration for maintenance purposes.
+.pp
+\fI\)LOADGRP\fR extensions to the Signalling User Adaptation Layers
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+permits close control over the grouping of Application Server Processes
+serving an Application Server that provides the capability to group ASPs into
+load groups not existing in the current scheme.
+.pp
+Under the existing approach, each Application Server Process acts
+independently with respect to an Application Server.  This approach does not
+provide for the grouping of ASPs into work groups, not does it provide
+coordinated control of the role of groups of ASPs serving an ASP.  As a
+result, the existing scheme does not scale well in this regard.
+.pp
+\fI\)LOADGRP\fR provides for the grouping of ASPs into load groups with
+a traffic distribution mode (Load Distribution) within the load group
+that is independent of the Application Sever traffic mode.
+.sh 3 "Existing Traffic Distribution"
+.(z
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig1.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+                                    ____
+           Traffic                 /....\\
+           Mode Type          ____|__....|
+ _______                     |       |...|
+|       |------------------->|  ASP  |...|
+|  SGP  |-----\\              |_______|...|
+|_______|----\\ \\              ____|__....|
+         \\--\\ \\ \\            |       |...|
+             \\ \\ \\---------->|  ASP  |...|
+ _______      \\ \\            |_______|...|
+|       |      \\ \\                |......| Application
+|  SGP  |       \\ \\               |......| Server
+|_______|        \\ \\              |......|
+                  \\ \\             |......|
+                   \\ \\        ____|__....|
+                    \\ \\      |       |...|
+                     \\ \\---->|  ASP  |...|
+                      \\      |_______|...|
+                       \\      ____|__....|
+                        \\    |       |...|
+                         \\-->|  ASP  |...|
+                             |_______|...|
+                                  |......|
+                                   \\____/
+.sz +2
+.)c
+.\}
+.#f "Existing Traffic Distribution"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates the existing traffic distribution algorithm that
+is used across the Signalling User Adaptation Layers.
+.pp
+When an SGP distributes a Signalling User Adaptation Layer message toward the
+Application Server based on the \fI\)Routing (Link) Key\fR, it selects an ASP
+that is active for the AS according to a \fI\)Traffic Mode Type\fR that is
+associated with the AS.  The \fI\)Traffic Mode Type\fR describes three general
+distribution algorithms: Override, Load-share and Broadcast.
+.pp
+The detailed actions taken for these distribution algorithms are described in
+Section 4 of the Signalling User Adaptation Layer specifications;
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+however, they can be summarized as follows:
+.lp
+.b "Traffic Mode Type Override:\-\ "
+.ix +\n(iiu
+When distributing messages to an Override Application Server, the SGP selects
+the ASP which is active for the Application Server.  In an Override
+Application Server, at most one ASP can be active for the AS at any given
+point in time.  The active ASP for the AS is selected.
+.lp
+.b "Traffic Mode Type Load-share:\-\ "
+.ix +\n(iiu
+When distributing messages to a Load-share Application Server, the SGP selects
+one of the ASPs that are active for the Application Server using an
+implementation dependent load-sharing algorithm based on some unspecified
+aspect of the traffic or static configuration data.
+.lp
+.b "Traffic Mode Type Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages to a Broadcast Application Server, the SGP sends a
+copy of the message to each of the ASPs that are active for the Application
+Server.  (The ASPs themselves decide which, if any, of the ASPs will process
+the message.)
+.pp
+In general, for the Signalling User Adaptation Layers, the \fI\)Traffic Mode
+Type\fR is a characteristic of the Application Server, and an Application
+Server can only have associated with it only one \fI\)Traffic Mode Type\fR,
+and thus, only one traffic distribution algorithm can be used across the ASPs
+that are serving a given Application Server.
+.pp
+\fI\)LOADGRP\fR enhances the traffic distribution algorithms of the
+existing Signalling User Adaptation Layers by introducing an additional
+level of distribution.
+.sh 3 "Extended Traffic Distribution"
+.(z
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+                             ____    ____
+           Traffic    Load  /....\\  /....\\
+           Mode Type  Group|...___||__....|
+ _______                   |..|       |...|
+|       |---+---------------->|  ASP  |...|
+|  SGP  |    \\             |..|_______|...|
+|_______|-\\   \\            |...___||__....|
+           \\   \\           |..|       |...|
+            \\   \\------------>|  ASP  |...|
+ _______    |              |..|_______|...|
+|       |   |              |......||......| Application
+|  SGP  |   |               \\____/ |......| Server
+|_______|   |                ____  |......|
+            |         Load  /....\\ |......|
+            |         Group|...___||__....|
+            |              |..|       |...|
+            +---------------->|  ASP  |...|
+             \\             |..|_______|...|
+              \\            |...___||__....|
+               \\           |..|       |...|
+                \\------------>|  ASP  |...|
+                           |..|_______|...|
+                           |......||......|
+                            \\____/  \\____/
+.sz +2
+.)c
+.\}
+.#f "Load Group Traffic Distribution"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates the extended traffic distribution algorithms that
+are used across the Signalling User Adaptation Layers as a result of the
+messages and procedures in \fI\)LOADGRP\fR.
+.pp
+\fI\)LOADGRP\fR introduces the concept of a Load Group.  A Load Group is
+a logical grouping of Application Server Processes (ASPs) into traffic
+groups serving an Application Server.  Signalling Gateway Processes
+(SGPs) distribute traffic first over \fI\)Load Groups\fR and then
+distribute traffic within the Load Group.  Each Load Group describes and
+is identified by a \fI\)Load Selector\fR
+.[
+loadsel05
+.]
+within the Application Server.  The \fI\)Load Selector\fR identifies the
+traffic flows that will be distributed to an associated Load Group
+within an Application Server.
+.pp
+When an SGP distributes a Signalling User Adaptation Layer message toward an
+Application Server based on the \fI\)Routing (Link) Key\fR, it first selects
+an Load Group that is active for the Application Server according a
+traffic distribution algorithm determined by the \fI\)Load Distribution\fR
+that is associated with the Application Server and the \fI\)Load Selector\fR
+position of the Load Group within the AS.
+.pp
+The \fI\)Traffic Mode Type\fR continues to describe three general
+distribution algorithms: Override, Load-share and Broadcast.  The change
+in the behaviour of the SGP when selecting an ASP for traffic
+distribution introduced by \fI\)LOADGRP\fR is that the SGP also takes
+into account the concept of a Load Group as identified within an AS by
+its \fI\)Load Selector\fR.
+.pp
+The extended procedures can be summarized as follows:
+.lp
+.b "Traffic Mode Type Override:\-\ "
+.ix +\n(iiu
+When distributing messages to an Override Application Server, the SGP first
+selects the Load Group that is active for the Application Server.  In
+an Override Application Server, at most one Load Group can be active
+for the AS at any given point in time.  The active Load Group for the
+AS is selected.
+.lp
+.b "Traffic Mode Type Load-share:\-\ "
+.ix +\n(iiu
+When distributing messages to a Load-share Application Server, the SGP selects
+one of the \fI\)Load Groups\fR that are active for the Application Server
+using an implementation dependent load-sharing algorithm based on the
+\fI\)Load Selector\fR
+.[
+loadsel05
+.]
+associated with the Load Group.
+.lp
+.b "Traffic Mode Type Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages to a Broadcast Application Server, the SGP sends a
+copy of the message to each of the \fI\)Load Groups\fR that are active for the
+Application Server.  (The \fI\)Load Groups\fR themselves decide which, if any,
+of the \fI\)Load Groups\fR will process the message.)
+.pp
+After selecting an Load Group according to the \fI\)Traffic Mode
+Type\fR for the Application Server, the SGP then selects an ASP within the
+Load Group based on the \fI\)Load Distribution\fR that is associated
+with the Load Group.  The \fI\)Load Distribution\fR describes the same
+three general distribution algorithms that are provided in the \fI\)Traffic
+Mode Type:\fR Override, Load-share and Broadcast.  When selecting an active
+ASP within a Load Group, the procedures that the SGP will follow can
+be summarized as follows:
+.lp
+.b "Load Distribution Override:\-\ "
+.ix +\n(iiu
+When distributing messages within an Override Load Group, the SGP selects the
+ASP which is active for the Load Group.  In an Override Load Group, at most
+one ASP can be active for the Load Group at any given point in time.
+The active ASP for the Load Group is selected.
+.lp
+.b "Load Distribution Load-share:\-\ "
+.ix +\n(iiu
+When distributing messages within a Load-share Load Group, the SGP selects one
+of the ASPs that are active for the Load Group using an implementation
+dependent load-sharing algorithm based on some unspecified aspect of the
+traffic or static configuration data.
+.lp
+.b "Load Distribution Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages within a Broadcast Load Group, the SGP sends a copy
+of the message to each of the ASPs that are active for the Load Group.  (The
+ASPs themselves decide which, if any, of the ASPs will process the message.)
+.pp
+The result of \fI\)LOADGRP\fR is that two levels of traffic distribution
+are provided for, permitting more flexible membership of ASPs serving
+Application Servers, and provides the Application Server Process with
+more control over the traffic patterns for which it is active.
+.sh 2 "Sample Configurations"
+.pp
+Although \fI\)LOADGRP\fR does not restrict either \fI\)Traffic Mode
+Type\fR or \fI\)Load Distribution\fR to a static assignment, there are,
+for example, six (6) combinations of static \fI\)Traffic Mode Type\fR
+and \fI\)Load Distribution\fR assignment under this scheme.  Not all of
+these combinations provide for interesting or useful configurations as
+follows:
+.(b C
+.#t "Sample Configurations"
+.TS
+box center tab(:);
+cb1|cb1|cb1|lb
+cb|cb|cb|lb
+cb|cb|cb|lb
+n|l|l|lw(3.8i).
+:Traffic:Load:
+Mode:Mode:Distri-:Description
+:Type:bution:
+=
+1:Override:Load-share:T{
+.#v
+This mode permits a load-share group of ASPs to override another load-share
+group of ASPs.
+T}
+_::_:_
+2::Broadcast:T{
+.#v
+This mode allows "mirrored" ASPs to override each other.
+T}
+_
+3:Load-share:Override:T{
+.#v
+This mode allows ASPs to override each other within a traffic slot of a
+load-share group.
+T}
+_::_:_
+4::Broadcast:T{
+.#v
+This mode permits "striping" and "mirroring" with load-sharing under ASP
+control.
+T}
+_
+5:Broadcast:Override:T{
+.#v
+This mode permits a joining ASP to knock another ASP out of a Broadcast slot
+for an Application Server.
+T}
+_::_:_
+6::Load-share:T{
+.#v
+This mode permits "mirroring" and "striping" including automatic load-sharing
+within a mirror image.
+T}
+.TE
+.)b
+.#e
+.sh 1 "Conventions"
+.#C
+.#e
+.sh 1 "Protocol Elements"
+.pp
+The following subsections describe the parameters which are added by
+\fI\)LOADGRP\fR, their format and the message in which they are used.
+.sh 2 "Parameters"
+.pp
+\fI\)LOADGRP\fR adds one new parameter: the \fI\)Load Distribution\fR
+parameter.
+.sh 3 "Load Distribution"
+.pp
+The \fI\)Load Distribution\fR parameter is used in the \fB\)REQ REQ\fR,
+\fB\)REQ RSP\fR, \fB\)ASPAC\fR and \fB\)ASPAC ACK\fR messages.  It is used in
+conjunction with the \fI\)Traffic Mode Type\fR parameter
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+and \fI\)Load Selector\fR parameter
+.[
+loadsel05
+.]
+to further refine the traffic distribution algorithm for an ASP in a Load
+Group serving an Application Server.  The \fI\)Load Selector\fR parameter
+identifies the Load Group for which the ASP is registering, activating or
+deactivating and the \fI\)Load Distribution\fR parameter identifies the
+traffic distribution that is to be used within the Load Group.
+.lp
+The \fI\)Load Distribution\fR parameter is formatted as follows: \*#
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Tag = 0x001a         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+|                       Load Distribution                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0x001a\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+The \fI\)Load Distribution\fR parameter contains the following fields:
+.ip "\fB\)Load Distribution field: n x 32-bits (unsigned integer)\fR" 2
+.ip "" 2
+The \fI\)Load Distribution\fR has the same purpose for the Load Group
+that the \fI\)Traffic Mode Type\fR has for the Application Server: it
+identifies the traffic distribution algorithm to be used within the Load
+Group.  Valid values for \fI\)Load Distribution\fR are as follows:
+.ix +4
+.TS
+tab(:);
+nl.
+1:Override
+2:Load-share
+3:Broadcast
+.TE
+.sh 2 "Messages"
+.ds #u \*#
+.pp
+\fI\)LOADGRP\fR adds the \fI\)Load Distribution\fR parameter as an
+\fB\)OPTIONAL\fR parameter to be used in conjunction with the common
+\fI\)Traffic Mode Type\fR in the following messages: \*#
+.(d
+.ip \*#
+For a detailed description of these messages, see Section 3 of the specific UA
+document.
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.)d
+.ix +4
+.TS
+tab(:);
+lbl.
+REG REQ:Registration Request message
+ASPAC:ASP Active message
+ASPAC ACK:ASP Active Ack message
+.TE
+.sh 3 "Registration Request (REG REQ)"
+.pp
+\fI\)LOADGRP\fR supplements the \fB\)Registration Request (REG REQ)\fR message
+by permitting the following optional parameters to be included in the
+\fI\)Routing (Link) Key\fR
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+parameter or \fI\)Link Key\fR
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+parameter within the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Sub-parameters
+_
+Load Distribution:Optional:
+.TE
+.ix -4
+.pp
+The \fI\)Load Distribution\fR parameter is used in the Routing (Link) Key to
+further refine the traffic distribution to be received by the registering ASP.
+.pp
+The format of the resulting \fI\)Routing Key\fR or \fI\)Link Key\fR parameter
+is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     Local-RK(LK)-Identifier                   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                  Traffic Mode Type (optional)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Load Selection (optional)                  |
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                  Load Distribution (optional)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\f(CR\
+\\                                                               \\
+/                          Routing Context                      /
+\\                                or                             \\
+/                       Interface Identifier(s)                 /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.pp
+When an ASP wishes to register within a Load Group associated with an
+Application Server, it includes the \fI\)Load Selection\fR parameter and
+\fI\)Load Distribution\fR in the \fI\)Routing (Link) Key\fR for that
+Application Server in the \fB\)REG REQ\fR message.
+.pp
+The \fI\)Load Distribution\fR parameter indicates the traffic distribution
+method to be used within the Load Group as identified by the Load
+Selection.
+.pp
+No other changes to the \fB\)REG REQ\fR message, \fI\)Routing Key\fR or
+\fI\)Link Key\fR parameters format are provided by \fI\)LOADGRP\fR\*(#u.
+.sh 3 "Registration Response (REG RSP)"
+.pp
+\fI\)LOADGRP\fR adds the following \fI\)Registration Status\fR values to the
+\fI)Registration Status\fR field in the \fB\)REG RSP\fR message: \*#
+.ix +4
+.TS
+tab(:);
+nl.
+16:Error \- Unsupported/Invalid Load Distribution
+.TE
+.ix -4
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Registration Status\fR value shown as
+\f(CR\)16\fR will be assigned by IANA as a value of the UA-specific
+\fI\)Registration Status\fR parameter for each SIGTRAN UA and may change its
+value in further versions of this document.
+.)d
+.sh 3 "ASP Active (ASPAC)"
+.pp
+\fI\)LOADGRP\fR supplements the \fB\)ASPAC\fR message by permitting the
+following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Distribution:Optional:
+.TE
+.ix -4
+.pp
+The format of the resulting \fB\)ASPAC\fR message is as follows: \*#
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Tag = 0x000b         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+|                       Traffic Mode Type                       |
++---------------------------------------------------------------+
+\\                                                               \\
+/                        Routing Context                        /
+\\                              or                               \\
+/                    Interface Identifier(s)                    /
+\\                                                               \\
+\f(CB\
++-------------------------------+-------------------------------+
+|          Tag = 0x001a         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+|                       Load Distribution                       |
++-------------------------------+-------------------------------+
+\f(CR\
+|          Tag = 0x001d         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+\\                                                               \\
+/                        Load Selector(s)                       /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|          Tag = 0x0004         |             Length            |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0x001a\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+When an ASP wishes to activate only within a Load Group associated
+with an Application Server, it includes the \fI\)Load Selector\fR and
+\fI\)Load Distribution\fR parameters in the \fB\)ASPAC\fR message.
+.pp
+The \fI\)Load Distribution\fR parameter indicates the traffic distribution
+method to be used within the Load Group as identified by the Load
+Selector.
+.pp
+No other changes to the \fB\)ASPAC\fR message format are provided by
+\fI\)LOADGRP\fR\*(#u.
+.sh 3 "ASP Active Ack (ASPAC ACK)"
+.pp
+\fI\)LOADGRP\fR supplements the \fB\)ASPAC ACK\fR message by permitting
+the following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Distribution:Optional:
+.TE
+.ix -4
+.pp
+The format of the resulting \fB\)ASPAC ACK\fR message is as follows: \*#
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Tag = 0x000b         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+|                       Traffic Mode Type                       |
++---------------------------------------------------------------+
+\\                                                               \\
+/                        Routing Context                        /
+\\                              or                               \\
+/                    Interface Identifier(s)                    /
+\\                                                               \\
+\f(CB\
++-------------------------------+-------------------------------+
+|          Tag = 0x001a         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+|                       Load Distribution                       |
++-------------------------------+-------------------------------+
+\f(CR\
+|          Tag = 0x001d         |           Length = 8          |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+\\                                                               \\
+/                        Load Selector(s)                       /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|          Tag = 0x0004         |             Length            |
++ - - - - - - - - - - - - - - - + - - - - - - - - - - - - - - - +
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0x001a\fR
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+When an ASP has requested activation within a Load Group or the SG
+otherwise activates the ASP within a Load Group the SG responds with
+an \fB\)ASPAC ACK\fR message including the \fI\)Load Selector\fR that
+identifies the Load Group and optionally includes the \fI\)Load
+Distribution\fR for the Load Group in which the ASP has been
+activated.  If the ASP included the \fI\)Load Distribution\fR parameter in the
+\fB\)ASPAC\fR message, the SG \fB\)MUST\fR include the \fI\)Load
+Distribution\fR parameter in the response \fB\)ASPAC ACK\fR message.
+.pp
+The \fI\)Load Distribution\fR parameter indicates the traffic distribution
+method to be used within the Load Group as identified by the Load
+Selector.
+.pp
+No other changes to the \fB\)ASPAC ACK\fR message format are provided by
+\fI\)LOADGRP\fR\*(#u.
+.sh 3 "Error (ERR)"
+.pp
+\fI\)LOADGRP\fR supplements the \fB\)Error (ERR)\fR message by adding
+the following values to the common mandatory \fI\)Error Code\fR
+parameter in the \fB\)ERR\fR message: \*#
+.ix +4
+.TS
+tab(:);
+nl.
+28:Unsupported Load Distribution
+.TE
+.ix -4
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Error Code\fR value shown throughout this
+document as \f(CR\)28\fR will be assigned by IANA as a value of the common
+\fI\)Error Code\fR parameter for SIGTRAN UAs and may change its value in
+further versions of this document.
+.)d
+.lp
+This new error code is interpreted as follows:
+.lp
+The \fI\)"Invalid/Unsupported Load Distribution"\fR error
+.ix +4
+would be sent by an SGP if an ASP sends an ASP Active with an invalid or
+unsupported Load Distribution.  An example would be a case in which the SGP
+did not support override within a Load Group.
+.pp
+No other changes to the \fB\)ERR\fR message or \fI\)Error Code\fR
+parameter values are provided by \fI\)LOADGRP\fR.  See Section 4 for
+extension procedures associated with the \fB\)ERR\fR message.
+.#e
+.sh 1 "Procedures"
+.pp
+\fI\)LOADGRP\fR provides for an additional level of control over the traffic
+distribution patterns within an Application Server.  \fI\)LOADGRP\fR provides
+the \fI\)Load Distribution\fR parameter which may be optionally included in
+the \fB\)REG REQ\fR, \fB\)ASPAC\fR and \fB\)ASPAC ACK\fR messages.  In
+addition, it supplements the ASP State Maintenance and ASP Traffic Maintenance
+procedures.
+.sh 2 "ASP State Maintenance"
+.pp
+In addition to the SGP maintaining the state of each remote ASP in each
+Application Server that the ASP is configured to receive traffic, under
+\fI\)LOADGRP\fR, the SGP \fB\)MAY\fR also maintain the state of each
+remote ASP in each Load Group within an Application server that the ASP
+is configured to receive traffic.  The Load Group state is maintained
+separate from the ASP and AS states.
+.sh 3 "Load Group State"
+.pp
+The state of the Load Group is maintained in the Signalling User
+Adaptation Layer on the SGPs.  The state of the Load Group changes due
+ASP state transitions.  The possible states of a Load Group are:
+.ip "\fB\)LG-DOWN\fR:" 16
+The Load Group is unavailable.  This state implies that all related
+ASPs are in the \fB\)ASP-DOWN\fR state for this Load Group.
+Initially, the Load Group will be in this state.
+.ip "\fB\)LG-INACTIVE\fR:" 16
+The Load Group is available but no application traffic is active (i.e,
+one or more related ASPs are in the \fB\)ASP-INACTIVE\fR state, but none are
+in the \fB\)ASP-ACTIVE\fR state within the Load Group).
+.ip "\fB\)LG-ACTIVE\fR:" 16
+The Load Group is available and application traffic is active.  This
+state implies that at least one ASP is in the \fB\)ASP-ACTIVE\fR state within
+the Load Group.
+.sh 3 "Application Server State"
+.pp
+Where ASPs are configured for operation within \fI\)Load Groups\fR under
+\fI\)LOADGRP\fR, the Application Server state is interpreted as provided
+in the Signalling User Adaptation Layer specifications.
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.sh 2 "ASP Traffic Maintenance"
+.sh 3 "ASP Up Procedures"
+.pp
+\fI\)LOADGRP\fR extends the ASP Up procedures to include the concept
+of the Load Group.
+.pp
+Whenever an SGP moves an ASP to the ASP-UP state, it also moves the ASP
+to the ASP-INACTIVE state in all Load Groups in all Application Servers
+for which the ASP is configured.  This may have the effect of changing
+the Load Group state, requiring the generation of \fB\)NTFY\fR messages
+as described under ""Notify Procedures"" below.
+.sh 3 "ASP Down Procedures"
+.pp
+\fI\)LOADGRP\fR extends the ASP Down procedures to include the concept
+of the Load Group.
+.pp
+Whenever an SGP moves an ASP to the ASP-DOWN state, it also moves the
+ASP to the ASP-DOWN state in all Load Groups in all Application Servers
+to which the ASP belongs.  This may have the effect of changing the Load
+Group state, requiring the generation of \fB\)NTFY\fR messages as
+described under ""Notify Procedures"" below.
+.sh 3 "ASP Active Procedures"
+.pp
+When activating, \fI\)LOADGRP\fR extends the UA activation procedures by
+permitting an optional \fI\)Load Distribution\fR parameter to be
+included in the ASP Active (\fB\)ASPAC\fR) and ASP Active Ack
+(\fB\)ASPAC ACK\fR) messages.  The \fI\)Load Selector\fR parameter is
+used to indicate for which Load Group the concerned Application Server
+is becoming active
+.[
+loadsel05
+.]
+and the \fI\)Load Distribution\fR parameter is used
+to indicate the traffic mode of the Load Group.
+.pp
+\fI\)LOADGRP\fR supplements the ASP Active Procedures as follows:
+.pp
+When an ASP sends an \fB\)ASPAC\fR message to activate the ASP within an
+Application Server, the ASP \fB\)MAY\fR choose to activate within a Load
+Group for the specified AS by including the \fI\)Load Selector\fR
+parameter in the \fB\)ASPAC\fR message.
+.pp
+When an SGP receives an \fB\)ASPAC\fR message with a \fI\)Load
+Selector\fR parameter in the message, or where the SGP is otherwise
+configured to activate the ASP in a configured Load Group, when the SGP
+moves the ASP to the ASP-ACTIVE state for the AS, it also moves the ASP
+to the ASP-ACTIVE state for the Load Group identified by the \fI\)Load
+Selector\fR parameter.  In either case, if the activation is successful,
+the SGP includes the \fI\)Load Selector\fR parameter in the \fB\)ASPAC
+ACK\fR message.
+.pp
+If the \fI\)Load Selector\fR in the \fB\)ASPAC\fR message is invalid, the SGP
+responds with \fB\)ERR\fR("Invalid Load Selector").  If the \fI\)Load
+Selector\fR parameter is not present in the \fB\)ASPAC\fR message and the SGP
+is configured to require one, or the \fI\)Load Selector\fR parameter is not
+valid or not configured for the Application Server, the SGP responds with
+\fB\)ERR\fR("Missing Parameter").  If the \fI\)Load Selector\fR parameter
+contains an invalid or unsupported \fI\)Load Distribution\fR value, or the
+\fI\)Load Distribution\fR parameter is missing but the SGP cannot determine
+the distribution applicable to the Load Group without one, the SGP responds
+with \fB\)ERR\fR("Unsupported Load Distribution").
+.pp
+There are three modes of Application Server traffic handling in the SGP
+at the Application Server level and three modes of AS traffic handling
+at the Load Group level: Override, Load-share and Broadcast.  When
+included, the \fI\)Traffic Mode Type\fR parameter in the \fB\)ASPAC\fR
+message indicates the traffic handling mode to be used in a particular
+Application Server between Load Groups.  When included, the \fI\)Load
+Distribution\fR parameter indicates the traffic handling mode to be used
+between ASPs within the Load Group indicated by the \fI\)Load
+Selector\fR parameter.
+.pp
+In the case of an Override mode AS, reception of an ASP Active message
+at an SGP may move a Load Group to the LG-ACTIVE state.  When an LG
+moves to the LG-ACTIVE state in an Override mode AS, this causes the
+(re)direction of all traffic for the AS to the active Load Group.
+Distribution of traffic within the Load Group is determine on the basis
+of the Load Distribution mode of the Load Group.  Any previously active
+Load Group is now considered to be in state LG-INACTIVE and
+\fB\)SHOULD\fR no longer receive traffic from the SGP within the AS.
+The SGP then \fB\)MUST\fR send a Notify message \fB\)NTFY\fR("Alternate
+ASP Active") and include the \fI\)Load Selector\fR parameter in the
+Notify message indicating the Load Group that has become active.
+.pp
+In the case of a Load-share mode AS, the reception of an ASP Active
+message at an SGP that moves a Load Group to the LG-ACTIVE state causes
+the direction of specific traffic flows associated with the \fI\)Load
+Selector\fR to the Load Group.  The assignment of traffic flows to
+\fI\)Load Selector\fR values is implementation dependent, but could be
+based on specific information in the protocol data message.
+.pp
+In the case of a Broadcast mode AS, reception of an ASP Active message
+at an SGP that results in moving a Load Group to the LG-ACTIVE state
+within the AS causes the direction of traffic to the newly active Load
+Group in addition to all the other LGs that are currently active for the
+AS.  The algorithm at the SGP for broadcasting traffic within an AS to
+all the active ASPs is a simple broadcast algorithm, where every message
+is sent to each of the active Load Groups.
+.sh 3 "ASP Inactive Procedures"
+.pp
+When deactivating, \fI\)LOADGRP\fR extends the UA activation procedures
+by permitting an optional \fI\)Load Selector\fR parameter to be included
+in the ASP Inactive (\fB\)ASPIA\fR) and ASP Inactive Ack (\fB\)ASPIA
+ACK\fR) message.  The \fI\)Load Selector\fR parameter is used to
+indicate for which Load Group the concerned Application Server is
+becoming inactive.
+.pp
+\fI\)LOADGRP\fR supplements the ASP Active procedures of the UAs as
+follows:
+.pp
+When an ASP wishes to withdraw from a specific Load Group within an
+Application Server, the ASP sends an ASP Inactive message to the SGP
+with a \fI\)Load Selector\fR parameter included in the message.  In the
+case where the ASP does not include the \fI\)Load Selector\fR parameter
+in the ASP Inactive message, the SGP must know via configuration data
+which Load Groups the ASP is a member.  Upon receiving an ASP Inactive
+message with included or implied \fI\)Load Selector\fR, the SGP moves
+the ASP to the ASP-INACTIVE state in each of the Load Groups indicated.
+.sh 3 "Notify Procedures"
+.pp
+When the SGP or IPSP notifies its UA peer with a \fB\)NTFY\fR messages
+which concerns an ASP, it \fB\)MUST\fR include the Load Group (if
+available) along with the \fI\)ASP Identifier\fR in the message.  The
+\fB\)NTFY\fR messages to which this applies are:
+.ip "\fI\)NTFY\fR(""AS-ACTIVE"")\fR, \fI\)NTFY\fR(""AS-PENDING""), \fI\)NTFY\fR(""AS-INACTIVE"") \-\fR" 2
+.ip "" 2
+When the SGP or IPSP notifies the active and inactive ASPs in an AS that
+it has detected the transition of the Application Server to the
+AS-ACTIVE, AS-PENDING or AS-INACTIVE state, or that it has detected the
+transition of a Load Group to the LG-ACTIVE state for the AS, it
+\fI\)MUST\fR include the \fI\)Load Selector\fR, if available, indicating
+the Load Group which has changed state along with the \fI\)ASP
+Identifier\fR, if any, in the \fB\)NTFY\fR message.
+.ip "" 2
+When the \fI\)Routing Context\fR (\fI\)Interface Identifier\fR)
+associated with the Application Server cannot be implied at the ASP from
+static configuration data, the \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) \fB\)MUST\fR also be placed in the \fB\)NTFY\fR message.
+.ip "\fI\)NTFY\fR(""ASP Failure"") \-\fR"
+.ip "" 2
+When the SGP or IPSP notifies the active and inactive ASPs in an AS that
+it has detected the failure of an ASP or the failure of an association
+to an ASP (i.e. SCTP Communication Lost Indication), it \fB\)MUST\fR
+include the \fI\)Load Selector\fR (if available) with the \fI\)ASP
+Identifier\fR in the message.
+.ip "" 2
+When the \fI\)Routing Context\fR (\fI\)Interface Identifier\fR)
+associated with the Application Servers cannot be implied at the ASP
+from static configuration data, the \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) \fB\)MUST\fR also be placed in the
+\fB\)NTFY\fR("ASP Failure") message.
+.ip "" 2
+The notifying SGP or IPSP \fB\)MAY\fR also place the \fI\)Load
+Selector\fR parameter into the \fB\)NTFY\fR("ASP Failure") message to
+indicate the traffic which was applicable to the load selection at the
+time of the failure.
+.ip "" 2
+The purpose of this procedure is to inform the active and inactive ASPs,
+not only of the ASP failure, but of the identity of the ASP and the load
+selection for which the failed ASP was responsible.
+.ip "\fI\)NTFY\fR(""Alternate ASP Active in AS"") \-\fR"
+.ip "" 2
+When the SGP or IPSP notifies the previously active ASP in a override AS
+that an alternate ASP has become active, it \fB\)MUST\fR include the
+\fI\)Load Selector\fR indicating the Load Group, if any, with the
+\fI\)ASP Identifier\fR, if available, in the \fB\)NTFY\fR message.
+.ip "" 2
+The purpose of this procedure is to inform the previously active ASP,
+not only of the that another ASP has taken over the traffic for which
+the notified ASP was previously responsible, but to also indicate the
+identify of the overriding ASP and the load selection that was
+overridden.
+.pp
+When an ASP becomes ASP-INACTIVE for a Load Group or Application Server
+for the first time, the SGP \fB\)MAY\fR send \fB\)NTFY\fR messages
+indicating the state of the Application Server and the Load Groups in
+the application server to the newly inactive ASP.  Application Server
+state is notified by sending the appropriate \fB\)NTFY\fR message
+without a \fI\)Load Selector\fR parameter present in the message.  Load
+Group state is notified by sending the appropriate \fB\)NTFY\fR message
+with a \fI\)Load Selector\fR parameter indicating the Load Group in the
+message.
+.sh 2 "Registration"
+.pp
+UAs permit Application Server Processes to register for the \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) associated with a \fI\)Routing
+Key\fR (\fI\)Link Key\fR).  \fI\)LOADGRP\fR extends the registration procedure
+to also permit the Application Server Process to register a \fI)Load
+Distribution\fR against a \fI\)Load Selector\fR identifying a Load Group
+in addition to the \fI\)Routing Context\fR (\fI\)Interface Id\fR).
+.pp
+This is performed by extending the registration procedure of \fI\)Load
+Selection\fR
+.[
+loadsel05
+.]
+by adding the \fI\)Load Distribution\fR parameter to the \fI\)REG REQ\fR
+message during registration.  The \fI\)Load Distribution\fR parameter is
+analogous to the \fI\)Traffic Mode Type\fR parameter.
+.pp
+In addition to the normal registration procedures of the UAs, the following
+additional error conditions can occur:
+.ip "\fI""Error \- Unsupported/Invalid Load Distribution""\fR" 3
+.ip "" 3
+This error \fB\)MUST\fR be sent in an \fB\)Registration Response (REG RSP)\fR
+message whenever the SG determines that the \fI\)Load Distribution\fR
+associated with a Load Group is invalid, is not supported by the SG, or is
+required to determine the Load Distribution algorithm of the Load Group but is
+missing from the \fI\)Load Selection\fR in the \fB\)REG REQ\fR message.
+.sh 2 "Interworking Procedures"
+.#e
+.sh 1 "Examples"
+.pp
+\fI\*(&f\n(&n\fR illustrates the example configuration that is used for all
+the examples in this section.  The example configuration consist of:
+.bu
+Two SGs (SG1 and SG2) acting as STPs in the SS7 network and consisting (for
+example) of a single SGP.  Each SG is connected to each of the ASPs in the
+example configuration.
+
+.bu
+Four ASPs (ASP1, ASP2, ASP3 and ASP4).  Each ASP is connected to both of the
+SGs in the example configuration.
+.bu
+Two Load Selectors (LS1 and LS2) are associated with the Application Server.
+The traffic that corresponds to each Load Selectors and the Load Distribution
+within each Load Selector is different in each example.
+.lp
+.(b
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig3.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+                      SCTP
+                      Associations  ________      _________
+           _________   ............|        |    /         \\
+          |         |..:    .......|  ASP1  |   |    AS1    |
+          |         |.....  :      |________|   |           |
+  ________|   SG1   |....:  :                   | ......... |
+         /|         |...::  :       ________    | :       : |
+  \\     / |_________|  :::..:......|        |   | :  LS1  : |
+   \\   /       |       ::   :......|  ASP2  |   | :.......: |
+    \\ /        |       ::   ::     |________|   |           |
+     X         |       ::   ::                  |           |
+    / \\        |       ::   ::      ________    |           |
+   /   \\   ____|____   ::...::.....|        |   |           |
+  /     \\ |         |..:....::.....|  ASP3  |   | ......... |
+  _______\\|         |..:.....::    |________|   | :       : |
+          |   SG2   |..:......:                 | :  LS2  : |
+          |         |..:.....       ________    | :.......: |
+          |_________|  :....:......|        |   |           |
+                            :......|  ASP4  |   |           |
+                                   |________|    \\_________/
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example Configuration"
+.)b
+.sh 3 "Initialization"
+.pp
+\fI\*(&f\n(&n\fR illustrates the common initialization procedure use for all
+of the examples.  Each ASP establishes an SCTP Association with SG1 and sends
+and ASP Up message to which it receives and ASP Up response.  The ASPs are not
+statically configured to serve specific AS or LS within the AS, so no Notify
+messages are received.  The same sequence of messages are also exchanged with
+SG2.
+.(b
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig4.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-Establish Association------>:    :    :    :       :
+    :<----:-ASPUP-----------------------:    :    :    :       :
+    :-----:-ASPUP ACK------------------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+(2) :<----:-Establish Association-------:--->:    :    :       :
+    :<----:-ASPUP-----------------------:----:    :    :       :
+    :-----:-ASPUP ACK-------------------:--->:    :    :       :
+    :     :                             :    :    :    :       :
+(3) :<----:-Establish Association-------:----:--->:    :       :
+    :<----:-ASPUP-----------------------:----:----:    :       :
+    :-----:-ASPUP ACK-------------------:----:--->:    :       :
+    :     :                             :    :    :    :       :
+(4) :<----:-Establish Association-------:----:----:--->:       :
+    :<----:-ASPUP-----------------------:----:----:----:       :
+    :-----:-ASPUP ACK-------------------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+(5) :     : (Same message exchange for SG2)  :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Initialization"
+.)b
+.sh 2 "M3UA with Override LG, Load-share AS, based on CIC"
+.pp
+This example is for an M3UA
+.[
+m3uarfc
+.]
+configuration with the Application Server (AS1) configured with a
+Traffic Mode Type of Load-share.  The Application Server (AS1) has
+associated with it a Routing Key (RK1) that consists of a Destination
+Point Code that corresponds to the AS1 (MGC1) point code (PC1), an
+Originating Point Code that corresponds to a remote MGC2 point code
+(PC2), and the SI value for ISUP (SI=5).  The Load Selectors (LS1 and
+LS2) correspond to two sets of CIC values which correspond to two
+different trunk groups between MGC1 and MGC2 (TG1 and TG2).
+.(b L
+.sh 3 "Activation"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig5.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-ASPAC(LS1/RC1)--------------:    :    :    :       :
+    :-----:-ASPAC ACK(LS1/RC1)--------->:    :    :    :       :
+    :-----:-NTFY(AS_Act)(LS1/RC1)------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<----:-ASPAC(LS2/RC1)--------------:----:    :    :       :
+    :-----:-ASPAC ACK(LS2/RC1)----------:--->:    :    :       :
+    :-----:-NTFY(AS_Act)(LS2/RC1)------>:    :    :    :       :
+    :-----:-NTFY(AS_Act)(LS2/RC1)-------:--->:    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(3) :<----:-ASPAC(LS2/RC1)--------------:----:----:    :       :
+    :-----:-ASPAC ACK(LS2/RC1)----------:----:--->:    :       :
+    :-----:-NTFY(Alt ASP)(LS2/RC1/ASP3)-:--->:    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS2)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(4) :<----:-ASPIA(LS2/RC1)--------------:----:    :    :       :
+    :-----:-ASPIA ACK(LS2/RC1)----------:--->:    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS2)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "M3UA Example \- Activation"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates activation of the ASPs for Load-share Load
+Distribution within the Override Application Server.  The sequence of
+events is as follows:
+.np
+ASP1 sends an ASP Active message to SG1 identifying \fI\)Load
+Selector\fR LS1 within Application Server AS1/RC1, optionally including
+a \fI\)Load Distribution\fR indicating ""Load-share,"" and receives an
+acknowledgement and a notification.  Data is transferred between the SG
+and ASP1 for Load Group LS1 within AS1. 
+.np
+ASP2 sends an ASP Active message to SG1 identifying \fI\)Load
+Selector\fR LS2 within Application Server AS1/RC1 and receives an
+acknowledgement and notification.  ASP1 also receives notification that
+LS2 is active for AS1/RC1.  Data is transferred between the SG and ASP2
+for AS1/RC1 load-shared on CIC between LS1/ASP1 and LS2/ASP2.
+.np
+ASP3 sends an ASP Active message to SG1 identifying \fI\)Load
+Selector\fR LS2 within Application Server AS1/RC1 and receives an
+acknowledgement.  Because LS2 is an Override Load Group, ASP2 gets a
+notification that ASP3 is now the active ASP for LS2/AS1/RC1.  Data is
+transfer to ASP3 for LS2 and remains transferred to ASP1 for LS1.
+.np
+ASP2 sends an ASP Inactive message to SG1 identifying \fI\)Load
+Selector\fR LS1 within Application Server AS1/RC1 and receives an
+acknowledgement.  Because ASP2 is not active in LS2, and LS2 is an
+Override Load Group, SG1 continues to load-share between LS1 to ASP1 and
+LS2 to ASP3.
+.(b L
+.sh 3 "Failure of ASP1"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig6.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<- - :-COMM LOST - - - - -XXXX- - -:    :    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:--->:    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:----:--->:    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:----:----:--->:       :
+    :-----:-NTFY(AS_Pending)(LS1/RC1)---:--->:    :    :       :
+    :-----:-NTFY(AS_Pending)(LS1/RC1)---:----:--->:    :       :
+    :-----:-NTFY(AS_Pending)(LS1/RC1)---:----:----:--->:       :
+    :     :                             :    :    :    :       :
+(3) :<----:-ASPAC(LS1/RC1)--------------:----:----:----:       :
+    :-----:-ASPAC ACK(LS1/RC1)----------:----:----:--->:       :
+    :-----:-NTFY(AS_Active)(LS1/RC1)----:--->:    :    :       :
+    :-----:-NTFY(AS_Active)(LS1/RC1)----:----:--->:    :       :
+    :-----:-NTFY(AS_Active)(LS1/RC1)----:----:----:--->:       :
+    :     :                             :    :    :    :       :
+(4) :<----:-DATA(LS1)-------------------:----:----:--->:<----->:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "M3UA Example \- Failure of ASP1"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates the failure of ASP1.  The sequence of
+events is as follows:
+.np
+Data for LS1 within AS1 is exchanged between SG1 and ASP1.  Data for LS2
+within AS1 is exchanged between SG1 and ASP2.
+.np
+Communication is lost between SG1 and ASP1.  ASP2, ASP3, and ASP4 are
+notified of the failure of ASP1 and the change of state of AS1 to
+\fB\)AS-PENDING\fR for LS1.  Data for LS2 in AS1 is unaffected.
+.np
+ASP4 (spare) responds to the \fB\)AS-PENDING\fR notification and
+activates for LS1 in AS1/RC1.  ASP2, ASP3 and ASP4 receive an
+\fB\)AS-ACTIVE\fR notification.  Data for LS1 in AS1 is now exchanged
+with ASP4.  Data for LS2 in AS1 continues to be exchanged with ASP2.
+.(b L
+.sh 3 "Sparing"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig7.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<----:-ASPAC(LS1/RC1)--------------:----:----:----:       :
+    :-----:-ASPAC ACK(LS1/RC1)----------:----:----:--->:       :
+    :-----:-NTFY(Alt ASP)(ASP4)-------->:    :    :    :       :
+    :     :                             :    :    :    :       :
+(3) :<----:-DATA(LS1)-------------------:----:----:--->:<----->:
+    :<----:-DATA(LS1)-------------------:----:----:--->:<----->:
+    :     :                             :    :    :    :       :
+(4) :<----:-ASPDN-----------------------:    :    :    :       :
+    :-----:-ASPDN ACK------------------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "M3UA Example \- Sparing"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates a sparing situation where one ASP takes
+over traffic from another so that the original ASP can be taken out of
+service.  The sequence of events is as follows:
+.np
+Data for LS1 in AS1 is exchange between SG1 and ASP1.
+.np
+ASP4 (spare) activates for LS1 in AS1 and receives an acknowledgement.
+ASP4 has overridden ASP1 and a notification is sent to ASP1 that
+indicates that ASP4 in now the "Alternate ASP Active for AS".
+.np
+Data for LS1 in AS1 is now being exchanged between SG1 and ASP4.
+.np
+ASP1 can now be taken down and out of service.
+.sh 2 "SUA with Load-share LG, Load-share AS based on GT"
+.pp
+This example is for an SUA
+.[
+suarfc
+.]
+configuration with the Application Server (AS1) configured with a
+Traffic Mode Type of Load-share.  The Application Server (AS1) has
+associated with it (RK1) that consists of Destination Point Code and
+Subsystem Number that corresponds to the AS1 (HLR1) point code (PC1).
+The Load Selectors (LS1 and LS2) correspond to two sets of Global Titles
+which correspond to Mobile and GSTN numbering.
+.(b L
+.sh 3 "Activation"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig8.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-ASPAC(LS1/RC1)--------------:    :    :    :       :
+    :-----:-ASPAC ACK(LS1/RC1)--------->:    :    :    :       :
+    :-----:-NTFY(AS_Act)(LS1/RC1)------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<----:-ASPAC(LS2/RC1)--------------:----:    :    :       :
+    :-----:-ASPAC ACK(LS2/RC1)----------:--->:    :    :       :
+    :-----:-NTFY(AS_Act)(LS2/RC1)------>:    :    :    :       :
+    :-----:-NTFY(AS_Act)(LS2/RC1)-------:--->:    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(3) :<----:-ASPAC(LS1/RC1)--------------:----:----:    :       :
+    :-----:-ASPAC ACK(LS1/RC1)----------:----:--->:    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(4) :<----:-ASPIA(LS1,LS2/RC1)----------:----:----:----:       :
+    :-----:-ASPIA ACK(LS1,LS2/RC1)------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+(5) :     : (Same message exchange for SG2)  :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "SUA Example \- Activation"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates activation of the ASPs for Load Selectors
+within the Load-share Application Server.  The sequence of events is as
+follows:
+.np
+ASP1 sends an ASP Active message to SG1 identifying Load Selector LS1
+within Application Server AS1/RC1 and receives an acknowledgement and a
+notification.  Data is transferred between the SG and ASP1 for Load
+Selector LS1 within AS1. 
+.np
+ASP2 sends an ASP Active message to SG1 identifying Load Selector LS2
+within Application Server AS1/RC1 and receives an acknowledgement and a
+notification.  ASP1 also receives notification that AS1/RC1 is active
+for LS2.  Data is transferred between the SG and ASP2 for Load Selector
+LS2 within AS1. 
+.np
+ASP3 sends an ASP Active message to SG1 identifying Load Selector LS1
+within Application Server AS1/RC1 and receives an acknowledgement.  Data
+is load-shared between the SG and ASP1 and ASP3 for Load Selector LS1
+within AS1. 
+.np
+ASP4 sends an ASP Inactive message to SG1 identifying Load Selector LS1
+and LS2 within Application Server AS1/RC1 and receives an
+acknowledgement.
+.np
+The same exchange is repeated for SG2.
+.(b L
+.sh 3 "Failure of ASP1 and ASP2"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig9.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<- - :-COMM LOST - - - - -XXXX- - -:    :    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:--->:    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:----:--->:    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(3) :<- - :-COMM LOST - - - - -XXXX- - -: - -:    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP2)--------:----:--->:    :       :
+    :-----:-NTFY(ASP Fail)(ASP2)--------:----:----:--->:       :
+    :-----:-NTFY(AS_Pending)(LS2/RC1)---:----:--->:    :       :
+    :-----:-NTFY(AS_Pending)(LS2/RC1)---:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(4) :<----:-ASPAC(LS2/RC1)--------------:----:----:----:       :
+    :-----:-ASPAC ACK(LS2/RC1)----------:----:----:--->:       :
+    :-----:-NTFY(AS_Active)(LS2/RC1)----:----:--->:    :       :
+    :-----:-NTFY(AS_Active)(LS2/RC1)----:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :<----:-DATA(LS2)-------------------:----:----:--->:<----->:
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "SUA Example \- Failure of ASP1 and ASP2"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates the failure of ASP1 followed by the failure of
+ASP2.  The sequence of events is as follows:
+.np
+Data for LS1 within AS1 is load-shared between ASP1 and ASP3.  Data for LS2
+within AS1 is transferred to ASP2.
+.np
+Communication is lost between SG1 and ASP1.  ASP2, ASP3, and ASP4 are notified
+of the failure of ASP1.  Data for LS1 in AS1 is now transferred to ASP3 only.
+Data for LS2 in AS1 is unaffected and is still transferred to ASP2.
+.np
+Communication is lost between SG1 and ASP2.  ASP3 and ASP4 are notified of the
+failure of ASP2 as well of the AS1 state change to \fB\)AS-PENDING\fR for LS2.
+Data for LS2 is queued at the SG.
+.np
+ASP4 (spare) responds to the \fB\)AS-PENDING\fR notification and activates for
+LS2 in AS1/RC1.  ASP3 and ASP4 receive an \fB\)AS-ACTIVE\fR notification for
+LS2.  Data for LS2 in AS1 is now transferred to ASP4.
+.(b L
+.sh 3 "Sparing"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig10.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(2) :<----:-ASPAC(LS1/RC1)--------------:----:----:----:       :
+    :-----:-ASPAC ACK(LS1/RC1)----------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :<----:-DATA(LS1)-------------------:----:----:--->:<----->:
+    :     :                             :    :    :    :       :
+(3) :<----:-ASPIA(LS1/RC1)--------------:    :    :    :       :
+    :-----:-ASPIA ACK(LS1/RC1)--------->:    :    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :<----:-DATA(LS1)-------------------:----:----:--->:<----->:
+    :     :                             :    :    :    :       :
+(5) :<----:-ASPDN-----------------------:    :    :    :       :
+    :-----:-ASPDN ACK------------------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "SUA Example \- Sparing"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates a sparing situation where one ASP takes over
+traffic from another so that the original ASP can be taken out of service.
+The sequence of events is as follows:
+.np
+Data for LS1 in AS1 is load-shared by SG1 between ASP1 and ASP3.
+.np
+ASP4 (spare) activates for LS1 in AS1 and receives and acknowledgement.  Data
+for LS1 in AS1 is now load-shared by SG1 between ASP1, ASP3 and ASP4.
+.np
+ASP1 deactivates for LS1 in AS1 and receives and acknowledgement.
+.np
+Data for LS1 in AS1 is now load-shared by SG1 between ASP3 and ASP4.
+.np
+ASP1 can now be taken down and out of service.
+.sh 2 "TUA with Broadcast LG, Load-share AS based on DID"
+.pp
+This example is for an TUA
+.[
+tua05
+.]
+configuration with the Application Server (AS1) configured with a Traffic Mode
+Type of Broadcast.  The Application Server (AS1) has associated with it (RK1)
+that consists of Destination Point Code and Subsystem Number that corresponds
+to the AS1 (HLR1) point code (PC1).  The Load Selectors (LS1 and LS2)
+correspond to two sets of Dialogue Ids which correspond to even and odd Dialogue
+Ids.
+.(b L
+.sh 3 "Activation"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig11.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-ASPAC(LS1/RC1)--------------:    :    :    :       :
+    :-----:-ASPAC ACK(LS1/RC1)--------->:    :    :    :       :
+    :-----:-NTFY(AS_Act)(LS1/RC1)------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)(CorrId)---------->:<---:----:----:------>:
+    :<----:-DATA(LS1)------------------>:<---:----:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<----:-ASPAC(LS2/RC1)--------------:----:    :    :       :
+    :-----:-ASPAC ACK(LS2/RC1)----------:--->:    :    :       :
+    :-----:-NTFY(AS_Act)(LS2/RC1)------>:    :    :    :       :
+    :-----:-NTFY(AS_Act)(LS2/RC1)-------:--->:    :    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS2)(CorrId)-----------:--->:<---:----:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(3) :<----:-ASPAC(LS1/RC1)--------------:----:----:    :       :
+    :-----:-ASPAC ACK(LS1/RC1)----------:----:--->:    :       :
+    :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:----:--->:    :       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)(CorrId)---------->:<---:--->:<---:------>:
+    :<----:-DATA(LS1)------------------>:<---:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(4) :<----:-ASPIA(LS2/RC1)--------------:----:----:----:       :
+    :-----:-ASPIA ACK(LS2/RC1)----------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+(5) :     : (Same message exchange for SG2)  :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "TUA Example \- Activation"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates activation of the ASPs for Load Selectors
+within the Broadcast Application Server.  The sequence of events is as
+follows:
+.np
+ASP1 sends an ASP Active message to SG1 identifying Load Selector LS1
+within Application Server AS1/RC1 and receives an acknowledgement and a
+notification.  Data is transferred between the SG and ASP1 for Load
+Selector LS1 within AS1.  The initial Data Messages for LS1 within AS1
+are tagged with a \fI\)Correlation Id\fR.
+.np
+ASP2 sends an ASP Active message to SG1 identifying Load Selector LS2
+within Application Server AS1/RC1 and receives an acknowledgement and a
+notification.  ASP1 also receives notification that AS1/RC1 is active
+for LS2.  Data is transferred between the SG and ASP2 for Load Selector
+LS2 within AS1.  The initial Data Messages for LS2 within AS1 are tagged
+with a \fI\)Correlation Id\fR.
+.np
+ASP3 sends an ASP Active message to SG1 identifying Load Selector LS1
+within Application Server AS1/RC1 and receives an acknowledgement.  Data
+is broadcast the SG and ASP1 and ASP3 for Load Selector LS1 within AS1.
+The initial Data Messages for LS2 within AS1 are tagged with a
+\fI\)Correlation Id\fR.
+.np
+ASP4 sends an ASP Inactive message to SG1 identifying Load Selector LS1
+and LS2 within Application Server AS1/RC1 and receives an
+acknowledgement.
+.np
+The same exchange is repeated for SG2.
+.(b L
+.sh 3 "Failure of ASP1 and ASP2"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig12.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-DATA(LS1)------------------>:<---:--->:<---:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(2) :<- - :-COMM LOST - - - - -XXXX- - -:    :    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:--->:    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:----:--->:    :       :
+    :-----:-NTFY(ASP Fail)(ASP1)--------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :<----:-DATA(LS2)-------------------:--->:<---:----:------>:
+    :     :                             :    :    :    :       :
+(3) :<- - :-COMM LOST - - - - -XXXX- - -: - -:    :    :       :
+    :-----:-NTFY(ASP Fail)(ASP2)--------:----:--->:    :       :
+    :-----:-NTFY(ASP Fail)(ASP2)--------:----:----:--->:       :
+    :-----:-NTFY(AS_Pending)(LS2/RC1)---:----:--->:    :       :
+    :-----:-NTFY(AS_Pending)(LS2/RC1)---:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(4) :<----:-ASPAC(LS2/RC1)--------------:----:----:----:       :
+    :-----:-ASPAC ACK(LS2/RC1)----------:----:----:--->:       :
+    :-----:-NTFY(AS_Active)(LS2/RC1)----:----:--->:    :       :
+    :-----:-NTFY(AS_Active)(LS2/RC1)----:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS2)(CorrId)-----------:----:----:--->:<----->:
+    :<----:-DATA(LS2)-------------------:----:----:--->:<----->:
+    :<----:-DATA(LS1)-------------------:----:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(5) :<----:-ASPDN-----------------------:    :    :    :       :
+    :-----:-ASPDN ACK------------------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "TUA Example \- Failure of ASP1"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates the failure of ASP1 followed by the failure of
+ASP2.  The sequence of events is as follows:
+.np
+Data for LS1 within AS1 is broadcast to ASP1 and ASP3.  Data for LS2
+within AS1 is sent to ASP2.
+.np
+Communication is lost between SG1 and ASP1.  ASP2, ASP3, and ASP4 are notified
+of the failure of ASP1.  Data for LS1 in AS1 is directed toward ASP3 only.
+Data for LS2 in AS1 is unaffected.
+.np
+Communication is lost between SG1 and ASP2.  ASP3 and ASP4 are notified of the
+failure of ASP1 as well of the AS1 state change to \fB\)AS-PENDING\fR for LS2.
+Data for LS2 is queued at the SG.
+.np
+ASP4 (spare) responds to the \fB\)AS-PENDING\fR notification and activates for
+LS2 in AS1/RC1.  ASP3 and ASP4 receive an \fB\)AS-ACTIVE\fR notification.
+Data for LS2 in AS1 is now exchanged with ASP4.  Initial DATA messages for LS2
+in AS1 are tagged with a
+\fI\)Correlation Id\fR.
+.(b L
+.sh 3 "Sparing"
+.(l L
+.ie '\*(.T'ps' \{\
+.so loadgrp-03.fig13.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   SG1   SG2                           ASP1 ASP2 ASP3 ASP4    AS1
+    :     :                             :    :    :    :       :
+(1) :<----:-DATA(LS1)------------------>:<---:--->:<---:------>:
+    :     :                             :    :    :    :       :
+(2) :<----:-ASPAC(LS1/RC1)--------------:----:----:----:       :
+    :-----:-ASPAC ACK(LS1/RC1)----------:----:----:--->:       :
+    :     :                             :    :    :    :       :
+    :<----:-DATA(LS1)(CorrId)-----------:----:----:--->:<----->:
+    :<----:-DATA(LS1)------------------>:<---:--->:<-->:<----->:
+    :     :                             :    :    :    :       :
+(3) :<----:-ASPIA(LS1/RC1)--------------:    :    :    :       :
+    :-----:-ASPIA ACK(LS1/RC1)--------->:    :    :    :       :
+    :     :                             :    :    :    :       :
+(4) :<----:-DATA(LS1)-------------------:----:--->:<-->:<----->:
+    :     :                             :    :    :    :       :
+(5) :<----:-ASPDN-----------------------:    :    :    :       :
+    :-----:-ASPDN ACK------------------>:    :    :    :       :
+    :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "TUA Example \- Sparing"
+.)l
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates a sparing situation where one ASP takes over
+traffic from another so that the original ASP can be taken out of service.
+The sequence of events is as follows:
+.np
+Data for LS1 in AS1 is broadcast from SG1 to ASP1 and ASP3.
+.np
+ASP4 (spare) activates for LS1 in AS1 and receives and acknowledgement.
+Data for LS1 in AS1 is now being broadcast from SG1 to ASP1, ASP3 and
+ASP4.  Initial data for LS1 in AS1 is tagged with a \fI\)Correlation Id\fR.
+.np
+ASP1 deactivates for LS1 in AS1 and receives and acknowledgement.
+.np
+Data for LS1 in AS1 is now broadcast from SG1 to ASP3 and ASP4.
+.np
+ASP1 can now be taken down and out of service.
+.#e
+.sh 1 "Security"
+.pp
+\fI\)LOADGRP\fR does not introduce any new security risks or
+considerations that are not already inherent in the UA
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+Please see SIGTRAN Security document
+.[
+sigsec
+%Z 1
+.]
+for security considerations and recommendations that are applicable to each UA.
+.#e
+.sh 1 "IANA Considerations"
+.pp
+\fI\)LOADGRP\fR adds the following parameter tag value (described in
+Section 3) to the Common Parameter numbering space for the UAs.
+.[
+iuarfc
+.]
+.[
+duarfc
+.]
+.[
+v5uarfc
+.]
+.[
+gr303ua00
+.]
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.ix +4
+.TS
+tab(:);
+lblb
+nl.
+Tag Value:Parameter Name
+_
+0x001a:Load Distribution \*#
+.TE
+.ix -4
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The \fI\)Load Distribution\fR parameter tag value
+shown throughout this document as \f(CB\)0x001a\fR will be assigned by IANA
+within the common parameter range of the SIGTRAN UAs and may change its value
+in further versions of this document.
+.)d
+.pp
+\fI\)LOADGRP\fR adds the following value to the \fI\)Error Code\fR
+parameter of the UAs.
+.ix +4
+.TS
+tab(:);
+nl.
+28:Unsupported Load Distribution \*#
+.TE
+.ix -4
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Error Code\fR value shown as \f(CR\)28\fR
+above will be assigned by IANA as a value of the common \fI\)Error Code\fR
+parameter for SIGTRAN UAs and may change its value in further versions of this
+document.
+.)d
+.pp
+\fI\)LOADGRP\fR adds the following value to the \fI\)Registration Status\fR
+field of the \fI\)Registration Result\fR parameter for the UAs.
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.ix +4
+.TS
+tab(:);
+nl.
+16:Error \- Invalid/Unsupported Load Distribution \*#
+.TE
+.ix -4
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Registration Status\fR value shown as
+\f(CR\)16\fR above will be assigned by IANA as a value of each UA-specific
+\fI\)Registration Status\fR parameter for each SIGTRAN UA and may change its
+value in further versions of this document.
+.)d
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Revision History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Changes from Version 0.4 to Version 0.5" 0 5
+.bu
+updated to new boilerplate.
+.bu
+updated references, version numbers and dates.
+.sh 2 "Changes from Version 0.3 to Version 0.4" 0 4
+.bu
+updated to IETF boilerplate for first and last page.
+.bu
+updated references, version numbers and dates.
+.bu
+resubmitted to sync with IETF numbering
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.bu
+updated references, version numbers and dates.
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.bu
+added list of abbreviations.
+.bu
+moved history section.
+.bu
+updated release version and dates.
+.bu
+updated references.
+.bu
+split reference section.
+.bu
+updated security section.
+.bu
+moved notes to end of document.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.bu
+added this section,
+.bu
+updated release version and dates,
+.bu
+updated references,
+.bu
+updated postscript diagrams,
+.bu
+minor formatting changes,
+.bu
+reworked the procedures section,
+.bu
+added interworking rules,
+.bu
+change \fI\)Load Selection\fR to \fI\)Load Selector\fR to match \fI\)LOADSEL\fR,
+.[
+loadsel05
+.]
+.bu
+added examples,
+.bu
+updated author's address.
+.sh 2 "Version 0.0" 0 0
+.pp
+The initial version of this document.
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-3\
+$Log: draft-bidulock-sigtran-loadgrp-05.me,v $
+Revision 0.9.2.1  2007/02/03 15:47:25  brian
+- added new drafts
+
+Revision 0.9.2.5  2006/06/27 09:41:15  brian
+- rereleased drafts
+
+Revision 0.9.2.4  2006/06/18 20:53:35  brian
+- preparing for draft rerelease
+
+Revision 0.9.2.3  2005/10/17 11:53:46  brian
+- updated drafts for republication
+
+Revision 0.9.2.2  2005/05/14 08:33:19  brian
+- copyright header correction
+
+Revision 0.9.2.1  2004/03/16 05:10:41  brian
+- Added drafts and figures.
+
+Revision 0.8.2.2  2003/08/01 12:23:15  brian
+Added abbreviations, updated format.
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.(b M
+.#v
+.uh "Acknowledgements"
+.pp
+The authors would like to thank
+Tolga Asveren,
+Ken Morneault,
+Barry Nagelberg,
+Benjamin J. Wilson,
+Jacques Rajchgod,
+Greg Sidebottom
+and
+Gery Verwimp
+for their valuable comments and suggestions.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2007
