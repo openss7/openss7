@@ -606,7 +606,7 @@ void
 version(int argc, char *argv[])
 {
 	if (verbose <= 0)
-
+		return;
 	fprintf(stdout, "\
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
@@ -642,7 +642,6 @@ help(int argc, char *argv[])
 	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
-\n\
 Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
@@ -652,28 +651,28 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -p, --port=PORT\n\
-        Specifies both the local and remote PORT number\n\
+        specifies both the local and remote PORT number\n\
     -l, --loc_host=LOCAL-HOST\n\
-        Specifies the  LOCAL-HOST (bind) for the SCTP socket with optional\n\
+        specifies the  LOCAL-HOST (bind) for the SCTP socket with optional\n\
         local port number\n\
     -r, --rem_host=REMOTE-HOST\n\
-        Specifies the REMOTE-HOST (connect) address for the SCTP socket\n\
+        specifies the REMOTE-HOST (connect) address for the SCTP socket\n\
         with optional remote port number\n\
     -t, --rep_time=REPORT-TIME\n\
-        Specifies the REPORT-TIME in seconds between reports\n\
+        specifies the REPORT-TIME in seconds between reports\n\
     -w, --length=LENGTH\n\
-        Specifies the message LENGTH\n\
+        specifies the message LENGTH\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exits\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        Prints copyright and permissions and exits\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 

@@ -196,6 +196,7 @@ AC_OPENSS7
 
 AC_CONFIG_FILES([Makefile
 		 doc/Makefile
+		 doc/drafts/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi

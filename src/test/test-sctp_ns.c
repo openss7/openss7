@@ -155,6 +155,8 @@ N_qos_sel_info_sctp_t qos_info = {
 
 #define HOST_BUF_LEN 256
 
+int rep_time = 1;
+
 static volatile int timer_timeout = 0;
 
 static void
@@ -186,7 +188,7 @@ timer_sethandler(void)
 static int
 start_timer(void)
 {
-	struct itimerval setting = { {0, 0}, {1, 0} };
+	struct itimerval setting = { {0, 0}, {rep_time, 0} };
 
 	if (timer_sethandler())
 		return -1;
@@ -207,7 +209,7 @@ sctp_get(int fd, int wait)
 		default:
 		case EPROTO:
 		case EINVAL:
-			perror("sctp_get: gestmsg");
+			perror("sctp_get: getmsg");
 			return -1;
 		case EINTR:
 		case ERESTART:
@@ -471,16 +473,6 @@ test_sctps(void)
 	}
 	fprintf(stderr, "--> Timer started\n");
 
-	/* 
-	   for (;;) { pfd[0].fd = fd; pfd[0].revents = 0; pfd[0].events = POLLIN; if (
-	   timer_timeout ) { printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld\n",
-	   inp_count, out_count, inp_count+out_count, out_count-inp_count); inp_count = 0;
-	   out_count = 0; if ( start_timer() ) { perror("timer"); goto dead; } } if ( poll(&pfd[0], 
-	   1, -1) < 0 ) { if ( errno == EINTR ) continue; perror("poll"); goto dead; } if (
-	   pfd[0].revents & POLLIN ) { while ( sctp_read(fd, ur_msg, sizeof(ur_msg)) == 0 &&
-	   ++inp_count ) { sctp_write(fd, ur_msg, data.len, 0, &qos_data); ++out_count; } if (
-	   errno != EAGAIN ) { fprintf(stderr,"sctp_read: couldn't read message\n"); goto dead; } } 
-	   } */
 	for (;;) {
 		pfd[0].fd = fd;
 		pfd[0].events = POLLIN | POLLOUT;
@@ -533,9 +525,9 @@ test_sctps(void)
 }
 
 void
-splash(int argc, char *argv[])
+copying(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
@@ -568,8 +560,8 @@ provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
 Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+distributed with, and only used for the testing of, OpenSS7 modules, drivers and\n\
+libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -584,13 +576,15 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
+	fflush(stdout);
 }
 
 void
 version(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
@@ -604,13 +598,13 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp_ns", PACKAGE, VERSION, "$Revision: 0.9.2.14 $ $Date: 2009-03-05 13:07:16 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.14 $ $Date: 2009-03-05 13:07:16 $");
 }
 
 void
 usage(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
@@ -624,7 +618,7 @@ Usage:\n\
 void
 help(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
@@ -673,8 +667,7 @@ main(int argc, char **argv)
 	char **hostlp = &hostl;
 	char **hostrp = &hostr;
 	short portl = TEST_PORT_NUMBER + 1;
-	short portr = TEST_PORT_NUMBER;
-	int time;
+	short portr = TEST_PORT_NUMBER + 0;
 	struct hostent *haddr;
 
 	for (;;) {
@@ -695,7 +688,7 @@ main(int argc, char **argv)
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{NULL, }
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
 
@@ -717,7 +710,7 @@ main(int argc, char **argv)
 			hostrp = &hostr;
 			break;
 		case 't':
-			time = atoi(optarg);
+			rep_time = atoi(optarg);
 			break;
 		case 'p':
 			portl = atoi(optarg);
@@ -745,7 +738,7 @@ main(int argc, char **argv)
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			splash(argc, argv);
+			copying(argc, argv);
 			exit(0);
 		case '?':
 		default:
