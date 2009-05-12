@@ -1,12 +1,13 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sock2path.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.6 $) $Date: 2008-09-22 03:48:05 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 ##
 ## -----------------------------------------------------------------------------
 ##
+## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
@@ -47,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-22 03:48:05 $ by $Author: brian $
+## Last Modified $Date$ by $Author$
 ##
 ## =============================================================================
 
@@ -109,24 +110,6 @@ EXTRA_DIST		+= src/util/sysconfig/sock2path
 
 ## =============================================================================
 ##
-## $Log: sock2path.am,v $
-## Revision 0.9.2.6  2008-09-22 03:48:05  brian
-## - mark our debugs as such
-##
-## Revision 0.9.2.5  2008-04-28 09:30:19  brian
-## - updated headers for release
-##
-## Revision 0.9.2.4  2007/12/15 20:19:29  brian
-## - updates
-##
-## Revision 0.9.2.3  2007/08/12 17:31:07  brian
-## - updated headers
-##
-## Revision 0.9.2.2  2006/12/28 11:06:56  brian
-## - distribute sock2path file
-##
-## Revision 0.9.2.1  2006/10/16 05:13:50  brian
-## - rules for configuration files
-##
+## $Log$
 ## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
