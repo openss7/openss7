@@ -87,7 +87,7 @@
 % =========================================================================
 
 \input texinfo
-@setfilename npi_sccp.info
+@setfilename npi_mtp.info
 @include texi/args.texi
 @set MANUAL_TITLE Network Provider Interface
 @set MANUAL_TYPE Corrigendum for MTP Conformance
@@ -149,7 +149,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @set MANUAL_TITLE Network Provider Interface
 @set MANUAL_TYPE Corrigendum for MTP Conformance
 
-@set PART Message Transfer Part
+@set PART Message Transfer
 @set LONG Message Transfer Part
 @set SHORT MTP
 @set INTERFACE NPI-MTP
@@ -173,7 +173,7 @@ This document specifies an (unofficial) addendum to the Network Provider Interfa
 Specification [NPI] for SS7 Message Transfer Part (MTP) [Q.704] conformance in support of the MTP to
 MTP User primitive interface [Q.701].  It supports the user-level XNS/NPI abstraction [XNS] of the
 Message Transfer Part User interface as well as providing a basis for MTP User protocols using the
-services of the SS7 Message Tranfer Part.
+services of the SS7 Message Transfer Part.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -399,9 +399,10 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
-(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
-components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Message
+Transfer Part
+(MTP) protocol stacks.  It provides abstraction of the Message Transfer interface to these
+components as well as providing a basis for Message Transfer control for other Message Transfer protocols.
 
 @subsection Purpose
 @cpindex STREAMS
@@ -537,7 +538,7 @@ that are exposed through the @file{<sys/npi_mtp.h>} header file.
 @node Protocol Address
 @section Protocol Address
 
-In an MTP environment, the protocol address is the MTP-SAPI that identifies the SS7 netweork, SS7
+In an MTP environment, the protocol address is the MTP-SAPI that identifies the SS7 network, SS7
 Signalling Point Code within the SS7 network, and the MTP-User identifier (service indicator).
 
 @node Connection and Connectionless Modes
@@ -545,7 +546,7 @@ Signalling Point Code within the SS7 network, and the MTP-User identifier (servi
 
 @subsection Connection-Oriented Mode
 
-The Message Transfer Part NSP supports connect-oriented mode for MTP-User protocols that form an
+The Message Transfer Part NSP supports connection-oriented mode for MTP-User protocols that form an
 association between two MTP-Users in an end-to-end exchange.  This includes TUP [Q.721], ISUP
 [Q.761], BTNUP, BICC and other call control protocols.
 
@@ -567,7 +568,7 @@ exchange of MTP.  This includes SCCP [Q.711], MTUP, and other MTP Users of a con
 
 The Message Transfer Part, both in connection-oriented mode and in connection-less mode, does not
 permit sending a NSDU of zero octets.  So, in connection-less mode, if the number of @msg{M_DATA}
-message blocks is zero, the @prim{N_UNITDATA_REQ} primitive will always faile with the
+message blocks is zero, the @prim{N_UNITDATA_REQ} primitive will always fail with the
 @parm{NPI_error} in the @prim{N_ERROR_ACK} set to @pval{NBADDATA}.  In connection-oriented mode, if
 the number of @msg{M_DATA} message block bytes is zero, the @prim{N_DATA_REQ} primitive will always
 fail with the @parm{NPI_error} in the @prim{N_ERROR_ACK} set to @pval{NBADDATA}.  If either the
@@ -585,7 +586,7 @@ negotiated in the NPI state @psta{NS_IDLE}, and are read-only in all other state
 
 @subsection Quality of Service Structures
 
-MTP-NPI provides quality of service structure selection for data, connections, information and range
+NPI-MTP provides quality of service structure selection for data, connections, information and range
 information.  The MTP specific quality of service structures are discussed in detail below.
 
 @node NPI-MTP
@@ -781,7 +782,7 @@ typedef struct {
 Specifies or indicates the quality of service structure type.  This field is always coded
 @pval{N_QOS_SEL_DATA_MTP}.
 @item sls
-Specifies the value fo the Signalling Link Selection field to use in outgoing MTP messages, or
+Specifies the value of the Signalling Link Selection field to use in outgoing MTP messages, or
 indicates the value of the Signalling Link Selection field that was received in incoming MTP
 messages.
 @item mp
@@ -826,8 +827,8 @@ Specifies the default Message Priority value to be used on the connection.
 
 @subsubheading N_QOS_SEL_INFO_MTP
 
-This quality of service structure type is used when selecting quality of service parameters
-for information with the @prim{N_INFO_ACK} primitive.
+This quality of service structure type is used when selecting quality of service parameters for
+information with the @prim{N_INFO_ACK} primitive.
 
 @subsubheading Format
 
@@ -839,8 +840,8 @@ typedef struct {
         np_ulong pvar;                  /* protocol variant */
         np_ulong popt;                  /* protocol options */
         np_ulong sls;                   /* signalling link selection */
-        np_ulong mp;                    /* message piority */
-} n_qos_sel_info_mtp_t;
+        np_ulong mp;                    /* message priority */
+} N_qos_sel_info_mtp_t;
 @end verbatim
 @end smallexample
 
@@ -866,7 +867,7 @@ value.
 
 @subsubheading N_QOS_RANGE_INFO_MTP
 
-This quality of service structure type is used hwen indicating the range quality of service
+This quality of service structure type is used when indicating the range quality of service
 parameters for information with the @prim{N_INFO_ACK} primitive.
 
 @subsubheading Format
@@ -934,7 +935,7 @@ Indicates the maximum size of data included in the @prim{N_CONN_REQ}, @prim{N_CO
 @prim{N_CONN_RES} and @prim{N_CONN_CON} primitives.
 @item DDATA_size
 Indicates the maximum size of data included in the @prim{N_DISCON_REQ} or @prim{N_DISCON_IND}
-primtiives.
+primitives.
 @item ADDR_size
 Indicates the maximum size of an address.   This is the size of the @type{sockaddr_mtp} structure.
 @item ADDR_length
@@ -943,10 +944,10 @@ Indicates the length of the associated protocol address.
 Indicates the offset of the associated protocol address from the beginning of the @msg{M_PCPROTO}
 message block.
 @item QOS_length
-Indicates the length of the quality of service parameters.
+Indicates the length of the selected quality of service parameters.
 @item QOS_offset
-Indicates the offset of the quality of service parameters from the beginning of the @msg{M_PCPROTO}
-message block.
+Indicates the offset of the selected quality of service parameters from the beginning of the
+@msg{M_PCPROTO} message block.
 @item QOS_range_length
 Indicates the length of the range of quality of service parameters.
 @item QOS_range_offset
@@ -962,7 +963,7 @@ Indicates the service type.  The service type can be one of the following:
 @item CLNS
 Indicates that the NSP is in Connection-less mode for the current Stream.
 @item CONS
-Indicates that the NSP is in Connect-oriented mode for the current Stream.
+Indicates that the NSP is in Connection-oriented mode for the current Stream.
 @end table
 @item CURRENT_state
 Indicates the current state of the NSP.  The current states can be one of the following:
@@ -1012,7 +1013,7 @@ and was previously in the @psta{NS_WRES_RIND} state.
 Indicates the type of NS provider.  The value of this field can be one of the following:
 @table @pval
 @item N_SNICFP
-The provider is a subnetwork independent convergence function/protoocol sub-layer of the network
+The provider is a subnetwork independent convergence function/protocol sub-layer of the network
 layer.
 @item N_SUBNET
 The provider is a subnetwork.
@@ -2175,15 +2176,65 @@ The mapping of NPI primitives to Q.704 [Q.704] and ANSI T1.111 [T1.111] is shown
 @node Glossary
 @unnumbered Glossary
 
+@table @emph
+@item Signalling Data Link Service Data Unit
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+@item Data transfer
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+@item SDL provider
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+@item SDL user
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+@item Local management
+The phase in connection and connectionless modes in which a SDL user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+@item PPA
+The point at which a system attaches itself to a physical communications medium.
+@item PPA identifier
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
 @node Acronyms
 @unnumbered Acronyms
 
+@multitable {SDL SDU}{International Telecommunications Union}
+@item SDLI @tab Signalling Data Link Interface
+@item SDL @tab Signalling Data Link
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item ITU-T @tab International Telecommunications Union - Telecom Sector
+@item PPA @tab Physical Point of Attachment
+@end multitable
+
 @node References
 @unnumbered References
+@enumerate
+@item ITU-T Recommendation X.210, (Geneva, 1993), ``Information Technology --- Open Systems Interconnection --- Basic reference model: Conventions for the definition of OSI services,'' ISO/IEC 10731:1994.
+@item ITU-T Recommendation X.217, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Service definition for the Association Control Service Element,'' ISO/IEC 8649:1996.
+@item ITU-T Recommendation X.227, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connection-oriented protocol for the Association Control Service Element: Protocol Specification,'' ISO/IEC 8650-1.
+@item ITU-T Recommendation X.237, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless protocol for the Association Control Service Element: Protocol Specification,'' ISO/IEC 10035-1 : 1995.
+@item ITU-T Recommendation X.216, (Geneva, 1994), ``Information Technology --- Open Systems Interconnection --- Presentation service definition,'' ISO/IEC 8822:1994.
+@item ITU-T Recommendation X.226, (Geneva, 1994), ``Information Technology --- Open Systems Interconnection --- Connection-oriented presentation protocol: Protocol specification,'' ISO/IEC 8823-1:1994.
+@item ITU-T Recommendation X.236, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless presentation protocol: Protocol specification,'' ISO/IEC 9576-1:1995.
+@item ITU-T Recommendation X.215, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Session service definition,'' ISO/IEC 8326:1996.
+@item ITU-T Recommendation X.225, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connection-oriented session protocol: Protocol specification,'' ISO/IEC 8327-1:1996.
+@item ITU-T Recommendation X.235, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Connectionless session protocol: Protocol specification,'' ISO/IEC 9548-1:1995.
+@item ITU-T Recommendation X.214, (Geneva, 1995), ``Information Technology --- Open Systems Interconnection --- Transport service definition,'' ISO/IEC 8072:1996.
+@item ITU-T Recommendation X.224
+@item ITU-T Recommendation Q.700
+@item ITU-T Recommendation Q.701
+@item ITU-T Recommendation Q.702
+@item ITU-T Recommendation Q.703
+@item ITU-T Recommendation Q.704
+@item Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
+@item ITU-T Recommendation Q.771, (Geneva, 1993), ``Signalling System No. 7 --- Functional description of transaction capabilities,'' (White Book).
+@end enumerate
 
 @node Licenses 
 @unnumbered Licenses 
-@cindex licenses
 
 All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
 The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no

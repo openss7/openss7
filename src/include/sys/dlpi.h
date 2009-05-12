@@ -71,215 +71,216 @@ typedef u_int16_t dl_ushort;
 /*
    DLPI revision definition history
  */
-#define DL_CURRENT_VERSION		0x02	/* current version of DLPI */
-#define DL_VERSION_2			0x02	/* DLPI March 12, 1991 */
+#define DL_CURRENT_VERSION	0x02	/* current version of DLPI */
+#define DL_VERSION_2		0x02	/* DLPI March 12, 1991 */
 
 /*
    Primitives for Local Management Services
  */
-#define DL_INFO_REQ			0x00	/* Information Req */
-#define DL_INFO_ACK			0x03	/* Information Ack */
-#define DL_ATTACH_REQ			0x0b	/* Attach a PPA */
-#define DL_DETACH_REQ			0x0c	/* Detach a PPA */
-#define DL_BIND_REQ			0x01	/* Bind dlsap address */
-#define DL_BIND_ACK			0x04	/* Dlsap address bound */
-#define DL_UNBIND_REQ			0x02	/* Unbind dlsap address */
-#define DL_OK_ACK			0x06	/* Success acknowledgment */
-#define DL_ERROR_ACK			0x05	/* Error acknowledgment */
-#define DL_SUBS_BIND_REQ		0x1b	/* Bind Subsequent DLSAP address */
-#define DL_SUBS_BIND_ACK		0x1c	/* Subsequent DLSAP address bound */
-#define DL_SUBS_UNBIND_REQ		0x15	/* Subsequent unbind */
-#define DL_ENABMULTI_REQ		0x1d	/* Enable multicast addresses */
-#define DL_DISABMULTI_REQ		0x1e	/* Disable multicast addresses */
-#define DL_PROMISCON_REQ		0x1f	/* Turn on promiscuous mode */
-#define DL_PROMISCOFF_REQ		0x20	/* Turn off promiscuous mode */
+#define DL_INFO_REQ		0x00	/* Information Req */
+#define DL_INFO_ACK		0x03	/* Information Ack */
+#define DL_ATTACH_REQ		0x0b	/* Attach a PPA */
+#define DL_DETACH_REQ		0x0c	/* Detach a PPA */
+#define DL_BIND_REQ		0x01	/* Bind dlsap address */
+#define DL_BIND_ACK		0x04	/* Dlsap address bound */
+#define DL_UNBIND_REQ		0x02	/* Unbind dlsap address */
+#define DL_OK_ACK		0x06	/* Success acknowledgment */
+#define DL_ERROR_ACK		0x05	/* Error acknowledgment */
+#define DL_SUBS_BIND_REQ	0x1b	/* Bind Subsequent DLSAP address */
+#define DL_SUBS_BIND_ACK	0x1c	/* Subsequent DLSAP address bound */
+#define DL_SUBS_UNBIND_REQ	0x15	/* Subsequent unbind */
+#define DL_ENABMULTI_REQ	0x1d	/* Enable multicast addresses */
+#define DL_DISABMULTI_REQ	0x1e	/* Disable multicast addresses */
+#define DL_PROMISCON_REQ	0x1f	/* Turn on promiscuous mode */
+#define DL_PROMISCOFF_REQ	0x20	/* Turn off promiscuous mode */
 
 /*
    Primitives used for Connectionless Service
  */
-#define DL_UNITDATA_REQ			0x07	/* datagram send request */
-#define DL_UNITDATA_IND			0x08	/* datagram receive indication */
-#define DL_UDERROR_IND			0x09	/* datagram error indication */
-#define DL_UDQOS_REQ			0x0a	/* set QOS for subsequent datagrams */
+#define DL_UNITDATA_REQ		0x07	/* datagram send request */
+#define DL_UNITDATA_IND		0x08	/* datagram receive indication */
+#define DL_UDERROR_IND		0x09	/* datagram error indication */
+#define DL_UDQOS_REQ		0x0a	/* set QOS for subsequent datagrams */
 
 /*
    Primitives used for Connection-Oriented Service
  */
-#define DL_CONNECT_REQ			0x0d	/* Connect request */
-#define DL_CONNECT_IND			0x0e	/* Incoming connect indication */
-#define DL_CONNECT_RES			0x0f	/* Accept previous connect indication */
-#define DL_CONNECT_CON			0x10	/* Connection established */
-#define DL_TOKEN_REQ			0x11	/* Passoff token request */
-#define DL_TOKEN_ACK			0x12	/* Passoff token ack */
-#define DL_DISCONNECT_REQ		0x13	/* Disconnect request */
-#define DL_DISCONNECT_IND		0x14	/* Disconnect indication */
-#define DL_RESET_REQ			0x17	/* Reset service request */
-#define DL_RESET_IND			0x18	/* Incoming reset indication */
-#define DL_RESET_RES			0x19	/* Complete reset processing */
-#define DL_RESET_CON			0x1a	/* Reset processing complete */
+#define DL_CONNECT_REQ		0x0d	/* Connect request */
+#define DL_CONNECT_IND		0x0e	/* Incoming connect indication */
+#define DL_CONNECT_RES		0x0f	/* Accept previous connect indication */
+#define DL_CONNECT_CON		0x10	/* Connection established */
+#define DL_TOKEN_REQ		0x11	/* Passoff token request */
+#define DL_TOKEN_ACK		0x12	/* Passoff token ack */
+#define DL_DISCONNECT_REQ	0x13	/* Disconnect request */
+#define DL_DISCONNECT_IND	0x14	/* Disconnect indication */
+#define DL_RESET_REQ		0x17	/* Reset service request */
+#define DL_RESET_IND		0x18	/* Incoming reset indication */
+#define DL_RESET_RES		0x19	/* Complete reset processing */
+#define DL_RESET_CON		0x1a	/* Reset processing complete */
 
 /*
    Primitives used for Acknowledged Connectionless Service
  */
-#define DL_DATA_ACK_REQ			0x21	/* data unit transmission request */
-#define DL_DATA_ACK_IND			0x22	/* Arrival of a command PDU */
-#define DL_DATA_ACK_STATUS_IND		0x23	/* Status indication of DATA_ACK_REQ */
-#define DL_REPLY_REQ			0x24	/* Request a DLSDU from the remote */
-#define DL_REPLY_IND			0x25	/* Arrival of a command PDU */
-#define DL_REPLY_STATUS_IND		0x26	/* Status indication of REPLY_REQ */
-#define DL_REPLY_UPDATE_REQ		0x27	/* Hold a DLSDU for transmission */
-#define DL_REPLY_UPDATE_STATUS_IND	0x28	/* Status of REPLY_UPDATE req */
+#define DL_DATA_ACK_REQ		0x21	/* data unit transmission request */
+#define DL_DATA_ACK_IND		0x22	/* Arrival of a command PDU */
+#define DL_DATA_ACK_STATUS_IND	0x23	/* Status indication of DATA_ACK_REQ */
+#define DL_REPLY_REQ		0x24	/* Request a DLSDU from the remote */
+#define DL_REPLY_IND		0x25	/* Arrival of a command PDU */
+#define DL_REPLY_STATUS_IND	0x26	/* Status indication of REPLY_REQ */
+#define DL_REPLY_UPDATE_REQ	0x27	/* Hold a DLSDU for transmission */
+#define DL_REPLY_UPDATE_STATUS_IND 0x28	/* Status of REPLY_UPDATE req */
 
 /*
    Primitives used for XID and TEST operations
  */
-#define DL_XID_REQ			0x29	/* Request to send an XID PDU */
-#define DL_XID_IND			0x2a	/* Arrival of an XID PDU */
-#define DL_XID_RES			0x2b	/* request to send a response XID PDU */
-#define DL_XID_CON			0x2c	/* Arrival of a response XID PDU */
-#define DL_TEST_REQ			0x2d	/* TEST command request */
-#define DL_TEST_IND			0x2e	/* TEST response indication */
-#define DL_TEST_RES			0x2f	/* TEST response */
-#define DL_TEST_CON			0x30	/* TEST Confirmation */
+#define DL_XID_REQ		0x29	/* Request to send an XID PDU */
+#define DL_XID_IND		0x2a	/* Arrival of an XID PDU */
+#define DL_XID_RES		0x2b	/* request to send a response XID PDU */
+#define DL_XID_CON		0x2c	/* Arrival of a response XID PDU */
+#define DL_TEST_REQ		0x2d	/* TEST command request */
+#define DL_TEST_IND		0x2e	/* TEST response indication */
+#define DL_TEST_RES		0x2f	/* TEST response */
+#define DL_TEST_CON		0x30	/* TEST Confirmation */
 
 /*
    Primitives to get and set the physical address
  */
-#define DL_PHYS_ADDR_REQ		0x31	/* Request to get physical addr */
-#define DL_PHYS_ADDR_ACK		0x32	/* Return physical addr */
-#define DL_SET_PHYS_ADDR_REQ		0x33	/* set physical addr */
+#define DL_PHYS_ADDR_REQ	0x31	/* Request to get physical addr */
+#define DL_PHYS_ADDR_ACK	0x32	/* Return physical addr */
+#define DL_SET_PHYS_ADDR_REQ	0x33	/* set physical addr */
 
 /*
    Primitives to get statistics
  */
-#define DL_GET_STATISTICS_REQ		0x34	/* Request to get statistics */
-#define DL_GET_STATISTICS_ACK		0x35	/* Return statistics */
+#define DL_GET_STATISTICS_REQ	0x34	/* Request to get statistics */
+#define DL_GET_STATISTICS_ACK	0x35	/* Return statistics */
 
 /*
    Invalid primitive
  */
-#define DL_PRIM_INVAL			0xffff	/* Invalid DL primitive value */
+#define DL_PRIM_INVAL		0xffff	/* Invalid DL primitive value */
 
 /*
    DLPI interface states
  */
-#define DL_UNATTACHED			0x04	/* PPA not attached */
-#define DL_ATTACH_PENDING		0x05	/* Waiting ack of DL_ATTACH_REQ */
-#define DL_DETACH_PENDING		0x06	/* Waiting ack of DL_DETACH_REQ */
-#define DL_UNBOUND			0x00	/* PPA attached */
-#define DL_BIND_PENDING			0x01	/* Waiting ack of DL_BIND_REQ */
-#define DL_UNBIND_PENDING		0x02	/* Waiting ack of DL_UNBIND_REQ */
-#define DL_IDLE				0x03	/* dlsap bound, awaiting use */
-#define DL_UDQOS_PENDING		0x07	/* Waiting ack of DL_UDQOS_REQ */
-#define DL_OUTCON_PENDING		0x08	/* awaiting DL_CONN_CON */
-#define DL_INCON_PENDING		0x09	/* awaiting DL_CONN_RES */
-#define DL_CONN_RES_PENDING		0x0a	/* Waiting ack of DL_CONNECT_RES */
-#define DL_DATAXFER			0x0b	/* connection-oriented data transfer */
-#define DL_USER_RESET_PENDING		0x0c	/* awaiting DL_RESET_CON */
-#define DL_PROV_RESET_PENDING		0x0d	/* awaiting DL_RESET_RES */
-#define DL_RESET_RES_PENDING		0x0e	/* Waiting ack of DL_RESET_RES */
-#define DL_DISCON8_PENDING		0x0f	/* Waiting ack of DL_DISC_REQ */
-#define DL_DISCON9_PENDING		0x10	/* Waiting ack of DL_DISC_REQ */
-#define DL_DISCON11_PENDING		0x11	/* Waiting ack of DL_DISC_REQ */
-#define DL_DISCON12_PENDING		0x12	/* Waiting ack of DL_DISC_REQ */
-#define DL_DISCON13_PENDING		0x13	/* Waiting ack of DL_DISC_REQ */
-#define DL_SUBS_BIND_PND		0x14	/* Waiting ack of DL_SUBS_BIND_REQ */
-#define DL_SUBS_UNBIND_PND		0x15	/* Waiting ack of DL_SUBS_UNBIND_REQ */
+#define DL_UNATTACHED		0x04	/* PPA not attached */
+#define DL_ATTACH_PENDING	0x05	/* Waiting ack of DL_ATTACH_REQ */
+#define DL_DETACH_PENDING	0x06	/* Waiting ack of DL_DETACH_REQ */
+#define DL_UNBOUND		0x00	/* PPA attached */
+#define DL_BIND_PENDING		0x01	/* Waiting ack of DL_BIND_REQ */
+#define DL_UNBIND_PENDING	0x02	/* Waiting ack of DL_UNBIND_REQ */
+#define DL_IDLE			0x03	/* dlsap bound, awaiting use */
+#define DL_UDQOS_PENDING	0x07	/* Waiting ack of DL_UDQOS_REQ */
+#define DL_OUTCON_PENDING	0x08	/* awaiting DL_CONN_CON */
+#define DL_INCON_PENDING	0x09	/* awaiting DL_CONN_RES */
+#define DL_CONN_RES_PENDING	0x0a	/* Waiting ack of DL_CONNECT_RES */
+#define DL_DATAXFER		0x0b	/* connection-oriented data transfer */
+#define DL_USER_RESET_PENDING	0x0c	/* awaiting DL_RESET_CON */
+#define DL_PROV_RESET_PENDING	0x0d	/* awaiting DL_RESET_RES */
+#define DL_RESET_RES_PENDING	0x0e	/* Waiting ack of DL_RESET_RES */
+#define DL_DISCON8_PENDING	0x0f	/* Waiting ack of DL_DISC_REQ */
+#define DL_DISCON9_PENDING	0x10	/* Waiting ack of DL_DISC_REQ */
+#define DL_DISCON11_PENDING	0x11	/* Waiting ack of DL_DISC_REQ */
+#define DL_DISCON12_PENDING	0x12	/* Waiting ack of DL_DISC_REQ */
+#define DL_DISCON13_PENDING	0x13	/* Waiting ack of DL_DISC_REQ */
+#define DL_SUBS_BIND_PND	0x14	/* Waiting ack of DL_SUBS_BIND_REQ */
+#define DL_SUBS_UNBIND_PND	0x15	/* Waiting ack of DL_SUBS_UNBIND_REQ */
 
 /*
    DL_ERROR_ACK error return values
  */
-#define DL_ACCESS			0x02	/* Improper permissions for request */
-#define DL_BADADDR			0x01	/* DLSAP addr in improper format or invalid */
-#define DL_BADCORR			0x05	/* Seq number not from outstand DL_CONN_IND */
-#define DL_BADDATA			0x06	/* User data exceeded provider limit */
-#define DL_BADPPA			0x08	/* Specified PPA was invalid */
-#define DL_BADPRIM			0x09	/* Primitive received not known by provider */
-#define DL_BADQOSPARAM			0x0a	/* QOS parameters contained invalid values */
-#define DL_BADQOSTYPE			0x0b	/* QOS structure type is unknown/unsupported */
-#define DL_BADSAP			0x00	/* Bad LSAP selector */
-#define DL_BADTOKEN			0x0c	/* Token used not an active stream */
-#define DL_BOUND			0x0d	/* Attempted second bind with dl_max_conind */
-#define DL_INITFAILED			0x0e	/* Physical Link initialization failed */
-#define DL_NOADDR			0x0f	/* Provider couldn't allocate alt. address */
-#define DL_NOTINIT			0x10	/* Physical Link not initialized */
-#define DL_OUTSTATE			0x03	/* Primitive issued in improper state */
-#define DL_SYSERR			0x04	/* UNIX system error occurred */
-#define DL_UNSUPPORTED			0x07	/* Requested serv. not supplied by provider */
-#define DL_UNDELIVERABLE		0x11	/* Previous data unit could not be delivered */
-#define DL_NOTSUPPORTED			0x12	/* Primitive is known but not supported */
-#define DL_TOOMANY			0x13	/* Limit exceeded */
-#define DL_NOTENAB			0x14	/* Promiscuous mode not enabled */
-#define DL_BUSY				0x15	/* Other streams for PPA in post-attached state */
-#define DL_NOAUTO			0x16	/* Automatic handling of XID and TEST response not
-						   supported.  */
-#define DL_NOXIDAUTO			0x17	/* Automatic handling of XID not supported */
-#define DL_NOTESTAUTO			0x18	/* Automatic handling of TEST not supported */
-#define DL_XIDAUTO			0x19	/* Automatic handling of XID response */
-#define DL_TESTAUTO			0x1a	/* Automatic handling of TEST response */
-#define DL_PENDING			0x1b	/* pending outstanding connect indications */
+#define DL_ACCESS	0x02	/* Improper permissions for request */
+#define DL_BADADDR	0x01	/* DLSAP addr in improper format or invalid */
+#define DL_BADCORR	0x05	/* Seq number not from outstand DL_CONN_IND */
+#define DL_BADDATA	0x06	/* User data exceeded provider limit */
+#define DL_BADPPA	0x08	/* Specified PPA was invalid */
+#define DL_BADPRIM	0x09	/* Primitive received not known by provider */
+#define DL_BADQOSPARAM	0x0a	/* QOS parameters contained invalid values */
+#define DL_BADQOSTYPE	0x0b	/* QOS structure type is unknown/unsupported */
+#define DL_BADSAP	0x00	/* Bad LSAP selector */
+#define DL_BADTOKEN	0x0c	/* Token used not an active stream */
+#define DL_BOUND	0x0d	/* Attempted second bind with dl_max_conind */
+#define DL_INITFAILED	0x0e	/* Physical Link initialization failed */
+#define DL_NOADDR	0x0f	/* Provider couldn't allocate alt. address */
+#define DL_NOTINIT	0x10	/* Physical Link not initialized */
+#define DL_OUTSTATE	0x03	/* Primitive issued in improper state */
+#define DL_SYSERR	0x04	/* UNIX system error occurred */
+#define DL_UNSUPPORTED	0x07	/* Requested serv. not supplied by provider */
+#define DL_UNDELIVERABLE 0x11	/* Previous data unit could not be delivered */
+#define DL_NOTSUPPORTED	0x12	/* Primitive is known but not supported */
+#define DL_TOOMANY	0x13	/* Limit exceeded */
+#define DL_NOTENAB	0x14	/* Promiscuous mode not enabled */
+#define DL_BUSY		0x15	/* Other streams for PPA in post-attached state */
+#define DL_NOAUTO	0x16	/* Automatic handling of XID and TEST response not
+				   supported.  */
+#define DL_NOXIDAUTO	0x17	/* Automatic handling of XID not supported */
+#define DL_NOTESTAUTO	0x18	/* Automatic handling of TEST not supported */
+#define DL_XIDAUTO	0x19	/* Automatic handling of XID response */
+#define DL_TESTAUTO	0x1a	/* Automatic handling of TEST response */
+#define DL_PENDING	0x1b	/* pending outstanding connect indications */
 
 /*
-   NOTE: The range of error codes from 0x80 - 0xff is reserved for implementation specific error
-   codes.  This reserved range of error codes will be defined by the DLS Provider.
+   NOTE: The range of error codes from 0x80 - 0xff is reserved for
+   implementation specific error codes.  This reserved range of error codes
+   will be defined by the DLS Provider.
  */
 
 /*
    DLPI media types supported
  */
-#define DL_CSMACD			0x00	/* IEEE 802.3 CSMA/CD network */
-#define DL_TPB				0x01	/* IEEE 802.4 Token Passing Bus */
-#define DL_TPR				0x02	/* IEEE 802.5 Token Passing Ring */
-#define DL_METRO			0x03	/* IEEE 802.6 Metro Net */
-#define DL_ETHER			0x04	/* Ethernet Bus */
-#define DL_HDLC				0x05	/* ISO HDLC protocol support */
-#define DL_CHAR				0x06	/* Character Synchronous protocol support */
-#define DL_CTCA				0x07	/* IBM Channel-to-Channel Adapter */
-#define DL_FDDI				0x08	/* Fiber Distributed data interface */
-#define DL_FC				0x10	/* Fibre Channel interface */
-#define DL_ATM				0x11	/* ATM */
-#define DL_IPATM			0x12	/* ATM Classical IP interface */
-#define DL_X25				0x13	/* X.25 LAPB interface */
-#define DL_ISDN				0x14	/* ISDN interface */
-#define DL_HIPPI			0x15	/* HIPPI interface */
-#define DL_100VG			0x16	/* 100 Based VG Ethernet */
-#define DL_100VGTPR			0x17	/* 100 Based VG Token Ring */
-#define DL_ETH_CSMA			0x18	/* ISO 8802/3 and Ethernet */
-#define DL_100BT			0x19	/* 100 Base T */
-#define DL_IB				0x1a	/* Infiniband */
-#define DL_FRAME			0x0a	/* Frame Relay LAPF */
-#define DL_MPFRAME			0x0b	/* Multi-protocol over Frame Relay */
-#define DL_ASYNC			0x0c	/* Character Asynchronous Protocol */
-#define DL_IPX25			0x0d	/* X.25 Classical IP interface */
-#define DL_LOOP				0x0e	/* software loopback */
-#define DL_OTHER			0x09	/* Any other medium not listed above */
+#define DL_CSMACD	0x00	/* IEEE 802.3 CSMA/CD network */
+#define DL_TPB		0x01	/* IEEE 802.4 Token Passing Bus */
+#define DL_TPR		0x02	/* IEEE 802.5 Token Passing Ring */
+#define DL_METRO	0x03	/* IEEE 802.6 Metro Net */
+#define DL_ETHER	0x04	/* Ethernet Bus */
+#define DL_HDLC		0x05	/* ISO HDLC protocol support */
+#define DL_CHAR		0x06	/* Character Synchronous protocol support */
+#define DL_CTCA		0x07	/* IBM Channel-to-Channel Adapter */
+#define DL_FDDI		0x08	/* Fiber Distributed data interface */
+#define DL_FC		0x10	/* Fibre Channel interface */
+#define DL_ATM		0x11	/* ATM */
+#define DL_IPATM	0x12	/* ATM Classical IP interface */
+#define DL_X25		0x13	/* X.25 LAPB interface */
+#define DL_ISDN		0x14	/* ISDN interface */
+#define DL_HIPPI	0x15	/* HIPPI interface */
+#define DL_100VG	0x16	/* 100 Based VG Ethernet */
+#define DL_100VGTPR	0x17	/* 100 Based VG Token Ring */
+#define DL_ETH_CSMA	0x18	/* ISO 8802/3 and Ethernet */
+#define DL_100BT	0x19	/* 100 Base T */
+#define DL_IB		0x1a	/* Infiniband */
+#define DL_FRAME	0x0a	/* Frame Relay LAPF */
+#define DL_MPFRAME	0x0b	/* Multi-protocol over Frame Relay */
+#define DL_ASYNC	0x0c	/* Character Asynchronous Protocol */
+#define DL_IPX25	0x0d	/* X.25 Classical IP interface */
+#define DL_LOOP		0x0e	/* software loopback */
+#define DL_OTHER	0x09	/* Any other medium not listed above */
 
 /*
    DLPI provider service supported.
 
    These must be allowed to be bitwise-OR for dl_service_mode in DL_INFO_ACK.
  */
-#define DL_CODLS			0x01	/* connection-oriented service */
-#define DL_CLDLS			0x02	/* connectionless data link service */
-#define DL_ACLDLS			0x04	/* acknowledged connectionless service */
+#define DL_CODLS	0x01	/* connection-oriented service */
+#define DL_CLDLS	0x02	/* connectionless data link service */
+#define DL_ACLDLS	0x04	/* acknowledged connectionless service */
 #ifdef _HPUX_SOURCE
-#define DL_HP_RAWDLS			0x08	/* raw data link service */
+#define DL_HP_RAWDLS	0x08	/* raw data link service */
 #endif				/* _HPUX_SOURCE */
 
 /*
    DLPI provider style.
 
-   The DLPI provider style which determines whether a provider requires a DL_ATTACH_REQ to inform
-   the provider which PPA user messages should be sent/received on.
+   The DLPI provider style which determines whether a provider requires a DL_ATTACH_REQ to
+   inform the provider which PPA user messages should be sent/received on.
  */
-#define DL_STYLE1			0x0500	/* PPA is implicitly bound by open(2) */
-#define DL_STYLE2			0x0501	/* PPA must be expl. bound via DL_ATTACH_REQ */
+#define DL_STYLE1	0x0500	/* PPA is implicitly bound by open(2) */
+#define DL_STYLE2	0x0501	/* PPA must be expl. bound via DL_ATTACH_REQ */
 
 /*
    DLPI Originator for Disconnect and Resets
  */
-#define DL_PROVIDER			0x0700
-#define DL_USER				0x0701
+#define DL_PROVIDER	0x0700
+#define DL_USER		0x0701
 
 /*
    DLPI Disconnect Reasons
@@ -300,73 +301,74 @@ typedef u_int16_t dl_ushort;
 /*
    DLPI Reset Reasons
  */
-#define DL_RESET_FLOW_CONTROL		0x0900
-#define DL_RESET_LINK_ERROR		0x0901
-#define DL_RESET_RESYNCH		0x0902
+#define DL_RESET_FLOW_CONTROL	0x0900
+#define DL_RESET_LINK_ERROR	0x0901
+#define DL_RESET_RESYNCH	0x0902
 
 /*
    DLPI status values for acknowledged connectionless data transfer
  */
-#define DL_CMD_MASK			0x0f	/* mask for command portion of status */
-#define DL_CMD_OK			0x00	/* Command Accepted */
-#define DL_CMD_RS			0x01	/* Unimplemented or inactivated service */
-#define DL_CMD_UE			0x05	/* Data Link User interface error */
-#define DL_CMD_PE			0x06	/* Protocol error */
-#define DL_CMD_IP			0x07	/* Permanent implementation dependent error */
-#define DL_CMD_UN			0x09	/* Resources temporarily unavailable */
-#define DL_CMD_IT			0x0f	/* Temporary implementation dependent error */
+#define DL_CMD_MASK	0x0f	/* mask for command portion of status */
+#define DL_CMD_OK	0x00	/* Command Accepted */
+#define DL_CMD_RS	0x01	/* Unimplemented or inactivated service */
+#define DL_CMD_UE	0x05	/* Data Link User interface error */
+#define DL_CMD_PE	0x06	/* Protocol error */
+#define DL_CMD_IP	0x07	/* Permanent implementation dependent error */
+#define DL_CMD_UN	0x09	/* Resources temporarily unavailable */
+#define DL_CMD_IT	0x0f	/* Temporary implementation dependent error */
 
-#define DL_RSP_MASK			0xf0	/* mask for response portion of status */
-#define DL_RSP_OK			0x00	/* Response DLSDU present */
-#define DL_RSP_RS			0x10	/* Unimplemented or inactivated service */
-#define DL_RSP_NE			0x30	/* Response DLSDU never submitted */
-#define DL_RSP_NR			0x40	/* Response DLSDU not requested */
-#define DL_RSP_UE			0x50	/* Data Link User interface error */
-#define DL_RSP_IP			0x70	/* Permanent implementation dependent error */
-#define DL_RSP_UN			0x90	/* Resources temporarily unavailable */
-#define DL_RSP_IT			0xf0	/* Temporary implementation dependent error */
+#define DL_RSP_MASK	0xf0	/* mask for response portion of status */
+#define DL_RSP_OK	0x00	/* Response DLSDU present */
+#define DL_RSP_RS	0x10	/* Unimplemented or inactivated service */
+#define DL_RSP_NE	0x30	/* Response DLSDU never submitted */
+#define DL_RSP_NR	0x40	/* Response DLSDU not requested */
+#define DL_RSP_UE	0x50	/* Data Link User interface error */
+#define DL_RSP_IP	0x70	/* Permanent implementation dependent error */
+#define DL_RSP_UN	0x90	/* Resources temporarily unavailable */
+#define DL_RSP_IT	0xf0	/* Temporary implementation dependent error */
 
 /*
    Service Class values for acknowledged connectionless data transfer
  */
-#define DL_RQST_RSP			0x01	/* Use acknowledge capability in MAC sublayer */
-#define DL_RQST_NORSP			0x02	/* No acknowledgement service requested */
+#define DL_RQST_RSP	0x01	/* Use acknowledge capability in MAC sublayer */
+#define DL_RQST_NORSP	0x02	/* No acknowledgement service requested */
 
 /*
    DLPI address type definition
  */
-#define DL_FACT_PHYS_ADDR		0x01	/* factory physical address */
-#define DL_CURR_PHYS_ADDR		0x02	/* current physical address */
-#define DL_IPV6_TOKEN			0x03	/* IPv6 interface token */
-#define DL_IPV6_LINK_LAYER_ADDR		0x04	/* Neighbor Discovery format */
+#define DL_FACT_PHYS_ADDR	0x01	/* factory physical address */
+#define DL_CURR_PHYS_ADDR	0x02	/* current physical address */
+#define DL_IPV6_TOKEN		0x03	/* IPv6 interface token */
+#define DL_IPV6_LINK_LAYER_ADDR	0x04	/* Neighbor Discovery format */
 
 /*
    DLPI flag definitions
  */
-#define DL_POLL_FINAL			0x01	/* poll/final bit for TEST/XID */
+#define DL_POLL_FINAL		0x01	/* poll/final bit for TEST/XID */
 
 /*
    XID and TEST responses supported by the provider
  */
-#define DL_AUTO_XID			0x01	/* provider will respond to XID */
-#define DL_AUTO_TEST			0x02	/* provider will respond to TEST */
+#define DL_AUTO_XID		0x01	/* provider will respond to XID */
+#define DL_AUTO_TEST		0x02	/* provider will respond to TEST */
 
 /*
    Subsequent bind types
  */
-#define DL_PEER_BIND			0x01	/* subsequent bind on a peer addr */
-#define DL_HIERARCHICAL_BIND		0x02	/* subs-bind on a hierarchical addr */
+#define DL_PEER_BIND		0x01	/* subsequent bind on a peer addr */
+#define DL_HIERARCHICAL_BIND	0x02	/* subs-bind on a hierarchical addr */
 
 /*
    DLPI promiscuous mode definitions
  */
-#define DL_PROMISC_PHYS			0x01	/* promiscuous mode at phys level */
-#define DL_PROMISC_SAP			0x02	/* promiscous mode at sap level */
-#define DL_PROMISC_MULTI		0x03	/* promiscuous mode for multicast */
+#define DL_PROMISC_PHYS		0x01	/* promiscuous mode at phys level */
+#define DL_PROMISC_SAP		0x02	/* promiscous mode at sap level */
+#define DL_PROMISC_MULTI	0x03	/* promiscuous mode for multicast */
 
 /*
-   DLPI Quality Of Service definition for use in QOS structure definitions. The QOS structures are
-   used in connection establishment, DL_INFO_ACK, and setting connectionless QOS values.
+   DLPI Quality Of Service definition for use in QOS structure definitions.  The QOS
+   structures are used in connection establishment, DL_INFO_ACK, and setting
+   connectionless QOS values.
  */
 
 /*
@@ -382,8 +384,9 @@ typedef struct {
 /*
    transit delay specification
 
-   This parameter is specified for both directions. expressed in milliseconds assuming a DLSDU size
-   of 128 octets. The scaling of the value to the current DLSDU size is provider dependent.
+   This parameter is specified for both directions. expressed in milliseconds assuming a
+   DLSDU size of 128 octets. The scaling of the value to the current DLSDU size is
+   provider dependent.
  */
 typedef struct {
 	dl_long dl_target_value;	/* desired value of service */
@@ -403,10 +406,10 @@ typedef struct {
 /*
    protection specification
  */
-#define DL_NONE				0x0B01	/* no protection supplied */
-#define DL_MONITOR			0x0B02	/* prot. from passive monit. */
-#define DL_MAXIMUM			0x0B03	/* prot. from modification, replay, addition, or
-						   deletion */
+#define DL_NONE		0x0B01	/* no protection supplied */
+#define DL_MONITOR	0x0B02	/* prot. from passive monit. */
+#define DL_MAXIMUM	0x0B03	/* prot. from modification, replay, addition, or deletion 
+				 */
 
 typedef struct {
 	dl_long dl_min;
@@ -416,7 +419,8 @@ typedef struct {
 /*
    Resilience specification
 
-   probabilities are scaled by a factor of 10,000 with a time interval of 10,000 seconds.
+   probabilities are scaled by a factor of 10,000 with a time interval of
+   10,000 seconds.
  */
 typedef struct {
 	dl_long dl_disc_prob;		/* prob. of provider init DISC */
@@ -424,20 +428,21 @@ typedef struct {
 } dl_resilience_t;
 
 /*
-   QOS type definition to be used for negotiation with the remote end of a connection, or a
-   connectionless unitdata request. There are two type definitions to handle the negotiation
-   process at connection establishment. The typedef dl_qos_range_t is used to present a range for
-   parameters. This is used in the DL_CONNECT_REQ and DL_CONNECT_IND messages. The typedef
-   dl_qos_sel_t is used to select a specific value for the QOS parameters. This is used in the
-   DL_CONNECT_RES, DL_CONNECT_CON, and DL_INFO_ACK messages to define the selected QOS parameters
-   for a connection.
+   QOS type definition to be used for negotiation with the remote end of a connection, or
+   a connectionless unitdata request. There are two type definitions to handle the
+   negotiation process at connection establishment.  The typedef dl_qos_range_t is used to
+   present a range for parameters. This is used in the DL_CONNECT_REQ and DL_CONNECT_IND
+   messages. The typedef dl_qos_sel_t is used to select a specific value for the QOS
+   parameters.  This is used in the DL_CONNECT_RES, DL_CONNECT_CON, and DL_INFO_ACK
+   messages to define the selected QOS parameters for a connection.
 
-   NOTE: A DataLink provider which has unknown values for any of the fields will use a value of
-   DL_UNKNOWN for all values in the fields.
+   NOTE: A DataLink provider which has unknown values for any of the fields will use a
+   value of DL_UNKNOWN for all values in the fields.
 
-   NOTE: A QOS parameter value of DL_QOS_DONT_CARE informs the DLS provider the user requesting
-   this value doesn't care what the QOS parameter is set to. This value becomes the least possible
-   value in the range of QOS parameters. The order of the QOS parameter range is then:
+   NOTE: A QOS parameter value of DL_QOS_DONT_CARE informs the DLS provider the user
+   requesting this value doesn't care what the QOS parameter is set to. This value becomes
+   the least possible value in the range of QOS parameters. The order of the QOS parameter
+   range is then:
 
    DL_QOS_DONT_CARE < 0 < MAXIMUM QOS VALUE
  */
@@ -445,16 +450,16 @@ typedef struct {
 #define DL_QOS_DONT_CARE	-2
 
 /*
-   Every QOS structure has the first 4 bytes containing a type field, denoting the definition of
-   the rest of the structure. This is used in the same manner has the dl_primitive variable is in
-   messages.
+   Every QOS structure has the first 4 bytes containing a type field, denoting the
+   definition of the rest of the structure. This is used in the same manner has the
+   dl_primitive variable is in messages.
 
    The following list is the defined QOS structure type values and structures.
  */
-#define DL_QOS_CO_RANGE1		0x0101	/* CO QOS range struct. */
-#define DL_QOS_CO_SEL1			0x0102	/* CO QOS selection structure */
-#define DL_QOS_CL_RANGE1		0x0103	/* CL QOS range struct. */
-#define DL_QOS_CL_SEL1			0x0104	/* CL QOS selection */
+#define DL_QOS_CO_RANGE1	0x0101	/* CO QOS range struct. */
+#define DL_QOS_CO_SEL1		0x0102	/* CO QOS selection structure */
+#define DL_QOS_CL_RANGE1	0x0103	/* CL QOS range struct. */
+#define DL_QOS_CL_SEL1		0x0104	/* CL QOS selection */
 
 typedef struct {
 	dl_ulong dl_qos_type;
@@ -507,16 +512,17 @@ union DL_qos_types {
 /*
    DLPI interface primitive definitions.
 
-   Each primitive is sent as a stream message.  It is possible that the messages may be viewed as a
-   sequence of bytes that have the following form without any padding. The structure definition of
-   the following messages may have to change depending on the underlying hardware architecture and
-   crossing of a hardware boundary with a different hardware architecture.
+   Each primitive is sent as a stream message.  It is possible that the messages may be
+   viewed as a sequence of bytes that have the following form without any padding. The
+   structure definition of the following messages may have to change depending on the
+   underlying hardware architecture and crossing of a hardware boundary with a different
+   hardware architecture.
 
-   Fields in the primitives having a name of the form dl_reserved cannot be used and have the value
-   of binary zero, no bits turned on.
+   Fields in the primitives having a name of the form dl_reserved cannot be used and have
+   the value of binary zero, no bits turned on.
 
-   Each message has the name defined followed by the stream message type (M_PROTO, M_PCPROTO,
-   M_DATA)
+   Each message has the name defined followed by the stream message type (M_PROTO,
+   M_PCPROTO, M_DATA)
  */
 
 /*

@@ -61,10 +61,20 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= mtpi.texi npi_mtp.texi
 
+mtpi.h: $(top_srcdir)/src/include/ss7/mtpi.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += mtpi.h
+
 mtpi_TEXINFOS		= \
 			  mtpi.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
+
+npi_mtp.h: $(top_srcdir)/src/include/sys/npi_mtp.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += npi_mtp.h
 
 npi_mtp_TEXINFOS	= \
 			  npi_mtp.h \

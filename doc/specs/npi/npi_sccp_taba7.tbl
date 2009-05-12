@@ -1,0 +1,76 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+ciss|cis
+li|li|li|li|li
+l|l|l|l|l.
+Q.711 Primitive:NPI Primitive
+_
+Generic:Specific:Parameter:Type:Field
+=
+N-COORD:request:Affected SSN:\*-:\*-
+:_:_:_:_
+:indicate:Affected SSN:\*-:\*-
+::SMI::\*-
+:_:_:_:_
+:respond:Affected SSN:\*-:\*-
+:_:_:_:_
+:confirm:Affected SSN:\*-:\*-
+::SMI::\*-
+_
+N-STATE:request:Affected SSN:\*-:\*-
+::User status::\*-
+:_:_:_:_
+:indicate:Affected SSN:N_UDERROR_IND:(implied)
+::User status::ERROR_type
+::SMI::\*-
+::_:_:_
+::Affected SSN:N_RESET_IND:(implied)
+::User status::RESET_reason
+::_:_:_
+::Affected SSN:N_DISCON_IND:(implied)
+::User status::DISCON_reason
+::SMI::\*-
+_
+N-PCSTATE:indicate:Affected MTP-SAP:N_UDERROR_IND:(implied)
+::SP status::ERROR_type
+::Rest. Imp.::ERROR_type
+::SCCP status::ERROR_type
+::_:_:_
+::Affected MTP-SAP:N_RESET_IND:(implied)
+::SP status::RESET_reason
+::Rest. Imp.::RESET_reason
+::SCCP status::RESET_reason
+::_:_:_
+::Affected MTP-SAP:N_DISCON_IND:(implied)
+::SP status::DISCON_reason
+::Rest. Imp.::DISCON_reason
+::SCCP status::DISCON_reason
+.TH
+.TE

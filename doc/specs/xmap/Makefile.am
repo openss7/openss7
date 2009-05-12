@@ -61,7 +61,15 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= xmap.texi
 
-xmap_TEXINFOS	= \
+xmap.h: $(top_srcdir)/src/include/xmap.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+xmap_gsm.h: $(top_srcdir)/src/include/xmap_gsm.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += xmap.h xmap_gsm.h
+
+xmap_TEXINFOS		= \
 		  	  xmap.h \
 		  	  xmap_gsm.h \
 			  example.c \

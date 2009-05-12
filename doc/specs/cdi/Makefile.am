@@ -61,7 +61,13 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= cdi.texi
 
+cdi.h: $(top_srcdir)/src/include/sys/cdi.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += cdi.h
+
 cdi_TEXINFOS		= \
+			  cdi.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 

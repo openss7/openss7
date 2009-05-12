@@ -61,6 +61,14 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= nli.texi
 
+x25_control.h: $(top_srcdir)/src/include/netx25/x25_control.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+x25_proto.h: $(top_srcdir)/src/include/netx25/x25_proto.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += x25_control.h x25_proto.h
+
 nli_TEXINFOS		= \
 			  x25_control.h \
 			  x25_proto.h \

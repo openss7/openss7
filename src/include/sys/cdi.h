@@ -253,14 +253,14 @@
 /*
  * CDI interface primitive definitions.
  *
- * Each primitive is sent as a Stream message.  It is possible that the messages
- * may be viewed as a sequence of bytes that have the following form without any
- * padding. The structure definition of the following messages may have to
- * change depending on the underlying hardware architecture and crossing of a
- * hardware boundary with a different hardware architecture.
+ * Each primitive is sent as a Stream message.  It is possible that the messages may be
+ * viewed as a sequence of bytes that have the following form without any padding. The
+ * structure definition of the following messages may have to change depending on the
+ * underlying hardware architecture and crossing of a hardware boundary with a different
+ * hardware architecture.
  *
- * Each message has the name defined followed by the Stream message type
- * (M_PROTO, M_PCPROTO, M_DATA)
+ * Each message has the name defined followed by the Stream message type (M_PROTO,
+ * M_PCPROTO, M_DATA)
  */
 
 typedef int32_t cd_long;
@@ -454,8 +454,8 @@ typedef struct {
 /*
  * CD_MODEM_SIG_REQ, M_PROTO type
  *
- * Assert the modem signals with '1' bits in the cd_sigs mask and drop those
- * signals with '0' bits.  Sensed modem signals such as DCD or CTS are ignored.
+ * Assert the modem signals with '1' bits in the cd_sigs mask and drop those signals with
+ * '0' bits.  Sensed modem signals such as DCD or CTS are ignored.
  */
 typedef struct {
 	cd_ulong cd_primitive;
@@ -465,10 +465,10 @@ typedef struct {
 /*
  * CD_MODEM_SIG_IND, M_PROTO type
  *
- * The cd_sigs field reports the current state of the modem signals.  This
- * message is sent when modem signals change at the hardware interface.  Only
- * changes in signals selected by the cd_modem_sig_enb_req_t cd_sigs mask will
- * be evaluated for purposes of change detection.
+ * The cd_sigs field reports the current state of the modem signals.  This message is sent
+ * when modem signals change at the hardware interface.  Only changes in signals selected
+ * by the cd_modem_sig_enb_req_t cd_sigs mask will be evaluated for purposes of change
+ * detection.
  */
 typedef struct {
 	cd_ulong cd_primitive;

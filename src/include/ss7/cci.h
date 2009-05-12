@@ -54,8 +54,8 @@
  $Log$
  *****************************************************************************/
 
-#ifndef __CCI_H__
-#define __CCI_H__
+#ifndef __SS7_CCI_H__
+#define __SS7_CCI_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
@@ -952,4 +952,4 @@ union CC_primitives {
 	CC_maint_ind_t maint_ind;
 };
 
-#endif				/* __CCI_H__ */
+#endif				/* __SS7_CCI_H__ */

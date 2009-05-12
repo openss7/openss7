@@ -61,6 +61,17 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= cci.texi
 
+cci.h: $(top_srcdir)/src/include/ss7/cci.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+isupi.h: $(top_srcdir)/src/include/ss7/isupi.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+isdni.h: $(top_srcdir)/src/include/ss7/isdni.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += cci.h isupi.h isdni.h
+
 cci_TEXINFOS		= \
 			  cci.h \
 			  isupi.h \
