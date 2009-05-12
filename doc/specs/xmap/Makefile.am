@@ -62,6 +62,9 @@ if DEVELOPMENT
 info_TEXINFOS		+= xmap.texi
 
 xmap_TEXINFOS	= \
+		  	  xmap.h \
+		  	  xmap_gsm.h \
+			  example.c \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi

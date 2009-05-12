@@ -54,7 +54,7 @@
 .ds date February\ 14,\ 2004
 .ds expiry August\ 2004
 .nr levels 3
-.so ../draft.me
+.so draft.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'M2PA-TEST'\\\\*[date]'
@@ -109,7 +109,7 @@ This Internet Draft provides information for the Internet community on test
 cases for testing the
 \fISS7 MTP2-User Peer-to-Peer Adaptation Layer\fR
 .[
-m2pa-11
+m2pa11
 %Z 1
 .]
 based on the conformance test specifications for SS7 MTP Level 2.
@@ -134,7 +134,7 @@ history for this document appears at the end of the document.
 This draft provides a set of detailed tests of the
 \fISS7 MTP2-User Peer-to-Peer Adaptation Layer\fR
 .[
-m2pa-11
+m2pa11
 .]
 based on the test specifications for SS7 MTP Level 2.
 .[
@@ -144,7 +144,7 @@ These tests are intended to validate the
 \fISS7 MTP2-User Peer-to-Peer Adaptation Layer\fR
 (M2PA) protocol.
 .[
-m2pa-11
+m2pa11
 .]
 .pp
 These tests attempt to completely validate the M2PA protocol without
@@ -169,7 +169,7 @@ q781
 is largely applicable to SS7 signalling links using the SS7 MTP2-User
 Peer-to-Peer Adaptation Layer,
 .[
-m2pa-11
+m2pa11
 .]
 those test cases describe messages and some sequences that are not applicable
 to M2PA.  This document describes a set of Validation and Compatibility tests that
@@ -188,11 +188,11 @@ q780
 .pp
 M2PA
 .[
-m2pa-11
+m2pa11
 .]
 provides that, unless modified by the M2PA specification,
 .[
-m2pa-11
+m2pa11
 .]
 that the procedures of the applicable MTP Level 2 standard are to be used.
 This includes ITU,
@@ -249,7 +249,7 @@ although similar, are outside the scope of this document.
 .pp
 This document extends the terminology of M2PA
 .[
-m2pa-11
+m2pa11
 .]
 with the following terms:
 .lp
@@ -349,24 +349,24 @@ The keywords \fBMUST\fR, \fBMUST NOT\fR, \fBREQUIRED\fR, \fBSHALL\fR,
 \fBNOT RECOMMENDED\fR, \fBMAY\fR, and \fBOPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in RFC 2119.
 .[
-rfc 2119
+rfc2119
 %Z 1
 .]
 .pp
 This test specification is not a replacement for or extension of the \fISS7
 MTP2-User Peer-to-Peer Adaptation Layer\fR protocol specification.
 .[
-m2pa-11
+m2pa11
 .]
 Where this document and the requirements or recommendations of the \fISS7
 MTP2-User Peer-to-Peer Adaptation Layer\fR protocol specification
 .[
-m2pa-11
+m2pa11
 .]
 disagree, the requirements and recommendations of the \fISS7 MTP2-User
 Peer-to-Peer Adaptation Layer\fR protocol specification
 .[
-m2pa-11
+m2pa11
 .]
 shall be taken as authoritative.
 .\"
@@ -491,7 +491,7 @@ A protocol testing device acting as \(lqSP B\(rq.
 A simulation device or function used to issue commands and collect response to
 and from the SS7 MTP2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-11
+m2pa11
 .]
 implementation at position \(lqSP A\(rq.
 .np
@@ -519,7 +519,7 @@ q781
 .]
 with the exception that an M2PA
 .[
-m2pa-11
+m2pa11
 .]
 signalling link has been interposed for an SS7 signalling link.
 .[
@@ -569,7 +569,7 @@ An implementation for compatibility testing acting as \(lqSP B\(rq.
 A simulation device or function used to issue commands and collect responses to
 and from the SS7 MTP2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-11
+m2pa11
 .]
 implementation at position \(lqSP A\(rq.
 .np
@@ -577,7 +577,7 @@ implementation at position \(lqSP A\(rq.
 A simulation device or function used to issue commands and collect responses to
 and from the SS7 MTP2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-11
+m2pa11
 .]
 implementation at position \(lqSP B\(rq.
 .np
@@ -605,7 +605,7 @@ q781
 .]
 with the exception that an M2PA
 .[
-m2pa-11
+m2pa11
 .]
 signalling link has been interposed for an SS7 signalling link.
 .[
@@ -6205,7 +6205,7 @@ t1.111
 .]
 .B M2PA
 .[
-m2pa-11
+m2pa11
 .]
 requires that the excessive delay of acknowledgment timer T7 expire when the
 oldest unacknowledged User Data message is over T7 old.  This test sends User
@@ -6772,7 +6772,7 @@ are being performed, the test environment and Implementations Under Test (IUT)
 \fBMUST\fR use the security measures required in the Security section of the
 M2PA specification
 .[
-m2pa-11
+m2pa11
 .]
 while the tests are being performed.  Test results without the required
 security measures in place during testing will be of little value for
@@ -6793,7 +6793,7 @@ finalized.
 .np
 The test specification has been updated to M2PA Draft Revision 11.
 .[
-m2pa-11
+m2pa11
 .]
 .np
 Corrected error in test case 3.1.8: SP A should maintain the "Processor
@@ -6825,7 +6825,7 @@ synchronization, acknowledgement and sending rules for processor outage.
 .np
 The test specification has been updated to M2PA Draft Revision 9.
 .[
-m2pa-09
+m2pa09
 %Z 2
 .]
 .np
@@ -6846,14 +6846,14 @@ place during testing.
 .np
 M2PA Draft Revision 9
 .[
-m2pa-09
+m2pa09
 .]
 uses normal initial sequence numbers.  Sequence numbers on all tests have been
 updated to match.
 .np
 M2PA Draft Revision 9
 .[
-m2pa-09
+m2pa09
 .]
 makes proving configurable.
 Test cases have been added to
@@ -6863,7 +6863,7 @@ to test also the situation where the link is not configured for proving.
 .np
 M2PA Draft Revision 9
 .[
-m2pa-09
+m2pa09
 .]
 uses a flexible T7 timer that times the age of the oldest unacknowledged data
 message in the retransmission buffer.  This is slightly different that MTP2
@@ -6878,7 +6878,7 @@ acknowledgment) to test this variation from MTP2.
 .np
 M2PA Draft Revision 9
 .[
-m2pa-09
+m2pa09
 .]
 has some problems with T6 and T7 timer handling.  It is anticipated that
 changes will be made to the T6 and T7 timer handling.  Additions to test case
@@ -6888,7 +6888,7 @@ PROCESSOR-OUTAGE-ENDED renamed to PROCESSOR-RECOVERED.
 .np
 M2PA Draft Revision 9
 .[
-m2pa-09
+m2pa09
 .]
 has some problems with processor outage handing.  It is anticipated that
 changes will be made to the processor outage handling on both sides.
@@ -6923,12 +6923,12 @@ cases.
 .np
 The test specification has been updated to M2PA Draft Revision 7,
 .[
-m2pa-07
+m2pa07
 %Z 2
 .]
 with anticipated changes for M2PA Draft Revision 8.
 .[
-m2pa-08
+m2pa08
 %Z 2
 .]
 .sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
@@ -6936,17 +6936,17 @@ m2pa-08
 .np
 The test specification has been updated to M2PA Draft Revision 6,
 .[
-m2pa-06
+m2pa06
 %Z 2
 .]
 with anticipated changes for M2PA Draft Revision 7.
 .[
-m2pa-07
+m2pa07
 .]
 .np
 M2PA Draft Revision 6
 .[
-m2pa-06
+m2pa06
 .]
 provides for acknowledgment of DATA messages using a special DATA message
 which contains no data payload.  This message has been labeled "DATA-ACK" in
@@ -6957,7 +6957,7 @@ This has resulted in changes to test cases 1.6, 2.1, 2.2, 2.3, 2.4, 3.2, 3.4,
 .np
 Although M2PA Draft Revision 6
 .[
-m2pa-06
+m2pa06
 .]
 specifies that the DATA-ACK message should have its Forward Sequence Number
 (FSN) incremented as with any other normal DATA message, this causes problems
@@ -6966,7 +6966,7 @@ anticipates M2PA Draft Revision 7 by not incrementing FSN for DATA-ACK messages.
 .np
 M2PA Draft Revision 6
 .[
-m2pa-06
+m2pa06
 .]
 provides FSN and BSN sequence numbers in STATUS messages as well as DATA
 messages.  It has been proposed that STATUS messages not contain FSN and BSN
@@ -6978,30 +6978,30 @@ version of the test specification in anticipation of M2PA Draft Revision 7.
 .np
 The test specification has been updated to M2PA Draft Revision 4,
 .[
-m2pa-04
+m2pa04
 %Z 2
 .]
 with anticipated changes for M2PA Draft Revision 5.
 .[
-m2pa-05
+m2pa05
 %Z 2
 .]
 .np
 M2PA Draft Revision 4
 .[
-m2pa-04
+m2pa04
 .]
 no longer contains a special proving message.  Status PROVING-NORMAL or
 PROVING-EMERGENCY messages are padded and sent repeatedly to accomplish
 proving during the proving period.  The occurrence of PROVING messages has been
 removed from the test cases to update this draft to match the M2PA draft revision 4.
 .[
-m2pa-04
+m2pa04
 .]
 .np
 M2PA Draft Revision 4
 .[
-m2pa-04
+m2pa04
 .]
 contains both forward and backward sequence numbers (FSN, BSN).  The test
 cases were updated to include the sequence numbers (where other than zero) and
@@ -7009,13 +7009,13 @@ test cases were added for abnormal backward sequence numbers.
 .np
 M2PA Draft Revision 4
 .[
-m2pa-04
+m2pa04
 .]
 has no formal method for acknowledging the receipt of a DATA message when
 there are no other messages to send (DATA or STATUS).  The Status of
 "In Service", for which no other use has been specified in the current draft,
 .[
-m2pa-04
+m2pa04
 .]
 is used as such an explicit acknowledgment.  Another possibility would have
 been to send a DATA message with no data in it.
@@ -7025,7 +7025,7 @@ The status message previously labeled "IN-SERVICE" has been relabeled
 "READY" to better reflect the name of that status message in the draft and to
 not conflict with the new
 .[
-m2pa-04
+m2pa04
 .]
 "IN-SERVICE" status message.
 .)b

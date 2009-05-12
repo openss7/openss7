@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3>0 \{\
@@ -204,7 +207,7 @@ bracket-label " [" "]" ", "
 .he 'Internet Draft'M3PA'\\\\*(td'
 .TS
 expand tab(;);
-l c r.
+lcr.
 Network Working Group;;Tolga Averson (ed.)
 INTERNET-DRAFT;;SS8 Networks Inc.
 ;;Brian Bidulock
@@ -252,11 +255,11 @@ This Internet-Draft describes SS7 MTP3-User Peer-to-Peer Adaptation Layer
 Procedures (M3PA) to support peer-to-peer operation for SS7 MTP3-User
 Adaptation Layer
 .[
-m3ua-12
+m3ua12
 .]
 in support of MTP3
 .[
-q.704
+q704
 .]
 users in an all IP network.  These procedures permit the seamless operation of
 SS7 MTP3-User in an all-IP environment, while not requiring (but allowing)
@@ -270,11 +273,11 @@ The Internet-Draft describes \fB\)SS7 MTP3-User Peer-to-Peer Adaptation Layer
 nodes in an IP network in extension to the messages and procedures provided
 for SS7 MTP3-User Adaptation Layer.
 .[
-m3ua-12
+m3ua12
 .]
 These extensions provide seamless operation of the MTP3-User interface
 .[
-q.704
+q704
 .]
 between M3UA endpoints (SGP and ASP) across an IP network.  Interworking
 between \fB\)M3PA\fR endpoints supporting these procedures and SS7 SGs is also
@@ -284,7 +287,7 @@ In addition, this I-D describes extension messages and procedures which are
 required to permit \fB\)M3PA\fR endpoints to act as relay points to other
 \fB\)M3PA\fR nodes, providing the Signalling Transfer Point (STP)
 .[
-q.705
+q705
 .]
 capabilities contained within an IP network.
 .pp
@@ -297,7 +300,7 @@ endpoints implement \fB\)M3PA\fR\).
 .pp
 \fB\)M3PA\fR\) supplements the terminology used in M3UA
 .[
-m3ua-12
+m3ua12
 .]
 by adding the following terms:
 .lp
@@ -329,7 +332,7 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 the MTP3
 .[
-q.704
+q704
 .]
 procedure for diverting signalling traffic from a failed primary linkset to an
 alternate linkset where sequence number information cannot be exchanged
@@ -418,7 +421,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Functional Areas"
 .sh 2 "Signalling Point Code Representation"
@@ -461,7 +464,7 @@ extension, their format and the message in which they are used.
 \fB\)M3PA\fR\) supplements the \fI\)Concerned Destination\fR\) parameter of
 M3UA
 .[
-m3ua-12
+m3ua12
 .]
 by allowing the parameter to be included in the \fB\)DUPU\fR message.  When
 the \fI\)Concerned Destination\fR parameter is included in the \fB\)DUPU\fR
@@ -470,7 +473,7 @@ indication of User Part Unavailability needs to be given.  When included in
 the \fB\)SCON\fR message, the interpretation of the \fI\)Concerned
 Destination\fR parameter is as given in M3UA.
 .[
-m3ua-12
+m3ua12
 .]
 .lp
 The \fI\)Concerned Destination\fR\) parameter is formatted as follows:
@@ -691,20 +694,20 @@ The format for DUPU message parameters is as follows:
 \fB\)M3PA\fR provides for a set of procedures which are suited to peer-to-peer
 operation which are based on the procedures of M3UA.
 .[
-m3ua-12
+m3ua12
 .]
 \fB\)M3PA\fR provide supplementary use of the \fI\)Concerned Destination\fR
 parameter in the \fB\)DUPU\fR message, as well as providing additional
 procedures for M3UA
 .[
-m3ua-12
+m3ua12
 .]
 messages.
 .sh 2 "Establishment of SCTP Associations"
 .pp
 An SCTP
 .[
-rfc 2960
+rfc2960
 .]
 Association between two IPSPs is treated as equivalent to a "Signalling Route"
 as defined in the MTP specifications \*#.
@@ -713,19 +716,19 @@ as defined in the MTP specifications \*#.
 For a definition of \fI\)"Signalling Route"\fR\), see the pertinent MTP
 specifications, such as the ITU specifications.
 .[
-q.704
+q704
 .]
 .)d
 Therefore, an SCTP
 .[
-rfc 2960
+rfc2960
 .]
 Association form a signalling relation between two ISPSs acting as Signalling
 Points.
 .pp
 Whenever an SCTP
 .[
-rfc 2960
+rfc2960
 .]
 Association is formed between two IPSPs, and the IPSPs have exchanged ASPUP
 and ASPUP Ack messages, the signalling relation is deemed to be available
@@ -736,7 +739,7 @@ is then determined by the exchange of SNMM messages between the IPSPs.\*#
 \fB\)NOTE:-\fR
 In contrast to the procedures and messages of M3UA
 .[
-m3ua-12
+m3ua12
 .]
 there is no need for IPSPs to exchange ASPTM or RKM messages.  These are
 backhaul messages and there is no need to use them for peer-to-peer operation.

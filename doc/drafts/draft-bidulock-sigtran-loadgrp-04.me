@@ -54,7 +54,7 @@
 .ds date June\ 18,\ 2006
 .ds expiry December\ 2006
 .nr levels 0
-.so ../draft3.me
+.so draft3.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'UA LOADGRP'\\\\*[date]'
@@ -93,40 +93,40 @@ iua-bis
 %Z 2
 .]
 .[
-dua
+dua05
 %Z 2
 .]
 .[
-v5ua
+v5ua03
 %Z 2
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 %Z 2
 .]
 .[
-m2ua
+m2ua-rfc
 %Z 1
 .]
 .[
-m3ua
+m3ua-rfc
 %Z 1
 .]
 .[
-sua
+sua-rfc
 %Z 1
 .]
 .[
-isua
+isua04
 %Z 1
 .]
 .[
-tua
+tua06
 %Z 1
 .]
 based on the Stream Transmission Control Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 which permits an Application Server Processes (ASP) to indicate its placement
@@ -139,7 +139,7 @@ Application Server Processes (ASPs) resulting in a mixture of traffic modes
 within an Application Server (AS).  The parameters and procedures described
 here supplement the \fI\)UA Load Selection\fR
 .[
-loadsel
+loadsel05
 %Z 2
 .]
 extension parameters and procedures for improved distribution of traffic over
@@ -161,32 +161,32 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and the \fI\)UA Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 extension, for the purpose of permitting Application Server Process control
 over grouping of ASPs into Application Servers as part of the procedures of
@@ -230,32 +230,32 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and the \fI\)UA Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 extension by adding the following terms:
 .lp
@@ -281,7 +281,7 @@ Load Group at a Signalling Gateway.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 Signalling User Adaptation Layers.
 .[
@@ -291,28 +291,28 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .sh 2 "Overview"
 .pp
@@ -332,28 +332,28 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 permits close control over the grouping of Application Server Processes
 serving an Application Server that provides the capability to group ASPs into
@@ -426,28 +426,28 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 however, they can be summarized as follows:
 .lp
@@ -532,7 +532,7 @@ groups serving an Application Server.  Signalling Gateway Processes
 distribute traffic within the Load Group.  Each Load Group describes and
 is identified by a \fI\)Load Selector\fR
 .[
-loadsel
+loadsel05
 .]
 within the Application Server.  The \fI\)Load Selector\fR identifies the
 traffic flows that will be distributed to an associated Load Group
@@ -569,7 +569,7 @@ one of the \fI\)Load Groups\fR that are active for the Application Server
 using an implementation dependent load-sharing algorithm based on the
 \fI\)Load Selector\fR
 .[
-loadsel
+loadsel05
 .]
 associated with the Load Group.
 .lp
@@ -687,23 +687,23 @@ The \fI\)Load Distribution\fR parameter is used in the \fB\)REQ REQ\fR,
 \fB\)REQ RSP\fR, \fB\)ASPAC\fR and \fB\)ASPAC ACK\fR messages.  It is used in
 conjunction with the \fI\)Traffic Mode Type\fR parameter
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and \fI\)Load Selector\fR parameter
 .[
-loadsel
+loadsel05
 .]
 to further refine the traffic distribution algorithm for an ASP in a Load
 Group serving an Application Server.  The \fI\)Load Selector\fR parameter
@@ -761,19 +761,19 @@ nl.
 For a detailed description of these messages, see Section 3 of the specific UA
 document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 .ix +4
@@ -790,19 +790,19 @@ ASPAC ACK:ASP Active Ack message
 by permitting the following optional parameters to be included in the
 \fI\)Routing (Link) Key\fR
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 parameter or \fI\)Link Key\fR
 .[
@@ -812,16 +812,16 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 parameter within the message:
 .ix +4
@@ -1121,19 +1121,19 @@ Where ASPs are configured for operation within \fI\)Load Groups\fR under
 \fI\)LOADGRP\fR, the Application Server state is interpreted as provided
 in the Signalling User Adaptation Layer specifications.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .sh 2 "ASP Traffic Maintenance"
 .sh 3 "ASP Up Procedures"
@@ -1165,7 +1165,7 @@ included in the ASP Active (\fB\)ASPAC\fR) and ASP Active Ack
 used to indicate for which Load Group the concerned Application Server
 is becoming active
 .[
-loadsel
+loadsel05
 .]
 and the \fI\)Load Distribution\fR parameter is used
 to indicate the traffic mode of the Load Group.
@@ -1329,7 +1329,7 @@ in addition to the \fI\)Routing Context\fR (\fI\)Interface Id\fR).
 This is performed by extending the registration procedure of \fI\)Load
 Selection\fR
 .[
-loadsel
+loadsel05
 .]
 by adding the \fI\)Load Distribution\fR parameter to the \fI\)REG REQ\fR
 message during registration.  The \fI\)Load Distribution\fR parameter is
@@ -1445,7 +1445,7 @@ SG2.
 .pp
 This example is for an M3UA
 .[
-m3ua
+m3ua-rfc
 .]
 configuration with the Application Server (AS1) configured with a
 Traffic Mode Type of Load-share.  The Application Server (AS1) has
@@ -1636,7 +1636,7 @@ ASP1 can now be taken down and out of service.
 .pp
 This example is for an SUA
 .[
-sua
+sua-rfc
 .]
 configuration with the Application Server (AS1) configured with a
 Traffic Mode Type of Load-share.  The Application Server (AS1) has
@@ -1838,7 +1838,7 @@ ASP1 can now be taken down and out of service.
 .pp
 This example is for an TUA
 .[
-tua
+tua06
 .]
 configuration with the Application Server (AS1) configured with a Traffic Mode
 Type of Broadcast.  The Application Server (AS1) has associated with it (RK1)
@@ -2057,28 +2057,28 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 Please see SIGTRAN Security document
 .[
@@ -2098,28 +2098,28 @@ iuarfc
 iua-bis
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .ix +4
 .TS
@@ -2161,19 +2161,19 @@ document.
 \fI\)LOADGRP\fR adds the following value to the \fI\)Registration Status\fR
 field of the \fI\)Registration Result\fR parameter for the UAs.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .ix +4
 .TS
@@ -2243,7 +2243,7 @@ added interworking rules,
 .bu
 change \fI\)Load Selection\fR to \fI\)Load Selector\fR to match \fI\)LOADSEL\fR,
 .[
-loadsel
+loadsel05
 .]
 .bu
 added examples,

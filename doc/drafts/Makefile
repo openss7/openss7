@@ -65,6 +65,8 @@ GIF = $(FIG:.fig=.gif)
 EPS = $(FIG:.fig=.eps)
 BAS = $(MES:.me=)
 
+SRCDIR = `pwd`
+
 all:: $(BAS) $(GT) # $(EPS) $(GIF) $(HT) $(GI)
 
 $(BAS) : % : %.txt %.ps %.pdf ;
@@ -76,8 +78,8 @@ html:: $(HTML) $(GIF)
 
 #$(TXT) : %.txt : %.me ./idrefs ./draft.me; cat $< | soelim | refer | groff -p -t -e -Tascii -me | ./fixup > $@
 #$(PSS) : %.ps  : %.me ./idrefs ./draft.me; cat $< | soelim | refer | groff -p -t -e -Tps    -me > $@
-$(TXT) : %.txt : %.me ./idrefs ./draft.me; groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
-$(PSS) : %.ps  : %.me ./idrefs ./draft.me; groff -R -s -p -t -e -Tps    -me $< > $@
+$(TXT) : %.txt : %.me ./idrefs ./draft.me; groff -R -s -p -t -e -Tascii -d srcdir=$(SRCDIR) -me $< | ./fixup > $@
+$(PSS) : %.ps  : %.me ./idrefs ./draft.me; groff -R -s -p -t -e -Tps    -d srcdir=$(SRCDIR) -me $< > $@
 $(PDF) : %.pdf : %.ps ./idrefs ./draft.me; ps2pdf $< $@
 
 $(PIC) : %.pic : %.fig ; fig2dev -L pic -p allps $< $@
@@ -101,8 +103,8 @@ realclean::
 	$(AW:%.aw=%_object*.ag) .depend
 
 .depend: $(MES)
-	@grep -H '^\.so' $(MES) | sed -e's/\.so//' | sed 's/\.me/.ps/' > .depend
-	@grep -H '^\.so' $(MES) | sed -e's/\.so//' | sed 's/\.me/.txt/' >> .depend
+	@grep -H '^\.so' $(MES) | sed -e's/\.so//' | sed 's,\\\*[[]srcdir[]],'$(SRCDIR)',' | sed 's/\.me/.ps/' > .depend
+	@grep -H '^\.so' $(MES) | sed -e's/\.so//' | sed 's,\\\*[[]srcdir[]],'$(SRCDIR)',' | sed 's/\.me/.txt/' >> .depend
 
 %::
 

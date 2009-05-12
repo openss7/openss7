@@ -54,7 +54,7 @@
 .ds date June\ 18,\ 2006
 .ds expiry December\ 2006
 .nr levels 0
-.so ../draft3.me
+.so draft3.me
 .bp
 .he 'Internet Draft'UA CORID'\\\\*[date]'
 .TS
@@ -84,7 +84,7 @@ This Internet-Draft describes Correlation Id and Heartbeat procedures to
 support lossless fail-over between
 SCTP
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 associations for SS7
@@ -94,23 +94,23 @@ q700
 .]
 Signalling User Adaptation Protocols
 .[
-m2ua
+m2ua-rfc
 %Z 1
 .]
 .[
-m3ua
+m3ua-rfc
 %Z 1
 .]
 .[
-sua
+sua-rfc
 %Z 1
 .]
 .[
-isua
+isua04
 %Z 1
 .]
 .[
-tua
+tua06
 %Z 2
 .]
 supporting the concept of a \fI\)Routing Context\fR or \fI\)Interface
@@ -130,7 +130,7 @@ This Internet-Draft describes Correlation Id and Heartbeat (CORID) procedures to
 support lossless fail-over between
 SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations for SS7
 .[
@@ -138,19 +138,19 @@ q700
 .]
 Signalling User Adaptation Protocols
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 above MTP3
 .[
@@ -200,19 +200,19 @@ WG:\(em:Working Group
 \fI\)CORID\fR supplements the terminology used in the UA
 documents
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 by adding the following terms:
 .lp
@@ -238,7 +238,7 @@ alternate linkset.
 .ix +\n(iiu
 is mechanism for fail-over between SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations (i.e, between ASPs, IPSPs, SGPs or SGs) that provides for the
 elminitation of duplication or loss of UA-User messages between SG and AS.
@@ -275,23 +275,23 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 supporting the \fI\)Correlation Id\fR parameter and the \fI\)BEAT\fR message.
 .lp
@@ -309,24 +309,24 @@ changeover procedures.
 .pp
 The existing UA
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 procedures do not include procedures to avoid loss or duplication of messages
 when a UA peer must fail-over between SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations between diverse Application Server Processes (ASPs), Signalling
 Gateway Processes (SGPs), Signalling Gateways (SGs), and IP Signalling
@@ -369,31 +369,31 @@ The UA protocols place no restrictions on the distribution algorithm which is
 used for distributing traffic over multiple Signalling Processes.
 Additional traffic distribution proposals have been put forward for Load Selection
 .[
-loadsel
+loadsel05
 %Z 2
 .]
 and Load Grouping
 .[
-loadgrp
+loadgrp05
 %Z 2
 .]
 .pp
 Fail-over between Application Server Processes (ASPs) and Signalling Gateway
 Processes (SGPs) is not detailed in the UA protocols,
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 but it is clear that when an SCTP association fails and the ASP transitions to
 the ASP-DOWN state from the perspective of the SGP peer, the traffic which the
@@ -565,19 +565,19 @@ The normal procedure for dealing with such a failure\*#
 .ip \*#
 As described in the UA documents.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 is for SGP1 to mark ASP1 in the ASP-DOWN state and to redirect traffic over
@@ -597,19 +597,19 @@ activates for the AS using the ASP Active Procedures\*#,
 .ip \*#
 See Section 4.3.4.3 of the specific UA document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 once ASP1 has entered the ASP-ACTIVE state for the AS, message mis-sequencing
@@ -668,7 +668,7 @@ from ASP1 to the SS7 network.
 (This queueing could either be within the SGP or as a result of queueing
 within the transport protocol.)
 .[
-rfc 2960
+rfc2960
 .]
 If the traffic flow from ASP1 is switched rapidly to SGP1, a race condition
 exists between messages in SGPx's queue and messages in SGP1's queue.  A rapid
@@ -715,7 +715,7 @@ Context\fR to which they correspond\*#.
 .ip \*#
 This is true for all User Adaptation layers with the exception of M2UA.
 .[
-m2ua
+m2ua-rfc
 .]
 In M2UA, the Application Server and traffic flows are identified by an
 equivalent of the \fI\)Routing Key\fR: the \fI\)Link Key\fR, and the
@@ -729,7 +729,7 @@ number or combination of traffic flows.  That is, the ASP can be actively
 handling traffic for any number of Application Servers.
 When an SCTP
 .[
-rfc 2960
+rfc2960
 .]
 association fails, it is necessary to identify both the sequence of the last
 message succesfully received and processed by the Signalling Process, as well
@@ -753,7 +753,7 @@ context are given the \fI\)Correlation Id\fR number of two (2), three (3), and s
 .pp
 Because SCTP is a sequenced reliable transport,
 .[
-rfc 2960
+rfc2960
 .]
 it is only necessary to communicate this \fI\)Correlation Id\fR number between SPP
 peers for the intial message which is sent to the peer.  Each Signalling
@@ -894,19 +894,19 @@ network (i.e, AS) is loadshared over the SGs in the same fashion.
 The following protcol element definitions are provided by \fI\)CORID\fR in
 extension to the existing protocol element definitions for the UAs.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .sh 2 "Parameters"
 .pp
@@ -982,11 +982,11 @@ The \fI\)Traffic Flow Id\fR field identifies a traffic flow associated with an
 Application Server.  When used for tagging messages or in the \fI\)BEAT
 (ACK)\fR or \fI\)ASPAC (ACK)\fR message for a Loadshare AS Load Selection
 .[
-loadsel
+loadsel05
 .]
 or Loadshare Load Group,
 .[
-loadgrp
+loadgrp05
 .]
 the \fI\)Traffic Flow Id\fR field \fB\)MUST\fR identify traffic flow
 (\fI\)Load Selection\fR) within an Application Server.
@@ -1187,22 +1187,22 @@ Correlation Id:Conditional:
 The \fI\)Routing Context\fR parameter is only included in those UAs that
 support \fI\)Routing Context\fR.
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .ip "Note 2:" 8
 The \fI\)Interface Identifier\fR parameter is only included in those UAs that
 support \fI\)Interface Identifier\fR.
 .[
-m2ua
+m2ua-rfc
 .]
 .ba -4
 .lp
@@ -1307,22 +1307,22 @@ Correlation Id:Conditional:
 The \fI\)Routing Context\fR parameter is only included in those UAs that
 support \fI\)Routing Context\fR.
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .ip "Note 2:" 8
 The \fI\)Interface Identifier\fR parameter is only included in those UAs that
 support \fI\)Interface Identifier\fR.
 .[
-m2ua
+m2ua-rfc
 .]
 .ba -4
 .lp
@@ -1408,19 +1408,19 @@ extension.
 \fI\)CORID\fR provides the following procedures in extension to the procedures
 of the UAs.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .sh 2 "Traffic Handling"
 .pp
@@ -1587,7 +1587,7 @@ traffic flow within the AS.
 .np
 If an SPP belongs to a Load Selector,
 .[
-loadsel
+loadsel05
 .]
 a \fI\)Traffic Flow Id\fR is assigned and included in the \fI\)Correlation
 Id\fR parameter regardless of the \fI\)Traffic Mode Type\fR of the AS.  The
@@ -1598,7 +1598,7 @@ Load Selection within the AS.\*#
 \fB\)IMPLEMENTATION NOTE:\-\fR  A simple way to assign the \fI\)Traffic Flow
 Id\fR when performing Load Selection
 .[
-loadsel
+loadsel05
 .]
 is to simply assign the same value to the \fI\)Traffic Flow Id\fR as is
 assigned to the \fI\)Load Selector\fR.
@@ -1606,7 +1606,7 @@ assigned to the \fI\)Load Selector\fR.
 .np
 If an SPP belongs to a Load Group,
 .[
-loadgrp
+loadgrp05
 .]
 a \fI\)Traffic Flow Id\fR is assigned and included in the \fI\)Correlation
 Id\fR for a Loadshare AS or Load Group.  An assigned \fI\)Traffic Flow Id\fR
@@ -1618,7 +1618,7 @@ or included in the \fI\)Correlation Id\fR parameter.\*#
 \fB\)IMPLEMENTATION NOTE:\-\fR  A simple way to assign the \fI\)Traffic Flow
 Id\fR when performing Load Grouping
 .[
-loadgrp
+loadgrp05
 .]
 is to simply assign the same value to the \fI\)Traffic Flow Id\fR as is
 assigned to the \fI\)Load Selector\fR or \fI\)Load Group Identifier\fR.
@@ -1744,19 +1744,19 @@ The SPP determines (by implementation-dependent means \*#)
 processed for the AS may require some ASP-to-ASP or SGP-to-SGP synchronization
 that is outside the scope of the UA documents
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and also outside the scope of this document.
 .ip ""
@@ -2014,19 +2014,19 @@ The ASP \fB\)SHALL\fR perform the applicable UA ASP Inactive Procedures\*(#u.
 For the "ASP Inactive Procedures", see Section 4.3.4.4 of the specific UA
 document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 .sh 4 "SGP receiving ASPIA or sending ASPIA ACK"
@@ -2096,19 +2096,19 @@ The ASP \fB\)SHALL\fR perform the applicable UA ASP Active Procedures\*(#w.
 For the "ASP Active Procedures", see Section 4.3.4.3 of the specific UA
 document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 .sh 4 "SGP receiving ASPAC"
@@ -2171,7 +2171,7 @@ procedures.
 A peer SPP that does not support the \fI\)CORID\fR procedures can either be
 identified by local configuration information, the ASP Extenstions
 .[
-aspext
+aspext05
 %Z 1
 .]
 procedure, or at ASP Activation time.  The lack of support for \fI\)CORID\fR
@@ -2717,19 +2717,19 @@ follows:
 \fI\)CORID\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 Please see the SIGTRAN Secuirty document
 .[

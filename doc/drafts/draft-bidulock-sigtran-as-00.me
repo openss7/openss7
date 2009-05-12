@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
-abbreviate-label-ranges "..."
 bracket-label " [" "]" ", "
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3<4 \{\
@@ -253,7 +256,7 @@ This document defines a protocol for the transport of any SS7 ISUP-User
 signalling (e.g, Call Control) over IP using the Stream Control
 Transport Protocol.
 .[
-RFC 2960
+rfc2960
 %O [Normative]
 .]
 The protocol should be modular and symmetric, to allow it to work in
@@ -275,7 +278,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR,
 \fB\)OPTIONAL\fR, when they appear in this document, are to be
 interpreted as described in.
 .[
-RFC 2119
+rfc2119
 %O [Normative]
 .]
 .lp
@@ -314,7 +317,7 @@ T}
 .pp
 \fI\*(&f\n(&n\fR illustrates the intended architecture for M2PA.
 .[
-m2pa-06
+m2pa06
 .]
 .(b
 .(c
@@ -390,7 +393,7 @@ isua-00
 .pp
 \fI\*(&f\n(&n\fR illustrates the intended architecture for SUA.
 .[
-sua-14
+sua14
 .]
 .(b
 .(c

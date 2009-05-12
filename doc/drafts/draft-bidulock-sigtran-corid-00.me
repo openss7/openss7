@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3>0 \{\
@@ -256,14 +259,14 @@ This Internet-Draft describes Correlation Id and Heartbeat procedures to
 support lossless fail-over between
 SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations for Signalling User Adaptation Protocols
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -288,14 +291,14 @@ This Internet-Draft describes Correlation Id and Heartbeat (CORID) procedures to
 support lossless fail-over between
 SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations for Signalling User Adaptation Protocols
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -320,13 +323,13 @@ implementations at both endpoints implement \fB\)CORID\fR.
 \fB\)CORID\fR supplements the terminology used in the UA
 documents
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -355,7 +358,7 @@ alternate linkset.
 .ix +\n(iiu
 is mechanism for fail-over between SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations (i.e, between ASPs, IPSPs, SGPs or SGs) that provides for the
 elminitation of duplication or loss of UA-User messages between SG and AS.
@@ -392,17 +395,17 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -423,10 +426,10 @@ changeover procedures.
 .pp
 The existing UA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -434,7 +437,7 @@ tua-01
 procedures do not include procedures to avoid loss or duplication of messages
 when a UA peer must fail-over between SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations between diverse Application Server Processes (ASPs), Signalling
 Gateway Processes (SGPs), Signalling Gateways (SGs), and IP Signalling
@@ -491,10 +494,10 @@ loadgrp-00
 Fail-over between Application Server Processes (ASPs) and Signalling Gateway
 Processes (SGPs) is not detailed in the UA protocols,
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -679,10 +682,10 @@ activates for the AS using the ASP Active Procedures\*#,
 .ip \*#
 See Section 4.3.4.3 of M3UA, SUA or TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -781,7 +784,7 @@ they correspond\*#.
 .ip \*#
 This is true for all User Adaptation layers with the exception of M2UA.
 .[
-m2ua-11
+m2ua11
 .]
 In M2UA, the Application Server and traffic flows are identified by an
 equivalent of the Routing Context: the Interface Identifier.  An Application
@@ -794,7 +797,7 @@ handling traffic for any number of Application Servers.
 .pp
 When an SCTP
 .[
-rfc 2960
+rfc2960
 .]
 association fails, it is necessary to identify both the sequence of the last
 message succesfully received and processed by the Signalling Process, as well
@@ -817,7 +820,7 @@ context are given the Correlation Id number of two (2), three (3), and so on.
 .pp
 Because SCTP is a sequenced reliable transport,
 .[
-rfc 2960
+rfc2960
 .]
 it is only necessary to communicate this Correlation Id number between SPP
 peers for the intial message which is sent to the peer.  Each Signalling
@@ -951,16 +954,16 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 The following protcol element definitions are provided by \fB\)CORID\fR in
 extension to the existing protocol element definitions for the UAs.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1072,7 +1075,7 @@ For details on the assignment of \fI\)Load Ids\fR, see Section 4.1.2.2.
 
 The \fI\)Stream Id\fR field contains the SCTP Stream Identifier
 .[
-rfc 2960
+rfc2960
 .]
 on which the message or referenced message was sent.
 .ba -2
@@ -1451,10 +1454,10 @@ The SPP determines (by implementation-dependent means \*#)
 processed for the AS may require some ASP-to-ASP or SGP-to-SGP synchronization
 that is outside the scope of the UA documents
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1631,10 +1634,10 @@ The ASP \fB\)SHALL\fR perform the applicable UA ASP Inactive Procedures\*(#u.
 For the "ASP Inactive Procedures", see Section 4.3.4.4 of M3UA, SUA, and
 TUA.\ 
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1704,10 +1707,10 @@ The ASP \fB\)SHALL\fR perform the applicable UA ASP Active Procedures\*(#w.
 For the "ASP Active Procedures", see Section 4.3.4.3 of M3UA, SUA, and
 TUA.\ 
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1915,20 +1918,20 @@ follows:
 \fB\)CORID\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
 .]
 Please see the "Security" sections of M3UA, SUA and TUA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01

@@ -54,7 +54,7 @@
 .ds date October\ 16,\ 2005
 .ds expiry April\ 2006
 .nr levels 0
-.so ../draft2.me
+.so draft2.me
 .bp
 .sz \n(pp
 .he 'Internet Draft'UA MULTI-SG'\\\\*[date]'
@@ -84,19 +84,19 @@ Signalling User Adaptation Layers
 This Internet-Draft describes \fB\)Load Selection\fR for Signalling User
 Adaptation Protocols,
 .[
-m3ua
+m3ua-rfc
 %Z 1
 .]
 .[
-sua
+sua-rfc
 %Z 2
 .]
 .[
-isua
+isua04
 %Z 2
 .]
 .[
-tua
+tua06
 %Z 2
 .]
 which permits an Application Server Processes (ASP) to indicate its placement
@@ -114,16 +114,16 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 for the purpose of supporting Application Servers interworking with multiple
 Signalling Gateways to the SS7 Network.
@@ -149,16 +149,16 @@ This is commonly referred to within the SIGTRAN WG as the "peer-to-peer" case.
 \fB\)Multiple SG Support (MULTI-SG)\fR supplements the terminology used in the
 UA documents
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 by adding the following terms:
 .lp
@@ -170,21 +170,21 @@ the parameters and procedures provided in this document.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 supporting the concept of a \fI\)Routing Context\fR.
 .sh 2 "Overview"
@@ -194,16 +194,16 @@ supporting the concept of a \fI\)Routing Context\fR.
 .ip \*#
 See Section 4 of M3UA, SUA and TUA.
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 that provides for seamless interworking of SS7 Network Management with
@@ -231,13 +231,13 @@ during fail-over or restoration of ASPs, SGPs and IPSPs already provided for
 in \fI\)"Correlation Id and Heartbeat Procedures (CORID) Supporting Lossless
 Fail-Over between SCTP Associations"\fR.
 .[
-corid
+corid05
 %Z 2
 .]
 The benefits of \fB\)MULTI-SG\fR can, nevertheless, be supported indepedent
 from \fB\)CORID\fR
 .[
-corid
+corid05
 .]
 .sh 3 "Multiple SGs"
 .pp
@@ -328,16 +328,16 @@ network (i.e, AS) is loadshared over the SGs in the same fashion.
 \fB\)Load Selection\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 Please see the SIGTRAN Security document
 .[

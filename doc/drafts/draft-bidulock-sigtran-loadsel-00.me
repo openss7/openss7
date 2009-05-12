@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3>0 \{\
@@ -252,10 +255,10 @@ Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
 This Internet-Draft describes \fB\)Load Selection\fR for Signalling User
 Adaptation Protocols,
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -271,10 +274,10 @@ This Internet-Draft provides parameters and associated procedures in extension
 to the parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -306,14 +309,14 @@ Gateway.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -338,10 +341,10 @@ fail-over purposes.
 .lp
 \fB\)Load Selection\fR for the Signalling User Adaptation Layers
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -410,10 +413,10 @@ Override, Load-share and Broadcast.
 The detailed actions taken for these distribution algorithms are described in
 Section 4 of the Signalling User Adaptation Layer specifications;
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -594,7 +597,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .lp
@@ -676,10 +679,10 @@ in the following messages: \*#
 For a detailed description of these messages, see Section 3 of
 the M3UA, SUA or TUA specifications cited under "References".
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1078,10 +1081,10 @@ configuration data.
 For a detailed description of these procedures, see Section 4 of the M3UA, SUA
 and TUA specifications cited under "References".
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1110,10 +1113,10 @@ separate from the ASP and AS states.
 .lp
 \fB\)Load Selection\fR uses the existing UA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1345,7 +1348,7 @@ q704
 .]
 for M3UA,
 .[
-m3ua-10
+m3ua10
 .]
 Destination Local Reference (DLR)
 .[
@@ -1353,7 +1356,7 @@ q713
 .]
 for SUA,
 .[
-sua-09
+sua09
 .]
 and Destination Transaction Id
 .[
@@ -1997,20 +2000,20 @@ SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
 \fB\)Load Selection\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
 .]
 Please see the "Security" sections of M3UA, SUA and TUA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -2023,10 +2026,10 @@ these UAs.
 adds the following parameter tag value (described in Section 3) to the Common
 Parameter numbering range for M3UA, SUA and TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -2050,10 +2053,10 @@ versions of this document.
 adds the following value to the \fI\)Error Code\fR parameter (described in
 Section 3 and 4) for M3UA, SUA and TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-rfc 2960
+rfc2960
 .]
 association fails, it is necessary to identify both the sequence of the last
 message succesfully received and processed by the Signalling Process, as well
@@ -2078,7 +2081,7 @@ Correlation Id number of one (1), two (2), and so on.
 .pp
 Because SCTP is a sequenced reliable transport,
 .[
-rfc 2960
+rfc2960
 .]
 .ix +4
 .TS

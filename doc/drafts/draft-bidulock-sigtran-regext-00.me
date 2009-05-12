@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3>0 \{\
@@ -258,17 +261,17 @@ systems.
 The extensions described in this memo permit modification of Signalling Link
 membership in Application Servers for SS7 MTP2-User Adaptation Layer,
 .[
-m2ua-12
+m2ua12
 .]
 modification of Circuit Identification Code (CIC) ranges for the SS7 MTP3-User
 Adaptation Layer,
 .[
-m3ua-11
+m3ua11
 .]
 modificiation of Destination Local Reference (DLR) ranges for SS7 SCCP-User
 Adaptation Layer,
 .[
-sua-10
+sua10
 .]
 and modification of Transaction Identifier (TID) ranges for SS7 TCAP-User
 Adaptation Layer.
@@ -281,13 +284,13 @@ tua-01
 This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the SS7 Signalling User Adaptation Layers (UAs),
 .[
-m2ua-12
+m2ua12
 .]
 .[
-m3ua-11
+m3ua11
 .]
 .[
-sua-10
+sua10
 .]
 .[
 tua-01
@@ -314,17 +317,17 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-RFC 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m2ua-12
+m2ua12
 .]
 .[
-m3ua-11
+m3ua11
 .]
 .[
-sua-10
+sua10
 .]
 .[
 tua-01
@@ -340,13 +343,13 @@ procedures that permit this modification.
 .pp
 Each of the UAs
 .[
-m2ua-12
+m2ua12
 .]
 .[
-m3ua-11
+m3ua11
 .]
 .[
-sua-10
+sua10
 .]
 .[
 tua-01
@@ -357,7 +360,7 @@ Keys for a Application Server (AS) in the active state.
 .pp
 In SS7 MTP2-User Adaptation Layer
 .[
-m2ua-12
+m2ua12
 .]
 registration of a Link Key associates a signalling link with an Interface
 Identifier (IID).  However, registration does not provide a mechanism for
@@ -367,7 +370,7 @@ signalling links associated with an Application Server.
 .pp
 The SS7 MTP3-User Adaptation Layer
 .[
-m3ua-11
+m3ua11
 .]
 registration of a Routing Key associates a range of tranffic with an
 Application Server through a Routing Context.  However, it does not provide
@@ -380,7 +383,7 @@ from Application Servers.
 .pp
 The SS7 SCCP-User Adaptation Layer
 .[
-sua-10
+sua10
 .]
 registration of a Routing Key associates a range of traffic with an
 Application Server through a Routing Context and the Address Mapping Fucntion.
@@ -418,7 +421,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .pp
@@ -435,14 +438,14 @@ parameter within a \fI\)DEREG REQ\fR\) message.
 .pp
 \fI\)REGEXT\fR\) augments the \fI\)Link Key\fR\) parameter of M2UA
 .[
-m2ua-12
+m2ua12
 .]
 and the \fI\)Routing Key\fR\) parameters of M3UA, SUA, and TUA.
 .[
-m3ua-11
+m3ua11
 .]
 .[
-sua-10
+sua10
 .]
 .[
 tua-01

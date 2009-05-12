@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
-abbreviate-label-ranges "..."
 bracket-label " [" "]" ", "
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3<4 \{\
@@ -249,7 +252,7 @@ This document defines a protocol for the transport of any SS7 ISUP-User
 signalling (e.g, Call Control) over IP using the Stream Control
 Transport Protocol.
 .[
-RFC 2960
+rfc2960
 %O [Normative]
 .]
 The protocol should be modular and symmetric, to allow it to work in
@@ -273,7 +276,7 @@ t1.113
 Users (i.e, Call Control) signalling messages over IP using the
 Stream Control Transmission Protocol (SCTP).
 .[
-RFC 2960
+rfc2960
 .]
 This protocol would be used between a Signalling Gateway (SG) and
 Signalling End-point located in an IP network.  Additionally, the
@@ -288,7 +291,7 @@ transport user data and for operators to expand their networks and build new
 services.  In these networks, there is a need for interworking between the SS7
 and IP domains.
 .[
-RFC 2719
+rfc2719
 %O [Informative]
 .]
 .pp
@@ -298,7 +301,7 @@ transport from an SS7 Signalling Gateway (SG) to an IP signalling node (such
 as an IP-resident Database) as described in the Framework Architecture for
 Signalling Transport
 .[
-RFC 2719
+rfc2719
 .]
 This protocol can also support transport of Call Control messages between two
 end-points wholly contained within and IP network.
@@ -348,7 +351,7 @@ SCTP end-point and may be configured to process traffic within more that one
 .ix +\n(iiu
 refers to an SCTP association.
 .[
-RFC 2960
+rfc2960
 .]
 The association provides the transport for the delivery of ISUP protocol data
 units and ISUA layer peer messages.
@@ -456,7 +459,7 @@ Application Server.
 a signalling agent that exchanges SCN native signalling at the edge of the IP
 network.
 .[
-RFC 2719
+rfc2719
 .]
 An SG appears to the SS7 network as an SS7 Signalling Point.  An SG contains a
 set of one or more Signalling Gateway Processes, of which one or more is
@@ -496,7 +499,7 @@ number \*#.
 \fB\)IMPLEMENTATION NOTE:\-\fR\  Only one SCTP port may be defined for
 each endpoint, but each SCTP endpoint may have multiple IP addresses.
 .[
-RFC 2960
+rfc2960
 .]
 .)d
 .sh 2 "ISUA Overview"
@@ -505,7 +508,7 @@ RFC 2960
 The framework architecture that has been defined for SCN signalling
 transport over IP
 .[
-RFC 2719
+rfc2719
 .]
 uses multiple components, including an IP transport protocol, a
 signalling common transport protocol and an adaptation module to support
@@ -1525,7 +1528,7 @@ T}
 The upper layer primitives provided by the SCTP are provided in the SCTP
 specification "Stream Control Transmission Protocol (SCTP)".
 .[
-RFC 2960
+rfc2960
 .]
 .sh 1 "Conventions"
 .pp
@@ -1535,7 +1538,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR,
 \fB\)OPTIONAL\fR, when they appear in this document, are to be
 interpreted as described in.
 .[
-RFC 2119
+rfc2119
 %O [Normative]
 .]
 .lp
@@ -2906,7 +2909,7 @@ SGP to an ASP to indicate the reset reset of the specified circuit(s).
 The \fI\)CRSC\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -2963,7 +2966,7 @@ to confirm the reset of the specified circuit(s).
 The \fI\)CRSA\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -3017,7 +3020,7 @@ the SGP to an ASP to indicate the blocking indication.
 The \fI\)CBLO\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -3069,7 +3072,7 @@ message is sent from the SGP to an ASP to indicate the blocking confirmation.
 The \fI\)CBLA\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -3123,7 +3126,7 @@ sent from the SGP to an ASP to indicate the unblocking indication.
 The \fI\)CUBL\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -3176,7 +3179,7 @@ confirmation.
 The \fI\)CUBA\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -3230,7 +3233,7 @@ the SGP to an ASP to indicate the query indication.
 The \fI\)CQRY\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -3278,7 +3281,7 @@ message is sent from the SGP to an ASP to indicate the query confirmation.
 The \fI\)CQRA\fR message corresponds to the
 ITU-T
 .[
-q.764
+q764
 .]
 and ANSI
 .[
@@ -4156,7 +4159,7 @@ The \fI\)Info String\fR parameter contains the following fields:
 .ip "" 2
 The \fI\)Info String\fR field can carry any meaningful UTF-8
 .[
-RFC 2279
+rfc2279
 %O [Normative]
 .]
 character string along with the message.  Length of the \fI\)Info String\fR
@@ -7883,7 +7886,7 @@ When ISUA is running in professionally managed corporate or service provider
 network, it is reasonable to expect that this network include an appropriate
 security policy framework.  The "Site Security Handbook"
 .[
-RFC 2196
+rfc2196
 %O [Normative]
 .]
 should be consulted for guidance.
@@ -7914,7 +7917,7 @@ for key management.
 .pp
 All ISUA implementations \fB\)MUST\fR support IPsec ESP
 .[
-RFC 2406
+rfc2406
 %O [Normative]
 .]
 in transport mode with non-null encryption and authentication algorithms to
@@ -7924,14 +7927,14 @@ and \fB\)MUST\fR support the replay protection mechanisms of IPsec.
 ISUA implementations \fB\)MUST\fR support IKE for peer authentication,
 negotiation of security associations, and key management, using IPsec DOI.
 .[
-RFC 2407
+rfc2407
 %O [Normative]
 .]
 ISUA implementations \fB\)MUST\fR support peer authentication using a
 pre-shared key, and \fB\)MAY\fR support certificate-authentication using the
 public key encryption methods outlined in IKE sections 5.2 and 5.3
 .[
-RFC 2409
+rfc2409
 %O [Normative]
 .]
 \fB\)SHOULD NOT\fR be used.
@@ -7970,11 +7973,11 @@ continually bringing connections up and down.
 A ISUA peer that initiates a connection to another ISUA peer acts as a TLS
 client according to TLS,
 .[
-RFC 2246
+rfc2246
 %O [Normative]
 .]
 .[
-RFC 3436
+rfc3436
 %O [Normative]
 .]
 and a ISUA peer that accepts a connection acts as a TLS server.  ISUA peers
@@ -8101,7 +8104,7 @@ The definition and use of new message classes, types and parameters is an
 integral part of SIGTRAN adaptation layers.  Thus, these extensions are
 assigned by IANA through an IETF Consensus action as defined in.
 .[
-RFC 2434
+rfc2434
 %O [Normative]
 .]
 .pp

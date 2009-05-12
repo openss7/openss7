@@ -54,7 +54,7 @@
 .ds date July\ 26,\ 2003
 .ds expiry January\ 2004
 .nr levels 0
-.so ../draft.me
+.so draft.me
 .bp
 .he 'Internet Draft'UA CORID'\\\\*[date]'
 .TS
@@ -109,7 +109,7 @@ This Internet-Draft describes Correlation Id and Heartbeat procedures to
 support lossless fail-over between
 SCTP
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 associations for SS7
@@ -127,7 +127,7 @@ m3ua-rfc
 %Z 1
 .]
 .[
-sua-15
+sua15
 %Z 1
 .]
 .[
@@ -155,7 +155,7 @@ This Internet-Draft describes Correlation Id and Heartbeat (CORID) procedures to
 support lossless fail-over between
 SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations for SS7
 .[
@@ -169,7 +169,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -231,7 +231,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -263,7 +263,7 @@ alternate linkset.
 .ix +\n(iiu
 is mechanism for fail-over between SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations (i.e, between ASPs, IPSPs, SGPs or SGs) that provides for the
 elminitation of duplication or loss of UA-User messages between SG and AS.
@@ -300,7 +300,7 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
@@ -310,7 +310,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -340,7 +340,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -351,7 +351,7 @@ tua-02
 procedures do not include procedures to avoid loss or duplication of messages
 when a UA peer must fail-over between SCTP
 .[
-rfc 2960
+rfc2960
 .]
 associations between diverse Application Server Processes (ASPs), Signalling
 Gateway Processes (SGPs), Signalling Gateways (SGs), and IP Signalling
@@ -412,7 +412,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -596,7 +596,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -628,7 +628,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -693,7 +693,7 @@ from ASP1 to the SS7 network.
 (This queueing could either be within the SGP or as a result of queueing
 within the transport protocol.)
 .[
-rfc 2960
+rfc2960
 .]
 If the traffic flow from ASP1 is switched rapidly to SGP1, a race condition
 exists between messages in SGPx's queue and messages in SGP1's queue.  A rapid
@@ -754,7 +754,7 @@ number or combination of traffic flows.  That is, the ASP can be actively
 handling traffic for any number of Application Servers.
 When an SCTP
 .[
-rfc 2960
+rfc2960
 .]
 association fails, it is necessary to identify both the sequence of the last
 message succesfully received and processed by the Signalling Process, as well
@@ -778,7 +778,7 @@ context are given the \fI\)Correlation Id\fR number of two (2), three (3), and s
 .pp
 Because SCTP is a sequenced reliable transport,
 .[
-rfc 2960
+rfc2960
 .]
 it is only necessary to communicate this \fI\)Correlation Id\fR number between SPP
 peers for the intial message which is sent to the peer.  Each Signalling
@@ -919,7 +919,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 %Z 1
 .]
 .#e
@@ -933,7 +933,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -1223,7 +1223,7 @@ support \fI\)Routing Context\fR.
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -1343,7 +1343,7 @@ support \fI\)Routing Context\fR.
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -1447,7 +1447,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -1783,7 +1783,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -2053,7 +2053,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -2135,7 +2135,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -2756,7 +2756,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-15
+sua15
 .]
 .[
 isua-01
@@ -2766,7 +2766,7 @@ tua-02
 .]
 Please see the SIGTRAN Secuirty document
 .[
-sigsec-03
+sigsec03
 %Z 1
 .]
 for security considerations and recommendations that are applicable to each of

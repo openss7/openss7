@@ -54,7 +54,7 @@
 .ds date June\ 18,\ 2006
 .ds expiry December\ 2006
 .nr levels 0
-.so ../draft3.me
+.so draft3.me
 .bp
 .sz \n(pp
 .he 'Internet Draft'UA ASPEXT'\\\\*[date]'
@@ -84,19 +84,19 @@ Signalling User Adaptation Layers
 This Internet-Draft describes \fI\)ASP Extensions (ASPEXT)\fR for Signalling
 User Adaptation Protocols,
 .[
-iua
+iua-rfc
 %Z 1
 .]
 .[
-iua
+iuabis
 %Z 2
 .]
 .[
-dua
+dua05
 %Z 2
 .]
 .[
-v5ua
+v5ua03
 %Z 2
 .]
 .[
@@ -104,23 +104,23 @@ gr303ua00
 %Z 2
 .]
 .[
-m2ua
+m2ua-rfc
 %Z 1
 .]
 .[
-m3ua
+m3ua-rfc
 %Z 1
 .]
 .[
-sua
+sua-rfc
 %Z 1
 .]
 .[
-isua
+isua04
 %Z 2
 .]
 .[
-tua
+tua06
 %Z 2
 .]
 which permits cooperating Signalling Peer Processes (SPPs) to indicate to each
@@ -136,34 +136,34 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-iua
+iua-rfc
 .]
 .[
-iua
+iua-rfc
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
 gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 for the purpose of supporting a framework for extending the parameters and
 procedures of these Adaptation Layers.
@@ -227,40 +227,40 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 ISDN Signalling User Adaptation Layers
 .[
-iua
+iua-rfc
 .]
 .[
-iua
+iua-rfc
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
 gr303ua00
 .]
 or SS7 Signalling User Adaptation Layers.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 supporting the concept of ASP Management\*#.
 .(d
@@ -268,7 +268,7 @@ supporting the concept of ASP Management\*#.
 Currently all SS7 Signalling User Adaptation Layers support ASP Management
 with the exception of M2PA.
 .[
-m2pa
+m2pa-rfc
 %Z 2
 .]
 .)d
@@ -290,16 +290,16 @@ The existing UA procedures\*#
 .ip \*#
 See, for example, Section 4 of the specific UA document.
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 make no provisions for the management of extensions.  Any mechanism that an
@@ -337,16 +337,16 @@ they are included in addition to the parameters of the UAs.\*#
 .ip \*#
 See, for example, Section 3 of the specific UA document.
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 .sh 2 "Parameters"
@@ -409,43 +409,42 @@ nl.
 0:None
 1:Protocol Limits Extension
 .[
-sginfo
+sginfo06
 %Z 2
 .]
 2:Load Selection Extension
 .[
-loadsel
+loadsel05
 %Z 2
 .]
 3:Load Grouping Extension
 .[
-loadgrp
+loadgrp05
 %Z 2
 .]
 4:Correlation Id and Heartbeat Extension
 .[
-corid
+corid05
 %Z 2
 .]
 5:Registration Extension
 .[
-regext
+regext05
 %Z 2
 .]
 6:Session Identification Extension
 .[
-sessid
+sessid06
 %Z 2
 .]
 7:Dynamic Registration Option
 8:Double-Ended (DE) IPSP Model Option
 .[
-m3ua
-%Z 2
+m3ua-rfc
 .]
 9:ASP Congestion Extension
 .[
-aspcong
+aspcong01
 %Z 2
 .]
 \-:(All other values are IETF reserved.)
@@ -667,11 +666,11 @@ The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
 \fI\)ASP Extensions\fR parameter identifying (for example) two
 extensions: Load Selection
 .[
-loadsel
+loadsel05
 .]
 and Correlation Id/Heartbeat;
 .[
-corid
+corid05
 .]
 indicating the ASP's support for these two extensions requiring interworking
 support.
@@ -680,7 +679,7 @@ The SGP or IPSP responds with an \fI\)ASPUP ACK\fR message containing an \fI\)AS
 Extensions\fR parameter identifying (for example) support for only one
 extension: Load Selection
 .[
-loadsel
+loadsel05
 .]
 .np
 The ASP and SGP/IPSP register the peer's support (or lack of support) for the
@@ -729,11 +728,11 @@ The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
 \fI\)ASP Extensions\fR parameter identifying (for example) two
 extensions: Load Selection
 .[
-loadsel
+loadsel05
 .]
 and Correlation Id/Heartbeat;
 .[
-corid
+corid05
 .]
 indicating the ASP's support for these two extensions requiring interworking
 support.
@@ -791,11 +790,11 @@ The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
 \fI\)ASP Extensions\fR parameter identifying (for example) two
 extensions: Load Selection
 .[
-loadsel
+loadsel05
 .]
 and Correlation Id/Heartbeat;
 .[
-corid
+corid05
 .]
 indicating the ASP's support for these two extensions requiring interworking
 support.
@@ -868,34 +867,34 @@ extension accordingly.
 \fI\)ASPEXT\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA.
 .[
-iua
+iua-rfc
 .]
 .[
-iua
+iua-rfc
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
 gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 Please see the SIGTRAN security document
 .[
@@ -924,34 +923,34 @@ invalid.
 \fI\)ASPEXT\fR provides an additional \fI\)ASP Extensions\fR message
 parameter to the common parameter range of the SIGTRAN UAs:
 .[
-iua
+iua-rfc
 .]
 .[
-iua
+iua-rfc
 .]
 .[
-dua
+dua05
 .]
 .[
-v5ua
+v5ua03
 .]
 .[
 gr303ua00
 .]
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .af $p a
 .np
@@ -989,7 +988,7 @@ The definition and used of new message classes, types and parameters is an
 integral part of the SIGTRAN adaptation layers.  Thus, these extensions are
 assigned by IANA through an IETF Consensus action.
 .[
-rfc 2434
+rfc2434
 %Z 1
 .]
 .pp
@@ -1058,7 +1057,7 @@ added CVS change log.
 .bu
 added dynamic registration and DE IPSP model from IG
 .[
-m3ua
+m3ua-rfc
 .]
 as extensions.
 .sh 2 "Changes from Version 0.0 to Version 0.1" 0 1

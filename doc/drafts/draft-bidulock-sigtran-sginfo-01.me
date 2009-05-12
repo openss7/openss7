@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .\".if \\$3>0 \{\
@@ -265,7 +268,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -290,7 +293,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -314,7 +317,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -325,7 +328,7 @@ tua-01
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
@@ -335,7 +338,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -369,34 +372,34 @@ q771
 and the need for these protocol limits at the Application Server is evidenced
 by the requirements for these values in the OSI/ISO NSD
 .[
-x.213
+x213
 .]
 Compliant NPI,
 .[
-npi
+npi revision 2.0.0
 .]
 and the OSI/ISO TSD
 .[
-x.214
+x214
 .]
 and the OSI/ISO ROSE
 .[
-x.219
+x219
 .]
 Compliant TPI,
 .[
-tpi
+tpi revision 2.0.0
 .]
 and the ACSE
 .[
-iso 8649
+iso8649
 .]
 .[
-iso 8650
+ISO/IEC 8650:1988
 .]
 compliant mOSI extensions to the XNS.
 .[
-xns
+xns99
 .]
 .pp
 \fB\)SGINFO\fR provides parameters and procedures that allow
@@ -418,7 +421,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -463,7 +466,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .ds #w \*#
@@ -480,7 +483,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -567,7 +570,7 @@ would be 3094.
 .ip "SUA"
 For SUA
 .[
-sua-14
+sua14
 .]
 the \fI\)Maximum SDU Size\fR field
 provides the limit on the maximum size of the User Data field for a normal
@@ -623,7 +626,7 @@ would be 272.
 .ip "SUA"
 For SUA
 .[
-sua-14
+sua14
 .]
 the \fI\)Optimal SDU Size\fR field
 provides the limit on the optimal size of the User Data field for a normal
@@ -668,7 +671,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua-14
+sua14
 .]
 the \fI\)Maximum Connect Data Size\fR field
 provides a limit on the maximum size of the User Data field that can be
@@ -712,7 +715,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua-14
+sua14
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 provides a limit on the maximum size of the User Data field that can be
@@ -756,7 +759,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua-14
+sua14
 .]
 the \fI\)Maximum ESDU Size\fR field
 provides a maximum number of bytes in the User Data field for an expedited
@@ -1164,7 +1167,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -1180,7 +1183,7 @@ m3ua-rfc
 .]
 SUA
 .[
-sua-14
+sua14
 .]
 and TUA,
 .[
@@ -1200,7 +1203,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01

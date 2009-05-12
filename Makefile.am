@@ -559,12 +559,34 @@ endif
 EXTRA_DIST			+= $(EXTRA_DOCS)
 
 EXTRA_TEX			+= scripts/texinfo.cnf \
+				   scripts/texi/agpl3.texi \
 				   scripts/texi/args.texi.in \
+				   scripts/texi/bsd.texi \
+				   scripts/texi/compat.texi \
+				   scripts/texi/decmit.texi \
+				   scripts/texi/fdl12.texi \
+				   scripts/texi/fdl13.texi \
 				   scripts/texi/fdl.texi \
+				   scripts/texi/funding.texi \
+				   scripts/texi/gpl3.texi \
 				   scripts/texi/gpl.texi \
+				   scripts/texi/hp.texi \
 				   scripts/texi/install.texi \
+				   scripts/texi/isode.texi \
 				   scripts/texi/lesser.texi \
-				   scripts/texi/testsuite.texi
+				   scripts/texi/lgpl3.texi \
+				   scripts/texi/macros.texi \
+				   scripts/texi/mail.texi \
+				   scripts/texi/mit.texi \
+				   scripts/texi/quick.texi \
+				   scripts/texi/sunrpc.texi \
+				   scripts/texi/testsuite.texi \
+				   scripts/texi/uidlpi.texi \
+				   scripts/texi/uinpi.texi \
+				   scripts/texi/ui.texi \
+				   scripts/texi/uitpi.texi \
+				   scripts/texi/uslbsd.texi \
+				   scripts/texi/versions.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3

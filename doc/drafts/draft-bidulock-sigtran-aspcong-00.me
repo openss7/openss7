@@ -54,7 +54,7 @@
 .ds date July\ 11,\ 2006
 .ds expiry January\ 2007
 .nr levels 0
-.so ../draft3.me
+.so draft3.me
 .bp
 .he 'Internet Draft'UA ASPCONG'\\\\*[date]'
 .TS
@@ -84,23 +84,23 @@ ability for an Application Server Process (ASP) to indicate congestion
 to a Signalling Gateway (SG) for the SS7 Signalling User Adaptation
 Layers.
 .[
-m2ua
+m2ua-rfc
 %Z 1
 .]
 .[
-m3ua
+m3ua-rfc
 %Z 1
 .]
 .[
-sua
+sua-rfc
 %Z 1
 .]
 .[
-isua
+isua04
 %Z 2
 .]
 .[
-tua
+tua06
 %Z 2
 .]
 Extension parameters and procedures are added by this memo in extension
@@ -113,7 +113,7 @@ procedures to support the management of congestion and flow control
 between a Signalling Gateway (SG) and an Application Server (AS) across
 SCTP
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 associations for SS7
@@ -123,24 +123,19 @@ q700
 .]
 Signalling User Adaptation Protocols
 .[
-m2ua
-%Z 1
+m2ua-rfc
 .]
 .[
-m3ua
-%Z 1
+m3ua-rfc
 .]
 .[
-sua
-%Z 1
+sua-rfc
 .]
 .[
-isua
-%Z 1
+isua04
 .]
 .[
-tua
-%Z 1
+tua06
 .]
 supporting the concept of a \fI\)Routing Context\fR or \fI\)Interface
 Identifier\fR.  These procedures permit the coordination of \fI\)ASP
@@ -189,19 +184,19 @@ WG:\(em:Working Group
 \fI\)ASPCONG\fR supplements the terminology used in the UA
 documents
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 by adding the following terms:
 .lp
@@ -242,7 +237,6 @@ an SS7 protocol stack at an SGP and the UA protocol layer at the SGP.
 in this document, a \fI\)Signalling Endpoint\fR is an SS7 SEP
 .[
 q700
-%Z 1
 .]
 or an Application Server.
 .lp
@@ -254,24 +248,23 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
-%Z 1
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 supporting the \fI\)Correlation Id\fR parameter and the \fI\)BEAT\fR message.
 .sh 2 "Overview"
@@ -517,7 +510,7 @@ Any redistribution of traffic with a Load Share AS, or within an
 Active-Standby AS should result for the activation or deactivate of an
 ASP within the AS, and then, the procedures of
 .[
-corid
+corid05
 %Z 1
 .]
 \fB\)SHOULD\fR be followed to avoid message loss, duplication or
@@ -567,22 +560,22 @@ message.
 The UAs have an existing optional mechanism for communicating SS7 User
 congestion to the SG.  For 
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-tua
+tua06
 .]
 .[
-isua
+isua04
 .]
 that mechanism is the use of the \fB\)SCON\fR message in the ASP to SG
 direction.
 For
 .[
-m2ua
+m2ua-rfc
 .]
 it is the use of the \fB\)Status Request\fR message.
 
@@ -603,12 +596,12 @@ rather than at the SG.
 In fitting with this principle, use of the \fI\)Notify\fR procedures
 in conjunction with the
 .[
-loadsel
+loadsel05
 %Z 1
 .]
 or
 .[
-loadgrp
+loadgrp05
 %Z 1
 .]
 approach to ASP management of load sharing selection and grouping would
@@ -649,29 +642,29 @@ redistribution in response to AS congestion at the SG \fB\)NOT
 RECOMMENDED\fR.  If performed at all, load redistribution \fB\)SHOULD\fR
 be performed using
 .[
-loadsel
+loadsel05
 .]
 and
 .[
-loadgrp
+loadgrp05
 .]
 in conjunction with
 .[
-corid
+corid05
 .]
 (to minimize message loss and mis-sequencing) by the ASPs in response to
 the \fI\)Notify\fR procedures outlined in this document, and the SG
 \fB\)SHOULD NOT\fR perform load redistribution on its own.
 .np
 .[
-corid
+corid05
 .]
 provides some adjustments to the \fB\)HEARTBEAT\fR mechanism that can be
 used effectively by the SG to determine congestion toward the SS7 User
 at the ASP, while retaining the management of congestion onset and
 abatement levels on the SG.  In particular,\ 
 .[
-corid
+corid05
 .]
 provides that a \fB\)HEARTBEAT\fR sent within an Application Server
 traffic flow \fB\)MUST\fR not be responded to by the ASP until the
@@ -681,7 +674,7 @@ periodically by the SG to determine the amount of outstanding signalling
 messages toward the SS7 User and apply SG managed thresholds.  The
 \fB\)HEARTBEAT\fR mechanism from
 .[
-corid
+corid05
 .]
 \fB\)SHOULD\fR be used instead of the \fI\)ASPSTAT\fR mechanism
 described here.
@@ -695,19 +688,19 @@ The following protocol element definitions are provided by
 \fI\)ASPCONG\fR in extension to the existing protocol element
 definitions for the UAs.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .sh 2 "Parameters"
 .pp
@@ -769,7 +762,7 @@ used to indicated the current congestion level of the AS.  The value
 .lp
 For,
 .[
-m2ua
+m2ua-rfc
 .]
 the values of the \fI\)Level\fR field are interpreted
 in accordance with
@@ -796,7 +789,7 @@ n0c0n1l.
 .lp
 For,
 .[
-m3ua
+m3ua-rfc
 .]
 the values of the \fI\)Level\fR field are interpreted
 in accordance with
@@ -821,10 +814,10 @@ n0c0n1l.
 .lp
 For,
 .[
-sua
+sua-rfc
 .]
 .[
-tua
+tua06
 .]
 the values of the \fI\)Level\fR field are interpreted
 in accordance with
@@ -861,7 +854,7 @@ n0c0n1l.
 .lp
 For,
 .[
-isua
+isua04
 .]
 the values of the \fI\)Level\fR field are interpreted
 in accordance with
@@ -1010,16 +1003,16 @@ Info String:Optional:
 The \fI\)Routing Context\fR parameter is only optionally included in
 UA protocols that support it,
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and indicates the Application Server to which the message applies.  If
 there is only one Application Server provisioned for a given SCTP
@@ -1029,7 +1022,7 @@ Otherwise, the \fI\)Routing Context\fR field is mandatory.
 The \fI\)Interface Identifier\fR parameter is only optionally included
 in UA protocols that support it.
 .[
-m2ua
+m2ua-rfc
 .]
 .ip "Note 3:" 8
 The \fI\)ASP Congestion\fR parameter is included in the \fI\)ASPAC\fR
@@ -1125,16 +1118,16 @@ with the AS whose state is being notified \fB\)MUST\fR be placed in the
 The \fI\)Routing Context\fR parameter is only optionally included in
 UA protocols that support it,
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and indicates the Application Server to which the message applies.  If
 there is only one Application Server provisioned for a given SCTP
@@ -1144,7 +1137,7 @@ Otherwise, the \fI\)Routing Context\fR field is mandatory.
 The \fI\)Interface Identifier\fR parameter is only optionally included
 in UA protocols that support it.
 .[
-m2ua
+m2ua-rfc
 .]
 .ip "\fBNote 5\fR:" 8
 The \fI\)ASP Congestion\fR parameter \fB\)MUST\fR be included in the
@@ -1215,16 +1208,16 @@ Info String:Optional
 The \fI\)Routing Context\fR parameter is only optionally included in
 UA protocols that support it,
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and indicates the Application Server to which the message applies.  If
 there is only one Application Server provisioned for a given SCTP
@@ -1234,7 +1227,7 @@ Otherwise, the \fI\)Routing Context\fR field is mandatory.
 The \fI\)Interface Identifier\fR parameter is only optionally included
 in UA protocols that support it.
 .[
-m2ua
+m2ua-rfc
 .]
 .ip "\fBNote 3\fR:" 8
 The \fI\)ASP Congestion\fR parameter is used by the ASP in the
@@ -1306,16 +1299,16 @@ Server (AS) the current congestion status is requested.
 The \fI\)Routing Context\fR parameter is only optionally included in
 UA protocols that support it,
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 and indicates the Application Server to which the message applies.  If
 there is only one Application Server provisioned for a given SCTP
@@ -1325,7 +1318,7 @@ Otherwise, the \fI\)Routing Context\fR field is mandatory.
 The \fI\)Interface Identifier\fR parameter is only optionally included
 in UA protocols that support it.
 .[
-m2ua
+m2ua-rfc
 .]
 .pp
 The \fI\)ASPSTAT QRY\fR message \fB\)MAY\fR contain additional extension
@@ -1336,19 +1329,19 @@ parameters provided for by other extensions.
 \fI\)ASPCONG\fR provides the following procedures in extension to the
 procedures of the UAs.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .sh 2 "AS and ASP State Maintenance"
 .pp
@@ -1564,19 +1557,19 @@ charts indicating the use of each new protocol element and procedure.)
 does not introduce any new security risks or considerations that are not
 already inherent in the UAs.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 Please see the SIGTRAN Security document
 .[
@@ -1600,7 +1593,7 @@ A peer ASP or SGP that does not support the \fI\)ASPCONG\fR procedures
 can either be identified by local configuration information, the ASP
 Extensions
 .[
-aspext
+aspext05
 .]
 procedure, or at ASP Activation time.  The lack of support for
 \fI\)ASPCONG\fR can be determined at ASP Activation time when the peer
@@ -1642,29 +1635,28 @@ congestion toward the SS7 network.
 redefines the format of the \fI\)Status ID\fR field of the
 \fI\)Status\fR parmeter contained in the \fI\)Notify\fR message in the
 .[
-m2ua
+m2ua-rfc
 .]
 .[
 m3ua-rfc
-%Z 1
 .]
 and
 .[
-sua
+sua-rfc
 .]
 registries.
 .pp
 .i ASPCONG
 defines a new \fI\)ASP Congestion\fR parameter in the
 .[
-m2ua
+m2ua-rfc
 .]
 .[
 m3ua-rfc
 .]
 and
 .[
-sua
+sua-rfc
 .]
 registries.
 .pp
@@ -1672,28 +1664,28 @@ registries.
 redefines the parameters accepted in the \fI\)ASP Active\fR message to
 include the new conditional \fI\)ASP Congestion\fR parameter in the
 .[
-m2ua
+m2ua-rfc
 .]
 .[
 m3ua-rfc
 .]
 and
 .[
-sua
+sua-rfc
 .]
 registries.
 .i ASPCONG
 redefines the parameters accepted in the \fI\)Notify\fR message to
 include the new conditioanl \fI\)ASP Congestion\fR parameter in the
 .[
-m2ua
+m2ua-rfc
 .]
 .[
 m3ua-rfc
 .]
 and
 .[
-sua
+sua-rfc
 .]
 registries.
 .pp
@@ -1702,14 +1694,14 @@ defines two new messages in the \fI\)ASP Traffic Management\fR messge
 class, the \fI\)ASP Status\fR and \fI\)ASP Status Query\fR messages, in
 the
 .[
-m2ua
+m2ua-rfc
 .]
 .[
 m3ua-rfc
 .]
 and
 .[
-sua
+sua-rfc
 .]
 registries.
 .#e

@@ -54,7 +54,7 @@
 .ds date June\ 18,\ 2006
 .ds expiry December\ 2006
 .nr levels 0
-.so ../draft3.me
+.so draft3.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'UA SGINFO'\\\\*[date]'
@@ -85,23 +85,23 @@ Signalling User Adaptation Layers
 This Internet-Draft describes \fI\)Signalling Gateway (SG) Information
 (SGINFO)\fR for Signalling User Adaptation Protocols,
 .[
-m2ua
+m2ua-rfc
 %Z 1
 .]
 .[
-m3ua
+m3ua-rfc
 %Z 1
 .]
 .[
-sua
+sua-rfc
 %Z 1
 .]
 .[
-isua
+isua04
 %Z 1
 .]
 .[
-tua
+tua06
 %Z 1
 .]
 which permits supporting Signalling Gateways (SG) to convey additional
@@ -122,19 +122,19 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 for the purpose of supporting the transfer of SG-specific information of
 interest to an Application Server during the ASP Active procedure.
@@ -175,19 +175,19 @@ in the UA documents:\*#
 .ip \*#
 See, for example, Section 1.2 of the specific UA document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 .lp
@@ -195,24 +195,24 @@ tua
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 supporting ASP Management.
 .sh 2 "Overview"
@@ -251,7 +251,7 @@ x213
 .]
 Compliant NPI,
 .[
-npi
+npi revision 2.0.0
 %Z 2
 .]
 and the OSI/ISO TSD
@@ -266,21 +266,21 @@ x219
 .]
 Compliant TPI,
 .[
-tpi
+tpi revision 2.0.0
 %Z 2
 .]
 and the ACSE
 .[
-iso 8649
+iso8649
 %Z 2
 .]
 .[
-iso 8650
+ISO/IEC 8650:1988
 %Z 2
 .]
 compliant mOSI extensions to the XNS.
 .[
-xns
+xns99
 %Z 2
 .]
 .pp
@@ -297,19 +297,19 @@ existing UA procedures\*#
 .ip \*#
 See, for example, Section 4 of the specific UA document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 and MIBs
@@ -357,19 +357,19 @@ they are included in addition to the parameters of the UAs.\*#
 .ip \*#
 See, for example, Section 3 of the specific UA document.
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .)d
 .sh 2 "Parameters"
@@ -424,7 +424,7 @@ Signalling Gateway can support to the specific Application Server.
 .ip "M2UA"
 For M2UA
 .[
-m2ua
+m2ua-rfc
 .]
 the \fI\)Maximum SDU Size\fR field
 provides the maximum size of the data payload of the \fI\)Protocol Data\fR field.  The
@@ -439,7 +439,7 @@ bytes, this size would be 272.
 .ip "M3UA"
 For M3UA
 .[
-m3ua
+m3ua-rfc
 .]
 the \fI\)Maximum SDU Size\fR field
 provides the limit on the maximum size of the data payload of the \fI\)Protocol Data\fR field.
@@ -454,7 +454,7 @@ would be 3094.
 .ip "SUA"
 For SUA
 .[
-sua
+sua-rfc
 .]
 the \fI\)Maximum SDU Size\fR field
 provides the limit on the maximum size of the User Data field for a normal
@@ -467,7 +467,7 @@ set to a value of -1 (0xFFFFFFFF).
 .ip "TUA"
 For TUA
 .[
-tua
+tua06
 .]
 the \fI\)Maximum SDU Size\fR field
 provide the limit on the maximum size of the Components field for a
@@ -487,7 +487,7 @@ Signalling Gateway can support to the specific Application Server.
 .ip "M2UA"
 For M2UA
 .[
-m2ua
+m2ua-rfc
 .]
 the \fI\)Optimal SDU Size\fR field
 does not apply and
@@ -495,7 +495,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "M3UA"
 For M3UA
 .[
-m3ua
+m3ua-rfc
 .]
 the \fI\)Optimal SDU Size\fR field
 provides the limit on the optimal size of the data payload of the \fI\)Protocol Data\fR field.
@@ -510,7 +510,7 @@ would be 272.
 .ip "SUA"
 For SUA
 .[
-sua
+sua-rfc
 .]
 the \fI\)Optimal SDU Size\fR field
 provides the limit on the optimal size of the User Data field for a normal
@@ -521,7 +521,7 @@ associated Protocol Class) without segmentation.
 .ip "TUA"
 For TUA
 .[
-tua
+tua06
 .]
 the \fI\)Optimal SDU Size\fR field
 provides the limit on the optimal size of the Components field for a
@@ -540,14 +540,14 @@ connection or transaction dialogue establishment.
 .ip "M2UA"
 For M2UA
 .[
-m2ua
+m2ua-rfc
 .]
 the \fI\)Maximum Connect Data Size\fR field does not apply and is not included
 in the \fI\)Protocol Limits\fR parameter.
 .ip "M3UA"
 For M3UA
 .[
-m3ua
+m3ua-rfc
 .]
 the \fI\)Maximum Connect Data Size\fR field
 does not apply and
@@ -555,7 +555,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua
+sua-rfc
 .]
 the \fI\)Maximum Connect Data Size\fR field
 provides a limit on the maximum size of the User Data field that can be
@@ -565,7 +565,7 @@ the \fI\)Protocol Limits\fR parameter.
 .ip "TUA"
 For TUA
 .[
-tua
+tua06
 .]
 the \fI\)Maximum Connect Data Size\fR field
 provides the limit on the maximum size of the User Information and Components
@@ -583,7 +583,7 @@ disconnection or transaction dialogue abort.
 .ip "M2UA"
 For M2UA
 .[
-m2ua
+m2ua-rfc
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 does not apply and
@@ -591,7 +591,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "M3UA"
 For M3UA
 .[
-m3ua
+m3ua-rfc
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 does not apply and
@@ -599,7 +599,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua
+sua-rfc
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 provides a limit on the maximum size of the User Data field that can be
@@ -609,7 +609,7 @@ the \fI\)Protocol Limits\fR parameter.
 .ip "TUA"
 For TUA
 .[
-tua
+tua06
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 provides the limit on the maximum size of the User Abort Information
@@ -627,7 +627,7 @@ expedited on a connection.
 .ip "M2UA"
 For M2UA
 .[
-m2ua
+m2ua-rfc
 .]
 The \fI\)Maximum ESDU Size\fR field
 does not apply and
@@ -635,7 +635,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "M3UA"
 For M3UA
 .[
-m3ua
+m3ua-rfc
 .]
 the \fI\)Maximum ESDU Size\fR field
 does not apply and
@@ -643,7 +643,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua
+sua-rfc
 .]
 the \fI\)Maximum ESDU Size\fR field
 provides a maximum number of bytes in the User Data field for an expedited
@@ -655,7 +655,7 @@ and is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "TUA"
 For TUA
 .[
-tua
+tua06
 .]
 the \fI\)Maximum ESDU Size\fR field
 does not apply and
@@ -1062,19 +1062,19 @@ limits.
 \fI\)SGINFO\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 Please see the SIGTRAN Security document
 .[
@@ -1090,19 +1090,19 @@ these UAs.
 \fI\)SGINFO\fR provides an additional \fI\)Protocol Limits\fR message
 parameter to the common parameter range of the SIGTRAN UAs:
 .[
-m2ua
+m2ua-rfc
 .]
 .[
-m3ua
+m3ua-rfc
 .]
 .[
-sua
+sua-rfc
 .]
 .[
-isua
+isua04
 .]
 .[
-tua
+tua06
 .]
 .af $p a
 .np
