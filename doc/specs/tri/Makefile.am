@@ -61,6 +61,11 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= tri.texi
 
+tr.h: $(top_srcdir)/src/include/ss7/tr.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += tr.h
+
 tri_TEXINFOS		= \
 			  tr.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \

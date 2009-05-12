@@ -59,15 +59,45 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= npi.texi
+info_TEXINFOS		+= npi.texi npi_mtp.texi npi_sccp.texi
+
+npi.h: $(top_srcdir)/src/include/sys/npi.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += npi.h
 
 npi_TEXINFOS		= \
+			  npi.h \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+npi_mtp.h: $(top_srcdir)/src/include/sys/npi_mtp.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += npi_mtp.h
+
+npi_mtp_TEXINFOS	= \
+			  npi_mtp.h \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+npi_sccp.h: $(top_srcdir)/src/include/sys/npi_sccp.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += npi_sccp.h
+
+npi_sccp_TEXINFOS	= \
+			  npi_sccp.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
 if AMDEP
 npi_TEXINFOS		+= \
+			  texi/args.texi
+npi_mtp_TEXINFOS	+= \
+			  texi/args.texi
+npi_sccp_TEXINFOS	+= \
 			  texi/args.texi
 endif
 endif
@@ -106,6 +136,15 @@ FIG_FIGS		= \
 			npi_fi23.fig
 
 TBL_TBLS		= \
+			npi_mtp_taba1.tbl \
+			npi_sccp_taba1.tbl \
+			npi_sccp_taba2.tbl \
+			npi_sccp_taba3.tbl \
+			npi_sccp_taba4.tbl \
+			npi_sccp_taba5b.tbl \
+			npi_sccp_taba5.tbl \
+			npi_sccp_taba6.tbl \
+			npi_sccp_taba7.tbl \
 			npi_tab1.tbl \
 			npi_tab2.tbl \
 			npi_tab3.tbl \

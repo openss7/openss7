@@ -190,7 +190,8 @@ typedef struct MX_parms_chanmap {
 	mx_long mp_span_increment;	/* increment of next span from previous span */
 	mx_ulong mp_slot_offset;	/* offset from beginning of span */
 	mx_long mp_slot_increment;	/* increment of next slot from previous slot */
-	mx_ulong mp_chan_map;		/* channel (bit) map (lsb = slot 0, msb = slot 31) */
+	mx_ulong mp_chan_map;		/* channel (bit) map (lsb = slot 0, msb = slot
+					   31) */
 } MX_parms_chanmap_t;
 
 union MX_parms {
@@ -455,45 +456,45 @@ typedef struct MX_event_ind {
 	mx_ulong mx_slot;		/* slot within multiplex for event */
 } MX_event_ind_t;
 
-#define MX_EVT_DCD_ASSERT		 0
-#define MX_EVT_DCD_DEASSERT		 1
-#define MX_EVT_DSR_ASSERT		 2
-#define MX_EVT_DSR_DEASSERT		 3
-#define MX_EVT_DTR_ASSERT		 4
-#define MX_EVT_DTR_DEASSERT		 5
-#define MX_EVT_RTS_ASSERT		 6
-#define MX_EVT_RTS_DEASSERT		 7
-#define MX_EVT_CTS_ASSERT		 8
-#define MX_EVT_CTS_DEASSERT		 9
-#define MX_EVT_RI_ASSERT		10
-#define MX_EVT_RI_DEASSERT		11
-#define MX_EVT_YEL_ALARM		12
-#define MX_EVT_BLU_ALARM		13
-#define MX_EVT_RED_ALARM		14
-#define MX_EVT_NO_ALARM			15
+#define MX_EVT_DCD_ASSERT	 0
+#define MX_EVT_DCD_DEASSERT	 1
+#define MX_EVT_DSR_ASSERT	 2
+#define MX_EVT_DSR_DEASSERT	 3
+#define MX_EVT_DTR_ASSERT	 4
+#define MX_EVT_DTR_DEASSERT	 5
+#define MX_EVT_RTS_ASSERT	 6
+#define MX_EVT_RTS_DEASSERT	 7
+#define MX_EVT_CTS_ASSERT	 8
+#define MX_EVT_CTS_DEASSERT	 9
+#define MX_EVT_RI_ASSERT	10
+#define MX_EVT_RI_DEASSERT	11
+#define MX_EVT_YEL_ALARM	12
+#define MX_EVT_BLU_ALARM	13
+#define MX_EVT_RED_ALARM	14
+#define MX_EVT_NO_ALARM		15
 
-#define MXF_EVT_DCD_ASSERT		(1 <<  0)
-#define MXF_EVT_DCD_DEASSERT		(1 <<  1)
-#define MXF_EVT_DSR_ASSERT		(1 <<  2)
-#define MXF_EVT_DSR_DEASSERT		(1 <<  3)
-#define MXF_EVT_DTR_ASSERT		(1 <<  4)
-#define MXF_EVT_DTR_DEASSERT		(1 <<  5)
-#define MXF_EVT_RTS_ASSERT		(1 <<  6)
-#define MXF_EVT_RTS_DEASSERT		(1 <<  7)
-#define MXF_EVT_CTS_ASSERT		(1 <<  8)
-#define MXF_EVT_CTS_DEASSERT		(1 <<  9)
-#define MXF_EVT_RI_ASSERT		(1 << 10)
-#define MXF_EVT_RI_DEASSERT		(1 << 11)
-#define MXF_EVT_YEL_ALARM		(1 << 12)
-#define MXF_EVT_BLU_ALARM		(1 << 13)
-#define MXF_EVT_RED_ALARM		(1 << 14)
-#define MXF_EVT_NO_ALARM		(1 << 15)
+#define MXF_EVT_DCD_ASSERT	(1 <<  0)
+#define MXF_EVT_DCD_DEASSERT	(1 <<  1)
+#define MXF_EVT_DSR_ASSERT	(1 <<  2)
+#define MXF_EVT_DSR_DEASSERT	(1 <<  3)
+#define MXF_EVT_DTR_ASSERT	(1 <<  4)
+#define MXF_EVT_DTR_DEASSERT	(1 <<  5)
+#define MXF_EVT_RTS_ASSERT	(1 <<  6)
+#define MXF_EVT_RTS_DEASSERT	(1 <<  7)
+#define MXF_EVT_CTS_ASSERT	(1 <<  8)
+#define MXF_EVT_CTS_DEASSERT	(1 <<  9)
+#define MXF_EVT_RI_ASSERT	(1 << 10)
+#define MXF_EVT_RI_DEASSERT	(1 << 11)
+#define MXF_EVT_YEL_ALARM	(1 << 12)
+#define MXF_EVT_BLU_ALARM	(1 << 13)
+#define MXF_EVT_RED_ALARM	(1 << 14)
+#define MXF_EVT_NO_ALARM	(1 << 15)
 
-#define MXF_EVT_DCD_CHANGE		(MXF_EVT_DCD_ASSERT|MXF_EVT_DCD_DEASSERT)
-#define MXF_EVT_DSR_CHANGE		(MXF_EVT_DSR_ASSERT|MXF_EVT_DSR_DEASSERT)
-#define MXF_EVT_DTR_CHANGE		(MXF_EVT_DTR_ASSERT|MXF_EVT_DTR_DEASSERT)
-#define MXF_EVT_RTS_CHANGE		(MXF_EVT_RTS_ASSERT|MXF_EVT_RTS_DEASSERT)
-#define MXF_EVT_CTS_CHANGE		(MXF_EVT_CTS_ASSERT|MXF_EVT_CTS_DEASSERT)
-#define MXF_EVT_RI_CHANGE		(MXF_EVT_RI_ASSERT|MXF_EVT_RI_DEASSERT)
+#define MXF_EVT_DCD_CHANGE	(MXF_EVT_DCD_ASSERT|MXF_EVT_DCD_DEASSERT)
+#define MXF_EVT_DSR_CHANGE	(MXF_EVT_DSR_ASSERT|MXF_EVT_DSR_DEASSERT)
+#define MXF_EVT_DTR_CHANGE	(MXF_EVT_DTR_ASSERT|MXF_EVT_DTR_DEASSERT)
+#define MXF_EVT_RTS_CHANGE	(MXF_EVT_RTS_ASSERT|MXF_EVT_RTS_DEASSERT)
+#define MXF_EVT_CTS_CHANGE	(MXF_EVT_CTS_ASSERT|MXF_EVT_CTS_DEASSERT)
+#define MXF_EVT_RI_CHANGE	(MXF_EVT_RI_ASSERT|MXF_EVT_RI_DEASSERT)
 
 #endif				/* __SS7_MXI_H__ */

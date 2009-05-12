@@ -149,7 +149,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @set MANUAL_TITLE Network Provider Interface
 @set MANUAL_TYPE Corrigendum for MTP Conformance
 
-@set PART Network Layer
+@set PART Message Transfer
 @set LONG Message Transfer Part
 @set SHORT MTP
 @set INTERFACE NPI-MTP
@@ -399,9 +399,10 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
-(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
-components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Message
+Transfer Part
+(MTP) protocol stacks.  It provides abstraction of the Message Transfer interface to these
+components as well as providing a basis for Message Transfer control for other Message Transfer protocols.
 
 @subsection Purpose
 @cpindex STREAMS
@@ -417,6 +418,10 @@ that are made available in the software package.
 It is the intent of this document that it act as the primary source of information concerning the
 @value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
 @value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+This document is intended to provide information for writers of OpenSS7 Message Transfer Part (MTP)
+applications at both the user and kernel level, as well as writers of OpenSS7 Message Transfer Part
+(MTP) Users.
 
 @subsection Audience
 
@@ -536,7 +541,7 @@ that are exposed through the @file{<sys/npi_mtp.h>} header file.
 @node Protocol Address
 @section Protocol Address
 
-In an MTP environment, the protocol address is the MTP-SAPI that identifies the SS7 netweork, SS7
+In an MTP environment, the protocol address is the MTP-SAPI that identifies the SS7 network, SS7
 Signalling Point Code within the SS7 network, and the MTP-User identifier (service indicator).
 
 @node Connection and Connectionless Modes
@@ -544,7 +549,7 @@ Signalling Point Code within the SS7 network, and the MTP-User identifier (servi
 
 @subsection Connection-Oriented Mode
 
-The Message Transfer Part NSP supports connect-oriented mode for MTP-User protocols that form an
+The Message Transfer Part NSP supports connection-oriented mode for MTP-User protocols that form an
 association between two MTP-Users in an end-to-end exchange.  This includes TUP [Q.721], ISUP
 [Q.761], BTNUP, BICC and other call control protocols.
 
@@ -566,7 +571,7 @@ exchange of MTP.  This includes SCCP [Q.711], MTUP, and other MTP Users of a con
 
 The Message Transfer Part, both in connection-oriented mode and in connection-less mode, does not
 permit sending a NSDU of zero octets.  So, in connection-less mode, if the number of @msg{M_DATA}
-message blocks is zero, the @prim{N_UNITDATA_REQ} primitive will always faile with the
+message blocks is zero, the @prim{N_UNITDATA_REQ} primitive will always fail with the
 @parm{NPI_error} in the @prim{N_ERROR_ACK} set to @pval{NBADDATA}.  In connection-oriented mode, if
 the number of @msg{M_DATA} message block bytes is zero, the @prim{N_DATA_REQ} primitive will always
 fail with the @parm{NPI_error} in the @prim{N_ERROR_ACK} set to @pval{NBADDATA}.  If either the
@@ -584,7 +589,7 @@ negotiated in the NPI state @psta{NS_IDLE}, and are read-only in all other state
 
 @subsection Quality of Service Structures
 
-MTP-NPI provides quality of service structure selection for data, connections, information and range
+NPI-MTP provides quality of service structure selection for data, connections, information and range
 information.  The MTP specific quality of service structures are discussed in detail below.
 
 @node NPI-MTP
@@ -780,7 +785,7 @@ typedef struct {
 Specifies or indicates the quality of service structure type.  This field is always coded
 @pval{N_QOS_SEL_DATA_MTP}.
 @item sls
-Specifies the value fo the Signalling Link Selection field to use in outgoing MTP messages, or
+Specifies the value of the Signalling Link Selection field to use in outgoing MTP messages, or
 indicates the value of the Signalling Link Selection field that was received in incoming MTP
 messages.
 @item mp
@@ -825,8 +830,8 @@ Specifies the default Message Priority value to be used on the connection.
 
 @subsubheading N_QOS_SEL_INFO_MTP
 
-This quality of service structure type is used when selecting quality of service parameters
-for information with the @prim{N_INFO_ACK} primitive.
+This quality of service structure type is used when selecting quality of service parameters for
+information with the @prim{N_INFO_ACK} primitive.
 
 @subsubheading Format
 
@@ -838,8 +843,8 @@ typedef struct {
         np_ulong pvar;                  /* protocol variant */
         np_ulong popt;                  /* protocol options */
         np_ulong sls;                   /* signalling link selection */
-        np_ulong mp;                    /* message piority */
-} n_qos_sel_info_mtp_t;
+        np_ulong mp;                    /* message priority */
+} N_qos_sel_info_mtp_t;
 @end verbatim
 @end smallexample
 
@@ -865,7 +870,7 @@ value.
 
 @subsubheading N_QOS_RANGE_INFO_MTP
 
-This quality of service structure type is used hwen indicating the range quality of service
+This quality of service structure type is used when indicating the range quality of service
 parameters for information with the @prim{N_INFO_ACK} primitive.
 
 @subsubheading Format

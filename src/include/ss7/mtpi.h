@@ -302,7 +302,7 @@ typedef struct MTP_resume_ind {
 /*
  * MTP_STATUS_REQ, M_PROTO or M_PCPROTO
  */
-typedef struct MTP_status_req{
+typedef struct MTP_status_req {
 	mtp_ulong mtp_primitive;	/* always MTP_STATUS_REQ */
 	mtp_ulong mtp_addr_length;	/* length of affected MTP address */
 	mtp_ulong mtp_addr_offset;	/* offset of affected MTP address */
@@ -325,16 +325,18 @@ typedef struct MTP_status_ind {
    Type for MTP_STATUS_IND 
  */
 #define MTP_STATUS_TYPE_CONG		0x00	/* MTP-STATUS refers to congestion */
-#define MTP_STATUS_TYPE_UPU		0x01	/* MTP-STATUS refers to user part unavailability */
+#define MTP_STATUS_TYPE_UPU		0x01	/* MTP-STATUS refers to user part
+						   unavailability */
 #define MTP_STATUS_TYPE_RSTR		0x02	/* MTP-STATUS refers to restriction */
 
 /*
    Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_UPU 
  */
 #define MTP_STATUS_UPU_UNKNOWN		0x01	/* User part unavailable: unknown */
-#define MTP_STATUS_UPU_UNEQUIPPED	0x02	/* User part unavailable: unequipped remote user. */
-#define MTP_STATUS_UPU_INACCESSIBLE	0x03	/* User part unavailable: inaccessible remote user. 
-						 */
+#define MTP_STATUS_UPU_UNEQUIPPED	0x02	/* User part unavailable: unequipped
+						   remote user. */
+#define MTP_STATUS_UPU_INACCESSIBLE	0x03	/* User part unavailable: inaccessible
+						   remote user. */
 
 /*
    Status for MTP_STATUS_IND, with MTP_STATUS_TYPE_CONG 

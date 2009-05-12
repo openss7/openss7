@@ -1624,14 +1624,30 @@ described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @node ll_control.h Header File
 @section ll_control.h Header File
 
+@smallformat
+@verbatiminclude ll_control.h
+@end smallformat
+
 @node ll_proto.h Header File
 @section ll_proto.h Header File
+
+@smallformat
+@verbatiminclude ll_proto.h
+@end smallformat
 
 @node mlp_control.h Header File
 @section mlp_control.h Header File
 
+@smallformat
+@verbatiminclude mlp_control.h
+@end smallformat
+
 @node mlp_proto.h Header File
 @section mlp_proto.h Header File
+
+@smallformat
+@verbatiminclude mlp_proto.h
+@end smallformat
 
 @node LLI Library
 @chapter LLI Library

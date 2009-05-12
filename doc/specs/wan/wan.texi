@@ -2387,8 +2387,39 @@ system header files:
 @node WAN Protocol Header File
 @section WAN Protocol Header File
 
+@table @file
+@item <errno.h>
+@item <sys/types.h>
+@item <sys/ioctl.h>
+@item <sys/stropts.h>
+@item <sys/snet/wan_proto.h>
+@end table
+
+Note that on @cite{IRIS SX.25} this file is located in @file{<sys/snet/wan_proto.h>}.
+Note that on @cite{Solaris X.25} this file is located in @file{<sys/netx25/wan_proto.h>}.
+
+@smallformat
+@verbatiminclude wan_proto.h
+@end smallformat
+
 @node WAN Control Header File
 @section WAN Control Header File
+
+@table @file
+@item <errno.h>
+@item <sys/types.h>
+@item <sys/ioctl.h>
+@item <sys/stropts.h>
+@item <sys/snet/wan_proto.h>
+@item <sys/snet/wan_control.h>
+@end table
+
+Note that on @cite{IRIS SX.25} this file is located in @file{<sys/snet/wan_control.h>}.
+Note that on @cite{Solaris X.25} this file is located in @file{<sys/netx25/wan_control.h>}.
+
+@smallformat
+@verbatiminclude wan_control.h
+@end smallformat
 
 @c @node WAN Library
 @c @appendix WAN Library

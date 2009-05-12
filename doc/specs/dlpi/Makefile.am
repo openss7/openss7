@@ -61,7 +61,13 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= dlpi.texi
 
+dlpi.h: $(top_srcdir)/src/include/sys/dlpi.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += dlpi.h
+
 dlpi_TEXINFOS		= \
+			  dlpi.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 

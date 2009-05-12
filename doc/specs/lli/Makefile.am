@@ -61,7 +61,25 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= lli.texi
 
+ll_control.h: $(top_srcdir)/src/include/sys/snet/ll_control.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+ll_proto.h: $(top_srcdir)/src/include/sys/snet/ll_proto.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+mlp_control.h: $(top_srcdir)/src/include/sys/snet/mlp_control.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+mlp_proto.h: $(top_srcdir)/src/include/sys/snet/mlp_proto.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += ll_control.h ll_proto.h mlp_control.h mlp_proto.h
+
 lli_TEXINFOS		= \
+			  ll_control.h \
+			  ll_proto.h \
+			  mlp_control.h \
+			  mlp_proto.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
