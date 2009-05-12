@@ -1,0 +1,661 @@
+.de $0
+.(x 0
+\\$2 \\$1
+.)x
+..
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 11.0i
+.po 4
+.ll 7.2i
+.lt 7.2i
+.nr LL 7.2i
+.nr LT 7.2i
+.fo 'Bidulock'Version 0.0'FORMFEED[Page %]'
+.he 'Internet Draft'Informational'April 2000'
+.hy 6
+.ad b
+.ta 3
+\".na
+.ba 0
+.nr so -3n
+.nr ii 3n
+.nr pi 3n
+.nf
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       The OpenSS7 Project
+.fi
+.sp  2
+Expires in six months                                           May 2001
+.sp  2
+.ce 3
+
+Stream Control Transmission Protocol (SCTP)
+Stream Control Transmission Provider Interface (SCTPI)
+<draft-bidulock-sctpstreams-sigtran-00.txt>
+.sp 2
+.fi
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet Draft provides a specification mapping the Stream Control
+Transmission Protocol RFC 2960[1] into a SVR 4.2 STREAMS provider interface.
+The benefit of this specification includes compatibility to UNIX International
+TLI (Transport Layer Interface)[2] and XOpen/XPG4 XTI (XOpen Transport
+Interface)[3] for maximum compatibility with OSI and IP transport provider
+applications based on SVR 4.2 STREAMS.  In addition, this specification
+provides access to the features of SCTP which extend beyond those of existing
+transport level interfaces.
+.sh 1 "Introduction"
+.(z
+.(c
++----------------+-----------+-----------------------------+
+|   Transport    |  Stream   |     IS 8072 Transport       |
+|  Primitives    | Msg Type  |         Primitives          |
++----------------+-----------+-----------------------------+
+| T_CONN_REQ     | M_PROTO   | T-CONNECT request           |
+| T_CONN_IND     | M_PROTO   | T-CONNECT indication        |
+| T_CONN_RES     | M_PROTO   | T-CONNECT response          |
+| T_CONN_CON     | M_PROTO   | T-CONNECT confirm           |
+| T_DATA_REQ     | M_PROTO   | T-DATA request              |
+| T_DATA_IND     | M_PROTO   | T-DATA indication           |
+| T_EXDATA_REQ   | M_PROTO   | T-EXPEDITED-DATA request    |
+| T_EXDATA_IND   | M_PROTO   | T-EXPEDITED-DATA indication |
+| T_DISCON_REQ   | M_PROTO   | T-DISCONNECT request        |
+| T_DISCON_IND   | M_PROTO   | T-DISCONNECT indication     |
+| T_UNITDATA_REQ | M_PROTO   | T-UNITDATA request          |
+| T_UNITDATA_IND | M_PROTO   | T-UNITDATA indication       |
+| T_ORDREL_REQ   | M_PROTO   | not defined in ISO          |
+| T_ORDREL_IND   | M_PROTO   | not defined in ISO          |
+| T_BIND_REQ     | M_PROTO   | not defined in ISO          |
+| T_BIND_ACK     | M_PCPROTO | not defined in ISO          |
+| T_UNBIND_REQ   | M_PROTO   | not defined in ISO          |
+| T_OK_ACK       | M_PCPROTO | not defined in ISO          |
+| T_ERROR_ACK    | M_PCPROTO | not defined in ISO          |
+| T_INFO_REQ     | M_PCPROTO | not defined in ISO          |
+| T_INFO_ACK     | M_PCPROTO | not defined in ISO          |
+| T_UDERROR_IND  | M_PROTO   | not defined in ISO          |
+| T_OPTMGMT_REQ  | M_PROTO   | not defined in ISO          |
+| T_OPTMGMT_ACK  | M_PCPROTO | not defined in ISO          |
+| T_ADDR_REQ     | M_PROTO   | not defined in ISO          |
+| T_ADDR_ACK     | M_PCPROTO | not defined in ISO          |
++----------------+-----------+-----------------------------+
+.)c
+.ce 2
+\fBFigure 1.\fR  Mapping of ISO IS8072 and RFC 2960 to Kernel-level
+Transport Service Primitives
+.)z
+.sh 1 "Service Primitives"
+.sh 2 "Transport Service Management Primitives"
+.sh 3 "T_INFO_REQ \- Get transport protocol parameter sizes"
+.lp
+This primitive requests the transport provider to return the sizes of all
+relevant protocol parameters, plus the current state of the provider.  This
+message consists of a M_PCPROTO mesage block formatted as follows:
+.(l
+struct T_info_req {
+    t_scalar_t  PRIM_type;  /* always T_INFO_REQ */
+};
+.)l
+.lp
+Where \fIPRIM_type\fR indicates the primitive type.  Note that the T_INFO_REQ
+and T_INFO_ACK primitive have no effect on the state of the transport provider
+and do not appear in the state tables.
+.lp
+This primitive requirest the transport provider to generate one of the
+following acknowledgements on receipt of the primitive and that the transport
+user wait for the acknowledgement before issuing any other primitives:
+.ip "Successful"
+Acknolwegement of the primitive via the T_INFO_ACK.
+.ip "Non-fatal errors"
+There are no errors associated with this primitive.
+.sh 3 "T_INFO_ACK \- Protocol information acknolwedgement"
+.lp
+This primitive indicates to the transport user any relevan protocol-dependent
+paramters.  It should be initiated in response to the T_INFO_REQ primitive
+described above.  The format of this message is one M_PCPROTO message block
+formatted as follows:
+.(l
+struct T_info_ack {
+    t_scalar_t  PRIM_type;      /* always T_INFO_ACK    */
+    t_scalar_t  TSDU_size;      /* max TSDU size        */
+    t_scalar_t  ETSDU_size;     /* max ETSDU size       */
+    t_scalar_t  CDATA_size;     /* connect data size    */
+    t_scalar_t  DDATA_size;     /* disconnect data size */
+    t_scalar_t  ADDR_size;      /* TSAP size            */
+    t_scalar_t  OPT_size;       /* Options size         */
+    t_scalar_t  TIDU_size;      /* TIDU size            */
+    t_scalar_t  SERV_type;      /* service type         */
+    t_scalar_t  CURRENT_state;  /* current state        */
+    t_scalar_t  PROVIDER_flag;  /* provider flag        */
+};
+.)l
+.lp
+Where the fields of this message have the following meanings:
+.ip \fIPRIM_type\fR
+This indicates the primitive type and is always T_INFO_ACK.
+.ip \fITSDU_size\fR
+A value greater than zero specifies the maximum size of a transport service
+data unit (TSDU); a value of zero specifies that the transport provider does
+not suppor the concept of TSDU, although it does support the sending of a data
+stream with no logical boundaries preserved across a connection; a value of -1
+specifies that there is no limit on the size of a TSDU; and a value of -2
+specifies that the transfer of normal data is not supported by the transport
+provider.
+
+Stream Control Transmission Protocol (SCTP) transport service providers must
+support the concept of a TSDU to provide the capabilites described in [1].
+Therefore, SCTP transport providers should never return 0 or -2 in the
+\fITSDU_size\fR parameter of the T_INFO_ACK.  It is advised that SCTP
+providers which are capable of segmentation and reassembly of packets return
+-1 in this parameter.
+.ip \fIETSDU_size\fR
+A value greater that zero specified the maximum size of an expedited transport
+service data unit (ETSDU); a value of zero specifies that the transport
+provider does not support the concept of ETSDU, although it does support the
+sending of an expedited data stream with no logical boundaries preserved
+across a connection; a value of -1 specifies that there is no limit on the
+size of an ETSDU; and a value of -2 specifies that the transfer of expedited
+data is not supported by the transport provider.
+
+SCTP as specified in RFC 2960 does not support the concept of expedited data
+directly; however, some SCTP service providers may support this concept in an
+implementation dependent fashion.  It is advised, therefore, that SCTP
+transport provider return -1 if it supports expedited data, and -2 otherwise.
+.ip \fICDATA_size\fR
+A value greater that or equal to zero specifies the maximum amount of data
+that may be associated with the connection establishment primitives; and a
+value of -2 specifies that the transport provider does not allow data for be
+sent with connection establishment primitives.
+.ip \fIDDATA_size\fR
+A value greater than or equal to zero specifies the maximum amount of data
+that may be associated with the disconnect primitives; and a value of -2
+specifies that the transport provider does not allow data to be sent with the
+disconnect primitives.
+.ip \fIADDR_size\fR
+A value greater than or equal to zero indicates the maximum size of a
+transport protocol address; and a value of -2 specifies that the transport
+provider does not provide user access to transport protocol addresses.
+.ip \fIOPT_size\fR
+A value greater than or equal to zero indicates the maximum number of bytes of
+protocol-specific options supported by the provider; and a value of -2
+specifies that the transport provider does not support user-settable options.
+
+SCTP providers have user-settable options which are mandated by RFC 2960[1]
+and the SCTP provider is advised to return a non-zero value for the
+\fIOPT_size\fR in the T_INFO_ACK.
+.ip \fITIDU_size\fR
+This is the amount of user data that may be presented in a single T_DATA_REQ
+or T_EXDATA_REQ primitive.  This is the size of the transport protocol
+interface data unit, and should not exceed the tunable system limit, if
+non-zero, for the size of a STREAMS message.
+
+This value is STREAMS specific and must be determined independent of the SCTP
+protocol.
+.ip \fISERV_type\fR
+This field specifies the service type supported by the transport provider, and
+is one of the following:
+.ba +3
+.ip T_COTS 12
+The provider service is connection oriented with no orderly release support.
+
+This service type may be returned by \fIstreams\fR which are stream associated
+rather than association associated.  That is, the stream head corresponds to
+an SCTP stream rather than an SCTP association.  SCTP streams do not have
+orderly release.
+.ip T_COTS_ORD 12
+The provider service is connection oriented with orderly release support.
+
+This service type may be returned by \fIstreams\fR which are association
+associated rather than stream associated.  That is, the stream head
+corresponds to an SCTP association rather than an SCTP stream.  SCTP
+associations do have orderly release.
+.ip T_CLTS 12
+The provider service is a connectionless transport service.
+
+This service type may be returned by \fIstreams\fR which are not associated
+with a given stream but which can access any stream in an association with
+T_UNITDATA_REQ and T_UNITDATA_IND messages.
+.ba -3
+.ip \fICURRENT_state\fR
+This is the current state of the transport provider.
+.ip \fIPROVIDER_flag\fR
+This field specifies additional properties specific to the transport provider
+and may alter the way the transport user communicates.  The following flags
+may be set by the provider:
+.ba +3
+.ip SENDZERO 12
+This flag indicates that the transport provider supports the sending of
+zero-length TSDUs.
+.ip XPG4_1 12
+This flag indicates that the transport provider supports XPG4 semantics.
+.ba -3
+.lp
+The following rules apply when the type of service is T_CLTS:
+.bu
+The ETSDU_size, CDATA_size and DDATA_size files should be -2.
+.bu
+The TSDU_size should equal the TIDU_size.
+
+.sh 3 "User-Originated Primitives"
+.sh 4 "T_INFO_REQ - protocol sizes and capabilities"
+.sh 3 "T_BIND_REQ - bind protocol address request"
+.lp
+This primtive requests that the transport provider bind a protocol address to
+th \fIstream\fR, negotiate the number of connect indications allowed to be
+outstanding by the transport provider for the specified protocol address, and
+activate the \fIstream\fR associated with the protocol address.  The format of
+the message is one M_PROTO message block.  The format of the M_PROTO message
+block is as follows:
+.(l
+struct T_bind_req {
+    t_scalar_t  PRIM_type;      /* always T_BIND_REQ */
+    t_scalar_t  ADDR_length;    /* length of address */
+    t_scalar_t  ADDR_offset;    /* offset of address */
+    t_uscalar_t CONIND_number;  /* requested number of connect
+                                   indications to be queued */
+}
+.)l
+.lp
+Where the fields of this message have the following meanings:
+.ip \fIPRIM_type\fR
+This parameter indicates the primitive type.
+.ip \fIADDR_length\fR
+This field is the length of the protocol address to be bound to the
+\fIstream\fR.
+
+SCTP permits binding to multiple local addresses.  This can be accomplished
+using the T_BIND_REQ in two ways:
+.ba +3
+.np
+One local destination transport address is specified for each call to
+T_BIND_REQ and multiple calls are made to establish multiple local destination
+transport addresses.
+.np
+Multiple local destination transport addresses are concatenated into a single
+\fIADDR_length\fR and \fIADDR_offset\fR parameter, with indicators in each of
+the destination transport addresses as to the transport address size and type.
+.ba -3
+.ip
+The second method is the advised method for all SCTP transport providers
+because it is more consistent with the semantics of the socket library.
+
+If the SCTP transport user wants the SCTP association to bind to all local
+destination transport addresses known to the SCTP provider, the
+\fIADDR_length\fR parameter can be set to 0.  In this case, the SCTP provider
+will attempt to bind to all local destination transport addresses which are
+known to the SCTP provider.
+.ip \fIADDR_offset\fR
+This field is the offset from the beginning of the M_PROTO block where
+the protocol address begins.
+.ip \fICONIND_number\fR
+This field is the requested number of connect indications allowed to be
+outstanding by the transport provider for the specified protocol address.  The
+proper alignment of the address in the M_PROTO message block is not
+guaranteed.  The address in the M_PROTO message block is, however, aligned the
+same as it was received from the transport user.
+.lp
+This primitive requires the transport provider to generate one of the
+following acknolwedgements upon receipt of the primitive, and the transport
+user must wait for the acknowledgement before issuing any other primitive:
+.ip "\- Successful"
+Correct acknowledgement of the primitive is indicated via the T_BIND_ACK
+primitive.
+.ip "\- Non-fatal errors"
+These errors will be indicated via the T_ERROR_ACK primitive (described in
+section detailing the T_ERROR_ACK primitive).  The allowable errors are as
+follows:
+.ba +3
+.ip TBADADDR 12
+This indicates that the protocol address was in an incorrect format or the
+address contained illegal information.  It is not intended to indicate
+protocol errors.
+.ip TNOADDR 12
+This indicates that the transport provider could not allocate an address.
+.ip TACCES 12
+This indicates that the user did not have proper permissions for the use of
+the requested address.
+.ip TOUTSTATE 12
+The primitive would place the transport interface out of state.
+.ip TSYSERR 12
+A system error has occurred and the UNIX System error is indicated in the
+primitive.
+.ip TADDRBUSY 12
+This indicates that the requested address is already in use.
+.ba -3
+.fi
+.sh 3 "T_BIND_ACK \- Bind protocol address acknolwedgement"
+.lp
+This primitive indicates to the transport user that the specified protocol
+address has been bound to the stream, that the specified number of connection
+indications are allowed to be queued by the transport provider for the
+specified protocol address, and that the stream associated with the specified
+protocol address has been activated.  This message consists of one M_PCPROTO
+message block formatted as follows:
+.(l
+struct T_bind_ack {
+    t_scalar_t  PRIM_type;      /* always T_BIND_ACK */
+    t_scalar_t  ADDR_length;
+    t_scalar_t  ADDR_offset;
+    t_uscalar_t CONIND_number;
+};
+.)l
+.lp
+Where the parameters of the T_BIND_ACK message are as follows:
+.ip \fIPRIM_type\fR
+This parameter indicates the primitive type and is always T_BIND_ACK.
+.ip \fIADDR_length\fR
+This parameter is the length of the protocol address(es) bound to the stream.
+.ip \fIADDR_offset\fR
+This parameter is the offset from the begninning of the M_PCPROTO block where
+the protocol address begins.
+.ip \fICONIND_number\fR
+This parameter is the accepted number of connect indications allowed to be
+outstanding by the transport provider for the specified protocol address.
+
+Note that this filed does not apply to connectionless transport providers.
+
+The proper alignment of the address in the M_PCPROTO message block is not
+guaranteed.
+.lp
+The following rules apply to the binding of the specified protocol address to
+the stream:
+.bu
+If the ADDR_length field in the T_BIND_REQ primitive is 0, then the transport
+provider is to assign a transport protocol address to the user.
+.bu
+The transport provider is to bind the transport address as specified in the
+T_BIND_REQ primitive.
+.bu
+If the transport provider cannot bind the specified address(es) the provider
+will return TADDRBUSY.
+
+.sh 1 "Transport Provider States"
+.lp
+This section provides a mapping of TLI (Transport Layer Interface) kernel
+states onto SCTP states.
+.(z
+.(c
++-----------------+-----------+-------------------------+
+|   TLI  State    | Usr State |       SCTP State        |
++-----------------+-----------+-------------------------+
+|                 | T_UNINIT  |                         |
+| TS_UNBND        | T_UNBND   | SCTP_CLOSED             |
+| TS_WACK_BREQ    | T_UNBND   | SCTP_CLOSED             |
+| TS_WACK_UREQ    | T_IDLE    | SCTP_CLOSED             |
+| TS_IDLE         | T_IDLE    | SCTP_CLOSED             |
+| TS_WACK_OPTREQ  | T_IDLE    | SCTP_CLOSED             |
+| TS_WACK_CREQ    | T_OUTCON  | SCTP_COOKIE_WAIT        |
+| TS_WCON_CREQ    | T_OUTCON  | SCTP_COOKIE_WAIT        |
+| TS_WRES_CIND    | T_INCON   | SCTP_COOKIE_ECHOED      |
+| TS_WACK_CRES    | T_INCON   | SCTP_COOKIE_ECHOED      |
+| TS_DATA_XFER    | T_DATAXFER| SCTP_ESTABLISHED        |
+| TS_WIND_ORDREL  | T_OUTREL  | SCTP_SHUTDOWN_PENDING,  |
+|                 |           | SCTP_SHUTDOWN_SENT,     |
+|                 |           | SCTP_SHUTDOWN_ACK_SENT1 |
+| TS_WREQ_ORDREL  | T_INREL   | SCTP_SHUTDOWN_RECEIVED  |
+| TS_WACK_DREQ6   | T_OUTCON  | SCTP_COOKIE_WAIT        |
+| TS_WACK_DREQ7   | T_INCON   | SCTP_COOKIE_ECHOED      |
+| TS_WACK_DREQ9   | T_DATAXFER| SCTP_ESTABLISHED        |
+| TS_WACK_DREQ10  | T_OUTREL  | SCTP_SHUTDOWN_PENDING,  |
+|                 |           | SCTP_SHUTDOWN_SENT,     |
+|                 |           | SCTP_SHUTDOWN_ACK_SENT1 |
+| TS_WACK_DREQ11  | T_INREL   | SCTP_SHUTDOWN_RECEIVED  |
+| TS_NOSTATES     | T_FAKE    | SCTP_UNREACHABLE        |
++-----------------+-----------+-------------------------+
+.)c
+.ce 2
+\fBFigure 2.\fR  Mapping of TLI kernel states to RFC 2960 states.
+.)z
+
+.sh 3 \fBTS_UNBND\fR
+
+.ip \fIT_BIND_REQ\fR
+When the user requests a bind with \fIT_BIND_REQ\fR, move to the
+\fBTS_WACK_BREQ\fR state.
+.ip \fIT_PASS_CONN\fR
+
+.sh 3 \fBTS_WACK_BREQ\fR
+
+.ip \fIT_BIND_ACK\fR
+If the user's \fIT_BIND_REQ\fR was valid, bind the stream and move to the
+\fBTS_IDLE\fR state.
+.ip \fIT_ERROR_ACK\fR
+If the user's \fIT_BIND_REQ\fR was invalid, return a \fIT_ERROR_ACK\fR
+primitive to the user and return to the \fBTS_UNBND\fR state.
+
+.sh 3 \fBTS_WACK_UREQ\fR
+
+.sh 3 \fBTS_IDLE\fR
+
+.ip \fIT_CONN_REQ\fR
+When the user request a connection with a \fIT_CONN_REQ\fR, move to the
+\fBTS_WACK_CREQ\fR state.
+.ip \fIT_CONN_IND\fR
+When the peer requests a connection (receipt of a valid \fBCOOKIE-ECHO\fR
+chunk), move to state \fBTS_WRES_CIND\fR.
+
+.sh 3 \fBTS_WACK_OPTREQ\fR
+
+.sh 3 \fBTS_WACK_CREQ\fR
+
+.ip \fIT_ERROR_ACK\fR
+If the user \fIT_CONN_REQ\fR was invalid,
+return a \fIT_ERROR_ACK\fR primitive to the user
+and stay in the \fBTS_IDLE\fR state.
+.ip \fIT_OK_ACK1\fR
+If the user \fIT_CONN_REQ\fR was valid, send a \fBINIT\fR chunk to the peer
+and return a \fIT_OK_ACK\fR primitive to the user and move to the
+\fBTS_WCON_CREQ\fR state.
+
+.sh 3 \fBTS_WCON_CREQ\fR
+
+.ip \fIT_DISCON_REQ\fR
+
+.ip \fIT_CONN_CON\fR
+
+.ip \fIT_DISCON_IND1\fR
+
+.sh 3 \fBTS_WRES_CIND\fR
+
+.lp
+In this state, the provider is awaiting a response to a connection indication.
+SCTP is in the \fBSCTP_CLOSED\fR state after having received a
+\fBCOOKIE-ECHO\fR chunk.
+.ip \fIT_CONN_RES\fR
+The user has decided to accept the connection.  Send a \fBCOOKIE-ACK\fR and
+move to the \fBSCTP_ESTABLISHED\fR state.  The provider moves to the
+\fBTS_DATA_XFER\fR state.
+
+.ip \fIT_DISCON_REQ\fR
+The user has decided not to accept the connection.  Send an \fBABORT\fR and
+move to the \fBSCTP_CLOSED\fR state.  The provider moves to the \fBTS_IDLE\fR
+state.
+
+.ip \fIT_CONN_IND\fR
+
+.ip \fIT_DISCON_IND2\fR
+
+.sh 3 \fBTS_WACK_CRES\fR
+
+.ip \fIT_ERROR_ACK\fR
+
+.ip \fIT_OK_ACK2\fR
+
+.ip \fIT_OK_ACK3\fR
+
+.ip \fIT_OK_ACK4\fR
+
+.sh 3 \fBTS_DATA_XFER\fR
+
+.ip \fIT_DISCON_REQ\fR
+
+.ip \fIT_DATA_REQ\fR
+
+.ip \fIT_EXDATA_REQ\fR
+
+.ip \fIT_ORDREL_REQ\fR
+
+.ip \fIT_DATA_IND\fR
+
+.ip \fIT_EXDATA_IND\fR
+
+.ip \fIT_ORDREL_IND\fR
+
+.ip \fIT_DISCON_IND1\fR
+
+.sh 3 \fBTS_WIND_ORDREL\fR
+.lp
+This is a stable state while waiting for a \fIT_ORDREL_IND\fR from the peer.
+This corresponds to a state where the local sender has shut down transmission
+of data and we are waiting for the peer endpoint to shut down transmission of
+data in repsonse to a \fBSHUTDOWN\fR chunk which was previously sent when
+entering this state.  Data transmission in this state is not valid.
+
+For SCTP, this corresponds to the SCTP \fBSHUTDOWN-SENT\fR state.
+
+.ip \fIT_DISCON_REQ
+
+.ip \fIT_DATA_IND\fR
+
+.ip \fIT_EXDATA_IND\fR
+
+.ip \fIT_ORDREL_IND\fR
+
+.ip \fIT_DISCON_IND1\fR
+
+.sh 3 \fBTS_WREQ_ORDREL\fR
+.lp
+This is a stable state while waiting for a \fIT_ORDREL_REQ\fR from the
+user.  This corresponds to a state where the peer has shut down transmission
+of data and we are waiting for the local endpoint to shut down transmission of
+data in response to a \fIT_ORDREL_IND\fR which was previously delivered.  Data
+transmission in this state is not valid.
+
+For SCTP, this state corresponds to the SCTP \fBSHUTDOWN-RECEIVED\fR state.
+
+.ip \fIT_DISCON_REQ\fR
+
+.ip \fIT_DATA_REQ\fR
+
+.ip \fIT_EXDATA_REQ\fR
+
+.ip \fIT_ORDREL_REQ\fR
+
+.ip \fIT_DISCON_IND1\fR
+
+.sh 3 \fBTS_WACK_DREQ6\fR
+.lp
+This is a transient state while waiting for acknowledgement of a
+\fIT_DISCON_REQ\fR issued while in state 6 (\fBTS_WCON_CREQ\fR).
+
+.ip \fIT_ERROR_ACK\fR
+
+.ip \fIT_OK_ACK_1\fR
+
+.sh 3 \fBTS_WACK_DREQ7\fR
+.lp
+This is a transient state while waiting for acknowledgement of a
+\fIT_DISCON_REQ\fR issued while in state 7 (\fBTS_WRES_CIND\fR).
+
+.ip \fIT_ERROR_ACK\fR
+
+.ip \fIT_OK_ACK2\fR
+
+.ip \fIT_OK_ACK3\fR
+
+.ip \fIT_OK_ACK4\fR
+
+.sh 3 \fBTS_WACK_DREQ9\fR
+.lp
+This is a transient state while waiting for acknowledgement of a
+\fIT_DISCON_REQ\fR issued while in state 9 (\fBTS_DATA_XFER\fR).
+
+.ip \fIT_ERROR_ACK\fR
+
+.ip \fIT_OK_ACK_1\fR
+
+.sh 3 \fBTS_WACK_DREQ10\fR
+.lp
+This is a transient state while waiting for acknowledgement of a
+\fIT_DISCON_REQ\fR issued while in state 10 (\fBTS_WIND_ORDREL\fR).
+
+.ip \fIT_ERROR_ACK\fR
+
+.ip \fIT_OK_ACK_1\fR
+
+.sh 3 \fBTS_WACK_DREQ11\fR
+.lp
+This is a transient state while waiting for acknowledgement of a
+\fIT_DISCON_REQ\fR issued while in state 11 (\fBTS_WREQ_ORDREL\fR).
+.ip \fIT_ERROR_ACK\fR
+
+.ip \fIT_OK_ACK_1\fR
+
+
+.uh "Security Considerations"
+.sh 1 Acknowledgements
+.sh 1 References
+.ip " [1]" 5
+Stream Control Transmission Protocol, RFC 2960
+February 2000
+.ip " [2]" 5
+Transport Provider Interface Specification, Unix International - OSI Special
+Interest Group, Revision 1.5, December 10, 1992.
+.ip " [3]" 5
+
+.ip " [4]" 5
+.ip " [5]" 5
+.ip " [6]" 5
+.ip " [7]" 5
+.ip " [8]" 5
+.ip " [9]" 5
+.ip "[10]" 5
+.ip "[11]" 5
+.ip "[12]" 5
+.ip "[13]" 5
+.ip "[14]" 5
+.ip "[15]" 5
+.ip "[16]" 5
+.ip "[17]" 5
+.ip "[18]" 5
+.ip "[19]" 5
+.sh 1 "Author's  Addresses"
+.(d
+.nf
+Brian F. G. Bidulock                                Tel: +1-972-839-4489
+The OpenSS7 Project                          EMail: bidulock@openss7.org
+4701 Preston Park Boulevard, Suite 424
+Plano, TX 75093
+USA                                                                     
+.fi
+.)d
+.pd
+.sp 2
+.lp
+This Internet Draft expires September 2001.

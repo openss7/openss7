@@ -1,0 +1,1149 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-aspext-02.me,v 0.9.2.2 2005/05/14 08:33:18 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:18 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.2
+.ds date July\ 26,\ 2003
+.ds expiry January\ 2004
+.nr levels 0
+.so ../draft.me
+.bp
+.sz \n(pp
+.he 'Internet Draft'UA ASPEXT'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+.sz \n(pp
+\fB\
+Application Server Process (ASP) Extension (ASPEXT) Framework
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-aspext-02.\*(|x>
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.pp
+.pp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Internet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.pp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Copyright"
+.pp
+Copyright \(co The Internet Society (2003).  All Rights Reserved.
+.uh "Abstract"
+.pp
+This Internet-Draft describes \fI\)ASP Extensions (ASPEXT)\fR for Signalling
+User Adaptation Protocols,
+.[
+iua-rfc
+%Z 1
+.]
+.[
+iua-bis
+%Z 2
+.]
+.[
+dua-05
+%Z 2
+.]
+.[
+v5ua-03
+%Z 2
+.]
+.[
+gr303ua00
+%Z 2
+.]
+.[
+m2ua-rfc
+%Z 1
+.]
+.[
+m3ua-rfc
+%Z 1
+.]
+.[
+sua-15
+%Z 1
+.]
+.[
+isua-01
+%Z 2
+.]
+.[
+tua-02
+%Z 2
+.]
+which permits cooperating Signalling Peer Processes (SPPs) to indicate to each
+other the specific protocol extensions that each supports.
+.uh "Contents"
+.pp
+A complete table of contents, list of tables and illustrations, and change
+history appears at the end of this document.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft provides parameters and procedures in extension to the
+parameters and procedures of the Signalling User Adaptation Layers
+(UAs),
+.[
+iua-rfc
+.]
+.[
+iua-bis
+.]
+.[
+dua-05
+.]
+.[
+v5ua-03
+.]
+.[
+gr303ua00
+.]
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-15
+.]
+.[
+isua-01
+.]
+.[
+tua-02
+.]
+for the purpose of supporting a framework for extending the parameters and
+procedures of these Adaptation Layers.
+.pp
+UA implementations with \fI\)ASPEXT\fR are intended to be
+compatible with UA implementations not supporting this configuration.
+.sh 2 "Abbreviations"
+.pp
+.ix +\n(iiu
+.TS
+tab(:);
+li1c0lssss.
+AS:\(em:Application Server.
+ASP:\(em:Application Server Process.
+ASPEXT:\(em:ASP Extensions.
+CAP:\(em:CAMEL Application Protocol.
+CORID:\(em:Correlation Id Extension
+DE:\(em:IPSP Double-Ended Model
+IANA:\(em:Internet Assigned Numbers Authority
+I-D:\(em:Internet-Draft
+IETF:\(em:Internet Engineering Task Force
+IP:\(em:Internet Protocol.
+IPSP:\(em:IP Signalling Point.
+LOADGRP:\(em:Load Grouping Extension
+LOADSEL:\(em:Load Selection Extension
+M2PA:\(em:SS7 MTP2-User Peer-to-Peer Adaptation Layer.
+PC:\(em:SS7 Point Code.
+SCCP:\(em:Signalling Connection Control Part.
+SCN:\(em:Switched Circuit Network.
+SCP:\(em:Signalling Control Point.
+SCTP:\(em:Stream Control Transmission Protocol.
+SE:\(em:IPSP Single-Ended Model
+SG:\(em:Signalling Gateway.
+SGP:\(em:Signalling Gateway Process.
+SIGTRAN:\(em:IETF Signalling Transport WG
+SPP:\(em:Signalling Peer Process.
+SS7:\(em:Signalling System No. 7.
+SSP:\(em:Service Switching Point.
+SUA:\(em:SS7 SCCP-User Adpatation Layer.
+TCAP:\(em:Transaction Capabilities Application Part.
+TUA:\(em:SS7 TCAP-User Adaptation Layer.
+UA:\(em:User Adaptation Layer.
+WG:\(em:Working Group
+.TE
+.sh 2 "Terminology"
+.pp
+\fI\)ASPEXT\fR adds the following terms to the terminology presented
+in the UA documents:
+.lp
+\fI\)ASP Extension (ASPEXT)\fR \-
+.ix +\n(iiu
+An extension to one or more of the the UAs that requires identification of the
+capabilities of the SPP to support the extension as part of its requirements.
+.lp
+\fI\)Signalling Peer Process (SPP)\fR \-
+.ix +\n(iiu
+refers to an ASP, SGP or IPSP.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+%Z 1
+.]
+ISDN Signalling User Adaptation Layers
+.[
+iua-rfc
+.]
+.[
+iua-bis
+.]
+.[
+dua-05
+.]
+.[
+v5ua-03
+.]
+.[
+gr303ua00
+.]
+or SS7 Signalling User Adaptation Layers.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-15
+.]
+.[
+isua-01
+.]
+.[
+tua-02
+.]
+supporting the concept of ASP Management\*#.
+.(d
+.ip \*#
+Currently all SS7 Signalling User Adaptation Layers support ASP Management
+with the exception of M2PA.
+.[
+m2pa-09
+%Z 2
+.]
+.)d
+.sh 2 "Overview"
+.pp
+There is a need to provide extensions for the Signalling User Adaptation Layer
+protocols that require interworking between Signalling Peer Processes (SPPs)
+implementing a specific extension and SPPs not implementing the extension.
+.pp
+\fI\)ASPEXT\fR provides parameters and procedures that allow
+Signalling Peer Processes (SPPs) implementing a given set of extensions to
+indicate its support to other SPPs as well as to discover the support for
+extensions provided by peer SPPs.
+.sh 3 "Existing Extension Management"
+.ds #u \*#
+.pp
+The existing UA procedures\*#
+.(d
+.ip \*#
+See, for example, Section 4 of the specific UA document.
+.[
+m3ua-rfc
+.]
+.[
+sua-15
+.]
+.[
+isua-01
+.]
+.[
+tua-02
+.]
+.)d
+make no provisions for the management of extensions.  Any mechanism that an
+SPP might use to determine the extension support of peer SPPs depends upon
+implementation dependent configuration information or protocols between SPPs.
+.pp
+For example, if an ASP implements and extension that requires that the ASP
+have knowledge of whether a peer SGP supports the extension, the ASP would
+have to be configured with this SGP-specific information, or would need to use
+some implementation-dependent mechanism to determine this information.
+.pp
+The lack of an IETF procedure for managing extension support represents a
+deficiency of the existing UA procedures\*(#u that detracts from
+interoperability between separate implementations of SPP peers.
+.sh 3 "ASP Extension Management"
+.pp
+\fI\)ASPEXT\fR provide support for the following:
+.bu
+Support for an SPP indicating to peer SPPs the extensions that are supported.
+.bu
+Support for an SPP discovering what extensions are supported by peer SPPs.
+.bu
+Support for an SPP supporting \fI\)ASPEXT\fR interworking with an SPP that
+does not support \fI\)ASPEXT\fR.
+.#e
+.sh 1 "Conventions"
+.pp
+The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
+\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
+\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in.
+.[
+key words
+%Z 1
+.]
+.#e
+.sh 1 "Protocol Elements"
+.ds #w \*#
+.pp
+\fI\)ASPEXT\fR provides the following parameters and the messages in which
+they are included in addition to the parameters of the UAs.\*#
+.(d
+.ip \*#
+See, for example, Section 3 of the specific UA document.
+.[
+m3ua-rfc
+.]
+.[
+sua-15
+.]
+.[
+isua-01
+.]
+.[
+tua-02
+.]
+.)d
+.sh 2 "Parameters"
+.pp
+\fI\)ASPEXT\fR provides the following parameters in addition to the parameters
+defined for the UAs.\*(#w
+.sh 3 "ASP Extensions"
+.pp
+The \fI\)ASP Extensions\fR parameter is a common parameter used in the
+\fI\)ASPUP\fR and \fI\)ASPUP ACK\fR messages to identify the extension
+capabilities of the ASP (\fI\)ASPUP\fR) and the extension capabilities of the
+SGP or IPSP (\fI\)ASPUP ACK\fR).
+.pp
+The \fI\)ASP Extensions\fR parameter is formatted as follows: \*#
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0xXXXX          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                       ASP Extension #1                        |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                       ASP Extension #2                        |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+\\                               .                               \\
+/                               .                               /
+\\                               .                               \\
+/                                                               /
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                       ASP Extension #n                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0xXXXX\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+The \fI\)ASP Extensions\fR parameter contains one or more of the following
+fields:
+.ip "\fB\)ASP Extension field: 32-bits (unsigned integer)\fR" 2
+
+The \fI\)ASP Extension\fR field contains an IANA registered extension
+identifier number that identifies the extension supported by the ASP in an
+\fI\)ASPUP\fR or an extension supported by the SGP or IPSP in an \fI\)ASPUP
+ACK\fR.  Examples of valid values for the \fI\)ASP Extension\fR field are as
+follows:
+.ix +4
+.TS
+tab(:);
+nl.
+0:None
+1:Protocol Limits Extension
+.[
+sginfo-02
+%Z 2
+.]
+2:Load Selection Extension
+.[
+loadsel-02
+%Z 2
+.]
+3:Load Grouping Extension
+.[
+loadgrp-02
+%Z 2
+.]
+4:Correlation Id and Heartbeat Extension
+.[
+corid-02
+%Z 2
+.]
+5:Registration Extension
+.[
+regext-02
+%Z 2
+.]
+6:Session Identification Extension
+.[
+sessid-02
+%Z 2
+.]
+7:Dynamic Registration Option
+8:Double-Ended (DE) IPSP Model Option
+.[
+m3ua-implementors-guide-04
+%Z 2
+.]
+\-:(All other values are IETF reserved.)
+.TE
+.ix -4
+Each occurrence of an \fI\)ASP Extension\fR field indicates that the sending
+SPP supports the specified extension.  The \fI\)ASP Extension\fR
+parameter \fB\)MUST\fR contain at least one ASP Extension value.  An ASP
+Extension field containing the value "None" \fB\)MUST\fR be the only ASP
+Extension field included in the \fI\)ASP Extension\fR parameter.
+.sh 2 "Messages"
+.pp
+\fI\)ASPEXT\fR extends the following messages defined for the UAs.\*(#w
+.sh 3 "ASP Up (ASPUP)"
+.pp
+\fI\)ASPEXT\fR supplements the \fI\)ASPUP\fR message by permitting the
+following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+ASP Extensions:Optional:
+.TE
+.pp
+The format of the resulting \fI\)ASPUP\fR message is as follows: \*#
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0011          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         ASP Identifier                        |
+\f(CB\
++-------------------------------+-------------------------------+
+|         Tag = 0xXXXX          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         ASP Extensions                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0xXXXX\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+To indicate its support for a specific extension, the ASP \fB\)MUST\fR
+include the specific extension number in the \fI\)ASP Extensions\fR parameter
+in the \fI\)ASPUP\fR message.
+.pp
+No other changes to the \fI\)ASPUP\fR message format are provided by this
+extension.
+.sh 3 "ASP Up Acknowledgment (ASPUP ACK)"
+.pp
+\fI\)ASPEXT\fR supplements the \fI\)ASPUP ACK\fR message by permitting
+the following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+ASP Extensions:Optional:
+.TE
+.pp
+The format of the resulting \fI\)ASPUP ACK\fR message is as follows: \*#
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0xXXXX          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         ASP Extensions                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0xXXXX\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+To indicate its support for a specific extension, SGP and IPSP \fB\)MUST\fR
+include the specific extension number in the \fI\)ASP Extensions\fR parameter
+in the \fI\)ASPUP ACK\fR message.
+.pp
+No other changes to the \fI\)ASPUP ACK\fR message format are provided by this
+extension.
+.#e
+.sh 1 "Procedures"
+.pp
+The following procedures are provided in extension to the UA procedures by
+\fI\)ASPEXT\fR.
+.sh 2 "ASP Management Procedures"
+.sh 3 "ASP Up Procedures"
+.pp
+In extension of the "ASP Up Procedures" of the UAs\*(#u, \fI\)ASPEXT\fR
+provides the following procedures:
+.pp
+Whenever an ASP, as part of the normal UA procedures, sends an ASP Up
+(\fI\)ASPUP\fR) message to an SGP or IPSP it \fB\)MAY\fR include the \fI\)ASP
+Extensions\fR parameter indicating the extensions supported by the ASP.
+.pp
+Upon receiving an ASP Up (\fI\)ASPUP\fR) message from an ASP that contains the
+\fI\)ASP Extensions\fR parameter, an SGP or IPSP supporting \fI\)ASPEXT\fR
+\fB\)MUST\fR register the ASP's support of the specified extensions and
+\fB\)MUST\fR place an \fI\)ASP Extensions\fR parameter of its own in the
+responding ASP Up Acknowledgment (\fI\)ASPUP ACK\fR) indicating which of the
+extensions provided in the \fI\)ASPUP\fR are supported.
+.pp
+If an SGP or IPSP supporting \fI\)ASPEXT\fR receives an \fI\)ASPUP\fR
+message that does not contain an \fI\)ASP Extensions\fR parameter, the SGP or
+IPSP \fB\)MAY\fR assume that the ASP does not support any extensions, or
+\fB\)MAY\fR rely on internal configuration data to determine the extensions
+supported by the ASP.  The SGP or IPSP \fB\)SHOULD NOT\fR include the \fI\)ASP
+Extensions\fR parameter in the responding \fI\)ASPUP ACK\fR message.
+.pp
+Upon receiving an ASP Up Acknowledgment (\fI\)ASPUP ACK\fR) containing an
+\fI\)ASP Extensions\fR parameter, an ASP supporting \fI\)ASPEXT\fR
+\fB\)MUST\fR register the SGP or IPSP's support of the specified extensions.
+.pp
+If an SPP supporting \fI\)ASPEXT\fR receives an \fB\)ERR\fR message
+indicating the \fI\)ASP Extensions\fR parameter as an "Invalid Parameter" in
+response to an \fI\)ASPUP\fR or \fI\)ASPUP ACK\fR message, the SPP
+\fB\)SHOULD\fR re-attempt sending the \fI\)ASPUP\fR or \fI\)ASPUP ACK\fR
+message without the \fI\)ASP Extensions\fR parameter.
+.sh 3 "ASP Down Procedures"
+.pp
+In extension to the "ASP Down Procedure" of the UAs\*(#u, \fI\)ASPEXT\fR
+provides the following procedures:
+.pp
+Whenever an ASP, as part of the normal UA procedures, sends an ASP Down
+(\fI\)ASPDN\fR) message to an SGP or IPSP, the ASP supporting \fI\)ASPEXT\fR
+\fB\)SHOULD\fR clear any \fI\)ASP Extensions\fR previously registered while
+the ASP was in the ASP-UP state for the SGP.
+.pp
+Upon sending an ASP Down Acknowledgment (\fI\)ASPDN ACK\fR), either in
+response to an \fI\)ASPDN\fR or unsolicited, an SGP supporting \fI\)ASPEXT\fR
+\fB\)SHOULD\fR clear any \fI\)ASP Extensions\fR previously registered while
+the ASP was in the ASP-UP state at the SGP.
+.#e
+.sh 1 "Examples"
+.sh 2 "Both ASP and SGP/IPSP support ASP Extensions"
+.pp
+\fI\*(&f\n(&n\fR illustrates an example where both the ASP and the SGP or IPSP
+support \fI\)ASPEXT\fR.
+.(b
+.ie '\*(.T'ps' \{\
+.so aspext-02.fig1.pic
+.sz \n(tp
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+     ASP                                    SGP/IPSP
+      |                                         |
+ (1)  |      SCTP Association Established       |
+      |<- - - - - - - - - - - - - - - - - - - ->|
+      |                                         |
+ (2)  |    ASPUP (Extensions: LOADSEL, CORID)   |
+      |---------------------------------------->|
+      |                                         |
+ (3)  |     ASPUP ACK (Extensions: LOADSEL)     |
+      |<--------------------------------------->|
+      |                                         |
+ (4)  |                                         |
+      |                                         |
+.sz +2
+.)c
+.\}
+.#f "Both ASP and SGP/IPSP support ASP Extensions"
+.)b
+.pp
+The example sequence of events for the example illustrated in \fI\)\*(&f\n(&p\fR is as follows:
+.np
+An SCTP Association is established or the ASP is otherwise in the ASP-DOWN
+state.
+.np
+The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
+\fI\)ASP Extensions\fR parameter identifying (for example) two
+extensions: Load Selection
+.[
+loadsel-02
+.]
+and Correlation Id/Heartbeat;
+.[
+corid-02
+.]
+indicating the ASP's support for these two extensions requiring interworking
+support.
+.np
+The SGP or IPSP responds with an \fI\)ASPUP ACK\fR message containing an \fI\)ASP
+Extensions\fR parameter identifying (for example) support for only one
+extension: Load Selection
+.[
+loadsel-02
+.]
+.np
+The ASP and SGP/IPSP register the peer's support (or lack of support) for the
+LOADSEL and CORID extensions and modify subsequent procedures accordingly.
+.sh 2 "Interworking Examples"
+.sh 3 "ASP supports ASP Extensions, SGP/IPSP does not"
+.nr &u \n(&n+1
+.pp
+\fI\*(&f\n(&n\fR and \fI\n(&u\fR illustrate an example where the ASP supports
+\fI\)ASPEXT\fR but the SGP or IPSP does not.
+.(b
+.ie '\*(.T'ps' \{\
+.so aspext-02.fig2.pic
+.sz \n(tp
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+     ASP                                    SGP/IPSP
+      |                                         |
+ (1)  |      SCTP Association Established       |
+      |<- - - - - - - - - - - - - - - - - - - ->|
+      |                                         |
+ (2)  |    ASPUP (Extensions: LOADSEL, CORID)   |
+      |---------------------------------------->|
+      |                                         |
+ (3)  |               ASPUP ACK                 |
+      |<--------------------------------------->|
+      |                                         |
+ (4)  |                                         |
+      |                                         |
+.sz +2
+.)c
+.\}
+.#f "ASP supports ASP Extensions, SGP/IPSP ignores"
+.)b
+.pp
+The example sequence of events for the example illustrated in \fI\)\*(&f\n(&p\fR is as follows:
+.np
+An SCTP Association is established or the ASP is otherwise in the ASP-DOWN
+state.
+.np
+The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
+\fI\)ASP Extensions\fR parameter identifying (for example) two
+extensions: Load Selection
+.[
+loadsel-02
+.]
+and Correlation Id/Heartbeat;
+.[
+corid-02
+.]
+indicating the ASP's support for these two extensions requiring interworking
+support.
+.np
+The SGP or IPSP ignores the \fI\)ASP Extensions\fR parameter in the
+\fI\)ASPUP\fR and responds with an \fI\)ASPUP ACK\fR message containing no
+\fI\)ASP Extensions\fR parameter.
+.np
+The ASP either assumes that the SGP or IPSP does not support the LOADSEL or
+CORID extensions, or relies upon configuration data to indicate the SGP or IPSP's
+support for these extensions.  The ASP modifies its subsequent procedures with
+regard to the extension accordingly.
+.lp
+.(b
+.ie '\*(.T'ps' \{\
+.so aspext-02.fig3.pic
+.sz \n(tp
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+     ASP                                    SGP/IPSP
+      |                                         |
+ (1)  |      SCTP Association Established       |
+      |<- - - - - - - - - - - - - - - - - - - ->|
+      |                                         |
+ (2)  |    ASPUP (Extensions: LOADSEL, CORID)   |
+      |---------------------------------------->|
+      |                                         |
+ (3)  |         ERR("Invalid Parameter")        |
+      |<--------------------------------------->|
+      |                                         |
+ (4)  |                 ASPUP                   |
+      |---------------------------------------->|
+      |                                         |
+ (5)  |               ASPUP ACK                 |
+      |<--------------------------------------->|
+      |                                         |
+ (6)  |                                         |
+      |                                         |
+.sz +2
+.)c
+.\}
+.#f "ASP supports ASP Extensions, SGP/IPSP refuses"
+.)b
+.pp
+The example sequence of events for the example illustrated in \fI\)\*(&f\n(&p\fR is as follows:
+.np
+An SCTP Association is established or the ASP is otherwise in the ASP-DOWN
+state.
+.np
+The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP containing an
+\fI\)ASP Extensions\fR parameter identifying (for example) two
+extensions: Load Selection
+.[
+loadsel-02
+.]
+and Correlation Id/Heartbeat;
+.[
+corid-02
+.]
+indicating the ASP's support for these two extensions requiring interworking
+support.
+.np
+The SGP or IPSP refuses to accept the \fI\)ASP Extensions\fR parameter in the
+\fI\)ASPUP\fR message and responds with an \fB\)ERR\fR("Invalid Parameter")
+message indicating such.
+.np
+The ASP re-attempts by sending an \fI\)ASPUP\fR message without an \fI\)ASP
+Extensions\fR parameter.
+.np
+The SGP or IPSP responds with an \fI\)ASPUP ACK\fR message containing no
+\fI\)ASP Extensions\fR parameter.
+.np
+The ASP either assumes that the SGP or IPSP does not support the LOADSEL or
+CORID extensions, or relies upon configuration data to indicate the SGP or
+IPSP's support for these extensions.  The ASP modifies its subsequent
+procedures with regard to the extension accordingly.
+.sh 3 "SGP/IPSP supports ASP Extensions, ASP does not"
+.pp
+\fI\*(&f\n(&n\fR illustrates an example where the SGP or IPSP supports
+\fI\)ASPEXT\fR but the ASP does not.
+.(b
+.ie '\*(.T'ps' \{\
+.so aspext-02.fig4.pic
+.sz \n(tp
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+     ASP                                    SGP/IPSP
+      |                                         |
+ (1)  |      SCTP Association Established       |
+      |<- - - - - - - - - - - - - - - - - - - ->|
+      |                                         |
+ (2)  |                 ASPUP                   |
+      |---------------------------------------->|
+      |                                         |
+ (3)  |               ASPUP ACK                 |
+      |<--------------------------------------->|
+      |                                         |
+ (4)  |                                         |
+      |                                         |
+.sz +2
+.)c
+.\}
+.#f "SGP/IPSP supports ASP Extensions, ASP ignores"
+.)b
+.pp
+The example sequence of events for the example illustrated in \fI\)\*(&f\n(&p\fR is as follows:
+.np
+An SCTP Association is established or the ASP is otherwise in the ASP-DOWN
+state.
+.np
+The ASP sends an \fI\)ASPUP\fR message to the SGP or IPSP not containing an
+\fI\)ASP Extensions\fR parameter.
+.np
+The SGP or IPSP responds with an \fI\)ASPUP ACK\fR message not containing an \fI\)ASP
+Extensions\fR parameter.
+.np
+The SGP either assumes that the ASP does not support the CORID extensions, or
+relies upon configuration data to indicate the ASP's support for these
+extensions.  The SGP modifies its subsequent procedures with regard to the
+extension accordingly.
+.#e
+.sh 1 "Security"
+.pp
+\fI\)ASPEXT\fR does not introduce any new security risks or
+considerations that are not already inherent in the UA.
+.[
+iua-rfc
+.]
+.[
+iua-bis
+.]
+.[
+dua-05
+.]
+.[
+v5ua-03
+.]
+.[
+gr303ua00
+.]
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-15
+.]
+.[
+isua-01
+.]
+.[
+tua-02
+.]
+Please see the SIGTRAN security document
+.[
+sigsec-03
+%Z 1
+.]
+for security considerations and recommendations that are applicable to each of
+these UAs.
+.pp
+It is possible that an attacker or malicious endpoint might manipulate the
+\fI\)ASP Extensions\fR parameter in an attempt to cause denial of service
+attacks on either an SGP or ASP.  However, because each extension has a
+fall back procedure which provides for interworking without the \fI\)ASPEXT\fR
+capability, \fI\)ASPEXT\fR introduces no further threat if the endpoint
+adheres to the following rule:
+.pp
+Although an endpoint has registered an ASP extension against a peer endpoint,
+the registering endpoint \fB\)SHOULD\fR take this information as advisory and
+continue to effect interworking and fullback procedures in the event that the
+information in the \fI\)ASP Extensions\fR parameter is malicious, in error, or
+invalid.
+.#e
+.sh 1 "IANA Considerations"
+.sh 2 "Extensions"
+.pp
+\fI\)ASPEXT\fR provides an additional \fI\)ASP Extensions\fR message
+parameter to the common parameter range of the SIGTRAN UAs:
+.[
+iua-rfc
+.]
+.[
+iua-bis
+.]
+.[
+dua-05
+.]
+.[
+v5ua-03
+.]
+.[
+gr303ua00
+.]
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-15
+.]
+.[
+isua-01
+.]
+.[
+tua-02
+.]
+.af $p a
+.np
+The parameter is named the \fI\)ASP Extensions\fR parameter.
+.np
+The structure of the \fI\)ASP Extensions\fR parameter field conforms to the UA
+general TLV format and is described in detail in Section 3.1.1.
+.np
+The detailed definition of each component of the \fI\)ASP Extensions\fR
+parameter values is described in Section 3.1.1.
+.np
+This document also provides a detailed description of the intended use of the
+\fI\)ASP Extensions\fR\*# parameter, and in which messages the \fI\)ASP
+Extensions\fR parameter should appear, how many times, and when.
+.lp
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The \fI\)ASP Extensions\fR parameter tag value
+shown throughout this document as \f(CB\)0xXXXX\fR will be assigned by IANA
+within the common parameter range of the SIGTRAN UAs and may change its value
+in further versions of this document.
+.)d
+.sh 2 "Protocol Extensions"
+.pp
+UA protocols may be extended through IANA in three ways:
+.bu
+through definition of additional message classes;
+.bu
+through definition of additional message types; and,
+.bu
+through definition of additional message parameters.
+.pp
+The definition and used of new message classes, types and parameters is an
+integral part of the SIGTRAN adaptation layers.  Thus, these extensions are
+assigned by IANA through an IETF Consensus action.
+.[
+rfc 2434
+%Z 1
+.]
+.pp
+The proposed extension \fB\)MUST\fR in no way adversely affect the general
+working of the protocol.
+.pp
+To permit interoperability of implementations supporting a particular
+extension with implementation not supporting that extension, a UA Extension
+number can be assigned to a protocol extension in accordance with this
+document.  A new registry will be created by IANA to allow:
+.sh 3 "IETF Defined UA Protocol Extension"
+.pp
+In additional to the documentation required for each message class, message
+type and message parameter extension, the documentation of the UA Protocol
+Extension number \fB\)MUST\fR include the following information:
+.af $p a
+.np
+A long and short name for the Extension.
+.np
+A detailed description of the the purpose of the Extension.
+.np
+A detailed description of the Message Classes, Types and Parameters provided
+by the extension.
+.np
+A detailed description of the interworking between UA implementations
+supporting the Extension and UA implementations not supporting the Extension.
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Revision History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.bu
+added list of abbreviations.
+.bu
+moved change history.
+.bu
+updated references.
+.bu
+split references.
+.bu
+updated version numbers and dates.
+.bu
+updated security section.
+.bu
+moved notes to end of document.
+.bu
+added CVS change log.
+.bu
+added dynamic registration and DE IPSP model from IG
+.[
+m3ua-implementors-guide-04
+.]
+as extensions.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.bu
+added this history section,
+.bu
+updated references,
+.bu
+updated version numbers and dates,
+.bu
+updated postscript diagrams,
+.bu
+updated author's address.
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-3\
+$Log: draft-bidulock-sigtran-aspext-02.me,v $
+Revision 0.9.2.2  2005/05/14 08:33:18  brian
+- copyright header correction
+
+Revision 0.9.2.1  2004/03/16 05:10:39  brian
+- Added drafts and figures.
+
+Revision 0.8.2.4  2003/08/01 12:23:15  brian
+Added abbreviations, updated format.
+
+Revision 0.8.2.3  2003/07/29 00:35:06  brian
+Finalizing latest round of drafts.
+
+Revision 0.8.2.2  2003/07/28 13:12:20  brian
+Reformatting.
+
+Revision 0.8.2.1  2003/07/27 22:10:12  brian
+A few formatting changes.
+
+Revision 0.8  2003/07/26 19:28:45  brian
+Added new draft verions.
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.(b M
+.#v
+.\".uh "Acknowledgments"
+.\".pp
+.\"The authors would like to thank
+.\"for their valuable comments and suggestions.
+.uh "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-780-490-1141
+OpenSS7 Corporation;Email: bidulock@openss7.org
+1469 Jeffreys Crescent;URL: http//www.openss7.org/
+Edmonton, AB  T6L 6T1;
+Canada;
+.TE
+.bl 3
+.lp
+This Internet draft expires \*[expiry].
+.)b
+.#T 2003
