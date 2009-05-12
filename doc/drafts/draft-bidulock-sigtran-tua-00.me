@@ -244,7 +244,7 @@ This document defines a protocol for the transport of any SS7 TCAP-User
 signalling (e.g, INAP, MAP, etc.) over IP using the Stream Control
 Transport Protocol.
 .[
-RFC 2960
+rfc2960
 .]
 The protocol should be modular and symmetric, to allow it to work in
 diverse architectures, such as a Signalling Gateway and IP Signalling
@@ -262,7 +262,7 @@ t1.114
 Users (i.e, MAP, INAP, etc.) signalling messages over IP using the
 Stream Control Transmission Protocol (SCTP).
 .[
-RFC 2960
+rfc2960
 .]
 This protocol would be used between a Signalling Gateway (SG) and
 Signalling End-point located in an IP network.  Additionally, the
@@ -277,7 +277,7 @@ transport user data and for operators to expand their networks and build new
 services.  In these networks, there is a need for interworking between the SS7
 and IP domains.
 .[
-RFC 2719
+rfc2719
 .]
 .pp
 This document details the delivery of TC-user messages (MAP, CAP,
@@ -286,7 +286,7 @@ for the transport from an SS7 Signalling Gateway (SG) to an IP signalling node
 (such as an IP-resident Database) as described in the Framework Architecture
 for Signalling Transport
 .[
-RFC 2719
+rfc2719
 .]
 This protocol can also support transport of TC-user messages between two
 end-points wholly contained within and IP network.
@@ -329,7 +329,7 @@ SCTP end-point and may be configured to process traffic within more that one
 .ix +\n(iiu
 refers to an SCTP association.
 .[
-RFC 2960
+rfc2960
 .]
 The association provides the transport for the delivery of TCAP protocol data
 units and TUA layer peer messages.
@@ -413,7 +413,7 @@ of the SS7 protocol.
 a signalling agent that exchanges SCN native signalling at the edge of the IP
 network.
 .[
-RFC 2719
+rfc2719
 .]
 An SG appears to the SS7 network as an SS7 Signalling Point.  An SG contains a
 set of one or more Signalling Gateway Processes, of which one or more is
@@ -471,7 +471,7 @@ number \*#.
 \fB\)IMPLEMENTATION NOTE:\-\fR\  Only one SCTP port may be defined for
 each endpoint, but each SCTP endpoint may have multiple IP addresses.
 .[
-RFC 2960
+rfc2960
 .]
 .)d
 .sh 2 "TUA Overview"
@@ -480,7 +480,7 @@ RFC 2960
 The framework architecture that has been defined for SCN signalling
 transport over IP
 .[
-RFC 2719
+rfc2719
 .]
 uses multiple components, including an IP transport protocol, a
 signalling common transport protocol and an adaptation module to support
@@ -770,7 +770,7 @@ Transaction Mapping Function (TMF).  This function is considered part of TUA,
 but the way it is realized is left implementation or deployment dependent
 (local tables, SCCP GTT database, DNS,
 .[
-RFC 2916
+rfc2916
 .]
 LDAP, etc.)
 .pp
@@ -870,11 +870,11 @@ to provide transport of the messages.
 Note that it is also possible for the SCCP services to be provided using the
 services of the SCCP-User Adaptation Layer (SUA)
 .[
-sua-09
+sua09
 .]
 and the MTP3-User Adaptation Layer (M3UA).
 .[
-m3ua-10
+m3ua10
 .]
 .pp
 The TC-SAP through which TUA at the SG obtains its services could reside at a
@@ -1534,7 +1534,7 @@ T}
 The upper layer primitives provided by the SCTP are provided in the SCTP
 specification "Stream Control Transmission Protocol (SCTP)".
 .[
-RFC 2960
+rfc2960
 .]
 .sh 1 "Conventions"
 .pp
@@ -1544,7 +1544,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR,
 \fB\)OPTIONAL\fR, when they appear in this document, are to be
 interpreted as described in.
 .[
-RFC 2119
+rfc2119
 .]
 .pp
 In this document, the following conventions are used to describe how a
@@ -5150,7 +5150,7 @@ context that is being proposed by the dialogue initiator or responder.  When
 the Application Type is `0' this field \fB\)MUST\fR be formatted as an
 \f(CB\)OBJECT IDENTIFIER\fR
 .[
-asn.1
+x690
 .]
 representing the proposed Application Id.  When the Application Type is `1'
 this field \fB\)MUST\fR be formatted as 32-bit unsigned integer value
@@ -5238,7 +5238,7 @@ context that is being proposed by the dialogue initiator or responder.  When
 the Security Type is `0' this field \fB\)MUST\fR be formatted as an
 \f(CB\)OBJECT IDENTIFIER\fR
 .[
-asn.1
+x690
 .]
 representing the proposed Security Id.  When the Security Type is `1' this
 field \fB\)MUST\fR be formatted as 32-bit unsigned integer value representing
@@ -5290,7 +5290,7 @@ context that is being proposed by the dialogue initiator or responder.  When
 the Confidentiality Type is `0,' this field \fB\)MUST\fR be formatted as an
 \f(CB\)OBJECT IDENTIFIER\fR
 .[
-asn.1
+x690
 .]
 representing the proposed Confidentiality Id.  When the Confidentiality Type
 is `1,' this field \fB\)MUST\fR be formatted as 32-bit unsigned integer value
@@ -5888,7 +5888,7 @@ requested operation.
 When the Operation Type is "Global," this field \fB\)MUST\fR be formatted as
 an \f(CB\)OBJECT IDENTIFIER\fR.
 .[
-asn.1
+x690
 .]
 representing the requested operation.
 The value of this field is TCAP protocol-variant-specific.
@@ -5922,7 +5922,7 @@ The \fI\)Parameters\fR parameter contains the following fields:
 The \fI\)Parameters\fR field contains all of the parameters coded
 according to the coding
 .[
-asn.1
+x690
 .]
 for Parameter Sequences or Parameter Sets per the applicable TCAP protocol
 specification.  For example, ITU
@@ -5993,7 +5993,7 @@ When the Error Type is "National," "Private," or "Local," this field
 indicated error.  When the Error Type is "Global," this field \fB\)MUST\fR be
 formatted as an \f(CB\)OBJECT IDENTIFIER\fR
 .[
-asn.1
+x690
 .]
 representing the indicated error.
 The value of this field is TCAP protocol-variant-specific.
@@ -8555,7 +8555,7 @@ The definition and use of new message classes, types and parameters is
 an integral part of SIGTRAN adaptation layers.  Thus, these extensions
 are assigned by IANA through an IETF Consensus action as defined in.
 .[
-RFC 2434
+rfc2434
 .]
 .pp
 The proposed extension \fB\)MUST\fR in no way adversely affect the

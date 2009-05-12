@@ -201,7 +201,7 @@ Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
 This Internet Draft provides information for the Internet community on test
 cases for testing the SS7 M2P2-User Peer-to-Peer Adaptation Layer
 .[
-m2pa-07
+m2pa07
 .]
 based on the conformance test specifications for SS7 MTP Level 2.
 .[
@@ -212,7 +212,7 @@ q781
 This draft provides a set of detailed tests of the SS7 MTP2-User Peer-to-Peer
 Adaptation Layer
 .[
-m2pa-07
+m2pa07
 .]
 based on the test specifications for SS7 MTP Level 2.
 .[
@@ -221,7 +221,7 @@ q781
 These tests are intended to validate the SS7 MTP2-User Peer-to-Peer Adaptation
 Layer (M2PA) protocol.
 .[
-m2pa-07
+m2pa07
 .]
 .lp
 These tests attempt to completely validate the M2PA protocol without
@@ -239,26 +239,26 @@ http://www.openss7.org/downloads.html/.
 .np
 The test specification has been updated to M2PA Draft Revision 7,
 .[
-m2pa-07
+m2pa07
 .]
 with anticipated changes for M2PA Draft Revision 8.
 .[
-m2pa-08
+m2pa08
 .]
 .sh 3 "Changes from draft-bidulock-sigtran-m2pa-test-01"
 .np
 The test specification has been updated to M2PA Draft Revision 6,
 .[
-m2pa-06
+m2pa06
 .]
 with anticipated changes for M2PA Draft Revision 7.
 .[
-m2pa-07
+m2pa07
 .]
 .np
 M2PA Draft Revision 6
 .[
-m2pa-06
+m2pa06
 .]
 provides for acknowledgment of DATA messages using a special DATA message
 which contains no data payload.  This message has been labeled "DATA-ACK" in
@@ -269,7 +269,7 @@ This has resulted in changes to test cases 1.6, 2.1, 2.2, 2.3, 2.4, 3.2, 3.4,
 .np
 Although M2PA Draft Revision 6
 .[
-m2pa-06
+m2pa06
 .]
 specifies that the DATA-ACK message should have its Forward Sequence Number
 (FSN) incremented as with any other normal DATA message, this causes problems
@@ -278,7 +278,7 @@ anticipates M2PA Draft Revision 7 by not incrementing FSN for DATA-ACK messages.
 .np
 M2PA Draft Revision 6
 .[
-m2pa-06
+m2pa06
 .]
 provides FSN and BSN sequence numbers in STATUS messages as well as DATA
 messages.  It has been proposed that STATUS messages not contain FSN and BSN
@@ -289,28 +289,28 @@ version of the test specification in anticipation of M2PA Draft Revision 7.
 .np
 The test specification has been updated to M2PA Draft Revision 4,
 .[
-m2pa-04
+m2pa04
 .]
 with anticipated changes for M2PA Draft Revision 5.
 .[
-m2pa-05
+m2pa05
 .]
 .np
 M2PA Draft Revision 4
 .[
-m2pa-04
+m2pa04
 .]
 no longer contains a special proving message.  Status PROVING-NORMAL or
 PROVING-EMERGENCY messages are padded and sent repeatedly to accomplish
 proving during the proving period.  The occurrence of PROVING messages has been
 removed from the test cases to update this draft to match the M2PA draft revision 4.
 .[
-m2pa-04
+m2pa04
 .]
 .np
 M2PA Draft Revision 4
 .[
-m2pa-04
+m2pa04
 .]
 contains both forward and backward sequence numbers (FSN, BSN).  The test
 cases were updated to include the sequence numbers (where other than zero) and
@@ -318,13 +318,13 @@ test cases were added for abnormal backward sequence numbers.
 .np
 M2PA Draft Revision 4
 .[
-m2pa-04
+m2pa04
 .]
 has no formal method for acknowledging the receipt of a DATA message when
 there are no other messages to send (DATA or STATUS).  The Status of
 "In Service", for which no other use has been specified in the current draft,
 .[
-m2pa-04
+m2pa04
 .]
 is used as such an explicit acknowledgment.  Another possibility would have
 been to send a DATA message with no data in it.
@@ -334,7 +334,7 @@ The status message previously labeled "IN-SERVICE" has been relabeled
 "READY" to better reflect the name of that status message in the draft and to
 not conflict with the new
 .[
-m2pa-04
+m2pa04
 .]
 "IN-SERVICE" status message.
 .sh 1 "Test Environment"

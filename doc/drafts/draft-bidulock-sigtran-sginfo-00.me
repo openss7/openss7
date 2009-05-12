@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .\".if \\$3>0 \{\
@@ -259,10 +262,10 @@ Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
 This Internet-Draft describes \fB\)Signalling Gateway (SG) Information
 (SGINFO)\fR for Signalling User Adaptation Protocols,
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -281,10 +284,10 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -302,10 +305,10 @@ in the UA documents: \*#
 .ip \*#
 See, for example, Section 1.2 of M3UA, SUA or TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -316,14 +319,14 @@ tua-01
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -357,34 +360,34 @@ q771
 and the need for these protocol limits at the Application Server is evidenced
 by the requirements for these values in the OSI/ISO NSD
 .[
-x.213
+x213
 .]
 Compliant NPI,
 .[
-npi
+npi revision 2.0.0
 .]
 and the OSI/ISO TSD
 .[
-x.214
+x214
 .]
 and the OSI/ISO ROSE
 .[
-x.219
+x219
 .]
 Compliant TPI,
 .[
-tpi
+tpi revision 2.0.0
 .]
 and the ACSE
 .[
-iso 8649
+iso8649
 .]
 .[
-iso 8650
+ISO/IEC 8650:1988
 .]
 compliant mOSI extensions to the XNS.
 .[
-xns
+xns99
 .]
 .pp
 \fB\)SGINFO\fR provides parameters and procedures that allow
@@ -400,10 +403,10 @@ existing UA procedures\*#
 .ip \*#
 See, for example, Section 4 of M3UA, SUA or TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -448,7 +451,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .ds #w \*#
@@ -459,10 +462,10 @@ they are included in addition to the parameters of the UAs.\*#
 .ip \*#
 See, for example, Section 3 of the M3UA, SUA or TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -519,7 +522,7 @@ Signalling Gateway can support to the specific Application Server.
 .ip "M3UA"
 For M3UA
 .[
-m3ua-10
+m3ua10
 .]
 the \fI\)Maximum SDU Size\fR field
 provides the limit on the maximum size of the data payload of the Protocol Data field.
@@ -534,7 +537,7 @@ would be 3094.
 .ip "SUA"
 For SUA
 .[
-sua-09
+sua09
 .]
 the \fI\)Maximum SDU Size\fR field
 provides the limit on the maximum size of the User Data field for a normal
@@ -567,7 +570,7 @@ Signalling Gateway can support to the specific Application Server.
 .ip "M3UA"
 For M3UA
 .[
-m3ua-10
+m3ua10
 .]
 the \fI\)Optimal SDU Size\fR field
 provides the limit on the optimal size of the data payload of the Protocol Data field.
@@ -582,7 +585,7 @@ would be 272.
 .ip "SUA"
 For SUA
 .[
-sua-09
+sua09
 .]
 the \fI\)Optimal SDU Size\fR field
 provides the limit on the optimal size of the User Data field for a normal
@@ -612,7 +615,7 @@ connection or transaction dialogue establishment.
 .ip "M3UA"
 For M3UA
 .[
-m3ua-10
+m3ua10
 .]
 the \fI\)Maximum Connect Data Size\fR field
 does not apply and
@@ -620,7 +623,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua-09
+sua09
 .]
 the \fI\)Maximum Connect Data Size\fR field
 provides a limit on the maximum size of the User Data field that can be
@@ -648,7 +651,7 @@ disconnection or transaction dialogue abort.
 .ip "M3UA"
 For M3UA
 .[
-m3ua-10
+m3ua10
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 does not apply and
@@ -656,7 +659,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua-09
+sua09
 .]
 the \fI\)Maximum Disconnect Data Size\fR field
 provides a limit on the maximum size of the User Data field that can be
@@ -684,7 +687,7 @@ expedited on a connection.
 .ip "M3UA"
 For M3UA
 .[
-m3ua-10
+m3ua10
 .]
 the \fI\)Maximum ESDU Size\fR field
 does not apply and
@@ -692,7 +695,7 @@ is not included in the \fI\)Protocol Limits\fR parameter.
 .ip "SUA"
 For SUA
 .[
-sua-09
+sua09
 .]
 the \fI\)Maximum ESDU Size\fR field
 provides a maximum number of bytes in the User Data field for an expedited
@@ -1025,10 +1028,10 @@ limits.
 \fB\)SGINFO\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1036,11 +1039,11 @@ tua-01
 Please see the "Security" sections of
 M3UA,
 .[
-m3ua-10
+m3ua10
 .]
 SUA
 .[
-sua-09
+sua09
 .]
 and TUA,
 .[
@@ -1054,10 +1057,10 @@ these UAs.
 \fB\)SGINFO\fR provides an additional \fI\)Protocol Limits\fR message
 parameter to the common parameter range of the SIGTRAN UAs:
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01

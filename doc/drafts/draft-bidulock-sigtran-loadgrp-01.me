@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
-abbreviate-label-ranges "..."
 bracket-label " [" "]" ", "
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3<4 \{\
@@ -265,7 +268,7 @@ v5ua-03
 %O Work In Progress. [Informative]
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 %O Work In Progress. [Informative]
 .]
 .[
@@ -277,7 +280,7 @@ m3ua-rfc
 %O [Normative]
 .]
 .[
-sua-14
+sua14
 %O Work In Progress. [Normative]
 .]
 .[
@@ -290,7 +293,7 @@ tua-01
 .]
 based on the Stream Transmission Control Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 %O [Normative]
 .]
 which permits an Application Server Processes (ASP) to indicate its placement
@@ -324,7 +327,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -333,7 +336,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -392,7 +395,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -401,7 +404,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -437,7 +440,7 @@ Load Group at a Signalling Gateway.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 Signalling User Adaptation Layers.
 .[
@@ -450,7 +453,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -459,7 +462,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -488,7 +491,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -497,7 +500,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -579,7 +582,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -588,7 +591,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -823,7 +826,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 %O [Normative]
 .]
 .sh 1 "Protocol Elements"
@@ -846,7 +849,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -919,7 +922,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -948,7 +951,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -967,7 +970,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -1271,7 +1274,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -1779,7 +1782,7 @@ ASP1 can now be taken down and out of service.
 .pp
 This example is for an SUA
 .[
-sua-14
+sua14
 .]
 configuration with the Application Server (AS1) configured with a
 Traffic Mode Type of Load-share.  The Application Server (AS1) has
@@ -2202,7 +2205,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -2211,7 +2214,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -2230,7 +2233,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -2239,7 +2242,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -2262,7 +2265,7 @@ dua-04
 v5ua-03
 .]
 .[
-ietf-sigtran-gr303ua-00
+gr303ua00
 .]
 .[
 m2ua-rfc
@@ -2271,7 +2274,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00
@@ -2323,7 +2326,7 @@ m2ua-rfc
 m3ua-rfc
 .]
 .[
-sua-14
+sua14
 .]
 .[
 isua-00

@@ -57,18 +57,19 @@ no-default-database
 no-accumulate
 no-annotate
 database idrefs
+annotate X lp
 move-punctuation
 discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
 abbreviate-label-ranges ".."
-sort Z*L*R*
+sort Z
 sort-adjacent-labels
-# sort A+
-# reverse A
+reverse A
 .R2
 .de ]<
 .\".sh 1 References
@@ -379,7 +380,7 @@ http://www.ietf.org/shadow.html
 .pp
 The \fISS7 MTP2 User Peer-to-Peer Adaptation Layer (M2PA)\fR 
 .[
-m2pa-09
+m2pa09
 %Z 1
 .]
 is a protocol supporting the transport of Signalling System No. 7 (SS7)
@@ -395,7 +396,7 @@ q701
 signalling messages over Internet Protocol (IP) using the services of the
 Stream Control Transmission Protocol (SCTP).
 .[
-rfc 2960
+rfc2960
 %Z 1
 .]
 This protocol would be used between SS7 Signalling Points using the MTP Level
@@ -428,11 +429,11 @@ continues with the MIB explanation and security considerations among others.
 .pp
 This memo supplements the terminology used in SCTP
 .[
-rfc 2960
+rfc2960
 .]
 and M2PA
 .[
-m2pa-09
+m2pa09
 .]
 by adding the following terms:
 .\"
@@ -441,11 +442,11 @@ by adding the following terms:
 .pp
 This memo supplements the abbreviates used in SCTP
 .[
-rfc 2960
+rfc2960
 .]
 and M2PA
 .[
-m2pa-09
+m2pa09
 .]
 by adding the following abbreviations:
 .lp
@@ -469,7 +470,7 @@ The keywords \fBMUST\fR, \fBMUST NOT\fR, \fBREQUIRED\fR, \fBSHALL\fR,
 \fBNOT RECOMMENDED\fR, \fBMAY\fR, and \fBOPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in RFC 2119.
 .[
-rfc 2119
+rfc2119
 %Z 1
 .]
 .\"
@@ -480,7 +481,7 @@ The SNMP Management Framework presently consists of five major components:
 .bu
 An overall architecture, described in RFC 2271.
 .[
-RFC 2271
+rfc2271
 %Z 2
 .]
 
@@ -489,21 +490,21 @@ Mechanisms for describing and naming objects and events for the purpose of
 management,
 Structure of Management Information (SMI) Version 1
 .[
-RFC 1155
+rfc1155
 %Z 1
 .]
 and
 Structure of Management Information (SMI) Version 2
 .[
-RFC 1902
+rfc1902
 %Z 1
 .]
 .[
-RFC 1903
+rfc1903
 %Z 1
 .]
 .[
-RFC 1904
+rfc1904
 %Z 1
 .]
 
@@ -511,29 +512,29 @@ RFC 1904
 Message protocols for transferring management information.  The first version
 of SNMP message protocol is called SNMPv1.
 .[
-RFC 1157
+rfc1157
 %Z 1
 .]
 The second version of the SNMP message protocol, which is not an Internet
 standards track protocol, is called SNMPv2c.
 .[
-RFC 1901
+rfc1901
 %Z 1
 .]
 .[
-RFC 1906
+rfc1906
 %Z 1
 .]
 The third version of the message protocol is called SNMPv3.
 .[
-RFC 1906
+rfc1906
 .]
 .[
-RFC 2272
+rfc2272
 %Z 1
 .]
 .[
-RFC 2574
+rfc2574
 %Z 1
 .]
 
@@ -541,24 +542,24 @@ RFC 2574
 Protocol operations for accessing management information.  The first set of
 protocol operations and associated PDU formats is described in SNMPv1.
 .[
-RFC 1157
+rfc1157
 .]
 A second set of protocol operations and assocaited PDU formats is described in
 SNMPv2.
 .[
-RFC 1905
+rfc1905
 %Z 1
 .]
 
 .bu
 A set of fundamental applications
 .[
-RFC 2273
+rfc2273
 %Z 1
 .]
 and view-based access control mechanism.
 .[
-RFC 2575
+rfc2575
 %Z 1
 .]
 .pp
@@ -596,7 +597,7 @@ For a detailed overview of the documents that describ the current
 Internet-Standard Management Framework, please refer to section 7 of
 RFC 3410.
 .[
-RFC 3410
+rfc3410
 %Z 1
 .]
 .pp
@@ -607,15 +608,15 @@ using the mechanisms defined in the Structure and Identification of Management
 Information (SMI).  This memo specifies a MIB module that is compliant to the
 SMIv2.
 .[
-RFC 2578
+rfc2578
 %Z 1
 .]
 .[
-RFC 2579
+rfc2579
 %Z 1
 .]
 .[
-RFC 2580
+rfc2580
 %Z 1
 .]
 .\"

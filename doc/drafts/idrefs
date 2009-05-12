@@ -172,7 +172,6 @@
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tci.pdf
-%O Distributed with package strss7-0.9a.
 
 %L TRI
 %A The\ OpenSS7\ Project
@@ -184,7 +183,6 @@
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tri.pdf
-%O Distributed with package strss7-0.9a.
 
 %L TPI
 %A Open\ Group
@@ -197,7 +195,6 @@
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
 %S Open Group CAE Specification
-%O Distributed with package strxnet-0.9.2.
 
 %L NPI
 %A UNIX\ International,\ Inc.
@@ -210,7 +207,6 @@
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
 %S Open Group CAE Specification
-%O Distributed with package strxns-0.9.2.
 
 %L DLPI
 %A UNIX International,\ Inc.
@@ -223,7 +219,6 @@
 %I UNIX International Press
 %U http://www.openss7.org/doc/dlpi.pdf
 %S Open Group CAE Specification
-%O Distributed with package strxns-0.9.2.
 
 %L TLI
 %A UNIX\ International,\ Inc.
@@ -301,7 +296,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/nli.pdf
-%O Distributed with package strx25-0.9.2.
 
 %L LLI
 %A Brian Bidulock
@@ -313,7 +307,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lli.pdf
-%O Distributed with package strx25-0.9.2.
 
 %L CDI
 %A Brian Bidulock
@@ -325,7 +318,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
-%O Distributed with package strxns-0.9.2.
 
 %L WAN
 %A Brian Bidulock
@@ -337,7 +329,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/wan.pdf
-%O Distributed with package strx25-0.9.2.
 
 %L LMI
 %A Brian Bidulock
@@ -349,7 +340,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lmi.pdf
-%O Distributed with package strss7-0.9a.
 
 %L SLI
 %A Brian Bidulock
@@ -361,7 +351,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sli.pdf
-%O Distributed with package strss7-0.9a.
 
 %L SDTI
 %A Brian Bidulock
@@ -373,7 +362,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdti.pdf
-%O Distributed with package strss7-0.9a.
 
 %L SDLI
 %A Brian Bidulock
@@ -385,7 +373,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdli.pdf
-%O Distributed with package strss7-0.9a.
 
 %L MTPI
 %A Brian Bidulock
@@ -397,7 +384,6 @@
 %C Edmonton, Canada
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/specs/mtpi.pdf
-%O Distributed with package strss7-0.9a.
 
 %L CHI
 %A Brian Bidulock
@@ -409,7 +395,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/chi.pdf
-%O Distributed with package strchan-0.9.2.
 
 %L MXI
 %A Brian Bidulock
@@ -421,7 +406,6 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/mxi.pdf
-%O Distributed with package strchan-0.9.2.
 
 %K xxx
 %A X Programmer's Group
@@ -1375,6 +1359,7 @@ Part 1: Protocol Specification
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-isua-00.txt
 
 %K tua05
+%K tua06
 %L TUA
 %A Brian Bidulock
 %E Brian Bidulock

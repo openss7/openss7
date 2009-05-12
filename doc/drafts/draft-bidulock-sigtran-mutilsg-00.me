@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3>0 \{\
@@ -249,10 +252,10 @@ Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
 This Internet-Draft describes \fB\)Load Selection\fR for Signalling User
 Adaptation Protocols,
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -268,10 +271,10 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -301,10 +304,10 @@ This is commonly referred to within the SIGTRAN WG as the "peer-to-peer" case.
 \fB\)Multiple SG Support (MULTI-SG)\fR supplements the terminology used in the
 UA documents
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -319,14 +322,14 @@ the parameters and procedures provided in this document.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -338,10 +341,10 @@ supporting the concept of a \fI\)Routing Context\fR.
 .(f
 \*(#n See Section 4 of M3UA, SUA and TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -449,7 +452,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .sh 2 "Parameters"
@@ -469,20 +472,20 @@ key words
 \fB\)Load Selection\fR does not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
 .]
 Please see the "Security" sections of M3UA, SUA and TUA
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01

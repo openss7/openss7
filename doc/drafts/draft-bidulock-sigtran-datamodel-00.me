@@ -168,15 +168,15 @@ to the Internet Community regarding data models used in the OpenSS7
 impelementation of the SS7 User Adaptation Protocols
 M2UA,
 .[
-m2ua-11
+m2ua11
 .]
 M3UA,
 .[
-m3ua-10
+m3ua10
 .]
 SUA,
 .[
-sua-09
+sua09
 .]
 TUA,
 .[
@@ -184,7 +184,7 @@ tua-01
 .]
 and IUA.
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .sh 1 "Introduction"
 .lp
@@ -408,7 +408,7 @@ SS7 Users attach or bind using a Routing (Link) Key.
 .lp
 For example, an M2UA
 .[
-m2ua-11
+m2ua11
 .]
 SS7 Signalling Link User attaches using a Signalling Data Terminal Identifier
 and a Signalling Data Link Identifier.  These two identifiers can be combined
@@ -419,13 +419,13 @@ Interface Identifier (SDTI/SDLI) as an argument of the attach.
 .lp
 As another example, an M3UA
 .[
-m3ua-10
+m3ua10
 .]
 SS7 User binds its interface using a Bind request that includes the local
 address (NI/PC/UP) to which the SS7 User is binding.  This is equivalent to an
 M3UA
 .[
-m3ua-10
+m3ua10
 .]
 Routing Key.
 .lp
@@ -709,13 +709,13 @@ of both.  This can be accomplished by associating both an ASP and and
 SGP datastructure with the SPP and discriminating messages to one or
 the other.  The SIGTRAN UAs
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -770,7 +770,7 @@ at the Signalling Gateway.  The data models described here are based on the
 presumption that the Routing Context has been included in the message.  This
 is true for many of the messages in SUA
 .[
-sua-09
+sua09
 .]
 but not all of the messages.  If current proposals are followed\*#,
 .(d
@@ -780,11 +780,11 @@ initial writing of this draft.
 .)d
 it will be true for M3UA.
 .[
-m3ua-10
+m3ua10
 .]
 M2UA
 .[
-m2ua-11
+m2ua11
 .]
 already includes the Interface Identifier (M2UA's equivalent to a Routing
 Context) in each message.
@@ -1019,16 +1019,16 @@ at the Signalling Gateway.  The data models described here are based on the
 presumption that the Routing Context has been included in the message.  This
 is true for many of the messages in SUA
 .[
-sua-09
+sua09
 .]
 but not all of the messages.  If current proposals are follows, it will be
 true for M3UA.
 .[
-m3ua-10
+m3ua10
 .]
 M2UA
 .[
-m2ua-11
+m2ua11
 .]
 already includes the Interface Identifier (M2UA's equivalent to a Routing
 Context) in each message.
@@ -1220,22 +1220,22 @@ Application Server.
 .lp
 In SUA
 .[
-sua-09
+sua09
 .]
 and M3UA
 .[
-m3ua-10
+m3ua10
 .]
 these messages apply to one or more Routing Contexts.  In M2UA,
 .[
-m2ua-11
+m2ua11
 .]
 link control messages apply to a single Interface Identifier\*#.
 .(d
 .ip \*#
 The Interface Identifier in M2UA
 .[
-m2ua-11
+m2ua11
 .]
 is a direct equivalent for Routing Context in the other UAs.
 .)d 7
@@ -1248,15 +1248,15 @@ in the message\*#.
 .ip \*#
 This is true of SUA
 .[
-sua-09
+sua09
 .]
 and M2UA,
 .[
-m2ua-11
+m2ua11
 .]
 but not as of yet for M3UA.
 .[
-m3ua-10
+m3ua10
 .]
 There are currently proposals to make M3UA also place Routing Context lists in
 Signalling Network Management Messages.
@@ -1339,7 +1339,7 @@ SNM messages when they move to the Active state, but after that point, they
 must keep their management configuration up to date by receiving managemnt
 messages.  For M2UA,
 .[
-m2ua-11
+m2ua11
 .]
 only one Application Server Process is active at one time.
 .np
@@ -1402,7 +1402,7 @@ traffic to the User\*#.
 .ip \*#
 Note that for M2UA
 .[
-m2ua-11
+m2ua11
 .]
 there is only ever one SG and one SGP which are active for a given Interface
 Identifier.

@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
 bracket-label " [" "]" ", "
-# abbreviate-label-ranges "..."
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .\".if \\$3>0 \{\
@@ -254,7 +257,7 @@ Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
 This Internet-Draft describes \fB\)ASP Extensions (ASPEXT)\fR for Signalling
 User Adaptation Protocols,
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -263,13 +266,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -283,7 +286,7 @@ This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the Signalling User Adaptation Layers
 (UAs),
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -292,13 +295,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -326,11 +329,11 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 SS7 Signalling User Adaptation Layers
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -339,13 +342,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -369,10 +372,10 @@ The existing UA procedures\*#
 .ip \*#
 See, for example, Section 4 of M3UA, SUA or TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -407,7 +410,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .ds #w \*#
@@ -418,10 +421,10 @@ they are included in addition to the parameters of the UAs.\*#
 .ip \*#
 See, for example, Section 3 of the M3UA, SUA or TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -873,7 +876,7 @@ extension accordingly.
 \fB\)ASPEXT\fR do not introduce any new security risks or
 considerations that are not already inherent in the UA
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -882,13 +885,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -896,7 +899,7 @@ tua-01
 Please see the "Security" sections of
 IUA,
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 DUA,
 .[
@@ -908,15 +911,15 @@ v5ua-01
 .]
 M2UA,
 .[
-m2ua-11
+m2ua11
 .]
 M3UA,
 .[
-m3ua-10
+m3ua10
 .]
 SUA
 .[
-sua-09
+sua09
 .]
 and TUA,
 .[
@@ -930,7 +933,7 @@ these UAs.
 \fB\)ASPEXT\fR provides an additional \fI\)ASP Extensions\fR message
 parameter to the common parameter range of the SIGTRAN UAs:
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -939,13 +942,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -985,7 +988,7 @@ The definition and used of new message classes, types and parameters is an
 integral part of the SIGTRAN adaptation layers.  Thus, these extensions are
 assigned by IANA through an IETF Consensus action.
 .[
-rfc 2434
+rfc2434
 .]
 .pp
 The proposed extension \fB\)MUST\fR in no way adversely affect the general

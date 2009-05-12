@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
-abbreviate-label-ranges "..."
 bracket-label " [" "]" ", "
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3>0 \{\
@@ -252,7 +255,7 @@ Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
 This Internet-Draft describes an extension parameter and procedure to the
 Signalling User Adaptation Protocols,
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -261,20 +264,20 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
 .]
 based on the Stream Transmission Control Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 which permits an Application Server Processes (ASP) to indicate its placement
 within a Load Group and permits an Signalling Gateway (SG) to distribute
@@ -297,7 +300,7 @@ This Internet-Draft provides the \fI\)Load Distribution\fR parameter and
 associated procedures in extension to the parmeters and procedures of the
 Signalling User Adaptation Layers (UAs),
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -306,13 +309,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -355,11 +358,11 @@ Context\fR or (set of) \fI\)Interface Identifier(s)\fR to uniquely define a
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-rfc 2960
+rfc2960
 .]
 Signalling User Adatapation Layers.
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -368,13 +371,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -391,7 +394,7 @@ reconfiguration for maintenance purposes.
 .lp
 This extension to the Signalling User Adaptation Layers
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -400,13 +403,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -472,7 +475,7 @@ Override, Loadshare and Broadcast.
 The detailed actions taken for these distribution algorithms are described in
 Section 4 of the Signalling User Adaptation Layer specifications;
 .[
-RFC 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -481,13 +484,13 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -712,7 +715,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 .]
 .sh 1 "Protocol Elements"
 .lp
@@ -728,10 +731,10 @@ The \fI\)Load Distribution\fR parameter is used in the \fI\)REQ REQ\fR, \fI\)REQ
 RSP\fR, \fI\)ASPAC\fR and \fI\)ASPAC ACK\fR messages.  It is used in
 conjunction with the \fI\)Traffic Mode Type\fR parameter
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -795,10 +798,10 @@ This extension adds the \fI\)Load Distribtution\fR parameter as an
 For a detailed description of these messages, see Section 3 of
 M3UA, SUA and TUA.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -818,17 +821,17 @@ This extension supplements the \fI\)Registration Request (REG REQ)\fR message
 by permitting the following optional parameters to be included in the
 \fI\)Routing Key\fR
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
 .]
 parameter or \fI\)Link Key\fR
 .[
-rfc 3057
+rfc3057 november 2000
 .]
 .[
 dua-00
@@ -837,7 +840,7 @@ dua-00
 v5ua-01
 .]
 .[
-m2ua-11
+m2ua11
 .]
 parameter within the message:
 .ix +4
@@ -1133,10 +1136,10 @@ Where ASPs are configured to operation within \fI\)Load Groups\fR under this
 extension, the Application Server state is interpreted as provided in the
 Signalling User Adaptation Layer specifications.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1319,10 +1322,10 @@ overriding ASP and the load selection that was overridden.
 This extension adds the following parameter tag value (described in Section 3)
 to the Common Parameter numbering space for the UAs.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01
@@ -1362,10 +1365,10 @@ document.
 This extension adds the following value to the \fI\)Registration Status\fR
 field of the \fI\)Registration Result\fR parameter for the UAs.
 .[
-m3ua-10
+m3ua10
 .]
 .[
-sua-09
+sua09
 .]
 .[
 tua-01

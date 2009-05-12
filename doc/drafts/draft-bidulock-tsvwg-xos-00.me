@@ -75,7 +75,7 @@
 .ds date May\ 1,\ 2009
 .ds expiry November\ 2009
 .nr levels 0
-.so ../draft4.me
+.so draft4.me
 .bp
 .sz \n(tp
 .he 'Internet Draft'X.25 over SCTP (XOS)'\\\\*[date]'
@@ -103,7 +103,7 @@ Version: 1
 .pp
 This document is a revision to RFC 1613
 .[
-xot
+rfc1613
 %Z 1
 .]
 written by James R. Forster, Greg Satz, Gilbert Glick and Bob Day.  Since the
@@ -141,7 +141,7 @@ installed base of RFC 1613 users.
 It is sometimes desirable to transport X.25 over IP internets.  The X.25
 Packet Level requires a reliable link level below it and normally uses LAPB
 .[
-iso 7776
+iso7776
 %Z 2
 .]
 .[
@@ -155,7 +155,7 @@ iso 8802-2 : 1998
 .]
 XOT
 .[
-xot
+rfc1613
 .]
 describes a method for using a TCP/IP connection as a data link over which
 X.25 PLP (Packet Layer Protocol)
@@ -179,7 +179,7 @@ to identify the version of the protocol.
 .pp
 In contrast, the TCP approach with XOT
 .[
-xot
+rfc1613
 .]
 does not preserve message boundaries directly, and requires a header field,
 both to preserve message boundaries as well as to provide a protocol version
@@ -194,7 +194,7 @@ apply to the X.25 layer in XOS.  Exceptions to this are noted.
 .pp
 \fB\)XOS\fP has a number of unique advantages over XOT,
 .[
-xot
+rfc1613
 .]
 as itemized below:
 .np
@@ -233,32 +233,32 @@ replacement to XOT.
 The XOS protocol described in this memo is not intended as a replacement for
 XOT,
 .[
-xot
+rfc1613
 .]
 but XOS is intended, where available, as a superior alternative to XOT.
 .pp
 The XOT specification,
 .[
-xot
+rfc1613
 .]
 was used as a template for the initial drafts of this memo.  However,
 RFC 1613 provides sections that are not applicable to XOS, as follows:
 .np
 The XOT specification,
 .[
-xot
+rfc1613
 .]
 went to some length to describe the interactions between an XOT interface and
 an X.25 interface on a given host to provide an network relay function.  This
 function, however, has since been standardized as
 ISO/IEC 10028
 .[
-iso 10028
+iso10028
 %Z 2
 .]
 and ISO/IEC 10177,
 .[
-iso 10177
+iso10177
 %Z 2
 .]
 and, therefore, does not need to be discussed here.  Also, because the X.25
@@ -271,22 +271,22 @@ been removed from XOS.
 The procedures of ISO
 10177
 .[
-iso 10028
+iso10028
 .]
 .[
-iso 10177
+iso10177
 .]
 are as applicable to XOS as they are to LAPB
 .[
-iso 3309
+iso3309
 %Z 2
 .]
 .[
-iso 4335
+iso4335
 %Z 2
 .]
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -296,15 +296,15 @@ or LLC,
 iso 8802-2 : 1998
 .]
 .[
-iso 8881
+iso8881
 %Z 1
 .]
 and the reader is referred to those documents.
 .[
-iso 10028
+iso10028
 .]
 .[
-iso 10177
+iso10177
 .]
 .np
 The XOT specification went to some trouble to remove the distinction between
@@ -417,13 +417,13 @@ iso/iec 8208 : 2000
 protocol implementation), that engine may be connected to interface(s) running
 LAPB,
 .[
-iso 3309
+iso3309
 .]
 .[
-iso 4335
+iso4335
 .]
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -433,11 +433,11 @@ and/or to logical interface(s) running LLC,
 iso 8802-2 : 1998
 .]
 .[
-iso 8881
+iso8881
 .]
 XOT/TCP/IP
 .[
-xot
+rfc1613
 .]
 or XOS/SCTP/IP.
 In general, the XOS layer itself is not at all sensitive to what kind of
@@ -452,11 +452,11 @@ interfaces of two networking devices).  In general, the X.25 PLP is unaware
 that the data link services are being provided by XOS/SCTP/IP and therefore
 the standards applicable to network internal layer services
 .[
-iso 10028
+iso10028
 .]
 and network layer relay and protocol interworking
 .[
-iso 10177
+iso10177
 .]
 are as applicable to X.25 PLP using XOS and LAPB as they are to X.25 PLP using
 LLC2 and LAPB.
@@ -577,13 +577,13 @@ virtual circuit associated with the SCTP association has been cleared or \fB\)MA
 accordance with X.25 and ISO 8208 data link procedures.  Note that the SCTP association corresponds
 to the LAPB
 .[
-iso 3309
+iso3309
 .]
 .[
-iso 4335
+iso4335
 .]
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -593,7 +593,7 @@ or LLC2
 iso 8802-2 : 1998
 .]
 .[
-iso 8881
+iso8881
 .]
 link for X.25, and each SCTP
 stream corresponds to an individual Virtual Circuit (VC) and Logical Channel
@@ -885,7 +885,7 @@ dlpi revision 2.0.0
 .]
 for LAPB
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -952,7 +952,7 @@ x212
 The X.25 PLP processes this data no differently that if it were received from
 LAPB
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -966,7 +966,7 @@ LLC2.
 iso 8802-2 : 1998
 .]
 .[
-iso 8881
+iso8881
 .]
 .\"
 .\"
@@ -974,7 +974,7 @@ iso 8881
 .pp
 XOS procedures are modeled after the procedures of the LAPB Data Link.
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -1554,7 +1554,7 @@ x25
 .]
 ISO Data Link Protocol,
 .[
-iso 7776
+iso7776
 .]
 .[
 x222
@@ -1566,7 +1566,7 @@ iso 8802-2 : 1998
 all provide for Quality of Service parameters to be determined at the time of
 establishment of the data link.  XOT
 .[
-xot
+rfc1613
 .]
 (and TCP beneath it) provides no mechanism for Quality of Service.
 For XOS, on the other hand, SCTP provides several mechanisms to enforce grade
@@ -1588,7 +1588,7 @@ residual error rate for the SCTP association.
 Another approach to the management of QOS in the IP network surfaced after the
 advent of XOT
 .[
-xot
+rfc1613
 .]
 as the protocol RSVP.
 .[
@@ -1683,7 +1683,7 @@ SCTP.  A request will be made to IANA to assign SCTP Payload Protocol IDs.
 .pp
 IANA has registered TCP Port Number "1998"\*# for XOT.
 .[
-xot
+rfc1613
 .]
 It is recommended that XOS hosts use this TCP port number also for SCTP for
 listening for new connections.  XOS hosts \fB\)MAY\fP also use statically configured

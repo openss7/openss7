@@ -55,18 +55,21 @@ abbreviate A
 label L
 no-default-database
 no-accumulate
+no-annotate
 database idrefs
 annotate X lp
 move-punctuation
-discard YZ
+discard Y
 join-authors ", " ", " " and "
-et-al " et al" 2 3
-search-truncate 10
+et-al " et al" 1 2
+search-truncate 32
+search-ignore T
 separate-label-second-parts ""
-abbreviate-label-ranges ".."
 bracket-label " [" "]" ", "
-# sort A+
-# reverse A
+abbreviate-label-ranges ".."
+sort Z
+sort-adjacent-labels
+reverse A
 .R2
 .de $0
 .if \\$3<4 \{\
@@ -271,7 +274,7 @@ isua-00
 %O Work In Progress. [Informative]
 .]
 .[
-sua-14
+sua14
 %O Work In Progress. [Normative]
 .]
 .[
@@ -300,7 +303,7 @@ isua-00
 modificiation of Destination Local Reference (DLR) ranges for SS7 SCCP-User
 Adaptation Layer,
 .[
-sua-14
+sua14
 .]
 and modification of Transaction Identifier (TID) ranges for SS7 TCAP-User
 Adaptation Layer.
@@ -322,7 +325,7 @@ m3ua-rfc
 isua-00
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -343,7 +346,7 @@ updated references,
 addition of \fI\)Source Reference Number\fR, \fI\)Destination Reference
 Number\fR and \fI\)Reference Number Range\fR to SUA
 .[
-sua-14
+sua14
 .]
 \fI\)Routing Key\fR.
 .bu
@@ -365,7 +368,7 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-RFC 2960
+rfc2960
 %O [Normative]
 .]
 SS7 Signalling User Adaptation Layers
@@ -379,7 +382,7 @@ m3ua-rfc
 isua-00
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -404,7 +407,7 @@ m3ua-rfc
 isua-00
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -466,7 +469,7 @@ Application Servers.\*#
 .pp
 The SS7 SCCP-User Adaptation Layer
 .[
-sua-14
+sua14
 .]
 registration of a \fI\)Routing Key\fR associates a range of traffic with an
 Application Server through a \fI\)Routing Context\fR and the Address Mapping
@@ -481,7 +484,7 @@ connections to Application Servers.\*#
 \fB\)EDITOR'S NOTE:\-\fR
 Text was include in the SUA specification
 .[
-sua-14
+sua14
 .]
 to permit this operation, however, detailed procedures and the addition of the
 \fI\)Routing Context\fR parameter to the \fI\)Routing Key\fR was missed.
@@ -491,7 +494,7 @@ acting as STPs, and can replace the \fI\)DRN Label\fR and associated
 mechanism.  The \fI\)TID Label\fR and associated mechanism is inadequate and
 should be removed from the SUA specification.
 .[
-sua-14
+sua14
 .]
 .)d
 .sh 4 "Limitations of Registration for TUA"
@@ -699,7 +702,7 @@ the \f(BI\)REG REQ\fR message.
 The purpose of \fI\)REGEXT\fR for
 SUA
 .[
-sua-14
+sua14
 .]
 is to associate a newly formed connection with an Application Server that is
 responsible for the connection.  Almost all connection-oriented interface
@@ -758,7 +761,7 @@ additional \fI\)Destination Reference Number\fR that is assigned to the
 connection, permitting the SCCP implementation to follow the Network Provider
 Interface.
 .[
-npi
+npi revision 2.0.0
 %O [Informative]
 .]
 .pp
@@ -831,11 +834,11 @@ additional \fI\)Terminating Transaction Id\fR that is assigned to the
 transaction, permitting the TCAP implemetnation to follow the Transport
 Provider Interface.
 .[
-tpi
+tpi revision 2.0.0
 %O [Informative]
 .]
 .[
-xns
+xns99
 %O [Informative]
 .]
 .pp
@@ -869,7 +872,7 @@ The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
 \fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
 in this document, are to be interpreted as described in.
 .[
-key words
+rfc2119
 %O [Normative]
 .]
 .sh 1 "Protocol Elements"
@@ -885,13 +888,13 @@ It also allows the use of the \fI\)Routing (Link) Key\fR\) parameter within a
 \fB\)DEREG REQ\fR\) message.  This memo also defines a new \fI\)Reference
 Number Range\fR parameter for use in the SUA
 .[
-sua-14
+sua14
 .]
 \fI\)Routing Key\fR.  In addition, this memo permits the use of the
 \fI\)Source Reference Number\fR, \fI\)Destination Reference Number\fR and
 \fI\)Reference Number Range\fR parameters in the SUA
 .[
-sua-14
+sua14
 .]
 \fI\)Routing Key\fR.
 .sh 3 "Routing Key Parameters"
@@ -899,7 +902,7 @@ sua-14
 .pp
 \fI\)REGEXT\fR defines a new SUA
 .[
-sua-14
+sua14
 .]
 \fI\)Reference Number Range\fR parameter for use in the \fI\)Routing Key\fR in
 the \f(BI\)REG REQ\fR message.  This parameter is used to associate a range of
@@ -930,7 +933,7 @@ The \fI\)Reference Number Range\fR parameter is formatted as follows: \*#
 will be assigned by IANA within the specific parameter range of
 SUA
 .[
-sua-14
+sua14
 .]
 and may change its value in further versions of this document.
 .)d
@@ -971,7 +974,7 @@ m3ua-rfc
 isua-00
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -1124,7 +1127,7 @@ parameter \fB\)MUST\fR only occur once in the \fI\)Key\fR parameters.
 .lp
 The SUA
 .[
-sua-14
+sua14
 .]
 \fI\)Routing Key\fR parameter is formatted as follows:
 .(b L
@@ -1150,7 +1153,7 @@ sua-14
 .pp
 \fI\)REGEXT\fR extends the SUA \fI\)Routing Key\fR
 .[
-sua-14
+sua14
 .]
 by adding the following optional \fI\)Key parameters\fR to the \fI\)Routing
 Key\fR.
@@ -1377,7 +1380,7 @@ parameter.
 .lp
 The SUA
 .[
-sua-14
+sua14
 .]
 \fI\)Load Selection\fR parameter
 .[
@@ -1496,7 +1499,7 @@ In addition, \fI\)REGEXT\fR removes the following text associated with the
 The "Routing Key Change Refused" error is sent when the SG refuses a change in
 the Routing Key parameters. 
 .[
-sua-14
+sua14
 .]
 .)q
 .sh 3 "Registration Status"
@@ -1523,7 +1526,7 @@ isua-00
 .]
 SUA
 .[
-sua-14
+sua14
 .]
 and TUA.
 .[
@@ -1548,7 +1551,7 @@ The Common
 isua-00
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -1578,7 +1581,7 @@ isua-00
 .]
 SUA
 .[
-sua-14
+sua14
 .]
 and TUA
 .[
@@ -1832,7 +1835,7 @@ m3ua-rfc
 isua-00
 .]
 .[
-sua-14
+sua14
 .]
 .[
 tua-01
@@ -1856,7 +1859,7 @@ isua-00
 .]
 SUA
 .[
-sua-14
+sua14
 .]
 and TUA
 .[
@@ -2012,7 +2015,7 @@ isua-00
 .]
 SUA
 .[
-sua-14
+sua14
 .]
 and TUA.
 .[
@@ -2039,7 +2042,7 @@ parameter in the \f(BI\)REG REQ\fR message as is experienced in the
 adds the following parameter tag value (described in Section 3) to the
 SUA-Specific Parameter numbering range for SUA:
 .[
-sua-14
+sua14
 .]
 .ix +\n(iiu
 .TS
@@ -2057,7 +2060,7 @@ _
 through this document as \f(CB\)0x0119\fR will be assigned by IANA within the
 SUA-specfic parameter range of the SUA
 .[
-sua-14
+sua14
 .]
 and may change its value in further versions of this document.
 .)q
