@@ -77,11 +77,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <sys/dlpi.h>
 
-#undef WITH_32BIT_COMPATIBILITY
-#if defined LFS && defined __LP64__
-#define WITH_32BIT_COMPATIBILITY 1
-#endif
-
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
@@ -114,10 +109,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define IP_TO_STREAMS_MOD_ID	CONFIG_STREAMS_IP_TO_STREAMS_MODID
 #define IP_TO_STREAMS_MOD_NAME	CONFIG_STREAMS_IP_TO_STREAMS_NAME
-#endif				/* LFS */
 
 #define MOD_ID		IP_TO_STREAMS_MOD_ID
 #define MOD_NAME	IP_TO_STREAMS_MOD_NAME
@@ -262,7 +255,6 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
  * tear down the whole thing by closing the streams file.
  */
 
-#ifdef LFS
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
 #define	KERNEL_2_0
 #else
@@ -270,7 +262,6 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 # if LINUX_VERSION_CODE > KERNEL_VERSION(2,3,0)
 # define KERNEL_2_3
 # endif
-#endif
 #endif
 
 #include "ip_strm_mod.h"
@@ -397,18 +388,6 @@ ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 	(void) credp;
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
 		cmn_err(CE_NOTE, "%s: q=%p ", __FUNCTION__, q);
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			MOD_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif
 	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 	if (minor_ptr != NULL && minor_ptr->dl_magic == DL_MAGIC) {
 		if (ip_to_streams_debug_mask & (DBG_OPEN))
@@ -1618,7 +1597,6 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct fmodsw ip_to_streams_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &ip_to_streams_info,
@@ -1626,28 +1604,28 @@ STATIC struct fmodsw ip_to_streams_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-#ifdef WITH_32BIT_COMPATIBILITY
+#ifdef __LP64__
 static void *ip_to_streams_ioctl32;
-#endif				/* WITH_32BIT_COMPATIBILITY */
+#endif				/* __LP64__ */
 
 static void
 ip_to_streams_unregister_ioctl32(void)
 {
-#ifdef WITH_32BIT_COMPATIBILITY
+#ifdef __LP64__
 	if (ip_to_streams_ioctl32 != NULL)
 		unregister_ioctl32(ip_to_streams_ioctl32);
 	ip_to_streams_ioctl32 = NULL;
-#endif				/* WITH_32BIT_COMPATIBILITY */
+#endif				/* __LP64__ */
 }
 
 static int
 ip_to_streams_register_ioctl32(void)
 {
-#ifdef WITH_32BIT_COMPATIBILITY
+#ifdef __LP64__
 	if (ip_to_streams_ioctl32 == NULL)
 		if ((ip_to_streams_ioctl32 = register_ioctl32(SIOCSIFNAME)) == NULL)
 			return (-ENOMEM);
-#endif				/* WITH_32BIT_COMPATIBILITY */
+#endif				/* __LP64__ */
 	return (0);
 }
 
@@ -1676,29 +1654,6 @@ ip_to_streams_unregister_module(void)
 	unregister_strmod(&ip_to_streams_fmod);
 	ip_to_streams_unregister_ioctl32();
 }
-#else
-#ifdef LIS
-STATIC int
-ip_to_streams_register_module(void)
-{
-	int ret;
-
-	if ((ret = lis_register_strmod(&ip_to_streams_info, MOD_NAME)) != LIS_NULL_MID) {
-		if (modid == 0)
-			modid = ret;
-		return (0);
-	}
-	/* LiS is not too good on giving informative errors here. */
-	return (EIO);
-}
-STATIC void
-ip_to_streams_unregister_module(void)
-{
-	/* LiS provides detailed error here when they are discarded. */
-	return (void) lis_unregister_strmod(&ip_to_streams_info);
-}
-#endif
-#endif
 
 STATIC int __init
 ip_to_streams_init(void)

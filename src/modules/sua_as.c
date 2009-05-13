@@ -91,7 +91,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  into SCCP-primitives and sent upstream.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -161,10 +160,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SUA_AS_MOD_ID		CONFIG_STREAMS_SUA_AS_MODID
 #define SUA_AS_MOD_NAME		CONFIG_STREAMS_SUA_AS_NAME
-#endif
 
 #define MOD_ID	    SUA_AS_MOD_ID
 #define MOD_NAME    SUA_AS_MOD_NAME

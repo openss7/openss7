@@ -836,30 +836,12 @@ struct protosw {
 	int p_capability;		/* required capabilities */
 };
 
-#ifdef CONFIG_STREAMS_LIS_BCM
-struct linkblk {
-	queue_t *l_qtop;		/* upper write queue */
-	queue_t *l_qbot;		/* lower write queue */
-	int l_index;			/* multiplexor index */
-	long l_pad[5];
-};
-#else
 struct linkblk {
 	struct queue *l_qtop;		/* upper write queue */
 	struct queue *l_qbot;		/* lower write queue */
 	int l_index;			/* multiplexor index */
 	char __pad[4 * sizeof(int) + sizeof(size_t) + sizeof(mblk_t *)];
 };
-#endif
-
-/* LiS actually has some problems where, it does not align using the union below, meaning that the
-   remaining fields overlap on 64-bit architectures.  Therefore, this LiS compatibility is only
-   really for 32-bit architectures.  I you have problems with IOCTLs, this is it.  Setting
-   CONFIG_STREAMS_LIS_BCM uses LiS 2.18.0 compatible definitions for iocblk on __LP64__.  Note
-   that without CONFIG_STREAMS_LIS_BCM, or on 32-bit native architectures, Linux Fast-STREAMS is
-   always binary compatible with OSF/HPUX/AIX/SUX/IRIX/UW7.  It is only binary compatible with
-   Solaris on 32bit architectures.  Solaris 64bit deviates from this so much that binary
-   compatibilty with Solaris 64 bit is not possible without breaking everything else. */
 
 typedef union {
 	long l;				/* long value */
@@ -872,12 +854,8 @@ struct iocblk {
 	int ioc_cmd;			/* command to perform */
 	cred_t *ioc_cr;			/* credentials */
 	uint ioc_id;			/* id of this ioctl */
-#if defined __LP64__ && defined CONFIG_STREAMS_LIS_BCM
-	uint ioc_count;			/* size of the data field */
-#else
 	ioc_pad ioc_cnt;
 #define ioc_count       ioc_cnt.ul	/* size of the data field */
-#endif
 	int ioc_error;			/* ioctl error code (for errno) */
 	int ioc_rval;			/* system call return value */
 	long ioc_filler[4];

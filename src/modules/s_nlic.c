@@ -1243,10 +1243,6 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for S_NLIC.  (0 for allocation.)");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 struct fmodsw s_nlic_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &s_nlic_info,

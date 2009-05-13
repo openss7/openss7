@@ -113,220 +113,56 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #include "src/kernel/strreg.h"
 #include "src/modules/sth.h"	/* for str_minfo */
 
+#include "src/kernel/strmain.h"
+#include "sys/modconf.h"
+
 /* 
  *  We put all our heavily used globals handy.  Hopefully by placing these all
  *  together we keep them in the same cache slot or two.
  */
-#ifdef CONFIG_STREAMS_CLONE
-extern int clone_init(void);
-extern void clone_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_FIFO
-extern int fifo_init(void);
-extern void fifo_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_LOOP
-extern int loop_init(void);
-extern void loop_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_SAD
-extern int sad_init(void);
-extern void sad_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_NSDEV
-extern int nsdev_init(void);
-extern void nsdev_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_ECHO
-extern int echo_init(void);
-extern void echo_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_NULS
-extern int nuls_init(void);
-extern void nuls_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_PIPE
-extern int pipe_init(void);
-extern void pipe_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_SOCKSYS
-extern int socksys_init(void);
-extern void socksys_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_UNIX
-extern int unix_init(void);
-extern void unix_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_XNET
-extern int xnet_init(void);
-extern void xnet_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_LOG
-extern int log_init(void);
-extern void log_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_INET
-extern int inet_init(void);
-extern void inet_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_STH
-extern int sth_init(void);
-extern void sth_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_PIPEMOD
-extern int pipemod_init(void);
-extern void pipemod_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_CONNLD
-extern int connld_init(void);
-extern void connld_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_TIMOD
-extern int timod_init(void);
-extern void timod_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_TIRDWR
-extern int tirdwr_init(void);
-extern void tirdwr_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_SOCKMOD
-extern int sockmod_init(void);
-extern void sockmod_exit(void);
-#endif
-#ifdef CONFIG_STREAMS_SC
-extern int sc_init(void);
-extern void sc_exit(void);
-#endif
 
 static int
 modules_init(void)
 {
-#ifdef CONFIG_STREAMS_CLONE
-	clone_init();
-#endif
-#ifdef CONFIG_STREAMS_FIFO
-	fifo_init();
-#endif
-#ifdef CONFIG_STREAMS_LOOP
-	loop_init();
-#endif
-#ifdef CONFIG_STREAMS_SAD
-	sad_init();
-#endif
-#ifdef CONFIG_STREAMS_NSDEV
-	nsdev_init();
-#endif
-#ifdef CONFIG_STREAMS_ECHO
-	echo_init();
-#endif
-#ifdef CONFIG_STREAMS_NULS
-	nuls_init();
-#endif
-#ifdef CONFIG_STREAMS_PIPE
-	pipe_init();
-#endif
-#ifdef CONFIG_STREAMS_SOCKSYS
-	socksys_init();
-#endif
-#ifdef CONFIG_STREAMS_UNIX
-	unix_init();
-#endif
-#ifdef CONFIG_STREAMS_XNET
-	xnet_init();
-#endif
-#ifdef CONFIG_STREAMS_LOG
-	log_init();
-#endif
-#ifdef CONFIG_STREAMS_INET
-	inet_init();
-#endif
-#ifdef CONFIG_STREAMS_STH
-	sth_init();
-#endif
-#ifdef CONFIG_STREAMS_PIPEMOD
-	pipemod_init();
-#endif
-#ifdef CONFIG_STREAMS_CONNLD
-	connld_init();
-#endif
-#ifdef CONFIG_STREAMS_TIMOD
-	timod_init();
-#endif
-#ifdef CONFIG_STREAMS_TIRDWR
-	tirdwr_init();
-#endif
-#ifdef CONFIG_STREAMS_SOCKMOD
-	sockmod_init();
-#endif
-#ifdef CONFIG_STREAMS_SC
-	sc_init();
-#endif
+	module_config_t *m;
+	driver_config_t *d;
+	int i, err;
+
+	for (i = 0, m = &lfs_module_config[0]; i < sizeof(lfs_module_config)/sizeof(lfs_module_config[0]); i++, m++)
+		if (m->cnf_init != NULL)
+			if ((err = (*m->cnf_init)())) {
+				for (i--, m--; i >= 0; i--, m--)
+					if (m->cnf_term != NULL)
+						(*m->cnf_term)();
+				return (err);
+			}
+	for (i = 0, d = &lfs_driver_config[0]; i < sizeof(lfs_driver_config)/sizeof(lfs_driver_config[0]); i++, d++)
+		if (d->cnf_init != NULL)
+			if ((err = (*d->cnf_init)())) {
+				for (i--, d--; i >= 0; i--, d--)
+					if (d->cnf_term != NULL)
+						(*d->cnf_term)();
+				for (i = sizeof(lfs_module_config)/sizeof(lfs_module_config[0]), m = &lfs_module_config[i-1]; i > 0; i--, m--)
+					if (m->cnf_term != NULL)
+						(*m->cnf_term)();
+				return (err);
+			}
 	return (0);
 }
 
 static void
 modules_exit(void)
 {
-#ifdef CONFIG_STREAMS_SC
-	sc_exit();
-#endif
-#ifdef CONFIG_STREAMS_SOCKMOD
-	sockmod_exit();
-#endif
-#ifdef CONFIG_STREAMS_TIRDWR
-	tirdwr_exit();
-#endif
-#ifdef CONFIG_STREAMS_TIMOD
-	timod_exit();
-#endif
-#ifdef CONFIG_STREAMS_CONNLD
-	connld_exit();
-#endif
-#ifdef CONFIG_STREAMS_PIPEMOD
-	pipemod_exit();
-#endif
-#ifdef CONFIG_STREAMS_STH
-	sth_exit();
-#endif
-#ifdef CONFIG_STREAMS_INET
-	inet_exit();
-#endif
-#ifdef CONFIG_STREAMS_LOG
-	log_exit();
-#endif
-#ifdef CONFIG_STREAMS_XNET
-	xnet_exit();
-#endif
-#ifdef CONFIG_STREAMS_UNIX
-	unix_exit();
-#endif
-#ifdef CONFIG_STREAMS_SOCKSYS
-	socksys_exit();
-#endif
-#ifdef CONFIG_STREAMS_PIPE
-	pipe_exit();
-#endif
-#ifdef CONFIG_STREAMS_NULS
-	nuls_exit();
-#endif
-#ifdef CONFIG_STREAMS_ECHO
-	echo_exit();
-#endif
-#ifdef CONFIG_STREAMS_NSDEV
-	nsdev_exit();
-#endif
-#ifdef CONFIG_STREAMS_SAD
-	sad_exit();
-#endif
-#ifdef CONFIG_STREAMS_LOOP
-	loop_exit();
-#endif
-#ifdef CONFIG_STREAMS_FIFO
-	fifo_exit();
-#endif
-#ifdef CONFIG_STREAMS_CLONE
-	clone_exit();
-#endif
+	driver_config_t *d;
+	module_config_t *m;
+	int i;
+
+	for (i = sizeof(lfs_driver_config)/sizeof(lfs_driver_config[0]), d = &lfs_driver_config[i-1]; i > 0; i--, d--)
+		if (d->cnf_term != NULL)
+			(*d->cnf_term)();
+	for (i = sizeof(lfs_module_config)/sizeof(lfs_module_config[0]), m = &lfs_module_config[i-1]; i > 0; i--, m--)
+		if (m->cnf_term != NULL)
+			(*m->cnf_term)();
 }
 
 #ifdef CONFIG_STREAMS_MODULE
@@ -350,8 +186,11 @@ streams_init(void)
 		goto no_strsysctl;
 	if ((result = strsched_init()))
 		goto no_strsched;
-	modules_init();
+	if ((result = modules_init()))
+		goto no_modules;
 	return (0);
+      no_modules:
+	strsched_exit();
       no_strsched:
 	strsysctl_exit();
       no_strsysctl:

@@ -65,7 +65,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * connection-oriented or connectionless service provider.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -135,10 +134,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SCCP_TPI_MOD_ID		CONFIG_STREAMS_SCCP_TPI_MODID
 #define SCCP_TPI_MOD_NAME	CONFIG_STREAMS_SCCP_TPI_NAME
-#endif				/* LFS */
 
 /*
  * STREAMS DEFINITIONS

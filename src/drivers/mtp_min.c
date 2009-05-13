@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  layer for SS7.  This is a minimal implementation which is suitable for GSM-A or F-Links only
  *  between SEPs.
  */
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -115,13 +114,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MTP_MIN_DRV_ID		CONFIG_STREAMS_MTP_MIN_MODID
 #define MTP_MIN_DRV_NAME	CONFIG_STREAMS_MTP_MIN_NAME
 #define MTP_MIN_CMAJORS		CONFIG_STREAMS_MTP_MIN_NMAJORS
 #define MTP_MIN_CMAJOR_0	CONFIG_STREAMS_MTP_MIN_MAJOR
 #define MTP_MIN_UNITS		CONFIG_STREAMS_MTP_MIN_NMINORS
-#endif
 
 #define DRV_ID		MTP_MIN_DRV_ID
 #define DRV_NAME	MTP_MIN_DRV_NAME

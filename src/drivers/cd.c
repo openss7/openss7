@@ -113,24 +113,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define CD_DRV_ID	CONFIG_STREAMS_CD_MODID
 #define CD_DRV_NAME	CONFIG_STREAMS_CD_NAME
 #define CD_CMAJORS	CONFIG_STREAMS_CD_NMAJOR
 #define CD_CMAJOR_0	CONFIG_STREAMS_CD_MAJOR
 #define CD_UNITS	CONFIG_STREAMS_CD_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CD_MODID));
 MODULE_ALIAS("streams-driver-cd");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CD_MAJOR));
 MODULE_ALIAS("/dev/streams/cd");
 MODULE_ALIAS("/dev/streams/cd/*");
 MODULE_ALIAS("/dev/streams/clone/cd");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
@@ -249,7 +245,7 @@ cd_register_device(struct streamtab *str, major_t major, minor_t minor)
 	cd_devices[minor].cd_str = str;
 	cd_devices[minor].cd_major = major;
 
-	/* For LFS, register a minor device node. */
+	/* Register a minor device node. */
 
 	write_unlock(&cd_devices_lock);
 	return (0);
@@ -283,7 +279,7 @@ cd_unregister_device(struct streamtab *str, major_t major, minor_t minor)
 	if (cd_devices[minor].cd_str == NULL)
 		goto ealready;
 
-	/* For LFS, unregister a minor device node. */
+	/* Unregister a minor device node. */
 
 	cd_devices[minor].cd_str = NULL;
 	cd_devices[minor].cd_major = 0;
@@ -326,21 +322,12 @@ cd_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENXIO);
 	}
 	/* cannot open anything but defined clone minors */
-#ifdef LIS
-	if (cmajor != CMAJOR_0 || cminor > MAX_MINORS) {
-		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "attempt to open device number %d:%d directly", cmajor, cminor);
-		return (ENXIO);
-	}
-#endif				/* LIS */
-#ifdef LFS
 	/* Linux Fast-STREAMS always passes internal major dvice numbers (module ids) */
 	if (cmajor != DRV_ID || cminor > MAX_MINORS) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "attempt to open device number %d:%d directly", cmajor, cminor);
 		return (ENXIO);
 	}
-#endif				/* LFS */
 	sflag = CLONEOPEN;
 	read_lock(&cd_devices_lock);
 	if (cd_devices[cminor].cd_str == NULL) {
@@ -365,14 +352,6 @@ cd_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 STATIC streamscall int
 cd_qclose(queue_t *q, int oflags, cred_t *crp)
 {
-#ifdef LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS double-close bug detected");
-		return (0);
-	}
-#endif				/* LIS */
 	swerr();
 	/* We should never get here.  One of the major reasons is that STREAMS should have
 	   allocated the new streamtab because the registered driver should have opened with its
@@ -407,7 +386,6 @@ MODULE_PARM_DESC(major, "Major device number for CD driver (0 for allocation).")
 
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct cdevsw cd_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &cd_info,
@@ -443,71 +421,3 @@ cd_exit(void)
 module_init(cd_init);
 module_exit(cd_exit);
 #endif				/* MODULE */
-
-#endif				/* LFS */
-
-#ifdef LIS
-STATIC int cd_initalized = 0;
-STATIC void
-cd_init(void)
-{
-	int err;
-
-	if (cd_initialized != 0)
-		return;
-	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	if ((err = lis_register_strdev(major, &cd_info, UNITS, DRV_NAME)) < 0) {
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		cd_initialized = err;
-		return;
-	}
-	cd_initialized = 1;
-	if (major = 0 && err > 0) {
-		major = err;
-		cd_initialized = 2;
-	}
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		cd_initialized = err;
-		return;
-	}
-	return;
-}
-STATIC void
-cd_terminate(void)
-{
-	int err;
-
-	if (cd_initialized <= 0)
-		return;
-	if (major) {
-		if ((err = lis_unregister_strdev(major)) < 0)
-			strlog(DRV_ID, 0, LOG_CRIT, SL_FATAL | SL_CONSOLE,
-			       "cannot unregister major %d", major);
-		major = 0;
-	}
-	cd_initialized = 0;
-	return;
-}
-
-#ifdef MODULE
-int
-init_module(void)
-{
-	cd_init();
-	if (cd_initialized < 0)
-		return cd_initialized;
-	return (0);
-}
-
-void
-cleanup_module(void)
-{
-	return cd_terminate();
-}
-#endif				/* MODULE */
-
-#endif				/* LIS */

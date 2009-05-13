@@ -94,14 +94,11 @@ MODULE_AUTHOR(NSDEV_CONTACT);
 MODULE_DESCRIPTION(NSDEV_DESCRIP);
 MODULE_SUPPORTED_DEVICE(NSDEV_DEVICE);
 MODULE_LICENSE(NSDEV_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-nsdev");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_NSDEV_MODULE */
 
 #ifndef CONFIG_STREAMS_NSDEV_NAME
 //#define CONFIG_STREAMS_NSDEV_NAME "nsdev"
@@ -116,29 +113,48 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_NSDEV_MAJOR must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-nsdev");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_NSDEV_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_NSDEV_MODID;
 
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for NSDEV driver.");
+#endif				/* CONFIG_STREAMS_NSDEV_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NSDEV_MODID));
 MODULE_ALIAS("streams-driver-nsdev");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_NSDEV_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_NSDEV_MAJOR;
 
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for NSDEV driver.");
+#endif				/* CONFIG_STREAMS_NSDEV_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR) "-*");
 MODULE_ALIAS("/dev/nsdev");
@@ -146,7 +162,8 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NSDEV_MAJOR));
 MODULE_ALIAS("/dev/streams/nsdev");
 MODULE_ALIAS("/dev/streams/nsdev/*");
 MODULE_ALIAS("/dev/streams/clone/nsdev");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info nsdev_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NSDEV_MODID,
@@ -161,19 +178,22 @@ static struct module_stat nsdev_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTE
 
 static struct qinit nsdev_rinit = {
 	// qi_putp:putq,
-	qi_minfo:&nsdev_minfo,
-	qi_mstat:&nsdev_mstat,
+      qi_minfo:&nsdev_minfo,
+      qi_mstat:&nsdev_mstat,
 };
 
 static struct qinit nsdev_winit = {
 	// qi_putp:putq,
-	qi_minfo:&nsdev_minfo,
-	qi_mstat:&nsdev_mstat,
+      qi_minfo:&nsdev_minfo,
+      qi_mstat:&nsdev_mstat,
 };
 
-static struct streamtab nsdev_info = {
-	st_rdinit:&nsdev_rinit,
-	st_wrinit:&nsdev_winit,
+#ifdef CONFIG_STREAMS_NSDEV_MODULE
+static
+#endif
+struct streamtab nsdevinfo = {
+      st_rdinit:&nsdev_rinit,
+      st_wrinit:&nsdev_winit,
 };
 
 /**
@@ -211,7 +231,7 @@ nsdevopen(struct inode *inode, struct file *file)
 }
 
 struct file_operations nsdev_ops ____cacheline_aligned = {
-	.owner = NULL,			/* yes NULL */
+	.owner = NULL,		/* yes NULL */
 	.open = nsdevopen,
 };
 
@@ -225,7 +245,7 @@ struct file_operations nsdev_ops ____cacheline_aligned = {
 
 static struct cdevsw nsdev_cdev = {
 	.d_name = CONFIG_STREAMS_NSDEV_NAME,
-	.d_str = &nsdev_info,
+	.d_str = &nsdevinfo,
 	.d_flag = D_MP,
 	.d_fop = &nsdev_ops,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -308,7 +328,7 @@ STATIC struct file_operations nsdev_f_ops ____cacheline_aligned = {
 static
 #endif
 int __init
-nsdev_init(void)
+nsdevinit(void)
 {
 	int err;
 
@@ -329,12 +349,12 @@ nsdev_init(void)
 static
 #endif
 void __exit
-nsdev_exit(void)
+nsdevexit(void)
 {
 	unregister_cmajor(&nsdev_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
-module_init(nsdev_init);
-module_exit(nsdev_exit);
+module_init(nsdevinit);
+module_exit(nsdevexit);
 #endif

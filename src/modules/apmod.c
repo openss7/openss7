@@ -1024,10 +1024,6 @@ module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for APLI. (0 for allocation.)");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 static struct fmodsw ap_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &ap_modinfo,

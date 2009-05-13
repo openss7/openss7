@@ -528,10 +528,8 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TTCOMPAT_MODID));
 MODULE_ALIAS("streams-module-ttcompat");
-#endif
 #endif
 
 static struct module_info ttcompat_minfo = {
@@ -545,11 +543,6 @@ static struct module_info ttcompat_minfo = {
 
 static struct module_stat ttcompat_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat ttcompat_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-
-#if defined __LP64__ && defined LFS
-#  undef WITH_32BIT_CONVERSION
-#  define WITH_32BIT_CONVERSION 1
-#endif
 
 /*
  *  Private structure.
@@ -1186,9 +1179,6 @@ static struct streamtab ttcompat_info = {
 	.st_wrinit = &ttcompat_wqinit,
 };
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 static struct fmodsw ttcompat_fmod = {
 	.f_name = CONFIG_STREAMS_TTCOMPAT_NAME,
 	.f_str = &ttcompat_info,

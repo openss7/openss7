@@ -119,13 +119,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_MUX_DRV_ID		CONFIG_STREAMS_SL_MUX_MODID
 #define SL_MUX_DRV_NAME		CONFIG_STREAMS_SL_MUX_NAME
 #define SL_MUX_CMAJORS		CONFIG_STREAMS_SL_MUX_NMAJORS
 #define SL_MUX_CMAJOR_0		CONFIG_STREAMS_SL_MUX_MAJOR
 #define SL_MUX_UNITS		CONFIG_STREAMS_SL_MUX_NMINORS
-#endif
 
 /*
  *  =========================================================================
@@ -1110,8 +1108,6 @@ MODULE_PARM_DESC(major, "Device number for the SDL-MUX driver. (0 for allocation
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw slm_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sl_muxinfo,
@@ -1138,40 +1134,6 @@ slm_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-slm_register_strdev(major_t major)
-{
-	int err;
-	if ((err = lis_register_strdev(major, &sl_muxinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-slm_unregister_strdev(major_t major)
-{
-	int err;
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 sl_muxterminate(void)

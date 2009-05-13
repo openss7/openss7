@@ -63,7 +63,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  stream and provide statistical multiplexing access to one or more channels in one or more spans.
  */
 
-#define _LFS_SOURCE
 #define _MPS_SOURCE
 
 #include <sys/os8/compat.h>

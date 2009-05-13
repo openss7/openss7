@@ -322,18 +322,7 @@ zm_strdoioctl_str(struct mx *mx, int cmd, const void __user *arg, size_t len)
 	mblk_t *mp, *dp;
 	long timeo;
 	int err = 0;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	static cred_t creds;
-	cred_t *crp = &creds;
-
-	crp->cr_uid = current->euid;
-	crp->cr_gid = current->egid;
-	crp->cr_ruid = current->uid;
-	crp->cr_rgid = current->gid;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	if (len < 0 || len > sysctl_str_strmsgsz)
 		return (-EINVAL);

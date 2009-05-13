@@ -60,18 +60,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define __NO_VERSION__
 
-#ifdef LFS
-#define CONFIG_STREAMS_COMPAT_LIS
-#define _LIS_SOURCE
-#endif
-
 #include <sys/os7/compat.h>
-
-#if 0
-#ifdef LFS
-#include <sys/lis/ddi.h>
-#endif
-#endif
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>

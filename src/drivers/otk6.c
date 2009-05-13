@@ -146,7 +146,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_OTK6_MODID));
 MODULE_ALIAS("streams-driver-otk6");
 MODULE_ALIAS("streams-module-otk6");
@@ -154,7 +153,6 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_OTK6_MAJOR));
 MODULE_ALIAS("/dev/streams/otk6");
 MODULE_ALIAS("/dev/streams/otk6/*");
 MODULE_ALIAS("/dev/streams/clone/otk6");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(OTK6_CMAJOR_0) "-0");
@@ -14103,9 +14101,6 @@ MODULE_PARM_DESC(major, "Major device number for TP0. (0 for allocation.)");
 /*
  * Linux Fast-STREAMS Registration
  */
-
-#ifdef LFS
-
 static struct cdevsw tp_cdev = {
 	.d_str = &otk6_info,
 	.d_flag = D_MP | D_CLONE,
@@ -14133,38 +14128,6 @@ otk6_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-#ifdef LIS
-
-static int
-otk6_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &tp_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-static int
-otk6_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 static __init int
 otk6_modinit(void)

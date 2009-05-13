@@ -180,11 +180,7 @@ static const char *lpkgname = "SS7 ISDN User Part";
 static const char *lstdname = "Q.763/ANSI T1.113/JQ.763";
 static const char *sstdname = "Q.784";
 static const char *shortname = "ISUP";
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/isup";
-#else
-static char devname[256] = "/dev/isup";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

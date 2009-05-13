@@ -101,13 +101,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define DL_LAPD_DRV_ID		CONFIG_STREAMS_DL_LAPD_MODID
 #define DL_LAPD_DRV_NAME	CONFIG_STREAMS_DL_LAPD_NAME
 #define DL_LAPD_CMAJORS		CONFIG_STREAMS_DL_LAPD_NMAJORS
 #define DL_LAPD_CMAJOR_0	CONFIG_STREAMS_DL_LAPD_MAJOR
 #define DL_LAPD_UNITS		CONFIG_STREAMS_DL_LAPD_NMINORS
-#endif				/* LIS */
 
 /*
  *  =========================================================================
@@ -6832,8 +6830,6 @@ MODULE_PARM_DESC(major, "Device number for the DL driver. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw dl_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &dl_lapdinfo,
@@ -6862,42 +6858,6 @@ dl_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-dl_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &dl_lapdinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-dl_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 dlterminate(void)
@@ -6944,9 +6904,6 @@ dlinit(void)
 		}
 		if (lapd_majors[mindex] == 0)
 			lapd_majors[mindex] = err;
-#ifdef LIS
-		LIS_DEVFLAGS(lapd_majors[mindex]) |= LIS_MODFLG_CLONE;
-#endif
 		if (major == 0)
 			major = lapd_majors[0];
 	}

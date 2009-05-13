@@ -69,7 +69,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * written to support COTS and CLTS.
  */
 
-#define _LFS_SOURCE
 #define _MPS_SOURCE
 #define _SVR4_SOURCE
 

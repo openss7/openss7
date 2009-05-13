@@ -101,14 +101,11 @@ MODULE_AUTHOR(MUX_CONTACT);
 MODULE_DESCRIPTION(MUX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MUX_DEVICE);
 MODULE_LICENSE(MUX_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-mux");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_MUX_MODULE */
 
 #ifndef CONFIG_STREAMS_MUX_NAME
 #error CONFIG_STREAMS_MUX_NAME must be defined.
@@ -120,29 +117,48 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_MUX_MODID must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-mux");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_MUX_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_MUX_MODID;
 
+#ifdef CONFIG_STREAMS_MUX_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-mux driver.");
+#endif				/* CONFIG_STREAMS_MUX_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MUX_MODID));
 MODULE_ALIAS("streams-driver-mux");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_MUX_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_MUX_MAJOR;
 
+#ifdef CONFIG_STREAMS_MUX_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-mux driver.");
+#endif				/* CONFIG_STREAMS_MUX_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR) "-*");
 MODULE_ALIAS("/dev/mux");
@@ -150,7 +166,8 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mux");
 MODULE_ALIAS("/dev/streams/mux/*");
 MODULE_ALIAS("/dev/streams/clone/mux");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info mux_minfo = {
 	.mi_idnum = CONFIG_STREAMS_MUX_MODID,
@@ -765,7 +782,10 @@ static struct qinit mux_lwqinit = {
 	.qi_mstat = &mux_lwstat,
 };
 
-static struct streamtab mux_info = {
+#ifdef CONFIG_STREAMS_MUX_MODULE
+static
+#endif
+struct streamtab muxinfo = {
 	.st_rdinit = &mux_urqinit,
 	.st_wrinit = &mux_uwqinit,
 	.st_muxrinit = &mux_lrqinit,
@@ -774,7 +794,7 @@ static struct streamtab mux_info = {
 
 static struct cdevsw mux_cdev = {
 	.d_name = CONFIG_STREAMS_MUX_NAME,
-	.d_str = &mux_info,
+	.d_str = &muxinfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -785,7 +805,7 @@ static struct cdevsw mux_cdev = {
 static
 #endif
 int __init
-mux_init(void)
+muxinit(void)
 {
 	int err;
 
@@ -806,12 +826,12 @@ mux_init(void)
 static
 #endif
 void __exit
-mux_exit(void)
+muxexit(void)
 {
 	unregister_strdev(&mux_cdev, major);
 }
 
 #ifdef CONFIG_STREAMS_MUX_MODULE
-module_init(mux_init);
-module_exit(mux_exit);
+module_init(muxinit);
+module_exit(muxexit);
 #endif

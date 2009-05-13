@@ -111,7 +111,6 @@ __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
 
 EXPORT_SYMBOL_GPL(unfreezestr_SUN);
 
-#ifdef LFS
 /**
  *  qwait:  - wait for a procedure to be called on a queue pair
  *  @rq:    a pointer to the read queue of the queue pair
@@ -134,9 +133,7 @@ qwait(queue_t *rq)
 }
 
 EXPORT_SYMBOL_GPL(qwait);		/* sun/ddi.h */
-#endif
 
-#ifdef LFS
 /**
  *  qwait_sig: - wait for a procedure on a queue pair or signal
  *  @rq:    a pointer to the read queue of the queue pair
@@ -162,9 +159,7 @@ qwait_sig(queue_t *rq)
 }
 
 EXPORT_SYMBOL_GPL(qwait_sig);	/* sun/ddi.h */
-#endif
 
-#ifdef LFS
 /**
  *  qbufcall:	- schedule a buffer callout
  *  @q:		queue used for synchronization
@@ -191,7 +186,6 @@ qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long tick
 }
 
 EXPORT_SYMBOL_GPL(qtimeout);	/* sun/ddi.h */
-#endif
 /**
  *  qunbufcall: - cancel a buffer callout
  *  @q:		queue used for synchronization
@@ -212,13 +206,10 @@ quntimeout(queue_t *q, timeout_id_t toid)
 }
 
 EXPORT_SYMBOL_GPL(quntimeout);	/* sun/ddi.h */
-#ifdef LFS
-/* LIS already has queclass defined */
+
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(queclass);	/* sun/ddi.h */
-#endif
-#ifdef LFS
 /**
  *  qwriter:	- deferred call to a callback function.
  *  @qp:	a pointer to the RD() queue of a queue pair
@@ -245,7 +236,6 @@ EXPORT_SYMBOL_GPL(qwriter);		/* sun/ddi.h */
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void);
 
 EXPORT_SYMBOL_GPL(ddi_get_cred);	/* sun/ddi.h */
-#endif
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void);
 
 EXPORT_SYMBOL_GPL(ddi_get_lbolt);	/* sun/ddi.h */
@@ -637,17 +627,6 @@ mod_install(struct modlinkage *ml)
 		struct modlstrmod *mod = ml->ml_linkage[0];
 		int err;
 
-#ifdef LIS
-		struct streamtab *st = mod->strmod_fmodsw->f_str;
-
-		if ((err = lis_register_strmod(st, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
-			/* for LiS we save the modid in the mi_idnum */
-			st->st_rdinit->qi_minfo->mi_idnum = err;
-			return (DDI_SUCCESS);
-		}
-		return (-err);
-#endif
-#ifdef LFS
 		/* registering a module */
 		struct fmodsw *fmod;
 
@@ -668,23 +647,10 @@ mod_install(struct modlinkage *ml)
 			}
 			return (DDI_SUCCESS);
 		}
-#endif
 	} else {
 		struct modldrv *drv = ml->ml_linkage[0];
 		int err;
 
-#ifdef LIS
-		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
-
-		if ((err =
-		     lis_register_strdev(0, st, 255, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
-			/* for LiS we save the major in the mi_idnum */
-			st->st_rdinit->qi_minfo->mi_idnum = err;
-			return (DDI_SUCCESS);
-		}
-		return (-err);
-#endif
-#ifdef LFS
 		/* registering a driver */
 		struct cdevsw *cdev;
 
@@ -707,7 +673,6 @@ mod_install(struct modlinkage *ml)
 				kmem_free(cdev, sizeof(*cdev));
 			return (-err);
 		}
-#endif
 	}
 	return (ENOMEM);
 }
@@ -729,14 +694,6 @@ mod_remove(struct modlinkage *ml)
 		struct modlstrmod *mod = ml->ml_linkage[0];
 		int err;
 
-#ifdef LIS
-		struct streamtab *st = mod->strmod_fmodsw->f_str;
-
-		if ((err = lis_unregister_strmod(st)) >= 0)
-			return (DDI_SUCCESS);
-		return (-err);
-#endif
-#ifdef LFS
 		struct fmodsw *fmod;
 		struct streamtab *st = mod->strmod_fmodsw->f_str;
 
@@ -749,20 +706,11 @@ mod_remove(struct modlinkage *ml)
 				kmem_free(fmod, sizeof(*fmod));
 			return (-err);
 		}
-#endif
 	} else {
 		/* was a driver */
 		struct modldrv *drv = ml->ml_linkage[0];
 		int err;
 
-#ifdef LIS
-		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
-
-		if ((err = lis_unregister_strdev(st->st_rdinit->qi_minfo->mi_idnum)) >= 0)
-			return (DDI_SUCCESS);
-		return (-err);
-#endif
-#ifdef LFS
 		struct cdevsw *cdev;
 		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
 
@@ -771,7 +719,6 @@ mod_remove(struct modlinkage *ml)
 				kmem_free(cdev, sizeof(*cdev));
 			return (-err);
 		}
-#endif
 	}
 	return (ENXIO);
 }

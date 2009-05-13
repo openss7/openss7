@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * (SSCOPE-MCE) and NPI.  For the lower interface boundary, see NPI-UDP or TPI-UDP.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -105,10 +104,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SSCOPMCE_MOD_ID	CONFIG_STREAMS_SSCOPMCE_MODID
 #define SSCOPMCE_MOD_NAME	CONFIG_STREAMS_SSCOPMCE_NAME
-#endif				/* LFS */
 
 #define MOD_ID		SSCOPMCE_MOD_ID
 #define MOD_NAME	SSCOPMCE_MOD_NAME

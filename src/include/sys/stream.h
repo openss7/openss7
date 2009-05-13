@@ -78,16 +78,6 @@ __BEGIN_DECLS
 #ifdef _SVR4_SOURCE
 #include <sys/svr4/stream.h>
 #endif
-#ifdef _LFS_SOURCE
-#ifdef LIS
-#include <sys/lfs/stream.h>
-#endif
-#endif				/* _LFS_SOURCE */
-#ifdef _LIS_SOURCE
-#ifdef LFS
-#include <sys/lis/stream.h>
-#endif
-#endif				/* _LIS_SOURCE */
 #ifdef _MPS_SOURCE
 #include <sys/mps/stream.h>
 #endif

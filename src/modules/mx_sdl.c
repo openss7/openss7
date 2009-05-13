@@ -110,10 +110,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MX_SDL_MOD_ID		CONFIG_STREAMS_MX_SDL_MODID
 #define MX_SDL_MOD_NAME		CONFIG_STREAMS_MX_SDL_NAME
-#endif
 
 /*
  *  =========================================================================
@@ -2810,8 +2808,6 @@ MODULE_PARM_DESC(modid, "Module ID for the MX-SDL module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw mx_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &mx_sdlinfo,
@@ -2838,40 +2834,6 @@ mx_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-mx_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&mx_sdlinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&mx_sdlinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-mx_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&mx_sdlinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 mx_sdlinit(void)

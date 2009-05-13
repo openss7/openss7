@@ -91,14 +91,11 @@ MODULE_AUTHOR(SPX_CONTACT);
 MODULE_DESCRIPTION(SPX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SPX_DEVICE);
 MODULE_LICENSE(SPX_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-spx");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_SPX_MODULE */
 
 #ifndef CONFIG_STREAMS_SPX_NAME
 //#define CONFIG_STREAMS_SPX_NAME "spx"
@@ -113,39 +110,57 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_SPX_MAJOR must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-spx");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_SPX_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_SPX_MODID;
 
+#ifdef CONFIG_STREAMS_SPX_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver (0 for allocation).");
+#endif				/* CONFIG_STREAMS_SPX_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SPX_MODID));
 MODULE_ALIAS("streams-driver-spx");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_SPX_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_SPX_MAJOR;
 
+#ifdef CONFIG_STREAMS_SPX_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver (0 for allocation).");
+#endif				/* CONFIG_STREAMS_SPX_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR) "-*");
 MODULE_ALIAS("/dev/spx");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SPX_MAJOR));
 MODULE_ALIAS("/dev/streams/spx");
 MODULE_ALIAS("/dev/streams/spx/*");
 MODULE_ALIAS("/dev/streams/clone/spx");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info spx_minfo = {
 	.mi_idnum = CONFIG_STREAMS_SPX_MODID,
@@ -377,14 +392,17 @@ static struct qinit spx_wqinit = {
 	.qi_mstat = &spx_wstat,
 };
 
-static struct streamtab spx_info = {
+#ifdef CONFIG_STREAMS_SPX_MODULE
+static
+#endif
+struct streamtab spxinfo = {
 	.st_rdinit = &spx_rqinit,
 	.st_wrinit = &spx_wqinit,
 };
 
 static struct cdevsw spx_cdev = {
 	.d_name = CONFIG_STREAMS_SPX_NAME,
-	.d_str = &spx_info,
+	.d_str = &spxinfo,
 	.d_flag = D_CLONE | D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -395,7 +413,7 @@ static struct cdevsw spx_cdev = {
 static
 #endif
 int __init
-spx_init(void)
+spxinit(void)
 {
 	int err;
 
@@ -416,12 +434,12 @@ spx_init(void)
 static
 #endif
 void __exit
-spx_exit(void)
+spxexit(void)
 {
 	unregister_strdev(&spx_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_SPX_MODULE
-module_init(spx_init);
-module_exit(spx_exit);
+module_init(spxinit);
+module_exit(spxexit);
 #endif

@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  stream to effect an NPI interface to the MTP.  This module is intended to be used by application
  *  programs or by upper modules that expect an NPI connectionless service provider.
  */
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -115,10 +114,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MTP_NPI_MOD_ID		CONFIG_STREAMS_MTP_NPI_MODID
 #define MTP_NPI_MOD_NAME	CONFIG_STREAMS_MTP_NPI_NAME
-#endif
 
 #define MOD_ID		MTP_NPI_MOD_ID
 #define MOD_NAME	MTP_NPI_MOD_NAME

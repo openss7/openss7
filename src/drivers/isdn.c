@@ -105,13 +105,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define ISDN_DRV_ID		CONFIG_STREAMS_ISDN_MODID
 #define ISDN_DRV_NAME		CONFIG_STREAMS_ISDN_NAME
 #define ISDN_CMAJORS		CONFIG_STREAMS_ISDN_NMAJORS
 #define ISDN_CMAJOR_0		CONFIG_STREAMS_ISDN_MAJOR
 #define ISDN_UNITS		CONFIG_STREAMS_ISDN_NMINORS
-#endif
 
 /*
  *  =========================================================================
@@ -16952,7 +16950,6 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct cdevsw isdn_cdev = {
 	.d_name = DRV_NAME,
@@ -16982,42 +16979,6 @@ isdn_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-isdn_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &isdn_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-isdn_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 isdnterminate(void)

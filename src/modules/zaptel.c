@@ -119,10 +119,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define ZAP_MX_MOD_ID		CONFIG_STREAMS_ZAP_MX_MODID
 #define ZAP_MX_MOD_NAME		CONFIG_STREAMS_ZAP_MX_NAME
-#endif				/* LFS */
 
 /*
  *  =========================================================================

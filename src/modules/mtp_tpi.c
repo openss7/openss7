@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  stream to effect a TPI interface to the MTP.  This module is intended to be used by application
  *  programs or by upper modules that expect a TPI connectionless service provider.
  */
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 #define _SUN_SOURCE 1
@@ -112,10 +111,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MTP_TPI_MOD_ID		CONFIG_STREAMS_MTP_TPI_MODID
 #define MTP_TPI_MOD_NAME	CONFIG_STREAMS_MTP_TPI_NAME
-#endif
 
 #define MOD_ID		MTP_TPI_MOD_ID
 #define MOD_NAME	MTP_TPI_MOD_NAME

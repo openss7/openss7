@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-#define _LFS_SOURCE
 #define _SVR4_SOURCE
 #define _SUN_SOURCE
 
@@ -103,9 +102,7 @@ MODULE_LICENSE(SCTP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sctp");
-#ifdef LFS
 MODULE_ALIAS("streams-driver-sctp");
-#endif
 #endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
@@ -15115,13 +15112,11 @@ sctp_n_setstate(struct sctp *sp, t_scalar_t newstate)
 #define sctp_n_setstate(sp, newstate) do { sp->i_state = newstate; } while (0)
 #endif
 
-#ifdef LFS
 #define SCTP_N_DRV_ID	    CONFIG_STREAMS_SCTP_N_MODID
 #define SCTP_N_DRV_NAME	    CONFIG_STREAMS_SCTP_N_NAME
 #define SCTP_N_CMAJORS	    CONFIG_STREAMS_SCTP_N_NMAJORS
 #define SCTP_N_CMAJOR_0	    CONFIG_STREAMS_SCTP_N_MAJOR
 #define SCTP_N_UNITS	    CONFIG_STREAMS_SCTP_N_NMINORS
-#endif				/* LFS */
 
 #undef DRV_ID
 #undef DRV_NAME
@@ -17618,13 +17613,11 @@ module_param(n_major, uint, 0444);
 MODULE_PARM_DESC(n_major, "Major device number for STREAMS SCTP NPI driver (0 for allocation).");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(SCTP_N_DRV_ID));
 MODULE_ALIAS("streams-major-" __stringify(SCTP_N_CMAJOR_0));
 MODULE_ALIAS("/dev/streams/sctp_n");
 MODULE_ALIAS("/dev/streams/sctp_n/*");
 MODULE_ALIAS("/dev/streams/clone/sctp_n");
-#endif
 MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0) "-0");
@@ -17633,7 +17626,6 @@ MODULE_ALIAS("/dev/sctp_n");
 
 #endif				/* LINUX */
 
-#ifdef LFS
 /*
  *  =========================================================================
  *
@@ -17685,44 +17677,6 @@ sctp_n_term(void)
 #endif				/* WITH_NPI_IP_DRV */
 	unregister_strdev(&sctp_n_cdev, n_major);
 }
-#endif				/* LFS */
-
-#ifdef LIS
-/*
- *  =========================================================================
- *
- *  LiS Module Initialization
- *
- *  =========================================================================
- */
-STATIC void
-sctp_n_init(void)
-{
-	int err;
-
-	if ((err = lis_register_strdev(n_major, &sctp_n_info, UNITS, DRV_NAME)) < 0) {
-		cmn_err(CE_PANIC, "%s: cannot register driver\n", DRV_NAME);
-		return;
-	}
-	if (!n_major && err > 0)
-		n_major = err;
-	if ((err = lis_register_module_qlock_option(n_major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(n_major);
-		cmn_err(CE_PANIC, "%s: cannot register driver\n", DRV_NAME);
-		return;
-	}
-	return;
-}
-STATIC void
-sctp_n_term(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(n_major))) {
-		cmn_err(CE_PANIC, "%s: cannot unregister driver!\n", DRV_NAME);
-	}
-}
-#endif				/* LIS */
 
 /*
  *  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
@@ -17738,13 +17692,11 @@ sctp_n_term(void)
  *  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
  */
 
-#ifdef LFS
 #define SCTP_T_DRV_ID	    CONFIG_STREAMS_SCTP_T_MODID
 #define SCTP_T_DRV_NAME	    CONFIG_STREAMS_SCTP_T_NAME
 #define SCTP_T_CMAJORS	    CONFIG_STREAMS_SCTP_T_NMAJORS
 #define SCTP_T_CMAJOR_0	    CONFIG_STREAMS_SCTP_T_MAJOR
 #define SCTP_T_UNITS	    CONFIG_STREAMS_SCTP_T_NMINORS
-#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -29133,13 +29085,11 @@ module_param(t_major, uint, 0444);
 MODULE_PARM_DESC(t_major, "Major device number for STREAMS SCTP TPI driver (0 for allocation).");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(SCTP_T_DRV_ID));
 MODULE_ALIAS("streams-major-" __stringify(SCTP_T_CMAJOR_0));
 MODULE_ALIAS("/dev/streams/sctp_t");
 MODULE_ALIAS("/dev/streams/sctp_t/*");
 MODULE_ALIAS("/dev/streams/clone/sctp_t");
-#endif
 MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0) "-0");
@@ -29148,7 +29098,6 @@ MODULE_ALIAS("/dev/sctp_t");
 
 #endif				/* LINUX */
 
-#ifdef LFS
 /*
  *  =========================================================================
  *
@@ -29185,49 +29134,6 @@ sctp_t_term(void)
 {
 	unregister_strdev(&sctp_cdev, t_major);
 }
-#endif				/* LFS */
-
-#ifdef LIS
-/*
- *  =========================================================================
- *
- *  LiS Module Initialization
- *
- *  =========================================================================
- *  ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
- *  ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
- *  ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
- *  ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
- *  ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
- */
-STATIC void
-sctp_t_init(void)
-{
-	int err;
-
-	if ((err = lis_register_strdev(t_major, &sctp_t_info, UNITS, DRV_NAME)) < 0) {
-		cmn_err(CE_PANIC, "%s: cannot register driver\n", DRV_NAME);
-		return;
-	}
-	if (!t_major && err > 0)
-		t_major = err;
-	if ((err = lis_register_module_qlock_option(t_major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(t_major);
-		cmn_err(CE_PANIC, "%s: cannot register driver\n", DRV_NAME);
-		return;
-	}
-	return;
-}
-STATIC void
-sctp_t_term(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(t_major))) {
-		cmn_err(CE_PANIC, "%s: cannot unregister driver!\n", DRV_NAME);
-	}
-};
-#endif				/* LIS */
 
 /*
  *  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
@@ -29798,23 +29704,6 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 	return;
 }
 
-#ifdef LIS
-/**
- * sctp_free: - free routine for handling esballoc'ed skbuffs
- * @data: a pointer to the skbuff
- */
-STATIC streamscall __hot_get void
-sctp_free(caddr_t data)
-{
-	struct sk_buff *skb = (struct sk_buff *) data;
-
-	trace();
-	ensure(skb, return);
-	kfree_skb(skb);
-	return;
-}
-#endif
-
 #define COPY_INSTEAD_OF_ESBALLOC 1
 #undef COPY_INSTEAD_OF_ESBALLOC
 
@@ -29832,11 +29721,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	mblk_t *mp;
 	struct sctp *sp;
 	struct sctphdr *sh;
-
-#ifdef LIS
-	struct sctphdr *sh2;
-	frtn_t fr = { &sctp_free, (char *) skb };
-#endif
 
 #ifdef HAVE_KFUNC_NF_RESET
 	nf_reset(skb);
@@ -29885,23 +29769,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 		mp->b_rptr += (skb->data - skb->nh.raw);
 	}
 #else
-#ifdef LIS
-	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw), BPRI_MED, &fr)))
-		goto no_buffers;
-#ifndef LIS
-	/* tell others it is a socket buffer */
-	mp->b_datap->db_flag |= DB_SKBUFF;
-#endif
-	printd(("%s: mp %p ref count %d\n", __FUNCTION__, mp, mp->b_datap->db_ref));
-	mp->b_datap->db_type = M_DATA;
-	mp->b_wptr = mp->b_rptr + skb->len + (skb->data - skb->nh.raw);
-	/* trim the ip header */
-	mp->b_rptr += skb->h.raw - skb->nh.raw;
-	sh2 = (typeof(sh2)) mp->b_rptr;
-	if (sh->check != sh2->check)
-		goto sanity;
-	mp->b_rptr += sizeof(struct sctphdr);
-#else
 	if (!(mp = skballoc(skb, BPRI_MED)))
 		goto no_buffers;
 	// mp->b_rptr = skb->data;
@@ -29909,7 +29776,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	mp->b_datap->db_base = skb_network_header(skb);	/* important */
 	mp->b_datap->db_lim = mp->b_wptr;
 	mp->b_datap->db_size = mp->b_datap->db_lim - mp->b_datap->db_base;
-#endif
 #endif
 	/* we do the lookup before the checksum */
 	{
@@ -30002,12 +29868,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	sctp_put(sp);
 	ptrace(("ERROR: Flow Controlled\n"));
 	goto free_it;
-#ifdef LIS
-      sanity:
-	ptrace(("ERROR: Sanity check on esballoc sh->check = %08x, sh2->check = %08x\n", sh->check,
-		sh2->check));
-	goto free_it;
-#endif
       no_buffers:
 	ptrace(("ERROR: Couldn't allocate mblk\n"));
 	goto discard_it;

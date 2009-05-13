@@ -66,7 +66,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  protocol layer for SS7.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -140,13 +139,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define FIXME -1
 #endif
 
-#ifdef LFS
 #define TCAP_DRV_ID		CONFIG_STREAMS_TCAP_MODID
 #define TCAP_DRV_NAME		CONFIG_STREAMS_TCAP_NAME
 #define TCAP_CMAJORS		CONFIG_STREAMS_TCAP_NMAJORS
 #define TCAP_CMAJOR_0		CONFIG_STREAMS_TCAP_MAJOR
 #define TCAP_UNITS		CONFIG_STREAMS_TCAP_NMINORS
-#endif
 
 #ifndef TCAP_CMINOR_TRI
 #define TCAP_CMINOR_TRI		1
@@ -13693,8 +13690,6 @@ MODULE_PARM_DESC(major, "Device number for the TCAP driver. (0 for allocation.)"
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 static struct cdevsw tcap_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &tcinfo,
@@ -13723,42 +13718,6 @@ tcap_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-static int
-tcap_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &tcinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-static int
-tcap_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 static void __exit
 tcapterminate(void)

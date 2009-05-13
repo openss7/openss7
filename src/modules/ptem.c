@@ -159,10 +159,8 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for PTEM (0 for allocation).");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PTEM_MODID));
 MODULE_ALIAS("streams-module-ptem");
-#endif				/* LFS */
 #endif				/* MODULE_ALIAS */
 
 static struct module_info ptem_minfo = {
@@ -176,11 +174,6 @@ static struct module_info ptem_minfo = {
 
 static struct module_stat ptem_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat ptem_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-
-#if defined __LP64__ && defined LFS
-#   undef WITH_32BIT_CONVERSION
-#   define WITH_32BIT_CONVERSION 1
-#endif
 
 /*
  * Private Structure.
@@ -1015,9 +1008,6 @@ static struct streamtab ptem_info = {
 	.st_wrinit = &ptem_winit,
 };
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 static struct fmodsw ptem_fmod = {
 	.f_name = CONFIG_STREAMS_PTEM_NAME,
 	.f_str = &ptem_info,

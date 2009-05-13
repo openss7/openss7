@@ -89,8 +89,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  library to push "sockmod" to transform them into sockets.
  */
 
-#define _LFS_SOURCE
-
 #include <sys/os7/compat.h>
 
 #ifdef LINUX
@@ -124,24 +122,20 @@ MODULE_SUPPORTED_DEVICE(SOCKSYS_DEVICE);
 MODULE_LICENSE(SOCKSYS_LICENSE);
 #endif				/* CONFIG_STREAMS_SOCKSYS_MODULE */
 
-#ifdef LFS
 #define SOCKSYS_DRV_ID		CONFIG_STREAMS_SOCKSYS_MODID
 #define SOCKSYS_DRV_NAME	CONFIG_STREAMS_SOCKSYS_NAME
 #define SOCKSYS_CMAJORS		CONFIG_STREAMS_SOCKSYS_NMAJORS
 #define SOCKSYS_CMAJOR_0	CONFIG_STREAMS_SOCKSYS_MAJOR
 #define SOCKSYS_UNITS		CONFIG_STREAMS_SOCKSYS_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SOCKSYS_MODID));
 MODULE_ALIAS("streams-driver-socksys");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SOCKSYS_MAJOR));
 MODULE_ALIAS("/dev/streams/socksys");
 MODULE_ALIAS("/dev/streams/socksys/*");
 MODULE_ALIAS("/dev/streams/clone/socksys");
-#endif
 MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-0");
@@ -249,13 +243,6 @@ MODULE_STATIC struct streamtab socksys_info = {
 /*
  *  Primary data structures.
  */
-
-#ifdef LFS
-#ifdef __LP64__
-#  undef  WITH_32BIT_CONVERSION
-#  define WITH_32BIT_CONVERSION 1
-#endif
-#endif
 
 /* private structures */
 struct ssys {
@@ -676,14 +663,14 @@ socksys_put(queue_t *q, mblk_t *mp)
 		break;
 	case M_IOCTL:
 		ioc = (typeof(ioc)) mp->b_rptr;
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 		if (ioc->iocblk.ioc_flag == IOC_ILP32) {
 			/* XXX: following pointer conversion does not work on all architectures */
 			req_addr =
 			    (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->b_rptr;
 			req_size = sizeof(struct socksysreq32);
 		} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 		{
 			req_addr = (caddr_t) *(unsigned long *) dp->b_rptr;
 			req_size = sizeof(struct socksysreq);
@@ -747,7 +734,7 @@ socksys_put(queue_t *q, mblk_t *mp)
 		{
 			struct socksysreq sr = { {0,} };
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
 				struct socksysreq32 *req32 = (typeof(req32)) dp->b_rptr;
 
@@ -762,7 +749,7 @@ socksys_put(queue_t *q, mblk_t *mp)
 				sr.args[5] = (unsigned long) (uint32_t) req32->args[5];
 				sr.args[6] = (unsigned long) (uint32_t) req32->args[6];
 			} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 			{
 				err = -EFAULT;
 				if (!dp || dp->b_wptr < dp->b_rptr + sizeof(sr))
@@ -875,15 +862,9 @@ socksys_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
 	   however, that strconf-sh attempts to allocate module ids that are identical to the base
 	   major device number anyway. */
-#if defined LIS
-	if (cmajor != CMAJOR_0)
-		return (ENXIO);
-#endif
-#if defined LFS
 	/* Linux Fast-STREAMS always passes internal major device numbers (module ids) */
 	if (cmajor != DRV_ID)
 		return (ENXIO);
-#endif
 	/* sorry, you cannot open by minor device */
 	if (cminor > LAST_CMINOR) {
 		return (ENXIO);
@@ -942,20 +923,6 @@ socksys_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) crp;
 	(void) s;
 	_printd(("%s: closing character device %d:%d\n", DRV_NAME, s->dev.cmajor, s->dev.cminor));
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
-	goto skip_pop;
-      skip_pop:
 	/* make sure procedures are off */
 	qprocsoff(q);
 	ssys_free_priv(q);	/* free and unlink the structure */
@@ -1026,7 +993,6 @@ module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SOCKSYS driver. (0 for allocation.)");
 
-#ifdef LFS
 /*
  *  Linux Fast-STREAMS Registration
  */
@@ -1058,38 +1024,6 @@ ssys_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-#endif				/* LFS */
-
-#ifdef LIS
-/*
- *  Linux STREAMS Registration
- */
-STATIC __unlikely int
-ssys_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &socksys_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC __unlikely int
-ssys_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 ssysterminate(void)

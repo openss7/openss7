@@ -469,8 +469,6 @@ _put_filp = (typeof(_put_filp)) HAVE_PUT_FILP_ADDR;
 }
 #endif
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(do_spipe);
-#endif
 
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */

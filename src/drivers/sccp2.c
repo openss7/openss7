@@ -68,7 +68,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * SCCP.
  */
 
-#define _LFS_SOURCE
 #define _MPS_SOURCE
 #define _SVR4_SOURCE
 

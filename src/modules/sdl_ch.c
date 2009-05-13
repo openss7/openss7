@@ -58,9 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-#define _MPS_SOURCE 1
-#define _LFS_SOURCE 1
-
 /*
  * `This is the SDL-CH STREAMS pushable module.  Its purpose is to convert from a general purpose
  * Channel Interface (CHI) Stream to an SS7-specific Signalling Data Link (SDL) Stream.  For the
@@ -72,8 +69,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * Another more direct approach is to have a SDT module that pushes directly over a CH Stream
  * instead of over an SDL Stream.  Nevertheless, this module can be useful for testing.
  */
-#define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
+#define _MPS_SOURCE	1
 
 #include <sys/os7/compat.h>
 
@@ -114,10 +111,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDL_MOD_ID	CONFIG_STREAMS_SDL_MODID
 #define SDL_MOD_NAME	CONFIG_STREAMS_SDL_NAME
-#endif				/* LFS */
 
 #ifndef SDL_MOD_NAME
 #define SDL_MOD_NAME	"sdl"
@@ -3320,10 +3315,6 @@ STATIC struct streamtab sdlinfo = {
 	.st_rdinit = &sdl_rinit,	/* Upper read queue */
 	.st_wrinit = &sdl_winit,	/* Upper write queue */
 };
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw sdl_fmod = {
 	.f_name = MOD_NAME,

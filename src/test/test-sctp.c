@@ -636,11 +636,7 @@ put_and_get(int fd, int flags)
 	get_only(fd, 10);
 }
 
-#ifdef LFS
 static const char sctpname[] = "/dev/streams/clone/sctp_n";
-#else
-static const char sctpname[] = "/dev/sctp_n";
-#endif
 
 int
 sctp_n_open(void)

@@ -93,7 +93,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  driver.  I will probably abandon this module.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -158,10 +157,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define M3UA_AS_MOD_ID		CONFIG_STREAMS_M3UA_AS_MODID
 #define M3UA_AS_MOD_NAME	CONFIG_STREAMS_M3UA_AS_NAME
-#endif
 
 #define MOD_ID	    M3UA_AS_MOD_ID
 #define MOD_NAME    M3UA_AS_MOD_NAME
@@ -5493,10 +5490,6 @@ static struct streamtab m3ua_asinfo = {
 	.st_rdinit = &mtp_rinit,	/* Upper read queue */
 	.st_wrinit = &mtp_winit,	/* Upper write queue */
 };
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 
 static struct fmodsw m3_fmod = {
 	.f_name = MOD_NAME,

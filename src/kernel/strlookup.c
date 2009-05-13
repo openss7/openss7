@@ -150,19 +150,13 @@ struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here *
 struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
 #endif
 
-#if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL_GPL(cdevsw_lock);
 EXPORT_SYMBOL_GPL(cdevsw_list);
-#endif
-#if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL_GPL(fmodsw_lock);
 EXPORT_SYMBOL_GPL(fmodsw_list);
-#endif
-#if	defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 #if 0
 EXPORT_SYMBOL_GPL(cminsw_lock);
 EXPORT_SYMBOL_GPL(cminsw_list);
-#endif
 #endif
 
 struct list_head fmodsw_hash[STRMOD_HASH_SIZE] __cacheline_aligned = { {NULL,}, };
@@ -173,11 +167,9 @@ int cdev_count = 0;
 int fmod_count = 0;
 int cmin_count = 0;
 
-#if defined CONFIG_STREAMS_SC_MODULE || !defined CONFIG_STREAMS_SC
 EXPORT_SYMBOL_GPL(cdev_count);
 EXPORT_SYMBOL_GPL(fmod_count);
 EXPORT_SYMBOL_GPL(cmin_count);
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -1073,9 +1065,7 @@ cdev_match(const char *name)
 	return cdev_find(root);
 }
 
-#if defined CONFIG_STREAMS_NSDEV_MODULE || !defined CONFIG_STREAMS_NSDEV
 EXPORT_SYMBOL_GPL(cdev_match);
-#endif
 
 /**
  *  fmod_find: - get a reference to a STREAMS module

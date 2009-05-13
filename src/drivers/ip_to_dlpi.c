@@ -107,13 +107,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define IP2XINET_DRV_ID		CONFIG_STREAMS_IP2XINET_MODID
 #define IP2XINET_DRV_NAME	CONFIG_STREAMS_IP2XINET_NAME
 #define IP2XINET_CMAJORS	CONFIG_STREAMS_IP2XINET_NMAJORS
 #define IP2XINET_CMAJOR_0	CONFIG_STREAMS_IP2XINET_MAJOR
 #define IP2XINET_UNITS		CONFIG_STREAMS_IP2XINET_NMINORS
-#endif				/* LFS */
 
 #define DRV_ID		IP2XINET_DRV_ID
 #define DRV_NAME	IP2XINET_DRV_NAME
@@ -361,18 +359,6 @@ ip2xinet_close(queue_t *q, int oflag, cred_t *credp)
 {
 	(void) oflag;
 	(void) credp;
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-#endif				/* defined LIS */
 	qprocsoff(q);
 	spin_lock(ip2xinet_lock);
 	ip2xinet_numopen = 0;
@@ -1465,7 +1451,6 @@ module_param(major, uint, 0444);
 MODULE_PARM_DESC(major, "Major device number for IP2XINET driver (0 for allocation).");
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct cdevsw ip2xinet_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ip2xinet_info,
@@ -1502,93 +1487,3 @@ module_init(ip2xinet_init);
 module_exit(ip2xinet_exit);
 #endif
 
-#else
-#ifdef LIS
-
-STATIC int ip2xinet_initialized = 0;
-STATIC void
-ip2xinet_init(void)
-{
-	int err;
-
-	if (ip2xinet_initialized != 0)
-		return;
-	cmn_err(CE_NOTE, IP2XINET_BANNER);	/* console splash */
-	if (!(ip2xinet_lock = kmem_alloc(sizeof(spinlock_t), KM_NOSLEEP))) {
-		ip2xinet_initialized = -ENOMEM;
-		return;
-	}
-	spin_lock_init(ip2xinet_lock);
-	if (!(err = ip2xinetinit())) {
-		kmem_free((void *) ip2xinet_lock, sizeof(*ip2xinet_lock));
-		ip2xinet_lock = NULL;
-		ip2xinet_initialized = err;
-		return;
-	}
-	if ((err = lis_register_strdev(major, &ip2xinet_info, UNITS, DRV_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: Cannot register major %d\n", DRV_NAME, major);
-		kmem_free((void *) ip2xinet_lock, sizeof(*ip2xinet_lock));
-		ip2xinet_lock = NULL;
-		ip2xinet_initialized = err;
-		return;
-	}
-	ip2xinet_initialized = 1;
-	if (major == 0 && err > 0) {
-		int clonemajor = lis_clone_major();
-
-		major = err;
-		/* Remove the old /dev/ip2xinet node.  We are about to create a new one, and that
-		   call may fail if the old one is still there. We don't actually care if the
-		   unlink call fails, just as long as the node isn't there. */
-		lis_unlink("/dev/ip2xinet");
-		if ((err =
-		     lis_mknod("/dev/ip2xinet", 0666 | S_IFCHR, MKDEV(clonemajor, major))) < 0) {
-			kmem_free((void *) ip2xinet_lock, sizeof(*ip2xinet_lock));
-			ip2xinet_lock = NULL;
-			lis_unregister_strdev(major);
-			ip2xinet_initialized = err;
-			return;
-		}
-		ip2xinet_initialized = 2;
-	}
-	return;
-}
-STATIC void
-ip2xinet_terminate(void)
-{
-	int err;
-
-	if (ip2xinet_initialized <= 0)
-		return;
-	if (major) {
-		if ((err = lis_unregister_strdev(major)) < 0)
-			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", DRV_NAME, major);
-		major = 0;
-	}
-	cleanup_linuxip();
-	if (ip2xinet_initialized == 2)
-		lis_unlink("/dev/ip2xinet");
-	kmem_free((void *) ip2xinet_lock, sizeof(*ip2xinet_lock));
-	ip2xinet_lock = NULL;
-	ip2xinet_initialized = 0;
-	return;
-}
-
-int
-init_module(void)
-{
-	(void) major;
-	ip2xinet_init();
-	if (ip2xinet_initialized < 0)
-		return ip2xinet_initialized;
-	return (0);
-}
-
-void
-cleanup_module(void)
-{
-	return ip2xinet_terminate();
-}
-
-#endif
-#endif

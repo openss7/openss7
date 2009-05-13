@@ -136,7 +136,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif
 
-#ifdef LFS
 #define TP_DRV_ID	CONFIG_STREAMS_TP_MODID
 #define TP_MOD_ID	CONFIG_STREAMS_TP_MODID
 #define TP_DRV_NAME	CONFIG_STREAMS_TP_NAME
@@ -144,11 +143,9 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define TP_CMAJORS	CONFIG_STREAMS_TP_NMAJOR
 #define TP_CMAJOR_0	CONFIG_STREAMS_TP_MAJOR
 #define TP_UNITS	CONFIG_STREAMS_TP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TP_MODID));
 MODULE_ALIAS("streams-driver-tp");
 MODULE_ALIAS("streams-module-tp");
@@ -156,7 +153,6 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TP_MAJOR));
 MODULE_ALIAS("/dev/streams/tp");
 MODULE_ALIAS("/dev/streams/tp/*");
 MODULE_ALIAS("/dev/streams/clone/tp");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
@@ -4878,17 +4874,10 @@ tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	case CLONEOPEN:
 	{
 	      drvopen:
-#ifdef LIS
-		if (cmajor != TP_CMAJOR_0) {
-			return (ENXIO);
-		}
-#endif				/* LIS */
-#ifdef LFS
 		/* Linux Fast-STREAMS always passes internal major device numbers (modules ids) */
 		if (cmajor != TP_DRV_ID) {
 			return (ENXIO);
 		}
-#endif				/* LFS */
 		if (cminor > LAST_CMINOR) {
 			return (ENXIO);
 		}
@@ -4954,18 +4943,6 @@ tp_qclose(queue_t *q, int oflags, cred_t *crp)
 	(void) tp;
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, tp->u.dev.cmajor,
 		tp->u.dev.cminor));
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
 	goto skip_pop;
       skip_pop:
 	qprocsoff(q);

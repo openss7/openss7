@@ -132,7 +132,6 @@ __SVR4_EXTERN pl_t spl7(void);
 
 typedef int processorid_t;
 
-#ifdef LFS
 __SVR4_EXTERN_INLINE toid_t
 dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
 {
@@ -143,7 +142,6 @@ itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
 {
 	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
 }
-#endif
 
 __SVR4_EXTERN_INLINE major_t
 getemajor(dev_t dev)

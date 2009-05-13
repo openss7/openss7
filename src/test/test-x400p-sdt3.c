@@ -188,11 +188,7 @@ static const char *lpkgname = "SS7 MTP Signalling Terminal";
 static const char *lstdname = "Q.702/ANSI T1.111.2/JQ.702";
 static const char *sstdname = "Q.781";
 static const char *shortname = "MTP2";
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/x400p-sl";
-#else
-static char devname[256] = "/dev/x400p-sl";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

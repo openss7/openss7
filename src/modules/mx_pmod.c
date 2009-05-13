@@ -65,7 +65,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  the STREAMS-based pipe will present the MXI interface.
  */
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 #define _SUN_SOURCE 1
@@ -109,10 +108,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MX_PMOD_MOD_ID CONFIG_STREAMS_MX_PMOD_MODID
 #define MX_PMOD_MOD_NAME CONFIG_STREAMS_MX_PMOD_NAME
-#endif				/* LFS */
 
 #ifndef MX_PMOD_MOD_NAME
 #define MX_PMOD_MOD_NAME "mx-pmod"
@@ -2911,10 +2908,6 @@ MODULE_PARM(modid, "h");
 module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for MX-PMOD module. (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw mx_fmod = {
 	.f_name = MOD_NAME,

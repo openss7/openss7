@@ -59,10 +59,6 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
-#ifndef BIG_STATIC_STH
-#define BIG_STATIC_STH
-#endif
-
 // defined in sys/strconf.h
 //extern int autopush_add(struct strapush *sap);
 //extern int autopush_del(struct strapush *sap);
@@ -72,7 +68,7 @@
 //extern int apush_get(struct strapush *sap);
 //extern int apush_vml(struct str_list *slp);
 
-BIG_STATIC_STH int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp,
+int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp,
 					     int oflag, int sflag, cred_t *crp);
 
 #endif				/* __LOCAL_STRSAD_H__ */

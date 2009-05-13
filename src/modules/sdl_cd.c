@@ -71,7 +71,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  instead of over an SDL Stream.  Nevertheless, this module can be useful for testing.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -115,10 +114,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDL_CD_MOD_ID		CONFIG_STREAMS_SDL_CD_MODID
 #define SDL_CD_MON_NAME		CONFIG_STREAMS_SDL_CD_NAME
-#endif
 
 #ifndef SDL_CD_MOD_ID
 #define SDL_CD_MOD_ID		"sdl-cd"
@@ -2723,10 +2720,6 @@ static struct streamtab sdl_cdinfo = {
 	.st_rdinit = &sdl_rinit,
 	.st_wrinit = &sdl_winit,
 };
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw *sdl_fmod = {
 	.f_name = MOD_NAME,

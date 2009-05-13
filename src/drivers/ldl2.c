@@ -110,7 +110,6 @@ MODULE_LICENSE(LDL_LICENSE);
 MODULE_ALIAS("streams-ldl");
 MODULE_ALIAS("streams-link-driver");
 MODULE_ALIAS("streams-link-dri");
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LDL_MODID));
 MODULE_ALIAS("streams-driver-link-driver");
 MODULE_ALIAS("streams-driver-link-dri");
@@ -118,7 +117,6 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LDL_MAJOR));
 MODULE_ALIAS("/dev/streams/link-dri");
 MODULE_ALIAS("/dev/streams/link-dri/*");
 MODULE_ALIAS("/dev/streams/clone/link-dri");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-0");
@@ -130,13 +128,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define LDL_DRV_ID	CONFIG_STREAMS_LDL_MODID
 #define LDL_DRV_NAME	CONFIG_STREAMS_LDL_NAME
 #define LDL_CMAJORS	CONFIG_STREAMS_LDL_NMAJORS
 #define LDL_CMAJOR_0	CONFIG_STREAMS_LDL_MAJOR
 #define LDL_UNITS	CONFIG_STREAMS_LDL_NMINORS
-#endif				/* LFS */
 
 #define DRV_ID		LDL_DRV_ID
 #define DRV_NAME	LDL_DRV_NAME

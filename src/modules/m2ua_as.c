@@ -84,7 +84,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  into SL-primitives and set upstream.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -154,10 +153,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define M2UA_AS_MOD_ID		CONFIG_STREAMS_M2UA_AS_MODID
 #define M2UA_AS_MOD_NAME	CONFIG_STREAMS_M2UA_AS_NAME
-#endif
 
 #define MOD_ID	    M2UA_AS_MOD_ID
 #define MOD_NAME    M2UA_AS_MOD_NAME
@@ -5069,10 +5066,6 @@ static struct streamtab m2ua_asinfo = {
 	.st_rdinit = &sl_rinit,		/* Upper read queue */
 	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 
 static struct fmodsw m2_fmod = {
 	.f_name = MOD_NAME,

@@ -415,10 +415,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	return (err);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
-         || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
 EXPORT_SYMBOL_GPL(spec_reparent);
-#endif
 
 streams_fastcall int
 spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
@@ -452,10 +449,7 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 	return (err > 0 ? -err : err);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
-         || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
 EXPORT_SYMBOL_GPL(spec_open);
-#endif
 
 /* 
  *  =========================================================================

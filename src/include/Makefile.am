@@ -409,12 +409,6 @@ nobase_pkginclude_HEADERS = \
 	sys/irix/ddi.h \
 	sys/irix/strconf.h \
 	sys/irix/stream.h \
-	sys/lfs/ddi.h \
-	sys/lfs/strconf.h \
-	sys/lfs/stream.h \
-	sys/lis/ddi.h \
-	sys/lis/strconf.h \
-	sys/lis/stream.h \
 	sys/mac/ddi.h \
 	sys/mac/strconf.h \
 	sys/mac/stream.h \

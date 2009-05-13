@@ -59,7 +59,6 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _SVR4_SOURCE
-#define _LIS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -83,11 +82,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #endif
 
 #include <sys/ldl.h>
-
-#undef WITH_32BIT_CONVERSION
-#if defined LFS && defined __LP64__
-#define WITH_32BIT_CONVERSION 1
-#endif
 
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
@@ -123,17 +117,14 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define LDL_DRV_ID	CONFIG_STREAMS_LDL_MODID
 #define LDL_DRV_NAME	CONFIG_STREAMS_LDL_NAME
 #define LDL_CMAJORS	CONFIG_STREAMS_LDL_NMAJORS
 #define LDL_CMAJOR_0	CONFIG_STREAMS_LDL_MAJOR
 #define LDL_UNITS	CONFIG_STREAMS_LDL_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LDL_MODID));
 MODULE_ALIAS("streams-driver-link-driver");
 MODULE_ALIAS("streams-driver-link-dri");
@@ -141,7 +132,6 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LDL_MAJOR));
 MODULE_ALIAS("/dev/streams/link-dri");
 MODULE_ALIAS("/dev/streams/link-dri/*");
 MODULE_ALIAS("/dev/streams/clone/link-dri");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-0");
@@ -777,7 +767,7 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 
 	saptype = htons(saptype);
 
-	if ((sap = ALLOC(sizeof(*sap))) == NULL)
+	if ((sap = kmem_alloc(sizeof(*sap), KM_NOSLEEP)) == NULL)
 		return -1;
 	++sap_n_alloc;
 	memset(sap, 0, sizeof *sap);
@@ -805,8 +795,8 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		if (pt == NULL) {
 			if (npt == NULL) {
 				spin_unlock(&first_pt_lock);
-				if ((npt = ALLOC(sizeof(*pt))) == NULL) {
-					FREE(sap);
+				if ((npt = kmem_alloc(sizeof(*pt), KM_NOSLEEP)) == NULL) {
+					kmem_free(sap, sizeof(*sap));
 					sap_n_alloc--;
 					return -1;
 				}
@@ -818,7 +808,7 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 				first_pt = pt = npt;
 			}
 		} else if (npt != NULL) {
-			FREE(npt);
+			kmem_free(npt, sizeof(*npt));
 			npt = NULL;
 			pt_n_alloc--;
 		}
@@ -912,7 +902,7 @@ sap_destroy(struct dl *dl, struct sap *sap)
 		spin_unlock(&first_pt_lock);
 		dev_remove_pack(&pt->pt);
 		pt->magic = 0;
-		FREE(pt);
+		kmem_free(pt, sizeof(*pt));
 		--pt_n_alloc;
 	} else {
 		spin_unlock(&first_pt_lock);
@@ -963,7 +953,7 @@ sap_destroy(struct dl *dl, struct sap *sap)
 	sap->dl = NULL;
 	sap->pt = NULL;
 	sap->magic = 0;
-	FREE(sap);
+	kmem_free(sap, sizeof(*sap));
 	--sap_n_alloc;
 
 	SPLX(psw);
@@ -1155,7 +1145,7 @@ ndev_get(dl_ulong ppa)
 	ASSERT(ppa == i);
 
 	if ((ndev = ndev_find(dev)) == NULL) {
-		if ((ndev = ALLOC(sizeof(*ndev))) == NULL)
+		if ((ndev = kmem_alloc(sizeof(*ndev), KM_NOSLEEP)) == NULL)
 			return NULL;
 		++ndev_n_alloc;
 		memset(ndev, 0, sizeof *ndev);
@@ -1209,7 +1199,7 @@ ndev_free(struct ndev *ndev)
 		ndev->tx_congest_timer = 0;
 	}
 	ndev->magic = 0;
-	FREE(ndev);
+	kmem_free(ndev, sizeof(*ndev));
 	--ndev_n_alloc;
 }
 
@@ -4237,7 +4227,7 @@ ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp);	/* No M_DATA block for flags */
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (iocp->ioc_flag == IOC_ILP32) {
 		struct ldl_flags_ioctl32 *flg;
 
@@ -4256,7 +4246,7 @@ ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 			flg->flags = dl->flags;
 		}
 	} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 	{
 		struct ldl_flags_ioctl *flg;
 
@@ -4359,14 +4349,14 @@ ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	memcpy(dp->b_rptr, dl->ndev->dev->name, usize);
 	dp->b_wptr += usize;
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (iocp->ioc_flag == IOC_ILP32) {
 		if (iocp->ioc_count == TRANSPARENT) {
 			uaddr = (caddr_t) (unsigned long) (uint32_t)
 			    *(unsigned long *) mp->b_cont->b_rptr;
 		}
 	} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 	{
 		if (iocp->ioc_count == TRANSPARENT) {
 			uaddr = (caddr_t)
@@ -4406,7 +4396,7 @@ ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 
 	ASSERT(iocp->ioc_cmd == LDL_GETGSTATS);
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (iocp->ioc_flag == IOC_ILP32) {
 		struct ldl_gstats_ioctl32 *out;
 
@@ -4443,7 +4433,7 @@ ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 			    *(unsigned long *) mp->b_cont->b_rptr;
 		}
 	} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 	{
 		struct ldl_gstats_ioctl *out;
 
@@ -4510,7 +4500,7 @@ ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
 		return ioc_nak(dl, mp);	/* No M_DATA block for flags */
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (iocp->ioc_flag == IOC_ILP32) {
 		if (iocp->ioc_count == TRANSPARENT) {
 			ldl_debug_mask = *(unsigned long *) mp->b_cont->b_rptr;
@@ -4520,7 +4510,7 @@ ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 			ldl_debug_mask = *(uint32_t *) mp->b_cont->b_rptr;
 		}
 	} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 	{
 		if (iocp->ioc_count == TRANSPARENT) {
 			ldl_debug_mask = *(unsigned long *) mp->b_cont->b_rptr;
@@ -4788,7 +4778,7 @@ do_iocdata(struct dl *dl, mblk_t *mp)
 	}
 	switch (iocp->ioc_cmd) {
 	case LDL_SETFLAGS:
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 		if (cp->cp_flag == IOC_ILP32) {
 			struct ldl_flags_ioctl32 *flg;
 			psw_t psw;
@@ -4800,7 +4790,7 @@ do_iocdata(struct dl *dl, mblk_t *mp)
 			SPLX(psw);
 			flg->flags = dl->flags;
 		} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 		{
 			struct ldl_flags_ioctl *flg;
 			psw_t psw;
@@ -4977,7 +4967,6 @@ module_param(major, uint, 0444);
 MODULE_PARM_DESC(major, "Major device number for LDL driver (0 for allocation).");
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct cdevsw ldl_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ldl_info,
@@ -5055,63 +5044,4 @@ ldl_exit(void)
 #ifdef CONFIG_STREAMS_LDL_MODULE
 module_init(ldl_init);
 module_exit(ldl_exit);
-#endif
-
-#else
-#ifdef LIS
-
-STATIC int ldl_initialized = 0;
-STATIC void
-ldl_init(void)
-{
-	int err;
-
-	if (ldl_initialized != 0)
-		return;
-	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	if ((err = lis_register_strdev(major, &ldl_info, UNITS, DRV_NAME)) < 0) {
-		cmn_err(CE_WARN, "%s: Cannot register major %d\n", DRV_NAME, major);
-		ldl_initialized = err;
-		return;
-	}
-	ldl_initialized = 1;
-	if (major == 0 && err > 0) {
-		major = err;
-		ldl_initialized = 2;
-	}
-	return;
-}
-STATIC void
-ldl_terminate(void)
-{
-	int err;
-
-	if (ldl_initialized <= 0)
-		return;
-	if (major) {
-		if ((err = lis_unregister_strdev(major)) < 0)
-			cmn_err(CE_PANIC, "%s: Cannot unregister major %d\n", DRV_NAME, major);
-		major = 0;
-	}
-	ldl_initialized = 0;
-	return;
-}
-
-int
-init_module(void)
-{
-	(void) major;
-	ldl_init();
-	if (ldl_initialized < 0)
-		return ldl_initialized;
-	return (0);
-}
-
-void
-cleanup_module(void)
-{
-	return ldl_terminate();
-}
-
-#endif
 #endif

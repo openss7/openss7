@@ -94,14 +94,11 @@ MODULE_AUTHOR(CONNLD_CONTACT);
 MODULE_DESCRIPTION(CONNLD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CONNLD_DEVICE);
 MODULE_LICENSE(CONNLD_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-connld");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_CONNLD_MODULE */
 
 #ifndef CONFIG_STREAMS_CONNLD_NAME
 //#define CONFIG_STREAMS_CONNLD_NAME "connld"
@@ -112,21 +109,32 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_CONNLD_MODID must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-connld");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_CONNLD_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_CONNLD_MODID;
 
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for CONNLD.");
+#endif				/* CONFIG_STREAMS_CONNLD_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CONNLD_MODID));
 MODULE_ALIAS("streams-module-connld");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info connld_minfo = {
 	.mi_idnum = CONFIG_STREAMS_CONNLD_MODID,
@@ -178,14 +186,17 @@ static struct qinit connld_qinit = {
 	.qi_mstat = &connld_mstat,
 };
 
-static struct streamtab connld_info = {
+#ifdef CONFIG_STREAMS_CONNLD_MODULE
+static
+#endif
+struct streamtab connldinfo = {
 	.st_rdinit = &connld_qinit,
 	.st_wrinit = &connld_qinit,
 };
 
 static struct fmodsw connld_fmod = {
 	.f_name = CONFIG_STREAMS_CONNLD_NAME,
-	.f_str = &connld_info,
+	.f_str = &connldinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
@@ -194,7 +205,7 @@ static struct fmodsw connld_fmod = {
 static
 #endif
 int __init
-connld_init(void)
+connldinit(void)
 {
 	int err;
 
@@ -215,7 +226,7 @@ connld_init(void)
 static
 #endif
 void __exit
-connld_exit(void)
+connldexit(void)
 {
 	int err;
 
@@ -225,6 +236,6 @@ connld_exit(void)
 };
 
 #ifdef CONFIG_STREAMS_CONNLD_MODULE
-module_init(connld_init);
-module_exit(connld_exit);
+module_init(connldinit);
+module_exit(connldexit);
 #endif

@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * For the lower interface boundary, see DLPI.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -105,10 +104,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SSCOP_MOD_ID	CONFIG_STREAMS_SSCOP_MODID
 #define SSCOP_MOD_NAME	CONFIG_STREAMS_SSCOP_NAME
-#endif				/* LFS */
 
 #define MOD_ID		SSCOP_MOD_ID
 #define MOD_NAME	SSCOP_MOD_NAME

@@ -550,7 +550,4 @@ typdef struct llc2GetConStats {
 
 #endif				/* _SUN_SOURCE */
 
-#ifdef _LFS_SOURCE
-#endif				/* _LFS_SOURCE */
-
 #endif				/* __SS7_DLPI_IOCTL_H__ */

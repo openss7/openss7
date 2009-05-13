@@ -265,10 +265,8 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PCKT_MODID));
 MODULE_ALIAS("streams-module-pckt");
-#endif
 #endif
 
 static struct module_info pckt_minfo = {
@@ -282,11 +280,6 @@ static struct module_info pckt_minfo = {
 
 static struct module_stat pckt_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat pckt_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-
-#if defined __LP64__ && defined LFS
-#  undef WITH_32BIT_CONVERSION
-#  define WITH_32BIT_CONVERSION 1
-#endif
 
 /*
  *  Private structure.
@@ -582,9 +575,6 @@ static struct streamtab pckt_info = {
 	.st_wrinit = &pckt_wqinit,
 };
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 static struct fmodsw pckt_fmod = {
 	.f_name = CONFIG_STREAMS_PCKT_NAME,
 	.f_str = &pckt_info,

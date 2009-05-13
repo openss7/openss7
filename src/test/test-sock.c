@@ -123,11 +123,7 @@ static const char *lstdname = "UNIX SVID/ABI";
 static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/sock";
-#else
-static char devname[256] = "/dev/sock";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

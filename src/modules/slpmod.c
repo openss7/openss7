@@ -67,7 +67,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  signalling links for building virtual SS7 networks within a host.
  */
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 #define _SUN_SOURCE 1
@@ -113,10 +112,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SLPMOD_MOD_ID		CONFIG_STREAMS_SLPMOD_MODID
 #define SLPMOD_MOD_NAME		CONFIG_STREAMS_SLPMOD_NAME
-#endif				/* LFS */
 
 #ifndef SLPMOD_MOD_NAME
 #define SLPMOD_MOD_NAME "sl-pmod"
@@ -4185,10 +4182,6 @@ MODULE_PARM(modid, "h");
 module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for SLPMOD module.  (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,

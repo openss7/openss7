@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
  *  module.  Its purpose is primarily for testing and for serviing as an example of the skeleton of
@@ -100,14 +99,11 @@ MODULE_AUTHOR(NULLMOD_CONTACT);
 MODULE_DESCRIPTION(NULLMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(NULLMOD_DEVICE);
 MODULE_LICENSE(NULLMOD_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-nullmod");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_NULLMOD_MODULE */
 
 #ifndef CONFIG_STREAMS_NULLMOD_NAME
 #error "CONFIG_STREAMS_NULLMOD_NAME must be defined."
@@ -116,19 +112,32 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_NULLMOD_MODID must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-nullmod");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_NULLMOD_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_NULLMOD_MODID;
 
+#ifdef CONFIG_STREAMS_NULLMOD_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for NULLMOD.");
+#endif				/* CONFIG_STREAMS_NULLMOD_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULLMOD_MODID));
 MODULE_ALIAS("streams-module-nullmod");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 STATIC struct module_info nullmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULLMOD_MODID,
@@ -380,14 +389,17 @@ STATIC struct qinit nullmod_winit = {
 	.qi_mstat = &nullmod_wstat,
 };
 
-STATIC struct streamtab nullmod_info = {
+#ifdef CONFIG_STREAMS_NULLMOD_MODULE
+STATIC
+#endif
+struct streamtab nullmodinfo = {
 	.st_rdinit = &nullmod_rinit,
 	.st_wrinit = &nullmod_winit,
 };
 
 STATIC struct fmodsw nullmod_fmod = {
 	.f_name = CONFIG_STREAMS_NULLMOD_NAME,
-	.f_str = &nullmod_info,
+	.f_str = &nullmodinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
@@ -439,7 +451,7 @@ nullmod_register_ioctl32(void)
 STATIC
 #endif
 int __init
-nullmod_init(void)
+nullmodinit(void)
 {
 	int err;
 
@@ -464,13 +476,13 @@ nullmod_init(void)
 STATIC
 #endif
 void __exit
-nullmod_exit(void)
+nullmodexit(void)
 {
 	unregister_strmod(&nullmod_fmod);
 	nullmod_unregister_ioctl32();
 }
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
-module_init(nullmod_init);
-module_exit(nullmod_exit);
+module_init(nullmodinit);
+module_exit(nullmodexit);
 #endif

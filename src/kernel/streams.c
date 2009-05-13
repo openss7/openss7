@@ -66,16 +66,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define BIG_COMPILE_STREAMS 1
 
-#ifdef CONFIG_STREAMS_STH
-#define BIG_STATIC_STH STATIC
-#define BIG_STATIC_INLINE_STH STATIC streams_inline
-#endif
-
-#ifdef CONFIG_STREAMS_CLONE
-#define BIG_STATIC_CLONE STATIC
-#define BIG_STATIC_INLINE_CLONE STATIC streams_inline
-#endif
-
 #define __STRSCHD_EXTERN_INLINE	streams_inline streams_fastcall __unlikely
 #define __STRUTIL_EXTERN_INLINE streams_inline streams_fastcall __unlikely
 
@@ -91,16 +81,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #undef ident
 #define ident ident_strutil
 #include "strutil.c"
-#ifdef CONFIG_STREAMS_STH
-#undef ident
-#define ident ident_sth
-#include "src/modules/sth.c"
-#endif
-#ifdef CONFIG_STREAMS_CLONE
-#undef ident
-#define ident ident_clone
-#include "src/drivers/clone.c"
-#endif
 #undef ident
 #define ident ident_strsad
 #include "strsad.c"

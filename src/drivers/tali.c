@@ -103,13 +103,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TALI_DRV_ID	CONFIG_STREAMS_TALI_MODID
 #define TALI_DRV_NAME	CONFIG_STREAMS_TALI_NAME
 #define TALI_CMAJORS	CONFIG_STREAMS_TALI_NMAJORS
 #define TALI_CMAJOR_0	CONFIG_STREAMS_TALI_MAJOR
 #define TALI_UNITS	CONFIG_STREAMS_TALI_UNITS
-#endif
 
 #define TALI_MTP_CMINOR		1
 #define TALI_SCCP_CMINOR	2
@@ -482,8 +480,6 @@ MODULE_PARM_DESC(major, "Device number for the TALI driver. (0 for allocation.)"
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw tali_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &taliinfo,
@@ -512,42 +508,6 @@ tali_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-tali_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &taliinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-tali_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 taliterminate(void)

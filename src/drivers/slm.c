@@ -125,13 +125,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SLM_DRV_ID		CONFIG_STREAMS_SLM_MODID
 #define SLM_DRV_NAME		CONFIG_STREAMS_SLM_NAME
 #define SLM_CMAJORS		CONFIG_STREAMS_SLM_NMAJORS
 #define SLM_CMAJOR_0		CONFIG_STREAMS_SLM_MAJOR
 #define SLM_UNITS		CONFIG_STREAMS_SLM_NMINORS
-#endif
 
 /*
  *  =========================================================================

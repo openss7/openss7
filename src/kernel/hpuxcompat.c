@@ -130,7 +130,6 @@ __HPUX_EXTERN lock_t *get_sleep_lock(caddr_t event)
 
 EXPORT_SYMBOL_GPL(get_sleep_lock);	/* hpux/ddi.h */
 
-#ifdef LFS
 /**
  *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
  *  @func:  put function (often the put() function)
@@ -160,37 +159,10 @@ streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 }
 
 EXPORT_SYMBOL_GPL(streams_put);	/* hpux/ddi.h */
-#endif
 
 __HPUX_EXTERN int
 str_install_HPUX(struct stream_inst *inst)
 {
-#ifdef LIS
-	switch (inst->inst_flags & STR_TYPE_MASK) {
-	case STR_IS_DEVICE:
-	{
-		int err;
-
-		if (inst->inst_major == -1)
-			inst->inst_major = 0;
-		if ((err = lis_register_strdev(inst->inst_major, &inst->inst_str_tab, 255,
-					       inst->name)) > 0)
-			inst->inst_major = err;
-		return (err < 0 ? -err : 0);
-	}
-	case STR_IS_MODULE:
-	{
-		int err;
-
-		if ((err = lis_register_strmod(&inst->inst_str_tab, inst->name)) > 0)
-			inst->inst_major = err;
-		return (err < 0 ? -err : 0);
-	}
-	default:
-		return (EINVAL);
-	}
-#endif
-#ifdef LFS
 	switch (inst->inst_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
@@ -211,7 +183,7 @@ str_install_HPUX(struct stream_inst *inst)
 			cdev->d_flag |= D_MP;
 			break;
 			/* Note that HPUX does not allow more than one thread in _any_ open or
-			   close procedure.  We signal this to the LFS registration function by
+			   close procedure.  We signal this to the registration function by
 			   setting D_MTOCEXCL without setting D_MTOUTPERIM when synchronization is
 			   beneath a module and by setting D_MTOCEXCL without setting D_MTOUTPERIM
 			   when sycncrhonization is at the module or above. */
@@ -270,7 +242,7 @@ str_install_HPUX(struct stream_inst *inst)
 			fmod->f_flag |= D_MP;
 			break;
 			/* Note that HPUX does not allow more than one thread in _any_ open or
-			   close procedure.  We signal this to the LFS registration function by
+			   close procedure.  We signal this to the registration function by
 			   setting D_MTOCEXCL without setting D_MTOUTPERIM when synchronization is
 			   beneath a module and by setting D_MTOCEXCL without setting D_MTOUTPERIM
 			   when sycncrhonization is at the module or above. */
@@ -313,7 +285,6 @@ str_install_HPUX(struct stream_inst *inst)
 	default:
 		return (EINVAL);
 	}
-#endif
 }
 
 EXPORT_SYMBOL_GPL(str_install_HPUX);
@@ -321,17 +292,6 @@ EXPORT_SYMBOL_GPL(str_install_HPUX);
 __HPUX_EXTERN int
 str_uninstall(struct stream_inst *inst)
 {
-#ifdef LIS
-	switch (inst->inst_flags & STR_TYPE_MASK) {
-	case STR_IS_DEVICE:
-		return lis_unregister_strdev(inst->inst_major);
-	case STR_IS_MODULE:
-		return lis_unregister_strmod(&inst->inst_str_tab);
-	default:
-		return (EINVAL);
-	}
-#endif
-#ifdef LFS
 	switch (inst->inst_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
@@ -358,7 +318,6 @@ str_uninstall(struct stream_inst *inst)
 	default:
 		return (EINVAL);
 	}
-#endif
 }
 
 EXPORT_SYMBOL_GPL(str_uninstall);

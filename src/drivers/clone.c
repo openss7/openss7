@@ -90,9 +90,6 @@ MODULE_AUTHOR(CLONE_CONTACT);
 MODULE_DESCRIPTION(CLONE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CLONE_DEVICE);
 MODULE_LICENSE(CLONE_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-clone");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
@@ -112,42 +109,44 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_CLONE_MAJOR must be defined."
 #endif
 
+#ifdef CONFIG_STREAMS_CLONE_MODULE
 modID_t clone_modid = CONFIG_STREAMS_CLONE_MODID;
 
-#ifdef CONFIG_STREAMS_CLONE_MODULE
 #ifndef module_param
 MODULE_PARM(clone_modid, "h");
 #else
 module_param(clone_modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(clone_modid, "Module id number for CLONE driver.");
-
-#ifdef MODULE_ALIAS
-MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLONE_MODID));
-MODULE_ALIAS("streams-driver-clone");
-#endif
-#endif
-
-major_t major = CONFIG_STREAMS_CLONE_MAJOR;
+#else				/* CONFIG_STREAMS_CLONE_MODULE */
+static modID_t clone_modid = CONFIG_STREAMS_CLONE_MODID;
+#endif				/* CONFIG_STREAMS_CLONE_MODULE */
 
 #ifdef CONFIG_STREAMS_CLONE_MODULE
+major_t major = CONFIG_STREAMS_CLONE_MAJOR;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for CLONE driver.");
+#else				/* CONFIG_STREAMS_CLONE_MODULE */
+static major_t major = CONFIG_STREAMS_CLONE_MAJOR;
+#endif				/* CONFIG_STREAMS_CLONE_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-clone");
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLONE_MODID));
+MODULE_ALIAS("streams-driver-clone");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-*");
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-0");
 MODULE_ALIAS("/dev/clone");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR));
 MODULE_ALIAS("/dev/streams/clone");
 MODULE_ALIAS("/dev/streams/clone/*");
-#endif
 #endif
 #endif
 
@@ -179,7 +178,10 @@ static struct qinit clone_winit = {
 	.qi_mstat = &clone_wstat,
 };
 
-static struct streamtab clone_info = {
+#ifdef CONFIG_STREAMS_CLONE_MODULE
+static
+#endif
+struct streamtab cloneinfo = {
 	.st_rdinit = &clone_rinit,
 	.st_wrinit = &clone_winit,
 };
@@ -231,7 +233,7 @@ struct file_operations clone_ops ____cacheline_aligned = {
 
 static struct cdevsw clone_cdev = {
 	.d_name = "clone",
-	.d_str = &clone_info,
+	.d_str = &cloneinfo,
 	.d_flag = D_CLONE | D_MP,
 	.d_fop = &clone_ops,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -317,7 +319,7 @@ cdev_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
-	.owner = NULL,			/* yes NULL */
+	.owner = NULL,		/* yes NULL */
 	.open = cdev_open,
 };
 
@@ -525,7 +527,7 @@ clone_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
-	.owner = NULL,			/* yes NULL */
+	.owner = NULL,		/* yes NULL */
 	.open = clone_open,
 };
 
@@ -541,7 +543,7 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
 static
 #endif
 int __init
-clone_init(void)
+cloneinit(void)
 {
 	int err;
 
@@ -562,13 +564,13 @@ clone_init(void)
 static
 #endif
 void __exit
-clone_exit(void)
+cloneexit(void)
 {
 	if (unregister_cmajor(&clone_cdev, major) != 0)
 		swerr();
 };
 
 #ifdef CONFIG_STREAMS_CLONE_MODULE
-module_init(clone_init);
-module_exit(clone_exit);
+module_init(cloneinit);
+module_exit(cloneexit);
 #endif

@@ -78,7 +78,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define _DEBUG 1
 // #undef _DEBUG
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -120,24 +119,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define HDLC_DRV_ID		CONFIG_STREAMS_HDLC_MODID
 #define HDLC_DRV_NAME		CONFIG_STREAMS_HDLC_NAME
 #define HDLC_CMAJORS		CONFIG_STREAMS_HDLC_NMAJORS
 #define HDLC_CMAJOR_0		CONFIG_STREAMS_HDLC_MAJOR
 #define HDLC_UNITS		CONFIG_STREAMS_HDLC_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_HDLC_MODID));
 MODULE_ALIAS("streams-driver-hdlc");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_HDLC_MAJOR));
 MODULE_ALIAS("/dev/streams/hdlc");
 MODULE_ALIAS("/dev/streams/hdlc/*");
 MODULE_ALIAS("/dev/streams/clone/hdlc");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(HDLC_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(HDLC_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(HDLC_CMAJOR_0) "-0");

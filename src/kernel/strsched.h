@@ -83,14 +83,6 @@
 #define BIG_STATIC_INLINE __EXTERN_INLINE
 #endif
 
-#ifndef BIG_STATIC_STH
-#define BIG_STATIC_STH __EXTERN
-#endif
-
-#ifndef BIG_STATIC_INLINE_STH
-#define BIG_STATIC_INLINE_STH __EXTERN_INLINE
-#endif
-
 #undef STR
 #include <linux/interrupt.h>	/* for in_irq() and friends */
 #if defined HAVE_KINC_LINUX_HARDIRQ_H
@@ -122,8 +114,8 @@ BIG_STATIC void streams_fastcall bput(qband_t **bp);
 /* ctors and dtors for stream heads */
 __STREAMS_EXTERN struct stdata *allocstr(void);
 __STREAMS_EXTERN void freestr(struct stdata *sd);
-BIG_STATIC_STH struct stdata *streams_fastcall sd_get(struct stdata *sd);
-BIG_STATIC_STH void streams_fastcall sd_put(struct stdata **sdp);
+__STREAMS_EXTERN struct stdata *sd_get(struct stdata *sd);
+__STREAMS_EXTERN void sd_put(struct stdata **sdp);
 
 /* ctors and dtors for autopush entries */
 BIG_STATIC struct apinfo *streams_fastcall ap_alloc(struct strapush *sap);
@@ -131,7 +123,7 @@ BIG_STATIC struct apinfo *streams_fastcall ap_get(struct apinfo *api);
 BIG_STATIC void streams_fastcall ap_put(struct apinfo *api);
 
 /* XXX: not even in strsched.c */
-BIG_STATIC_STH int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp,
+__STREAMS_EXTERN int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp,
 					     int oflag, int sflag, cred_t *crp);
 
 #if 0
@@ -147,8 +139,8 @@ BIG_STATIC void streams_fastcall modi_put(struct mdlinfo *mi);
 #endif
 
 /* ctors and dtors for linkblk */
-BIG_STATIC_STH struct linkblk *streams_fastcall alloclk(void);
-BIG_STATIC_STH void streams_fastcall freelk(struct linkblk *l);
+__STREAMS_EXTERN struct linkblk *alloclk(void);
+__STREAMS_EXTERN void freelk(struct linkblk *l);
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* ctors and dtors for syncq */
@@ -172,7 +164,7 @@ __STREAMS_EXTERN void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
 
 /* stuff for examining streams information lists */
 extern struct strinfo Strinfo[];
-BIG_STATIC_STH struct strthread strthreads[];
+__EXTERN struct strthread strthreads[];
 
 #define this_thread (&strthreads[smp_processor_id()])
 

@@ -168,11 +168,7 @@ static const char *lstdname = "M3UA SIGTRAN for SCTP";
 static const char *sstdname = "RFC 4666/4960";
 static const char *shortname = "M3UA/SCTP";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_t";
-#else
-static char devname[256] = "/dev/sctp_t";
-#endif
 
 static const int test_level = T_INET_SCTP;
 

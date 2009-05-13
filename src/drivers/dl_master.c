@@ -96,13 +96,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define DL_DRV_ID	CONFIG_STREAMS_DL_MODID
 #define DL_DRV_NAME	CONFIG_STREAMS_DL_NAME
 #define DL_CMAJORS	CONFIG_STREAMS_DL_NMAJORS
 #define DL_CMAJOR_0	CONFIG_STREAMS_DL_MAJOR
 #define DL_UNITS	CONFIG_STREAMS_DL_NMINORS
-#endif
 
 /*
  *  =========================================================================
@@ -179,20 +177,6 @@ STATIC const char *dl_modules[256] = {
  *
  *  =========================================================================
  */
-#ifdef LIS
-STATIC int
-dl_find_strdev(const char *devname)
-{
-	int i;
-
-	for (i = 0; i < MAX_STRDEV; i++)
-		if (lis_fstr_sw[i].f_str)
-			if (strncmp(devname, lis_fstr_sw[i].f_name, FMNAMESZ) == 0)
-				return (i);
-	return (-1);
-}
-#endif
-#ifdef LFS
 STATIC int
 dl_find_strdev(const char *devname)
 {
@@ -200,7 +184,6 @@ dl_find_strdev(const char *devname)
 		return (1);
 	return (-1);
 }
-#endif
 
 /*
  *  Open
@@ -218,24 +201,11 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	const char *devname;
 	struct streamtab *stab = NULL;
 	int err;
-
-#ifdef LFS
 	struct cdevsw *cdev;
-#endif
+
 	if (cminor == 0)
 		return (ENOENT);	/* would loop */
 	if ((cmajor = dl_majors[cminor])) {
-#ifdef LIS
-		if (!(stab = lis_find_strdev(dl_majors[cminor])))
-			cmajor = dl_majors[cminor] = 0;
-		else if (strncmp(dl_modules[cminor], lis_fstr_sw[cmajor].f_name, FMNAMESZ) != 0) {
-			/* 
-			   name changed */
-			stab = NULL;
-			cmajor = dl_majors[cminor] = 0;
-		}
-#endif
-#ifdef LFS
 		if ((cdev = __cdev_lookup(dl_majors[cminor])))
 			stab = cdev->d_str;
 		if (!stab)
@@ -246,7 +216,6 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			stab = NULL;
 			cmajor = dl_majors[cminor] = 0;
 		}
-#endif
 	}
 	if (!cmajor) {
 		if (!(devname = dl_modules[cminor]))
@@ -264,16 +233,9 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		}
 		cmajor = err;
 	}
-#ifdef LIS
-	if (!(stab = lis_find_strdev(cmajor)))
-		return (ENOENT);
-	lis_setq(q, stab->st_rdinit, stab->st_wrinit);
-#endif
-#ifdef LFS
 	if (!(cdev = __cdev_lookup(cmajor)))
 		return (ENOENT);
 	setq(q, stab->st_rdinit, stab->st_wrinit);
-#endif
 	if (!q->q_qinfo->qi_qopen) {
 		swerr();
 		return (EIO);
@@ -330,7 +292,6 @@ MODULE_PARM_DESC(major, "Device number for the DL driver. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct cdevsw dl_cdev = {
 	.d_name = DRV_NAME,
@@ -360,42 +321,6 @@ dl_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-dl_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &dlinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-dl_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 dlterminate(void)

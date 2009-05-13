@@ -94,14 +94,11 @@ MODULE_AUTHOR(PIPE_CONTACT);
 MODULE_DESCRIPTION(PIPE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPE_DEVICE);
 MODULE_LICENSE(PIPE_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-pipe");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_PIPE_MODULE */
 
 #ifndef CONFIG_STREAMS_PIPE_NAME
 //#define CONFIG_STREAMS_PIPE_NAME "pipe"
@@ -116,29 +113,48 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_PIPE_MAJOR must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-pipe");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_PIPE_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_PIPE_MODID;
 
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-based PIPEs (0 for allocation).");
+#endif				/* CONFIG_STREAMS_PIPE_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PIPE_MODID));
 MODULE_ALIAS("streams-driver-pipe");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_PIPE_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_PIPE_MAJOR;
 
+#ifdef CONFIG_STREAMS_PIPE_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based PIPEs (0 for allocation).");
+#endif				/* CONFIG_STREAMS_PIPE_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR) "-*");
 MODULE_ALIAS("/dev/pipe");
@@ -146,7 +162,8 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PIPE_MAJOR));
 MODULE_ALIAS("/dev/streams/pipe");
 MODULE_ALIAS("/dev/streams/pipe/*");
 MODULE_ALIAS("/dev/streams/clone/pipe");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info pipe_minfo = {
 	.mi_idnum = CONFIG_STREAMS_PIPE_MODID,
@@ -176,7 +193,10 @@ static struct qinit pipe_winit = {
 	.qi_mstat = &pipe_wstat,
 };
 
-static struct streamtab pipe_info = {
+#ifdef CONFIG_STREAMS_PIPE_MODULE
+static
+#endif
+struct streamtab pipeinfo = {
 	.st_rdinit = &pipe_rinit,
 	.st_wrinit = &pipe_winit,
 };
@@ -191,7 +211,7 @@ static struct streamtab pipe_info = {
 
 static struct cdevsw pipe_cdev = {
 	.d_name = CONFIG_STREAMS_PIPE_NAME,
-	.d_str = &pipe_info,
+	.d_str = &pipeinfo,
 	.d_flag = D_CLONE | D_MP,
 	.d_fop = &strm_f_ops,
 	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
@@ -202,7 +222,7 @@ static struct cdevsw pipe_cdev = {
 static
 #endif
 int __init
-pipe_init(void)
+pipeinit(void)
 {
 	int err;
 
@@ -223,12 +243,12 @@ pipe_init(void)
 static
 #endif
 void __exit
-pipe_exit(void)
+pipeexit(void)
 {
 	unregister_strdev(&pipe_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_PIPE_MODULE
-module_init(pipe_init);
-module_exit(pipe_exit);
+module_init(pipeinit);
+module_exit(pipeexit);
 #endif

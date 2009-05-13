@@ -2593,10 +2593,6 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for LAPB.  (0 for allocation.)");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 static struct fmodsw dl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &dlaix_info,

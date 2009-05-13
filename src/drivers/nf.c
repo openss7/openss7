@@ -128,24 +128,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define NF_DRV_ID	CONFIG_STREAMS_NF_MODID
 #define NF_DRV_NAME	CONFIG_STREAMS_NF_NAME
 #define NF_CMAJORS	CONFIG_STREAMS_NF_NMAJORS
 #define NF_CMAJOR_0	CONFIG_STREAMS_NF_MAJOR
 #define NF_UNITS	CONFIG_STREAMS_NF_NMINORS
-#endif
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NF_MODID));
 MODULE_ALIAS("streams-driver-nf");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NF_MAJOR));
 MODULE_ALIAS("/dev/streams/nf");
 MODULE_ALIAS("/dev/streams/nf/*");
 MODULE_ALIAS("/dev/streams/clone/nf");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(NF_CMAJOR_0) "-0");

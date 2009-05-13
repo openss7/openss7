@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  the STREAMS-based pipe will present the CHI interface.
  */
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 #define _SUN_SOURCE 1
@@ -108,10 +107,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define CH_PMOD_MOD_ID CONFIG_STREAMS_CH_PMOD_MODID
 #define CH_PMOD_MOD_NAME CONFIG_STREAMS_CH_PMOD_NAME
-#endif				/* LFS */
 
 #ifndef CH_PMOD_MOD_NAME
 #define CH_PMOD_MOD_NAME "ch-pmod"
@@ -2910,10 +2907,6 @@ MODULE_PARM(modid, "h");
 module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for CH-PMOD module. (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw ch_fmod = {
 	.f_name = MOD_NAME,

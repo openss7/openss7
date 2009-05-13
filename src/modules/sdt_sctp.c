@@ -59,7 +59,6 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 
-#define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
@@ -106,10 +105,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDT_SCTP_MOD_ID		CONFIG_STREAMS_SDT_SCTP_MODID
 #define SDT_SCTP_MOD_NAME	CONFIG_STREAMS_SDT_SCTP_NAME
-#endif
 
 // #define SDT_RX_COMPRESSION
 // #define SDT_TX_COMPRESSION
@@ -2277,8 +2274,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sdt_sctpinfo,
@@ -2305,40 +2300,6 @@ sdt_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sdt_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&sdt_sctpinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sdt_sctpinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-sdt_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&sdt_sctpinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 sdt_sctpinit(void)

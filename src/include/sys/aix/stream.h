@@ -99,7 +99,6 @@ __AIX_EXTERN caddr_t mi_next_ptr(caddr_t strptr);
 __AIX_EXTERN caddr_t mi_prev_ptr(caddr_t strptr);
 __AIX_EXTERN void mi_bufcall(queue_t *q, int size, int priority);
 
-#ifdef LFS
 __AIX_EXTERN int wantio(queue_t *q, struct wantio *w);
 
 __AIX_EXTERN_INLINE int
@@ -111,7 +110,6 @@ wantmsg(queue_t *q, int streamscall (*func) (mblk_t *))
 	}
 	return (0);
 }
-#endif
 
 #else
 #ifdef _AIX_SOURCE

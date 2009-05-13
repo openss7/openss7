@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
 #endif
@@ -179,13 +178,10 @@ MODULE_AUTHOR(STH_CONTACT);
 MODULE_DESCRIPTION(STH_DESCRIP);
 MODULE_SUPPORTED_DEVICE(STH_DEVICE);
 MODULE_LICENSE(STH_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-sth");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
+#endif				/* MODULE_VERSION */
 #endif				/* CONFIG_STREAMS_STH_MODULE */
 
 #ifndef CONFIG_STREAMS_STH_NAME
@@ -197,6 +193,15 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_STH_MODID must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-sth");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_STH_MODULE
+static
+#endif
 modID_t sth_modid = CONFIG_STREAMS_STH_MODID;
 
 #ifdef CONFIG_STREAMS_STH_MODULE
@@ -206,12 +211,14 @@ MODULE_PARM(sth_modid, "h");
 module_param(sth_modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(sth_modid, "Module identification number for STH module.");
+#endif				/* CONFIG_STREAMS_STH_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_STH_MODID));
 MODULE_ALIAS("streams-module-sth");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 struct module_info str_minfo = {
 	.mi_idnum = CONFIG_STREAMS_STH_MODID,
@@ -250,7 +257,7 @@ static struct qinit str_winit = {
 	.qi_mstat = &str_wstat,
 };
 
-struct streamtab str_info = {
+struct streamtab sthinfo = {
 	.st_rdinit = &str_rinit,
 	.st_wrinit = &str_winit,
 };
@@ -1903,8 +1910,8 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetfp_slow(sd, q)) != NULL))
 			break;
-		/* Only error on a hung up stream when the read queue is empty
-		 * and we know that we are going to block. */
+		/* Only error on a hung up stream when the read queue is empty and we know that we
+		   are going to block. */
 		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
 			mp = ERR_PTR(err);
 			break;
@@ -1920,8 +1927,7 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		srlock(sd);
-		/* Don't error on a hung up Stream until we known that we are
-		 * about to block. */
+		/* Don't error on a hung up Stream until we known that we are about to block. */
 		if (unlikely((err = straccess(sd, (FREAD | FNDELAY))) != 0)) {
 			mp = ERR_PTR(err);
 			break;
@@ -2308,14 +2314,7 @@ strwaitclose(struct stdata *sd, int oflag)
 	queue_t *q;
 	bool wait;
 	long closetime;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	assert(sd);
 	q = sd->sd_wq;
@@ -2699,14 +2698,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	mblk_t *mb;
 	unsigned long timeo;
 	int err = 0;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	if (ic->ic_len < 0 || ic->ic_len > sd->sd_strmsgsz) {
 		/* POSIX less than zero or larger than maximum data part. */
@@ -2838,14 +2830,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 	mblk_t *mb, *db;
 	unsigned long timeo;
 	int err = 0;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	while (!(mb = allocb(sizeof(*ioc), BPRI_WAITOK))) ;
 
@@ -2959,14 +2944,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	mblk_t *mb, *db;
 	unsigned long timeo;
 	int err = 0;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	while (!(mb = allocb(sizeof(*ioc), BPRI_WAITOK))) ;
 
@@ -3100,14 +3078,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	union ioctypes *ioc;
 	struct linkblk *lbp;
 	mblk_t *mb, *db;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	/* wake everybody up before we block -- the STRCLOSE bit is set */
 	strwakeall(sd);
@@ -4059,14 +4030,7 @@ stropen(struct inode *inode, struct file *file)
 {
 	int err, oflag, sflag;
 	struct stdata *sd;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 
 	_ptrace(("opening a stream\n"));
 	oflag = make_oflag(file);
@@ -4525,8 +4489,8 @@ __strwaithlist(struct stdata *sd, queue_t *q)
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		srlock(sd);
-		/* Don't check for hung up Streams until we know that we are
-		 * going to block awaiting data. */
+		/* Don't check for hung up Streams until we know that we are going to block
+		   awaiting data. */
 		if (unlikely((err = straccess(sd, (FREAD | FNDELAY))) != 0))
 			break;
 	}
@@ -4730,8 +4694,8 @@ __strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, in
 		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetq_slow(sd, q, flags, band)) != NULL))
 			break;
-		/* When the read queue has no data, error if the stream is
-		 * hungup so that zero (0) will be returned. */
+		/* When the read queue has no data, error if the stream is hungup so that zero (0)
+		   will be returned. */
 		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
 			mp = ERR_PTR(err);
 			break;
@@ -4746,8 +4710,8 @@ __strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, in
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
 		srlock(sd);
-		/* Don't error because of blocking on a a hunup up Stream
-		 * until we know that we are going to block. */
+		/* Don't error because of blocking on a a hunup up Stream until we know that we are 
+		   going to block. */
 		if (unlikely((err = straccess(sd, (FREAD | FNDELAY))) != 0)) {
 			mp = ERR_PTR(err);
 			break;
@@ -4970,8 +4934,8 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 
-	/* Don't error because of a hung up Stream until we know that we are
-	 * about to block awaiting data on the read queue. */
+	/* Don't error because of a hung up Stream until we know that we are about to block
+	   awaiting data on the read queue. */
 	if (unlikely((err = straccess_rlock(sd, (FREAD | FNDELAY))) != 0))
 		goto access_error;
 
@@ -5575,7 +5539,8 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		char *base = kmap(page) + offset;
 		struct free_rtn frtn = { __strfreepage, (caddr_t) page };
 		unsigned long timeo = ((file->f_flags & FNDELAY)
-			      && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
+				       && !test_bit(STRNDEL_BIT,
+						    &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 
 		mp = strwaitpage(sd, file->f_flags, size, BPRI_MED, 0, M_DATA, base, &frtn, &timeo);
 		if (IS_ERR(mp)) {
@@ -5927,8 +5892,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	if (unlikely((err = strcopyin_gstrbuf(file, datp, &dat, true)) < 0))
 		goto error;
 
-	/* Don't error on a hung up Stream until we know that we are about to
-	 * block. */
+	/* Don't error on a hung up Stream until we know that we are about to block. */
 	if (likely((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0)) {
 
 		/* First acquire QHLIST bit. */
@@ -6834,8 +6798,8 @@ str_i_flushband(const struct file *file, struct stdata *sd, unsigned long arg)
 	*mp->b_wptr++ = bi.bi_flag | FLUSHBAND;
 	*mp->b_wptr++ = bi.bi_pri;
 
-	/* Note that the FNDELAY access flag permits I_FLUSHBAND on a Stream,
-	 * pipe, FIFO or TTY that is hung up. */
+	/* Note that the FNDELAY access flag permits I_FLUSHBAND on a Stream, pipe, FIFO or TTY
+	   that is hung up. */
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
 		if (bi.bi_flag & FLUSHW)
@@ -6894,8 +6858,8 @@ str_i_flush(const struct file *file, struct stdata *sd, unsigned long arg)
 	mp->b_datap->db_type = M_FLUSH;
 	*mp->b_wptr++ = flags;
 
-	/* Note that the FNDELAY access flag permits I_FLUSH on a Stream,
-	 * pipe, FIFO or TTY that is hung up. */
+	/* Note that the FNDELAY access flag permits I_FLUSH on a Stream, pipe, FIFO or TTY that is 
+	   hung up. */
 	if (!(err = straccess_rlock(sd, (FREAD | FWRITE | FNDELAY | FEXCL)))) {
 		srunlock(sd);
 		if (flags & FLUSHW)
@@ -8065,15 +8029,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 
 				dev_t dev = sd->sd_dev;
 				int oflag = make_oflag(file);
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-				cred_t creds = {.cr_uid = current->euid,.cr_gid =
-					    current->egid,.cr_ruid = current->uid,.cr_rgid =
-					    current->gid,
-				}, *crp = &creds;
-#else
 				cred_t *crp = current_creds;
-#endif
 				bool wasctty = (test_bit(STRISTTY_BIT, &sd->sd_flag) != 0);
 
 				if (!(err = qattach(sd, fmod, &dev, oflag, MODOPEN, crp))) {
@@ -8154,13 +8110,7 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 
 		/* protected by STWOPEN bit */
 		if (sd->sd_pushcnt > 0) {
-#ifdef CONFIG_STREAMS_LIS_BCM
-			cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-				    current->uid,.cr_rgid = current->gid,
-			}, *crp = &creds;
-#else
 			cred_t *crp = current_creds;
-#endif
 
 			/* TODO: should use capabilities instead of UID */
 			if (sd->sd_pushcnt >= sd->sd_nanchor || crp->cr_uid == 0) {
@@ -10731,11 +10681,7 @@ strwsrv(queue_t *q)
 	return (0);
 }
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
- || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
 EXPORT_SYMBOL_GPL(strwsrv);
-#endif
 
 /*
  *  Read Message Handling
@@ -11400,11 +11346,7 @@ strrput(queue_t *q, mblk_t *mp)
 	return strrput_slow(q, mp);
 }
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
- || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
 EXPORT_SYMBOL_GPL(strrput);
-#endif
 
 streamscall __hot_in int
 strrsrv(queue_t *q)
@@ -11420,11 +11362,7 @@ strrsrv(queue_t *q)
 	return (0);
 }
 
-#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
- || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
 EXPORT_SYMBOL_GPL(strrsrv);
-#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -11556,7 +11494,7 @@ EXPORT_SYMBOL_GPL(str_close);
 
 struct fmodsw sth_fmod = {
 	.f_name = CONFIG_STREAMS_STH_NAME,
-	.f_str = &str_info,
+	.f_str = &sthinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
@@ -11565,7 +11503,7 @@ struct fmodsw sth_fmod = {
 STATIC
 #endif
 int __init
-sth_init(void)
+sthinit(void)
 {
 	int result;
 
@@ -11591,7 +11529,7 @@ sth_init(void)
 STATIC
 #endif
 void __exit
-sth_exit(void)
+sthexit(void)
 {
 #if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
 	streams_unregister_ioctl32_conversions();
@@ -11600,6 +11538,6 @@ sth_exit(void)
 }
 
 #ifdef CONFIG_STREAMS_STH_MODULE
-module_init(sth_init);
-module_exit(sth_exit);
+module_init(sthinit);
+module_exit(sthexit);
 #endif				/* CONFIG_STREAMS_STH_MODULE */

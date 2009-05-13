@@ -88,13 +88,11 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
-#ifdef LFS
 static __inline__ cred_t *
 ddi_get_cred(void)
 {
 	return (current_creds);
 }
-#endif
 __SUN_EXTERN_INLINE clock_t
 ddi_get_lbolt(void)
 {

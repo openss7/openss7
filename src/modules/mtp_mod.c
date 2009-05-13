@@ -80,7 +80,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define _MPS_SOURCE	1
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _SUN_SOURCE	1
 
@@ -122,9 +121,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
-
-#ifdef LFS
-#endif				/* LFS */
 
 #ifndef MTP_MOD_MOD_NAME
 #define MTP_MOD_MOD_NAME "mtp-mod"
@@ -4383,10 +4379,6 @@ module_param(modid, ushort, 0444);
 MODULE_PARM(modid, "h");
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module id for MTP-MOD module.  (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 
 static struct fmodsw mt_fmod = {
 	.f_name = MOD_NAME,

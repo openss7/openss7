@@ -58,8 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-#define _LFS_SOURCE 1
-
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
 
@@ -100,13 +98,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define M2UA_DRV_ID		CONFIG_STREAMS_M2UA_MODID
 #define M2UA_DRV_NAME		CONFIG_STREAMS_M2UA_NAME
 #define M2UA_CMAJORS		CONFIG_STREAMS_M2UA_NMAJORS
 #define M2UA_CMAJOR_0		CONFIG_STREAMS_M2UA_MAJOR
 #define M2UA_UNITS		CONFIG_STREAMS_M2UA_NMINORS
-#endif
 
 /* Lock debugging. */
 
@@ -16977,7 +16973,6 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct cdevsw m2ua_cdev = {
 	.d_name = DRV_NAME,
@@ -17007,42 +17002,6 @@ m2ua_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-m2ua_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &m2uainfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-m2ua_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 m2uaterminate(void)

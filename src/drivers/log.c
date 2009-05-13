@@ -116,14 +116,11 @@ MODULE_AUTHOR(LOG_CONTACT);
 MODULE_DESCRIPTION(LOG_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LOG_DEVICE);
 MODULE_LICENSE(LOG_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-log");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_LOG_MODULE */
 
 #ifndef CONFIG_STREAMS_LOG_NAME
 #error CONFIG_STREAMS_LOG_NAME must be defined.
@@ -135,29 +132,48 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_LOG_MODID must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-log");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_LOG_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_LOG_MODID;
 
+#ifdef CONFIG_STREAMS_LOG_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-log driver.");
+#endif				/* CONFIG_STREAMS_LOG_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LOG_MODID));
 MODULE_ALIAS("streams-driver-log");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_LOG_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_LOG_MAJOR;
 
+#ifdef CONFIG_STREAMS_LOG_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-log driver.");
+#endif				/* CONFIG_STREAMS_LOG_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR) "-*");
 MODULE_ALIAS("/dev/log");
@@ -167,7 +183,8 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOG_MAJOR));
 MODULE_ALIAS("/dev/streams/log");
 MODULE_ALIAS("/dev/streams/log/*");
 MODULE_ALIAS("/dev/streams/clone/log");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info log_minfo = {
 	.mi_idnum = CONFIG_STREAMS_LOG_MODID,
@@ -605,14 +622,17 @@ static struct qinit log_wqinit = {
 	.qi_mstat = &log_wstat,
 };
 
-static struct streamtab log_info = {
+#ifdef CONFIG_STREAMS_LOG_MODULE
+static
+#endif
+struct streamtab loginfo = {
 	.st_rdinit = &log_rqinit,
 	.st_wrinit = &log_wqinit,
 };
 
 static struct cdevsw log_cdev = {
 	.d_name = CONFIG_STREAMS_LOG_NAME,
-	.d_str = &log_info,
+	.d_str = &loginfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -1033,7 +1053,7 @@ log_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, v
 static
 #endif
 int __init
-log_init(void)
+loginit(void)
 {
 	int err;
 
@@ -1060,7 +1080,7 @@ log_init(void)
 static
 #endif
 void __exit
-log_exit(void)
+logexit(void)
 {
 	/* unhook from vstrlog */
 #if 0
@@ -1072,6 +1092,6 @@ log_exit(void)
 }
 
 #ifdef CONFIG_STREAMS_LOG_MODULE
-module_init(log_init);
-module_exit(log_exit);
+module_init(loginit);
+module_exit(logexit);
 #endif

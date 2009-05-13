@@ -110,19 +110,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <sys/sad.h>
 
-#ifdef LFS
 #include "sys/openss7/config.h"
-#endif
-
-#ifdef LIS
-#include "sys/LiS/config.h"
-#ifndef CONFIG_STREAMS_SAD_NAME
-#define CONFIG_STREAMS_SAD_NAME "sad"
-#endif
-#ifndef CONFIG_STREAMS_SC_NAME
-#define CONFIG_STREAMS_SC_NAME "nullmod"
-#endif
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -139,14 +127,8 @@ static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "SAD";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/sad";
 static char admname[256] = "/dev/streams/sad/admin";
-#endif
-#ifdef LIS
-static char devname[256] = "/dev/sad";
-static char admname[256] = "/dev/sad";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;
@@ -2550,12 +2532,7 @@ system."
 int
 test_case_2_1_4(int child)
 {
-#ifdef LFS
 	struct str_mlist sml = { "sth" };
-#endif
-#ifdef LIS
-	struct str_mlist sml = { "relay" };
-#endif
 	struct str_list sl = { 1, &sml };
 
 	if (test_ioctl(child, SAD_VML, (intptr_t) &sl) != __RESULT_SUCCESS)
@@ -2614,12 +2591,7 @@ the device specified by sap_major and sap_minor is invalid."
 int
 test_case_2_2_2(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_ALL, 0, -1, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_ALL, 0, -1, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -2647,12 +2619,7 @@ device."
 int
 test_case_2_2_3(int child)
 {
-#ifdef LFS
 	struct strapush sap = { 0, 136, 5, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, };
-#endif
-#ifdef LIS
-	struct strapush sap = { {0, 136, 5, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -2680,12 +2647,7 @@ for autopush."
 int
 test_case_2_2_4(int child)
 {
-#ifdef LFS
 	struct strapush sap = { 0, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {0, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -2711,12 +2673,7 @@ Check that SAD_GAP can be performed."
 int
 preamble_test_case_2_2_5(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_ALL, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -2732,12 +2689,7 @@ preamble_test_case_2_2_5(int child)
 int
 test_case_2_2_5(int child)
 {
-#ifdef LFS
 	struct strapush sap2 = { 0, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap2 = { {0, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (test_ioctl(child, SAD_GAP, (intptr_t) &sap2) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -2748,12 +2700,7 @@ test_case_2_2_5(int child)
 int
 postamble_test_case_2_2_5(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_CLEAR, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 	int result = __RESULT_SUCCESS;
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
@@ -2814,24 +2761,9 @@ when sap_cmd, sap_major, sap_minor or sap_lastminor was invalid."
 int
 test_case_2_3_2(int child)
 {
-#ifdef LFS
 	struct strapush sap = { 5, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 	struct strapush sap1 = { SAP_CLEAR, 0, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, };
 	struct strapush sap2 = { SAP_CLEAR, -1, -1, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-
-#if 0
-	struct strapush sap3 = { SAP_CLEAR, -1, 4, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#endif
-#ifdef LIS
-	struct strapush sap = { {5, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-	struct strapush sap1 = { {SAP_CLEAR, 0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-	struct strapush sap2 = { {SAP_CLEAR, SAD__CMAJOR_0, -1, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-
-#if 0
-	struct strapush sap3 = { {SAP_CLEAR, SAD__CMAJOR_0, 4, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -2853,14 +2785,6 @@ test_case_2_3_2(int child)
 	if (last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
-#if 0
-	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap3) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
-	state++;
-	if (last_errno != EINVAL)
-		return (__RESULT_FAILURE);
-	state++;
-#endif
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_2_3_2 = { &preamble_0, &test_case_2_3_2, &postamble_0 };
@@ -2880,14 +2804,8 @@ when sap_nlist is less than one or greater than MAXAPUSH."
 int
 test_case_2_3_3(int child)
 {
-#ifdef LFS
 	struct strapush sap1 = { SAP_ALL, -1, 0, 1, 0, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 	struct strapush sap2 = { SAP_ALL, -1, 0, 1, MAXAPUSH + 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap1 = { {SAP_ALL, SAD__CMAJOR_0, 0, 1, 0,}, {CONFIG_STREAMS_SC_NAME,}, };
-	struct strapush sap2 = { {SAP_ALL, SAD__CMAJOR_0, 0, 1, MAXAPUSH + 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -2929,12 +2847,7 @@ terminated)."
 int
 test_case_2_3_4(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, {"",}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_ALL, SAD__CMAJOR_0, 0, 1, 1,}, {"",}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -2964,12 +2877,7 @@ that is not a STREAMS device."
 int
 test_case_2_3_5(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_ALL, 137, 5, 6, 1, {CONFIG_STREAMS_SC_NAME,}, 0, };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_ALL, 137, 5, 6, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -3001,12 +2909,7 @@ was SAP_ONE, SAP_RANGE or SAP_ALL."
 int
 preamble_test_case_2_3_6(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_ALL, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_ALL, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -3023,16 +2926,9 @@ preamble_test_case_2_3_6(int child)
 int
 test_case_2_3_6(int child)
 {
-#ifdef LFS
 	struct strapush sap1 = { SAP_ONE, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 	struct strapush sap2 = { SAP_RANGE, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 	struct strapush sap3 = { SAP_ALL, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap1 = { {SAP_ONE, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-	struct strapush sap2 = { {SAP_RANGE, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-	struct strapush sap3 = { {SAP_ALL, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap1) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3058,12 +2954,7 @@ test_case_2_3_6(int child)
 int
 postamble_test_case_2_3_6(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_CLEAR, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_CLEAR, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 	int result = __RESULT_SUCCESS;
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
@@ -3092,12 +2983,7 @@ SAP_RANGE."
 int
 preamble_test_case_2_3_7(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_RANGE, -1, 0, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_RANGE, SAD__CMAJOR_0, 0, 2, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -3114,12 +3000,7 @@ preamble_test_case_2_3_7(int child)
 int
 test_case_2_3_7(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_CLEAR, -1, 1, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_CLEAR, SAD__CMAJOR_0, 1, 2, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3133,12 +3014,7 @@ test_case_2_3_7(int child)
 int
 postamble_test_case_2_3_7(int child)
 {
-#ifdef LFS
 	struct strapush sap = { SAP_CLEAR, -1, 0, 2, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap = { {SAP_CLEAR, SAD__CMAJOR_0, 0, 2, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 	int result = __RESULT_SUCCESS;
 
 	if (test_ioctl(child, SAD_SAP, (intptr_t) &sap) != __RESULT_SUCCESS)
@@ -3167,14 +3043,8 @@ SAP_RANGE."
 int
 test_case_2_3_8(int child)
 {
-#ifdef LFS
 	struct strapush sap1 = { SAP_RANGE, -1, 1, 0, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
 	struct strapush sap2 = { SAP_RANGE, -1, 1, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap1 = { {SAP_RANGE, SAD__CMAJOR_0, 1, 0, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-	struct strapush sap2 = { {SAP_RANGE, SAD__CMAJOR_0, 1, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);
@@ -3210,12 +3080,7 @@ with an autopush list and the sap_cmd was SAP_CLEAR."
 int
 test_case_2_3_9(int child)
 {
-#ifdef LFS
 	struct strapush sap1 = { SAP_CLEAR, -1, 0, 1, 1, {CONFIG_STREAMS_SC_NAME,}, 0, CONFIG_STREAMS_SAD_NAME };
-#endif
-#ifdef LIS
-	struct strapush sap1 = { {SAP_CLEAR, SAD__CMAJOR_0, 0, 1, 1,}, {CONFIG_STREAMS_SC_NAME,}, };
-#endif
 
 	if (getuid() != 0 && geteuid() != 0)
 		return (__RESULT_SKIPPED);

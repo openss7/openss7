@@ -67,7 +67,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _DEBUG 1
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -108,13 +107,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TRMUX_DRV_ID	CONFIG_STREAMS_TRMUX_MODID
 #define TRMUX_DRV_NAME	CONFIG_STREAMS_TRMUX_NAME
 #define TRMUX_CMAJORS	CONFIG_STREAMS_TRMUX_NMAJORS
 #define TRMUX_CMAJOR_0	CONFIG_STREAMS_TRMUX_MAJOR
 #define TRMUX_UNITS	CONFIG_STREAMS_TRMUX_NMINORS
-#endif				/* LFS */
 
 #ifndef TRMUX_DRV_ID
 #error "TRMUX_DRV_ID must be defined."
@@ -135,7 +132,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TRMUX_MODID));
 MODULE_ALIAS("streams-driver-trmux");
 MODULE_ALIAS("/dev/streams/trmux");
@@ -146,7 +142,6 @@ MODULE_ALIAS("/dev/streams/trmux/mgr");
 MODULE_ALIAS("/dev/streams/trmux/tp");
 MODULE_ALIAS("/dev/streams/trmux/tc");
 MODULE_ALIAS("/dev/streams/trmux/map");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(TRMUX_CMAJOR_0) "-0");

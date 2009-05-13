@@ -123,13 +123,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDT_X400P_DRV_ID	CONFIG_STREAMS_SDT_X400P_MODID
 #define SDT_X400P_DRV_NAME	CONFIG_STREAMS_SDT_X400P_NAME
 #define SDT_X400P_CMAJORS	CONFIG_STREAMS_SDT_X400P_NMAJORS
 #define SDT_X400P_CMAJOR_0	CONFIG_STREAMS_SDT_X400P_MAJOR
 #define SDT_X400P_UNITS		CONFIG_STREAMS_SDT_X400P_NMINORS
-#endif
 
 /*
  *  =======================================================================
@@ -6672,8 +6670,6 @@ MODULE_PARM_DESC(major, "Device number for the X400-SDL driver. (0 for allocatio
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sdt_x400pinfo,
@@ -6702,42 +6698,6 @@ xp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-xp_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &sdt_x400pinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-xp_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 sdt_x400pterminate(void)

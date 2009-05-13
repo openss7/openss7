@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 #include <sys/os7/compat.h>
 
 /*
@@ -87,21 +86,18 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TIRDWR_SPLASH		TIRDWR_DEVICE		" - " \
 				TIRDWR_REVISION
 
-#ifdef LINUX
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
 MODULE_AUTHOR(TIRDWR_CONTACT);
 MODULE_DESCRIPTION(TIRDWR_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TIRDWR_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TIRDWR_LICENSE);
 #endif				/* MODULE_LICENSE */
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-tirdwr");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
-#endif				/* LINUX */
+#endif				/* CONFIG_STREAMS_TIRDWR_MODULE */
 
 #ifndef CONFIG_STREAMS_TIRDWR_NAME
 //#define CONFIG_STREAMS_TIRDWR_NAME "timod"
@@ -112,14 +108,32 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_TIRDWR_MODID must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-tirdwr");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_TIRDWR_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_TIRDWR_MODID;
 
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for TIRDWR. (0 for allocation.)");
+#endif				/* CONFIG_STREAMS_TIRDWR_MODULE */
+
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TIRDWR_MODID));
+MODULE_ALIAS("streams-module-tirdwr");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 /*
  *  =========================================================================
@@ -129,15 +143,16 @@ MODULE_PARM_DESC(modid, "Module ID for TIRDWR. (0 for allocation.)");
  *  =========================================================================
  */
 
+#define MOD_ID		CONFIG_STREAMS_TIRDWR_MODID
 #define MOD_NAME	CONFIG_STREAMS_TIRDWR_NAME
 
 static struct module_info tirdwr_minfo = {
-	.mi_idnum = CONFIG_STREAMS_TIRDWR_MODID,	/* Module ID number */
-	.mi_idname = CONFIG_STREAMS_TIRDWR_NAME,	/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 0,			/* Hi water mark */
-	.mi_lowat = 0,			/* Lo water mark */
+	.mi_idnum = MOD_ID,	/* Module ID number */
+	.mi_idname = MOD_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
+	.mi_hiwat = 0,		/* Hi water mark */
+	.mi_lowat = 0,		/* Lo water mark */
 };
 
 static struct module_stat tirdwr_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
@@ -150,7 +165,7 @@ static streamscall int tirdwr_rput(queue_t *q, mblk_t *mp);
 static streamscall int tirdwr_wput(queue_t *q, mblk_t *mp);
 
 static struct qinit tirdwr_rinit = {
-	.qi_putp = tirdwr_rput,		/* Read put (message from below) */
+	.qi_putp = tirdwr_rput,	/* Read put (message from below) */
 	.qi_qopen = tirdwr_open,	/* Each open */
 	.qi_qclose = tirdwr_close,	/* Last close */
 	.qi_minfo = &tirdwr_minfo,	/* Information */
@@ -158,12 +173,15 @@ static struct qinit tirdwr_rinit = {
 };
 
 static struct qinit tirdwr_winit = {
-	.qi_putp = tirdwr_wput,		/* Write put (message from above) */
+	.qi_putp = tirdwr_wput,	/* Write put (message from above) */
 	.qi_minfo = &tirdwr_minfo,	/* Information */
 	.qi_mstat = &tirdwr_wstat,	/* Statistics */
 };
 
-static struct streamtab tirdwrinfo = {
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
+static
+#endif
+struct streamtab tirdwrinfo = {
 	.st_rdinit = &tirdwr_rinit,	/* Upper read queue */
 	.st_wrinit = &tirdwr_winit,	/* Upper write queue */
 };
@@ -400,14 +418,6 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *bp = NULL;
 
-#if defined LIS
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			MOD_NAME, __FUNCTION__);
-		freemsg(mp);
-		return (0);
-	}
-#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		/* There is a problem here right off the bat.  Although a TPI compliant provider
@@ -553,14 +563,6 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
 
-#if defined LIS
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			MOD_NAME, __FUNCTION__);
-		freemsg(mp);
-		return (0);
-	}
-#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		if (!(priv->flags & (TIRDWR_EPROTO | TIRDWR_HANGUP))) {
@@ -657,34 +659,15 @@ tirdwr_push(queue_t *q)
 		err = EFAULT;
 	else if (qsize(hq) > 0) {
 		mblk_t *mp;
-
-#ifdef LIS
-		lis_flags_t psw;
-
-		/* Under LiS we can't freeze the stream but we can lock the queue.  This is not a
-		   completely satisfactory solution for SMP because another processor could be in
-		   the middle of performing putq to the queue from before the push while we lock
-		   the queue.  Unless LiS provides assurances that the qopen procedure of the
-		   module will not be called while lower level modules are putting to the stream
-		   head, this will never work. Missing an M_PROTO or M_PCPROTO message on the
-		   stream head read queue will result in read(2) returning EBADMSG for default
-		   stream head read ops. tirdwr should return EPROTO and refuse to push the module
-		   instead. */
-		LIS_QISRLOCK(hq, &psw);
-#else
 		unsigned long psw = freezestr(q);
-#endif
+
 		for (mp = hq->q_first; mp && !err; mp = mp->b_next)
 			switch (mp->b_datap->db_type) {
 			case M_PROTO:
 			case M_PCPROTO:
 				err = EPROTO;
 			}
-#ifdef LIS
-		LIS_QISRUNLOCK(hq, &psw);
-#else
 		unfreezestr(q, psw);
-#endif
 	}
 	return (err);
 }
@@ -783,35 +766,9 @@ tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 static streamscall int
 tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
-	queue_t *rq, *wq;
-
-	(void) oflag;
-	(void) crp;
-	(void) rq;
-	(void) wq;
-#if defined LIS
-	/* protect against some LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			MOD_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
-	rq = RD(q);
-	wq = WR(q);
-	__ensure(rq->q_next != NULL, goto skip_pop);
-	__ensure(wq->q_next != NULL, goto skip_pop);
 	tirdwr_pop(q);
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	tirdwr_free_priv(q);
-	goto quit;
-      quit:
 	return (0);
 }
 
@@ -832,8 +789,6 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw tirdwr_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tirdwrinfo,
@@ -861,41 +816,10 @@ tirdwr_unregister_strmod(void)
 	return (0);
 }
 
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-tirdwr_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&tirdwrinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&tirdwrinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-tirdwr_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&tirdwrinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
-
-MODULE_STATIC int __init
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
+static
+#endif
+int __init
 tirdwrinit(void)
 {
 	int err;
@@ -919,8 +843,11 @@ tirdwrinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
-tirdwrterminate(void)
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
+static
+#endif
+void __exit
+tirdwrexit(void)
 {
 	int err;
 
@@ -935,7 +862,9 @@ tirdwrterminate(void)
  *  Linux Kernel Module Initialization
  *  -------------------------------------------------------------------------
  */
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
 module_init(tirdwrinit);
-module_exit(tirdwrterminate);
+module_exit(tirdwrexit);
+#endif
 
 #endif				/* LINUX */

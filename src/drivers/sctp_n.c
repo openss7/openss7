@@ -60,21 +60,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define __NO_VERSION__
 
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
-
-#if defined LFS && !defined _LFS_SOURCE
-#define _LFS_SOURCE
-#endif
-
-#if !defined _LIS_SOURCE && !defined _LFS_SOURCE
-#   error ****
-#   error **** One of _LFS_SOURCE or _LIS_SOURCE must be defined
-#   error **** to compile the sctp driver.
-#   error ****
-#endif
-
 #ifdef LINUX
 #   include <linux/autoconf.h>
 #   include <linux/version.h>
@@ -148,20 +133,15 @@ struct sockaddr_storage {
 #include <sys/stream.h>
 #include <sys/dki.h>
 
-#ifdef LFS_SOURCE
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/strdebug.h>
 #include <sys/debug.h>
-#endif
 #include <sys/ddi.h>
 
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
 
-#ifndef LFS
-#include <os7/debug.h>
-#endif
 #include <os7/bufq.h>
 
 #include "sctp.h"

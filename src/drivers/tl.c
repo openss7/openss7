@@ -69,7 +69,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define _SVR4_SOURCE
-#define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -127,17 +126,14 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define UDP_DRV_ID	CONFIG_STREAMS_UDP_MODID
 #define UDP_DRV_NAME	CONFIG_STREAMS_UDP_NAME
 #define UDP_CMAJORS	CONFIG_STREAMS_UDP_NMAJORS
 #define UDP_CMAJOR_0	CONFIG_STREAMS_UDP_MAJOR
 #define UDP_UNITS	CONFIG_STREAMS_UDP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_UDP_MODID));
 MODULE_ALIAS("streams-driver-tl");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_UDP_MAJOR));
@@ -147,7 +143,6 @@ MODULE_ALIAS("/dev/streams/tl/ticots");
 MODULE_ALIAS("/dev/streams/tl/ticotsord");
 MODULE_ALIAS("/dev/streams/tl/*");
 MODULE_ALIAS("/dev/streams/clone/tl");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-0");

@@ -80,7 +80,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define _SVR4_SOURCE
-#define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -166,24 +165,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TP_DRV_ID	CONFIG_STREAMS_RAW_MODID
 #define TP_DRV_NAME	CONFIG_STREAMS_RAW_NAME
 #define TP_CMAJORS	CONFIG_STREAMS_RAW_NMAJORS
 #define TP_CMAJOR_0	CONFIG_STREAMS_RAW_MAJOR
 #define TP_UNITS	CONFIG_STREAMS_RAW_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_RAW_MODID));
 MODULE_ALIAS("streams-driver-rawip");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_RAW_MAJOR));
 MODULE_ALIAS("/dev/streams/rawip");
 MODULE_ALIAS("/dev/streams/rawip/*");
 MODULE_ALIAS("/dev/streams/clone/rawip");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
@@ -635,18 +630,6 @@ tp_alloc(void)
 #define local_restore_str2(__flags) \
 	local_irq_restore(__flags)
 
-#endif
-
-#ifdef LIS
-#ifndef noinline
-#define noinline
-#endif
-#ifndef fastcall
-#define fastcall
-#endif
-#ifndef __unlikely
-#define __unlikely
-#endif
 #endif
 
 /*
@@ -3962,7 +3945,6 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * the header need be completed.  If checksum has not yet been performed, it is necessary to walk
  * through the data to generate the checksum.
  */
-#if defined LFS
 noinline fastcall __unlikely struct sk_buff *
 tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
@@ -4140,13 +4122,6 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
-#else				/* !defined LFS */
-STATIC INLINE fastcall __hot_out struct sk_buff *
-tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
-{
-	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
-}
-#endif				/* !defined LFS */
 
 noinline fastcall int
 tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
@@ -8518,10 +8493,8 @@ tp_v4_rcv(struct sk_buff *skb)
 		/* now allocate an mblk */
 		if (unlikely((mp = esballoc(skb_network_header(skb), plen, BPRI_MED, &fr)) == NULL))
 			goto no_buffers;
-#ifndef LIS
 		/* tell others it is a socket buffer */
 		mp->b_datap->db_flag |= DB_SKBUFF;
-#endif
 #else
 		if (unlikely((mp = skballoc(skb, BPRI_MED)) == NULL))
 			goto no_buffers;
@@ -8846,15 +8819,9 @@ tp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
 	   however, that strconf-sh attempts to allocate module ids that are identical to the base
 	   major device number anyway. */
-#if defined LIS
-	if (cmajor != CMAJOR_0)
-		return (ENXIO);
-#endif
-#if defined LFS
 	/* Linux Fast-STREAMS always passes internal major device numbers (modules ids) */
 	if (cmajor != DRV_ID)
 		return (ENXIO);
-#endif
 	/* sorry, you can't open by minor device */
 	if (cminor > LAST_CMINOR) {
 		return (ENXIO);
@@ -8900,9 +8867,7 @@ tp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	write_unlock_irqrestore(&master.lock, flags);
 	so = (typeof(so)) mp->b_wptr;
 	bzero(so, sizeof(*so));
-#if defined LFS
 	so->so_flags |= SO_SKBUFF;
-#endif
 	/* want to set a write offet of MAX_HEADER bytes */
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
@@ -8944,18 +8909,6 @@ tp_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) tp;
 	_printd(("%s: closing character device %d:%d\n", DRV_NAME, tp->u.dev.cmajor,
 		 tp->u.dev.cminor));
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
 	goto skip_pop;
       skip_pop:
 	/* make sure procedures are off */
@@ -9115,7 +9068,6 @@ MODULE_PARM_DESC(major, "Device number for the RAWIP driver. (0 for allocation.)
 /*
  *  Linux Fast-STREAMS Registration
  */
-#ifdef LFS
 
 STATIC struct cdevsw tp_cdev = {
 	.d_name = DRV_NAME,
@@ -9145,41 +9097,6 @@ tp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- */
-#ifdef LIS
-
-STATIC __unlikely int
-tp_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &tp_rawinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC __unlikely int
-tp_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 tp_rawterminate(void)

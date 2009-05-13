@@ -64,22 +64,16 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * functions.
  */
 
- /* MPS does not define registration functions for registering and
-    deregistering device drivers, so we use the LFS ones.  This define exposes
-    the functions whether it is LFS or LIS we are compiling against.  */
-#define _LFS_SOURCE	1
-
  /* Functions not defined by MPS are defined by the SVR4 compatability module.
-    This define exposes the SVR4 functions whether it is LFS or LIS we are
-    compiling against.  */
+    This define exposes the SVR4 functions. */
 #define _SVR4_SOURCE	1
 
  /* This exposes the MPS compatability functions.  */
 #define _MPS_SOURCE	1
 
  /* This is the first header file included.  It provides all of the STREAMS
-    header files in a compatabile way, whether LFS or LIS.  It uses the
-    definitions above to determine which headers to include.  */
+    header files in a compatabile way.  It uses the definitions above to
+    determine which headers to include.  */
 #include <sys/os7/compat.h>
 
  /* This is simply defines for use with Linux module functions. */
@@ -117,7 +111,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* defined MODULE_VERSION */
 #endif				/* defined LINUX */
 
- /* Shorten some names for compatability with older LIS releases. */
 #define TM_MPS_MOD_ID		CONFIG_STREAMS_TM_MPS_MODID
 #define TM_MPS_MOD_NAME		CONFIG_STREAMS_TM_MPS_NAME
 
@@ -153,15 +146,14 @@ static struct module_info tm_minfo = {
 	.mi_lowat = SHEADLOWAT,		/* Lo water mark */
 };
 
- /* Under Linxu Fast-STREAMS if you define a module statistics structure LFS
+ /* Under Linux Fast-STREAMS if you define a module statistics structure STREAMS
     will keep track of qopen, qclose, qadmin, qput and qsrv procedure entry
     statistics for you.  Align these on an SMP cache line for speed. */
 static struct module_stat tm_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat tm_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
  /* Standard STREAMS open and close procedures.  These are 'streamscall' so
-    that they match the ABI of the STREAMS implementation whether LFS or LIS.
-    You could also use _RP for LIS. */
+    that they match the ABI of the STREAMS implementation. */
 static streamscall int tm_qopen(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tm_qclose(queue_t *, int, cred_t *);
 
@@ -253,7 +245,7 @@ module_param(modid, ushort, 0444);
 #endif				/* defined module_param */
 MODULE_PARM_DESC(modid, "Module ID for TESTMOD-MPS driver. (0 for allocation.)");
 
- /* Linux FAST-STREAMS registration.  You can use this even under LIS. */
+ /* Linux FAST-STREAMS registration. */
 
 static struct fmodsw tm_fmod = {
 	.f_name = MOD_NAME,

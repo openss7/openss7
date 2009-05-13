@@ -78,11 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <sys/ioctl.h>
 #include <sys/dlpi.h>
-#ifdef LFS
 #include <stropts.h>
-#else
-#include <sys/stropts.h>
-#endif
 #include <sys/ldl.h>
 
 int output = 1;

@@ -202,13 +202,8 @@ static const char *lstdname = "RFC 2960, SCTP-IG, ETSI TS 102 144";
 static const char *sstdname = "RFC2960/TS102144";
 static const char *shortname = "SCTP";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_t";
 static char modname[256] = "sctp_t";
-#else
-static char devname[256] = "/dev/sctp_t";
-static char modname[256] = "sctp_t";
-#endif
 
 static const int test_level = T_INET_SCTP;
 

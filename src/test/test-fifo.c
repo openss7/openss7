@@ -123,11 +123,7 @@ static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "FIFO";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/fifo/0";
-#else
-static char devname[256] = "/dev/fifo";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;
@@ -3206,10 +3202,6 @@ struct test_stream test_2_4_4 = { &preamble_2_1, &test_case_2_4_4, &postamble_2 
 #define desc_case_2_4_5 "\
 Check that I_FDINSERT can be performed on a FIFO.  Checks that ENXIO is\n\
 returned when I_FDINSERT is attempted on a hung up FIFO."
-
-#ifdef LIS
-typedef ulong t_uscalar_t;
-#endif
 
 int
 test_case_2_4_5(int child)

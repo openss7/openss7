@@ -78,7 +78,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * Transport Provider Interface (TPI) as intepreted for TCP.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _UW7_SOURCE	1
 #define _MPS_SOURCE	1
@@ -4078,10 +4077,6 @@ MODULE_PARM(modid, "h");
 module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for XOT.  (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static __init int
 xot_modinit(void)

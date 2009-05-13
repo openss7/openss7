@@ -93,14 +93,11 @@ MODULE_AUTHOR(SFX_CONTACT);
 MODULE_DESCRIPTION(SFX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SFX_DEVICE);
 MODULE_LICENSE(SFX_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-sfx");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_SFX_MODULE */
 
 #ifndef CONFIG_STREAMS_SFX_NAME
 //#define CONFIG_STREAMS_SFX_NAME "sfx"
@@ -115,39 +112,57 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_SFX_MAJOR must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-sfx");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_SFX_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_SFX_MODID;
 
+#ifdef CONFIG_STREAMS_SFX_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-based FIFOs (0 for allocation).");
+#endif				/* CONFIG_STREAMS_SFX_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SFX_MODID));
 MODULE_ALIAS("streams-driver-sfx");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_SFX_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_SFX_MAJOR;
 
+#ifdef CONFIG_STREAMS_SFX_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs (0 for allocation).");
+#endif				/* CONFIG_STREAMS_SFX_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR) "-*");
 MODULE_ALIAS("/dev/sfx");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SFX_MAJOR));
 MODULE_ALIAS("/dev/streams/sfx");
 MODULE_ALIAS("/dev/streams/sfx/*");
 MODULE_ALIAS("/dev/streams/clone/sfx");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info sfx_minfo = {
 	.mi_idnum = CONFIG_STREAMS_SFX_MODID,
@@ -177,14 +192,17 @@ static struct qinit sfx_wqinit = {
 	.qi_mstat = &sfx_wstat,
 };
 
-static struct streamtab sfx_info = {
+#ifdef CONFIG_STREAMS_SFX_MODULE
+static
+#endif
+struct streamtab sfxinfo = {
 	.st_rdinit = &sfx_rqinit,
 	.st_wrinit = &sfx_wqinit,
 };
 
 static struct cdevsw sfx_cdev = {
 	.d_name = CONFIG_STREAMS_SFX_NAME,
-	.d_str = &sfx_info,
+	.d_str = &sfxinfo,
 	.d_flag = D_MP,
 	.d_fop = &strm_f_ops,
 	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
@@ -195,7 +213,7 @@ static struct cdevsw sfx_cdev = {
 static
 #endif
 int __init
-sfx_init(void)
+sfxinit(void)
 {
 	int err;
 
@@ -216,12 +234,12 @@ sfx_init(void)
 static
 #endif
 void __exit
-sfx_exit(void)
+sfxexit(void)
 {
 	unregister_strdev(&sfx_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_SFX_MODULE
-module_init(sfx_init);
-module_exit(sfx_exit);
+module_init(sfxinit);
+module_exit(sfxexit);
 #endif

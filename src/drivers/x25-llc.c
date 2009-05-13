@@ -117,7 +117,6 @@ MODULE_SUPPORTED_DEVICE(LLC_DEVICE);
 MODULE_LICENSE(LLC_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LLC_MODID));
 MODULE_ALIAS("streams-driver-llc");
 MODULE_ALIAS("streams-module-llc");
@@ -125,7 +124,6 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR));
 MODULE_ALIAS("/dev/streams/llc");
 MODULE_ALIAS("/dev/streams/llc/*");
 MODULE_ALIAS("/dev/streams/clone/llc");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-0");
@@ -2433,7 +2431,6 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for LLC.  (0 for allocation)");
 
-#ifdef LFS
 
 struct cdevsw llc_cdev = {
 	.d_str = &llc_info,
@@ -2462,38 +2459,6 @@ llc_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-#ifdef LIS
-
-static int
-llc_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &llc_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NAME)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-static int
-llc_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 static __init int
 llc_modinit(void)

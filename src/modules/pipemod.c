@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
  *  send of the M_FLUSH message.  It is pushed on one side of STREAMS-based
@@ -99,14 +98,11 @@ MODULE_AUTHOR(PIPEMOD_CONTACT);
 MODULE_DESCRIPTION(PIPEMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPEMOD_DEVICE);
 MODULE_LICENSE(PIPEMOD_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-pipemod");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_PIPEMOD_MODULE */
 
 #ifndef CONFIG_STREAMS_PIPEMOD_NAME
 //#define CONFIG_STREAMS_PIPEMOD_NAME "pipemod"
@@ -117,21 +113,32 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_PIPEMOD_MODID must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-pipemod");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_PIPEMOD_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_PIPEMOD_MODID;
 
+#ifdef CONFIG_STREAMS_PIPEMOD_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for PIPEMOD.");
+#endif				/* CONFIG_STREAMS_PIPEMOD_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PIPEMOD_MODID));
 MODULE_ALIAS("streams-module-pipemod");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info pipemod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_PIPEMOD_MODID,
@@ -224,14 +231,17 @@ static struct qinit pipemod_qinit = {
 	.qi_mstat = &pipemod_mstat,
 };
 
-static struct streamtab pipemod_info = {
+#ifdef CONFIG_STREAMS_PIPEMOD_MODULE
+static
+#endif
+struct streamtab pipemodinfo = {
 	.st_rdinit = &pipemod_qinit,
 	.st_wrinit = &pipemod_qinit,
 };
 
 static struct fmodsw pipemod_fmod = {
 	.f_name = CONFIG_STREAMS_PIPEMOD_NAME,
-	.f_str = &pipemod_info,
+	.f_str = &pipemodinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
@@ -240,7 +250,7 @@ static struct fmodsw pipemod_fmod = {
 static
 #endif
 int __init
-pipemod_init(void)
+pipemodinit(void)
 {
 	int err;
 
@@ -261,7 +271,7 @@ pipemod_init(void)
 static
 #endif
 void __exit
-pipemod_exit(void)
+pipemodexit(void)
 {
 	int err;
 
@@ -271,6 +281,6 @@ pipemod_exit(void)
 };
 
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE
-module_init(pipemod_init);
-module_exit(pipemod_exit);
+module_init(pipemodinit);
+module_exit(pipemodexit);
 #endif

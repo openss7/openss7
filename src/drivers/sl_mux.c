@@ -79,7 +79,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  the specific signalling link stream.
  */
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 #define _SUN_SOURCE 1
@@ -127,13 +126,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_MUX_DRV_ID		CONFIG_STREAMS_SL_MUX_MODID
 #define SL_MUX_DRV_NAME		CONFIG_STREAMS_SL_MUX_NAME
 #define SL_MUX_CMAJORS		CONFIG_STREAMS_SL_MUX_NMAJORS
 #define SL_MUX_CMAJOR_0		CONFIG_STREAMS_SL_MUX_MAJOR
 #define SL_MUX_UNITS		CONFIG_STREAMS_SL_MUX_NMINORS
-#endif				/* LFS */
 
 /*
  *  ===========================================================================

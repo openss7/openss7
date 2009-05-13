@@ -227,7 +227,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define _DEBUG 1
 // #undef _DEBUG
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -282,24 +281,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MX_V400P_DRV_ID		CONFIG_STREAMS_MX_V400P_MODID
 #define MX_V400P_DRV_NAME	CONFIG_STREAMS_MX_V400P_NAME
 #define MX_V400P_CMAJORS	CONFIG_STREAMS_MX_V400P_NMAJORS
 #define MX_V400P_CMAJOR_0	CONFIG_STREAMS_MX_V400P_MAJOR
 #define MX_V400P_UNITS		CONFIG_STREAMS_MX_V400P_NMINORS
-#endif
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MX_V400P_MODID));
 MODULE_ALIAS("streams-driver-mx-v400p");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_V400P_MAJOR));
 MODULE_ALIAS("/dev/streams/v400p-mx");
 MODULE_ALIAS("/dev/streams/v400p-mx/*");
 MODULE_ALIAS("/dev/streams/clone/v400p-mx");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(MX_V400P_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(MX_V400P_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(MX_V400P_CMAJOR_0) "-0");

@@ -113,13 +113,11 @@ MODULE_ALIAS("streams-sl_x400p");
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_X400P_DRV_ID		CONFIG_STREAMS_SL_X400P_MODID
 #define SL_X400P_DRV_NAME	CONFIG_STREAMS_SL_X400P_NAME
 #define SL_X400P_CMAJORS	CONFIG_STREAMS_SL_X400P_NMAJORS
 #define SL_X400P_CMAJOR_0	CONFIG_STREAMS_SL_X400P_MAJOR
 #define SL_X400P_UNITS		CONFIG_STREAMS_SL_X400P_NMINORS
-#endif
 
 /*
  *  =======================================================================
@@ -9937,7 +9935,6 @@ MODULE_PARM_DESC(major, "Device number for the X100P-SL driver. (0 for allocatio
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
@@ -9965,34 +9962,6 @@ xp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-xp_register_strdev(major_t major)
-{
-	int err;
-	if ((err = lis_register_strdev(major, &sl_x400pinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	return (0);
-}
-
-STATIC int
-xp_unregister_strdev(major_t major)
-{
-	int err;
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 sl_x400pterminate(void)

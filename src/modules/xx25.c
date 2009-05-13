@@ -5616,10 +5616,6 @@ MODULE_PARM_DESC(modid, "Module ID for XX25. (0 for allocation.)");
  *  LINUX FAST-STREAMS REGISTRATION
  */
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 static __init int
 xx25_modinit(void)
 {

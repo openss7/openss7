@@ -103,12 +103,10 @@ static int tc_debug = TC_DEBUG;
 static int tc_debug = 2;
 #endif
 
-#ifdef LFS
 #define TC_DRV_ID		CONFIG_STREAMS_TC_MODID
 #define TC_DRV_NAME		CONFIG_STREAMS_TC_NAME
 #define TC_CMAJORS		CONFIG_STREAMS_TC_NMAJORS
 #define TC_CMAJOR_0		CONFIG_STREAMS_TC_MAJOR
-#endif
 
 #ifndef TC_CMAJOR_0
 #define TC_CMAJOR_0 210

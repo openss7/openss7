@@ -106,7 +106,6 @@ MODULE_LICENSE(LCD_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-" CONFIG_STREAMS_LCD_NAME);
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LCD_MODID));
 MODULE_ALIAS("streams-driver-" CONFIG_STREAMS_LCD_NAME);
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LCD_MAJOR));
@@ -117,7 +116,6 @@ MODULE_ALIAS("/dev/streams/lcd/sdlc");
 MODULE_ALIAS("/dev/streams/lcd/mac");
 MODULE_ALIAS("/dev/streams/lcd/lan");
 MODULE_ALIAS("/dev/streams/clone/lcd");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(LCD_CMAJOR_0) "-0");
@@ -146,13 +144,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
  * --------------------------------------------------------------------------
  */
 
-#ifdef LFS
 #define LCD_DRV_ID	CONFIG_STREAMS_LCD_MODID
 #define LCD_DRV_NAME	CONFIG_STREAMS_LCD_NAME
 #define LCD_CMAJORS	CONFIG_STREAMS_LCD_NMAJORS
 #define LCD_CMAJOR_0	CONFIG_STREAMS_LCD_MAJOR
 #define LCD_UNITS	CONFIG_STREAMS_LCD_NMINORS
-#endif				/* LFS */
 
 #define DRV_ID		LCD_DRV_ID
 #define DRV_NAME	LCD_DRV_NAME

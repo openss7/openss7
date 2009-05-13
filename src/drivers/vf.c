@@ -146,12 +146,10 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS-vf driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_VF_MAJOR) "-*");
 MODULE_ALIAS("/dev/vf");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_VF_MAJOR));
 MODULE_ALIAS("/dev/streams/vf");
 MODULE_ALIAS("/dev/streams/vf/*");
 MODULE_ALIAS("/dev/streams/clone/vf");
-#endif
 #endif
 
 STATIC struct module_info vf_minfo = {

@@ -148,11 +148,7 @@ EXTRA_libOS7streams_a_SOURCES	= src/kernel/strmain.c \
 				  src/kernel/strsysctl.c \
 				  src/kernel/strsyms.c \
 				  src/kernel/strutil.c \
-				  src/kernel/strsad.c \
-				  src/modules/sth.c \
-				  src/modules/sth.h \
-				  src/drivers/clone.c \
-				  src/drivers/clone.h
+				  src/kernel/strsad.c
 libOS7streams_a_SOURCES		= src/kernel/streams.c \
 				  src/kernel/strreg.h \
 				  src/kernel/strprocfs.h \
@@ -160,7 +156,8 @@ libOS7streams_a_SOURCES		= src/kernel/streams.c \
 				  src/kernel/strsysctl.h \
 				  src/kernel/strutil.h \
 				  src/kernel/strsad.h \
-				  src/kernel/strargs.h
+				  src/kernel/strargs.h \
+				  src/kernel/strmain.h
 libOS7streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7streams_a_CFLAGS		= $(KERNEL_CFLAGS)
@@ -176,7 +173,7 @@ streams.o: stamp-verobjs
 
 noinst_LIBRARIES		+= libOS7kernel.a
 
-libOS7kernel_a_SOURCES		= src/include/sys/os7/allocb.h \
+libOS7kernel_a_SOURCES	        = src/include/sys/os7/allocb.h \
 				  src/include/sys/os7/bufpool.h \
 				  src/include/sys/os7/bufq.h \
 				  src/include/sys/os7/compat.h \
@@ -184,59 +181,151 @@ libOS7kernel_a_SOURCES		= src/include/sys/os7/allocb.h \
 				  src/include/sys/os7/lock.h \
 				  src/include/sys/os7/priv.h \
 				  src/include/sys/os7/queue.h \
-				  src/include/sys/os7/timer.h \
-				  src/kernel/os7compat.c \
-				  src/include/sys/os7/ddi.h \
-				  src/include/sys/os7/strconf.h \
-				  src/include/sys/os7/stream.h \
-				  src/kernel/svr3compat.c \
-				  src/include/sys/svr3/ddi.h \
-				  src/include/sys/svr3/strconf.h \
-				  src/include/sys/svr3/stream.h \
-				  src/kernel/svr4compat.c \
-				  src/include/sys/svr4/ddi.h \
-				  src/include/sys/svr4/strconf.h \
-				  src/include/sys/svr4/stream.h \
-				  src/kernel/mpscompat.c \
-				  src/include/sys/mps/ddi.h \
-				  src/include/sys/mps/strconf.h \
-				  src/include/sys/mps/stream.h \
-				  src/kernel/suncompat.c \
-				  src/include/sys/sunddi.h \
-				  src/include/sys/strsun.h \
-				  src/include/sys/sun/ddi.h \
-				  src/include/sys/sun/strconf.h \
-				  src/include/sys/sun/strsun.h \
-				  src/include/sys/sun/stream.h \
-				  src/kernel/uw7compat.c \
-				  src/include/sys/uw7/ddi.h \
-				  src/include/sys/uw7/strconf.h \
-				  src/include/sys/uw7/stream.h \
-				  src/kernel/osfcompat.c \
-				  src/include/sys/osf/ddi.h \
-				  src/include/sys/osf/strconf.h \
-				  src/include/sys/osf/stream.h \
-				  src/kernel/aixcompat.c \
-				  src/include/sys/aix/ddi.h \
-				  src/include/sys/aix/strconf.h \
-				  src/include/sys/aix/stream.h \
-				  src/kernel/hpuxcompat.c \
-				  src/include/sys/hpux/ddi.h \
-				  src/include/sys/hpux/strconf.h \
-				  src/include/sys/hpux/stream.h \
-				  src/kernel/irixcompat.c \
-				  src/include/sys/irix/ddi.h \
-				  src/include/sys/irix/strconf.h \
-				  src/include/sys/irix/stream.h \
-				  src/kernel/maccompat.c \
-				  src/include/sys/mac/ddi.h \
-				  src/include/sys/mac/strconf.h \
-				  src/include/sys/mac/stream.h
+				  src/include/sys/os7/timer.h
 libOS7kernel_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_EXPSYMTAB)
 libOS7kernel_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7kernel_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/os7compat.c \
+				  src/include/sys/os7/ddi.h \
+				  src/include/sys/os7/strconf.h \
+				  src/include/sys/os7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OS7
+libOS7streams_a_SOURCES	       += src/kernel/os7compat.c \
+				  src/include/sys/os7/ddi.h \
+				  src/include/sys/os7/strconf.h \
+				  src/include/sys/os7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/svr3compat.c \
+				  src/include/sys/svr3/ddi.h \
+				  src/include/sys/svr3/strconf.h \
+				  src/include/sys/svr3/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR3
+libOS7streams_a_SOURCES	       += src/kernel/svr3compat.c \
+				  src/include/sys/svr3/ddi.h \
+				  src/include/sys/svr3/strconf.h \
+				  src/include/sys/svr3/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/svr4compat.c \
+				  src/include/sys/svr4/ddi.h \
+				  src/include/sys/svr4/strconf.h \
+				  src/include/sys/svr4/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+libOS7streams_a_SOURCES	       += src/kernel/svr4compat.c \
+				  src/include/sys/svr4/ddi.h \
+				  src/include/sys/svr4/strconf.h \
+				  src/include/sys/svr4/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/mpscompat.c \
+				  src/include/sys/mps/ddi.h \
+				  src/include/sys/mps/strconf.h \
+				  src/include/sys/mps/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+libOS7streams_a_SOURCES	       += src/kernel/mpscompat.c \
+				  src/include/sys/mps/ddi.h \
+				  src/include/sys/mps/strconf.h \
+				  src/include/sys/mps/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/suncompat.c \
+				  src/include/sys/sunddi.h \
+				  src/include/sys/strsun.h \
+				  src/include/sys/sun/ddi.h \
+				  src/include/sys/sun/strconf.h \
+				  src/include/sys/sun/strsun.h \
+				  src/include/sys/sun/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+libOS7streams_a_SOURCES	       += src/kernel/suncompat.c \
+				  src/include/sys/sunddi.h \
+				  src/include/sys/strsun.h \
+				  src/include/sys/sun/ddi.h \
+				  src/include/sys/sun/strconf.h \
+				  src/include/sys/sun/strsun.h \
+				  src/include/sys/sun/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/uw7compat.c \
+				  src/include/sys/uw7/ddi.h \
+				  src/include/sys/uw7/strconf.h \
+				  src/include/sys/uw7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+libOS7streams_a_SOURCES	       += src/kernel/uw7compat.c \
+				  src/include/sys/uw7/ddi.h \
+				  src/include/sys/uw7/strconf.h \
+				  src/include/sys/uw7/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/osfcompat.c \
+				  src/include/sys/osf/ddi.h \
+				  src/include/sys/osf/strconf.h \
+				  src/include/sys/osf/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+libOS7streams_a_SOURCES	       += src/kernel/osfcompat.c \
+				  src/include/sys/osf/ddi.h \
+				  src/include/sys/osf/strconf.h \
+				  src/include/sys/osf/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/aixcompat.c \
+				  src/include/sys/aix/ddi.h \
+				  src/include/sys/aix/strconf.h \
+				  src/include/sys/aix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+libOS7streams_a_SOURCES	       += src/kernel/aixcompat.c \
+				  src/include/sys/aix/ddi.h \
+				  src/include/sys/aix/strconf.h \
+				  src/include/sys/aix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/hpuxcompat.c \
+				  src/include/sys/hpux/ddi.h \
+				  src/include/sys/hpux/strconf.h \
+				  src/include/sys/hpux/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+libOS7streams_a_SOURCES	       += src/kernel/hpuxcompat.c \
+				  src/include/sys/hpux/ddi.h \
+				  src/include/sys/hpux/strconf.h \
+				  src/include/sys/hpux/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/irixcompat.c \
+				  src/include/sys/irix/ddi.h \
+				  src/include/sys/irix/strconf.h \
+				  src/include/sys/irix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+libOS7streams_a_SOURCES	       += src/kernel/irixcompat.c \
+				  src/include/sys/irix/ddi.h \
+				  src/include/sys/irix/strconf.h \
+				  src/include/sys/irix/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+libOS7kernel_a_SOURCES	       += src/kernel/maccompat.c \
+				  src/include/sys/mac/ddi.h \
+				  src/include/sys/mac/strconf.h \
+				  src/include/sys/mac/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+libOS7streams_a_SOURCES	       += src/kernel/maccompat.c \
+				  src/include/sys/mac/ddi.h \
+				  src/include/sys/mac/strconf.h \
+				  src/include/sys/mac/stream.h
+endif
 
 ## =====================================================================
 
@@ -254,20 +343,12 @@ EXTRA_libOS7modules_a_SOURCES	= src/modules/mx_sdl.c \
 				  src/modules/sscop.c \
 				  src/modules/sscop2.c \
 				  src/modules/m2tp.c
-libOS7modules_a_SOURCES		= src/modules/bufmod.c \
-				  src/modules/nullmod.c \
-				  src/modules/pipemod.c \
-				  src/modules/connld.c \
-				  src/modules/sc.c src/include/sys/sc.h \
-				  src/modules/testmod.c src/include/sys/testmod.h \
-				  src/modules/pckt.c \
+libOS7modules_a_SOURCES		= src/modules/pckt.c \
 				  src/modules/ptem.c \
 				  src/modules/ttcompat.c \
 				  src/modules/ldterm.c \
 				  src/modules/debug.h \
 				  src/modules/ip_strm_mod.c src/modules/ip_strm_mod.h \
-				  src/modules/tirdwr.c \
-				  src/modules/timod.c \
 				  src/modules/sockmod.c \
 				  src/modules/tpiperf.c \
 				  src/modules/ch_pmod.c \
@@ -315,6 +396,62 @@ libOS7modules_a_CPPFLAGS	= -I$(top_builddir)/src/modules -I$(top_srcdir)/src/mod
 libOS7modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7modules_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_STH_MODULE
+libOS7modules_a_SOURCES	       += src/modules/sth.c src/modules/sth.h
+endif
+if CONFIG_STREAMS_STH
+libOS7streams_a_SOURCES	       += src/modules/sth.c src/modules/sth.h
+endif
+if CONFIG_STREAMS_BUFMOD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/bufmod.c
+endif
+if CONFIG_STREAMS_BUFMOD
+libOS7streams_a_SOURCES	       += src/modules/bufmod.c
+endif
+if CONFIG_STREAMS_NULLMOD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/nullmod.c
+endif
+if CONFIG_STREAMS_NULLMOD
+libOS7streams_a_SOURCES	       += src/modules/nullmod.c
+endif
+if CONFIG_STREAMS_PIPEMOD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/pipemod.c
+endif
+if CONFIG_STREAMS_PIPEMOD
+libOS7streams_a_SOURCES	       += src/modules/pipemod.c
+endif
+if CONFIG_STREAMS_CONNLD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/connld.c
+endif
+if CONFIG_STREAMS_CONNLD
+libOS7streams_a_SOURCES	       += src/modules/connld.c
+endif
+if CONFIG_STREAMS_SC_MODULE
+libOS7modules_a_SOURCES	       += src/modules/sc.c src/include/sys/sc.h
+endif
+if CONFIG_STREAMS_SC
+libOS7streams_a_SOURCES	       += src/modules/sc.c src/include/sys/sc.h
+endif
+if CONFIG_STREAMS_TESTMOD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/testmod.c src/include/sys/testmod.h
+endif
+if CONFIG_STREAMS_TESTMOD
+libOS7streams_a_SOURCES	       += src/modules/testmod.c src/include/sys/testmod.h
+endif
+
+if CONFIG_STREAMS_TIMOD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/timod.c
+endif
+if CONFIG_STREAMS_TIMOD
+libOS7streams_a_SOURCES	       += src/modules/timod.c
+endif
+if CONFIG_STREAMS_TIRDWR_MODULE
+libOS7modules_a_SOURCES	       += src/modules/tirdwr.c
+endif
+if CONFIG_STREAMS_TIRDWR
+libOS7streams_a_SOURCES	       += src/modules/tirdwr.c
+endif
 
 ## =====================================================================
 
@@ -406,18 +543,7 @@ EXTRA_libOS7drivers_a_SOURCES	= src/drivers/cd.c \
 				  src/drivers/tua_spp.c \
 				  src/drivers/tua_ss7.c \
 				  src/drivers/ua_msg.h
-libOS7drivers_a_SOURCES		= src/drivers/fifo.c src/drivers/fifo.h \
-				  src/drivers/sad.c src/include/sys/sad.h \
-				  src/drivers/nsdev.c \
-				  src/drivers/echo.c \
-				  src/drivers/mux.c \
-				  src/drivers/nuls.c \
-				  src/drivers/pipe.c src/drivers/pipe.h \
-				  src/drivers/log.c src/include/log.h src/include/sys/log.h src/include/strlog.h src/include/sys/strlog.h src/drivers/log.h \
-				  src/drivers/loop.c src/include/sys/loop.h \
-				  src/drivers/sfx.c \
-				  src/drivers/spx.c \
-				  src/drivers/pty.c \
+libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/debug.h \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
@@ -459,6 +585,79 @@ libOS7drivers_a_CPPFLAGS	= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/dri
 libOS7drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7drivers_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+if CONFIG_STREAMS_CLONE_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/clone.c src/drivers/clone.h
+endif
+if CONFIG_STREAMS_CLONE
+libOS7streams_a_SOURCES	       += src/drivers/clone.c src/drivers/clone.h
+endif
+if CONFIG_STREAMS_ECHO_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/echo.c
+endif
+if CONFIG_STREAMS_ECHO
+libOS7streams_a_SOURCES	       += src/drivers/echo.c
+endif
+if CONFIG_STREAMS_FIFO_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/fifo.c src/drivers/fifo.h
+endif
+if CONFIG_STREAMS_FIFO
+libOS7streams_a_SOURCES	       += src/drivers/fifo.c src/drivers/fifo.h
+endif
+if CONFIG_STREAMS_LOG_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/log.c src/include/log.h src/include/sys/log.h src/include/strlog.h src/include/sys/strlog.h src/drivers/log.h
+endif
+if CONFIG_STREAMS_LOG
+libOS7streams_a_SOURCES	       += src/drivers/log.c src/include/log.h src/include/sys/log.h src/include/strlog.h src/include/sys/strlog.h src/drivers/log.h
+endif
+if CONFIG_STREAMS_LOOP_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/loop.c src/include/sys/loop.h
+endif
+if CONFIG_STREAMS_LOOP
+libOS7streams_a_SOURCES	       += src/drivers/loop.c src/include/sys/loop.h
+endif
+if CONFIG_STREAMS_NSDEV_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/nsdev.c
+endif
+if CONFIG_STREAMS_NSDEV
+libOS7streams_a_SOURCES	       += src/drivers/nsdev.c
+endif
+if CONFIG_STREAMS_MUX_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/mux.c
+endif
+if CONFIG_STREAMS_MUX
+libOS7streams_a_SOURCES	       += src/drivers/mux.c
+endif
+if CONFIG_STREAMS_NULS_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/nuls.c
+endif
+if CONFIG_STREAMS_NULS
+libOS7streams_a_SOURCES	       += src/drivers/nuls.c
+endif
+if CONFIG_STREAMS_PIPE_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/pipe.c src/drivers/pipe.h
+endif
+if CONFIG_STREAMS_PIPE
+libOS7streams_a_SOURCES	       += src/drivers/pipe.c src/drivers/pipe.h
+endif
+if CONFIG_STREAMS_SAD_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/sad.c src/include/sys/sad.h
+endif
+if CONFIG_STREAMS_SAD
+libOS7streams_a_SOURCES	       += src/drivers/sad.c src/include/sys/sad.h
+endif
+if CONFIG_STREAMS_SFX_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/sfx.c
+endif
+if CONFIG_STREAMS_SFX
+libOS7streams_a_SOURCES	       += src/drivers/sfx.c
+endif
+if CONFIG_STREAMS_SPX_MODULE
+libOS7drivers_a_SOURCES	       += src/drivers/spx.c
+endif
+if CONFIG_STREAMS_SPX
+libOS7streams_a_SOURCES	       += src/drivers/spx.c
+endif
 
 ## =====================================================================
 
