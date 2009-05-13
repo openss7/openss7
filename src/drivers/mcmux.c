@@ -67,7 +67,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _DEBUG 1
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -108,13 +107,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MCMUX_DRV_ID	CONFIG_STREAMS_MCMUX_MODID
 #define MCMUX_DRV_NAME	CONFIG_STREAMS_MCMUX_NAME
 #define MCMUX_CMAJORS	CONFIG_STREAMS_MCMUX_NMAJORS
 #define MCMUX_CMAJOR_0	CONFIG_STREAMS_MCMUX_MAJOR
 #define MCMUX_UNITS	CONFIG_STREAMS_MCMUX_NMINORS
-#endif				/* LFS */
 
 #ifndef MCMUX_DRV_ID
 #error "MCMUX_DRV_ID must be defined."
@@ -151,9 +148,7 @@ MODULE_PARM_DESC(major, "Device ID for MCMOD.  (0 for allocation.)");
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MCMUX_MODID));
-if 1
 MODULE_ALIAS("streams-driver-mcmux");
 MODULE_ALIAS("/dev/streams/mcmux");
 MODULE_ALIAS("/dev/streams/mcmux/*");
@@ -161,15 +156,11 @@ MODULE_ALIAS("/dev/streams/clone/mcmux");
 MODULE_ALIAS("/dev/streams/mcmux/mc");
 MODULE_ALIAS("/dev/streams/mcmux/mgr");
 MODULE_ALIAS("/dev/streams/mcmux/tp");
-#endif
-#endif				/* LFS */
-#if 1
 MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-" __stringify(MGR_CMINOR));
 MODULE_ALIAS("char-major-" __stringify(MCMUX_CMAJOR_0) "-" __stringify(TP_CMINOR));
-#endif
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

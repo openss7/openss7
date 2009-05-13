@@ -60,7 +60,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _DEBUG 1
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -83,10 +82,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TCMOD_SPLASH	TCMOD_DESCRIP	"\n" \
 			TCMOD_REVISION
 
-#ifdef LFS
 #define TCMOD_MOD_ID	CONFIG_STREAMS_TCMOD_MODID
 #define TCMOD_MOD_NAME	CONFIG_STREAMS_TCMOD_NAME
-#endif				/* LFS */
 
 #ifndef TCMOD_MOD_ID
 #error "TCMOD_MOD_ID must be defined."

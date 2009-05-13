@@ -204,9 +204,7 @@ autopush_next(dev_t dev)
 	return ((struct strapush *) api);
 }
 
-#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
 EXPORT_SYMBOL_GPL(autopush_next);
-#endif
 
 streams_fastcall struct strapush *
 autopush_find(dev_t dev)
@@ -230,9 +228,7 @@ autopush_find(dev_t dev)
 	return ((struct strapush *) api);
 }
 
-#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
 EXPORT_SYMBOL_GPL(autopush_find);
-#endif
 
 streams_fastcall struct strapush *
 autopush_search(const char *name, minor_t minor)
@@ -262,9 +258,7 @@ autopush_search(const char *name, minor_t minor)
 	return ((struct strapush *) api);
 }
 
-#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
 EXPORT_SYMBOL_GPL(autopush_search);
-#endif
 
 streams_fastcall int
 autopush_add(struct strapush *sap)
@@ -338,9 +332,7 @@ autopush_add(struct strapush *sap)
 	return (err);
 }
 
-#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
 EXPORT_SYMBOL_GPL(autopush_add);
-#endif
 
 streams_fastcall int
 autopush_del(struct strapush *sap)
@@ -380,9 +372,7 @@ autopush_del(struct strapush *sap)
 	return (err);
 }
 
-#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
 EXPORT_SYMBOL_GPL(autopush_del);
-#endif
 
 streams_fastcall int
 autopush_vml(struct str_mlist *smp, int nmods)
@@ -410,9 +400,7 @@ autopush_vml(struct str_mlist *smp, int nmods)
 	return (-EINVAL);
 }
 
-#if defined CONFIG_STREAMS_SAD_MODULE || !defined CONFIG_STREAMS_SAD
 EXPORT_SYMBOL_GPL(autopush_vml);
-#endif
 
 streams_fastcall int
 apush_set(struct strapush *sap)
@@ -555,7 +543,7 @@ EXPORT_SYMBOL_GPL(apush_vml);
  *  @sflag: stream flag (%MODOPEN or %CLONEOPEN or %DRVOPEN)
  *  @crp: pointer to user credentials structure
  */
-BIG_STATIC_STH streams_fastcall int
+streams_fastcall int
 autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct apinfo *api;
@@ -603,6 +591,4 @@ autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sfl
 	}
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(autopush);
-#endif

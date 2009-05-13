@@ -107,6 +107,15 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
+#include <linux/sockios.h>
+#include <linux/ioctl.h>
+#include <linux/termios.h>
+#include <asm/ioctls.h>
+#include <asm/sockios.h>
+#include <asm/termios.h>
+
+#include <sys/sockio.h>
+#include <sys/socksys.h>
 
 /*
    These are for TPI definitions 
@@ -365,18 +374,6 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct smod *priv = q->q_ptr;
 
-#if defined LIS
-	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
-	   modules and, of course, does not properly suppress queue procedures while closing.  We
-	   can check this as many times as we would like on SMP and the q->q_next pointer could be
-	   invalidate immediately after we check it.  Never use LiS. */
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			MOD_NAME, __FUNCTION__);
-		freemsg(mp);
-		return (0);
-	}
-#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 		union T_primitives *p;
 		struct iocblk *ioc;
@@ -397,20 +394,8 @@ smod_wput_slow(queue_t *q, mblk_t *mp)
 		dp->b_datap->db_type = (ioc->ioc_cmd == SI_GETUDATA) ? M_PCPROTO : M_PROTO;
 		p = (typeof(p)) dp->b_rptr;
 		err = -EINVAL;
-#if defined LIS
-		/* LiS does not implement the SVR 4 Stream head correctly.  It is the
-		   responsibility of the Stream head, according to the SVR 4.2 SPG, to convert
-		   legacy character device, file, terminal and socket intput-output controls to
-		   I_STR input-output controls.  When the Stream head works correctly (as it does
-		   for Linux Fast-STREAMS) we will never receive a TRANPARENT ioctl here. */
-#if 0
-		if (ioc->ioc_count == TRANSPARENT)
-			return smod_ioctl_slow(q, mp);
-#endif
-#else				/* defined LIS */
 		if (ioc->ioc_count == TRANSPARENT)
 			goto error;
-#endif				/* defined LIS */
 		switch (ioc->ioc_cmd) {
 #ifdef O_SI_OPTMGMT
 		case O_SI_OPTMGMT:
@@ -615,18 +600,6 @@ smod_wput(queue_t *q, mblk_t *mp)
 {
 	union T_primitives *p;
 
-#if defined LIS
-	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
-	   modules and, of course, does not properly suppress queue procedures while closing.  We
-	   can check this as many times as we would like on SMP and the q->q_next pointer could be
-	   invalidate immediately after we check it.  Never use LiS. */
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			MOD_NAME, __FUNCTION__);
-		freemsg(mp);
-		return (0);
-	}
-#endif				/* defined LIS */
 	/* fast path for data */
 	if (unlikely(mp->b_datap->db_type != M_PROTO))
 		goto go_slow;
@@ -825,7 +798,7 @@ struct proto_ops tpi_socket_ops = {
  * points access sock->sk structure, so it must be present and sane.  This means that we need to
  * create a new socket and sockfs file entry, remove the STREAMS file pointer from the file
  * descriptor, add the socket file pointer to the file descriptor, and attache the STREAMS file
- * pointer to the socket somewhere.  This technique should work for both LFS and LIS.
+ * pointer to the socket somewhere.
  *
  * The trick here is when sockmod is pushed to transform the Stream head into a socket (from the
  * filesystem and system call perspective).  This can be accomplished most eaily in a similar manner
@@ -864,31 +837,9 @@ smod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 static streamscall int
 smod_close(queue_t *q, int oflag, cred_t *crp)
 {
-	(void) oflag;
-	(void) crp;
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
-		goto quit;
-	}
-	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
-	   modules and, of course, does not properly suppress queue procedures while closing.  We
-	   can check this as many times as we would like on SMP and the q->q_next pointer could be
-	   invalidate immediately after we check it.  Never use LiS. */
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			MOD_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
 	smod_pop(q);
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	smod_free_priv(q);
-	goto quit;
-      quit:
 	return (0);
 }
 
@@ -920,7 +871,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SOCKMOD module. (0 for allocation.)")
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct fmodsw sockmod_fmod = {
 	.f_name = MOD_NAME,
@@ -949,13 +899,13 @@ smod_unregister_strmod(void)
 	return (0);
 }
 
-#if defined WITH_32BIT_CONVERSION
+#if defined __LP64__
 struct sockmod_trans {
 	unsigned int cmd;
 	void *opaque;
 };
 
-STATIC sockmod_trans sockmod_trans_map[] = {
+STATIC struct sockmod_trans sockmod_trans_map[] = {
 	{.cmd = O_SI_GETUDATA,}
 	, {.cmd = SI_SHUTDOWN,}
 	, {.cmd = SI_LISTEN,}
@@ -978,12 +928,16 @@ STATIC sockmod_trans sockmod_trans_map[] = {
 	, {.cmd = SIOCGETPEER,}
 	, {.cmd = SIOCXPROTO,}
 	, {.cmd = SIOCSOCKSYS,}
+#ifdef FIOCGPGRP
 	, {.cmd = FIOCGPGRP,}
+#endif				/* FIOCGPGRP */
+#ifdef FIOCSPGRP
 	, {.cmd = FIOCSPGRP,}
+#endif				/* FIOCSPGRP */
 	, {.cmd = FIONREAD,}
 	, {.cmd = FIONBIO,}
 	, {.cmd = TIOCINQ,}
-	, {.cmd = TIOOUTQ,}
+	, {.cmd = TIOCOUTQ,}
 	, {.cmd = 0,}
 };
 
@@ -993,7 +947,7 @@ smod_ioctl32_unregister(void)
 	struct sockmod_trans *t;
 
 	for (t = sockmod_trans_map; t->cmd != 0; t++) {
-		streams_unregister_ioctl32(t->opaque);
+		unregister_ioctl32(t->opaque);
 		t->opaque = NULL;
 	}
 	return;
@@ -1005,7 +959,7 @@ smod_ioctl32_register(void)
 	struct sockmod_trans *t;
 
 	for (t = sockmod_trans_map; t->cmd != 0; t++) {
-		if ((t->opaque = streams_register_ioctl32(t->cmd)) == NULL) {
+		if ((t->opaque = register_ioctl32(t->cmd)) == NULL) {
 			smod_ioctl32_unregister();
 			return (-ENOMEM);
 		}
@@ -1013,41 +967,7 @@ smod_ioctl32_register(void)
 	return (0);
 }
 
-#endif				/* defined WITH_32BIT_CONVERSION */
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC __unlikely int
-smod_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&sockmodinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sockmodinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC __unlikely int
-smod_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&sockmodinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
+#endif				/* defined __LP64__ */
 
 MODULE_STATIC int __init
 sockmodinit(void)
@@ -1059,18 +979,18 @@ sockmodinit(void)
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
 	}
-#if defined WITH_32BIT_CONVERSION
+#if defined __LP64__
 	if ((err = smod_ioctl32_register())) {
 		cmn_err(CE_WARN, "%s: could not register 32bit ioctls, err = %d", MOD_NAME, err);
 		smod_term_caches();
 		return (err);
 	}
-#endif				/* defined WITH_32BIT_CONVERSION */
+#endif				/* defined __LP64__ */
 	if ((err = smod_register_strmod())) {
 		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);
-#if defined WITH_32BIT_CONVERSION
+#if defined __LP64__
 		smod_ioctl32_unregister();
-#endif				/* defined WITH_32BIT_CONVERSION */
+#endif				/* defined __LP64__ */
 		smod_term_caches();
 		return (err);
 	}
@@ -1086,9 +1006,9 @@ sockmodterminate(void)
 
 	if ((err = smod_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
-#if defined WITH_32BIT_CONVERSION
+#if defined __LP64__
 	smod_ioctl32_unregister();
-#endif				/* defined WITH_32BIT_CONVERSION */
+#endif				/* defined __LP64__ */
 	if ((err = smod_term_caches()))
 		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
 	return;

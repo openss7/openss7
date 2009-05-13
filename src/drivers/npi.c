@@ -111,7 +111,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NPI_MODID));
 MODULE_ALIAS("streams-driver-npi");
 MODULE_ALIAS("streams-module-npi");
@@ -119,7 +118,6 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NPI_MAJOR));
 MODULE_ALIAS("/dev/streams/npi");
 MODULE_ALIAS("/dev/streams/npi/*");
 MODULE_ALIAS("/dev/streams/clone/npi");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(NPI_CMAJOR_0) "-0");
@@ -2328,7 +2326,6 @@ MODULE_PARM_DESC(major, "Major device number for NPI. (0 for allocation.)");
  * LINUX FAST STREAMS REGISTRATION
  */
 
-#ifdef LFS
 
 static struct cdevsw np_cdev = {
 	.d_str = &npi_info,
@@ -2357,38 +2354,6 @@ npi_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-#ifdef LIS
-
-static int
-npi_regsiter_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &npi_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-static int
-npi_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 static __init int
 npi_modinit(void)

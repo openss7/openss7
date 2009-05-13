@@ -67,9 +67,6 @@
 #include <stdbool.h>
 #endif
 
-/*
- *  Unfortunately this is necessary for older non-rpm LIS releases.
- */
 #ifdef LINUX
 #include <linux/autoconf.h>
 #include <linux/version.h>	/* for UTS_RELEASE */
@@ -119,28 +116,7 @@ typedef void irqreturn_t;
 #define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL_GPL(__sym)
 #endif
 
-#ifdef LIS
-#define streamscall _RP
-#define STREAMSCALL(__X) __X streamscall
-#define streams_fastcall __attribute__((__regparm__(3)))
-#define STREAMS_FASTCALL(__X) __X streams_fastcall
-#ifndef noinline
-#define noinline
-#endif
-#define __unlikely
-#define __hot
-#define __hot_in
-#define __hot_out
-#define __hot_put
-#define __hot_get
-#define __hot_read
-#define __hot_write
-#define XCHG xchg
-#endif
-
-#ifdef LFS
 #define _RP streamscall
-#endif
 
 #define _OS7_SOURCE
 
@@ -154,21 +130,8 @@ typedef void irqreturn_t;
 #include <sys/strconf.h>
 #include <sys/strlog.h>
 
-/* queue flags */
-#if defined LIS
-#define QSVCBUSY QRUNNING
-#endif
-
 /* minor device number range */
-#ifdef LIS
-#define NMINORS		MINORMASK	/* really 255 for LiS */
-#else
-#ifdef LFS
-#define NMINORS		((1UL<<16)-1)	/* really big for LFS */
-#else
-#define NMINORS		((1UL<<8)-1)	/* be conservative for others */
-#endif
-#endif
+#define NMINORS		((1UL<<16)-1)
 
 #ifdef LINUX
 #ifdef MODULE

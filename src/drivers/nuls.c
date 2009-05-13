@@ -90,14 +90,11 @@ MODULE_AUTHOR(NULS_CONTACT);
 MODULE_DESCRIPTION(NULS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(NULS_DEVICE);
 MODULE_LICENSE(NULS_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-nuls");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_NULS_MODULE */
 
 #ifndef CONFIG_STREAMS_NULS_NAME
 #define CONFIG_STREAMS_NULS_NAME "nuls"
@@ -109,29 +106,48 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_NULS_MAJOR must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-nuls");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_NULS_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_NULS_MODID;
 
+#ifdef CONFIG_STREAMS_NULS_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for NULS driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_NULS_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NULS_MODID));
 MODULE_ALIAS("streams-driver-nuls");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_NULS_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_NULS_MAJOR;
 
+#ifdef CONFIG_STREAMS_NULS_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_NULS_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_NULS_MAJOR) "-*");
 MODULE_ALIAS("/dev/nuls");
@@ -139,7 +155,8 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NULS_MAJOR));
 MODULE_ALIAS("/dev/streams/nuls");
 MODULE_ALIAS("/dev/streams/nuls/*");
 MODULE_ALIAS("/dev/streams/clone/nuls");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info nuls_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULS_MODID,
@@ -323,14 +340,17 @@ static struct qinit nuls_wqinit = {
 	.qi_mstat = &nuls_wstat,
 };
 
-static struct streamtab nuls_info = {
+#ifdef CONFIG_STREAMS_NULS_MODULE
+static
+#endif
+struct streamtab nulsinfo = {
 	.st_rdinit = &nuls_rqinit,
 	.st_wrinit = &nuls_wqinit,
 };
 
 static struct cdevsw nuls_cdev = {
 	.d_name = CONFIG_STREAMS_NULS_NAME,
-	.d_str = &nuls_info,
+	.d_str = &nulsinfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -341,7 +361,7 @@ static struct cdevsw nuls_cdev = {
 static
 #endif
 int __init
-nuls_init(void)
+nulsinit(void)
 {
 	int err;
 
@@ -362,12 +382,12 @@ nuls_init(void)
 static
 #endif
 void __exit
-nuls_exit(void)
+nulsexit(void)
 {
 	unregister_strdev(&nuls_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_NULS_MODULE
-module_init(nuls_init);
-module_exit(nuls_exit);
+module_init(nulsinit);
+module_exit(nulsexit);
 #endif

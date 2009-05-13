@@ -127,10 +127,7 @@ typedef struct {
 	unsigned char sg_format;
 } scgth_t;
 
-#ifdef LFS
-/* already defined by LiS */
 __UW7_EXTERN mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
-#endif
 __UW7_EXTERN mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
 __UW7_EXTERN mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
 __UW7_EXTERN mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);

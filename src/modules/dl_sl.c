@@ -95,10 +95,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define DL_SL_MOD_ID		CONFIG_STREAMS_DL_SL_MODID
 #define DL_SL_MOD_NAME		CONFIG_STREAMS_DL_SL_NAME
-#endif				/* LFS */
 
 #define MOD_ID		DL_SL_MOD_ID
 #define MOD_NAME	DL_SL_MOD_NAME
@@ -3090,10 +3088,6 @@ static struct streamtab dl_slinfo = {
 	.st_rdinit = &dl_rinit,
 	.st_wrinit = &dl_winit,
 };
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 
 static struct fmodsw dl_fmod = {
 	.f_name = MOD_NAME,

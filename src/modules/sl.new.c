@@ -104,10 +104,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_MOD_ID	CONFIG_STREAMS_SL_MODID
 #define SL_MOD_NAME	CONFIG_STREAMS_SL_NAME
-#endif
 
 /*
  *  =========================================================================
@@ -7116,10 +7114,6 @@ MODULE_PARM(modid, "h");
 module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for SL module.  (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,

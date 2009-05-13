@@ -110,7 +110,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
  *  implemented in mspcompat.c
  */
 
-#ifdef LFS
 /* 
  *  WANTIO
  *  -------------------------------------------------------------------------
@@ -140,7 +139,6 @@ EXPORT_SYMBOL_GPL(wantio);		/* aix/ddi.h */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int streamscall (*func) (mblk_t *));
 
 EXPORT_SYMBOL_GPL(wantmsg);		/* aix/ddi.h */
-#endif
 
 /* 
  *  STR_INSTALL
@@ -153,16 +151,6 @@ str_install_AIX(int cmd, strconf_t * sc)
 		return (EINVAL);
 	switch (cmd) {
 	case STR_LOAD_DEV:
-#ifdef LIS
-	{
-		int err;
-
-		if ((err = lis_register_strdev(sc->sc_major, sc->sc_str, 255, sc->sc_name)) > 0)
-			sc->sc_major = err;
-		return (err < 0 ? -err : 0);
-	}
-#endif
-#ifdef LFS
 		{
 			struct cdevsw *cdev;
 			int err;
@@ -228,14 +216,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 				kmem_free(cdev, sizeof(*cdev));
 			return (-err);
 		}
-#endif
 	case STR_UNLOAD_DEV:
-#ifdef LIS
-	{
-		return lis_unregister_strdev(sc->sc_major);
-	}
-#endif
-#ifdef LFS
 		{
 			struct cdevsw *cdev;
 			int err;
@@ -251,18 +232,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 				kmem_free(cdev, sizeof(*cdev));
 			return (-err);
 		}
-#endif
 	case STR_LOAD_MOD:
-#ifdef LIS
-	{
-		int err;
-
-		if ((err = lis_register_strmod(sc->sc_str, sc->sc_name)) > 0)
-			sc->sc_major = err;
-		return (err < 0 ? -err : 0);
-	}
-#endif
-#ifdef LFS
 		{
 			struct fmodsw *fmod;
 			int err;
@@ -327,14 +297,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 				kmem_free(fmod, sizeof(*fmod));
 			return (-err);
 		}
-#endif
 	case STR_UNLOAD_MOD:
-#ifdef LIS
-	{
-		return lis_unregister_strmod(sc->sc_str);
-	}
-#endif
-#ifdef LFS
 		{
 			struct fmodsw *fmod;
 			int err;
@@ -345,7 +308,6 @@ str_install_AIX(int cmd, strconf_t * sc)
 				kmem_free(fmod, sizeof(fmod));
 			return (-err);
 		}
-#endif
 	}
 	return (EINVAL);
 }

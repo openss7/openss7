@@ -190,11 +190,7 @@ static const char *lpkgname = "SS7 MTP Level 3";
 static const char *lstdname = "Q.704/ANSI T1.111.4/JQ.704";
 static const char *sstdname = "Q.782";
 static const char *shortname = "MTP3";
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/mtp";
-#else
-static char devname[256] = "/dev/mtp";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

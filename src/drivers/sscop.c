@@ -113,13 +113,11 @@ static int sscop_debug = SSCOP_DEBUG;
 static int sscop_debug = 2;
 #endif
 
-#ifdef LFS
 #define SSCOP_DRV_ID		CONFIG_STREAMS_SSCOP_MODID
 #define SSCOP_DRV_NAME		CONFIG_STREAMS_SSCOP_NAME
 #define SSCOP_CMAJORS		CONFIG_STREAMS_SSCOP_NMAJORS
 #define SSCOP_CMAJOR_0		CONFIG_STREAMS_SSCOP_MAJOR
 #define SSCOP_NMINOR		CONFIG_STREAMS_SSCOP_NMINORS
-#endif
 
 #ifndef SSCOP_DRV_NAME
 #define SSCOP_DRV_NAME		"sscop-mce"
@@ -2823,8 +2821,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw aa_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sscopinfo,
@@ -2851,40 +2847,6 @@ aa_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-aa_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&sscopinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sscopinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-aa_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&sscopinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 sscopinit(void)

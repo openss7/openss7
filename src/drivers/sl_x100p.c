@@ -63,7 +63,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  capabilities of the SLI for the E100P-SS7 and T100P-SS7 cards.  This is a
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
-#define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
@@ -123,13 +122,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_X100P_DRV_ID		CONFIG_STREAMS_SL_X100P_MODID
 #define SL_X100P_DRV_NAME	CONFIG_STREAMS_SL_X100P_NAME
 #define SL_X100P_CMAJORS	CONFIG_STREAMS_SL_X100P_NMAJORS
 #define SL_X100P_CMAJOR_0	CONFIG_STREAMS_SL_X100P_MAJOR
 #define SL_X100P_UNITS		CONFIG_STREAMS_SL_X100P_NMINORS
-#endif
 
 /*
  *  =======================================================================
@@ -9968,8 +9965,6 @@ MODULE_PARM_DESC(major, "Device number for the X100P-SL driver. (0 for allocatio
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sl_x100pinfo,
@@ -9996,40 +9991,6 @@ xp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-xp_register_strdev(major_t major)
-{
-	int err;
-	if ((err = lis_register_strdev(major, &sl_x100pinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-xp_unregister_strdev(major_t major)
-{
-	int err;
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 sl_x100pterminate(void)

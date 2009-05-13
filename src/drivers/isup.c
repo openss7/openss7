@@ -110,13 +110,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define ISUP_DRV_ID		CONFIG_STREAMS_ISUP_MODID
 #define ISUP_DRV_NAME		CONFIG_STREAMS_ISUP_NAME
 #define ISUP_CMAJORS		CONFIG_STREAMS_ISUP_NMAJORS
 #define ISUP_CMAJOR_0		CONFIG_STREAMS_ISUP_MAJOR
 #define ISUP_UNITS		CONFIG_STREAMS_ISUP_NMINORS
-#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -27438,8 +27436,6 @@ MODULE_PARM_DESC(major, "Device number for the ISUP driver. (0 for allocation.)"
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw isup_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &isupinfo,
@@ -27468,42 +27464,6 @@ isup_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-isup_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &isupinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-isup_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 isupterminate(void)

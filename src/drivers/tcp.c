@@ -164,24 +164,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TCP_DRV_ID	CONFIG_STREAMS_TCP_MODID
 #define TCP_DRV_NAME	CONFIG_STREAMS_TCP_NAME
 #define TCP_CMAJORS	CONFIG_STREAMS_TCP_NMAJORS
 #define TCP_CMAJOR_0	CONFIG_STREAMS_TCP_MAJOR
 #define TCP_UNITS	CONFIG_STREAMS_TCP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TCP_MODID));
 MODULE_ALIAS("streams-driver-tcp");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_TCP_MAJOR));
 MODULE_ALIAS("/dev/streams/tcp");
 MODULE_ALIAS("/dev/streams/tcp/*");
 MODULE_ALIAS("/dev/streams/clone/tcp");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(TCP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(TCP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(TCP_CMAJOR_0) "-0");
@@ -189,13 +185,6 @@ MODULE_ALIAS("/dev/tcp");
 MODULE_ALIAS("/dev/inet/tcp");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
-
-#ifdef LIS
-#define STRMINPSZ	0
-#define STRMAXPSZ	4096
-#define STRHIGH		5120
-#define STRLOW		1024
-#endif
 
 /*
  *  ==========================================================================
@@ -6759,14 +6748,8 @@ tpi_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		/* Linux Fast-STREAMS always passes internal major device number (module id).  Note 
 		   also, however, that strconf-sh attempts to allocate module ids that are
 		   identical to the base major device number anyway. */
-#ifdef LIS
-		if (cmajor != CMAJOR_0)
-			return (ENXIO);
-#endif
-#ifdef LFS
 		if (cmajor != DRV_ID)
 			return (ENXIO);
-#endif
 	}
 	/* sorry, you can't open by minor device */
 	if (cminor < 0 || cminor > 0)
@@ -6820,20 +6803,6 @@ tpi_qclose(queue_t *q, int flag, cred_t *crp)
 {
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, (int) TPI_PRIV(q)->u.dev.cmajor,
 		(int) TPI_PRIV(q)->u.dev.cminor));
-#ifdef LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* LIS */
-	goto skip_pop;
-      skip_pop:
 	/* make sure procedures are off */
 	qprocsoff(q);
 	tpi_free_priv(q);	/* free and unlink the structure */
@@ -6988,7 +6957,6 @@ module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the driver. (0 for allocation.)");
 
-#ifdef LFS
 /*
  *  Linux Fast-STREAMS Registration
  */
@@ -7018,37 +6986,6 @@ tpi_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-#endif				/* LFS */
-
-#ifdef LIS
-/*
- *  Linux STREAMS Registration
- */
-STATIC int
-tpi_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &tpi_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-STATIC int
-tpi_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 tpiterminate(void)

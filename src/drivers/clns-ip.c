@@ -109,7 +109,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  protocol header.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -149,24 +148,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define CLNS_IP_DRV_ID		CONFIG_STREAMS_CLNS_IP_MODID
 #define CLNS_IP_DRV_NAME	CONFIG_STREAMS_CLNS_IP_NAME
 #define CLNS_IP_CMAJORS		CONFIG_STREAMS_CLNS_IP_NMAJORS
 #define CLNS_IP_CMAJOR_0	CONFIG_STREAMS_CLNS_IP_MAJOR
 #define CLNS_IP_UNITS		CONFIG_STREAMS_CLNS_IP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLNS_MODID));
 MODULE_ALIAS("streams-driver-clns-ip");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNS_MAJOR));
 MODULE_ALIAS("/dev/streams/clns-ip");
 MODULE_ALIAS("/dev/streams/clns-ip/*");
 MODULE_ALIAS("/dev/streams/clone/clns-ip");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-0");

@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
  * for testing purposes only.  It is pushed onto another driver (such as the nuls or echo driver) to
@@ -73,16 +72,12 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/kmem.h>
 #include <sys/stream.h>
 #include <sys/strconf.h>
-#ifdef LFS
 #include <sys/strsubr.h>
-#endif
 #include <sys/ddi.h>
 
 #include <sys/testmod.h>
 
-#ifdef LFS
 #include "sys/config.h"
-#endif
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
@@ -98,61 +93,50 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TESTMOD_SPLASH		TESTMOD_DEVICE		" - " \
 				TESTMOD_REVISION	"\n"
 
-#if defined LIS && defined MODULE
-#define CONFIG_STREAMS_TESTMOD_MODULE MODULE
-#endif
-
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
 MODULE_AUTHOR(TESTMOD_CONTACT);
 MODULE_DESCRIPTION(TESTMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(TESTMOD_DEVICE);
 MODULE_LICENSE(TESTMOD_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-testmod");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_TESTMOD_MODULE */
 
 #ifndef CONFIG_STREAMS_TESTMOD_NAME
-#ifdef LIS
-#define CONFIG_STREAMS_TESTMOD_NAME TESTMOD__MOD_NAME
-#else
 #error "CONFIG_STREAMS_TESTMOD_NAME must be defined."
 #endif
-#endif
 #ifndef CONFIG_STREAMS_TESTMOD_MODID
-#ifdef LIS
-#define CONFIG_STREAMS_TESTMOD_MODID TESTMOD__ID
-#else
 #error "CONFIG_STREAMS_TESTMOD_MODID must be defined."
 #endif
-#endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-testmod");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_TESTMOD_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_TESTMOD_MODID;
 
+#ifdef CONFIG_STREAMS_TESTMOD_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for TESTMOD.");
+#endif				/* CONFIG_STREAMS_TESTMOD_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TESTMOD_MODID));
 MODULE_ALIAS("streams-module-testmod");
-#endif
-#endif
-
-#ifdef LIS
-#define STRMINPSZ   0
-#define STRMAXPSZ   4096
-#define STRHIGH	    5120
-#define STRLOW	    1024
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info testmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_TESTMOD_MODID,
@@ -174,10 +158,6 @@ static struct module_stat testmod_wstat __attribute__ ((__aligned__(SMP_CACHE_BY
  *  -------------------------------------------------------------------------
  */
 
-#ifdef LIS
-#define streamscall _RP
-#endif
-
 static streamscall int
 testmod_rput(queue_t *q, mblk_t *mp)
 {
@@ -185,39 +165,6 @@ testmod_rput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
-
-#ifdef LIS
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-
-int
-ctlmsg(unsigned char type)
-{
-	unsigned char mod = (type & ~QPCTL);
-
-	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
-}
-
-int
-putnextctl2(queue_t *q, int type, int param1, int param2)
-{
-	mblk_t *mp;
-
-	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
-		mp->b_datap->db_type = type;
-		mp->b_wptr[0] = (unsigned char) param1;
-		mp->b_wptr++;
-		mp->b_wptr[1] = (unsigned char) param2;
-		mp->b_wptr++;
-		putnext(q, mp);
-		return (1);
-	}
-	return (0);
-}
-#endif
 
 static streamscall int
 testmod_wput(queue_t *q, mblk_t *mp)
@@ -304,14 +251,12 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				err = EINVAL;
 				goto nak;
 			}
-#ifdef LFS
 #if defined __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32)
 				uaddr = (caddr_t) (unsigned long) (uint32_t)
 				    *(unsigned long *) mp->b_cont->b_rptr;
 			else
 #endif				/* defined __LP64__ */
-#endif				/* LFS */
 				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
@@ -332,14 +277,12 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				err = EINVAL;
 				goto nak;
 			}
-#ifdef LFS
 #if defined __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32)
 				uaddr = (caddr_t) (unsigned long) (uint32_t)
 				    *(unsigned long *) mp->b_cont->b_rptr;
 			else
 #endif				/* defined __LP64__ */
-#endif				/* LFS */
 				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
@@ -378,14 +321,12 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				err = EINVAL;
 				goto nak;
 			}
-#ifdef LFS
 #if defined __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32)
 				uaddr = (caddr_t) (unsigned long) (uint32_t)
 				    *(unsigned long *) mp->b_cont->b_rptr;
 			else
 #endif				/* defined __LP64__ */
-#endif				/* LFS */
 				uaddr = (caddr_t) *(unsigned long *) mp->b_cont->b_rptr;
 			mp->b_cont->b_wptr = mp->b_cont->b_rptr + FASTBUF;
 			memset(mp->b_cont->b_rptr, 0xa5, FASTBUF);
@@ -562,21 +503,21 @@ static struct qinit testmod_winit = {
 	.qi_mstat = &testmod_wstat,
 };
 
-static struct streamtab testmod_info = {
+#ifdef CONFIG_STREAMS_TESTMOD_MODULE
+static
+#endif
+struct streamtab testmodinfo = {
 	.st_rdinit = &testmod_rinit,
 	.st_wrinit = &testmod_winit,
 };
 
-#ifdef LFS
 static struct fmodsw testmod_fmod = {
 	.f_name = CONFIG_STREAMS_TESTMOD_NAME,
-	.f_str = &testmod_info,
+	.f_str = &testmodinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
-#endif
 
-#ifdef LFS
 struct tm_ioctl {
 	unsigned int cmd;
 	void *opaque;
@@ -618,13 +559,12 @@ tm_register_ioctl32(void)
 	}
 	return (0);
 }
-#endif				/* LFS */
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
 static
 #endif
 int __init
-testmod_init(void)
+testmodinit(void)
 {
 	int err;
 
@@ -634,27 +574,14 @@ testmod_init(void)
 	printk(KERN_INFO TESTMOD_SPLASH);
 #endif
 	testmod_minfo.mi_idnum = modid;
-#ifdef LFS
 	if ((err = tm_register_ioctl32()) < 0)
 		return (err);
 	if ((err = register_strmod(&testmod_fmod)) < 0) {
 		tm_unregister_ioctl32();
 		return (err);
 	}
-#endif
-#ifdef LIS
-	if ((err = lis_register_strmod(&testmod_info, CONFIG_STREAMS_TESTMOD_NAME)) < 0)
-		return (err);
-#endif
 	if (modid == 0 && err > 0)
 		modid = err;
-#ifdef LIS
-	if ((err = lis_register_module_qlock_option(modid, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&testmod_info);
-		tm_unregister_ioctl32();
-		return (err);
-	}
-#endif
 	return (0);
 };
 
@@ -662,18 +589,13 @@ testmod_init(void)
 static
 #endif
 void __exit
-testmod_exit(void)
+testmodexit(void)
 {
-#ifdef LFS
 	unregister_strmod(&testmod_fmod);
 	tm_unregister_ioctl32();
-#endif
-#ifdef LIS
-	lis_unregister_strmod(&testmod_info);
-#endif
 };
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
-module_init(testmod_init);
-module_exit(testmod_exit);
+module_init(testmodinit);
+module_exit(testmodexit);
 #endif

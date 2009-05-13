@@ -122,13 +122,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TUA_DRV_ID	CONFIG_STREAMS_TUA_MODID
 #define TUA_DRV_NAME	CONFIG_STREAMS_TUA_NAME
 #define TUA_CMAJORS	CONFIG_STREAMS_TUA_NMAJORS
 #define TUA_CMAJOR_0	CONFIG_STREAMS_TUA_MAJOR
 #define TUA_UNITS	CONFIG_STREAMS_TUA_NMINORS
-#endif
 
 /*
  *  =========================================================================
@@ -665,7 +663,6 @@ MODULE_PARM_DESC(major, "Major device number for the TUA driver. (0 for allocati
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct cdevsw tua_cdev = {
 	.d_name = DRV_NAME,
@@ -695,42 +692,6 @@ tua_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-tua_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &tuainfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-tua_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 tuaterminate(void)

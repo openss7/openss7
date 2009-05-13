@@ -67,7 +67,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _DEBUG 1
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -108,10 +107,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TRMOD_MOD_ID	CONFIG_STREAMS_TRMOD_MODID
 #define TRMOD_MOD_NAME	CONFIG_STREAMS_TRMOD_NAME
-#endif				/* LFS */
 
 #ifndef TRMOD_MOD_ID
 #error "TRMOD_MOD_ID must be defined."
@@ -122,10 +119,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TRMOD_MODID));
 MODULE_ALIAS("streams-module-trmod");
-#endif				/* LFS */
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 

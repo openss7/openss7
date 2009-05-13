@@ -138,24 +138,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define IP_DRV_ID	CONFIG_STREAMS_IP_MODID
 #define IP_DRV_NAME	CONFIG_STREAMS_IP_NAME
 #define IP_CMAJORS	CONFIG_STREAMS_IP_NMAJORS
 #define IP_CMAJOR_0	CONFIG_STREAMS_IP_MAJOR
 #define IP_UNITS	CONFIG_STREAMS_IP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_IP_MODID));
 MODULE_ALIAS("streams-driver-ip");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_IP_MAJOR));
 MODULE_ALIAS("/dev/streams/ip");
 MODULE_ALIAS("/dev/streams/ip/*");
 MODULE_ALIAS("/dev/streams/clone/ip");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(IP_CMAJOR_0) "-0");
@@ -5008,15 +5004,9 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		ptrace(("%s: ERROR: can't push as module\n", DRV_NAME));
 		return (EIO);
 	}
-#if defined LIS
-	if (cmajor != CMAJOR_0)
-		return (ENXIO);
-#endif
-#if defined LFS
 	/* Linux Fast-STREAMS always passes internal major device numbers (modules ids) */
 	if (cmajor != DRV_ID)
 		return (ENXIO);
-#endif
 	if (cminor > LAST_CMINOR) {
 		return (ENXIO);
 	}
@@ -5085,20 +5075,6 @@ np_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) np;
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, np->u.dev.cmajor,
 		np->u.dev.cminor));
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	npi_free_priv(q);
 	goto quit;
@@ -5141,7 +5117,6 @@ MODULE_PARM_DESC(major, "Device number for the IP driver. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct cdevsw np_cdev = {
 	.d_name = DRV_NAME,
@@ -5195,42 +5170,6 @@ np_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-np_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &np_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-np_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 ipterminate(void)

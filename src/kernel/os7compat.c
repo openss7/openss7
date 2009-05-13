@@ -299,9 +299,6 @@ ss7_trylockq(queue_t *q)
 
 EXPORT_SYMBOL_GPL(ss7_trylockq);
 
-#ifdef LIS
-extern int enableq(queue_t *q);
-#endif
 /**
  * ss7_unlockq: - unlock a queue pair, enabling waiting queues
  * @q: queue whose put or service procedure is running

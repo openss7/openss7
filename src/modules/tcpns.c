@@ -295,14 +295,6 @@ tcpns_rput(queue_t *q, mblk_t *mp)
 {
 	// struct tcpns *priv = q->q_ptr;
 
-#if defined LIS
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer.",
-			MOD_NAME, __FUNCTION__);
-		freemsg(mp);
-		return (0);
-	}
-#endif
 	switch (mp->b_datap->db_type) {
 	case M_PROTO:
 	case M_PCPROTO:
@@ -431,24 +423,8 @@ tcpns_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
-#if defined LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			MOD_NAME, __FUNCTION__);
-		goto free;
-	}
-#endif
-	goto free;
-      free:
 	qprocsoff(q);
 	tcpns_free_priv(q);
-	goto quit;
-      quit:
 	return (0);
 }
 
@@ -471,8 +447,6 @@ MODULE_PARM_DESC(modid, "Module ID for TCPNS module. (0 for allocation.)");
 /*
  *  Linux Fast-STREAMS Registration
  */
-#ifdef LFS
-
 STATIC struct fmodsw tcpns_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tcpnsinfo,
@@ -499,39 +473,6 @@ tcpns_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- */
-#ifdef LIS
-
-STATIC __unlikely int
-tcpns_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&tcpnsinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&tcpnsinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC __unlikely int
-tcpns_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&tcpnsinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 tcpnsinit(void)

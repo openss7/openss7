@@ -114,17 +114,13 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* defined MODULE_VERSION */
 #endif				/* defined LINUX */
 
-#if defined LFS
 #define TDM_IP_MOD_ID		CONFIG_STREAMS_TDM_IP_MODID
 #define TDM_IP_MOD_NAME		CONFIG_STREAMS_TDM_IP_NAME
-#endif				/* defined LFS */
 
 #if defined LINUX
 #if defined MODULE_ALIAS
-#if defined LFS
 MODULE_ALIAS("streams-modid-" __stringify(TDM_IP_MOD_ID));
 MODULE_ALIAS("streams-module-tdm-ip");
-#endif				/* defined LFS */
 #endif				/* defined MODULE_ALIAS */
 #endif				/* defined LINUX */
 

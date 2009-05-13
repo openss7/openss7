@@ -109,10 +109,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDT_ACB56_MOD_ID	CONFIG_STREAMS_SDT_ACB56_MODID
 #define SDT_ACB56_MOD_NAME	CONFIG_STREAMS_SDT_ACB56_NAME
-#endif
 
 #ifndef SDT_ACB56_MOD_ID
 #define SDT_ACB56_MOD_ID	SDT_IOC_MAGIC
@@ -4862,7 +4860,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT-ACB56 module. (0 for allocation.)
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
@@ -4890,40 +4887,6 @@ sdt_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sdt_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&sdt_acb56info, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sdt_acb56info);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-sdt_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&sdt_acb56info)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 sdt_acb56init(void)

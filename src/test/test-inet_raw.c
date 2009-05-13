@@ -151,13 +151,8 @@ static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/RAW";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/inet/rawip";
 static char modname[256] = "rawip";
-#else
-static char devname[256] = "/dev/rawip";
-static char modname[256] = "rawip";
-#endif
 
 static const int test_level = T_INET_IP;
 

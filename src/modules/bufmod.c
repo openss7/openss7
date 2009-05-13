@@ -101,14 +101,11 @@ MODULE_AUTHOR(BUFMOD_CONTACT);
 MODULE_DESCRIPTION(BUFMOD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(BUFMOD_DEVICE);
 MODULE_LICENSE(BUFMOD_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-bufmod");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_BUFMOD_MODULE */
 
 #ifndef CONFIG_STREAMS_BUFMOD_NAME
 //#define CONFIG_STREAMS_BUFMOD_NAME "bufmod"
@@ -119,21 +116,32 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_BUFMOD_MODID must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-bufmod");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_BUFMOD_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_BUFMOD_MODID;
 
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for BUFMOD.");
+#endif				/* CONFIG_STREAMS_BUFMOD_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_BUFMOD_MODID));
 MODULE_ALIAS("streams-module-bufmod");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 STATIC struct module_info bufmod_minfo = {
 	.mi_idnum = CONFIG_STREAMS_BUFMOD_MODID,
@@ -279,14 +287,17 @@ STATIC struct qinit bufmod_winit = {
 	.qi_mstat = &bufmod_wstat,
 };
 
-STATIC struct streamtab bufmod_info = {
+#ifdef CONFIG_STREAMS_BUFMOD_MODULE
+STATIC
+#endif
+struct streamtab bufmodinfo = {
 	.st_rdinit = &bufmod_rinit,
 	.st_wrinit = &bufmod_winit,
 };
 
 STATIC struct fmodsw bufmod_fmod = {
 	.f_name = CONFIG_STREAMS_BUFMOD_NAME,
-	.f_str = &bufmod_info,
+	.f_str = &bufmodinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
@@ -295,7 +306,7 @@ STATIC struct fmodsw bufmod_fmod = {
 STATIC
 #endif
 int __init
-bufmod_init(void)
+bufmodinit(void)
 {
 	int err;
 
@@ -316,7 +327,7 @@ bufmod_init(void)
 STATIC
 #endif
 void __exit
-bufmod_exit(void)
+bufmodexit(void)
 {
 	int err;
 
@@ -326,6 +337,6 @@ bufmod_exit(void)
 }
 
 #ifdef CONFIG_STREAMS_BUFMOD_MODULE
-module_init(bufmod_init);
-module_exit(bufmod_exit);
+module_init(bufmodinit);
+module_exit(bufmodexit);
 #endif

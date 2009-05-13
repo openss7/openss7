@@ -100,10 +100,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define CD_DAED_MOD_ID		CONFIG_STREAMS_CD_DAED_MODID
 #define CD_DAED_MOD_NAME	CONFIG_STREAMS_CD_DAED_NAME
-#endif				/* LFS */
 
 /*
  *  =======================================================================
@@ -244,8 +242,6 @@ MODULE_PARM_DESC(modid, "Module ID for the CD-DAED module. (0 for allocation.)")
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw daed_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &cd_daedinfo,
@@ -272,40 +268,6 @@ daed_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-daed_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&cd_daedinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&cd_daedinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-daed_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&cd_daedinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 cd_daedinit(void)

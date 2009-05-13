@@ -63,10 +63,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  consists of two devices, a master device (ptm) and a slave device (pts).
  *  When a slave device is opened, the resulting minor device number indicates
  *  the minor device number of the master to open.  The two are then linked.
- *
- *  Note that there are no LFS or LIS defines here.  This is because the LIS
- *  Stream head cannot handle terminals anyway.  This package only works with
- *  LFS.
  */
 
 #include <sys/os7/compat.h>

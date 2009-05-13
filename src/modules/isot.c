@@ -3355,10 +3355,6 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for ISOT. (0 for allocation.)");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 static __init int
 isot_modinit(void)
 {

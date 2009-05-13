@@ -170,13 +170,8 @@ static const char *lstdname = "RFC 2960/ETSI TS 102 144 V.1.1.1 (2003-05)";
 static const char *sstdname = "RFC 2960";
 static const char *shortname = "SCTP";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/ua-as";
 static char xptname[256] = "/dev/streams/clone/sctp_t";
-#else
-static char devname[256] = "/dev/ua-as";
-static char xptname[256] = "/dev/sctp_t";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

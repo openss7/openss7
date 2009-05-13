@@ -71,9 +71,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define __MPS_EXTERN_INLINE __inline__ streamscall __unlikely
 #define __MPS_EXTERN streamscall
 
-#ifdef LIS
-#define _LFS_SOURCE
-#endif
 #define _MPS_SOURCE
 
 #include "sys/os7/compat.h"
@@ -1230,16 +1227,11 @@ mi_copy_done(queue_t *q, mblk_t *mp, int err)
 			rval = mi->mi_rval;
 			freemsg(XCHG(&ioc->copyresp.cp_private, NULL));
 		}
-#ifdef LIS
-		/* LiS bug, see above. */
-		break;
-#else
 		if (ioc->copyresp.cp_rval == (caddr_t) 0)
 			break;
 		/* SVR 4 SPG says don't return ACK/NAK on M_IOCDATA error */
 		freemsg(mp);
 		return;
-#endif
 	case M_IOCTL:
 		break;
 	default:
@@ -2394,16 +2386,11 @@ EXPORT_SYMBOL_GPL(mi_timer_free);
 __MPS_EXTERN queue_t *
 mi_allocq(struct streamtab *st)
 {
-#ifdef LIS
-	return lis_allocq(st->st_rdinit->qi_minfo->mi_idname);
-#endif
-#ifdef LFS
 	queue_t *q;
 
 	if ((q = allocq()))
 		setq(q, st->st_rdinit, st->st_wrinit);
 	return (q);
-#endif
 }
 
 EXPORT_SYMBOL_GPL(mi_allocq);
@@ -2411,12 +2398,7 @@ EXPORT_SYMBOL_GPL(mi_allocq);
 __MPS_EXTERN void
 mi_freeq(queue_t *q)
 {
-#ifdef LIS
-	lis_freeq(q);
-#endif
-#ifdef LFS
 	freeq(q);
-#endif
 }
 
 EXPORT_SYMBOL_GPL(mi_freeq);
@@ -3136,18 +3118,9 @@ EXPORT_SYMBOL_GPL(mi_offset_paramc);
 __MPS_EXTERN void
 mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 {
-#ifdef LIS
-	lis_flags_t flags;
-
-	LIS_QISRLOCK(q, &flags);
-	(*proc) (q, mp);
-	LIS_QISRUNLOCK(q, &flags);
-#endif
-#ifdef LFS
 	extern void __strwrit(queue_t *q, mblk_t *mp, void (*func) (queue_t *, mblk_t *),
 			      int perim);
 	__strwrit(q, mp, proc, PERIM_INNER | PERIM_OUTER);
-#endif
 }
 
 EXPORT_SYMBOL_GPL(mps_become_writer);

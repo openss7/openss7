@@ -116,7 +116,6 @@ MODULE_SUPPORTED_DEVICE(PLP_DEVICE);
 MODULE_LICENSE(PLP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PLP_MODID));
 MODULE_ALIAS("streams-driver-x25-plp");
 MODULE_ALIAS("streams-module-x25-plp");
@@ -127,7 +126,6 @@ MODULE_ALIAS("/dev/streams/x25-plp/x25");
 MODULE_ALIAS("/dev/streams/x25-plp/xx25");
 MODULE_ALIAS("/dev/streams/x25-plp/cons");
 MODULE_ALIAS("/dev/streams/clone/x25-plp");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(PLP_MAJOR_0) "-0");
@@ -4992,9 +4990,6 @@ MODULE_PARM_DESC(major, "Major device number for X25-PLP. (0 for allocation.)");
  *
  * --------------------------------------------------------------------------
  */
-
-#ifdef LFS
-
 static struct cdevsw plp_cdev = {
 	.d_str = &plp_info,
 	.d_flag = D_MP | D_CLONE,
@@ -5022,38 +5017,6 @@ plp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-#ifdef LIS
-
-static int
-plp_regsiter_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &plp_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-static int
-plp_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 static __init int
 plp_modinit(void)

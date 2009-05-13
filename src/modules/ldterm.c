@@ -197,10 +197,8 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module Id for LDTERM (0 for allocation).");
 
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LDTERM_MODID));
 MODULE_ALIAS("streams-module-ldterm");
-#endif				/* LFS */
 #endif				/* MODULE_ALIAS */
 
 static struct module_info ldterm_minfo = {
@@ -214,11 +212,6 @@ static struct module_info ldterm_minfo = {
 
 static struct module_stat ldterm_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat ldterm_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-
-#if defined __LP64__ && defined LFS
-#   undef WITH_32BIT_CONVERSION
-#   define WITH_32BIT_CONVERSION 1
-#endif
 
 /*
  *  Private Structure.
@@ -676,9 +669,6 @@ static struct streamtab ldterm_info = {
 	.st_wrinit = &ldterm_winit,
 };
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 static struct fmodsw ldterm_fmod = {
 	.f_name = CONFIG_STREAMS_LDTERM_NAME,
 	.f_str = &ldterm_info,

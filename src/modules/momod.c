@@ -499,10 +499,6 @@ module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for mOSI. (0 for allocation.)");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 static struct fmodsw mosi_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &mosi_modinfo,

@@ -76,7 +76,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  can be used for SCTP transport, a standard way to use SCTP for SS7
  *  signallign link transport would be M2PA instead of this module.
  */
-#define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
@@ -124,10 +123,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDT_TPI_MOD_ID		CONFIG_STREAMS_SDT_TPI_MODID
 #define SDT_TPI_MOD_NAME	CONFIG_STREAMS_SDT_TPI_NAME
-#endif
 
 /*
  *  =========================================================================
@@ -4670,8 +4667,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sdt_tpiinfo,
@@ -4698,40 +4693,6 @@ sdt_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sdt_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&sdt_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sdt_tpiinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-sdt_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&sdt_tpiinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 sdt_tpiinit(void)

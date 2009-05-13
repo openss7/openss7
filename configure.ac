@@ -242,6 +242,8 @@ AC_CONFIG_FILES([Makefile
 		 po/Makefile.in
 		 scripts/texi/args.texi
 		 src/Makefile
+		 src/drivers/Config
+		 src/modules/Config
 		 src/include/Makefile])
 
 _OPENSS7_OUTPUT

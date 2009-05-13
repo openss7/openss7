@@ -118,24 +118,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define DL_DRV_ID	CONFIG_STREAMS_DL_MODID
 #define DL_DRV_NAME	CONFIG_STREAMS_DL_NAME
 #define DL_CMAJORS	CONFIG_STREAMS_DL_NMAJOR
 #define DL_CMAJOR_0	CONFIG_STREAMS_DL_MAJOR
 #define DL_UNITS	CONFIG_STREAMS_DL_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_DL_MODID));
 MODULE_ALIAS("streams-driver-dl");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_DL_MAJOR));
 MODULE_ALIAS("/dev/streams/dl");
 MODULE_ALIAS("/dev/streams/dl/*");
 MODULE_ALIAS("/dev/streams/clone/dl");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
@@ -4031,21 +4027,12 @@ dl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE, "cannot push as module");
 		return (ENXIO);
 	}
-#ifdef LIS
-	if (cmajor != CMAJOR_0 || (cminor & 0x1f) >= DL_MINOR_FREE) {
-		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "attempt to open device %d:%d directly", cmajor, cminor);
-		return (ENXIO);
-	}
-#endif				/* LIS */
-#ifdef LFS
 	/* Linux Fast-STREAMS always passes internal major dvice numbers (module ids) */
 	if (cmajor != DRV_ID || (cminor & 0x1f) >= DL_MINOR_FREE) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "attempt to open device %d:%d directly", cmajor, cminor);
 		return (ENXIO);
 	}
-#endif				/* LFS */
 	if (sflag == CLONEOPEN || (cminor & 0x1f) == 0 || (cminor & ~0x1f) == 0) {
 		strlog(DRV_ID, cminor, LOG_DEBUG, SL_TRACE, "clone open in effect");
 		sflag = CLONEOPEN;
@@ -4105,24 +4092,6 @@ dl_qclose(queue_t *q, int oflags, cred_t *crp)
 	struct dl *dl = DL_PRIV(q);
 
 	strlog(DRV_ID, dl->u.dev.cminor, LOG_DEBUG, SL_TRACE, "closing character device");
-#ifdef LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		strlog(DRV_ID, dl->u.dev.cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS double-close bug detected");
-		goto quit;
-	}
-#if 0
-	/* only for modules pushed on pipe ends */
-	if (q->q_next == NULL) {
-		strlog(DRV_ID, dl->u.dev.cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS pipe bug: called with NULL q->q_next pointer");
-		goto skip_pop;
-	}
-#endif
-#endif				/* LIS */
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	dl_free_priv(q);
 	goto quit;
@@ -4156,7 +4125,6 @@ MODULE_PARM_DESC(major, "Major device number for DL driver (0 for allocation).")
 
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct cdevsw dl_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &dl_info,
@@ -4196,77 +4164,3 @@ dl_exit(void)
 module_init(dl_init);
 module_exit(dl_exit);
 #endif				/* MODULE */
-
-#endif				/* LFS */
-
-#ifdef LIS
-STATIC int dl_initalized = 0;
-STATIC void
-dl_init(void)
-{
-	int err;
-
-	if (dl_initialized != 0)
-		return;
-	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	if ((err = dl_init_caches())) {
-		dl_initialized = err;
-		return;
-	}
-	if ((err = lis_register_strdev(major, &dl_info, UNITS, DRV_NAME)) < 0) {
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		dl_initialized = err;
-		dl_term_caches();
-		return;
-	}
-	dl_initialized = 1;
-	if (major = 0 && err > 0) {
-		major = err;
-		dl_initialized = 2;
-	}
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		dl_initialized = err;
-		return;
-	}
-	return;
-}
-STATIC void
-dl_terminate(void)
-{
-	int err;
-
-	if (dl_initialized <= 0)
-		return;
-	if (major) {
-		if ((err = lis_unregister_strdev(major)) < 0)
-			strlog(DRV_ID, 0, LOG_CRIT, SL_FATAL | SL_CONSOLE,
-			       "cannot unregister major %d", major);
-		major = 0;
-	}
-	dl_term_caches();
-	dl_initialized = 0;
-	return;
-}
-
-#ifdef MODULE
-int
-init_module(void)
-{
-	dl_init();
-	if (dl_initialized < 0)
-		return dl_initialized;
-	return (0);
-}
-
-void
-cleanup_module(void)
-{
-	return dl_terminate();
-}
-#endif				/* MODULE */
-
-#endif				/* LIS */

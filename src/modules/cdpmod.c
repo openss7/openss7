@@ -1517,10 +1517,6 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for CDPMOD.  (0 for allocation.)");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
-
 struct fmodsw cd_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &cdpmod_info,

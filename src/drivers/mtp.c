@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  complete Message Transfer Part protocol layer for SS7.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -126,13 +125,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MTP_DRV_ID		CONFIG_STREAMS_MTP_MODID
 #define MTP_DRV_NAME		CONFIG_STREAMS_MTP_NAME
 #define MTP_CMAJORS		CONFIG_STREAMS_MTP_NMAJORS
 #define MTP_CMAJOR_0		CONFIG_STREAMS_MTP_MAJOR
 #define MTP_UNITS		CONFIG_STREAMS_MTP_NMINORS
-#endif
 
 #define MTP_CMINOR_MTPI	0
 #define MTP_CMINOR_TPI	1

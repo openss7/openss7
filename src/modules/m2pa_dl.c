@@ -89,10 +89,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define M2PA_DL_MOD_ID		CONFIG_STREAMS_M2PA_DL_MODID
 #define M2PA_DL_MOD_NAME	CONFIG_STREAMS_M2PA_DL_NAME
-#endif
 
 #define MOD_ID		M2PA_DL_MOD_ID
 #define MOD_NAME	M2PA_DL_MOD_NAME
@@ -2752,9 +2750,6 @@ MODULE_PARAM(modid, "h");
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID fo the M2PA-DL module. (0 for allocation).");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 STATIC struct fmodsw dl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &m2pa_dlinfo,

@@ -67,7 +67,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 //#define _DEBUG 1
 #undef _DEBUG
 
-#define _LFS_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _SUN_SOURCE	1
@@ -140,24 +139,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_X400P_DRV_ID		CONFIG_STREAMS_SL_X400P_MODID
 #define SL_X400P_DRV_NAME	CONFIG_STREAMS_SL_X400P_NAME
 #define SL_X400P_CMAJORS	CONFIG_STREAMS_SL_X400P_NMAJORS
 #define SL_X400P_CMAJOR_0	CONFIG_STREAMS_SL_X400P_MAJOR
 #define SL_X400P_UNITS		CONFIG_STREAMS_SL_X400P_NMINORS
-#endif
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SL_X400P_MODID));
 MODULE_ALIAS("streams-driver-sl-x400p");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SL_X400P_MAJOR));
 MODULE_ALIAS("/dev/streams/x400p-sl");
 MODULE_ALIAS("/dev/streams/x400p-sl/*");
 MODULE_ALIAS("/dev/streams/clone/x400p-sl");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SL_X400P_CMAJOR_0) "-0");
@@ -18103,8 +18098,6 @@ MODULE_PARM_DESC(major, "Device number for the SL-X400P driver. (0 for allocatio
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sl_x400pinfo,
@@ -18133,42 +18126,6 @@ xp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC noinline __devinit int
-xp_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &sl_x400pinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC noinline __devexit int
-xp_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 sl_x400pterminate(void)

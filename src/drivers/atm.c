@@ -70,7 +70,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * For the upper interface boundary, see DLPI.  For the lower interface boundary, see CDI.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -112,13 +111,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define ATM_DRV_ID	CONFIG_STREAMS_ATM_MODID
 #define ATM_DRV_NAME	CONFIG_STREAMS_ATM_NAME
 #define ATM_CMAJOR_0	CONFIG_STREAMS_ATM_MAJOR
 #define ATM_CMAJORS	CONFIG_STREAMS_ATM_NMAJORS
 #define ATM_UNITS	CONFIG_STREAMS_ATM_NMINORS
-#endif				/* LFS */
 
 #define DRV_ID		ATM_DRV_ID
 #define DRV_NAME	ATM_DRV_NAME

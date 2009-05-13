@@ -100,14 +100,11 @@ MODULE_AUTHOR(LOOP_CONTACT);
 MODULE_DESCRIPTION(LOOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LOOP_DEVICE);
 MODULE_LICENSE(LOOP_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-loop");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_LOOP_MODULE */
 
 #ifndef CONFIG_STREAMS_LOOP_NAME
 #define CONFIG_STREAMS_LOOP_NAME "loop"
@@ -119,41 +116,59 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_LOOP_MAJOR must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-loop");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_LOOP_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_LOOP_MODID;
 
+#ifdef CONFIG_STREAMS_LOOP_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for LOOP driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_LOOP_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LOOP_MODID));
 MODULE_ALIAS("streams-driver-loop");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_LOOP_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_LOOP_MAJOR;
 
+#ifdef CONFIG_STREAMS_LOOP_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_LOOP_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR) "-*");
 MODULE_ALIAS("/dev/loop.1");
 MODULE_ALIAS("/dev/loop.2");
 MODULE_ALIAS("/dev/loop_clone");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LOOP_MAJOR));
 MODULE_ALIAS("/dev/streams/loop");
 MODULE_ALIAS("/dev/streams/loop/*");
 MODULE_ALIAS("/dev/streams/clone/loop");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 STATIC struct module_info loop_minfo = {
 	.mi_idnum = CONFIG_STREAMS_LOOP_MODID,
@@ -503,14 +518,17 @@ STATIC struct qinit loop_wqinit = {
 	.qi_mstat = &loop_wstat,
 };
 
-STATIC struct streamtab loop_info = {
+#ifdef CONFIG_STREAMS_LOOP_MODULE
+STATIC
+#endif
+struct streamtab loopinfo = {
 	.st_rdinit = &loop_rqinit,
 	.st_wrinit = &loop_wqinit,
 };
 
 STATIC struct cdevsw loop_cdev = {
 	.d_name = CONFIG_STREAMS_LOOP_NAME,
-	.d_str = &loop_info,
+	.d_str = &loopinfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -521,7 +539,7 @@ STATIC struct cdevsw loop_cdev = {
 STATIC
 #endif
 int __init
-loop_init(void)
+loopinit(void)
 {
 	int err;
 
@@ -542,12 +560,12 @@ loop_init(void)
 STATIC
 #endif
 void __exit
-loop_exit(void)
+loopexit(void)
 {
 	unregister_strdev(&loop_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_LOOP_MODULE
-module_init(loop_init);
-module_exit(loop_exit);
+module_init(loopinit);
+module_exit(loopexit);
 #endif

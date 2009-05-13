@@ -242,13 +242,10 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 //EXPORT_SYMBOL_NOVERS(spec_open);     /* strspecfs.h */
 //EXPORT_SYMBOL_NOVERS(spec_reparent);     /* strspecfs.h */
 
-#if	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
-	defined(CONFIG_STREAMS_SC_MODULE)
 //EXPORT_SYMBOL_NOVERS(fmodsw_list);   /* strreg.h */
 //EXPORT_SYMBOL_NOVERS(cdevsw_list);   /* strreg.h */
 //EXPORT_SYMBOL_NOVERS(fmod_count);    /* strreg.h */
 //EXPORT_SYMBOL_NOVERS(cdev_count);    /* strreg.h */
-#endif
 
 //EXPORT_SYMBOL_NOVERS(fmod_str);      /* strreg.h */
 

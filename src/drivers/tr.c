@@ -107,13 +107,11 @@ static int tr_debug = TR_DEBUG;
 static int tr_debug = 2;
 #endif
 
-#ifdef LFS
 #define TR_DRV_ID	CONFIG_STREAMS_TR_MODID
 #define TR_DRV_NAME	CONFIG_STREAMS_TR_NAME
 #define TR_CMAJORS	CONFIG_STREAMS_TR_NMAJORS
 #define TR_CMAJOR_0	CONFIG_STREAMS_TR_MAJOR
 #define TR_NMINOR	CONFIG_STREAMS_TR_NMINORS
-#endif
 
 #ifndef TR_CMAJOR_0
 #define TR_CMAJOR_0	210
@@ -2388,7 +2386,7 @@ tr_close(queue_t *q, int flag, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  LIS STREAMS INITIALIZATION
+ *  STREAMS INITIALIZATION
  *
  *  =========================================================================
  */

@@ -131,11 +131,7 @@ static const char *lstdname = "XNS 5.2/NPI Rev 2";
 static const char *sstdname = "XNS/NPI";
 static const char *shortname = "NPI-IP";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/ip";
-#else
-static char devname[256] = "/dev/ip";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * from there.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -94,14 +93,12 @@ MODULE_SUPPORTED_DEVICE(DL_DEVICE);
 MODULE_LICENSE(DL_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LLC_MODID));
 MODULE_ALIAS("streams-driver-llc");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LLC_MAJOR));
 MODULE_ALIAS("/dev/streams/llc");
 MODULE_ALIAS("/dev/streams/llc/*");
 MODULE_ALIAS("/dev/streams/clone/llc");
-#endif				/* LFS */
 MODULE_ALIAS("streams-llc");
 MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0) "-*");
@@ -113,13 +110,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define LLC_DRV_ID		CONFIG_STREAMS_LLC_MODID
 #define LLC_DRV_NAME		CONFIG_STREAMS_LLC_NAME
 #define LLC_CMAJORS		CONFIG_STREAMS_LLC_NMAJORS
 #define LLC_CMAJOR_0		CONFIG_STREAMS_LLC_MAJOR
 #define LLC_UNITS		CONFIG_STREAMS_LLC_NMINORS
-#endif				/* LFS */
 
 #ifndef LLC_DRV_NAME
 #define LLC_DRV_NAME	"llc"

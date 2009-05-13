@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  stream.
  */
 
-#define _LFS_SOURCE 1
 #define _DEBUG 1
 
 #include <sys/os7/compat.h>
@@ -108,7 +107,5 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TUA_AS_MOD_ID		CONFIG_STREAMS_TUA_AS_MODID
 #define TUA_AS_MOD_NAME		CONFIG_STREAMS_TUA_AS_NAME
-#endif

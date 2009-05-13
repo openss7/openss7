@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -151,13 +150,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define TUA_AS_DRV_ID		CONFIG_STREAMS_TUA_AS_MODID
 #define TUA_AS_DRV_NAME		CONFIG_STREAMS_TUA_AS_NAME
 #define TUA_AS_CMAJORS		CONFIG_STREAMS_TUA_AS_NMAJORS
 #define TUA_AS_CMAJOR_0		CONFIG_STREAMS_TUA_AS_MAJOR
 #define TUA_AS_UNITS		CONFIG_STREAMS_TUA_AS_NMINORS
-#endif				/* LFS */
 
 #define DRV_ID		TUA_AS_DRV_ID
 #define DRV_NAME	TUA_AS_DRV_NAME

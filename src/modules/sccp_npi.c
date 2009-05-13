@@ -69,7 +69,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * and libraries written to support CONS (X.25) and CLNS (CLNP).
  */
 
-#define _LFS_SOURCE
 #define _MPS_SOURCE
 #define _SVR4_SOURCE
 
@@ -135,10 +134,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SCCP_NPI_MOD_ID		CONFIG_STREAMS_SCCP_NPI_MODID
 #define SCCP_NPI_MOD_NAME	CONFIG_STREAMS_SCCP_NPI_NAME
-#endif				/* LFS */
 
 /*
  * STREAMS DEFINITIONS

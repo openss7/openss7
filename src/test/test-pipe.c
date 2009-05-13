@@ -2964,10 +2964,6 @@ struct test_stream test_2_4_4 = { &preamble_2_1, &test_case_2_4_4, &postamble_2 
 Check that I_FDINSERT can be performed on a pipe.  Checks that ENXIO is\n\
 returned when I_FDINSERT is attempted on a hung up pipe."
 
-#ifdef LIS
-typedef ulong t_uscalar_t;
-#endif
-
 int
 test_case_2_4_5(int child)
 {

@@ -288,16 +288,6 @@ dnl--------------------------------------------------------------------------
 		until streams FIFOs are proven.])
     fi
 dnl--------------------------------------------------------------------------
-    AC_CACHE_CHECK([for STREAMS binary compatibilty mode], [os7_cv_bcm], [dnl
-	AC_ARG_ENABLE([streams-bcm],
-	    AS_HELP_STRING([--enable-streams-bcm],
-		[disable STREAMS binary compatibility mode.
-		@<:@default=disabled@:>@]),
-		[enable_streams_bcm="$enableval"],
-		[enable_streams_bcm='no'])
-	os7_cv_bcm="${enable_streams_bcm:-no}"])
-    AH_TEMPLATE([CONFIG_STREAMS_LIS_BCM], [Defined when] AC_PACKAGE_TITLE [was
-	compiled for LiS Binary Compatibility.])
     AH_VERBATIM([streamscall], m4_text_wrap([Use this macro like fastcall.  It
 	is set to an attribute with the number of parameters passed in registers
 	to STREAMS callouts (qi_putp, qi_srvp, qi_qopen, qi_qclose, qi_admin).
@@ -320,13 +310,7 @@ dnl--------------------------------------------------------------------------
 #else
 #define STREAMSCALL(__x) __x
 #endif])
-    if test :"${os7_cv_bcm:-no}" = :yes
-    then
-	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LIS_BCM], [1])
-	AC_DEFINE_UNQUOTED([streamscall], [__attribute__((__regparm__(0)))])
-    else
-	AC_DEFINE_UNQUOTED([streamscall], [__attribute__((__regparm__(3)))])
-    fi
+    AC_DEFINE_UNQUOTED([streamscall], [__attribute__((__regparm__(3)))])
     AC_DEFINE_UNQUOTED([STREAMSCALL(__x)], [__x streamscall])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-sth],
@@ -334,7 +318,7 @@ dnl--------------------------------------------------------------------------
 	    [enable module sth for linkage with STREAMS.
 	    @<:@default=module@:>@]),
 	    [enable_module_sth="$enableval"],
-	    [if test :${enable_big_compile:-yes} = :yes ; then enable_module_sth='yes' ; else enable_module_sth='module' ; fi])
+	    [enable_module_sth='module'])
     AM_CONDITIONAL([CONFIG_STREAMS_STH], [test :${enable_module_sth:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE], [test :${enable_module_sth:-module} = :module])
 dnl--------------------------------------------------------------------------
@@ -392,12 +376,30 @@ dnl--------------------------------------------------------------------------
     AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD], [test :${enable_module_testmod:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD_MODULE], [test :${enable_module_testmod:-module} = :module])
 dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([module-timod],
+	AS_HELP_STRING([--enable-module-timod],
+	    [enable timod module for linkage with STREAMS.
+	    @<:@default=module@:>@]),
+	    [enable_module_timod="$enableval"],
+	    [enable_module_timod='module'])
+    AM_CONDITIONAL([CONFIG_STREAMS_TIMOD], [test :${enable_module_timod:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TIMOD_MODULE], [test :${enable_module_timod:-module} = :module])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([module-tirdwr],
+	AS_HELP_STRING([--enable-module-tirdwr],
+	    [enable tirdwr module for linkage with STREAMS.
+	    @<:@default=module@:>@]),
+	    [enable_module_tirdwr="$enableval"],
+	    [enable_module_tirdwr='module'])
+    AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR], [test :${enable_module_tirdwr:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR_MODULE], [test :${enable_module_tirdwr:-module} = :module])
+dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-clone],
 	AS_HELP_STRING([--enable-driver-clone],
 	    [enable clone driver for linkage with STREAMS.
 	    @<:@default=module@:>@]),
 	    [enable_driver_clone="$enableval"],
-	    [if test :${enable_big_compile:-yes} = :yes ; then enable_driver_clone='yes' ; else enable_driver_clone='module' ; fi])
+	    [enable_driver_clone='module'])
     AM_CONDITIONAL([CONFIG_STREAMS_CLONE], [test :${enable_driver_clone:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE], [test :${enable_driver_clone:-module} = :module])
 dnl--------------------------------------------------------------------------
@@ -589,15 +591,6 @@ dnl--------------------------------------------------------------------------
 	    [enable_compat_irix='module'])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX], [test ":${enable_compat_irix:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test ":${enable_compat_irix:-module}" = :module])
-dnl--------------------------------------------------------------------------
-    AC_ARG_ENABLE([compat-lis],
-	AS_HELP_STRING([--enable-compat-lis],
-	    [enable source compatibility with LiS variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_lis="$enableval"],
-	    [enable_compat_lis='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS], [test ":${enable_compat_lis:-module}" = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE], [test ":${enable_compat_lis:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-mac],
 	AS_HELP_STRING([--enable-compat-mac],
@@ -2922,6 +2915,48 @@ dnl--------------------------------------------------------------------------
 	    ;;
     esac
 dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS module timod])
+	if test :$enable_module_timod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_timod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_timod:-module}])
+    case ${enable_module_timod:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TIMOD], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the timod module for linkage
+		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
+		include the timod module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TIMOD_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the timod module as a
+		standalone loadable kernel module.  When undefined,]
+		AC_PACKAGE_TITLE [will not include the timod module as a
+		standalone loadable kernel module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS module tirdwr])
+	if test :$enable_module_tirdwr = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_tirdwr='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_tirdwr:-module}])
+    case ${enable_module_tirdwr:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TIRDWR], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the tirdwr module for linkage
+		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
+		include the tirdwr module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TIRDWR_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the tirdwr module as a
+		standalone loadable kernel module.  When undefined,]
+		AC_PACKAGE_TITLE [will not include the tirdwr module as a
+		standalone loadable kernel module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver clone])
 	if test :${enable_driver_clone:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_clone='yes'
@@ -3443,34 +3478,6 @@ dnl----------------------------------------------------------------------------
 	    ;;
     esac
 dnl----------------------------------------------------------------------------
-    AC_MSG_CHECKING([for STREAMS LiS compatibility])
-	if test ":${enable_compat_lis:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    enable_compat_lis='yes'
-	fi
-    AC_MSG_RESULT([${enable_compat_lis:-module}])
-    case "${enable_compat_lis:-module}" in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS], [], [When defined,
-		Linux Fast STREAMS will attempt to be as compatible as possible
-		(without replicating any bugs) with the LiS release so that
-		STREAMS drivers and modules written for LiS will compile with
-		Linux Fast STREAMS.  When undefined, STREAMS drivers and modules
-		written for LiS will require porting in more respects.  This
-		symbol determines whether compatibility will be compiled and
-		linkable with Linux Fast-STREAMS.])
-	    ;;
-	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS_MODULE], [], [When
-		defined, Linux Fast STREAMS will attempt to be as compatible as
-		possible (without replicating any bugs) with the LiS release so
-		that STREAMS drivers and modules written for LiS will compile
-		with Linux Fast STREAMS.  When undefined, STREAMS drivers and
-		modules written for LiS will require porting in more respects.
-		This symbol determines whether compatibility will be compiled as
-		a loadable module to Linux Fast-STREAMS.])
-	    ;;
-    esac
-dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS MacOT compatibility])
 	case ${enable_compat_mac:-module} in
 	    (yes) enable_compat_mps=yes ;;
@@ -3616,6 +3623,7 @@ AC_DEFUN([_OS7_STRCONF], [dnl
     ])
     os7_cv_sconfig='src/include/sys/config.h'
     os7_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
+    os7_cv_modconf="src/include/sys/modconf.h"
     _STRCONF
 ])# _OS7_STRCONF
 # =============================================================================

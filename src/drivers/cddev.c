@@ -92,13 +92,11 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define CDDEV_BANNER	CDDEV_DESCRIP	"\n" \
 			CDDEV_REVISION
 
-#ifdef LFS
 #define CDDEV_DRV_ID	CONFIG_STREAMS_CDDEV_MODID
 #define CDDEV_DRV_NAME	CONFIG_STREAMS_CDDEV_NAME
 #define CDDEV_CMAJORS	CONFIG_STREAMS_CDDEV_NMAJOR
 #define CDDEV_CMAJOR_0	CONFIG_STREAMS_CDDEV_MAJOR
 #define CDDEV_UNITS	CONFIG_STREAMS_CDDEV_NMINORS
-#endif
 
 #ifdef LINUX
 MODULE_AUTHOR(CDDEV_CONTACT);
@@ -109,14 +107,12 @@ MODULE_LICENSE(CDDEV_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-cddev");
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CDDEV_DRV_ID));
 MODULE_ALIAS("streamd-driver-cddev");
 MODULE_ALIAS("streams-major-" __stringify(CDDEV_CMAJOR_0));
 MODULE_ALIAS("/dev/streams/cddev");
 MODULE_ALIAS("/dev/streams/cddev/*");
 MODULE_ALIAS("/dev/streams/clone/cddev");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(CDDEV_CMAJOR_0) "-0");
@@ -1721,9 +1717,6 @@ MODULE_PARM_DESC(major, "Major device number for CDDEV. (0 for allocation.)");
  *
  * --------------------------------------------------------------------------
  */
-
-#ifdef LFS
-
 static struct cdevsw cddev_cdev = {
 	.d_str = &cddev_info,
 	.d_flag = D_MP,
@@ -1751,38 +1744,6 @@ cddev_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-#ifdef LIS
-
-static int
-cddev_regsiter_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &cddev_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-static int
-cddev_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 static __init int
 cddev_modinit(void)

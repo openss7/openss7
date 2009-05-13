@@ -148,33 +148,10 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 __SVR4_EXTERN pl_t
 MPSTR_QLOCK(queue_t *q)
 {
-#ifdef LIS
-	lis_flags_t flags;
-
-	lis_rw_write_lock_irqsave(&q->q_isr_lock, &flags);
-	return (flags);
-#endif
-#ifdef LFS
-#if 0
-	if (q->q_klock.kl_owner == current)
-		q->q_klock.kl_nest++;
-	else {
-		pl_t pl;
-
-		pl = splstr();
-		write_lock(&q->q_klock.kl_lock);
-		q->q_klock.kl_isrflags = pl;
-		q->q_klock.kl_owner = current;
-		q->q_klock.kl_nest = 0;
-	}
-	return (q->q_klock.kl_isrflags);
-#else
 	pl_t pl = splstr();
 
 	write_lock(&q->q_lock);
 	return (pl);
-#endif
-#endif
 }
 
 EXPORT_SYMBOL_GPL(MPSTR_QLOCK);	/* svr4/ddi.h */
@@ -183,32 +160,8 @@ EXPORT_SYMBOL_GPL(MPSTR_QLOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN void
 MPSTR_QRELE(queue_t *q, pl_t pl)
 {
-#ifdef LIS
-	lis_flags_t flags = pl;
-
-	lis_rw_write_unlock_irqrestore(&q->q_isr_lock, &flags);
-	return;
-#endif
-#ifdef LFS
-#if 0
-	if (q->q_klock.kl_nest > 0)
-		q->q_klock.kl_nest--;
-	else {
-		unsigned long flags = q->q_klock.kl_isrflags;
-
-		q->q_klock.kl_owner = NULL;
-		q->q_klock.kl_nest = 0;
-		if (waitqueue_active(&q->q_klock.kl_waitq))
-			wake_up(&q->q_klock.kl_waitq);
-		write_unlock(&q->q_klock.kl_lock);
-		local_restore_str(flags);
-	}
-	return;
-#else
 	write_unlock(&q->q_lock);
 	splx(pl);
-#endif
-#endif
 }
 
 EXPORT_SYMBOL_GPL(MPSTR_QRELE);	/* svr4/ddi.h */
@@ -217,33 +170,10 @@ EXPORT_SYMBOL_GPL(MPSTR_QRELE);	/* svr4/ddi.h */
 __SVR4_EXTERN pl_t
 MPSTR_STPLOCK(struct stdata * sd)
 {
-#ifdef LIS
-	lis_flags_t flags;
-
-	lis_spin_lock_irqsave(&sd->sd_lock, &flags);
-	return (flags);
-#endif
-#ifdef LFS
-#if 0
-	if (sd->sd_klock.kl_owner == current)
-		sd->sd_klock.kl_nest++;
-	else {
-		unsigned long flags;
-
-		local_save_str(flags);
-		write_lock(&sd->sd_klock.kl_lock);
-		sd->sd_klock.kl_isrflags = flags;
-		sd->sd_klock.kl_owner = current;
-		sd->sd_klock.kl_nest = 0;
-	}
-	return (sd->sd_klock.kl_isrflags);
-#else
 	pl_t pl = splstr();
 
 	write_lock(&sd->sd_lock);
 	return (pl);
-#endif
-#endif
 }
 
 EXPORT_SYMBOL_GPL(MPSTR_STPLOCK);	/* svr4/ddi.h */
@@ -252,43 +182,18 @@ EXPORT_SYMBOL_GPL(MPSTR_STPLOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN void
 MPSTR_STPRELE(struct stdata *sd, pl_t pl)
 {
-#ifdef LIS
-	lis_flags_t flags = pl;
-
-	lis_spin_unlock_irqrestore(&sd->sd_lock, &flags);
-	return;
-#endif
-#ifdef LFS
-#if 0
-	if (sd->sd_klock.kl_nest > 0)
-		sd->sd_klock.kl_nest--;
-	else {
-		unsigned long flags = sd->sd_klock.kl_isrflags;
-
-		sd->sd_klock.kl_owner = NULL;
-		sd->sd_klock.kl_nest = 0;
-		if (waitqueue_active(&sd->sd_klock.kl_waitq))
-			wake_up(&sd->sd_klock.kl_waitq);
-		write_unlock(&sd->sd_klock.kl_lock);
-		local_restore_str(flags);
-	}
-#else
 	write_unlock(&sd->sd_lock);
 	splx(pl);
-#endif
-#endif
 }
 
 EXPORT_SYMBOL_GPL(MPSTR_STPRELE);	/* svr4/ddi.h */
 
-#ifdef LFS
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl,
 				     processorid_t processor);
 EXPORT_SYMBOL_GPL(dtimeout);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
 
 EXPORT_SYMBOL_GPL(itimeout);	/* svr4/ddi.h */
-#endif
 
 #if defined CONFIG_STREAMS_NOIRQ || defined _TEST
 
@@ -454,7 +359,6 @@ etoimajor(major_t emajor)
 {
 	major_t major = NODEV;
 
-#ifdef LFS
 	struct cdevsw *cdev;
 
 	if ((cdev = sdev_get(emajor))) {
@@ -463,7 +367,6 @@ etoimajor(major_t emajor)
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
 		sdev_put(cdev);
 	}
-#endif
 	return (major);
 }
 
@@ -472,7 +375,6 @@ EXPORT_SYMBOL_GPL(etoimajor);	/* uw7/ddi.h */
 int
 itoemajor(major_t imajor, int prevemaj)
 {
-#ifdef LFS
 	struct cdevsw *cdev;
 
 	if ((cdev = cdrv_get(imajor)) && cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
@@ -489,7 +391,6 @@ itoemajor(major_t imajor, int prevemaj)
 				found_previous = 1;
 		}
 	}
-#endif
 	return (NODEV);
 }
 
@@ -649,10 +550,8 @@ SV_SIGNAL(sv_t * svp)
 
 EXPORT_SYMBOL_GPL(SV_SIGNAL);	/* svr4/ddi.h */
 
-#ifdef LFS
 #undef schedule
 #define schedule() streams_schedule()
-#endif
 
 __SVR4_EXTERN void
 SV_WAIT(sv_t * svp, int priority, lock_t * lkp)

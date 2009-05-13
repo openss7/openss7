@@ -80,7 +80,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define _DEBUG 1
 //#undef _DEBUG
 /
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #include <sys/os7/compat.h>
@@ -117,24 +116,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define ND_DRV_ID		CONFIG_STREAMS_ND_MODID
 #define ND_DRV_NAME		CONFIG_STREAMS_ND_NAME
 #define ND_CMAJORS		CONFIG_STREAMS_ND_NMAJORS
 #define ND_CMAJOR_0		CONFIG_STREAMS_ND_MAJOR
 #define ND_UNITS		CONFIG_STREAMS_ND_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_ND_MODID));
 MODULE_ALIAS("stremas-driver-nd");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ND_MAJOR));
 MODULE_ALIAS("/dev/streams/nd");
 MODULE_ALIAS("/dev/streams/nd/*");
 MODULE_ALIAS("/dev/streams/clone/nd");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(ND_CMAJOR_0) "-0");

@@ -210,11 +210,7 @@ static const char *lstdname = "Q.703/ANSI T1.111.3/JQ.703";
 static const char *sstdname = "Q.781";
 static const char *shortname = "MTP2";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/sl-mux";
-#else
-static char devname[256] = "/dev/sl-mux";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

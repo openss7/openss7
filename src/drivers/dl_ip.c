@@ -111,24 +111,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define DL_IP_DRV_ID	CONFIG_STREAMS_DL_IP_MODID
 #define DL_IP_DRV_NAME	CONFIG_STREAMS_DL_IP_NAME
 #define DL_IP_CMAJORS	CONFIG_STREAMS_DL_IP_NMAJOR
 #define DL_IP_CMAJOR_0	CONFIG_STREAMS_DL_IP_MAJOR
 #define DL_IP_UNITS	CONFIG_STREAMS_DL_IP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_DL_MODID));
 MODULE_ALIAS("streams-driver-dl_ip");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_DL_MAJOR));
 MODULE_ALIAS("/dev/streams/dl_ip");
 MODULE_ALIAS("/dev/streams/dl_ip/*");
 MODULE_ALIAS("/dev/streams/clone/dl_ip");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(DL_CMAJOR_0) "-0");
@@ -2165,7 +2161,6 @@ static struct cdevsw dl_cdev = {
 	.d_kmod = THIS_MODULE,
 };
 
-#ifdef LFS
 static struct devnode dl_node_ip = {
 	.n_name = "ip",
 	.n_flag = D_CLONE,
@@ -2183,7 +2178,6 @@ static struct devnode dl_node_ipcl = {
 	.n_flag = D_CLONE,
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
-#endif				/* LFS */
 
 static __init int
 dlipinit(void)
@@ -2200,11 +2194,9 @@ dlipinit(void)
 	if (major == 0)
 		major = err;
 
-#ifdef LFS
 	register_strnod(&dl_cdev, &dl_node_ip, IP_CMINOR);
 	register_strnod(&dl_cdev, &dl_node_ipco, IPCO_CMINOR);
 	register_strnod(&dl_cdev, &dl_node_ipcl, IPCL_CMINOR);
-#endif				/* LFS */
 
 	return (0);
 }
@@ -2214,11 +2206,9 @@ dlipexit(void)
 {
 	int err;
 
-#ifdef LFS
 	unregister_strnod(&dl_cdev, IP_CMINOR);
 	unregister_strnod(&dl_cdev, IPCO_CMINOR);
 	unregister_strnod(&dl_cdev, IPCL_CMINOR);
-#endif				/* LFS */
 
 	if ((err = unregister_strdev(&dl_cdev, major)) < 0)
 		cmn_err(CE_WARN, "%s: could not unregister major %d", DRV_NAME, major);

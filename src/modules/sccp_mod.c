@@ -78,7 +78,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  - Close the MTP Stream.
  */
 
-#define _LFS_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _SUN_SOURCE	1
@@ -126,10 +125,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SCCP_MOD_MOD_ID		CONFIG_STREAMS_SCCP_MOD_MODID
 #define SCCP_MOD_MOD_NAME	CONFIG_STREAMS_SCCP_MOD_NAME
-#endif				/* LFS */
 
 #ifndef SCCP_MOD_MOD_NAME
 #define SCCP_MOD_MOD_NAME	"sccp-mod"
@@ -4590,10 +4587,6 @@ module_param(modid, ushort, 0444);
 MODULE_PARM(modid, "h");
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module id for SCCP-MOD module.  (0 for allocation.)");
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw sc_fmod = {
 	.f_name = MOD_NAME,

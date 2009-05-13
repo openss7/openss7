@@ -114,7 +114,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  the SL-User.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -207,13 +206,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define M2UA_AS_DRV_ID		CONFIG_STREAMS_M2UA_AS_MODID
 #define M2UA_AS_DRV_NAME	CONFIG_STREAMS_M2UA_AS_NAME
 #define M2UA_AS_MAJORS		CONFIG_STREAMS_M2UA_AS_NMAJORS
 #define M2UA_AS_CMAJOR_0	CONFIG_STREAMS_M2UA_AS_MAJOR
 #define M2UA_AS_UNITS		CONFIG_STREAMS_M2UA_AS_NMINORS
-#endif				/* LFS */
 
 #define DRV_ID		M2UA_AS_DRV_ID
 #define DRV_NAME	M2UA_AS_DRV_NAME

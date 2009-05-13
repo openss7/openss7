@@ -59,7 +59,6 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -117,10 +116,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define M2PA_SL_MOD_ID		CONFIG_STREAMS_M2PA_SL_MODID
 #define M2PA_SL_MOD_NAME	CONFIG_STREAMS_M2PA_SL_NAME
-#endif
 
 /*
  *  =========================================================================
@@ -8355,10 +8352,6 @@ MODULE_PARM_DESC(modid, "Module ID for the M2PA-SL module. (0 for allocation.)")
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
-
 STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &m2pa_slinfo,

@@ -69,7 +69,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define _DEBUG 1
 // #undef _DEBUG
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -112,24 +111,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define CHMUX_DRV_ID		CONFIG_STREAMS_CHMUX_MODID
 #define CHMUX_DRV_NAME		CONFIG_STREAMS_CHMUX_NAME
 #define CHMUX_CMAJORS		CONFIG_STREAMS_CHMUX_NMAJORS
 #define CHMUX_CMAJOR_0		CONFIG_STREAMS_CHMUX_MAJOR
 #define CHMUX_UNITS		CONFIG_STREAMS_CHMUX_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MXMUX_MODID));
 MODULE_ALIAS("streams-driver-ch");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MXMUX_MAJOR));
 MODULE_ALIAS("/dev/streams/ch");
 MODULE_ALIAS("/dev/streams/ch/*");
 MODULE_ALIAS("/dev/streams/clone/ch");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(CHMUX_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(CHMUX_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(CHMUX_CMAJOR_0) "-0");

@@ -765,11 +765,7 @@ test_async(int fds[])
 	return (0);
 }
 
-#ifdef LFS
 static const char fifoname[] = "/dev/streams/fifo/0";
-#else
-static const char fifoname[] = "/dev/fifo";
-#endif
 
 int
 do_tests(void)

@@ -90,9 +90,6 @@ MODULE_AUTHOR(ECHO_CONTACT);
 MODULE_DESCRIPTION(ECHO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
 MODULE_LICENSE(ECHO_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-echo");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
@@ -109,29 +106,48 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_ECHO_MAJOR must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-echo");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_ECHO_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_ECHO_MODID;
 
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for ECHO driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_ECHO_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_ECHO_MODID));
 MODULE_ALIAS("streams-driver-echo");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_ECHO_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_ECHO_MAJOR;
 
+#ifdef CONFIG_STREAMS_ECHO_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto allocation)");
+#endif				/* CONFIG_STREAMS_ECHO_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR) "-*");
 MODULE_ALIAS("/dev/echo");
@@ -139,7 +155,8 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_ECHO_MAJOR));
 MODULE_ALIAS("/dev/streams/echo");
 MODULE_ALIAS("/dev/streams/echo/*");
 MODULE_ALIAS("/dev/streams/clone/echo");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info echo_minfo = {
 	.mi_idnum = CONFIG_STREAMS_ECHO_MODID,
@@ -365,14 +382,17 @@ static struct qinit echo_wqinit = {
 	.qi_mstat = &echo_wstat,
 };
 
-static struct streamtab echo_info = {
+#ifdef CONFIG_STREAMS_ECHO_MODULE
+static
+#endif
+struct streamtab echoinfo = {
 	.st_rdinit = &echo_rqinit,
 	.st_wrinit = &echo_wqinit,
 };
 
 static struct cdevsw echo_cdev = {
 	.d_name = CONFIG_STREAMS_ECHO_NAME,
-	.d_str = &echo_info,
+	.d_str = &echoinfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
@@ -383,7 +403,7 @@ static struct cdevsw echo_cdev = {
 static
 #endif
 int __init
-echo_init(void)
+echoinit(void)
 {
 	int err;
 
@@ -404,12 +424,12 @@ echo_init(void)
 static
 #endif
 void __exit
-echo_exit(void)
+echoexit(void)
 {
 	unregister_strdev(&echo_cdev, major);
 };
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE
-module_init(echo_init);
-module_exit(echo_exit);
+module_init(echoinit);
+module_exit(echoexit);
 #endif

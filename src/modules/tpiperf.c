@@ -710,24 +710,8 @@ tpiperf_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 static streamscall int
 tpiperf_close(queue_t *q, int oflag, cred_t *crp)
 {
-#if defined LIS
-	/* protect against some LiS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
-		goto quit;
-	}
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
-			MOD_NAME, __FUNCTION__);
-		goto skip_pop;
-	}
-#endif				/* defined LIS */
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	tpiperf_free_priv(q);
-	goto quit;
-      quit:
 	return (0);
 }
 
@@ -757,8 +741,6 @@ MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw tpiperf_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tpiperfinfo,
@@ -785,40 +767,6 @@ tpiperf_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-tpiperf_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&tpiperfinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&tpiperfinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-tpiperf_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&tpiperfinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 tpiperfinit(void)

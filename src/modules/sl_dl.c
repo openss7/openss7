@@ -66,7 +66,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define _MPS_SOURCE
-#define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -99,10 +98,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_DL_MOD_ID	CONFIG_STREAMS_SL_DL_MODID
 #define SL_DL_MOD_NAME	CONFIG_STREAMS_SL_DL_NAME
-#endif
 
 #define MOD_ID		SL_DL_MOD_ID
 #define MOD_NAME	SL_DL_MOD_NAME
@@ -3567,9 +3564,6 @@ MODULE_PARAM(modid, "h");
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID fo the DL-SL module. (0 for allocation).");
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 STATIC struct fmodsw dl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &dl_slinfo,

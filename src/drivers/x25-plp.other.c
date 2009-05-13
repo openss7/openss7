@@ -63,7 +63,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * X.25 LAPB driver.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -105,24 +104,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define PLP_DRV_ID	CONFIG_STREAMS_PLP_MODID
 #define PLP_DRV_NAME	CONFIG_STREAMS_PLP_NAME
 #define PLP_CMAJORS	CONFIG_STREAMS_PLP_NMAJORS
 #define PLP_CMAJOR_0	CONFIG_STREAMS_PLP_MAJOR
 #define PLP_UNITS	CONFIG_STREAMS_PLP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_PLP_MODID));
 MODULE_ALIAS("streams-driver-x25-plp");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_PLP_MAJOR));
 MODULE_ALIAS("/dev/streams/x25-plp");
 MODULE_ALIAS("/dev/streams/x25-plp/*");
 MODULE_ALIAS("/dev/streams/clone/x25-plp");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(PLP_CMAJOR_0) "-0");

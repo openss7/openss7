@@ -175,17 +175,14 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define CLNS_DRV_ID	CONFIG_STREAMS_CLNS_MODID
 #define CLNS_DRV_NAME	CONFIG_STREAMS_CLNS_NAME
 #define CLNS_CMAJORS	CONFIG_STREAMS_CLNS_NMAJORS
 #define CLNS_CMAJOR_0	CONFIG_STREAMS_CLNS_MAJOR
 #define CLNS_UNITS	CONFIG_STREAMS_CLNS_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_CLNS_MODID));
 MODULE_ALIAS("streams-driver-dl");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_CLNS_MAJOR));
@@ -196,7 +193,6 @@ MODULE_ALIAS("/dev/streams/clnl/clns");
 MODULE_ALIAS("/dev/streams/clnl/esis");
 MODULE_ALIAS("/dev/streams/clnl/isis");
 MODULE_ALIAS("/dev/streams/clone/clnl");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(CLNS_CMAJOR_0) "-0");
@@ -919,15 +915,6 @@ n_reset_res(queue_t *q, mblk_t *mp)
 	return (-EFAULT);
 }
 
-#ifdef LIS
-#ifndef fastcall
-#define fastcall
-#endif
-#ifndef __hot_put
-#define __hot_put
-#endif
-#endif
-
 STATIC INLINE fastcall __hot_put int
 np_w_proto(queue_t *q, mblk_t *mp)
 {
@@ -1564,21 +1551,12 @@ np_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE, "cannot push as module");
 		return (ENXIO);
 	}
-#ifdef LIS
-	if (cmajor != CMAJOR_0) {
-		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "major device number mismatch %d != %d", cmajor, CMAJOR_0);
-		return (ENXIO);
-	}
-#endif				/* LIS */
-#ifdef LFS
 	/* Linux Fast-STREAMS always passes internal major dvice numbers (module ids) */
 	if (cmajor != DRV_ID) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "major device number mismatch %d != %d", cmajor, DRV_ID);
 		return (ENXIO);
 	}
-#endif				/* LFS */
 	if (sflag == CLONEOPEN || cminor < 1) {
 		strlog(DRV_ID, cminor, LOG_DEBUG, SL_TRACE, "clone open in effect");
 		sflag = CLONEOPEN;
@@ -1621,24 +1599,6 @@ np_qclose(queue_t *q, int oflags, cred_t *crp)
 	struct np *np = NP_PRIV(q);
 
 	strlog(DRV_ID, np->u.dev.cminor, LOG_DEBUG, SL_TRACE, "closing character device");
-#ifdef LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		strlog(DRV_ID, np->u.dev.cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS double-close bug detected");
-		goto quit;
-	}
-#if 0
-	/* only for modules pushed on pipe ends */
-	if (q->q_next == NULL) {
-		strlog(DRV_ID, np->u.dev.cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS pipe bug: called with NULL q->q_next pointer");
-		goto skip_pop;
-	}
-#endif
-#endif				/* LIS */
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	np_free_priv(q);
 	goto quit;
@@ -1672,7 +1632,6 @@ MODULE_PARM_DESC(major, "Major device number for CLNS driver (0 for allocation).
 
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct cdevsw np_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &np_info,
@@ -1712,78 +1671,3 @@ np_exit(void)
 module_init(np_init);
 module_exit(np_exit);
 #endif				/* MODULE */
-
-#endif				/* LFS */
-
-#ifdef LIS
-STATIC int np_initialized = 0;
-STATIC void
-np_init(void)
-{
-	int err;
-
-	if (np_initialized != 0)
-		return;
-	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	if ((err = np_init_caches())) {
-		np_initialized = err;
-		return;
-	}
-	if ((err = lis_register_strdev(major, &np_info, UNITS, DRV_NAME)) < 0) {
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		np_initialized = err;
-		np_term_caches();
-		return;
-	}
-	np_initialized = 1;
-	if (major == 0 && err > 0) {
-		major = err;
-		np_initialized = 2;
-	}
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		np_initialized = err;
-		np_term_caches();
-		return;
-	}
-	return;
-}
-STATIC void
-np_terminate(void)
-{
-	int err;
-
-	if (np_initialized <= 0)
-		return;
-	if (major) {
-		if ((err = lis_unregister_strdev(major)) < 0)
-			strlog(DRV_ID, 0, LOG_CRIT, SL_FATAL | SL_CONSOLE,
-			       "cannot unregister major %d", major);
-		major = 0;
-	}
-	np_term_caches();
-	np_initialized = 0;
-	return;
-}
-
-#ifdef MODULE
-int
-init_module(void)
-{
-	np_init();
-	if (np_initialized < 0)
-		return np_initialized;
-	return (0);
-}
-
-void
-cleanup_module(void)
-{
-	return np_terminate();
-}
-#endif				/* MODULE */
-
-#endif				/* LIS */

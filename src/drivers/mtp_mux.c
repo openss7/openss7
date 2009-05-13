@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -103,13 +102,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MTP_MUX_DRV_ID		CONFIG_STREAMS_MTP_MUX_MODID
 #define MTP_MUX_DRV_NAME	CONFIG_STREAMS_MTP_MUX_NAME
 #define MTP_MUX_CMAJORS		CONFIG_STREAMS_MTP_MUX_NMAJORS
 #define MTP_MUX_CMAJOR_0	CONFIG_STREAMS_MTP_MUX_MAJOR
 #define MTP_MUX_UNITS		CONFIG_STREAMS_MTP_MUX_NMINORES
-#endif				/* LFS */
 
 /*
  * LOGGING

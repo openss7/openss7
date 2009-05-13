@@ -99,43 +99,30 @@ freezestr_SUN(queue_t *q)
 __SUN_EXTERN_INLINE void
 unfreezestr_SUN(queue_t *q)
 {
-#ifdef LFS
 	unfreezestr(q, -1UL);
-#endif
-#ifdef LIS
-	unfreezestr(q);
-#endif
 }
 
 #undef unfreezestr
 #define unfreezestr unfreezestr_SUN
 
-#ifdef LFS
 __SUN_EXTERN void qwait(queue_t *rq);
 __SUN_EXTERN int qwait_sig(queue_t *rq);
-#endif
 
-#ifdef LFS
 __SUN_EXTERN bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *),
 			     void *arg);
 __SUN_EXTERN timeout_id_t qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks);
-#endif
 
 __SUN_EXTERN void qunbufcall(queue_t *q, bufcall_id_t bcid);
 __SUN_EXTERN clock_t quntimeout(queue_t *q, timeout_id_t toid);
 
-#ifdef LFS
 /* LiS already defines this */
 __SUN_EXTERN_INLINE unsigned char
 queclass(mblk_t *mp)
 {
 	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
 }
-#endif
 
-#ifdef LFS
 __SUN_EXTERN void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
-#endif
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
@@ -144,15 +131,7 @@ mkiocb(unsigned int command)
 {
 	mblk_t *mp;
 	union ioctypes *iocp;
-
-#ifdef CONFIG_STREAMS_LIS_BCM
-	/* FIXME: this goes away when we leave! */
-	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
-		    current->uid,.cr_rgid = current->gid,
-	}, *crp = &creds;
-#else
 	cred_t *crp = current_creds;
-#endif
 	static atomic_t ioc_id = ATOMIC_INIT(0);
 
 	if ((mp = allocb(sizeof(*iocp), BPRI_MED))) {
@@ -167,9 +146,7 @@ mkiocb(unsigned int command)
 		iocp->iocblk.ioc_count = 0;
 		iocp->iocblk.ioc_rval = 0;
 		iocp->iocblk.ioc_error = 0;
-#ifdef LFS
 		iocp->iocblk.ioc_flag = IOC_NATIVE;
-#endif
 	}
 	return (mp);
 }

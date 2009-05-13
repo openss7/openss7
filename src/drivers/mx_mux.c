@@ -108,28 +108,13 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_MX_MUX_NAME
-#ifdef LIS
-#define CONFIG_STREAMS_MX_MUX_NAME MX_MUX__DRV_NAME
-#endif				/* LIS */
-#ifdef LFS
 #error CONFIG_STREAMS_MX_MUX_NAME must be defined.
-#endif				/* LFS */
 #endif				/* CONFIG_STREAMS_MX_MUX_NAME */
 #ifndef CONFIG_STREAMS_MX_MUX_MAJOR
-#ifdef LIS
-#define CONFIG_STREAMS_MX_MUX_MAJOR MX_MUX__CMAJOR_0
-#endif				/* LIS */
-#ifdef LFS
 #error CONFIG_STREAMS_MX_MUX_MAJOR must be defined.
-#endif				/* LFS */
 #endif				/* CONFIG_STREAMS_MX_MUX_MAJOR */
 #ifndef CONFIG_STREAMS_MX_MUX_MODID
-#ifdef LIS
-#define CONFIG_STREAMS_MX_MUX_MODID MX_MUX__ID
-#endif				/* LIS */
-#ifdef LFS
 #error CONFIG_STREAMS_MX_MUX_MODID must be defined.
-#endif				/* LFS */
 #endif				/* CONFIG_STREAMS_MX_MUX_MODID */
 
 modID_t modid = CONFIG_STREAMS_MX_MUX_MODID;
@@ -158,20 +143,11 @@ MODULE_PARM_DESC(major, "Major device number for STREAMS MX-MUX driver.");
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
 MODULE_ALIAS("/dev/mx");
-#ifdef LFS
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_MX_MUX_MAJOR));
 MODULE_ALIAS("/dev/streams/mx");
 MODULE_ALIAS("/dev/streams/mx/*");
 MODULE_ALIAS("/dev/streams/clone/mx");
-#endif				/* LFS */
 #endif				/* MODULE_ALIAS */
-
-#ifdef LIS
-#define STRMINPSZ	0
-#define STRMAXPSZ	4096
-#define STRHIGH		5120
-#define STRLOW		1024
-#endif				/* LIS */
 
 STATIC struct module_info mx_minfo = {
 	.mi_idnum = CONFIG_STREAMS_MX_MUX_MODID,
@@ -181,22 +157,6 @@ STATIC struct module_info mx_minfo = {
 	.mi_hiwat = STRHIGH,
 	.mi_lowat = STRLOW,
 };
-
-#ifdef LIS
-#define trace() while (0) { }
-#define ptrace(__x) while (0) { }
-#define printd(__x) while (0) { }
-#define pswerr(__x) while (0) { }
-#define ctrace(__x) __x
-
-#define QSVCBUSY QRUNNING
-
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-#endif				/* LIS */
 
 /* private structures */
 struct mx {
@@ -224,10 +184,6 @@ STATIC struct mx *mx_links = NULL;
 
 #define MUX_UP		1
 #define MUX_DOWN	2
-
-#ifdef LIS
-#define streamscall _RP
-#endif				/* LIS */
 
 /**
  *  mx_uwput: - upper stream write put procedure

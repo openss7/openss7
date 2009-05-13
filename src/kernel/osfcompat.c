@@ -269,40 +269,6 @@ EXPORT_SYMBOL_GPL(streams_close_comm);
 __OSF_EXTERN dev_t
 strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
-#ifdef LIS
-	switch (sa->sa_flags & STR_TYPE_MASK) {
-	case STR_IS_DEVICE:
-	{
-		major_t major = getmajor(dev);
-		minor_t minor = getminor(dev);
-		int result;
-
-		if ((result = lis_register_strdev(major, st, minor, sa->sa_name)) > 0) {
-			major = result;
-			dev = makedevice(major, minor);
-		} else {
-			dev = NODEV;
-		}
-		return (dev);
-	}
-	case STR_IS_MODULE:
-	{
-		modID_t modid;
-		int result;
-
-		if ((result = lis_register_strmod(st, sa->sa_name)) > 0) {
-			modid = result;
-			dev = makedevice(modid, 0);
-		} else {
-			dev = NODEV;
-		}
-		return (dev);
-	}
-	default:
-		return (NODEV);
-	}
-#endif
-#ifdef LFS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
@@ -405,7 +371,6 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	default:
 		return (NODEV);
 	}
-#endif
 }
 
 EXPORT_SYMBOL_GPL(strmod_add);
@@ -417,17 +382,6 @@ EXPORT_SYMBOL_GPL(strmod_add);
 __OSF_EXTERN int
 strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
-#ifdef LIS
-	switch (sa->sa_flags & STR_TYPE_MASK) {
-	case STR_IS_DEVICE:
-		return lis_unregister_strdev(getmajor(dev));
-	case STR_IS_MODULE:
-		return lis_unregister_strmod(st);
-	default:
-		return (EINVAL);
-	}
-#endif
-#ifdef LFS
 	switch (sa->sa_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
 	{
@@ -454,7 +408,6 @@ strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	default:
 		return (EINVAL);
 	}
-#endif
 }
 
 EXPORT_SYMBOL_GPL(strmod_del);

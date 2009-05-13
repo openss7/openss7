@@ -123,11 +123,9 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #undef CONFIG_STREAMS_NORECYCLE
 #endif
 
-BIG_STATIC_STH struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
+struct strthread strthreads[NR_CPUS] ____cacheline_aligned;
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(strthreads);
-#endif
 
 struct strinfo Strinfo[DYN_SIZE] ____cacheline_aligned;
 
@@ -449,7 +447,7 @@ devinfo_ctor(kmem_cachep_t cachep, void *obj)
 }
 
 #if 0
-BIG_STATIC_STH struct __unlikely streams_fastcall devinfo *
+struct __unlikely streams_fastcall devinfo *
 di_alloc(struct cdevsw *cdev)
 {
 	struct devinfo *di;
@@ -475,11 +473,9 @@ di_alloc(struct cdevsw *cdev)
 	return (di);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(di_alloc);	/* include/sys/openss7/strsubr.h */
-#endif
 
-STATIC __unlikely void
+__unlikely void
 di_free(struct devinfo *di)
 {
 	struct strinfo *si = &Strinfo[DYN_DEVINFO];
@@ -502,7 +498,9 @@ di_free(struct devinfo *di)
 	kmem_cache_free(si->si_cache, di);
 }
 
-BIG_STATIC_STH __unlikely streams_fastcall struct devinfo *
+EXPORT_SYMBOL_GPL(di_free);	/* include/sys/openss7/strsubr.h */
+
+__unlikely streams_fastcall struct devinfo *
 di_get(struct devinfo *di)
 {
 	if (di) {
@@ -512,7 +510,9 @@ di_get(struct devinfo *di)
 	return (di);
 }
 
-BIG_STATIC __unlikely streams_fastcall void
+EXPORT_SYMBOL_GPL(di_get);	/* include/sys/openss7/strsubr.h */
+
+__unlikely streams_fastcall void
 di_put(struct devinfo *di)
 {
 	assert(di != NULL);
@@ -521,9 +521,7 @@ di_put(struct devinfo *di)
 		di_free(di);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(di_put);	/* include/sys/openss7/strsubr.h */
-#endif
 #endif
 
 /* 
@@ -1397,7 +1395,7 @@ linkinfo_ctor(kmem_cachep_t cachep, void *obj)
 		spin_unlock(&link_index_lock);
 	}
 }
-BIG_STATIC_STH streams_fastcall __unlikely struct linkblk *
+streams_fastcall __unlikely struct linkblk *
 alloclk(void)
 {
 	struct linkblk *l;
@@ -1422,11 +1420,9 @@ alloclk(void)
 	return (l);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(alloclk);	/* include/sys/openss7/strsubr.h */
-#endif
 
-BIG_STATIC_STH streams_fastcall __unlikely void
+streams_fastcall __unlikely void
 freelk(struct linkblk *l)
 {
 	struct strinfo *si = &Strinfo[DYN_LINKBLK];
@@ -1441,9 +1437,7 @@ freelk(struct linkblk *l)
 	kmem_cache_free(si->si_cache, li);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(freelk);	/* include/sys/openss7/strsubr.h */
-#endif
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* 
@@ -5439,7 +5433,7 @@ sd_free(struct stdata *sd)
 	if (mp)
 		freechain(mp, mpp);
 }
-BIG_STATIC_STH streams_fastcall __hot struct stdata *
+streams_fastcall __hot struct stdata *
 sd_get(struct stdata *sd)
 {
 	if (sd) {
@@ -5454,10 +5448,9 @@ sd_get(struct stdata *sd)
 	return (sd);
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(sd_get);	/* include/sys/openss7/strsubr.h */
-#endif
-BIG_STATIC_STH streams_fastcall __hot void
+
+streams_fastcall __hot void
 sd_put(struct stdata **sdp)
 {
 	struct stdata *sd;
@@ -5478,9 +5471,7 @@ sd_put(struct stdata **sdp)
 	return;
 }
 
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(sd_put);	/* include/sys/openss7/strsubr.h */
-#endif
 
 streams_noinline streams_fastcall void
 sd_release(struct stdata **sdp)

@@ -151,13 +151,8 @@ static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/UDP";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/inet/udp";
 static char modname[256] = "udp";
-#else
-static char devname[256] = "/dev/udp";
-static char modname[256] = "udp";
-#endif
 
 static const int test_level = T_INET_UDP;
 

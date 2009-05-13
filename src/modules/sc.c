@@ -58,7 +58,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
  *  is an auxilliary module to the SAD (STREAMS Administrative Driver) and can
@@ -101,14 +100,11 @@ MODULE_AUTHOR(SC_CONTACT);
 MODULE_DESCRIPTION(SC_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SC_DEVICE);
 MODULE_LICENSE(SC_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-sc");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_SC_MODULE */
 
 #ifndef CONFIG_STREAMS_SC_NAME
 #error CONFIG_STREAMS_SC_NAME must be defined.
@@ -117,21 +113,32 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error CONFIG_STREAMS_SC_MODID must be defined.
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-sc");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_SC_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_SC_MODID;
 
+#ifdef CONFIG_STREAMS_SC_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for SC.");
+#endif				/* CONFIG_STREAMS_SC_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SC_MODID));
 MODULE_ALIAS("streams-module-sc");
-#endif
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info sc_minfo = {
 	.mi_idnum = CONFIG_STREAMS_SC_MODID,
@@ -145,18 +152,13 @@ static struct module_info sc_minfo = {
 static struct module_stat sc_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat sc_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-#if defined __LP64__ && defined LFS
-#  undef WITH_32BIT_CONVERSION
-#  define WITH_32BIT_CONVERSION 1
-#endif
-
 static size_t
 sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const int reset, const uint flag)
 {
 	struct module_info *info;
 	struct module_stat *stat;
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (flag == IOC_ILP32) {
 		struct sc_mlist32 *mlist = (typeof(mlist)) _mlist;
 
@@ -305,7 +307,7 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const int reset,
 		}
 		return sizeof(struct sc_mlist32);
 	} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 	{
 		struct sc_mlist *mlist = (typeof(mlist)) _mlist;
 
@@ -459,17 +461,6 @@ sc_mlist_copy(long major, struct streamtab *st, caddr_t _mlist, const int reset,
 static size_t
 str_mlist_count(void)
 {
-#ifdef LIS
-	int i, cdev_count = 0, fmod_count = 0;
-
-	for (i = 0; i < MAX_STRDEV; i++)
-		if (lis_fstr_sw[i].f_str && lis_fstr_sw[i].f_count)
-			cdev_count++;
-	for (i = 1; i < MAX_STRMOD; i++)
-		if ((lis_fmod_sw[i].f_state & LIS_MODSTATE_INITED)
-		    && lis_fmod_sw[i].f_count)
-			fmod_count++;
-#endif
 	return (cdev_count + fmod_count);
 }
 
@@ -489,7 +480,7 @@ sc_slist_copy(caddr_t _slist, const int index, const uint flag)
 {
 	struct strinfo *si = &Strinfo[index];
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (flag == IOC_ILP32) {
 		struct sc_stat32 *slist = (typeof(slist)) _slist;
 
@@ -502,7 +493,7 @@ sc_slist_copy(caddr_t _slist, const int index, const uint flag)
 		}
 		return (sizeof(struct sc_stat32));
 	} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 	{
 		struct sc_stat *slist = (typeof(slist)) _slist;
 
@@ -540,7 +531,7 @@ sc_tlist_tune(struct streamtab *st, caddr_t _tlist, const int index, const uint 
 {
 	struct module_info *mi = NULL;
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 	if (flag == IOC_ILP32) {
 		struct sc_tune32 *tlist = (typeof(tlist)) _tlist;
 
@@ -705,7 +696,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_RESET:
 			reset = 1;
 		case SC_IOC_LIST:
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
 				uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *)
 				    dp->b_rptr;
@@ -746,8 +737,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 			err = -EINVAL;
 			goto nak;
 		case SC_IOC_TUNE:
-#ifdef LFS
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
 				uaddr = (caddr_t) (unsigned long) (uint32_t) *(unsigned long *)
 				    dp->b_rptr;
@@ -768,13 +758,10 @@ sc_wput(queue_t *q, mblk_t *mp)
 				return (0);
 			}
 			/* doesn't support I_STR yet, just TRANSPARENT */
-			/* not supported under LIS */
-#endif
 			err = -EINVAL;
 			goto nak;
 		case SC_IOC_STATS:
-#ifdef LFS
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
 				uaddr =
 				    (caddr_t) (unsigned long) (uint32_t) *(unsigned long *) dp->
@@ -800,7 +787,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 				return (0);
 			}
 			/* doesn't support I_STR yet, just TRANSPARENT */
-#endif
 			err = -EINVAL;
 			goto nak;
 		}
@@ -815,16 +801,8 @@ sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_LIST:
 			_trace();
 			if (ioc->copyresp.cp_rval != 0) {
-#ifdef LFS
 				_ptrace(("Aborting ioctl!\n"));
 				goto abort;
-#endif
-#ifdef LIS
-				/* LiS has a bug here... */
-				_ptrace(("Nacking failed ioctl!\n"));
-				err = -(long) ioc->copyresp.cp_rval;
-				goto nak;
-#endif
 			}
 			_trace();
 			if (ioc->copyresp.cp_private == (mblk_t *) 0) {
@@ -837,7 +815,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					rval = str_mlist_count();
 					goto ack;
 				}
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 				if (ioc->copyresp.cp_flag == IOC_ILP32) {
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_list32)) {
 						_ptrace(("Error path taken!\n"));
@@ -888,52 +866,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 				bzero(dp->b_rptr, usize);
 				freemsg(mp->b_cont);
 				mp->b_cont = dp;
-#ifdef LIS
-				{
-					int i;
-					uint flag = 0;
-					caddr_t mlist = (typeof(mlist)) dp->b_rptr;
-
-					_trace();
-					if (n < count) {
-						_trace();
-						/* list all devices */
-						for (i = 0; i < MAX_STRDEV; i++) {
-							struct cdevsw *cdev;
-							struct streamtab *st;
-
-							cdev = &lis_fstr_sw[i];
-							if (!cdev->f_str || !cdev->f_count)
-								continue;
-							if (n >= count)
-								break;
-							st = cdev->f_str;
-							mlist += sc_mlist_copy(i, st, mlist,
-									       reset, flag);
-							n++;
-						}
-					}
-					_trace();
-					if (n < count) {
-						/* list all modules */
-						for (i = 1; i < MAX_STRMOD; i++) {
-							struct fmodsw *fmod;
-							struct streamtab *st;
-
-							fmod = &lis_fmod_sw[i];
-							if (!fmod->f_str || !fmod->f_count)
-								continue;
-							if (n >= count)
-								break;
-							st = fmod->f_str;
-							mlist += sc_mlist_copy(0, st, mlist,
-									       reset, flag);
-							n++;
-						}
-					}
-				}
-#endif
-#ifdef LFS
 				{
 					struct list_head *pos;
 					uint flag = ioc->copyresp.cp_flag;
@@ -986,7 +918,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 						    sc_mlist_copy(-1, NULL, mlist, reset, flag);
 					}
 				}
-#endif
 				_trace();
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
@@ -1019,7 +950,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					rval = str_tlist_count();
 					goto ack;
 				}
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 				if (ioc->copyresp.cp_flag == IOC_ILP32) {
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_tlist32)) {
 						_ptrace(("Error path taken!\n"));
@@ -1033,7 +964,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 						usize = count * sizeof(struct sc_tune32);
 					}
 				} else
-#endif				/* WITH_32BIT_CONVERSION */
+#endif				/* __LP64__ */
 				{
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_tlist)) {
 						_ptrace(("Error path taken!\n"));
@@ -1091,7 +1022,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 				struct cdevsw *cdev = NULL;
 				struct streamtab *st = NULL;
 
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 				if (flag == IOC_ILP32) {
 					struct sc_tlist32 *sclp = (typeof(sclp)) cp->b_rptr;
 
@@ -1196,7 +1127,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 					rval = str_slist_count();
 					goto ack;
 				}
-#ifdef WITH_32BIT_CONVERSION
+#ifdef __LP64__
 				if (ioc->copyresp.cp_flag == IOC_ILP32) {
 					if (dp->b_wptr < dp->b_rptr + sizeof(struct sc_slist32)) {
 						_ptrace(("Error path taken!\n"));
@@ -1247,11 +1178,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 				bzero(dp->b_rptr, usize);
 				freemsg(mp->b_cont);
 				mp->b_cont = dp;
-#ifdef LIS
-				err = -EINVAL;
-				goto nak;
-#endif
-#ifdef LFS
 				{
 					uint flag = ioc->copyresp.cp_flag;
 					caddr_t slist = (typeof(slist)) dp->b_rptr;
@@ -1260,7 +1186,6 @@ sc_wput(queue_t *q, mblk_t *mp)
 						slist += sc_slist_copy(slist, n, flag);
 					rval = str_slist_count();
 				}
-#endif
 				mp->b_datap->db_type = M_COPYOUT;
 				ioc->copyreq.cq_addr = uaddr;
 				ioc->copyreq.cq_size = usize;
@@ -1288,11 +1213,9 @@ sc_wput(queue_t *q, mblk_t *mp)
 		ioc->iocblk.ioc_error = 0;
 		qreply(q, mp);
 		return (0);
-#ifdef LFS
 	      abort:
 		_ctrace(freemsg(mp));
 		return (0);
-#endif
 	}
 	putnext(q, mp);
 	return (0);
@@ -1358,17 +1281,17 @@ static struct qinit sc_wqinit = {
 	.qi_mstat = &sc_wstat,
 };
 
-static struct streamtab sc_info = {
+#ifdef CONFIG_STREAMS_SC_MODULE
+static
+#endif
+struct streamtab scinfo = {
 	.st_rdinit = &sc_rqinit,
 	.st_wrinit = &sc_wqinit,
 };
 
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 static struct fmodsw sc_fmod = {
 	.f_name = CONFIG_STREAMS_SC_NAME,
-	.f_str = &sc_info,
+	.f_str = &scinfo,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
@@ -1394,7 +1317,7 @@ sc_register_ioctl32(void)
 static
 #endif
 int __init
-sc_init(void)
+scinit(void)
 {
 	int err;
 
@@ -1419,13 +1342,13 @@ sc_init(void)
 static
 #endif
 void __exit
-sc_exit(void)
+scexit(void)
 {
 	unregister_strmod(&sc_fmod);
 	sc_unregister_ioctl32();
 };
 
 #ifdef CONFIG_STREAMS_SC_MODULE
-module_init(sc_init);
-module_exit(sc_exit);
+module_init(scinit);
+module_exit(scexit);
 #endif

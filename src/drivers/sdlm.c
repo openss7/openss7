@@ -68,7 +68,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  an upper stream to a lower stream.
  */
 
-#define _LFS_SOURCE
 #define _SUN_SOURCE
 
 #include <sys/os7/compat.h>
@@ -114,14 +113,12 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDLM_DRV_ID		CONFIG_STREAMS_SDLM_MODID
 #define SDLM_DRV_NAME		CONFIG_STREAMS_SDLM_NAME
 #define SDLM_CMAJORS		CONFIG_STREAMS_SDLM_NMAJORS
 #define SDLM_CMAJOR_0		CONFIG_STREAMS_SDLM_MAJOR
 #define SDLM_CMAJOR_1		CONFIG_STREAMS_SDLM_MAJOR_1
 #define SDLM_UNITS		CONFIG_STREAMS_SDLM_NMINORS
-#endif				/* LFS */
 
 #define DL_NMAJOR	(SDLM_CMAJORS - 1)
 #define LM_NMAJOR	1
@@ -609,12 +606,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		if (!sd || sd->iq->q_next)
 			goto lbadppa;
 		/* link queues together */
-#ifdef LFS
 		weldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
-#else
-		dl->iq->q_next = sd->oq;
-		sd->iq->q_next = dl->oq;
-#endif
 		return lmi_ok_ack_reply(q, mp, LMI_ATTACH_REQ, LMI_DISABLED);
 	}
       lbadppa:
@@ -654,12 +646,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 		struct sd *sd = SD_PRIV(q->q_next);
 
 		/* disconnect them */
-#ifdef LFS
 		unweldq(dl->iq, sd->oq, sd->iq, dl->oq, NULL, 0, dl->iq);
-#else
-		dl->iq->q_next = NULL;
-		sd->iq->q_next = NULL;
-#endif
 		mp->b_wptr = mp->b_rptr;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
@@ -1038,8 +1025,6 @@ MODULE_PARM_DESC(major, "Device number for the SDL-MUX driver. (0 for allocation
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct cdevsw sdlm_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sdlminfo,
@@ -1068,42 +1053,6 @@ sdlm_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sdlm_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &sdlminfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-sdlm_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC void __exit
 sdlmterminate(void)

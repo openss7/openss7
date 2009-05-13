@@ -105,10 +105,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SPM_MOD_ID	CONFIG_STREAMS_SPM_MODID
 #define SPM_MOD_NAME	CONFIG_STREAMS_SPM_NAME
-#endif				/* LFS */
 
 #ifndef SPM_MOD_NAME
 #define SPM_MOD_NAME	"spm"
@@ -1432,7 +1430,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SPM module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
 
 STATIC struct fmodsw spm_fmod = {
 	.f_name = MOD_NAME,
@@ -1460,40 +1457,6 @@ spm_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-spm_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&spminfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&spminfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-spm_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&spminfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 spminit(void)

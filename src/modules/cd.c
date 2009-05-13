@@ -88,7 +88,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  is also compatible with that interface).
  */
 
-#define LFS_SOURCE
 
 #include <sys/cdi.h>		/* Upper CD interface. */
 #include <sys/chi.h>		/* Lower CH interface. */
@@ -2812,9 +2811,6 @@ STATIC struct streamtab xrayinfo = {
  *  STREAMS Registration.
  *  =====================
  */
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
 
 STATIC struct fmodsw hdlc_fmod = {
 	.f_name = HDLC_MOD_NAME,

@@ -130,7 +130,6 @@ MODULE_SUPPORTED_DEVICE(DLPI_DEVICE);
 MODULE_LICENSE(DLPI_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_DLPI_MODID));
 MODULE_ALIAS("streams-driver-dlpi");
 MODULE_ALIAS("streams-module-dlpi");
@@ -141,7 +140,6 @@ MODULE_ALIAS("/dev/streams/dlpi/eth");
 MODULE_ALIAS("/dev/streams/dlpi/llc");
 MODULE_ALIAS("/dev/streams/dlpi/hdlc");
 MODULE_ALIAS("/dev/streams/dlpi/lapb");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(DLPI_MAJOR_0) "-0");

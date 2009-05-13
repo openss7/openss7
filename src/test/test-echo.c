@@ -123,11 +123,7 @@ static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "ECHO";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/echo";
-#else
-static char devname[256] = "/dev/echo";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

@@ -91,7 +91,6 @@ MODULE_PARM_DESC(major, "Major device number for DL driver (0 for allocation).")
 
 #endif				/* LINUX */
 
-#ifdef LFS
 STATIC struct cdevsw dl_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &dl_info,
@@ -131,78 +130,3 @@ dl_exit(void)
 module_init(dl_init);
 module_exit(dl_exit);
 #endif				/* MODULE */
-
-#endif				/* LFS */
-
-#ifdef LIS
-STATIC int dl_initalized = 0;
-STATIC void
-dl_init(void)
-{
-	int err;
-
-	if (dl_initialized != 0)
-		return;
-	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
-	if ((err = dl_init_caches())) {
-		dl_initialized = err;
-		return;
-	}
-	if ((err = lis_register_strdev(major, &dl_info, UNITS, DRV_NAME)) < 0) {
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		dl_initialized = err;
-		dl_term_caches();
-		return;
-	}
-	dl_initialized = 1;
-	if (major = 0 && err > 0) {
-		major = err;
-		dl_initialized = 2;
-	}
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "cannot register major %d", major);
-		dl_initialized = err;
-		dl_term_caches();
-		return;
-	}
-	return;
-}
-STATIC void
-dl_terminate(void)
-{
-	int err;
-
-	if (dl_initialized <= 0)
-		return;
-	if (major) {
-		if ((err = lis_unregister_strdev(major)) < 0)
-			strlog(DRV_ID, 0, LOG_CRIT, SL_FATAL | SL_CONSOLE,
-			       "cannot unregister major %d", major);
-		major = 0;
-	}
-	dl_term_caches();
-	dl_initialized = 0;
-	return;
-}
-
-#ifdef MODULE
-int
-init_module(void)
-{
-	dl_init();
-	if (dl_initialized < 0)
-		return dl_initialized;
-	return (0);
-}
-
-void
-cleanup_module(void)
-{
-	return dl_terminate();
-}
-#endif				/* MODULE */
-
-#endif				/* LIS */

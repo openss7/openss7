@@ -129,24 +129,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define RTP_DRV_ID	CONFIG_STREAMS_RTP_MODID
 #define RTP_DRV_NAME	CONFIG_STREAMS_RTP_NAME
 #define RTP_CMAJORS	CONFIG_STREAMS_RTP_NMAJORS
 #define RTP_CMAJOR_0	CONFIG_STREAMS_RTP_MAJOR
 #define RTP_UNITS	CONFIG_STREAMS_RTP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_RTP_MODID));
 MODULE_ALIAS("streams-driver-rtp");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_RTP_MAJOR));
 MODULE_ALIAS("/dev/streams/rtp");
 MODULE_ALIAS("/dev/streams/rtp/*");
 MODULE_ALIAS("/dev/streams/clone/rtp");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(RTP_CMAJOR_0) "-0");
@@ -1475,7 +1471,6 @@ module_param(major, major_t, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Device number for the RTP driver. (0 for allocation.)");
 
-#ifdef LFS
 /*
  *  Linux Fast-STREAMS Registration
  */
@@ -1515,46 +1510,6 @@ rtp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-#endif				/* LFS */
-
-#ifdef LIS
-/*
- *  Linux STREAMS Registration
- */
-/**
- * rtp_register_strdev: - register an RTP driver major device number
- * @major: the major device number to register
- */
-STATIC int
-rtp_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &rtpinfo, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-
-/**
- * rtp_unregister_strdev: - unregister an RTP driver major device number
- * @major: the major device number to unregister
- */
-STATIC int
-rtp_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-#endif				/* LIS */
 
 /**
  * rtpterminate: - terminate the RTP kernel module

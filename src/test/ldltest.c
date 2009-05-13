@@ -119,11 +119,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <getopt.h>
 #endif
 
-#ifdef LFS
 #include <stropts.h>
-#else
-#include <sys/stropts.h>
-#endif
 #include <sys/dlpi.h>
 #include <sys/ldl.h>
 
@@ -563,11 +559,7 @@ do_getname(int fd)
 	return name;
 }
 
-#ifdef LFS
 static const char ldlname[] = "/dev/streams/clone/ldl";
-#else
-static const char ldlname[] = "/dev/ldl";
-#endif
 
 void
 do_global_stats(void)

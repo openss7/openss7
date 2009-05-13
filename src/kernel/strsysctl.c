@@ -80,19 +80,19 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include "src/modules/sth.h"	/* for str_minfo */
 #include "strsysctl.h"		/* extern verification */
 
-BIG_STATIC ulong sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
-BIG_STATIC ulong sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
-BIG_STATIC ulong sysctl_str_hiwat = STRHIGH;	/* stream head default hi water mark */
-BIG_STATIC ulong sysctl_str_lowat = STRLOW;	/* stream head default lo water mark */
+ulong sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
+ulong sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
+ulong sysctl_str_hiwat = STRHIGH;	/* stream head default hi water mark */
+ulong sysctl_str_lowat = STRLOW;	/* stream head default lo water mark */
 BIG_STATIC ulong sysctl_str_cltime = 15 * HZ;	/* close wait time in msec (saved in ticks) */
 BIG_STATIC ulong sysctl_str_rtime = (10 * HZ) / 1000;	/* msec to wait to forward held msg (saved
 							   in ticks) */
 BIG_STATIC ulong sysctl_str_ioctime = 15 * HZ;	/* msec to wait for ioctl() acknowledgement (saved
 						   in ticks) */
-BIG_STATIC_STH ulong sysctl_str_nstrpush = 64;	/* maximum number of pushed modules */
+ulong sysctl_str_nstrpush = 64;	/* maximum number of pushed modules */
 BIG_STATIC ulong sysctl_str_strthresh = (1 << 20);	/* memory limit */
 BIG_STATIC ulong sysctl_str_strhold = 0;	/* active stream hold feature */
-BIG_STATIC_STH ulong sysctl_str_strctlsz = (1 << 12);	/* maximum stream control size */
+ulong sysctl_str_strctlsz = (1 << 12);	/* maximum stream control size */
 ulong sysctl_str_strmsgsz = (1 << 18);	/* maximum stream message size */
 BIG_STATIC ulong sysctl_str_nstrmsgs = (1 << 20);	/* maximum number of streams messages */
 BIG_STATIC ulong sysctl_str_nband = 256;	/* number of queue bands */
@@ -105,10 +105,8 @@ BIG_STATIC ulong sysctl_str_max_mblk = 10;	/* max no of headers on free list */
 BIG_STATIC int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
 
 EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
-#if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);
 EXPORT_SYMBOL_GPL(sysctl_str_nstrpush);
-#endif
 
 STATIC struct ctl_table_header *streams_sysctl_handle;
 

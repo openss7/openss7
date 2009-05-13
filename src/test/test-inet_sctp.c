@@ -151,13 +151,8 @@ static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/SCTP";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/inet/sctp";
 static char modname[256] = "sctp";
-#else
-static char devname[256] = "/dev/sctp";
-static char modname[256] = "sctp";
-#endif
 
 static const int test_level = T_INET_SCTP;
 

@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  Signalling Connection Control Part protocol layer for SS7.
  */
 
-#define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -120,13 +119,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SCCP_DRV_ID	CONFIG_STREAMS_SCCP_MODID
 #define SCCP_DRV_NAME	CONFIG_STREAMS_SCCP_NAME
 #define SCCP_CMAJORS	CONFIG_STREAMS_SCCP_NMAJORS
 #define SCCP_CMAJOR_0	CONFIG_STREAMS_SCCP_MAJOR
 #define SCCP_UNITS	CONFIG_STREAMS_SCCP_NMINORS
-#endif
 
 #define SCCP_CMINOR_SCCPI   0
 #define SCCP_CMINOR_TPI	    1

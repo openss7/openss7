@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -10,9 +10,9 @@
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -54,35 +54,66 @@
  $Log$
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ifndef __LOCAL_STRMAIN_H__
+#define __LOCAL_STRMAIN_H__
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
-/* can we just include these into one big compilation unit? */
+typedef struct module_config {
+	char cnf_name[FMNAMESZ + 1];
+	struct streamtab *cnf_str;
+	char cnf_objname[FMNAMESZ + 1];
+	int (*cnf_init) (void);
+	void (*cnf_term) (void);
+	int cnf_qlock_option;
+} module_config_t;
 
-#define BIG_COMPILE 1
-#define BIG_STATIC static
-#define BIG_STATIC_INLINE static streams_inline
+typedef struct driver_config {
+	char cnf_name[FMNAMESZ + 1];
+	struct streamtab *cnf_str;
+	int *cnf_major;
+	int cnf_n_majors;
+	int cnf_n_minors;
+	int (*cnf_init) (void);
+	void (*cnf_term) (void);
+	int cnf_qlock_option;
+} driver_config_t;
 
-#define BIG_COMPILE_SPECFS 1
+typedef struct device_config {
+	char *name;
+	char *prefix;
+	struct streamtab *strtb;
+	void *handler;
+	int unit;
+	long port;
+	int nports;
+	int irq_share;
+	int irq;
+	long mem;
+	long mem_size;
+	int dma1;
+	int dma2;
+	int major;
+	int minor;
+} device_config_t;
 
-#define __EXTERN_INLINE
-#define __STRSCHD_EXTERN_INLINE static inline streams_fastcall
-#define __STRUTIL_EXTERN_INLINE static inline streams_fastcall
+#ifdef LFS_LOADABLE_SUPPORT
 
-/* initialization for specfs */
-BIG_STATIC int strlookup_init(void);
-BIG_STATIC void strlookup_exit(void);
+typedef struct driver_obj_name {
+	const int *major;
+	const int nmajors;
+	const char *initname;
+	const char *objname;
+} driver_obj_name_t;
 
-#undef ident
-#define ident ident_strspecfs
-#include "strspecfs.c"
-#undef ident
-#define ident ident_strlookup
-#include "strlookup.c"
-#undef ident
-#define ident ident_strattach
-#include "strattach.c"
-#undef ident
-#define ident ident_strpipe
-#include "strpipe.c"
+#endif				/* LFS_LOADABLE_SUPPORT */
+
+typedef struct autopush_init {
+	const int major;
+	const int minor;
+	const int lastminor;
+	const int npush;
+	const char mods[MAXAPUSH][FMNAMESZ + 1];
+} autopush_init_t;
+
+#endif				/* __LOCAL_STRMAIN_H__ */

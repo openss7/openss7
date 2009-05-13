@@ -75,7 +75,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define _DEBUG 1
 
-#define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -121,13 +120,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
-#ifdef LFS
 #define MCMOD_MOD_ID	CONFIG_STREAMS_MCMOD_MODID
 #define MCMOD_MOD_NAME	CONFIG_STREAMS_MCMOD_NAME
 #define MCMOD_CMAJORS	CONFIG_STREMSS_MCMOD_NMAJORS
 #define MCMOD_CMAJOR_0	CONFIG_STREAMS_MCMOD_MAJOR
 #define MCMOD_UNITS	CONFIG_STREAMS_MCMOD_NMINORS
-#endif				/* LFS */
 
 #ifndef MCMOD_MOD_ID
 #error "MCMOD_MOD_ID must be defined."
@@ -161,7 +158,6 @@ MODULE_PARM_DESC(modid, "Module ID for MCMOD.  (0 for allocation.)");
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_MCMOD_MODID));
 #if 0
 MODULE_ALIAS("streams-driver-mcmod");
@@ -172,7 +168,6 @@ MODULE_ALIAS("/dev/streams/mcmod/mc");
 MODULE_ALIAS("/dev/streams/mcmod/mgr");
 MODULE_ALIAS("/dev/streams/mcmod/tp");
 #endif
-#endif				/* LFS */
 #if 0
 MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(MCMOD_CMAJOR_0) "-*");

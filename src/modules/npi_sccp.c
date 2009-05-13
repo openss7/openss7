@@ -69,7 +69,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * and libraries written to support CONS (X.25) and CLNS (CLNP).
  */
 
-#define _LFS_SOURCE
 #define _MPS_SOURCE
 #define _SVR4_SOURCE
 

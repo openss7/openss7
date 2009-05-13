@@ -461,11 +461,7 @@ static addr_t rem_addr = { 0, {{INADDR_ANY}} };
 
 int len = 32;
 
-#ifdef LFS
 static const char sctpname[] = "/dev/streams/clone/sctp_n";
-#else
-static const char sctpname[] = "/dev/sctp_n";
-#endif
 
 int
 test_sctpc(void)

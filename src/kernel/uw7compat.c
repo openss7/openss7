@@ -115,10 +115,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 __UW7_EXTERN mblk_t *
 allocb_physreq(size_t size, uint priority, physreq_t * prp)
 {
-#ifdef LIS
-	return lis_allocb_physreq(size, priority, prp, __FILE__, __LINE__);
-#endif
-#ifdef LFS
 	if (prp->phys_align > 8)
 		return (NULL);
 	if (prp->phys_boundary != 0)
@@ -128,7 +124,6 @@ allocb_physreq(size_t size, uint priority, physreq_t * prp)
 	if (prp->phys_flags & PREQ_PHYSCONTIG)
 		return (NULL);
 	return (allocb(size, priority));
-#endif
 }
 
 EXPORT_SYMBOL_GPL(allocb_physreq);	/* uw7/ddi.h */

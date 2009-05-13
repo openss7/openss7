@@ -123,24 +123,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define NP_IP_DRV_ID	CONFIG_STREAMS_NP_IP_MODID
 #define NP_IP_DRV_NAME	CONFIG_STREAMS_NP_IP_NAME
 #define NP_IP_CMAJORS	CONFIG_STREAMS_NP_IP_NMAJOR
 #define NP_IP_CMAJOR_0	CONFIG_STREAMS_NP_IP_MAJOR
 #define NP_IP_UNITS	CONFIG_STREAMS_NP_IP_NMINORS
-#endif				/* LFS */
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
-#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_NP_MODID));
 MODULE_ALIAS("streams-driver-np_ip");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NP_MAJOR));
 MODULE_ALIAS("/dev/streams/np_ip");
 MODULE_ALIAS("/dev/streams/np_ip/*");
 MODULE_ALIAS("/dev/streams/clone/np_ip");
-#endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(NP_IP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(NP_IP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(NP_IP_CMAJOR_0) "-0");
@@ -4658,20 +4654,11 @@ np_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE, "cannot push as module");
 		return (ENXIO);
 	}
-#ifdef LIS
-	if (cmajor != CMAJOR_0 || cminor >= NP_MINOR_FREE) {
-		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "attempt to open device %d:%d directly", cmajor, cminor);
-		return (ENXIO);
-	}
-#endif				/* LIS */
-#ifdef LFS
 	if (cmajor != DRV_ID || cminor >= NP_MINOR_FREE) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "attempt to open device %d:%d directly", cmajor, cminor);
 		return (ENXIO);
 	}
-#endif				/* LFS */
 	if (sflag == CLONEOPEN || cminor < NP_MINOR_FREE) {
 		strlog(DRV_ID, cminor, LOG_DEBUG, SL_TRACE, "clone open in effect");
 		sflag = CLONEOPEN;
@@ -4719,24 +4706,6 @@ np_qclose(queue_t *q, int oflags, cred_t *crp)
 	struct np *np = NP_PRIV(q);
 
 	strlog(DRV_ID, np->u.dev.cminor, LOG_DEBUG, SL_TRACE, "closing character device");
-#ifdef LIS
-	/* protect against LiS bugs */
-	if (q->q_ptr == NULL) {
-		strlog(DRV_ID, np->u.dev.cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS double-close bug detected");
-		goto quit;
-	}
-#if 0
-	/* only for modules push on pipe ends */
-	if (q->q_next == NULL) {
-		strlog(DRV_ID, np->u.dev.cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
-		       "LiS pipe bug: called with NULL q->q_next pointer");
-		goto skip_pop;
-	}
-#endif
-#endif				/* LIS */
-	goto skip_pop;
-      skip_pop:
 	qprocsoff(q);
 	np_free_priv(q);
 	goto quit;
@@ -4772,7 +4741,6 @@ module_param(major, uint, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for NP driver (0 for allocation).");
 
-#ifdef LFS
 /*
  *  Linux Fast-STREAMS Registration
  *  -------------------------------
@@ -4867,46 +4835,6 @@ np_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
-#endif				/* LFS */
-
-#ifdef LIS
-/*
- *  Linux STREAMS Registation
- *  -------------------------
- */
-STATIC int
-np_register_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_register_strdev(major, &np_info, UNITS, DRV_NAME)) < 0)
-		return (err);
-	if (major == 0)
-		major = err;
-	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strdev(major);
-		return (err);
-	}
-	return (0);
-}
-STATIC void
-np_register_strnod(void)
-{
-}
-STATIC void
-np_unregister_strnod(void)
-{
-}
-STATIC int
-np_unregister_strdev(major_t major)
-{
-	int err;
-
-	if ((err = lis_unregister_strdev(major)) < 0)
-		return (err);
-	return (0);
-}
-#endif				/* LIS */
 
 STATIC int np_initialized = 0;
 STATIC void

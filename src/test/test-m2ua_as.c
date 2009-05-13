@@ -168,13 +168,8 @@ static const char *lstdname = "RFC 3331/ETSI TS 102 380 V1.1.1 (2004-12)";
 static const char *sstdname = "RFC 3331";
 static const char *shortname = "M2UA";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/m2ua-as";
 static char xptname[256] = "/dev/streams/clone/sctp_t";
-#else
-static char devname[256] = "/dev/m2ua-as";
-static char xptname[256] = "/dev/sctp_t";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

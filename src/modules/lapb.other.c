@@ -2990,9 +2990,7 @@ dl_mod_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	WR(q)->q_ptr = (void *) dl;
 
 	so = (typeof(so)) mp->b_wptr;
-#ifdef LFS
 	so->so_flags |= SO_SKBUFF;
-#endif				/* LFS */
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = 12;
 	/* Not really necessary for modules. */
@@ -3037,20 +3035,11 @@ dl_mux_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also,
 	   however, that strconf-sh attempts to allocate module ids that are identical to the base
 	   major device number anyway. */
-#ifdef LIS
-	/* sorry, cannot open by minor device number */
-	if (cmajor != CMAJOR_0 || cminor != 0) {
-		ptrace(("%s: ERROR: cannot open specific minor\n", DRV_NAME));
-		return (ENXIO);
-	}
-#endif				/* LIS */
-#ifdef LFS
 	/* sorry, cannot open by minor device number */
 	if (cmajor != DRV_ID || cminor != 0) {
 		ptrace(("%s: ERROR: cannot open specific minor\n", DRV_NAME));
 		return (ENXIO);
 	}
-#endif				/* LFS */
 	if ((mp = allocb(sizeof(*so), BPRI_WAITOK)) == NULL)
 		return (ENOBUFS);
 	if ((dl = kmem_alloc(sizeof(*dl), KM_SLEEP)) == NULL) {
@@ -3145,9 +3134,7 @@ dl_mux_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	q->q_ptr = WR(q)->q_ptr = (void *) dl;
 
 	so = (typeof(so)) mp->b_wptr;
-#ifdef LFS
 	so->so_flags |= SO_SKBUFF;
-#endif				/* LFS */
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = 12;
 	/* Not really necessary for modules. */
@@ -3172,16 +3159,6 @@ dl_mod_close(queue_t *q, dev_t *devp, int oflags)
 
 	_printd(("%s: closing character device %d:%d\n", DRV_NAME, cd->u.dev.cmajor,
 		 cd->u.dev.cminor));
-#ifdef LIS
-	/* protect agains LIS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		return (0);
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-	}
 	/* make sure procedures are off */
 	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
@@ -3195,16 +3172,6 @@ dl_mux_close(queue_t *q, dev_t *devp, int oflags)
 
 	_printd(("%s: closing character device %d:%d\n", DRV_NAME, dl->u.dev.cmajor,
 		 dl->u.dev.cminor));
-#ifdef LIS
-	/* protect agains LIS bugs */
-	if (q->q_ptr == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
-		return (0);
-	}
-	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
-	}
 	/* make sure procedures are off */
 	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = NULL;
@@ -3304,10 +3271,6 @@ MODULE_STATIC struct streamtab lapbdrvinfo = {
  *  STREAMS Registration.
  *  =====================
  */
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif
-
 modID_t modid = MOD_ID;
 major_t major = CMAJOR_0;
 

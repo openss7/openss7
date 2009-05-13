@@ -74,18 +74,6 @@
 typedef __kernel_dev_t major_t;
 typedef __kernel_dev_t minor_t;
 
-#ifdef CONFIG_STREAMS_LIS_BCM
-
-/* for LiS binary compatibility */
-typedef struct cred {
-	uid_t cr_uid;			/* effective user id */
-	gid_t cr_gid;			/* effective group id */
-	uid_t cr_ruid;			/* real user id */
-	gid_t cr_rgid;			/* real group id */
-} cred_t;
-
-#else				/* CONFIG_STREAMS_LIS_BCM */
-
 /* same layout as in task_struct */
 typedef struct cred {
 	uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
@@ -98,8 +86,6 @@ typedef struct cred {
 	struct group_info *cr_group_info;
 #endif
 } cred_t;
-
-#endif				/* CONFIG_STREAMS_LIS_BCM */
 
 /* doesn't work for LIS BCM. */
 #define current_creds ((cred_t *)(&current->uid))

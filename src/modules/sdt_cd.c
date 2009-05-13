@@ -122,10 +122,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SDT_CD_MOD_ID		CONFIG_STREAMS_SDT_CD_MODID
 #define SDT_CD_MON_NAME		CONFIG_STREAMS_SDT_CD_NAME
-#endif
 
 #ifndef SDT_CD_MOD_ID
 #define SDT_CD_MOD_ID		"sdt-cd"
@@ -3363,10 +3361,6 @@ static struct streamtab sdt_cdinfo = {
 	.st_rdinit = &sdt_rinit,
 	.st_wrinit = &sdt_winit,
 };
-
-#ifdef LIS
-#define fmodsw _fmodsw
-#endif				/* LIS */
 
 static struct fmodsw *sdt_fmod = {
 	.f_name = MOD_NAME,

@@ -70,7 +70,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  the SDL is performed using soft-HDLC.
  */
 
-#define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
@@ -4392,8 +4391,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sdtinfo,
@@ -4418,38 +4415,6 @@ sdt_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sdt_register_strmod(void)
-{
-	int err;
-	if ((err = lis_register_strmod(&sdtinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sdtinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-sdt_unregister_strmod(void)
-{
-	int err;
-	if ((err = lis_unregister_strmod(&sdtinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 sdtinit(void)

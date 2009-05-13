@@ -168,11 +168,7 @@ static const char *lstdname = "draft-bidulock-sigtran-m2pa-test";
 static const char *sstdname = "Q.781";
 static const char *shortname = "M2PA";
 
-#ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_n";
-#else
-static char devname[256] = "/dev/sctp_n";
-#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

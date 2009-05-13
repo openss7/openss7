@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  cam be pushed over a TLI transport to effect an OpenSS7 Signalling Link or
  *  Signalling Data Terminal.
  */
-#define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
@@ -112,10 +111,8 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifdef LFS
 #define SL_TPI_MOD_ID		CONFIG_STREAMS_SL_TPI_MODID
 #define SL_TPI_MOD_NAME		CONFIG_STREAMS_SL_TPI_NAME
-#endif				/* LFS */
 
 /*
  *  =========================================================================
@@ -8882,8 +8879,6 @@ MODULE_PARM_DESC(modid, "Module ID for the SL-TPI module. (0 for allocation.)");
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-#ifdef LFS
-
 STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sl_tpiinfo,
@@ -8910,40 +8905,6 @@ sl_unregister_strmod(void)
 		return (err);
 	return (0);
 }
-
-#endif				/* LFS */
-
-/*
- *  Linux STREAMS Registration
- *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- */
-#ifdef LIS
-
-STATIC int
-sl_register_strmod(void)
-{
-	int err;
-
-	if ((err = lis_register_strmod(&sl_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
-		return (-EIO);
-	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
-		lis_unregister_strmod(&sl_tpiinfo);
-		return (err);
-	}
-	return (0);
-}
-
-STATIC int
-sl_unregister_strmod(void)
-{
-	int err;
-
-	if ((err = lis_unregister_strmod(&sl_tpiinfo)) < 0)
-		return (err);
-	return (0);
-}
-
-#endif				/* LIS */
 
 MODULE_STATIC int __init
 sl_tpiinit(void)

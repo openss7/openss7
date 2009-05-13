@@ -99,14 +99,11 @@ MODULE_AUTHOR(FIFO_CONTACT);
 MODULE_DESCRIPTION(FIFO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(FIFO_DEVICE);
 MODULE_LICENSE(FIFO_LICENSE);
-#if defined MODULE_ALIAS
-MODULE_ALIAS("streams-fifo");
-#endif
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
-#endif
+#endif				/* MODULE_VERSION */
+#endif				/* CONFIG_STREAMS_FIFO_MODULE */
 
 #ifndef CONFIG_STREAMS_FIFO_NAME
 //#define CONFIG_STREAMS_FIFO_NAME "fifo"
@@ -121,36 +118,56 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_FIFO_MAJOR must be defined."
 #endif
 
+#ifdef MODULE
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-fifo");
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
+
+#ifndef CONFIG_STREAMS_FIFO_MODULE
+static
+#endif
 modID_t modid = CONFIG_STREAMS_FIFO_MODID;
 
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
 module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module identification number for STREAMS-based FIFOs");
+#endif				/* CONFIG_STREAMS_FIFO_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_FIFO_MODID));
 MODULE_ALIAS("streams-driver-fifo");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
+#ifndef CONFIG_STREAMS_FIFO_MODULE
+static
+#endif
 major_t major = CONFIG_STREAMS_FIFO_MAJOR;
 
+#ifdef CONFIG_STREAMS_FIFO_MODULE
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
 module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
+#endif				/* CONFIG_STREAMS_FIFO_MODULE */
 
+#ifdef MODULE
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR) "-*");
 MODULE_ALIAS("/dev/fifo");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_FIFO_MAJOR));
 MODULE_ALIAS("/dev/streams/fifo");
 MODULE_ALIAS("/dev/streams/fifo/*");
-#endif
+#endif				/* MODULE_ALIAS */
+#endif				/* MODULE */
 
 static struct module_info fifo_minfo = {
 	.mi_idnum = CONFIG_STREAMS_FIFO_MODID,
@@ -180,7 +197,10 @@ static struct qinit fifo_winit = {
 	.qi_mstat = &fifo_wstat,
 };
 
-static struct streamtab fifo_info = {
+#ifdef CONFIG_STREAMS_FIFO_MODULE
+static
+#endif
+struct streamtab fifoinfo = {
 	.st_rdinit = &fifo_rinit,
 	.st_wrinit = &fifo_winit,
 };
@@ -195,7 +215,7 @@ static struct streamtab fifo_info = {
 
 static struct cdevsw fifo_cdev = {
 	.d_name = CONFIG_STREAMS_FIFO_NAME,
-	.d_str = &fifo_info,
+	.d_str = &fifoinfo,
 	.d_flag = D_MP,
 	.d_fop = &strm_f_ops,
 	.d_mode = S_IFIFO | S_IRUGO | S_IWUGO,
@@ -244,7 +264,7 @@ fifo_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
-	.owner = NULL,			/* yes NULL */
+	.owner = NULL,		/* yes NULL */
 	.open = &fifo_open,
 };
 
@@ -289,7 +309,7 @@ unregister_fifo(void)
 static
 #endif
 int __init
-fifo_init(void)
+fifoinit(void)
 {
 	int err;
 
@@ -313,7 +333,7 @@ fifo_init(void)
 static
 #endif
 void __exit
-fifo_exit(void)
+fifoexit(void)
 {
 #ifdef CONFIG_STREAMS_FIFO_OVERRIDE
 	unregister_fifo();	/* This is not safe... */
@@ -322,6 +342,6 @@ fifo_exit(void)
 };
 
 #ifdef CONFIG_STREAMS_FIFO_MODULE
-module_init(fifo_init);
-module_exit(fifo_exit);
+module_init(fifoinit);
+module_exit(fifoexit);
 #endif

@@ -95,10 +95,8 @@ typedef spinlock_t lock_t;
 
 __HPUX_EXTERN lock_t *streams_get_sleep_lock(caddr_t event);
 
-#ifdef LFS
 typedef void (*streams_put_t) (void *, mblk_t *);
 __HPUX_EXTERN void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
-#endif
 
 #else
 #ifdef _HPUX_SOURCE

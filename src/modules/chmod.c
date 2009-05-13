@@ -64,7 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  this module is for testing, but it can also be used to simulate a channel within a system.
  */
 
-#define LFS_SOURCE
 #define MPS_SOURCE
 
 #include <sys/strlog.h>

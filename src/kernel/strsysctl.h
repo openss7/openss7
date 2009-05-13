@@ -67,10 +67,6 @@
 #define BIG_STATIC_INLINE
 #endif
 
-#ifndef BIG_STATIC_STH
-#define BIG_STATIC_STH
-#endif
-
 #if !defined(HAVE_SYSCTL_CHECK_TABLE_SYMBOL)
 /* /proc/streams */
 enum {
@@ -133,13 +129,13 @@ enum {
 };
 #endif				/* !defined(HAVE_SYSCTL_CHECK_TABLE_SYMBOL) */
 
-BIG_STATIC ulong sysctl_str_maxpsz;	/* stream head default max packet size */
+extern ulong sysctl_str_maxpsz;	/* stream head default max packet size */
 
-BIG_STATIC ulong sysctl_str_minpsz;	/* stream head default min packet size */
+extern ulong sysctl_str_minpsz;	/* stream head default min packet size */
 
-BIG_STATIC ulong sysctl_str_hiwat;	/* stream head default hi water mark */
+extern ulong sysctl_str_hiwat;	/* stream head default hi water mark */
 
-BIG_STATIC ulong sysctl_str_lowat;	/* stream head default lo water mark */
+extern ulong sysctl_str_lowat;	/* stream head default lo water mark */
 
 BIG_STATIC ulong sysctl_str_cltime;	/* close wait time in msec (save in ticks) */
 
@@ -147,13 +143,13 @@ BIG_STATIC ulong sysctl_str_rtime;	/* msec to wait to forward held msg (save in 
 
 BIG_STATIC ulong sysctl_str_ioctime;	/* msec to wait for ioctl() acknowledgement (save in ticks) 
 					 */
-BIG_STATIC_STH ulong sysctl_str_nstrpush;	/* max pushed modules */
+extern ulong sysctl_str_nstrpush;	/* max pushed modules */
 
 BIG_STATIC ulong sysctl_str_strthresh;	/* memory limit */
 
 BIG_STATIC ulong sysctl_str_strhold;	/* active stream hold feature */
 
-BIG_STATIC_STH ulong sysctl_str_strctlsz;	/* maximum stream control size */
+extern ulong sysctl_str_strctlsz;	/* maximum stream control size */
 
 extern ulong sysctl_str_strmsgsz;	/* maximum stream message size */
 
