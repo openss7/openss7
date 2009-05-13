@@ -84,15 +84,15 @@ npi_mtp_TEXINFOS	= \
 if MAINTAINER_MODE
 if AMDEP
 mtpi_TEXINFOS		+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 
 npi_mtp_TEXINFOS	+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 endif
 endif
 
 EXTRA_info_TEXINFOS	= \
-			  texi/args.texi \
+			  $(top_builddir)/scripts/texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(mtpi_TEXINFOS) \
 			  $(npi_mtp_TEXINFOS)
