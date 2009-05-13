@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define	LCD_DESCRIP	"SVR 4.2 COMMUNICATIONS DEVICE DRIVER FOR LINUX FAST-STREAMS"
 #define	LCD_EXTRA	"Part of X/Open Network Services for Linux Fast-STREAMS"
 #define	LCD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define	LCD_REVISION	"OpenSS7 $RCSfile: lcd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:50 $"
+#define	LCD_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define	LCD_DEVICE	"SVR 4.2MP Communications Device (CD) for Linux Fast-STREAMS"
 #define	LCD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define	LCD_LICENSE	"GPL"

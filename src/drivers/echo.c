@@ -73,7 +73,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-30 18:31:35 $"
+#define ECHO_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"

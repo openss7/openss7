@@ -72,7 +72,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:40 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

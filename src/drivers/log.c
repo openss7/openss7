@@ -99,7 +99,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-10-11 04:31:31 $"
+#define LOG_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

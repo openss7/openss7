@@ -95,7 +95,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define CH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CH_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:28 $"
+#define CH_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define CH_DEVICE	"SVR 4.2 STREAMS Channel Module (CH)"
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"

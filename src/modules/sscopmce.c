@@ -75,7 +75,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/npi_ip.h>
 
 #define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS MODULE."
-#define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $"
+#define SSCOPMCE_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

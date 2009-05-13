@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/atm_dlpi.h>
 
 #define ATM_DESCRIP	"ATM STREAMS MULTIPLEXING DRIVER."
-#define ATM_REVISION	"OpenSS7 $RCSfile: atm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2009-01-16 20:46:07 $"
+#define ATM_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define ATM_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ATM_DEVICE	"Provides OpenSS7 ATM I.432.X Pseudo-Device Driver."
 #define ATM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -129,7 +129,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2009-03-26 19:34:15 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

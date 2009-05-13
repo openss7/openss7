@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define SCCP_NPI_DESCRIP	"SCCPI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define SCCP_NPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_NPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SCCP_NPI_REVISION	"OpenSS7 $RCSfile: sccp_npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:52 $"
+#define SCCP_NPI_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SCCP_NPI_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define SCCP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_NPI_LICENSE	"GPL"

@@ -91,7 +91,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/chi.h>
 
 #define PHYS_DESCRIP	"MTP3B-PHYS STREAMS MODULE."
-#define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-12-07 06:57:10 $"
+#define PHYS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define PHYS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

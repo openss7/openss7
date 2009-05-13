@@ -67,7 +67,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define MTP3B_DESCRIP	"MTP3B-MTP3B STREAMS MODULE."
-#define MTP3B_REVISION	"OpenSS7 $RCSfile: mtp3b.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:52 $"
+#define MTP3B_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define MTP3B_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MTP3B_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-MTP3B module."
 #define MTP3B_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

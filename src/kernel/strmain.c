@@ -70,7 +70,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:31 $"
+#define STREAMS_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"

@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #undef unfreezestr
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS PIPE MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-12-07 10:40:21 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

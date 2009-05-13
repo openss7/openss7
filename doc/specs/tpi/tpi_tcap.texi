@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.27 2009-05-01 04:50:55 brian Exp $
+% @(#) $Id$
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-05-01 04:50:55 $ by $Author: brian $
+% Last Modified $Date$ by $Author$
 %
 % =========================================================================
 
@@ -466,7 +466,7 @@ changes in the design of any techniques, or procedures embodied, described, or r
 
 @smallexample
 @verbatim
-$Log: tpi_tcap.texi,v $
+$Log$
 Revision 0.9.2.27  2009-05-01 04:50:55  brian
 - update documentation for release
 

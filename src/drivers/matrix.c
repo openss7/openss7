@@ -151,7 +151,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/mxi_ioctl.h>
 
 #define MATRIX_DESCRIP		"MATRIX (MX) STREAMS MULTIPLEXING DRIVER."
-#define MATRIX_REVISION		"OpenSS7 $RCSfile: matrix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-20 12:48:39 $"
+#define MATRIX_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define MATRIX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

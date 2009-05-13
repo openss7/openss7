@@ -85,7 +85,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TDM_IP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TDM_IP_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TDM_IP_REVISION		"OpenSS7 $RCSfile: tdm_ip.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 09:06:06 $"
+#define TDM_IP_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TDM_IP_DEVICE		"SVR 4.2 STREAMS TDM-IP MODULE"
 #define TDM_IP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TDM_IP_LICENSE		"GPL"

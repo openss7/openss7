@@ -88,7 +88,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define LLC_DESCRIP	"SVR 4.2 DLPI LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the Openss7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: x25-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define LLC_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for IEEE 802.2 LLC"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"

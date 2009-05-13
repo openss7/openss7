@@ -96,7 +96,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define STRLOGDA	7	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-12-07 10:40:18 $"
+#define MTP_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define MTP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

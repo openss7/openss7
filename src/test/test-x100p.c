@@ -10345,7 +10345,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.12 $ $Date: 2008-04-29 07:11:31 $");
+", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
 }
 
 void

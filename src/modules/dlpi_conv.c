@@ -70,7 +70,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define DLPI_CONV_DESCRIP	"DLPI ENDIAN CONVERSION (DLPI-CONV) FOR LINUX FAST-STREAMS"
 #define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $"
+#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_CONV_LICENSE	"GPL"

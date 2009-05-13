@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 //#undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-12-07 10:40:27 $"
+#define CH_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define CH_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x400pMIB.h,v 0.9.2.14 2009-02-18 20:19:00 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-02-18 20:19:00 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: x400pMIB.h,v $
+ $Log$
  Revision 0.9.2.14  2009-02-18 20:19:00  brian
  - updated agents
 
@@ -99,7 +99,7 @@
 #ifndef __LOCAL_X400PMIB_H__
 #define __LOCAL_X400PMIB_H__
 
-#ident "@(#) $RCSfile: x400pMIB.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/types.h>
 #include <stropts.h>

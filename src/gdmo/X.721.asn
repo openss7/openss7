@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ GDMOCHECK $Revision$
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -11,7 +11,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: X.721.asn,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/29 14:28:10 $
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -56,11 +56,11 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/29 14:28:10 $ by $Author: brian $
+--  Last Modified $Date$ by $Author$
 --  
 --  -----------------------------------------------------------------------------
 --  
---  $Log: X.721.asn,v $
+--  $Log$
 --  Revision 0.9.2.2  2007/09/29 14:28:10  brian
 --  - update gdmos and asns
 --

@@ -101,7 +101,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define DLPI_DESCRIP	"UNIX SVR 4.2 DLPI DRIVER FOR LINUX FAST-STREAMS"
 #define DLPI_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DLPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define DLPI_REVISION	"OpenSS7 $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:50 $"
+#define DLPI_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define DLPI_DEVICE	"SVR 4.2MP DLPI Driver (DLPI)"
 #define DLPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_LICENSE	"GPL"

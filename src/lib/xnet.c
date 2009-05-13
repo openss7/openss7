@@ -6179,10 +6179,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.33 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name$(\$Revision$).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.33 $)
-  * @date \$Date: 2008-09-10 03:50:05 $
+  * @version \$Name$(\$Revision$)
+  * @date \$Date$
   */
 
 /** @} */

@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define MOSI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MOSI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define MOSI_REVISION	"OpenSS7 $RCSfile: momod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
+#define MOSI_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define MOSI_DEVICE	"SVR 4.2 STREAMS MOSI Module for RFC 1698 (mOSI)"
 #define MOSI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MOSI_LICENSE	"GPL"

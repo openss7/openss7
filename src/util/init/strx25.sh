@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strx25.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-21 22:42:22 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -221,7 +221,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strx25.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-21 22:42:22 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
@@ -266,11 +266,11 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-21 22:42:22 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # -----------------------------------------------------------------------------
 #
-# $Log: strx25.sh,v $
+# $Log$
 # Revision 0.9.2.2  2008-10-21 22:42:22  brian
 # - handle verbose better in debian initscripts
 #

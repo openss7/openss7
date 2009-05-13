@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"

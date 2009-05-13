@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-22 20:31:30 $"
+#define PIPE_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision$) $Date$
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -354,7 +354,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision$) $Date$
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #

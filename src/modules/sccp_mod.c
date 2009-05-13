@@ -96,7 +96,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/mtpi_ioctl.h>
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
-#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-12-07 10:40:20 $"
+#define SC_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-03-05 13:07:17 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-05 13:07:17 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: dlpi.c,v $
+ $Log$
  Revision 0.9.2.7  2009-03-05 13:07:17  brian
  - fixes thanks to Larry Capriani's syntax checker
 
@@ -74,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-03-05 13:07:17 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2009-03-05 13:07:17 $";
+    "$RCSfile$ $Name$($Revision$) $Date$";
 
 /* This file can be processed by doxygen(1). */
 

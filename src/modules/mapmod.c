@@ -91,7 +91,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define MCMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MCMOD_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define MCMOD_REVISION		"Monavacon $RCSfile: mapmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-05 15:59:41 $"
+#define MCMOD_REVISION		"Monavacon $RCSfile$ $Name$($Revision$) $Date$"
 #define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
 #define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MCMOD_LICENSE		"GPL"

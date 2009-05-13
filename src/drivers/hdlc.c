@@ -89,7 +89,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
 #define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

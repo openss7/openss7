@@ -72,7 +72,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define MTP_MUX_DESCRIP		"MTP-MUX SS7/MTP (Message Transfer Part) STREAMS MULTIPLEXING DRIVER."
 #define MTP_MUX_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MTP_MUX_REVISION	"OpenSS7 $RCSfile: mtp_mux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-11-26 13:13:55 $"
+#define MTP_MUX_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define MTP_MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MTP_MUX_DEVICE		"Supports the OpenSS7 MTP and M3UA drivers."
 #define MTP_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

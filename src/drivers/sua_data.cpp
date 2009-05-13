@@ -1,6 +1,6 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: sua_data.cpp,v 0.9.2.4 2008-04-29 01:52:21 brian Exp $
+//  @(#) $Id$
 //  
 //  --------------------------------------------------------------------------
 //  
@@ -46,11 +46,11 @@
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Last Modified $Date: 2008-04-29 01:52:21 $ by $Author: brian $
+//  Last Modified $Date$ by $Author$
 //  
 //  --------------------------------------------------------------------------
 //  
-//  $Log: sua_data.cpp,v $
+//  $Log$
 //  Revision 0.9.2.4  2008-04-29 01:52:21  brian
 //  - updated headers for release
 //
@@ -59,9 +59,9 @@
 //
 //  ==========================================================================
 
-#ident "@(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 01:52:21 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] = "$RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 01:52:21 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #pragma implementation
 #include "sua_data.hh"

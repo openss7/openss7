@@ -150,7 +150,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/chi_ioctl.h>
 
 #define MX_DESCRIP	"MX (MX) STREAMS MULTIPLEXING DRIVER."
-#define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2008-11-26 13:13:54 $"
+#define MX_REVISION	"LfS $RCSfile$ $Name$ ($Revision$) $Date$"
 #define MX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -86,7 +86,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define LDL_DESCRIP	"SVR 4.2 DATA LINK DRIVER FOR LINUX FAST-STREAMS"
 #define LDL_EXTRA	"Part of the OpenSS7 X/Open Network Services for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LDL_REVISION	"OpenSS7 $RCSfile: ldl2.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:50 $"
+#define LDL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define LDL_DEVICE	"SVR 4.2MP Data Link Driver (DL) for Linux Fast-STREAMS"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"

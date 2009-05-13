@@ -99,7 +99,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define SCCP_TPI_DESCRIP	"SCCPI to TPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define SCCP_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_TPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-11-26 13:13:52 $"
+#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SCCP_TPI_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define SCCP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_TPI_LICENSE	"GPL"

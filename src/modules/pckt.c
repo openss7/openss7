@@ -221,7 +221,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:42 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PCKT_LICENSE		"GPL"

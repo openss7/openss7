@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 12:54:04 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:04 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: liscompat.h,v $
+ $Log$
  Revision 0.9.2.16  2008-04-28 12:54:04  brian
  - update file headers for release
 
@@ -68,7 +68,7 @@
 #ifndef __LOCAL_LISCOMPAT_H__
 #define __LOCAL_LISCOMPAT_H__
 
-#ident "@(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define LIS_MAXAPUSH	8
 #define LIS_FMNAMESZ	8

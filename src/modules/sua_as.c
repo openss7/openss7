@@ -131,7 +131,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:04 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

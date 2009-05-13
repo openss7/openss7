@@ -2310,10 +2310,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.8 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name$(\$Revision$).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.8 $)
- * @date \$Date: 2008-08-20 10:57:03 $
+ * @version \$Name$(\$Revision$)
+ * @date \$Date$
  *
  * @}
  */

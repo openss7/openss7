@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define S_LLIC_DESCRIP		"SPIDER LLI ADMIN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_LLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_LLIC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define S_LLIC_REVISION		"OpenSS7 $RCSfile: s_llic.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
+#define S_LLIC_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define S_LLIC_DEVICE		"SVR 4.2MP DLPI Devices"
 #define S_LLIC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define S_LLIC_LICENSE		"GPL"

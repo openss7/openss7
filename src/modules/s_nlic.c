@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define S_NLIC_DESCRIP		"SPIDER X25 ADMIN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_NLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_NLIC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define S_NLIC_REVISION		"OpenSS7 $RCSfile: s_nlic.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
+#define S_NLIC_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define S_NLIC_DEVICE		"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_NLIC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define S_NLIC_LICENSE		"GPL"

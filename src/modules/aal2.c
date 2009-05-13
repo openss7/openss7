@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/dlpi.h>
 
 #define AAL2_DESCRIP	"MTP3B-AAL2 STREAMS MODULE."
-#define AAL2_REVISION	"OpenSS7 $RCSfile: aal2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:24 $"
+#define AAL2_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define AAL2_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define AAL2_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL2 module."
 #define AAL2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
