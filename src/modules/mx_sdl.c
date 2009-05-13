@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:13 $"
+#define MX_SDL_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

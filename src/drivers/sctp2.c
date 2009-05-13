@@ -73,7 +73,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-10-24 15:51:20 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

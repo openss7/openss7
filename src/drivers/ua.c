@@ -59,7 +59,7 @@
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:01 $"
+#define UA_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define UA_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

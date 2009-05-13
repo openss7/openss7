@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400config.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 07:11:33 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:33 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: x400config.h,v $
+ $Log$
  Revision 0.9.2.2  2008-04-29 07:11:33  brian
  - updating headers for release
 
@@ -62,7 +62,7 @@
 #ifndef __LOCAL_X400CONFIG_H__
 #define __LOCAL_X400CONFIG_H__
 
-#ident "@(#) $RCSfile: x400config.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef YYSTYPE
 #define YYSTYPE int

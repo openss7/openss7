@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.pl,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-29 18:14:57 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-29 18:14:57 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -80,7 +80,7 @@ $default{'cachefile'} = $ENV{MODPOST_CACHE};
 $debug = 0;
 $verbose = 1;
 
-$ident = '$RCSfile: modpost.pl,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-29 18:14:57 $';
+$ident = '$RCSfile$ $Name$($Revision$) $Date$';
 $version = '3.0.0';
 
 $show = 'yes';
@@ -811,7 +811,7 @@ exit $retval;
 
 # =============================================================================
 #
-# $Log: modpost.pl,v $
+# $Log$
 # Revision 0.9.2.1  2008-10-29 18:14:57  brian
 # - commit working files for release
 #

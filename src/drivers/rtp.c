@@ -100,7 +100,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:45 $"
+#define RTP_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"

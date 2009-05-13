@@ -93,7 +93,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:18 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SDT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Provides OpenSS7 SDT-CD module."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

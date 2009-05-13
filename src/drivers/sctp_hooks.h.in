@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hooks.h.in,v 0.9.2.15 2008-10-23 09:34:11 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-23 09:34:11 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: sctp_hooks.h.in,v $
+ $Log$
  Revision 0.9.2.15  2008-10-23 09:34:11  brian
  - updates for release and compatibility
 
@@ -71,7 +71,7 @@
 #ifndef __LOCAL_SCTP_HOOKS_H__
 #define __LOCAL_SCTP_HOOKS_H__
 
-#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that

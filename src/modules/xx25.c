@@ -88,7 +88,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define XX25_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XX25_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:48 $"
+#define XX25_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define XX25_DEVICE	"SVR 4.2 STREAMS XX25 Modle for X.25-PLP (X25MOD)"
 #define XX25_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XX25_LICENSE	"GPL"

@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define MCMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-05 15:51:27 $"
+#define MCMUX_REVISION	"Monavacon $RCSfile$ $Name$($Revision$) $Date$"
 #define MCMUX_DEVICE	"SVR 4.2 STREAMS 3GPP TS 29.002 MAP Common Services (MC) Driver"
 #define MCMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MCMUX_LICENSE	"GPL"

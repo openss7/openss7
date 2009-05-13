@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: struct.h,v 0.9.2.4 2008-04-28 09:47:28 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 09:47:28 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: struct.h,v $
+ $Log$
  Revision 0.9.2.4  2008-04-28 09:47:28  brian
  - updated headers for release
 
@@ -68,7 +68,7 @@
 #ifndef __LOCAL_STRUCT_H__
 #define __LOCAL_STRUCT_H__
 
-#ident "@(#) $RCSfile: struct.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define STRMAX			1024
 

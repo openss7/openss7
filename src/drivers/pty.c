@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2009-03-23 11:43:59 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"

@@ -74,7 +74,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define NPI_DESCRIP	"NLI TO NPI CONVERSION FOR LINUX FAST STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
+#define NPI_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_LICENSE	"GPL"

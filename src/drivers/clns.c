@@ -147,7 +147,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:37 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"

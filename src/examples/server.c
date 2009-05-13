@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: server.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-18 16:43:14 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:43:14 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: server.c,v $
+ $Log$
  Revision 0.9.2.1  2008-06-18 16:43:14  brian
  - added new files for NLI and DLPI
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: server.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-18 16:43:14 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] = "$RCSfile: server.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-18 16:43:14 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
  * From Tru64 UNIX Network Programmer's Guide AR-H9UE-TE.

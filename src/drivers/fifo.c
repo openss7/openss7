@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-22 20:31:30 $"
+#define FIFO_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"

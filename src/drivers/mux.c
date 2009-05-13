@@ -84,7 +84,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:30 $"
+#define MUX_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"

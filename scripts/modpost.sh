@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-09-04 06:02:28 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-04 06:02:28 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-09-04 06:02:28 $'
+ident='$RCSfile$ $Name$($Revision$) $Date$'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1124,7 +1124,7 @@ exit $retval
 
 # =============================================================================
 #
-# $Log: modpost.sh,v $
+# $Log$
 # Revision 0.9.2.25  2008-09-04 06:02:28  brian
 # - corrections for recent 2.6.25.4 kernels
 #

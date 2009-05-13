@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TD_MPS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TD_MPS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TD_MPS_REVISION		"OpenSS7 $RCSfile: testdrv_mps.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-20 01:22:51 $"
+#define TD_MPS_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TD_MPS_DEVICE		"MPS Compatability TEST Driver (TEST-DRV-MPS)"
 #define TD_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TD_MPS_LICENSE		"GPL"

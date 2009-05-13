@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define LAPB_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
 #define LAPB_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define LAPB_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"

@@ -74,7 +74,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:00 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define TALI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

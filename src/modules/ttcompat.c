@@ -484,7 +484,7 @@ struct ltchars {
 
 #define TTCOMPAT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:42 $"
+#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TTCOMPAT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TTCOMPAT_LICENSE	"GPL"

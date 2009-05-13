@@ -103,7 +103,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

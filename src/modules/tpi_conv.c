@@ -74,7 +74,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define TPI_CONV_DESCRIP	"TPI ENDIAN CONVERSION (TPI-CONV) FOR LINUX FAST-STREAMS"
 #define TPI_CONV_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:49 $"
+#define TPI_CONV_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TPI_CONV_DEVICE		"SVR 4.2 TPI Endian Conversion (TPI-CONV) for STREAMS"
 #define TPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TPI_CONV_LICENSE	"GPL"

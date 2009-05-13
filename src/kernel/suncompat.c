@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:29 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

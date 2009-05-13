@@ -73,7 +73,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/dlpi.h>
 
 #define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:50 $"
+#define DL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

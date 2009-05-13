@@ -66,7 +66,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/os7/compat.h>
 
 #define DL_SL_DESCRIP	"DLPI/SLI CONVERSION STREAMS MODULE."
-#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:06 $"
+#define DL_SL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define DL_SL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

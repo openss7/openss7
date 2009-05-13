@@ -66,7 +66,7 @@
  *
  * All rights reserved.
  *
- * $Id: zaptel.h,v 0.9.2.4 2008-04-28 23:39:55 brian Exp $
+ * $Id$
  */
 
 #ifndef _LINUX_ZAPTEL_H

@@ -68,7 +68,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:26 $"
+#define MG_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define MG_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

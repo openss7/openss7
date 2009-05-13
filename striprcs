@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for k in Author Date Header Id Locker Log Name RCSfile Revision Source State; do
+	find . -type f | grep -v CVS | xargs grep -l '\$'$k: | while read f ; do
+		echo "Editing $f..."
+		echo ',s/\$'$k':[^\$]*\$/$'$k'$/
+wq
+' | ed $f
+		grep '\$'$k $f
+	done
+done

@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:00 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define TUA_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

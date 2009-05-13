@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: stratm.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:53 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -221,7 +221,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: stratm.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 08:20:53 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
@@ -266,11 +266,11 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-12-06 08:20:53 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # -----------------------------------------------------------------------------
 #
-# $Log: stratm.sh,v $
+# $Log$
 # Revision 0.9.2.1  2008-12-06 08:20:53  brian
 # - added base release files for stratm package
 #

@@ -1308,10 +1308,10 @@ __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.6 $).
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name$(\$Revision$).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.6 $)
- * @date \$Date: 2008-09-10 03:49:56 $
+ * @version \$Name$(\$Revision$)
+ * @date \$Date$
  *
  * @}
  */

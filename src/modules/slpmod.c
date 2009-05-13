@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-12-07 10:40:22 $"
+#define SL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

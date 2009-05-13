@@ -99,9 +99,9 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2009-03-02 05:15:01 $';
-my $version = '$Revision: 0.9.2.13 $';
-my $date = '$Date: 2009-03-02 05:15:01 $';
+my $ident = '$RCSfile$ $Name$($Revision$) $Date$';
+my $version = '$Revision$';
+my $date = '$Date$';
 my $title = 'OpenSS7 Network Manager';
 
 use SNMP;

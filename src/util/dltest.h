@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dltest.h,v 0.9.2.1 2008-05-25 12:46:57 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-25 12:46:57 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: dltest.h,v $
+ $Log$
  Revision 0.9.2.1  2008-05-25 12:46:57  brian
  - added manual pages, libraries, utilities and drivers
 
@@ -59,7 +59,7 @@
 #ifndef __LOCAL_DLTEST_H__
 #define __LOCAL_DLTEST_H__
 
-#ident "@(#) $RCSfile: dltest.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  * Common DLPI Test Suite header file

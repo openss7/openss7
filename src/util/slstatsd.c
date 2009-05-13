@@ -346,7 +346,7 @@ slstats_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SLSTATSD $Id: slstatsd.c,v 0.9.2.3 2008-04-29 07:11:33 brian Exp $ Output Header\n");
+	fprintf(stdout, " # SLSTATSD $Id$ Output Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

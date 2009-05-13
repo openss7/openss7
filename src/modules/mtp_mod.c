@@ -93,7 +93,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/mtpi_ioctl.h>
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
-#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-12-07 10:40:19 $"
+#define MT_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define MT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

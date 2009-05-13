@@ -77,7 +77,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-22 20:31:41 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"

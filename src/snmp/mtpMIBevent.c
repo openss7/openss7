@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtpMIBevent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:01 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-03-02 05:15:01 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: mtpMIBevent.c,v $
+ $Log$
  Revision 0.9.2.1  2009-03-02 05:15:01  brian
  - updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtpMIBevent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:01 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] = "$RCSfile: mtpMIBevent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2009-03-02 05:15:01 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>

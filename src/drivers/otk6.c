@@ -116,7 +116,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:37 $"
+#define OTK6_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define OTK6_DEVICE	"SVR 4.2 STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"

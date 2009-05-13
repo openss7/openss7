@@ -120,7 +120,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2008-10-11 04:31:24 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

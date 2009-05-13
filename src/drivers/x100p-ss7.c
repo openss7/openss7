@@ -88,7 +88,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.36 $) $Date: 2008-09-22 20:31:25 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define X100P_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

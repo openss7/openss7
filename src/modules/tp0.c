@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define TP0_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP0_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
+#define TP0_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TP0_DEVICE	"SVR 4.2 STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"

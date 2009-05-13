@@ -112,7 +112,7 @@ References
 
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:42 $"
+#define PTEM_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define PTEM_DEVICE		"SVR 4.2 STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"

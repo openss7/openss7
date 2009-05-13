@@ -116,7 +116,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/chi_ioctl.h>
 
 #define CH_MUX_DESCRIP		"CH MULTIPLEX (CH-MUX) STREAMS MULTIPLEXING DRIVER"
-#define CH_MUX_REVISION		"OpenSS7 $RCSfile: chmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-04-21 07:48:36 $"
+#define CH_MUX_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define CH_MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define CH_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CH_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

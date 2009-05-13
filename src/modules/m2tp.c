@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 //#include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

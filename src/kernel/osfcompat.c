@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-22 20:31:29 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"

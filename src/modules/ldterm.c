@@ -152,7 +152,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:37 $"
+#define LDTERM_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LDTERM_LICENSE		"GPL"

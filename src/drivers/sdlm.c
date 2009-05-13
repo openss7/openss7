@@ -84,7 +84,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:18 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SDLM_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

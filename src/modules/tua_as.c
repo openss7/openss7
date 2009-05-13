@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/tpi_tcap.h>
 
 #define TUA_AS_DESCRIP		"TUA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:04 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

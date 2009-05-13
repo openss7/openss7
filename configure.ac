@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.2],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 0.9.2.57 $) $Date: 2009-03-12 15:08:33 $])
+AC_REVISION([$Name$($Revision$) $Date$])
 
 _OPENSS7_DIRCHANGE
 

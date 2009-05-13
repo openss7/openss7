@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mib_modules.h,v 0.9.2.4 2008-04-28 09:47:28 brian Exp $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 09:47:28 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: mib_modules.h,v $
+ $Log$
  Revision 0.9.2.4  2008-04-28 09:47:28  brian
  - updated headers for release
 
@@ -68,7 +68,7 @@
 #ifndef __LOCAL_MIB_MODULES_H__
 #define __LOCAL_MIB_MODULES_H__
 
-#ident "@(#) $RCSfile: mib_modules.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define DO_INITIALIZE   1
 #define DONT_INITIALIZE 0

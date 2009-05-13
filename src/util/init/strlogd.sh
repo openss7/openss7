@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strlogd.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-21 22:42:21 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -173,7 +173,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strlogd.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-21 22:42:21 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
@@ -218,11 +218,11 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-21 22:42:21 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # -----------------------------------------------------------------------------
 #
-# $Log: strlogd.sh,v $
+# $Log$
 # Revision 0.9.2.8  2008-10-21 22:42:21  brian
 # - handle verbose better in debian initscripts
 #

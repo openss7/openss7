@@ -61,7 +61,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/os7/compat.h>
 
 #define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:21 $"
+#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define SSCOP_TPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

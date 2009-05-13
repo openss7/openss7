@@ -79,7 +79,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define DLAIX_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
 #define DLAIX_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define DLAIX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define DLAIX_REVISION	"OpenSS7 $RCSfile: dlaix.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-12-07 10:40:37 $"
+#define DLAIX_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define DLAIX_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define DLAIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLAIX_LICENSE	"GPL"

@@ -98,7 +98,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:25 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define X400P_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -419,7 +419,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.7 2008-04-29 07:11:33 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id$ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

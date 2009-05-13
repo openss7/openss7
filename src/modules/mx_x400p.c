@@ -70,7 +70,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:24 $"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

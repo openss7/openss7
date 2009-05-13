@@ -87,7 +87,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <linux/netdevice.h>
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $"
+#define ND_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define ND_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

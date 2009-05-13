@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ GDMOCHECK $Revision$
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -17,7 +17,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: example.gdmo,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:52 $
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -62,7 +62,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/09 22:58:52 $ by $Author: brian $
+--  Last Modified $Date$ by $Author$
 --  
 --  =============================================================================
 --  >--
@@ -3206,7 +3206,7 @@ REGISTERED AS { mtpNameBinding15 };
 --< GDMO.ChangeLog
 --  =============================================================================
 --  
---  $Log: example.gdmo,v $
+--  $Log$
 --  Revision 0.9.2.2  2007/09/09 22:58:52  brian
 --  - updates for namespace
 --

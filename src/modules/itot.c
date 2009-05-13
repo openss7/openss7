@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:38 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"

@@ -85,7 +85,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CD_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:49 $"
+#define CD_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define CD_DEVICE	"SVR 4.2 STREAMS CDI OSI Communications Device Provider"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"

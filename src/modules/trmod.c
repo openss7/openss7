@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TRMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TRMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TRMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TRMOD_REVISION	"$RCSfile: trmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2009-03-05 15:59:41 $"
+#define TRMOD_REVISION	"$RCSfile$ $Name$($Revision$) $Date$"
 #define TRMOD_DEVICE	"SVR 4.2 STREAMS Q.771 Transaction Sublayer (TR) Module"
 #define TRMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMOD_LICENSE	"GPL"

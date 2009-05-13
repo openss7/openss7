@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:30 $"
+#define LOOP_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"

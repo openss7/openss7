@@ -85,7 +85,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:16 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL-CD module."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

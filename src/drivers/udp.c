@@ -137,7 +137,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-10-24 08:52:41 $"
+#define TP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define TP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"

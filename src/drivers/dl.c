@@ -90,7 +90,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2009-03-05 13:07:17 $"
+#define DL_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"

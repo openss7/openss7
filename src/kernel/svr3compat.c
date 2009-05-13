@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR3COMP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:29 $"
+#define SVR3COMP_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR3COMP_LICENSE	"GPL"

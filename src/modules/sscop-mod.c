@@ -65,7 +65,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define SSCOP_DESCRIP	"MTP3B-SSCOP STREAMS MODULE."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-12-06 09:06:06 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
 #define SSCOP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-SSCOP module."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
