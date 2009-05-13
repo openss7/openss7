@@ -80,7 +80,16 @@ include ../../../am/papers.am
 EXTRA_DIST += \
 	voipt.tex \
 	voipt.bib \
-	voipt.css
+	voipt.css \
+	voipt_fig01.fig \
+	voipt_fig02.fig \
+	voipt_fig03.fig \
+	voipt_fig04.fig \
+	voipt_fig05.fig \
+	voipt_fig06.fig \
+	voipt_fig07.fig \
+	voipt_fig08.fig \
+	org.css
 
 # =============================================================================
 #

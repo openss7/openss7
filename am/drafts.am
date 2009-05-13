@@ -62,9 +62,9 @@ PICS  = $(FIG_FIGS:.fig=.pic)
 GIFS  = $(FIG_FIGS:.fig=.gif)
 EPSS  = $(FIG_FIGS:.fig=.eps)
 
-ME_DEPS = idrefs draft.me draft2.me draft3.me draft4.me
+ME_DEPS = fixup idrefs draft.me draft2.me draft3.me draft4.me
 
-.me.txt:  ; cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tascii -me | ./fixup > $@
+.me.txt:  ; cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tascii -me | $(srcdir)/fixup > $@
 .me.dvi:  ; cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tdvi   -me > $@
 .me.ps:   ; cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tps    -me > $@
 .me.html: ; cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Thtml  -me > $@
@@ -94,19 +94,23 @@ if MAINTAINER_MODE
 ##
 # Only build docs in maintainer mode, don't build what we don't distribute.
 ##
-dvi-local: $(DVIS)
-ps-local: $(PSS)
-pdf-local: $(PDFS)
-html-local: $(HTMLS)
+dvi-local: $(PICS) $(DVIS)
+txt-local: $(PICS) $(TXTS)
+ps-local: $(PICS) $(PSS)
+pdf-local: $(PICS) $(PDFS)
+html-local: $(PICS) $(HTMLS)
 ## MAINTAINER_MODE
 else
 ## !MAINTAINER_MODE
 dvi-local:
+txt-local:
 ps-local:
 pdf-local:
 html-local:
 ## !MAINTAINER_MODE
 endif
+
+txt-am: txt-local
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -123,19 +127,19 @@ if MAINTAINER_MODE
 ## MAINTAINER_MODE
 if AMDEP
 ## AMDEP
-$(TXTS)		: %.txt  : %.me $(ME_DEPS)
+$(TXTS)		: %.txt  : %.me $(ME_DEPS) $(PICS)
 $(PDFS)		: %.pdf  : %.me $(ME_DEPS) $(PICS)
 ## AMDEP
 else
 ## !AMDEP
-#$(TXTS)	: %.txt  : %.me $(ME_DEPS)
+#$(TXTS)	: %.txt  : %.me $(ME_DEPS) $(PICS)
 #$(PDFS)	: %.pdf  : %.me $(ME_DEPS) $(PICS)
 ## !AMDEP
 endif
 ## MAINTAINER_MODE
 endif
 
-EXTRA_DIST	+= $(ME_MES) $(FIG_FIGS)
+EXTRA_DIST	+= $(ME_MES) $(FIG_FIGS) $(ME_DEPS)
 EXTRA_DIST	+= $(TXTS)
 EXTRA_DIST	+= $(PDFS)
 
@@ -256,7 +260,7 @@ if MAINTAINER_MODE
 ##
 # Only build docs in maintianer mode, don't build what we don't distribute.
 ##
-ALL_LOCAL		+= dvi ps pdf
+ALL_LOCAL		+= dvi ps pdf txt
 ## MAINTAINER_MODE
 endif
 

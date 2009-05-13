@@ -199,7 +199,6 @@ AC_CONFIG_FILES([Makefile
 		 doc/drafts/Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
-		 doc/manual/texi/args.texi
 		 doc/papers/Makefile
 		 doc/papers/chan/Makefile
 		 doc/papers/inet/Makefile

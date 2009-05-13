@@ -94,16 +94,16 @@ npi_sccp_TEXINFOS	= \
 if MAINTAINER_MODE
 if AMDEP
 npi_TEXINFOS		+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 npi_mtp_TEXINFOS	+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 npi_sccp_TEXINFOS	+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 endif
 endif
 
 EXTRA_info_TEXINFOS	= \
-			  texi/args.texi \
+			  $(top_builddir)/scripts/texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(npi_TEXINFOS)
 

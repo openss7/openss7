@@ -524,6 +524,27 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
+##
+# These are from po/POTFILES.in
+##
+EXTRA_DIST			+= \
+				src/lib/apli.c \
+				src/lib/cdiapi.c \
+				src/lib/dlpiapi.c \
+				src/lib/dlpi.c \
+				src/lib/netdir.c \
+				src/lib/netdir_inet.c \
+				src/lib/netselect.c \
+				src/lib/npiapi.c \
+				src/lib/osi.c \
+				src/lib/socket.c \
+				src/lib/socklib.c \
+				src/lib/sockpath.c \
+				src/lib/sun_libdlpi.c \
+				src/lib/xap.c \
+				src/lib/xnet.c \
+				src/lib/xnsl.c
+
 ##EXTRA_DOCS			+= doc/drafts/isua/draft-bidulock-sigtran-isua-03.txt \
 ##				   doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-ig-00.txt \
 ##				   doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-mib-00.txt \

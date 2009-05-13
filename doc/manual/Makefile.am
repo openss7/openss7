@@ -83,28 +83,28 @@ openss7_TEXINFOS	= \
 			rpm.texi \
 			todo.texi \
 			tree.texi \
-			texi/agpl3.texi \
-			texi/bsd.texi \
-			texi/decmit.texi \
-			texi/fdl12.texi \
-			texi/fdl13.texi \
-			texi/fdl.texi \
-			texi/gpl3.texi \
-			texi/gpl.texi \
-			texi/hp.texi \
-			texi/install.texi \
-			texi/isode.texi \
-			texi/lesser.texi \
-			texi/lgpl3.texi \
-			texi/mit.texi \
-			texi/quick.texi \
-			texi/sunrpc.texi \
-			texi/testsuite.texi \
-			texi/uidlpi.texi \
-			texi/uinpi.texi \
-			texi/ui.texi \
-			texi/uitpi.texi \
-			texi/uslbsd.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/bsd.texi \
+			$(top_srcdir)/scripts/texi/decmit.texi \
+			$(top_srcdir)/scripts/texi/fdl12.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/fdl.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/gpl.texi \
+			$(top_srcdir)/scripts/texi/hp.texi \
+			$(top_srcdir)/scripts/texi/install.texi \
+			$(top_srcdir)/scripts/texi/isode.texi \
+			$(top_srcdir)/scripts/texi/lesser.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/mit.texi \
+			$(top_srcdir)/scripts/texi/quick.texi \
+			$(top_srcdir)/scripts/texi/sunrpc.texi \
+			$(top_srcdir)/scripts/texi/testsuite.texi \
+			$(top_srcdir)/scripts/texi/uidlpi.texi \
+			$(top_srcdir)/scripts/texi/uinpi.texi \
+			$(top_srcdir)/scripts/texi/ui.texi \
+			$(top_srcdir)/scripts/texi/uitpi.texi \
+			$(top_srcdir)/scripts/texi/uslbsd.texi \
 			$(top_srcdir)/scripts/texi/compat.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
@@ -114,102 +114,102 @@ openss7_TEXINFOS	= \
 STREAMS_TEXINFOS	= \
 			install.texi \
 			releases.texi \
-			texi/agpl3.texi \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
-			texi/lgpl3.texi \
-			texi/quick.texi \
-			texi/testsuite.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/quick.texi \
+			$(top_srcdir)/scripts/texi/testsuite.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/mail.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 STREAMS_FAQ_TEXINFOS	= \
-			texi/agpl3.texi \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
-			texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 SPG2_TEXINFOS		= \
-			texi/agpl3.texi \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
-			texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 SPG_TEXINFOS		= \
-			texi/agpl3.texi \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
-			texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 porting_TEXINFOS	= \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 libxnet_TEXINFOS	= \
-			texi/lgpl3.texi \
-			texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 libxnsl_TEXINFOS	= \
-			texi/fdl13.texi \
-			texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 x25_porting_TEXINFOS	= \
-			texi/agpl3.texi \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
-			texi/lgpl3.texi \
-			texi/uidlpi.texi \
-			texi/uinpi.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/uidlpi.texi \
+			$(top_srcdir)/scripts/texi/uinpi.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 x400p_TEXINFOS		= \
-			texi/agpl3.texi \
-			texi/fdl13.texi \
-			texi/gpl3.texi \
-			texi/lgpl3.texi \
+			$(top_srcdir)/scripts/texi/agpl3.texi \
+			$(top_srcdir)/scripts/texi/fdl13.texi \
+			$(top_srcdir)/scripts/texi/gpl3.texi \
+			$(top_srcdir)/scripts/texi/lgpl3.texi \
 			$(top_srcdir)/scripts/texi/funding.texi \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
 if AMDEP
-openss7_TEXINFOS	+= texi/args.texi
-STREAMS_TEXINFOS	+= texi/args.texi
-STREAMS_FAQ_TEXINFOS	+= texi/args.texi
-SPG2_TEXINFOS		+= texi/args.texi
-SPG_TEXINFOS		+= texi/args.texi
-porting_TEXINFOS	+= texi/args.texi
-libxnet_TEXINFOS	+= texi/args.texi
-libxnsl_TEXINFOS	+= texi/args.texi
-x25_porting_TEXINFOS	+= texi/args.texi
-x400p_TEXINFOS		+= texi/args.texi
+openss7_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+STREAMS_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+STREAMS_FAQ_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+SPG2_TEXINFOS		+= $(top_builddir)/scripts/texi/args.texi
+SPG_TEXINFOS		+= $(top_builddir)/scripts/texi/args.texi
+porting_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+libxnet_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+libxnsl_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+x25_porting_TEXINFOS	+= $(top_builddir)/scripts/texi/args.texi
+x400p_TEXINFOS		+= $(top_builddir)/scripts/texi/args.texi
 endif
 endif
 
 EXTRA_info_TEXINFOS	= \
-			texi/args.texi \
+			$(top_builddir)/scripts/texi/args.texi \
 			$(info_TEXINFOS) \
 			$(openss7_TEXINFOS) \
 			$(STREAMS_TEXINFOS) \

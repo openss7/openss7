@@ -79,12 +79,12 @@ wan_TEXINFOS		= \
 if MAINTAINER_MODE
 if AMDEP
 wan_TEXINFOS		+= \
-			   texi/args.texi
+			   $(top_builddir)/scripts/texi/args.texi
 endif
 endif
 
 EXTRA_info_TEXINFOS	= \
-			  texi/args.texi \
+			  $(top_builddir)/scripts/texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(wan_TEXINFOS) \
 			  $(FIG_FIGS)

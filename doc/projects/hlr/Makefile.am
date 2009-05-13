@@ -68,12 +68,12 @@ hlr_TEXINFOS		= \
 if MAINTAINER_MODE
 if AMDEP
 hlr_TEXINFOS		+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 endif
 endif
 
 EXTRA_info_TEXINFOS	= \
-			  texi/args.texi \
+			  $(top_builddir)/scripts/texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(hlr_TEXINFOS)
 

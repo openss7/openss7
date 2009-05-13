@@ -78,12 +78,12 @@ sli_TEXINFOS		= \
 if MAINTAINER_MODE
 if AMDEP
 sli_TEXINFOS		+= \
-			  texi/args.texi
+			  $(top_builddir)/scripts/texi/args.texi
 endif
 endif
 
 EXTRA_info_TEXINFOS	= \
-			  texi/args.texi \
+			  $(top_builddir)/scripts/texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(sli_TEXINFOS)
 
