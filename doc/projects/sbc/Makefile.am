@@ -58,9 +58,9 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= mg.texi
+info_TEXINFOS		+= sbc.texi
 
-mg_TEXINFOS		= \
+sbc_TEXINFOS		= \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/versions.texi \
 			$(top_srcdir)/scripts/texi/prims.texi \
@@ -68,7 +68,7 @@ mg_TEXINFOS		= \
 
 if MAINTAINER_MODE
 if AMDEP
-mg_TEXINFOS		+= \
+sbc_TEXINFOS		+= \
 			$(top_builddir)/scripts/texi/args.texi
 endif
 endif
@@ -76,24 +76,12 @@ endif
 EXTRA_info_TEXINFOS	= \
 			$(top_builddir)/scripts/texi/args.texi \
 			$(info_TEXINFOS) \
-			$(mg_TEXINFOS)
+			$(sbc_TEXINFOS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		= \
-			osimap.fig \
-			platarch.fig \
-			platarch2.fig \
-			protconf.fig \
-			rack.fig \
-			stack.fig \
-			sysarch.fig \
-			netarch.fig \
-			netarch2.fig \
-			tiphon.fig \
-			iface.fig \
-			manarch.fig
+FIG_FIGS		=
 
 PNG_PNGS		=
 

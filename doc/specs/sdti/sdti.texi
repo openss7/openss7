@@ -88,7 +88,7 @@
 
 \input texinfo
 @setfilename sdti.info
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Signalling Data Terminal Interface (SDTI)
 @set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
@@ -98,7 +98,7 @@
 * SDTI: (sdti).			Signalling Data Terminal Interface
 @end direntry
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Signalling Data Terminal Interface (SDTI)
 @set MANUAL_TYPE Specification
 
@@ -145,7 +145,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Signalling Data Terminal Interface (SDTI)
 @set MANUAL_TYPE Specification
 

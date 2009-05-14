@@ -611,6 +611,7 @@ scripts/config.sub
 scripts/depcomp
 scripts/install-sh
 scripts/ltmain.sh
+scripts/mdate-sh
 scripts/missing
 scripts/texinfo.tex
 scripts/ylwrap

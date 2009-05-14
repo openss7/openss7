@@ -88,7 +88,7 @@
 
 \input texinfo
 @setfilename porting.info
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE Linux Fast-STREAMS
 @set MANUAL_TYPE Porting Guide
 @settitle @value{MANUAL_TITLE}
@@ -100,7 +100,7 @@
 
 @defindex op
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE Linux Fast-STREAMS
 @set MANUAL_TYPE Porting Guide
 
@@ -147,7 +147,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE Linux Fast-STREAMS
 @set MANUAL_TYPE Porting Guide
 
@@ -2052,7 +2052,7 @@ In general, @cite{LiS} @dfn{STREAMS} drivers and modules are easily portable to
 recently, were capable of running under both @cite{LiS} and
 @cite{@value{PACKAGE_TITLE}}.  For the most part, @dfn{STREAMS} driver and
 modules ported from @cite{LiS} to @cite{@value{PACKAGE_TITLE}} experience
-performance, conformance and bug-free operation on @cite{@value{PACKAGE_TILTE}}.
+performance, conformance and bug-free operation on @cite{@value{PACKAGE_TITLE}}.
 Mechanisms used to circumvent @cite{LiS} deficiencies, bugs and race conditions,
 are no longer necessary under @cite{@value{PACKAGE_TITLE}}.
 

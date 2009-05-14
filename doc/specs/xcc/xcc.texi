@@ -87,7 +87,7 @@
 
 \input texinfo
 @setfilename xcc.info
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE XOM Call Control (XCC)
 @set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
@@ -97,7 +97,7 @@
 * XCC: (xcc).                   XOM Call Control
 @end direntry
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE XOM Call Control (XCC)
 @set MANUAL_TYPE Specification
 
@@ -144,7 +144,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE XOM Call Control (XCC)
 @set MANUAL_TYPE Specification
 

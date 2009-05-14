@@ -88,7 +88,7 @@
 
 \input texinfo
 @setfilename tpi_sccp.info
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Corrigendum for SCCP Conformance
 @settitle @value{MANUAL_TITLE}
@@ -98,7 +98,7 @@
 * TPI-SCCP: (tpi_sccp).		TPI Corrigendum for SCCP
 @end direntry
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Corrigendum for SCCP Conformance
 
@@ -145,7 +145,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Corrigendum for SCCP Conformance
 

@@ -1,1 +1,0 @@
-.so man9/getmajor.9.man

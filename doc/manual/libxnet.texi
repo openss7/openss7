@@ -88,7 +88,7 @@
 
 \input texinfo
 @setfilename libxnet.info
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 XNS/XTI Library
 @set MANUAL_TYPE Reference Manual
 @settitle @value{MANUAL_TITLE}
@@ -100,7 +100,7 @@
 
 @defindex op
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 XNS/XTI Library
 @set MANUAL_TYPE Reference Manual
 
@@ -147,7 +147,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 XNS/XTI Library
 @set MANUAL_TYPE Reference Manual
 
