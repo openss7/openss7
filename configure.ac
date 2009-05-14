@@ -211,10 +211,11 @@ AC_CONFIG_FILES([Makefile
 		 doc/projects/hlr/Makefile
 		 doc/projects/lab/Makefile
 		 doc/projects/mg/Makefile
+		 doc/projects/sbc/Makefile
 		 doc/projects/sg/Makefile
 		 doc/projects/sgp/Makefile
-		 doc/projects/ss/Makefile
 		 doc/projects/ssg/Makefile
+		 doc/projects/ss/Makefile
 		 doc/projects/voip/Makefile
 		 doc/specs/Makefile
 		 doc/specs/cci/Makefile

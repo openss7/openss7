@@ -62,7 +62,7 @@
 
 \input texinfo
 @setfilename tpi.info
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
@@ -72,7 +72,7 @@
 * TPI: (tpi).                   Transport Provider Interface
 @end direntry
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Specification
 
@@ -118,7 +118,7 @@ Permission is granted to copy and distribute translations of this manual into an
 under the above conditions for modified versions.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE Transport Provider Interface
 @set MANUAL_TYPE Specification
 

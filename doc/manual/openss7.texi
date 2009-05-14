@@ -87,7 +87,7 @@
 
 \input texinfo
 @setfilename openss7.info
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE Installation and Reference Manual
 @settitle @value{MANUAL_TITLE}
@@ -97,7 +97,7 @@
 * openss7: (@value{PACKAGE_TARNAME}).	    OpenSS7 Master Package.
 @end direntry
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE Installation and Reference Manual
 
@@ -144,7 +144,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE Installation and Reference Manual
 

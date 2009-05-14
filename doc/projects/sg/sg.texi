@@ -88,7 +88,7 @@
 
 \input texinfo
 @setfilename sg.info
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
 @set MANUAL_TYPE High-Level Design
 @settitle @value{MANUAL_TITLE}
@@ -98,7 +98,7 @@
 * SG: (sg).			OpenSS7 Signalling Gateway Platform
 @end direntry
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
 @set MANUAL_TYPE High-Level Design
 
@@ -145,7 +145,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 Signalling Gateway Platform
 @set MANUAL_TYPE High-Level Design
 
@@ -159,7 +159,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008  OpenSS7 Corporation
+@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -227,6 +227,11 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @vskip 0pt
 @end titlepage
+
+@c An index of manual pages.
+@defcodeindex mp
+@syncodeindex mp cp
+
 @iftex
 @headings off
 @everyheading @thistitle @| @thisfile @| @thischaptername
@@ -237,35 +242,6 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
-
-@c Define an index of primitives
-@defcodeindex pr
-@c Define an index of primitive values
-@defcodeindex pv
-@c Define an index of primitive error values
-@defcodeindex pe
-@c Define an index of protocol states
-@defcodeindex st
-@c Define an index of input-output controls
-@defcodeindex ct
-@c Define an index of manual pages.
-@defcodeindex mp
-@c Define an index of MIB objects.
-@defcodeindex mo
-
-@c frags out automake
-@c @ifnottex
-@c @c concatenate indices for text, html and info
-@syncodeindex pr cp
-@syncodeindex pv cp
-@syncodeindex pe cp
-@syncodeindex st cp
-@syncodeindex mp cp
-@syncodeindex tp cp
-@syncodeindex vr cp
-@syncodeindex ct cp
-@syncodeindex mo cp
-@c @end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
@@ -286,6 +262,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Introduction::
 * Application Architecture::
 * Network Architecture::
+* Reference Architecture::
 * System Architecture::
 * Platform Architecture::
 * Protocol Architecture::
@@ -303,7 +280,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Optional Management Support::
 * Programmatic Interfaces::
 * Platform Sizing::
-* Indices::
+* Index::
 @end menu
 
 @node Executive Overview
@@ -519,7 +496,7 @@ This document is organized as follows:
 * Optional Management Support::
 * Programmatic Interfaces::
 * Platform Sizing::
-* Indices::
+* Index::
 @end menu
 @end ifnottex
 @iftex
@@ -562,7 +539,7 @@ Additional managment component support not directly contributing to the current 
 Programmatic interfaces to selected protocol components.
 @item @ref{Platform Sizing}
 Detailed platform sizing considerations.
-@item @ref{Indices}
+@item @ref{Index}
 Index of concepts, manual pages, etc.
 @end table
 @end iftex
@@ -850,6 +827,10 @@ From the IP network, the SG platforms appear in the SG as STP configuration for 
 Although MGC's are shown within the IP network as being provided SS7 connectivity by the SG
 platforms, any SIGTRAN equipped SS7 user application may also be supported by this configuration.
 
+@node Reference Architecture
+@chapter Reference Architecture
+@cindex Reference architecture
+
 @node System Architecture
 @chapter System Architecture
 @cindex System architecture
@@ -983,7 +964,7 @@ driver and the driver provides the functions of a SCCP endpoint or relay with fu
 translations.  Signalling Connection Control Part streams bound to TCAP SCCP-SAPs are linked under
 the TCAP driver to form a complete SS7 stack in support of call transactions.
 
-@figuresized{sccp,6.1,Signalling Connection Control Part (SCCP) Module,3in}
+@figuresized{sccp,6.1b,Signalling Connection Control Part (SCCP) Module,3in}
 
 The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
@@ -1367,7 +1348,7 @@ interface.
 
 @node Hardware Architecture
 @chapter Hardware Architecture
-@cindex Hardware Architecture
+@cindex Hardware architecture
 
 @figref{8.1} illustrates the hardware configuration for the @value{MANUAL_TITLE}.
 
@@ -1400,7 +1381,7 @@ the signalling gateway.
 
 @node Management Architecture
 @chapter Management Architecture
-@cindex Management Architecture
+@cindex Management architecture
 
 @node Logistics
 @chapter Logistics
@@ -1446,23 +1427,11 @@ the signalling gateway.
 @appendix Platform Sizing
 @cindex Platform sizing
 
-@node Indices
-@unnumbered Indices
-@cindex indices
+@node Index
+@unnumbered Index
+@cindex index
 
-@menu
-* Concept Index::		    Index of Concepts
-* Manual Page Index::		    Index of Manual Pages Referenced
-@end menu
-
-@node Concept Index
-@unnumberedsec Index of Concepts
 @printindex cp
-
-@page 
-@node Manual Page Index
-@unnumberedsec Index of Manual Pages Referenced
-@printindex mp
 
 @page
 @shortcontents

@@ -88,7 +88,7 @@
 
 \input texinfo
 @setfilename SPG.info
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE STREAMS Programmer's Guide
 @settitle @value{MANUAL_TITLE}
@@ -98,7 +98,7 @@
 * SPG: (SPG).                   STREAMS Programmer's Guide
 @end direntry
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE STREAMS Programmer's Guide
 
@@ -145,7 +145,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTIO
 THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @end ifinfo
 
-@include texi/args.texi
+@include ../../scripts/texi/args.texi
 @set MANUAL_TITLE @value{PACKAGE_TITLE}
 @set MANUAL_TYPE STREAMS Programmer's Guide
 
