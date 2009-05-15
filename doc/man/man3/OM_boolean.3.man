@@ -143,7 +143,7 @@ referes to the integer one specifically.
 .BR OM_boolean
 is compatible with XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -151,7 +151,7 @@ xom osi
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -160,7 +160,7 @@ xom osi
 .BR OM_boolean ()
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"

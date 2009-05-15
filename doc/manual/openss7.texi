@@ -381,13 +381,13 @@ Appendices
 
 Licenses
 
-* University of Illinois License::	The UI license
-* Hewlett-Packard License::		The HP license
-* BSD/USL Combined License::		The BSD license
-* GNU Affero General Public License::	The AGPL license
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
+* GNU Affero General Public License::	The AGPL license
+@c * GNU General Public License::		The GPL license
+@c * GNU Lesser General Public License::	The LGPL license
+@c * Hewlett-Packard License::		The HP license
+@c * University of Illinois License::	The UI license
+@c * BSD/USL Combined License::		The BSD license
 
 Indices
 
@@ -430,9 +430,9 @@ publications and other sources).  Consult the permission notices contained in th
 more information.
 
 This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
-invariant sections, no front-cover texts and no back-cover texts.  Some of the manuals and
-documentation contained in this package are released under different terms.  Please consult the
-specific manual for more information.
+@emph{Invariant Sections}, no @emph{Front-Fover Texts} and no @emph{Back-Cover Texts}.  Some of the
+manuals and documentation contained in this package are released under different terms.  Please
+consult the specific manual for more information.
 
 @node Abstract
 @section Abstract
@@ -804,6 +804,220 @@ components.
 Whereas in the old master package, protocol components and suites were organized by subpackage,
 components in the @value{PACKAGE_TITLE} package are now organized by protocol suite and application.
 
+The disposition of the old subpackages is as follows:
+
+@table @file
+@item openss7-@value{VERSION_OPENSS7}
+All @cite{OpenSS7 Master Package} components have been incorporated into the
+@file{openss7-@value{VERSION}} release.
+The last subpackage release was
+@command{streams-@value{VERSION_OPENSS7}}.
+
+@item streams-@value{VERSION_STREAMS}
+All @cite{Linux Fast-STREAMS} components have been incorporated into the
+@file{openss7-@value{VERSION}} release.
+The last subpackage release was
+@command{streams-@value{VERSION_STREAMS}}.
+
+@item strutil-@value{VERSION_STRUTIL}
+The @file{strutil} package was a package that provided utilities that were
+missing in @cite{LiS}, but which were incoporporated into @cite{Linux
+Fast-STREAMS}.  All components are represented in the
+@file{openss7-@value{VERSION}} release.
+The last subpackage release was
+@command{strutil-@value{VERSION_STREAMS}}.
+
+@item strcompat-@value{VERSION_STRCOMPAT}
+All @cite{STREAMS Compatibility Module} components have been incorporated into
+the @file{openss7-@value{VERSION}} release with the exception of the
+@cite{LiS} compatibility modules, which have been discarded.  All @cite{STREAMS}
+compatibility modules now load as part of the @cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strcompat-@value{VERSION_STRCOMPAT}}.
+
+@item strbcm-@value{VERSION_STRBCM}
+All @cite{STREAMS Binary Compatibility Modules} components have been
+incorporated into the @file{openss7-@value{VERSION}} build system.
+The last subpackage release was
+@command{strbcm-@value{VERSION_STRBCM}}.
+
+@item strtty-@value{VERSION_STRTTY}
+All @cite{STREAMS Terminal Subsystem} pseudo-device drivers, modules, library
+functions utilities and documentation have been incorporated into the
+@file{openss7-@value{VERSION}} release.  All @cite{STREAMS} terminal modules now
+load as part of the @cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strtty-@value{VERSION_STRTTY}}.
+
+@item strxns-@value{VERSION_STRXNS}
+All @cite{STREAMS X/Open Network Services} pseudo-device drivers, modules,
+library functions utilities, head files, and documentation have been
+incorporated into the @file{openss7-@value{VERSION}} release.  All @acronym{IP},
+@acronym{UDP}, @acronym{TCP}, @acronym{SCTP}, and Ethernet networking device
+drivers now load as part of the @cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strxns-@value{VERSION_STRXNS}}.
+
+@item strxnet-@value{VERSION_STRXNET}
+All @cite{STREAMS X/Open Transport Interface} libraries (@manref{libxnet(3)})
+and coordinating @cite{STREAMS} modules, including @manref{timod(4)} and
+@manref{tirdwr(4)} have been incorporated into the
+@file{openss7-@value{VERSION}} release.  All @cite{XTI} modules now load as part
+of the @cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strxnet-@value{VERSION_STRXNET}}.
+
+@item strsock-@value{VERSION_STRSOCK}
+All @cite{STREAMS Sockets} libraries (@manref{libsocket(3)},
+@manref{libsockmod(3)}) and coordinating @cite{STREAMS} drivers and modules
+(@manref{sockmod(4)}, @manref{socksys(4)}) have been incorporated into the
+@file{openss7-@value{VERSION}} release.  All modules now load as part of the
+@cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strsock-@value{VERSION_STRSOCK}}.
+
+@item strinet-@value{VERSION_STRINET}
+The @cite{OpenSS7 STREAMS INET} driver (@manref{inet(4)}) has been incorporated
+into the @file{openss7-@value{VERSION}} package and now loads as part of the
+@cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strinet-@value{VERSION_STRINET}}.
+
+@item strsctp-@value{VERSION_STRSCTP}
+The @cite{OpenSS7 STREAMS SCTP} driver (@manref{sctp(4)}) has been incorporated
+into the @file{openss7-@value{VERSION}} package and now loads as part of the
+@cite{STREAMS} base subsystem.
+The last subpackage release was
+@command{strsctp-@value{VERSION_STRSCTP}}.
+
+@item strchan-@value{VERSION_STRCHAN}
+All @cite{STREAM Channels} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+kernel modules.
+The last subpackage release was
+@command{strchan-@value{VERSION_STRCHAN}}.
+
+@item strx25-@value{VERSION_STRX25}
+All @cite{STREAMS X.25} and @cite{STREAMS Frame Relay} libraries, drivers and
+modules, header files, documentation, and SNMP agents, have been incorporated
+into the @file{openss7-@value{VERSION}} release.  They initially optionally load
+as optional kernel modules.
+The last subpackage release was
+@command{strx25-@value{VERSION_STRX25}}.
+
+@item striso-@value{VERSION_STRISO}
+All @cite{STREAMS ISO/OSI} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+optional kernel modules.
+The last subpackage release was
+@command{striso-@value{VERSION_STRISO}}.
+
+@item strisdn-@value{VERSION_STRISDN}
+All @cite{STREAMS ISDN} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+optional kernel modules.
+The last subpackage release was
+@command{strisdn-@value{VERSION_STRISDN}}.
+
+@item stratm-@value{VERSION_STRATM}
+All @cite{STREAMS ATM} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+optional kernel modules.
+The last subpackage release was
+@command{stratm-@value{VERSION_STRATM}}.
+
+@item strss7-@value{VERSION_STRSS7}
+All @cite{STREAMS SS7} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+optional kernel modules.
+The last subpackage release was
+@command{strss7-@value{VERSION_STRSS7}}.
+
+@item sigtran-@value{VERSION_SIGTRAN}
+All @cite{STREAMS SIGTRAN} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+optional kernel modules.
+The last subpackage release was
+@command{sigtran-@value{VERSION_SIGTRAN}}.
+
+@item strvoip-@value{VERSION_STRVOIP}
+All @cite{STREAMS VOIP} libraries, drivers and modules, header files,
+documentation, and SNMP agents, have been incorporated into the
+@file{openss7-@value{VERSION}} release.  They initially optionally load as
+optional kernel modules.
+The last subpackage release was
+@command{strvoip-@value{VERSION_STRVOIP}}.
+
+@end table
+
+The following subpackages are deprecated and no longer available, maintained nor
+supported, and have been removed from all releases.
+These were source code releases and archival copies are no longer available from
+the OpenSS7 Project website.
+
+@table @file
+@item sctp-@value{VERSION_SCTP}
+The @file{sctp} subpackage contained an older Linux Native Sockets
+implementation of SCTP that only worked with 2.4 kernels.  It is deprecated.
+The @file{strsctp} @cite{STREAMS} implementation is far superior in performance
+and compatibility and has been preferred for a number of years.
+The final release was
+@command{sctp-@value{VERSION_SCTP}}.
+This subpackage is deprecated, is no longer maintained or supported, and has
+been removed from all releases.
+Archival copies are no longer available from the OpenSS7 Project.
+
+@item iperf-@value{VERSION_IPERF}
+The @file{iperf} package was an @url{http://www.openss7.org/,OpenSS7 Project}
+modified release of the DAST package of the same name.  The only purpose of this
+package was to support repeatable performance testing of the
+@file{sctp-@value{VERSION_SCTP}} package, which is deprecated, so is no longer
+needed.
+The final release was
+@command{iperf-@value{VERSION_IPERF}}.
+This subpackage is deprecated, is no longer maintained or supported, and has
+been removed from all releases.
+Archival copies are no longer available from the OpenSS7 Project.
+
+@item netperf-@value{VERSION_NETPERF}
+The @file{netperf} package as an @url{http://www.openss7.org/,OpenSS7 Project}
+modified release of the HP package of the same name.  The only purpose of this
+package was to support repeatable performance testing of the @file{strxns} and
+@file{strxnet} packages.  It is no longer necessary.  HP releases far more
+current versions of this package.
+The final release was
+@command{netperf-@value{VERSION_NETPERF}}.
+This subpackage is deprecated, is no longer maintained or supported, and has
+been removed from all releases.
+Archival copies are no longer available from the OpenSS7 Project.
+
+@item osr61-@value{VERSION_OSR}
+The @file{osr61} package as an @url{http://www.openss7.org/,OpenSS7 Project}
+release of the Dialogic package of the same name modified to work with
+@cite{Linux Fast-STREAMS}.  It is no longer provided as a public BSD/GPL release
+by Dialogic.  Dialogic provides proprietary releases.
+The final release was
+@command{osr61-@value{VERSION_OSR}}.
+This subpackage is deprecated, is no longer maintained or supported, and has
+been removed from all releases.
+Archival copies are no longer available from the OpenSS7 Project.
+
+@item LiS-@value{VERSION_LIS}
+The final release was
+@command{LiS-2.18.3}.
+The final internal archival version was
+@command{LiS-@value{VERSION_LIS}}.
+This subpackage is deprecated, is no longer maintained or supported, and has
+been removed from all releases.
+Archival copies are no longer available from the OpenSS7 Project.
+@end table
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -994,10 +1208,10 @@ Reports}.
 @chapter Development
 @cindex developing
 
-@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
-manual pages and documentation necessary for the development of both user space applications
-programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
-follow describe these development facilities.
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static
+libraries, manual pages and documentation necessary for the development of both user space
+applications programs and kernel space @dfn{STREAMS} modules and drivers based on the package.
+The sections that follow describe these development facilities.
 
 @menu
 * Development Header Files::
@@ -1009,31 +1223,147 @@ follow describe these development facilities.
 @node Development Header Files::
 @section Header Files
 
-Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
-use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
-@command{gcc} command line as a preprocessor option.
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.
+To use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included
+in the @command{gcc} command line as a preprocessor option.
 
-In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
-ordered in the reverse order of the dependencies between packages.  So, for example, if the include
-files from all add-on packages are required, the order of these directives would be:
+@ignore
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should
+be ordered in the reverse order of the dependencies between packages.  So, for example, if the
+include files from all add-on packages are required, the order of these directives would be:
 @samp{-I/usr/include/@value{PACKAGE}}
 @samp{-I/usr/include/strxns}
 @samp{-I/usr/include/strcompat}
 @samp{-I/usr/include/streams}.
+@end ignore
 
-Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
-package in the directory @file{/usr/include/@value{PACKAGE}}:
-
-@table @file
-
-
-@end table
+Following are the user visible header files provided by the
+@file{@value{PACKAGE}-@value{VERSION}} package in the directory
+@file{/usr/include/@value{PACKAGE}}:
 
 @subsection User Space Programs
 
 Typical include files for interacting with Transport providers from user space include the
 @file{xti.h} header file.  Additional header files for interacting with specific drivers or modules
 may also be required.  The @cite{xti.h} header file is for interacting with the XTI library.
+
+@subsubsection STREAMS User Header Files
+
+@table @file
+@item log.h
+Provides user definitions for the @manref{log(4)} driver.
+@item loop.h
+Provides user definitions for the @manref{loop(4)} driver.
+@item sad.h
+Provides user defintiions for the @manref{sad(4)} driver.
+@item strlog.h
+Provides user definitions and declarations for the @manref{strlog(4)} facility.
+@item stropts.h
+Provides user defintions for @manref{streamio(7)}.
+@end table
+
+@subsubsection Terminal User Header Files
+
+@table @file
+@item sgtty.h
+Provides user defintions for scatter-gather terminal intput-output.
+@item termio.h
+Provides user definitions for terminal input-output (@manref{ldterm(4)}).
+@item termios.h
+Provides user definitions for terminal input-output.
+@item ttcompat.h
+Provides user definitions for terminal compatibiity (@manref{ldterm(4)}).
+@item ttychars.h
+Provides user definitions for terminal control characters.
+@end table
+
+@subsubsection Socket User Header Files
+
+@table @file
+@item sockdb.h
+@item sockio.h
+@item sockmod.h
+@item socksys.h
+@end table
+
+@subsubsection X/Open Network Services Header Files
+
+@subsubsection XTI/TLI Header Files
+
+@table @asis
+@item @file{ticlts.h}, @file{ticots.h}, @file{ticotsord.h}
+Provides standard user definitions for use with UNIX networking (@manref{unix(4)}) and the
+XTI/TLI library.
+@item @file{tihdr.h}
+Provides system defintions for the @manref{tli(3)} XTI/TLI library.
+@item @file{timod.h}
+Provides user defintions for the @manref{timod(4)} module.
+@item @file{tirdwr.h}
+Provides user defintions for the @manref{tirdwr(4)} module.
+@item @file{tiuser.h}
+Provides user definitions for the @manref{tli(3)} XTI/TLI library.
+@item @file{xti.h}, @file{sys/xti.h}, @file{sys/xti_local.h}, @file{sys/xti_xti.h}
+Provides user definitions for the @manref{xti(3)} XTI/TLI library.
+@item @file{xti_inet.h}, @file{sys/xti_inet.h}, @file{sys/xti_ip.h}, @file{sys/xti_udp.h}, @file{sys/xti_tcp.h}, @file{sys/xti_sctp.h}
+Provides standard IP networking definitions for the @manref{xti(3)} XTI/TLI library.
+@item @file{xti_mosi.h}, @file{sys/xti_mosi.h}
+Provides standard Minimal OSI networking definitions for the @manref{xti(3)} XTI/TLI library.
+@item @file{xti_osi.h}, @file{sys/xti_osi.h}
+Provides standard OSI networking definitions for the @manref{xti(3)} XTI/TLI library.
+@item @file{xti_apli.h}, @file{sys/xti_apli.h}
+Provides XTI/TLI extension definitions for use with ACSE/OSI and for implementing the APLI/ROSE library.
+@item @file{xti_xx25.h}, @file{sys/xti_xx25.h}
+Provides XTI/TLI standard definitions for use with X.25.
+@item @file{sys/xti_atm.h}, @file{sys/xti_sscop.h}
+Provides XTI/TLI standard definitions for use with ATM, SSCOP and SSCOPMCE.
+@item @file{sys/xti_ss7.h}, @file{sys/xti_sl.h}, @file{sys/xti_mtp.h}, @file{sys/xti_sccp.h}, @file{sys/xti_tcap.h}
+Provides XTI/TLI extension definitions for use with the SS7 protocol, including MTP2, MTP3, SCCP
+and TCAP.
+@end table
+
+@subsubsection X.25 Header Files
+
+@table @file
+@item netx25/nli.h
+@item netx25/xnetdb.h
+@item netx25/ll_control.h
+@item netx25/x25_control.h
+@itemx netx25/x25_proto.h
+@item snet/dl_control.h
+@itemx snet/dl_proto.h
+@itemx sys/snet/dl_control.h
+@itemx sys/snet/dl_proto.h
+@item snet/ixe_control.h
+@itemx snet/ixe_proto.h
+@itemx sys/snet/ixe_control.h
+@itemx sys/snet/ixe_proto.h
+@item snet/ll_control.h
+@itemx snet/ll_proto.h
+@itemx sys/snet/ll_control.h
+@itemx sys/snet/ll_proto.h
+@item snet/mlp_control.h
+@itemx snet/mlp_proto.h
+@itemx sys/snet/mlp_control.h
+@itemx sys/snet/mlp_proto.h
+@item snet/wan_control.h
+@itemx snet/wan_proto.h
+@itemx sys/snet/wan_control.h
+@itemx sys/snet/wan_proto.h
+@item snet/x25_control.h
+@itemx snet/x25_proto.h
+@itemx sys/snet/x25_control.h
+@itemx sys/snet/x25_proto.h
+@item snet/x32_control.h
+@itemx sys/snet/x32_control.h
+@end table
+
+@subsubsection APLI Header Files
+
+@table @file
+@item ap_lib.h
+@item ap_poll.h
+@end table
+
 
 @subsection Kernel Space Drivers and Modules
 
@@ -1046,6 +1376,101 @@ required.
 Aside from including this header files, the general procedures for compiling @dfn{STREAMS} modules
 and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
 Interface.
+
+@subsubsection STREAMS System Header Files
+
+@table @file
+@item sys/cmn_err.h
+@item sys/ddi.h
+@itemx sys/openss7/ddi.h
+@item sys/debug.h
+@itemx sys/openss7/debug.h
+@item sys/dki.h
+@itemx sys/openss7/dki.h
+@item sys/kmem.h
+@itemx sys/openss7/kmem.h
+@item sys/log.h
+@itemx sys/openss7/log.h
+@item sys/loop.h
+@itemx sys/openss7/loop.h
+@item sys/sad.h
+@itemx sys/openss7/sad.h
+@item sys/sc.h
+@itemx sys/openss7/sc.h
+@item sys/strconf.h
+@itemx sys/openss7/strconf.h
+@item sys/strdebug.h
+@itemx sys/openss7/strdebug.h
+@item sys/stream.h
+@itemx sys/openss7/stream.h
+@item sys/strlog.h
+@itemx sys/openss7/strlog.h
+@item sys/stropts.h
+@itemx sys/openss7/stropts.h
+@itemx sys/stropts32.h
+@itemx sys/openss7/stropts32.h
+@item sys/strsubr.h
+@itemx sys/openss7/strsubr.h
+@item sys/strsun.h
+@item sys/sunddi.h
+@itemx sys/openss7/testmod.h
+@end table
+
+@subsubsection Socket System Header Files
+
+@table @file
+@item sys/sockio.h
+@item sys/socklib.h
+@item sys/sockmod.h
+@item sys/sockpath.h
+@item sys/socksys.h
+@end table
+
+@subsubsection Terminal System Header Files
+
+@table @file
+@item sys/pty.h
+@item sys/sgtty.h
+@item sys/strtty.h
+@item sys/termio.h
+@item sys/termios.h
+@item sys/testmod.h
+@item sys/ttychars.h
+@item sys/ttydev.h
+@item sys/ttyio.h
+@end table
+
+@subsubsection XTI/TLI System Header Files
+
+@table @file
+@item sys/ticlts.h
+@item sys/ticots.h
+@item sys/ticotsord.h
+@item sys/tihdr.h
+@item sys/timod.h
+@item sys/tirdwr.h
+@item sys/tiuser.h
+@item sys/tli.h
+@item sys/xti_apli.h
+@item sys/xti_atm.h
+@item sys/xti.h
+@item sys/xti_inet.h
+@item sys/xti_ip.h
+@item sys/xti_local.h
+@item sys/xti_mosi.h
+@item sys/xti_mtp.h
+@item sys/xti_osi.h
+@item sys/xti_sccp.h
+@item sys/xti_sctp.h
+@item sys/xti_sl.h
+@item sys/xti_ss7.h
+@item sys/xti_sscop.h
+@item sys/xti_tcap.h
+@item sys/xti_tcp.h
+@item sys/xti_udp.h
+@item sys/xti_xti.h
+@item sys/xti_xx25.h
+@end table
 
 @node Static and Shared Libraries
 @section Libraries
@@ -1074,6 +1499,178 @@ If the static library is linked, include the following options on the @command{g
 Link to the @file{/usr/lib/libxnet.a} static library.
 
 @end table
+
+@subsection STREAMS Libraries
+
+@subsubsection STREAMS Library
+
+The compiler or loader argument for use of the @cite{STREAMS} shared object library is
+@samp{-lstreams}.
+The static version of the library,
+@file{@value{_libdir}/libstreams.a}, may also be linked.
+
+@subsection XNS Libraries
+
+@subsubsection Socket Library
+
+The compiler or loader argument for use of the @acronym{POSIX} Sockets shared object library is
+@samp{-lsocket}.
+The static version of the library,
+@file{@value{_libdir}/libsocket.a}, may also be linked.
+
+@subsubsection Socklib Library
+
+The compiler or loader argument for use of the @acronym{POSIX} Sockets compatibility shared
+object library is @samp{-lsocklib}.
+The static version of the library,
+@file{@value{_libdir}/libsocklib.a}, may also be linked.
+
+@subsubsection Sockpath Library
+
+The compiler or loader argument for use of the @acronym{POSIX} Sockets path shared object library
+is @samp{-lsockpath}.
+The static version of the library,
+@file{@value{_libdir}/libsockpath.a}, may also be linked.
+
+@subsection XTI/TLI Libraries
+
+@subsubsection XTI/TLI Library
+
+The compiler or loader argument for use of the @acronym{XTI/TLI} shared object library is
+@samp{-lxnet}.
+The static version of the library,
+@file{@value{_libdir}/libxnet.a}, may also be linked.
+
+@subsubsection NSL Library
+
+The compiler or loader argument for use of the @acronym{NSL} shared object library is
+@samp{-lxnsl}.
+The static version of the library,
+@file{@value{_libdir}/libxnsl.a}, may also be linked.
+
+@subsection GCOM Libraries
+
+@subsubsection CDI-API Library
+
+The compiler or loader argument for use of the @acronym{CDI-API} shared object library is
+@samp{-lcdiapi}.
+The static version of the library,
+@file{@value{_libdir}/libcdiapi.a}, may also be linked.
+
+@subsubsection DLPI-API Library
+
+The compiler or loader argument for use of the @acronym{DLPI-API} shared object library is
+@samp{-ldlpiapi}.
+The static version of the library,
+@file{@value{_libdir}/libdlpiapi.a}, may also be linked.
+
+@subsubsection NPI-API Library
+
+The compiler or loader argument for use of the @acronym{NPI-API} shared object library is
+@samp{-lnpiapi}.
+The static version of the library,
+@file{@value{_libdir}/libnpiapi.a}, may also be linked.
+
+@subsection Sun Libraries
+
+@subsubsection DLPI Library
+
+The compiler or loader argument for use of the @acronym{DLPI} shared object library is
+@samp{-ldlpi}.
+The static version of the library,
+@file{@value{_libdir}/libdlpi.a}, may also be linked.
+
+@subsection X.25 Libraries
+
+@subsubsection SX25 Library
+
+The compiler or loader argument for use of the @acronym{SX25} shared object library is
+@samp{-lsx25}.
+The static version of the library,
+@file{@value{_libdir}/libsx25.a}, may also be linked.
+
+@subsection OSI Libraries
+
+@subsubsection OSI Library
+
+The compiler or loader argument for use of the @acronym{OSI} shared object library is
+@samp{-losi}.
+The static version of the library,
+@file{@value{_libdir}/libosi.a}, may also be linked.
+
+@subsubsection APLI Library
+
+The compiler or loader argument for use of the @acronym{APLI} shared object library is
+@samp{-lapli}.
+The static version of the library,
+@file{@value{_libdir}/libapli.a}, may also be linked.
+
+@subsubsection XAP-ROSE Library
+
+The compiler or loader argument for use of the @acronym{XAP-ROSE} shared object library is
+@samp{-lxap_rose}.
+The static version of the library,
+@file{@value{_libdir}/libxap_rose.a}, may also be linked.
+
+@subsection XOM Libraries
+
+@subsubsection XAP Library
+
+The compiler or loader argument for use of the @acronym{XAP} shared object library is
+@samp{-lxap}.
+The static version of the library,
+@file{@value{_libdir}/libxap.a}, may also be linked.
+
+@subsubsection XDS Library
+
+The compiler or loader argument for use of the @acronym{XDS} shared object library is
+@samp{-lxds}.
+The static version of the library,
+@file{@value{_libdir}/libxds.a}, may also be linked.
+
+@subsubsection XFTAM Library
+
+The compiler or loader argument for use of the @acronym{XFTAM} shared object library is
+@samp{-lxftam}.
+The static version of the library,
+@file{@value{_libdir}/libxftam.a}, may also be linked.
+
+@subsubsection XMP Library
+
+The compiler or loader argument for use of the @acronym{XMP} shared object library is
+@samp{-lxmp}.
+The static version of the library,
+@file{@value{_libdir}/libxmp.a}, may also be linked.
+
+@subsubsection XOM Library
+
+The compiler or loader argument for use of the @acronym{XOM} shared object library is
+@samp{-lxom}.
+The static version of the library,
+@file{@value{_libdir}/libxom.a}, may also be linked.
+
+@subsection SS7 Libraries
+
+@subsubsection XCC Library
+
+The compiler or loader argument for use of the @acronym{XCC} shared object library is
+@samp{-lxcc}.
+The static version of the library,
+@file{@value{_libdir}/libxcc.a}, may also be linked.
+
+@subsubsection XMAP Library
+
+The compiler or loader argument for use of the @acronym{XMAP} shared object library is
+@samp{-lxmap}.
+The static version of the library,
+@file{@value{_libdir}/libxmap.a}, may also be linked.
+
+@subsubsection XTCAP Library
+
+The compiler or loader argument for use of the @acronym{XTCAP} shared object library is
+@samp{-lxtcap}.
+The static version of the library,
+@file{@value{_libdir}/libxtcap.a}, may also be linked.
 
 @node Kernel Module Development
 @section Kernel Modules
@@ -1223,27 +1820,27 @@ restrictions.  Similar information is available in the manual pages that accompa
 @cindex licenses
 
 @menu
-* University of Illinois License::	The UI license
-* Hewlett-Packard License::		The HP license
-* BSD/USL Combined License::		The BSD license
-* Sun RPC License::			The TIRPCSRC license
+* GNU Free Documentation License::	The FDL license
+* GNU Affero General Public License::	The AGPL license
+@c * GNU General Public License::		The GPL license
+@c * GNU Lesser General Public License::	The LGPL license
 * UNIX International DLPI License::	The DLPI license
 * UNIX International NPI License::	The NPI license
 * UNIX International TPI License::	The TPI license
-* GNU Affero General Public License::	The AGPL license
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
-* GNU Free Documentation License::	The FDL license
+* Sun RPC License::			The TIRPCSRC license
+@c * Hewlett-Packard License::		The HP license
+@c * University of Illinois License::	The UI license
+* BSD/USL Combined License::		The BSD license
 @end menu
 
 @page
-@include texi/ui.texi
+@include texi/fdl13.texi
 @page
-@include texi/hp.texi
-@page
-@include texi/uslbsd.texi
-@page
-@include texi/sunrpc.texi
+@include texi/agpl3.texi
+@c @page
+@c @include texi/gpl3.texi
+@c @page
+@c @include texi/lgpl3.texi
 @page
 @include texi/uidlpi.texi
 @page
@@ -1251,13 +1848,13 @@ restrictions.  Similar information is available in the manual pages that accompa
 @page
 @include texi/uitpi.texi
 @page
-@include texi/agpl3.texi
+@include texi/sunrpc.texi
+@c @page
+@c @include texi/hp.texi
+@c @page
+@c @include texi/ui.texi
 @page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
-@page
-@include texi/fdl13.texi
+@include texi/uslbsd.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

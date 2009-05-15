@@ -798,6 +798,7 @@ EXTRA_TEX			+= scripts/texinfo.cnf \
 				   scripts/texi/macros.texi \
 				   scripts/texi/mail.texi \
 				   scripts/texi/mit.texi \
+				   scripts/texi/prims.texi \
 				   scripts/texi/quick.texi \
 				   scripts/texi/sunrpc.texi \
 				   scripts/texi/testsuite.texi \

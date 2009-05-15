@@ -1166,7 +1166,7 @@ xap c303
 .]
 does not require abstract data manipulation using the XOM
 .[
-xom osi
+xom c607
 .]
 model or interfaces.
 It is, therefore, fairly easy to implement the A- and P- primitives directly

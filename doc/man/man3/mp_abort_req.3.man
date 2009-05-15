@@ -232,7 +232,7 @@ This function is compatible with
 .I Solstice CMIP 9.0
 and implementations based on XMP,
 .[
-xmp
+xmp c306
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -247,11 +247,11 @@ for additional compatibility information.
 .PP
 XOM,
 .[
-xom osi
+xom c607
 .]
 XMP.
 .[
-xmp
+xmp c306
 .]
 .\"
 .\"
@@ -259,7 +259,7 @@ xmp
 .PP
 This function first appeared in XMP.
 .[
-xmp
+xmp c306
 .]
 .\"
 .\"

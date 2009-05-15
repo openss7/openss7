@@ -169,7 +169,7 @@ replace-certain-values:OM_REPLACE_CERTAIN_VALUES:5
 .BR OM_modification
 is compatible with XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -177,7 +177,7 @@ xom osi
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -186,7 +186,7 @@ xom osi
 .BR OM_modification
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"

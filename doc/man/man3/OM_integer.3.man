@@ -136,7 +136,7 @@ A data value of this data type is an attribute value whose syntax is
 .BR OM_integer
 is compatible with XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -144,7 +144,7 @@ xom osi
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -153,7 +153,7 @@ xom osi
 .BR OM_integer
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
