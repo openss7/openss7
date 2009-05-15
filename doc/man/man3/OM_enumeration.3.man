@@ -136,7 +136,7 @@ Enumeration syntax.
 .BR OM_enumeration
 is compatible with XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -144,7 +144,7 @@ xom osi
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -153,7 +153,7 @@ xom osi
 .BR OM_enumeration
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"

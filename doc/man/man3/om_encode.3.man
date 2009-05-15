@@ -116,7 +116,7 @@ search-ignore T
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -249,7 +249,7 @@ is compatible with
 and implementations based on
 XOM,
 .[
-xom osi
+xom c607
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -269,7 +269,7 @@ for additional compatibility information.
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -278,7 +278,7 @@ xom osi
 .BR om_encode ()
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"

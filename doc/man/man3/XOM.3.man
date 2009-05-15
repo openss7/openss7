@@ -372,7 +372,7 @@ arbitrarily long value without having to place a copy of the entire value in mem
 .PP
 The XOM interface
 .[
-xom osi
+xom c607
 .]
 is designed to be used with other, application-specific APIs, for example, for application control,
 .[
@@ -380,7 +380,7 @@ xap c303
 .]
 management,
 .[
-xmp
+xmp c306
 .]
 message transfer,
 .[
@@ -408,7 +408,7 @@ inherent in that approach.  Collections of data are referred to as objects, obje
 are grouped together into classes, and classes are related to one another by means of sub-classing.
 The information architecture is described in detail in XOM.
 .[
-xom osi
+xom c607
 .]
 Among its important features, however, is that wherever an application-specific API requires an
 instance of a particular class, an instance of any of that class' subclasses may be supplied instead.
@@ -475,7 +475,7 @@ objects under the client's direction.  A principal purpose of the interface is t
 and service to exchange objects in whole or in part.  This requirement provides the rationale for the
 information architecture whose specification is contained in XOM.
 .[
-xom osi
+xom c607
 .]
 .PP
 Objects are of two kinds: public and private.  A public object is represented by a data structure
@@ -520,8 +520,8 @@ assigned integers by OM applications.  The integers' scope is a package.
 An object's attributes are unordered, but an attribute's values are ordered.  The position of the
 first value is zero.  The positions of successive values are successive positive integers.
 .PP
-One object, O-2, may be a value of an attribute of another object, O-1.  O-2 is called an
-'intermediate sub-object' of O-1, and O-1 the 'intermediate super-object' of O-2.  The intermediate
+One object, O-2, may be a value of an attribute of another object, O-1.  O-2 is called
+an 'intermediate sub-object' of O-1, and O-1 the 'intermediate super-object' of O-2.  The intermediate
 sub-objects of O-1, and all of their sub-objects, are the 'sub-objects' of O-1.  The intermediate
 super-object of O-2, and all of its super-objects, are the 'super-objects' of O-2.  The package that
 contains an object's class may differ from those containing the classes of its intermediate
@@ -705,7 +705,7 @@ has no known bugs.
 .BR XOM
 is compatible with XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -713,7 +713,7 @@ xom osi
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -722,7 +722,7 @@ xom osi
 .BR XOM
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"

@@ -239,7 +239,7 @@ is compatible with
 and implementations based on
 XOM,
 .[
-xom osi
+xom c607
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -260,7 +260,7 @@ for additional compatibility information.
 .PP
 XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"
@@ -269,7 +269,7 @@ xom osi
 .BR om_copy ()
 first appeared in XOM.
 .[
-xom osi
+xom c607
 .]
 .\"
 .\"

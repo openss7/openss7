@@ -473,7 +473,9 @@ nobase_pkginclude_HEADERS = \
 	sys/openss7/stropts32.h \
 	sys/openss7/stropts.h \
 	sys/openss7/strsubr.h \
-	sys/openss7/testmod.h \
+	sys/openss7/testmod.h
+
+dist_noinst_HEADERS = \
 	ucd-snmp-4.2.5/agent_index.h \
 	ucd-snmp-4.2.5/agent_read_config.h \
 	ucd-snmp-4.2.5/agent_registry.h \
@@ -512,9 +514,6 @@ nobase_pkginclude_HEADERS = \
 	ucd-snmp-4.2.5/util_funcs.h \
 	ucd-snmp-4.2.5/var_struct.h \
 	ucd-snmp-4.2.5/version.h
-
-##dist_noinst_HEADERS = \
-##	$(nobase_pkginclude_HEADERS)
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

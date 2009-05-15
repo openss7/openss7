@@ -60,38 +60,26 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 openss7_man_MANS = \
-	man1/oc.1 \
-	man1/pafd.1 \
-	man1/psfd.1 \
-	man1/rwf.1 \
 	man1/strchg.1 \
 	man1/strconf.1 \
 	man1/strlog.1 \
 	man1/strreset.1 \
-	man1/xxx.1 \
 	man2/fattach.2 \
-	man2/fcntl.2 \
 	man2/fcntl.2s \
 	man2/fdetach.2 \
 	man2/getmsg.2 \
 	man2/getpmsg.2s \
 	man2/ioctl.2s \
 	man2/isastream.2 \
-	man2/pipe.2 \
 	man2/pipe.2s \
-	man2/poll.2 \
 	man2/poll.2s \
 	man2/putmsg.2 \
 	man2/putpmsg.2s \
-	man2/read.2 \
 	man2/read.2s \
-	man2/readv.2 \
 	man2/readv.2s \
 	man2/soon.2 \
 	man2/streamio.2 \
-	man2/write.2 \
 	man2/write.2s \
-	man2/writev.2 \
 	man2/writev.2s \
 	man3/accept.3 \
 	man3/ap_bind.3 \
@@ -129,7 +117,6 @@ openss7_man_MANS = \
 	man3/ap_save.3 \
 	man3/ap_set_env.3 \
 	man3/ap_snd.3 \
-	man3/ap_xxx.3 \
 	man3/bind.3 \
 	man3/cdi_allow_input_req.3 \
 	man3/cdiapi.3 \
@@ -168,7 +155,6 @@ openss7_man_MANS = \
 	man3/cdi_wait_ack.3 \
 	man3/cdi_write_data.3 \
 	man3/cdi_xray_req.3 \
-	man3/cdi_xxx.3 \
 	man3/cframe.3 \
 	man3/connect.3 \
 	man3/DLPI.3 \
@@ -263,7 +249,6 @@ openss7_man_MANS = \
 	man3/dlpi_xid_req.3 \
 	man3/dlpi_xid_res.3 \
 	man3/dlpi_xray_req.3 \
-	man3/dlpi_xxx.3 \
 	man3/ds_abandon.3 \
 	man3/ds_add_entry.3 \
 	man3/ds_bind.3 \
@@ -379,7 +364,6 @@ openss7_man_MANS = \
 	man3/mp_unbind.3 \
 	man3/mp_validate_object.3 \
 	man3/mp_wait.3 \
-	man3/mp_xxx.3 \
 	man3/ms_bind.3 \
 	man3/ms_cancel_submission.3 \
 	man3/ms_check_alert.3 \
@@ -415,7 +399,6 @@ openss7_man_MANS = \
 	man3/npi_ascii_facil.3 \
 	man3/npi_bind_ascii_nsap.3 \
 	man3/npi_bind_nsap.3 \
-	man3/npi_conenct.3 \
 	man3/npi_connect.3 \
 	man3/npi_connect_req.3 \
 	man3/npi_connect_wait.3 \
@@ -475,7 +458,6 @@ openss7_man_MANS = \
 	man3/npi_x25_registration_cause.3 \
 	man3/npi_x25_reset_cause.3 \
 	man3/npi_x25_restart_cause.3 \
-	man3/npi_xxx.3 \
 	man3/nsap2net.3 \
 	man3/OM_boolean.3 \
 	man3/om_copy.3 \
@@ -509,7 +491,6 @@ openss7_man_MANS = \
 	man3/OM_value_position.3 \
 	man3/OM_workspace.3 \
 	man3/om_write.3 \
-	man3/om_xxx.3 \
 	man3/OSI.3 \
 	man3/osi.3 \
 	man3/padent.3 \
@@ -527,7 +508,6 @@ openss7_man_MANS = \
 	man3/pu_map_npi_lpa_to_handle.3 \
 	man3/pu_strerror.3 \
 	man3/put_npi_proto.3 \
-	man3/pu_xxx.3 \
 	man3/recv.3 \
 	man3/recvfrom.3 \
 	man3/recvmsg.3 \
@@ -747,7 +727,6 @@ openss7_man_MANS = \
 	man3/xti_udp.3 \
 	man3/xti_x25.3 \
 	man3/XX25.3 \
-	man3/xxx.3 \
 	man4/aal1.4 \
 	man4/aal2.4 \
 	man4/aal5.4 \
@@ -833,9 +812,7 @@ openss7_man_MANS = \
 	man4/echo.4 \
 	man4/egp.4 \
 	man4/eth.4 \
-	man4/fifo.4 \
 	man4/fifo.4s \
-	man4/fifo.old.4 \
 	man4/fr.4 \
 	man4/ggp.4 \
 	man4/gr303.4 \
@@ -1210,7 +1187,6 @@ openss7_man_MANS = \
 	man4/xot.4 \
 	man4/xtios.4 \
 	man4/xx25.4 \
-	man4/xxx.4 \
 	man5/ap_env_file.5 \
 	man5/autopush.5 \
 	man5/extraformat.5 \
@@ -1230,34 +1206,15 @@ openss7_man_MANS = \
 	man5/qosformat.5 \
 	man5/sdlconf.5 \
 	man5/sdtconf.5 \
-	man5/sigtran.5 \
 	man5/sigtran.conf.5 \
 	man5/slconf.5 \
 	man5/sock2path.5 \
 	man5/soon.5 \
 	man5/specfs.5 \
 	man5/strapush.5 \
-	man5/stratm.5 \
-	man5/strbcm.5 \
-	man5/strchan.5 \
-	man5/strcompat.5 \
 	man5/strconf_config.5 \
-	man5/streams.5 \
-	man5/strinet.5 \
 	man5/strioctl.5 \
-	man5/strisdn.5 \
-	man5/striso.5 \
-	man5/strnsl.5 \
-	man5/strsctp.5 \
 	man5/strsetup.conf.5 \
-	man5/strsock.5 \
-	man5/strss7.5 \
-	man5/strtty.5 \
-	man5/strutil.5 \
-	man5/strvoip.5 \
-	man5/strx25.5 \
-	man5/strxnet.5 \
-	man5/strxns.5 \
 	man5/wanmapconf.5 \
 	man5/wantemplate.5 \
 	man5/x25conf.5 \
@@ -1270,7 +1227,6 @@ openss7_man_MANS = \
 	man5/xmp.h.5 \
 	man5/xmp_snmp.h.5 \
 	man5/xom.h.5 \
-	man5/xxx.5 \
 	man7/A_ABORT_IND.7 \
 	man7/A_ABORT_REQ.7 \
 	man7/A_ASSOC_CNF.7 \
@@ -2877,7 +2833,6 @@ openss7_man_MANS = \
 	man7/ua_as_lm.7 \
 	man7/WAN.7 \
 	man7/wan.7 \
-	man7/xxx.7 \
 	man8/acb56.8 \
 	man8/asn1.8 \
 	man8/autopush.8 \
@@ -2937,6 +2892,7 @@ openss7_man_MANS = \
 	man8/mtpconfig.8 \
 	man8/mxmib.8 \
 	man8/nuimap.8 \
+	man8/openss7_mknod.8 \
 	man8/osinetd.8 \
 	man8/perftest.8 \
 	man8/perftestn.8 \
@@ -2948,10 +2904,8 @@ openss7_man_MANS = \
 	man8/sdl.8 \
 	man8/sdlconfig.8 \
 	man8/sdl_udp.8 \
-	man8/sdl_xxx.8 \
 	man8/sdt.8 \
 	man8/sigtran.8 \
-	man8/sigtran_mknod.8 \
 	man8/sl.8 \
 	man8/slconfd.8 \
 	man8/slconfig.8 \
@@ -2970,21 +2924,13 @@ openss7_man_MANS = \
 	man8/ss7statsd.8 \
 	man8/ss7_undoc.8 \
 	man8/strace.8 \
-	man8/stratm_mknod.8 \
-	man8/strbcm_mknod.8 \
-	man8/strchan_mknod.8 \
 	man8/strclean.8 \
-	man8/strcompat_mknod.8 \
 	man8/strconf.8 \
 	man8/streams.8 \
 	man8/streamsd.8 \
-	man8/streams_mknod.8 \
 	man8/streams.sh.8 \
 	man8/strerr.8 \
-	man8/strinet_mknod.8 \
 	man8/strinfo.8 \
-	man8/strisdn_mknod.8 \
-	man8/striso_mknod.8 \
 	man8/strload.8 \
 	man8/strlogd.8 \
 	man8/strmakenodes.8 \
@@ -2992,19 +2938,10 @@ openss7_man_MANS = \
 	man8/strms_down.8 \
 	man8/strms_status.8 \
 	man8/strms_up.8 \
-	man8/strsctp_mknod.8 \
 	man8/strsetup.8 \
-	man8/strsock_mknod.8 \
-	man8/strss7_mknod.8 \
 	man8/strtst.8 \
-	man8/strtty_mknod.8 \
 	man8/strtune.8 \
-	man8/strutil_mknod.8 \
 	man8/strvf.8 \
-	man8/strvoip_mknod.8 \
-	man8/strx25_mknod.8 \
-	man8/strxnet_mknod.8 \
-	man8/strxns_mknod.8 \
 	man8/sua.8 \
 	man8/tcap.8 \
 	man8/tcapconf.8 \
@@ -3079,7 +3016,6 @@ openss7_man_MANS = \
 	man8/test-xnet_thr.8 \
 	man8/test-xnsl.8 \
 	man8/test-xnsl_thr.8 \
-	man8/test-xxx.8 \
 	man8/thrtst.8 \
 	man8/timetst.8 \
 	man8/tua.8 \
@@ -3101,7 +3037,6 @@ openss7_man_MANS = \
 	man8/x400config.8 \
 	man8/x400pconf.8 \
 	man8/x400pmib.8 \
-	man8/xxx.8 \
 	man9/adjmsg.9 \
 	man9/admin.9s \
 	man9/aixcompat.9 \
@@ -3770,7 +3705,6 @@ openss7_man_MANS = \
 	man9/mi_zalloc.9 \
 	man9/mi_zalloc_sleep.9 \
 	man9/mkiocb.9 \
-	man9/mknod.9 \
 	man9/M_LETSPLAY.9 \
 	man9/M_MI.9 \
 	man9/M_NOTIFY.9 \
@@ -4161,35 +4095,7 @@ openss7_man_MANS = \
 	man9/weld_fcn_t.9 \
 	man9/weldq.9 \
 	man9/WR.9 \
-	man9/__wrap_memcmp.9 \
-	man9/__wrap_memcpy.9 \
-	man9/__wrap_memset.9 \
-	man9/__wrap_strcat.9 \
-	man9/__wrap_strchr.9 \
-	man9/__wrap_strcmp.9 \
-	man9/__wrap_strcpy.9 \
-	man9/__wrap_strlen.9 \
-	man9/__wrap_strncat.9 \
-	man9/__wrap_strncmp.9 \
-	man9/__wrap_strncpy.9 \
-	man9/__wrap_strnicmp.9 \
-	man9/__wrap_strrchr.9 \
-	man9/__wrap_strstr.9 \
 	man9/xmsgsize.9 \
-	man9/xxx.9 \
-	man9/xxxaix.9 \
-	man9/xxxhpux.9 \
-	man9/xxxirix.9 \
-	man9/xxxmac.9 \
-	man9/xxxmi.9 \
-	man9/xxxmps.9 \
-	man9/xxxosf.9 \
-	man9/xxxsun.9 \
-	man9/xxxsux.9 \
-	man9/xxxsvr3.9 \
-	man9/xxxsvr.9 \
-	man9/xxxuw7.9 \
-	man9/xxxuxp.9 \
 	man9/zaptel.9 \
 	man9/zt_alarm_notify.9 \
 	man9/zt_dtmf_tone.9 \
@@ -4215,38 +4121,26 @@ openss7_man_MANS = \
 man_MANS	= $(openss7_man_MANS)
 
 openss7_dist_noinst_MANS = \
-	man1/oc.1.man \
-	man1/pafd.1.man \
-	man1/psfd.1.man \
-	man1/rwf.1.man \
 	man1/strchg.1.man \
 	man1/strconf.1.man \
 	man1/strlog.1.man \
 	man1/strreset.1.man \
-	man1/xxx.1.man \
 	man2/fattach.2.man \
-	man2/fcntl.2.man \
 	man2/fcntl.2s.man \
 	man2/fdetach.2.man \
 	man2/getmsg.2.man \
 	man2/getpmsg.2s.man \
 	man2/ioctl.2s.man \
 	man2/isastream.2.man \
-	man2/pipe.2.man \
 	man2/pipe.2s.man \
-	man2/poll.2.man \
 	man2/poll.2s.man \
 	man2/putmsg.2.man \
 	man2/putpmsg.2s.man \
-	man2/read.2.man \
 	man2/read.2s.man \
-	man2/readv.2.man \
 	man2/readv.2s.man \
 	man2/soon.2.man \
 	man2/streamio.2.man \
-	man2/write.2.man \
 	man2/write.2s.man \
-	man2/writev.2.man \
 	man2/writev.2s.man \
 	man3/accept.3.man \
 	man3/ap_bind.3.man \
@@ -4284,7 +4178,6 @@ openss7_dist_noinst_MANS = \
 	man3/ap_save.3.man \
 	man3/ap_set_env.3.man \
 	man3/ap_snd.3.man \
-	man3/ap_xxx.3.man \
 	man3/bind.3.man \
 	man3/cdi_allow_input_req.3.man \
 	man3/cdiapi.3.man \
@@ -4323,7 +4216,6 @@ openss7_dist_noinst_MANS = \
 	man3/cdi_wait_ack.3.man \
 	man3/cdi_write_data.3.man \
 	man3/cdi_xray_req.3.man \
-	man3/cdi_xxx.3.man \
 	man3/cframe.3.man \
 	man3/connect.3.man \
 	man3/DLPI.3.man \
@@ -4418,7 +4310,6 @@ openss7_dist_noinst_MANS = \
 	man3/dlpi_xid_req.3.man \
 	man3/dlpi_xid_res.3.man \
 	man3/dlpi_xray_req.3.man \
-	man3/dlpi_xxx.3.man \
 	man3/ds_abandon.3.man \
 	man3/ds_add_entry.3.man \
 	man3/ds_bind.3.man \
@@ -4534,7 +4425,6 @@ openss7_dist_noinst_MANS = \
 	man3/mp_unbind.3.man \
 	man3/mp_validate_object.3.man \
 	man3/mp_wait.3.man \
-	man3/mp_xxx.3.man \
 	man3/ms_bind.3.man \
 	man3/ms_cancel_submission.3.man \
 	man3/ms_check_alert.3.man \
@@ -4570,7 +4460,6 @@ openss7_dist_noinst_MANS = \
 	man3/npi_ascii_facil.3.man \
 	man3/npi_bind_ascii_nsap.3.man \
 	man3/npi_bind_nsap.3.man \
-	man3/npi_conenct.3.man \
 	man3/npi_connect.3.man \
 	man3/npi_connect_req.3.man \
 	man3/npi_connect_wait.3.man \
@@ -4630,7 +4519,6 @@ openss7_dist_noinst_MANS = \
 	man3/npi_x25_registration_cause.3.man \
 	man3/npi_x25_reset_cause.3.man \
 	man3/npi_x25_restart_cause.3.man \
-	man3/npi_xxx.3.man \
 	man3/nsap2net.3.man \
 	man3/OM_boolean.3.man \
 	man3/om_copy.3.man \
@@ -4664,7 +4552,6 @@ openss7_dist_noinst_MANS = \
 	man3/OM_value_position.3.man \
 	man3/OM_workspace.3.man \
 	man3/om_write.3.man \
-	man3/om_xxx.3.man \
 	man3/OSI.3.man \
 	man3/osi.3.man \
 	man3/padent.3.man \
@@ -4682,7 +4569,6 @@ openss7_dist_noinst_MANS = \
 	man3/pu_map_npi_lpa_to_handle.3.man \
 	man3/pu_strerror.3.man \
 	man3/put_npi_proto.3.man \
-	man3/pu_xxx.3.man \
 	man3/recv.3.man \
 	man3/recvfrom.3.man \
 	man3/recvmsg.3.man \
@@ -4902,7 +4788,6 @@ openss7_dist_noinst_MANS = \
 	man3/xti_udp.3.man \
 	man3/xti_x25.3.man \
 	man3/XX25.3.man \
-	man3/xxx.3.man \
 	man4/aal1.4.man \
 	man4/aal2.4.man \
 	man4/aal5.4.man \
@@ -4988,9 +4873,7 @@ openss7_dist_noinst_MANS = \
 	man4/echo.4.man \
 	man4/egp.4.man \
 	man4/eth.4.man \
-	man4/fifo.4.man \
 	man4/fifo.4s.man \
-	man4/fifo.old.4.man \
 	man4/fr.4.man \
 	man4/ggp.4.man \
 	man4/gr303.4.man \
@@ -5365,7 +5248,6 @@ openss7_dist_noinst_MANS = \
 	man4/xot.4.man \
 	man4/xtios.4.man \
 	man4/xx25.4.man \
-	man4/xxx.4.man \
 	man5/ap_env_file.5.man \
 	man5/autopush.5.man \
 	man5/extraformat.5.man \
@@ -5385,34 +5267,15 @@ openss7_dist_noinst_MANS = \
 	man5/qosformat.5.man \
 	man5/sdlconf.5.man \
 	man5/sdtconf.5.man \
-	man5/sigtran.5.man \
 	man5/sigtran.conf.5.man \
 	man5/slconf.5.man \
 	man5/sock2path.5.man \
 	man5/soon.5.man \
 	man5/specfs.5.man \
 	man5/strapush.5.man \
-	man5/stratm.5.man \
-	man5/strbcm.5.man \
-	man5/strchan.5.man \
-	man5/strcompat.5.man \
 	man5/strconf_config.5.man \
-	man5/streams.5.man \
-	man5/strinet.5.man \
 	man5/strioctl.5.man \
-	man5/strisdn.5.man \
-	man5/striso.5.man \
-	man5/strnsl.5.man \
-	man5/strsctp.5.man \
 	man5/strsetup.conf.5.man \
-	man5/strsock.5.man \
-	man5/strss7.5.man \
-	man5/strtty.5.man \
-	man5/strutil.5.man \
-	man5/strvoip.5.man \
-	man5/strx25.5.man \
-	man5/strxnet.5.man \
-	man5/strxns.5.man \
 	man5/wanmapconf.5.man \
 	man5/wantemplate.5.man \
 	man5/x25conf.5.man \
@@ -5425,7 +5288,6 @@ openss7_dist_noinst_MANS = \
 	man5/xmp.h.5.man \
 	man5/xmp_snmp.h.5.man \
 	man5/xom.h.5.man \
-	man5/xxx.5.man \
 	man7/A_ABORT_IND.7.man \
 	man7/A_ABORT_REQ.7.man \
 	man7/A_ASSOC_CNF.7.man \
@@ -7032,7 +6894,6 @@ openss7_dist_noinst_MANS = \
 	man7/ua_as_lm.7.man \
 	man7/WAN.7.man \
 	man7/wan.7.man \
-	man7/xxx.7.man \
 	man8/acb56.8.man \
 	man8/asn1.8.man \
 	man8/autopush.8.man \
@@ -7092,6 +6953,7 @@ openss7_dist_noinst_MANS = \
 	man8/mtpconfig.8.man \
 	man8/mxmib.8.man \
 	man8/nuimap.8.man \
+	man8/openss7_mknod.8.man \
 	man8/osinetd.8.man \
 	man8/perftest.8.man \
 	man8/perftestn.8.man \
@@ -7103,10 +6965,8 @@ openss7_dist_noinst_MANS = \
 	man8/sdl.8.man \
 	man8/sdlconfig.8.man \
 	man8/sdl_udp.8.man \
-	man8/sdl_xxx.8.man \
 	man8/sdt.8.man \
 	man8/sigtran.8.man \
-	man8/sigtran_mknod.8.man \
 	man8/sl.8.man \
 	man8/slconfd.8.man \
 	man8/slconfig.8.man \
@@ -7125,21 +6985,13 @@ openss7_dist_noinst_MANS = \
 	man8/ss7statsd.8.man \
 	man8/ss7_undoc.8.man \
 	man8/strace.8.man \
-	man8/stratm_mknod.8.man \
-	man8/strbcm_mknod.8.man \
-	man8/strchan_mknod.8.man \
 	man8/strclean.8.man \
-	man8/strcompat_mknod.8.man \
 	man8/strconf.8.man \
 	man8/streams.8.man \
 	man8/streamsd.8.man \
-	man8/streams_mknod.8.man \
 	man8/streams.sh.8.man \
 	man8/strerr.8.man \
-	man8/strinet_mknod.8.man \
 	man8/strinfo.8.man \
-	man8/strisdn_mknod.8.man \
-	man8/striso_mknod.8.man \
 	man8/strload.8.man \
 	man8/strlogd.8.man \
 	man8/strmakenodes.8.man \
@@ -7147,19 +6999,10 @@ openss7_dist_noinst_MANS = \
 	man8/strms_down.8.man \
 	man8/strms_status.8.man \
 	man8/strms_up.8.man \
-	man8/strsctp_mknod.8.man \
 	man8/strsetup.8.man \
-	man8/strsock_mknod.8.man \
-	man8/strss7_mknod.8.man \
 	man8/strtst.8.man \
-	man8/strtty_mknod.8.man \
 	man8/strtune.8.man \
-	man8/strutil_mknod.8.man \
 	man8/strvf.8.man \
-	man8/strvoip_mknod.8.man \
-	man8/strx25_mknod.8.man \
-	man8/strxnet_mknod.8.man \
-	man8/strxns_mknod.8.man \
 	man8/sua.8.man \
 	man8/tcap.8.man \
 	man8/tcapconf.8.man \
@@ -7234,7 +7077,6 @@ openss7_dist_noinst_MANS = \
 	man8/test-xnet_thr.8.man \
 	man8/test-xnsl.8.man \
 	man8/test-xnsl_thr.8.man \
-	man8/test-xxx.8.man \
 	man8/thrtst.8.man \
 	man8/timetst.8.man \
 	man8/tua.8.man \
@@ -7256,7 +7098,6 @@ openss7_dist_noinst_MANS = \
 	man8/x400config.8.man \
 	man8/x400pconf.8.man \
 	man8/x400pmib.8.man \
-	man8/xxx.8.man \
 	man9/adjmsg.9.man \
 	man9/admin.9s.man \
 	man9/aixcompat.9.man \
@@ -7925,7 +7766,6 @@ openss7_dist_noinst_MANS = \
 	man9/mi_zalloc.9.man \
 	man9/mi_zalloc_sleep.9.man \
 	man9/mkiocb.9.man \
-	man9/mknod.9.man \
 	man9/M_LETSPLAY.9.man \
 	man9/M_MI.9.man \
 	man9/M_NOTIFY.9.man \
@@ -8316,36 +8156,7 @@ openss7_dist_noinst_MANS = \
 	man9/weld_fcn_t.9.man \
 	man9/weldq.9.man \
 	man9/WR.9.man \
-	man9/__wrap_memcmp.9.man \
-	man9/__wrap_memcpy.9.man \
-	man9/__wrap_memset.9.man \
-	man9/__wrap_strcat.9.man \
-	man9/__wrap_strchr.9.man \
-	man9/__wrap_strcmp.9.man \
-	man9/__wrap_strcpy.9.man \
-	man9/__wrap_strlen.9.man \
-	man9/__wrap_strncat.9.man \
-	man9/__wrap_strncmp.9.man \
-	man9/__wrap_strncpy.9.man \
-	man9/__wrap_strnicmp.9.man \
-	man9/__wrap_strrchr.9.man \
-	man9/__wrap_strstr.9.man \
 	man9/xmsgsize.9.man \
-	man9/xxx.9.man \
-	man9/xxxaix.9.man \
-	man9/xxxhpux.9.man \
-	man9/xxxirix.9.man \
-	man9/xxxlis.9.man \
-	man9/xxxmac.9.man \
-	man9/xxxmi.9.man \
-	man9/xxxmps.9.man \
-	man9/xxxosf.9.man \
-	man9/xxxsun.9.man \
-	man9/xxxsux.9.man \
-	man9/xxxsvr3.9.man \
-	man9/xxxsvr.9.man \
-	man9/xxxuw7.9.man \
-	man9/xxxuxp.9.man \
 	man9/zaptel.9.man \
 	man9/zt_alarm_notify.9.man \
 	man9/zt_dtmf_tone.9.man \
@@ -8367,6 +8178,58 @@ openss7_dist_noinst_MANS = \
 	man9/zt_transmit.9.man \
 	man9/zt_txtone_nextsample.9.man \
 	man9/zt_unregister.9.man
+
+man_templates = \
+	man1/xxx.1.man \
+	man3/ap_xxx.3.man \
+	man3/cdi_xxx.3.man \
+	man3/dlpi_xxx.3.man \
+	man3/mp_xxx.3.man \
+	man3/npi_xxx.3.man \
+	man3/om_xxx.3.man \
+	man3/pu_xxx.3.man \
+	man3/xxx.3.man \
+	man4/xxx.4.man \
+	man5/xxx.5.man \
+	man7/xxx.7.man \
+	man8/sdl_xxx.8.man \
+	man8/test-xxx.8.man \
+	man8/xxx.8.man \
+	man9/xxx.9.man \
+	man9/xxxaix.9.man \
+	man9/xxxhpux.9.man \
+	man9/xxxirix.9.man \
+	man9/xxxmac.9.man \
+	man9/xxxmi.9.man \
+	man9/xxxmps.9.man \
+	man9/xxxosf.9.man \
+	man9/xxxsun.9.man \
+	man9/xxxsux.9.man \
+	man9/xxxsvr3.9.man \
+	man9/xxxsvr.9.man \
+	man9/xxxuw7.9.man \
+	man9/xxxuxp.9.man
+
+old_subpackage_pages = \
+	man5/streams.5.man \
+	man5/strcompat.5.man \
+	man5/strbcm.5.man \
+	man5/strutil.5.man \
+	man5/strtty.5.man \
+	man5/strchan.5.man \
+	man5/strxns.5.man \
+	man5/strxnet.5.man \
+	man5/strnsl.5.man \
+	man5/strsock.5.man \
+	man5/strinet.5.man \
+	man5/strsctp.5.man \
+	man5/strx25.5.man \
+	man5/striso.5.man \
+	man5/strisdn.5.man \
+	man5/stratm.5.man \
+	man5/strss7.5.man \
+	man5/sigtran.5.man \
+	man5/strvoip.5.man
 
 dist_noinst_MANS = $(openss7_dist_noinst_MANS)
 

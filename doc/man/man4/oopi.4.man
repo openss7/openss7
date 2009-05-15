@@ -182,7 +182,7 @@ xmp c306
 .]
 These library interfaces, based on XOM,
 .[
-xom osi
+xom c607
 .]
 provide services via the APLI/XAP libraries which utilize almost exclusively the
 .B oopi
