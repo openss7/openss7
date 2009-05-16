@@ -141,7 +141,7 @@ header file contain defintions for the OM interface.
 .PP
 XOM.
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

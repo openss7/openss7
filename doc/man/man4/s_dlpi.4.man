@@ -147,7 +147,7 @@ The \fBS_DLPI\fP module is a pushable \fISTREAMS\fP(9) module that performs
 conversion between the Spider
 .IR "Link Layer Interface (LLI)" ,
 .[
-lli revision 0.9.2
+lli @PACKAGE_VERSION@
 .]
 interface at the lower service interface, and the
 .IR "Data Link Provider Interface (DLPI)" ,
@@ -163,7 +163,7 @@ at the upper service interface.
 This is a pushable module that converts between the Link Layer Interface
 (LLI),
 .[
-lli revision 0.9.2
+lli @PACKAGE_VERSION@
 .]
 .BR lli (7),
 and the Data Link Provider Interface (DLPI),
@@ -281,7 +281,7 @@ dlpi revision 2.0.0
 .]
 .IR LLI .
 .[
-lli revision 0.9.2
+lli @PACKAGE_VERSION@
 .]
 .\"
 .\"
@@ -314,7 +314,7 @@ dlpi revision 2.0.0
 The lower service interface conforms to Version 3 of the
 .IR "Link Layer Interface " ( LLI ),
 .[
-lli revision 0.9.2
+lli @PACKAGE_VERSION@
 .]
 .BR lli (7).
 .\"

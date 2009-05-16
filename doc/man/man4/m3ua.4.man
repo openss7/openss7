@@ -273,10 +273,10 @@ call and provides the
 .B MTP
 interface using XTI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 as described in
 .BR xti_mtp (3).

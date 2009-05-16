@@ -118,7 +118,7 @@ the
 .IR GCOM -specific,
 CDI
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 API Library.
 .[
@@ -304,7 +304,7 @@ For further compatibility information, see
 .PP
 CDI,
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 and
 .I GCOM
@@ -318,7 +318,7 @@ cdiapi
 .PP
 The Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 was developed by NCR Comten.

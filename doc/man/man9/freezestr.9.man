@@ -116,8 +116,6 @@ search-ignore T
 .PP
 .B #undef _SUN_SOURCE
 .br
-.B #undef _LIS_SOURCE
-.br
 .B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
@@ -126,8 +124,6 @@ search-ignore T
 .sp 2
 .PP
 .B #define _SUN_SOURCE
-.br
-.B #define _LIS_SOURCE
 .br
 .B #include <sys/stream.h>
 .br
@@ -320,16 +316,9 @@ For compatibility with
 .[
 solspg
 .]
-and
-.IR LiS ,
-.[
-lis
-.]
 if
 .B _SUN_SOURCE
-or
-.B _LIS_SOURCE
-are defined before including the
+is defined before including the
 .I stream.h
 and
 .I ddi.h
@@ -354,9 +343,7 @@ uw7spg
 .]
 if
 .B _SUN_SOURCE
-and
-.B _LIS_SOURCE
-are undefined before including the
+is undefined before including the
 .I stream.h
 and
 .I ddi.h
@@ -813,10 +800,9 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR "SVR 4.2 MP DDI/DKI" ,
 .IR Solaris \(rg,
-.IR SUPER-UX \(rg,
-.IR UnixWare \(rg,
+.IR SUPER-UX \(rg
 and
-.IR LiS
+.IR UnixWare \(rg
 provide this function.
 .[
 usldk
@@ -829,9 +815,6 @@ suxspg
 .]
 .[
 uw7spg
-.]
-.[
-lis
 .]
 .IR IRIX \(rg
 documents support for the function
@@ -894,100 +877,35 @@ non-MP, and as a non-MP version did not require
 functions.
 .IP ""
 .IR Solaris \(rg
-and
-.IR LiS
-provide the function prototype:
+provides the function prototype:
 .BI "void freezestr(queue_t *" q ).
 .[
 soldoc
 .]
-.[
-lis
-.]
 All the others provide the prototype
 .BI "pl_t freezestr(queue_t *" q ).
 For compatibility with
-.IR Solaris \(rg
-and
-.IR LiS ,
+.IR Solaris \(rg,
 the software priority level otherwise returned by
 .BR freezestr ()
 is stored internally as well as being returned.
 .[
 soldoc
 .]
-.[
-lis
-.]
 .BR unfreezestr (9)
 will access this internal software priority level to restore when the
 .IR Solaris \(rg
-or
-.IR LiS
 version of
 .BR unfreezestr (9)
 is called.
 .[
 soldoc
 .]
-.[
-lis
-.]
 .IP ""
 Portable
 .I STREAMS
 drivers and modules will avoid using
 .BR freezestr ().
-.IP \(em
-.BR freezestr ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-.IR "LiS 2.16" ,
-and previous versions,
-did not implement
-.BR freezestr ().
-.I LiS 2.18
-implements the function, but
-has a particularly broken implementation.
-.[
-lis
-.]
-Under
-.IR LiS ,
-.BR freezestr ()
-only sets a flag (in a non-MP-safe way) on the
-Stream head
-and queue pair,
-.IR q .
-It does not stop the
-Stream
-from being closed, flushed, or other actions taken as a result of timeouts, callbacks or buffer
-calls.
-It does not keep actions from being performed on other queues in the
-Stream.
-It incorrectly defers
-.IR qi_putp (9)
-procedure invocation (when no
-.IR qi_putp (9)
-or
-.IR qi_srvp (9)
-procedure need be running).  It does not stop running
-.IR qi_putp (9)
-or
-.IR qi_srvp (9)
-procedures from adding messages to or removing messages from any other queues in the
-Stream.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-@PACKAGE@
-.]
-in place of
-.IR LiS .
 .IP \(em
 .BR freezestr ()
 results in a kernel panic when called by the same thread for the second time for the same queue,

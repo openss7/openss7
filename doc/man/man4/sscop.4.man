@@ -205,10 +205,10 @@ library and provides
 .B SSCOP
 interface using XTI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 as described in
 .BR xti_sscop (3).

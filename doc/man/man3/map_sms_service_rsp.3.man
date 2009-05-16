@@ -102,96 +102,146 @@ search-truncate 40
 search-ignore T
 .R2
 .so openss7.macros
-.\"
-.\"
-.TH UNDOCUMENTED 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
-.\"
-.\"
+.TH MAP_XXX 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMAP Library Calls"
 .SH NAME
-.B allstream, autopush, __bufcall, cmn_err_tag, ddi_prop_op, defer_func, di_alloc, di_put,
-.B do_fattach, do_fdetach, do_spipe, esballoca, findlinks, freelk, getendq, getf, icmn_err,
-.B kmem_alloc_node, kmem_alloc_physcontig, kmem_alloc_physreq, kmem_free_physcontig,
-.B kmem_free_physreq, kmem_zalloc_node, kmem_zalloc_physreq, map_cv, maplock, mi_sprintf, mkiocb,
-.B mknod, mod_strmops, mount, msgscgth, nochpoll, nodev, nulldev, physreq_alloc, physreq_free,
-.B physreq_prep, pipe, printf, printf_UW7, qpop, qpush, qready, register_clone, register_cmajor,
-.B register_strdrv, register_strnod, rmsetwant, rmwanted, sd_get, sd_put, sealloc, sefree,
-.B setqsched, spec_dentry, spec_open, specfs_get, specfs_put,
-.B streams_interrupt, STREAMS_TIMEOUT, strgetpmsg, strioccall,
-.B strm_f_ops, strputpmsg, strrput, str_uninstall, strwsrv, sysctl_str_strctlsz,
-.B sysctl_str_strmsgsz, __timeout, udelay, unregister_clone, unregister_cmajor, unregister_strdrv,
-.B unregister_strnod, vtop, wakeup
-\- undocumented functions
+.B map_xxx
+\- map_xxx \-
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-Various.
+.B #include <xom.h>
+.br
+.B #include <xmap.h>
+.HP
+.BI "MAP_status map_xxx(
+.PD 0
+.RS
+.HP
+.BI "OM_private_object " session ,
+.HP
+.BI "OM_private_object " context ,
+.HP
+.BI "OM_private_object *" xxx_return
+.RE
+.HP
+.BI );
+.PD
 .\"
 .\"
-.SH ARGUMENTS
+.SH INTERFACE
 .PP
-Various.
+XMAP.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-These are undocumented function that still need a manual page written for them.
+This function
 .\"
 .\"
-.SH USAGE
+.SH ARGUMENTS
 .PP
+.TP
+.I session
+The management session against which this operation is performed.
+This must be a private object previously returned from
+.BR map_bind (3).
+.TP
+.I context
+The management context to be used for this operation.
+This argument must be a private object or the contant
+.RB ( MAP_DEFAULT_CONTEXT ).
 .\"
 .\"
 .SH RETURN
 .PP
+.TP
+.I status
+Indicates whether the operation was successful.
 .\"
 .\"
 .SH ERRORS
 .PP
-.\"
-.\"
-.SH CONTEXT
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error s:
+.TP
+.RB [ MAP_E_BAD_CONTEXT ]
+.PD 0
+.TP
+.RB [ MAP_E_BAD_SESSION ]
+.TP
+.RB [ MAP_E_NO_SUCH_OPERATION ]
+.TP
+.RB [ MAP_E_NOT_SUPPORTED ]
+.TP
+.RB [ MAP_E_MISCELLANEOUS ]
+.TP
+.RB [ MAP_E_SESSION_TERMINATED ]
+.PD
 .PP
-.\"
-.\"
-.SH MP-STREAMS
+This function can return a
+.BR Communications-Error .
 .PP
+Also, this function can return the error constants:
+.TP
+.RB [ MAP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MAP_INVALID_SESSION ]
+.TP
+.RB [ MAP_INSUFFICIENT_RESOURCES ]
+.PD
 .\"
 .\"
-.SH NOTICES
+.SH SEE ALSO
 .PP
-.\"
-.\"
-.SH IMPLEMENTATION
-.PP
-.\"
-.\"
-.SH "SEE ALSO"
-.PP
+.BR map_bind (3),
+.BR XMAP (3).
 .\"
 .\"
 .SH BUGS
 .PP
-These functions need a manual page.
+.BR map_xxx (3)
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+This function is compatible with
+implementations based on XMAP,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
 .PP
-See
-.BR STREAMS (9)
-for additional compatibility considerations.
+See also,
+.BR XMAP (3),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+XOM,
+.[
+xom c607
+.]
+XMAP.
 .\"
 .\"
 .SH HISTORY
 .PP
+This function first appeared in XMAP.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMAP Library.
 .\"
 .\"
 .[
 $LIST$
 .]
-.TI
+.T2

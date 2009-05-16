@@ -90,6 +90,9 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     PACKAGE_DATE=`date -I`
     AC_SUBST([PACKAGE_DATE])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_DATE], ["$PACKAGE_DATE"], [The package release date.])
+    PACKAGE_PDATE=`date '+%B %e, %Y'`
+    AC_SUBST([PACKAGE_PDATE])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_PDATE], ["$PACKAGE_PDATE"], [The package publishing date.])
     PKGINCL="include/sys/${PACKAGE_NAME}"
     AC_SUBST([PKGINCL])dnl
     PACKAGE_CVSTAG=`echo "${PACKAGE_LCNAME}-${VERSION}" | sed -e 's,-,_,g;s,\.,-,g'`

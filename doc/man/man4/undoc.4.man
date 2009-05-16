@@ -104,120 +104,93 @@ search-ignore T
 .so openss7.macros
 .\"
 .\"
-.TH UNDOCUMENTED 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols and Interfaces"
+.TH UNDOCUMENTED 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .\"
 .\"
 .SH NAME
-.B ss7_undoc
-\- undocumented SS7 protocols and interfaces
+.B undoc
+\- undocumented modules and devices
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBundocumented_interface\fR
+\fBundocumented_module\fR
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .hy 6
-These are undocumented SS7 protocols and interfaces that still need a manual page written for them.
+These are undocumented SS7 modules and devices that still need a manual page written for them.
 .TP
-.BR CC_FACILITY_IND ,
+.BR cpc388 ,
 .PD 0
 .TP
-.BR CC_FACILITY_REQ ,
+.BR dpnss ,
 .TP
-.BR CC_HOLD_CON ,
+.BR eth ,
 .TP
-.BR CC_HOLD_IND ,
+.BR fr ,
 .TP
-.BR CC_HOLD_REQ ,
+.BR gr303 ,
 .TP
-.BR CC_HOLD_RES ,
+.BR gsma ,
 .TP
-.BR cci_capi ,
+.BR h245 ,
 .TP
-.BR cci_dass ,
+.BR idlc ,
 .TP
-.BR cci_gr303 ,
+.BR m2tp ,
 .TP
-.BR cci_idlc ,
+.BR m3pa ,
 .TP
-.BR CC_REGISTER_IND ,
+.BR m3tp ,
 .TP
-.BR CC_REGISTER_REQ ,
+.BR pca200e ,
 .TP
-.BR CC_RETRIEVE_CON ,
+.BR sctp_ioctl ,
 .TP
-.BR CC_RETRIEVE_IND ,
+.BR sdl_eth ,
 .TP
-.BR CC_RETRIEVE_REQ ,
+.BR sdl_ip ,
 .TP
-.BR CC_RETRIEVE_RES ,
+.BR sdl_rtp ,
 .TP
-.BR cdi_hdlc ,
+.BR sdl_sctp ,
 .TP
-.BR dlpi_dass ,
+.BR sdl_tcp ,
 .TP
-.BR dlpi_dua ,
+.BR sdl_udp ,
 .TP
-.BR dlpi_eth ,
+.BR sipt ,
 .TP
-.BR dlpi_gr303 ,
+.BR sipt_ioctl ,
 .TP
-.BR dlpi_gr303ua ,
+.BR sscop_ioctl ,
 .TP
-.BR dlpi_iua ,
-.TP
-.BR dlpi_lapb ,
-.TP
-.BR dlpi_lapd ,
-.TP
-.BR dlpi_lapf ,
-.TP
-.BR dlpli_gr303ua ,
-.TP
-.BR isup_socket ,
-.TP
-.BR mgi_h248 ,
-.TP
-.BR mgi_mg ,
-.TP
-.BR mgi_mgcp ,
-.TP
-.BR npi_ip ,
-.TP
-.BR npi_iso ,
-.TP
-.BR npi_q933 ,
-.TP
-.BR npi_sccp ,
-.TP
-.BR npi_sctp ,
-.TP
-.BR npi_sscop ,
-.TP
-.BR N_TOKEN_ACK ,
-.TP
-.BR N_TOKEN_REQ ,
-.TP
-.BR rudp ,
-.TP
-.BR saal_sscop ,
-.TP
-.BR sccp_socket ,
-.TP
-.BR sccpi ,
-.TP
-.BR sscop ,
-.TP
-.BR sscopi ,
-.TP
-.BR tcap_socket ,
-.TP
-.BR tpi_ss7 .
+.BR v5 .
 .PD
+.\"
+.\"
+.SH USAGE
+.PP
+These symbols are usable, but usage information is not available in manual
+page format.
+.\"
+.\"
+.SH DEVICES
+.PP
+Various.
+.\"
+.\"
+.SH MODULES
+.PP
+Various.
+.\"
+.\"
+.SH IOCTLS
+.PP
+Undocumented.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -227,7 +200,7 @@ These are undocumented SS7 protocols and interfaces that still need a manual pag
 .\"
 .SH BUGS
 .PP
-These symbols and libraries need a manual page.
+These devices and modules need a manual page.
 .\"
 .\"
 .SH COMPATIBILITY

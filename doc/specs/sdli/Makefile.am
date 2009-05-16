@@ -119,7 +119,9 @@ FIG_FIGS		= \
 			  sdli13.fig \
 			  sdli14.fig \
 			  sdli15.fig \
-			  sdli16.fig
+			  sdli16.fig \
+			  sdlib1.fig \
+			  sdlic1.fig
 
 TBL_TBLS		= \
 			  lmit01.tbl \

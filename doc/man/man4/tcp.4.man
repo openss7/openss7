@@ -180,10 +180,10 @@ TPI Revision 2.0.0
 .]
 transport provider streams suitable for use with XTI,
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 (see
 .BR xti (3)).
@@ -214,10 +214,10 @@ library and provides
 .B TCP
 interface using XTI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 as described in
 .BR xti_tcp (3).
@@ -369,7 +369,7 @@ soldoc
 .PP
 XNS 5.2.
 .[
-XNS
+xns99
 .]
 Conformance is validated using the
 .BR test-inet_tcp (8)

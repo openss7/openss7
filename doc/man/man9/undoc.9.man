@@ -108,16 +108,16 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B allstream, autopush, __bufcall, cmn_err_tag, ddi_prop_op, defer_func, di_alloc, di_put,
-.B do_fattach, do_fdetach, do_spipe, esballoca, findlinks, freelk, getendq, getf, icmn_err,
+.B allstream, autopush, bcache_allocb, bcache_create, bcache_destroy, bpsize, __bufcall, cmn_err_tag, create_putlocks, ddi_prop_op, defer_func, di_alloc, di_put,
+.B do_fattach, do_fdetach, do_spipe, esballoca, findlinks, flushq_common, freelk, getendq, getf, icmn_err, infonext, isuioq,
 .B kmem_alloc_node, kmem_alloc_physcontig, kmem_alloc_physreq, kmem_free_physcontig,
 .B kmem_free_physreq, kmem_zalloc_node, kmem_zalloc_physreq, map_cv, maplock, mi_sprintf, mkiocb,
 .B mknod, mod_strmops, mount, msgscgth, nochpoll, nodev, nulldev, physreq_alloc, physreq_free,
-.B physreq_prep, pipe, printf, printf_UW7, qpop, qpush, qready, register_clone, register_cmajor,
+.B physreq_prep, pipe, printf, printf_UW7, QNAME, qpop, qpush, qready, qwait_rw, reallocb, register_clone, register_cmajor,
 .B register_strdrv, register_strnod, rmsetwant, rmwanted, sd_get, sd_put, sealloc, sefree,
-.B setqsched, spec_dentry, spec_open, specfs_get, specfs_put,
-.B streams_interrupt, STREAMS_TIMEOUT, strgetpmsg, strioccall,
-.B strm_f_ops, strputpmsg, strrput, str_uninstall, strwsrv, sysctl_str_strctlsz,
+.B setqsched, sparc_ioremap, spec_dentry, spec_open, specfs_get, specfs_put,
+.B straln, strbcpy, streams_interrupt, STREAMS_TIMEOUT, strgetpmsg, strioccall,
+.B strm_f_ops, strputpmsg, strrput, str_uninstall, struioget, struioput, strwakeq, strwsrv, sysctl_str_strctlsz,
 .B sysctl_str_strmsgsz, __timeout, udelay, unregister_clone, unregister_cmajor, unregister_strdrv,
 .B unregister_strnod, vtop, wakeup
 \- undocumented functions

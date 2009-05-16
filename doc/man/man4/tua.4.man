@@ -206,10 +206,10 @@ call and provides the
 .B TCAP
 interface using XTI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 as described in
 .BR xti_tcap (3).

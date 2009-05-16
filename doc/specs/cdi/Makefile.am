@@ -64,12 +64,17 @@ info_TEXINFOS		+= cdi.texi
 cdi.h: $(top_srcdir)/src/include/sys/cdi.h
 	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
-CLEANFILES += cdi.h
+cdiapi.h: $(top_srcdir)/src/include/cdiapi.h
+	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+
+CLEANFILES += cdi.h cdiapi.h
 
 cdi_TEXINFOS		= \
 			  cdi.h \
+			  cdiapi.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
-			  $(top_srcdir)/scripts/texi/versions.texi
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/prims.texi
 
 if MAINTAINER_MODE
 if AMDEP

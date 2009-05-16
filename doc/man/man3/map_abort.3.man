@@ -102,82 +102,146 @@ search-truncate 40
 search-ignore T
 .R2
 .so openss7.macros
-.\"
-.\"
-.TH UNDOC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
-.\"
-.\"
+.TH MAP_XXX 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 XMAP Library Calls"
 .SH NAME
-.B bicc, bua, cpc388, h225, h323confd, isdn, isdnconfd, isua, isup, iua, m2pa, m2tp, m2ua, m3tp,
-.B m3ua, mgconfd, mtp, sccp, sctp, sdl, sdt, sigtran, sl, sls, soip, isdn, isdnconfd, isdnd, sua, tcap,
-.B tua, uaconfd, voipconfd
-\- undocumented commands
+.B map_xxx
+\- map_xxx \-
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
-\fBundocumented_utility\fR
+.B #include <xom.h>
+.br
+.B #include <xmap.h>
+.HP
+.BI "MAP_status map_xxx(
+.PD 0
+.RS
+.HP
+.BI "OM_private_object " session ,
+.HP
+.BI "OM_private_object " context ,
+.HP
+.BI "OM_private_object *" xxx_return
+.RE
+.HP
+.BI );
+.PD
 .\"
 .\"
-.SH OPTIONS
+.SH INTERFACE
 .PP
-Various.
-.TP
-.BR -h ", " --help
-.TP
-.BR -V ", " --version
-.TP
-.BR -C ", " --copying
+XMAP.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.hy 6
-These are undocumented ISDN utilities that still need a manual page written for them.
+This function
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I session
+The management session against which this operation is performed.
+This must be a private object previously returned from
+.BR map_bind (3).
+.TP
+.I context
+The management context to be used for this operation.
+This argument must be a private object or the contant
+.RB ( MAP_DEFAULT_CONTEXT ).
 .\"
 .\"
 .SH RETURN
 .PP
-Various
-.\"
-.\"
-.SH DIAGNOSTICS
-.PP
-Unknown.
+.TP
+.I status
+Indicates whether the operation was successful.
 .\"
 .\"
 .SH ERRORS
 .PP
-Various.
+This function can return a
+.B System-Error
+or one of the following
+.BR Library-Error s:
+.TP
+.RB [ MAP_E_BAD_CONTEXT ]
+.PD 0
+.TP
+.RB [ MAP_E_BAD_SESSION ]
+.TP
+.RB [ MAP_E_NO_SUCH_OPERATION ]
+.TP
+.RB [ MAP_E_NOT_SUPPORTED ]
+.TP
+.RB [ MAP_E_MISCELLANEOUS ]
+.TP
+.RB [ MAP_E_SESSION_TERMINATED ]
+.PD
+.PP
+This function can return a
+.BR Communications-Error .
+.PP
+Also, this function can return the error constants:
+.TP
+.RB [ MAP_NO_WORKSPACE ]
+.PD 0
+.TP
+.RB [ MAP_INVALID_SESSION ]
+.TP
+.RB [ MAP_INSUFFICIENT_RESOURCES ]
+.PD
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR map_bind (3),
+.BR XMAP (3).
 .\"
 .\"
 .SH BUGS
 .PP
-These symbols and libraries need a manual page.
-.\"
-.\"
-.SH "SEE ALSO"
-.PP
-.BR STREAMS (9).
+.BR map_xxx (3)
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-Unknown.
+This function is compatible with
+implementations based on XMAP,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is source compatible.  Binary compatibility was not attempted.
+.PP
+See also,
+.BR XMAP (3),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-Unknown.
+XOM,
+.[
+xom c607
+.]
+XMAP.
 .\"
 .\"
 .SH HISTORY
 .PP
-Unknown.
+This function first appeared in XMAP.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+XMAP Library.
 .\"
 .\"
 .[
 $LIST$
 .]
-.TI
+.T2

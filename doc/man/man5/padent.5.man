@@ -269,7 +269,7 @@ structure is compatible with
 NLI, and implementations based on NLI such as
 .IR SunLink \(rg,
 .[
-sunlink9
+sunlink tli
 .]
 .IR "Solaris Solstice" \(rg " X.25 9.2" ,
 .[
@@ -326,11 +326,11 @@ for additional compatiblity considerations.
 .PP
 SunLink 8.1,
 .[
-sunlink8
+sunlink tli
 .]
-SunLink 9.0.
+Solstice 9.2.
 .[
-sunlink9
+solx25pg
 .]
 The NLI is not a formal standard.  The
 .IR OpenSS7 \(tm
@@ -343,7 +343,7 @@ The
 .B padent
 structure first appears in SunLink\(rg X.25.
 .[
-sunlink9
+sunlink tli
 .]
 .PP
 The NLI is an interface originally developed by Spider Systems, Ltd. (now a

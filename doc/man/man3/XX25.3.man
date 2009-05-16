@@ -106,7 +106,7 @@ search-ignore T
 .\"
 .TH XTI_X25 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
-.B XX25
+.B xti_x25, XX25
 \- X.25 Programming Interface using XTI (XX25)
 .SH SYNOPSIS
 .PP
@@ -146,11 +146,11 @@ relevant for X.25 transport providers.  This section also describes the
 protocol-specific information that is relevant when X.25 services are provided
 over an IP network using XOT
 .[
-XOT
+rfc1613
 .]
 or an ISO-TP0 bridge.
 .[
-ISO-TP0
+rfc1086
 .]
 .PP
 This section also defines the data structures and constants required for X.25
@@ -1736,7 +1736,7 @@ dissociates the user from the PVC and normally resets the PVC.
 .\"
 .XX
 .[
-XNS99
+xns99
 .]
 .[
 XX25

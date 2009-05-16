@@ -3403,7 +3403,7 @@ extent indicated by the pointer argument to the @manref{ioctl(2)} call.
 @subsubheading @pioc{MX_IOCSCONFIG}
 
 Set the multiplex configuration.  Upon success, the multiplex configuration is read from the memory
-extent specified by the pointer argument tot he @manref{ioctl(2)} call.
+extent specified by the pointer argument to the @manref{ioctl(2)} call.
 
 @node MXI Test Configuration
 @subsection MXI Test Configuration
@@ -3750,7 +3750,7 @@ pointed to by the argument to the input-output control and set for the multiplex
 @subsection MXI Clear Notify
 @subsubheading @pioc{MX_IOCCNOTIFY}
 
-Reqeust that the events associated with the multiplex be read from the @type{mx_notify_t} structure
+Request that the events associated with the multiplex be read from the @type{mx_notify_t} structure
 pointed to by the argument to the input-output control and cleared for the multiplex.  Each bit set in
 the @member{events} member specifies an event for which notification is to be cleared.
 

@@ -132,7 +132,7 @@ staring with these letters.
 The OSI-Abstract-Data Manipulation API uses similar, though not identical, naming conventions which
 are described in XOM.
 .[
-XOM
+xom c607
 .]
 All its identifiers are prefixed by the letters '\fIOM\fP' or '\fIom\fP'.
 .PP
@@ -354,11 +354,11 @@ This is a local function.
 .PP
 XMP,
 .[
-XMP
+xmp c306
 .]
 XOM.
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

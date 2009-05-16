@@ -213,7 +213,7 @@ argument.
 On successful completion, contains a handle to a workspace in which OM objects
 can be created and manipulated.
 .[
-XOM
+xom c607
 .]
 Objects created in this workspace may be used as arguments to other interface
 functions.
@@ -287,7 +287,7 @@ XMS
 .\"
 .XX
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

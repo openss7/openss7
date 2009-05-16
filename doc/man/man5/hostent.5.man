@@ -209,9 +209,9 @@ structure has no known bugs.
 The
 .B hostent
 structure is compatible with
-SunLink\(rg and products based on SunLink\(rg,
+Solstice\(rg and products based on Solstice\(rg,
 .[
-sunlink9
+SOLX25PG
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -227,11 +227,11 @@ before including any header files to expose these symbols.
 .PP
 SunLink 8.1,
 .[
-sunlink8
+sunlink tli
 .]
-SunLink 9.0.
+Solstice 9.0.
 .[
-sunlink9
+solx25pg
 .]
 .\"
 .\"
@@ -241,7 +241,7 @@ The
 .B hostent
 structure first appears in SunLink\(rg X.25.
 .[
-sunlink9
+sunlink tli
 .]
 .\"
 .\"

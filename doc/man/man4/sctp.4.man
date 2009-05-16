@@ -464,10 +464,10 @@ rfc3873
 rfc3758
 .]
 .[
-addip-08
+addip08
 .]
 .[
-sctpig-10
+sctpig10
 .]
 .\"
 .[

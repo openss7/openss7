@@ -144,11 +144,11 @@ The
 .B gdmo
 utility program is intended to be compatible with XOM
 .[
-xom
+xom c607
 .]
 and XMP.
 .[
-xmp
+xmp c306
 .]
 .\"
 .\"
@@ -240,11 +240,11 @@ has no known bugs.
 .B gdmo
 is compatible with XOM
 .[
-xom
+xom c607
 .]
 and XMP,
 .[
-xmp
+xmp c306
 .]
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
@@ -259,11 +259,11 @@ OpenSS7 coding standards.
 .PP
 XOM,
 .[
-xom
+xom c607
 .]
 XMP.
 .[
-xmp
+xmp c306
 .]
 .\"
 .\"

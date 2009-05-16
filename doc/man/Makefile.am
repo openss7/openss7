@@ -77,7 +77,6 @@ openss7_man_MANS = \
 	man2/putpmsg.2s \
 	man2/read.2s \
 	man2/readv.2s \
-	man2/soon.2 \
 	man2/streamio.2 \
 	man2/write.2s \
 	man2/writev.2s \
@@ -330,6 +329,24 @@ openss7_man_MANS = \
 	man3/libxom.3 \
 	man3/linkidtox25.3 \
 	man3/listen.3 \
+	man3/map_abort.3 \
+	man3/map_bind.3 \
+	man3/map_close.3 \
+	man3/map_delim_req.3 \
+	man3/map_get_last_error.3 \
+	man3/map_initialize.3 \
+	man3/map_negotiate.3 \
+	man3/map_open_req.3 \
+	man3/map_open_rsp.3 \
+	man3/map_receive.3 \
+	man3/map_refuse.3 \
+	man3/map_service_req.3 \
+	man3/map_service_rsp.3 \
+	man3/map_sms_service_rcv.3 \
+	man3/map_sms_service_req.3 \
+	man3/map_sms_service_rsp.3 \
+	man3/map_unbind.3 \
+	man3/map_wait.3 \
 	man3/mp_abandon.3 \
 	man3/mp_abort.3 \
 	man3/mp_abort_req.3 \
@@ -530,13 +547,11 @@ openss7_man_MANS = \
 	man3/sockets.3 \
 	man3/socklib.3 \
 	man3/sockpath.3 \
-	man3/soon.3 \
 	man3/sp_errbuf.3 \
 	man3/sp_error.3 \
 	man3/s_pipe.3 \
 	man3/sp_perror.3 \
 	man3/sp_sperror.3 \
-	man3/ss7_undoc.3 \
 	man3/stox25.3 \
 	man3/streams.3 \
 	man3/strlog.3 \
@@ -602,6 +617,7 @@ openss7_man_MANS = \
 	man3/t_tcp_info.3 \
 	man3/t_unbind.3 \
 	man3/uaddr2taddr.3 \
+	man3/undoc.3 \
 	man3/unlockpt.3tty \
 	man3/vstrlog.3 \
 	man3/x25diags.3 \
@@ -623,90 +639,10 @@ openss7_man_MANS = \
 	man3/xds.3 \
 	man3/XFTAM.3 \
 	man3/xftam.3 \
-	man3/xhostent.3 \
 	man3/XMP.3 \
 	man3/xmp.3 \
 	man3/XMS.3 \
 	man3/xnet.3 \
-	man3/__xnet_t_accept.3 \
-	man3/__xnet_t_accept_r.3 \
-	man3/__xnet_t_addleaf.3 \
-	man3/__xnet_t_addleaf_r.3 \
-	man3/__xnet_t_alloc.3 \
-	man3/__xnet_t_alloc_r.3 \
-	man3/__xnet_t_bind.3 \
-	man3/__xnet_t_bind_r.3 \
-	man3/__xnet_t_close.3 \
-	man3/__xnet_t_close_r.3 \
-	man3/__xnet_t_connect.3 \
-	man3/__xnet_t_connect_r.3 \
-	man3/__xnet_t_errno.3 \
-	man3/__xnet_t_error.3 \
-	man3/__xnet_t_error_r.3 \
-	man3/__xnet_t_free.3 \
-	man3/__xnet_t_getinfo.3 \
-	man3/__xnet_t_getinfo_r.3 \
-	man3/__xnet_t_getprotaddr.3 \
-	man3/__xnet_t_getprotaddr_r.3 \
-	man3/__xnet_t_getstate.3 \
-	man3/__xnet_t_getstate_r.3 \
-	man3/__xnet_t_listen.3 \
-	man3/__xnet_t_listen_r.3 \
-	man3/__xnet_t_look.3 \
-	man3/__xnet_t_look_r.3 \
-	man3/__xnet_t_open.3 \
-	man3/__xnet_t_open_r.3 \
-	man3/__xnet_t_optmgmt.3 \
-	man3/__xnet_t_optmgmt_r.3 \
-	man3/__xnet_t_peek.3 \
-	man3/__xnet_t_rcv.3 \
-	man3/__xnet_t_rcvconnect.3 \
-	man3/__xnet_t_rcvconnect_r.3 \
-	man3/__xnet_t_rcvdis.3 \
-	man3/__xnet_t_rcvdis_r.3 \
-	man3/__xnet_t_rcvleafchange.3 \
-	man3/__xnet_t_rcvleafchange_r.3 \
-	man3/__xnet_t_rcvopt.3 \
-	man3/__xnet_t_rcvopt_r.3 \
-	man3/__xnet_t_rcv_r.3 \
-	man3/__xnet_t_rcvrel.3 \
-	man3/__xnet_t_rcvreldata.3 \
-	man3/__xnet_t_rcvreldata_r.3 \
-	man3/__xnet_t_rcvrel_r.3 \
-	man3/__xnet_t_rcvudata.3 \
-	man3/__xnet_t_rcvudata_r.3 \
-	man3/__xnet_t_rcvuderr.3 \
-	man3/__xnet_t_rcvuderr_r.3 \
-	man3/__xnet_t_rcvv.3 \
-	man3/__xnet_t_rcvv_r.3 \
-	man3/__xnet_t_rcvvudata.3 \
-	man3/__xnet_t_rcvvudata_r.3 \
-	man3/__xnet_t_removeleaf.3 \
-	man3/__xnet_t_removeleaf_r.3 \
-	man3/__xnet_t_snd.3 \
-	man3/__xnet_t_snddis.3 \
-	man3/__xnet_t_snddis_r.3 \
-	man3/__xnet_t_sndopt.3 \
-	man3/__xnet_t_sndopt_r.3 \
-	man3/__xnet_t_snd_r.3 \
-	man3/__xnet_t_sndrel.3 \
-	man3/__xnet_t_sndreldata.3 \
-	man3/__xnet_t_sndreldata_r.3 \
-	man3/__xnet_t_sndrel_r.3 \
-	man3/__xnet_t_sndudata.3 \
-	man3/__xnet_t_sndudata_r.3 \
-	man3/__xnet_t_sndv.3 \
-	man3/__xnet_t_sndvopt.3 \
-	man3/__xnet_t_sndvopt_r.3 \
-	man3/__xnet_t_sndv_r.3 \
-	man3/__xnet_t_sndvudata.3 \
-	man3/__xnet_t_sndvudata_r.3 \
-	man3/__xnet_t_strerror.3 \
-	man3/__xnet_t_sync.3 \
-	man3/__xnet_t_sync_r.3 \
-	man3/__xnet_t_sysconf.3 \
-	man3/__xnet_t_unbind.3 \
-	man3/__xnet_t_unbind_r.3 \
 	man3/xnsl.3 \
 	man3/XOM.3 \
 	man3/xom.3 \
@@ -849,7 +785,6 @@ openss7_man_MANS = \
 	man4/ISDN.4 \
 	man4/isdn.4 \
 	man4/isdn_ioctl.4 \
-	man4/isdn_undoc.4 \
 	man4/ISO.4 \
 	man4/iso-ip.4 \
 	man4/iso-lan.4 \
@@ -952,7 +887,6 @@ openss7_man_MANS = \
 	man4/onpi.4 \
 	man4/oopi.4 \
 	man4/OpenSS7.4 \
-	man4/openss7_soon.4 \
 	man4/otk6.4 \
 	man4/otpi.4 \
 	man4/pca200e.4 \
@@ -1020,6 +954,7 @@ openss7_man_MANS = \
 	man4/sdt.4 \
 	man4/sdt-acb56.4 \
 	man4/sdt_cd.4 \
+	man4/sdt-cd.4 \
 	man4/sdt_ioctl.4 \
 	man4/sdt_pmod.4 \
 	man4/sdt-pmod.4 \
@@ -1052,7 +987,6 @@ openss7_man_MANS = \
 	man4/s_npi.4 \
 	man4/sockmod.4 \
 	man4/socksys.4 \
-	man4/soon.4 \
 	man4/s_pipe.4 \
 	man4/spm.4 \
 	man4/spx.4 \
@@ -1069,7 +1003,6 @@ openss7_man_MANS = \
 	man4/ss7-sl-acb1.4 \
 	man4/ss7-sl-acb2.4 \
 	man4/ss7-sl-acb3.4 \
-	man4/ss7_undoc.4 \
 	man4/sscop.4 \
 	man4/sscop_ioctl.4 \
 	man4/sscop_mce.4 \
@@ -1143,6 +1076,7 @@ openss7_man_MANS = \
 	man4/udp2.4 \
 	man4/udp.4 \
 	man4/udp_ioctl.4 \
+	man4/undoc.4 \
 	man4/v401p.4 \
 	man4/v52.4 \
 	man4/v5.4 \
@@ -1200,7 +1134,6 @@ openss7_man_MANS = \
 	man5/mfetemplate.5 \
 	man5/netconfig.5 \
 	man5/netdir.5 \
-	man5/openss7_soon.5 \
 	man5/padent.5 \
 	man5/protosw.5 \
 	man5/qosformat.5 \
@@ -1209,7 +1142,6 @@ openss7_man_MANS = \
 	man5/sigtran.conf.5 \
 	man5/slconf.5 \
 	man5/sock2path.5 \
-	man5/soon.5 \
 	man5/specfs.5 \
 	man5/strapush.5 \
 	man5/strconf_config.5 \
@@ -2001,7 +1933,6 @@ openss7_man_MANS = \
 	man7/I_PUTPMSG.7 \
 	man7/I_RECVFD.7 \
 	man7/isdni.7 \
-	man7/isdn_undoc.7 \
 	man7/I_SENDFD.7 \
 	man7/I_SERROPT.7 \
 	man7/I_SETCLTIME.7 \
@@ -2560,9 +2491,7 @@ openss7_man_MANS = \
 	man7/SL_STOP_REQ.7 \
 	man7/sl_stop_req_t.7 \
 	man7/smi.7 \
-	man7/soon.7 \
 	man7/ss7.7 \
-	man7/ss7_undoc.7 \
 	man7/sscop.7 \
 	man7/sscopi.7 \
 	man7/streamio.7 \
@@ -2831,6 +2760,7 @@ openss7_man_MANS = \
 	man7/T_UNITDATA_REQ.7 \
 	man7/T_unitdata_req.7 \
 	man7/ua_as_lm.7 \
+	man7/undoc.7 \
 	man7/WAN.7 \
 	man7/wan.7 \
 	man8/acb56.8 \
@@ -2856,7 +2786,6 @@ openss7_man_MANS = \
 	man8/insf.8 \
 	man8/isdn.8 \
 	man8/isdnconfd.8 \
-	man8/isdn_undoc.8 \
 	man8/isua.8 \
 	man8/isup.8 \
 	man8/iua.8 \
@@ -2913,7 +2842,6 @@ openss7_man_MANS = \
 	man8/sls.8 \
 	man8/soconfig.8 \
 	man8/soip.8 \
-	man8/soon.8 \
 	man8/specfs.8 \
 	man8/specfs.sh.8 \
 	man8/ss7.8 \
@@ -2922,7 +2850,6 @@ openss7_man_MANS = \
 	man8/ss7d.8 \
 	man8/ss7dev.8 \
 	man8/ss7statsd.8 \
-	man8/ss7_undoc.8 \
 	man8/strace.8 \
 	man8/strclean.8 \
 	man8/strconf.8 \
@@ -3052,10 +2979,6 @@ openss7_man_MANS = \
 	man9/allocstr.9 \
 	man9/allstream.9 \
 	man9/appq.9 \
-	man9/apush_get.9 \
-	man9/apush_lst.9 \
-	man9/apush_set.9 \
-	man9/apush_vml.9 \
 	man9/ATOMIC_INT_ADD.9 \
 	man9/ATOMIC_INT_ALLOC.9 \
 	man9/ATOMIC_INT_DEALLOC.9 \
@@ -3149,7 +3072,6 @@ openss7_man_MANS = \
 	man9/cminsw_list.9 \
 	man9/cmn_err.9 \
 	man9/cmn_err_tag.9 \
-	man9/compat_undoc.9 \
 	man9/connld.9 \
 	man9/copyb.9 \
 	man9/copyin.9 \
@@ -3915,7 +3837,6 @@ openss7_man_MANS = \
 	man9/SLEEP_TRYLOCK.9 \
 	man9/SLEEP_UNLOCK.9 \
 	man9/__smod_search.9 \
-	man9/soon.9 \
 	man9/sparc_ioremap.9 \
 	man9/spec_dentry.9 \
 	man9/specfs_get.9 \
@@ -3979,8 +3900,6 @@ openss7_man_MANS = \
 	man9/ss7_stop_timer.9 \
 	man9/ss7_trylockq.9 \
 	man9/ss7_unbufcall.9 \
-	man9/ss7_undoc.9 \
-	man9/ss7undoc.9 \
 	man9/ss7_unlockq.9 \
 	man9/ss7_w_flush.9 \
 	man9/straln.9 \
@@ -4138,7 +4057,6 @@ openss7_dist_noinst_MANS = \
 	man2/putpmsg.2s.man \
 	man2/read.2s.man \
 	man2/readv.2s.man \
-	man2/soon.2.man \
 	man2/streamio.2.man \
 	man2/write.2s.man \
 	man2/writev.2s.man \
@@ -4391,6 +4309,24 @@ openss7_dist_noinst_MANS = \
 	man3/libxom.3.man \
 	man3/linkidtox25.3.man \
 	man3/listen.3.man \
+	man3/map_abort.3.man \
+	man3/map_bind.3.man \
+	man3/map_close.3.man \
+	man3/map_delim_req.3.man \
+	man3/map_get_last_error.3.man \
+	man3/map_initialize.3.man \
+	man3/map_negotiate.3.man \
+	man3/map_open_req.3.man \
+	man3/map_open_rsp.3.man \
+	man3/map_receive.3.man \
+	man3/map_refuse.3.man \
+	man3/map_service_req.3.man \
+	man3/map_service_rsp.3.man \
+	man3/map_sms_service_rcv.3.man \
+	man3/map_sms_service_req.3.man \
+	man3/map_sms_service_rsp.3.man \
+	man3/map_unbind.3.man \
+	man3/map_wait.3.man \
 	man3/mp_abandon.3.man \
 	man3/mp_abort.3.man \
 	man3/mp_abort_req.3.man \
@@ -4591,13 +4527,11 @@ openss7_dist_noinst_MANS = \
 	man3/sockets.3.man \
 	man3/socklib.3.man \
 	man3/sockpath.3.man \
-	man3/soon.3.man \
 	man3/sp_errbuf.3.man \
 	man3/sp_error.3.man \
 	man3/s_pipe.3.man \
 	man3/sp_perror.3.man \
 	man3/sp_sperror.3.man \
-	man3/ss7_undoc.3.man \
 	man3/stox25.3.man \
 	man3/streams.3.man \
 	man3/strlog.3.man \
@@ -4663,6 +4597,7 @@ openss7_dist_noinst_MANS = \
 	man3/t_tcp_info.3.man \
 	man3/t_unbind.3.man \
 	man3/uaddr2taddr.3.man \
+	man3/undoc.3.man \
 	man3/unlockpt.3tty.man \
 	man3/vstrlog.3.man \
 	man3/x25diags.3.man \
@@ -4684,90 +4619,10 @@ openss7_dist_noinst_MANS = \
 	man3/xds.3.man \
 	man3/XFTAM.3.man \
 	man3/xftam.3.man \
-	man3/xhostent.3.man \
 	man3/XMP.3.man \
 	man3/xmp.3.man \
 	man3/XMS.3.man \
 	man3/xnet.3.man \
-	man3/__xnet_t_accept.3.man \
-	man3/__xnet_t_accept_r.3.man \
-	man3/__xnet_t_addleaf.3.man \
-	man3/__xnet_t_addleaf_r.3.man \
-	man3/__xnet_t_alloc.3.man \
-	man3/__xnet_t_alloc_r.3.man \
-	man3/__xnet_t_bind.3.man \
-	man3/__xnet_t_bind_r.3.man \
-	man3/__xnet_t_close.3.man \
-	man3/__xnet_t_close_r.3.man \
-	man3/__xnet_t_connect.3.man \
-	man3/__xnet_t_connect_r.3.man \
-	man3/__xnet_t_errno.3.man \
-	man3/__xnet_t_error.3.man \
-	man3/__xnet_t_error_r.3.man \
-	man3/__xnet_t_free.3.man \
-	man3/__xnet_t_getinfo.3.man \
-	man3/__xnet_t_getinfo_r.3.man \
-	man3/__xnet_t_getprotaddr.3.man \
-	man3/__xnet_t_getprotaddr_r.3.man \
-	man3/__xnet_t_getstate.3.man \
-	man3/__xnet_t_getstate_r.3.man \
-	man3/__xnet_t_listen.3.man \
-	man3/__xnet_t_listen_r.3.man \
-	man3/__xnet_t_look.3.man \
-	man3/__xnet_t_look_r.3.man \
-	man3/__xnet_t_open.3.man \
-	man3/__xnet_t_open_r.3.man \
-	man3/__xnet_t_optmgmt.3.man \
-	man3/__xnet_t_optmgmt_r.3.man \
-	man3/__xnet_t_peek.3.man \
-	man3/__xnet_t_rcv.3.man \
-	man3/__xnet_t_rcvconnect.3.man \
-	man3/__xnet_t_rcvconnect_r.3.man \
-	man3/__xnet_t_rcvdis.3.man \
-	man3/__xnet_t_rcvdis_r.3.man \
-	man3/__xnet_t_rcvleafchange.3.man \
-	man3/__xnet_t_rcvleafchange_r.3.man \
-	man3/__xnet_t_rcvopt.3.man \
-	man3/__xnet_t_rcvopt_r.3.man \
-	man3/__xnet_t_rcv_r.3.man \
-	man3/__xnet_t_rcvrel.3.man \
-	man3/__xnet_t_rcvreldata.3.man \
-	man3/__xnet_t_rcvreldata_r.3.man \
-	man3/__xnet_t_rcvrel_r.3.man \
-	man3/__xnet_t_rcvudata.3.man \
-	man3/__xnet_t_rcvudata_r.3.man \
-	man3/__xnet_t_rcvuderr.3.man \
-	man3/__xnet_t_rcvuderr_r.3.man \
-	man3/__xnet_t_rcvv.3.man \
-	man3/__xnet_t_rcvv_r.3.man \
-	man3/__xnet_t_rcvvudata.3.man \
-	man3/__xnet_t_rcvvudata_r.3.man \
-	man3/__xnet_t_removeleaf.3.man \
-	man3/__xnet_t_removeleaf_r.3.man \
-	man3/__xnet_t_snd.3.man \
-	man3/__xnet_t_snddis.3.man \
-	man3/__xnet_t_snddis_r.3.man \
-	man3/__xnet_t_sndopt.3.man \
-	man3/__xnet_t_sndopt_r.3.man \
-	man3/__xnet_t_snd_r.3.man \
-	man3/__xnet_t_sndrel.3.man \
-	man3/__xnet_t_sndreldata.3.man \
-	man3/__xnet_t_sndreldata_r.3.man \
-	man3/__xnet_t_sndrel_r.3.man \
-	man3/__xnet_t_sndudata.3.man \
-	man3/__xnet_t_sndudata_r.3.man \
-	man3/__xnet_t_sndv.3.man \
-	man3/__xnet_t_sndvopt.3.man \
-	man3/__xnet_t_sndvopt_r.3.man \
-	man3/__xnet_t_sndv_r.3.man \
-	man3/__xnet_t_sndvudata.3.man \
-	man3/__xnet_t_sndvudata_r.3.man \
-	man3/__xnet_t_strerror.3.man \
-	man3/__xnet_t_sync.3.man \
-	man3/__xnet_t_sync_r.3.man \
-	man3/__xnet_t_sysconf.3.man \
-	man3/__xnet_t_unbind.3.man \
-	man3/__xnet_t_unbind_r.3.man \
 	man3/xnsl.3.man \
 	man3/XOM.3.man \
 	man3/xom.3.man \
@@ -4910,7 +4765,6 @@ openss7_dist_noinst_MANS = \
 	man4/ISDN.4.man \
 	man4/isdn.4.man \
 	man4/isdn_ioctl.4.man \
-	man4/isdn_undoc.4.man \
 	man4/ISO.4.man \
 	man4/iso-ip.4.man \
 	man4/iso-lan.4.man \
@@ -5013,7 +4867,6 @@ openss7_dist_noinst_MANS = \
 	man4/onpi.4.man \
 	man4/oopi.4.man \
 	man4/OpenSS7.4.man \
-	man4/openss7_soon.4.man \
 	man4/otk6.4.man \
 	man4/otpi.4.man \
 	man4/pca200e.4.man \
@@ -5081,6 +4934,7 @@ openss7_dist_noinst_MANS = \
 	man4/sdt.4.man \
 	man4/sdt-acb56.4.man \
 	man4/sdt_cd.4.man \
+	man4/sdt-cd.4.man \
 	man4/sdt_ioctl.4.man \
 	man4/sdt_pmod.4.man \
 	man4/sdt-pmod.4.man \
@@ -5113,7 +4967,6 @@ openss7_dist_noinst_MANS = \
 	man4/s_npi.4.man \
 	man4/sockmod.4.man \
 	man4/socksys.4.man \
-	man4/soon.4.man \
 	man4/s_pipe.4.man \
 	man4/spm.4.man \
 	man4/spx.4.man \
@@ -5130,7 +4983,6 @@ openss7_dist_noinst_MANS = \
 	man4/ss7-sl-acb1.4.man \
 	man4/ss7-sl-acb2.4.man \
 	man4/ss7-sl-acb3.4.man \
-	man4/ss7_undoc.4.man \
 	man4/sscop.4.man \
 	man4/sscop_ioctl.4.man \
 	man4/sscop_mce.4.man \
@@ -5204,6 +5056,7 @@ openss7_dist_noinst_MANS = \
 	man4/udp2.4.man \
 	man4/udp.4.man \
 	man4/udp_ioctl.4.man \
+	man4/undoc.4.man \
 	man4/v401p.4.man \
 	man4/v52.4.man \
 	man4/v5.4.man \
@@ -5261,7 +5114,6 @@ openss7_dist_noinst_MANS = \
 	man5/mfetemplate.5.man \
 	man5/netconfig.5.man \
 	man5/netdir.5.man \
-	man5/openss7_soon.5.man \
 	man5/padent.5.man \
 	man5/protosw.5.man \
 	man5/qosformat.5.man \
@@ -5270,7 +5122,6 @@ openss7_dist_noinst_MANS = \
 	man5/sigtran.conf.5.man \
 	man5/slconf.5.man \
 	man5/sock2path.5.man \
-	man5/soon.5.man \
 	man5/specfs.5.man \
 	man5/strapush.5.man \
 	man5/strconf_config.5.man \
@@ -6062,7 +5913,6 @@ openss7_dist_noinst_MANS = \
 	man7/I_PUTPMSG.7.man \
 	man7/I_RECVFD.7.man \
 	man7/isdni.7.man \
-	man7/isdn_undoc.7.man \
 	man7/I_SENDFD.7.man \
 	man7/I_SERROPT.7.man \
 	man7/I_SETCLTIME.7.man \
@@ -6621,9 +6471,7 @@ openss7_dist_noinst_MANS = \
 	man7/SL_STOP_REQ.7.man \
 	man7/sl_stop_req_t.7.man \
 	man7/smi.7.man \
-	man7/soon.7.man \
 	man7/ss7.7.man \
-	man7/ss7_undoc.7.man \
 	man7/sscop.7.man \
 	man7/sscopi.7.man \
 	man7/streamio.7.man \
@@ -6892,6 +6740,7 @@ openss7_dist_noinst_MANS = \
 	man7/T_UNITDATA_REQ.7.man \
 	man7/T_unitdata_req.7.man \
 	man7/ua_as_lm.7.man \
+	man7/undoc.7.man \
 	man7/WAN.7.man \
 	man7/wan.7.man \
 	man8/acb56.8.man \
@@ -6917,7 +6766,6 @@ openss7_dist_noinst_MANS = \
 	man8/insf.8.man \
 	man8/isdn.8.man \
 	man8/isdnconfd.8.man \
-	man8/isdn_undoc.8.man \
 	man8/isua.8.man \
 	man8/isup.8.man \
 	man8/iua.8.man \
@@ -6974,7 +6822,6 @@ openss7_dist_noinst_MANS = \
 	man8/sls.8.man \
 	man8/soconfig.8.man \
 	man8/soip.8.man \
-	man8/soon.8.man \
 	man8/specfs.8.man \
 	man8/specfs.sh.8.man \
 	man8/ss7.8.man \
@@ -6983,7 +6830,6 @@ openss7_dist_noinst_MANS = \
 	man8/ss7d.8.man \
 	man8/ss7dev.8.man \
 	man8/ss7statsd.8.man \
-	man8/ss7_undoc.8.man \
 	man8/strace.8.man \
 	man8/strclean.8.man \
 	man8/strconf.8.man \
@@ -7113,10 +6959,6 @@ openss7_dist_noinst_MANS = \
 	man9/allocstr.9.man \
 	man9/allstream.9.man \
 	man9/appq.9.man \
-	man9/apush_get.9.man \
-	man9/apush_lst.9.man \
-	man9/apush_set.9.man \
-	man9/apush_vml.9.man \
 	man9/ATOMIC_INT_ADD.9.man \
 	man9/ATOMIC_INT_ALLOC.9.man \
 	man9/ATOMIC_INT_DEALLOC.9.man \
@@ -7210,7 +7052,6 @@ openss7_dist_noinst_MANS = \
 	man9/cminsw_list.9.man \
 	man9/cmn_err.9.man \
 	man9/cmn_err_tag.9.man \
-	man9/compat_undoc.9.man \
 	man9/connld.9.man \
 	man9/copyb.9.man \
 	man9/copyin.9.man \
@@ -7976,7 +7817,6 @@ openss7_dist_noinst_MANS = \
 	man9/SLEEP_TRYLOCK.9.man \
 	man9/SLEEP_UNLOCK.9.man \
 	man9/__smod_search.9.man \
-	man9/soon.9.man \
 	man9/sparc_ioremap.9.man \
 	man9/spec_dentry.9.man \
 	man9/specfs_get.9.man \
@@ -8040,8 +7880,6 @@ openss7_dist_noinst_MANS = \
 	man9/ss7_stop_timer.9.man \
 	man9/ss7_trylockq.9.man \
 	man9/ss7_unbufcall.9.man \
-	man9/ss7_undoc.9.man \
-	man9/ss7undoc.9.man \
 	man9/ss7_unlockq.9.man \
 	man9/ss7_w_flush.9.man \
 	man9/straln.9.man \
@@ -8237,7 +8075,742 @@ dist_noinst_MANS = $(openss7_dist_noinst_MANS)
 ## These are not used by any function, device or driver but needs to be included in the
 ## distribution.
 ##
-MANS_UNUSED = 
+MANS_UNUSED = \
+	man1/strlog.1 \
+	man2/fcntl.2s \
+	man2/poll.2s \
+	man2/read.2s \
+	man2/readv.2s \
+	man2/streamio.2 \
+	man2/write.2s \
+	man2/writev.2s \
+	man3/ap_env.3 \
+	man3/apli_close.3 \
+	man3/apli_env.3 \
+	man3/apli_errno.3 \
+	man3/apli_error.3 \
+	man3/apli_free.3 \
+	man3/apli_get_env.3 \
+	man3/apli_init_env.3 \
+	man3/apli_open.3 \
+	man3/apli_poll.3 \
+	man3/apli_rcv.3 \
+	man3/apli_set_env.3 \
+	man3/apli_snd.3 \
+	man3/ap_ro_init.3 \
+	man3/ap_ro_release.3 \
+	man3/ap_ro_unbind.3 \
+	man3/cframe.3 \
+	man3/dlpi_get_both.3 \
+	man3/dlpi_get_info_strm.3 \
+	man3/dlpi_get_style_strm.3 \
+	man3/dlpi_set_test_req.3 \
+	man3/dlpi_set_test_res.3 \
+	man3/ft_abandon.3 \
+	man3/ft_abort.3 \
+	man3/ft_close.3 \
+	man3/ft_connect.3 \
+	man3/ft_disconnect.3 \
+	man3/ft_fcattributes.3 \
+	man3/ft_fdelete.3 \
+	man3/ft_frattributes.3 \
+	man3/ft_frdir.3 \
+	man3/ft_freceive.3 \
+	man3/ft_fsend.3 \
+	man3/ft_gperror.3 \
+	man3/ft_open.3 \
+	man3/ft_rcvresult.3 \
+	man3/grantpt.3tty \
+	man3/libapli.3 \
+	man3/libx25.3 \
+	man3/libxap.3 \
+	man3/libxds.3 \
+	man3/libxftam.3 \
+	man3/libxmp.3 \
+	man3/libxom.3 \
+	man3/mp_abort.3 \
+	man3/mp_get_next.3 \
+	man3/netpath.3 \
+	man3/OSI.3 \
+	man3/ptsname.3tty \
+	man3/ro_bind.3 \
+	man3/ro_unbind.3 \
+	man3/snmp_logging.3 \
+	man3/s_pipe.3 \
+	man3/_t_errstr.3 \
+	man3/unlockpt.3tty \
+	man3/x25diags.3 \
+	man3/xftam.3 \
+	man3/XMS.3 \
+	man3/xti_tc.3 \
+	man3/xti_tr.3 \
+	man3/xti_x25.3 \
+	man4/acb56.4 \
+	man4/apmod.4 \
+	man4/bicc.4 \
+	man4/bicc_ioctl.4 \
+	man4/bssap.4 \
+	man4/bssap_ioctl.4 \
+	man4/bua.4 \
+	man4/bua_ioctl.4 \
+	man4/capi.4 \
+	man4/capi_ioctl.4 \
+	man4/cd-llc.4 \
+	man4/ch.4 \
+	man4/ch_ioctl.4 \
+	man4/ch_mux.4 \
+	man4/ch_x400p.4 \
+	man4/clnp.4 \
+	man4/clnstpi.4 \
+	man4/clone_drvr.4 \
+	man4/clone-drvr.4 \
+	man4/connld.old.4 \
+	man4/cpc388.4 \
+	man4/dass.4 \
+	man4/dlb.4 \
+	man4/DLC_ADD_FUNC_ADDR.4 \
+	man4/DLC_ADD_GRP.4 \
+	man4/DLC_ALTER.4 \
+	man4/DLC_CONTACT.4 \
+	man4/DLC_DEL_FUNC_ADDR.4 \
+	man4/DLC_DEL_GRP.4 \
+	man4/DLC_DISABLE_SAP.4 \
+	man4/DLC_ENABLE_SAP.4 \
+	man4/DLC_ENTER_LBUSY.4 \
+	man4/DLC_ENTER_SHOLD.4 \
+	man4/DLC_EXIT_LBUSY.4 \
+	man4/DLC_EXIT_SHOLD.4 \
+	man4/DLC_GET_EXCEP.4 \
+	man4/DLC_HALT_LS.4 \
+	man4/DLC_QUERY_LS.4 \
+	man4/DLC_QUERY_SAP.4 \
+	man4/DLC_START_LS.4 \
+	man4/DLC_TEST.4 \
+	man4/DLC_TRACE.4 \
+	man4/dl_ioctl.4 \
+	man4/dl-llc.4 \
+	man4/dlpi_ioctl.4 \
+	man4/dpnss.4 \
+	man4/dua.4 \
+	man4/dua_ioctl.4 \
+	man4/eth.4 \
+	man4/fr.4 \
+	man4/gr303.4 \
+	man4/gr303_ioctl.4 \
+	man4/gr303ua.4 \
+	man4/gr303ua_ioctl.4 \
+	man4/gsma.4 \
+	man4/h225_ioctl.4 \
+	man4/h245.4 \
+	man4/h248.4 \
+	man4/h248_ioctl.4 \
+	man4/hdlc_ioctl.4 \
+	man4/iax.4 \
+	man4/idlc.4 \
+	man4/ifnet.4 \
+	man4/ifr.4 \
+	man4/ip_strm.4 \
+	man4/ipx25.4 \
+	man4/isdn_ioctl.4 \
+	man4/ISO.4 \
+	man4/isos.4 \
+	man4/iso-udp.4 \
+	man4/isua.4 \
+	man4/isua_ioctl.4 \
+	man4/isup_ioctl.4 \
+	man4/iua.4 \
+	man4/iua-as.4 \
+	man4/iua_ioctl.4 \
+	man4/ixe.4 \
+	man4/lapf.4 \
+	man4/llc.4 \
+	man4/lli.4 \
+	man4/loop-around.4 \
+	man4/m2pa_cd.4 \
+	man4/m2pa_dl.4 \
+	man4/m2ua_as_ioctl.4 \
+	man4/m2ua_ioctl.4 \
+	man4/m3pa.4 \
+	man4/m3tp.4 \
+	man4/m3ua_ioctl.4 \
+	man4/matrix.4 \
+	man4/mfe.4 \
+	man4/mgc.4 \
+	man4/mgcp.4 \
+	man4/mgcp_ioctl.4 \
+	man4/mg_ioctl.4 \
+	man4/mini-mux.4 \
+	man4/mlp.4 \
+	man4/momod.4 \
+	man4/mtdrv.4 \
+	man4/mtp_ioctl.4 \
+	man4/mux_clone.4 \
+	man4/mxi_ioctl.4 \
+	man4/mx_ioctl.4 \
+	man4/mx_mux.4 \
+	man4/mx_x400p.4 \
+	man4/np.4 \
+	man4/npi.4 \
+	man4/npi_ip.4 \
+	man4/oclt.4 \
+	man4/onpi.4 \
+	man4/oopi.4 \
+	man4/OpenSS7.4 \
+	man4/otk6.4 \
+	man4/otpi.4 \
+	man4/pca200e.4 \
+	man4/pipemod.old.4 \
+	man4/printk.4 \
+	man4/ptc.4 \
+	man4/ptmx.4tty \
+	man4/q921.4 \
+	man4/q922.4 \
+	man4/q931.4 \
+	man4/relay2.4 \
+	man4/relay3.4 \
+	man4/rmux.4 \
+	man4/romod.4 \
+	man4/rtp.4 \
+	man4/sccp_ioctl.4 \
+	man4/s_cons.4 \
+	man4/sctp_ioctl.4 \
+	man4/sdl_eth.4 \
+	man4/sdl_ioctl.4 \
+	man4/sdl_ip.4 \
+	man4/sdlold.4 \
+	man4/s_dlpi.4 \
+	man4/sdl_rtp.4 \
+	man4/sdl_tcp.4 \
+	man4/sdl_udp.4 \
+	man4/sdl_x400p.4 \
+	man4/sdt-cd.4 \
+	man4/sdt_ioctl.4 \
+	man4/sdt_x400p.4 \
+	man4/s_fifo.4 \
+	man4/SIGTRAN.4 \
+	man4/sipt.4 \
+	man4/sipt_ioctl.4 \
+	man4/sl_ioctl.4 \
+	man4/s_lli.4 \
+	man4/s_nli3.4 \
+	man4/s_pipe.4 \
+	man4/SS7.4 \
+	man4/sscop_ioctl.4 \
+	man4/sscop_mce.4 \
+	man4/sua_ioctl.4 \
+	man4/s_wan.4 \
+	man4/s_xx25.4 \
+	man4/tali_ioctl.4 \
+	man4/tcap_ioctl.4 \
+	man4/tcp_ioctl.4 \
+	man4/tdm-ip.4 \
+	man4/tlclts.4 \
+	man4/tlcots.4 \
+	man4/tlcotsod.4 \
+	man4/tstdrv.4 \
+	man4/tstmod.4 \
+	man4/TTY.4 \
+	man4/tua_ioctl.4 \
+	man4/ua_as_ioctl.4 \
+	man4/ua_ioctl.4 \
+	man4/ua_sg_ioctl.4 \
+	man4/udp_ioctl.4 \
+	man4/v401p.4 \
+	man4/v52.4 \
+	man4/v5_ioctl.4 \
+	man4/v5ua.4 \
+	man4/v5ua_ioctl.4 \
+	man4/VOIP.4 \
+	man4/vtoip.4 \
+	man4/wan.4 \
+	man4/x100p-ch.4 \
+	man4/X25.4 \
+	man4/x25-llc.4 \
+	man4/x400p-ch.4 \
+	man4/xapmod.4 \
+	man4/XNS.4 \
+	man4/xol.4 \
+	man4/xos.4 \
+	man4/xtios.4 \
+	man8/acb56.8 \
+	man8/asn1.8 \
+	man8/bicc.8 \
+	man8/bua.8 \
+	man8/cpc388.8 \
+	man8/ds1.8 \
+	man8/ds1ext.8 \
+	man8/fattach.old.8 \
+	man8/fdetach.old.8 \
+	man8/gdmo.8 \
+	man8/h225.8 \
+	man8/h323confd.8 \
+	man8/isdn.8 \
+	man8/isdnconfd.8 \
+	man8/isua.8 \
+	man8/isup.8 \
+	man8/iua.8 \
+	man8/iuaasconf.8 \
+	man8/lltune.8 \
+	man8/m2pa.8 \
+	man8/m2paconf.8 \
+	man8/m2tp.8 \
+	man8/m2ua.8 \
+	man8/m2uaasconf.8 \
+	man8/m2uaasd.8 \
+	man8/m2uaconf.8 \
+	man8/m3tp.8 \
+	man8/m3ua.8 \
+	man8/mfeproto.8 \
+	man8/mfevc.8 \
+	man8/mgconfd.8 \
+	man8/mkfifo.8s \
+	man8/mtp.8 \
+	man8/mxmib.8 \
+	man8/osinetd.8 \
+	man8/phymib.8 \
+	man8/sccp.8 \
+	man8/sctp.8 \
+	man8/sdl.8 \
+	man8/sdl_udp.8 \
+	man8/sdt.8 \
+	man8/sigtran.8 \
+	man8/sl.8 \
+	man8/slconfig.8 \
+	man8/sls.8 \
+	man8/soip.8 \
+	man8/specfs.sh.8 \
+	man8/ss7.8 \
+	man8/ss7confd.8 \
+	man8/ss7d.8 \
+	man8/ss7dev.8 \
+	man8/strconf.8 \
+	man8/streams.sh.8 \
+	man8/strlogd.8 \
+	man8/strmakenodes.8 \
+	man8/strmib.8 \
+	man8/strms_down.8 \
+	man8/strms_status.8 \
+	man8/strms_up.8 \
+	man8/strtst.8 \
+	man8/strtune.8 \
+	man8/sua.8 \
+	man8/tcap.8 \
+	man8/tcapconf.8 \
+	man8/test-bcm.8 \
+	man8/test-m3ua_as.8 \
+	man8/test-q784.8 \
+	man8/thrtst.8 \
+	man8/timetst.8 \
+	man8/tua.8 \
+	man8/uaconfd.8 \
+	man8/voipconfd.8 \
+	man8/wanmap.8 \
+	man8/x25tune.8 \
+	man8/x400pconf.8 \
+	man8/x400pmib.8 \
+	man9/admin.9s \
+	man9/allocbi.9 \
+	man9/allocb_skb.9 \
+	man9/allocqb.9 \
+	man9/allocsd.9 \
+	man9/allstream.9 \
+	man9/attach.9 \
+	man9/bcache_allocb.9 \
+	man9/bcache_create.9 \
+	man9/bcache_destroy.9 \
+	man9/bpsize.9 \
+	man9/cdev_add.9 \
+	man9/cdev_del.9 \
+	man9/cdev_get.9 \
+	man9/cdev_put.9 \
+	man9/close.9s \
+	man9/cminsw_list.9 \
+	man9/create_putlocks.9 \
+	man9/DDI.9 \
+	man9/ddi_add_intr.9 \
+	man9/ddi_add_softintr.9 \
+	man9/ddi_binding_name.9 \
+	man9/ddi_btop.9 \
+	man9/ddi_btopr.9 \
+	man9/ddi_check_acc_handle.9 \
+	man9/ddi_check_dma_handle.9 \
+	man9/ddi_copyin.9 \
+	man9/ddi_copyout.9 \
+	man9/ddi_create_minor_node.9 \
+	man9/ddi_device_copy.9 \
+	man9/ddi_device_zero.9 \
+	man9/ddi_devid_compare.9 \
+	man9/ddi_devid_free.9 \
+	man9/ddi_devid_init.9 \
+	man9/ddi_devid_register.9 \
+	man9/ddi_devid_sizeof.9 \
+	man9/ddi_devid_str_decode.9 \
+	man9/ddi_devid_str_encode.9 \
+	man9/ddi_devid_str_free.9 \
+	man9/ddi_devid_unregister.9 \
+	man9/ddi_devid_valid.9 \
+	man9/ddi_dev_is_needed.9 \
+	man9/ddi_dev_is_sid.9 \
+	man9/ddi_devmap_segmap.9 \
+	man9/ddi_dev_nintrs.9 \
+	man9/ddi_dev_nregs.9 \
+	man9/ddi_dev_regsize.9 \
+	man9/ddi_dev_report_fault.9 \
+	man9/ddi_dma_addr_bind_handle.9 \
+	man9/ddi_dma_addr_setup.9 \
+	man9/ddi_dma_alloc_handle.9 \
+	man9/ddi_dma_buf_bind_handle.9 \
+	man9/ddi_dma_buf_setup.9 \
+	man9/ddi_dma_burstsizes.9 \
+	man9/ddi_dma_coff.9 \
+	man9/ddi_dma_curwin.9 \
+	man9/ddi_dma_devalign.9 \
+	man9/ddi_dmae_1stparty.9 \
+	man9/ddi_dmae.9 \
+	man9/ddi_dmae_alloc.9 \
+	man9/ddi_dmae_disable.9 \
+	man9/ddi_dmae_enable.9 \
+	man9/ddi_dmae_getattr.9 \
+	man9/ddi_dmae_getcnt.9 \
+	man9/ddi_dmae_getlim.9 \
+	man9/ddi_dmae_prog.9 \
+	man9/ddi_dmae_release.9 \
+	man9/ddi_dmae_stop.9 \
+	man9/ddi_dma_free.9 \
+	man9/ddi_dma_free_handle.9 \
+	man9/ddi_dma_get_attr.9 \
+	man9/ddi_dma_getwin.9 \
+	man9/ddi_dma_htoc.9 \
+	man9/ddi_dma_mem_alloc.9 \
+	man9/ddi_dma_mem_free.9 \
+	man9/ddi_dma_movwin.9 \
+	man9/ddi_dma_nextcookie.9 \
+	man9/ddi_dma_nextseg.9 \
+	man9/ddi_dma_nextwin.9 \
+	man9/ddi_dma_numwin.9 \
+	man9/ddi_dma_segtocookie.9 \
+	man9/ddi_dma_set_sbus64.9 \
+	man9/ddi_dma_setup.9 \
+	man9/ddi_dma_sync.9 \
+	man9/ddi_dma_unbind_handle.9 \
+	man9/ddi_driver_major.9 \
+	man9/ddi_driver_name.9 \
+	man9/ddi_enter_critical.9 \
+	man9/ddi_exit_critical.9 \
+	man9/ddi_ffs.9 \
+	man9/ddi_fls.9 \
+	man9/ddi_get16.9 \
+	man9/ddi_get32.9 \
+	man9/ddi_get64.9 \
+	man9/ddi_get8.9 \
+	man9/ddi_getb.9 \
+	man9/ddi_get_devstate.9 \
+	man9/ddi_get_driver_private.9 \
+	man9/ddi_get_iblock_cookie.9 \
+	man9/ddi_get_instance.9 \
+	man9/ddi_get_kt_did.9 \
+	man9/ddi_getl.9 \
+	man9/ddi_getll.9 \
+	man9/ddi_getlongprop.9 \
+	man9/ddi_getlongprop_buf.9 \
+	man9/ddi_get_name.9 \
+	man9/ddi_get_parent.9 \
+	man9/ddi_getprop.9 \
+	man9/ddi_getproplen.9 \
+	man9/ddi_get_soft_iblock_cookie.9 \
+	man9/ddi_get_soft_state.9 \
+	man9/ddi_getw.9 \
+	man9/ddi_in_panic.9 \
+	man9/ddi_intr_hilevel.9 \
+	man9/ddi_io_get16.9 \
+	man9/ddi_io_get32.9 \
+	man9/ddi_io_get64.9 \
+	man9/ddi_io_get8.9 \
+	man9/ddi_io_getb.9 \
+	man9/ddi_io_getl.9 \
+	man9/ddi_io_getw.9 \
+	man9/ddi_iomin.9 \
+	man9/ddi_iopb_alloc.9 \
+	man9/ddi_iopb_free.9 \
+	man9/ddi_io_put16.9 \
+	man9/ddi_io_put32.9 \
+	man9/ddi_io_put64.9 \
+	man9/ddi_io_put8.9 \
+	man9/ddi_io_putb.9 \
+	man9/ddi_io_putl.9 \
+	man9/ddi_io_putw.9 \
+	man9/ddi_io_rep_get16.9 \
+	man9/ddi_io_rep_get32.9 \
+	man9/ddi_io_rep_get64.9 \
+	man9/ddi_io_rep_get8.9 \
+	man9/ddi_io_rep_getb.9 \
+	man9/ddi_io_rep_getl.9 \
+	man9/ddi_io_rep_getw.9 \
+	man9/ddi_io_rep_put16.9 \
+	man9/ddi_io_rep_put32.9 \
+	man9/ddi_io_rep_put64.9 \
+	man9/ddi_io_rep_put8.9 \
+	man9/ddi_io_rep_putb.9 \
+	man9/ddi_io_rep_putl.9 \
+	man9/ddi_io_rep_putw.9 \
+	man9/ddi_log_sysevent.9 \
+	man9/ddi_mapdev.9 \
+	man9/ddi_mapdev_intercept.9 \
+	man9/ddi_mapdev_nointercept.9 \
+	man9/ddi_map_regs.9 \
+	man9/ddi_mem_alloc.9 \
+	man9/ddi_mem_free.9 \
+	man9/ddi_mem_get16.9 \
+	man9/ddi_mem_get32.9 \
+	man9/ddi_mem_get64.9 \
+	man9/ddi_mem_get8.9 \
+	man9/ddi_mem_getb.9 \
+	man9/ddi_mem_getl.9 \
+	man9/ddi_mem_getll.9 \
+	man9/ddi_mem_getw.9 \
+	man9/ddi_mem_put16.9 \
+	man9/ddi_mem_put32.9 \
+	man9/ddi_mem_put64.9 \
+	man9/ddi_mem_put8.9 \
+	man9/ddi_mem_putb.9 \
+	man9/ddi_mem_putl.9 \
+	man9/ddi_mem_putll.9 \
+	man9/ddi_mem_putw.9 \
+	man9/ddi_mem_rep_get16.9 \
+	man9/ddi_mem_rep_get32.9 \
+	man9/ddi_mem_rep_get64.9 \
+	man9/ddi_mem_rep_get8.9 \
+	man9/ddi_mem_rep_getb.9 \
+	man9/ddi_mem_rep_getl.9 \
+	man9/ddi_mem_rep_getll.9 \
+	man9/ddi_mem_rep_getw.9 \
+	man9/ddi_mem_rep_put16.9 \
+	man9/ddi_mem_rep_put32.9 \
+	man9/ddi_mem_rep_put64.9 \
+	man9/ddi_mem_rep_put8.9 \
+	man9/ddi_mem_rep_putb.9 \
+	man9/ddi_mem_rep_putl.9 \
+	man9/ddi_mem_rep_putll.9 \
+	man9/ddi_mem_rep_putw.9 \
+	man9/ddi_mmap_get_model.9 \
+	man9/ddi_model_convert_from.9 \
+	man9/ddi_node_name.9 \
+	man9/ddi_peek16.9 \
+	man9/ddi_peek32.9 \
+	man9/ddi_peek64.9 \
+	man9/ddi_peek8.9 \
+	man9/ddi_peek.9 \
+	man9/ddi_peekc.9 \
+	man9/ddi_peekd.9 \
+	man9/ddi_peekl.9 \
+	man9/ddi_peeks.9 \
+	man9/ddi_poke16.9 \
+	man9/ddi_poke32.9 \
+	man9/ddi_poke64.9 \
+	man9/ddi_poke8.9 \
+	man9/ddi_poke.9 \
+	man9/ddi_pokec.9 \
+	man9/ddi_poked.9 \
+	man9/ddi_pokel.9 \
+	man9/ddi_pokes.9 \
+	man9/ddi_prop_create.9 \
+	man9/ddi_prop_exists.9 \
+	man9/ddi_prop_free.9 \
+	man9/ddi_prop_get_int64.9 \
+	man9/ddi_prop_get_int.9 \
+	man9/ddi_prop_lookup.9 \
+	man9/ddi_prop_lookup_byte_array.9 \
+	man9/ddi_prop_lookup_int64_array.9 \
+	man9/ddi_prop_lookup_int_array.9 \
+	man9/ddi_prop_lookup_string.9 \
+	man9/ddi_prop_lookup_string_array.9 \
+	man9/ddi_prop_modify.9 \
+	man9/ddi_prop_remove.9 \
+	man9/ddi_prop_remove_all.9 \
+	man9/ddi_prop_undefine.9 \
+	man9/ddi_prop_update.9 \
+	man9/ddi_prop_update_byte_array.9 \
+	man9/ddi_prop_update_int64.9 \
+	man9/ddi_prop_update_int64_array.9 \
+	man9/ddi_prop_update_int.9 \
+	man9/ddi_prop_update_string.9 \
+	man9/ddi_prop_update_string_array.9 \
+	man9/ddi_ptob.9 \
+	man9/ddi_put16.9 \
+	man9/ddi_put32.9 \
+	man9/ddi_put64.9 \
+	man9/ddi_put8.9 \
+	man9/ddi_putb.9 \
+	man9/ddi_putl.9 \
+	man9/ddi_putll.9 \
+	man9/ddi_putw.9 \
+	man9/ddi_regs_map_free.9 \
+	man9/ddi_regs_map_setup.9 \
+	man9/ddi_remove_intr.9 \
+	man9/ddi_remove_minor_node.9 \
+	man9/ddi_remove_softintr.9 \
+	man9/ddi_removing_power.9 \
+	man9/ddi_rep_get16.9 \
+	man9/ddi_rep_get32.9 \
+	man9/ddi_rep_get64.9 \
+	man9/ddi_rep_get8.9 \
+	man9/ddi_rep_getb.9 \
+	man9/ddi_rep_getl.9 \
+	man9/ddi_rep_getll.9 \
+	man9/ddi_rep_getw.9 \
+	man9/ddi_report_dev.9 \
+	man9/ddi_rep_put16.9 \
+	man9/ddi_rep_put32.9 \
+	man9/ddi_rep_put64.9 \
+	man9/ddi_rep_put8.9 \
+	man9/ddi_rep_putb.9 \
+	man9/ddi_rep_putl.9 \
+	man9/ddi_rep_putll.9 \
+	man9/ddi_rep_putw.9 \
+	man9/ddi_root_node.9 \
+	man9/ddi_segmap.9 \
+	man9/ddi_segmap_setup.9 \
+	man9/ddi_set_driver_private.9 \
+	man9/ddi_slaveonly.9 \
+	man9/ddi_soft_state.9 \
+	man9/ddi_soft_state_fini.9 \
+	man9/ddi_soft_state_free.9 \
+	man9/ddi_soft_state_init.9 \
+	man9/ddi_soft_state_zalloc.9 \
+	man9/ddi_trigger_softintr.9 \
+	man9/ddi_umem_lock.9 \
+	man9/ddi_umem_unlock.9 \
+	man9/ddi_unmap_regs.9 \
+	man9/defer_func.9 \
+	man9/detach.9 \
+	man9/di_alloc.9 \
+	man9/di_put.9 \
+	man9/esballoca.9 \
+	man9/findlinks.9 \
+	man9/_fini.9 \
+	man9/flushq_common.9 \
+	man9/freechain.9 \
+	man9/freeqb.9 \
+	man9/getendq.9 \
+	man9/getf.9 \
+	man9/getinfo.9 \
+	man9/GetOTInstallInfo.9 \
+	man9/identify.9 \
+	man9/_info.9 \
+	man9/infonext.9 \
+	man9/_init.9 \
+	man9/install_driver.9 \
+	man9/install_info.9 \
+	man9/Intro.9 \
+	man9/isuioq.9 \
+	man9/kmem_alloc_physcontig.9 \
+	man9/kmem_alloc_physreq.9 \
+	man9/kmem_fast_free.9 \
+	man9/kmem_free_physcontig.9 \
+	man9/kmem_free_physreq.9 \
+	man9/kmem_zalloc_physreq.9 \
+	man9/lfs_register_strdev.9 \
+	man9/major.9 \
+	man9/makedev.9 \
+	man9/malloc.9 \
+	man9/map_cv.9 \
+	man9/mapfree.9 \
+	man9/mapinit.9 \
+	man9/maplock.9 \
+	man9/mapname.9 \
+	man9/mapsize.9 \
+	man9/mapstart.9 \
+	man9/mapwant.9 \
+	man9/mdbblock_alloc.9 \
+	man9/mdbblock_free.9 \
+	man9/mfree.9 \
+	man9/minor.9 \
+	man9/mi_sprintf_putc.9 \
+	man9/mi_strol.9 \
+	man9/mi_tpi_ack_alloc.9 \
+	man9/mi_tpi_conn_con.9 \
+	man9/mi_tpi_conn_ind.9 \
+	man9/mi_tpi_conn_req.9 \
+	man9/mi_tpi_data_ind.9 \
+	man9/mi_tpi_data_req.9 \
+	man9/mi_tpi_discon_ind.9 \
+	man9/mi_tpi_discon_req.9 \
+	man9/mi_tpi_err_ack_alloc.9 \
+	man9/mi_tpi_exdata_ind.9 \
+	man9/mi_tpi_exdata_req.9 \
+	man9/mi_tpi_info_req.9 \
+	man9/mi_tpi_ok_ack_alloc.9 \
+	man9/mi_tpi_ordrel_ind.9 \
+	man9/mi_tpi_ordrel_req.9 \
+	man9/mi_tpi_uderror_ind.9 \
+	man9/mi_tpi_unitdata_ind.9 \
+	man9/mi_tpi_unitdata_req.9 \
+	man9/module_info_t.9 \
+	man9/mount.9 \
+	man9/mpsleep.9 \
+	man9/mp-streams.9 \
+	man9/msgutil.9 \
+	man9/nodesw_lock.9 \
+	man9/open.9s \
+	man9/OTHER.9 \
+	man9/physreq_alloc.9 \
+	man9/physreq_free.9 \
+	man9/physreq_prep.9 \
+	man9/power.9 \
+	man9/printf.9 \
+	man9/probe.9 \
+	man9/putp.9 \
+	man9/qallocb.9 \
+	man9/QNAME.9 \
+	man9/qpop.9 \
+	man9/qpush.9 \
+	man9/qschedule.9 \
+	man9/queue_free.9 \
+	man9/qwait_rw.9 \
+	man9/reallocb.9 \
+	man9/rmalloc_locked.9 \
+	man9/rmallocmap_wait.9 \
+	man9/rmalloc_wait.9 \
+	man9/rmfreemap.9 \
+	man9/rmget.9 \
+	man9/rmsetwant.9 \
+	man9/rmwanted.9 \
+	man9/rwnext.9 \
+	man9/service.9s \
+	man9/sparc_ioremap.9 \
+	man9/spec_dentry.9 \
+	man9/specfs_get.9 \
+	man9/specfs_put.9 \
+	man9/SPG.9 \
+	man9/SPL0.9 \
+	man9/SPLSTR.9 \
+	man9/SPLX.9 \
+	man9/srvp.9 \
+	man9/ss7_fast_allocb_bh.9 \
+	man9/ss7_fast_freeb_bh.9 \
+	man9/ss7_fast_freemsg_bh.9 \
+	man9/strbcpy.9 \
+	man9/stream_free.9 \
+	man9/streams_interrupt.9 \
+	man9/streams_mpsleep.9 \
+	man9/STREAMS_TIMEOUT.9 \
+	man9/stream_utils.9 \
+	man9/strioccall.9 \
+	man9/strreadv.9 \
+	man9/struioget.9 \
+	man9/struioput.9 \
+	man9/strwakeq.9 \
+	man9/strwritev.9 \
+	man9/suxcompat.9 \
+	man9/tmout_fcn_t.9 \
+	man9/udelay.9 \
+	man9/umount.9 \
+	man9/unlink.9 \
+	man9/unregister_inode.9 \
+	man9/uxpcompat.9 \
+	man9/vstrlog_hook.9 \
+	man9/vtop.9 \
+	man9/vxwcompat.9
 
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE
