@@ -147,7 +147,7 @@ module.  The
 module can be pushed over Streams conforming to the Communication Device
 Interface (CDI)
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 as described in
 .BR cdi (7).
@@ -267,9 +267,9 @@ operation as described in
 .PP
 The
 .B SDT-CD
-module conforms to the SDTI Specification, Revision 0.9.2.
+module conforms to the SDTI Specification.
 .[
-sdti revision 0.9.2
+sdti
 .]
 .PP
 The

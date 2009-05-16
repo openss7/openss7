@@ -161,7 +161,7 @@ TMN
 T}:T{
 XMP
 .[
-XMP c306
+xmp c306
 .]
 T}
 .TE
@@ -271,6 +271,9 @@ XNS Issue 5.2
 .PP
 Underneath the Session layer is the Transport layer which is provided by
 XTI
+.[
+xti revision 1.0
+.]
 .[
 XNS Issue 5.2
 .]

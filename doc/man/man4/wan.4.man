@@ -128,7 +128,7 @@ iso3309
 .]
 Stream that present the Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 service interface.
@@ -840,7 +840,7 @@ using a standard service interface.  Because of the widespread use of this
 interface, the \fBs_wan\fP, module provides the ability to convert between the
 \fB@PACKAGE_TITLE@\fP CDI,
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 interface and the Spider WAN interface.  \fB@PACKAGE_TITLE@\fP multiplexing

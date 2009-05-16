@@ -148,11 +148,11 @@ Management Information Service (CMIS) along with the ASN.1 productions of the re
 .PP
 XMP,
 .[
-XMP
+xmp c306
 .]
 XOM.
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

@@ -188,7 +188,7 @@ WAN interface directly.
 and other \fBOpenSS7\fP applications, drivers and modules provide primarily a
 Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 for devices at this level; however, a compatibility module,
@@ -1740,7 +1740,7 @@ The Spider Wide Area Network (WAN) interface is a proprietary interface
 without a \fIformal\fP standard (although its widespread use makes it an
 \fIipso facto\fP standard).  The Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 should be used in its stead.
@@ -1838,7 +1838,7 @@ broken in a subsequent release.
 .PP
 New applications should use the Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 instead.

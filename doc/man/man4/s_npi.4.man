@@ -280,7 +280,7 @@ npi revision 2.0.0
 .]
 .BR "NLI Version 3" ,
 .[
-nli revision 0.9.2
+nli @PACKAGE_VERSION@
 .]
 .IR AIXlink/X.25 \(rg,
 .[

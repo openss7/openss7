@@ -116,8 +116,6 @@ search-ignore T
 .PP
 .B #undef _SUN_SOURCE
 .br
-.B #undef _LIS_SOURCE
-.br
 .B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
@@ -126,8 +124,6 @@ search-ignore T
 .sp 2
 .PP
 .B #define _SUN_SOURCE
-.br
-.B #define _LIS_SOURCE
 .br
 .B #include <sys/stream.h>
 .br
@@ -379,14 +375,10 @@ solspg
 .[
 suxspg
 .]
+and
 .IR UnixWare \(rg
 .[
 uw7spg
-.]
-and
-.IR LiS
-.[
-lis
 .]
 provide this function.
 .IR AIX \(rg,
@@ -431,9 +423,7 @@ code; that is, contexts asynchronous to the Stream containing
 .[
 solspg
 .]
-and
-.IR LiS
-provide the function prototype:
+provides the function prototype:
 .BI "void unfreezestr(queue_t *" q ).
 .IR HP-UX \(rg,
 .[
@@ -457,24 +447,6 @@ drivers and modules will avoid the use of
 .BR freezestr (9)
 and
 .BR unfreezestr ().
-.IP \(em
-.IR LiS
-.[
-LiS
-.]
-provides a particularly broken version of this function.  See
-.BR freezestr (9)
-for more information.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules that use this function in the SMP environment will use
-.B @PACKAGE_TITLE@
-.[
-@PACKAGE@
-.]
-in place of
-.IR LiS .
 .IP \(em
 .I "SVR 4.2 MP DDI/DKI"
 specifies that the following functions cannot be called on a frozen stream:

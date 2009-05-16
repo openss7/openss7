@@ -128,7 +128,7 @@ search-ignore T
 .BR "@PACKAGE_TITLE@" ,
 and most OpenSS7 packages, utilize the Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 or Data Link Provider Interface (DLPI),
@@ -550,7 +550,7 @@ The Spider Wide Area Network (WAN) interface is a proprietary interface without
 a \fIformal\fP standard (although its widespread use makes it an \fIipso
 facto\fP standard).  Either the Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 or the Data Link Provider Interface (DLPI),
@@ -592,7 +592,7 @@ has no known bugs.
 is compatible with
 CDI,
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 DLPI,
 .[
@@ -658,7 +658,7 @@ for additional compatibility information.
 .PP
 .BR "CDI Revision 0.9.2" ,
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR "DLPI Revision 2.0.0" ,
 .[

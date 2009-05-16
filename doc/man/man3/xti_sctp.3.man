@@ -3117,9 +3117,6 @@ and implementations based on
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 Internet Protocol (IP) options were not standardized until XPG4.
-.[
-xpg 5.2
-.]
 .IP \(em
 The format of options for the Transport Provider Interface (TPI) differ from
 those for the AT&T Transport Layer Interface (TLI).  This interface follows
@@ -3161,9 +3158,6 @@ and later
 by
 .B The OpenGroup
 in XPG4
-.[
-xpg 5.2
-.]
 and XNS 5.2.
 .[
 xns99

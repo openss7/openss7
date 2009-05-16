@@ -157,7 +157,12 @@ The
 file is compatible with
 SunLink\(rg and products based on SunLink\(rg,
 .[
-sunlink9
+sunlink tli
+.]
+or
+.IR Solstice "\(rg " "X.25
+.[
+solx25pg
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u

@@ -179,10 +179,10 @@ TPI Revision 2.0.0
 .]
 transport provider Streams suitable for use with XTI,
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 (see
 .BR xti (3)).
@@ -221,10 +221,10 @@ library and provides
 .BR RAWIP
 interface using XTI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 as described in
 .BR xti_ip (3).
@@ -478,7 +478,7 @@ soldoc
 .PP
 XNS 5.2.
 .[
-XNS
+xns99
 .]
 Conformance is validated using the
 .BR test-inet_raw (8)

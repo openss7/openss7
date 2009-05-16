@@ -4072,7 +4072,8 @@ mtpMsId OBJECT-TYPE
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
-	""
+	"Provides a Managed Switching Element identifier used to name 
+	 managed objects in this table."
     REFERENCE
 	""
     ::= { mtpMsEntry 1 }
@@ -14169,7 +14170,7 @@ mtpSdlAdjPc OBJECT-TYPE
 	"This columnar object is an entry of the SDL table that 
 	 indicates the signalling point code of the adjacent signalling 
 	 point (the signalling point at the opposite end of the link).  
-	 Becase the Signalling Point could be operating in multiple 
+	 Because the Signalling Point could be operating in multiple 
 	 National and International networks, the NetworkPointCode 
 	 contains a network identifier."
     REFERENCE

@@ -181,7 +181,7 @@ Transaction provider.
 The Transaction Interface first appeared in OpenSS7.
 .SH CONFORMANCE
 .PP
-This interface conforms to TRI revision 0.9.2, Draft 1.
+This interface conforms to TRI Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@.
 .[
 tri
 .]

@@ -236,7 +236,7 @@ provides OSI compatible interfaces.  Thus,
 is largely compatible with implements providing the CDI
 interface.
 .[
-communications device interface cdi
+cdi revision @PACKAGE_VERSION@
 .]
 .\"
 .\"

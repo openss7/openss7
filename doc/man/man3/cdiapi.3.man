@@ -115,7 +115,7 @@ search-ignore T
 .PP
 CDI
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 Application Program Interface.
 .[
@@ -246,7 +246,7 @@ The
 is a library of CDI helper and utility functions designed for use with the
 Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7).
 The original library was designed by
@@ -684,7 +684,7 @@ necessary for the user of these functions.
 .B @includedir@/@PACKAGE@/sys/cdi.h
 the standard CDI
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 header file.
 .TP
@@ -727,7 +727,7 @@ considerations:
 Application programming interfaces for devices and modules that implement the
 Communications Device Interface (CDI),
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7),
 have not been subjected to standardization and are, therefore, inherently
@@ -788,7 +788,7 @@ and
 .PP
 CDI,
 .[
-cdi revision 0.9.2
+cdi revision @PACKAGE_VERSION@
 .]
 CDI API documentation.
 .[

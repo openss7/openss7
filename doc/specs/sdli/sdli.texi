@@ -369,8 +369,13 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @c * Mapping of SDLI Primitives to ANSI T1.111.3::
 @c * State/Event Tables::
 @c * Primitive Precedence Tables::
-* LMI Header File Listing::
-* SDLI Header File Listing::
+* SDLI Input-Output Controls::
+* SDLI Management Information Base::
+* SDLI Header Files::
+* SDLI Drivers and Modules::
+* SDLI Applications::
+* SDLI Utilities::
+* SDLI File Formats::
 * Glossary::
 * Acronyms::
 * References::
@@ -658,7 +663,7 @@ layer user can also be a user program that conforms to the SDLI and accesses the
 however, is to place a signalling data terminal module above the signalling data link layer.
 
 @node SDLI Services
-@section SDLI Services
+@section Services
 
 The features of the SDLI are defined in terms of the services provided by the SDLS provider, and the
 individual primitives that may flow between the SDLS user and the SDLS provider.
@@ -705,7 +710,7 @@ This allows SDT and SL modules to be verified independently for correct operatio
 used for all manner of new device drivers that can implement the SDLI interface.
 
 @node SDLI Services Definition
-@chapter SDLI Services Definition
+@chapter Services Definition
 
 @menu
 * Local Management Services::
@@ -1113,7 +1118,7 @@ A successful invocation of the disconnection service by  the SDLS provider is il
 @figuresized{sdli14,14,Message Flow: Successful Disconnection Service by SDLS Provider,4.0in}
 
 @node SDLI Primitives
-@chapter SDLI Primitives
+@chapter Primitives
 
 @menu
 * Local Management Service Primitives::
@@ -3430,8 +3435,419 @@ associated with the Stream, and then reopening them for processing.
 @appendix Primitive Precedence Tables
 @end ignore
 
+@node SDLI Input-Output Controls
+@chapter Input-Output Controls
+
+@menu
+* SDLI Configuration::
+* SDLI Options::
+* SDLI State::
+* SDLI Statistics::
+* SDLI Events::
+* SDLI Commands::
+@end menu
+
+These input-output controls can be used to interrogate, negotiate, reset, collect and manage a given
+signalling data link or group of signalling data links.  When issued on a SDL user Stream, they can
+only be used to affect the data link or links associated with the SDL user Stream.  Detached
+@dfn{Style 2} Streams have no associated data links.  When issued on a mangement Stream, they can be
+used to affect the configuration of any data link or links accessible to the management Stream (i.e.
+provided by the same driver or module, or temporarily linked from the control Stream).
+
+Data links can have characteristics at the data link level, as well as characteristics at the group
+level.  For example, the data link may not be looped back at the data link, but may be looped back
+at the link group (span).  Where the data link represents a link within a multiplexed medium (such
+as PCM TDM facility), the MXI input-output controls might be available to interrogate, negotiate and
+otherwise manage the link group characteristics providing that the SDL user has sufficient privilege
+to do so.
+
+Note that these input-output controls are not normally issued on the global management Stream by
+user processes.  Rather, the Management Agent (@acronym{SNMP} Agent) for the driver or module is
+normally responsible for managing channels within the driver or module using these input-output
+controls.  Normally these input-output controls would only be issued by user processes to affect the
+data link or links associated with the attached SDL user Stream.
+
+@node SDLI Configuration
+@section Configuration
+
+These input-output controls can be used to interrogate or negotiate the configuration of a given
+data link or group of data links.
+
+@smalldisplay
+@verbatim
+typedef struct sdl_config {
+} sdl_config_t;
+@end verbatim
+@end smalldisplay
+
+The signalling data link configuration structure, @type{sdl_config_t}, contains the following
+members:
+
+@subsection Get Configuration
+@subsubheading @pioc{SDL_IOCGCONFIG}
+
+Gets the signalling data link configuration.  Upon success, the signalling data link configuration
+is written to the memory extent indicated by the pointer argument to the @manref{ioctl(2)} call.
+
+@subsection Set Configuration
+@subsubheading @pioc{SDL_IOCSCONFIG}
+
+Sets the signalling data link configuration.  Upon success, the signalling data link configuration
+is read from the memory extent pointed to by the pointer argument to the @manref{ioctl(2)} call.
+
+@subsection Test Configuration
+@subsubheading @pioc{SDL_IOCTCONFIG}
+
+Test the signalling data link configuration.  Upon success, the signalling data link configuration
+is read from the memory extent specified by the pointer argument to the @manref{ioctl(2)} call,
+values adjusted according to the rules for configuration, and the resulting configuraiton written
+back to the memory extent specified by the pointer argumnet to the @manref{ioctl(2)} call.  Actual
+configuration is not changed.
+
+@subsection Commit Configuration
+@subsubheading @pioc{SDL_IOCCCONFIG}
+
+Confirms the signalling data link configuration.  Upon success, the signalling data link
+configuration is read from the memory extent specified by the pointer argument to the
+@manref{ioctl(2)} call, values adjusted according to the rules for configuration, the configuration
+applied, and then the resulting configuration written back to the memory extent specified by the
+pointer argument to the @manref{ioctl(2)} call.
+
+Normally, the argument to the @pioc{SDL_IOCCCONFIG} call is the same as to an immediately preceding
+@pioc{SDL_IOCTCONFIG} call.
+
+@node SDLI Options
+@section Options
+
+These input-output controls can used to interrogate or negotiate the options associated with a
+given data link or group of data links.
+
+@node SDLI State
+@section State
+
+These input-output controls can be used to interrotate or reset the state associated with a data
+link or a group of data links.
+
+State input-output controls all take an argument containing a poitner to a @type{sdl_statem_t}
+structure, formatted as follows:
+
+@smalldisplay
+@verbatim
+typedef struct sdl_statem {
+} sdl_statem_t;
+@end verbatim
+@end smalldisplay
+
+The signalling data link state structure, @type{sdl_statem_t}, contains the following members:
+
+@table @member
+@end table
+
+@subsection Get State
+@subsubheading @pioc{SDL_IOCGSTATEM}
+
+Requests that the state information be obtained and written to the @type{sdl_statem_t} structure
+pointed to by the argument to the input-output control.
+
+@subsection Reset State
+@subsubheading @pioc{SDL_IOCCMRESET}
+
+Request that the state associated with the data link be reset.  This input-output control takes no
+argument.
+
+@node SDLI Statistics
+@section Statistics
+
+These input-output controls can be used to collect statistics or set statistics collection intervals
+associated with a data link or group of data links.
+
+Statistic input-output controls all take an argument containing a pointer to a @type{sdl_stats_t}
+structure, formatted as follows:
+
+@smalldisplay
+@verbatim
+typedef struct sdl_stats {
+} sdl_stats_t;
+@end verbatim
+@end smalldisplay
+
+The signalling data link statistics structure, @type{sdl_stats_t}, contains the following members:
+
+@table @member
+@end table
+
+@node SDLI Events
+@section Events
+
+These input-output controls can be used to specify the events that will be reported by a data link or
+data links.
+
+Notification input-output controls all take an argument containing a pointer to a @type{sdl_notify_t}
+structure, formatted as follows:
+
+@smalldisplay
+@verbatim
+typedef struct sdl_notify {
+    sdl_ulong events;
+} sdl_notify_t;
+@end verbatim
+@end smalldisplay
+
+The signalling data link events structure, @type{sdl_notify_t}, contains the following members:
+
+@table @member
+@item events
+Specifies or indicates a bitwise OR of the events associated wtih the data link.  When a bit is set,
+it specifies that event reporting for the specific event is enabled for the data link; when clear,
+that the event reporting is disabled.
+@end table
+
+@subsection Get Notify
+@subsubheading @pioc{SDL_IOCGNOTIFY}
+
+Requests that the events associated with the data link be obtained and written to the
+@type{sdl_notify_t} structure pointed to by the argument to the input-output control.
+
+@subsection Set Notify
+@subsubheading @pioc{SDL_IOCSNOTIFY}
+
+Requests that the events associated with the data link be read from the @type{sdl_notify_t} structure
+pointed to by the argument to the input-output control and set for the data link.  Each bit set in the
+@member{events} member specifies an event for which notification is to be set.
+
+@subsection Clear Notify
+@subsubheading @pioc{SDL_IOCCNOTIFY}
+
+Request that the events associated with the data link be read from the @type{sdl_notify_t} structure
+pointed to by the argument to the input-output control and cleared for the data link.  Each bit set in
+the @member{events} member specifies an event for which notification is to be cleared.
+
+@node SDLI Commands
+@section Commands
+
+These input-output controls can be used to manage a data link or data links.
+
+Management input-output controls all take an argument containing a pointer to a @type{sdl_mgmt_t}
+structure, formatted as follows:
+
+@smalldisplay
+@verbatim
+typedef struct sdl_mgmt {
+    sdl_ulong cmd;
+} sdl_mgmt_t;
+@end verbatim
+@end smalldisplay
+
+The signalling data link management structure, @type{sdl_mgmt_t}, contains the following members:
+
+@subsection Command
+@subsubheading @pioc{SDL_IOCCMGMT}
+
+Request that the management command be read from the @type{sdl_mgmt_t} structure pointed to by the
+argument to the input-output control and acted upon for the data link.
+
+@node SDLI Management Information Base
+@chapter Management Information Base
+
+The @file{OPENSS7-MTP-MIB} provides the following Signalling Data Link specific tables:
+
+@menu
+* mtpSdlTable::		MTP SDL Configuration Table
+* mtpNotifications::	MTP SDL Notifications
+@end menu
+
+@iftex
+@itemize
+@item @ref{mtpSdlTable}.
+@end itemize
+@end iftex
+
+@ifhtml
+@multitable {mtpSdlTable:}{MTP Signalling Data Link (SDL) Configuration Table}
+@item @ref{mtpSdlTable}: @tab MTP Signalling Data Link (SDL) Configuration Table
+@end multitable
+@end ifhtml
+
+@ifplaintext
+@multitable {mtpSdlTable:}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item mtpSdlTable: @tab MTP Signalling Data Link (SDL) Configuration Table
+@end multitable
+@end ifplaintext
+
+@node mtpSdlTable
+@section MTP Signalling Data Link (SDL) Configuration Table
+
+The @cite{MTP Signalling Data Link (SDL) Configuration Table}, @mobj{mtpSdlTable}, is a table that
+provides specific configuration information for various @dfn{MTP Signalling Data Link Entities}.
+
+Provides a table of @value{LONG} (@value{SHORT}) Entities.  Each Signalling Data Link entity
+represents the path termination of the signalling data link within the signalling point as defined
+in ITU-T Rec. Q.702.  The operational state is @samp{enabled} in normal operation.  In case of
+failure of the part of the siganlling data link that is within the control of the managed switching
+element, this state will be @samp{disabled}.
+
+If the @mobj{vcTTpPointer} attribute is present, then the transmission rate is determined by the
+cell rate fixed in the @mobj{trafficDescriptorPackage} of the @mobj{vcTTPBidirectional} instance
+referenced by the @mobj{signDataLinkTp}.
+
+Note that for a complete view fo the state of a signalling data link a network view is required.
+
+@table @mobj
+@item mtpMsId
+This attribute is used for naming instances and identifiers the Managed Switching Element to which
+the the Signalling Point and Signalling Data Link path termination belong.
+@item mtpSpId
+Provides a non-zero ordinal sub-index into the signalling point table.  This attribute is used for
+naming instances.  Signalling points are contained by managed switching elements and the managed
+switching element id is used to name instances of signalling points.
+@item mtpSdlId
+This attribute is used for naming instances.  Along with the @mobj{mtpSpId}, It provides a non-zero
+ordinal index into the table.  Signalling Data Links are contained by Signalling Points which are in
+turn contained by Managed Switching Elements.
+@item mtpSdlType
+Provides the type of signalling data link.  The type of signalling data link may be:
+@itemize @bullet
+@item @samp{narrowBand(1)}, for a narrow-band signalling data link.  In this case, the following
+columns are present:
+@itemize --
+@item @mobj{mtpSdlLoopDelay}, which specifies the nominal loop delay of the narrowband signalling
+data link.  This value is used to select the appropriate transmission and reception method (base or
+preventative cyclic retransmission) and the appropriate timer profile.
+@item @mobj{mtpSdlTransmissionRate}, which specifies the tranmission bit rate.  This value is used
+to select the appropriate timer profile in conjunction with the @mobj{mtpSdlLoopDelay} field.
+@item @mobj{mtpSdlStmChannel}, which specifies the channel within a primary multiplex facility.
+@end itemize
+@item @samp{broadband(2)}, for a SAAL signalling data link.  In this case, the following columns are
+present:
+@itemize --
+@item @mobj{mtpSdlVcTTpPointer}
+@end itemize
+@item @samp{m2pa(3)}, for an M2PA signalling data link.  In this case, the following columns are
+present:
+@itemize --
+@item @mobj{mtpSdlSctpPointer}
+@end itemize
+@end itemize
+@item mtpSdlAdjPc
+This columnar object is an entry of the SDL table that indicates the signalling point code of the
+adjacent signalling point (the signalling point at the opposite end of the link).  Because the
+Signalling Point could be operating in multiple National and International networks, the
+@mobj{NetworkPointCode} contains a network identifier.
+@item mtpSdlLoopDelay
+Specifies the nominal loop delay (in milliseconds) associated with the narrowband signalling data
+link.  The value zero (0), indicates that the nominal loop delay of the signalling data link is
+unknown and unspecified.
+@item mtpSdlOperationalState
+Provides the operational state of the signalling data link following the OperationalState textual
+convention of the @file{OPENSS7-SMI-MIB} module, and according to ITU-T Rec. X.721 | ISO/IEC
+10165-2.
+@itemize @bullet
+@item @samp{disabled(0)}, the signalling data link is not operational and is unable to provide
+service to a signalling link;
+@item @samp{enabled(1)}, the signalling data link is operational and is able to provide service to a
+signalling link.
+@end itemize
+@item mtpSdlEquipmentPointer
+This attribute is used to reference physical equipment.  The constraints on this pointer are
+determined by the @mobj{mtpSdlType} as follows:
+@itemize @bullet
+@item @samp{narrowBand(1)}, a narrow-band signalling data link, this pointer references a row in an
+equipment table that models the narrow-band interface.  Note that in some circumstances this may be
+the same as the signalling terminal equipment pointer.
+@item @samp{broadband(2)}, an ATM SAAL signalling data link, this pointer references a row in an
+equipment table that models the ATM SAAL NNI interface.  Note that this is normally the same as the
+signalling terminal equipment pointer.
+@item @samp{m2pa(3)}, of an M2PA signalling data link, this pointer references a row in a table that
+models the M2PA interface.  Note that under some circumstances this may be the same as the
+signalling terminal equipment pointer.
+@end itemize
+Where the signalling link is accessed using M2UA or M3UA, the equipment pointer references a row in
+an M2UA or M3UA table that models the remote interface.  Note that this is normally the same as the
+signalling terminal equipment pointer.
+@item mtpSdlCIC
+This attribute is used to reference the SS No. 7 trunk used by the datalink.  Its value has to be
+unique within the SP's connected by the trunk.
+	 
+This columnar object is an entry of the SDL table that indicates the circuit identification code
+(CIC) which identifies the SDL channel between the local and adjacent signalling points.  This value
+is only necessary when the automatic allocation of signalling data links is supported.  For IUT-T
+based networks, the CIC can have a value 0..4095, for ANSI based networks, the CIC can have a value
+0..16383.
+@item mtpSdlTransmissionRate
+Specifies or indicates the nominal transmission rate associated with the narrowband signalling data
+link.
+@item mtpSdlStmChannel
+This is a circuit code which uniquely identifies the circuit group or circuit facility which
+provides the signalling data link.
+	 
+This attribute denotes the STM channel which defines the signalling datalink on the PCM
+transmission system.  Note that the range is (1..31) for E1 and (1..24) for T1 and J1.
+	 
+For broadband (SAAL) and SIGTRAN (M2PA) signalling data links, this column is not present.
+@item mtpSdlVcTTpPointer
+This attribute references an object class defined in I.751.  It must be present for a broadband
+signalling data link, it must not be present for a narrowband datalink (the term broadband
+signalling data link signifies a data link using the SAAL NNI).  The referenced instance has a
+mandatory relation via its upstream- and downstreamConnectivityPointers to one instance of object
+class vcCTPBidirectional, whose Id represents the VCI of the virtual channel used by the data link.
+This vcCTPBidirectional is contained in a superior object vpTTPBidirectional, which has a mandatory
+relation via its upstream- and downstreamConnectivityPointers to one instance of the object class
+vpTTPBidirectional, whose Id represents the VPI of the virtual path used by the data link.
+	 
+For narrowband (TDM) and SIGTRAN (M2PA) signalling data links, this column is not present.
+@item mtpSdlSctpPointer
+This attribute references an SCTP association defined in RFC 4960.  It must be present for an M2PA
+signalling data link, it must not be present for a narrow-band or broadband signalling data link
+(the term broadband signalling data link signifies a data link using the SAAL NNI).  The referenced
+instance identifies the IP addresses and port numbers of the association.
+	 
+For narrowband (TDM) and broadband (ATM SAAL) signalling data links, this column is not present.
+@item mtpSdlName
+This attribute is an additional name for instances of the signDataLinkTp managed object class.  This
+name, when provided, must be unique within the table.  An attempt to create an entry  in this table
+with a name that is used by another entry in this  table will be rejected as having an inconsistent
+value.
+@item mtpSdlRowStatus
+Provides a mechanism whereby management stations may create and delete entries in this table.
+	 
+A create request is rejected if the equipmentPointer would reference equipment that does not exist.
+If the name package is supported: a create request with a value for the name attribute that is
+already used by another instance of the same object class will be rejected.  A create request may be
+rejected if the mtpSpId index does not correspond to an existing entry in the mtpSpTable.
+	 
+A delete request, or a request to take an entry out of service, is rejected as an inconsistent value
+if the entry is referenced by an entry in the mtpSlTable.
+@end table
+
+@node mtpNotifications
+@section MTP SDL Notifications
+
+@table @mobj
+@item sdlEventLostSync
+This notification is sent when a frame-based interface (channel) group loses
+frame synchronization on the line.  The argument of the notification is the
+mtpSdlTable index.
+@item sdlEventSuError
+This notification is sent when a frame-based interface (channel) group receives
+an SU in Error.  The argument of the notification is the mtpSdlTable index.
+@item sdlEventTxFail
+This notification is sent when the transmit section of the interface fails.  The
+argument of the notification is the mtpSdlTable index.
+@item sdlEventRxFail
+This notification is sent when the receive section of the interface fails.  The
+argument of the notification is the mtpSdlTable index.
+@end table
+
+@node SDLI Header Files
+@appendix Header Files
+
+@menu
+* LMI Header File Listing::
+* SDLI Header File Listing::
+@end menu
+
 @node LMI Header File Listing
-@appendix LMI Header File Listing
+@section LMI Header File Listing
 
 @noindent
 @smallformat
@@ -3439,12 +3855,109 @@ associated with the Stream, and then reopening them for processing.
 @end smallformat
 
 @node SDLI Header File Listing
-@appendix SDLI Header File Listing
+@section SDLI Header File Listing
 
 @noindent
 @smallformat
 @verbatiminclude sdli.h
 @end smallformat
+
+@node SDLI Drivers and Modules
+@appendix Drivers and Modules
+
+@menu
+* SDLI Drivers::
+* SDLI Modules::
+@end menu
+
+The Signalling Data Link Interface (SDLI) is used to provide services to a number of @cite{STREAMS}
+drivers and modules in addition to user-space applications.  @cite{OpenSS7} provides a range of
+@cite{STREAMS} multiplexing drivers, pseudo-device drivers, and pushable modules that complement the
+drivers that provide signalling data link services at their service interfaces.
+
+@node SDLI Drivers
+@section Drivers
+
+Although theoretically a driver can provide the SDL interface directly, there are currently no
+drivers that do so.  Any driver that provides the SDL interface (SDLI) can easily provide the
+Channel interface (CHI) instead and provide much wider use of the driver.
+Drivers that provide the Channel Interface (CHI) can specify the @manref{sdl(4)} module in an
+@manref{autopush(8)} specification to transparently provide both the CHI and SDLI interfaces.
+
+@node SDLI Modules
+@section Modules
+
+@subsection SDL Module
+
+The SDL module, @manref{sdl(4)}, is a pushable @dfn{STREAMS} module named @file{sdl}.  Its purpose
+is to take an @cite{OpenSS7} Channel Interface (CHI) Stream and convert it for use as an SDL
+interface Stream by applications programs, drivers or modules expecting the SDLI interface.  The
+insertion and use of this module is illustrated in @figref{B-1}.
+
+@figuresized{sdlib1,B-1,SS7 Protocol Stack,5.0in}
+
+The @file{sdl} pushable @dfn{STREAMS} module accepts a Channel Inteface (CHI) at it lower service
+boundary and provides a Signalling Data Link Inteface (SDLI) at its upper service boundary.
+
+Note that, as @file{sdl} is a pushable module, it is possible to include an @manref{autopush(8)}
+specification for a driver providing the Channel Interface (CHI), to provide a specialized device
+minor or minor name that clones channel device layers following the SDLI approach.
+
+The role of the SDL module in the @cite{OpenSS7} SS7 protocol suite is illustrated in @figref{B-1}
+and @figref{C-1}.
+
+@node SDLI Applications
+@appendix Applications
+
+@section SDLI in SS7 Protocol Suite
+
+The signalling data link interface is an important lower layer component of the @cite{OpenSS7} SS7
+signalling stack.
+
+@figuresized{sdlic1,C-1,SS7 Protocol Stack,5.0in}
+
+@figref{C-1} illustrates the use of the SDLI interfae specifications in the formation of the SS7
+(Signalling System No. 7) protocol stack.
+
+The SDLI interface is responsible for providing access to the signalling data links necessary for
+implementing signalling terminals and signalling links in accordance with ITU-T Recommendationds
+Q.702 and Q.703 as well as similar national standards (e.g. ANSI T1.111).
+
+Use of the @cite{OpenSS7} softswitch matrix a the lowest level, as illustrated in @figref{C-1},
+provides a mechanism whereby any communications channel available to the host can be used as an SS7
+link.
+
+Due to the high performance of the @cite{Linux Fast-STREAMS} and power of recent CPUs, it is
+possible to break the SS7 atack into multiple lower layers.  This has the following advantages:
+
+@itemize ---
+@item Because the driver is no longer closely integrated, it is easy to reuse the same driver for
+different purposes (such as X.25, Frame Relay, ISDN, Voice) and not just SS7 data links.
+@item Drivers are no longer specific ot SS7.
+@item Drivers can easily be used for voice and switching.
+@item Devices can be share across protocol suites and applications.
+@item The SDLI interface can support fractional E1/T1 spans.
+@end itemize
+
+The advent of the high-performance @cite{Linux Fast-STREAMS} as well as extremely powerful COTS
+processors, it is easily possibl to spearate protocol levels.@footnote{As it turns out, @cite{Linux
+Fast-STREAMS} has such high peformance that higher levels of performance can be acheived by
+splitting functions into narrowly defined modules that can use @cite{STREAMS} flow control to keep
+code paths scortchingly hot.}  Thus, the drivers provide the generic Multiplex Interface (MXI) that
+provides direct access to the multiplexed spans, or the generic Multiplex Interface (MXI) to provide
+direct access to non-multiplexed discrete channel devices, and these generic driver interfaces can
+be linked under the switching matrix multiplexing driver so that a sngle upper MXI user Stream can
+provide access to any channel, span, or fractional span within the entire host.
+
+@node SDLI Utilities
+@appendix Utilities
+
+@section SDL Configuration Utility
+
+@manref{sdlconfig(8)}
+
+@node SDLI File Formats
+@appendix File Formats
 
 @node Glossary
 @unnumbered Glossary
@@ -3489,33 +4002,33 @@ An identifier of a particular physical medium over which communication transpire
 @unnumbered Acronyms
 
 @multitable {LMS Provider}{International Telecommunication Union - Telecom Sector}
-@item AERM @tab Alignment Error Rate Monitor
-@item CC @tab Congestion Control
-@item DAEDR @tab Delimitation Alignment and Error Detection (Receive)
-@item DAEDT @tab Delimitation Alignment and Error Detection (Transmit)
-@item EIM @tab Errored Interval Monitor
-@item IAC @tab Initial Alignment Control
-@item ITU-T @tab International Telecommunications Union - Telecom Sector
-@item LMS Provider @tab A provider of Local Management Services
-@item LMS @tab Local Management Service
-@item LMS User @tab A user of Local Management Services
-@item LM @tab Local Management
-@item LSC @tab Link State Control
-@item PPA @tab Physical Point of Attachment
-@item RC @tab Reception Control
-@item SDLI @tab Signalling Data Link Interface
-@item SDL SDU @tab Signalling Data Link Service Data Unit
-@item SDLS @tab Signalling Data Link Service
-@item SDL @tab Signalling Data Link
-@item SDTI @tab Signalling Data Terminal Interface
-@item SDTS @tab Signalling Data Terminal Service
-@item SDT @tab Signalling Data Terminal
-@item SLI @tab Signalling Link Interface
-@item SLS @tab Signalling Link Service
-@item SL @tab Signalling Link
-@item SL @tab Signalling Link
-@item SS7 @tab Signalling System No. 7
-@item TXC @tab Transmission Control
+@item @acronym{AERM} @tab Alignment Error Rate Monitor
+@item @acronym{CC} @tab Congestion Control
+@item @acronym{DAEDR} @tab Delimitation Alignment and Error Detection (Receive)
+@item @acronym{DAEDT} @tab Delimitation Alignment and Error Detection (Transmit)
+@item @acronym{EIM} @tab Errored Interval Monitor
+@item @acronym{IAC} @tab Initial Alignment Control
+@item @acronym{ITU-T} @tab International Telecommunications Union - Telecom Sector
+@item @acronym{LMS} Provider @tab A provider of Local Management Services
+@item @acronym{LMS} @tab Local Management Service
+@item @acronym{LMS} User @tab A user of Local Management Services
+@item @acronym{LM} @tab Local Management
+@item @acronym{LSC} @tab Link State Control
+@item @acronym{PPA} @tab Physical Point of Attachment
+@item @acronym{RC} @tab Reception Control
+@item @acronym{SDLI} @tab Signalling Data Link Interface
+@item @acronym{SDL SDU} @tab Signalling Data Link Service Data Unit
+@item @acronym{SDLS} @tab Signalling Data Link Service
+@item @acronym{SDL} @tab Signalling Data Link
+@item @acronym{SDTI} @tab Signalling Data Terminal Interface
+@item @acronym{SDTS} @tab Signalling Data Terminal Service
+@item @acronym{SDT} @tab Signalling Data Terminal
+@item @acronym{SLI} @tab Signalling Link Interface
+@item @acronym{SLS} @tab Signalling Link Service
+@item @acronym{SL} @tab Signalling Link
+@item @acronym{SL} @tab Signalling Link
+@item @acronym{SS7} @tab Signalling System No. 7
+@item @acronym{TXC} @tab Transmission Control
 @end multitable
 
 @node References

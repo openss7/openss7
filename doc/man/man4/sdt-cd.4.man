@@ -1,0 +1,1 @@
+.so man4/sdt_cd.4.man

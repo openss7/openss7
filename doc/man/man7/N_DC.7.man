@@ -112,7 +112,7 @@ search-ignore T
 .PP
 Network Layer Interface (NLI),
 .[
-nli Revision 0.9.2
+nli revision @PACKAGE_VERSION@
 .]
 .BR nli (7).
 .SH SYNOPSIS

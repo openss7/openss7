@@ -225,7 +225,7 @@ or
 Otherwise, the OM object's OM class is that of the result of the asynchronous
 operation, and can be determined by using the OM functions.
 .[
-XOM
+xom c607
 .]
 .PP
 This result is only valid if the
@@ -333,7 +333,7 @@ XDS
 .\"
 .XX
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

@@ -147,7 +147,7 @@ The module pushes over a UDP Stream that provides connectivity to the
 peer TDM-IP system.  The upper boundary service interface for the module
 is the Multiplex Interface (MXI),
 .[
-mxi revision 0.9.2
+mxi @PACKAGE_VERSION@
 .]
 .BR mxi (7),
 interface.  The lower boundary service interface for the module is the

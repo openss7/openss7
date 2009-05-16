@@ -269,9 +269,16 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * CDI Primitives::
 * Allowable Sequence of CDI Primitives::
 * Precedence of CDI Primitives::
+@c * CDI Input-Output Controls::
+@c * CDI Management Information Base::
 * Guidelines for Protocol Independent CDS Users::
 * Required Information for CDS Provider-Specific Addenda::
-* CDI Header File::
+* CDI Header Files::
+* CDI Library::
+* CDI Drivers and Modules::
+@c * CDI Utilities::
+@c * CDI File Formats::
+@c * CDI Compatibility and Porting::
 * Glossary of CDI Terms and Acronyms::
 * References::
 * Licenses::
@@ -473,7 +480,7 @@ summarizes guidelines a CDS user implementation must follow to be fully protocol
 @item @ref{Required Information for CDS Provider-Specific Addenda},
 presents the information that should be documented for each CDS provider implementation.
 
-@item @ref{CDI Header File},
+@item @ref{CDI Header Files},
 presents the header file containing CDI structure and constant definitions needed by a CDS user or provider implemented
 to use the interface.
 
@@ -5211,18 +5218,420 @@ UNIX system error.
 @node Precedence of CDI Primitives
 @chapter Precedence of CDI Primitives
 
+@ignore
+
+@node CDI Input-Output Controls
+@chapter CDI Input-Output Controls
+
+@menu
+* Input-Output Control Data Structures::
+* Input-Output Control Commands::
+@end menu
+
+The Communications Device Interface (CDI) specification proper does not define
+input-output control commands.  Nevertheless, in support of a management
+information base for WAN and LAN interfaces supported by the CDI interface,
+this @cite{OpenSS7} specification appendix provides definition of a set of
+input-output control datastructures and commands following the principles of
+the @cite{OpenSS7} Local Management Interface.
+
+@node Input-Output Control Data Structures
+@section Input-Output Control Data Structures
+
+The @file{@value{_includedir}/@value{PACKAGE_LCNAME}/sys/lmi_ioctl.h} header
+file (@file{<sys/lmi_ioctl.h>} with proper compile flags) defines a number of
+structures, pointers to which are used as argumnets to input-output control
+commands.  These structures fall into a number of classes as follows:
+
+The structures are described in detail in the subsections that follow.
+
+@node Input-Output Control Commands
+@section Input-Output Control Commands
+
+The @file{@value{_includedir}/@value{PACKAGE_LCNAME}/sys/lmi_ioctl.h} header
+file (@file{<sys/lmi_ioctl.h>} with proper compile flags) defines a number of
+input-output controls as follows:
+
+These input-output controls are described in detail in the subsections that
+follow.
+
+@node CDI Management Information Base
+@chapter CDI Management Information Base
+
+The Communications Device Interface (CDI) specification proper does not define
+any management information base for use with supported interfaces.
+Nevertheless, in support of management information bases for SS7, WAN and LAN
+interfaces supported by the CDI interface, this @cite{OpenSS7} specification
+appendix provides identification of a set of management information bases for
+use with specific drivers and modules.
+
+@end ignore
+
 @node Guidelines for Protocol Independent CDS Users
 @appendix Guidelines for Protocol Independent CDS Users
 
 @node Required Information for CDS Provider-Specific Addenda
 @appendix Required Information for CDS Provider-Specific Addenda
 
-@node CDI Header File
-@appendix CDI Header File
+@node CDI Header Files
+@appendix CDI Header Files
+
+@section Compilation with Header Files
+
+All applications programs and @cite{STREAMS} drivers and modules that use this interface include the
+@file{<sys/cdi.h>} header file.  When compiling using a @samp{C} language compiler, the compilation
+line must specify the location of the header file, such as
+@samp{-I@value{_includedir}/@value{PACKAGE_LCNAME}}.
+
+@section cdi.h
 
 @smallformat
 @verbatiminclude cdi.h
 @end smallformat
+
+@section cdiapi.h
+
+@smallformat
+@verbatiminclude cdiapi.h
+@end smallformat
+
+@node CDI Library
+@appendix CDI Library
+
+Although nowhere close to becoming a standard, @url{http://www.gcom.com/,GCOM} specified a
+@acronym{CDI-API} library the provided user functions for accessing a @dfn{Stream} implementing the
+@cite{Communications Device Interface}.  A compatible library is implemented as the @file{libcdiapi}
+library in the @dfn{@value{PACKAGE_TITLE}} package.
+
+Applications programs using this library must specifiy the standard library include path,
+@samp{-L @value{_libdir}} and the library to link, @samp{-lcdiapi}, as @samp{C} compiler command
+line arguments.
+
+@section Functions
+
+The @acronym{CDI-API} library provides the following subroutines:
+
+@itemize
+@item @manref{cdi_allow_input_req(3)}
+@item @manref{cdi_attach_req(3)}
+@item @manref{cdi_close(3)}
+@item @manref{cdi_decode_ctl(3)}
+@item @manref{cdi_decode_modem_sigs(3)}
+@item @manref{cdi_detach_req(3)}
+@item @manref{cdi_dial_req(3)}
+@item @manref{cdi_disable_req(3)}
+@item @manref{cdi_enable_req(3)}
+@item @manref{cdi_get_a_msg(3)}
+@item @manref{cdi_get_modem_sigs(3)}
+@item @manref{cdi_init(3)}
+@item @manref{cdi_init_FILE(3)}
+@item @manref{cdi_modem_sig_poll(3)}
+@item @manref{cdi_mdoem_sig_req(3)}
+@item @manref{cdi_open(3)}
+@item @manref{cdi_open_data(3)}
+@item @manref{cdi_perror(3)}
+@item @manref{cdi_printf(3)}
+@item @manref{cdi_print_msg(3)}
+@item @manref{cdi_put_allow_input_req(3)}
+@item @manref{cdi_put_attach_req(3)}
+@item @manref{cdi_put_both(3)}
+@item @manref{cdi_puth_data(3)}
+@item @manref{cdi_put_detach_req(3)}
+@item @manref{cdi_put_dial_req(3)}
+@item @manref{cdi_put_disable_req(3)}
+@item @manref{cdi_put_enable_req(3)}
+@item @manref{cdi_put_frame(3)}
+@item @manref{cdi_put_proto(3)}
+@item @manref{cdi_rcv_msg(3)}
+@item @manref{cdi_read_data(3)}
+@item @manref{cdi_set_log_size(3)}
+@item @manref{cdi_wait_ack(3)}
+@item @manref{cdi_write_data(3)}
+@item @manref{cdi_xray_req(3)}
+@end itemize
+
+@node CDI Drivers and Modules
+@appendix CDI Drivers and Modules
+
+@menu
+* CDI Drivers::
+* CDI Modules::
+@end menu
+
+The Communications Device Interface (CDI) is used to provide services to a
+number of @cite{STREAMS} drivers and modules in addition to user-space
+applications.  @cite{OpenSS7} provides a range of @cite{STREAMS} multiplexing
+drivers, pseudo-device drivers, and pushable modules that complement the
+Channel driver that provides channel services at its upper layer.
+
+@node CDI Drivers
+@section CDI Drivers
+@cindex CDI drivers
+
+@subsection cd
+
+@manref{cd(4)}
+
+@subsection cd-llc
+
+@manref{cd-llc(4)}
+
+@node CDI Modules
+@section CDI Modules
+@cindex CDI modules
+
+@subsection CD DAED Module
+
+The @acronym{DAED} module, @manref{cd_daed(4)}, is a pushable @cite{STREAMS}
+module named @file{cd-daed}.  Its purpose is to take an @cite{OpenSS7} Channel
+Interface (CHI) Stream and convert it for use as an @acronym{DEAD} interface
+Stream by applications programs, drivers or modules expecting the CDI
+interface.  The insertion and use of this module is illustrated in
+
+The @file{cd-daed} pushable @cite{STREAMS} module accepts a Channel Interface
+(CHI) at its lower service boundary and provides a Communicaitons Device
+Interface (CDI) at its upper service boundary.
+
+Note that, as @file{cd-hdlc} is a pushable module, it is possible to include an
+@manref{autopush(8)} specification for a driver providing the Channel Interface
+(CHI), to provide a specialized device minor or minor device name that clones
+channel device layers following the CDI approach.
+
+@smallexample
+@verbatim
+#include <sys/types.h>
+#include <sys/stropts.h>
+#include <sys/errno.h>
+#include <sys/cdi.h>
+
+int fd;
+
+/* Open the channel device. */
+
+if ((fd = open("/dev/ch", O_RDWR)) < 0) {
+        perror();
+        exit(1);
+}
+
+/* Push the CD DAED module. */
+if (ioctl(fd, I_PUSH, "cd-daed") < 0) {
+        perror();
+        exit(1);
+}
+
+/* At this point we can talk to the Stream using
+ * the service primitives and input-output controls
+ * of the CDI interface. */
+@end verbatim
+@end smallexample
+
+@manref{cd_daed(4)} is an implementation of the Delimination Alignment and
+Error Detection (DAED) procedures as specified in @cite{ITU-T Recommendation
+Q.703} and @cite{ANSI T1.111.3}.  It is intended to be used with a
+@manref{ch(4)} driver.
+
+@manref{cd_daed(4)} is implemented as a pushabled @cite{STREAMS} module.  The
+module ccan be pushed over a @dfn{Stream} conforming to the @cite{Channel
+Interface (CHI)}, as described in @manref{chi(7)}.  The module provides DAED
+access to the bit stream from the channel provided by the @manref{chi(7)}
+@dfn{Stream} below it, by performing @acronym{HDLC} and @acronym{DAED}
+functions on the raw bit stream.  The upper interface provided by the module is
+the @cite{Communications Device Interface (CDI)} as described in this document
+and @manref{chi(7)}.
+
+@manref{cd_daed(4)} @dfn{Streams} can be linked under the @manref{cd(4)}
+multiplexing driver using the @ioctlref{I_LINK} or @ioctlref{I_PLINK}
+commands of @manref{streamio(7)}, to provide a complete Communications SDevice
+that can then be linked under a @manref{dl(4)} driver using the
+@ioctlref{I_LINK} or @ioctlref{I_PLINK} commands of @manref{streamio(7)},
+to provide the data link services to the layer 3 protocol.  This is normally
+performed, as required, by the SS7 Configuration Agent, @manref{ss7confd(8)}.
+
+This modules has been implemented as a pushable module to ease the developmetn
+of SS7 Communications Device and Data Link drivers for various hardware cards.
+All that is required is for the acrd to provide a @cite{Channel Interface
+(CHI)}, @manref{chi(7)}, and push the @manref{cd_daed(4)} and
+@manref{sl_cd(4)} modules to provide a complete and compliant SS7 Signalling
+Link.
+
+This module is implemented internally as a soft-HDLC using host-based table
+lookups.  While this is fairly efficient, devices that are capable of
+performing this function in hardware should provide the @cite{Communication
+Device Interface (CDI)}, @manref{cdi(7)}, directly.  An example of a device
+that does not include @acronym{HDLC} is the @manref{x400p(4)} driver.  An
+example of one that does, is the @manref{acb56(4)} driver.
+
+Note that the @manref{cd_daed(4)} module is not normally pushed or accessed
+directly by user-level programs.  The @manref{cd_daed(4)} module is used
+directly by some test and monitoring programs.
+
+@subsection CD HDLC Module
+
+The @acronym{HDLC} module, @manref{cd_hdlc(4)}, is a pushable @cite{STREAMS}
+module named @file{cd-hdlc}.  Its purpose is to take an @cite{OpenSS7} Channel
+Interface (CHI) Stream and convert it for use as an @acronym{HDLC} interface
+Stream by applications programs, drivers or modules expecting the CDI
+interface.  The insertion and use of this module is illustrated in
+
+The @file{cd-hdlc} pushable @cite{STREAMS} module accepts a Channel
+Interface (CHI) at its lower service boundary and provides a Communications
+Device Interface (CDI) at its upper service boundary.
+
+Note that, as @file{cd-hdlc} is a pushable module, it is possible to include an
+@manref{autopush(8)} specification for a driver providing the Channel Interface
+(CHI), to provide a specialized device minor or minor device name that clones
+channel device layers following the CDI approach.
+
+@smallexample
+@verbatim
+#include <sys/types.h>
+#include <sys/stropts.h>
+#include <sys/errno.h>
+#include <sys/cdi.h>
+
+int fd;
+
+/* Open the channel device. */
+
+if ((fd = open("/dev/ch", O_RDWR)) < 0) {
+        perror();
+        exit(1);
+}
+
+/* Push the CD HDLC module. */
+if (ioctl(fd, I_PUSH, "cd-hdlc") < 0) {
+        perror();
+        exit(1);
+}
+
+/* At this point we can talk to the Stream using
+ * the service primitives and input-output controls
+ * of the CDI interface. */
+@end verbatim
+@end smallexample
+
+@subsection CD Pipe Module
+
+The CD pipe module, @manref{cdpmod(4)}, is a pushable @cite{STREAMS} module
+named @file{cdpmod}.  Its purpose is to take a @cite{STREAMS}-based pipe and
+convert it to a connected pair of CDI Streams for use by applications programs,
+drivers or modules expecting a CDI interface.  The insertion and use of this
+module is illustrated in
+
+The @file{chpmod} pushable @cite{STREAMS} module provides a Communications
+Device Interface (CDI) at its upper service boundary and provides an inverted
+Communications Device Interface (CDI) at its lower service boundary.  This
+provides a @dfn{Style 1} connected communications device.
+
+The purpose of the pipe module is for testing of upper layer drivers expecting
+a CDI interface.
+
+@subsection CD to WAN Conversion Module
+
+The CD to WAN Conversion Module, @manref{s_wan(4)}, is a pushable
+@cite{STREAMS} module named @file{s_wan} that converts between a @dfn{Stream}
+supporting the Communications Device Interace (CDI) and a @dfn{Strema}
+supporting the @cite{Spider WAN} interface.
+
+The @file{s_wan} pushable @cite{STREAMS} module provides a Communications
+Device Interface (CDI) at its lower service boundary and provides a
+@cite{Spider WAN} interface at its upper service boundary.  This provides a
+@dfn{Style 1} or @dfn{Style 2} @acronym{HDLC} communications device.
+
+The purpose of the @file{s_wan} module is to convert between the general
+purpose Communications Device Interface (CDI) and the @cite{Spider WAN}
+specific WAN interface expected by the @cite{Spider} X.25 and Frame Relay
+protocol suites.
+
+See the @cite{Wide Area Network Interface} specification document for
+additional information on this conversion module.
+
+@subsection WAN to CD Conversion Module
+
+The WAN to CD Conversion Module, @manref{s_cdi(4)}, is a pushable
+@cite{STREAMS} module named @file{s_cdi} that converts between a @dfn{Stream}
+supporting the @cite{Spider WAN} interface and a @dfn{Strema} supporting the
+Communications Device Inteface (CDI).
+
+The purpose of the @file{s_cdi} module is to convert between the general
+purpose Communications Device Interface (CDI) and the @cite{Spider WAN}
+specific WAN interface provided by the @cite{Spider} X.25 and Frame Relay
+protocol suites.
+
+See the @cite{Wide Area Network Interface} specification document for
+additional information on this conversion module.
+
+@subsection CD to SDT Conversion Module
+
+The CD to SDT Conversion Module, @manref{cd_sdt(4)}, is a pushable
+@cite{STREAMS} module named @file{cd-sdt} that converts between a @dfn{Stream}
+supporting the Communications Device Interface (CDI) and a @dfn{Stream}
+supporting the Signalling Data Terminal Interface (SDTI).
+
+The @file{cd-sdt} pushable @cite{STREAMS} module provides a Communications
+Device Interface (CDI) at its upper service boundary and provides a Signalling
+Data Terminal Inteface (SDTI) at its lower service boundary.  This
+provides a @dfn{Style 1} or @dfn{Style 2} @acronym{DAED} communications device.
+
+The purpose of the @file{cd-sdt} module is to convert between the general
+purpose Communications Device Interface (CDI) and the SS7 specific Signalling
+Data Terminal Interface (SDTI) expected by the @cite{OpenSS7} SS7 signalling
+protocol suite.  This provides the ability to use the CDI API library with an
+@cite{OpenSS7} Signalling Data Terminal device driver.
+
+See the @cite{Signalling Data Terminal Interface} specification document for
+additional information on this conversion module.
+
+@subsection SDT to CD Conversion Module
+
+The SDT to CD Conversion Module, @manref{sdt_cd(4)}, is a pushable
+@cite{STREAMS} module named @file{sdt-cd} that converts between a @dfn{Stream}
+supporting the Signalling Data Terminal Interface (SDTI) and a @dfn{Stream}
+supporting the Communications Device Inteface (CDI).
+
+The @file{sdt-cd} pushable @cite{STREAMS} module provides a Signalling Data
+Terminal Interface (SDTI) at its upper service boundary and provides a
+Communications Device Inteface (CDI) at its lower service boundary.  This
+provides a @dfn{Style 1} or @dfn{Style 2} signalling data terminal.
+
+The purpose of the @file{sdt-cd} module is to convert between the general
+purpose Communications Device Interface (CDI) and the SS7 specific Signalling
+Data Terminal Interface (SDTI) expected by the @cite{OpenSS7} SS7 signalling
+protocol suite.  This provides the ability to use communications device drivers
+providing the CDI with the @cite{OpenSS7} SS7 signalling stack.
+
+See the @cite{Signalling Data Terminal Interface} specification document for
+additional information on this conversion module.
+
+@ignore
+
+@node CDI Utilities
+@appendix CDI Utilities
+
+Implementations of the CDI do not provide any standardized set of utilities.  Nevertheless, the
+objectives of such utilities would be:
+
+@itemize
+@item Adjusting the tunable parameters associated with the CDI communications devices.
+@item Administrating mapping data.
+@item Collecting and displaying statistics.
+@item Monitoring traffic flow on specific devices.
+@end itemize
+
+@node CDI File Formats
+@appendix CDI File Formats
+
+@node CDI Compatibility and Porting
+@appendix CDI Compatibility and Porting
+
+Very little information is available on NCR Compten systems (mostly ancient
+mainframe systems and communications front-ends for mainframes) supporting the
+CDI interface.  As such there is no information for determining compatibility
+and portability of the interface.  The @cite{OpenSS7} project has been using
+interfaces based on the CDI interface for SS7 and other interfaces since 2001.
+Since then the service primitive interface has remained static.
+
+@end ignore
 
 @node Glossary of CDI Terms and Acronyms
 @appendix Glossary of CDI Terms and Acronyms

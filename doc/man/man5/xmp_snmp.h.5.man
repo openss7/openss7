@@ -147,11 +147,11 @@ Management Protocol (SNMP) along with the associated ASN.1 productions.
 .PP
 XMP,
 .[
-XMP
+xmp c306
 .]
 XOM.
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

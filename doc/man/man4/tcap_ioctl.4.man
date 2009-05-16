@@ -244,7 +244,7 @@ TCAP provides the following stream types:
 This device provides the TCAP protocol service interface using the TC-primitives of the Transaction
 Component Interface (TCI)
 .[
-tci revision 0.9a
+tci revision @PACKAGE_VERSION@
 .]
 described in
 .BR tci (7).
@@ -253,7 +253,7 @@ described in
 This device provides the TCAP protocol service interface using the TR-primitives of the Transaction
 Interface (TRI)
 .[
-tri revision 0.9a
+tri revision @PACKAGE_VERSION@
 .]
 described in
 .BR tri (7).
@@ -296,12 +296,12 @@ and this object is a candidate for this type of peristence.)
 This managed object represents the user of the protocol service interface being provided by the TCAP
 provider.  For TCAP, this is a Transaction Component Interface (TCI),
 .[
-tci revision 0.9a
+tci revision @PACKAGE_VERSION@
 .]
 .BR tci (7),
 a Transaction Interface (TRI),
 .[
-tri revision 0.9a
+tri revision @PACKAGE_VERSION@
 .]
 .BR tri (7),
 or Transport Provider Interface (TPI),

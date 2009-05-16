@@ -74,6 +74,7 @@ nli_TEXINFOS		= \
 			  x25_proto.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/prims.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE

@@ -108,7 +108,7 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B XMP
+.B libxmp, xmp, XMP
 \- X/Open Management Protocol API (XMP)
 .\"
 .\"
@@ -306,7 +306,7 @@ Identifiers are supplied to the
 function to incorporate the extensions into the workspace.  Features defined
 by the XMP
 .[
-XMP
+xmp c306
 .]
 specification are described and assigned object identifiers by that package.
 A feature represents any package or any additional or modified functionality
@@ -318,7 +318,7 @@ After a workspace with the required features has been negotiated in this way,
 the applications can use the workspace as required.  It can create and
 manipulate OM objects using the OM functions,
 .[
-XOM
+xom c607
 .]
 and can start one or more
 managemend sessions using
@@ -331,7 +331,7 @@ sessions using
 and released all its OM objects using
 .BR OM_delete (3),
 .[
-XOM
+xom c607
 .]
 the application should ensure that resources associated with the interface are
 freed by calling
@@ -413,7 +413,7 @@ A session is described by an OM object of OM class \fBSession\fP.  It is
 created, and appropriate parameter values may be set, using the
 OSI-Abstract-Data Manipulation
 .[
-XOM
+xom c607
 .]
 functions.  A management session is then started with
 .BR mp_bind (3)
@@ -674,7 +674,7 @@ T}
 .\"
 .XX
 .[
-XMP
+xmp c306
 .]
 .\"
 .\"

@@ -181,7 +181,7 @@ None.
 .BR MS_status
 is implemented directly in C language and XOM
 .[
-XOM
+xom c607
 .]
 constructs.
 .\"
@@ -235,7 +235,7 @@ XMS
 .\"
 .XX
 .[
-XOM
+xom c607
 .]
 .\"
 .\"

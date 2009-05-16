@@ -166,25 +166,25 @@
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
 %R TCI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Transaction Component Interface (TCI) Specification
-%D July 15, 2007
+%D @PACKAGE_PDATE@
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tci.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
 %R TRI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Transaction Interface (TRI) Specification
-%D July 15, 2007
+%D @PACKAGE_PDATE@
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tri.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L TPI
 %A Open\ Group
@@ -192,12 +192,12 @@
 %R TPI Revision 2.0.0
 %J Revision 2.0.0, Draft 2
 %T Transport Provider Interface (TPI) Specification
-%D 1999
+%D 1999 (Reprinted @PACKAGE_PDATE@)
 %C Berkshire, UK
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
 %S Open Group CAE Specification
-%O Distributed with package strxnet-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L NPI
 %A UNIX\ International,\ Inc.
@@ -205,12 +205,12 @@
 %R NPI
 %J Revision 2.0.0, Draft 2
 %T Network Provider Interface (NPI) Specification
-%D August 17, 1992
+%D August 17, 1992 (Reprinted @PACKAGE_PDATE@)
 %C Parsippany, New Jersey
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
 %S Open Group CAE Specification
-%O Distributed with package strxns-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L DLPI
 %A UNIX International,\ Inc.
@@ -218,12 +218,12 @@
 %R DLPI
 %J Revision 2.0.0, Draft 2
 %T Data Link Provider Interface (DLPI) Specification
-%D August 20, 1991
+%D August 20, 1991 (Reprinted @PACKAGE_PDATE@)
 %C Parsippany, New Jersey
 %I UNIX International Press
 %U http://www.openss7.org/doc/dlpi.pdf
 %S Open Group CAE Specification
-%O Distributed with package strxns-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L TLI
 %A UNIX\ International,\ Inc.
@@ -295,133 +295,133 @@
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R NLI
-%J Revision 0.9.2, Draft 1
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T OpenSS7 CAE Specification: Network Layer Interface (NLI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/nli.pdf
-%O Distributed with package strx25-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L LLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R LLI
-%J Revision 0.9.2, Draft 1
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T OpenSS7 CAE Specification: Link Layer Interface (LLI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lli.pdf
-%O Distributed with package strx25-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L CDI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R CDI
-%J Revision 0.9.2, Draft 7
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T OpenSS7 CAE Specification: Communications Device Interface (CDI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
-%O Distributed with package strxns-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L WAN
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R WAN
-%J Revision 0.9.2, Draft 1
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T OpenSS7 CAE Specification: Wide Area Network (WAN) Interface Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/wan.pdf
-%O Distributed with package strx25-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L LMI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R LMI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Local Management Interface (LMI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lmi.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L SLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R SLI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Signalling Link Interface (SLI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sli.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L SDTI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R SDTI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Signalling Data Terminal Interface (SDTI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdti.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L SDLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R SDLI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Signalling Data Link Interface (SDLI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdli.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L MTPI
 %A Brian Bidulock
 %Q OpenSS7\ Corporation
 %R MTPI
-%J Revision 0.9a, Draft 8
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Message Transfer Provider Interface (MTPI)  Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/specs/mtpi.pdf
-%O Distributed with package strss7-0.9a.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L CHI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R CHI
-%J Revision 0.9.2, Draft 4
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Channel Interface (CHI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/chi.pdf
-%O Distributed with package strchan-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %L MXI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
 %R MXI
-%J Revision 0.9.2, Draft 4
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
 %T Multiplex Interface (MXI) Specification
-%D October 31, 2008
+%D @PACKAGE_PDATE@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/mxi.pdf
-%O Distributed with package strchan-0.9.2.
+%O Distributed with package @PACKAGE@-@VERSION@.
 
 %K xxx
 %A X Programmer's Group

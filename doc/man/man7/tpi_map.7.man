@@ -169,10 +169,10 @@ uses the same address as SCCP.  See
 maps the service primitives of the Mobile Application Part
 (MAP) onto the service primitives of the TPI.
 .sp
-.TS
-tab(;);
-ll.
-.TE
+.\".TS
+.\"tab(;);
+.\"ll.
+.\".TE
 
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 

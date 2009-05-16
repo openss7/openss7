@@ -153,7 +153,7 @@ The
 .B asn1
 utility program is intended to be compatible with XOM.
 .[
-xom
+xom c607
 .]
 .\"
 .\"
@@ -245,7 +245,7 @@ has no known bugs.
 .B asn1
 is compatible with XOM,
 .[
-xom
+xom c607
 .]
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
@@ -260,7 +260,7 @@ OpenSS7 coding standards.
 .PP
 XOM.
 .[
-xom
+xom c607
 .]
 .\"
 .\"

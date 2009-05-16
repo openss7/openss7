@@ -289,10 +289,10 @@ TPI Revision 2.0.0
 .]
 and XTI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 using the
 .B strinet
