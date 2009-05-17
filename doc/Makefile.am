@@ -57,7 +57,7 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man manual papers projects specs drafts
+SUBDIRS = . drafts man manual papers projects specs suites
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

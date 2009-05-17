@@ -2979,6 +2979,10 @@ openss7_man_MANS = \
 	man9/allocstr.9 \
 	man9/allstream.9 \
 	man9/appq.9 \
+	man9/apush_get.9 \
+	man9/apush_lst.9 \
+	man9/apush_set.9 \
+	man9/apush_vml.9 \
 	man9/ATOMIC_INT_ADD.9 \
 	man9/ATOMIC_INT_ALLOC.9 \
 	man9/ATOMIC_INT_DEALLOC.9 \
@@ -6959,6 +6963,10 @@ openss7_dist_noinst_MANS = \
 	man9/allocstr.9.man \
 	man9/allstream.9.man \
 	man9/appq.9.man \
+	man9/apush_get.9.man \
+	man9/apush_lst.9.man \
+	man9/apush_set.9.man \
+	man9/apush_vml.9.man \
 	man9/ATOMIC_INT_ADD.9.man \
 	man9/ATOMIC_INT_ALLOC.9.man \
 	man9/ATOMIC_INT_DEALLOC.9.man \
