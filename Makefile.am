@@ -1179,15 +1179,15 @@ strreset_LDADD			= libstreams.la
 
 bin_PROGRAMS			+= strreset
 
-#### =====================================================================
-##
-##asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h $(CONFIG_HEADER)
-##asn_CPPFLAGS			= $(UTIL_INCLUDES)
-##asn_CFLAGS			= $(USER_CFLAGS)
-##
-##EXTRA_PROGRAMS			+= asn
-###bin_PROGRAMS			+= asn
-
+## =====================================================================
+#
+#asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h $(CONFIG_HEADER)
+#asn_CPPFLAGS			= $(UTIL_INCLUDES)
+#asn_CFLAGS			= $(USER_CFLAGS)
+#
+#EXTRA_PROGRAMS			+= asn
+##bin_PROGRAMS			+= asn
+#
 ## =====================================================================
 
 gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l gdmoyac.h $(CONFIG_HEADER)
@@ -1672,19 +1672,19 @@ ss7statsd_LDADD			= libstreams.la
 sbin_PROGRAMS			+= ss7statsd
 
 ## =====================================================================
-
-slconfig_SOURCES		= src/util/slconf_yac.y \
-				  src/util/slconf_lex.l \
-				  src/util/slconf.c \
-				  slconf_yac.h \
-				  $(CONFIG_HEADER)
-slconfig_CPPFLAGS		= $(UTIL_INCLUDES)
-slconfig_CFLAGS			= $(USER_CFLAGS)
-slconfig_LDADD			= libstreams.la
-
-EXTRA_PROGRAMS			+= slconfig
-#sbin_PROGRAMS			+= slconfig
-
+#
+#slconfig_SOURCES		= src/util/slconf_yac.y \
+#				  src/util/slconf_lex.l \
+#				  src/util/slconf.c \
+#				  slconf_yac.h \
+#				  $(CONFIG_HEADER)
+#slconfig_CPPFLAGS		= $(UTIL_INCLUDES)
+#slconfig_CFLAGS			= $(USER_CFLAGS)
+#slconfig_LDADD			= libstreams.la
+#
+#EXTRA_PROGRAMS			+= slconfig
+##sbin_PROGRAMS			+= slconfig
+#
 ## =====================================================================
 
 mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
