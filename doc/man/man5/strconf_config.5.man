@@ -112,8 +112,8 @@ search-ignore T
 \- STREAMS strconf configuration file
 .\"
 .\"
-.SH SYNOPSIS
-.PP
+.\".SH SYNOPSIS
+.\".PP
 .\"
 .\"
 .SH DESCRIPTION
@@ -364,6 +364,8 @@ introduces this entry.
 .\"
 .SH FILES
 .PP
+The strconf configuration file is typically named
+.RB \*(lq Config .\*(rq
 .\"
 .\"
 .[

@@ -134,30 +134,57 @@ The
 union contains the following members:
 .TP \w'copyresp\(em'u
 .I iocblk
+an
+.BR iocblk (9)
+structure.
 .TP
 .I copyreq
+an
+.BR copyreq (9)
+structure.
 .TP
 .I copyresp
+an
+.BR copyresp (9)
+structure.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B ioctypes
+union is a convenience union used to describe the contents of a
+.BR M_IOCTL (9),
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9),
+.BR M_IOCDATA (9),
+.BR M_COPYIN (9)
+or
+.BR M_COPYOUT (9)
+message.
 .\"
 .\"
-.SH CONTEXT
-.PP
+.\".SH CONTEXT
+.\".PP
 .\"
 .\"
-.SH MP-STREAMS
-.PP
+.\".SH MP-STREAMS
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
+.\"The
+.\".B ioctypes
+.\"union is specific to
+.\".BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR iocblk (9),
+.BR copyreq (9),
+.BR copyresp (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -176,7 +203,6 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 Lining up these input-output control block data structures is tedious and uninteresting.  See
 .BR ioctypes (9)
 for more information.

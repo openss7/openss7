@@ -112,10 +112,6 @@ search-ignore T
 \- XAP Environment File
 .\"
 .\"
-.SH OVERVIEW
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
 This manual page defines the format of an ACSE/Presentation Library
@@ -732,57 +728,82 @@ Type \fBunsigned long\fP with bit values \fIAP_DATA_TOK\fP, \fIAP_SYNCMINOR_TOK\
 This attribute is readable in any states except \fBAP_UNBOUND\fP, \fBAP_IDLE\fP, \fBAP_WASSOCcnf_ASSOCreq\fP, \fBAP_WASSOCrsp_ASSOCind\fP and writable never.
 .\"
 .\"
-.SH "PACKAGE CONTENTS"
+.SH FILES
 .PP
+.TP
+.B @sysconfdir@/xap/ap_env
+The default
+.B ap_env_file
+file.
 .\"
 .\"
-.SH MODULES
+.SH SEE ALSO
 .PP
-.\"
-.\"
-.SH DRIVERS
-.PP
-.\"
-.\"
-.SH DEVICES
-.PP
-.\"
-.\"
-.SH PREREQUISITES
-.PP
-.\"
-.\"
-.SH NOTICES
-.PP
-.\"
-.\"
-.SH BUGS
-.PP
-.\"
-.\"
-.SH "SEE ALSO"
-.PP
-.IR STREAMS (9).
+.BR ap_env (3),
+.BR XAP (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+The OpenSS7 XAP Library
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI or XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The OpenSS7 XAP Library supports \fINULL\fP bit-strings for the AP_ACSE_AVAIL, AP_ACSE_SEL,
+AP_PRES_AVAIL, AP_PRES_SEL, AP_SESS_AVAIL and AP_SESS_SEL environment attributes.  When the
+corresponding bit-string is \fINULL\fP, it indicates that either the entire layer is unavailable, or
+the entire layer is removed (\fINULL\fP) and service primitives for the layer are mapped directly
+onto service primitives for the lower layer.
+.RS
+.PP
+This is not specified in XAP,
+.[
+xap c303
+.]
+and is inherently non-portable.  Portable XAP programs will not reply upon this capability.
+.RE
+.IP \(em
+Four additional bit values are defined for the \fBAP_AFU_AVAIL\fP and \fBAP_AFU_SEL\fP environment
+attributes: \fIAP_ACSE_AUTH\fP, \fIAP_ACSE_CNTXNEG\fP, \fIAP_ACSE_HLASSOC\fP,
+\fIAP_ACSE_NESTASSOC\fP.
+.PP
+.PP
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+XAP.
+.[
+xap c303
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
-.\"
-.\"
-.SH STATUS
-.PP
+The
+.B ap_env_file
+format first appeared in XAP.
+.[
+xap c303
+.]
 .\"
 .\"
 .[
 $LIST$
 .]
-.\"
 .TI

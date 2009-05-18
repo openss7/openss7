@@ -128,13 +128,13 @@ search-ignore T
 .B ATM
 is an implementation of the ATM Adaption Layer 0 (AAL0) procedure as
 specified in
-.BR "ITU-T I.361" ,
+.BR "ITU-T Rec. I.361"
 .[
-i.361
+i361
 .]
-and a number of ATM Forum documents.
+and a number of other ATM Forum documents.
 .[
-af89
+af43
 .]
 .[
 af91
@@ -174,12 +174,11 @@ input-output controls as interpreted for ATM operation as described in
 .\"
 .SH MODULES
 .PP
-.RI streams- aal0 .o
+.RI streams- atm .o
 .\"
 .\"
 .SH SEE ALSO
 .PP
-.BR atm (4),
 .BR aal1 (4),
 .BR aal2 (4),
 .BR aal3 (4),

@@ -100,8 +100,6 @@
 * Libxnsl: (libxnsl).           An Open NSL library for STREAMS.
 @end direntry
 
-@defindex op
-
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE OpenSS7 XNS Library
 @set MANUAL_TYPE Reference Manual
@@ -153,20 +151,29 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @set MANUAL_TITLE OpenSS7 XNS Library
 @set MANUAL_TYPE Reference Manual
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
 @title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
-@subtitle Updated @value{PACKAGE_DATE}
+@subtitle Updated @value{PACKAGE_PDATE}
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
 @subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
 @subtitle All Rights Reserved.
+@ignore
+@sp 4
+@quotation
+@chapheading Abstract:
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
+@value{LONG} control for other @value{LONG} protocols.
+@end quotation
+@end ignore
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
 @author The OpenSS7 Project <@uref{http://www.openss7.org/}>
@@ -174,7 +181,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @page
 @vskip 0pt plus 1filll
 
-@subsubheading Published by:
+@chapheading Published by:
 
 @sp 1
 
@@ -214,36 +221,43 @@ specific, written prior permission.  @cite{OpenSS7 Corporation} makes no represe
 suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
-@subsubheading Notice:
+@chapheading Notice:
 
 @noindent
-@strong{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
-IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
-THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
-NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
-DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
-OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+@strong{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
 
 @vskip 0pt
 @end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
 @page
 
-@c Define an index of authors.
-@defindex au
-
-@defcodeindex mp
 @include texi/macros.texi
 @include texi/versions.texi
+@include texi/prims.texi
 
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@unnumbered About This Manual
-This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
-@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
-release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the @value{PACKAGE_TITLE} package.
+@heading About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
 @end ifnottex
 
 @menu

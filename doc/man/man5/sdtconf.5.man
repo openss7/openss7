@@ -296,6 +296,13 @@ are additional configuration fields specific to the device type specified in the
 field.
 .\"
 .\"
+.SH FILES
+.PP
+.TP
+.B @configdir@/sdtconf
+The signalling data terminal configuration file.
+.\"
+.\"
 .SH BUGS
 .PP
 Not done yet.

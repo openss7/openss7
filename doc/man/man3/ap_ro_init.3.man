@@ -250,6 +250,12 @@ may be returned.
 .\"
 .SH SEE ALSO
 .PP
+.BR ap_set_env (3),
+.BR ap_snd (3),
+.BR AP_RO_UNBIND_REQ (7),
+.BR AP_RO_UNBIND_RSP (7),
+.BR XAP (3),
+.BR STREAMS (4).
 .\"
 .\"
 .SH COMPATIBILITY

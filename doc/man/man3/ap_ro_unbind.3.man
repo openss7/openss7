@@ -105,12 +105,12 @@ search-ignore T
 .\"
 .\"
 .TH AP_RO_UNBIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
-.B ap_ro_unbind, ro_unbind
-\- unbind an instance of the ACSE/Presentation ROSE library
 .\"
 .\"
 .SH NAME
 .PP
+.B ap_ro_unbind, ro_unbind
+\- unbind an instance of the ACSE/Presentation ROSE library
 .\"
 .\"
 .SH INTERFACE
@@ -226,7 +226,13 @@ hpuxapli
 This function is not yet implemented.
 .\"
 .\"
-.SH "SEE ALSO"
+.SH BUGS
+.PP
+.BR ap_ro_unbind ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
 .PP
 .BR ap_set_env (3),
 .BR ap_snd (3),
@@ -234,12 +240,6 @@ This function is not yet implemented.
 .BR AP_RO_UNBIND_RSP (7),
 .BR XAP (3),
 .BR STREAMS (4).
-.\"
-.\"
-.SH "BUGS"
-.PP
-.BR ap_ro_unbind ()
-has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY

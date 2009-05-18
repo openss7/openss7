@@ -285,7 +285,7 @@ datagrams over User Datagram Protocol (UDP).
 proivdes access to an X.25 data link using the Communications Device Interface
 (CDI),
 .[
-cdi specification
+cdi revision @PACKAGE_VERSION@
 .]
 This is the same as the
 .BR x25_lapb (4)
@@ -472,7 +472,7 @@ tpi revision 2.0.0
 proivdes access to an X.25 data link using the Communications Device Interface
 (CDI),
 .[
-cdi specification
+cdi revision @PACKAGE_VERSION@
 .]
 .BR cdi (7).
 This is the same as the

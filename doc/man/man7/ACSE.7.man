@@ -122,10 +122,11 @@ search-ignore T
 .\"
 .SH DESCRIPTION
 .PP
+This manual page describes an experimental ACSE interface.
 .\"
 .\"
-.SH SERVICE PRIMITIVES
-.PP
+.\".SH SERVICE PRIMITIVES
+.\".PP
 .\"
 .\"
 .SH ACSE Functional Units

@@ -173,6 +173,9 @@ maps the service primitives of the Mobile Application Part
 .\"tab(;);
 .\"ll.
 .\".TE
-
-.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
-
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

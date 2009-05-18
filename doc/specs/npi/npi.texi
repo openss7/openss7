@@ -12,14 +12,40 @@
 %
 % All Rights Reserved.
 %
-% Permission is granted to make and distribute verbatim copies of this
-% manual provided the copyright notice and this permission notice are
-% preserved on all copies.
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.3 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
 %
-% Permission is granted to copy and distribute modified versions of this
-% manual under the conditions for verbatim copying, provided that the
-% entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one.
+% Permission to use, copy and distribute this documentation without
+% modification, for any purpose and without fee or royalty is hereby
+% granted, provided that both the above copyright notice and this
+% permission notice appears in all copies and that the name of OpenSS7
+% Corporation not be used in advertising or publicity pertaining to
+% distribution of this documentation or its contents without specific,
+% written prior permission.  OpenSS7 Corporation makes no representation
+% about the suitability of this documentation for any purpose.  It is
+% provided "as is" without express or implied warranty.
+% 
+% Permission is granted to process this file through Tex and print the
+% results, provided the printed document carries copying permission
+% notice identical to this one except for the removal of this paragraph
+% (this paragraph not being relevant to the printed manual).
+% 
+% OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+% DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+% CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+% IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+% PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+% OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+% CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+% USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+% OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+% THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+% THEREOF.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -138,7 +164,7 @@ under the above conditions for modified versions.
 @subtitle August 17, 1992
 @sp 0.2
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
-@subtitle Updated @value{PACKAGE_DATE}
+@subtitle Updated @value{PACKAGE_PDATE}
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
@@ -148,7 +174,7 @@ under the above conditions for modified versions.
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
-@subheading Abstract
+@chapheading Abstract:
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7. It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
@@ -162,7 +188,7 @@ network protocols.
 @page
 @vskip 0pt plus 1filll
 
-@subsubheading Published by:
+@chapheading Published by:
 
 @center UNIX International
 @center Waterview Corporate Center
@@ -177,7 +203,7 @@ network protocols.
 @sp 1
 
 @ignore
-@subsubheading International Offices:
+@chapheading International Offices:
 
 @multitable @columnfractions .33 .33 .34
 @item
@@ -275,7 +301,7 @@ FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RES
 USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS DOCUMENTATION.}
 
-@subsubheading Notice:
+@chapheading Notice:
 
 @noindent
 This document is based on the UNIX System Laboratories Network Provider Interface (NPI)
@@ -289,7 +315,7 @@ While UNIX International believes that these interfaces are well defined in this
 document, minor changes may be made prior to products conforming to the interfaces being made
 available from UNIX System Laboratories or UNIX International members.
 
-@subsubheading Trademarks:
+@chapheading Trademarks:
 
 @noindent
 UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in
@@ -302,7 +328,7 @@ countries.
 @page
 @vskip 0pt plus 1filll
 
-@subsubheading Published by:
+@chapheading Published by:
 
 @sp 1
 
@@ -353,7 +379,7 @@ or its contents without specific, written prior permission.  Monavacon Limited a
 Corporation make no representation about the suitability of this documentation for any purpose.  It
 is provided ``as is'' without express or implied warranty.
 
-@subsubheading Notice:
+@chapheading Notice:
 
 @noindent
 @b{Monavacon Limited and OpenSS7 Corporation disclaim all warranties with regard to this
@@ -389,107 +415,18 @@ herein.
 @end iftex
 @page
 
-@c Define an index of primitives
-@defcodeindex pr
-@c Define an index of primitive values
-@defcodeindex pv
-@c Define an index of primitive error values
-@defcodeindex pe
-@c Define an index of protocol states
-@defcodeindex st
-@c Define an index of input-output controls
-@defcodeindex ct
-@c Define an index of manual pages.
-@defcodeindex mp
-@c Define an index of MIB objects.
-@defcodeindex mo
-
-@c frags out automake
-@c @ifnottex
-@c @c concatenate indices for text, html and info
-@syncodeindex pr cp
-@syncodeindex pv cp
-@syncodeindex pe cp
-@syncodeindex st cp
-@syncodeindex mp cp
-@syncodeindex tp cp
-@syncodeindex vr cp
-@syncodeindex ct cp
-@syncodeindex mo cp
-@c @end ifnottex
-
 @include texi/macros.texi
 @include texi/versions.texi
-
-@iftex
-
-@macro prim{name}
-@code{\name\}@prindex \name\
-@end macro
-
-@macro pval{name}
-@code{\name\}@pvindex \name\
-@end macro
-
-@macro perr{name}
-@code{[\name\]}@peindex \name\
-@end macro
-
-@macro psta{name}
-@code{\name\}@stindex \name\
-@end macro
-
-@macro parm{name}
-@var{\name\}@vrindex \name\
-@end macro
-
-@macro pioc{name}
-@code{\name\}@ctindex \name\
-@end macro
-
-@macro mobj{name}
-@code{\name\}@moindex \name\
-@end macro
-
-@end iftex
-
-@ifnottex
-@c skip deep indexing for plain text, html and info
-@c it messes up column with maximums (texinfo bug)
-
-@macro prim{name}
-@code{\name\}
-@end macro
-
-@macro pval{name}
-@code{\name\}
-@end macro
-
-@macro perr{name}
-@code{[\name\]}
-@end macro
-
-@macro psta{name}
-@code{\name\}
-@end macro
-
-@macro parm{name}
-@var{\name\}
-@end macro
-
-@macro pioc{name}
-@code{\name\}
-@end macro
-
-@macro mobj{name}
-@code{\name\}
-@end macro
-
-@end ifnottex
+@include texi/prims.texi
 
 @ifnottex
 @node Top
-@top Network Provider Interface
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@heading About This Manual
+This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
+@value{PACKAGE_TITLE} package.
 @end ifnottex
 
 @menu

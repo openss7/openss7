@@ -125,6 +125,8 @@ search-ignore T
 .\"
 .SH DESCRIPTION
 .PP
+This manual page describes an experimental Presentation Provider Interface
+(PPI).
 .\"
 .\"
 .SH SERVICE PRIMITIVES

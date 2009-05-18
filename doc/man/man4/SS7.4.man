@@ -104,10 +104,15 @@ search-ignore T
 .so openss7.macros
 .\"
 .\"
+.\"
+.\"
 .TH SS7 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B SS7
 \- OpenSS7 SS7 Devices
+.\"
 .\"
 .SH SYNOPSIS
 .PP
@@ -116,10 +121,12 @@ search-ignore T
 .BI "int " ss7_stream " = open(" ss7_device ", " flags );
 .HP
 .BI "int " retval " = ioctl(" ss7_stream ", " \fRI_PUSH\fI ", " ss7_module );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-.SS "Devices"
-.PP
+.\"
+.SS Devices
 .PP
 .B SS7
 .[
@@ -266,6 +273,7 @@ and an IO Control Interface,
 .BR lmi_ioctl (4),
 for MTP operation,
 .BR mtp_ioctl (4).
+.\"
 .SS Modules
 .PP
 .PP
@@ -315,8 +323,7 @@ module that can be pushed on a stream that conforms to the
 Channel Interface,
 .BR chi (7).
 .\"
-.SS "Drivers"
-.PP
+.SS Drivers
 .PP
 .B SS7
 .[
@@ -380,6 +387,8 @@ modules can be pushed over the
 device to form a complete SS7 MTP Level 2 signalling link, or the
 .BR sli (7)
 interface can be used directly.
+.\"
+.\"
 .SH NOTICES
 .PP
 The devices
@@ -398,10 +407,16 @@ equivalents:
 .BR sua (4),
 or
 .BR m3ua (4).
+.\"
+.\"
 .\".SH BUGS
-.PP
+.\".PP
+.\"
+.\"
 .\".SH FILES
-.PP
+.\".PP
+.\"
+.\"
 .SH DEVICES
 .PP
 .IR /dev/isup ,
@@ -424,20 +439,25 @@ or
 .IR /dev/x100p ,
 .IR /dev/x100p-ch ,
 .IR /dev/x100p-mx .
-.SH "SEE ALSO"
+.\"
+.\"
+.SH SEE ALSO
 .PP
 .BR ss7confd (8),
 .BR SIGTRAN (4),
 .BR ISDN (4),
 .BR MG (4).
+.\"
+.\"
 .SH VERSIONS
 .PP
-This manpage was written for
-.B strss7
-release $Name$($Revision$).
+This manual page was written for the
+.B @PACKAGE_TITLE@
+package
+.RB ( "@PACKAGE@-@VERSION@" ).
+.\"
 .\"
 .[
 $LIST$
 .]
-.\"
 .TI

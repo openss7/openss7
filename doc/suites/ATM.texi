@@ -90,7 +90,7 @@
 @setfilename ATM.info
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE ATM Protocol Suite
-@set MANUAL_TYPE Programmer's Manual
+@set MANUAL_TYPE Users Manual
 @settitle @value{MANUAL_TITLE}
 
 @dircategory OpenSS7
@@ -100,7 +100,7 @@
 
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE ATM Protocol Suite
-@set MANUAL_TYPE Programmer's Manual
+@set MANUAL_TYPE Users Manual
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
@@ -147,7 +147,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 
 @include ../../scripts/texi/args.texi
 @set MANUAL_TITLE ATM Protocol Suite
-@set MANUAL_TYPE Programmer's Manual
+@set MANUAL_TYPE Users Manual
 
 @set PART Asynchronous Transfer Mode
 @set LONG Asynchronous Transfer Mode
@@ -168,7 +168,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
-@subheading Abstract
+@chapheading Abstract:
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
@@ -182,7 +182,7 @@ as platform and system applicability of the @value{MANUAL_TITLE}.  It provides a
 @page
 @vskip 0pt plus 1filll
 
-@subsubheading Published by:
+@chapheading Published by:
 
 @sp 1
 
@@ -222,17 +222,17 @@ specific, written prior permission.  @cite{OpenSS7 Corporation} makes no represe
 suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
-@subsubheading Notice:
+@chapheading Notice:
 
 @noindent
-@strong{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
-IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
-THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
-NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
-DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
-OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
-THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+@strong{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
 
 @vskip 0pt
 @end titlepage
@@ -254,7 +254,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@unnumbered About This Manual
+@heading About This Manual
 This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated @value{PACKAGE_DATE}, of
 @cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
 @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL} of the
@@ -264,6 +264,8 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @menu
 * Preface::
 * Introduction::
+* Drivers and Modules::
+* Libraries::
 * Glossary of ATM Terms and Acronyms::
 * References::
 * Licenses::
@@ -355,21 +357,6 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.15  2009-05-01 04:50:49  brian
-- update documentation for release
-
-Revision 0.9.2.13  2009-04-30 06:07:44  brian
-- more documentation updates for release
-
-Revision 0.9.2.11  2009-04-29 18:05:42  brian
-- updated documentation for release
-
-Revision 0.9.2.9  2008-11-26 12:57:42  brian
-- corrections to FDL update
-
-Revision 0.9.2.8  2008-11-26 12:01:49  brian
-- updated to FDL 1.3
-
 @end verbatim
 @end smallexample
 
@@ -422,6 +409,14 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 
 @node Introduction
 @chapter Introduction
+
+@node Drivers and Modules
+@chapter Drivers and Modules
+
+@figuresized{atm01,1,ATM Drivers and Modules,5.0in}
+
+@node Libraries
+@chapter Libraries
 
 @node Glossary of ATM Terms and Acronyms
 @appendix Glossary of ATM Terms and Acronyms
@@ -535,15 +530,17 @@ Corporation, RadiSys. [Doc No: 007-01232-0003], @uref{http://www.radisys.com/,
 RadiSys Support Documentation}.
 
 @item [CDI] @anchor{CDI} @tab @cite{OpenSS7 CAE Specification: Communications
-Device Interface (CDI) Specification}, Revision 0.9.2, Draft 2, July 15, 2007,
-(Edmonton, Canada), B. Bidulock, OpenSS7 Corporation.  Distributed with package
-@file{strxns-0.9.2} and @file{openss7-0.9.2}.
-@url{http://www.openss7.org/docs/cdi.pdf, OpenSS7 Documents}.
+Device Interface (CDI) Specification}, Revision @value{PACKAGE_VERSION}, Draft
+@value{PACKAGE_RELEASE}, @value{PACKAGE_PDATE}, (Edmonton, Canada), B.
+Bidulock, OpenSS7 Corporation.  Distributed with package @file{strxns-0.9.2}
+and @file{openss7-0.9.2}.  @url{http://www.openss7.org/docs/cdi.pdf, OpenSS7
+Documents}.
 
 @item [DLPI] @anchor{DLPI} @tab @cite{Open Group CAE Specification: Data Link
 Provider Interface (DLPI) Specification}, Revision 2.0.0, Draft 2, August 20,
-1992, (Parsippany, New Jersey), UNIX International, Inc., UNIX International
-Press.  @uref{http://www.opengroup.org/onlinepubs/,The Open Group},
+1992, (Reprinted @value{PACKAGE_PDATE}) (Parsippany, New Jersey), UNIX
+International, Inc., UNIX International Press.
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group},
 @uref{http://www.openss7.org/docs/dlpi.pdf,The OpenSS7 Project}.
 
 @item [IRIS SX.25] @anchor{IRIS SX.25} @tab @cite{IRIS SX.25 NLI Programmer's
@@ -605,7 +602,7 @@ Provider Interface (TPI) Specification}, Revision 2.0.0, Draft 2, 1999,
 @uref{http://www.openss7.org/docs/tpi.pdf,The OpenSS7 Project}.
 
 @item [V.25 bis] @anchor{V.25 bis} @tab @b{ITU-T Recommendation V.25 bis (10/96)},
-@cite{Synchronous and asyncrhonous automatic dialing procedrues on switched
+@cite{Synchronous and asynchronous automatic dialing procedures on switched
 networks}, October 1996, (Geneva), ITU, ITU-T Telecommunication Standardization
 Sector of ITU, (Previously ``CCITT Recommendation''),
 @url{http://www.itu.int/rec/T-REC-V.25bis/en/ T-REC-V.25bis}.

@@ -162,8 +162,18 @@ multiplexing driver.
 The \*(lqI\*(rq in \fBIFR\fP stands for \fIIRIX\fP\(rg.
 .\"
 .\"
-.SH COMPATIBILITY
+.SH DEVICES
 .PP
+.B /dev/ifr
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ifnet (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 For additional compatibility information, see
 .BR ifr (4),

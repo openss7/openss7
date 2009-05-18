@@ -348,6 +348,10 @@ This is a local function.
 .\"
 .SH COMPATIBILITY
 .PP
+This header file is compatible with XMP.
+.[
+xmp c306
+.]
 .\"
 .\"
 .SH CONFORMANCE
@@ -360,10 +364,6 @@ XOM.
 .[
 xom c607
 .]
-.\"
-.\"
-.SH HISTORY
-.PP
 .\"
 .\"
 .SH VERSIONS

@@ -110,8 +110,10 @@ search-ignore T
 \- logical link control device
 .\"
 .\"
-.SH OVERVIEW
+.SH DESCRIPTION
 .PP
+.B LLC
+is a logical link control driver.
 .SS ADDRESSING
 .PP
 The LLC2 DLSAP is contained in the following structure:
@@ -783,13 +785,9 @@ Numeric value between 0 and 300.  The default is 5.
 Not used for the LLC2 driver.  See \fBlapb\fP(4).
 .\"
 .\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
-.\"
+.SH DEVICES
+.PP
+.IR /dev/llc .
 .\"
 .\"
 .[
