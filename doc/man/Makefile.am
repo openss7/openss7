@@ -60,6 +60,8 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 openss7_man_MANS = \
+	man1/asn1.1 \
+	man1/gdmo.1 \
 	man1/strchg.1 \
 	man1/strconf.1 \
 	man1/strlog.1 \
@@ -773,8 +775,6 @@ openss7_man_MANS = \
 	man4/ipip.4 \
 	man4/ip_strm.4 \
 	man4/ip_strm_mod.4 \
-	man4/ip_strms.4 \
-	man4/ip_strms_mod.4 \
 	man4/ip_to_dlpi.4 \
 	man4/ipx25.4 \
 	man4/ISDN.4 \
@@ -856,7 +856,6 @@ openss7_man_MANS = \
 	man4/mtp_tpi.4 \
 	man4/mtp-tpi.4 \
 	man4/mux.4 \
-	man4/mux_clone.4 \
 	man4/mx.4 \
 	man4/mxi_ioctl.4 \
 	man4/mx_ioctl.4 \
@@ -900,7 +899,6 @@ openss7_man_MANS = \
 	man4/rawip2.4 \
 	man4/rawip.4 \
 	man4/rip.4 \
-	man4/rmux.4 \
 	man4/romod.4 \
 	man4/rtp.4 \
 	man4/sad.4 \
@@ -1106,6 +1104,9 @@ openss7_man_MANS = \
 	man4/xos.4 \
 	man4/xot.4 \
 	man4/xx25.4 \
+	man4/mx-lm.4 \
+	man4/unix.4 \
+	man4/xnet.4 \
 	man5/ap_env_file.5 \
 	man5/autopush.5 \
 	man5/extraformat.5 \
@@ -1120,7 +1121,6 @@ openss7_man_MANS = \
 	man5/netconfig.5 \
 	man5/netdir.5 \
 	man5/padent.5 \
-	man5/protosw.5 \
 	man5/qosformat.5 \
 	man5/sdlconf.5 \
 	man5/sdtconf.5 \
@@ -2747,8 +2747,6 @@ openss7_man_MANS = \
 	man7/undoc.7 \
 	man7/WAN.7 \
 	man7/wan.7 \
-	man8/acb56.8 \
-	man8/asn1.8 \
 	man8/autopush.8 \
 	man8/bicc.8 \
 	man8/bua.8 \
@@ -2758,7 +2756,6 @@ openss7_man_MANS = \
 	man8/ds1ext.8 \
 	man8/fattach.8 \
 	man8/fdetach.8 \
-	man8/gdmo.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
 	man8/ifrdlci.8 \
@@ -2829,11 +2826,9 @@ openss7_man_MANS = \
 	man8/ss7capd.8 \
 	man8/ss7confd.8 \
 	man8/ss7d.8 \
-	man8/ss7dev.8 \
 	man8/ss7statsd.8 \
 	man8/strace.8 \
 	man8/strclean.8 \
-	man8/strconf.8 \
 	man8/streams.8 \
 	man8/streamsd.8 \
 	man8/streams.sh.8 \
@@ -2936,7 +2931,6 @@ openss7_man_MANS = \
 	man8/x25tune.8 \
 	man8/x32map.8 \
 	man8/x400config.8 \
-	man8/x400pconf.8 \
 	man8/x400pmib.8 \
 	man9/adjmsg.9 \
 	man9/admin.9s \
@@ -3050,7 +3044,6 @@ openss7_man_MANS = \
 	man9/cminsw_list.9 \
 	man9/cmn_err.9 \
 	man9/cmn_err_tag.9 \
-	man9/connld.9 \
 	man9/copyb.9 \
 	man9/copyin.9 \
 	man9/copymsg.9 \
@@ -3445,7 +3438,6 @@ openss7_man_MANS = \
 	man9/makedev.9 \
 	man9/makedevice.9 \
 	man9/malloc.9 \
-	man9/map.9 \
 	man9/map_cv.9 \
 	man9/mapfree.9 \
 	man9/mapinit.9 \
@@ -3562,7 +3554,6 @@ openss7_man_MANS = \
 	man9/mi_strcmp.9 \
 	man9/mi_strlen.9 \
 	man9/mi_strlog.9 \
-	man9/mi_strol.9 \
 	man9/mi_strtol.9 \
 	man9/mi_timer.9 \
 	man9/mi_timer_alloc.9 \
@@ -3733,7 +3724,6 @@ openss7_man_MANS = \
 	man9/qsize.9 \
 	man9/qtimeout.9 \
 	man9/queclass.9 \
-	man9/queinfo.9 \
 	man9/queue.9 \
 	man9/queue_free.9 \
 	man9/queue_t.9 \
@@ -4008,6 +3998,8 @@ openss7_man_MANS = \
 man_MANS	= $(openss7_man_MANS)
 
 openss7_dist_noinst_MANS = \
+	man1/asn1.1.man \
+	man1/gdmo.1.man \
 	man1/strchg.1.man \
 	man1/strconf.1.man \
 	man1/strlog.1.man \
@@ -4721,8 +4713,6 @@ openss7_dist_noinst_MANS = \
 	man4/ipip.4.man \
 	man4/ip_strm.4.man \
 	man4/ip_strm_mod.4.man \
-	man4/ip_strms.4.man \
-	man4/ip_strms_mod.4.man \
 	man4/ip_to_dlpi.4.man \
 	man4/ipx25.4.man \
 	man4/ISDN.4.man \
@@ -4804,7 +4794,6 @@ openss7_dist_noinst_MANS = \
 	man4/mtp_tpi.4.man \
 	man4/mtp-tpi.4.man \
 	man4/mux.4.man \
-	man4/mux_clone.4.man \
 	man4/mx.4.man \
 	man4/mxi_ioctl.4.man \
 	man4/mx_ioctl.4.man \
@@ -4848,7 +4837,6 @@ openss7_dist_noinst_MANS = \
 	man4/rawip2.4.man \
 	man4/rawip.4.man \
 	man4/rip.4.man \
-	man4/rmux.4.man \
 	man4/romod.4.man \
 	man4/rtp.4.man \
 	man4/sad.4.man \
@@ -5054,6 +5042,9 @@ openss7_dist_noinst_MANS = \
 	man4/xos.4.man \
 	man4/xot.4.man \
 	man4/xx25.4.man \
+	man4/mx-lm.4.man \
+	man4/unix.4.man \
+	man4/xnet.4.man \
 	man5/ap_env_file.5.man \
 	man5/autopush.5.man \
 	man5/extraformat.5.man \
@@ -5068,7 +5059,6 @@ openss7_dist_noinst_MANS = \
 	man5/netconfig.5.man \
 	man5/netdir.5.man \
 	man5/padent.5.man \
-	man5/protosw.5.man \
 	man5/qosformat.5.man \
 	man5/sdlconf.5.man \
 	man5/sdtconf.5.man \
@@ -6695,8 +6685,6 @@ openss7_dist_noinst_MANS = \
 	man7/undoc.7.man \
 	man7/WAN.7.man \
 	man7/wan.7.man \
-	man8/acb56.8.man \
-	man8/asn1.8.man \
 	man8/autopush.8.man \
 	man8/bicc.8.man \
 	man8/bua.8.man \
@@ -6706,7 +6694,6 @@ openss7_dist_noinst_MANS = \
 	man8/ds1ext.8.man \
 	man8/fattach.8.man \
 	man8/fdetach.8.man \
-	man8/gdmo.8.man \
 	man8/h225.8.man \
 	man8/h323confd.8.man \
 	man8/ifrdlci.8.man \
@@ -6777,11 +6764,9 @@ openss7_dist_noinst_MANS = \
 	man8/ss7capd.8.man \
 	man8/ss7confd.8.man \
 	man8/ss7d.8.man \
-	man8/ss7dev.8.man \
 	man8/ss7statsd.8.man \
 	man8/strace.8.man \
 	man8/strclean.8.man \
-	man8/strconf.8.man \
 	man8/streams.8.man \
 	man8/streamsd.8.man \
 	man8/streams.sh.8.man \
@@ -6884,7 +6869,6 @@ openss7_dist_noinst_MANS = \
 	man8/x25tune.8.man \
 	man8/x32map.8.man \
 	man8/x400config.8.man \
-	man8/x400pconf.8.man \
 	man8/x400pmib.8.man \
 	man9/adjmsg.9.man \
 	man9/admin.9s.man \
@@ -6998,7 +6982,6 @@ openss7_dist_noinst_MANS = \
 	man9/cminsw_list.9.man \
 	man9/cmn_err.9.man \
 	man9/cmn_err_tag.9.man \
-	man9/connld.9.man \
 	man9/copyb.9.man \
 	man9/copyin.9.man \
 	man9/copymsg.9.man \
@@ -7393,7 +7376,6 @@ openss7_dist_noinst_MANS = \
 	man9/makedev.9.man \
 	man9/makedevice.9.man \
 	man9/malloc.9.man \
-	man9/map.9.man \
 	man9/map_cv.9.man \
 	man9/mapfree.9.man \
 	man9/mapinit.9.man \
@@ -7510,7 +7492,6 @@ openss7_dist_noinst_MANS = \
 	man9/mi_strcmp.9.man \
 	man9/mi_strlen.9.man \
 	man9/mi_strlog.9.man \
-	man9/mi_strol.9.man \
 	man9/mi_strtol.9.man \
 	man9/mi_timer.9.man \
 	man9/mi_timer_alloc.9.man \
@@ -7681,7 +7662,6 @@ openss7_dist_noinst_MANS = \
 	man9/qsize.9.man \
 	man9/qtimeout.9.man \
 	man9/queclass.9.man \
-	man9/queinfo.9.man \
 	man9/queue.9.man \
 	man9/queue_free.9.man \
 	man9/queue_t.9.man \
@@ -8012,6 +7992,8 @@ dist_noinst_MANS = $(openss7_dist_noinst_MANS)
 ## distribution.
 ##
 MANS_UNUSED = \
+	man1/asn1.1 \
+	man1/gdmo.1 \
 	man1/strlog.1 \
 	man2/poll.2s \
 	man2/read.2s \
@@ -8174,7 +8156,6 @@ MANS_UNUSED = \
 	man4/mlp.4 \
 	man4/momod.4 \
 	man4/mtp_ioctl.4 \
-	man4/mux_clone.4 \
 	man4/mxi_ioctl.4 \
 	man4/mx_ioctl.4 \
 	man4/mx_mux.4 \
@@ -8194,7 +8175,6 @@ MANS_UNUSED = \
 	man4/q921.4 \
 	man4/q922.4 \
 	man4/q931.4 \
-	man4/rmux.4 \
 	man4/romod.4 \
 	man4/rtp.4 \
 	man4/sccp_ioctl.4 \
@@ -8256,14 +8236,11 @@ MANS_UNUSED = \
 	man4/XNS.4 \
 	man4/xol.4 \
 	man4/xos.4 \
-	man8/acb56.8 \
-	man8/asn1.8 \
 	man8/bicc.8 \
 	man8/bua.8 \
 	man8/cpc388.8 \
 	man8/ds1.8 \
 	man8/ds1ext.8 \
-	man8/gdmo.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
 	man8/isdn.8 \
@@ -8287,6 +8264,7 @@ MANS_UNUSED = \
 	man8/mgconfd.8 \
 	man8/mtp.8 \
 	man8/mxmib.8 \
+	man8/openss7.8 \
 	man8/osinetd.8 \
 	man8/phymib.8 \
 	man8/sccp.8 \
@@ -8302,8 +8280,6 @@ MANS_UNUSED = \
 	man8/ss7.8 \
 	man8/ss7confd.8 \
 	man8/ss7d.8 \
-	man8/ss7dev.8 \
-	man8/strconf.8 \
 	man8/streams.sh.8 \
 	man8/strlogd.8 \
 	man8/strmib.8 \
@@ -8319,7 +8295,6 @@ MANS_UNUSED = \
 	man8/voipconfd.8 \
 	man8/wanmap.8 \
 	man8/x25tune.8 \
-	man8/x400pconf.8 \
 	man8/x400pmib.8 \
 	man9/admin.9s \
 	man9/allocbi.9 \
@@ -8639,7 +8614,6 @@ MANS_UNUSED = \
 	man9/mfree.9 \
 	man9/minor.9 \
 	man9/mi_sprintf_putc.9 \
-	man9/mi_strol.9 \
 	man9/mi_tpi_ack_alloc.9 \
 	man9/mi_tpi_conn_con.9 \
 	man9/mi_tpi_conn_ind.9 \
@@ -8717,6 +8691,11 @@ MANS_UNUSED = \
 	man9/uxpcompat.9 \
 	man9/vstrlog_hook.9 \
 	man9/vtop.9
+
+MANS_EXEMPT = \
+	man8/openss7.8.man \
+	man8/specfs.8.man \
+	man8/streams.8.man
 
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE

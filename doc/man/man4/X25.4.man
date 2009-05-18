@@ -104,7 +104,11 @@ search-ignore T
 .so openss7.macros
 .\"
 .\"
+.\"
+.\"
 .TH X25 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B X25
 \- @PACKAGE_TITLE@ Devices
@@ -134,6 +138,18 @@ iso 8208
 provides the following
 .I STREAMS
 pseudo-device drivers:
+.TP
+.BR x25 (4)
+.TP
+.BR lapb (4)
+.TP
+.BR llc (4)
+.TP
+.BR llc2 (4)
+.TP
+.BR mac (4)
+.TP
+.BR ixe (4)
 .\"
 .SS Modules
 .PP
@@ -146,7 +162,19 @@ iso 8208
 .]
 provides the following pushable
 .I STREAMS
-modules
+modules:
+.TP
+.BR s_nli3 (4)
+.TP
+.BR s_npi "(4), " npi (4)
+.TP
+.BR s_cons (4)
+.TP
+.BR s_xx25 (4)
+.TP
+.BR wans (4)
+.TP
+.BR hdlc (4)
 .\"
 .SS Drivers
 .PP
@@ -157,33 +185,46 @@ x25
 .[
 iso 8208
 .]
-provides the following
+support is provided for the following
 .I STREAMS
 device drivers:
+.TP
+.BR phys (4)
+.TP
+.BR ch (4)
+.TP
+.BR mx (4)
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH BUGS
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.IR /dev/lapb ,
+.IR /dev/llc ,
+.IR /dev/llc2 ,
+.IR /dev/wans ,
+.IR /dev/eth ,
+.IR /dev/x25 ,
+.IR /dev/x25pckt ,
+.IR /dev/x25-plp ,
+.IR /dev/mlp ,
+.IR /dev/ixe .
 .\"
 .\"
 .SH SEE ALSO
 .PP
-.\"
-.\"
-.SH COMPATIBILITY
-.PP
-.\"
-.\"
-.SH CONFORMANCE
-.PP
-.\"
-.\"
-.SH HISTORY
-.PP
+PHYS (4).
 .\"
 .\"
 .SH VERSIONS

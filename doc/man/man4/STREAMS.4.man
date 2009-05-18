@@ -140,7 +140,16 @@ A STREAMS module for pipes.
 A STREAMS socket compatability module for TPI.
 .\"
 .\"
-.\".SH NOTICES
+.SH DEVICES
+.PP
+.IR /dev/clone ,
+.IR /dev/echo ,
+.IR /dev/strlog ,
+.IR /dev/sloop ,
+.IR /dev/loop_clone ,
+.IR /dev/mux ,
+.IR /dev/nuls ,
+.IR /dev/sad .
 .\"
 .\"
 .BG

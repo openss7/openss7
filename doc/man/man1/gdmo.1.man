@@ -102,7 +102,7 @@ search-truncate 40
 search-ignore T
 .R2
 .so openss7.macros
-.TH GDMO 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Adminstrative Commands"
+.TH GDMO 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
 .\"
 .\"
 .SH NAME
@@ -226,7 +226,7 @@ option suppresses the printing of diagnostic messages to
 .\"
 .SH "SEE ALSO"
 .PP
-.BR asn1 (8).
+.BR asn1 (1).
 .\"
 .\"
 .SH BUGS

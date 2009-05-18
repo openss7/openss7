@@ -326,8 +326,8 @@ command provides a method for the caller to query or change the current
 configuration and associated tunable parameters of queues, queue pairs, Streams and modules.
 .\"
 .\"
-.SH FORMAT
-.PP
+.\".SH FORMAT
+.\".PP
 .\"
 .\"
 .SH DIAGNOSTICS

@@ -288,8 +288,8 @@ Interworking modules between
 and Linux IP subsystem is not subject to standardization.
 .\"
 .\"
-.SH HISTORY
-.PP
+.\".SH HISTORY
+.\".PP
 .\"
 .\"
 .[

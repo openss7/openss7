@@ -277,6 +277,13 @@ header files to expose the definitions, structures and declarations associated
 with the input-output control.
 .\"
 .\"
+.SH DEVICES
+.PP
+For use with
+.IR AIX \(rg
+compatible devices.
+.\"
+.\"
 .SH SEE ALSO
 .PP
 .BR DLC_CONTACT (4),

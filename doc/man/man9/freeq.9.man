@@ -206,7 +206,7 @@ has no known bugs.
 .BR freeq ()
 is compatible with SVR3.2
 .[
-svr32
+svr3spg
 .]
 with the following exceptions:
 .IP \(em \w'\(em\(em'u

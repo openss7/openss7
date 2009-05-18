@@ -381,7 +381,13 @@ number of signalling links.
 .TP
 .I name
 is an identifier for the signalling link profile.
-
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @configdir@/slconf
+The signalling link configuration file.
 .\"
 .\"
 .SH BUGS

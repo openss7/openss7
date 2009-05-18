@@ -187,7 +187,20 @@ endif
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		=
+FIG_FIGS		= \
+			tty01.fig \
+			phys01.fig \
+			xns01.fig \
+			inet01.fig \
+			x2501.fig \
+			fr01.fig \
+			osi01.fig \
+			isdn01.fig \
+			atm01.fig \
+			ss701.fig \
+			sigtran01.fig \
+			mg01.fig \
+			voip01.fig
 
 ## PKG_BUILD_INDEP
 endif

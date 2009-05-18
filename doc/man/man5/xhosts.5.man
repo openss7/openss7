@@ -112,16 +112,56 @@ search-ignore T
 \- X.25 hosts configuration table
 .\"
 .\"
-.SH SYNOPSIS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The X.25 hosts configuration database file,
+.BR @sysconfdir@/xhosts ,
+is a system file that contains configuration information for X.25 hosts
+and, specifically, the X.25 host entry component of the SX.25 library,
+.BR libsx25 (3).
+.PP
+Each entry in the X.25 hosts configuration database file can be represented by a
+.B xhostent
+structure.
 .\"
 .\"
 .SH FORMAT
 .PP
+The
+.B xhosts
+file contains information regarding all known X.25 hosts.  For each X.25
+host, a single line should be present with the following information:
+.TP
+.B X.25 address
+.TP
+.B official host name
+.TP
+.B aliases
+.PP
+Items are separated by any number of blanks or table characters.  A '#'
+indicates the beginning of a comment; characters up to the end of the line
+are not interpreted by routines that search the file.
+.PP
+X.25 addresses are specified in the X.25 dot format.  An entry can be taken
+from the
+.B @sysconfdir@/xhosts
+file using the routine
+.BR getxhostent (3).
+Host names may contain any printable character other than a field delimiter,
+newline, or comment character.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of a file entry:
+.RS
+.sp
+.nf
+\f(CW\s-1\
+A.01234567890123.X.12    realhost   alias1 alias2
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH FILES
@@ -131,11 +171,18 @@ search-ignore T
 Provides the
 .B xhosts
 configuration file.
+.PP
+(Note that the directory varies depending on whether the build was on a
+.BR dpkg (1)-based
+or
+.BR rpm (1)-based
+system.)
 .\"
 .\"
 .SH SEE ALSO
 .PP
 .BR hostent (5),
+.BR stox25 (3),
 .BR endxhostent (3),
 .BR getxhostbyaddr (3),
 .BR getxhostbyname (3),
@@ -154,32 +201,87 @@ file has no known bugs.
 .PP
 The
 .B xhosts
-file is compatible with
-SunLink\(rg and products based on SunLink\(rg,
+file format is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
 .[
-sunlink tli
+aixx25
 .]
-or
-.IR Solstice "\(rg " "X.25
+.IR "HP-UX" ,
 .[
-solx25pg
+hpuxdoc
 .]
-with the following portability considerations:
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 .IP \(em
-.B xhosts
-is a Solaris\*(rg
-specific file.  It may be necessary to define
-.B _SUN_SOURCE
-before including any header files to expose the functionality of this file.
+.PP
+For additional compatibility information see,
+.BR xhostent (5)
+and
+.BR STREAMS (9).
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B xhosts
+file format first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25. 
 .\"
 .\"
 .[

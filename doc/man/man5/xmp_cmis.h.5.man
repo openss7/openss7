@@ -142,6 +142,10 @@ Management Information Service (CMIS) along with the ASN.1 productions of the re
 .\"
 .SH COMPATIBILITY
 .PP
+This header file is compatible with XMP.
+.[
+xmp c306
+.]
 .\"
 .\"
 .SH CONFORMANCE
@@ -154,10 +158,6 @@ XOM.
 .[
 xom c607
 .]
-.\"
-.\"
-.SH HISTORY
-.PP
 .\"
 .\"
 .SH VERSIONS

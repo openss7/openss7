@@ -146,12 +146,9 @@ pushed on the
 device.
 .\"
 .\"
-.SH IOCTLS
+.SH NOTICES
 .PP
-.\"
-.\"
-.SH EXAMPLES
-.PP
+The \*(lqI\*(rq in \fBIFR\fP stands for \fIIRIX\fP\(rg.
 .\"
 .\"
 .SH DEVICES
@@ -159,25 +156,39 @@ device.
 .B /dev/ifnet
 .\"
 .\"
-.SH "SEE ALSO"
+.SH SEE ALSO
 .PP
-.BR nuls (4),
-.\"
-.\"
-.SH BUGS
-.PP
+.BR ifr (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+For additional compatibility information, see
+.BR ifr (4),
+.BR ifrdlci (8),
+.BR ifrtune (8),
+.BR mfeproto (8),
+.BR mfevc (8),
+.BR pvcmap (8),
+.BR lltune (8),
+and
+.BR STREAMS (9).
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+DLPI.
+.[
+dlpi revision 2.0.0
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B WAN
+driver first appeared in \fIIRIX\fP\(rg.
 .\"
 .\"
 .[

@@ -146,6 +146,10 @@ These are undocumented SS7 modules and devices that still need a manual page wri
 .TP
 .BR m3tp ,
 .TP
+.BR mtp3b ,
+.TP
+.BR onpi ,
+.TP
 .BR pca200e ,
 .TP
 .BR sctp_ioctl ,

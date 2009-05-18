@@ -135,6 +135,10 @@ header file contain defintions for the OM interface.
 .\"
 .SH COMPATIBILITY
 .PP
+This header file is compatible with XOM.
+.[
+xom c607
+.]
 .\"
 .\"
 .SH CONFORMANCE
@@ -143,10 +147,6 @@ XOM.
 .[
 xom c607
 .]
-.\"
-.\"
-.SH HISTORY
-.PP
 .\"
 .\"
 .SH VERSIONS

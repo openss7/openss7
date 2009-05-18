@@ -188,8 +188,10 @@ message fill mode.
 Similar to
 .B RNORM
 but requests that the stream head fill a buffer completely before returning to
-the application.  This is used in conjunction with a cooperating module and
+the application.  This is used in conjunction with a cooperating module,
 .BR M_READ (9)
+and
+.BR M_MI (9)
 messages.
 .PP
 bitwise OR'ed with one flag from the protocol group as follows:
@@ -451,7 +453,9 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .BR ioctl (3p),
 .BR streamio (7),
 .BR ioctl (2s),
-.BR errno (3).
+.BR errno (3),
+.BR M_READ (9),
+.BR M_MI (9).
 .\"
 .\"
 .SH BUGS
@@ -493,6 +497,16 @@ Portable
 .I STREAMS
 applications programs will expect conformance to
 .IR POSIX/SUSv3 .
+.IP \(em
+.IR AIX \(rg
+.[
+aixspg
+.]
+provides an additional message that interacts with the
+.B RFILL
+mode, described in the
+.BR M_MI (9)
+manual page.
 .PP
 For general
 .BR ioctl (2s)

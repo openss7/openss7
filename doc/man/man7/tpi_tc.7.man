@@ -599,5 +599,9 @@ otherwise.
 is used during the data transfer state;
 .BR T_UNITDATA_IND (7)
 otherwise.
-.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
-
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

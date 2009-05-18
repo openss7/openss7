@@ -455,8 +455,8 @@ are implemented using
 .BR snmp_vlog ().
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO

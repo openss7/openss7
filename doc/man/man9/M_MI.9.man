@@ -104,8 +104,6 @@ search-ignore T
 .so openss7.macros
 .\"
 .\"
-.\"
-.\"
 .TH M_MI 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
@@ -152,8 +150,10 @@ The end of the buffer.
 .RE
 .TP
 .B M_MI_READ_RESET
+Reset the read position.
 .TP
 .B M_MI_READ_END
+End the read.
 .\"
 .\"
 .SH INTERFACE
@@ -164,10 +164,73 @@ implementation extension.
 .\"
 .SH DESCRIPTION
 .PP
-.\"
-.\"
-.SH USAGE
+Under
+.IR AIX \(rg,
+the
+.B RFILL
+mode described in
+.BR I_SRDOPT (7)
+prevents completion of a read request at the Stream head until one of the
+following events occur:
+.IP 1. \w'0.\(em'u
+The entire buffer is filled.
+.IP 2.
+An end of file condition occurs.
+.IP 3.
+The Stream head receives an
+.B M_MI_READ_END
+message.
 .PP
+Several control messages support the
+.B RFILL
+mode.  They are used by modules to manipulate data being placed in user
+buffers at the Stream head.  These messages are multiplexed under a single
+.B M_MI
+message type.  The message subtype, pointed to by the
+.B b_rptr
+member of a
+.BR msgb (9)
+message block, is one of the following:
+.TP
+.B M_MI_READ_SEEK
+Provides random access data retrieval.  An application and a cooperating
+module can gather large data blocks from a slow, high-latency, or unreliable
+link, while minimizing the number of system calls required, and relieving the
+protocol modules of large buffering requirements.
+.sp
+The
+.B M_MI_READ_SEEK
+message subtype is followed by two long words, as in a standard seek call.
+The first word is an origin indicator as follows:
+.RS
+.TP
+.I 0
+Start of buffer.
+.PD 0
+.TP
+.I 1
+Current position.
+.TP
+.I 2
+End of buffer
+.PD
+.RE
+.sp
+The second word is a signed offset from the specified origin.
+.TP
+.B M_MI_READ_RESET
+Discards any data previously delivered to partially satisfy an
+.B RFILL
+mode read request.
+.TP
+.B M_MI_READ_END
+Completes the current
+.B RFILL
+mode read request within whatever data has already been delivered.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH NOTICES
@@ -178,8 +241,8 @@ is an
 specific message.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"

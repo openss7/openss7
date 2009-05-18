@@ -102,7 +102,11 @@ search-truncate 40
 search-ignore T
 .R2
 .so openss7.macros
+.\"
+.\"
 .TH MFEPROTOCONF 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.\"
+.\"
 .SH NAME
 .B mfeprotoconf
 \- Multi-Protocol over Frame Relay Encapsulation Protocol File Format
@@ -226,6 +230,13 @@ system.)
 .BR x25netd (8).
 .\"
 .\"
+.SH BUGS
+.PP
+The
+.B mfeprotoconf
+file has no known bugs.
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
 The
@@ -263,7 +274,7 @@ with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
 .IP \(em
 .PP
-For additional compatibiltiy information see,
+For additional compatibility information see,
 .BR mfeproto (8),
 .BR mfe (4),
 and
