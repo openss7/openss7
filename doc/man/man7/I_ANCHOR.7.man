@@ -414,8 +414,6 @@ applications programs will not use this
 .B @PACKAGE_TITLE@
 recognizes some
 .IR Solaris \(rg-specific
-and
-.IR LiS -specific
 IO control numbers for compatibility.
 .B I_ANCHOR
 is one of them.

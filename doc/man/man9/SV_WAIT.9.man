@@ -428,9 +428,6 @@ hpuxdoc
 .]
 for more information.
 .IP \(em
-.I LiS
-does not provide these functions.
-.IP \(em
 .IR Solaris \(rg
 provides the related functions
 .BR qwait (9)

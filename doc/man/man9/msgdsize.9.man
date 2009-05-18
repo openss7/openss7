@@ -297,38 +297,6 @@ Portable
 .I STREAMS
 drivers and modules may use this function.
 .IP \(em
-.I LiS
-.[
-LiS
-.]
-places limits on the maximum size of a message block.
-.BR msgdsize ()
-does not.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_msgdsize ()
-.\"is provided for compatibility to
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_msgdsize ()
-.\"calls
-.\".BR msgdsize ()
-.\"directly.
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will not directly access
-.\".I LiS
-.\"symbols.
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

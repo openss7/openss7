@@ -224,5 +224,9 @@ The TR service primitives
 q771
 .]
 map onto the XTI functions as follows
-.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
-
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

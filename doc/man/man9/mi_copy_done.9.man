@@ -329,20 +329,6 @@ or
 .RB copyout (9)
 error, then the message block is simply freed and no positive or negative
 acknowledgement is returned.
-.PP
-.I LiS
-has a longstanding bug in its implementation of
-.BR M_IOCDATA (9)
-whereby it expects a negative acknowledgement,
-.BR M_IOCNAK (9),
-from the driver instead of abandonning the input-output control request as
-specified in the
-.IR "SVR 4 SPG" .
-.[
-svr4spg
-.]
-This is accommodated by the routine when it compiles for
-.IR LiS .
 .\"
 .\"
 .SH "SEE ALSO"

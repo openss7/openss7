@@ -325,9 +325,6 @@ do not document
 and
 .IR UnixWare \(rg
 do.
-.I LiS
-does not provide (or document)
-.BR drv_getparm ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

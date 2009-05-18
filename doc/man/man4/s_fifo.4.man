@@ -503,20 +503,6 @@ and
 .BR unregister_strdev_minor (9).)
 .\"
 .\"
-.PP
-Allocation of major and minor device numbers is, however, an issue for
-.BR LiS ,
-.[
-LiS
-.]
-which uses an inferior mechanism.
-.B LfS
-.[
-LfS
-.]
-does not have this limitation.
-.\"
-.\"
 .SH CAVEATS
 .PP
 Fifo special node file-system based named pipes will only use

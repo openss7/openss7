@@ -359,13 +359,6 @@ aixdoc
 does nothing if
 .I len
 is zero.
-.I LiS
-returns success (1) when
-.I len
-is zero (0).
-.[
-LiS
-.]
 .IP ""
 Portable
 .I STREAMS
@@ -380,10 +373,9 @@ may free zero length message blocks created or encountered during the trimming p
 .[
 soldoc
 .]
-.IR IRIX \(rg,
-.IR UnixWare \(rg
+.IR IRIX \(rg
 and
-.I LiS
+.IR UnixWare \(rg
 do not free zero length message blocks encountered during the trimming
 process.
 .[
@@ -391,9 +383,6 @@ irixdoc
 .]
 .[
 uw7doc
-.]
-.[
-LiS
 .]
 .IP ""
 Portable

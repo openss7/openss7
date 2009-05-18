@@ -357,10 +357,6 @@ is a pointer to an integer value specifying the lower multiplexed STREAM to be u
 connection.
 .PP
 This input-output control is provided for compatibility with the
-.I LiS
-.[
-lis
-.]
 .B minimux
 driver.
 .SS MINIMUX_DOWN
@@ -375,10 +371,6 @@ is a pointer to an integer value specifying the lower multiplexed STREAM to be u
 connection.
 .PP
 This input-output control is provided for compatibility with the
-.I LiS
-.[
-lis
-.]
 .B minimux
 driver.
 .\"
@@ -440,17 +432,11 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
+.B Linux Fast-STREAMS
 provides the
 .B mux
 pseudo-device driver for testing and compatibility with
-.IR LiS ,
-.[
-LiS
-.]
+.IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 Although this driver is described in the
@@ -480,10 +466,6 @@ for additional compatibility information.
 SVR4
 .[
 svr4spg
-.]
-and LiS
-.[
-lis
 .]
 documentation.
 Conformance is verified using the

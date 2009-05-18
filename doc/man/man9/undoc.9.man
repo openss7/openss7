@@ -149,34 +149,42 @@ These are undocumented function that still need a manual page written for them.
 .\"
 .SH USAGE
 .PP
+Unknown.
 .\"
 .\"
 .SH RETURN
 .PP
+Unknown.
 .\"
 .\"
 .SH ERRORS
 .PP
+Unknown.
 .\"
 .\"
 .SH CONTEXT
 .PP
+Unknown.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Unknown.
 .\"
 .\"
 .SH NOTICES
 .PP
+Unknown.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+Unknown.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
@@ -194,10 +202,12 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+Unknown.
 .\"
 .\"
 .SH HISTORY
 .PP
+Unknown.
 .\"
 .\"
 .[

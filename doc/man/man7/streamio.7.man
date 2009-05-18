@@ -2297,13 +2297,9 @@ is compatible with
 .[
 svr42
 .]
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS ,
-.[
-LiS
-.]
+.IR UnixWare \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .B Linux Fast-STREAMS
@@ -2323,8 +2319,6 @@ provides ioctls that are used to implement this system call.
 .B Linux Fast-STREAMS
 recognizes some
 .IR Solaris \(rg-specific
-and
-.IR LiS -specific
 IO control numbers for compatibility.
 .IP \(em
 The numbering of standard input-output control commands for
@@ -2390,9 +2384,6 @@ documents that, when command is
 .BR I_SETCLTIME ,
 .I arg
 is a long timeout value.
-.I LiS
-follows
-.IR Solaris \(rg.
 .B SUSv2
 .[
 susv2
@@ -2406,16 +2397,7 @@ can be seen in
 .BR strace (8)
 output to pass a pointer instead of a value.  This means that
 .IR Solaris \(rg
-documentation is erroneous, and
-.I LiS
-implementation is wrong.
-.IP ""
-Portable
-.IR STREAMS (9)
-libraries and applications programs will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
+documentation is erroneous.
 .\"
 .\"
 .SH CONFORMANCE

@@ -251,15 +251,6 @@ based implementations discussed here.
 Portable
 .I STREAMS
 drivers and modules may use this function.
-.\".IP \(em
-.\".I LiS
-.\".[
-.\"LiS
-.\".]
-.\"Symbol
-.\".BR lis_linkb ()
-.\"is provided for binary compatibility with
-.\".IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

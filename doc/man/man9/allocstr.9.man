@@ -281,23 +281,6 @@ usldk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_alloc_stdata ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\".BR lis_alloc_stdata ()
-.\"simply calls
-.\".BR allocstr ()
-.\"directly.
-.\".IP ""
-.\"Note that
-.\".BR lis_alloc_stdata ()
-.\"was deprecated as of
-.\".IR "LiS 2.18.0" .
-.\"See
-.\".BR lisdeprec (9)
-.\"for more information.
-.\".IP \(em
 Some older
 .I AT&T
 header files from

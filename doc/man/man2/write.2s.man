@@ -1060,7 +1060,6 @@ including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
-.IR LiS ,
 .IR MacOT \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
@@ -1075,8 +1074,7 @@ The
 write option is supported by
 .BR "@PACKAGE_TITLE@" .
 This option is not documented in detail, but is present in
-.IR Solaris \(rg,
-.I LiS
+.IR Solaris \(rg
 and the GNU C Library header files.
 .I POSIX
 .[
@@ -1126,19 +1124,6 @@ The
 definition appears in
 .IR Solaris \(rg
 header files, however, it is noted as being no longer implemented.
-The
-.B SO_STRHOLD
-definition appears in
-.I LiS
-.[
-lis
-.]
-header files and is implemented per the descriptions in the Magic Garden.
-.[
-magic
-%O Section 7.9.5 \(lqWriting to a Stream\(rq,
-%P p. 476
-.]
 .I The Magic Garden
 .[
 magic
@@ -1168,32 +1153,6 @@ applications programs will not use the
 write option, and will not rely on the positive or negative behavior of
 .BR I_SWROPT (7)
 with respect to this flag.
-.IP \(em
-.IP \(em
-.IP \(em
-.PP
-.B @PACKAGE_TITLE@
-used to recognize the \(lqinvalid\(rq buffer length to
-.BR write ()
-used by
-.I LiS
-to emulate the
-.I __NR_putpmsg
-system call.
-This is no longer the case.
-.B @PACKAGE_TITLE@
-(as with current versions of
-.IR LiS ),
-.[
-lis
-.]
-uses the
-.B I_PUTPMSG
-command to
-.BR ioctl (2s)
-to emulate the
-.BR putpmsg (2s)
-system call.
 .\"
 .\"
 .SH CONFORMANCE

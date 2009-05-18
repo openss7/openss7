@@ -300,9 +300,9 @@ has no known bugs.
 .PP
 .BR qclose ()
 is not exported by
-.IR "SVR 4.2 MP DDI/DKI" ,
-.IR Solaris \(rg
-or LiS.
+.IR "SVR 4.2 MP DDI/DKI"
+or
+.IR Solaris \(rg.
 .PP
 See
 .BR STREAMS (9)

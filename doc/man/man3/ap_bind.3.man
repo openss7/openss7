@@ -134,12 +134,13 @@ xap c303
 .\"
 .\"
 .SH ARGUMENTS
+.PP
 .TP \w'\fIaperrno_p\fP\ \(em'u
 .I fd
 a file descriptor corresponding to an XAP instance.
 .PD 0
 .TP
-.I apperrno_p
+.I aperrno_p
 an extent into which to place an error code when unsuccessful.
 .PD
 .\"
@@ -213,6 +214,7 @@ is set to indicate the error.
 .\"
 .\"
 .SH ERRORS
+.PP
 .TP \w'[\fBAP_BADNSAP\fP]\(em'u
 .RB [ AP_ACCES ]
 Request to bind to specified address denied.
@@ -319,8 +321,12 @@ Binary compatibility is not
 attempted: any exhibited binary compatibility is coincidental and is scheduled
 to be removed on the next release.
 .PP
-See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
-compatibility information.
+See
+.BR APLI (3),
+.BR XAP (3)
+and 
+.BR STREAMS (4),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -353,6 +359,3 @@ This manual page was written for the OpenSS7 XAP Library.
 $LIST$
 .]
 .T4
-
-
-

@@ -608,8 +608,7 @@ svr42
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Some implementations (e.g.,
-.IR LiS )
+Some implementations
 treat the
 .I mi_idnum
 and
@@ -632,8 +631,7 @@ and
 .I mi_idname
 in the defining structures.
 .IP \(em
-Some implementations (e.g.,
-.IR LiS )
+Some implementations
 use the
 .I mi_idnum
 and

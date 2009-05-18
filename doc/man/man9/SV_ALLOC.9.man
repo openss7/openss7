@@ -323,12 +323,6 @@ hpuxspg
 documents these functions as available for use with
 .IR STREAMS .
 .IP \(em
-.I LiS
-.[
-lis
-.]
-does not support these functions.
-.IP \(em
 .BR SV_ALLOC ()
 and
 .BR SV_DEALLOC ()

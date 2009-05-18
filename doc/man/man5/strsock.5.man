@@ -165,9 +165,7 @@ The
 package contains header files and a number of modules and drivers and the
 associated documentation originally contained in the
 .B Linux Fast-STREAMS
-release, but not contained in the
-.B Linux STREAMS (LiS)
-releases.
+release.
 .PP
 The package uses the following standard
 .I Open Systems Interconnect (OSI)
@@ -565,19 +563,6 @@ Network Selection Library package.
 .\"
 .\"
 .SH NOTICES
-.PP
-No release of the
-.B @PACKAGE@
-package is compatible with
-.IR LiS .
-.I LiS
-lacks the Stream head support necessary to properly implement a socket.  As
-.I LiS
-is long deprecated, this should not present a problem.  The
-.B @PACKAGE@
-package is comatible with
-.BR "Linux Fast-STREAMS" ,
-which always contained full socket support in the Stream head.
 .PP
 .I Alpha
 release are releases that have received little to no testing, or that have been tested

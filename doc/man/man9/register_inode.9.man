@@ -344,8 +344,8 @@ and
 are MP-safe.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"

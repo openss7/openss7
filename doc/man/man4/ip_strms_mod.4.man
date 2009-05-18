@@ -260,7 +260,6 @@ would allow the establishing process to terminate.
 .\"
 .SH HISTORY
 .PP
-Most of the devices and modules here appeared in earlier releases of LiS.
 .\"
 .\"
 .[

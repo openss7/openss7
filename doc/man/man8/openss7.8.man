@@ -104,31 +104,31 @@ search-ignore T
 .so openss7.macros
 .\"
 .\"
-.TH SPECFS 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH OPENSS7 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B specfs, specfs.sh
-\- System V Init Script for the \fISTREAMS\fP Shadow Special Filesystem.
+.B openss7, openss7.sh
+\- System V Init Script for the \fIOpenSS7\fP package.
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBservice\fP \fRspecfs\fP
+\fBservice\fP \fBopenss7\fB
 [\fIcommand\fP]
 # RedHat/Mandriva distribution
 .PD 0
 .HP 12
-\fBrc\fRspecfs\fP
+\fBrc\fRopenss7\fP
 [\fIcommand\fP]
 # SuSE distribution
 .HP 12
-\fB/etc/init.d/\fP\fRspecfs\fP
+\fB/etc/init.d/\fP\fRopenss7\fP
 [\fIcommand\fP]
 # Ubuntu distribution
 .HP 12
-\fB/etc/init.d/\\fPfRspecfs.sh\fP
+\fB/etc/init.d/\\fPfRopenss7.sh\fP
 [\fIcommand\fP]
 # Debian distribution
 .PD
@@ -137,7 +137,7 @@ search-ignore T
 .SH DESCRIPTION
 .PP
 The
-.B specfs
+.B openss7
 System V Init Script starts, stop, restarts and displays the status of the
 .IR STREAMS (9)
 Special Shadow Filesystem.
@@ -156,7 +156,7 @@ argument can be one of the following:
 .TP
 (none)
 When executed without arguments, the
-.B specfs
+.B openss7
 init script will display a short usage summary and exit.
 .TP
 .B start
@@ -164,7 +164,7 @@ Start the
 .IR STREAMS (9)
 Special Shadow Filesystem.
 The filesystem is mounted if
-.B SPECFS_MOUNT
+.B OPENSS7_MOUNT
 is set to
 .IR yes .
 All
@@ -178,13 +178,13 @@ Stop the
 .IR STREAMS (9)
 Special Shadow Filesystem.
 The filesystem is unmount if
-.B SPECFS_MOUNT
+.B OPENSS7_MOUNT
 is set to
 .IR yes .
 Any
 .I STREAMS Special Shadow Filesystem
 kernel modules that are loaded (that is the
-.BR specfs (5)
+.BR openss7 (5)
 kernel module), will be removed with
 .BR "modprobe -r" .
 If devices do not exist and there are no
@@ -202,7 +202,7 @@ This has the same effect as a
 except that the lock file is forcibly removed.
 .PP
 The Debian-style
-.B specfs.sh
+.B openss7.sh
 script also recognizes the following commands:
 .TP
 .B show
@@ -211,7 +211,7 @@ Report on the status of the
 Special Shadow Filesystem.
 .PP
 The RedHat-style
-.B specfs
+.B openss7
 script also recognizes the following commands:
 .TP
 .B status
@@ -262,9 +262,9 @@ filesystem.
 .SH USAGE
 .PP
 Normally the
-.B specfs
+.B openss7
 or
-.B specfs
+.B openss7
 init script is invoked by the
 .BR init (8)
 process.
@@ -282,7 +282,7 @@ arguments as the script itself, at the shell command prompt, as follows:
 .RS
 .nf
 \fC\s-1\
-$> service specfs [command]
+$> service openss7 [command]
 \s+1\fP
 .fi
 .RE
@@ -292,18 +292,18 @@ $> service specfs [command]
 When the init script is installed,
 .BR inserv (8)
 will also create the rc script named
-.B rcspecfs
+.B rcopenss7
 in the
 .B /usr/sbin
 directory.  This script can be invoked by the adminstrator with the same
 command arguments as the
-.B specfs
+.B openss7
 script itself, at the shell command prompt, as follows:
 .PP
 .RS
 .nf
 \fC\s-1\
-$> rcspecfs [command]
+$> rcopenss7 [command]
 \s+1\fP
 .fi
 .RE
@@ -318,7 +318,7 @@ shell command prompt, as follows:
 .RS
 .nf
 \fC\s-1\
-$> /etc/init.d/specfs.sh [command]
+$> /etc/init.d/openss7.sh [command]
 \s+1\fP
 .fi
 .RE
@@ -334,7 +334,7 @@ shell command prompt, as follows:
 .RS
 .nf
 \fC\s-1\
-$> /etc/init.d/specfs [command]
+$> /etc/init.d/openss7 [command]
 \s+1\fP
 .fi
 .RE
@@ -345,43 +345,43 @@ $> /etc/init.d/specfs [command]
 The following shell variables can be overridden in a configuration file or via
 the environment:
 .TP
-.B SPECFS_MOUNTPOINT
+.B OPENSS7_MOUNTPOINT
 When set to a directory path, the init script will mount the
-.BR specfs (5)
+.BR openss7 (5)
 filesystem on the specified mount point.  If the mount point does not exist,
 but can be created as a directory, the mount point will be created before
 mounting the filesystem.
 .IP ""
 When not set, the
-.BR specfs (5)
+.BR openss7 (5)
 filesystem will not be mounted.
 .TP
-.B SPECFS_UID
+.B OPENSS7_UID
 Specifies the user id to use for mounting the
-.BR specfs (5)
+.BR openss7 (5)
 filesystem.  If not specified, the user id will default to the user id of the
 process running the script and performing the
 .BR mount (8).
 .TP
-.B SPECFS_GID
+.B OPENSS7_GID
 Specifies the group id to use for mounting the
-.BR specfs (5)
+.BR openss7 (5)
 filesystem.  If not specified, the group id will default to the group id of
 the process running the script and performing the
 .BR mount (8).
 .TP
-.B SPECFS_MODE
+.B OPENSS7_MODE
 Specifies the mode of the mounted
-.BR specfs (5)
+.BR openss7 (5)
 filesystem.  If not specified, the mode will default to the umask of the
 process running the script and performing the
 .BR mount (8).
 .TP
-.B SPECFS_OPTIONS
+.B OPENSS7_OPTIONS
 Specifies additional options to the mount.  See
 .BR mount (8)
 and
-.BR specfs (5)
+.BR openss7 (5)
 for more information.
 .PP
 The Debian-style
@@ -396,9 +396,9 @@ by the script will be printed to standard output.
 .SH DIAGNOSTICS
 .PP
 The
-.B specfs
+.B openss7
 and
-.B specfs.sh
+.B openss7.sh
 scripts display success or failure on standard output in the normal manner of
 System V Init Scripts for the distribution upon which they are loaded.
 Diagnostic messages associated with the failure of the script or any command
@@ -421,7 +421,7 @@ the shell command prompt:
 .RS
 .nf
 \fC\s-1\
-$> service specfs probe
+$> service openss7 probe
 \s+1\fP
 .fi
 .RE
@@ -441,25 +441,25 @@ directory.
 .SH FILES
 .PP
 .TP
-.B /etc/rc.d/init.d/specfs
+.B /etc/rc.d/init.d/openss7
 Installed location of the init script on RedHat-style systems.
 .TP
-.B /etc/init.d/specfs.sh
+.B /etc/init.d/openss7.sh
 Installed location of the init script on Debian-style systems and accessible
 location of the init script on all systems.
 .TP
-.B /etc/sysconfig/specfs
+.B /etc/sysconfig/openss7
 The configuration file for the
-.B specfs
+.B openss7
 startup script is located in the
-.B /etc/sysconfig/specfs
+.B /etc/sysconfig/openss7
 file (for RedHat-style System V Init Script configurations).
 .TP
-.B /etc/default/specfs
+.B /etc/default/openss7
 The configuration file for the
-.B specfs.sh
+.B openss7.sh
 startup script is located in the
-.B /etc/default/specfs
+.B /etc/default/openss7
 file (for Debian-style System V Init Script configurations).
 .TP
 .B /etc/sysctl.conf
@@ -470,7 +470,7 @@ This file has the format described in
 Special Shadow Filesystem system controls can either be placed in this global file or in the
 specific file below.
 .TP
-.B /etc/specfs.conf
+.B /etc/openss7.conf
 Contains
 .I STREAMS
 Special Shadow Filesystem specific system controls.
@@ -480,7 +480,7 @@ This file has the format described in
 Special Shadow Filesystem system controls can either be placed in this specific file or in the
 global file above.
 .TP
-.B /var/lock/subsys/specfs
+.B /var/lock/subsys/openss7
 The subsystem lock file for the
 .I STREAMS
 subsystem on RedHat-style systems.  This file normally exists when the
@@ -504,17 +504,17 @@ Special Shadow Filesystem is initialized and locked.
 .\"
 .SH BUGS
 .PP
-.B specfs
+.B openss7
 and
-.BR specfs.sh
+.BR openss7.sh
 have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B specfs
+.B openss7
 and
-.B specfs.sh
+.B openss7.sh
 init scripts are compatible with
 .IR "SVR 4.2" ,
 .[
@@ -546,14 +546,14 @@ Initializing the
 Special Shadow Filesystem is implementation specific and not subject to standardization.
 .PP
 The
-.B specfs
+.B openss7
 init script conforms to
 .I LSB
 specification for init scripts and is compatible with a wide range of
 RedHat-style and LSB compatibile systems.
 .PP
 The
-.B specfs.sh
+.B openss7.sh
 init script conforms to
 .I Debian
 policy.
@@ -562,9 +562,9 @@ policy.
 .SH HISTORY
 .PP
 The
-.B specfs
+.B openss7
 and
-.B specfs.sh
+.B openss7.sh
 init scripts are new to
 .BR "@PACKAGE_TITLE@" .
 .\"

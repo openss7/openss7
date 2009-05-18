@@ -181,27 +181,9 @@ with the following portability considerations:
 .B M_DELAY
 has a different constant value on
 older versions of
-.IR OSF/1 \(rg,
+.IR OSF/1 \(rg.
 .[
 osfspg
-.]
-and older versions of
-.IR LiS .
-.[
-lis
-.]
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.[
-lis
 .]
 .IP \(em
 Binary compatibiltiy is not guaranteed.

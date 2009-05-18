@@ -396,10 +396,6 @@ or with a
 that points to other than a valid
 .B queue_t
 structure is invalid and the result is undefined.
-When
-.I LiS
-.BR canenable ()
-encounters such an error, it will return false (0).
 .IP ""
 Portable
 .I STREAMS
@@ -433,26 +429,6 @@ drivers and modules.  Any and all functionality provided by
 in support of
 .RB non- STREAMS
 devices are not supported.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_safe_canenable ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_safe_canenable ()
-.\"simply calls
-.\".BR canenable ()
-.\"directly.
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will not access these symbols.  Portable
-.\".I STREAMS
-.\"drivers and modules will use
-.\".B "@PACKAGE_TITLE@"
-.\"instead of
-.\".IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -460,8 +436,6 @@ Additional compatibility is available using the
 .I STREAMS Compatibility Modules
 .BR strcompat (5)
 package for
-.I LiS
-and
 .BR "@PACKAGE_TITLE@" .
 See
 .BR svr3compat (9),

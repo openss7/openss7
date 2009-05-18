@@ -268,10 +268,6 @@ suxspg
 .[
 uw7spg
 .]
-.IR LiS ,
-.[
-lis
-.]
 permit both a read or write queue pointer to be passed
 as the
 .I q

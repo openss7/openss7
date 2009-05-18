@@ -866,36 +866,6 @@ drivers and modules will not call
 .BR bcanput ()
 from outside the queue's put or service procedure.
 .IP \(em
-.BR bcanput ()
-always succeeds.  Under
-.IR LiS ,
-.BR bcanput ()
-will return zero (0 - flow controlled) if an internal error occurs, without
-setting the
-.BR QWANTW " or " QB_WANTW
-flag for the queue or band.  This means that, although flow controlled, no
-back-enable procedure will be run.  This can lead to indefinite postponement of
-a queue
-.IR qi_srvp (9)
-procedure under
-.IR LiS .
-.B "@PACKAGE_TITLE@"
-.[
-@PACKAGE_TITLE@
-.]
-.BR bcanput ()
-does not have this problem.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-.[
-@PACKAGE_TITLE@
-.]
-instead of
-.IR LiS .
-.IP \(em
 The declaration for
 .BR bcanput ()
 provides that
@@ -912,27 +882,6 @@ and other systems based on
 .I band
 is
 .BR "unsigned char" .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_bcanput ()
-.\"and
-.\".BR lis_bcanput_anyband ()
-.\"are provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_bcanput ()
-.\"and
-.\".BR lis_bcanput_anyband ()
-.\"simply call
-.\".BR bcanput ()
-.\"directly.
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will not access these symbols, but will call
-.\".BR bcanput ()
-.\"directly.
 .IP \(em
 .BR bcanput ()
 may be called on a
@@ -1019,31 +968,6 @@ framework).
 Such drivers should provide a dummy
 .IR qi_srvp (9)
 procedure.
-.IP \(em
-All versions of
-.I LiS
-contain the bug that they keep track of message queue counts,
-.IR q_count ,
-.IR qb_count ,
-in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
-.RB ( "db_lim - db_base" ),
-and not the sizes of the message blocks themselves,
-.RB ( "b_wptr - b_rptr" ),
-which does not conform to
-.IR "SVR 4.2 STREAMS" .
-.[
-svr42spg
-.]
-See
-.BR msgsize (9).
-No other implementation has this bug.
-.IP ""
-Portable
-.I STREAMS
-applications programs, drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -243,14 +243,10 @@ macspg
 .[
 osfspg
 .]
-.IR VxWorks \(rg,
+and
+.IR VxWorks \(rg.
 .[
 vxwspg
-.]
-and to some degree
-.IR "LiS 2.18" ,
-.[
-lis
 .]
 and other implementations based on the neo-classical
 .I Mentat Portable Streams
@@ -390,11 +386,7 @@ hpuxspg
 .]
 specifies that the default syncrhonization level is at the level of the queue
 pair,
-.BR SQLVL_QUEUEPAIR ;
-.IR "LiS 2.18" ,
-the level of the individual queue,
-.BR SQLVL_QUEUE .)
-
+.BR SQLVL_QUEUEPAIR .)
 .TP
 .B D_MTPERQ
 Specifies that the module has an inner perimeter and that synchronization at the
@@ -2241,11 +2233,6 @@ syncrhonization is poorly documented for most systems and is treated uniquely
 on most.  Some implementations do not support
 .I STREAMS
 syncrhonization at all.  (For example,
-.I LiS 2.16
-did not support any synchronization and
-.I LiS 2.18
-does not support per-module, per-Stream or elsewhere synchronization levels.
-Also,
 .IR IRIX \(rg
 .[
 irixspg
@@ -2283,13 +2270,7 @@ and
 .[
 hpuxspg
 .]
-state that,
-and
-.IR LiS
-.[
-lis
-.]
-implements so that,
+state that
 syncrhonization level
 .B SQLVL_GLOBAL
 only single threads the modules that are syncrhonized under that level (making
@@ -2355,21 +2336,6 @@ Portable
 .I STREAMS
 modules and drivers will not rely upon exclusive syncrhonization at an outer
 barrier.
-.IP \(em
-.I LiS 2.18
-.[
-lis
-.]
-provides no outer barrier and no (effective) syncrhonization of open and close
-routines.
-.IP ""
-Portable
-.I STREAMS
-modules and drivers will not use
-.I LiS
-and will use the superior
-.B @PACKAGE_TITLE@
-in its stead.
 .IP \(em
 .IR VxWorks \(rg
 .[

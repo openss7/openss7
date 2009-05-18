@@ -295,10 +295,9 @@ is source-level compatible with
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
-.IR UnixWare \(rg,
-.IR UXP/V \(rg
+.IR UnixWare \(rg
 and
-.I LiS
+.IR UXP/V \(rg
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
 .IR AIX \(rg,
@@ -312,10 +311,9 @@ implement
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
-.IR UnixWare \(rg,
-.IR UXP/V \(rg
+.IR UnixWare \(rg
 and
-.I LiS
+.IR UXP/V \(rg
 do not provide
 .BR putctl2 ().
 .IP \(em

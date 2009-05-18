@@ -178,7 +178,7 @@ The size of the resource map is set with
 .BR rminit (9)
 or
 .BR rmmapalloc (9),
-and can be examines with
+and can be examined with
 .BR mapsize (9).
 The number of waiters on the resource map is saved in the
 .I m_addr
@@ -206,6 +206,14 @@ The second element in the array is the start of the resource map.  It can be loc
 .\"
 .SH "SEE ALSO"
 .PP
+.BR rminit (9),
+.BR rmmapalloc (9),
+.BR mapsize (9),
+.BR rmsetwant (9),
+.BR rmfree (9),
+.BR rmwanted (9),
+.BR mapstart (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY

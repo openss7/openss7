@@ -221,31 +221,8 @@ structure.
 .PP
 .BR apush_vml ()
 is an
-.IR LiS -specific
+.IR @PACKAGE@ -specific
 function.
-This symbol is exported primarily in support of the
-.I STREAMS Compatibiltiy Modules
-package,
-.BR strcompat (5).
-.\"The macro definition
-.\".B _LIS_SOURCE
-.\"must be defined before including
-.\".I STREAMS
-.\"header files to expose the prototype for this function.
-.\"Also,
-.\".B "@PACKAGE_TITLE@"
-.\".[
-.\"@PACKAGE_TITLE@
-.\".]
-.\"must have been compiled with
-.\"kernel configuration parameter
-.\".BR CONFIG_STREAMS_LIS_COMPAT
-.\"defined.
-.\".PP
-.\".BR apush_vml ()
-.\"should not be used by portable
-.\".I STREAMS
-.\"drivers and modules.
 .PP
 .BR apush_vml ()
 is an internal implementation specific function, and will not be used directly by portable
@@ -293,22 +270,8 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR apush_vml ()
-is compatible with
-.IR LiS ,
-.[
-lis
-.]
-with the following portability considerations:
+has the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_apush_vml ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_apush_vml ()
-.\"simply calls
-.\".BR apush_vml ()
-.\"directly.
-.\".IP \(em
 .I SVR 4.2 MP DDI/DKI
 .[
 usldk
@@ -335,9 +298,7 @@ svr42
 Administrative Driver).  See
 .BR sad (4).
 .BR apush_vml ()
-is provided only for compatibility with
-.IR LiS ,
-and is not subject to standardization.
+is not subject to standardization.
 For the
 .B "@PACKAGE_TITLE@"
 .[
@@ -348,9 +309,6 @@ specific function, see
 .\"
 .\"
 .SH HISTORY
-.\".PP
-.\".BR lis_apush_vml ()
-.\"is an LiS-specific function.
 .PP
 .BR apush_vml ()
 is specific to

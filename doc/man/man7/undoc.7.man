@@ -196,6 +196,7 @@ These protocols, addendum and corrigendum need a manual page.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR streamio (7).
 .\"
 .\"
 .SH COMPATIBILITY

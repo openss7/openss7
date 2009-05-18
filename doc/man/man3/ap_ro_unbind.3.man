@@ -109,12 +109,149 @@ search-ignore T
 \- unbind an instance of the ACSE/Presentation ROSE library
 .\"
 .\"
+.SH NAME
+.PP
+.\"
+.\"
+.SH INTERFACE
+.PP
+ACSE/Presentation and ROSELibrary Interface,
+XAP.
+.[
+xap c303
+.]
+.[
+xap-rose c408
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libxap (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include xap.h
+.br
+.B #include xap_rose.h
+.HP
+.BI "int ap_ro_unbind(int " fd ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIaperrno_p\fP\ \(em'u
+.I fd
+a file descriptor corresponding to an XAP-ROSE instance.
+.PD 0
+.TP
+.I aperrno_p
+an extent into which to place an error code when unsuccessful.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is mentioned in HP-UX APRI library documentation.
+.[
+hpuxapli
+.]
+It does not appear in XAP-ROSE.
+.[
+xap-rose c408
+.]
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned. Otherwise, a value of
+minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP \w'[\fBAP_BADNSAP\fP]\(em'u
+.RB [ AP_ACCES ]
+Request to bind to specified address denied.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+parameter does not identify an XAP instance.
+.TP
+.RB [ AP_BADNSAP ]
+The format of the NSAP portion of the Presentation Address is not supported.
+.TP
+.RB [ AP_NOENV ]
+There is no XAP environment associated with
+.IR fd .
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/tp ", " /dev/streams/clone/tp
+The OSI Transport Provider.
+.TP
+.BR /dev/oopi ", " /dev/streams/clone/oopi
+The OSI Open Presentation Interface device.
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.BR apmod (4)
+An ACSE/Presentation Module named
+.RB \*(lq apmod \*(rq.
+.\"
+.\"
+.SH NOTICES
+.PP
+This function was only mentioned in an incomplete fashion in HP's OTS/9000
+manual.
+.[
+hpuxapli
+.]
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+This function is not yet implemented.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_set_env (3),
+.BR ap_snd (3),
+.BR AP_RO_UNBIND_REQ (7),
+.BR AP_RO_UNBIND_RSP (7),
+.BR XAP (3),
+.BR STREAMS (4).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR ap_ro_unbind ()
+has no known bugs.
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
 .BR ap_bind ()
 is compatible with XAP,
 .[
 xap c303
+.]
+XAP-ROSE,
+.[
+xap-rose c408
 .]
 and implementations based on XAP, such as
 .IR "USL ONP\(rg" ,
@@ -130,14 +267,15 @@ hpuxapli
 .IR "Digital\(rg DECnet/OSI" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
-Only source compatibility is supported.  Binary compatibility is not
+Only source compatibility is attempted.
+Binary compatibility is not
 attempted: any exhibited binary compatibility is coincidental and is scheduled
 to be removed on the next release.
 .PP
-See also,
+See
+.BR APRI (3),
 .BR XAP (3)
+.BR XAP-ROSE (3)
 and
 .BR STREAMS (4),
 for additional compatibility information.
@@ -151,7 +289,7 @@ xap c303
 .]
 XAP-ROSE.
 .[
-xap-rose
+xap-rose c408
 .]
 .\"
 .\"

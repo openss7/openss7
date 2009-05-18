@@ -201,39 +201,8 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR qcountstrm ()
-is compatible with
-.I LiS
-.[
-lis
-.]
-with the following exceptions:
+has the following exceptions:
 .IP \(em \w'\(em\(em'u
-.B Linux Fast-STREAMS
-keeps track of message block sizes in
-.I q->q_count
-for a queue.
-.I LiS
-counts the absolute sizes of data blocks.  This is an
-.I LiS
-bug.  See
-.BR msgsize (9).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.\".PP
-.\"Symbol
-.\".BR lis_qcountstrm ()
-.\"is provided for binary compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_qcountstrm ()
-.\"calls
-.\".BR qcountstrm ()
-.\"directly.
-.IP \(em
 This function is not provided by
 .I SVR 4.2 MP DDI/DKI
 or
@@ -248,18 +217,15 @@ for additional compatibility considerations.
 .PP
 .BR qcountstrm ()
 is an
-.IR LiS -specific
+.IR @PACKAGE@ -specific
 function.
-.BR qcountstrm ()
-is provided for source and binary compatibility with
-.IR LiS .
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR qcountstrm ()
-first appeared in
-.IR LiS .
+appears in
+.IR "@PACKAGE@" .
 .\"
 .\"
 .[

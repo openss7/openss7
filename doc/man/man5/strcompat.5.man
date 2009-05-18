@@ -122,12 +122,7 @@ OpenSS7
 add-on packages are separate add-on packages to the
 .B Linux Fast-STREAMS
 release that provide additional functionality and protocol support not traditionally found on
-UNIX systems, or which have traditionally fallen into the domain of value add system software, or,
-in this case, where the functionality was applicable to both
-.B "Linux Fast-STREAMS" " and " LiS
-(to provide support for both until
-.B Linux Fast-STREAMS
-became production grade).
+UNIX systems, or which have traditionally fallen into the domain of value add system software.
 The
 .B @PACKAGE_TITLE@
 package is one of several add-on packages that provides enhanced
@@ -335,10 +330,7 @@ architectures, but should build and install for other architectures as well.
 .PP
 This package represents compatibility components that we previously part of the
 .B streams (5)
-package, but which were separated into this package in 2004 so that they could be used with
-the now deprecated
-.I LiS
-as well.
+package, but which were separated into this package in 2004.
 As the kernel modules involved represent a significant footprint for embedded targets, the
 .B @PACKAGE@
 package has been maintained as a separate add-on package.
@@ -513,7 +505,6 @@ aixspg
 .[
 hpuxspg
 .]
-.IR "LiS" ,
 .IR "IRIX" \(rg,
 .[
 irixspg
@@ -552,18 +543,10 @@ standards.
 .PP
 The
 .B Linux Fast-STREAMS
-package was started in early 2003 as a production replacement for the aging
-.I LiS
-package that was full of bugs and was unstable on most production
-distributions.
+package was started in early 2003.
 The
 .B @PACKAGE_TITLE@
-package was split off from the base package before the first public release and was adapted to
-support
-.I LiS
-as well until
-.B Linux Fast-STREAMS
-was production ready.
+package was split off from the base package before the first public release.
 Since then, the
 .B @PACKAGE_TITLE@
 package has undergone 6 public releases:

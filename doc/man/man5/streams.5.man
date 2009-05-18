@@ -653,23 +653,7 @@ determine whether an open file is \fISTREAMS\fR-based
 .I STREAMS
 system call library
 .HP
-.BR libLiS (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
-.BR libpLiS (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
 .BR streams (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
-.BR LiS (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
-.BR pLiS (3)\ \-\ 
 .I STREAMS
 system call library
 .HP
@@ -1966,10 +1950,6 @@ device
 .\"
 .SH NOTICES
 .PP
-.B @PACKAGE_TITLE@
-is an enhanced production replacement for the now deprecated
-.IR LiS .
-.PP
 .I Production
 releases are releases that have received exhaustive testing within the project
 and validated on specific distributions and architectures.
@@ -2181,10 +2161,7 @@ test suite.
 .PP
 The
 .B @PACKAGE_TITLE@
-package was started in early 2003 as a production replacement for the aging
-.I LiS
-package that was full of bugs and was unstable on most production
-distributions.
+package was started in early 2003.
 The
 .B @PACKAGE_TITLE@
 package has since undergone 6 public releases:

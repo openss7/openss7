@@ -200,17 +200,6 @@ read-write locks for mutual exclusion, rather than relying on suppression of
 local bottom half or hard interrupts for serialization.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
-The
-.I LiS
-implementation of
-.BR splx ()
-simply restores flags from the
-.I pl
-argument.
-.\"
-.\"
 .SH NOTICES
 .PP
 .PP
@@ -220,10 +209,6 @@ and family are
 functions.
 .PP
 There is, in fact, only one
-.I LiS
-.[
-LiS
-.]
 .I STREAMS
 driver that uses this function, and that is the
 .BR ldl (4)
@@ -269,13 +254,8 @@ for the purpose of porting
 .IR "SVR 4.2"
 drivers to
 .BR Linux .
-Because internal structures and definitions for
-.I LiS
-.[
-lis
-.]
-differ from that of
-.IR "SVR 4.2"
+Because internal structures and definitions differ from that of
+.IR "SVR 4.2" ,
 binaries are incompatible.
 .IP \(em
 .BR splx ()

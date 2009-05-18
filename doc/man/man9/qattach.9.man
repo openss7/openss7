@@ -319,14 +319,6 @@ magic
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_qattach ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_qattach ()
-.\"simply calls
-.\".BR qattach ().
-.\".IP \(em
 .I SVR 4.2 MP
 .[
 uslspg

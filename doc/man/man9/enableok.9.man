@@ -358,13 +358,6 @@ permits
 .BR enableok ()
 to be called on a stream frozen with
 .BR freezestr (9).
-Under
-.IR LiS ,
-.[
-lis
-.]
-.BR enableok ()
-takes the queue spin lock and uses normal bit operations to set the flag.
 .IP ""
 Portable
 .I STREAMS
@@ -377,78 +370,6 @@ on a stream that has previously been frozen with
 lfs
 .]
 includes an assertion to enforce this in the SMP environment.)
-.IP \(em
-.BR enableok ()
-called with an invalid
-.I q
-argument will have an undefined result.
-In referenced versions of
-.I LiS
-.[
-LiS
-.]
-the result is undefined in the same situations due to an
-.I LiS
-coding error.  Repaired versions of
-.I LiS
-will make
-.BR enableok ()
-fail silently in these situations, which is largely unacceptable because it masks errors.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not invoke
-.BR enableok ()
-with an invalid
-.I q
-argument.
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.IP \(em
-.BR enableok ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-.I LiS
-incorrectly schedules a queue that would have otherwise been enabled had
-.BR nonenable (9)
-not been in effect, whenever
-.BR enableok ()
-is called.  This is not consistent with
-.I SVR 4
-descriptions of treatment of the
-.B QNOENB
-flag and is an
-.I LiS
-bug.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_safe_enableok ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_safe_enableok ()
-.\"calls
-.\".BR enableok ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

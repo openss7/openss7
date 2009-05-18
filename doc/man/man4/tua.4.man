@@ -145,12 +145,7 @@ below.)
 .B TUA
 is implemented as a
 .IR STREAMS (4)
-multiplexing driver for
-.BR LiS (9)\c
-.
-.[
-LiS
-.]
+multiplexing driver.
 .BR tcap "(4) or " sctp (4)
 streams are lined under the
 .B TUA

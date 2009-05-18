@@ -276,46 +276,6 @@ with the following portability considerations:
 could panic the kernel if passed a
 .B NULL
 or invalid queue or message pointer.
-Under
-.IR LiS ,
-.BR qreply ()
-fails silently and frees
-.I mp
-if
-the message pointer
-.I mp
-is
-.BR NULL ;
-the queue pointer
-.I q
-is
-.BR NULL ,
-or
-.BI OTHERQ( q )
-is
-.BR NULL ;
-.BI OTHERQ( q )
-does not refer to a queue structure;
-.BI OTHERQ( q ) ->q_next
-is
-.BR NULL ;
-.BI OTHERQ( q ) ->q_next
-does not refer to a queue structure;
-.BI OTHERQ( q ) ->q_next->q_info
-is
-.BR NULL ,
-or
-.BI OTHERQ( q ) ->q_next
-does not have a
-.IR qi_putp (9)
-procedure;
-.BI OTHERQ( q ) ->q_next
-has
-.IR qi_putp (9)
-and
-.IR qi_srvp (9)
-procedures turned off (e.g. with
-.BR qprocsoff (9)).
 .IP ""
 Portable
 .I STREAMS
@@ -332,12 +292,6 @@ pointer with the stream head read lock.
 and
 .IR Solaris \(rg
 offer the same protection.
-Under
-.IR LiS ,
-.BR qreply ()
-does not protect dereference of the
-.I q_next
-pointer against module pushes and pops.
 See
 .BR putnext (9)
 for additional information.
@@ -349,17 +303,6 @@ drivers and modules in a multiprocessor (MP) environment can assume that
 properly protects dereference of the
 .I q_next
 pointer.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not use
-.I LiS
-and will use
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-in its place.
 .IP \(em
 .BR qreply ()
 may be called on a stream frozen with
@@ -415,17 +358,6 @@ from outside of a
 .BR qinit (9)
 routine for the queue pair of
 .IR q .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_safe_qreply ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_safe_qreply ()
-.\"simply calls
-.\".BR qreply ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

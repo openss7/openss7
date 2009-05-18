@@ -498,35 +498,6 @@ and implementations based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.B LiS
-.[
-lis
-.]
-erroneously expects an
-.BR M_IOCNAK (9)
-message containing an error when it responds to the driver with an
-.BR M_IOCDATA (9)
-message with a
-.I cp_rval
-of
-.BR "(caddr_t)(1)" .
-See
-.BR M_IOCDATA (9),
-for more information.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.BR LiS .
-.[
-lis
-.]
-.IP \(em
 .B M_COPYOUT
 has a different constant value on
 .IR HP-UX \(rg,
@@ -537,27 +508,10 @@ hpuxspg
 .[
 macspg
 .]
-.IR OSF/1 \(rg,
+and
+.IR OSF/1 \(rg.
 .[
 osfspg
-.]
-and older versions of
-.IR LiS .
-.[
-lis
-.]
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.[
-lis
 .]
 .IP \(em
 Binary compatiblity is not guaranteed.

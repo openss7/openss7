@@ -328,8 +328,6 @@ has no known bugs.
 .BR allocb_physreq ()
 is source level compatible with
 .IR UnixWare \(rg
-and
-.IR LiS ,
 with the following considerations:
 .IP \(em \w'\(em\(em'u
 Despite the description above,
@@ -339,8 +337,6 @@ is not specially implemented and results in a simple call to
 with the argument
 .I physrp
 being largely ignored.
-.IR LiS
-has the same behaviour.
 .IP \(em
 .I STREAMS
 modules relying on
@@ -352,15 +348,6 @@ power of 2 boundary greater than the requested size; (2) allocations of
 greater than a page size result in contiguous memory allocations; (3)
 allocations of greater than a page size are aligned to a page boundary.
 .IP \(em
-Symbol
-.BR lis_allocb_physreq ()
-is provided for compatibility with LiS.  See
-.BR liscompat (9).
-.BR lis_allocb_physreq ()
-simply calls
-.BR allocb_physreq ()
-directly.
-.IP \(em
 This function is not provided by
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
@@ -369,12 +356,7 @@ usldk
 nor any other
 .I SVR 4
 based implementation with the exception of
-.IR UnixWare \(rg
-and
-.IR LiS ,
-.RB ( LiS
-largely for compatibility with
-.IR UnixWare \(rg).
+.IR UnixWare \(rg.
 .IP \(em
 .BR allocb_physreq ()
 is provided for source level compatibility with
@@ -413,18 +395,12 @@ for more compatibility information.
 .SH CONFORMANCE
 .PP
 .IR UnixWare \(rg
-documentation;
+documentation.
 .[
 uw7doc
 .]
 .[
 uw7spg
-.]
-and
-.I LiS
-source code.
-.[
-LiS
 .]
 .\"
 .\"

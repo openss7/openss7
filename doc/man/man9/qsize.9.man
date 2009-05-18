@@ -218,42 +218,6 @@ maintains a count of the messages on a given queue or queue band in the
 structure.  Therefore, the messages do not need to be counted when
 .BR qsize ()
 is called.
-.IP ""
-Under
-.IR LiS ,
-.BR qsize ()
-must lock the queue and walk the buffer chains counting the number of messages
-on the queue for each invocation.
-.I LiS
-is inefficient if many calls to
-.BR qsize ()
-are performed by a given
-.I STREAMS
-driver or module.
-.IP \(em
-.BR qsize ()
-always succeeds.
-.I LiS
-returns zero (0) on failure.
-.BR qsize ()
-called with an invalid
-.I q
-pointer can panic the system.
-Under
-.IR LiS ,
-.BR qsize ()
-called with an invalid
-.I q
-pointer will return zero (0).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not call
-.BR qsize ()
-with a
-.B NULL
-or invalid queue pointer,
-.IR q .
 .IP \(em
 .BR qsize ()
 may be called on a stream frozen with
@@ -313,17 +277,6 @@ from outside of a
 .BR qinit (9)
 routine for the queue pair of
 .IR q .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_qsize ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_qsize ()
-.\"simply calls
-.\".BR qsize ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -260,28 +260,6 @@ magic
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_qdetach ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_qdetach ()
-.\"simply calls
-.\".BR qdetach ().
-.\"Note that
-.\".BR lis_qdetach ()
-.\"was deprecated as of
-.\".IR "LiS 2.18.0" .
-.\"See
-.\".BR lisdeprec (9)
-.\"for more information.
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will use
-.\".BR "@PACKAGE_TITLE@"
-.\"instead of
-.\".IR LiS .
-.\".IP \(em
 .I SVR 4.2
 and
 .IR Solaris \(rg

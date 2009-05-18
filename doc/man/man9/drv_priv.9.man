@@ -225,13 +225,10 @@ and implementations based on
 .I SVR 4
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IR AIX \(rg,
-.IR SUPER-UX \(rg
+.IR AIX \(rg
 and
-.IR LiS
+.IR SUPER-UX \(rg
 do not document this function.
-.I LiS
-does not implement this function.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

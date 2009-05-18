@@ -236,29 +236,13 @@ is source-level compatible with
 .[
 usldk
 .]
+and
 .IR Solaris \(rg
 .[
 solspg
 .]
-and LiS
-.[
-LiS
-.]
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
-When
-.BR dupb ()
-is passed a
-.B NULL
-.I bp
-pointer, the results are undefined.  When LiS
-.BR dupb ()
-is passed a
-.B NULL
-.I bp
-pointer, it returns
-.BR NULL .
-.IP \(em
 .IR Solaris \(rg
 .[
 soldoc
@@ -266,15 +250,6 @@ soldoc
 is the only other implementation that documents that the call fails when the
 .I db_ref
 member has reached the maximum of 255.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_dupb ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_dupb ()
-.\"calls
-.\".BR dupb ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

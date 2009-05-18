@@ -227,26 +227,6 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR copyin ()
-runs faster than the LiS equivalent.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_copyin ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_copyin ()
-.\"calls
-.\".BR copyin ()
-.\"directly.
-.\".IP ""
-.\"Note that
-.\".BR lis_copyin ()
-.\"was deprecated as of
-.\".IR "LiS 2.18.0" .
-.\"See
-.\".BR lisdeprec (9)
-.\"for more information.
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

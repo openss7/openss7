@@ -341,8 +341,6 @@ flag is specified, and do not normally print a newline after the information pro
 .BR cmn_err ().
 This is the opposite of BSD and Linux behavior, which print a newline at the end of the sequence
 rather than the beginning.
-.I LiS
-can be compiled with flags providing either behavior.
 .B @PACKAGE_TITLE@
 can be compiled with flags providing either behavior, however, the
 .B Linux
@@ -433,23 +431,6 @@ calls
 directly, and ignores the
 .I sequence
 argument.
-.IP \(em
-.I LiS
-.[
-LiS
-.]
-uses
-.BR printk (9)
-to print the messages.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_cmn_err ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\".BR lis_cmn_err ()
-.\"calls
-.\".BR cmn_err ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -216,8 +216,12 @@ are additional configuration fields specific to the device type specified in the
 field.
 .\"
 .\"
-.SH BUGS
-Not done yet.
+.SH FILES
+.PP
+This is the signalling link configuration file.
+.\"
+.\"
+.BG
 .\"
 .[
 $LIST$

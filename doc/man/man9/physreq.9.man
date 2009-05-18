@@ -250,8 +250,6 @@ The
 .BR physreq _t
 structure is compatible with
 .IR UnixWare \(rg
-and
-.IR LiS ,
 with the following considerations:
 .IP \(em \w'\(em\(em'u
 The
@@ -269,13 +267,6 @@ with compatibility flag:
 or
 .BR CONFIG_STREAMS_COMPAT_LIS_MODULE .
 .IP \(em
-.I LiS
-ignores this argument and provides a
-.B void 
-pointer in the
-.BR lis_allocb_physreq (9)
-function prototype.
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -286,14 +277,9 @@ for additional compatibility information.
 .SH CONFORMANCE
 .PP
 .IR UnixWare \(rg
-documentation;
+documentation.
 .[
 uw7doc
-.]
-.I LiS
-source code.
-.[
-LiS
 .]
 
 .\"

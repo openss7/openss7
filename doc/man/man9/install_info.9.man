@@ -189,8 +189,8 @@ structure contains the following members:
 .BR install_info ()
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH CONTEXT
@@ -199,8 +199,8 @@ structure contains the following members:
 can be called from
 .\"
 .\"
-.SH MP-STREAMS
-.PP
+.\".SH MP-STREAMS
+.\".PP
 .\"
 .\"
 .SH NOTICES

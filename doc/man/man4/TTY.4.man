@@ -183,8 +183,8 @@ provides the following
 device drivers:
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH DEVICES
@@ -252,8 +252,8 @@ with the following portability considerations:
 .IP \(em
 .\"
 .\"
-.SH CONFORMANCE
-.PP
+.\".SH CONFORMANCE
+.\".PP
 .\"
 .\"
 .SH HISTORY

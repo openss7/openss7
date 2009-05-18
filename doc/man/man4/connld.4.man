@@ -249,14 +249,10 @@ has no known bugs.
 is compatible with
 .IR Solaris \(rg,
 .IR UnixWare \(rg
-.BR SVR 4.2
+and
+.BR "SVR 4.2" .
 .[
 svr42
-.]
-and
-.BR LiS .
-.[
-LiS
 .]
 .\"
 .\"

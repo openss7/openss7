@@ -148,6 +148,7 @@ search-ignore T
 .\"
 .SH DESCRIPTION
 .PP
+The XDS Library contains the following functions:
 .\"
 .\"
 .SH FUNCTIONS

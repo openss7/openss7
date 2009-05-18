@@ -278,27 +278,6 @@ function.
 Portable
 .I STREAMS
 drivers and modules may use this function.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_freeb ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_freeb ()
-.\"calls
-.\".BR freeb ()
-.\"directly.
-.IP \(em
-.I LiS
-.[
-LiS
-.]
-uses a complicated message block and data block binding scheme with embedded
-data buffers
-.B FASTBUF
-or less in size.  Determining the point at which a buffer is actually freed is
-rather complicated.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

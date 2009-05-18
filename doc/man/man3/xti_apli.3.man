@@ -150,6 +150,9 @@ APLI transport providers that are exposed through the
 header file.
 .\"
 .\"
-.SH OPTIONS
-.PP
-
+.[
+$LIST$
+.]
+.\"
+.\"
+.TA

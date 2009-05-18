@@ -824,23 +824,6 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-.PP
-This
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-implementation of
-.B timod
-was backported to
-.B LiS
-.[
-LiS
-.]
-to repair deficiencies in the previous
-.B LiS
-implementation.
-.PP
 .B timod
 is compatible with
 .BR "XNS 5.2"

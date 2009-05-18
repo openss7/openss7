@@ -1145,8 +1145,7 @@ passes the internal device number to the
 .IR qi_qopen ()
 procedure with the
 .I devp
-argument, not the external device number, as does
-.IR LiS .
+argument, not the external device number.
 .IP \(em
 If a driver returns a non-unique device number in
 .I devp

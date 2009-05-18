@@ -401,66 +401,6 @@ pointer points to
 .IR q .
 .IP \(em
 .BR backq ()
-will kernel oops if
-.I q
-is
-.BR NULL .
-Under
-.IR LiS ,
-.BR backq ()
-will return
-.B NULL
-if
-.I q
-is
-.BR NULL .
-.IP \(em
-.BR backq ()
-will destabilize the kernel if
-.I q
-is a
-.RB non- NULL
-pointer to a structure other than a valid
-.B queue_t
-structure.
-Under
-.IR LiS ,
-.BR backq ()
-will return
-.B NULL
-in the same situation.
-.IP \(em
-.BR backq ()
-always succeeds.
-Under
-.IR LiS ,
-.BR backq ()
-will fail silently and return
-.B NULL
-in the two situations above, and when an internal error occurs.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-.[
-@PACKAGE_TITLE@
-.]
-instead of
-.IR LiS .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_backq ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_backq ()
-.\"simply calls
-.\".BR backq ()
-.\"directly.
-.IP \(em
-.BR backq ()
 is a function.
 .BR backq ()
 is implemented as a \(lqC\(rq pre-processor macro in some implementations.

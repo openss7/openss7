@@ -314,46 +314,6 @@ flag and the calling of
 .BR noenable (9).
 .IP \(em
 .BR qenable ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-Under older versions of
-.IR LiS ,
-.BR qenable ()
-will not enable a queue previously disabled with
-.BR enableok ()
-or
-.BR qprocsoff ().
-This is an
-.I LiS
-bug.
-Under current versions of
-.IR LiS ,
-this is not the case, but current versions of
-.I LiS
-have their own bugs: for example,
-.BR qenable ()
-will not enable a queue that is closing (i.e. had the
-.B QCLOSING
-flag set), which is before driver and module
-.IR qi_qclose (9)
-procedures get called.
-.[
-lis
-.]
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not use
-.IR LiS ,
-but will use
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-in its place.
-.IP \(em
-.BR qenable ()
 may be called on a stream frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
@@ -433,15 +393,6 @@ osfdoc
 .[
 uxpdoc
 .]
-Older versions of
-.I LiS
-source code,
-on the other hand, shows that no queue will be enabled while the
-.BR QNOENB ", "  QPROCSOFF " or " QCLOSING
-flags are set.
-This is an
-.I LiS
-bug.
 .IP ""
 Portable
 .I STREAMS
@@ -458,16 +409,6 @@ See
 under
 .BR enableok (9)
 for an example.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_qenable ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_qenable ()
-.\"simply calls
-.\".BR qenable ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

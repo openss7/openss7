@@ -431,26 +431,6 @@ Portable
 modules and driver should not expect the upstream queues to be flushed when only a write error
 occurse, nor the downstream queues flushed when a read error occurs.
 .IP \(em
-.B M_ERROR
-is has the wrong message type value on older versions of
-.IR LiS .
-.[
-lis
-.]
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.[
-lis
-.]
-.IP \(em
 Binary compatibiltiy is not guaranteed.
 .PP
 See

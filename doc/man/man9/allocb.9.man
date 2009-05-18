@@ -638,18 +638,14 @@ solspg
 .[
 suxspg
 .]
-.IR UnixWare \(rg,
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
+and
 .IR UXP/V \(rg
 .[
 uxpspg
-.]
-and
-.I LiS
-.[
-lis
 .]
 only fail allocation when the system is out of memory.
 .IR UnixWare \(rg
@@ -728,18 +724,14 @@ solspg
 .[
 suxspg
 .]
-.IR UnixWare \(rg,
+.IR UnixWare \(rg
 .[
 uw7spg
 .]
+and
 .IR UXP/V \(rg
 .[
 uxpspg
-.]
-and
-.I LiS
-.[
-lis
 .]
 ignore the
 .I pri

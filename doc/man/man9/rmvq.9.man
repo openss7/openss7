@@ -275,73 +275,6 @@ svr4dk
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR rmvq ()
-is always successful.
-.IP ""
-Under
-.IR LiS ,
-.BR rmvq ()
-silently fails if
-the message pointer
-.I mp
-is
-.BR NULL ;
-the queue pointer
-.I q
-is
-.BR NULL ;
-the queue pointer
-.I q
-does not point to a valid queue structure;
-.I q
-is closing;
-.I q
-has
-.IR qi_putp (9)
-and
-.IR qi_srvp (9)
-procedures turned off (e.g. with
-.BR qprocsoff (9));
-the message pointed to by
-.I mp
-does not exist on the queue
-.IR q .
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not pass
-.B NULL
-or invalid pointers to
-.BR rmvq ().
-.IP \(em
-.B Linux Fast-STREAMS
-maintains a queue pointer within the
-.BR msgb (9)
-structure.  This permits immediate determination of whether the passed in
-message pointer,
-.IR mp ,
-is a member of the queue,
-.IR q .
-It even permits ignoring the passed in
-.I q
-pointer.
-.IP ""
-.I LiS
-does not maintain a pointer in the
-.BR msgb (9)
-structure to the queue to which a given message currently belongs.  This means
-that
-.I LiS
-must search the queue pointed to by
-.I q
-for the message pointed to by
-.I mp
-using a linear search.  This is inefficient if
-.BR rmvq ()
-is called often by a
-.IR STREAMS (4)
-driver or module (which it is by the Stream head).
-.IP \(em
-.BR rmvq ()
 does not panic if the message pointer,
 .IR mp ,
 points to a message not on queue,
@@ -445,41 +378,6 @@ coroutine, only
 will be used by a portable
 .I STREAMS
 driver or module.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_rmvq ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_rmvq ()
-.\"simply calls
-.\".BR rmvq ().
-.IP \(em
-All versions of
-.I LiS
-contain the bug that they keep track of message queue counts,
-.IR q_count ,
-.IR qb_count ,
-in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
-.RB ( "db_lim - db_base" ),
-and not the sizes of the message blocks themselves,
-.RB ( "b_wptr - b_rptr" ),
-which does not conform to
-.IR "SVR 4.2 STREAMS" .
-.[
-svr42spg
-.]
-See
-.BR msgsize (9).
-No other implementation has this bug.
-.IP ""
-Portable
-.I STREAMS
-applications programs, drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

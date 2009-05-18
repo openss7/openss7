@@ -214,10 +214,9 @@ is source-level compatible with
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
 .IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS .
+.IR UnixWare \(rg.
 .PP
 See
 .BR STREAMS (9)
@@ -237,7 +236,7 @@ usldk
 .IR Solaris \(rg
 and
 .IR UnixWare \(rg
-documentation;
+documentation.
 .[
 aixdoc
 .]
@@ -256,12 +255,6 @@ soldoc
 .[
 uw7doc
 .]
-and
-.IR LiS 
-.[
-LiS
-.]
-source code.
 .\"
 .\"
 .SH HISTORY

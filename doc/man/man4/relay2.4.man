@@ -1,1 +1,0 @@
-.so man4/relay.4.man

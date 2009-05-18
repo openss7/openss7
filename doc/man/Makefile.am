@@ -65,7 +65,6 @@ openss7_man_MANS = \
 	man1/strlog.1 \
 	man1/strreset.1 \
 	man2/fattach.2 \
-	man2/fcntl.2s \
 	man2/fdetach.2 \
 	man2/getmsg.2 \
 	man2/getpmsg.2s \
@@ -77,7 +76,6 @@ openss7_man_MANS = \
 	man2/putpmsg.2s \
 	man2/read.2s \
 	man2/readv.2s \
-	man2/streamio.2 \
 	man2/write.2s \
 	man2/writev.2s \
 	man3/accept.3 \
@@ -510,7 +508,6 @@ openss7_man_MANS = \
 	man3/om_write.3 \
 	man3/OSI.3 \
 	man3/osi.3 \
-	man3/padent.3 \
 	man3/padtos.3 \
 	man3/pipe.3 \
 	man3/pstrlog.3 \
@@ -620,7 +617,6 @@ openss7_man_MANS = \
 	man3/undoc.3 \
 	man3/unlockpt.3tty \
 	man3/vstrlog.3 \
-	man3/x25diags.3 \
 	man3/x25_find_link_parameters.3 \
 	man3/x25_read_config_parameters.3 \
 	man3/x25_read_config_parameters_file.3 \
@@ -701,7 +697,6 @@ openss7_man_MANS = \
 	man4/clone-drvr.4 \
 	man4/cmot.4 \
 	man4/connld.4 \
-	man4/connld.old.4 \
 	man4/cons.4 \
 	man4/conslog.4 \
 	man4/cpc388.4 \
@@ -845,11 +840,8 @@ openss7_man_MANS = \
 	man4/mgi_ioctl.4 \
 	man4/mg_ioctl.4 \
 	man4/mg-lm.4 \
-	man4/mini-mux.4 \
-	man4/minimux.4 \
 	man4/mlp.4 \
 	man4/momod.4 \
-	man4/mtdrv.4 \
 	man4/mtp3b.4 \
 	man4/mtp.4 \
 	man4/mtp_ioctl.4 \
@@ -894,9 +886,7 @@ openss7_man_MANS = \
 	man4/phys.4 \
 	man4/pipe.4 \
 	man4/pipemod.4 \
-	man4/pipemod.old.4 \
 	man4/plp.4 \
-	man4/printk.4 \
 	man4/ptc.4 \
 	man4/ptem.4 \
 	man4/ptm.4 \
@@ -909,9 +899,6 @@ openss7_man_MANS = \
 	man4/q931.4 \
 	man4/rawip2.4 \
 	man4/rawip.4 \
-	man4/relay2.4 \
-	man4/relay3.4 \
-	man4/relay.4 \
 	man4/rip.4 \
 	man4/rmux.4 \
 	man4/romod.4 \
@@ -942,7 +929,6 @@ openss7_man_MANS = \
 	man4/sdlm.4 \
 	man4/sdlm-lm.4 \
 	man4/sdl-mux.4 \
-	man4/sdlold.4 \
 	man4/s_dlpi.4 \
 	man4/sdl_pmod.4 \
 	man4/sdl-pmod.4 \
@@ -1119,7 +1105,6 @@ openss7_man_MANS = \
 	man4/xol.4 \
 	man4/xos.4 \
 	man4/xot.4 \
-	man4/xtios.4 \
 	man4/xx25.4 \
 	man5/ap_env_file.5 \
 	man5/autopush.5 \
@@ -2084,7 +2069,6 @@ openss7_man_MANS = \
 	man7/MTP_TRANSFER_IND.7 \
 	man7/MTP_TRANSFER_REQ.7 \
 	man7/MTP_UNBIND_REQ.7 \
-	man7/mtp_xti.7 \
 	man7/MX_ATTACH_REQ.7 \
 	man7/MX_attach_req.7 \
 	man7/MX_attach_req_t.7 \
@@ -2773,9 +2757,7 @@ openss7_man_MANS = \
 	man8/ds1.8 \
 	man8/ds1ext.8 \
 	man8/fattach.8 \
-	man8/fattach.old.8 \
 	man8/fdetach.8 \
-	man8/fdetach.old.8 \
 	man8/gdmo.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
@@ -2815,12 +2797,12 @@ openss7_man_MANS = \
 	man8/mfeproto.8 \
 	man8/mfevc.8 \
 	man8/mgconfd.8 \
-	man8/mkfifo.8s \
 	man8/mlptune.8 \
 	man8/mtp.8 \
 	man8/mtpconfig.8 \
 	man8/mxmib.8 \
 	man8/nuimap.8 \
+	man8/openss7.8 \
 	man8/openss7_mknod.8 \
 	man8/osinetd.8 \
 	man8/perftest.8 \
@@ -2832,7 +2814,6 @@ openss7_man_MANS = \
 	man8/sctp.8 \
 	man8/sdl.8 \
 	man8/sdlconfig.8 \
-	man8/sdl_udp.8 \
 	man8/sdt.8 \
 	man8/sigtran.8 \
 	man8/sl.8 \
@@ -2860,13 +2841,8 @@ openss7_man_MANS = \
 	man8/strinfo.8 \
 	man8/strload.8 \
 	man8/strlogd.8 \
-	man8/strmakenodes.8 \
 	man8/strmib.8 \
-	man8/strms_down.8 \
-	man8/strms_status.8 \
-	man8/strms_up.8 \
 	man8/strsetup.8 \
-	man8/strtst.8 \
 	man8/strtune.8 \
 	man8/strvf.8 \
 	man8/sua.8 \
@@ -2943,8 +2919,6 @@ openss7_man_MANS = \
 	man8/test-xnet_thr.8 \
 	man8/test-xnsl.8 \
 	man8/test-xnsl_thr.8 \
-	man8/thrtst.8 \
-	man8/timetst.8 \
 	man8/tua.8 \
 	man8/uaconfd.8 \
 	man8/undoc.8 \
@@ -3385,7 +3359,6 @@ openss7_man_MANS = \
 	man9/esballoca.9 \
 	man9/esbbcall.9 \
 	man9/etoimajor.9 \
-	man9/fifo.9 \
 	man9/findlinks.9 \
 	man9/_fini.9 \
 	man9/flushband.9 \
@@ -3703,7 +3676,6 @@ openss7_man_MANS = \
 	man9/physreq_prep.9 \
 	man9/physreq_t.9 \
 	man9/pipe.9 \
-	man9/pipemod.9 \
 	man9/power.9 \
 	man9/printf.9 \
 	man9/printf_UW7.9 \
@@ -3720,7 +3692,6 @@ openss7_man_MANS = \
 	man9/putnextctl1.9 \
 	man9/putnextctl2.9 \
 	man9/putnextctl.9 \
-	man9/putp.9 \
 	man9/putq.9 \
 	man9/qallocb.9 \
 	man9/qattach.9 \
@@ -3871,7 +3842,6 @@ openss7_man_MANS = \
 	man9/splx.9 \
 	man9/srunqueues.9 \
 	man9/srv.9s \
-	man9/srvp.9 \
 	man9/ss7_allocb.9 \
 	man9/ss7_bufcall.9 \
 	man9/ss7_bufpool_init.9 \
@@ -3925,7 +3895,6 @@ openss7_man_MANS = \
 	man9/streams_unregister_notifier.9 \
 	man9/streamtab.9 \
 	man9/streamtab_t.9 \
-	man9/stream_utils.9 \
 	man9/strgetpmsg.9 \
 	man9/Strinfo.9 \
 	man9/str_install.9 \
@@ -3959,7 +3928,6 @@ openss7_man_MANS = \
 	man9/strwritev.9 \
 	man9/strwsrv.9 \
 	man9/suncompat.9 \
-	man9/suxcompat.9 \
 	man9/SV_ALLOC.9 \
 	man9/SV_BROADCAST.9 \
 	man9/SV_DEALLOC.9 \
@@ -3981,13 +3949,10 @@ openss7_man_MANS = \
 	man9/toid_t.9 \
 	man9/TRYLOCK.9 \
 	man9/udelay.9 \
-	man9/umount2.9 \
-	man9/umount.9 \
 	man9/unbufcall.9 \
 	man9/undoc.9 \
 	man9/unfreezestr.9 \
 	man9/unfreezestr_SUN.9 \
-	man9/unlink.9 \
 	man9/unlinkb.9 \
 	man9/unlinkmsg.9 \
 	man9/UNLOCK.9 \
@@ -4010,7 +3975,6 @@ openss7_man_MANS = \
 	man9/vstrlog_hook.9 \
 	man9/vstrlog_t.9 \
 	man9/vtop.9 \
-	man9/vxwcompat.9 \
 	man9/wakeup.9 \
 	man9/wantio.9 \
 	man9/wantmsg.9 \
@@ -4049,7 +4013,6 @@ openss7_dist_noinst_MANS = \
 	man1/strlog.1.man \
 	man1/strreset.1.man \
 	man2/fattach.2.man \
-	man2/fcntl.2s.man \
 	man2/fdetach.2.man \
 	man2/getmsg.2.man \
 	man2/getpmsg.2s.man \
@@ -4061,7 +4024,6 @@ openss7_dist_noinst_MANS = \
 	man2/putpmsg.2s.man \
 	man2/read.2s.man \
 	man2/readv.2s.man \
-	man2/streamio.2.man \
 	man2/write.2s.man \
 	man2/writev.2s.man \
 	man3/accept.3.man \
@@ -4494,7 +4456,6 @@ openss7_dist_noinst_MANS = \
 	man3/om_write.3.man \
 	man3/OSI.3.man \
 	man3/osi.3.man \
-	man3/padent.3.man \
 	man3/padtos.3.man \
 	man3/pipe.3.man \
 	man3/pstrlog.3.man \
@@ -4604,7 +4565,6 @@ openss7_dist_noinst_MANS = \
 	man3/undoc.3.man \
 	man3/unlockpt.3tty.man \
 	man3/vstrlog.3.man \
-	man3/x25diags.3.man \
 	man3/x25_find_link_parameters.3.man \
 	man3/x25_read_config_parameters.3.man \
 	man3/x25_read_config_parameters_file.3.man \
@@ -4685,7 +4645,6 @@ openss7_dist_noinst_MANS = \
 	man4/clone-drvr.4.man \
 	man4/cmot.4.man \
 	man4/connld.4.man \
-	man4/connld.old.4.man \
 	man4/cons.4.man \
 	man4/conslog.4.man \
 	man4/cpc388.4.man \
@@ -4829,11 +4788,8 @@ openss7_dist_noinst_MANS = \
 	man4/mgi_ioctl.4.man \
 	man4/mg_ioctl.4.man \
 	man4/mg-lm.4.man \
-	man4/mini-mux.4.man \
-	man4/minimux.4.man \
 	man4/mlp.4.man \
 	man4/momod.4.man \
-	man4/mtdrv.4.man \
 	man4/mtp3b.4.man \
 	man4/mtp.4.man \
 	man4/mtp_ioctl.4.man \
@@ -4878,9 +4834,7 @@ openss7_dist_noinst_MANS = \
 	man4/phys.4.man \
 	man4/pipe.4.man \
 	man4/pipemod.4.man \
-	man4/pipemod.old.4.man \
 	man4/plp.4.man \
-	man4/printk.4.man \
 	man4/ptc.4.man \
 	man4/ptem.4.man \
 	man4/ptm.4.man \
@@ -4893,9 +4847,6 @@ openss7_dist_noinst_MANS = \
 	man4/q931.4.man \
 	man4/rawip2.4.man \
 	man4/rawip.4.man \
-	man4/relay2.4.man \
-	man4/relay3.4.man \
-	man4/relay.4.man \
 	man4/rip.4.man \
 	man4/rmux.4.man \
 	man4/romod.4.man \
@@ -4926,7 +4877,6 @@ openss7_dist_noinst_MANS = \
 	man4/sdlm.4.man \
 	man4/sdlm-lm.4.man \
 	man4/sdl-mux.4.man \
-	man4/sdlold.4.man \
 	man4/s_dlpi.4.man \
 	man4/sdl_pmod.4.man \
 	man4/sdl-pmod.4.man \
@@ -5103,7 +5053,6 @@ openss7_dist_noinst_MANS = \
 	man4/xol.4.man \
 	man4/xos.4.man \
 	man4/xot.4.man \
-	man4/xtios.4.man \
 	man4/xx25.4.man \
 	man5/ap_env_file.5.man \
 	man5/autopush.5.man \
@@ -6068,7 +6017,6 @@ openss7_dist_noinst_MANS = \
 	man7/MTP_TRANSFER_IND.7.man \
 	man7/MTP_TRANSFER_REQ.7.man \
 	man7/MTP_UNBIND_REQ.7.man \
-	man7/mtp_xti.7.man \
 	man7/MX_ATTACH_REQ.7.man \
 	man7/MX_attach_req.7.man \
 	man7/MX_attach_req_t.7.man \
@@ -6757,9 +6705,7 @@ openss7_dist_noinst_MANS = \
 	man8/ds1.8.man \
 	man8/ds1ext.8.man \
 	man8/fattach.8.man \
-	man8/fattach.old.8.man \
 	man8/fdetach.8.man \
-	man8/fdetach.old.8.man \
 	man8/gdmo.8.man \
 	man8/h225.8.man \
 	man8/h323confd.8.man \
@@ -6799,12 +6745,12 @@ openss7_dist_noinst_MANS = \
 	man8/mfeproto.8.man \
 	man8/mfevc.8.man \
 	man8/mgconfd.8.man \
-	man8/mkfifo.8s.man \
 	man8/mlptune.8.man \
 	man8/mtp.8.man \
 	man8/mtpconfig.8.man \
 	man8/mxmib.8.man \
 	man8/nuimap.8.man \
+	man8/openss7.8.man \
 	man8/openss7_mknod.8.man \
 	man8/osinetd.8.man \
 	man8/perftest.8.man \
@@ -6816,7 +6762,6 @@ openss7_dist_noinst_MANS = \
 	man8/sctp.8.man \
 	man8/sdl.8.man \
 	man8/sdlconfig.8.man \
-	man8/sdl_udp.8.man \
 	man8/sdt.8.man \
 	man8/sigtran.8.man \
 	man8/sl.8.man \
@@ -6844,13 +6789,8 @@ openss7_dist_noinst_MANS = \
 	man8/strinfo.8.man \
 	man8/strload.8.man \
 	man8/strlogd.8.man \
-	man8/strmakenodes.8.man \
 	man8/strmib.8.man \
-	man8/strms_down.8.man \
-	man8/strms_status.8.man \
-	man8/strms_up.8.man \
 	man8/strsetup.8.man \
-	man8/strtst.8.man \
 	man8/strtune.8.man \
 	man8/strvf.8.man \
 	man8/sua.8.man \
@@ -6927,8 +6867,6 @@ openss7_dist_noinst_MANS = \
 	man8/test-xnet_thr.8.man \
 	man8/test-xnsl.8.man \
 	man8/test-xnsl_thr.8.man \
-	man8/thrtst.8.man \
-	man8/timetst.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
 	man8/undoc.8.man \
@@ -7369,7 +7307,6 @@ openss7_dist_noinst_MANS = \
 	man9/esballoca.9.man \
 	man9/esbbcall.9.man \
 	man9/etoimajor.9.man \
-	man9/fifo.9.man \
 	man9/findlinks.9.man \
 	man9/_fini.9.man \
 	man9/flushband.9.man \
@@ -7687,7 +7624,6 @@ openss7_dist_noinst_MANS = \
 	man9/physreq_prep.9.man \
 	man9/physreq_t.9.man \
 	man9/pipe.9.man \
-	man9/pipemod.9.man \
 	man9/power.9.man \
 	man9/printf.9.man \
 	man9/printf_UW7.9.man \
@@ -7704,7 +7640,6 @@ openss7_dist_noinst_MANS = \
 	man9/putnextctl1.9.man \
 	man9/putnextctl2.9.man \
 	man9/putnextctl.9.man \
-	man9/putp.9.man \
 	man9/putq.9.man \
 	man9/qallocb.9.man \
 	man9/qattach.9.man \
@@ -7855,7 +7790,6 @@ openss7_dist_noinst_MANS = \
 	man9/splx.9.man \
 	man9/srunqueues.9.man \
 	man9/srv.9s.man \
-	man9/srvp.9.man \
 	man9/ss7_allocb.9.man \
 	man9/ss7_bufcall.9.man \
 	man9/ss7_bufpool_init.9.man \
@@ -7909,7 +7843,6 @@ openss7_dist_noinst_MANS = \
 	man9/streams_unregister_notifier.9.man \
 	man9/streamtab.9.man \
 	man9/streamtab_t.9.man \
-	man9/stream_utils.9.man \
 	man9/strgetpmsg.9.man \
 	man9/Strinfo.9.man \
 	man9/str_install.9.man \
@@ -7943,7 +7876,6 @@ openss7_dist_noinst_MANS = \
 	man9/strwritev.9.man \
 	man9/strwsrv.9.man \
 	man9/suncompat.9.man \
-	man9/suxcompat.9.man \
 	man9/SV_ALLOC.9.man \
 	man9/SV_BROADCAST.9.man \
 	man9/SV_DEALLOC.9.man \
@@ -7965,13 +7897,10 @@ openss7_dist_noinst_MANS = \
 	man9/toid_t.9.man \
 	man9/TRYLOCK.9.man \
 	man9/udelay.9.man \
-	man9/umount2.9.man \
-	man9/umount.9.man \
 	man9/unbufcall.9.man \
 	man9/undoc.9.man \
 	man9/unfreezestr.9.man \
 	man9/unfreezestr_SUN.9.man \
-	man9/unlink.9.man \
 	man9/unlinkb.9.man \
 	man9/unlinkmsg.9.man \
 	man9/UNLOCK.9.man \
@@ -7994,7 +7923,6 @@ openss7_dist_noinst_MANS = \
 	man9/vstrlog_hook.9.man \
 	man9/vstrlog_t.9.man \
 	man9/vtop.9.man \
-	man9/vxwcompat.9.man \
 	man9/wakeup.9.man \
 	man9/wantio.9.man \
 	man9/wantmsg.9.man \
@@ -8085,11 +8013,9 @@ dist_noinst_MANS = $(openss7_dist_noinst_MANS)
 ##
 MANS_UNUSED = \
 	man1/strlog.1 \
-	man2/fcntl.2s \
 	man2/poll.2s \
 	man2/read.2s \
 	man2/readv.2s \
-	man2/streamio.2 \
 	man2/write.2s \
 	man2/writev.2s \
 	man3/ap_env.3 \
@@ -8147,7 +8073,6 @@ MANS_UNUSED = \
 	man3/s_pipe.3 \
 	man3/_t_errstr.3 \
 	man3/unlockpt.3tty \
-	man3/x25diags.3 \
 	man3/xftam.3 \
 	man3/XMS.3 \
 	man3/xti_tc.3 \
@@ -8172,7 +8097,6 @@ MANS_UNUSED = \
 	man4/clnstpi.4 \
 	man4/clone_drvr.4 \
 	man4/clone-drvr.4 \
-	man4/connld.old.4 \
 	man4/cpc388.4 \
 	man4/dass.4 \
 	man4/dlb.4 \
@@ -8247,10 +8171,8 @@ MANS_UNUSED = \
 	man4/mgcp.4 \
 	man4/mgcp_ioctl.4 \
 	man4/mg_ioctl.4 \
-	man4/mini-mux.4 \
 	man4/mlp.4 \
 	man4/momod.4 \
-	man4/mtdrv.4 \
 	man4/mtp_ioctl.4 \
 	man4/mux_clone.4 \
 	man4/mxi_ioctl.4 \
@@ -8267,15 +8189,11 @@ MANS_UNUSED = \
 	man4/otk6.4 \
 	man4/otpi.4 \
 	man4/pca200e.4 \
-	man4/pipemod.old.4 \
-	man4/printk.4 \
 	man4/ptc.4 \
 	man4/ptmx.4tty \
 	man4/q921.4 \
 	man4/q922.4 \
 	man4/q931.4 \
-	man4/relay2.4 \
-	man4/relay3.4 \
 	man4/rmux.4 \
 	man4/romod.4 \
 	man4/rtp.4 \
@@ -8285,7 +8203,6 @@ MANS_UNUSED = \
 	man4/sdl_eth.4 \
 	man4/sdl_ioctl.4 \
 	man4/sdl_ip.4 \
-	man4/sdlold.4 \
 	man4/s_dlpi.4 \
 	man4/sdl_rtp.4 \
 	man4/sdl_tcp.4 \
@@ -8339,7 +8256,6 @@ MANS_UNUSED = \
 	man4/XNS.4 \
 	man4/xol.4 \
 	man4/xos.4 \
-	man4/xtios.4 \
 	man8/acb56.8 \
 	man8/asn1.8 \
 	man8/bicc.8 \
@@ -8347,8 +8263,6 @@ MANS_UNUSED = \
 	man8/cpc388.8 \
 	man8/ds1.8 \
 	man8/ds1ext.8 \
-	man8/fattach.old.8 \
-	man8/fdetach.old.8 \
 	man8/gdmo.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
@@ -8371,7 +8285,6 @@ MANS_UNUSED = \
 	man8/mfeproto.8 \
 	man8/mfevc.8 \
 	man8/mgconfd.8 \
-	man8/mkfifo.8s \
 	man8/mtp.8 \
 	man8/mxmib.8 \
 	man8/osinetd.8 \
@@ -8379,7 +8292,6 @@ MANS_UNUSED = \
 	man8/sccp.8 \
 	man8/sctp.8 \
 	man8/sdl.8 \
-	man8/sdl_udp.8 \
 	man8/sdt.8 \
 	man8/sigtran.8 \
 	man8/sl.8 \
@@ -8394,12 +8306,7 @@ MANS_UNUSED = \
 	man8/strconf.8 \
 	man8/streams.sh.8 \
 	man8/strlogd.8 \
-	man8/strmakenodes.8 \
 	man8/strmib.8 \
-	man8/strms_down.8 \
-	man8/strms_status.8 \
-	man8/strms_up.8 \
-	man8/strtst.8 \
 	man8/strtune.8 \
 	man8/sua.8 \
 	man8/tcap.8 \
@@ -8407,8 +8314,6 @@ MANS_UNUSED = \
 	man8/test-bcm.8 \
 	man8/test-m3ua_as.8 \
 	man8/test-q784.8 \
-	man8/thrtst.8 \
-	man8/timetst.8 \
 	man8/tua.8 \
 	man8/uaconfd.8 \
 	man8/voipconfd.8 \
@@ -8767,7 +8672,6 @@ MANS_UNUSED = \
 	man9/power.9 \
 	man9/printf.9 \
 	man9/probe.9 \
-	man9/putp.9 \
 	man9/qallocb.9 \
 	man9/QNAME.9 \
 	man9/qpop.9 \
@@ -8793,7 +8697,6 @@ MANS_UNUSED = \
 	man9/SPL0.9 \
 	man9/SPLSTR.9 \
 	man9/SPLX.9 \
-	man9/srvp.9 \
 	man9/ss7_fast_allocb_bh.9 \
 	man9/ss7_fast_freeb_bh.9 \
 	man9/ss7_fast_freemsg_bh.9 \
@@ -8802,23 +8705,18 @@ MANS_UNUSED = \
 	man9/streams_interrupt.9 \
 	man9/streams_mpsleep.9 \
 	man9/STREAMS_TIMEOUT.9 \
-	man9/stream_utils.9 \
 	man9/strioccall.9 \
 	man9/strreadv.9 \
 	man9/struioget.9 \
 	man9/struioput.9 \
 	man9/strwakeq.9 \
 	man9/strwritev.9 \
-	man9/suxcompat.9 \
 	man9/tmout_fcn_t.9 \
 	man9/udelay.9 \
-	man9/umount.9 \
-	man9/unlink.9 \
 	man9/unregister_inode.9 \
 	man9/uxpcompat.9 \
 	man9/vstrlog_hook.9 \
-	man9/vtop.9 \
-	man9/vxwcompat.9
+	man9/vtop.9
 
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE

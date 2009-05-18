@@ -256,7 +256,6 @@ document this function with return value
 of type
 .BR ushort .
 .IP \(em
-.IR LiS \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg
 and

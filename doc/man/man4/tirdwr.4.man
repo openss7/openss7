@@ -563,154 +563,16 @@ soldoc
 suxdoc
 .]
 with the following portability considerations:
-.PP
-This
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-implementation of
-.B tirdwr
-was backported to
-.B LiS
-.[
-LiS
-.]
-to repair serious bugs in the previous
-.B LiS
-implementation.
-.B LiS
-previously had a implementation of
-.B tirdwr
-that was full of bugs.  This implementation is free of these many bugs and is,
-therefore, not compatible with the old buggy
-.BR tirdwr .
-Following are the bugs exhibited by the old implementation:
 .IP \(em \w'\(em\ \ 'u
-Zero length data messages, whether they have a control portion or not, are not
-supposed to be passed upstream by the
-.B tirdwr
-module.  This is because a zero-length data message will generate an
-end-of-file condition for
-.BR read "(2), " readv "(2), " getmsg "(2) and " getpmsg (2s).
-The
-.B tirdwr
-module that comes with
-.B LiS
-.[
-lis
-.]
-passes all
-.B M_DATA
-and
-.BR T_DATA_IND (7)
-.B M_DATA
-portions upstream without examining them to see if they contain zero-length
-data messages.  This is a bug with no work around.
-.
-When a
-.BR T_DISCON_IND (7)
-primitive is received by the
-.B tirdwr
-module, it is supposed to cause all further write system calls
-.RB ( write "(2), " writev "(2), " putmsg "(2) and " putpmsg (2s))
-to fail with error
-.RB [ ENXIO ];
-however, all read system calls
-.RB ( read "(2), " readv "(2), " getmsg "(2) and " getpmsg (2s))
-system calls are supposed to succeed.
-This corresponds to a hungup stream head that has been sent a
-.B M_HANGUP
-message.
-The
-.B tirdwr
-module that comes with
-.B LiS
-.[
-lis
-.]
-uses the
-.BR putctl1 (9)
-form of the
-.B M_ERROR
-message which causes all system calls to fail with error
-.RB [ ENXIO ].
-This is a bug with no workaround.
-.IP \(em
-When the
-.B tirdwr
-module is pushed on a TI stream, all XTI/TLI library calls are supposed to
-fail and return error
-.RB [ EPROTO ],
-causing all further system calls to fail on the stream.
-The
-.B tirdwr
-module that comes with
-.B LiS
-.[
-lis
-.]
-passes
-.BR M_IOCTL ", " M_IOCDATA ", " M_IOCACK ", " M_IOCNAK ", " M_COPYIN " and " M_COPYOUT
-messages transparently, meaning that a number of XTI/TLI functions will not
-generate an error.  This is a bug.  A workaround is to refrain from calling
-XTI/TLI functions on streams upon which
-.B tirdwr
-has been pushed.
-.IP \(em
-When a
-.B tirdwr
-module receives an
-.B M_READ
-message from upstream and a
-.BR T_ORDREL_IND (7)
-has been received and processed for the stream, a zero-length
-.B M_DATA
-block
-or a read size
-.B M_ERROR
-message should be sent upstream in response to reassert end-of-file and to
-keep the reader from blocking indefinitely on read system calls after an
-orderly release.
-The
-.B tirdwr
-module that comes with
-.B LiS
-.[
-lis
-.]
-does not perform this function.  Coupled with passing zero-length data
-messages on the read side, this can cause problem with loopback transports and
-make it difficult to determine when an end-of-file has actually occurred and
-yet not block indefinitely in synchronous file mode.
-.IP \(em
-When the
-.B tirdwr
-module is popped (closed) and no
-.BR T_ORDREL_IND (7)
-or
-.BR T_DISCON_IND (7)
-has been received for the stream, or if the stream has
-encountered an error and has not received a
-.BR T_DISCON_IND (7),
-the
-.B tirdwr
-module should send a
-.BR T_DISCON_REQ (7)
-downstream before completing the close.
-The
-.B tirdwr
-mdoule that comes with
-.B LiS
-.[
-lis
-.]
-does not send
-.BR T_DISCON_REQ (7)
-in any circumstance.
-The workaround is to always close the stream instead of popping the module
-using
-.IR I_POP .
+Operation of this module is not subject to standardization but is consistent
+with the descriptions for this module in documentation.
+.PP
+Compatibility is tested using the
+.BR test-tirdwr (8)
+test case executable and the
+.I @PACKAGE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH CONFORMANCE
@@ -735,6 +597,13 @@ susv2
 .[
 susv3
 .]
+.PP
+Conformance is tested using the
+.BR test-tirdwr (8)
+test case executable and the
+.I @PACKAGE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY

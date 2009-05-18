@@ -204,24 +204,12 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR freeq ()
-is compatible with LiS
+is compatible with SVR3.2
 .[
-LiS
+svr32
 .]
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
-Under LiS,
-.BR freeq ()
-does not check to see that the queue pair is not still connected in a stream.
-.\".PP
-.\"Symbol
-.\".BR lis_freeq ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_freeq ()
-.\"simply calls
-.\".BR freeq ()
-.\"directly.
 This function is not exported by
 .IR "SVR 4.2 MP DDI/DKI"
 or

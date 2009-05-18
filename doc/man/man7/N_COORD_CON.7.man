@@ -1,3 +1,4 @@
+.so man7/npi_sccp.7.man
 '\" rtp
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================

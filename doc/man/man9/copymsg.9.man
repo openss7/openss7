@@ -229,37 +229,6 @@ with the following portability considerations:
 See also compatibility notes for
 .BR copyb (9).
 .IP \(em
-.BR copymsg ()
-fails if memory allocation for message blocks fails.
-Under
-.IR LiS ,
-.BR copymsg ()
-can fail because the passed in message pointer,
-.IR mp ,
-is
-.BR NULL ;
-the size of any of the blocks to be copied has a negative message length (i.e.
-the
-.I b_wptr
-pointer is less than the
-.IR b_rptr );
-if any of the data blocks are mangled (i.e. the
-.I db_lim
-pointer is less than the
-.IR db_base );
-or, memory allocation for any of the copied blocks fails.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_copymsg ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_copymsg ()
-.\"calls
-.\".BR copymsg ()
-.\"directly.
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See also

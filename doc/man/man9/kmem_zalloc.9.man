@@ -284,10 +284,9 @@ osfdoc
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
 .IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS
+.IR UnixWare \(rg
 document this function.
 .[
 hpuxdoc
@@ -303,9 +302,6 @@ soldoc
 .]
 .[
 uw7doc
-.]
-.[
-lis
 .]
 .IP \(em
 .IR HP-UX \(rg
@@ -353,61 +349,6 @@ irixdoc
 .[
 uw7doc
 .]
-.IP \(em
-Under
-.IR LiS ,
-.BR kmem_zalloc ()
-ignores the
-.I flag
-argument and allocates memory using
-.BR lis_zmalloc ()
-which always calls
-.BR kmalloc (9)
-with a general fault protection class of
-.BR GFP_ATOMIC .
-This means that
-.BR kmem_zmalloc ()
-can fail and return
-.B NULL
-even if
-.I flag
-is set to
-.BR KM_SLEEP .
-Also, this means that when
-.I flag
-is set to
-.BR KM_SLEEP ,
-the calling process will neither wait nor reschedule.
-These are
-.I LiS
-bugs.
-.\".IP \(em
-Under
-.IR LiS ,
-.BR kmem_zalloc ()
-returns a pointer to zero-sized allocated memory when
-.I size
-is zero.
-This is incorrect behaviour and is an
-.I LiS
-bug.
-.\".IP \(em
-.I LiS
-destroys memory alignment by inserting hidden memory allocation management pointers at the
-beginningo of the
-.BR kmalloc (9)'ed
-extent.
-.\".IP \(em
-.BR kmem_zalloc ()
-is implemented as a function call.
-.I LiS
-implements
-.BR kmem_zalloc ()
-as a macro.
-.B Linux Fast-STREAMS
-does not perpetuate these
-.I LiS
-bugs.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

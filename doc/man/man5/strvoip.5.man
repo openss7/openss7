@@ -370,23 +370,6 @@ package is to obtain it as part of the
 .\"
 .SH NOTICES
 .PP
-Although previous releases of the
-.B @PACKAGE@
-package were tested with
-.IR LiS ,
-.I LiS
-is now deprecated and this release
-.RB ( @VERSION@ )
-of
-.B @PACKAGE@
-has not been tested with
-.IR LiS .
-.I The OpenSS7 Project
-will no longer support this package for
-.IR LiS :
-please upgrade to
-.BR "Linux Fast-STREAMS" .
-.PP
 .I Production
 releases are releases that have received exhaustive testing within the project
 and validated on specific distributions and architectures.

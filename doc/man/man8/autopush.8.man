@@ -665,13 +665,9 @@ svr42
 .IR Solaris \(rg,
 .IR UnixWare \(rg,
 .IR HP-UX \(rg,
-.IR AIX \(rg,
-.IR OSF/1 \(rg
+.IR AIX \(rg
 and
-.IR LiS ,
-.[
-LiS
-.]
+.IR OSF/1 \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .B autopush
@@ -744,18 +740,6 @@ driver.
 also provides an
 .BR sc (4)
 module that can be pushed (or not) to the same effect.
-.IP \(em
-.B LiS
-.[
-LiS
-.]
-provides a
-.BR sad (4)
-driver but does not provide an
-.B autopush
-command.
-.I @PACKAGE_TITLE@
-provides for this deficiency.
 .IP \(em
 Options
 .BR --help " and " --version

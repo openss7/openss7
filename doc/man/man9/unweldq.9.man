@@ -462,10 +462,9 @@ function.
 .IR MacOT \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
-.IR UnixWare \(rg,
-.IR UXP/V \(rg,
+.IR UnixWare \(rg
 and
-.I LiS
+.IR UXP/V \(rg
 do not document this function.
 .IP \(em
 Binary compatibility is not guaranteed.

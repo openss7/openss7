@@ -256,12 +256,6 @@ function and should not be used by portable
 .I STREAMS
 driver and modules.  However, there is no common replacement for this
 function.
-.I LiS
-provides the
-.BR lis_mknod (9)
-wrapper for an in-kernel system call to
-.BR mknod (2),
-but that approach is equally non-portable.
 .PP
 .BR ddi_create_minor_node ()
 creates a minor node in the shadow special device file system.  Symbolic links

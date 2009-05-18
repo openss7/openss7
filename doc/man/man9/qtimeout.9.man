@@ -359,10 +359,9 @@ usldk
 .IR UnixWare \(rg,
 .IR OSF/1 \(rg,
 .IR HP-UX \(rg,
-.IR SUPER-UX \(rg,
-.IR UXP/V \(rg,
+.IR SUPER-UX \(rg
 and
-.IR LiS ,
+.IR UXP/V \(rg
 do not provide this function.
 .IP \(em
 .BR qtimeout()

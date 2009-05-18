@@ -337,7 +337,6 @@ svr4
 including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
@@ -357,20 +356,6 @@ and
 .IR UnixWare "\(rg DDI8"
 provides a different mechanism with registered driver resources and channel
 numbers.
-.IP \(em
-.I LiS
-.[
-lis
-.]
-does not support extended device numbering, and
-.BR getmajor ()
-on
-.I LiS
-reduces to
-.BR getemajor (9).
-.I LiS
-version 2.17
-is supposed to have some enhancements in this regard.
 .IP \(em
 .BR getmajor ()
 is provided for source level compatibility with

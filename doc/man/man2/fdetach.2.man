@@ -251,7 +251,6 @@ and implementations based on
 including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg,
@@ -264,47 +263,10 @@ can be performed on any file to which the caller has ownership, write
 permission and sufficient privilege to execute
 .BR fdetach ().
 .IP \(em
-Under
-.BR LiS ,
-root privilege or
-.B CAP_SYS_ADMIN
-is required.
-.B @PACKAGE_TITLE@
-does not have this restriction.
-.IP \(em
 .BR fdetach ()
 makes no additional limitation on the number of
 .I STREAMS
 files that are attached.
-.IP \(em
-Under
-.BR LiS ,
-.BR fdetach ()
-limits number of
-.I STREAMS
-files attached to less than 256, because that is the maximum number of unnamed
-devices allowed by
-.BR mount (2).
-The same is true for
-.BR "@PACKAGE_TITLE@" .
-.PP
-.B @PACKAGE_TITLE@
-provide a system call for
-.I __NR_fattach
-that is used to implement this system call.  (glibc has prototypes for this system call.)
-In addition,
-.B @PACKAGE_TITLE@
-recognizes the
-.B I_LIS_FDETACH
-.BR streamio (7)
-input-output control used by
-.I LiS
-to emulate the
-.I __NR_fattach
-system call, permitting
-.I LiS
-libraries to be used with
-.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .SH CONFORMANCE

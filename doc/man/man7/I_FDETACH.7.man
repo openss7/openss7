@@ -419,13 +419,9 @@ is compatible with
 .[
 svr42
 .]
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS ,
-.[
-LiS
-.]
+.IR UnixWare \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 It is fairly common practice to emulate system calls with 

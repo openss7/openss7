@@ -4072,8 +4072,9 @@ mtpMsId OBJECT-TYPE
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
-	"Provides a Managed Switching Element identifier used to name 
-	 managed objects in this table."
+	"This attribute is used for naming instances.  Provides a 
+	 Managed Switching Element identifier used to name managed 
+	 objects in this table."
     REFERENCE
 	""
     ::= { mtpMsEntry 1 }

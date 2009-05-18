@@ -214,5 +214,9 @@ A TCAP transport provider compliant to this specification supports none, all or 
 subset of the options defined here.  An implementation may restrict the use of any
 of these options by offerming them only in the priviledged or read-only mode.  TUA
 transport providers only support a subset of the options defined here.
-.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
-
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

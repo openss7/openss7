@@ -229,11 +229,6 @@ is compatible with
 .[
 soldoc
 .]
-and
-.I LiS
-.[
-LiS
-.]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR msgsize ()
@@ -242,9 +237,6 @@ is an implementation specific utility provided by
 where it is made accessible by including the
 .RB < sys/strsun.h >
 header file.
-.BR msgsize ()
-is also provided by
-.IR LiS .
 .IP ""
 Portable
 .I STREAMS
@@ -279,46 +271,6 @@ pointers is negative.
 counts the size
 .RI ( b_wptr  " - " b_rptr )
 of all blocks in the message.
-.I LiS
-counts the absolute size
-.RI ( db_lim " - " db_base )
-of all blocks in the message.
-This is particularly broken verion of the
-.IR Solaris \(rg
-helper function.
-The worst problem with this is that
-.I LiS
-uses this broken
-.BR msgsize ()
-to do all queue and queue band accounting: meaning that queue counts have nothing to do with the
-size of message blocks, just the size of data buffers.  That is completely inconsistent with any
-.I STREAMS
-implementation and does not conform to
-.IR "SVR 4" .
-.[
-svr4spg
-.]
-.IP ""
-.IR Solaris \(rg
-compatible
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_msgsize ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will not directly access
-.\".I LiS
-.\"symbols.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -337,13 +289,6 @@ soldoc
 .\"
 .\"
 .SH HISTORY
-.PP
-.BR msgsize ()
-appears as an exported function in
-.IR LiS .
-.[
-LiS
-.]
 .PP
 .BR msgsize ()
 first appeared in

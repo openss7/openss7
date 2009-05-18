@@ -586,7 +586,6 @@ svr42
 including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
@@ -594,12 +593,8 @@ including
 .IR UXP/V \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.I LiS
-.[
-lis
-.]
-(and to my knowledge
-.IR Solaris \(rg)
+To my knowledge,
+.IR Solaris \(rg
 does not support the concept of clone minors.
 .IP \(em
 .IR AIX \(rg
@@ -618,8 +613,6 @@ supports both the concept of clone minors as well as providing for clone
 channels which is more in line with the behaviour of
 .BR "Linux Fast-STREAMS" .
 This should not, however, cause incompatibility problems with
-.I LiS
-or
 .IR Solaris \(rg
 because correctly written drivers for these systems have the requirement that
 they assign a new and unique minor device number when drivers are opened with
@@ -630,9 +623,7 @@ explicitly opened with
 .I sflag
 .BR DRVOPEN
 is a characteristic of
-.B Linux Fast-STREAMS
-that is also supported by
-.IR LiS .
+.BR "Linux Fast-STREAMS" .
 I do not know whether
 .IR Solaris \(rg
 or
@@ -650,9 +641,7 @@ device provided with
 .B Linux Fast-STREAMS
 release must be used.  Other
 .B clone
-device drivers (e.g. from
-.IR LiS )
-are incompatible with the
+device drivers are incompatible with the
 .B Linux Fast-STREAMS
 executive.
 .\"

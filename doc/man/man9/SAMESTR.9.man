@@ -286,13 +286,9 @@ solspg
 .[
 hpuxspg
 .]
-.IR SUPER-UX \(rg,
+.IR SUPER-UX \(rg.
 .[
 suxspg
-.]
-.IR LiS .
-.[
-lis
 .]
 These systems also support
 .IR STREAMS -based

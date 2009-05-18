@@ -551,14 +551,10 @@ above.
 .[
 aixspg
 .]
+and
 .IR Solaris \(rg
 .[
 solspg
-.]
-and
-.I LiS
-.[
-lis
 .]
 ignore the
 .I priority
@@ -576,20 +572,10 @@ argument.
 will return
 .B NULL
 only if the allocation fails.
-Under LiS,
-.BR esballoc ()
-will return
-.B NULL
-if
-.IR base " or " freeinfo
-is
-.BR NULL .
 .BR esballoc ()
 will panic when
 .IR base " or " freeinfo
 are
-.BR NULL .
-Under LiS, the same conditions will return
 .BR NULL .
 Portable
 .I STREAMS
@@ -621,15 +607,6 @@ drivers and modules will only use the priority values of
 .BR BPRI_MED
 and
 .BR BPRI_HI .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_esballoc ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_esballoc ()
-.\"simply calls
-.\".BR esballoc ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

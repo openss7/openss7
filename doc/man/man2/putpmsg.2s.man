@@ -570,88 +570,11 @@ svr42cr
 including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg,
 .IR UXP/V \(rg.
-.PP
-.BR putpmsg ()
-is compatible with LiS
-.[
-LiS
-.]
-with the following exceptions:
-.IP \(em \w'\(em\(em'u
-.B LiS
-.[
-LiS
-.]
-incorrectly returns
-.RB [ EINVAL ]
-instead of
-.RB [ EIO ]
-when the internal head queue pointer points to a structure that is not a queue
-structure, or is mangled.
-.IP \(em
-.B LiS
-does not return
-.RB [ EIO ]
-when
-.I fd
-refers to a closing stream.
-.IP \(em
-.B LiS
-incorrectly returns
-.RB [ EIO ]
-when
-.I fd
-refers to a broken pipe.
-.IP \(em
-.B LiS
-incorrectly returns
-.RB [ EAGAIN ]
-instead of
-.RB [ EINTR ]
-when an
-.B M_SIG
-message causes a signal that interrupts the call to
-.BR putpmsg ()
-before any data is written.
-.IP \(em
-.B LiS
-incorrectly returns
-.RB [ ENODEV ]
-instead of
-.RB [ ENOSTR ]
-when there is no stream associated with
-.IR fd .
-.IP \(em
-.B LiS
-incorrectly returns
-.RB [ EINVAL ]
-instead of
-.RB [ ENODEV ]
-when
-.I fd
-refers to a device that does not support the
-.BR putpmsg ()
-system call.
-.PP
-.B Linux Fast-STREAMS
-provides system calls for
-.IR __NR_getpmsg " and " __NR_putpmsg
-that are used to implement this system call.
-(glibc has prototypes for this system call.)
-In addition,
-.B Linux Fast-STREAMS
-recognizes the \*(lqinvalid\*(rq buffer length to
-.BR write (2s)
-used by LiS to emulate the
-.I __NR_getpmsg
-system call, permitting LiS libraries to be used with
-.BR "Linux Fast-STREAMS" .
 .\"
 .\"
 .SH CONFORMANCE

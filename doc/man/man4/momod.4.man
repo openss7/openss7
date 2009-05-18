@@ -105,11 +105,24 @@ search-ignore T
 .\"
 .\"
 .TH MOMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B momod
 \- Minimal OSI to ASCE/Presentation Module.
+.\"
+.\"
 .SH SYNOPSIS
 .PP
+.B #include <stropts.h>
+.br
+.B #include <ioctl.h>
+.HP
+.BI "int open(" xti_device ", " o_flags );
+.HP
+.BI "int ioctl(" xti_stream ", " I_PUSH ", " \*(lqmomod\*(rq );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B momod
@@ -200,8 +213,8 @@ Option name and values are as described in
 .BR xti_mosi (3).
 .\"
 .\"
-.SH PRIMITIVES
-.PP
+.\".SH PRIMITIVES
+.\".PP
 .\"
 .\"
 .SH IOCTLS
@@ -228,12 +241,12 @@ xti revision 1.0
 .\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
 .SH FILES
@@ -259,6 +272,18 @@ module.
 .\"
 .SH SEE ALSO
 .PP
+.BR apli (7),
+.BR ap_open (3),
+.BR autopush (8).
+.BR libapli (3),
+.BR libxap (3),
+.BR lpp (4),
+.BR osinetd (8),
+.BR test-mosi (8),
+.BR timod (4),
+.BR tpi (7),
+.BR xti (3),
+.BR xti_mosi (3).
 .\"
 .\"
 .SH BUGS

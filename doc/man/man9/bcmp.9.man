@@ -231,10 +231,9 @@ is source-level compatible with
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS ,
+.IR UnixWare \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR bcmp ()
@@ -289,13 +288,7 @@ and
 .[
 uw7doc
 .]
-documentation;
-and
-.IR LiS 
-.[
-LiS
-.]
-source code.
+documentation.
 .\"
 .\"
 .SH HISTORY

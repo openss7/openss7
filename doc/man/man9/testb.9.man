@@ -213,11 +213,7 @@ As with other post
 .[
 svr3
 .]
-implementations,
-.I LiS
-.[
-LiS
-.]
+implementations, this implementation
 ignores the
 .I priority
 argument to

@@ -220,10 +220,7 @@ drivers and modules may use this function.
 .BR ctlmsg ()
 is implemented as an
 .B extern inline
-function.  LiS implements
-.BR ctlmsg ()
-as a C preprocessor macro,
-which is rather against its stated purpose of providing functional interfaces.
+function.
 .IP \(em
 Some older implementations of
 .IR "SunOS 4" \(rg

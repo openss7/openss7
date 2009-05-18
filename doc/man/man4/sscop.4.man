@@ -161,11 +161,7 @@ to transfer packets.
 .B SSCOP
 is implemented as a
 .IR STREAMS (4)
-multiplexing driver for
-.BR LiS (9).
-.[
-LiS
-.]
+multiplexing driver.
 .BR ip (4)
 streams are linked under the
 .B SSCOP
@@ -284,11 +280,7 @@ These management controls are documented in
 .B SSCOP
 is implemented as a
 .IR STREAMS (4)
-implementation using
-.BR LiS (9),
-.[
-LiS
-.]
+implementation
 and supports sockets only with the
 .BR socksys (4)
 driver.

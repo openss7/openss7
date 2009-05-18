@@ -220,28 +220,6 @@ allocates message blocks with priority
 .BR BPRI_MED .
 See
 .BR allocb (9).
-.PP
-The
-.I LiS
-.[
-LiS
-.]
-implementation of
-.BR copyb ()
-will fail if the block to be copied has a negative message length (i.e. the
-.I b_wptr
-is less than the
-.IR b_rptr ),
-or if the data block is mangled (i.e.  the 
-.I db_lim
-pointer is less than the
-.IR db_base ).
-.PP
-This does not appear consistent with
-.IR "SVR 4.2 STREAMS" .
-.[
-svr42spg
-.]
 .\"
 .\"
 .SH "SEE ALSO"
@@ -279,16 +257,6 @@ copies both the
 and
 .I b_flag
 members of the passed in message block to the returned message block.
-Older versions of
-.I LiS
-.[
-lis
-.]
-did not copy
-.I b_band
-or
-.I b_flag
-members.  Recent versions copy both.
 .IR AIX \(rg
 copies
 .IR b_band ,
@@ -322,12 +290,6 @@ was called and the data was copied between
 uw7doc
 .]
 make no assurances whatsoever about the resulting alignment.
-.I LiS
-.[
-lis
-.]
-restores the same alignment in the copy as the original data to a word
-boundary.
 .IP ""
 Portable
 .I STREAMS
@@ -337,18 +299,6 @@ resulting from a
 or
 .BR copymsg (9)
 operation.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_copyb ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\".[
-.\"lis
-.\".]
-.\".BR lis_copyb ()
-.\"calls
-.\".BR copyb ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

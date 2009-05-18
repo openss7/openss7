@@ -143,12 +143,7 @@ below).
 .B BUA
 is implemented as a
 .IR STREAMS (4)
-multiplexing driver for
-.BR LiS (9)\c
-.
-.[
-LiS
-.]
+multiplexing driver.
 .BR bicc (4)
 or
 .BR sctp (4)

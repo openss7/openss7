@@ -550,13 +550,9 @@ provides the
 device for compatibility with
 .IR UnixWare \(rg
 7 and
-.IR AIX \(rg.
-.IR Solaris \(rg
+.IR AIX \(rg
 and
-.I LiS
-.[
-LiS
-.]
+.IR Solaris \(rg
 do not provide an
 .B spx
 driver.
@@ -580,8 +576,6 @@ The use of the
 driver under
 .IR UnixWare \(rg
 is not well documented.
-.IP \(em
-.I LiS
 .IP \(em
 .IR UnixWare \(rg
 documentation

@@ -363,13 +363,6 @@ input-output controls for backward compatibility with the
 svr3
 .]
 approach above.
-.B @PACKAGE_TITLE@
-implements this approach for
-.I LiS
-.[
-LiS
-.]
-which is incapable of the more sophisticated approach below.
 .PP
 See
 .BR sockmod (4)

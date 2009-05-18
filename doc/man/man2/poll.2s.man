@@ -566,12 +566,9 @@ SUSv3,
 susv3
 .]
 POSIX,
-.IR Solaris \(rg,
+.IR Solaris \(rg
+and
 .IR UnixWare \(rg
-and LiS
-.[
-LiS
-.]
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
 The
@@ -599,18 +596,6 @@ SUSv2
 SUSv2
 .]
 but is obvious.
-.IP \(em
-.B LiS
-.[
-LiS
-.]
-does not appear to return
-.RB [ EINVAL ]
-when a stream is linked under a multiplexer, but instead returns
-.B POLLNVAL
-for that file descriptor.
-.B Linux Fast-STREAMS
-does not duplicate this behavior.
 .PP
 .B Linux Fast-STREAMS
 only affects the use of
