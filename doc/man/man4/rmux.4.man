@@ -114,6 +114,11 @@ search-ignore T
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <stropts.h>
+.br
+.B #include <ioctl.h>
+.HP
+.BI "int open(" rmux_name ", " o_flags );
 .\"
 .\"
 .SH DESCRIPTION
@@ -482,51 +487,35 @@ all corresponding local Streams will be hungup with
 .\"
 .SS R_OPEN_IND
 .PP
+Open the remote multiplex.
 .\"
 .SS R_OPEN_RES
 .PP
+Response to a remote multiplex open.
 .\"
 .SS R_CLOSE_IND
 .PP
+Remote close indication.
 .\"
 .SS R_CLOSE_RES
 .PP
+Close the remote in response.
 .\"
 .SS R_POP_IND
 .PP
+A local module is to be popped.
 .\"
 .SS R_POP_RES
 .PP
+A remote module is to be popped.
 .\"
 .SS R_PUSH_IND
 .PP
+A local module is to be pushed
 .\"
 .SS R_PUSH_RES
 .PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
-.\"
-.SS R_OPEN_IND
-.PP
+A remote module is to be pushed
 .\"
 .\"
 .SH DESCRIPTION

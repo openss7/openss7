@@ -446,7 +446,6 @@ and implementations based on
 including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,

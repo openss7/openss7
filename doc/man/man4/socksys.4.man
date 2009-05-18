@@ -188,12 +188,6 @@ messages that are exchaged with the underlying
 .PP
 The remaining input-output controls are provided for backward compatibility to previous library
 implementations only.
-In particular, a application compiled against the less capable
-.I LiS
-.BR libsocket (3)
-must have access to the other
-.BR SIOCSOCKSYS
-commands to emulate system calls.
 See
 .BR sockmod (4)
 for more information in this regard.
@@ -712,31 +706,11 @@ has no known bugs.
 .PP
 .B /dev/socksys
 is compatible with
-.IR UnixWare \(rg,
-.IR Solaris \(rg
+.IR UnixWare \(rg
 and
-.B LiS
-.[
-LiS
-.]
+.IR Solaris \(rg
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
-.B LiS
-does not provide a usable
-.B socksys
-driver yet.
-.IP \(em
-The
-.B LiS
-stream head should recognize the
-.B TIOCINQ
-I/O control but it does not.
-.IP \(em
-The
-.B LiS
-stream head should recognize this
-.B TIOCOUTQ
-I/O control but it does not.
 .\"
 .\"
 .SH CONFORMANCE

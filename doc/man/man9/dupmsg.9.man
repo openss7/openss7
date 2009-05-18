@@ -252,34 +252,7 @@ When
 is passed a
 .B NULL
 .I mp
-pointer, the results are undefined.  When
-.B LiS
-.[
-lis
-.]
-.BR dupmsg ()
-is passed a
-.B NULL
-.I mp
-pointer, it returns
-.BR NULL .
-.IP ""
-Portable
-.I STREAMS
-drivers and modules should not pass
-.B NULL
-or invalid message block pointers to this function.
-.IP \(em
-.B LiS
-used to have some problems serializing access to the reference count in data blocks which caused
-inconsistencies in the reference count when duplicate messages were freed.
-.\".PP
-.\"Symbol
-.\".BR lis_dupmsg ()
-.\"is provided for compatibility with
-.\".BR LiS .
-.\"See
-.\".BR liscompat (9).
+pointer, the results are undefined.
 .PP
 See
 .BR STREAMS (9)

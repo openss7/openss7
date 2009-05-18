@@ -369,12 +369,6 @@ drivers and modules.  Any and all functionality provided by
 in support of
 .RI non- STREAMS
 devices are not supported.
-.IP \(em
-LiS
-.[
-LiS
-.]
-does not provide this function.
 .PP
 See
 .BR uw7compat (9)

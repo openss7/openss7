@@ -1141,36 +1141,15 @@ suxdoc
 .[
 uw7doc
 .]
-.IR MacOT \(rg,
+.IR MacOT \(rg
 .[
 macdoc
 .]
-.IR UXP/V \(rg,
+and
+.IR UXP/V \(rg
 .[
 uxpdoc
 .]
-and current versions of
-.IR LiS ,
-.[
-lis
-.]
-(but not older versions of
-.I LiS
-that had broken message type numbering):
-.BR QNORM ,
-.BR M_DATA (9),
-.BR M_PROTO (9),
-.BR QPCTL ,
-.BR M_IOCACK (9),
-.BR M_IOCNAK (9),
-.BR M_PCPROTO (9),
-.BR M_PCSIG (9),
-.BR M_FLUSH (9),
-.BR M_STOP (9),
-.BR M_START (9),
-.BR M_HANGUP (9),
-and
-.BR M_ERROR (9).
 .IP ""
 The following are consistent across all but
 .IR OSF/1 \(rg,

@@ -825,23 +825,7 @@ determine whether an open file is \fISTREAMS\fR-based
 .I STREAMS
 system call library
 .HP
-.BR libLiS (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
-.BR libpLiS (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
 .BR streams (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
-.BR LiS (3)\ \-\ 
-.I STREAMS
-system call library
-.HP
-.BR pLiS (3)\ \-\ 
 .I STREAMS
 system call library
 .HP
@@ -2365,33 +2349,10 @@ test suite.
 .PP
 The
 .B @PACKAGE_TITLE@
-package was started in early 2003 as a production replacement for the aging
-.I LiS
-package that was full of bugs and was unstable on most production
-distributions.
+package was started in 2000.
 The
 .B @PACKAGE_TITLE@
-package has since undergone 6 public releases:
-.TP \w'\fB0.7a.6.rc2\fP\(em'u
-.B 0.7a.3
-alpha release
-.PD 0
-.TP
-.B 0.7a.4
-beta release
-.TP
-.B 0.7a.5
-gamma release
-.TP
-.B 0.7a.6rc1
-production release candidate
-.TP
-.B 0.7a.6.rc2
-production release candidate
-.TP
-.B 0.9.2.1
-first production release
-.PD
+package has since undergone many public releases in many forms.
 .PP
 The
 .B @PACKAGE@-@VERSION@

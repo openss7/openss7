@@ -147,16 +147,6 @@ function was called.
 .BR spl5 ()
 is normally equivalent to
 .BR splstr ().
-.PP
-.BR SPLSTR ()
-is a macro under
-.I LiS
-that is simply defined as:
-.sp
-.BI "#define SPLSTR(" __x ") (" __x ") = lis_splstr()"\fR.
-.PP
-.BR lis_splstr_fcn ()
-is a debugging function that takes additional debugging information as arguments.
 .\"
 .\"
 .SH USAGE
@@ -211,15 +201,8 @@ locks for mutual exclusion, rather than relying on suppression of local bottom
 half or hard interrupts for serialization.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
-The
-.I LiS
-implementation of
-.BR splstr ()
-simply saves flags to the
-.I pl
-argument.
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
 .SH NOTICES
@@ -228,18 +211,6 @@ argument.
 and family are
 .IR "SVR 4.2" -specific
 functions.
-.PP
-There is, in fact, only one
-.I LiS
-.[
-LiS
-.]
-.I STREAMS
-driver that uses this function, and that is the
-.BR ldl (4)
-driver.  Also, the
-.BR ldl (4)
-driver misused this function, and has been converted to no longer use it.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -286,11 +257,7 @@ for the purpose of porting
 .IR "SVR 4.2"
 drivers to
 .BR Linux .
-Because internal structures and definitions for
-.I LiS
-.[
-lis
-.]
+Because internal structures and definitions
 differ from that of
 .IR "SVR 4.2"
 binaries are incompatible.

@@ -237,32 +237,6 @@ See
 .BR freeb (9)
 for additional compatibility information.
 .IP \(em
-In addition,
-.I LiS
-.[
-LiS
-.]
-uses a free list to hold freed message blocks and data blocks.  It is
-particularly inefficient for cache performance to do this.
-.I LiS
-.[
-LiS
-.]
-should use kernel memory caches instead and should free the message blocks and
-data blocks when they are no longer used to allow existing cache slots to be
-reused.  Bypassing the kernel memory allocation and deallocation mechanisms
-by using a free list results in poorer performance than might be expected by
-those that do not understand kernel memory caching mechanisms.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_freemsg ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_freemsg ()
-.\"calls
-.\".BR freemsg ()
-.\"directly.
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

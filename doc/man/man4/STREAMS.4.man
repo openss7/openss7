@@ -105,9 +105,13 @@ search-ignore T
 .\"
 .\"
 .TH STREAMS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B STREAMS
 \- SVR 4.2 STREAMS devices
+.\"
+.\"
 .SH DESCRIPTION
 .SS "Drivers"
 .TP 12
@@ -134,10 +138,23 @@ A STREAMS module for pipes.
 .TP 12
 .BR sockmod (4)
 A STREAMS socket compatability module for TPI.
-.SH NOTICES
-.SH BUGS
+.\"
+.\"
+.\".SH NOTICES
+.\"
+.\"
+.BG
+.\"
+.\"
 .SH "SEE ALSO"
-.SH VERSIONS
+.PP
+.BR fifo (4),
+.BR clone (4),
+.BR sad (4),
+.BR ldl (4),
+.BR inet (4),
+.BR pipemod (4),
+.BR sockmod (4).
 .\"
 .\"
 .XX
@@ -152,9 +169,6 @@ svr4
 .]
 .[
 svr3
-.]
-.[
-LiS
 .]
 .\"
 .[

@@ -412,10 +412,6 @@ documents that, when command is
 .BR I_SETCLTIME ,
 .I arg
 is a long timeout value.
-.I LiS
-implementation follows
-.IR Solaris \(rg
-documentation.
 .B SUSv2
 .[
 susv2
@@ -434,16 +430,7 @@ can be seen in
 .BR strace (8)
 output to pass a pointer instead of a value.  This means that
 .IR Solaris \(rg
-documentation is erroneous, and
-.I LiS
-implementation is wrong.
-.IP ""
-Portable
-.IR STREAMS (9)
-libraries and applications programs will use
-.B @PACKAGE_TITLE@
-instead of
-.IR LiS .
+documentation is erroneous.
 .PP
 For general
 .BR ioctl (2s)

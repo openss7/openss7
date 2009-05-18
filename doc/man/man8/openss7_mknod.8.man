@@ -509,41 +509,20 @@ has no known bugs.
 .PP
 .B openss7_mknod
 is an
-.IR LiS -specific
+.IR @PACKAGE@ -specific
 command.
-.B openss7_mknod
-is provided for compatibility with
-.I LiS
-with the following portability considerations:
-.IP \(em
-.I LiS
-does not document long options.
-Portable programs should avoid the use of long options.
-.IP \(em
-Options
-.BR --help " and " --version
-are provided for compatibility with GNU coding standards;
-.BR --copying ,
-OpenSS7 coding standards.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.I LiS
-documentation.
-.[
-LiS
-.]
+None.
 .\"
 .\"
 .SH HISTORY
 .PP
 .B openss7_mknod
 first appeared in
-.IR LiS .
-.[
-LiS
-.]
+.IR @PACKAGE@ .
 .\"
 .\"
 .[

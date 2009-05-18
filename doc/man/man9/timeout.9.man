@@ -378,12 +378,9 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR timeout ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
 .IR Solaris \(rg
-and LiS
-.[
-LiS
-.]
 with the following exceptions:
 .\"
 .\"
@@ -461,19 +458,6 @@ and
 is
 .BR long ,
 this is compatible with other definitions.
-.IP \(em
-LiS uses an
-.B int
-as a return value from
-.BR lis_timeout ().
-Because of this,
-the
-.I LiS Compatibility Module
-.BR liscompat (9)
-.BR lis_timeout ()
-symbol will not function properly on architectures with 64 significant bit
-pointers and 32-bit
-.BR int s.
 .\"
 .\"
 .IP \(em
@@ -491,24 +475,6 @@ objects for speed.
 objects expire once the event's callback function has run.
 .\"
 .\"
-.IP ""
-LiS provides a wrapper to Linux Kernel timer functions to implement
-.BR timeout ().
-LiS's implementation creates a Linux timer structure, assigns it a sequential
-integer timer identifier, and places it in a timer list.  Whenever LiS starts
-a timer it checks the list to see if the integer timer identifier is unique.
-This is an exhaustive linear search.  This is inefficient.
-.I STREAMS
-drivers or modules that set timers often will experience poorer performance
-than if the Linux kernel timer facility was used directly.
-.\".IP \(em
-.\".BR lis_timeout ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_timeout ()
-.\"calls
-.\".BR timeout ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

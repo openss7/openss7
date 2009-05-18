@@ -396,14 +396,6 @@ from outside of a
 .BR qinit (9)
 routine for the queue pair of
 .IR q .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_strqset ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_strqset ()
-.\"simply calls
-.\".BR strqset ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

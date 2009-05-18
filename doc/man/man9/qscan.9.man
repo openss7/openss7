@@ -320,23 +320,7 @@ no longer implements this option.
 .[
 uxpspg
 .]
-and
-.IR LiS
-.[
-lis
-.]
-implement this option.
-.I LiS
-chooses the expensive route of running a 10 millisecond timer per Stream
-with the feature.  Since 10 milliseconds is a single tick on older
-.B Linux
-kernels, it is a particularly bad idea to run may single-tick timers.
-.IP ""
-.I STREAMS
-drivers and modules expecting performance from the system should use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
+implements this option.
 .IP \(em
 .IR "SVR 4.2 MP"
 and systems based on

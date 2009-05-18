@@ -105,10 +105,14 @@ search-ignore T
 .TH LLC 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .\"
 .\"
+.SH NAME
+.B llc
+\- logical link control device
 .\"
 .\"
-.\"
-.SH ADDRESSING
+.SH OVERVIEW
+.PP
+.SS ADDRESSING
 .PP
 The LLC2 DLSAP is contained in the following structure:
 .PP
@@ -134,7 +138,7 @@ On Sun systems this structure is contained in the
 header file.
 .\"
 .\"
-.SH QUALITY OF SERVICE
+.SS QUALITY OF SERVICE
 .PP
 Quality of service options are not used.  On primitives issued by the DL-User,
 \fIdl_qos_length\fP and \fIdl_qos_offset\fP are ignored by the DL-Provider.

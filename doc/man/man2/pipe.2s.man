@@ -159,8 +159,8 @@ pipes in response to the
 system call.
 .PP
 The
-.BR libstreams "(3) and " libLiS (3)
-libraries provide a
+.BR libstreams (3)
+library provides a
 .BR pipe ()
 and
 .BR s_pipe ()
@@ -348,7 +348,7 @@ for an example.
 .BR fifo (4),
 .BR connld (4),
 .BR pipemod (4),
-.BR libstreams "(3), " libLiS (3),
+.BR libstreams (3),
 .BR M_FLUSH (9),
 .BR getmsg "(2), " getpmsg "(2s), " putmsg "(2), " putpmsg (2s),
 .BR fcntl (2),

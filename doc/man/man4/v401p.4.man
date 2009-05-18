@@ -278,14 +278,9 @@ Note that the new approach splits the driver over several
 .I STREAMS
 modules.  This approach has become possible to the drastic increase in
 performance exprience by using
-.BR "Linux Fast-STREAMS"
+.BR "Linux Fast-STREAMS" .
 .[
 lfs
-.]
-over the now deprecated
-.IR LiS .
-.[
-lis
 .]
 .\"
 .SS "SS7 Operation"

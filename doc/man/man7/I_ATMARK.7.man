@@ -559,14 +559,6 @@ is allowed and that, if both are set,
 supersedes
 .BR LASTMARK .
 .IP \(em
-.I LiS
-.[
-lis
-.]
-does not permit the flags to be combined and will return
-.RB [ ENINVAL ]
-if they are.
-.IP \(em
 .I POSIX
 .[
 susv3

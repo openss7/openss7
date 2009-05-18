@@ -341,8 +341,6 @@ This makes
 .BR noenable ()
 safe for use on a write locked stream that has been frozen with
 .BR freezestr (9).
-.I LiS
-takes the queue spin lock and uses normal bit operations to set the flag.
 .IP \(em
 .BR noenable ()
 may be called on a stream frozen with
@@ -381,67 +379,6 @@ on a stream that has previously been frozen with
 .BR freezestr (9).
 .IP \(em
 .BR noenable ()
-called with an invalid
-.I q
-argument will have an undefined result.
-In referenced versions of
-.I LiS
-.[
-LiS
-.]
-the result is undefined in the same situations due to an
-.I LiS
-coding error.
-Repaired versions of
-.I LiS
-will make
-.BR noenable ()
-fail silently in these situations.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not invoke
-.BR noenable ()
-with an invalid
-.I q
-argument.
-.IP \(em
-.BR noenable ()
-supresses the scheduling of queues for both
-.I high priority
-and
-.I ordinary priority
-messages enqueued with
-.BR appq (9).
-Only
-.I LiS
-provides the
-.BR appq (9)
-function so the behaviour of
-.BR noenable ()
-with regard to
-.BR appq (9)
-is non-portable anyway.
-As with
-.BR insq (9)
-.I LiS
-suppresses the scheduling of queues for any message enqueued with
-.BR appq (9).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not use the
-.BR appq (9)
-function call.
-.I STREAMS
-drivers and modules using the
-.BR appq (9)
-function call should not rely on the
-.I LiS
-behavior with regard to
-.BR noenable ().
-.IP \(em
-.BR noenable ()
 does not suppress the scheduling of queues when back-enabling is performed,
 when
 .BR qenable (9)
@@ -472,11 +409,6 @@ aixdoc
 .]
 .[
 uxpdoc
-.]
-.I LiS
-also follows this behaviour.
-.[
-lis
 .]
 .IP ""
 .IR OSF/1 \(rg
@@ -580,16 +512,6 @@ the queue immediately after a
 message is inserted into the queue with
 .BR insq (9);
 thus yeilding like behaviour across all these systems.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_safe_noenable ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_safe_noenable ()
-.\"simply calls
-.\".BR noenable ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -202,9 +202,7 @@ with the following portability considerations:
 .BR isdatamsg ()
 is implemented as an
 .BR "extern inline" .
-Some implementations, such as
-.IR LiS ,
-implement
+Some implementations, implement
 .BR isdatamsg ()
 as a macro.
 .IP ""

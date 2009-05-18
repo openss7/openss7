@@ -374,61 +374,6 @@ drivers and modules will not call
 on a stream frozen with
 .BR freezestr (9).
 .IP \(em
-.BR qprocson ()
-is not bug for bug compatible with
-.IR LiS .
-.[
-lis
-.]
-.IP ""
-Under
-.IR LiS ,
-.BR qprocsoff (9)
-simply sets a flag that causes
-.IR qi_srvp (9)
-procedures and
-.IR qi_putp (9)
-routines to be deferred.
-.[
-lis
-.]
-Under
-.IR LiS ,
-.BR qprocson ()
-then invokes these deferred
-.IR qi_putp (9)
-and
-.IR qi_srvp (9)
-procedures.
-.[
-lis
-.]
-This is an
-.I LiS
-bug: upstream or downstream invocations of
-.BR putnext (9)
-should bypass the queue pair with procedures turned off.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-in place of
-.IR LiS .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_qprocson ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_qprocson ()
-.\"simply calls
-.\".BR qprocson ().
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

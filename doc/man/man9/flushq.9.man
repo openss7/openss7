@@ -364,99 +364,6 @@ and implementations based on
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR flushq ()
-moves messages from the queue to the per-CPU free chains list.  Freeing blocks
-on the free chains list will be deferred to the next
-.BR runqueues (9)
-pass.  The next
-.BR runqueues (9)
-pass frees message blocks from the flush to the per-CPU free blocks list for
-use by
-.IR qi_srvp (9)
-procedures in the pass.
-.BR runqueues (9)
-runs a normal soft interrupt priority.
-.I LiS
-removes all messages from the queue and then rebuilds the queue one
-message at a time while freeing those to be flushed.  This is a rather
-inefficient way to do things, and with
-.I LiS
-running at higher priority than
-soft interrupts, bottom halves and timeouts, all these are locked out until
-the flush is complete.
-.B @PACKAGE_TITLE@
-.BR flushq ()
-should have far less of an impact on system latency and performance as that of
-.IR LiS .
-.IP ""
-Performing
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.IP \(em
-.BR flushq ()
-holds the queue write lock while removing selected messages or unlinking
-entire bands.  Order is preserved across concurrent attempts to perform
-.BR putq (9),
-.BR insq (9),
-.BR appq (9),
-.BR rmvq (9)
-or
-.BR putbq (9)
-functions.
-.I LiS
-empties the queue and unlocks the queue and then goes about adding
-messages back onto the queue that need to remain using normal utility
-functions.  This means that order is not necessarily preserved (even for messages
-that were on the queue) with concurrent calls to
-.BR putq (9),
-.BR insq (9),
-.BR appq (9),
-.BR rmvq (9)
-or
-.BR putbq (9)
-functions.
-Also, queue enabling and back-enabling will not necessary be performed
-correctly.
-There doesn't seem to be any excuse for the
-.I LiS
-approach, removing messages
-from the queue,
-.BR rmvq (9),
-is no more difficult than inserting them,
-.BR insq (9).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.IP \(em
-.BR flushq ()
-does not clear the
-.B QWANTR
-flag when flushing an empty queue.  This is an indication to the
-.I STREAMS
-scheduler that
-.BR getq (9)
-read an empty queue and the queue needs to be enabled when a message is placed on the queue.
-.I LiS
-clears the
-.B QWANTR
-flag when flushing an empty queue.  This means that a call to
-.BR putbq "(9), " insq "(9) or " appq (9)
-for the empty queue will fail to enable the queue.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.IP \(em
-.BR flushq ()
 may be called on a stream frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
@@ -533,29 +440,6 @@ driver).
 As
 .B "@PACKAGE_TITLE@"
 permits the same, there are no portability issues.
-.IP \(em
-.\"Symbol
-.\".BR lis_flushq ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_flushq ()
-.\"calls
-.\".BR flushq ()
-.\"directly.
-.I LiS
-appears to be rather buggy with regard to flushing queues and
-.BR flushq ()
-may behave rather different from that of
-.IR LiS .
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

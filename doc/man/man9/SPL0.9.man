@@ -147,16 +147,6 @@ function was called.
 .BR splbase ()
 is normally equivalent to
 .BR spl0 ().
-.PP
-.BR SPL0 ()
-is a macro under
-.I LiS
-that is simply defined as:
-.sp
-.BI "#define SPL0(" __x ") (" __x ") = lis_spl0()"\fR.
-.PP
-.BR lis_spl0_fcn ()
-is a debugging function that takes additional debugging information as arguments.
 .\"
 .\"
 .SH USAGE
@@ -211,31 +201,12 @@ locks for mutual exclusion, rather than relying on suppression of local bottom
 half or hard interrupts for serialization.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
-The
-.I LiS
-implementation of
-.BR spl0 ()
-simply saves flags to the
-.I pl
-argument.
-.\"
-.\"
 .SH NOTICES
 .PP
 .BR spl0 ()
 and family are
 .IR "SVR 4.2" -specific
 functions.
-.PP
-There are in fact no
-.I LiS
-.[
-LiS
-.]
-.I STREAMS
-drivers or modules that use this function.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -282,11 +253,7 @@ for the purpose of porting
 .IR "SVR 4.2"
 drivers to
 .BR Linux .
-Because internal structures and definitions for
-.I LiS
-.[
-lis
-.]
+Because internal structures and definitions
 differ from that of
 .IR "SVR 4.2"
 binaries are incompatible.

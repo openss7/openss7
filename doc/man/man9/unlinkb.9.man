@@ -210,15 +210,6 @@ and systems based on
 .IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_unlinkb ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_unlinkb ()
-.\"calls
-.\".BR unlinkb ()
-.\"directly.
-.\".IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

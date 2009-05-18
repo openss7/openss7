@@ -249,9 +249,7 @@ This distribution is only currently applicable to
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
 .PP
-This package is complete and has been in production use for both
-.I LiS
-and
+This package is complete and has been in production use for
 .I Linux Fast-STREAMS
 for a number of years.
 .\"
@@ -453,23 +451,6 @@ Sockets Library package.
 .\"
 .SH NOTICES
 .PP
-Although previous release of the
-.B @PACKAGE@
-package were tested with
-.IR LiS ,
-.I LiS
-is now deprecated and this release
-.RB ( @VERSION@ )
-of
-.B @PACKAGE@
-has not been tested with
-.IR LiS .
-.I The OpenSS7 Project
-will no longer support this package for
-.IR LiS :
-please upgrade to
-.BR "Linux Fast-STREAMS" .
-.PP
 .I Production
 releases are releases that have received exhaustive testing within the project
 and validated on specific distributions and architectures.
@@ -601,10 +582,8 @@ test suite.
 .PP
 The
 .B @PACKAGE_TITLE@
-package
-was originally written for
-.IR LiS ,
-and contained the XTI/TLI library and
+package originally
+contained the XTI/TLI library and
 .BR timod (4)
 and
 .BR tirdwr (4)

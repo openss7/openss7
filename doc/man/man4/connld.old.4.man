@@ -235,10 +235,7 @@ can be made entirely free-standing by attaching well-known paths to
 .I both
 ends of the original pipe.  The relevant capabilities are implemented
 in
-.B LiS
-.[
-LiS
-.]
+.B Linux Fast-STREAMS
 so that the original creator of the
 .B pipe
 can close both ends after attaching paths to them, and the

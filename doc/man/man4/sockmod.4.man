@@ -212,12 +212,12 @@ lfs
 .]
 does not require or use the
 .B sockmod
-module.  It is provided for
+module.  It was originally provided for
 .I LiS
 .[
 lis
 .]
-that is incapable of providing the socket input-output controls directly from
+that was incapable of providing the socket input-output controls directly from
 the
 .I "Stream head" .
 .B Linux Fast-STREAMS

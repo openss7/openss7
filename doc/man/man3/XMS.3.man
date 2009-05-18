@@ -153,6 +153,7 @@ search-ignore T
 .\"
 .SH DESCRIPTION
 .PP
+The XMS Library contains the following functions.
 .\"
 .\"
 .SH FUNCTIONS
@@ -188,10 +189,6 @@ search-ignore T
 .BR ms_unbind (3)
 .TP
 .BR ms_wait (3)
-.\"
-.\"
-.SH DESCRIPTOIN
-.PP
 .\"
 .\"
 .XX

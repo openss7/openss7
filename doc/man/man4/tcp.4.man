@@ -392,6 +392,7 @@ A second generation driver was started in 2006 but not completed.
 The first generation driver was upgraded significantly in
 .B strinet 0.9.2.7
 release in 2008.
+The driver was rolled into the full OpenSS7 release (openss7-1.2.2) in 2009.
 .\"
 .\"
 .\"

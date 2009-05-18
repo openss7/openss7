@@ -295,10 +295,9 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IR AIX \(rg,
-.IR UXP/V \(rg
+.IR AIX \(rg
 and
-.I LiS
+.IR UXP/V \(rg
 state that
 .BR putctl1 ()
 will fail if the
@@ -367,10 +366,9 @@ osfdoc
 .BR M_DELAY "(9) should probably be " M_DATA (9)
 in the failure list.
 This means that
-.IR AIX \(rg,
-.IR UXP/V \(rg
+.IR AIX \(rg
 and
-.I LiS
+.IR UXP/V \(rg
 are the oddballs in the documented behaviour.
 Otherwise,
 .BR putctl1 ()
@@ -391,53 +389,6 @@ drivers and modules will not pass a type of
 .BR M_DELAY (9)
 to
 .BR putctl1 ().
-.IP \(em
-.BR putctl1 ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-.BR putctl1 ()
-returns failure when the operations fails.
-Under
-.IR LiS ,
-.BR putctl1 ()
-will return success even if the operation fails because of the following
-conditions:
-.I q
-is not
-.BR NULL ,
-but
-.I q
-points to something other than a queue structure;
-the queue pointed to by
-.I q
-has a
-.I q_info
-pointer of
-.BR NULL ;
-the queue pointed to by
-.I q
-has no
-.IR qi_putp (9)
-procedure; or the queue pointed to by
-.I q
-is closing, or the queue has had
-.IR qi_putp (9)
-and
-.IR qi_srvp (9)
-procedure processing turned off
-(e.g. with
-.BR qprocsoff (9)).
-.I LiS
-should return failure when the operation fails.
-.IP \(em
-.BR putctl1 ()
-allocates a message block and calls
-.BR put (9).
-For differences from
-.IR LiS ,
-see
-.BR put (9).
 .IP \(em
 .BR putctl1 ()
 may be called on a stream frozen with
@@ -470,16 +421,6 @@ drivers and modules will not call
 .BR putctl1 ()
 on a stream frozen by the caller with
 .BR freezestr (9).
-.\".IP \(em
-.\"Symbol
-.\".BR lis_putctl1 ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_putctl1 ()
-.\"simply calls
-.\".BR putctl1 ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -379,14 +379,6 @@ flag to register
 .I STREAMS
 modules.
 .IP \(em
-.I LiS
-.[
-lis
-.]
-uses the function
-.BR lis_register_strmod (9)
-to register modules.
-.IP \(em
 .IR OSF/1 \(rg
 uses the function
 .BR strmod_add (9)

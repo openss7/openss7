@@ -1023,32 +1023,6 @@ follow
 as does
 .IR Solaris \(rg.
 .IP ""
-.I LiS
-allocates
-.BR qband (9)
-structures on demand, links them in a sparse array,
-and will also reuse
-.BR qband (9)
-structures that were previously allocated for bands that are currently empty.  This is not a good
-approach because user established band high- and low-water marks will be reset to those of the
-.BR queue (9)
-structure when a subsequent message is place on the reused band.
-Also, it is difficult to predict when
-.BR appq (9),
-.BR insq (9),
-.BR putq (),
-.BR putbq (9),
-will fail as a result of failure to allocate a
-.BR qband (9)
-structure.
-This
-.I LiS
-bug is not perpetuated in
-.BR "@PACKAGE_TITLE@" .
-.[
-@PACKAGE_TITLE@
-.]
-.IP ""
 Portable
 .I STREAMS
 drivers and modules can rely on intermediate band strutures being allocated
@@ -1063,19 +1037,6 @@ member of the
 structure to determine whether a
 .BR qband (9)
 exists for a given band number.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-.[
-@PACKAGE_TITLE@
-.]
-instead of
-.IR LiS .
-.[
-lis
-.]
 .IP \(em
 .BR putq ()
 orders the
@@ -1097,18 +1058,9 @@ soldoc
 lists
 .BR qband (9)
 structures from lowest to highest priority, without gaps (see consideration of allocation above).
-.I LiS
-.[
-lis
-.]
-lists
-.BR qband (9)
-structures from most recently allocated/reused to least recently allocated/reused.
-Neither the
+The
 .IR Solaris \(rg
-nor the
-.I LiS
-approach is very efficient.
+approach is not very efficient.
 .IP ""
 Portable
 .I STREAMS
@@ -1127,39 +1079,6 @@ members directly, but will use the portable
 and
 .BR strqset (9)
 utilities instead.
-.IP \(em
-.BR putq ()
-is not bug for bug compatible with 
-.IR LiS .
-.IP ""
-Versions of
-.I LiS
-previous to
-.I OpenSS7 Release LiS-2.16.18-17
-automatically freed the message on failure.
-Versions of
-.I LiS
-subsequent to
-.I OpenSS7 Release LiS-2.16.18-16
-do not free the message on failure in accordance with
-.I SVR 4.2
-and other implementation documentation.
-The
-.I LiS
-implementation of
-.BR putq ()
-stil has bugs related to
-.BR qprocsoff (9)
-handling in that it fails while
-.BR qprocsoff (9)
-is in effect or if the stream is closing.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not use releases of
-.I LiS
-prior to
-.IR "OpenSS7 Release LiS-2.16.18-17" .
 .IP \(em
 .BR putq ()
 may be called on a stream frozen with
@@ -1202,81 +1121,6 @@ on a stream currently frozen by the caller with
 .BR freezestr (9).
 .RB ( "@PACKAGE_TITLE@"
 includes an assertion to enforce this in the SMP environment.)
-.\".IP \(em
-.\".BR putq ()
-.\"cannot be called from an interrupt service routine (hard irq).
-.\".IP ""
-.\".B @PACKAGE_TITLE@
-.\".[
-.\"@PACKAGE_TITLE@
-.\".]
-.\"does not permit
-.\".BR putq ()
-.\"to be called from an interrupt service routine (hard irq) context to remove the need for suppressing
-.\"local interrupts, and greatly reducing the need to suppress local bottom halves, throughout the
-.\".I STREAMS
-.\"executive.  The only queue utilities that
-.\".B @PACKAGE_TITLE@
-.\"permits to be called from an interrupt service routine (hard irq) context are
-.\".BR qwriter (9),
-.\".BR streams_put (9),
-.\".BR mp_become_writer (9)
-.\"and
-.\".BR put (9),
-.\"and these functions defer until the next
-.\".BR runqueues (9)
-.\"pass.
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will not call
-.\".BR putq ()
-.\"from any context outside a
-.\".I STREAMS
-.\"queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
-.\"other than a
-.\".I STREAMS
-.\"coroutine, only
-.\".BR put (9)
-.\"will be used by a portable
-.\".I STREAMS
-.\"driver or module.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_putq ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_putq ()
-.\"simply calls
-.\".BR putq ()
-.\"directly.
-.IP \(em
-All versions of
-.I LiS
-contain the bug that they keep track of message queue counts,
-.IR q_count ,
-.IR qb_count ,
-in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
-.RB ( "db_lim - db_base" ),
-and not the sizes of the message blocks themselves,
-.RB ( "b_wptr - b_rptr" ),
-which does not conform to
-.IR "SVR 4.2 STREAMS" .
-.[
-svr42spg
-.]
-See
-.BR msgsize (9).
-No other implementation has this bug.
-.IP ""
-Portable
-.I STREAMS
-applications programs, drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

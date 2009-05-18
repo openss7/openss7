@@ -295,20 +295,20 @@ configuration files, see
 .BR strload (8).
 .\"
 .\"
-.SH DIAGNOSTICS
-.PP
+.\".SH DIAGNOSTICS
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH FILES
@@ -324,14 +324,7 @@ command.
 .BR strconf (5).
 .\"
 .\"
-.SH BUGS
-.PP
-.\"
-.\"
-.SH CAVEATS
-.PP
-This man page was shamelessly stolen directly from the
-.BR "LiS htdocs" .
+.BG
 .\"
 .\"
 .SH COMPATIBILITY

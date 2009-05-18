@@ -372,10 +372,9 @@ usldk
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
 .IR SUPER-UX \(rg,
-.IR UnixWare \(rg,
-.IR UXP/V \(rg
+.IR UnixWare \(rg
 and
-.IR LiS ,
+.IR UXP/V \(rg
 do not provide this function.
 .IP \(em
 .B @PACKAGE_TITLE@

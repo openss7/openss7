@@ -496,9 +496,6 @@ that never have Stream heads attached to inodes.  See also
 .\".BR sock (4)
 .\"driver.
 .\".TP
-.\".B D_LIS
-.\"Attempt to be LiS compatible with this module.
-.\".TP
 .\".B D_HEAD
 .\"The driver is a stream head.
 .\".TP
@@ -736,25 +733,6 @@ of
 structures, instead of an array,
 greatly reducing the memory footprint of
 .BR "@PACKAGE_TITLE@" .
-.PP
-This reduction is particularly noticeable when
-.BR "@PACKAGE_TITLE@"
-is compared to
-.IR LiS :
-.[
-lis
-.]
-.I LiS
-allocates a large array of similar
-.B cdevsw
-and
-.B fmodsw
-structures to represent
-.I STREAMS
-character devices and modules, swallowing up an excessive and whopping 600,000 bytes of BSS.
-In contrast, the BSS for
-.B @PACKAGE_TITLE@
-is about 1400 bytes.
 .\"
 .\"
 .SH NOTICES
@@ -873,7 +851,6 @@ implementation.
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,

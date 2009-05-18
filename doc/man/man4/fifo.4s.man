@@ -473,27 +473,10 @@ Some implementations support making all FIFOs
 as a system configuration option.
 Some implementations support character device special file implementations of FIFOs.  (See also
 .BR sfx (4).)
-Some implementations support only character device special file implementations of FIFOs (as
-.B LiS
-.[
-lis
-.]
-does) and do not support
+Some implementations support only character device special file implementations of FIFOs
+and do not support
 .IR STREAMS -based
 system FIFOs.
-.IP ""
-Portable
-.I STREAMS
-applications will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.BR LiS .
-.[
-lis
-.]
 .IP \(em
 Under
 .B Linux

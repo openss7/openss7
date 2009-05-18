@@ -500,73 +500,8 @@ This procedure is consistent with that described for
 .[
 magic
 .]
-.IP ""
-Under
-.IR LiS ,
-.BR bufcall ()
-does not actually generate a callback function once a buffer of the
-appropriate size becomes available.  Instead
-.I LiS
-starts a timer.  When the timer expires, the ability to allocate the necessary
-buffers is checked and the callback function invoked if it is now possible to
-allocate the necessary structures and buffers.  This is not entirely
-consistent with
-.I SVR 4.2
-.[
-svr42
-.]
-operation.
 .\"
 .\"
-.IP \(em
-.BR bufcall ()
-implements a
-.B bcid_t
-hash table to
-.B strevent
-objects for speed.
-.B strevent
-objects expire once the event's callback function has run.
-.IP ""
-.I LiS
-builds a linked list of buffer call structures and assigns an integer id
-to each structure.  Searches for unique buffer ids when ids are assigned and
-searches for buffer ids when
-.BR unbufcall (9)
-is called are linear searches that are slow and inefficient.  In fact,
-\*(lqThe Magic Garden\*(rq explains that in SVR 4.2
-.[
-svr42
-.]
-a
-.BR bufcall ()
-results in the creation of a
-.B strevent
-structure which is linked to the
-.I strbcalls
-system variable
-and sets the
-.I strbcwait
-flag which then causes
-.BR kmem_free ()
-to set the
-.IR qrunflag .
-At no point in this process is an integer id assigned to the
-.B strevent
-structure.  This means that
-.I LiS
-meaninglessly assigns an integer id to the buffer call structure and the
-inefficiencies of linear searches are pointless.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_bufcall ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_bufcall ()
-.\"returns
-.\".BR int .
 .IP \(em
 Depending on the system,
 .BR bufcall ()

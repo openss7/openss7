@@ -232,8 +232,8 @@ is MP-safe; however, the caller is responsible for ensuring exclusive access to
 the passed in map structure.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -274,8 +274,6 @@ and
 .IR SUPER-UX \(rg
 do not document
 .BR rmfree ().
-.IR LiS
-does not provide any of these functions.
 .IP \(em
 The
 .IR AIX \(rg

@@ -417,19 +417,6 @@ compatibility modules package.
 .\"
 .SH NOTICES
 .PP
-No release of the
-.B @PACKAGE@
-package is compatible with
-.IR LiS .
-.I LiS
-lacks the Stream head support necessary to properly implement a terminal device.  As
-.I LiS
-is long deprecated, this should not present a problem.  The
-.B @PACKAGE@
-package is comatible with
-.BR "Linux Fast-STREAMS" ,
-which always contained full terminal support in the Stream head.
-.PP
 The
 .B @PACKAGE_TITLE@
 package has known and unknown defects.  This is a

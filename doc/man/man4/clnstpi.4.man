@@ -126,8 +126,8 @@ module that provides conversion between the OSI CLNS NPI interface and the TPI i
 the XTI/TLI library to provide for applications that run directly over CLNP.
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH INTERFACE
@@ -264,16 +264,16 @@ does not provide any module-specific input-output controls: all input-output con
 toward the driver beneath the module.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH MODULES
@@ -319,8 +319,8 @@ Because the
 module is not yet implemented, it has no bugs.  Or, all of the bugs were in the design.
 .\"
 .\"
-.SH COMPATIBILITY
-.PP
+.\".SH COMPATIBILITY
+.\".PP
 .\"
 .\"
 .SH CONFORMANCE

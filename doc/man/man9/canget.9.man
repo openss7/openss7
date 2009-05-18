@@ -228,28 +228,8 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR canget ()
-is compatible with
-.I LiS
-.[
-lis
-.]
-with the following portability considerations:
+has the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\".BR canget ()
-.\"and the symbol
-.\".BR lis_canget ()
-.\"are provided for compatibility with
-.\".IR LiS .
-.\".[
-.\"lis
-.\".]
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_canget ()
-.\"simply calls
-.\".BR canget ()
-.\"directly.
-.\".IP \(em
 .BR canget ()
 should not be called by normal
 .I STREAMS

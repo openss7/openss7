@@ -318,7 +318,7 @@ XNS Issue 5.2
 .]
 with an OSI profile.
 .PP
-.SH CMISE
+.SH DESCRIPTION
 .PP
 A CMISE stack is illustrated as follows:
 .PP

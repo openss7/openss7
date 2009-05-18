@@ -1585,28 +1585,6 @@ kernels (and some patched 2.4 kernels) now have larger device numbers.  These ex
 numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits for
 the combined device number.
 .PP
-.BR "LiS Device Numbering" :\-
-.I LiS
-.[
-lis
-.]
-prior to the 2.18.0 release was incapable of providing an internal representation of the device
-number and the number of minor device numbers for a device driver was restricted to 256, just as in
-.IR "UNIX System V Release 3.2" .
-(In fact only 255, as the kernel reserved minor device number 255 for
-expansion.) Many
-.B OpenSS7
-device drivers written for
-.I LiS
-.[
-lis
-.]
-would allocate additional major device numbers if required.  Good examples of devices that require
-more than 255 minor device numbers are INET clone devices, SCTP streams, SS7 signalling link
-streams, MG media channels, etc.  These streams are often
-.BR I_PLINK ed
-under a multiplexing driver and do not even consume a system file descriptor.
-.PP
 .BR "Linux Fast-STREAMS Device Numbering" :\-
 .B Linux Fast-STREAMS
 .[
@@ -1672,10 +1650,6 @@ aixspg
 .IR HP-UX \(rg,
 .[
 hpuxspg
-.]
-.IR LiS ,
-.[
-lis
 .]
 .IR OSF/1 \(rg,
 .[
@@ -1772,28 +1746,6 @@ drivers and modules
 .I STREAMS
 devices
 .PD
-.PP
-Another approach to establishment of dynamically allocated major device
-numbers is to use the
-.I LiS
-.[
-lis
-.]
-approach of creating minor device nodes using the
-.BR mknod (9)
-and
-.BR unlink (9)
-facilities provide by the
-.I LiS
-compatibility module.
-But this approach does not work well with demand loading of kernel modules
-because it relies on the
-.B Linux
-character device demand loading approach, or requires informing
-.I STREAMS
-of all devices and drivers when
-.I STREAMS
-is being compiled.
 .PP
 .B LfS
 supports the
@@ -2251,9 +2203,6 @@ for major device numbers.
 .PP
 .\"
 .SS "Porting from UXP/V"
-.PP
-.\"
-.SS "Porting from Linux STREAMS/LiS 2.16.18"
 .PP
 .\"
 .\"

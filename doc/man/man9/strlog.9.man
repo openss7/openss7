@@ -845,24 +845,6 @@ drivers and modules will use the
 .BR log (4)
 logger instead of the default logger.
 .IP \(em
-.I LiS
-.[
-LiS
-.]
-does not provide this function, nor a
-.I STREAMS
-logger.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-@PACKAGE@
-.]
-instead of
-.IR LiS .
-.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

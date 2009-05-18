@@ -239,30 +239,6 @@ svr4dk
 with the following protability considerations:
 .IP \(em \w'\(em\(em'u
 .BR rmvb ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-When
-.IR mp " and " bp
-are
-.BR NULL ,
-.BR rmvb ()
-correctly returns
-.BI "(mblk_t *)(" -1 )\fR.
-Under LiS
-.BR rmvb ()
-will return
-.B NULL
-in the same situation.  This is an LiS bug.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will not pass
-.B NULL
-pointers to
-.BR rmvb ().
-.IP \(em
-.BR rmvb ()
 sets the block pointer's continuation pointer,
 .IR bp->b_cont ,
 to
@@ -277,15 +253,6 @@ setting the removed block's continuation pointer,
 .I bp->b_cont
 to
 .BR NULL .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_rmvb ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_rmvb ()
-.\"calls
-.\".BR rmvb ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

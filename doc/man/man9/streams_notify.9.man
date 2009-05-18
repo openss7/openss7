@@ -529,7 +529,7 @@ are
 specific functions and are not intended on being compatible with any other
 implementation.
 .IP \(em \w'\(em\(em'u
-There is no equivalent for these functions in LiS, nor documented equivalents
+There is no documented equivalents for these functions
 for other STREAMS implementations.
 .PP
 See

@@ -877,13 +877,9 @@ SVR 4.2,
 .[
 svr42
 .]
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.I LiS
-.[
-LiS
-.]
+.IR UnixWare \(rg
 with the following considerations:
 .IP \(em \w'\(em\(em'u
 .B sad
@@ -892,10 +888,8 @@ implements the
 .B SAP_CLONE
 command for specifying clone minor devices.
 This command is not implemented by
-SVR 4.2,
-.IR Solaris \(rg
-or
-.IR LiS .
+SVR 4.2, or
+.IR Solaris \(rg.
 .IP \(em
 The generation of
 .RI { SIGPOLL }

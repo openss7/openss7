@@ -807,7 +807,6 @@ including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
-.IR LiS ,
 .IR MacOT \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
@@ -913,22 +912,6 @@ to be processed easily within a module or driver
 .IR qi_putp (9)
 procedure.)
 .IP
-.I LiS
-.[
-lis
-.]
-terminates on a zero-length message but does not place a zero-length message back onto the STREAM
-head read queue when data has already been transferred and in byte-stream mode, but it terminates
-after reading data when there is no more data to read.  This seems half
-.I POSIX
-(terminate with short read when data no longer available, generate
-.BR M_READ (9)
-only for no data condition before blocking)
-and half
-.I SVR 4
-(do not requeue zero-length data messages in byte-stream mode)
-behavior.
-.IP
 These are several rather different behaviours for
 .BR read ()
 when in byte-stream mode.
@@ -1005,14 +988,6 @@ specifies that read waits for all requested bytes and therefore an implementatio
 time that there is no data waiting to be read and could, therefore, be interrupted in the middle of
 transferring data while waiting for more data.
 .IP
-.I LiS
-.[
-lis
-.]
-follows the
-.I POSIX
-behavior in this regard.
-.IP
 These behaviors are somewhat contradictory too.
 .IP
 When
@@ -1072,33 +1047,6 @@ Portable
 modules, drivers and application programs will not use the
 .BR RFILL " or " RPROTCOMPRESS
 read modes.
-.\"
-.\"
-.IP \(em
-.IP \(em
-.PP
-.B @PACKAGE_TITLE@
-used to recognize the \(lqinvalid\(rq buffer length to
-.BR read ()
-used by
-.I LiS
-to emulate the
-.I __NR_getpmsg
-system call.
-This is no longer the case.
-.B @PACKAGE_TITLE@
-(as with current versions of
-.IR LiS ),
-.[
-lis
-.]
-uses the
-.B I_GETPMSG
-command to
-.BR ioctl (2s)
-to emulate the
-.BR getpmsg (2s)
-system call.
 .\"
 .\"
 .SH "CONFORMING TO"

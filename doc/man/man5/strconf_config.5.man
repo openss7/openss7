@@ -109,7 +109,7 @@ search-ignore T
 .\"
 .SH NAME
 .B strconf.config
-\- LiS STREAMS strconf configuration file
+\- STREAMS strconf configuration file
 .\"
 .\"
 .SH SYNOPSIS

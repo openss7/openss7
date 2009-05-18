@@ -616,16 +616,6 @@ and
 .BR QWCLOSE ,
 and the queue band flag
 .BR QB_BACK .
-.I LiS
-defines a number of queue flags that are not elsewhere defined, yet returns those flags from a call
-to
-.BR strqget ().
-.[
-lis
-.]
-.I LiS
-should mask off its private flags when returning flags from a call to
-.BR strqget ().
 .IP ""
 Portable
 .I STREAMS
@@ -705,10 +695,9 @@ will allocate a queue band structure for the band argument,
 .IR band ,
 if one does not already exist.
 .IR HP-UX \(rg,
-.IR SUPER-UX \(rg,
-.IR UXP/V \(rg
+.IR SUPER-UX \(rg
 and
-.I LiS
+.IR UXP/V \(rg
 indicate that
 .BR strqget ()
 and
@@ -752,27 +741,6 @@ and
 .BR putbq (9)
 will always succeed for the queue band,
 .IR band .
-.IP \(em
-.BR strqget ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-.I LiS
-will return
-.RB [ EINVAL ]
-when it cannot allocate a
-.BR qband (9)
-structure instead of
-.RB [ ENOMEM ].
-.\".IP \(em
-.\"Symbol
-.\".BR lis_strqget ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_strqget ()
-.\"calls
-.\".BR strqget ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

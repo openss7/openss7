@@ -728,107 +728,12 @@ including
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
-.IR LiS ,
 .IR MacOT \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,
 .IR UnixWare \(rg,
-.IR UXP/V \(rg,
-with the following compatibility considerations:
-.IP \(em \w'\(em\(em'u
-.BR putmsg ()
-is compatible with LiS
-.[
-LiS
-.]
-with the following exceptions:
-.B LiS
-.[
-LiS
-.]
-incorrectly returns
-.RB [ EINVAL ]
-instead of
-.RB [ EIO ]
-when the internal head queue pointer points to a structure that is not a queue
-structure, or is mangled.
-.B LiS
-.[
-LiS
-.]
-does not return
-.RB [ EIO ]
-when
-.B putmsg()
-is called on a closing stream.
-.B LiS
-.[
-LiS
-.]
-incorrectly returns
-.RB [ EAGAIN ]
-instead of
-.RB [ EINTR ]
-when an
-.B M_SIG
-message causes a signal that interrupts the call to
-.B putmsg()
-before any data is written.
-.B LiS
-.[
-LiS
-.]
-incorrectly returns
-.RB [ ENODEV ]
-instead of
-.RB [ ENOSTR ]
-when there is no stream associated with
-.IR fd .
-.B LiS
-.[
-LiS
-.]
-incorrectly returns
-.RB [ EINVAL ]
-instead of
-.RB [ ENODEV ]
-when
-.I fd
-refers to a device that does not support the
-.B putmsg()
-system call.
-.BR putmsg ()
-is not bug-for-bug compatible with
-.B LiS
-in these and possibly other regards.
-.IP
-Portable
-.I STREAMS
-applications, modules and drivers will expect compatibility with
-.B POSIX
-.[
-susv3
-.]
-and not rely upon
-.BR LiS -specific
-bugs and behaviour.
-.\"
-.\"
-.PP
-.B Linux Fast-STREAMS
-provides system calls for
-.IR __NR_getpmsg " and " __NR_putpmsg
-that are used to implement this system call.
-(glibc has prototypes for this system call.)
-In addition,
-.B Linux Fast-STREAMS
-recognizes the \*(lqinvalid\*(rq buffer length to
-.BR write (2s)
-used by LiS to emulate the
-.I __NR_getpmsg
-system call, permitting LiS libraries to be used with
-.BR "Linux Fast-STREAMS" .
+.IR UXP/V \(rg.
 .\"
 .\"
 .SH CONFORMANCE

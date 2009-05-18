@@ -118,10 +118,8 @@ ss7 \- Signalling System No. 7 for STREAMS
 .SH "DESCRIPTION"
 
 The \fIOpenSS7\fR STREAMS package for SS7 consists of a number of loadable
-drivers and modules for Linux which are based on the LiS (Linux STREAMS)
-.[
-LiS
-.]
+drivers and modules for Linux which are based on the
+.B Linux Fast-STREAMS
 package.  These drivers and modules implement the traditional SS7 stack as
 well as providing some IETF SIGTRAN and other SS7 over IP components.
 

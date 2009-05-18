@@ -317,9 +317,6 @@ driver prior to a call to a registration function:
 .\".TP
 .B D_CLONE
 Ignored for modules.
-.\".TP
-.\".B D_LIS
-.\"Attempt to be LiS compatible with this module.
 .PP
 The following flags are
 .IR Solaris \(rg
@@ -541,25 +538,6 @@ of
 structures, instead of an array,
 greatly reducing the memory footprint of
 .BR "@PACKAGE_TITLE@" .
-.PP
-This reduction is particularly noticeable when
-.BR "@PACKAGE_TITLE@"
-is compared to
-.IR LiS :
-.[
-lis
-.]
-.I LiS
-allocates a large array of similar
-.B cdevsw
-and
-.B fmodsw
-structures to represent
-.I STREAMS
-character devices and modules, swallowing up an excessive and whopping 600,000 bytes of BSS.
-In contrast, the BSS for
-.B @PACKAGE_TITLE@
-is about 1400 bytes.
 .\"
 .\"
 .SH NOTICES
@@ -659,7 +637,6 @@ implementation.
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
-.IR LiS ,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg,

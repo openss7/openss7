@@ -265,13 +265,9 @@ svr42cr
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
-.IR UnixWare \(rg,
-.IR UXP/V \(rg
+.IR UnixWare \(rg
 and
-.BR LiS ,
-.[
-LiS
-.]
+.IR UXP/V \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR AIX \(rg

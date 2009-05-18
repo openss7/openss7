@@ -167,13 +167,16 @@ XAP Library prototype:
 .\"
 .\"
 .SH ARGUMENTS
-.TP \w'\fIaperrno_p\fP\(em'u
+.PP
+.TP \w'\fIaperrno_p\fP\ \(em'u
 .I fd
 The file descriptor identifying the ACSE/Presentation instance.
+.PD 0
 .TP
 .I aperrno_p
 For XAP,
 a pointer to an extent into which to receive an error number.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -347,6 +350,3 @@ This manual page was written for the OpenSS7 XAP Library.
 $LIST$
 .]
 .T4
-
-
-

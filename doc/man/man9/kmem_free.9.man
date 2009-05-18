@@ -276,10 +276,9 @@ uxpdoc
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
 .IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS
+.IR UnixWare \(rg
 document this function;
 .[
 hpuxdoc
@@ -296,28 +295,8 @@ soldoc
 .[
 uw7doc
 .]
-.[
-lis
-.]
 however, they do not describe behaviour of buffer calls under
 .IR STREAMS .
-.IP \(em
-Under
-.IR LiS ,
-.BR kmem_free ()
-ignores the
-.I size
-argument when freeing memory.
-.I LiS
-does not properly schedule buffer calls in accordance with
-.IR "SVR 4.2" .
-.IP \(em
-.BR kmem_free ()
-is implemented as a function call.
-.I LiS
-implements
-.BR kmem_free ()
-as a macro.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

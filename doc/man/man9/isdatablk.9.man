@@ -202,9 +202,7 @@ with the following portability considerations:
 .BR isdatablk ()
 is implemented as an
 .BR "extern inline" .
-Some implementations, such as
-.IR LiS ,
-implement
+Some implementations implement
 .BR isdatablk ()
 as a macro.
 .IP ""
@@ -212,21 +210,6 @@ Portable
 .I STREAMS
 drivers and modules will not attempt to take a function pointer reference to
 .BR isdatablk ().
-.IP \(em
-Some
-.I LiS
-versions have a typographical error in the macro definition that render it unusable.
-.BR isdatablk ()
-is binary compatible with
-.I LiS
-(versions without the typographical error).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

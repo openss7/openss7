@@ -307,33 +307,6 @@ The
 function prototype returns
 .BR void .
 .IP \(em
-Under
-.IR LiS ,
-.[
-lis
-.]
-.BR timeout (9)
-creates a Linux timer structure, assigns it a sequential integer timer
-identifier, and places it in a timer list.  Whenever
-.I LiS
-stops a timer, it
-checks the list for the integer timer identifier with interrupts disabled.
-This is an exhaustive linear search.  This is inefficient.
-.I STREAMS
-drivers or modules that stop timers often will experience poorer performance
-than if the Linux kernel timer facility was used directly.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_untimeout ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_untimeout ()
-.\"calls
-.\".BR untimeout ()
-.\"directly.
-.IP \(em
 .IR AIX \(rg
 .[
 aixdoc

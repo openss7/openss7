@@ -518,17 +518,6 @@ does not document the situation that occurs when
 .B I_PUSH
 is used to attempt to exceed the maximum push count.
 .IP ""
-.I LiS
-.[
-lis
-.]
-returns
-.RB [ ENOSR ]
-when the maximum push count is exceeded, however, in the latest
-.I LiS
-releases, the default maximum push count is unlimited and there is no mechanism to set the maximum
-push count.
-.IP ""
 .IR OpenSolaris \(rg
 returns
 .RB [ EINVAL ]
@@ -539,9 +528,6 @@ The purpose of limiting the maximum push count
 .B NSTRPUSH
 was to keep programs that automatically push modules from running amok an swallowing all system
 resources.
-The
-.I LiS
-approach (no limit) is unacceptable.
 In effect, to satisfy the purpose, any error would do.  The
 .B POSIX
 .[

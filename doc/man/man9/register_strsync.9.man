@@ -185,17 +185,8 @@ This is probably not the function that you want.  See
 .PP
 The
 .B register_strsync "() and " unregister_strsync ()
-functions are only exported for use by the
-.I STREAMS Compatibility Modules
-to support deprecated and broken
-.I LiS
-.[
-lis
-.]
-registration functions
-.BR lis_register_driver_qlock_option (9)
-and
-.BR lis_register_module_qlock_option (9).
+functions are exported for use by the
+.IR "STREAMS Compatibility Modules" .
 These functions are not intended on being called directly by the
 .I STREAMS
 module and driver writer.

@@ -358,8 +358,8 @@ or any Stream on the upper multiplex provided that the user has sufficient
 privilege.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -381,12 +381,12 @@ xns 5.2
 .BR tpi (7).
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
 .SH DEVICES
@@ -399,10 +399,10 @@ xns 5.2
 .\"
 .SH SEE ALSO
 .PP
+tpi (7).
 .\"
 .\"
-.SH BUGS
-.PP
+.BG
 .\"
 .\"
 .SH COMPATIBILITY

@@ -194,12 +194,8 @@ bugs.  Report bugs to
 .RB < bugs@openss7.org >.
 .\"
 .\"
-.SH COMPATIBILITY
-.PP
-.B ip_to_dlpi
-is compatible with the module of the same name from the GCOM
-.I LiS-2.18.0
-release.
+\".SH COMPATIBILITY
+\".PP
 .\"
 .\"
 .SH CONFORMANCE
@@ -209,9 +205,8 @@ Interworking modules between
 and Linux IP subsystem is not subject to standardization.
 .\"
 .\"
-.SH HISTORY
-.PP
-Most of the devices and modules here appeared in earlier releases of LiS.
+\".SH HISTORY
+\".PP
 .\"
 .\"
 .[

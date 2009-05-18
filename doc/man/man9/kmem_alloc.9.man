@@ -406,10 +406,9 @@ osfdoc
 .IR HP-UX \(rg,
 .IR IRIX \(rg,
 .IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
+.IR Solaris \(rg
 and
-.IR LiS
+.IR UnixWare \(rg
 document this function.
 .[
 hpuxdoc
@@ -425,9 +424,6 @@ soldoc
 .]
 .[
 uw7doc
-.]
-.[
-lis
 .]
 .IP ""
 Portable
@@ -456,16 +452,11 @@ irixdoc
 uw7doc
 .]
 .IR HP-UX \(rg
-and
-.I LiS
-try to allocate 32 bytes if the
+tries to allocate 32 bytes if the
 .I size
 argument is set to 0.
 .[
 hpuxdoc
-.]
-.[
-lis
 .]
 .IP ""
 Portable
@@ -507,68 +498,6 @@ drivers and modules will only use the flags
 .BR KM_SLEEP " and " KM_NOSLEEP
 when calling
 .BR kmem_alloc ().
-.IP \(em
-.BR kmem_alloc ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-Under
-.IR LiS ,
-.BR kmem_alloc ()
-ignores the
-.I flag
-argument and allocates memory using
-.BR lis_malloc ()
-which always calls
-.BR kmalloc (9)
-with a general fault protection class of
-.BR GFP_ATOMIC .
-This means that
-.BR kmem_alloc ()
-can fail and return
-.B NULL
-even if
-.I flag
-is set to
-.BR KM_SLEEP .
-Also, this means that when
-.I flag
-is set to
-.BR KM_SLEEP ,
-the calling process will neither wait nor reschedule.
-These are
-.I LiS
-bugs.
-.\".IP \(em
-Under
-.IR LiS ,
-.BR kmem_alloc ()
-returns a pointer to zero-sized allocated memory when
-.I size
-is zero.
-This is incorrect behaviour and is an
-.I LiS
-bug.
-.\".IP \(em
-.I LiS
-destroys memory alignment by inserting hidden memory allocation management pointers at the
-beginningo of the
-.BR kmalloc (9)'ed
-extent.
-.\".IP \(em
-.BR kmem_alloc ()
-is implemented as a function call.
-.I LiS
-implements
-.BR kmem_alloc ()
-as a macro.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B Linux Fast-STREAMS
-in place of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

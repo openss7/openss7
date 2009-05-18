@@ -570,12 +570,12 @@ if an internal failure occured, and an exit status of two
 if there was an error in option syntax.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH DEVICES

@@ -217,9 +217,7 @@ This distribution is only currently applicable to
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
 .PP
-This package is complete and has been in production use for both
-.I LiS
-and
+This package is complete and has been in production use for
 .I Linux Fast-STREAMS
 for a number of years.
 .\"

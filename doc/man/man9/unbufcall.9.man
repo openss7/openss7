@@ -288,19 +288,6 @@ svr4spg
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR unbufcall ()
-uses an efficient packed out-dating pointer for
-.BR bcid_t .
-.I LiS
-.[
-lis
-.]
-uses rather inefficient linear lookups with interrupts disabled while looking for the
-.I bcid
-in the list of buffer callbacks.  As buffer callbacks should be rare in most
-.I STREAMS
-driver and module designs, this is of little moment.
-.IP \(em
 In
 .I SVR 4
 .[
@@ -364,17 +351,6 @@ See
 .BR bufcall (9)
 for more information on
 .BR bcid_t .
-.\".IP \(em
-.\"Symbol
-.\".BR lis_unbufcall ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_unbufcall ()
-.\"calls
-.\".BR unbufcall ()
-.\"directly.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

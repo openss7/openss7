@@ -164,19 +164,21 @@ This manpage is under construction.
 .BR tua ,
 .BR uaconfd ,
 .BR voipconfd .
-
 .\"
 .\"
 .SH RETURN
 .PP
+Various.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+Various.
 .\"
 .\"
 .SH ERRORS
 .PP
+Various.
 .\"
 .\"
 .SH BUGS
@@ -186,22 +188,22 @@ Not done yet.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+Unknown.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Unknown.
 .\"
 .\"
 .SH HISTORY
 .PP
-.\"
-.\"
-.SH VERSIONS
-.PP
+Unknown.
 .\"
 .\"
 .[

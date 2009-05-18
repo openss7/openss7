@@ -236,11 +236,6 @@ drivers and modules may use this function.
 is implemented as an
 .B extern inline
 function.
-.I LiS
-implements
-.BR datamsg ()
-as a C preprocessor macro,
-which is rather against its stated purpose of providing functional interfaces.
 .IP ""
 Portable
 .I STREAMS

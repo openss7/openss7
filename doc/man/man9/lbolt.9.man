@@ -420,9 +420,6 @@ devices are not supported.
 .IP \(em
 .IR AIX \(rg
 does not document this kernel variable.
-.IP \(em
-.I LiS
-does not provide this kernel variable.
 .PP
 See
 .BR STREAMS (9)

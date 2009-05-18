@@ -328,10 +328,6 @@ repeatedly for the same queue without first calling
 .BR qprocson (9).
 .IP \(em
 .BR qprocsoff ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-.BR qprocsoff ()
 waits for all other threads to exit
 .IR qi_qopen (9),
 .IR qi_qclose (9),
@@ -341,39 +337,13 @@ and
 procedures before returning.  This is consistent with
 .I SVR 4.2 MP DDI/DKI
 and documentation for
-.IR Solaris \(rg
-but inconsistent with
-.IR LiS .
+.IR Solaris \(rg.
 .[
 usldk
 .]
 .[
 soldoc
 .]
-.[
-lis
-.]
-Under
-.IR LiS ,
-.BR qprocsoff ()
-does not wait for
-.IR qi_qopen (9),
-.IR qi_qclose (9),
-.IR qi_putp (9)
-or
-.IR qi_srvp (9)
-procedures on other threads to exit before returning, but simply
-sets a flag.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-in place of
-.IR LiS .
 .IP \(em
 The driver or module can neglect to call
 .BR qprocsoff ()
@@ -383,9 +353,7 @@ procedure and the
 .I STREAMS
 scheduler will perform an implicit
 .BR qprocsoff ().
-This is consistent with
-.I LiS
-behavior but different from
+This is different from
 .IR "SVR 4.2 MP DDI/DKI" ,
 .IR UnixWare \(rg,
 .IR OSF/1 \(rg,
@@ -455,8 +423,6 @@ or
 .IR Solaris \(rg
 but is consistent with
 .IR HP-UX \(rg
-and
-.IR LiS .
 .[
 usldk
 .]
@@ -466,9 +432,6 @@ soldoc
 .[
 hpuxspg
 .]
-.[
-lis
-.]
 .IP ""
 Portable
 .I STREAMS
@@ -476,33 +439,6 @@ drivers and modules will not call
 .BR qprocsoff ()
 repeatedly for the same queue without first calling
 .BR qprocson (9).
-.IP \(em
-.BR qprocsoff ()
-is not bug for bug compatible with
-.IR LiS .
-.IP ""
-.BR qprocsoff ()
-blocks other threads attempting to enter the
-.IR qi_putp (9)
-procedure until it returns.
-Under
-.IR LiS ,
-attempts to enter the
-.IR qi_putp (9)
-procedure will result in the message being dropped or freed.
-See
-.IR qi_putp (9)
-for more information.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
-in place of
-.IR LiS .
 .IP \(em
 .BR qprocsoff ()
 may be called on a stream frozen with
@@ -535,14 +471,6 @@ drivers and modules will not call
 .BR qprocsoff ()
 on a stream frozen with
 .BR freezestr (9).
-.\".IP \(em
-.\"Symbol
-.\".BR lis_qprocsoff ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_qprocsoff ()
-.\"simply calls
-.\".BR qprocsoff ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

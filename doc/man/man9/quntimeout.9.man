@@ -274,10 +274,9 @@ usldk
 .]
 .IR AIX \(rg,
 .IR UnixWare \(rg,
-.IR OSF/1 \(rg,
-.IR HP-UX \(rg,
+.IR OSF/1 \(rg
 and
-.IR LiS ,
+.IR HP-UX \(rg
 do not provide this function.
 .IP \(em
 Binary compatibility is not guaranteed.

@@ -465,16 +465,6 @@ Portable
 drivers and modules will not make any assumptions about the physical contiguity or suitability for
 worst-case DMA of data buffers allocated via
 .BR msgpullup (9).
-.\".IP \(em
-.\"Symbol
-.\".BR lis_pullupmsg ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_pullupmsg ()
-.\"simply calls
-.\".BR pullupmsg ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

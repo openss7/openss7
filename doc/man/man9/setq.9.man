@@ -211,22 +211,6 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_setq ()
-.\"is provided for compatibility with LiS.  See
-.\".BR liscompat (9).
-.\".BR lis_setq ()
-.\"simply calls
-.\".BR setq ().
-.\".IP \(em
-.\"Note that
-.\".BR lis_setq ()
-.\"was deprecated as of
-.\".IR "LiS 2.18.0" .
-.\"See
-.\".BR lisdeprec (9)
-.\"for more information.
-.\".IP \(em
 This function is not exported by
 .I "SVR 4.2 MP DDI/DKI"
 or

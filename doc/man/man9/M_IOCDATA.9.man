@@ -499,83 +499,6 @@ drivers and modules will not examine the
 .I cp_flag
 field.
 .IP \(em
-When a driver or module receives an
-.B M_IOCDATA
-indicating an error
-.RI ( cp_rval
-is non-zero), it is supposed to free any private resources associated with the
-.BR ioctl (2s),
-abort the 
-.BR ioctl (2s)
-operation, free the message, and return.
-.[
-svr4spg
-.]
-When the
-Stream head
-sends such a message, it aborts the current
-.BR M_IOCTL (9)
-operation and returns the error number to the user in
-.BR errno (3)
-indicating the cause of failure of the operation.
-In the error case, the
-Stream head
-does not block awaiting any further
-.BR ioctl (2s)
-message blocks, and release the
-.B STRIOWAIT
-bit in the
-Stream head.
-.IP ""
-.I LiS
-.[
-lis
-.]
-has the bug that it waits for a subsequent
-.BR M_IOCACK (9)
-or
-.BR M_IOCNAK (9)
-block.
-(Note however, that drivers and modules previously written to work with
-.I LiS
-.[
-lis
-.]
-will also work with
-.BR "@PACKAGE_TITLE@" ;
-.[
-lfs
-.]
-however, the extraneous
-.BR M_IOCACK (9)
-or
-.BR M_IOCNAK (9)
-will be discarded by the
-Stream head
-as the input-output control transaction has been closed, and the error number reported will be that
-of the failed
-.BR copyin (9)
-or
-.BR copyout (9)
-operation, i.e.
-.RB [ EFAULT ],
-and not that contained in any
-.BR M_IOCNAK (9)
-message.)
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.[
-lis
-.]
-.IP \(em
 .B M_IOCDATA
 has a different constant value on
 .IR HP-UX \(rg,
@@ -586,27 +509,10 @@ hpuxspg
 .[
 macspg
 .]
-.IR OSF/1 \(rg,
+and
+.IR OSF/1 \(rg.
 .[
 osfspg
-.]
-and older versions of
-.IR LiS .
-.[
-lis
-.]
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B @PACKAGE_TITLE@
-.[
-lfs
-.]
-instead of
-.IR LiS .
-.[
-lis
 .]
 .IP \(em
 Binary compatibility is not guaranteed.

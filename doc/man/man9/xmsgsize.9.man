@@ -244,11 +244,7 @@ is a
 .[
 soldoc
 .]
-specific internal function exported by
-.IR LiS .
-.[
-LiS
-.]
+specific internal function.
 .IP ""
 Portable
 .I STREAMS
@@ -257,40 +253,6 @@ drivers and modules will not access this function.
 compatible
 .I STREAMS
 drivers and modules should not access this function.
-.IP \(em
-.BR xmsgsize ()
-will panic the system if
-.IR mp
-is
-.BR NULL .
-Under
-.IR LiS ,
-but not
-.IR Solaris \(rg,
-.[
-soldoc
-.]
-.BR xmsgsize ()
-will return zero (0)
-if
-.I mp
-is
-.BR NULL .
-.IP ""
-.IR Solaris \(rg
-compatible
-.I STREAMS
-drivers and modules will not pass
-.B NULL
-pointers to
-.BR xmsgsize ().
-.IR Solaris \(rg
-compatible
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -309,13 +271,6 @@ soldoc
 .\"
 .\"
 .SH HISTORY
-.PP
-.BR xmsgsize ()
-appears as an exported function in
-.IR LiS .
-.[
-LiS
-.]
 .PP
 .BR xmsgsize ()
 first appeared as an internal function in

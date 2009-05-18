@@ -601,28 +601,6 @@ structure, as does other
 .IR "SVR 4.2" -based
 implementations.
 .IP ""
-.I LiS
-allocates
-.B qband
-structures on demand, links them in a sparse array, and will also reuse
-.B qband
-structures that were previously allocated for bands that are currently empty.  This is not a good
-approach because user established band high and low water marks will be reset to those of the
-.BR queue (9)
-structure when a subsequent message is placed on the reused band.  Also, this makes it difficult to predict when
-.BR appq (9),
-.BR insq (9),
-.BR putq (9),
-.BR putbq (9),
-.BR strqget (9),
-.BR strqset (9),
-will fail as a result of failure to allocate a
-.BR qband
-structure.  This
-.I LiS
-bug is not perpetuated in
-.BR "@PACKAGE_TITLE@" .
-.IP ""
 Portable
 .I STREAMS
 drivers and modules can rely on intermediate band structure being allocated when a normal priority
@@ -633,13 +611,6 @@ member of the
 structure to determine whether a
 .B qband
 exists.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 .B qband
 structures, in the list pointed to by the
@@ -657,14 +628,9 @@ soldoc
 orders
 .B qband
 from lowest to highest priority, and without gaps (see consideration of allocation above).
-.I LiS
-orders
-.B qband
-structures from most recently allocated/reused to least recently allocated/reused.  Neither the
+The
 .IR Solaris \(rg
-nor the
-.I LiS
-approach is very efficient.
+approach is not very efficient.
 .IP ""
 Portable
 .I STREAMS
@@ -683,53 +649,6 @@ members directly, but will use the portable and MP-safe
 and
 .BR strqset (9)
 utilities instead.
-.IP \(em
-Versions of
-.I LiS
-previous to
-.I OpenSS7 Release LiS-2.16.18-17
-automatically freed the message on failure.  Versions of
-.I LiS
-subsequent to
-.I OpenSS7 Release LiS-2.16.18-16
-do not free th message on failure in accordance with
-.IR "SVR 4"
-.[
-svr4spg
-.]
-and other implementation documentation.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.IP \(em
-All versions of
-.I LiS
-contain the bug that they keep track of message queue counts,
-.IR q_count ,
-.IR qb_count ,
-in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
-.RB ( "db_lim - db_base" ),
-and not the sizes of the message blocks themselves,
-.RB ( "b_wptr - b_rptr" ),
-which does not conform to
-.IR "SVR 4.2 STREAMS" .
-.[
-svr42spg
-.]
-See
-.BR msgsize (9).
-No other implementation has this bug.
-.IP ""
-Portable
-.I STREAMS
-applications programs, drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 .IR "Mac OT" \(rg
 has type

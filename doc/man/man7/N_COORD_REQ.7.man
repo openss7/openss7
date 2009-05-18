@@ -1,3 +1,4 @@
+.so man7/npi_sccp.7.man
 '\" rtp
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
@@ -111,7 +112,7 @@ search-ignore T
 .\"
 .SH NAME
 .BR N_COORD_REQ " (" N_coord_req_t )
-\- notice indication
+\- coordinate request
 .\"
 .\"
 .SH SYNOPSIS
@@ -119,34 +120,76 @@ search-ignore T
 The format of this message is one
 .B M_PROTO
 message block, and its structure is as follows:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong PRIM_type;    /* alwyas N_COORD_REQ */
+    np_ulong ADDR_length;  /* affected subsystem */
+    np_ulong ADDR_offset;
+} N_coord_req_t;
+\s+1\fP
+.fi
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+This primitive requests that the NS provider be permitted a coordinated
+withdrawal from service.
 .\"
 .\"
 .SH PARAMETERS
 .PP
+.TP
+.I PRIM_type
+The primitive type.  Always \fBN_COORD_REQ\fP.
+.TP
+.I ADDR_length
+The length in bytes of the network address for coordinated service
+withdrawal.
+.TP
+.I ADDR_offset
+The offset from the beginning of the
+.BR M_PROTO (9)
+message block where the network address begins.
 .\"
 .\"
-.SH RULES
-.PP
-.\"
-.\"
-.SH RESPONSE
-.PP
+.\".SH RULES
+.\".PP
 .\"
 .\"
 .SH STATE
 .PP
+This primitive is valid in state
+.BR NS_IDLE .
 .\"
 .\"
 .SH "NEW STATE"
 .PP
+The new state remains unchaned.
+.\"
+.\"
+.SH RESPONSE
+.PP
+The NS provider will generate one of the following acknowledgments upon
+receive of the
+.BR N_COORD_REQ (7)
+primitive.
+.HP
+.B Successful Coordinated Withdrawal:
+This is indicated via the
+.BR N_COORD_CON (7)
+primitive.  This results in the idle state.
+.HP
+.B Non-fatal errors:
+This is indicated with the 
+.BR N_ERROR_ACK (7)
+primitive.
 .\"
 .\"
 .SH ERRORS
 .PP
+The applicable non-fatal errors are defined as follows:
 .\"
 .\"
 .SH HISTORY

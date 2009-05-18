@@ -295,48 +295,6 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR putnext ()
-results are undefined if the arguments
-.IR q " or " mp
-is invalid.
-Under
-.IR LiS ,
-.BR putnext ()
-fails silently if
-.I q->q_next
-has a
-.I q_info
-pointer of
-.BR NULL ;
-the queue pointed to by
-.I q->q_next
-has no
-.IR qi_putp (9)
-procedure; or the
-queue pointed to by
-.I q->q_next
-is closing, or the queue has had
-.IR qi_putp (9)
-and
-.IR qi_srvp (9)
-procedure processing turned off
-(e.g. with
-.BR qprocsoff (9)).
-.IP \(em
-.BR putnext ()
-is MP-safe across pushes and pops of modules and other Stream reconfiguration
-because it protects dereference of the
-.I q->q_next
-pointer with the Stream head read lock.
-Under
-.IR LiS ,
-.BR putnext ()
-simply calls
-.BR put ()
-with the
-.I q->q_next
-pointer.
-.IP \(em
 .IR HP-UX \(rg
 .[
 hpuxspg
@@ -364,58 +322,6 @@ from outside of a
 routine for the queue pair of
 .IR q .
 .IP \(em
-.BR put "(9), " putnext "(), " qreply (9)
-will invoke a queue's
-.IR qi_putp (9)
-procedure shared and multi-threaded.
-.IP ""
-This is equivalent to
-.IR Solaris \(rg
-drivers with the
-.B D_MP
-flag set or with the
-.B D_MTPUTSHARED
-flag set.
-.IP ""
-.I LiS
-holds an exclusive nesting queue procedures lock while calling
-.BR putnext ()
-executes.
-.I LiS
-.BR lis_safe_putnext ()
-and
-.BR lis_safe_qreply (9)
-call the
-.BR lis_safe_putmsg (9)
-function, meaning that all message passing functions in
-.I LiS
-lock out interrupts until the entire thread of execution completes.
-.I LiS
-drivers and modules calling
-.BR putnext ()
-should notice superior interrupt service routine latency and performance.  It is normally the case
-that
-.IR qi_putp (9)
-procedures are MP-safe as they normally use only MP-safe queue and message utility
-functions.  Also, most
-.IR qi_putp (9)
-procedures are inherently invoked single threaded (from a single-threaded
-.IR qi_srvp (9)
-procedure).  Lack of locking should not present a problem.
-.IP ""
-Because
-.I LiS
-also uses this lock for
-.IR qi_srvp (9)
-procedures, this means that while the
-.I LiS
-scheduler is running (at kernel thread priority 50), interrupts, timeouts, bottom halves, hi
-tasklets and soft interrupts are indefinitely postponed.  This is not acceptable for soft real-time
-performance.  Rewrite
-.I LiS
-.IR qi_putp (9)
-procedures to be MP-safe.
-.IP \(em
 .IR UnixWare \(rg
 .[
 uw7spg
@@ -436,16 +342,6 @@ drivers and modules will not call
 .BR putnext ()
 on a Stream frozen by the caller with
 .BR freezestr (9).
-.\".IP \(em
-.\"Symbol
-.\".BR lis_safe_putnext ()
-.\"is provided for binary compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_safe_putnext ()
-.\"simply calls
-.\".BR putnext ().
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -666,28 +666,16 @@ distribution:
  3  {
  4      (void) oflag;
  5      (void) crp;
- 6      if (!q->q_ptr)
- 7          return (ENXIO);
- 8      qprocsoff(q);
- 9      q->q_ptr = WR(q)->q_ptr = NULL;
-10      return (0);
-11  }
+ 6      qprocsoff(q);
+ 7      q->q_ptr = WR(q)->q_ptr = NULL;
+ 8      return (0);
+ 9  }
 \s+2\fP
 .fi
-.IP "\fBLine 6-7\fR:" \w'Line\ 00-00\(em'u
-The module checks the existence of a
-.I q_ptr
-value or returns an error.  This is for compatibility with
-.IR LiS ,
-which call
-.IR qi_qclose ()
-procedures with the wrong conditions in some circumstances (particularly for pipes).
-This check is not necessary for
-.BR "@PACKAGE_TITLE@" .
-.IP "\fBLine 8\fR:"
+.IP "\fBLine 6\fR:" \w'Line\ 00-00\(em'u
 .BR qprocsoff (9)
 is called to disable procedures before removing the module private pointers.
-.IP "\fBLine 9-10\fR:"
+.IP "\fBLine 7-8\fR:"
 The module private pointers are nulled and the routine returns.
 .IP ""
 Note that, since no variables global another Stream are referenced, no locks are taken.

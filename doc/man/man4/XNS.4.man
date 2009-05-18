@@ -192,9 +192,8 @@ device drivers:
 .BR XNET (4).
 .\"
 .\"
-.SH HISTORY
-.PP
-Most of the devices and modules here appeared in earlier releases of LiS.
+.\".SH HISTORY
+.\".PP
 .\"
 .\"
 .[

@@ -857,22 +857,8 @@ The
 compatibility modules package.
 .\"
 .\"
-.SH NOTICES
-.PP
-Although previous releases of the
-.B @PACKAGE@
-package were tested with
-.IR LiS ,
-.I LiS
-is now deprecated and this release of
-.B @PACKAGE@
-has not been tested with
-.IR LiS .
-.I The OpenSS7 Project
-will no longer support this package for
-.IR LiS :
-please upgrade to
-.BR "Linux Fast-STREAMS" .
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH BUGS

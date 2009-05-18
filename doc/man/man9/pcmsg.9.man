@@ -282,14 +282,6 @@ which performs a similar function, but does not document
 .[
 soldoc
 .]
-.I LiS
-does not provide
-.BR pcmsg ()
-or
-.BR queclass (9).
-.[
-lis
-.]
 .BR pcmsg ()
 is not as widely implemented as one would like and it appears that there is no advantage to using
 .BR pcmsg ()

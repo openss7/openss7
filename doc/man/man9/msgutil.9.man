@@ -276,16 +276,9 @@ These message functions are source-level compatible with
 .[
 usldk
 .]
-.IR Solaris \(rg
 and
-LiS
-.[
-LiS
-.]
+.IR Solaris \(rg
 with the exceptions noted in the individual manual pages.
-.BR lis_ -prefixed
-symbols are provided for compatibility with LiS.  See
-.BR liscompat (9).
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

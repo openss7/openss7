@@ -176,8 +176,8 @@ statement on the return value of the
 helper function.
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH RETURN
@@ -266,8 +266,8 @@ or
 defined.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
