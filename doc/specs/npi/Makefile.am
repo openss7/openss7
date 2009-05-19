@@ -62,7 +62,7 @@ if DEVELOPMENT
 info_TEXINFOS		+= npi.texi npi_mtp.texi npi_sccp.texi
 
 npi.h: $(top_srcdir)/src/include/sys/npi.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += npi.h
 
@@ -72,7 +72,7 @@ npi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 npi_mtp.h: $(top_srcdir)/src/include/sys/npi_mtp.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += npi_mtp.h
 
@@ -82,7 +82,7 @@ npi_mtp_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 npi_sccp.h: $(top_srcdir)/src/include/sys/npi_sccp.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += npi_sccp.h
 

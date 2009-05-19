@@ -159,7 +159,7 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 @end example
 
 Note that it is also possible to point to these repositories as an additional installation source
-when installing CentOS, RedHat, Fedora, or others.  You will have an additional @cite{STREAMS}
+when installing CentOS, RedHat, Fedora, or others.  You will have an additional @acronym{STREAMS}
 category from which to choose installation packages.
 
 Some additional installation real or virtual package names and the installations they accomplish are
@@ -559,7 +559,7 @@ The build host requires the following GNU tools:
 @itemize
 @item @command{m4 1.4.13}
 @item @command{autoconf 2.63}
-@item @command{automake 1.10.2}
+@item @command{automake 1.11}
 @item @command{libtool 2.2.6a}
 @item @command{gettext 0.17}
 @item @command{flex 2.5.33}
@@ -577,7 +577,7 @@ software directory, and also at the following locations:
 @itemize
 @item @url{http://www.openss7.org/tarballs/m4-1.4.13.tar.bz2,m4-1.4.13}
 @item @url{http://www.openss7.org/tarballs/autoconf-2.63.tar.bz2,autoconf-2.63}
-@item @url{http://www.openss7.org/tarballs/automake-1.10.2.tar.bz2,automake-1.10.2}
+@item @url{http://www.openss7.org/tarballs/automake-1.11.tar.bz2,automake-1.11}
 @item @url{http://www.openss7.org/tarballs/libtool-2.2.6a.tar.gz,libtool-2.2.6a}
 @item @url{http://www.openss7.org/tarballs/gettext-0.17.tar.gz,gettext-0.17}
 @item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}
@@ -781,8 +781,8 @@ provided by @manpage{autoconf(1)}, @manpage{automake(1)}, @manpage{libtool(1)} a
 Not all @file{configure} options are applicable to all @value{pkgtype} packages.
 Options that are kernel module specific are only applicable to @value{pkgtype}
 packages that build kernel modules.
-@dfn{STREAMS} options are only applicable to @value{pkgtype} packages that
-provide or require @dfn{STREAMS}.
+@acronym{STREAMS} options are only applicable to @value{pkgtype} packages that
+provide or require @acronym{STREAMS}.
 
 Following are the additional @file{configure} options, their meaning and use:
 
@@ -1141,7 +1141,7 @@ modules will only be about 5% faster.
 @opindex strconf-master
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master file is written.  The
 default is @file{Config.master}.
-This option has no effect on @value{pkgtype} packages that do not use the @dfn{STREAMS} subsystem
+This option has no effect on @value{pkgtype} packages that do not use the @acronym{STREAMS} subsystem
 and the strconf scripts.
 This option should not be specified when configuring the master package as the setting for all
 add-on packages will conflict.
@@ -1149,7 +1149,7 @@ add-on packages will conflict.
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
 Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @samp{230}.
-This option has no effect on @value{pkgtype} packages that do not use the @dfn{STREAMS} subsystem
+This option has no effect on @value{pkgtype} packages that do not use the @acronym{STREAMS} subsystem
 and the strconf scripts.
 This option should not be specified when configuring the master package as the setting for all
 add-on packages will conflict.
@@ -1614,7 +1614,7 @@ The convention for @file{@value{PACKAGE}} kernel loadable object files is:
 @end itemize
 
 If your kernel has been built using the @file{kerneld} daemon, then @file{@value{PACKAGE_NAME}}
-kernel modules will automatically load as soon as the @dfn{STREAMS} module is pushed or the driver
+kernel modules will automatically load as soon as the @acronym{STREAMS} module is pushed or the driver
 is opened.  The @samp{make install} process makes the necessary changes to the
 @file{@value{_rootdir}/@-etc/@-modules.conf} file.  After the install, you will see lines like the
 following added to your @file{@value{_rootdir}/@-etc/@-modules.conf} file:
@@ -1640,7 +1640,7 @@ alias char-major-246  streams-@var{other_driver}
 @end smallexample
 @end cartouche
 
-Note that @dfn{STREAMS} modules are not listed in this file, but will be loaded by name using
+Note that @acronym{STREAMS} modules are not listed in this file, but will be loaded by name using
 @file{kerneld} if available.
 
 @cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than previously provided.

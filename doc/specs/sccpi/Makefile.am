@@ -62,7 +62,7 @@ if DEVELOPMENT
 info_TEXINFOS		+= sccpi.texi npi_sccp.texi tpi_sccp.texi xti_sccp.texi
 
 sccpi.h: $(top_srcdir)/src/include/ss7/sccpi.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += sccpi.h
 
@@ -72,7 +72,7 @@ sccpi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 npi_sccp.h: $(top_srcdir)/src/include/sys/npi_sccp.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += npi_sccp.h
 
@@ -82,7 +82,7 @@ npi_sccp_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 tpi_sccp.h: $(top_srcdir)/src/include/sys/tpi_sccp.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += tpi_sccp.h
 
@@ -92,7 +92,7 @@ tpi_sccp_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 xti_sccp.h: $(top_srcdir)/src/include/sys/xti_sccp.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += xti_sccp.h
 

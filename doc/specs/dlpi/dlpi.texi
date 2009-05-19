@@ -410,6 +410,35 @@ herein.
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -454,7 +483,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @node Introduction
 @chapter Introduction
 
-This document specifies a @cite{STREAMS} kernel-level instantiation of the ISO
+This document specifies a @acronym{STREAMS} kernel-level instantiation of the ISO
 Data Link Service Definition DIS 8886@footnote{International Organization for
 Standardization, "Data Link Service Definition for Open Systems
 Interconnection," DIS 8886, February 1987.} and Logical Link Control DIS 8802/2
@@ -482,7 +511,7 @@ address issues such as @acronym{DLSAP} address space, subsequent addresses,
 @acronym{PPA} access and control, @acronym{QoS}, supported services, etc.
 
 This specification assumes the reader is familiar with OSI Reference Model[4]
-terminology, OSI Data Link Services, and @cite{STREAMS}.
+terminology, OSI Data Link Services, and @acronym{STREAMS}.
 
 @section Document Organization
 
@@ -492,7 +521,7 @@ This specification is organized as follows:
 
 @item @ref{Model of the Data Link Layer},
 presents background on the structure of the data link layer of the OSI Reference
-Model, and explains the intended architecture in the @cite{STREAMS} environment.
+Model, and explains the intended architecture in the @acronym{STREAMS} environment.
 Data link addressing concepts are also presented.
 
 @item @ref{DLPI Services},
@@ -580,18 +609,18 @@ service primitive might request a particular service or indicate a pending event
 
 To provide uniformity among the various UNIX system networking products, an
 effort is underway to develop service interfaces that map to the OSI Reference
-Model.  A set of kernel-level interfaces, based on the @cite{STREAMS}
+Model.  A set of kernel-level interfaces, based on the @acronym{STREAMS}
 development environment, constitute a major portion of this effort.  The service
-primitives that make up these interfaces are defined as @cite{STREAMS} messages
+primitives that make up these interfaces are defined as @acronym{STREAMS} messages
 that are transferred between the user and provider of the service.
 @acronym{DLPI} is one
-such kernel-level interface, and is targeted for @cite{STREAMS} protocol modules
+such kernel-level interface, and is targeted for @acronym{STREAMS} protocol modules
 that either use or provide data link services.  In addition, user programs that
-wish to access a @cite{STREAMS}-based data link provider directly may do so
+wish to access a @acronym{STREAMS}-based data link provider directly may do so
 using the putmsg(2) and getmsg(2) system calls.
 
 Referring to the abstract view of @acronym{DLPI} (@figref{1}), the DLS provider is
-configured as a @cite{STREAMS} driver, and the DLS user accesses the provider
+configured as a @acronym{STREAMS} driver, and the DLS user accesses the provider
 using open(2) to establish a stream to the DLS provider.  The stream acts as a
 @cpindex Communication endpoint
 communication endpoint between a DLS user and the DLS provider.  After the
@@ -764,7 +793,7 @@ enable a DLS user to choose a particular @acronym{PPA}.  The style 1 provider
 assigns a @acronym{PPA} based on the major/minor device the DLS user opened.
 One possible implementation of a style 1 driver would reserve a major device for
 each @acronym{PPA} the data link driver would support.  This would allow the
-@cite{STREAMS} clone open feature to be used for each @acronym{PPA} configured.
+@acronym{STREAMS} clone open feature to be used for each @acronym{PPA} configured.
 This style of provider is appropriate when few PPAs will be supported.
 
 If the number of PPAs a DLS provider will support is large, a style 2 provider
@@ -1434,19 +1463,19 @@ close.
 * Acknowledged Connectionless-mode Service Primitives::
 @end menu
 
-The kernel-level interface to the data link layer defines a @cite{STREAMS}-based
+The kernel-level interface to the data link layer defines a @acronym{STREAMS}-based
 message interface between the provider of the data link service (DLS provider)
-and the consumer of the data link service (DLS user).  @cite{STREAMS} provides
+and the consumer of the data link service (DLS user).  @acronym{STREAMS} provides
 the mechanism in which @acronym{DLPI} primitives may be passed between the DLS user and
 DLS provider.
 
 Before @acronym{DLPI} primitives can be passed between the DLS user and the DLS provider,
 the DLS user must establish a stream to the DLS provider using open(2).  The DLS
-provider must therefore be configured as a @cite{STREAMS} driver.  When
+provider must therefore be configured as a @acronym{STREAMS} driver.  When
 interactions between the DLS user and DLS provider have completed, the stream
 may be closed.
 
-The @cite{STREAMS} messages used to transport data link service primitives
+The @acronym{STREAMS} messages used to transport data link service primitives
 across the interface have one of the following formats:
 
 @itemize @bullet
@@ -1463,7 +1492,7 @@ primitive.
 
 The information contained in the @msg{M_PROTO} or @msg{M_PCPROTO} message blocks
 must begin on a byte boundary that is appropriate for structure alignment (e.g.
-word-aligned on the AT&T 3B2 Computer).  @cite{STREAMS} will allocate buffers
+word-aligned on the AT&T 3B2 Computer).  @acronym{STREAMS} will allocate buffers
 that begin on such a boundary.  However, these message blocks may contain
 information whose representation is described by a length and an offset within
 the block.  An example is the @acronym{DLSAP} address (dl_addr_length and
@@ -3556,7 +3585,7 @@ DLS provider must recognize and process messages that consist of one or more
 @msg{M_DATA} message blocks with no preceding @msg{M_PROTO} message block.  This
 message type may originate from the write(2) system call.@footnote{This does not
 imply that @acronym{DLPI} will directly support a pure read(2)/write(2).  If such an
-interface is desired, a @cite{STREAMS} module could be implemented to be pushed
+interface is desired, a @acronym{STREAMS} module could be implemented to be pushed
 above the DLS provider.}
 
 @subsubheading State
@@ -3570,7 +3599,7 @@ The resulting state is unchanged.
 @subsubheading Response
 If the request is valid, no response is generated.
 
-If the request is erroneous, a @cite{STREAMS} @msg{M_ERROR} message should be
+If the request is erroneous, a @acronym{STREAMS} @msg{M_ERROR} message should be
 issued to the DLS user specifying an errno value of EPROTO.  This action should
 be interpreted as a fatal, unrecoverable, protocol error.  A request is
 considered erroneous under the following conditions.
@@ -3585,7 +3614,7 @@ provider's acceptable bounds as specified by dl_min_sdu and dl_max_sdu in the
 @end itemize
 
 @subsubheading Note (Support of Direct User-Level Access)
-A @cite{STREAMS} module would implement "more" field processing itself to
+A @acronym{STREAMS} module would implement "more" field processing itself to
 support direct user-level access.  This module could collect messages and send
 them in one larger message to the DLS provider, or break large DLSDUs passed to
 the DLS user into smaller messages.  The module would only be pushed if the DLS
@@ -7100,7 +7129,7 @@ interface as viewed by the DLS user, to be returned in the
 out of state (i.e.  would correspond to a "-" cell entry in the state transition
 table below).
 
-@item If the DLS provider generates a @cite{STREAMS} @msg{M_ERROR} message upstream, it
+@item If the DLS provider generates a @acronym{STREAMS} @msg{M_ERROR} message upstream, it
 should free any further primitives processed by it's write side put or service
 procedure.
 
@@ -7171,7 +7200,7 @@ the DLS provider.
 @item A @prim{DL_DATA_IND} primitive received by the DLS user after the user has
 issued a @prim{DL_RESET_REQ} should be discarded.  To ensure accurate processing
 of @acronym{DLPI} primitives, the DLS provider must adhere to the following rules
-concerning the receipt and generation of @cite{STREAMS} @msg{M_FLUSH} messages
+concerning the receipt and generation of @acronym{STREAMS} @msg{M_FLUSH} messages
 during various state transitions.
 
 @item The DLS provider must be ready to receive @msg{M_FLUSH} messages from
@@ -7232,9 +7261,9 @@ connection mode data transfer phase.
 
 This appendix presents the precedence of @acronym{DLPI} primitives relative to one
 another.  Two queues are used to describe @acronym{DLPI} precedence rules.  One queue
-contains DLS user-originated primitives and corresponds to the @cite{STREAMS}
+contains DLS user-originated primitives and corresponds to the @acronym{STREAMS}
 write queue of the DLS provider.  The other queue contains DLS
-provider-originated primitives and corresponds to the @cite{STREAMS} read queue
+provider-originated primitives and corresponds to the @acronym{STREAMS} read queue
 of the DLS user.  The DLS provider is responsible for determining precedence on
 its write queue and the DLS user is responsible for determining precedence on
 its read queue as indicated in the precedence tables below.  For each precedence
@@ -7262,7 +7291,7 @@ provider-originated primitives.
 @node Write Queue Precedence
 @appendixsec Write Queue Precedence
 The following table presents the precedence rules for DLS user-originated
-primitives on the DLS provider's @cite{STREAMS} write queue.  It assumes that
+primitives on the DLS provider's @acronym{STREAMS} write queue.  It assumes that
 only non-local primitives (i.e.  those that generate protocol data units to a
 peer DLS user) are queued by the DLS provider.
 
@@ -7293,7 +7322,7 @@ in the table below).
 @node Read Queue Precedence
 @appendixsec Read Queue Precedence
 The following table presents the precedence rules for DLS provider-originated
-primitives on the DLS user's @cite{STREAMS} read queue.
+primitives on the DLS user's @acronym{STREAMS} read queue.
 
 @cpindex Connection establishment
 For connection establishment primitives, this table represents the possible

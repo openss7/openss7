@@ -415,6 +415,35 @@ herein.
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -459,7 +488,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @node Introduction
 @chapter Introduction
 
-This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ISO/CCITT network
+This document specifies a @acronym{STREAMS}-based kernel-level instantiation of the ISO/CCITT network
 service definition.  The Network Provider Interface (NPI) enables the user of a network layer
 service to access and use any of a variety of conforming network layer service providers without
 specific knowledge of the provider's protocol.  The service interface is designed to support any
@@ -468,7 +497,7 @@ access to network layer service providers, and does not address issues concernin
 management,protocol performance, and performance analysis tools.
 
 The specification assumes that the reader is familiar with the OSI reference model terminology,
-ISO/CCITT Network Layer Service, and @cite{STREAMS}.
+ISO/CCITT Network Layer Service, and @acronym{STREAMS}.
 
 @section Related Documentation
 
@@ -605,7 +634,7 @@ the routing and management of data exchange between network-user entities.
 
 The @value{INTERFACE} defines the services provided by the network layer to the network-user at the boundary
 between the network layer and the network layer user entity.  The interface consists of a set of
-primitives defined as @cite{STREAMS} messages that provide access to the network layer services, and
+primitives defined as @acronym{STREAMS} messages that provide access to the network layer services, and
 are transferred between the NS user entity and the NS provider.  These primitives are of two types;
 ones that originate from the NS user, and others that originate from the NS provider.  The
 primitives that originate from the NS user make requests to the NS provider, or respond to an event
@@ -2649,7 +2678,7 @@ The resulting state remains the same (@psta{NS_DATA_XFER}).
 @subsubheading Acknowledgements
 
 This primitive does not require any acknowledgements, although it may generate a fatal error.  This
-is indicated to the NS user with a @msg{M_ERROR} @cite{STREAMS} message type (specifying an error
+is indicated to the NS user with a @msg{M_ERROR} @acronym{STREAMS} message type (specifying an error
 number value of @errno{EPROTO}) that results in the failure of all system calls on that Stream.  The
 applicable errors are defined as follows:
 
@@ -2793,7 +2822,7 @@ The resulting state remains the same (@psta{NS_DATA_XFER}).
 @subsubheading Acknowledgements
 
 This primitive does not require any acknowledgements, although it may generate a fatal
-(unrecoverable) error.  This is indicated via an @msg{M_ERROR} @cite{STREAMS} message type (issued
+(unrecoverable) error.  This is indicated via an @msg{M_ERROR} @acronym{STREAMS} message type (issued
 to the NS user specifying the error number value of @errno{EPROTO}), which results in the failure of
 all system calls on that Stream.  The allowable errors are as follows:
 
@@ -2857,8 +2886,8 @@ The resulting state remains the same (@psta{NS_DATA_XFER}).
 The expedited data transfer service provides a further means of information exchange on an NC in
 both directions simultaneously.  The transfer of expedited network service data unit (ENSDU) is
 subject to separate flow control from that applying to NS user data.  (However, a separate
-@cite{STREAMS} message type for expedited data is not available with @cite{UNIX@registeredsymbol{}
-System V Release 3.1}.  Until a new @cite{STREAMS} message type is provided, expedited data will be
+@acronym{STREAMS} message type for expedited data is not available with @cite{UNIX@registeredsymbol{}
+System V Release 3.1}.  Until a new @acronym{STREAMS} message type is provided, expedited data will be
 implemented via queue manipulation).  The NS provider should guarantee that an expedited-NSDU will
 not be delivered after any subsequently issued NSDU or expedited-NSDU on that NC.  The relationship
 between normal and expedited data is shown in @tabref{2}.  Expedited data can still be delivered
@@ -2907,7 +2936,7 @@ The resulting state remains the same (@psta{NS_DATA_XFER}).
 @subsubheading Acknowledgements
 
 This primitive does not require any acknowledgements, although it may generate a fatal
-(unrecoverable) error.  This is indicated with an @msg{M_ERROR} @cite{STREAMS} message type (issued
+(unrecoverable) error.  This is indicated with an @msg{M_ERROR} @acronym{STREAMS} message type (issued
 to the NS user with the error number value of @errno{EPROTO}), which results in the failure of all
 system calls on that Stream.  The applicable errors are as follows:
 
@@ -3454,7 +3483,7 @@ The amount of user data specified was outside the range supported by the NS prov
 The primitive was issued from an invalid state.
 @end multitable
 @item @emph{Fatal Error:}
-Fatal errors are indicated with an @msg{M_ERROR} @cite{STREAMS} message type (issued to the NS user with
+Fatal errors are indicated with an @msg{M_ERROR} @acronym{STREAMS} message type (issued to the NS user with
 the error number value of @errno{EPROTO}), that results in the failure of all
 @cite{UNIX@registeredsymbol{}} system calls on the Stream.  The fatal errors are as follows:
 @multitable @columnfractions .2 .7
@@ -3592,8 +3621,8 @@ via the non-fatal error handling facility.
 
 These errors are issued by the NS provider when it detects errors that are not correctable by the
 network service user, or if it is unable to report a correctable error to the network service user.
-Fatal errors are indicated via the @cite{STREAMS} message type @msg{M_ERROR} with the
-@cite{UNIX@registeredsymbol{}} system error @errno{EPROTO}.  The @msg{M_ERROR} @cite{STREAMS}
+Fatal errors are indicated via the @acronym{STREAMS} message type @msg{M_ERROR} with the
+@cite{UNIX@registeredsymbol{}} system error @errno{EPROTO}.  The @msg{M_ERROR} @acronym{STREAMS}
 message type will result in the failure of all the @cite{UNIX@registeredsymbol{}} system calls on
 the Stream.  The network service user can recover from a fatal error by having all the processes
 close the files associated with the Stream, and then reopening them for processing.

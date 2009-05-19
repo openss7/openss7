@@ -56,17 +56,19 @@ if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
 LSM $(PACKAGE)-$(VERSION).lsm: $(PACKAGE_TARNAME).lsm
-	cat $< > $@
+	$(AM_V_GEN)cat $< > $@
 
 $(tardir)/$(PACKAGE)-$(VERSION).lsm:
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
+		$(ECHO_Q) "  GEN   " $$f ; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test ! \( "$@" -ef "$$d$$f" \) || exit 0 ; \
 	test ":$(FORCE)" != :force -a -f "$@" || { \
-		$(ECHO) "cp -f -- $$d$$f $@" ; \
+		$(ECHO_Q) "  GEN   " `basename $@` ; \
+		$(ECHO_V) "cp -f -- $$d$$f $@" ; \
 		cp -f -- $$d$$f $@ ; }
 
 release-lsm: $(tardir)/$(PACKAGE)-$(VERSION).lsm
@@ -93,15 +95,17 @@ UPDATECLEANFILES	+= LSM
 ## the update stamp, and force was applied, remove and recereate the lsm.
 ##
 update-lsm:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f='$(tardir)/$(PACKAGE)-$(VERSION).lsm'; \
 	if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
-		$(ECHO) "D: $@: rebuild $$f"; \
-		$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
+		$(ECHO_V) "D: $@: rebuild $$f"; \
+		$(ECHO_Q) "  GEN   " $$f ; \
+		$(ECHO_V) "rm -f -- \"$$f\""; \
+		rm -f -- "$$f"; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
 	else \
-		test ! -e "$$f" || $(ECHO) "D: $@: skipped $$f"; \
+		test ! -e "$$f" || $(ECHO_V) "D: $@: skipped $$f"; \
 	fi
 
 ##
@@ -110,13 +114,13 @@ update-lsm:
 ## If the lsm exists and was created after the update stamp, remove it.
 ##
 update-clean-lsm:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f='$(tardir)/$(PACKAGE)-$(VERSION).lsm'; \
 	if test -e "$$f" -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
-		$(ECHO) "D: $@: removed $$f"; \
+		$(ECHO_V) "D: $@: removed $$f"; \
 		$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
 	else \
-		test ! -e "$$f" || $(ECHO) "D: $@: leaving $$f"; \
+		test ! -e "$$f" || $(ECHO_V) "D: $@: leaving $$f"; \
 	fi
 
 MY_PHONY		+= update-lsm

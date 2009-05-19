@@ -378,6 +378,14 @@ A CMISE stack is illustrated as follows:
 .fi
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+XNS 5.2.
+.[
+xns99
+.]
+.\"
+.\"
 .SH CONFORMANCE
 .PP
 XNS 5.2.

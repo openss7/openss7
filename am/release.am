@@ -67,12 +67,12 @@
 ## Put the text manual where we can find it in the distribution
 ##
 $(MANUAL_FILE):
-	make -C `dirname $(MANUAL_FILE)` `basename $(MANUAL_FILE)`
+	$(AM_V_GEN)make -C `dirname $(MANUAL_FILE)` `basename $(MANUAL_FILE)`
 
 MANUAL: $(MANUAL_FILE)
-	@cp -fv $< $@
+	$(AM_V_GEN)cp -f $< $@
 if MAINTAINER_MODE
-	@test $@ -ef $(top_srcdir)/$(@F) || cp -fv $@ $(top_srcdir)
+	$(AM_V_at)test $@ -ef $(top_srcdir)/`basename $@` || cp -f $@ $(top_srcdir)
 endif
 
 ALL_LOCAL			+= MANUAL
@@ -83,7 +83,8 @@ if MAINTAINER_MODE
 
 $(top_srcdir)/AUTHORS: MANUAL
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- authors.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -97,7 +98,8 @@ $(top_srcdir)/AUTHORS: MANUAL
 
 $(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- defects.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -111,7 +113,8 @@ $(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/LICENSES: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- licenses.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -125,7 +128,8 @@ $(top_srcdir)/LICENSES: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- problem reports.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -139,7 +143,8 @@ $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- history of user visible changes.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -153,7 +158,8 @@ $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- acknowledgements.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -167,7 +173,8 @@ $(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- things to do.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -181,7 +188,8 @@ $(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/README: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ; \
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me first file.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -195,7 +203,8 @@ $(top_srcdir)/README: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/README-cvs: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ;\
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ;\
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -211,7 +220,8 @@ $(top_srcdir)/README-cvs: MANUAL $(top_srcdir)/AUTHORS
 
 $(top_srcdir)/README-alpha: MANUAL $(top_srcdir)/AUTHORS
 	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
-	 $(ECHO) "Creating $@ from the MANUAL..." ;\
+	 $(ECHO_Q) "  GEN   " `basename $@` ; \
+	 $(ECHO_V) "Creating $@ from the MANUAL..." ;\
 	 reltype=`grep '^This software is' $${d}MANUAL | cut -f4 '-d '` ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- $$reltype release introduction.  $(PACKAGE_DATE)" > $@ ;\

@@ -237,7 +237,7 @@ initializes the backenable array.
 
 @item streams 020.  2008-07-31T04:59:41+0000
 
-Not really a bug (for @cite{STREAMS}), but when the @file{streams.ko} kernel module is loaded, the
+Not really a bug (for @acronym{STREAMS}), but when the @file{streams.ko} kernel module is loaded, the
 @mantype{crash(8)} debugger will not debug a running kernel because it finds the
 @command{runqueues()} exported function in the @file{streams.ko} module instead of the the static
 one from the kernel.  This has been temporarily renamed by macro to @command{srunqueues()} (notice

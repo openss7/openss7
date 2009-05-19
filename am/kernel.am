@@ -58,9 +58,9 @@ if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
 Modules.map: $(KERNEL_MODULES)
-	cat /dev/null > $@
+	$(AM_V_GEN)cat /dev/null > $@
 	@modules="$(KERNEL_MODULES)" ; for module in $$modules ; do \
-		$(ECHO) "$(NM) -s $$module >> $@" ; \
+		$(ECHO_V) "$(NM) -s $$module >> $@" ; \
 		$(NM) -s $$module >> $@ ; \
 	done
 
@@ -75,7 +75,8 @@ if AMDEP
 sinclude $(DEPDIR)/modules.Pk
 
 $(DEPDIR)/modules.Pk: Makefile
-	@$(ECHO) "Creating $@ dependencies..." ; \
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
 	( \
 		srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
 		$(ECHO) "stamp-mobjects: $$srcs" ; $(ECHO) "" ; \
@@ -87,14 +88,15 @@ $(DEPDIR)/modules.Pk: Makefile
 			$(ECHO) "sinclude $(DEPDIR)/$$b.Pko" ; \
 		done \
 	) >$(DEPDIR)/modules.Tpk || { rm -f $(DEPDIR)/modules.Tpk ; exit 1 ; } ; \
-	mv -f $(DEPDIR)/modules.Tpk $@
+	$(am__mv) $(DEPDIR)/modules.Tpk $@
 ## AMDEP
 endif
 
 stamp-modpost: stamp-verobjs $(KERNEL_MODULES)
 	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list" ; \
-	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list ; \
+	$(ECHO_Q) "  GEN   " $(MODPOST_MODVER) ; \
+	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list" ; \
+	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list ; \
 	touch stamp-modpost
 
 CLEANFILES		+= System.symvers Module.symvers
@@ -105,10 +107,11 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
 		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
-		then mv -f $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi" ; \
+		$(ECHO_Q) "  CC    " $$m.mod.o ; \
+		$(ECHO_V) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi" ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
-		then mv -f $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi ; \
+		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi ; \
 	done ; \
 	touch stamp-mobjects
 ## am__fastdepCC
@@ -120,7 +123,8 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+		$(ECHO_Q) "  CC    " $$m.mod.o ; \
+		$(ECHO_V) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
@@ -133,7 +137,8 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		$(ECHO_Q) "  CC    " $$m.mod.o ; \
+		$(ECHO_V) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
 	touch stamp-mobjects
@@ -145,15 +150,13 @@ endif
 if AMDEP
 ## AMDEP
 .o.ko:
-	@m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; b=`basename $$m` ; \
-	$(ECHO) "if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) \"$@: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
+	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; b=`basename $$m` ; \
 	if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) "$@: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi
 ## AMDEP
 else
 ## !AMDEP
 .o.ko:
-	@m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; \
-	$(ECHO) "$(LD) -r -o $@ $$m.o $$m.mod.o" ; \
+	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; \
 	$(LD) -r -o $@ $$m.o $$m.mod.o
 ## !AMDEP
 endif
@@ -166,7 +169,8 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|(\.mod)?\.o | |g'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
 		test :$$m != :stamp-mobjects || continue ; \
-		$(ECHO) "if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
+		$(ECHO_Q) "  CCLD  " $$m.ko ; \
+		$(ECHO_V) "if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
 		if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi ; \
 	done ; \
 	touch stamp-kobjects
@@ -177,7 +181,8 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|(\.mod)?\.o | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-mobjects || continue ; \
-		$(ECHO) "$(LD) -r -o $$m.ko $$m.o $$m.mod.o" ; \
+		$(ECHO_Q) "  CCLD  " $$m.ko ; \
+		$(ECHO_V) "$(LD) -r -o $$m.ko $$m.o $$m.mod.o" ; \
 		$(LD) -r -o $$m.ko $$m.o $$m.mod.o ; \
 	done ; \
 	touch stamp-kobjects
@@ -185,7 +190,7 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 endif
 
 clean-kernel:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
 	objs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
 	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.ko |g'` ; \
@@ -231,7 +236,7 @@ STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug
 # RH rpms to strip them.
 ##
 install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
 	some=no ; \
@@ -267,7 +272,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 # that some insmods really hate this, it might be necessary to defeat it altogether.
 ##
 install-preloads:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot
@@ -282,7 +287,7 @@ install-preloads:
 # specific to the old modprobe and are therefore 2.4 specific.
 ##
 install-modconf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)
 	@test -f "$(KERNEL_MODCONF)" || exit 0 ; \
@@ -320,7 +325,7 @@ endif
 # conflicting module as well.
 ##
 pre-modules:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@function remove_depmods() { \
 		local t ; \
 		test $$# -gt 0 || return 0 ; \
@@ -374,7 +379,7 @@ pre-modules:
 	fi
 
 pre-modconf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ##
 # The post-modconf target checks for a fully configured install directory by checking for the
@@ -406,7 +411,7 @@ pre-modconf:
 # please.
 ##
 post-modconf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@conf_fil=$(DESTDIR)$(sysconfdir)/modules.conf ; \
 	test -f $$conf_fil \
 	  -a -f $(DESTDIR)$(kmoduledir)/modules.dep \
@@ -421,7 +426,7 @@ post-modconf:
 		list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; for m in $$list ; do \
 			p="$$m$(kext)$(kzip)" ; \
 			sed -e "/$$m/d" $$conf_new > $$conf_tmp ; \
-			mv -f $$conf_tmp $$conf_new ; \
+			$(am__mv) $$conf_tmp $$conf_new ; \
 			for d in $$streams_dirs ; do \
 				for s in $$streams_subs ; do \
 					$(ECHO) "rm -f -- $$d/$$s/$$p $$d/$$s/boot/$$p" ; \
@@ -447,7 +452,7 @@ post-modconf:
 					list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; for m in $$list ; do \
 						p="$$m$(kext)$(kzip)" ; \
 						sed -e "/$$m/d" $$streams_new > $$streams_tmp ; \
-						mv -f $$streams_tmp $$streams_new ; \
+						$(am__mv) $$streams_tmp $$streams_new ; \
 						for d in $$streams_dirs ; do \
 							for s in $$streams_subs ; do \
 								$(ECHO) "rm -f -- $$d/$$s/$$p $$d/$$s/boot/$$p" ; \
@@ -479,7 +484,7 @@ post-modconf:
 # about placing markers in the file as we do with modules.conf.
 ##
 post-preload:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
 	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
 		test `grep -l "/$$p:" $(DESTDIR)$(rootdir)/lib/modules/*/modules.dep | wc -l` -eq 0 || exit 0 ; \
@@ -495,7 +500,7 @@ post-preload:
 	list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 		f=`$(ECHO) "$$p" | sed -e 's|\.o$$||'` ; \
 		sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
-		mv -f $$prel_tmp $$prel_new ; \
+		$(am__mv) $$prel_tmp $$prel_new ; \
 		$(ECHO) "$$f" >> $$prel_new ; \
 	done ; \
 	chmod --reference=$$prel_fil $$prel_new ; \
@@ -510,7 +515,7 @@ if WITH_KO_MODULES
 # (it should just run quicker).  New depmod could care less about modules.conf.
 ##
 post-depmod:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
 	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
 	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
@@ -522,7 +527,7 @@ else
 # (it should just run quicker).
 ##
 post-depmod:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
 	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
 	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -Ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
@@ -534,7 +539,7 @@ endif
 # directory, so this symbolic link is not made.
 ##
 post-source:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -d $(DESTDIR)$(rootdir)/usr/src || exit 0 ; \
 	$(ECHO) "$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)" ; \
 	$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)
@@ -544,10 +549,10 @@ post-source:
 # deprecated lksctp module and moves it as necessary.
 ##
 post-deprecated:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -f $(DESTDIR)$(kmoduledir)/modules.dep || exit 0 ; \
 	test -e $(DESTDIR)$(kmoduledir)/net/sctp/sctp$(kext)$(kzip) || exit 0 ; \
-	mv -f $(DESTDIR)$(kmoduledir)/net/sctp/sctp$(kext)$(kzip) $(DESTDIR)$(kmoduledir)/net/sctp/sctp_deprecated$(kext)$(kzip)
+	$(am__mv) $(DESTDIR)$(kmoduledir)/net/sctp/sctp$(kext)$(kzip) $(DESTDIR)$(kmoduledir)/net/sctp/sctp_deprecated$(kext)$(kzip)
 
 ##
 ## These post- targets are equivalent to the kernel modules package rpm %post scriptlet for non-rpm
@@ -571,7 +576,7 @@ endif
 # preload links that were built (and possibly the directories that they are in).
 ##
 uninstall-preload:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
 		$(ECHO_C)rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot/$$p ; \
@@ -579,7 +584,7 @@ uninstall-preload:
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot" || :
 
 uninstall-modules:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
 		$(ECHO_C)$(LIBTOOL) --mode=uninstall rm -f -- "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
@@ -591,7 +596,7 @@ uninstall-modules:
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)" || :
 
 uninstall-modconf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f -- "$(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)"
 
@@ -616,7 +621,7 @@ endif
 # modules and entries.  Use current versions of the openss7 autoconf/rpm LiS or LfS instead, please.
 ##
 postun-modconf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@conf_fil=$(DESTDIR)$(sysconfdir)/modules.conf ; \
 	test -f $$conf_fil || exit 0 ; \
 	for f in $(DESTDIR)$(kmoduledir)/../*/modules.$(KMODCONF_EXT) ; do \
@@ -626,7 +631,7 @@ postun-modconf:
 	conf_new="$${TMPDIR-/var/tmp}/`basename $$conf_fil`.new.$$$$" ; \
 	cp -f -- $$conf_fil $$conf_new ; \
 	sed -e '\|^include[[:space:]].*$(modutildir)/$(KMODCONF_EXT)|d' $$conf_new > $$conf_tmp ; \
-	mv -f -- $$conf_tmp $$conf_new ; \
+	$(am__mv) -- $$conf_tmp $$conf_new ; \
 	chmod --reference=$$conf_fil $$conf_new ; \
 	cp -fb --suffix=.$(KMODCONF_EXT).bak -- $$conf_new $$conf_fil ; \
 	rm -f -- $$conf_new
@@ -638,7 +643,7 @@ postun-modconf:
 # file for a dependency including one of our modules.
 ##
 postun-preload:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n "$(KERNEL_PRELOADS)" || exit 0 ; \
 	mods=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$mods ; do \
 		test `grep -l "/$$p:" $(DESTDIR)$(rootdir)/lib/modules/*/modules.dep | wc -l` -eq 0 || exit 0 ; \
@@ -654,7 +659,7 @@ postun-preload:
 	mods='$(KERNEL_PRELOADS)' ; for p in $$mods ; do \
 		m=`$(ECHO) $$p | sed -e 's|\.o$$||'` ; \
 		sed -e '\|^[[:space:]]*'"$$m"'[[:space:]]*$$|d' $$prel_new > $$prel_tmp ; \
-		mv -f -- $$prel_tmp $$prel_new ; \
+		$(am__mv) -- $$prel_tmp $$prel_new ; \
 	done ; \
 	chmod --reference=$$prel_fil -- $$prel_new ; \
 	cp -fb --suffix=$(KMODCONF_EXT).bak -- $$prel_new $$prel_fil ; \
@@ -670,7 +675,7 @@ if WITH_KO_MODULES
 # uninstall we need -ae.
 ##
 postun-depmod:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" || exit 0 ; \
 	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
 	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
@@ -683,25 +688,25 @@ else
 # result in updated files.  For uninstalls, old depmod likes -ae.
 ##
 postun-depmod:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n "$(DEPMOD)" -a -x "$(DEPMOD)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -f "$(DESTDIR)$(rootdir)$(ksysmap)" -a -f "$(DESTDIR)$(sysconfdir)/modules.conf" || exit 0 ; \
 	$(ECHO) "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)" ; \
 	UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(rootdir)/ -C $(DESTDIR)$(sysconfdir)/modules.conf -F $(DESTDIR)$(rootdir)$(ksysmap) $(kversion)
 endif
 
 postun-source:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	rm -f -- "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)"
 
 ##
 # If we moved the deprecated lksctp module on install, we move it back on uninstall.
 ##
 postun-deprecated:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -f $(DESTDIR)$(kmoduledir)/modules.dep || exit 0 ; \
 	test -e $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp_deprecated$(kext)$(kzip) || exit 0 ; \
-	$(ECHO) "mv -f $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp_deprecated$(kext)$(kzip) $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp$(kext)$(kzip)" ; \
-	mv -f $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp_deprecated$(kext)$(kzip) $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp$(kext)$(kzip)
+	$(ECHO) "$(am__mv) $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp_deprecated$(kext)$(kzip) $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp$(kext)$(kzip)" ; \
+	$(am__mv) $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp_deprecated$(kext)$(kzip) $(DESTDIR)$(kmoduledir)/kernel/net/sctp/sctp$(kext)$(kzip)
 
 ##
 # This is equivalent to the kernel modules package rpm %postun scriptlet.  It is only executed when

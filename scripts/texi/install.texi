@@ -940,7 +940,7 @@ The build host requires the following GNU tools:
 @itemize
 @item @command{m4 1.4.13}
 @item @command{autoconf 2.63}
-@item @command{automake 1.10.2}
+@item @command{automake 1.11}
 @item @command{libtool 2.2.6a}
 @item @command{gettext 0.17}
 @item @command{flex 2.5.33}
@@ -958,7 +958,7 @@ software directory, and also at the following locations:
 @itemize
 @item @url{http://www.openss7.org/tarballs/m4-1.4.13.tar.bz2,m4-1.4.13}
 @item @url{http://www.openss7.org/tarballs/autoconf-2.63.tar.bz2,autoconf-2.63}
-@item @url{http://www.openss7.org/tarballs/automake-1.10.2.tar.bz2,automake-1.10.2}
+@item @url{http://www.openss7.org/tarballs/automake-1.11.tar.bz2,automake-1.11}
 @item @url{http://www.openss7.org/tarballs/libtool-2.2.6a.tar.gz,libtool-2.2.6a}
 @item @url{http://www.openss7.org/tarballs/gettext-0.17.tar.gz,gettext-0.17}
 @item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}

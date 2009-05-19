@@ -247,6 +247,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -318,7 +347,7 @@ components as well as providing a basis for @value{PART} control for other @valu
 @cpindex STREAMS
 
 The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
-This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+This document is intended to be included with the OpenSS7 @acronym{STREAMS} software package released
 by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
 of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
 that are made available in the software package.
@@ -360,42 +389,6 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.23  2009-05-01 04:50:34  brian
-- update documentation for release
-
-Revision 0.9.2.22  2009-04-30 06:07:40  brian
-- more documentation updates for release
-
-Revision 0.9.2.21  2009-04-29 18:05:21  brian
-- updated documentation for release
-
-Revision 0.9.2.20  2008-11-26 12:01:36  brian
-- updated to FDL 1.3
-
-Revision 0.9.2.19  2008-09-20 11:04:31  brian
-- added package patchlevel
-
-Revision 0.9.2.18  2008-08-11 22:23:15  brian
-- rationalization of header files
-
-Revision 0.9.2.17  2008-08-03 06:03:33  brian
-- protected agains texinfo commands in log entries
-
-Revision 0.9.2.16  2008-08-03 05:05:17  brian
-- conditional @@syncodeindex frags out automake, fails distcheck
-
-Revision 0.9.2.15  2008-07-11 09:36:13  brian
-- updated documentation
-
-Revision 0.9.2.14  2008-04-29 07:10:40  brian
-- updating headers for release
-
-Revision 0.9.2.13  2007/08/03 13:34:56  brian
-- manual updates, put ss7 modules in public release
-
-Revision 0.9.2.12  2007/06/27 08:42:15  brian
-- added MTPI spec document
-
 @end verbatim
 @end smallexample
 
@@ -450,7 +443,7 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 @chapter Introduction
 @cpindex STREAMS
 
-This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T Transaction
+This document specifies a @acronym{STREAMS}-based kernel-level instantiation of the ITU-T Transaction
 Capabilities Application Part (TCAP) Component (TC) Sub-Layer.  The Transaction Component Interface
 (TCI) enables the user of a component sub-layer service to access and use any of a variety of
 conforming transaction providers without specific knowledge of the provider's protocol.  The service
@@ -569,7 +562,7 @@ mapi, Mobile Application Part Interface}), that also conforms to the TCI.  A tra
 sub-layer user can also be a user program that conforms to the TCI and accesses the TC provider via
 @manref{putmsg(2)} and @manref{getmsg(2)} system calls.
 
-@dfn{STREAMS} messages that are used to communicate transaction component service primitives between
+@acronym{STREAMS} messages that are used to communicate transaction component service primitives between
 the transaction component user and the transaction component provider may have one of the following
 formats:
 
@@ -598,7 +591,7 @@ the service user and primitives that originate from the service provider.  The p
 originate from the service user make requests to the service provider or response to an event of the
 service provider.  The primitive that originate from the service provider are either confirmations
 of a request or are indications to the service user that an event has occurred.  The primitive types
-along with the mapping of those primitives to the @dfn{STREAMS} message types and the service
+along with the mapping of those primitives to the @acronym{STREAMS} message types and the service
 primitives of the ISO/IEC xxxxx and service definitions are listed in @ref{TCI Primitives}.  The
 format of these primitives and the rules governing the use of them are described in @ref{Management
 Primitives}, @ref{Operation Class 1 through 3 Primitives}, and @ref{Operation Class 4 Primitives}.
@@ -1471,7 +1464,7 @@ Indicates the maximum size (in decimal digits) of the protocol options.
 @item TIDU_size
 Indicates the maximum amount of TC user data that may be present in a single @prim{TC_CONT_REQ}
 primitive.  This is the size fo the transaction protocol interface data unit, and should not exceed
-the tunable system limit, if non-zero, for the size of a @dfn{STREAMS} message.
+the tunable system limit, if non-zero, for the size of a @acronym{STREAMS} message.
 
 @item SERV_type
 Indicates the service type supported by the TC provider, and is a bitwise OR of zero or more of the

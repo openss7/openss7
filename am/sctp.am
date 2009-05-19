@@ -85,7 +85,7 @@ STRIP_KERNEL_MODULES		= $(STRIP) --strip-debug -X -x
 # just objects.  We set kernel module stripping as above.
 ##
 install-modules: $(KERNEL_MODULES)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
@@ -152,12 +152,12 @@ INSTALL_EXEC_LOCAL	+= install-modules
 # installing the source package under rpm.
 ##
 post-modules:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -f "$$conf_fil" ; then \
 		if test -e "$$k/net/sctp/sctp.o$$kext" ; then \
-			mv -f "$$k/net/sctp/sctp.o$$kext" "$$k/net/sctp/sctp_deprecated.o$$kext" ; \
+			$(am__mv) "$$k/net/sctp/sctp.o$$kext" "$$k/net/sctp/sctp_deprecated.o$$kext" ; \
 		fi ; \
 		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
 			s="$$r$(ksysmap)" ; \
@@ -174,7 +174,7 @@ post-modules:
 			list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 				f=`basename $$p .o` ; \
 				sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
-				mv -f $$prel_tmp $$prel_new ; \
+				$(am__mv) $$prel_tmp $$prel_new ; \
 				$(ECHO) "$$f" >> $$prel_new ; \
 			done ; \
 			chmod --reference=$$prel_fil $$prel_new ; \
@@ -184,7 +184,7 @@ post-modules:
 	fi
 
 post-source:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@u='$(DESTDIR)$(rootdir)/usr/src' ; \
 	if test -d $$u ; then \
 		p="$$u/$(PACKAGE_TARNAME)" ; \
@@ -210,7 +210,7 @@ POST_INSTALL_AM		+= post-modules post-source
 # possibly the directory that they are in).
 ##
 uninstall-modules:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
@@ -251,7 +251,7 @@ UNINSTALL_LOCAL		+= uninstall-modules
 # under rpm.
 ##
 postun-modules:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; conf_fil="$$r/etc/modules.conf" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	if test -f "$$conf_fil" ; then \
@@ -261,7 +261,7 @@ postun-modules:
 		done ; \
 		if test ":$$l" = :yes ; then \
 			if test -e "$$k/net/sctp/sctp_deprecated.o$$kext" ; then \
-				mv -f "$$k/net/sctp/sctp_deprecated.o$$kext" "$$k/net/sctp/sctp.o$$kext" ; \
+				$(am__mv) "$$k/net/sctp/sctp_deprecated.o$$kext" "$$k/net/sctp/sctp.o$$kext" ; \
 			fi ; \
 			prel_fil="$$r/etc/modules" ; \
 			if test -n "$(KERNEL_PRELOADS)" -a -f "$$prel_fil" ; then \
@@ -271,7 +271,7 @@ postun-modules:
 				list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 					f=`basename $$p .o` ; \
 					sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
-					mv -f $$prel_tmp $$prel_new ; \
+					$(am__mv) $$prel_tmp $$prel_new ; \
 				done ; \
 				chmod --reference=$$prel_fil $$prel_new ; \
 				cp -fb --suffix=$$ext.bak $$prel_new $$prel_fil ; \
@@ -288,7 +288,7 @@ postun-modules:
 	fi
 
 postun-source:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	rm -f -- "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)"
 
 ##

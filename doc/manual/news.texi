@@ -105,6 +105,9 @@ Major features since the last public release are:
 
 @itemize -
 @item
+Updated to @file{automake-1.11}.
+
+@item
 Deprecated sub-packages have been excluded from the master package release.  The excluded
 sub-packages are:
 

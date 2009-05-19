@@ -51,6 +51,8 @@
 #
 # =============================================================================
 
+ACLOCAL_AMFLAGS = -I m4
+
 ##
 ## General rules
 ##
@@ -134,7 +136,8 @@ $(libOS7specfs_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER)
 
 specfs.o: stamp-verobjs
 	@list=`$(ECHO) " $(libOS7specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(ECHO_Q) "  CCLD  " $@ ; \
+	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
 ## =====================================================================
@@ -166,7 +169,8 @@ $(libOS7streams_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER
 
 streams.o: stamp-verobjs
 	@list=`$(ECHO) " $(libOS7streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(ECHO_Q) "  CCLD  " $@ ; \
+	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
 ## =====================================================================
@@ -715,7 +719,7 @@ libOS7sctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libOS7sctp_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 
 $(kpre)sctp.o: $(libOS7sctp_a_OBJECTS)
-	$(LD) -r -o $@ $^
+	$(AM_V_CCLD)$(LD) -r -o $@ $^
 
 ## RPM_BUILD_KERNEL
 endif

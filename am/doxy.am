@@ -61,8 +61,8 @@
 
 if HAVE_DOXYGEN
 $(doxydir)/html/index.html: $(DOXY_CONFIG_INPUT) $(PACKAGE).dox scripts/Doxyfile $(srcdir)/scripts/check_version
-	rm -rf $(doxydir)/html
-	$(DOXYGEN) scripts/Doxyfile
+	$(AM_V_GEN)rm -rf $(doxydir)/html
+	$(AM_V_at)$(DOXYGEN) scripts/Doxyfile
 
 doxy-html: $(doxydir)/html/index.html
 else

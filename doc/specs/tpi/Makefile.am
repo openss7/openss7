@@ -62,13 +62,13 @@ if DEVELOPMENT
 info_TEXINFOS		+= tpi.texi tpi_tcap.texi
 
 tpi.h: $(top_srcdir)/src/include/sys/tpi.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 tihdr.h: $(top_srcdir)/src/include/sys/tihdr.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 tiuser.h: $(top_srcdir)/src/include/sys/tiuser.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += tpi.h tihdr.h tiuser.h
 
@@ -80,7 +80,7 @@ tpi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 tpi_tcap.h: $(top_srcdir)/src/include/sys/tpi_tcap.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += tpi_tcap.h
 

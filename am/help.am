@@ -228,7 +228,7 @@ help: ./README-make
 MY_PHONY += help
 
 README-make: Makefile
-	@grep '^#!' Makefile | sed -e 's|^#!||' > $@
+	$(AM_V_GEN)grep '^#!' Makefile | sed -e 's|^#!||' > $@
 
 EXTRA_DIST  += README-make
 CLEANFILES  += README-make
@@ -238,7 +238,7 @@ ALL_LOCAL   += README-make
 # Place configure --help specific instructions in INSTALL-$(PACKAGE)
 ##
 INSTALL-$(PACKAGE): $(top_srcdir)/configure
-	$(top_srcdir)/configure --help=recursive > $@
+	$(AM_V_GEN)$(top_srcdir)/configure --help=recursive > $@
 
 EXTRA_DIST  += INSTALL-$(PACKAGE)
 CLEANFILES  += INSTALL-$(PACKAGE)

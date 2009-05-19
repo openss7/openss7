@@ -247,6 +247,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -300,8 +329,8 @@ as platform and system applicability of the @value{MANUAL_TITLE}.
 @subsection Purpose
 @cpindex STREAMS
 
-The objective of this manual is to provide a porting guide for the @dfn{STREAMS} and @dfn{X.25}
-programmer when porting @dfn{STREAMS} drivers, modules and applications to
+The objective of this manual is to provide a porting guide for the @acronym{STREAMS} and @dfn{X.25}
+programmer when porting @acronym{STREAMS} drivers, modules and applications to
 @cite{@value{PACKAGE_TITLE}} from other major implementations of @dfn{X.25}, such as @cite{AIX},
 @cite{AIXlink/X.25}, @cite{Digital UNIX}, @cite{HP-UX}, @cite{IRIX}, @cite{OSF}, @cite{PowerMAX},
 @cite{Solaris}, @cite{Solstice X.25}, @cite{SVR4.2}, @cite{Tru64 UNIX}, @cite{UnixWare}, and others.
@@ -312,7 +341,7 @@ drivers and those of these other systems.
 
 @subsection Intent
 
-The intent of this manual is to act as a guide to porting @dfn{X.25} @dfn{STREAMS} modules, drivers
+The intent of this manual is to act as a guide to porting @dfn{X.25} @acronym{STREAMS} modules, drivers
 and applications programs from other @dfn{UNIX} implementations of @dfn{X.25} to @cite{Linux
 Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS
 (LfS) Reference Manual}.}.  It is intended to be read alone and is not intended to replace or
@@ -329,15 +358,15 @@ This manual is intended for a highly technical audience.  The reader should alre
 devices, driver input and output, interrupts, software interrupt handling, scheduling, process
 contexts, multiprocessor locks, thread programming, POSIX porgramming, etc.
 
-This guide is intended for network and systems programmers, who use the @dfn{STREAMS} and @dfn{X.25}
+This guide is intended for network and systems programmers, who use the @acronym{STREAMS} and @dfn{X.25}
 mechanism at user and kernel levels for @cite{Linux} and @cite{UNIX} system communications services.
 Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
 system, programming, networking, and data communication.
 
 To derive maximum use from this porting guide, it is intended that the reader also be familiar with
-the user of @dfn{STREAMS} and @dfn{X.25} under @cite{UNIX} and @cite{POSIX} systems implementing
+the user of @acronym{STREAMS} and @dfn{X.25} under @cite{UNIX} and @cite{POSIX} systems implementing
 @dfn{X.25} drivers and applications libraries.  The reader should certainly be familiar with the
-@dfn{X.25} implementations on the @cite{UNIX} or @cite{POSIX} system from which @dfn{STREAMS}
+@dfn{X.25} implementations on the @cite{UNIX} or @cite{POSIX} system from which @acronym{STREAMS}
 drivers, modules or applications are being ported.
 
 @section Revision History
@@ -366,23 +395,6 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.6  2009-05-01 04:50:49  brian
-- update documentation for release
-
-Revision 0.9.2.5  2009-04-30 06:07:43  brian
-- more documentation updates for release
-
-Revision 0.9.2.4  2008-11-26 12:01:49  brian
-- updated to FDL 1.3
-
-Revision 0.9.2.3  2008-09-20 11:04:41  brian
-- added package patchlevel
-
-Revision 0.9.2.2  2008-08-03 06:03:41  brian
-- protected agains texinfo commands in log entries
-
-Revision 0.9.2.1  2008-06-13 06:43:55  brian
-- added files
 @end verbatim
 @end smallexample
 
@@ -426,7 +438,7 @@ to the FAR (or any successor regulations).
 @cpindex STREAMS
 @cindex introduction
 
-This guide documents the porting of @dfn{X.25} @dfn{STREAMS} modules, drivers
+This guide documents the porting of @dfn{X.25} @acronym{STREAMS} modules, drivers
 and applications programs from various @dfn{UNIX} implementations to @cite{Linux
 Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
 STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
@@ -453,7 +465,7 @@ Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
 STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
 
 @noindent
-In addition, it provides documentation on @dfn{STREAMS} drivers and modules for
+In addition, it provides documentation on @acronym{STREAMS} drivers and modules for
 @dfn{X.25} including:
 
 @itemize
@@ -490,7 +502,7 @@ This manual uses @cite{texinfo} typographic conventions.
 * Porting Organization::
 @end menu
 
-This guide is largely focused on porting @dfn{STREAMS} drivers, modules and
+This guide is largely focused on porting @acronym{STREAMS} drivers, modules and
 applications programs that act in the capacity of an X.25 User.  Whereas other
 documents tend to focus on simply porting drivers for specific interface cards,
 that topic is adequately addressed elsewhere for the @cite{Linux} kernel.
@@ -498,7 +510,7 @@ Whenever a network device driver has been written for a device under
 @cite{Linux}, using @cite{Linux} paradigms and procedures, it can automatically
 work with @dfn{X.25}.  Therefore, this guide focusses on the differences between
 the @dfn{X.25} interfaces that would be experienced by the X.25 User:
-@dfn{STREAMS} modules that push over X.25 Streams; @dfn{STREAMS} drivers under
+@acronym{STREAMS} modules that push over X.25 Streams; @acronym{STREAMS} drivers under
 which X.25 Streams are linked; and applications programs that access the X.25
 interface directly as a user-space program.
 
@@ -506,7 +518,7 @@ interface directly as a user-space program.
 @cite{@value{PACKAGE_TITLE}}, ship with a wide assortment of manual pages.  Most
 manual pages contain a section entitled ``@cite{COMPATIBILITY}'' that provides
 compatibility and porting information for various mainstream @cite{UNIX}
-implementations.  For information on the minor differences in the @dfn{STREAMS}
+implementations.  For information on the minor differences in the @acronym{STREAMS}
 environment, see the @cite{Linux Fast-STREAMS} package,
 @command{streams-@value{VERSION_STREAMS}}.
 
@@ -522,7 +534,7 @@ manual pages of supported functions, primitives and structures provide
 compatibilty and porting information, this document attempts to gather together
 pertinent information concerning porting @dfn{X.25} modules, drivers and
 applications programs from various @dfn{UNIX} operating systems supporting
-@dfn{STREAMS} and @dfn{X.25} to @cite{@value{PACKAGE_TITLE}}.
+@acronym{STREAMS} and @dfn{X.25} to @cite{@value{PACKAGE_TITLE}}.
 
 Where there is discrepencies between this documentation and the manual pages
 that ship with the package, the manual pages are controlling.  This is because
@@ -621,7 +633,7 @@ Porting information is organized into sections as follows:
 @section Interfaces
 @anchor{Interfaces}
 
-There are four (4) @dfn{STREAMS} service primitive interfaces normally provided
+There are four (4) @acronym{STREAMS} service primitive interfaces normally provided
 by the X.25 implementations.  These are:
 
 @table @cite

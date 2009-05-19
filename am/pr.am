@@ -91,10 +91,10 @@ send-pr:
 	$(AP_AUTOPR) --config=$(AP_CONFIG) --file="problem.pr"
 
 clean-send-pr:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 distclean-send-pr:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list='$(LOGGING_TARGETS)' ; for t in $$list ; do \
 		p=`echo $$t | sed -e 's|\.log$$|.pr|'` ; \
 		$(ECHO) "rm -f -- $$p" ; \
@@ -104,7 +104,7 @@ distclean-send-pr:
 	rm -f -- problem.pr
 
 maintainer-clean-send-pr:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 CLEAN_LOCAL		+= clean-send-pr
 DISTCLEAN_LOCAL		+= distclean-send-pr

@@ -238,6 +238,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -424,47 +453,13 @@ updates.  To ensure that you are working with a current version, contact the
 @uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
 Project} website for a current version.
 
-@ignore
 @subsubsection Version Control
 
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.11  2009-05-01 04:50:25  brian
-- update documentation for release
-
-Revision 0.9.2.10  2008-11-26 12:01:29  brian
-- updated to FDL 1.3
-
-Revision 0.9.2.9  2008-09-20 11:04:25  brian
-- added package patchlevel
-
-Revision 0.9.2.8  2008-08-03 06:03:28  brian
-- protected agains texinfo commands in log entries
-
-Revision 0.9.2.7  2008-04-29 01:52:18  brian
-- updated headers for release
-
-Revision 0.9.2.6  2008-04-25 11:50:45  brian
-- updates to AGPLv3
-
-Revision 0.9.2.5  2008-04-11 16:58:25  brian
-- removed deprecated NEXUSWARE support
-
-Revision 0.9.2.4  2007/08/14 08:33:45  brian
-- GPLv3 header update
-
-Revision 0.9.2.3  2007/06/28 07:49:03  brian
-- doc updates
-
-Revision 0.9.2.2  2007/06/28 01:17:05  brian
-- added more documentation files
-
-Revision 0.9.2.1  2007/06/26 18:08:59  brian
-- added new doc files
 @end verbatim
 @end smallexample
-@end ignore
 
 @subsubsection ISO 9000 Compliance
 
@@ -830,13 +825,13 @@ signalling bearer.  This case is illustrated in @figref{1} below.
 @figure{hlrtest,1,HLR Implementation for Testing}
 
 The High Performance GSM/UMTS GPRS HLR is built using the OpenSS7 SS7 and SIGTRAN stacks and
-associated utilities.  This project provides an additional 3GPP TS 24.060 GPRS HLR @dfn{STREAMS}
-SS7 Stack component and 3GPP TS 29.002 Mobile Application Part (MAP) @dfn{STREAMS} SS7 Stack
+associated utilities.  This project provides an additional 3GPP TS 24.060 GPRS HLR @acronym{STREAMS}
+SS7 Stack component and 3GPP TS 29.002 Mobile Application Part (MAP) @acronym{STREAMS} SS7 Stack
 component that provides the core capabilities of the HLR.
 
 This HLR capability consists of a number of components:
 @enumerate
-@item A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 TCAP protocol component,
+@item A kernel resident @acronym{STREAMS} module that sits above the OpenSS7 TCAP protocol component,
 accept TCAP queries and provide conversations and responses.  This component contains the 3GPP TS
 29.002 message encoder and decoders and mapping to and from the TC interface
 @footnote{OpenSS7 implements the Q.771 TC interface with the Transaction Component Interface.
@@ -847,7 +842,7 @@ providing 3GPP TS 29.002 defined primitives.
 @footnote{OpenSS7 implements the 3GPP TS 29.002 MAP interface with the Mobile Application Part
 Interface.  @xref{Introduction,,,mapi,Mobile Application Part Interface Specification}.  See also
 @uref{http://www.openss7.org/man/man2html/7+mapi, @b{mapi}(8)}.}
-@item A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 MAP protocol component.
+@item A kernel resident @acronym{STREAMS} module that sits above the OpenSS7 MAP protocol component.
 This component exchanges 3GPP TS 29.002 MAP primitives with the module beneath and implements the
 3GPP TS 24.060 Release 4 state machines for a GPRS HLR.  This module also provides rule-based,
 template, and cached subscriber profile requests.
@@ -1281,14 +1276,14 @@ forward), including operation classes 1 through 5.  The TCAP driver provides a s
 interface to its users and accepts an X/Open NPI Revision 2.0 interface from beneath.  In addition, a
 TPI Revision 2.0 user interface supporting an X/Open XNS 5.2 mOSI XTI library interface is provided.
 
-The TCAP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The TCAP driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 The primary scale limiting characteristic of the TCAP driver is the number of simultaneous open
 transactions.  Each open transaction requires a number of timers, state information and dynamic
 transaction information such as addressing.  Transaction Identifier indexed hash tables must be
 appropriately sized and the mean and maximum simultaneous open transactions should be known for
 proper sizing.
 
-The Transaction Capabilities Application Part (TCAP) @dfn{STREAMS} module is responsible for
+The Transaction Capabilities Application Part (TCAP) @acronym{STREAMS} module is responsible for
 providing TCAP services on top of a Signalling Connection Control Part (SCCP) or SCCP-User
 Adaptation Layer (SUA) stream.  In addition, it is possible to use an ISO/OSI Network Service
 Provider to provide the network services to TCAP.
@@ -1307,13 +1302,13 @@ The OpenSS7 TCAP module supports all Operations Classes.
 
 @figuresized{tcap,15,Transaction Capabilities Application Part (TCAP) Modules,3in}
 
-A SIGTRAN TCAP-User Adaptation  Layer (TUA) or OpenSS7 @dfn{STREAMS} over
+A SIGTRAN TCAP-User Adaptation  Layer (TUA) or OpenSS7 @acronym{STREAMS} over
 @cindex SCTP
 SCTP multiplexing driver can be used between the TCAP and the TCAP-User to export the TCAP/TCAP-User
 interface between a provider and user host.
 
 Signalling Connection Control Part (SCCP) streams are linked beneath the TCAP module to provide SCCP
-services to TCAP.  Alternately, a SIGTRAN SCCP-User Adaptation Layer (SUA) or OpenSS7 @dfn{STREAMS}
+services to TCAP.  Alternately, a SIGTRAN SCCP-User Adaptation Layer (SUA) or OpenSS7 @acronym{STREAMS}
 over
 @cindex SCTP
 SCTP stream may be linked.
@@ -1351,12 +1346,12 @@ provided.
 
 The SCCP driver also provide GTT streams for servicing Global Title Translations requests.  These
 streams can be used by a user-space program for servicing GTT requests from a local or remote
-database, or can have specialized @dfn{STREAMS} modules pushed to perform rule-based GTT in the
+database, or can have specialized @acronym{STREAMS} modules pushed to perform rule-based GTT in the
 operating system kernel.
 
-The SCCP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The SCCP driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
-The Signalling Connection Control Part (SCCP) @dfn{STREAMS} module is responsible for providing SCCP
+The Signalling Connection Control Part (SCCP) @acronym{STREAMS} module is responsible for providing SCCP
 services on top of a Message Transfer Part (MTP) Level 3 (MTP3) or MTP3-User Adaptation Layer (M3UA)
 @cindex M3UA
 stream.  In addition, it is possible to use an ISO/OSI connectionless Network Service Provider to
@@ -1444,7 +1439,7 @@ forward), including full transfer function.  The MTP driver provides a specializ
 its users, in addition to an NPI Revision 2.0 connectionless interface.  A TPI Revision 2.0
 (connectionless) user interface support X/Open XNS 5.2 XTI library functions is also provided.
 
-The MTP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The MTP driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
 The Message Transfer Part (MTP) Level 3 (MTP3) module is responsible for providing MTP services to
 its users.
@@ -1479,7 +1474,7 @@ SCTP driver streams underneath it to provide the transport
 services for exporting the MTP-User interface.  The M3UA driver provides the same interface to its
 users as the OpenSS7 MTP.
 
-The M3UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The M3UA driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
 This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
 @ifinfo
@@ -1508,7 +1503,7 @@ Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
 The SL module provides a specialized SL interface to its users, in addition to an NCR Comten CDI
 Revision 2.0 Style 2 connectionless interface.
 
-The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+The SL module is a @acronym{STREAMS} module that runs in the Linux kernel for maximum performance.
 
 The Signalling Link (SL) module is responsible for providing SL services to its users.
 
@@ -1560,8 +1555,8 @@ components.
 @cindex Stream Control Transmission Protocol (SCTP) Driver
 @cindex SCTP
 
-OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
-transport protocol and provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS} SCTP
+OpenSS7 has two implementations (@acronym{STREAMS} and Linux Sockets) that provide support for this new
+transport protocol and provide transport for SIGTRAN and other protocols.  The @acronym{STREAMS} SCTP
 implementation provides an NPI Revision 2.0 and TPI Revision 2.0 interface to its users.  Also
 supported is an X/Open XNS 5.2 XTI library.  The Linux Native SCTP implementation provides a Sockets
 interface.
@@ -1581,7 +1576,7 @@ components.
 @cindex Software architecture
 
 This chapter details the software configuration of OpenSS7 solutions.  Open SS7 stack software is
-based on the @dfn{STREAMS} facility running on the Linux Operating System.  The provides for use of
+based on the @acronym{STREAMS} facility running on the Linux Operating System.  The provides for use of
 the Linux Operating System while maintaining portability and consistency with major UNIX operating
 systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
@@ -1595,7 +1590,7 @@ systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 @section Linux Operating System
 @cindex Linux operating system
 
-The OpenSS7 @dfn{STREAMS} releases and stacks currently support the 2.4 Linux Kernel.  A Linux
+The OpenSS7 @acronym{STREAMS} releases and stacks currently support the 2.4 Linux Kernel.  A Linux
 kernel version greater than or equal to 2.4.18 is recommended.  The Linux 2.5 and 2.6 kernel series
 are not yet supported.  The Linux 2.5 series will likely not ever be supported.  Linux 2.6 kernel
 series will be supported once the kernel releases stabilize.  Linux 2.4 kernels released by popular
@@ -1608,7 +1603,7 @@ with all updates applied.
 @cindex SuSE
 @cindex Fedora
 
-Although OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+Although OpenSS7 @acronym{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
 stacks compile and install on PPC (MPC 8260), HPPA, and other processor architectures supported by
 the Linux 2.4 kernel.
 
@@ -1616,21 +1611,21 @@ the Linux 2.4 kernel.
 @section STREAMS Facility
 @cindex STREAMS facility
 
-OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize an @dfn{SVR 4.2 ES/MP STREAMS} facility.
+OpenSS7 @acronym{STREAMS} SS7 and SIGTRAN stacks utilize an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
 @node OpenSS7 SS7 and SIGTRAN Stack
 @section OpenSS7 SS7 and SIGTRAN Stack
 @cindex OpenSS7 SS7 and SIGTRAN stack
 
-The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facility.  Protocol
-modules within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
-drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
-multiplexing drivers above a real or pseudo-device driver using @dfn{STREAMS} I_PUSH and I_LINK
+The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @acronym{STREAMS} facility.  Protocol
+modules within the stack are implemented as @acronym{STREAMS} modules, device drivers, multiplexing
+drivers and pseudo-device drivers.  The @acronym{STREAMS} facility has the ability to stack modules and
+multiplexing drivers above a real or pseudo-device driver using @acronym{STREAMS} I_PUSH and I_LINK
 facilities.  As STEAMS modules (and drivers) run within the context of the Operating System Kernel
 using message-based scheduling, greatly increased performance is experienced over equivalent
-user-space applications.  @dfn{STREAMS} modules and drivers communicate by passing @dfn{STREAMS}
+user-space applications.  @acronym{STREAMS} modules and drivers communicate by passing @acronym{STREAMS}
 message blocks upstream and downstream with bidirectional queueing and 256 levels of priority.  In
-addition, @dfn{STREAMS} provides memory management, timer, locking, synchronization, flow control
+addition, @acronym{STREAMS} provides memory management, timer, locking, synchronization, flow control
 and other facilities commonly used by protocol modules.
 
 @figuresized{osimap,21,SS7 to ISO/OSI Mapping,3.5in}
@@ -1641,7 +1636,7 @@ with support for the OpenSS7 XTI/TLI Library.
 
 @figuresized{stack,22,STREAMS SS7/SIGTRAN Stack Architecture,3in}
 
-@figref{22} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
+@figref{22} illustrates the organization of @acronym{STREAMS} modules, multiplexing drivers,
 pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
 equivalent SIGTRAN User Adaptation Layer (UA) can be used.  So, for example, between MTP Level 3 and
 its Users, the M3UA
@@ -2522,7 +2517,7 @@ SCTP driver streams underneath it to provide the
 transport services for exporting the SCCP-User interface.  The SUA driver provides the same
 interfaces to its users as the OpenSS7 SCCP.
 
-The SUA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The SUA driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
 @node MTP Level 3 Broadband (MTP3b) Module
 @subsection MTP Level 3 Broadband (MTP3b) Module
@@ -2591,7 +2586,7 @@ OpenSS7 components and applications support the following additional Linux Distr
 
 @dfn{Linux Fast-STREAMS (LfS)} is a dual licensed original work of OpenSS7 Corporation.  It was
 designed an implemented as a directly replacement for inferior implementations for use with
-OpenSS7 stack releases.  This complete reimplementation of an SVR 4.2 ES/MP compatible @dfn{STREAMS}
+OpenSS7 stack releases.  This complete reimplementation of an SVR 4.2 ES/MP compatible @acronym{STREAMS}
 facility exhibits simplified debugging and management, greatly increased performance, smaller memory
 footprint, wider compatibility.  Production releases of @dfn{Linux Fast-STREAMS} are
 currently available.
@@ -2796,7 +2791,7 @@ to define service interfaces to map to strategic levels of the Signalling System
 model.  These service interfaces hide implementation details of a particular service from the
 consumer of the service.  This enables system programmers to develop software independent of the
 particular protocol that provides a specific service.  The interfaces being specified for UNIX
-System V are defined within the @dfn{STREAMS} environment.  This document specifies a kernel-level
+System V are defined within the @acronym{STREAMS} environment.  This document specifies a kernel-level
 interface that supports the services of the Transaction Capabilities Application Part for Operation
 Class 1, 2, 3 and 4 services.
 
@@ -2813,8 +2808,8 @@ This specification applies to @dfn{System V Release 4.2 ES/MP STREAMS}.
 @end menu
 
 The transaction component interface defines a message interface to a transaction provider
-implemented under @dfn{STREAMS}.  @footnote{It is assumed that the reader of this document is familiar
-with the concept @dfn{STREAMS}.} A user communicates to a transport provider via a full duplex path
+implemented under @acronym{STREAMS}.  @footnote{It is assumed that the reader of this document is familiar
+with the concept @acronym{STREAMS}.} A user communicates to a transport provider via a full duplex path
 known as a @emph{stream} (see @emph{Figure F-1}).  This @emph{stream} provides a mechanism in which
 messages may be passed to the transaction provider from the transaction user and visa versa.
 
@@ -2822,7 +2817,7 @@ messages may be passed to the transaction provider from the transaction user and
 @center @emph{Figure F-1 - Example of a stream from a user to a transaction provider}
 @end cartouche
 
-The @dfn{STREAMS} messages that are used to communicate transaction service primitives between the
+The @acronym{STREAMS} messages that are used to communicate transaction service primitives between the
 transaction user and the transaction provider may have one of the following formats:
 
 @enumerate
@@ -2866,7 +2861,7 @@ struct TC_info_req @{
 @cindex TC Interface Local Management Primitives
 
 The following local management primitives provide local management functions within the
-@dfn{STREAMS} environment that are not standardized (implementation dependent).  Some of the
+@acronym{STREAMS} environment that are not standardized (implementation dependent).  Some of the
 functions are informatively described in ITU-T Recommendation Q.771.
 
 Local Management primitives:

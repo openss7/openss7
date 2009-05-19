@@ -82,70 +82,80 @@ man9_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\
 
 $(man_MANS):: %: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man_SED_SCRIPT) > $@ ;
 
 $(man1_MANS):: %.1: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man1_SED_SCRIPT) > $@ ;
 
 $(man2_MANS):: %.2: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man2_SED_SCRIPT) > $@ ;
 
 $(man3_MANS):: %.3: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man3_SED_SCRIPT) > $@ ;
 
 $(man4_MANS):: %.4: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man4_SED_SCRIPT) > $@ ;
 
 $(man5_MANS):: %.5: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man5_SED_SCRIPT) > $@ ;
 
 $(man6_MANS):: %.6: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man6_SED_SCRIPT) > $@ ;
 
 $(man7_MANS):: %.7: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man7_SED_SCRIPT) > $@ ;
 
 $(man8_MANS):: %.8: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man8_SED_SCRIPT) > $@ ;
 
 $(man9_MANS):: %.9: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
 	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man9_SED_SCRIPT) > $@ ;
 
 all-manmacros:
 
 install-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 uninstall-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 clean-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 distclean-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 maintainer-clean-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ## COOKED_MANPAGES
 else
@@ -164,52 +174,62 @@ man9_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.
 
 $(man_MANS): %: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man_SED_SCRIPT) > $@ ;
 
 $(man1_MANS): %.1: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man1_SED_SCRIPT) > $@ ;
 
 $(man2_MANS): %.2: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man2_SED_SCRIPT) > $@ ;
 
 $(man3_MANS): %.3: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man3_SED_SCRIPT) > $@ ;
 
 $(man4_MANS): %.4: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man4_SED_SCRIPT) > $@ ;
 
 $(man5_MANS): %.5: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man5_SED_SCRIPT) > $@ ;
 
 $(man6_MANS): %.6: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man6_SED_SCRIPT) > $@ ;
 
 $(man7_MANS): %.7: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man7_SED_SCRIPT) > $@ ;
 
 $(man8_MANS): %.8: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man8_SED_SCRIPT) > $@ ;
 
 $(man9_MANS): %.9: %.man
 	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
-	$(ECHO) "converting manpage $< to $@" ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "converting manpage $< to $@" ; \
 	cat $< | sed -e $(man9_SED_SCRIPT) > $@ ;
 
 ##
@@ -219,7 +239,8 @@ $(man9_MANS): %.9: %.man
 all-manmacros:
 	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
 		if test ! -e $$macro -o $(srcdir)/$$macro -nt $$macro ; then \
-			$(ECHO) "cat $(srcdir)/$$macro | sed -e '\$$(MAN_SUBST_STRING)' > $$macro" ; \
+			$(ECHO_Q) "  GEN   " $$macro ; \
+			$(ECHO_V) "cat $(srcdir)/$$macro | sed -e '\$$(MAN_SUBST_STRING)' > $$macro" ; \
 			cat $(srcdir)/$$macro | sed -e '$(MAN_SUBST_STRING)' > $$macro ; \
 		fi ; \
 	done
@@ -229,7 +250,7 @@ all-manmacros:
 # file in the mandir to be referenced by the uncooked manual pages.
 ##
 install-manmacros: $(man_MACROS)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(mandir)
 	@list="$(man_MACROS)" ; for f in $$list ; do \
@@ -239,7 +260,7 @@ install-manmacros: $(man_MACROS)
 	done
 
 uninstall-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
@@ -250,7 +271,7 @@ uninstall-manmacros:
 # the srcdir and the builddir are different before removing.
 ##
 clean-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test "`(cd $(srcdir); pwd)`" != "`pwd`" ; then \
 		macros='$(man_MACROS)' ; for macro in $$macros ; do \
 			$(ECHO) "rm -f -- $$macro" ;  \
@@ -259,10 +280,10 @@ clean-manmacros:
 	fi
 
 distclean-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 maintainer-clean-manmacros:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ## ! COOKED_MANPAGES
 endif
@@ -274,16 +295,16 @@ all-manpages: $(man_MANS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) \
 # This is handled by automake.
 ##
 install-manpages: install-man
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ##
 # This is handled by automake.
 ##
 uninstall-manpages: uninstall-man
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 clean-manpages:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(man_MANS)" ; for f in $$list ; do \
 		$(ECHO) "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
@@ -326,10 +347,10 @@ clean-manpages:
 	done
 
 distclean-manpages:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 maintainer-clean-manpages:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ALL_LOCAL		+= all-manmacros all-manpages
 
@@ -365,61 +386,71 @@ post-manpages:
 			if test -n "$$COMPRESS" -a -x "$$COMPRESS" ; then \
 				list="$(man_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man1_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man1/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man2_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man2/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man3_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man3/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man4_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man4/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man5_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man5/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man6_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man6/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man7_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man7/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man8_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man8/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man9_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man9/$$f ; then \
-						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
+						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
 					fi ; \
 				done ; \
@@ -427,11 +458,12 @@ post-manpages:
 		fi ; \
 	done ; \
 	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		$(ECHO_Q) "  GEN   " makewhatis ; \
 		if test -n '$(mandir)' ; then \
-			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			$(ECHO_V) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
 			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$?; \
 		else \
-			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			$(ECHO_V) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
 			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$?; \
 		fi ; \
 		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
@@ -538,11 +570,12 @@ else
 
 post-manpages:
 	@if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		$(ECHO_Q) "  GEN   " makewhatis ; \
 		if test -n "$(mandir)" ; then \
-			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			$(ECHO_V) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
 			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$? ; \
 		else \
-			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			$(ECHO_V) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
 			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
 		fi ; \
 		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \

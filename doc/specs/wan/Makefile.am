@@ -62,10 +62,10 @@ if DEVELOPMENT
 info_TEXINFOS		+= wan.texi
 
 wan_control.h: $(top_srcdir)/src/include/sys/snet/wan_control.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 wan_proto.h: $(top_srcdir)/src/include/sys/snet/wan_proto.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += wan_control.h wan_proto.h
 

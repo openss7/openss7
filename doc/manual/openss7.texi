@@ -768,8 +768,8 @@ The last subpackage release was
 @item strcompat-@value{VERSION_STRCOMPAT}
 All @cite{STREAMS Compatibility Module} components have been incorporated into
 the @file{openss7-@value{VERSION}} release with the exception of the
-deprecated compatibility modules, which have been discarded.  All @cite{STREAMS}
-compatibility modules now load as part of the @cite{STREAMS} base subsystem.
+deprecated compatibility modules, which have been discarded.  All @acronym{STREAMS}
+compatibility modules now load as part of the @acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strcompat-@value{VERSION_STRCOMPAT}}.
 
@@ -782,8 +782,8 @@ The last subpackage release was
 @item strtty-@value{VERSION_STRTTY}
 All @cite{STREAMS Terminal Subsystem} pseudo-device drivers, modules, library
 functions utilities and documentation have been incorporated into the
-@file{openss7-@value{VERSION}} release.  All @cite{STREAMS} terminal modules now
-load as part of the @cite{STREAMS} base subsystem.
+@file{openss7-@value{VERSION}} release.  All @acronym{STREAMS} terminal modules now
+load as part of the @acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strtty-@value{VERSION_STRTTY}}.
 
@@ -792,39 +792,39 @@ All @cite{STREAMS X/Open Network Services} pseudo-device drivers, modules,
 library functions utilities, head files, and documentation have been
 incorporated into the @file{openss7-@value{VERSION}} release.  All @acronym{IP},
 @acronym{UDP}, @acronym{TCP}, @acronym{SCTP}, and Ethernet networking device
-drivers now load as part of the @cite{STREAMS} base subsystem.
+drivers now load as part of the @acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strxns-@value{VERSION_STRXNS}}.
 
 @item strxnet-@value{VERSION_STRXNET}
 All @cite{STREAMS X/Open Transport Interface} libraries (@manref{libxnet(3)})
-and coordinating @cite{STREAMS} modules, including @manref{timod(4)} and
+and coordinating @acronym{STREAMS} modules, including @manref{timod(4)} and
 @manref{tirdwr(4)} have been incorporated into the
 @file{openss7-@value{VERSION}} release.  All @cite{XTI} modules now load as part
-of the @cite{STREAMS} base subsystem.
+of the @acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strxnet-@value{VERSION_STRXNET}}.
 
 @item strsock-@value{VERSION_STRSOCK}
 All @cite{STREAMS Sockets} libraries (@manref{libsocket(3)},
-@manref{libsockmod(3)}) and coordinating @cite{STREAMS} drivers and modules
+@manref{libsockmod(3)}) and coordinating @acronym{STREAMS} drivers and modules
 (@manref{sockmod(4)}, @manref{socksys(4)}) have been incorporated into the
 @file{openss7-@value{VERSION}} release.  All modules now load as part of the
-@cite{STREAMS} base subsystem.
+@acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strsock-@value{VERSION_STRSOCK}}.
 
 @item strinet-@value{VERSION_STRINET}
 The @cite{OpenSS7 STREAMS INET} driver (@manref{inet(4)}) has been incorporated
 into the @file{openss7-@value{VERSION}} package and now loads as part of the
-@cite{STREAMS} base subsystem.
+@acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strinet-@value{VERSION_STRINET}}.
 
 @item strsctp-@value{VERSION_STRSCTP}
 The @cite{OpenSS7 STREAMS SCTP} driver (@manref{sctp(4)}) has been incorporated
 into the @file{openss7-@value{VERSION}} package and now loads as part of the
-@cite{STREAMS} base subsystem.
+@acronym{STREAMS} base subsystem.
 The last subpackage release was
 @command{strsctp-@value{VERSION_STRSCTP}}.
 
@@ -903,7 +903,7 @@ the OpenSS7 Project website.
 @item sctp-@value{VERSION_SCTP}
 The @file{sctp} subpackage contained an older Linux Native Sockets
 implementation of SCTP that only worked with 2.4 kernels.  It is deprecated.
-The @file{strsctp} @cite{STREAMS} implementation is far superior in performance
+The @file{strsctp} @acronym{STREAMS} implementation is far superior in performance
 and compatibility and has been preferred for a number of years.
 The final release was
 @command{sctp-@value{VERSION_SCTP}}.
@@ -998,7 +998,7 @@ Following is a list of major components contained in the @dfn{@value{PACKAGE_TIT
 @section Drivers
 @cindex drivers
 
-The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} drivers:
+The @cite{@value{PACKAGE_TITLE}} package provides the following @acronym{STREAMS} drivers:
 
 @table @asis
 
@@ -1014,7 +1014,7 @@ Contains the @manpage{atm(4)} driver.
 @section Modules
 @cindex modules
 
-The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} modules:
+The @cite{@value{PACKAGE_TITLE}} package provides the following @acronym{STREAMS} modules:
 
 @table @asis
 
@@ -1148,7 +1148,7 @@ Reports}.
 
 @cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static
 libraries, manual pages and documentation necessary for the development of both user space
-applications programs and kernel space @dfn{STREAMS} modules and drivers based on the package.
+applications programs and kernel space @acronym{STREAMS} modules and drivers based on the package.
 The sections that follow describe these development facilities.
 
 @menu
@@ -1305,14 +1305,14 @@ and TCAP.
 
 @subsection Kernel Space Drivers and Modules
 
-Typical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+Typical include files for writing @acronym{STREAMS} module and drivers implementing transport providers
 in kernels space include @cite{xti.h} and @cite{xti_sctp.h}.  The header files provide access to
-definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
+definitions for the TPI interface and additional XTI definitions for use by @acronym{STREAMS} drivers
 and modules.  Additional header files for interacting with specific drivers or modules may also be
 required.
 
-Aside from including this header files, the general procedures for compiling @dfn{STREAMS} modules
-and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
+Aside from including this header files, the general procedures for compiling @acronym{STREAMS} modules
+and drivers also apply to @acronym{STREAMS} modules and drivers written to the Transport Provider
 Interface.
 
 @subsubsection STREAMS System Header Files
@@ -1442,7 +1442,7 @@ Link to the @file{/usr/lib/libxnet.a} static library.
 
 @subsubsection STREAMS Library
 
-The compiler or loader argument for use of the @cite{STREAMS} shared object library is
+The compiler or loader argument for use of the @acronym{STREAMS} shared object library is
 @samp{-lstreams}.
 The static version of the library,
 @file{@value{_libdir}/libstreams.a}, may also be linked.
@@ -1616,16 +1616,16 @@ The static version of the library,
 Developing TPI kernel modules is similar to user space programs with regard to header files.
 @file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
 command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
-@dfn{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
+@acronym{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
 should be considered:
 
 @itemize @bullet
 
 @item The @command{gcc} compiler used to compile the kernel modules must be the same version of
-compiler that was used to compile the kernel and @dfn{STREAMS} base package.
+compiler that was used to compile the kernel and @acronym{STREAMS} base package.
 
 @item The @command{gcc} command line must have the same compile flags that were used to compile the
-kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+kernel and @acronym{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
 
 @item The @command{gcc} command line must define several important kernel defines including
 @samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
@@ -1642,7 +1642,7 @@ output of @samp{uname -r}.}
 @node Manual Pages
 @section Manual Pages
 
-To assist in the development of user programs and @cite{STREAMS} driver or modules using the
+To assist in the development of user programs and @acronym{STREAMS} driver or modules using the
 @cite{@value{PACKAGE_TITLE}} protocol module, the following manual pages are provided:
 
 The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
@@ -1656,7 +1656,7 @@ The following manual pages are installed in Section 3 of the manual (in the subd
 
 @end table
 
-To assist in the development of user programs and @cite{STREAMS} driver or modules using the
+To assist in the development of user programs and @acronym{STREAMS} driver or modules using the
 @cite{@value{PACKAGE_TITLE}} protocol module, the following header files are provided:
 
 @table @header
