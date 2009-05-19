@@ -3932,11 +3932,7 @@ Use of the @cite{OpenSS7} softswitch matrix at the lowest level, as illustrated 
 provides a mechanism whereby any communications channel available to the host can be used as an SS7
 link.
 
-Before @cite{Linux Fast-STREAMS}, the @cite{OpenSS7 Project} was using the now deprecated
-@cite{LiS}.  As a result of @cite{LiS}' poor performance (and the relatively powerless CPUs at the
-time), it was not possible to break the SS7 stack at lower levels.  Therefore, drivers such as the
-@manref{x400p-sl(4)} driver implemented the SLI (Signalling Link Interface) directly.  The major
-difficulties experienced with such an integrated driver are as follows:
+The major difficulties experienced with such an integrated driver were as follows:
 
 @itemize @minus
 @item Because the driver is so closely integrated, it is difficult to use the driver for anything

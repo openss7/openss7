@@ -121,23 +121,8 @@ search-ignore T
 .BI "int " retval " = ioctl (int " fd ", int " command " , ... /* " arg " */);"
 .\"
 .\"
-.SH DESCRIPTION
+.SH ARGUMENTS
 .PP
-.I STREAMS
-I/O control commands are ioctl commands that are defined to operate on
-all
-.I STREAMS
-character special devices.  All of these commands are interpreted
-by the stream head.  Some commands are passed to the
-.I STREAMS
-module or driver.
-.PP
-.I STREAMS
-I/O control commands are invoked using the normal
-.BR ioctl (2s)
-system call, but are defined only for
-.I STREAMS
-character special files.
 .TP
 .I fd
 is an open file descriptor for a
@@ -155,6 +140,25 @@ provides additional information required by the particular I/O
 Specific
 .IR command " and " arg
 are described below.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.I STREAMS
+I/O control commands are ioctl commands that are defined to operate on
+all
+.I STREAMS
+character special devices.  All of these commands are interpreted
+by the stream head.  Some commands are passed to the
+.I STREAMS
+module or driver.
+.PP
+.I STREAMS
+I/O control commands are invoked using the normal
+.BR ioctl (2s)
+system call, but are defined only for
+.I STREAMS
+character special files.
 .\"
 .\"
 .SH IOCTLS

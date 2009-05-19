@@ -119,8 +119,6 @@ search-ignore T
 .PD 0
 .HP
 .BI "int qdetach(queue_t *" rq ", int " flags ", cred_t *" crp );
-.\".HP
-.\".BI "lis_qdetach(queue_t *" q ", int " do_close ", int " flag ", cred_t *" credp );
 .PD
 .\"
 .\"

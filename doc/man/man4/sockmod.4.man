@@ -212,14 +212,7 @@ lfs
 .]
 does not require or use the
 .B sockmod
-module.  It was originally provided for
-.I LiS
-.[
-lis
-.]
-that was incapable of providing the socket input-output controls directly from
-the
-.I "Stream head" .
+module.
 .B Linux Fast-STREAMS
 .[
 lfs
@@ -702,25 +695,6 @@ lfs
 .]
 these input-output controls are recognized and processed correctly by the
 .IR "Stream head" .
-.PP
-.I LiS
-.[
-lis
-.]
-does not properly recognize the full set of input-output controls that must be
-recognized and processed by the
-.IR "Stream head" .
-Under
-.I LiS
-.[
-lis
-.]
-.B sockmod
-also recognizes and processes these system controls (to the best of its
-ability, but most of them cannot be set or examined under
-.IR LiS ).
-Never use
-.IR LiS .
 .TP \w'\fBSI_GETINTRANSIT\fR\(em'u
 .B FIOCGPGRP
 Get process group.
@@ -750,24 +724,6 @@ lfs
 .]
 these input-output controls are recognized and processed by the
 .IR "Stream head" .
-.PP
-.I LiS
-.[
-lis
-.]
-does not properly recognize the full set of input-output controls that must be
-recognized and processed by the
-.IR "Stream head" .
-Under
-.I LiS
-.[
-lis
-.]
-.B sockmod
-also recognizes and processes these system controls (to the best of its
-ability).
-Never use
-.IR LiS .
 .TP \w'\fBSI_GETINTRANSIT\fR\(em'u
 .B TIOCINQ
 Number of bytes remaining to be read.
@@ -791,25 +747,6 @@ lfs
 .]
 these input-output controls are recognized and processed by the
 .IR "Stream head" .
-.PP
-.I LiS
-.[
-lis
-.]
-does not properly recognize the full set of input-output controls that must be
-recognized and processed by the
-.IR "Stream head" .
-Under
-.I LiS
-.[
-lis
-.]
-.B sockmod
-also recognizes and processes these system controls (to the best of its
-ability, but most of them cannot be set or examined under
-.IR LiS ).
-Never use
-.IR LiS .
 .\"
 .TP \w'\fBSI_GETINTRANSIT\fR\(em'u
 .B SIOCHIWAT
@@ -875,17 +812,6 @@ svr42
 to emulate
 .I BSD
 system calls.
-It is not the traditional role of the
-.B sockmod
-module to process these input-output controls; however, the
-.I LiS
-.[
-lis
-.]
-.I Stream head
-does not properly process them.  As they support the sockets API library, they
-are implemented here only for
-.IR LiS .
 The commands are as follows:
 .\"
 .TP \w'\fBSI_GETINTRANSIT\fR\(em'u
@@ -1071,25 +997,6 @@ Emulates the
 .BR socketpair (2)
 system call.
 .PD
-.\"
-.\"
-.SH NOTICES
-.PP
-Unfortunately,
-.I STREAMS
-modules and drivers cannot handle 32/64-bit conversion of input-output
-controls properly under
-.IR LiS .
-.[
-lis
-.]
-This means that
-.B sockmod
-simply cannot support 32/64-bit under
-.IR LiS .
-.[
-lis
-.]
 .\"
 .\"
 .SH NOTICES

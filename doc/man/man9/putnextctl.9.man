@@ -300,9 +300,6 @@ aixdoc
 .[
 uxpdoc
 .]
-.[
-lis
-.]
 .IR IRIX \(rg,
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg

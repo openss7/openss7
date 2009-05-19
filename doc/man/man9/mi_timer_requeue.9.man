@@ -341,6 +341,20 @@ and
 for additional compatibility considerations.
 .\"
 .\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation,
+.IR MacOT \(rg
+DDI documentation.
+.[
+macotr
+.]
+.[
+macspg
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR mi_timer_move (9)

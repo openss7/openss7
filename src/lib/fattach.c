@@ -103,32 +103,12 @@ __streams_fattach_r(int fd, const char *path)
 	return (retval);
 }
 
-/** @brief Attach a stream to a path in a filesystem.
-  * @param fd the file descriptor of the stream to attach.
-  * @param path the path in the filesystem to which to attach the stream.
-  * @par Alias:
-  * This symbol is a strong alias of __streams_fattach().
-  */
-int __lis_fattach(int fd, const char *path)
-    __attribute__ ((weak, alias("__streams_fattach")));
-
-/** @brief Attach a stream to a path in a filesystem.
-  * @param fd the file descriptor of the stream to attach.
-  * @param path the path in the filesystem to which to attach the stream.
-  * @par Alias:
-  * This symbol is a strong alias of __streams_fattach_r().
-  */
-int __lis_fattach_r(int fd, const char *path)
-    __attribute__ ((weak, alias("__streams_fattach_r")));
-
 /** @fn int fattach(int fd, const char *path)
   * @param fd the file descriptor of the stream to attach.
   * @param path the path in the filesystem to which to attach the stream.
   * @version STREAMS_1.0 __streams_fattach_r()
-  * @version LIS_1.0 __lis_fattach_r()
   */
 __asm__(".symver __streams_fattach_r,fattach@@STREAMS_1.0");
-__asm__(".symver __lis_fattach_r,fattach@LIS_1.0");
 
 /** @} */
 

@@ -132,7 +132,7 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
-.SH ARGMENTS
+.SH ARGUMENTS
 .PP
 .TP
 .I linkid
@@ -162,6 +162,13 @@ returns zero
 When unsuccessful,
 .BR x25_save_link_parameters ()
 returns a non-zero value.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR x25_save_link_parameters ()
+encounters an error, it returns a non-zero value.
 .\"
 .\"
 .SH FILES

@@ -210,6 +210,13 @@ When unsuccessful,
 returns a non-zero value.
 .\"
 .\"
+.SH ERRORS
+.PP
+When
+.BR x25_write_config_parameters ()
+encounters an error, it returns a non-zero value.
+.\"
+.\"
 .SH FILES
 .PP
 .TP

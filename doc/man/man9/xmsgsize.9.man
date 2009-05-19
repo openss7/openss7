@@ -108,7 +108,7 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B xmsgsize \", lis_xmsgsize
+.B xmsgsize
 \- calculate the size of message blocks in a \fISTREAMS\fR message
 .\"
 .\"

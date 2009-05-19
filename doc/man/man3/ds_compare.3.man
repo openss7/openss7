@@ -151,7 +151,7 @@ The Attribute Value Assertion which specifies the attribute type and value to be
 in the entry.
 .\"
 .\"
-.SH RESULTS
+.SH RETURN
 .PP
 .TP
 .I retval

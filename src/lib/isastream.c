@@ -106,27 +106,11 @@ __streams_isastream_r(int fd)
 	return (retval);
 }
 
-/** @param fd a file descriptor to test.
-  * @par Alias:
-  * This symbol is a strong alias of __streams_isastream().
-  */
-int __lis_isastream(int fd)
-    __attribute__ ((weak, alias("__streams_isastream")));
-
-/** @param fd a file descriptor to test.
-  * @par Alias:
-  * This symbol is a strong alias of __streams_isastream_r().
-  */
-int __lis_isastream_r(int fd)
-    __attribute__ ((weak, alias("__streams_isastream_r")));
-
 /** @fn int isastream(int fd)
   * @param fd a file descriptor to test.
   * @version STREAMS_1.0 __streams_isastream_r()
-  * @version LIS_1.0 __lis_isastream_r()
   */
 __asm__(".symver __streams_isastream_r,isastream@@STREAMS_1.0");
-__asm__(".symver __lis_isastream_r,isastream@LIS_1.0");
 
 /** @} */
 

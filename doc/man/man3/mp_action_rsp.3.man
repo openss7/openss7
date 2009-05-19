@@ -253,7 +253,7 @@ For more details about the OM classes and OM attributes mentioned above, refer t
 The invoke identifier of the requested operation to which the reply applies.
 .\"
 .\"
-.SH RESULT
+.SH RETURN
 .PP
 .TP
 .I status

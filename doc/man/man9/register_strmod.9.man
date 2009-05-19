@@ -221,7 +221,6 @@ specific module registration functions provided by
 see
 .BR str_install_AIX (9),
 .BR str_install_HPUX (9),
-.BR lis_register_strmod (9),
 .BR strmod_add (9).
 .\"
 .\"
@@ -334,7 +333,6 @@ will appear in
 .BR unregister_strdev (9),
 .BR str_install_AIX (9),
 .BR str_install_HPUX (9),
-.BR lis_register_strmod (9),
 .BR strmod_add (9).
 .\"
 .\"

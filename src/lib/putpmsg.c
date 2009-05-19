@@ -289,62 +289,6 @@ __old_streams_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf
 	return (err);
 }
 
-/** @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
-  * @param band the band to which to put the message.
-  * @param flags the priority of the message.
-  * @version LIS_1.0
-  * @par Alias:
-  * This symbol is a weak alias of __streams_putpmsg().
-  */
-int __lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
-		  int flags)
-    __attribute__ ((weak, alias("__streams_putpmsg")));
-
-/** @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
-  * @param band the band to which to put the message.
-  * @param flags the priority of the message.
-  * @version LIS_1.0 putpmsg()
-  * @par Alias:
-  * This symbol is a weak alias of __streams_putpmsg_r().
-  */
-int __lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
-		    int flags)
-    __attribute__ ((weak, alias("__streams_putpmsg_r")));
-
-/** @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
-  * @param band the band to which to put the message.
-  * @param flags the priority of the message.
-  * @version LIS_0.0
-  * @par Alias:
-  * This symbol is a weak alias of __old_streams_putpmsg().
-  */
-int __old_lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
-		      int flags)
-    __attribute__ ((weak, alias("__old_streams_putpmsg")));
-
-/** @brief Put a message to a stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure describing the data part of the message.
-  * @param band the band to which to put the message.
-  * @param flags the priority of the message.
-  * @version LIS_0.0 putpmsg()
-  * @par Alias:
-  * This symbol is a weak alias of __old_streams_putpmsg_r().
-  */
-int __old_lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
-			int flags)
-    __attribute__ ((weak, alias("__old_streams_putpmsg_r")));
-
 /** @fn int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure describing the control part of the message.
@@ -353,13 +297,9 @@ int __old_lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf
   * @param flags the priority of the message.
   * @version STREAMS_1.0 __streams_putpmsg_r()
   * @version STREAMS_0.0 __old_streams_putpmsg_r()
-  * @version LIS_1.0 __lis_putpmsg_r()
-  * @version LIS_0.0 __old_lis_putpmsg_r()
   */
 __asm__(".symver __streams_putpmsg_r,putpmsg@@STREAMS_1.0");
 __asm__(".symver __old_streams_putpmsg_r,putpmsg@STREAMS_0.0");
-__asm__(".symver __lis_putpmsg_r,putpmsg@LIS_1.0");
-__asm__(".symver __old_lis_putpmsg_r,putpmsg@LIS_0.0");
 
 /** @} */
 

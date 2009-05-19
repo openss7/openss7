@@ -1,1 +1,0 @@
-.so man3/t_removeleaf.3.man

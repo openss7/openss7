@@ -178,8 +178,10 @@ fails when
 can be called from
 .\"
 .\"
-.\".SH MP-STREAMS
-.\".PP
+.SH MP-STREAMS
+.PP
+.BR getinfo ()
+is MP safe.
 .\"
 .\"
 .SH NOTICES

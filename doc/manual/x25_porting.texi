@@ -282,13 +282,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 
 @section Notice
 
-This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
-@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
-part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS)
-Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
-@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code developed by other
-parties.
-
 This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
@@ -2048,24 +2041,11 @@ just plain wrong to modify statements of, or attribute statements to, the Author
 Corporation}.
 
 @menu
-* UNIX International DLPI License::	The UII DLPI license
-* UNIX International NPI License::	The UII NPI license
 * GNU Affero General Public License::	The AGPL license
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
 @end menu
 
-@page
-@include texi/uidlpi.texi
-@page
-@include texi/uinpi.texi
-@page
 @include texi/agpl3.texi
-@page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
 @page
 @include texi/fdl13.texi
 

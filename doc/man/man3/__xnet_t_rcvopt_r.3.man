@@ -1,1 +1,0 @@
-.so man3/t_rcvopt.3.man

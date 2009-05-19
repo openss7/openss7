@@ -216,6 +216,49 @@ of these options by offerming them only in the priviledged or read-only mode.  T
 transport providers only support a subset of the options defined here.
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+XTI-mOSI.
+.[
+xns99
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns99
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR XTI-TC
+first appeared in
+.BR openss7 .
+.BR XTI-mOSI
+first appeared in
+XNS 4.
+.[
+xns95
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of XTI-TC.
+.\"
+.\"
+.XX
+.[
+xns99
+.]
+.[
+XTI revision 1
+.]
+.\"
+.\"
 .[
 $LIST$
 .]

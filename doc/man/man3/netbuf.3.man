@@ -119,6 +119,20 @@ struct netbuf {
 };
 \fR\s+1
 .fi
+.SH MEMBERS
+.TP
+.I maxlen
+The maximum length of the buffer pointed to by the
+.I buf
+member.
+.TP
+.I len
+The current length of the data pointed to by the
+.I buf
+member.
+.TP
+.I buf
+A pointer to the data buffer.
 .SH DESCRIPTION
 .PP
 The
@@ -233,6 +247,12 @@ the call will fail with error
 .BR t_sndvudata (3),
 .BR test-xnet (8),
 .BR test-xnet_thr (8).
+.SH COMPATIBILITY
+.PP
+The Open Group XNS Issue 5.2.
+.[
+xns 5.2
+.]
 .SH CONFORMANCE
 .PP
 The Open Group XNS Issue 5.2.
@@ -248,6 +268,21 @@ test case executables and the
 .I @PACKAGE_TITLE@
 .B autotest
 test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B netbuf
+structure first appeared in
+.IR "SVR 3" .
+.[
+svr3
+.]
+These subroutines are related to the
+.IR UNIX \(rg
+.BR STREAMS (9)
+implementation of network transport providers.
 .\"
 .\"
 .[

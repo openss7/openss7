@@ -85,9 +85,7 @@ the groff extension package (@samp{groff_ext}), as it contains the @command{refe
 @item
 OpenSS7 Linux Fast-STREAMS
 (@uref{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2,, streams-@value{VERSION_STREAMS}}
-or better)@footnote{Although this an other OpenSS7 STREAMS packages will build and install with
-Linux STREAMS (LiS), @b{Linux STREAMS (LiS) is deprecated and cannot be supported because it is full
-of bugs!}}
+or better)
 
 @item
 OpenSS7 STREAMS Compatibility Modules
@@ -190,8 +188,6 @@ the dependencies listed below will already have been met by unpacking the master
 @item
 @cite{OpenSS7 Linux Fast-STREAMS},
 @uref{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2, streams-@value{VERSION_STREAMS}}.
-@footnote{Although, at one time, this package supported @cite{LiS}, @cite{LiS} is now deprecated and
-unsupported.}
 
 @item
 @cite{OpenSS7 STREAMS Compatibility Modules},

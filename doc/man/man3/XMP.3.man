@@ -282,6 +282,11 @@ analyze an OM object.
 wait for the availability of management message(s) from one or more bound Sessions.
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the OpenSS7 Standard XMP Library.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .\"
@@ -670,6 +675,46 @@ NOTIND:T{
 Notificatoin indication received in a management interaction.
 T}
 .TE
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B libxmp
+is compatible with XMP,
+.[
+xmp c306
+.]
+and implementations based on XMP with the following portability
+considerations:
+.IP \(em w'\(em\(em'u
+.PP
+See
+.BR OSI (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMP.
+.[
+xmp c306
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B libxmp
+first appeared as
+XMP.
+.[
+xmp c306
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of the XMP
+Library.
 .\"
 .\"
 .XX

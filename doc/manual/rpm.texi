@@ -271,36 +271,5 @@ The default is to include the
 @cite{Dialogic Open System Release 6.1} (@command{osr61-@value{VERSION_OSR}})
 add-on package in the build.
 
-@item --with LIS
-@opindex LIS
-
-When enabled, includes the @command{LiS-@value{VERSION_LIS}} add-on package in the build.
-Because the @command{LiS} add-on package is no longer distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}})
-add-on package from the build.
-
-@item --with lis
-@opindex  lis
-
-When enabled, @dfn{STREAMS} add-on packages will also have RedHat RPMs or Debian DEBs built for the
-@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}) @dfn{STREAMS} package.  @samp{--with LIS}
-must also be specified.
-The default is to not build RPMs nor DEBs for @cite{LiS} version of the add-on @dfn{STREAMS}
-packages.
-As @cite{LiS} is deprecated, so is this option.
-
-@item --without lfs
-@opindex lfs
-
-When disabled, @dfn{STREAMS} add-on packages will not have RedHat RPMS nor Debian DEBs built for the
-@cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) package.  @samp{--without
-STREAMS} may also be specified.
-The default is to build RPMs nor DEBs for @cite{Linux Fast-STREAMS} version of the add-on
-@dfn{STREAMS} packages.
-As @cite{LiS} is deprecated, and this option is only useful for suppressing @cite{Linux
-Fast-STREAMS} builds in favour of @cite{LiS}, this option is also deprecated.
-
 @end table
 

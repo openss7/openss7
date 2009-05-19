@@ -135,6 +135,12 @@ search-ignore T
 .ad b
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the Transport Name-to-Address translation
+shared object for INET.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 Name-to-Address translation shared objects are those listed in the name-to-address libraries member,

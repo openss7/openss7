@@ -716,9 +716,6 @@ suxspg
 .[
 uxpspg
 .]
-.[
-lis
-.]
 .IP ""
 Portable
 .I STREAMS

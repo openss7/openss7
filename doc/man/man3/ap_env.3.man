@@ -105,6 +105,8 @@ search-ignore T
 .\"
 .\"
 .TH AP_ENV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
 .SH NAME
 .B ap_env
 \- ACSE/Presentation environment attributes
@@ -1787,6 +1789,87 @@ This attribute is readable always and writable never.
 .RE
 .\"
 .\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned.  Otherwise, a value of minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
+If the call fails because of an attempt to either set
+an attribute to an illegal value or set an attribute in an illegal state,
+.BR ap_init_env ()
+will return the value of the symbolic constant that identifies that attribute.
+.\"
+.\"
+.SH ERRORS
+.TP \w'[\fBAP_NOT_SUPPORTED\fR]\(em'u
+.RB [ AP_BADATTRVAL ]
+An invalid value assignment was found in the initialisation file.
+.TP
+.RB [ AP_BADENV ]
+There is no value assigned to the requested environment attribute.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+argument does not identify an XAP instance.
+.TP
+.RB [ AP_NOATTR ]
+The
+.I attr
+argument does not specify a valid attribute type.
+.TP
+.RB [ AP_NOENV ]
+There is no XAP environment associated with
+.IR fd .
+.TP
+.RB [ AP_NOMEM ]
+XAP could not allocate sufficient memory to copy the value of the specified attribute.
+.TP
+.RB [ AP_NOT_SUPPORTED ]
+The use of a
+.RB non- NULL
+value for
+.I env_file
+is not supported by this implementation of XAP.
+.TP
+.RB [ AP_NOREAD ]
+The specified attribute is not readable.
+.TP
+.RB [ AP_NOWRITE ]
+An assignment for an attribute that is not writable in the current state
+appears in the initialisation file.
+.PP
+In addition, operating system class errors are reported.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The OpenSS7 XAP Library and cooperating modules and drivers implement the XAP
+environment attributes as XTI options and using input-output controls.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ap_free (3),
+.BR ap_get_env (3),
+.BR ap_set_env (3),
+.BR ap_init_env (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_get_env "(3) and " ap_init_env (3)
+have no known bugs.
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
 The OpenSS7 XAP Library
@@ -1823,7 +1906,11 @@ and is inherently non-portable.  Portable XAP programs will not reply upon this 
 Four additional bit values are defined for the \fBAP_AFU_AVAIL\fP and \fBAP_AFU_SEL\fP environment
 attributes: \fIAP_ACSE_AUTH\fP, \fIAP_ACSE_CNTXNEG\fP, \fIAP_ACSE_HLASSOC\fP,
 \fIAP_ACSE_NESTASSOC\fP.
-.PP
+.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 .PP
 See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
 compatibility information.

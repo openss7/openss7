@@ -315,7 +315,6 @@ Development
 
 Porting
 
-* Porting from LiS::		Porting from LiS to this package
 * Porting from SVR 4.2 MP::	Porting from SVR 4.2 to this package
 * Porting from Solaris::	Porting from Solaris to this package
 * Porting from UnixWare::	Porting from UnixWare to this package
@@ -684,7 +683,7 @@ Without their support, open software like this would not be possible.
 @section Authors
 @cindex authors
 
-The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+The authors of the @cite{@value{PACKAGE_TITLE}} package include:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -697,7 +696,7 @@ sections of this manual.
 @section Maintainer
 @cindex maintainer
 
-The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -973,25 +972,21 @@ just another @acronym{BSD}, and probably not a very good one.
 @node History of STREAMS for Linux
 @section History of STREAMS for Linux
 
-In the mid-90's, @uref{http://www.gcom.com/,,  GCOM, @abbr{Inc.}} embarked on development on an open
-source implementation of STREAMS called @cite{Linux STREAMS (LiS)}, likely driven by its use for
-porting existing @acronym{OSI} protocol stacks to @cite{Linux}.  In 2000,
+In 2000,
 @uref{http://www.openss7.org/,, The OpenSS7 Project} abandoned using the @cite{Linux} networking
 model for implementation of the @cite{Signalling System No. 7} protocol (primarily due to the lack of
 support for the full @acronym{BSD} networking model under @cite{Linux}) and switched to using
-STREAMS as the basis for all future development.  The @cite{GCOM LiS} release (2.2 at the time) was
-used as the STREAMS package.  Over the span of the next 5 years, (and not surprisingly given the body
+STREAMS as the basis for all future development.
+Over the span of the next 5 years, (and not surprisingly given the body
 of software), almost all @cite{Signalling System No. 7} products released on @cite{Linux} used
-@cite{LiS} for STREAMS.  In 2005, Dave Grothe (the @dfn{G} in @cite{GCOM}) announced that he would
-no longer be maintaining or developing @cite{LiS} subsequent to the 2.18.0 release, stranding many
-users of the package.
+STREAMS.
 
-Later in 2005, after briefly maintaining two GPL'ed releases of @cite{LiS}, (2.18.1 and 2.18.2),
+In 2005,
 @uref{http://wwww.openss7.org/,, The OpenSS7 Project} release (after two years of development) the
 @file{streams-0.7a.4} package: a reimplementation of @cite{SVR 4.2 STREAMS} with compatibility
 modules for all major @cite{UNIX@registeredsymbol{}} releases, called @cite{@value{PACKAGE_TITLE}}.
 @cite{@value{PACKAGE_TITLE}} was intended as a @cite{POSIX/SUSv3 XSR} conforming, high performance,
-production grade, replacement for @cite{LiS}, suitable for mainline @cite{Linux} adoption, and a
+production grade, implementation, suitable for mainline @cite{Linux} adoption, and a
 better foundation on which to base @acronym{SIGTRAN}, @acronym{VoIP}, @acronym{ISDN} and
 @acronym{SS7} protocol stacks developed under the @uref{http://www.openss7.org/,, The OpenSS7
 Project}, as well as a better foundation for porting commercial @cite{UNIX@registeredsymbol{}}
@@ -1001,25 +996,27 @@ package that contains the documentation you are reading now.
 @node Why Fast?
 @section Why Fast?
 
-After working with @cite{LiS} releases for over 3 years, in late 2003,
+In late 2003,
 @uref{http://www.openss7.org/,, The OpenSS7 Project} decided to begin implementation of a
-replacement for @cite{LiS}, because of a number of shortcomings of the @cite{LiS} releases:
+production grade implementation of STREAMS, because of a number of shortcomings of other
+@cite{Linux} STREAMS implementations:
 
 @enumerate a
-@item unsuitable for mainline kernel adoption due to coding style and organization;
+@item proprietary;
+@item unsuitable for mainline kernel adoption due to coding style or organization;
 @item poorly adapted to distribution production kernels;
-@item is unsuitable for packaging and repeatability;
+@item is unsuitable for packaging or repeatability;
 @item portability objective unsuitable for mainline kernel adoption;
 @item ports form the same baseline obfuscate the code;
-@item performs poorly due to portability and coding style;
-@item code bloat and over sized memory footprint;
-@item redundant debug statements obscuring defects and obfuscating code;
+@item poor performance due to portability or coding style;
+@item code bloat or over sized memory footprint;
+@item redundant debug statements obscuring defects or obfuscating code;
 @item overuse of semaphores;
-@item contains serious races and not suitable for threaded applications;
-@item does not conform to mainstream @cite{UNIX@registeredsymbol{}} implementations;
-@item does not conform to @cite{POSIX} or any release of the @cite{Single UNIX Specification};
-@item limited set of standard drivers and modules;
-@item limited set of diagnostic and administrative utilities;
+@item contain serious races or not suitable for threaded applications;
+@item non-conformance to mainstream @cite{UNIX@registeredsymbol{}} implementations;
+@item non-conformance to @cite{POSIX} or any release of the @cite{Single UNIX Specification};
+@item limited set of standard drivers or modules;
+@item limited set of diagnostic or administrative utilities;
 @item limited test programs;
 @item poorly documented.
 @end enumerate
@@ -1028,6 +1025,7 @@ The replacement, named @cite{@value{PACKAGE_TITLE}}, was to correct all of these
 by the initial @samp{streams-0.7a.4} release, was:
 
 @enumerate a
+@item opensource;
 @item completely Lindented and follows kernel coding practises;
 @item automatically adapts to production kernels with autoconf;
 @item packages itself into @acronym{LSB} compliant @acronym{RPM}s and @acronym{DEB}s;
@@ -1045,54 +1043,6 @@ by the initial @samp{streams-0.7a.4} release, was:
 @item integrated set of conformance test suites;
 @item fully documented.
 @end enumerate
-
-Many specific difficulties encountered with @cite{LiS} not repeated by @cite{@value{PACKAGE_TITLE}}
-are contained in the @dfn{COMPATIBILITY} section of most of the manual pages.
-
-@ignore
-@cite{@value{PACKAGE_TITLE}} is intended as a high-performance, production replacement for
-@cite{Linux STREAMS (LiS)}.  @cite{@value{PACKAGE_TITLE}} has the following features in contrast to
-@cite{Linux STREAMS}:
-
-@sp 1
-@multitable @columnfractions .5 .5
-@item @cite{@value{PACKAGE_TITLE}}
-@tab @b{LiS}
-@item @  @tab @ 
-@item Provided and optimized for Linux.
-@tab Maintains portability across Linux, User Space, QNX, DOS and other ports.
-@item @  @tab @ 
-@item Promotes mainstream kernel adoption.
-@tab Places portability concerns before mainstream kernel adoption.
-@item @  @tab @ 
-@item Lindented and follows normal kernel formatting and coding practises.
-@tab Non-lindented, does not follow normal kernel formatting and coding practises.
-@item @  @tab @ 
-@item Provides compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2 and LiS.  Supports
-all major SVR 4.2 variants.
-@tab Provides some compatibility interfaces but also many Linux-derived interfaces specific to LiS.
-@item @  @tab @ 
-@item Licensed under GPL with commercial licensing available.
-@tab Dubiously licensed under LGPL (yet parts are GPL).
-@item @  @tab @ 
-@item Supports full SVR 4.2 ES/MP synchronization models.
-@tab Supports only single, Linux derived synchronization models.
-@item @  @tab @ 
-@item Runs at SoftIRQ.  By running at SoftIRQ, @cite{@value{PACKAGE_TITLE}} ensures that its place within the
-scheduling network-based events is appropriate for the Linux kernel.
-@tab Separate kernel threads.
-@item @  @tab @ 
-@item Provides common SVR 4.2 system tunable parameters and system controls as well as /proc
-file system for support and debugging.
-@tab Provides only log-based debugging.
-@item @  @tab @ 
-@item Provides support for SVR 4.2 STREAMS and other utilities.
-@tab Provides limited set of LiS only Linux-derived utilities.
-@item @  @tab @ 
-@item Provides full named-streams device and device file system support.
-@tab Provides only character-based node support. @*
-@end multitable
-@end ignore
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1356,7 +1306,7 @@ This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
 The @command{mux} driver is detailed in the @cite{UNIX System V Release 4 Programmer's Manual -- STREAMS}.
 The @manpage{mux(4)} driver provides capabilities used primarily for validation test programs (see
 @manref{test-streams(8)} as well as serving as an example multiplexing driver.  This
-@manpage{mux(4)} driver also provides the @command{minimux} capabilities formerly present in @cite{LiS}.
+@manpage{mux(4)} driver also provides the @command{minimux} capabilities.
 
 See @manref{mux(4)} for more information.
 
@@ -1564,37 +1514,6 @@ Provides the @command{libtool} definitions for the library.
 
 @end table
 
-In addition to the @file{libstreams} library, @cite{@value{PACKAGE_TITLE}} also installs
-compatibility libraries for @cite{LiS}.  These compatibility libraries permit applications
-previously linked with @cite{LiS} shared libraries to function with @cite{@value{PACKAGE_TITLE}}
-without recompiling or relinking.
-
-@table @file
-
-@item libLiS.so.0.0.1
-@itemx libLiS.so.0
-@itemx libLiS.so
-Provides a shared object library for use by legacy @cite{LiS} applications programs.
-
-@item libLiS.a
-Provides a static library for use by legacy @cite{LiS} applications programs.
-
-@item libLiS.la
-Provides the @command{libtool} definitions for the library.
-
-@itemx libpLiS.so.0.0.1
-@itemx libpLiS.so.0
-@itemx libpLiS.so
-Provides a shared object library for use by legacy @cite{LiS} applications programs.
-
-@item libpLiS.a
-Provides a static library for use by legacy @cite{LiS} applications programs.
-
-@item libpLiS.la
-Provides the @command{libtool} definitions for the library.
-
-@end table
-
 @subsection libstreams Library Routines
 
 The following routines are present in the @file{libstreams} libraries.  The routines in these
@@ -1636,91 +1555,6 @@ Print a @dfn{STREAMS} log buffer.
 
 @item vstrlog(3)
 Print a @dfn{STREAMS} log buffer.
-
-@end ftable
-
-@subsection libLiS Library Routines
-
-The following routines are present in the @file{libLiS} libraries.  The routines are identical to
-the routines present in the @file{libstreams} library and are provided in the @file{libLiS} library
-for compatibility with existing applications linked against @file{libLiS}.
-
-@ftable @manref
-
-@item fattach(2)
-Name a @dfn{STREAMS} special file.
-
-@item fdetach(2)
-Unname a @dfn{STREAMS} special file.
-
-@item getmsg(2)
-Get next message off of a Stream.
-
-@item getpmsg(2s)
-Get next message off of a Stream.
-
-@item isastream(2)
-Test for a @dfn{STREAMS} special file.
-
-@item pipe(2s)
-Create a @dfn{STREAMS} pipe.
-
-@item putmsg(2)
-Put a message to a @dfn{STREAMS} character device.
-
-@item putpmsg(2s)
-Put a band message to a @dfn{STREAMS} character device.
-
-@ignore
-@item pstrlog(3)
-Print a @dfn{STREAMS} log buffer.
-@item strlog(3)
-Print a @dfn{STREAMS} log buffer.
-@item vstrlog(3)
-Print a @dfn{STREAMS} log buffer.
-@end ignore
-
-@end ftable
-
-@subsection libpLiS Library Routines
-
-The following routines are present in the @file{libpLiS} libraries.  The @file{libpLiS} library is
-the same as the @file{libLiS} and @file{libstreams} libraries but omits the @manpage{pipe(2s)}
-subroutine.  The purpose of the @file{libpLiS} library was to permit it to be used as a library
-preload without affecting the @manpage{pipe(2s)} function used by existing programs linked against
-@file{libc}.
-
-@ftable @manref
-
-@item fattach(2)
-Name a @dfn{STREAMS} special file.
-
-@item fdetach(2)
-Unname a @dfn{STREAMS} special file.
-
-@item getmsg(2)
-Get next message off of a Stream.
-
-@item getpmsg(2s)
-Get next message off of a Stream.
-
-@item isastream(2)
-Test for a @dfn{STREAMS} special file.
-
-@item putmsg(2)
-Put a message to a @dfn{STREAMS} character device.
-
-@item putpmsg(2s)
-Put a band message to a @dfn{STREAMS} character device.
-
-@ignore
-@item pstrlog(3)
-Print a @dfn{STREAMS} log buffer.
-@item strlog(3)
-Print a @dfn{STREAMS} log buffer.
-@item vstrlog(3)
-Print a @dfn{STREAMS} log buffer.
-@end ignore
 
 @end ftable
 
@@ -1904,7 +1738,7 @@ See @manref{autopush(8)} for more information.
 @pgindex /usr/sbin/fattach
 
 Name a @dfn{STREAMS} file.
-@manpage{fattach(8)} is an @cite{LiS} utility.  Although @cite{OSF/1} documentation mentions an
+@manpage{fattach(8)} is an @cite{OpenSS7} utility.  Although @cite{OSF/1} documentation mentions an
 @command{fattach} manual page in section 8, one does not exist.
 
 @manpage{fattach(8)} opens a @manpage{pipe(4)} and attaches one end of the pipe to a file using
@@ -2561,10 +2395,6 @@ The following manual pages are installed in Section 3 of the manual (in the subd
 @multitable @columnfractions .40 .60
 @item @manref{streams(3)} -- @tab @dfn{STREAMS} system call library.
 @item @manref{libstreams(3)} -- @tab @dfn{STREAMS} system call library.
-@item @manref{LiS(3)} -- @tab @dfn{STREAMS} system call library.
-@item @manref{pLiS(3)} -- @tab @dfn{STREAMS} system call library.
-@item @manref{libLiS(3)} -- @tab @dfn{STREAMS} system call library.
-@item @manref{libpLiS(3)} -- @tab @dfn{STREAMS} system call library.
 @item @manref{fattach(3)} -- @tab name a @dfn{STREAMS} special file.
 @item @manref{fdetach(3)} -- @tab unname a @dfn{STREAMS} special file.
 @item @manref{isastream(3)} -- @tab test for a @dfn{STREAMS} special file.
@@ -3017,7 +2847,6 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @cindex porting
 
 @menu
-* Porting from LiS::
 * Porting from SVR 4.2 MP::
 * Porting from Solaris::
 * Porting from UnixWare::
@@ -3048,12 +2877,6 @@ with a wide range of mainstream @dfn{STREAMS} implementations and significant gr
 compatibility and helper functions (such as those from @cite{Solaris} and @cite{Mentat}).  These
 compatibility packages also provide separate demand loadable kernel modules that provide the
 additional compatibility functionality with @cite{@value{PACKAGE_TITLE}}.
-
-Perhaps one of the most important ports to @cite{@value{PACKAGE_TITLE}} is from the deprecated and
-deficient @cite{LiS} package to @cite{@value{PACKAGE_TITLE}}.  The @cite{@dfn{STREAMS}
-Compatibility} package, @file{strcompat}, also provides a source level compatibility module that
-provides source level compatibility to @cite{LiS} to ease porting @cite{LiS} drivers and modules to
-the superior @cite{@value{PACKAGE_TITLE}}.
 
 In general, when porting to @cite{@value{PACKAGE_TITLE}} from another @dfn{STREAMS} implementation,
 the following items will need the most attention:
@@ -3099,44 +2922,6 @@ technical merit and licensing issues, the @file{strbcm} package is only currentl
 subscribers and sponsors of the @cite{OpenSS7 Project}.}
 
 @end table
-
-@node Porting from LiS
-@section Porting from LiS
-@cindex porting from LiS
-
-Applications programs to not need to be ported, or even recompiled when they use shared libraries.
-@cite{@value{PACKAGE_TITLE}} provides @cite{LiS} compatible shared object libraries.  Applications
-compiled against static libraries will need to be recompiled unless @cite{@value{PACKAGE_TITLE}} was
-configured for @dfn{STREAMS} binary compatibility mode.@footnote{See the @samp{--enable-streams-bcm}
-option to @command{configure} in @refman{Configure Options}.}
-
-In general, if no @cite{LiS} specific functions are used (other than @dfn{STREAMS} driver or module
-registration functions), porting of @cite{LiS} drivers and modules to @cite{@value{PACKAGE_TITLE}}
-is straightforward.  @cite{@value{PACKAGE_TITLE}} provides several @dfn{STREAMS} drivers and modules
-that are common to both OpenSS7 @cite{@value{PACKAGE_TITLE}} and @cite{LiS} releases.  These drivers
-and modules provide examples of how to write @dfn{STREAMS} drivers or modules that can run under
-either @cite{LiS} or @cite{@value{PACKAGE_TITLE}}.  The common modules and drivers are as follows:
-
-@multitable @columnfractions 0.5 0.5
-@item @file{src/drivers/echo.c} @tab @manref{echo(4)}
-@item @file{src/drivers/mux.c} @tab @manref{mux(4)}
-@item @file{src/drivers/nuls.c} @tab @manref{nuls(4)}
-@item @file{src/modules/nullmod.c} @tab @manref{nullmod(4)}
-@item @file{src/modules/sc.c} @tab @manref{sc(4)}
-@item @file{src/modules/testmod.c} @tab @manref{testmod(4)}
-@end multitable
-
-When built for @cite{@value{PACKAGE_TITLE}}, @samp{C} preprocessor symbol @samp{LFS} is defined; when
-built for @cite{LiS}, @samp{LIS} is defined.
-
-@cite{LiS} provides many simple wrapper functions that are @cite{Linux} kernel functions with
-@samp{lis_} prepended to the name.  Aside from licensing issues associated with using these wrapper
-functions, in many cases it is possible to simply drop the @samp{lis_} from the function call and
-use the @cite{Linux} functions directly.  This is true for most spin locks, read-write locks,
-semaphores, mutexes, atomic integers, bus access and memory mapping functions.
-
-When many or specific @cite{LiS} functions calls are necessary, it is better to use the @cite{LiS}
-compatibility module present in the @file{strcompat-@value{VERSION_STRCOMPAT}} package.
 
 @node Porting from SVR 4.2 MP
 @section Porting from SVR 4.2 MP
@@ -3248,12 +3033,6 @@ and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
 Portability considerations are maintained in a separate manual:
 @pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
 
-@item --- LiS-2.16.18
-@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
-@cite{LiS-2.16.18} and @cite{LiS-2.18.0},
-and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are maintained in a separate manual:
-@pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
 @end table
 
 For additional details,
@@ -3293,9 +3072,7 @@ between the default @cite{OpenGroup} XSI behaviour and the traditional @cite{SVR
 Most of the XSI specifications of the @cite{OpenGroup} describe the behaviour of the Stream head and
 the behaviour of specific @dfn{STREAMS} drivers or modules (such as pipes, FIFOs and terminals).
 Also described is the @manpage{poll(2s)} behaviour, generation of signals, and @manpage{read(2s)} and
-@manpage{write(2s)} behaviour as it applies to @dfn{STREAMS} character special devices.@footnote{One
-of the major deficiencies of the deprecated @cite{LiS} implemntation was its inability to conform to
-the standards imposed on the user interface and behaviour of the Stream head.}
+@manpage{write(2s)} behaviour as it applies to @dfn{STREAMS} character special devices.
 
 User interface compliance of the @cite{@value{PACKAGE_TITLE}} is tested with custom validation test
 suites that ship with the package.  See @refman{Conformance Test Programs} for more information on
@@ -3428,14 +3205,6 @@ to ease portability and common comprehension.
 @cite{UXP/V}
 to ease portability and common comprehension.
 
-@item --- LiS-2.16.18 and LiS 2.18.0
-@cite{@value{PACKAGE_TITLE}} provides a high degree of operational compatibility with
-@cite{LiS 2.16.18} and @cite{LiS 2.18.0}
-to ease portability and common comprehension.
-to ease portability and common comprehension.  Specific kernel utilities are provided by the
-@cite{STREAMS Compatibility} package to provide full source level compatibility with
-@cite{LiS 2.16.18} and @cite{LiS 2.18.0}.
-
 @end table
 
 For additional details,
@@ -3477,17 +3246,10 @@ For additional details,
 
 @menu
 * GNU Affero General Public License::	The AGPL license
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
 @end menu
 
-@page
 @include texi/agpl3.texi
-@page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
 @page
 @include texi/fdl13.texi
 

@@ -385,8 +385,8 @@ configuration programs are not subject to standardization.
 .SH HISTORY
 .PP
 .B ldlconfig
-first appeared in
-.IR LiS .
+appeared in
+.IR OpenSS7 .
 .\"
 .\"
 .[

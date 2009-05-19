@@ -93,7 +93,7 @@ tarball or RPM distribution, which would be nice, only individual RPMs for subpa
 
 We have nice autotest test suites that are fine for native builds, but for cross-compile builds, it
 would also be nice to cross-test.  We can accomplish this nicely within the autoconf framework using
-DejaGNU.  DejaGNU configured under the LiS, but we need a more general autoconf .m4 fragement check
+DejaGNU.  DejaGNU configured under the STREAMS, but we need a more general autoconf .m4 fragement check
 for the existence of DejaGNU, and automake and DejaGNU expect wrappers for the existing test
 programs (and integration into the make check-DEJAGNU target).  Then we could cross-build the
 package and then execute the test scripts on the result on a remote board using DEJAGNU.
@@ -144,8 +144,7 @@ include them in a far more general main Makefile.am file.
 @item Merge sub-packages.
 
 I really want to put all these packages back together, it is too time consuming maintaining the
-various administrative files for each of seven or so packages.  Once some more testing has been done
-on Linux Fast-STREAMS, I will drop LiS altogether and wrap the following packages together:
+various administrative files for each of seven or so packages.
 
 @multitable @columnfractions .05 .95
 @item @tab @bullet{} streams-0.7a.5
@@ -475,30 +474,6 @@ Tested on x86_64.
 @end table
 
 @item
-LiS Binary Compatibility:-  Pretty much messed up right now.  I have the regparm(0) stuff on the
-callout and callback functions, and the STREAMS Compatibility Modules does regparm(0) on all the
-lis_ functions.  Primary STREAMS data structures align on the first portion of the data structure.
-Sizes vary, so don't do q+1.  Flags are a little different.  There are however several problematic
-data structures: cred_t and the ioctypes: iocblk, copyreq, copyresp, and the linkblk.  When you
-enable binary compatibility mode, it uses the LiS versions of these.
-
-@table @emph
-@item DONE:
-Needs testing.
-@end table
-
-@item
-LfS Binary Compatibility:-  A little better.  Callouts and callbacks always regparm(0).  STREAMS
-utility functions are always regparm(3).  Data structures are stable for the most part.  cred_t,
-however, is variable depending on the kernel.  Compile with the LiS binary compatibility and the
-cred_t will be fixed size.
-
-@table @emph
-@item DONE:
-Needs testing.
-@end table
-
-@item
 Finish the documentation.
 
 @table @emph
@@ -651,14 +626,10 @@ binary modules.
 
 @item
 Linking of binary modules is not yet supported.  This is the place (strcompat) where binary modules
-should be permitted to be loaded against either Linux STREAMS or Linux Fast-STREAMS, because the
-binary compatibility interface modules are defined here.  There is the beginnings of an strconf
-script output to generate a C-language wrapper file that will link with a binary object file to
-generate a loadable module that could load under Linux STREAMS or Linux Fast-STREAMS.  Note that
-there are a bunch of binary compatibility issues with Linux STREAMS in the first place (it cannot
-even be binary compatible with user programs written for 32bit architectures running on 64bit
-architectures).  For fairly restricted use modules and drivers, a single binary object could run on
-both LiS and LfS.
+should be permitted to be loaded against Linux Fast-STREAMS, because the binary compatibility
+interface modules are defined here.  There is the beginnings of an strconf script output to generate
+a C-language wrapper file that will link with a binary object file to generate a loadable module
+that could load under Linux Fast-STREAMS.
 
 @table @emph
 @item *moved*
@@ -694,15 +665,14 @@ funding for its completion, please contact the project on the openss7 mailing li
 
 @itemize @minus
 @item
-Testing.  This package is completely untested.  One way to test LiS compatibility is to take a set
-of frozen binary modules and drivers from the LiS release and place them in a test directory.
+Testing.  This package is completely untested.  One way to test compatibility is to take a set
+of frozen binary modules and drivers from the release and place them in a test directory.
 
 @item
 The strbcm package is currently incomplete.  The purpose of the package was to move STREAMS binary
-compatibility module capabilities outside of the STREAMS release package so as to allow them to be
-used with both LiS and Linux Fast-STREAMS.  As Linux Fast-STREAMS has already shown superior to LiS
-in terms of both performance and conformance, it is no longer necessary to keep these packages
-separate and they can be combined once again (or still) with Linux Fast-STREAMS.
+compatibility module capabilities outside of the STREAMS release package.  As Linux Fast-STREAMS has
+become production grade in terms of both performance and conformance, it is no longer necessary to
+keep these packages separate and they can be combined once again (or still) with Linux Fast-STREAMS.
 
 This package; however, might has some use still outside of Linux Fast-STREAMS if only because it
 provides a separable way of incorporating 3rd party binary modules.
@@ -815,10 +785,7 @@ You are reading it.
 The @command{@value{PACKAGE}} package is currently incomplete.
 
 The purpose of the package was to provide @dfn{STREAMS} terminal capabilities
-for @cite{Linux Fast-STREAMS}.  These drivers and modules cannot possibly work
-with @cite{LiS}: @cite{LiS} does not provide TTY semantics at the Stream head
-and is incapable of providing a controlling terminal, and does not do POSIX
-job control.  The package will only build and install with @cite{Linux
+for @cite{Linux Fast-STREAMS}.  The package will only build and install with @cite{Linux
 Fast-STREAMS}
 
 If someone is interested in this package, a contribution of a working
@@ -865,10 +832,6 @@ This package is mature and complete and in production release.  The current plan
 maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
 evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
 
-This package will not be maintained for use with LiS.  LiS support is deprecated and has been
-discontinued (but still exists on the CVS archive for sponsors of the OpenSS7 Project).  Use Linux
-Fast-STREAMS instead, please.
-
 @subsubheading STRXNS Things to Do
 
 @itemize @minus
@@ -884,15 +847,14 @@ special network conditions on SCTP (for example), and will also allow for compar
 
 @itemize @bullet
 @item
-The strxns package contains several GPL'd modules and drivers originally included in the LiS
-releases that were removed to this package so that they could be used with both LiS and Linux
-Fast-STREAMS.
+The strxns package contains several GPL'd modules and drivers originally included in the STREAMS
+releases that were removed to this package so that they could be used with Linux Fast-STREAMS.
 @end itemize
 
 @itemize @minus
 @item
 Test.  Almost none of the modules or drivers in this package have been tested thoroughly against
-either LiS or Linux Fast-STREAMS.  One of the primary reasons for this is that The OpenSS7 Project
+Linux Fast-STREAMS.  One of the primary reasons for this is that The OpenSS7 Project
 does not really use any of these modules or drivers.
 
 @item
@@ -947,10 +909,6 @@ those for X.25, Frame Relay, and ISDN LAPD and LAPB.
 This package is mature and complete and in production release.  The current plan is to provide only
 maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
 evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
-
-This package will not be maintained for use with LiS.  LiS support is deprecated and has been
-discontinued (but still exists on the CVS archive for sponsors of the OpenSS7 Project).  Use Linux
-Fast-STREAMS instead, please.
 
 @subsubheading STRXNET Things to Do
 
@@ -1178,8 +1136,7 @@ You are reading it.
 The @command{@value{PACKAGE}} package is currently incomplete.
 
 The purpose of the package was to move @dfn{STREAMS} socket capabilities outside of the
-@dfn{STREAMS} release package so as to allow them to be used with both @cite{LiS} and @cite{Linux
-Fast-STREAMS}.  As @cite{Linux Fast-STREAMS} has already shown superior to @cite{LiS} in terms of
+@dfn{STREAMS} release package.  As @cite{Linux Fast-STREAMS} has already shown production grade in terms of
 both performance and conformance, it is no longer necessary to keep these packages separate and they
 can be combined once again (or still) with @cite{Linux Fast-STREAMS}.
 
@@ -1191,10 +1148,6 @@ can be combined once again (or still) with @cite{Linux Fast-STREAMS}.
 This package is mature and complete and in production release.  The current plan is to provide only
 maintenance releases supporting more recent Linux distributions and kernels as they evolve.  Expect
 public maintenance releases on a 3 to 6 month cycle.
-
-This package will not be maintained for use with LiS.  LiS support is deprecated and has been
-discontinuted (but still exists on the CVS archive for sponsors of the OpenSS7 Project).  Use Linux
-Fast-STREAMS instead, please.
 
 @subsubheading STRINET Things to Do
 
@@ -1299,10 +1252,6 @@ What I did was to perform SMP testing for Intel Pentium IV 630 HT at least.
 This package is mature and complete and in production release.  The current plan is to provide only
 maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
 evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
-
-This package will not be maintained for use with LiS.  LiS support is deprecated and has been
-discontinued (but still exists on the CVS archive for sponsors of the OpenSS7 Project).  Use Linux
-Fast-STREAMS instead, please.
 
 @subsubheading STRSCTP Things to Do
 

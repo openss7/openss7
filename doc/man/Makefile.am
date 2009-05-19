@@ -3421,7 +3421,6 @@ openss7_man_MANS = \
 	man9/kmem_zalloc_physreq.9 \
 	man9/lbolt.9 \
 	man9/LfS.9 \
-	man9/lfscompat.9 \
 	man9/lfs_register_strdev.9 \
 	man9/linkb.9 \
 	man9/linkblk.9 \
@@ -3955,7 +3954,6 @@ openss7_man_MANS = \
 	man9/uxpcompat.9 \
 	man9/vcmn_err.9 \
 	man9/vstrlog.9 \
-	man9/vstrlog_hook.9 \
 	man9/vstrlog_t.9 \
 	man9/vtop.9 \
 	man9/wakeup.9 \
@@ -7352,7 +7350,6 @@ openss7_dist_noinst_MANS = \
 	man9/kmem_zalloc_physreq.9.man \
 	man9/lbolt.9.man \
 	man9/LfS.9.man \
-	man9/lfscompat.9.man \
 	man9/lfs_register_strdev.9.man \
 	man9/linkb.9.man \
 	man9/linkblk.9.man \
@@ -7886,7 +7883,6 @@ openss7_dist_noinst_MANS = \
 	man9/uxpcompat.9.man \
 	man9/vcmn_err.9.man \
 	man9/vstrlog.9.man \
-	man9/vstrlog_hook.9.man \
 	man9/vstrlog_t.9.man \
 	man9/vtop.9.man \
 	man9/wakeup.9.man \
@@ -8669,7 +8665,6 @@ MANS_UNUSED = \
 	man9/udelay.9 \
 	man9/unregister_inode.9 \
 	man9/uxpcompat.9 \
-	man9/vstrlog_hook.9 \
 	man9/vtop.9
 
 MANS_EXEMPT = \

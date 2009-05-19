@@ -150,6 +150,49 @@ APLI transport providers that are exposed through the
 header file.
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+XTI-mOSI.
+.[
+xns99
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns99
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR XTI-APLI
+first appeared in
+.BR openss7 .
+.BR XTI-mOSI
+first appeared in
+XNS 4.
+.[
+xns95
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of XTI-APLI.
+.\"
+.\"
+.XX
+.[
+xns99
+.]
+.[
+XTI revision 1
+.]
+.\"
+.\"
 .[
 $LIST$
 .]

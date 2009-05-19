@@ -134,6 +134,8 @@ xap c303
 .B #include <ap_lib.h>
 .br
 .B #include <osi_lib.h>
+.HP
+.B int ap_errno;
 .PP
 .nf
 #define AP_ACCES                 1      /* Request to bind specified address denied. */
@@ -214,6 +216,13 @@ or
                                            successfully. There is an event available for
                                            the user to receive. (XAP only.) */
 .fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+.TP
+.I ap_errno
+The global APLI Library errror number variable.
 .\"
 .\"
 .SH DESCRIPTION

@@ -3378,6 +3378,7 @@ Corporation}.
 @end menu
 
 @include texi/agpl3.texi
+@page
 @include texi/fdl13.texi
 
 @node Glossary

@@ -151,6 +151,11 @@ search-ignore T
 .hy 6
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the OpenSS7 Standard XMS Library.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 The XMS Library contains the following functions.
@@ -189,6 +194,46 @@ The XMS Library contains the following functions.
 .BR ms_unbind (3)
 .TP
 .BR ms_wait (3)
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B libxms
+is compatible with XMS,
+.[
+xms
+.]
+and implementations based on XMS with the following portability
+considerations:
+.IP \(em w'\(em\(em'u
+.PP
+See
+.BR OSI (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMS.
+.[
+xms
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B libxms
+first appeared as
+XMS.
+.[
+xms
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of the XMS
+Library.
 .\"
 .\"
 .XX

@@ -1137,26 +1137,6 @@ use of this option is to specify @option{--with-k-optimize=speed --disable-k-saf
 maximum performance.  Nevertheless, even these setting are @dfn{ricing} and the resulting kernel
 modules will only be about 5% faster.
 
-@item --with-lis[=LIS-DIR]
-@itemx --without-lis
-@opindex lis
-Specify the @samp{LIS-DIR} directory in which to find @cite{LiS} headers.  Also specifies that the build is
-to be made against Linux STREAMS.  The default is @file{/usr/@-include/@-LiS} if it exists,
-@samp{no} otherwise.  This directory is normally located by the @file{configure} script and need
-only be provided for special cross-build environments or when requested by a @file{configure}
-script error message.  This option has no effect on @value{pkgtype} packages that do not use the
-@dfn{STREAMS} subsystem.
-
-@item --with-lfs[=LFS-DIR]
-@itemx --without-lfs
-@opindex lfs
-Specify the @samp{LFS-DIR} directory in which to find @cite{LfS} headers.  Also specifies that the build is
-to be made against Linux Fast-STREAMS.  The default is @file{/usr/@-include/@-streams} if it exists,
-@samp{no} otherwise.  This directory is normally located by the @file{configure} script and need
-only be provided for special cross-build environments or when requested by a @file{configure}
-script error message.  This option has no effect on @value{pkgtype} packages that do not use the
-@dfn{STREAMS} subsystem.
-
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master file is written.  The
@@ -1663,13 +1643,9 @@ alias char-major-246  streams-@var{other_driver}
 Note that @dfn{STREAMS} modules are not listed in this file, but will be loaded by name using
 @file{kerneld} if available.
 
-@cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than is provided by
-the deprecated @cite{LiS}.  For mechanisms used for kernel module loading under @cite{Linux
+@cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than previously provided.
+For mechanisms used for kernel module loading under @cite{Linux
 Fast-STREAMS}, @xref{Top, About This Manual, , STREAMS, Linux Fast-STREAMS Reference Manual}.
-
-@subsubsection Linux STREAMS Module Loading
-
-@cite{LiS} is deprecated and this section has been deleted.
 
 @node Maintenance
 @section Maintenance

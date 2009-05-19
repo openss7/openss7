@@ -356,15 +356,6 @@ LfS
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.\"Symbol
-.\".BR lis_apush_get ()
-.\"is provided for compatibility with LfS.  See
-.\".BR liscompat (9).
-.\".BR lis_apush_get ()
-.\"simply calls
-.\".BR apush_lst ()
-.\"directly.
-.\".IP \(em
 .I SVR 4.2 MP DDI/DKI
 .[
 usldk
@@ -404,9 +395,6 @@ specific function, see
 .\"
 .\"
 .SH HISTORY
-.\".PP
-.\".BR lis_apush_get ()
-.\"is an LfS-specific function.
 .PP
 .BR apush_lst ()
 is specific to

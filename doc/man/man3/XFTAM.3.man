@@ -308,6 +308,11 @@ receive result of an asynchronous operation
 .PD
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the OpenSS7 Standard XFTAM Library.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 The

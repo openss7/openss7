@@ -226,6 +226,49 @@ q771
 map onto the XTI functions as follows
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+XTI-mOSI.
+.[
+xns99
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns99
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR XTI-TR
+first appeared in
+.BR openss7 .
+.BR XTI-mOSI
+first appeared in
+XNS 4.
+.[
+xns95
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of XTI-TR.
+.\"
+.\"
+.XX
+.[
+xns99
+.]
+.[
+XTI revision 1
+.]
+.\"
+.\"
 .[
 $LIST$
 .]

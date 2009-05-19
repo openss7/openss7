@@ -264,6 +264,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Protocol Architecture::
 * Software Architecture::
 * Operations Architecture::
+* Licences::
 * Index::
 @end menu
 
@@ -402,6 +403,24 @@ The OpenSS7 Project
 @node Operations Architecture
 @chapter Operations Architecture
 @cindex Operations architecture
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+@dfn{Invariant Sections}, no @dfn{Front-Cover Texts} and no @dfn{Back-Cover Texts}.  Please note,
+however, that it is just plain wrong to modify statements of, or attribute statements to, the Author
+or @cite{OpenSS7 Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
 
 @node Index
 @unnumbered Index

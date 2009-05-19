@@ -202,10 +202,6 @@ driver does not implement input-output controls other than
 In contrast,
 .B loop
 implements a set of input-output controls compatible with the
-.I LiS
-.[
-lis
-.]
 loop-around driver for use in testing.
 .\"
 .\"
@@ -278,11 +274,7 @@ lfs
 .]
 provides the
 .B loop
-pseudo-device driver for testing and compatibility with
-.IR LiS ,
-.[
-LiS
-.]
+pseudo-device driver for testing
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 Although this driver is described in the
@@ -309,15 +301,10 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR4
+SVR4.
 .[
 svr4spg
 .]
-and LiS
-.[
-lis
-.]
-documentation.
 Conformance is verified using the
 .BR test-loop (8)
 verification test suite.

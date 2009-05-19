@@ -197,6 +197,12 @@ xap c303
 .BR libxap (3).
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the OpenSS7 standard X/Open ACSE/Presentation
+Library.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .SS Establishing and Releasing an XAP Instance
@@ -1293,7 +1299,6 @@ hpuxapli
 .IR "Digital\(rg DECnet/OSI" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 XAP
 .[
 xap c303
@@ -1362,6 +1367,11 @@ and XAP-TP.
 .[
 xap-tp
 .]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of the XAP Library.
 .\"
 .\"
 .[

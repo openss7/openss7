@@ -253,12 +253,37 @@ command.
 has no known bugs.
 .\"
 .\"
-.\".SH COMPATIBILITY
-.\".PP
+.SH COMPATIBILITY
+.PP
+The
+.B test-x400p
+test suite, when run using
+.BR autotest ,
+is compatible with the POSIX 1003.3 conformance test methodology, with the following mapping of test
+results:
+.PP
+.RS
+.TS
+tab(:);
+lb|lb|lb
+l|l|l.
+_
+POSIX 1003.3:test-x400p:autotest
+_
+PASS:PASS(0):PASS
+FAIL:FAIL(1):FAIL
+XFAIL:FAIL(1):XFAIL
+UNSUPPORTED:NOT APPLICABLE(0):PASS
+UNRESOLVED:INCONCLUSIVE(1):FAIL or XFAIL
+UNTESTED:SKIPPED(77):SKIPPED
+_
+.TE
+.RE
 .\"
 .\"
-.\".SH CONFORMANCE
-.\".PP
+.SH CONFORMANCE
+.PP
+None.
 .\"
 .\"
 .SH HISTORY

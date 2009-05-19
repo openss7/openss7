@@ -347,7 +347,7 @@ has no known bugs.
 The
 .B fattach
 command is an
-.BR LiS -specific
+.BR OpenSS7 -specific
 command.
 Although,
 .IR OSF/1 \(rg
@@ -368,21 +368,14 @@ OpenSS7 coding standards.
 .\"
 .SH CONFORMANCE
 .PP
-.B LiS
-.[
-lis
-.]
-documentation.
+OpenSS7.
 .\"
 .\"
 .SH HISTORY
 .PP
 .B fattach
-first appeared in
-.BR LiS .
-.[
-lis
-.]
+appeared in
+OpenSS7.
 .\"
 .\"
 .[

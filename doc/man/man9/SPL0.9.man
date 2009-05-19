@@ -108,7 +108,7 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B SPL0, lis_spl0, lis_spl0_fcn
+.B SPL0
 \- set priority level zero (0)
 .\"
 .\"
@@ -117,10 +117,6 @@ search-ignore T
 .B #include <sys/stream.h>
 .HP
 .BI "SPL0(pl_t " pl ");"
-.HP
-.BI "pl_t lis_spl0(void);"
-.HP
-.BI "pl_t lis_spl0_fcn(char *" file ", int " line ");
 .\"
 .\"
 .SH ARGUMENTS

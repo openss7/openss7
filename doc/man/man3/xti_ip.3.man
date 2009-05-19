@@ -736,7 +736,7 @@ See
 for additional compatibility information.
 .\"
 .\"
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 The OpenGroup XNS Issue 5.2.
 .[

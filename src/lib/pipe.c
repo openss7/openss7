@@ -133,27 +133,11 @@ __streams_pipe_r(int fds[2])
 	return (retval);
 }
 
-/** @brief open a streams based pipe.
-  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
-  * @par Alias:
-  * This symbol is a weak alias of __streams_pipe().  */
-int __lis_pipe(int fds[2])
-    __attribute__ ((weak, alias("__streams_pipe")));
-
-/** @brief open a streams based pipe.
-  * @param fds a pointer to the two file descriptors, one for each end of the pipe.
-  * @version LIS_1.0 pipe()
-  * @par Alias:
-  * This symbol is a weak alias of __streams_pipe_r().  */
-int __lis_pipe_r(int fds[2])
-    __attribute__ ((weak, alias("__streams_pipe_r")));
-
 /** @fn int pipe(int fds[2])
   * @param fds a pointer to the two file descriptors, one for each end of the pipe.
   * @version STREAMS_1.0 __streams_pipe_r().
-  * @version LIS_1.0 __lis_pipe_r() */
+  */
 __asm__(".symver __streams_pipe_r,pipe@@STREAMS_1.0");
-__asm__(".symver __lis_pipe_r,pipe@LIS_1.0");
 
 /** @} */
 

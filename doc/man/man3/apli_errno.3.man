@@ -172,6 +172,12 @@ APLI UNIX International
 .fi
 .\"
 .\"
+.SH MEMBERS
+.TP
+.I ap_errno
+The global APLI library error number.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 Provides a global error number into which error codes are returned when APLI API functions fail.
@@ -510,7 +516,7 @@ has no known bugs.
 .BR APLI (3).
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 .BR ap_errno
 is compatible with APLI,

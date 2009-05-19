@@ -281,41 +281,15 @@ each-rpm: $(rpm_spec_file) $(rpm_source_files)
 	$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories)
 	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $< || :
 
-##
-# This below is pretty obfuscated, but it is what we need to rebujild an rpm once for LiS and
-# another time for Linux Fast-STREAMS.  When we drop LiS support, this can be cleaned out.  This
-# uses the sneaky GNU make trick that per-target variables can be defined for the target and its
-# dependents, in our case the single build target.  Packages that do not build for STREAMS should
-# define conditionals WITH_LIS and WITH_LFS to be false and the plain rule above will be used
-# instead.
-##
 noa-rpm: AM_RPMBOPTS = --define "_without_arch --without-arch"
 noa-rpm: RPMTARGET = "noarch"
 noa-rpm: each-rpm
 
 one-rpm: AM_RPMBOPTS = --define "_without_indep --without-indep"
-one-rpm: @WITH_LIS_FALSE@@WITH_LFS_FALSE@ each-rpm
-
-lis-rpm: AM_RPMBOPTS = --define "_with_lis --with-lis" --define "_without_indep --without-indep"
-lis-rpm: @WITH_LIS_TRUE@ each-rpm
-
-lfs-rpm: AM_RPMBOPTS = --define "_with_lfs --with-lfs" --define "_without_indep --without-indep"
-lfs-rpm: @WITH_LFS_TRUE@ each-rpm
-
-lis-t-rpm: AM_RPMXOPTS = --define "_without_modules --without-modules"
-lis-t-rpm: lis-rpm
-
-lfs-t-rpm: AM_RPMXOPTS = --define "_without_modules --without-modules"
-lfs-t-rpm: lfs-rpm
+one-rpm: each-rpm
 
 one-t-rpm: AM_RPMXOPTS = --define "_without_modules --without-modules"
 one-t-rpm: one-rpm
-
-lis-k-rpm: AM_RPMXOPTS = --define "_without_tools --without-tools"
-lis-k-rpm: lis-rpm
-
-lfs-k-rpm: AM_RPMXOPTS = --define "_without_tools --without-tools"
-lfs-k-rpm: lfs-rpm
 
 one-k-rpm: AM_RPMXOPTS = --define "_without_tools --without-tools"
 one-k-rpm: one-rpm
@@ -336,20 +310,14 @@ rpms:
 	@$(ECHO) "D: $@: rebuild noarch"; \
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion='$(kversion)' RPMTARGET="noarch" noa-rpm || :
 	@$(ECHO) "D: $@: rebuild $(kversion)"; \
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion='$(kversion)' RPMTARGET='$(RPMTARGET)' lis-k-rpm lfs-k-rpm one-k-rpm || :
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion='$(kversion)' RPMTARGET='$(RPMTARGET)' one-k-rpm || :
 	@$(ECHO) "D: $@: rebuild $(RPMTARGET)"; \
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion='$(kversion)' RPMTARGET='$(RPMTARGET)' lis-t-rpm lfs-t-rpm one-t-rpm || :
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion='$(kversion)' RPMTARGET='$(RPMTARGET)' one-t-rpm || :
 
 # Another sneaky trick
 all-one-k-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lis-k-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lfs-k-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-one-t-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lis-t-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lfs-t-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-one-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lis-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lfs-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-noa-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-rpms:      ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 
@@ -410,7 +378,7 @@ rebuild:
 			rpms="`find $(rpmdir)/$$a -name '*$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$a'.rpm' 2>/dev/null`"; \
 			if test -z "$$rpms" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" lis-k-rpm lfs-k-rpm one-k-rpm || :; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" one-k-rpm || :; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
@@ -418,7 +386,7 @@ rebuild:
 		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 		if test -z "$$rpms" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" lis-t-rpm lfs-t-rpm one-t-rpm || :; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" one-t-rpm || :; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
@@ -473,7 +441,7 @@ RELEASE_DIRECTORIES	+= $(rpm_directories)
 if BUILD_RPMS
 ## BUILD_RPMS
 
-RELEASE			+= all-noa-rpm all-lis-k-rpm all-lfs-k-rpm all-one-k-rpm all-lis-t-rpm all-lfs-t-rpm all-one-t-rpm
+RELEASE			+= all-noa-rpm all-one-k-rpm all-one-t-rpm
 
 ## BUILD_RPMS
 endif
@@ -528,14 +496,8 @@ RELEASECLEANFILES	+= $(rpm_dir_stamp) \
 MY_PHONY		+= srpm rpms \
 			   each-rpm \
 			   one-k-rpm \
-			   lis-k-rpm \
-			   lfs-k-rpm \
 			   one-t-rpm \
-			   lis-t-rpm \
-			   lfs-t-rpm \
 			   one-rpm \
-			   lis-rpm \
-			   lfs-rpm \
 			   noa-rpm \
 			   sign \
 			   srpm-sign \
@@ -544,14 +506,8 @@ MY_PHONY		+= srpm rpms \
 ALL_RECURSIVE_TARGETS	+= all-srpm \
 			   all-rpms \
 			   all-one-k-rpm \
-			   all-lis-k-rpm \
-			   all-lfs-k-rpm \
 			   all-one-t-rpm \
-			   all-lis-t-rpm \
-			   all-lfs-t-rpm \
 			   all-one-rpm \
-			   all-lis-rpm \
-			   all-lfs-rpm \
 			   all-noa-rpm \
 			   all-sign \
 			   all-rebuild \
@@ -639,7 +595,7 @@ update-k-rpm:
 	done; \
 	if test ":$$rebuild" = :yes; then \
 		$(ECHO) "D: $@: rebuild $(kversion)"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" lis-k-rpm lfs-k-rpm one-k-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" one-k-rpm || :; \
 	else \
 		$(ECHO) "D: $@: skipped $(kversion)"; \
 	fi
@@ -658,7 +614,7 @@ update-t-rpm:
 	done; \
 	if test ":$$rebuild" = :yes; then \
 		$(ECHO) "D: $@: rebuild $$a"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET='$(RPMTARGET)' lis-t-rpm lfs-t-rpm one-t-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET='$(RPMTARGET)' one-t-rpm || :; \
 	else \
 		$(ECHO) "D: $@: skipped $$a"; \
 	fi
@@ -738,7 +694,7 @@ update-rpms:
 			done; \
 			if test ":$$rebuild" = :yes; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" lis-k-rpm lfs-k-rpm one-k-rpm || :; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" one-k-rpm || :; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
@@ -753,7 +709,7 @@ update-rpms:
 		done; \
 		if test ":$$rebuild" = :yes; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" lis-t-rpm lfs-t-rpm one-t-rpm || :; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" one-t-rpm || :; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
