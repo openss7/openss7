@@ -65,7 +65,7 @@ if RPM_BUILD_USER
 # removed.
 ##
 pre-libraries:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@l=`basename $(libdir)` ; \
 	for dir in /$$l /usr/$$l /usr/local/$$l ; do \
 		test ! \( "$$dir" -ef "$(libdir)" \) || continue ; \
@@ -104,9 +104,10 @@ PRE_INSTALL_AM		+= pre-libraries
 # in a cross-build situation, therefore, we perform the "finish" action ourselves.
 ##
 post-libraries:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
-		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(ECHO_Q) "LDCONFIG" ld.so.cache ; \
+		$(ECHO_V) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 
@@ -124,7 +125,7 @@ POST_INSTALL_AM		+= post-libraries
 # in a cross-build situation, therefore, we perform the "unfinish" action ourselves.
 ##
 postun-libraries:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \

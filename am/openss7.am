@@ -52,11 +52,12 @@
 ##
 ## =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.10 dist-bzip2 std-options -Wall
-
-ACLOCAL_AMFLAGS = -I m4
+AUTOMAKE_OPTIONS = gnits 1.10 dist-bzip2 std-options -Wall color-tests
 
 ECHO = echo
+
+ECHO_V = test -n '$(AM_V_at)' || $(ECHO)
+ECHO_Q = test -z '$(AM_V_at)' || $(ECHO)
 
 ##
 # Accumulate these 'till the end
@@ -175,7 +176,7 @@ endif
 ## Like automake recursive targets, but mine.
 ##
 $(MY_RECURSIVE_TARGETS):
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
 	target=`$(ECHO) $@ | sed s/-recursive//`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -184,9 +185,9 @@ $(MY_RECURSIVE_TARGETS):
 	if test "$$dot_seen" = "no"; then list="$$list ."; fi; \
 	for subdir in $$list; do \
 		case " m4 intl po " in (*" $$subdir "*) continue ;; esac; \
-		$(ECHO) "D: Making $$target in $$subdir"; \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
 		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
 	done; \
@@ -199,7 +200,7 @@ MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
 ## We also try to override uninstall-recursive.  Automake will probably complain violently.
 ##
 $(MY_REVERSIVE_TARGETS):
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
 	target=`$(ECHO) $@ | sed s/-recursive//`; \
 	list=''; rev='$(SUBDIRS)'; for subdir in $$rev; do \
@@ -211,9 +212,9 @@ $(MY_REVERSIVE_TARGETS):
 		case " m4 intl po " in (*" $$subdir "*) \
 			if test "$$target" = "remove"; then target='uninstall'; else continue; fi ;; \
 		esac; \
-		$(ECHO) "D: Making $$target in $$subdir"; \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
 		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
 	done; \
@@ -231,13 +232,13 @@ ALL_EXPORT_OPTS =
 
 $(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_RECURSIVE_TARGETS):
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
 	list='$(subdirs) .'; \
 	for subdir in $$list; do \
-		$(ECHO) "D: Making $$target in $$subdir"; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
 	done; \
@@ -253,15 +254,15 @@ ALL_REVERSIVE_TARGETS = all-uninstall
 
 $(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_REVERSIVE_TARGETS):
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
 	list=''; rev='$(subdirs) .'; for subdir in $$rev; do \
 		list="$$subdir $$list"; \
 	done; \
 	for subdir in $$list; do \
-		$(ECHO) "D: Making $$target in $$subdir"; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+		$(ECHO_V) "D: Making $$target in $$subdir"; \
+		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
 	done; \
@@ -272,8 +273,6 @@ MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
 ##
 # directory for test suites and other test programs
 ##
-pkglibexecdir = $(libexecdir)/@PACKAGE@
-
 if PERFORM_CHECKS
 dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
 TESTS			= $(dist_check_SCRIPTS)
@@ -712,7 +711,7 @@ MY_REVERSIVE_TARGETS	+= remove-recursive
 MY_PHONY		+= remove remove-am
 
 $(REPO_DIRECTORIES)::
-	@test -d $@ || { $(ECHO) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
 
 #! Repository targets:
 #! -------------------
@@ -758,7 +757,7 @@ repo-clean: $(REPO_CLEAN)
 MY_PHONY		+= repo-clean $(REPO_CLEAN)
 
 $(RELEASE_DIRECTORIES)::
-	@test -d $@ || { $(ECHO) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
 
 #!
 #! Release Targets:
@@ -816,18 +815,18 @@ FORCED_TARGETS		+= forced-release-sign
 release-clean: release-clean-recursive release-clean-local
 
 release-clean-am:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@targets="$(RELEASE_CLEAN_LOCAL)"; revers=; for t in $$targets; do \
 		revers="$$t$${reverse:+ $$reverse}"; \
 	done; \
 	for target in $$reverse; do \
-		$(ECHO) "D: Making $$target in `pwd`"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(ECHO_V) "D: Making $$target in `pwd`"; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	done
 
 release-clean-local:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(RELEASECLEANFILES)"; reverse=; for f in $$list; do \
 		reverse="$$f$${reverse:+ $$reverse}"; \
 	done; \
@@ -840,7 +839,7 @@ MY_REVERSIVE_TARGETS	+= release-clean-recursive
 MY_PHONY		+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
 
 $(UPDATE_DIRECTORIES)::
-	@test -d $@ || { $(ECHO) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
 
 #! Update Targets:
 #! ---------------
@@ -854,7 +853,7 @@ $(UPDATE_DIRECTORIES)::
 #! the existing distribution.
 #!
 $(USTAMP)::
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test ! -f $@ || exit 0
 	echo `date -uIseconds` > $@
 	touch $@
@@ -900,18 +899,18 @@ MY_PHONY		+= update-sign $(UPDATE_SIGN)
 update-clean: update-clean-recursive update-clean-local
 
 update-clean-am:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@targets="$(UPDATE_CLEAN_LOCAL)"; reverse=; for t in $$targets; do \
 		reverse="$$t$${reverse:+ $$reverse}"; \
 	done; \
 	for target in $$reverse; do \
-		$(ECHO) "D: Making $$target in `pwd`"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(ECHO_V) "D: Making $$target in `pwd`"; \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	done
 
 update-clean-local:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(UPDATECLEANFILES)"; reverse=; for f in $$list; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
 			reverse="$$f$${reverse:+ $$reverse}"; \
@@ -961,7 +960,7 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 #! If you want to add one, simply add it to LOGGING_TARGETS in Makefile.am
 #!
 $(LOGGING_TARGETS): FORCE
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'`; \
 	if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
 	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target || \
@@ -969,7 +968,7 @@ $(LOGGING_TARGETS): FORCE
 	| tee $@
 
 configure.log: FORCE
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
 	{ (cd $(top_builddir); ./config.status --recheck; ./config.status) || \
 	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \

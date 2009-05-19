@@ -247,6 +247,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -323,7 +352,7 @@ components as well as providing a basis for @value{PART} control for other @valu
 @cpindex STREAMS
 
 The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
-This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+This document is intended to be included with the OpenSS7 @acronym{STREAMS} software package released
 by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
 of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
 that are made available in the software package.
@@ -365,9 +394,6 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.11  2009-05-01 04:50:53  brian
-- update documentation for release
-
 @end verbatim
 @end smallexample
 
@@ -422,7 +448,7 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 @chapter Introduction
 @cpindex STREAMS
 
-This document specifies a @cite{STREAMS} kernel-level instantiation of the ISO
+This document specifies a @acronym{STREAMS} kernel-level instantiation of the ISO
 Data Link Service Definition DIS 8886@footnote{International Organization for
 Standardization, "Data Link Service Definition for Open Systems
 Interconnection," DIS 8886, February 1987.} and Logical Link Control DIS 8802/2
@@ -450,7 +476,7 @@ address issues such as @acronym{CDSAP} address space, subsequent address,
 @acronym{PPA} access and control, @acronym{QoS}, supported services, etc.
 
 This specification assumes the reader is familiar with OSI Reference Model[4]
-terminology, OSI Data Link Services, and @cite{STREAMS}.
+terminology, OSI Data Link Services, and @acronym{STREAMS}.
 
 @section Document Organization
 
@@ -5278,7 +5304,7 @@ use with specific drivers and modules.
 
 @section Compilation with Header Files
 
-All applications programs and @cite{STREAMS} drivers and modules that use this interface include the
+All applications programs and @acronym{STREAMS} drivers and modules that use this interface include the
 @file{<sys/cdi.h>} header file.  When compiling using a @samp{C} language compiler, the compilation
 line must specify the location of the header file, such as
 @samp{-I@value{_includedir}/@value{PACKAGE_LCNAME}}.
@@ -5359,8 +5385,8 @@ The @acronym{CDI-API} library provides the following subroutines:
 @end menu
 
 The Communications Device Interface (CDI) is used to provide services to a
-number of @cite{STREAMS} drivers and modules in addition to user-space
-applications.  @cite{OpenSS7} provides a range of @cite{STREAMS} multiplexing
+number of @acronym{STREAMS} drivers and modules in addition to user-space
+applications.  @cite{OpenSS7} provides a range of @acronym{STREAMS} multiplexing
 drivers, pseudo-device drivers, and pushable modules that complement the
 Channel driver that provides channel services at its upper layer.
 
@@ -5382,13 +5408,13 @@ Channel driver that provides channel services at its upper layer.
 
 @subsection CD DAED Module
 
-The @acronym{DAED} module, @manref{cd_daed(4)}, is a pushable @cite{STREAMS}
+The @acronym{DAED} module, @manref{cd_daed(4)}, is a pushable @acronym{STREAMS}
 module named @file{cd-daed}.  Its purpose is to take an @cite{OpenSS7} Channel
 Interface (CHI) Stream and convert it for use as an @acronym{DEAD} interface
 Stream by applications programs, drivers or modules expecting the CDI
 interface.  The insertion and use of this module is illustrated in
 
-The @file{cd-daed} pushable @cite{STREAMS} module accepts a Channel Interface
+The @file{cd-daed} pushable @acronym{STREAMS} module accepts a Channel Interface
 (CHI) at its lower service boundary and provides a Communicaitons Device
 Interface (CDI) at its upper service boundary.
 
@@ -5430,7 +5456,7 @@ Error Detection (DAED) procedures as specified in @cite{ITU-T Recommendation
 Q.703} and @cite{ANSI T1.111.3}.  It is intended to be used with a
 @manref{ch(4)} driver.
 
-@manref{cd_daed(4)} is implemented as a pushabled @cite{STREAMS} module.  The
+@manref{cd_daed(4)} is implemented as a pushabled @acronym{STREAMS} module.  The
 module ccan be pushed over a @dfn{Stream} conforming to the @cite{Channel
 Interface (CHI)}, as described in @manref{chi(7)}.  The module provides DAED
 access to the bit stream from the channel provided by the @manref{chi(7)}
@@ -5467,13 +5493,13 @@ directly by some test and monitoring programs.
 
 @subsection CD HDLC Module
 
-The @acronym{HDLC} module, @manref{cd_hdlc(4)}, is a pushable @cite{STREAMS}
+The @acronym{HDLC} module, @manref{cd_hdlc(4)}, is a pushable @acronym{STREAMS}
 module named @file{cd-hdlc}.  Its purpose is to take an @cite{OpenSS7} Channel
 Interface (CHI) Stream and convert it for use as an @acronym{HDLC} interface
 Stream by applications programs, drivers or modules expecting the CDI
 interface.  The insertion and use of this module is illustrated in
 
-The @file{cd-hdlc} pushable @cite{STREAMS} module accepts a Channel
+The @file{cd-hdlc} pushable @acronym{STREAMS} module accepts a Channel
 Interface (CHI) at its lower service boundary and provides a Communications
 Device Interface (CDI) at its upper service boundary.
 
@@ -5512,13 +5538,13 @@ if (ioctl(fd, I_PUSH, "cd-hdlc") < 0) {
 
 @subsection CD Pipe Module
 
-The CD pipe module, @manref{cdpmod(4)}, is a pushable @cite{STREAMS} module
-named @file{cdpmod}.  Its purpose is to take a @cite{STREAMS}-based pipe and
+The CD pipe module, @manref{cdpmod(4)}, is a pushable @acronym{STREAMS} module
+named @file{cdpmod}.  Its purpose is to take a @acronym{STREAMS}-based pipe and
 convert it to a connected pair of CDI Streams for use by applications programs,
 drivers or modules expecting a CDI interface.  The insertion and use of this
 module is illustrated in
 
-The @file{chpmod} pushable @cite{STREAMS} module provides a Communications
+The @file{chpmod} pushable @acronym{STREAMS} module provides a Communications
 Device Interface (CDI) at its upper service boundary and provides an inverted
 Communications Device Interface (CDI) at its lower service boundary.  This
 provides a @dfn{Style 1} connected communications device.
@@ -5529,11 +5555,11 @@ a CDI interface.
 @subsection CD to WAN Conversion Module
 
 The CD to WAN Conversion Module, @manref{s_wan(4)}, is a pushable
-@cite{STREAMS} module named @file{s_wan} that converts between a @dfn{Stream}
+@acronym{STREAMS} module named @file{s_wan} that converts between a @dfn{Stream}
 supporting the Communications Device Interace (CDI) and a @dfn{Strema}
 supporting the @cite{Spider WAN} interface.
 
-The @file{s_wan} pushable @cite{STREAMS} module provides a Communications
+The @file{s_wan} pushable @acronym{STREAMS} module provides a Communications
 Device Interface (CDI) at its lower service boundary and provides a
 @cite{Spider WAN} interface at its upper service boundary.  This provides a
 @dfn{Style 1} or @dfn{Style 2} @acronym{HDLC} communications device.
@@ -5549,7 +5575,7 @@ additional information on this conversion module.
 @subsection WAN to CD Conversion Module
 
 The WAN to CD Conversion Module, @manref{s_cdi(4)}, is a pushable
-@cite{STREAMS} module named @file{s_cdi} that converts between a @dfn{Stream}
+@acronym{STREAMS} module named @file{s_cdi} that converts between a @dfn{Stream}
 supporting the @cite{Spider WAN} interface and a @dfn{Strema} supporting the
 Communications Device Inteface (CDI).
 
@@ -5564,11 +5590,11 @@ additional information on this conversion module.
 @subsection CD to SDT Conversion Module
 
 The CD to SDT Conversion Module, @manref{cd_sdt(4)}, is a pushable
-@cite{STREAMS} module named @file{cd-sdt} that converts between a @dfn{Stream}
+@acronym{STREAMS} module named @file{cd-sdt} that converts between a @dfn{Stream}
 supporting the Communications Device Interface (CDI) and a @dfn{Stream}
 supporting the Signalling Data Terminal Interface (SDTI).
 
-The @file{cd-sdt} pushable @cite{STREAMS} module provides a Communications
+The @file{cd-sdt} pushable @acronym{STREAMS} module provides a Communications
 Device Interface (CDI) at its upper service boundary and provides a Signalling
 Data Terminal Inteface (SDTI) at its lower service boundary.  This
 provides a @dfn{Style 1} or @dfn{Style 2} @acronym{DAED} communications device.
@@ -5585,11 +5611,11 @@ additional information on this conversion module.
 @subsection SDT to CD Conversion Module
 
 The SDT to CD Conversion Module, @manref{sdt_cd(4)}, is a pushable
-@cite{STREAMS} module named @file{sdt-cd} that converts between a @dfn{Stream}
+@acronym{STREAMS} module named @file{sdt-cd} that converts between a @dfn{Stream}
 supporting the Signalling Data Terminal Interface (SDTI) and a @dfn{Stream}
 supporting the Communications Device Inteface (CDI).
 
-The @file{sdt-cd} pushable @cite{STREAMS} module provides a Signalling Data
+The @file{sdt-cd} pushable @acronym{STREAMS} module provides a Signalling Data
 Terminal Interface (SDTI) at its upper service boundary and provides a
 Communications Device Inteface (CDI) at its lower service boundary.  This
 provides a @dfn{Style 1} or @dfn{Style 2} signalling data terminal.

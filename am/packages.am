@@ -90,7 +90,7 @@ $(DEPDIR)/packages.Ph: Makefile
 		done ; \
 		$(ECHO) "stamp-pkgobjs: $$objs" ; $(ECHO) "" ; \
 	) >$(DEPDIR)/packages.Tph || { rm -f $(DEPDIR)/packages.Tph ; exit 1 ; } ; \
-	mv -f $(DEPDIR)/packages.Tph $@
+	$(am__mv) $(DEPDIR)/packages.Tph $@
 ## AMDEP
 endif
 
@@ -107,7 +107,7 @@ stamp-pkgobjs: $(PACKAGE_SRCFILES)
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -MT libBCMpkgs_a-$$r.o -MD -MP -MF "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
-		then mv -f "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
+		then $(am__mv) "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
 	done ; \
 	touch stamp-pkgobjs
 ## am__fastdepCC

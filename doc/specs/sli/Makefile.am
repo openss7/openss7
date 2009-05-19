@@ -62,10 +62,10 @@ if DEVELOPMENT
 info_TEXINFOS		+= sli.texi
 
 lmi.h: $(top_srcdir)/src/include/ss7/lmi.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 sli.h: $(top_srcdir)/src/include/ss7/sli.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += lmi.h sli.h
 

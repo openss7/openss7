@@ -238,6 +238,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -421,26 +450,6 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.7  2009-05-01 04:50:27  brian
-- update documentation for release
-
-Revision 0.9.2.6  2008/10/28 07:07:35  brian
-- remove conflict with sigtran package
-
-Revision 0.9.2.5  2008/09/20 11:04:27  brian
-- added package patchlevel
-
-Revision 0.9.2.4  2008-08-03 06:03:29  brian
-- protected agains texinfo commands in log entries
-
-Revision 0.9.2.3  2008-04-29 07:10:36  brian
-- updating headers for release
-
-Revision 0.9.2.2  2008-04-25 11:50:46  brian
-- updates to AGPLv3
-
-Revision 0.9.2.1  2007/11/06 09:33:53  brian
-- added sg document
 @end verbatim
 @end smallexample
 
@@ -949,7 +958,7 @@ the SG to the AS.  The SUA driver links
 SCTP driver streams underneath it to provide the transport services for exporting the MTP-User
 interface.  The SUA driver provides the same interface to its users as the OpenSS7 SCCP.
 
-The SUA driver is a @dfn{STREAMS} driver that runs int he Linux kernel for maximum performance.
+The SUA driver is a @acronym{STREAMS} driver that runs int he Linux kernel for maximum performance.
 
 This is an existing OpenSS7 SIGTRAN stack component: for documentation, see: @manref{sua(4)}.
 @dfn{Phase 1} activities for SUA include integration testing with the SG components.
@@ -975,12 +984,12 @@ provided.
 
 The SCCP driver also provide GTT streams for servicing Global Title Translations requests.  These
 streams can be used by a user-space program for servicing GTT requests from a local or remote
-database, or can have specialized @dfn{STREAMS} modules pushed to perform rule-based GTT in the
+database, or can have specialized @acronym{STREAMS} modules pushed to perform rule-based GTT in the
 operating system kernel.
 
-The SCCP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The SCCP driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
-The Signalling Connection Control Part (SCCP) @dfn{STREAMS} module is responsible for providing SCCP
+The Signalling Connection Control Part (SCCP) @acronym{STREAMS} module is responsible for providing SCCP
 services on top of a Message Transfer Part (MTP) Level 3 (MTP3) or MTP3-User Adaptation Layer (M3UA)
 @cindex M3UA
 stream.  In addition, it is possible to use an ISO/OSI connectionless Network Service Provider to
@@ -1049,7 +1058,7 @@ from the SG to the AS.  The M3UA driver links
 SCTP driver streams underneath it to provide the transport services for exporting the MTP-User
 interface.  The M3UA driver provides the same interface to its users as the OpenSS7 MTP.
 
-The M3UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The M3UA driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
 This is an existing OpenSS7 SIGTRAN stack component; for documentation, see: @manref{m3ua(4)}.
 @dfn{Phase 1} activities for M3UA include integration testing with the SG components.
@@ -1073,7 +1082,7 @@ forward), including full transfer function.  The MTP driver provides a specializ
 its users, in addition to an NPI Revision 2.0 connectionless interface.  A TPI Revision 2.0
 (connectionless) user interface support X/Open XNS 5.2 XTI library functions is also provided.
 
-The MTP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The MTP driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
 The Message Transfer Part (MTP) Level 3 (MTP3) module is responsible for providing MTP services to
 its users.
@@ -1099,7 +1108,7 @@ in this case, between SG's.}  The M2UA driver links
 SCTP driver streams underneath it to provide the transport services for exporting the SL-User
 interface.  The M2UA driver provides the same interface to its users as the OpenSS7 SL.
 
-The M2UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The M2UA driver is a @acronym{STREAMS} driver that runs in the Linux kernel for maximum performance.
 
 This is an existing OpenSS7 SIGTRAN stack component: for documentation, see @manref{m2ua(4)}.
 @dfn{Phase 1} activities for M2UA include integration testing with the SG components.
@@ -1115,7 +1124,7 @@ and Physical Point of Attachment scheme for all signalling links.  V401P-SS7 sig
 channel driver signalling links, M2PA signalling links and M2UA accessible signalling links can all
 be linked beneath the SL-MUX driver.
 
-The SL-MUX driver is a @dfn{STREAMS} multiplexing driver that runs in the kernel for maximum
+The SL-MUX driver is a @acronym{STREAMS} multiplexing driver that runs in the kernel for maximum
 performance.
 
 This is an existing OpenSS7 SS7 stack component: for documentation, see @manref{sl-mux(4)}.
@@ -1131,7 +1140,7 @@ acting as Signalling Transfer Points (STPs).  The M2PA module pushes over an SCT
 Stream to form a complete Signalling Link (SL).  The M2PA module provides the same interface to its
 users as the OpenSS7 Signalling Link (SL).
 
-The M2PA module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+The M2PA module is a @acronym{STREAMS} module that runs in the Linux kernel for maximum performance.
 
 This is an existing OpenSS7 SIGTRAN stack component: for documentation, see @manref{m2pa(4)}.
 @dfn{Phase 1} activities for M2PA include integration testing with the SG components.
@@ -1154,7 +1163,7 @@ Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
 The SL module provides a specialized SL interface to its users, in addition to an NCR Comten CDI
 Revision 2.0 Style 2 connectionless interface.
 
-The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+The SL module is a @acronym{STREAMS} module that runs in the Linux kernel for maximum performance.
 
 The Signalling Link (SL) module is responsible for providing SL services to its users.
 
@@ -1240,8 +1249,8 @@ The Multiplex/Channel (MX/CH) driver is responsible for providing CH services to
 @cindex Stream Control Transmission Protocol (SCTP) Driver
 @cindex SCTP
 
-OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
-transport protocol and that provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS}
+OpenSS7 has two implementations (@acronym{STREAMS} and Linux Sockets) that provide support for this new
+transport protocol and that provide transport for SIGTRAN and other protocols.  The @acronym{STREAMS}
 SCTP implementation provides an NPI Revision 2.0 and TPI Revision 2.0 interface to its users.  Alos
 supported is an X/Open XNS 5.2 XTI Library and ITOS (ISO over SCTP).  The Linux Native SCTP
 implementation provides a Sockets interface.
@@ -1255,7 +1264,7 @@ components.
 @cindex Software Architecture
 
 This chapter details the software configuration of the OpenSS7 solutions.  OpenSS7 stack software is
-based on the @dfn{STREAMS} facility running on the Linux Operating System.  This provides for use of
+based on the @acronym{STREAMS} facility running on the Linux Operating System.  This provides for use of
 the Linux Operating System while maintaining portability and consistency with major UNIX operating
 systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
@@ -1269,7 +1278,7 @@ systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 @section Linux Operating System
 @cindex Linux Operating System
 
-The OpenSS7 @dfn{STREAMS} releases and stacks currently support the 2.4 and 2.6 Linux Kernel.  A
+The OpenSS7 @acronym{STREAMS} releases and stacks currently support the 2.4 and 2.6 Linux Kernel.  A
 Linux kernel version greater than or equal to 2.4.18 is recommended for 2.4 kernels.  The Linux 2.5
 series kernels are not supported.  A Linux kernel version greater than or equal to 2.6.9 is
 recommended for 2.6 kernels.  Linux 2.4 and 2.6 kernels released by popular distributions are
@@ -1278,7 +1287,7 @@ EL4), Fedora Core (FC1-FC7), Debian (Woody-Etch), Ubuntu (6.10-7.10), SuSE (8.2-
 and 5), Lineox (4 and 5).  Currently our preferred distribution is CentOS 5 with all updates
 applied.
 
-Although OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+Although OpenSS7 @acronym{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
 stacks compile and install on PPC (MPC 8260, Freescale 440), HPPA, and other processor architectures
 supported by the Linux 2.4 and 2.6 kernels.
 
@@ -1288,20 +1297,20 @@ For the current project, RedHat AS/EL5 or CentOS 5 is recommended.
 @section STREAMS Facility
 @cindex STREAMS Facility
 
-OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize a @dfn{SVR 4.2 ES/MP STREAMS} facility.
+OpenSS7 @acronym{STREAMS} SS7 and SIGTRAN stacks utilize a @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
 @node OpenSS7 SS7 and SIGTRAN Stacks
 @section OpenSS7 SS7 and SIGTRAN Stacks
 @cindex OpenSS7 SS7 and SIGTRAN Stacks
 
-The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facility.  Protocol
-moduels within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
-drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
-multiplexing drivers above read or pseudo-device drivers using the @dfn{STREAMS} @manref{I_PUSH(7)}
-an @manref{I_LINK(7)} facilities.  Since @dfn{STREAMS} modules and drivers run within the context of
+The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @acronym{STREAMS} facility.  Protocol
+moduels within the stack are implemented as @acronym{STREAMS} modules, device drivers, multiplexing
+drivers and pseudo-device drivers.  The @acronym{STREAMS} facility has the ability to stack modules and
+multiplexing drivers above read or pseudo-device drivers using the @acronym{STREAMS} @manref{I_PUSH(7)}
+an @manref{I_LINK(7)} facilities.  Since @acronym{STREAMS} modules and drivers run within the context of
 the Operating System Kernel using message-based scheduling, greatly increased performance is
-experienced over equivalent user-space applications.  @dfn{STREAMS} modules and drivers communicate
-by passing priority.  In addition, @dfn{STREAMS} provides memory management, timer, locking,
+experienced over equivalent user-space applications.  @acronym{STREAMS} modules and drivers communicate
+by passing priority.  In addition, @acronym{STREAMS} provides memory management, timer, locking,
 syncrhonization, flow control and other facilities commonly used by protocol modules.
 
 @figure{osimap,7.1,SS7 to ISO/OSI Mapping}
@@ -1312,7 +1321,7 @@ with support fot he OpenSS7 XTI/TLI Library.
 
 @figuresized{stack,7.2,STREAMS SS7/SIGTRAN Stack Architecture,3in}
 
-@figref{7.2} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
+@figref{7.2} illustrates the organization of @acronym{STREAMS} modules, multiplexing drivers,
 pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
 equivalent SIGTRAN User Adaptation Layer (UA) can be used.  So, for example, between MTP Level 3 and
 its Users, the M3UA

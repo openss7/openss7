@@ -410,6 +410,35 @@ herein.
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -456,7 +485,7 @@ implementation details of a particular service from the consumer of the service.
 This enables system programmers to develop software independent of the
 particular protocol that provides a specific service.  The interfaces being
 specified for @cite{UNIX@registeredsymbol{} System V} are defined within the
-@dfn{STREAMS} environment.  This document specifies a kernel-level interface
+@acronym{STREAMS} environment.  This document specifies a kernel-level interface
 that supports the services of the Transport Layer for connection-mode and
 connectionless mode services.
 
@@ -478,8 +507,8 @@ This specification applies to @cite{System V Release 4.2 ES/MP}.
 @end menu
 
 The transport interface defines a message interface to a transport provider
-implemented under @dfn{STREAMS}.@footnote{It is assumed that the reader of this
-document is familiar with the concept @dfn{STREAMS}.}
+implemented under @acronym{STREAMS}.@footnote{It is assumed that the reader of this
+document is familiar with the concept @acronym{STREAMS}.}
 
 This version of the transport provider interface supports the @cite{XPG4}
 version of the @cite{X/Open Transport Interface (XTI)}.  A user communicates to
@@ -489,7 +518,7 @@ passed to the transport provider from the transport user and vice versa.
 
 @figure{tpi_fig1,1,Example of a stream from a user to a transport provider}
 
-The @dfn{STREAMS} messages that are used to communicate transport service
+The @acronym{STREAMS} messages that are used to communicate transport service
 primitives between the transport user and the transport provider may have one of
 the following formats:
 
@@ -521,7 +550,7 @@ requests to the transport provider or respond to an event of the transport
 provider. The primitives which originate from the transport provider are either
 confirmations of a request or are indications to the transport user that an
 event has occurred.  Section 2 lists the primitive types along with the mapping
-of those primitives to the @dfn{STREAMS} message types and the transport
+of those primitives to the @acronym{STREAMS} message types and the transport
 primitives of the @cite{ISO IS 8072} and @cite{IS 8072/DAD} transport service
 definitions.  The format of these primitives and the rules governing the use of
 them are described in sections 2.1, 2.2, and 2.3.
@@ -2306,7 +2335,7 @@ message to flush both the read and write queues after receiving a successful
 @cindex Mapping of transport primitives to osi
 
 The following table maps those transport primitives as seen by the transport
-provider to the @dfn{STREAMS} message types used to realize the primitives and
+provider to the @acronym{STREAMS} message types used to realize the primitives and
 to the ISO IS 8072 and IS8072/DAD1 transport service definition primitives.
 
 @figure{tpi_fig2,2,Mapping ISO IS 8072 and IS 8072/DAD1 to Kernel-level Transport Service Primitives}

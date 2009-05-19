@@ -1303,6 +1303,8 @@ fi
     --with-gnu-ld \
     --with-k-release=%{kernel_version} \
     --with-k-modules=%{_kmoduledir} \
+    %{?_with_silent_rules                   '%enable %_with_silent_rules'} \
+    %{?_without_silent_rules                '%disable %_without_silent_rules'} \
     %{?_with_pkg_epoch:                     '%_with_pkg_epoch'} \
     %{?_without_pkg_epoch:                  '%_without_pkg_epoch'} \
     %{?_with_pkg_release:                   '%_with_pkg_release'} \

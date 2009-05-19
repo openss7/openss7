@@ -412,22 +412,22 @@ This manual provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE
 @subsection Objective
 @cindex manual objective
 
-The objective of this manual is to provide a guide for the @dfn{STREAMS} programmer when
-developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
+The objective of this manual is to provide a guide for the @acronym{STREAMS} programmer when
+developing @acronym{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
 
-This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
+This guide provides information to developers on the use of the @acronym{STREAMS} mechanism at user and
 kernel levels.
 
-@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+@acronym{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
 (I/O) mechanism and to support development of communication services.
 
-@dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
+@acronym{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
 that expedite software design and implementation.
 
 @subsection Intent
 @cindex manual intent
 
-The intent of this manual is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+The intent of this manual is to act as an introductory guide to the @acronym{STREAMS} programmer.  It
 is intended to be read alone and is not intended to replace or supplement the
 @cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
 (see @manref{STREAMS(9)}) provide a better reference to the programmer.
@@ -443,7 +443,7 @@ with @cite{Linux} kernel programming, the @cite{Linux} file system, character de
 and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
 locks, etc.
 
-The guide is intended for network and systems programmers, who use the @dfn{STREAMS} mechanism at
+The guide is intended for network and systems programmers, who use the @acronym{STREAMS} mechanism at
 user and kernel levels for @cite{Linux} and @cite{UNIX} system communication services.
 
 Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
@@ -479,152 +479,6 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.49  2009-05-01 04:50:43  brian
-- update documentation for release
-
-Revision 0.9.2.48  2009-04-29 18:05:32  brian
-- updated documentation for release
-
-Revision 0.9.2.47  2009-04-21 07:48:38  brian
-- updates for release
-
-Revision 0.9.2.46  2008-11-26 12:01:41  brian
-- updated to FDL 1.3
-
-Revision 0.9.2.45  2008-09-20 11:04:35  brian
-- added package patchlevel
-
-Revision 0.9.2.44  2008-08-03 06:03:36  brian
-- protected agains texinfo commands in log entries
-
-Revision 0.9.2.43  2008/07/27 08:49:17  brian
-- no invariant sections, more libtool ignores
-
-Revision 0.9.2.42  2008-04-28 12:54:00  brian
-- update file headers for release
-
-Revision 0.9.2.41  2008-04-25 11:50:49  brian
-- updates to AGPLv3
-
-Revision 0.9.2.40  2007/12/15 20:19:44  brian
-- updates
-
-Revision 0.9.2.39  2007/11/06 10:27:04  brian
-- miscellaneous corrections
-
-Revision 0.9.2.38  2007/08/12 06:44:32  brian
-- updated licenses in manuals
-
-Revision 0.9.2.37  2007/03/17 08:31:56  brian
-- corrected formatting problems
-
-Revision 0.9.2.36  2007/02/28 06:30:55  brian
-- updates and corrections, #ifdef instead of #if
-
-Revision 0.9.2.35  2007/01/02 16:32:03  brian
-- updates for release, disable streams-bcm by default
-
-Revision 0.9.2.34  2006/12/31 13:26:37  brian
-- documentation updates for release
-
-Revision 0.9.2.33  2006/09/18 01:06:57  brian
-- updated manuals and release texi docs
-
-Revision 0.9.2.32  2006/08/28 10:47:05  brian
-- correction
-
-Revision 0.9.2.31  2006/08/28 10:32:54  brian
-- updated references
-
-Revision 0.9.2.30  2006/08/27 12:26:58  brian
-- finalizing auto release files
-
-Revision 0.9.2.29  2006/08/26 18:31:44  brian
-- handle long urls
-
-Revision 0.9.2.28  2006/08/26 09:18:27  brian
-- better release file generation
-
-Revision 0.9.2.27  2006/08/23 11:00:41  brian
-- added preface, corrections and updates for release
-
-Revision 0.9.2.26  2006/08/22 12:36:49  brian
-- udpates to documentation, tweaks to Stream head
-
-Revision 0.9.2.25  2006/03/22 10:02:04  brian
-- added makefile target index
-
-Revision 0.9.2.24  2006/03/03 10:57:11  brian
-- 32-bit compatibility support, updates for release
-
-Revision 0.9.2.23  2005/09/15 13:03:08  brian
-- added new graphics and updates
-
-Revision 0.9.2.22  2005/07/08 13:16:11  brian
-- updates to documentation
-
-Revision 0.9.2.21  2005/06/24 13:38:59  brian
-- added troubleshooting section to manuals
-
-Revision 0.9.2.20  2005/05/14 08:34:34  brian
-- copyright header correction
-
-Revision 0.9.2.19  2005/04/15 00:58:31  brian
-- working up documentation
-
-Revision 0.9.2.18  2005/04/14 08:06:09  brian
-- added figures
-
-Revision 0.9.2.17  2005/04/12 09:28:59  brian
-- corrections
-
-Revision 0.9.2.16  2005/04/11 20:48:41  brian
-- documentation updates and corrections
-
-Revision 0.9.2.15  2005/03/15 12:06:58  brian
-- Updated texinfo documentation.
-
-Revision 0.9.2.14  2005/03/15 00:56:42  brian
-- Updated version numbering in texinfo files.
-
-Revision 0.9.2.13  2005/03/15 00:51:34  brian
-- Updated version numbering in texinfo files.
-
-Revision 0.9.2.12  2005/02/17 22:57:34  brian
-- Some cross-reference corrections.
-
-Revision 0.9.2.11  2005/02/17 11:34:53  brian
-- Corrected some more texi problems.
-
-Revision 0.9.2.10  2005/01/24 11:57:57  brian
-- Updated texinfo headers.
-
-Revision 0.9.2.9  2004/12/19 15:15:02  brian
-- Corrected include position.
-
-Revision 0.9.2.8  2004/12/17 04:02:46  brian
-- Improving spec files.
-
-Revision 0.9.2.7  2004/11/06 10:24:35  brian
-- Updated documentation.
-
-Revision 0.9.2.6  2004/08/22 07:28:53  brian
-- Converted to shared common files.
-
-Revision 0.9.2.5  2004/08/22 06:17:50  brian
-- Checkin on new working branch.
-
-Revision 0.9.2.4  2004/08/15 19:59:29  brian
-- Build system updates.
-
-Revision 0.9.2.3  2004/05/29 08:28:01  brian
-- Working up stable release.
-
-Revision 0.9.2.2  2004/03/15 07:59:39  brian
-- Working up manual pages.
-
-Revision 0.9.2.1  2004/03/13 05:46:34  brian
-- Working up more documentation.
 @end verbatim
 @end smallexample
 
@@ -1078,138 +932,138 @@ The following kernel modules are installed by @cite{@value{PACKAGE_TITLE}} in th
 @item @file{specfs}
 @pgindex specfs
 
-This kernel module contains the @dfn{STREAMS} Special Shadow Filesystem.
+This kernel module contains the @acronym{STREAMS} Special Shadow Filesystem.
 See @manref{specfs(5)} for more information.
 
 @item @file{streams}
 @pgindex streams
 
-This kernel module contains the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
+This kernel module contains the @acronym{STREAMS} scheduler, utility functions, and @acronym{STREAMS} Device
 Driver Interface/Driver Kernel Interface (DDI/DKI).
 See @manref{STREAMS(9)} for more information.
 
 @item @file{streams-fifo}
 @pgindex streams-fifo
 
-This kernel module contains the @file{fifo} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+This kernel module contains the @file{fifo} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} driver, but is also used by the conformance and validation test suite.
 See @manref{fifo(4)} for more information.
 
 @item @file{streams-sad}
 @pgindex streams-sad
 
-This kernel module contains the @file{sad} @dfn{STREAMS} driver.
-This is the standard @dfn{STREAMS} Administrative Driver.
+This kernel module contains the @file{sad} @acronym{STREAMS} driver.
+This is the standard @acronym{STREAMS} Administrative Driver.
 See @manref{sad(4)} for more information.
 
 @item @file{streams-nsdev}
 @pgindex streams-nsdev
 
-This kernel module contains the @file{nsdev} @dfn{STREAMS} driver.
+This kernel module contains the @file{nsdev} @acronym{STREAMS} driver.
 This is a @cite{@value{PACKAGE_TITLE}} specific driver.
 See @manref{nsdev(4)} for more information.
 
 @item @file{streams-echo}
 @pgindex streams-echo
 
-This kernel module contains the @file{echo} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+This kernel module contains the @file{echo} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} driver, but is also used by the conformance and validation test suite.
 See @manref{echo(4)} for more information.
 
 @item @file{streams-mux}
 @pgindex streams-mux
 
-This kernel module contains the @file{mux} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} driver< but is also used by the conformance and validation test suite.
+This kernel module contains the @file{mux} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} driver< but is also used by the conformance and validation test suite.
 See @manref{mux(4)} for more information.
 
 @item @file{streams-nuls}
 @pgindex streams-nuls
 
-This kernel module contains the @file{nuls} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} module.
+This kernel module contains the @file{nuls} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} module.
 See @manref{nuls(4)} for more information.
 
 @item @file{streams-pipe}
 @pgindex streams-pipe
 
-This kernel module contains the @file{pipe} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} driver.
+This kernel module contains the @file{pipe} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} driver.
 See @manref{pipe(4)} for more information.
 
 @item @file{streams-log}
 @pgindex streams-log
 
-This kernel module contains the @file{log} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} driver.
+This kernel module contains the @file{log} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} driver.
 See @manref{log(4)} for more information.
 
 @item @file{streams-loop}
 @pgindex streams-loop
 
-This kernel module contains the @file{loop} @dfn{STREAMS} driver.
-This is a standard @dfn{STREAMS} driver, but is also used by the conformance and validation test suite.
+This kernel module contains the @file{loop} @acronym{STREAMS} driver.
+This is a standard @acronym{STREAMS} driver, but is also used by the conformance and validation test suite.
 See @manref{loop(4)} for more information.
 
 @item @file{streams-sfx}
 @pgindex streams-sfx
 
-This kernel module contains the @dfn{sfx} @dfn{STREAMS} driver.
-This is a common character device driver for implementing @dfn{STREAMS} FIFOs.
+This kernel module contains the @dfn{sfx} @acronym{STREAMS} driver.
+This is a common character device driver for implementing @acronym{STREAMS} FIFOs.
 See @manref{sfx(4)} for more information.
 
 @item @file{streams-spx}
 @pgindex streams-spx
 
-This kernel module contains the @dfn{spx} @dfn{STREAMS} driver.
-This is a common character device driver for implementing @dfn{STREAMS} pipes.
+This kernel module contains the @dfn{spx} @acronym{STREAMS} driver.
+This is a common character device driver for implementing @acronym{STREAMS} pipes.
 See @manref{spx(4)} for more information.
 
 @item @file{streams-bufmod}
 @pgindex streams-bufmod
 
-This kernel module contains the @file{bufmod} @dfn{STREAMS} module.  The @file{bufmod} @dfn{STREAMS}
+This kernel module contains the @file{bufmod} @acronym{STREAMS} module.  The @file{bufmod} @acronym{STREAMS}
 module is a simple buffer module (a module that always defers to its service procedure and then
-passes any message along).  This module is used for performance testing of the @dfn{STREAMS}
+passes any message along).  This module is used for performance testing of the @acronym{STREAMS}
 package.
 See @manref{bufmod(4)} for more information.
 
 @item @file{streams-nullmod}
 @pgindex streams-nullmod
 
-This kernel module contains the @file{nullmod} @dfn{STREAMS} module.  The @file{nullmod}
-@dfn{STREAMS} module is a simple null module (a module that always passes messages to the next
-module in along the Stream).  This module is used for performance testing of the @dfn{STREAMS}
+This kernel module contains the @file{nullmod} @acronym{STREAMS} module.  The @file{nullmod}
+@acronym{STREAMS} module is a simple null module (a module that always passes messages to the next
+module in along the Stream).  This module is used for performance testing of the @acronym{STREAMS}
 package and is also used by the conformance and validation test suite.
 See @manref{nullmod(4)} for more information.
 
 @item @file{streams-pipemod}
 @pgindex streams-pipemod
 
-This kernel module contains the @file{pipemod} @dfn{STREAMS} module.
-This is a standard @dfn{STREAMS} module used with pipes.
+This kernel module contains the @file{pipemod} @acronym{STREAMS} module.
+This is a standard @acronym{STREAMS} module used with pipes.
 See @manref{pipemod(4)} for more information.
 
 @item @file{streams-connld}
 @pgindex streams-connld
 
-This kernel module contains the @file{connld} @dfn{STREAMS} module.
-This is a standard @dfn{STREAMS} module.
+This kernel module contains the @file{connld} @acronym{STREAMS} module.
+This is a standard @acronym{STREAMS} module.
 See @manref{connld(4)} for more information.
 
 @item @file{streams-sc}
 @pgindex streams-sc
 
-This kernel module contains the @dfn{sc} @dfn{STREAMS} module.
-This is a common @dfn{STREAMS} Configuration module.
+This kernel module contains the @dfn{sc} @acronym{STREAMS} module.
+This is a common @acronym{STREAMS} Configuration module.
 See @manref{sc(4)} for more information.
 
 @item @file{streams-testmod}
 @pgindex streams-testmod
 
-This kernel module contains the @file{testmod} @dfn{STREAMS} module.
+This kernel module contains the @file{testmod} @acronym{STREAMS} module.
 This is a @cite{@value{PACKAGE_TITLE}} specific test module that is used for conformance and validation
-testing of @dfn{STREAMS}.
+testing of @acronym{STREAMS}.
 See @manref{testmod(4)} for more information.
 
 @end table
@@ -1223,12 +1077,12 @@ Additional kernel modules are provided by add-on packages.
 @section Drivers
 @cindex drivers
 
-The configuration of @dfn{STREAMS} drivers and modules is performed when compiling the
-@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{STREAMS} subsystem, core drivers and modules are
+The configuration of @acronym{STREAMS} drivers and modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @acronym{STREAMS} subsystem, core drivers and modules are
 part of every @cite{@value{PACKAGE_TITLE}} system.
 
-The following lists the core drivers and modules, @dfn{STREAMS} kernel tunable parameters, and
-@dfn{STREAMS} configuration information:@footnote{Note that documentation for @dfn{STREAMS} drivers
+The following lists the core drivers and modules, @acronym{STREAMS} kernel tunable parameters, and
+@acronym{STREAMS} configuration information:@footnote{Note that documentation for @acronym{STREAMS} drivers
 is in the form of manual pages in Section 4 of the manual pages with the same name as the driver.}
 
 @table @asis
@@ -1238,9 +1092,9 @@ is in the form of manual pages in Section 4 of the manual pages with the same na
 @pgindex clone
 
 Clone device driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
-The @manpage{clone(4)} driver is a integral part of @dfn{STREAMS} and is used to create clone
-instances of a @dfn{STREAMS} driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
+The @manpage{clone(4)} driver is a integral part of @acronym{STREAMS} and is used to create clone
+instances of a @acronym{STREAMS} driver.
 
 See @manref{clone(4)} for more information.
 
@@ -1249,9 +1103,9 @@ See @manref{clone(4)} for more information.
 @pgindex echo
 
 Echo (loopback) device driver.
-This is a commonly implemented @dfn{STREAMS} driver.  It is implemented by @cite{HP-UX@registeredsymbol{}} and
+This is a commonly implemented @acronym{STREAMS} driver.  It is implemented by @cite{HP-UX@registeredsymbol{}} and
 @cite{OSF/1@registeredsymbol{}}.  The @manpage{echo(4)} driver provides a simple FIFO-like device without full
-@cite{POSIX} FIFO semantics.  Its primary purpose is for the @dfn{STREAMS} Verification function,
+@cite{POSIX} FIFO semantics.  Its primary purpose is for the @acronym{STREAMS} Verification function,
 @manref{strvf(8)}, and the @manref{test-streams(8)} validation test suite.
 
 See @manref{echo(4)} for more information.
@@ -1261,11 +1115,11 @@ See @manref{echo(4)} for more information.
 @pgindex fifo
 
 FIFO (Named Pipe) device driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
-The @manpage{fifo(4)} driver provides @cite{POSIX}-compliant @dfn{STREAMS}-based @dfn{FIFO} device.
-Not all implementations of @dfn{STREAMS} provide @dfn{STREAMS}-based @dfn{FIFO}s: some
-implementations use the older @cite{SVR 3}-style @dfn{FIFO}s that are not @dfn{STREAMS}-based.
-@cite{@value{PACKAGE_TITLE}} provides @dfn{STREAMS}-based @dfn{FIFO}s with the @manpage{fifo(4)}
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
+The @manpage{fifo(4)} driver provides @cite{POSIX}-compliant @acronym{STREAMS}-based @dfn{FIFO} device.
+Not all implementations of @acronym{STREAMS} provide @acronym{STREAMS}-based @dfn{FIFO}s: some
+implementations use the older @cite{SVR 3}-style @dfn{FIFO}s that are not @acronym{STREAMS}-based.
+@cite{@value{PACKAGE_TITLE}} provides @acronym{STREAMS}-based @dfn{FIFO}s with the @manpage{fifo(4)}
 driver.
 
 See @manref{fifo(4)} for more information.
@@ -1274,11 +1128,11 @@ See @manref{fifo(4)} for more information.
 @pgindex streams-log
 @pgindex log
 
-@dfn{STREAMS} log driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
-The @manpage{log(4)} driver provides a @dfn{STREAMS} capable logger in addition to the @cite{BSD}
+@acronym{STREAMS} log driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
+The @manpage{log(4)} driver provides a @acronym{STREAMS} capable logger in addition to the @cite{BSD}
 logger present in @cite{Linux}.  The @manpage{log(4)} driver provides additional support for
-@dfn{STREAMS} modules and drivers using the @manref{strlog(9)} kernel level utility.
+@acronym{STREAMS} modules and drivers using the @manref{strlog(9)} kernel level utility.
 @cite{@value{PACKAGE_TITLE}} also provides the @manpage{strace(8)}, @manpage{strerr(8)} and
 @manpage{strclean(8)} administrative utility  functions and startup scripts for controlling the
 @manpage{log(4)} driver.
@@ -1290,7 +1144,7 @@ See @manref{log(4)} for more information.
 @pgindex loop
 
 Loop device driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
 The @command{loop} driver is detailed in the @cite{UNIX System V Release 4 Programmer's Manual -- STREAMS}.
 The @manpage{loop(4)} driver provides capabilities used primarily for validation test programs (see
 @manref{test-streams(8)}) as well as serving as an example driver.
@@ -1302,7 +1156,7 @@ See @manref{loop(4)} for more information.
 @pgindex mux
 
 Multiplexing driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
 The @command{mux} driver is detailed in the @cite{UNIX System V Release 4 Programmer's Manual -- STREAMS}.
 The @manpage{mux(4)} driver provides capabilities used primarily for validation test programs (see
 @manref{test-streams(8)} as well as serving as an example multiplexing driver.  This
@@ -1314,11 +1168,11 @@ See @manref{mux(4)} for more information.
 @pgindex streams-nsdev
 @pgindex nsdev
 
-Named @dfn{STREAMS} device driver.
+Named @acronym{STREAMS} device driver.
 This is a @cite{@value{PACKAGE_TITLE}} specific driver.
 The @manpage{nsdev(4)} driver is a @manpage{clone(4)}-like driver that permits the specification of
 major and minor device numbers using the device node name.  It provides one of three mechanisms
-under @cite{@value{PACKAGE_TITLE}} that remove @dfn{STREAMS} driver dependency on statically
+under @cite{@value{PACKAGE_TITLE}} that remove @acronym{STREAMS} driver dependency on statically
 allocated device numbers.
 
 See @manref{nsdev(4)} for more information.
@@ -1328,7 +1182,7 @@ See @manref{nsdev(4)} for more information.
 @pgindex nuls
 
 Null @dfn{Stream} driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
 The @manpage{nuls(4)} driver is usually called @samp{null}.  @cite{Linux} has its own
 @cite{SVR3}-style @file{/dev/null} driver, so it was renamed to @samp{nuls}.
 
@@ -1338,9 +1192,9 @@ See @manref{nuls(4)} for more information.
 @pgindex streams-pipe
 @pgindex pipe
 
-@dfn{STREAMS}-based pipe driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
-However, @manpage{pipe(4)} is not normally implemented as a @dfn{STREAMS} driver, but is implemented
+@acronym{STREAMS}-based pipe driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
+However, @manpage{pipe(4)} is not normally implemented as a @acronym{STREAMS} driver, but is implemented
 as a system call.  @cite{@value{PACKAGE_TITLE}} provides @manpage{pipe(2s)} system call emulation
 which invokes this driver internal to the kernel.
 
@@ -1350,11 +1204,11 @@ See @manref{pipe(4)} for more information.
 @pgindex streams-sad
 @pgindex sad
 
-@dfn{STREAMS} Administrative Driver.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
+@acronym{STREAMS} Administrative Driver.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
 The @manpage{sad(4)} driver is used by the @manref{autopush(8)} utility to examine and specify the
-autopush lists for @dfn{STREAMS} drivers.  Also, it is used to examine and verify the present of
-@dfn{STREAMS} modules or drivers in the system.
+autopush lists for @acronym{STREAMS} drivers.  Also, it is used to examine and verify the present of
+@acronym{STREAMS} modules or drivers in the system.
 
 See @manref{sad(4)} for more information.
 
@@ -1362,8 +1216,8 @@ See @manref{sad(4)} for more information.
 @pgindex streams-sfx
 @pgindex sfx
 
-@dfn{STREAMS} FIFO device driver.
-This is commonly implemented @dfn{STREAMS} driver that is used to implement @dfn{STREAMS} FIFOs
+@acronym{STREAMS} FIFO device driver.
+This is commonly implemented @acronym{STREAMS} driver that is used to implement @acronym{STREAMS} FIFOs
 (Named Pipes) using a regular character device.
 The @manpage{sfx(4)} driver provides a character based device approach to creating FIFOs.
 
@@ -1373,8 +1227,8 @@ See @manref{sfx(4)} for more information.
 @pgindex streams-spx
 @pgindex spx
 
-@dfn{STREAMS} pipe device driver.
-This is commonly implemented @dfn{STREAMS} driver that is used to implement @dfn{STREAMS} pipes
+@acronym{STREAMS} pipe device driver.
+This is commonly implemented @acronym{STREAMS} driver that is used to implement @acronym{STREAMS} pipes
 using a regular character device.
 The @manpage{spx(4)} driver provides a character based device approach to creating FIFOs and pipes.
 Only @cite{UnixWare@registeredsymbol{}} and @cite{AIX(4)} document this device.
@@ -1393,12 +1247,12 @@ Additional drivers are provided by add-on packages.
 @section Modules
 @cindex modules
 
-The configuration of @dfn{STREAMS} drivers and modules is performed when compiling the
-@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{STREAMS} subsystem, core drivers and modules are
+The configuration of @acronym{STREAMS} drivers and modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @acronym{STREAMS} subsystem, core drivers and modules are
 part of every @cite{@value{PACKAGE_TITLE}} system.
 
-The following lists the core drivers and modules, @dfn{STREAMS} kernel tunable parameters, and
-@dfn{STREAMS} configuration information:@footnote{Note that documentation for @dfn{STREAMS} modules
+The following lists the core drivers and modules, @acronym{STREAMS} kernel tunable parameters, and
+@acronym{STREAMS} configuration information:@footnote{Note that documentation for @acronym{STREAMS} modules
 is in the form of a manual page in Section 4 of the manual pages with the same name as the module.}
 
 @table @asis
@@ -1407,7 +1261,7 @@ is in the form of a manual page in Section 4 of the manual pages with the same n
 @pgindex streams-pipemod
 
 Pipe module.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} module.
 The @manpage{pipemod(4)} module can be pushed over a pipe end or FIFO before other modules are
 pushed (on either end) to reverse the sense of the @manpage{M_FLUSH(9)} message that traverse the
 pipe.
@@ -1418,7 +1272,7 @@ See @manref{pipemod(4)} for more information.
 @pgindex streams-connld
 
 Connection Line Discipline module.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module.
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} module.
 The @manpage{connld(4)} module can be pushed over a pipe end that has been attached to a file system
 file using @manref{fattach(3)} and will then create a new pipe instance on each @manpage{open(2s)}
 of the attached file and pass the new remove file pointer to the remove end using
@@ -1430,13 +1284,13 @@ See @manref{connld(4)} for more information.
 @item @manpage{sc(4)} (@file{streams-sc})
 @pgindex streams-sc
 
-@dfn{STREAMS} Configuration module.
-This is a commonly implemented @dfn{STREAMS} module.
+@acronym{STREAMS} Configuration module.
+This is a commonly implemented @acronym{STREAMS} module.
 It is implemented by @cite{HP-UX} and @cite{AIX}, and perhaps other @cite{Mentat}-derived
-@dfn{STREAMS} implementations.
-The @manpage{sc(4)} modules provides the ability to access @dfn{STREAMS} driver information by name
+@acronym{STREAMS} implementations.
+The @manpage{sc(4)} modules provides the ability to access @acronym{STREAMS} driver information by name
 rather than major device number.  It also provides access to the @mantype{module_info(9)} and
-@mantype{module_stat(9)} structure information for the named @dfn{STREAMS} module or driver, not
+@mantype{module_stat(9)} structure information for the named @acronym{STREAMS} module or driver, not
 accessible using the @manpage{sad(4)} driver.  The @manpage{sc(4)} module is used by the
 @manref{scls(8)} utility.
 
@@ -1446,12 +1300,12 @@ See @manref{sc(4)} for more information.
 @pgindex streams-bufmod
 
 Buffer module.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module described in the @cite{UNIX System V Release 4
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} module described in the @cite{UNIX System V Release 4
 Programmer's Manual -- STREAMS}.
 The @manpage{bufmod(4)} module also has @cite{@value{PACKAGE_TITLE}} specific extensions.
 The @manpage{bufmod(4)} module is used by the @manref{perftest(8)} performance test program to test
 the effect of additional levels of service procedure pushed over a @dfn{Stream}.
-The module also serves as an example of a @dfn{STREAMS} module using service procedures.
+The module also serves as an example of a @acronym{STREAMS} module using service procedures.
 
 See @manref{bufmod(4)} for more information.
 
@@ -1459,12 +1313,12 @@ See @manref{bufmod(4)} for more information.
 @pgindex streams-nullmod
 
 Null module.
-This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module described in the @cite{UNIX System V Release 4
+This is a standard @cite{SVR 4.2 @acronym{STREAMS}} module described in the @cite{UNIX System V Release 4
 Programmer's Manual -- STREAMS}.
 The @manpage{nullmod(4)} module also has @cite{@value{PACKAGE_TITLE}} specific extensions.
 The @manpage{nullmod(4)} module is used by the @manref{perftest(8)} performance test program to test
 the effect of additional levels of put procedure pushed over a @dfn{Stream}.
-The module also serves as an example of a @dfn{STREAMS} module not using service procedures.
+The module also serves as an example of a @acronym{STREAMS} module not using service procedures.
 
 See @manref{nullmod(4)} for more information.
 
@@ -1472,11 +1326,11 @@ See @manref{nullmod(4)} for more information.
 @pgindex streams-testmod
 
 Test module.
-This is a @cite{@value{PACKAGE_TITLE}} specific @dfn{STREAMS} module.
+This is a @cite{@value{PACKAGE_TITLE}} specific @acronym{STREAMS} module.
 The primary purpose of the @manpage{testmod(4)} modules is to provide the @manref{test-streams(8)}
 validation test program with the capability to pass specific @manpage{M_ERROR(9)} and
 @manpage{M_HANGUP(9)} messages to the @dfn{Stream head} for @cite{POSIX} validation testing.
-It also serves as an example of how a @dfn{STREAMS} module can properly process @manpage{M_IOCTL(9)}
+It also serves as an example of how a @acronym{STREAMS} module can properly process @manpage{M_IOCTL(9)}
 and related messages.
 
 See @manref{testmod(4)} for more information.
@@ -1504,10 +1358,10 @@ native and 32-bit compatibility libraries are installed to the @file{/usr/lib} s
 @item libstreams.so.0.0.1
 @itemx libstreams.so.0
 @itemx libstreams.so
-Provides a shared object library for use by @dfn{STREAMS} applications programs.
+Provides a shared object library for use by @acronym{STREAMS} applications programs.
 
 @item libstreams.a
-Provides a static library for use by @dfn{STREAMS} applications programs.
+Provides a static library for use by @acronym{STREAMS} applications programs.
 
 @item libstreams.la
 Provides the @command{libtool} definitions for the library.
@@ -1517,17 +1371,17 @@ Provides the @command{libtool} definitions for the library.
 @subsection libstreams Library Routines
 
 The following routines are present in the @file{libstreams} libraries.  The routines in these
-libraries are standard @dfn{STREAMS} interface system calls documented in the @cite{System V Release
+libraries are standard @acronym{STREAMS} interface system calls documented in the @cite{System V Release
 4.2 Programmer's Manual -- STREAMS}.  Refer to the associated manual pages for detailed information
 on these routines.
 
 @ftable @manref
 
 @item fattach(2)
-Name a @dfn{STREAMS} special file.
+Name a @acronym{STREAMS} special file.
 
 @item fdetach(2)
-Unname a @dfn{STREAMS} special file.
+Unname a @acronym{STREAMS} special file.
 
 @item getmsg(2)
 Get next message off of a Stream.
@@ -1536,25 +1390,25 @@ Get next message off of a Stream.
 Get next message off of a Stream.
 
 @item isastream(2)
-Test for a @dfn{STREAMS} special file.
+Test for a @acronym{STREAMS} special file.
 
 @item pipe(2s)
-Create a @dfn{STREAMS} pipe.
+Create a @acronym{STREAMS} pipe.
 
 @item putmsg(2)
-Put a message to a @dfn{STREAMS} character device.
+Put a message to a @acronym{STREAMS} character device.
 
 @item putpmsg(2s)
-Put a band message to a @dfn{STREAMS} character device.
+Put a band message to a @acronym{STREAMS} character device.
 
 @item pstrlog(3)
-Print a @dfn{STREAMS} log buffer.
+Print a @acronym{STREAMS} log buffer.
 
 @item strlog(3)
-Print a @dfn{STREAMS} log buffer.
+Print a @acronym{STREAMS} log buffer.
 
 @item vstrlog(3)
-Print a @dfn{STREAMS} log buffer.
+Print a @acronym{STREAMS} log buffer.
 
 @end ftable
 
@@ -1622,9 +1476,9 @@ Following are System V Init Scripts that are installed by the package:
 @pgindex specfs.sh
 @pgindex /etc/init.d/specfs.sh
 
-System V Init Script for the @dfn{STREAMS} Special Shadow Filesystem.
+System V Init Script for the @acronym{STREAMS} Special Shadow Filesystem.
 The @manpage{specfs(8)} init script provides the ability to initialize, configure and mount the
-@dfn{STREAMS} Special Shadow Filesystem, @manpage{specfs(5)}.
+@acronym{STREAMS} Special Shadow Filesystem, @manpage{specfs(5)}.
 The @manpage{specfs(8)} script provides the RedHat-style init script, whereas the
 @manpage{specfs.sh(8)} script provides the Debian-style init script.
 
@@ -1637,9 +1491,9 @@ See @manref{specfs(8)} for more information.
 @pgindex @value{PACKAGE}.sh
 @pgindex /etc/init.d/@value{PACKAGE}.sh
 
-System V Init Script for the @dfn{STREAMS} Subsystem.
+System V Init Script for the @acronym{STREAMS} Subsystem.
 The @manpage{streams(8)} init script provides the ability to initialize, configure and mount the
-@dfn{STREAMS} subsystem, @manpage{STREAMS(9)}.
+@acronym{STREAMS} subsystem, @manpage{STREAMS(9)}.
 The @manpage{streams(8)} script provides the RedHat-style init script, whereas the
 @manpage{streams.sh(8)} script provides the Debian-style init script.
 
@@ -1660,17 +1514,17 @@ Following are user utilities for manipulating @dfn{Streams}:
 @pgindex /usr/bin/strchg
 
 Change @dfn{Stream} configuration.
-@manpage{strchg(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
+@manpage{strchg(1)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} user utility.
 
 @manpage{strchg(1)} is a C-language user program that can be used to alter the configuration of the
 @dfn{Stream} associated with the caller's standard input.  The @manpage{strchg(1)} command pushes
 modules on the @dfn{Stream}, pops modules off of the @dfn{Stream}, or both.  Only the superuser or
-owner of the @dfn{STREAMS} device can alter the configuration of that @dfn{Stream}.  If another user
+owner of the @acronym{STREAMS} device can alter the configuration of that @dfn{Stream}.  If another user
 attempts to alter the configuration, the @manpage{strconf(1)} command will fail.
 
 @manpage{strchg(1)} is useful from the shell and, when standard input is redirected from an open
 file descriptor to the command, can be used to push and pop modules from arbitrary @dfn{Streams},
-not just those associated with @dfn{STREAMS}-based terminal devices.
+not just those associated with @acronym{STREAMS}-based terminal devices.
 
 See @manref{strchg(1)} for more information.
 
@@ -1679,7 +1533,7 @@ See @manref{strchg(1)} for more information.
 @pgindex /usr/bin/strconf
 
 Query @dfn{Stream} configuration.
-@manpage{strconf(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
+@manpage{strconf(1)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} user utility.
 
 @manpage{strconf(1)} is a C-language user program that can be used to query the configuration of a
 @dfn{Stream}.  When use without any options, it prints a list of the modules in the @dfn{Stream}
@@ -1689,7 +1543,7 @@ item printed is the name of the topmost driver associated with the @dfn{Stream}.
 
 @manpage{strconf(1)} is useful from the shell and, when standard input is redirected from an open
 file descriptor to the command, can be used to query arbitrary @dfn{Streams}, not just the
-associated with @dfn{STREAMS}-based terminal devices.
+associated with @acronym{STREAMS}-based terminal devices.
 
 See @manref{strconf(1)} for more information.
 
@@ -1698,7 +1552,7 @@ See @manref{strconf(1)} for more information.
 @pgindex /usr/bin/strreset
 
 Reset a @dfn{Stream}.
-@manpage{strreset(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
+@manpage{strreset(1)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} user utility.
 
 @manpage{strreset(1)}is a C-language user program that resets an open @dfn{Stream} by generating an
 @manpage{M_FLUSH(9)} message to the @dfn{Stream head}.  It is used mainly to reset blocked
@@ -1714,7 +1568,7 @@ See @manref{strreset(1)} for more information.
 @subsection Administrative Utilities
 @cindex administrative utilities
 
-Following are administrative utilities for manipulating and examining the @dfn{STREAMS} subsystem:
+Following are administrative utilities for manipulating and examining the @acronym{STREAMS} subsystem:
 
 @table @asis
 
@@ -1722,13 +1576,13 @@ Following are administrative utilities for manipulating and examining the @dfn{S
 @pgindex autopush
 @pgindex /usr/sbin/autopush
 
-Control the @dfn{autopush} module list for a @dfn{STREAMS} device.
-@manpage{autopush(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
+Control the @dfn{autopush} module list for a @acronym{STREAMS} device.
+@manpage{autopush(8)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} administrative utility.
 
 @manpage{autopush(8)} is a C-language program that can be used to manipulate and examine which
-@dfn{STREAMS} modules are automatically pushed over a device when it is opened.  It is also possible
+@acronym{STREAMS} modules are automatically pushed over a device when it is opened.  It is also possible
 to restrict the ability to push further modules on the @dfn{Stream} without proper privilege.
-The @manpage{autopush(8)} utility provides a user program interface to the @dfn{STREAMS}
+The @manpage{autopush(8)} utility provides a user program interface to the @acronym{STREAMS}
 Administrative Driver (@manpage{sad(4)}).
 
 See @manref{autopush(8)} for more information.
@@ -1737,7 +1591,7 @@ See @manref{autopush(8)} for more information.
 @pgindex fattach
 @pgindex /usr/sbin/fattach
 
-Name a @dfn{STREAMS} file.
+Name a @acronym{STREAMS} file.
 @manpage{fattach(8)} is an @cite{OpenSS7} utility.  Although @cite{OSF/1} documentation mentions an
 @command{fattach} manual page in section 8, one does not exist.
 
@@ -1746,7 +1600,7 @@ Name a @dfn{STREAMS} file.
 being attached to the file.  The other end of the pipe remains available for use by the shell
 program invoking this command.
 
-@manpage{fattach(8)} provides a easy way for shell programs to use @dfn{STREAMS}-based pipes and to
+@manpage{fattach(8)} provides a easy way for shell programs to use @acronym{STREAMS}-based pipes and to
 use the facilities of the @manpage{connld(4)} module.
 
 See @manref{fattach(8)} for more information.
@@ -1755,12 +1609,12 @@ See @manref{fattach(8)} for more information.
 @pgindex fdetach
 @pgindex /usr/sbin/fdetach
 
-Unlink a named @dfn{STREAMS} file.
+Unlink a named @acronym{STREAMS} file.
 
-@manpage{fdetach(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
+@manpage{fdetach(8)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} administrative utility.
 
 @manpage{fdetach(8)} is a C-language program that detaches or disassociates a file descriptor for an
-open @dfn{STREAMS} device or pipe from its filename in the file system.
+open @acronym{STREAMS} device or pipe from its filename in the file system.
 
 See @manref{fdetach(8)} for more information.
 
@@ -1779,13 +1633,13 @@ See @manref{insf(8)} for more information.
 @pgindex scls
 @pgindex /usr/sbin/scls
 
-List @dfn{STREAMS} configuration.
+List @acronym{STREAMS} configuration.
 @manpage{scls(8)} is a rather useful @cite{AIX} administrative utility that is also implemented by
 @cite{@value{PACKAGE_TITLE}}.
 
 @manpage{scls(8)} is a C-language program that can be used to list module and driver names as well
 as information and statistics associated with those modules or drivers.
-The @manpage{scls(8)} utility provides a user program interface to the @dfn{STREAMS} Configuration
+The @manpage{scls(8)} utility provides a user program interface to the @acronym{STREAMS} Configuration
 module (@manpage{sc(4)}).
 
 See @manref{scls(8)} for more information.
@@ -1794,15 +1648,15 @@ See @manref{scls(8)} for more information.
 @pgindex strace
 @pgindex /usr/sbin/strace
 
-Write @dfn{STREAMS} event trace messages to the standard output.
-@manpage{strace(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
+Write @acronym{STREAMS} event trace messages to the standard output.
+@manpage{strace(8)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} administrative utility.
 
-The @manpage{strace(8)} C-language program receives trace event messages from the @dfn{STREAMS} log
+The @manpage{strace(8)} C-language program receives trace event messages from the @acronym{STREAMS} log
 driver (@manpage{log(4)}) and writes these messages to the standard output.  When run as a daemon,
 @manpage{strace(8)} appends these messages to a log file.
 
 Messages that appear in the trace log are intended to report debugging information that assists with
-troubleshooting a running @dfn{STREAMS} module or driver.
+troubleshooting a running @acronym{STREAMS} module or driver.
 
 See @manref{strace(8)} for more information.
 
@@ -1810,11 +1664,11 @@ See @manref{strace(8)} for more information.
 @pgindex strclean
 @pgindex /usr/sbin/strclean
 
-Clean up after the @dfn{STREAMS} error logger.
-@manpage{strclean(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
+Clean up after the @acronym{STREAMS} error logger.
+@manpage{strclean(8)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} administrative utility.
 
 The @manpage{strclean(8)} utility is a bash script that can be used to delete aged log files
-generated by the @dfn{STREAMS} error logger, @manpage{strerr(8)}.
+generated by the @acronym{STREAMS} error logger, @manpage{strerr(8)}.
 
 See @manref{strclean(8)} for more information.
 
@@ -1822,7 +1676,7 @@ See @manref{strclean(8)} for more information.
 @pgindex streams_mknod
 @pgindex /usr/sbin/streams_mknod
 
-Make special device nodes for @dfn{STREAMS}.
+Make special device nodes for @acronym{STREAMS}.
 @manpage{streams_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific administrative utility.
 
 The @manpage{streams_mknod(8)} C-language program can be used to make (or remove) the special
@@ -1836,11 +1690,11 @@ See @manref{streams_mknod(8)} for more information.
 @pgindex strerr
 @pgindex /usr/sbin/strerr
 
-Receive error log messages from the @dfn{STREAMS} @manpage{log(4)} driver.
-@manpage{strerr(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
+Receive error log messages from the @acronym{STREAMS} @manpage{log(4)} driver.
+@manpage{strerr(8)} is a standard @cite{SVR 4.2 @acronym{STREAMS}} administrative utility.
 
 The @manpage{strerr(8)} utility is a C-language program, run as a daemon, that receives error log
-messages from the @dfn{STREAMS} log driver (@manpage{log(4)}) and writes these message to a log
+messages from the @acronym{STREAMS} log driver (@manpage{log(4)}) and writes these message to a log
 file.  By default, @manpage{strerr(8)} logs all @dfn{STREAM} error messages from all drivers and
 modules.
 
@@ -1859,7 +1713,7 @@ List @dfn{Stream} information.
 
 The @manpage{strinfo(8)} C-language program can be used to list @dfn{Stream} instance information as
 well as information and statistics on a module or driver basis.
-The @manpage{scls(8)} utility provides a user program interface to the @dfn{STREAMS} Configuration
+The @manpage{scls(8)} utility provides a user program interface to the @acronym{STREAMS} Configuration
 module (@manpage{sc(4)}).
 
 This program is not even partially implemented in @cite{@value{PACKAGE_TITLE}} yet.  User
@@ -1872,11 +1726,11 @@ See @manref{strinfo(8)} for more information.
 @pgindex strload
 @pgindex /usr/sbin/strload
 
-Loads the @dfn{STREAMS} subsystem.
+Loads the @acronym{STREAMS} subsystem.
 @manpage{strload(8)} is a useful @cite{AIX} administrative utility that is also implemented by
 @cite{@value{PACKAGE_TITLE}}.
 
-The @manpage{strload(8)} bash script can be used to load @dfn{STREAMS} modules and drivers
+The @manpage{strload(8)} bash script can be used to load @acronym{STREAMS} modules and drivers
 individually or from a configuration file.
 
 See @manref{strload(8)} for more information.
@@ -1939,7 +1793,7 @@ Following and conformance and validation testing programs:
 
 The @manpage{test-clone(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{clone(4)} @dfn{STREAMS} driver.
+@manpage{clone(4)} @acronym{STREAMS} driver.
 
 See @manref{test-clone(8)} for more information.
 
@@ -1949,7 +1803,7 @@ See @manref{test-clone(8)} for more information.
 
 The @manpage{test-connld(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{connld(4)} @dfn{STREAMS} driver.
+@manpage{connld(4)} @acronym{STREAMS} driver.
 
 See @manref{test-connld(8)} for more information.
 
@@ -1959,7 +1813,7 @@ See @manref{test-connld(8)} for more information.
 
 The @manpage{test-echo(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{echo(4)} @dfn{STREAMS} driver.
+@manpage{echo(4)} @acronym{STREAMS} driver.
 
 See @manref{test-echo(8)} for more information.
 
@@ -1969,7 +1823,7 @@ See @manref{test-echo(8)} for more information.
 
 The @manpage{test-fifo(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{fifo(4)} @dfn{STREAMS} driver.
+@manpage{fifo(4)} @acronym{STREAMS} driver.
 
 See @manref{test-fifo(8)} for more information.
 
@@ -1979,7 +1833,7 @@ See @manref{test-fifo(8)} for more information.
 
 The @manpage{test-log(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{log(4)} @dfn{STREAMS} driver.
+@manpage{log(4)} @acronym{STREAMS} driver.
 
 See @manref{test-log(8)} for more information.
 
@@ -1989,7 +1843,7 @@ See @manref{test-log(8)} for more information.
 
 The @manpage{test-loop(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{loop(4)} @dfn{STREAMS} driver.
+@manpage{loop(4)} @acronym{STREAMS} driver.
 
 See @manref{test-loop(8)} for more information.
 
@@ -1999,7 +1853,7 @@ See @manref{test-loop(8)} for more information.
 
 The @manpage{test-mux(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{mux(4)} @dfn{STREAMS} driver.
+@manpage{mux(4)} @acronym{STREAMS} driver.
 
 See @manref{test-mux(8)} for more information.
 
@@ -2009,7 +1863,7 @@ See @manref{test-mux(8)} for more information.
 
 The @manpage{test-nsdev(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{nsdev(4)} @dfn{STREAMS} driver.
+@manpage{nsdev(4)} @acronym{STREAMS} driver.
 
 See @manref{test-nsdev(8)} for more information.
 
@@ -2019,7 +1873,7 @@ See @manref{test-nsdev(8)} for more information.
 
 The @manpage{test-nuls(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{nuls(4)} @dfn{STREAMS} driver.
+@manpage{nuls(4)} @acronym{STREAMS} driver.
 
 See @manref{test-nuls(8)} for more information.
 
@@ -2029,7 +1883,7 @@ See @manref{test-nuls(8)} for more information.
 
 The @manpage{test-pipe(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{pipe(4)} @dfn{STREAMS} driver.
+@manpage{pipe(4)} @acronym{STREAMS} driver.
 
 See @manref{test-pipe(8)} for more information.
 
@@ -2039,7 +1893,7 @@ See @manref{test-pipe(8)} for more information.
 
 The @manpage{test-pipemod(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{pipemod(4)} @dfn{STREAMS} driver.
+@manpage{pipemod(4)} @acronym{STREAMS} driver.
 
 See @manref{test-pipemod(8)} for more information.
 
@@ -2049,7 +1903,7 @@ See @manref{test-pipemod(8)} for more information.
 
 The @manpage{test-sad(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{sad(4)} @dfn{STREAMS} driver.
+@manpage{sad(4)} @acronym{STREAMS} driver.
 
 See @manref{test-sad(8)} for more information.
 
@@ -2059,7 +1913,7 @@ See @manref{test-sad(8)} for more information.
 
 The @manpage{test-sc(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{sc(4)} @dfn{STREAMS} driver.
+@manpage{sc(4)} @acronym{STREAMS} driver.
 
 See @manref{test-sc(8)} for more information.
 
@@ -2164,8 +2018,8 @@ This is the system specific kernel header file for the @manref{cmn_err(9)} utili
 @pgindex sys/ddi.h
 @pgindex /usr/include/streams/sys/ddi.h
 
-This is the system specific kernel header file for various @dfn{STREAMS} @manref{DDI(9)} utilities.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for various @acronym{STREAMS} @manref{DDI(9)} utilities.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 See @manref{DDI(9)} for more information.
 
 @item @file{sys/debug.h}
@@ -2173,14 +2027,14 @@ See @manref{DDI(9)} for more information.
 @pgindex /usr/include/streams/sys/debug.h
 
 This is the system specific kernel header file for kernel debugging macros.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 
 @item @file{sys/dki.h}
 @pgindex sys/dki.h
 @pgindex /usr/include/streams/sys/dki.h
 
-This is the system specific kernel header file for various @dfn{STREAMS} @manref{DKI(9)} utilities.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for various @acronym{STREAMS} @manref{DKI(9)} utilities.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 See @manref{DKI(9)} for more information.
 
 @item @file{sys/kmem.h}
@@ -2188,29 +2042,29 @@ See @manref{DKI(9)} for more information.
 @pgindex /usr/include/streams/sys/kmem.h
 
 This is the system specific kernel header file for @manref{kmem_alloc(9)} and related utilities.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 See @manref{kmem_alloc(9)} for more information.
 
 @item @file{sys/strconf.h}
 @pgindex sys/strconf.h
 @pgindex /usr/include/streams/sys/strconf.h
 
-This is the system specific kernel header file for @dfn{STREAMS} driver and module configuration.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for @acronym{STREAMS} driver and module configuration.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 
 @item @file{sys/strdebug.h}
 @pgindex sys/strdebug.h
 @pgindex /usr/include/streams/sys/strdebug.h
 
-This is the system specific kernel header file for @dfn{STREAMS} driver and module debugging macros.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for @acronym{STREAMS} driver and module debugging macros.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 
 @item @file{sys/stream.h}
 @pgindex sys/stream.h
 @pgindex /usr/include/streams/sys/stream.h
 
-This is the system specific kernel header file for @dfn{STREAMS} drivers and modules.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for @acronym{STREAMS} drivers and modules.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 See @manref{STREAMS(9)} for more information.
 
 @item @file{sys/strlog.h}
@@ -2241,8 +2095,8 @@ See @manref{sth(4)} for more information.
 @pgindex sys/strsubr.h
 @pgindex /usr/include/streams/sys/strsubr.h
 
-This is the system specific kernel header file for @dfn{STREAMS} private definitions.
-It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for @acronym{STREAMS} private definitions.
+It is normal only included by kernel space @acronym{STREAMS} modules and drivers.
 See @manref{STREAMS(9)} for more information.
 
 @item @file{sys/log.h}
@@ -2289,13 +2143,13 @@ See @manref{testmod(4)} for more information.
 
 @subsection User Space Programs
 
-Typical include files for interacting with @dfn{STREAMS} from user space include the
+Typical include files for interacting with @acronym{STREAMS} from user space include the
 @file{stropts.h} header file.  Additional header files for interacting with specific drivers or
 modules may also be required.
 
 @subsection Kernel Space Drivers and Modules
 
-Typical include files for writing @dfn{STREAMS} modules and drivers for kernel space include the
+Typical include files for writing @acronym{STREAMS} modules and drivers for kernel space include the
 @file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
 and @file{sys/strconf.h} header files.  Additional header files for interacting with specific
 drivers or modules may also be required.
@@ -2329,7 +2183,7 @@ Link to the @file{/usr/lib/libstreams.a} static library.
 @node Kernel Module Development
 @section Kernel Modules
 
-Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
+Developing @acronym{STREAMS} kernel modules is similar to user space programs with regard to header
 files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
 the @command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules should be
 followed.  In particular, several important intricacies should be considered:
@@ -2375,15 +2229,15 @@ The following manual pages are installed in Section 1 of the manual (in the subd
 The following manual pages are installed in Section 2 of the manual (in the subdirectory @file{/usr/share/man/man2}):
 
 @multitable @columnfractions .40 .60
-@item @manref{fattach(2)} -- @tab name a @dfn{STREAMS} special file.
-@item @manref{fdetach(2)} -- @tab unname a @dfn{STREAMS} special file.
+@item @manref{fattach(2)} -- @tab name a @acronym{STREAMS} special file.
+@item @manref{fdetach(2)} -- @tab unname a @acronym{STREAMS} special file.
 @item @manref{getmsg(2)} -- @tab get next message off a Stream.
 @item @manref{getpmsg(2s)} -- @tab get next message off a Stream.
-@item @manref{isastream(2)} -- @tab test for a @dfn{STREAMS} special file.
-@item @manref{pipe(2s)} -- @tab create a @dfn{STREAMS} pipe.
-@item @manref{poll(2s)} -- @tab wait for an event on a @dfn{STREAMS} file descriptor.
-@item @manref{putmsg(2)} -- @tab put a message to a @dfn{STREAMS} character device.
-@item @manref{putpmsg(2s)} -- @tab put a band message to a @dfn{STREAMS} character device.
+@item @manref{isastream(2)} -- @tab test for a @acronym{STREAMS} special file.
+@item @manref{pipe(2s)} -- @tab create a @acronym{STREAMS} pipe.
+@item @manref{poll(2s)} -- @tab wait for an event on a @acronym{STREAMS} file descriptor.
+@item @manref{putmsg(2)} -- @tab put a message to a @acronym{STREAMS} character device.
+@item @manref{putpmsg(2s)} -- @tab put a band message to a @acronym{STREAMS} character device.
 @item @manref{read(2s)} -- @tab read from a file descriptor.
 @item @manref{readv(2s)} -- @tab read or write a vector.
 @item @manref{write(2s)} -- @tab write to a file descriptor.
@@ -2393,215 +2247,215 @@ The following manual pages are installed in Section 2 of the manual (in the subd
 The following manual pages are installed in Section 3 of the manual (in the subdirectory @file{/usr/share/man/man3}):
 
 @multitable @columnfractions .40 .60
-@item @manref{streams(3)} -- @tab @dfn{STREAMS} system call library.
-@item @manref{libstreams(3)} -- @tab @dfn{STREAMS} system call library.
-@item @manref{fattach(3)} -- @tab name a @dfn{STREAMS} special file.
-@item @manref{fdetach(3)} -- @tab unname a @dfn{STREAMS} special file.
-@item @manref{isastream(3)} -- @tab test for a @dfn{STREAMS} special file.
-@item @manref{pipe(3)} -- @tab create a @dfn{STREAMS} pipe.
-@item @manref{pstrlog(3)} -- @tab print a @dfn{STREAMS} log buffer.
-@item @manref{s_pipe(3)} -- @tab create a @dfn{STREAMS} pipe.
-@item @manref{strlog(3)} -- @tab print a @dfn{STREAMS} log buffer.
-@item @manref{vstrlog(3)} -- @tab print a @dfn{STREAMS} log buffer.
+@item @manref{streams(3)} -- @tab @acronym{STREAMS} system call library.
+@item @manref{libstreams(3)} -- @tab @acronym{STREAMS} system call library.
+@item @manref{fattach(3)} -- @tab name a @acronym{STREAMS} special file.
+@item @manref{fdetach(3)} -- @tab unname a @acronym{STREAMS} special file.
+@item @manref{isastream(3)} -- @tab test for a @acronym{STREAMS} special file.
+@item @manref{pipe(3)} -- @tab create a @acronym{STREAMS} pipe.
+@item @manref{pstrlog(3)} -- @tab print a @acronym{STREAMS} log buffer.
+@item @manref{s_pipe(3)} -- @tab create a @acronym{STREAMS} pipe.
+@item @manref{strlog(3)} -- @tab print a @acronym{STREAMS} log buffer.
+@item @manref{vstrlog(3)} -- @tab print a @acronym{STREAMS} log buffer.
 @end multitable
 
 The following manual pages are installed in Section 4 of the manual (in the subdirectory @file{/usr/share/man/man4}):
 
 @multitable @columnfractions .40 .60
-@item @manref{bufmod(4)} -- @tab @dfn{STREAMS} buffering null module.
-@item @manref{clone(4)} -- @tab the @dfn{STREAMS} clone driver.
-@item @manref{connld(4)} -- @tab @dfn{STREAMS} connection line discipline module.
-@item @manref{conslog(4)} -- @tab @dfn{STREAMS} log device.
-@item @manref{echo(4)} -- @tab echo @dfn{STREAMS} device.
-@item @manref{fifo(4s)} -- @tab @dfn{STREAMS}-based FIFO device.
-@item @manref{log(4)} -- @tab @dfn{STREAMS} log device.
-@item @manref{loop(4)} -- @tab @dfn{STREAMS} loop-around pseudo-device driver.
-@item @manref{loop_clone(4)} -- @tab @dfn{STREAMS} loop-around pseudo-device driver.
-@item @manref{mux(4)} -- @tab @dfn{STREAMS} multiplexing pseudo-device driver.
-@item @manref{nsdev(4)} -- @tab named @dfn{STREAMS} device.
-@item @manref{nullmod(4)} -- @tab @dfn{STREAMS} null module.
-@item @manref{nuls(4)} -- @tab null @dfn{STREAMS} device.
-@item @manref{pipe(4)} -- @tab @dfn{STREAMS} bi-directional pipe device.
-@item @manref{pipemod(4)} -- @tab @dfn{STREAMS}-based pipe module.
-@item @manref{s_fifo(4)} -- @tab @dfn{STREAMS}-based FIFO device.
-@item @manref{sad(4)} -- @tab @dfn{STREAMS} Administrative Driver.
-@item @manref{sc(4)} -- @tab @dfn{STREAMS} Configuration module.
-@item @manref{sfx(4)} -- @tab @dfn{STREAMS}-based FIFO device.
-@item @manref{sloop(4)} -- @tab @dfn{STREAMS} loop-around pseudo-device driver.
-@item @manref{spx(4)} -- @tab @dfn{STREAMS} bi-directional pipe device.
-@item @manref{sth(4)} -- @tab @dfn{STREAMS} Stream head module.
-@item @manref{strlog(4)} -- @tab @dfn{STREAMS} log device.
-@item @manref{testmod(4)} -- @tab @dfn{STREAMS} test module.
+@item @manref{bufmod(4)} -- @tab @acronym{STREAMS} buffering null module.
+@item @manref{clone(4)} -- @tab the @acronym{STREAMS} clone driver.
+@item @manref{connld(4)} -- @tab @acronym{STREAMS} connection line discipline module.
+@item @manref{conslog(4)} -- @tab @acronym{STREAMS} log device.
+@item @manref{echo(4)} -- @tab echo @acronym{STREAMS} device.
+@item @manref{fifo(4s)} -- @tab @acronym{STREAMS}-based FIFO device.
+@item @manref{log(4)} -- @tab @acronym{STREAMS} log device.
+@item @manref{loop(4)} -- @tab @acronym{STREAMS} loop-around pseudo-device driver.
+@item @manref{loop_clone(4)} -- @tab @acronym{STREAMS} loop-around pseudo-device driver.
+@item @manref{mux(4)} -- @tab @acronym{STREAMS} multiplexing pseudo-device driver.
+@item @manref{nsdev(4)} -- @tab named @acronym{STREAMS} device.
+@item @manref{nullmod(4)} -- @tab @acronym{STREAMS} null module.
+@item @manref{nuls(4)} -- @tab null @acronym{STREAMS} device.
+@item @manref{pipe(4)} -- @tab @acronym{STREAMS} bi-directional pipe device.
+@item @manref{pipemod(4)} -- @tab @acronym{STREAMS}-based pipe module.
+@item @manref{s_fifo(4)} -- @tab @acronym{STREAMS}-based FIFO device.
+@item @manref{sad(4)} -- @tab @acronym{STREAMS} Administrative Driver.
+@item @manref{sc(4)} -- @tab @acronym{STREAMS} Configuration module.
+@item @manref{sfx(4)} -- @tab @acronym{STREAMS}-based FIFO device.
+@item @manref{sloop(4)} -- @tab @acronym{STREAMS} loop-around pseudo-device driver.
+@item @manref{spx(4)} -- @tab @acronym{STREAMS} bi-directional pipe device.
+@item @manref{sth(4)} -- @tab @acronym{STREAMS} Stream head module.
+@item @manref{strlog(4)} -- @tab @acronym{STREAMS} log device.
+@item @manref{testmod(4)} -- @tab @acronym{STREAMS} test module.
 @end multitable
 
 The following manual pages are installed in Section 5 of the manual (in the subdirectory @file{/usr/share/man/man5}):
 
 @multitable @columnfractions .40 .60
-@item @manref{autopush(5)} -- @tab control the autopush module list for a @dfn{STREAMS} device.
-@item @manref{specfs(5)} -- @tab @dfn{STREAMS} special device shadow file system.
-@item @manref{strapush(5)} -- @tab @dfn{STREAMS} autopush structure.
-@item @manref{strioctl(5)} -- @tab @dfn{STREAMS} I/O control data structure.
-@item @manref{strsetup.conf(5)} -- @tab configuration file for @dfn{STREAMS} drivers.
+@item @manref{autopush(5)} -- @tab control the autopush module list for a @acronym{STREAMS} device.
+@item @manref{specfs(5)} -- @tab @acronym{STREAMS} special device shadow file system.
+@item @manref{strapush(5)} -- @tab @acronym{STREAMS} autopush structure.
+@item @manref{strioctl(5)} -- @tab @acronym{STREAMS} I/O control data structure.
+@item @manref{strsetup.conf(5)} -- @tab configuration file for @acronym{STREAMS} drivers.
 @end multitable
 
 The following manual pages are installed in Section 7 of the manual (in the subdirectory @file{/usr/share/man/man7}):
 
 @multitable @columnfractions .40 .60
-@item @manref{streamio(7)} -- @tab @dfn{STREAMS} ioctl commands.
-@item @manref{I_ANCHOR(7)} -- @tab @dfn{STREAMS} anchor input-output control.
-@item @manref{I_ATMARK(7)} -- @tab check if a @dfn{STREAMS} message is marked.
-@item @manref{I_CANPUT(7)} -- @tab check if a @dfn{STREAMS} band is writable.
-@item @manref{I_CKBAND(7)} -- @tab check if a @dfn{STREAMS} band is readable.
-@item @manref{I_EGETSIG(7)} -- @tab get enhanced @dfn{STREAMS} SIGPOLL events.
-@item @manref{I_ESETSIG(7)} -- @tab set enhanced @dfn{STREAMS} SIGPOLL events.
+@item @manref{streamio(7)} -- @tab @acronym{STREAMS} ioctl commands.
+@item @manref{I_ANCHOR(7)} -- @tab @acronym{STREAMS} anchor input-output control.
+@item @manref{I_ATMARK(7)} -- @tab check if a @acronym{STREAMS} message is marked.
+@item @manref{I_CANPUT(7)} -- @tab check if a @acronym{STREAMS} band is writable.
+@item @manref{I_CKBAND(7)} -- @tab check if a @acronym{STREAMS} band is readable.
+@item @manref{I_EGETSIG(7)} -- @tab get enhanced @acronym{STREAMS} SIGPOLL events.
+@item @manref{I_ESETSIG(7)} -- @tab set enhanced @acronym{STREAMS} SIGPOLL events.
 @item @manref{I_FATTACH(7)} -- @tab emulate @manpage{fattach(2)} system call.
 @item @manref{I_FDETACH(7)} -- @tab emulate @manpage{fdetach(2)} system call.
-@item @manref{I_FDINSERT(7)} -- @tab insert a Stream identifier into a @dfn{STREAMS} message and send it downstream.
-@item @manref{I_FIND(7)} -- @tab find a @dfn{STREAMS} module on a Stream.
-@item @manref{I_FLUSH(7)} -- @tab flush messages from a @dfn{STREAMS} special file.
-@item @manref{I_FLUSHBAND(7)} -- @tab flush messages for a band from a @dfn{STREAMS} special file.
-@item @manref{I_GERROPT(7)} -- @tab get error options for a @dfn{STREAMS} file.
+@item @manref{I_FDINSERT(7)} -- @tab insert a Stream identifier into a @acronym{STREAMS} message and send it downstream.
+@item @manref{I_FIND(7)} -- @tab find a @acronym{STREAMS} module on a Stream.
+@item @manref{I_FLUSH(7)} -- @tab flush messages from a @acronym{STREAMS} special file.
+@item @manref{I_FLUSHBAND(7)} -- @tab flush messages for a band from a @acronym{STREAMS} special file.
+@item @manref{I_GERROPT(7)} -- @tab get error options for a @acronym{STREAMS} file.
 @item @manref{I_GETBAND(7)} -- @tab get band number of a message on a Stream.
-@item @manref{I_GETCLTIME(7)} -- @tab get close time for a @dfn{STREAMS} file.
-@item @manref{I_GETPMSG(7)} -- @tab @dfn{STREAMS} @manpage{getpmsg(2s)} system call emulation.
+@item @manref{I_GETCLTIME(7)} -- @tab get close time for a @acronym{STREAMS} file.
+@item @manref{I_GETPMSG(7)} -- @tab @acronym{STREAMS} @manpage{getpmsg(2s)} system call emulation.
 @item @manref{I_GETSIG(7)} -- @tab get SIGPOLL events.
-@item @manref{I_GRDOPT(7)} -- @tab get @dfn{STREAMS} read options.
-@item @manref{I_GWROPT(7)} -- @tab get @dfn{STREAMS} write options.
+@item @manref{I_GRDOPT(7)} -- @tab get @acronym{STREAMS} read options.
+@item @manref{I_GWROPT(7)} -- @tab get @acronym{STREAMS} write options.
 @item @manref{I_ISASTREAM(7)} -- @tab emulate @manpage{isastream(2)} system call.
-@item @manref{I_LINK(7)} -- @tab link a Stream beneath a @dfn{STREAMS} multiplexing driver.
-@item @manref{I_LIST(7)} -- @tab list @dfn{STREAMS} module names on a Stream.
-@item @manref{I_LOOK(7)} -- @tab look at topmost @dfn{STREAMS} module on a Stream.
+@item @manref{I_LINK(7)} -- @tab link a Stream beneath a @acronym{STREAMS} multiplexing driver.
+@item @manref{I_LIST(7)} -- @tab list @acronym{STREAMS} module names on a Stream.
+@item @manref{I_LOOK(7)} -- @tab look at topmost @acronym{STREAMS} module on a Stream.
 @item @manref{I_NREAD(7)} -- @tab number of unread bytes on a Stream.
-@item @manref{I_PEEK(7)} -- @tab peek at @dfn{STREAMS} message on read queue.
-@item @manref{I_PIPE(7)} -- @tab obtain a @dfn{STREAMS} based pipe.
-@item @manref{I_PLINK(7)} -- @tab persistently link a Stream beneath a @dfn{STREAMS} multiplexing driver.
-@item @manref{I_POP(7)} -- @tab pop a @dfn{STREAMS} module from a Stream.
-@item @manref{I_PUNLINK(7)} -- @tab unlink a @dfn{STREAMS} persistent link.
-@item @manref{I_PUSH(7)} -- @tab push a @dfn{STREAMS} module on a Stream.
-@item @manref{I_PUTPMSG(7)} -- @tab @dfn{STREAMS} @manpage{putpmsg(2s)} system call emulation.
+@item @manref{I_PEEK(7)} -- @tab peek at @acronym{STREAMS} message on read queue.
+@item @manref{I_PIPE(7)} -- @tab obtain a @acronym{STREAMS} based pipe.
+@item @manref{I_PLINK(7)} -- @tab persistently link a Stream beneath a @acronym{STREAMS} multiplexing driver.
+@item @manref{I_POP(7)} -- @tab pop a @acronym{STREAMS} module from a Stream.
+@item @manref{I_PUNLINK(7)} -- @tab unlink a @acronym{STREAMS} persistent link.
+@item @manref{I_PUSH(7)} -- @tab push a @acronym{STREAMS} module on a Stream.
+@item @manref{I_PUTPMSG(7)} -- @tab @acronym{STREAMS} @manpage{putpmsg(2s)} system call emulation.
 @item @manref{I_RECVFD(7)} -- @tab receive a file descriptor on a Stream.
 @item @manref{I_SENDFD(7)} -- @tab send a file descriptor on a Stream.
-@item @manref{I_SERROPT(7)} -- @tab set error options for a @dfn{STREAMS} file.
-@item @manref{I_SETCLTIME(7)} -- @tab set close time for a @dfn{STREAMS} file.
+@item @manref{I_SERROPT(7)} -- @tab set error options for a @acronym{STREAMS} file.
+@item @manref{I_SETCLTIME(7)} -- @tab set close time for a @acronym{STREAMS} file.
 @item @manref{I_SETSIG(7)} -- @tab set SIGPOLL events.
-@item @manref{I_SRDOPT(7)} -- @tab set @dfn{STREAMS} read options.
-@item @manref{I_STR(7)} -- @tab @dfn{STREAMS} intput-output control.
-@item @manref{I_SWROPT(7)} -- @tab set @dfn{STREAMS} write options.
-@item @manref{I_UNLINK(7)} -- @tab unlink a Stream from a @dfn{STREAMS} multiplexing driver.
+@item @manref{I_SRDOPT(7)} -- @tab set @acronym{STREAMS} read options.
+@item @manref{I_STR(7)} -- @tab @acronym{STREAMS} intput-output control.
+@item @manref{I_SWROPT(7)} -- @tab set @acronym{STREAMS} write options.
+@item @manref{I_UNLINK(7)} -- @tab unlink a Stream from a @acronym{STREAMS} multiplexing driver.
 @end multitable
 
 The following manual pages are installed in Section 8 of the manual (in the subdirectory @file{/usr/share/man/man8}):
 
 @multitable @columnfractions .40 .60
-@item @manref{autopush(8)} -- @tab control the autopush module list for a @dfn{STREAMS} device.
-@item @manref{fattach(8)} -- @tab name a @dfn{STREAMS} file.
-@item @manref{fdetach(8)} -- @tab unname a @dfn{STREAMS} file.
+@item @manref{autopush(8)} -- @tab control the autopush module list for a @acronym{STREAMS} device.
+@item @manref{fattach(8)} -- @tab name a @acronym{STREAMS} file.
+@item @manref{fdetach(8)} -- @tab unname a @acronym{STREAMS} file.
 @item @manref{insf(8)} -- @tab install special device files.
-@item @manref{perftest(8)} -- @tab @dfn{STREAMS} benchmark performance tests on a pipe.
-@item @manref{perftestn(8)} -- @tab @dfn{STREAMS} benchmark performance tests on a pipe.
-@item @manref{scls(8)} -- @tab produce a list of @dfn{STREAMS} module and driver names.
-@item @manref{specfs(8)} -- @tab System V Init Script for the @dfn{STREAMS} Shadow Special Filesystem.
-@item @manref{specfs.sh(8)} -- @tab System V Init Script for the @dfn{STREAMS} Shadow Special Filesystem.
-@item @manref{strace(8)} -- @tab write @dfn{STREAMS} event trace messages to the standard output.
-@item @manref{strclean(8)} -- @tab clean up the @dfn{STREAMS} error logger.
-@item @manref{streams(8)} -- @tab System V Init Script for the @dfn{STREAMS} subsystem.
-@item @manref{streams_mknod(8)} -- @tab create or remove @dfn{STREAMS} device nodes.
-@item @manref{streams.sh(8)} -- @tab System V Init Script for the @dfn{STREAMS} subsystem.
-@item @manref{strerr(8)} -- @tab receive error log messages from the @dfn{STREAMS} @manpage{log(4)} driver.
-@item @manref{strinfo(8)} -- @tab display information about @dfn{STREAMS} devices.
-@item @manref{strload(8)} -- @tab load the @dfn{STREAMS} subsystem.
-@item @manref{strsetup(8)} -- @tab @dfn{STREAMS} setup command.
-@item @manref{strvf(8)} -- @tab @dfn{STREAMS} verification tool.
-@item @manref{test-clone(8)} -- @tab a test suite executable for the @manpage{clone(4)} @dfn{STREAMS} driver.
-@item @manref{test-connld(8)} -- @tab a test suite executable for the @manpage{connld(4)} @dfn{STREAMS} module.
-@item @manref{test-echo(8)} -- @tab a test suite executable for the @manpage{echo(4)} @dfn{STREAMS} driver.
-@item @manref{test-fifo(8)} -- @tab a test suite executable for the @manpage{fifo(4)} @dfn{STREAMS} driver.
-@item @manref{test-log(8)} -- @tab a test suite executable for the @manpage{log(4)} @dfn{STREAMS} driver.
-@item @manref{test-loop(8)} -- @tab a test suite executable for the @manpage{loop(4)} @dfn{STREAMS} driver.
-@item @manref{test-mux(8)} -- @tab a test suite executable for the @manpage{mux(4)} @dfn{STREAMS} driver.
-@item @manref{test-nsdev(8)} -- @tab a test suite executable for the @manpage{nsdev(4)} @dfn{STREAMS} driver.
-@item @manref{test-nuls(8)} -- @tab a test suite executable for the @manpage{nuls(4)} @dfn{STREAMS} driver.
-@item @manref{test-pipe(8)} -- @tab a test suite executable for the @manpage{pipe(4)} @dfn{STREAMS} driver.
-@item @manref{test-pipemod(8)} -- @tab a test suite executable for the @manpage{pipemod(4)} @dfn{STREAMS} module.
-@item @manref{test-sad(8)} -- @tab a test suite executable for the @manpage{sad(4)} @dfn{STREAMS} driver.
-@item @manref{test-sc(8)} -- @tab a test suite executable for the @manpage{sc(4)} @dfn{STREAMS} module.
-@item @manref{test-streams(8)} -- @tab a test suite executable for @dfn{STREAMS}.
+@item @manref{perftest(8)} -- @tab @acronym{STREAMS} benchmark performance tests on a pipe.
+@item @manref{perftestn(8)} -- @tab @acronym{STREAMS} benchmark performance tests on a pipe.
+@item @manref{scls(8)} -- @tab produce a list of @acronym{STREAMS} module and driver names.
+@item @manref{specfs(8)} -- @tab System V Init Script for the @acronym{STREAMS} Shadow Special Filesystem.
+@item @manref{specfs.sh(8)} -- @tab System V Init Script for the @acronym{STREAMS} Shadow Special Filesystem.
+@item @manref{strace(8)} -- @tab write @acronym{STREAMS} event trace messages to the standard output.
+@item @manref{strclean(8)} -- @tab clean up the @acronym{STREAMS} error logger.
+@item @manref{streams(8)} -- @tab System V Init Script for the @acronym{STREAMS} subsystem.
+@item @manref{streams_mknod(8)} -- @tab create or remove @acronym{STREAMS} device nodes.
+@item @manref{streams.sh(8)} -- @tab System V Init Script for the @acronym{STREAMS} subsystem.
+@item @manref{strerr(8)} -- @tab receive error log messages from the @acronym{STREAMS} @manpage{log(4)} driver.
+@item @manref{strinfo(8)} -- @tab display information about @acronym{STREAMS} devices.
+@item @manref{strload(8)} -- @tab load the @acronym{STREAMS} subsystem.
+@item @manref{strsetup(8)} -- @tab @acronym{STREAMS} setup command.
+@item @manref{strvf(8)} -- @tab @acronym{STREAMS} verification tool.
+@item @manref{test-clone(8)} -- @tab a test suite executable for the @manpage{clone(4)} @acronym{STREAMS} driver.
+@item @manref{test-connld(8)} -- @tab a test suite executable for the @manpage{connld(4)} @acronym{STREAMS} module.
+@item @manref{test-echo(8)} -- @tab a test suite executable for the @manpage{echo(4)} @acronym{STREAMS} driver.
+@item @manref{test-fifo(8)} -- @tab a test suite executable for the @manpage{fifo(4)} @acronym{STREAMS} driver.
+@item @manref{test-log(8)} -- @tab a test suite executable for the @manpage{log(4)} @acronym{STREAMS} driver.
+@item @manref{test-loop(8)} -- @tab a test suite executable for the @manpage{loop(4)} @acronym{STREAMS} driver.
+@item @manref{test-mux(8)} -- @tab a test suite executable for the @manpage{mux(4)} @acronym{STREAMS} driver.
+@item @manref{test-nsdev(8)} -- @tab a test suite executable for the @manpage{nsdev(4)} @acronym{STREAMS} driver.
+@item @manref{test-nuls(8)} -- @tab a test suite executable for the @manpage{nuls(4)} @acronym{STREAMS} driver.
+@item @manref{test-pipe(8)} -- @tab a test suite executable for the @manpage{pipe(4)} @acronym{STREAMS} driver.
+@item @manref{test-pipemod(8)} -- @tab a test suite executable for the @manpage{pipemod(4)} @acronym{STREAMS} module.
+@item @manref{test-sad(8)} -- @tab a test suite executable for the @manpage{sad(4)} @acronym{STREAMS} driver.
+@item @manref{test-sc(8)} -- @tab a test suite executable for the @manpage{sc(4)} @acronym{STREAMS} module.
+@item @manref{test-streams(8)} -- @tab a test suite executable for @acronym{STREAMS}.
 @end multitable
 
 The following manual pages are installed in Section 9 of the manual (in the subdirectory @file{/usr/share/man/man9}):
 
 @multitable @columnfractions .40 .60
-@item @manref{Intro(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
-@item @manref{STREAMS(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
+@item @manref{Intro(9)} -- @tab introduction to @acronym{STREAMS} kernel functions.
+@item @manref{STREAMS(9)} -- @tab introduction to @acronym{STREAMS} kernel functions.
 @item @manref{SPG(9)} -- @tab @cite{Linux Fast-STREAMS} Programmers Guide.
 @item @manref{DDI(9)} -- @tab Device Driver interface/Driver Kernel Interface.
-@item @manref{LfS(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
-@item @manref{mp-streams(9)} -- @tab multi-processor @dfn{STREAMS} executive.
-@item @manref{M_BACKDONE(9)} -- @tab @dfn{STREAMS} backwash done direct I/O message.
-@item @manref{M_BACKWASH(9)} -- @tab @dfn{STREAMS} backwash direct I/O message.
-@item @manref{M_BREAK(9)} -- @tab @dfn{STREAMS} break message.
-@item @manref{M_COPYIN(9)} -- @tab @dfn{STREAMS} copyin message.
-@item @manref{M_COPYOUT(9)} -- @tab @dfn{STREAMS} copyout message.
-@item @manref{M_CTL(9)} -- @tab @dfn{STREAMS} control message.
-@item @manref{M_DATA(9)} -- @tab @dfn{STREAMS} data message.
-@item @manref{M_DELAY(9)} -- @tab @dfn{STREAMS} delay message.
-@item @manref{M_DONTPLAY(9)} -- @tab @dfn{STREAMS} don't play direct I/O message.
-@item @manref{M_ERROR(9)} -- @tab @dfn{STREAMS} error message.
-@item @manref{M_EVENT(9)} -- @tab @dfn{STREAMS} event message.
-@item @manref{M_FLUSH(9)} -- @tab @dfn{STREAMS} flush message.
-@item @manref{M_HANGUP(9)} -- @tab @dfn{STREAMS} hangup message.
-@item @manref{M_HPDATA(9)} -- @tab @dfn{STREAMS} high priority data message.
-@item @manref{M_IOCACK(9)} -- @tab @dfn{STREAMS} IO control acknowledgement message.
-@item @manref{M_IOCDATA(9)} -- @tab @dfn{STREAMS} IO control data message.
-@item @manref{M_IOCNAK(9)} -- @tab @dfn{STREAMS} IO control negative acknowledgement message.
-@item @manref{M_IOCTL(9)} -- @tab @dfn{STREAMS} IO control message.
-@item @manref{M_LETSPLAY(9)} -- @tab @dfn{STREAMS} let's plan direct I/O message.
-@item @manref{M_NOTIFY(9)} -- @tab @dfn{STREAMS} notify message.
-@item @manref{M_PASSFP(9)} -- @tab @dfn{STREAMS} pass file pointer message.
-@item @manref{M_PCCTL(9)} -- @tab @dfn{STREAMS} priority control message.
-@item @manref{M_PCEVENT(9)} -- @tab @dfn{STREAMS} priority event message.
-@item @manref{M_PCPROTO(9)} -- @tab @dfn{STREAMS} priority protocol message.
-@item @manref{M_PCRSE(9)} -- @tab @dfn{STREAMS} priority reserved message.
-@item @manref{M_PCSETOPTS(9)} -- @tab @dfn{STREAMS} priority set options message.
-@item @manref{M_PCSIG(9)} -- @tab @dfn{STREAMS} priority signal message.
-@item @manref{M_PROTO(9)} -- @tab @dfn{STREAMS} protocol message.
-@item @manref{M_READ(9)} -- @tab @dfn{STREAMS} read message.
-@item @manref{M_RSE(9)} -- @tab @dfn{STREAMS} reserved message.
-@item @manref{M_SETOPTS(9)} -- @tab @dfn{STREAMS} set options message.
-@item @manref{M_SIG(9)} -- @tab @dfn{STREAMS} signal message.
-@item @manref{M_START(9)} -- @tab @dfn{STREAMS} start message.
-@item @manref{M_STARTI(9)} -- @tab @dfn{STREAMS} start input message.
-@item @manref{M_STOP(9)} -- @tab @dfn{STREAMS} stop message.
-@item @manref{M_STOPI(9)} -- @tab @dfn{STREAMS} stop input message.
-@item @manref{M_TRAIL(9)} -- @tab @dfn{STREAMS} trail message.
-@item @manref{M_UNHANGUP(9)} -- @tab @dfn{STREAMS} unhangup message.
-@item @manref{OTHERQ(9)} -- @tab return other queue of a @dfn{STREAMS} queue pair.
-@item @manref{QNORM(9)} -- @tab @dfn{STREAMS} data block structure.
-@item @manref{QPCTL(9)} -- @tab @dfn{STREAMS} data block structure.
-@item @manref{RD(9)} -- @tab return the read queue of a @dfn{STREAMS} queue pair.
-@item @manref{SAMESTR(9)} -- @tab test for a @dfn{STREAMS} pipe or FIFO.
-@item @manref{WR(9)} -- @tab return the write queue of a @dfn{STREAMS} queue pair.
-@item @manref{adjmsg(9)} -- @tab trim bytes from the front or back of a @dfn{STREAMS} message.
-@item @manref{allocb(9)} -- @tab allocate a @dfn{STREAMS} message and data block.
-@item @manref{alloclk(9)} -- @tab allocate or free a @dfn{STREAMS} link block.
-@item @manref{allocq(9)} -- @tab allocate a @dfn{STREAMS} queue pair.
-@item @manref{allocstr(9)} -- @tab allocate a @dfn{STREAMS} Stream head.
-@item @manref{appq(9)} -- @tab append one @dfn{STREAMS} message after another.
-@item @manref{apush_get(9)} -- @tab get the autopush list associated with a @dfn{STREAMS} driver.
-@item @manref{apush_set(9)} -- @tab set the autopush list associated with a @dfn{STREAMS} driver.
-@item @manref{apush_vml(9)} -- @tab verify a @dfn{STREAMS} module list.
+@item @manref{LfS(9)} -- @tab introduction to @acronym{STREAMS} kernel functions.
+@item @manref{mp-streams(9)} -- @tab multi-processor @acronym{STREAMS} executive.
+@item @manref{M_BACKDONE(9)} -- @tab @acronym{STREAMS} backwash done direct I/O message.
+@item @manref{M_BACKWASH(9)} -- @tab @acronym{STREAMS} backwash direct I/O message.
+@item @manref{M_BREAK(9)} -- @tab @acronym{STREAMS} break message.
+@item @manref{M_COPYIN(9)} -- @tab @acronym{STREAMS} copyin message.
+@item @manref{M_COPYOUT(9)} -- @tab @acronym{STREAMS} copyout message.
+@item @manref{M_CTL(9)} -- @tab @acronym{STREAMS} control message.
+@item @manref{M_DATA(9)} -- @tab @acronym{STREAMS} data message.
+@item @manref{M_DELAY(9)} -- @tab @acronym{STREAMS} delay message.
+@item @manref{M_DONTPLAY(9)} -- @tab @acronym{STREAMS} don't play direct I/O message.
+@item @manref{M_ERROR(9)} -- @tab @acronym{STREAMS} error message.
+@item @manref{M_EVENT(9)} -- @tab @acronym{STREAMS} event message.
+@item @manref{M_FLUSH(9)} -- @tab @acronym{STREAMS} flush message.
+@item @manref{M_HANGUP(9)} -- @tab @acronym{STREAMS} hangup message.
+@item @manref{M_HPDATA(9)} -- @tab @acronym{STREAMS} high priority data message.
+@item @manref{M_IOCACK(9)} -- @tab @acronym{STREAMS} IO control acknowledgement message.
+@item @manref{M_IOCDATA(9)} -- @tab @acronym{STREAMS} IO control data message.
+@item @manref{M_IOCNAK(9)} -- @tab @acronym{STREAMS} IO control negative acknowledgement message.
+@item @manref{M_IOCTL(9)} -- @tab @acronym{STREAMS} IO control message.
+@item @manref{M_LETSPLAY(9)} -- @tab @acronym{STREAMS} let's plan direct I/O message.
+@item @manref{M_NOTIFY(9)} -- @tab @acronym{STREAMS} notify message.
+@item @manref{M_PASSFP(9)} -- @tab @acronym{STREAMS} pass file pointer message.
+@item @manref{M_PCCTL(9)} -- @tab @acronym{STREAMS} priority control message.
+@item @manref{M_PCEVENT(9)} -- @tab @acronym{STREAMS} priority event message.
+@item @manref{M_PCPROTO(9)} -- @tab @acronym{STREAMS} priority protocol message.
+@item @manref{M_PCRSE(9)} -- @tab @acronym{STREAMS} priority reserved message.
+@item @manref{M_PCSETOPTS(9)} -- @tab @acronym{STREAMS} priority set options message.
+@item @manref{M_PCSIG(9)} -- @tab @acronym{STREAMS} priority signal message.
+@item @manref{M_PROTO(9)} -- @tab @acronym{STREAMS} protocol message.
+@item @manref{M_READ(9)} -- @tab @acronym{STREAMS} read message.
+@item @manref{M_RSE(9)} -- @tab @acronym{STREAMS} reserved message.
+@item @manref{M_SETOPTS(9)} -- @tab @acronym{STREAMS} set options message.
+@item @manref{M_SIG(9)} -- @tab @acronym{STREAMS} signal message.
+@item @manref{M_START(9)} -- @tab @acronym{STREAMS} start message.
+@item @manref{M_STARTI(9)} -- @tab @acronym{STREAMS} start input message.
+@item @manref{M_STOP(9)} -- @tab @acronym{STREAMS} stop message.
+@item @manref{M_STOPI(9)} -- @tab @acronym{STREAMS} stop input message.
+@item @manref{M_TRAIL(9)} -- @tab @acronym{STREAMS} trail message.
+@item @manref{M_UNHANGUP(9)} -- @tab @acronym{STREAMS} unhangup message.
+@item @manref{OTHERQ(9)} -- @tab return other queue of a @acronym{STREAMS} queue pair.
+@item @manref{QNORM(9)} -- @tab @acronym{STREAMS} data block structure.
+@item @manref{QPCTL(9)} -- @tab @acronym{STREAMS} data block structure.
+@item @manref{RD(9)} -- @tab return the read queue of a @acronym{STREAMS} queue pair.
+@item @manref{SAMESTR(9)} -- @tab test for a @acronym{STREAMS} pipe or FIFO.
+@item @manref{WR(9)} -- @tab return the write queue of a @acronym{STREAMS} queue pair.
+@item @manref{adjmsg(9)} -- @tab trim bytes from the front or back of a @acronym{STREAMS} message.
+@item @manref{allocb(9)} -- @tab allocate a @acronym{STREAMS} message and data block.
+@item @manref{alloclk(9)} -- @tab allocate or free a @acronym{STREAMS} link block.
+@item @manref{allocq(9)} -- @tab allocate a @acronym{STREAMS} queue pair.
+@item @manref{allocstr(9)} -- @tab allocate a @acronym{STREAMS} Stream head.
+@item @manref{appq(9)} -- @tab append one @acronym{STREAMS} message after another.
+@item @manref{apush_get(9)} -- @tab get the autopush list associated with a @acronym{STREAMS} driver.
+@item @manref{apush_set(9)} -- @tab set the autopush list associated with a @acronym{STREAMS} driver.
+@item @manref{apush_vml(9)} -- @tab verify a @acronym{STREAMS} module list.
 @item @manref{autopush(9)} -- @tab perform autopush operations on a newly opened Stream.
-@item @manref{autopush_add(9)} -- @tab add an autopush list entry for a given @dfn{STREAMS} device number.
-@item @manref{autopush_del(9)} -- @tab delete an autopush list entry for a given @dfn{STREAMS} device number.
-@item @manref{autopush_find(9)} -- @tab find an autopush list entry for a given @dfn{STREAMS} device number.
-@item @manref{autopush_search(9)} -- @tab find an autopush list entry for a given @dfn{STREAMS} device name and number.
-@item @manref{autopush_vml(9)} -- @tab verify a @dfn{STREAMS} module list.
+@item @manref{autopush_add(9)} -- @tab add an autopush list entry for a given @acronym{STREAMS} device number.
+@item @manref{autopush_del(9)} -- @tab delete an autopush list entry for a given @acronym{STREAMS} device number.
+@item @manref{autopush_find(9)} -- @tab find an autopush list entry for a given @acronym{STREAMS} device number.
+@item @manref{autopush_search(9)} -- @tab find an autopush list entry for a given @acronym{STREAMS} device name and number.
+@item @manref{autopush_vml(9)} -- @tab verify a @acronym{STREAMS} module list.
 @item @manref{backq(9)} -- @tab find the upstream or downstream queue.
 @item @manref{bcanget(9)} -- @tab test for message arrival on a band on a Stream.
 @item @manref{bcangetany(9)} -- @tab check whether messages are in any (non-zero) band.
-@item @manref{bcanput(9)} -- @tab test flow control on a @dfn{STREAMS} message queue.
+@item @manref{bcanput(9)} -- @tab test flow control on a @acronym{STREAMS} message queue.
 @item @manref{bcanputany(9)} -- @tab check if a message can be put to any (non-zero) band on a queue.
-@item @manref{bcanputnext(9)} -- @tab test flow control on the next @dfn{STREAMS} message queue.
+@item @manref{bcanputnext(9)} -- @tab test flow control on the next @acronym{STREAMS} message queue.
 @item @manref{bcanputnextany(9)} -- @tab check if a message can be put to any (non-zero) band on the next queue.
 @item @manref{bcid_t(9)} -- @tab install a buffer callback.
 @item @manref{bcmp(9)} -- @tab compare byte strings.
@@ -2609,10 +2463,10 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{bufcall(9)} -- @tab install a buffer callback.
 @item @manref{bufcall_id_t(9)} -- @tab install a buffer callback.
 @item @manref{bzero(9)} -- @tab zero a byte string.
-@item @manref{canenable(9)} -- @tab test whether a @dfn{STREAMS} message queue can be scheduled.
+@item @manref{canenable(9)} -- @tab test whether a @acronym{STREAMS} message queue can be scheduled.
 @item @manref{canget(9)} -- @tab test for message arrival on a Stream.
-@item @manref{canput(9)} -- @tab test flow control on a @dfn{STREAMS} message queue.
-@item @manref{canputnext(9)} -- @tab test flow control on the next @dfn{STREAMS} message queue.
+@item @manref{canput(9)} -- @tab test flow control on a @acronym{STREAMS} message queue.
+@item @manref{canputnext(9)} -- @tab test flow control on the next @acronym{STREAMS} message queue.
 @item @manref{cdev_count(9)} -- @tab character device switch table helper functions.
 @item @manref{cdev_find(9)} -- @tab character device switch table helper functions.
 @item @manref{cdev_match(9)} -- @tab character device switch table helper functions.
@@ -2634,20 +2488,20 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{cmin_ini(9)} -- @tab major/minor character device node helper functions.
 @item @manref{cmin_rel(9)} -- @tab major/minor character device node helper functions.
 @item @manref{cmn_err(9)} -- @tab print a kernel command error.
-@item @manref{copyb(9)} -- @tab copy a @dfn{STREAMS} message block.
+@item @manref{copyb(9)} -- @tab copy a @acronym{STREAMS} message block.
 @item @manref{copyin(9)} -- @tab copy user data in from user space to kernel space.
-@item @manref{copymsg(9)} -- @tab copy a @dfn{STREAMS} message.
+@item @manref{copymsg(9)} -- @tab copy a @acronym{STREAMS} message.
 @item @manref{copyout(9)} -- @tab copy user data in from kernel space to user space.
-@item @manref{copyreq(9)} -- @tab @dfn{STREAMS} copy request block structure.
-@item @manref{copyresp(9)} -- @tab @dfn{STREAMS} copy response block structure.
+@item @manref{copyreq(9)} -- @tab @acronym{STREAMS} copy request block structure.
+@item @manref{copyresp(9)} -- @tab @acronym{STREAMS} copy response block structure.
 @item @manref{cred_t(9)} -- @tab credentials structure.
-@item @manref{ctlmsg(9)} -- @tab test a @dfn{STREAMS} message type for control.
-@item @manref{datab(9)} -- @tab @dfn{STREAMS} data block structure.
-@item @manref{datamsg(9)} -- @tab test a @dfn{STREAMS} message type for data.
-@item @manref{dblk_t(9)} -- @tab @dfn{STREAMS} data block structure.
+@item @manref{ctlmsg(9)} -- @tab test a @acronym{STREAMS} message type for control.
+@item @manref{datab(9)} -- @tab @acronym{STREAMS} data block structure.
+@item @manref{datamsg(9)} -- @tab test a @acronym{STREAMS} message type for data.
+@item @manref{dblk_t(9)} -- @tab @acronym{STREAMS} data block structure.
 @item @manref{delay(9)} -- @tab postpone the calling process for a number of clock ticks.
-@item @manref{dev_t(9)} -- @tab @dfn{STREAMS} device type.
-@item @manref{devnode(9)} -- @tab @dfn{STREAMS} character device node structure.
+@item @manref{dev_t(9)} -- @tab @acronym{STREAMS} device type.
+@item @manref{devnode(9)} -- @tab @acronym{STREAMS} character device node structure.
 @item @manref{do_fattach(9)} -- @tab implement the @manpage{fattach(2)} system call.
 @item @manref{do_fdetach(9)} -- @tab implement the @manpage{fdetach(2)} system call.
 @item @manref{do_spipe(9)} -- @tab implement the @manpage{pipe(2s)} system call.
@@ -2658,13 +2512,13 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{drv_priv(9)} -- @tab check if current process is privileged.
 @item @manref{drv_usectohz(9)} -- @tab convert kernel tick time between microseconds or milliseconds.
 @item @manref{drv_usecwait(9)} -- @tab delay for a number of microseconds.
-@item @manref{dupb(9)} -- @tab duplicate a @dfn{STREAMS} message block.
-@item @manref{dupmsg(9)} -- @tab duplicate a @dfn{STREAMS} message.
-@item @manref{enableok(9)} -- @tab allow a @dfn{STREAMS} message queue to be scheduled.
-@item @manref{enableq(9)} -- @tab schedule a @dfn{STREAMS} message queue service procedure.
-@item @manref{esballoc(9)} -- @tab allocate a @dfn{STREAMS} message and data block with caller supplied data buffer.
-@item @manref{esbbcall(9)} -- @tab install a buffer callback for an extended @dfn{STREAMS} message block.
-@item @manref{flushband(9)} -- @tab flushes a band of @dfn{STREAMS} messages from a queue.
+@item @manref{dupb(9)} -- @tab duplicate a @acronym{STREAMS} message block.
+@item @manref{dupmsg(9)} -- @tab duplicate a @acronym{STREAMS} message.
+@item @manref{enableok(9)} -- @tab allow a @acronym{STREAMS} message queue to be scheduled.
+@item @manref{enableq(9)} -- @tab schedule a @acronym{STREAMS} message queue service procedure.
+@item @manref{esballoc(9)} -- @tab allocate a @acronym{STREAMS} message and data block with caller supplied data buffer.
+@item @manref{esbbcall(9)} -- @tab install a buffer callback for an extended @acronym{STREAMS} message block.
+@item @manref{flushband(9)} -- @tab flushes a band of @acronym{STREAMS} messages from a queue.
 @item @manref{flushq(9)} -- @tab flush messages from a @dfn{STERAMS} message queue.
 @item @manref{fmod_add(9)} -- @tab file module switch table helper functions.
 @item @manref{fmod_count(9)} -- @tab file module switch table helper functions.
@@ -2673,103 +2527,103 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{fmod_get(9)} -- @tab file module switch table helper functions.
 @item @manref{fmod_put(9)} -- @tab file module switch table helper functions.
 @item @manref{fmod_str(9)} -- @tab file module switch table helper functions.
-@item @manref{fmodsw(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} module switch table.
-@item @manref{fmodsw_list(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} module switch table.
-@item @manref{fmodsw_lock(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} module switch table.
-@item @manref{freeb(9)} -- @tab frees a @dfn{STREAMS} message block.
-@item @manref{freelk(9)} -- @tab allocate or free a @dfn{STREAMS} link block.
-@item @manref{freemsg(9)} -- @tab frees a @dfn{STREAMS} message.
-@item @manref{freeq(9)} -- @tab deallocate a @dfn{STREAMS} queue pair.
-@item @manref{freestr(9)} -- @tab deallocate a @dfn{STREAMS} Stream head.
+@item @manref{fmodsw(9)} -- @tab the @cite{SVR 4} @acronym{STREAMS} module switch table.
+@item @manref{fmodsw_list(9)} -- @tab the @cite{SVR 4} @acronym{STREAMS} module switch table.
+@item @manref{fmodsw_lock(9)} -- @tab the @cite{SVR 4} @acronym{STREAMS} module switch table.
+@item @manref{freeb(9)} -- @tab frees a @acronym{STREAMS} message block.
+@item @manref{freelk(9)} -- @tab allocate or free a @acronym{STREAMS} link block.
+@item @manref{freemsg(9)} -- @tab frees a @acronym{STREAMS} message.
+@item @manref{freeq(9)} -- @tab deallocate a @acronym{STREAMS} queue pair.
+@item @manref{freestr(9)} -- @tab deallocate a @acronym{STREAMS} Stream head.
 @item @manref{freezestr(9)} -- @tab freeze the state of a Stream.
-@item @manref{frtn_t(9)} -- @tab allocate a @dfn{STREAMS} message and data block with caller supplied data buffer.
-@item @manref{getadmin(9)} -- @tab get the administrative function pointer for a @dfn{STREAMS} module.
+@item @manref{frtn_t(9)} -- @tab allocate a @acronym{STREAMS} message and data block with caller supplied data buffer.
+@item @manref{getadmin(9)} -- @tab get the administrative function pointer for a @acronym{STREAMS} module.
 @item @manref{getmajor(9)} -- @tab get the internal major device number for a device.
-@item @manref{getmid(9)} -- @tab get the @dfn{STREAMS} module id for a name.
+@item @manref{getmid(9)} -- @tab get the @acronym{STREAMS} module id for a name.
 @item @manref{getminor(9)} -- @tab get the extended minor device number for a device.
-@item @manref{getq(9)} -- @tab get a message from a @dfn{STREAMS} message queue.
-@item @manref{insq(9)} -- @tab insert a message into a @dfn{STREAMS} message queue.
-@item @manref{iocblk(9)} -- @tab @dfn{STREAMS} input-output control block structure.
-@item @manref{isdatablk(9)} -- @tab test a @dfn{STREAMS} data block for data type.
-@item @manref{isdatamsg(9)} -- @tab test a @dfn{STREAMS} data block for data type.
+@item @manref{getq(9)} -- @tab get a message from a @acronym{STREAMS} message queue.
+@item @manref{insq(9)} -- @tab insert a message into a @acronym{STREAMS} message queue.
+@item @manref{iocblk(9)} -- @tab @acronym{STREAMS} input-output control block structure.
+@item @manref{isdatablk(9)} -- @tab test a @acronym{STREAMS} data block for data type.
+@item @manref{isdatamsg(9)} -- @tab test a @acronym{STREAMS} data block for data type.
 @item @manref{kmem_alloc(9)} -- @tab allocate kernel memory.
 @item @manref{kmem_alloc_node(9)} -- @tab allocate kernel memory.
 @item @manref{kmem_free(9)} -- @tab deallocate kernel memory.
 @item @manref{kmem_zalloc(9)} -- @tab allocate and zero kernel memory.
 @item @manref{kmem_zalloc_node(9)} -- @tab allocate and zero kernel memory.
-@item @manref{linkb(9)} -- @tab link a message block to a @dfn{STREAMS} message.
-@item @manref{linkblk(9)} -- @tab @dfn{STREAMS} link block structure.
-@item @manref{linkmsg(9)} -- @tab link a message block to a @dfn{STREAMS} message.
+@item @manref{linkb(9)} -- @tab link a message block to a @acronym{STREAMS} message.
+@item @manref{linkblk(9)} -- @tab @acronym{STREAMS} link block structure.
+@item @manref{linkmsg(9)} -- @tab link a message block to a @acronym{STREAMS} message.
 @item @manref{major_t(9)} -- @tab get the internal major device number for a device.
 @item @manref{makedevice(9)} -- @tab create a device from major and minor device numbers.
 @item @manref{max(9)} -- @tab determine the maximum of two integers.
-@item @manref{mblk_t(9)} -- @tab @dfn{STREAMS} message block structure.
+@item @manref{mblk_t(9)} -- @tab @acronym{STREAMS} message block structure.
 @item @manref{min(9)} -- @tab determine the minimum of two integers.
 @item @manref{minor_t(9)} -- @tab get the extended minor device number for a device.
-@item @manref{modID_t(9)} -- @tab get the @dfn{STREAMS} module id for a name.
-@item @manref{module_info(9)} -- @tab @dfn{STREAMS} module information structure.
-@item @manref{module_stat(9)} -- @tab @dfn{STREAMS} module statistics structure.
-@item @manref{module_stat_t(9)} -- @tab @dfn{STREAMS} module statistics structure.
-@item @manref{msgb(9)} -- @tab @dfn{STREAMS} message block structure.
-@item @manref{msgdsize(9)} -- @tab calculate the size of the data in a @dfn{STREAMS} message.
-@item @manref{msgpullup(9)} -- @tab pull up bytes in a @dfn{STREAMS} message.
-@item @manref{msgsize(9)} -- @tab calculate the size of the message blocks in a @dfn{STREAMS} message.
-@item @manref{noenable(9)} -- @tab disable a @dfn{STREAMS} message queue from being scheduled.
+@item @manref{modID_t(9)} -- @tab get the @acronym{STREAMS} module id for a name.
+@item @manref{module_info(9)} -- @tab @acronym{STREAMS} module information structure.
+@item @manref{module_stat(9)} -- @tab @acronym{STREAMS} module statistics structure.
+@item @manref{module_stat_t(9)} -- @tab @acronym{STREAMS} module statistics structure.
+@item @manref{msgb(9)} -- @tab @acronym{STREAMS} message block structure.
+@item @manref{msgdsize(9)} -- @tab calculate the size of the data in a @acronym{STREAMS} message.
+@item @manref{msgpullup(9)} -- @tab pull up bytes in a @acronym{STREAMS} message.
+@item @manref{msgsize(9)} -- @tab calculate the size of the message blocks in a @acronym{STREAMS} message.
+@item @manref{noenable(9)} -- @tab disable a @acronym{STREAMS} message queue from being scheduled.
 @item @manref{pcmsg(9)} -- @tab test a data block message type for priority control.
-@item @manref{pullupmsg(9)} -- @tab pull up the bytes in a @dfn{STREAMS} message.
-@item @manref{put(9)} -- @tab invoke the put procedure for a @dfn{STREAMS} driver of module with a @dfn{STREAMS} message.
-@item @manref{putbq(9)} -- @tab put a message back on a @dfn{STREAMS} message queue.
-@item @manref{putctl(9)} -- @tab put a control message on a @dfn{STREAMS} message queue.
-@item @manref{putctl1(9)} -- @tab put a one-byte control message on a @dfn{STREAMS} message queue.
-@item @manref{putctl2(9)} -- @tab put a two-byte control message on a @dfn{STREAMS} message queue.
-@item @manref{putnext(9)} -- @tab put a message on the downstream @dfn{STREAMS} message queue.
-@item @manref{putnextctl(9)} -- @tab put a control message on the next @dfn{STREAMS} message queue.
-@item @manref{putnextctl1(9)} -- @tab put a one-byte control message on the next @dfn{STREAMS} message queue.
-@item @manref{putnextctl2(9)} -- @tab put a two-byte control message on the next @dfn{STREAMS} message queue.
-@item @manref{putq(9)} -- @tab put a message on a @dfn{STREAMS} message queue.
-@item @manref{qattach(9)} -- @tab attach a module onto a @dfn{STREAMS} file.
-@item @manref{qbackenable(9)} -- @tab perform back enabling on a @dfn{STREAMS} queue.
+@item @manref{pullupmsg(9)} -- @tab pull up the bytes in a @acronym{STREAMS} message.
+@item @manref{put(9)} -- @tab invoke the put procedure for a @acronym{STREAMS} driver of module with a @acronym{STREAMS} message.
+@item @manref{putbq(9)} -- @tab put a message back on a @acronym{STREAMS} message queue.
+@item @manref{putctl(9)} -- @tab put a control message on a @acronym{STREAMS} message queue.
+@item @manref{putctl1(9)} -- @tab put a one-byte control message on a @acronym{STREAMS} message queue.
+@item @manref{putctl2(9)} -- @tab put a two-byte control message on a @acronym{STREAMS} message queue.
+@item @manref{putnext(9)} -- @tab put a message on the downstream @acronym{STREAMS} message queue.
+@item @manref{putnextctl(9)} -- @tab put a control message on the next @acronym{STREAMS} message queue.
+@item @manref{putnextctl1(9)} -- @tab put a one-byte control message on the next @acronym{STREAMS} message queue.
+@item @manref{putnextctl2(9)} -- @tab put a two-byte control message on the next @acronym{STREAMS} message queue.
+@item @manref{putq(9)} -- @tab put a message on a @acronym{STREAMS} message queue.
+@item @manref{qattach(9)} -- @tab attach a module onto a @acronym{STREAMS} file.
+@item @manref{qbackenable(9)} -- @tab perform back enabling on a @acronym{STREAMS} queue.
 @item @manref{qband(9)} -- @tab queue band structure.
 @item @manref{qband_t(9)} -- @tab queue band structure.
-@item @manref{qclose(9)} -- @tab close a @dfn{STREAMS} driver or module.
-@item @manref{qcountstrm(9)} -- @tab add all counts on all @dfn{STREAMS} message queues in a Stream.
+@item @manref{qclose(9)} -- @tab close a @acronym{STREAMS} driver or module.
+@item @manref{qcountstrm(9)} -- @tab add all counts on all @acronym{STREAMS} message queues in a Stream.
 @item @manref{qdelete(9)} -- @tab delete a queue pair from a Stream.
-@item @manref{qdetach(9)} -- @tab detach a module from a @dfn{STREAMS} file.
-@item @manref{qenable(9)} -- @tab schedule a @dfn{STREAMS} message queue service procedure.
-@item @manref{qfields(9)} -- @tab set attributes of a @dfn{STREAMS} message queue.
-@item @manref{qfields_t(9)} -- @tab set attributes of a @dfn{STREAMS} message queue.
-@item @manref{qi_putp(9)} -- @tab @dfn{STREAMS} driver or module put procedure.
-@item @manref{qi_putp_t(9)} -- @tab @dfn{STREAMS} driver or module put procedure.
-@item @manref{qi_qadmin(9)} -- @tab @dfn{STREAMS} driver or module admin routine.
-@item @manref{qi_qadmin_t(9)} -- @tab @dfn{STREAMS} driver or module admin routine.
-@item @manref{qi_qclose(9)} -- @tab @dfn{STREAMS} driver or module close routine.
-@item @manref{qi_qclose_t(9)} -- @tab @dfn{STREAMS} driver or module close routine.
-@item @manref{qi_qopen(9)} -- @tab @dfn{STREAMS} driver or module open routine.
-@item @manref{qi_qopen_t(9)} -- @tab @dfn{STREAMS} driver or module open routine.
-@item @manref{qi_srvp(9)} -- @tab @dfn{STREAMS} driver or module service procedure.
-@item @manref{qi_srvp_t(9)} -- @tab @dfn{STREAMS} driver or module service procedure.
-@item @manref{qinit(9)} -- @tab @dfn{STREAMS} queue initialization structure.
+@item @manref{qdetach(9)} -- @tab detach a module from a @acronym{STREAMS} file.
+@item @manref{qenable(9)} -- @tab schedule a @acronym{STREAMS} message queue service procedure.
+@item @manref{qfields(9)} -- @tab set attributes of a @acronym{STREAMS} message queue.
+@item @manref{qfields_t(9)} -- @tab set attributes of a @acronym{STREAMS} message queue.
+@item @manref{qi_putp(9)} -- @tab @acronym{STREAMS} driver or module put procedure.
+@item @manref{qi_putp_t(9)} -- @tab @acronym{STREAMS} driver or module put procedure.
+@item @manref{qi_qadmin(9)} -- @tab @acronym{STREAMS} driver or module admin routine.
+@item @manref{qi_qadmin_t(9)} -- @tab @acronym{STREAMS} driver or module admin routine.
+@item @manref{qi_qclose(9)} -- @tab @acronym{STREAMS} driver or module close routine.
+@item @manref{qi_qclose_t(9)} -- @tab @acronym{STREAMS} driver or module close routine.
+@item @manref{qi_qopen(9)} -- @tab @acronym{STREAMS} driver or module open routine.
+@item @manref{qi_qopen_t(9)} -- @tab @acronym{STREAMS} driver or module open routine.
+@item @manref{qi_srvp(9)} -- @tab @acronym{STREAMS} driver or module service procedure.
+@item @manref{qi_srvp_t(9)} -- @tab @acronym{STREAMS} driver or module service procedure.
+@item @manref{qinit(9)} -- @tab @acronym{STREAMS} queue initialization structure.
 @item @manref{qinsert(9)} -- @tab insert a queue pair beneath another queue pair in a Stream.
-@item @manref{qopen(9)} -- @tab call a @dfn{STREAMS} driver or module open routine.
-@item @manref{qprocsoff(9)} -- @tab disable @dfn{STREAMS} message queue processing for multi-processing.
-@item @manref{qprocson(9)} -- @tab enable a @dfn{STREAMS} message queue for multi-processing.
+@item @manref{qopen(9)} -- @tab call a @acronym{STREAMS} driver or module open routine.
+@item @manref{qprocsoff(9)} -- @tab disable @acronym{STREAMS} message queue processing for multi-processing.
+@item @manref{qprocson(9)} -- @tab enable a @acronym{STREAMS} message queue for multi-processing.
 @item @manref{qready(9)} -- @tab test if queue procedures are scheduled.
-@item @manref{qreply(9)} -- @tab replies to a message from a @dfn{STREAMS} message queue.
+@item @manref{qreply(9)} -- @tab replies to a message from a @acronym{STREAMS} message queue.
 @item @manref{qscan(9)} -- @tab place a queue on the scan list.
 @item @manref{qsize(9)} -- @tab return the number of messages on a queue.
-@item @manref{queue(9)} -- @tab @dfn{STREAMS} message queue structure.
-@item @manref{queue_t(9)} -- @tab @dfn{STREAMS} message queue structure.
+@item @manref{queue(9)} -- @tab @acronym{STREAMS} message queue structure.
+@item @manref{queue_t(9)} -- @tab @acronym{STREAMS} message queue structure.
 @item @manref{register_clone(9)} -- @tab register a @manpage{clone(4)} minor.
 @item @manref{register_cmajor(9)} -- @tab register external device major number.
 @item @manref{register_ioctl32(9)} -- @tab register a 32-bit IO control command.
-@item @manref{register_strdev(9)} -- @tab register a @dfn{STREAMS} device.
-@item @manref{register_strdrv(9)} -- @tab register a @dfn{STREAMS} driver.
-@item @manref{register_strlog(9)} -- @tab register a @dfn{STREAMS} logger.
-@item @manref{register_strmod(9)} -- @tab register a @dfn{STREAMS} module.
-@item @manref{register_strnod(9)} -- @tab register a @dfn{STREAMS} minor device node.
-@item @manref{rmvb(9)} -- @tab remove a message block from a @dfn{STREAMS} message.
-@item @manref{rmvq(9)} -- @tab remove a message from a @dfn{STREAMS} message queue.
-@item @manref{runqueues(9)} -- @tab run queue service procedures and other asynchronous @dfn{STREAMS} events.
+@item @manref{register_strdev(9)} -- @tab register a @acronym{STREAMS} device.
+@item @manref{register_strdrv(9)} -- @tab register a @acronym{STREAMS} driver.
+@item @manref{register_strlog(9)} -- @tab register a @acronym{STREAMS} logger.
+@item @manref{register_strmod(9)} -- @tab register a @acronym{STREAMS} module.
+@item @manref{register_strnod(9)} -- @tab register a @acronym{STREAMS} minor device node.
+@item @manref{rmvb(9)} -- @tab remove a message block from a @acronym{STREAMS} message.
+@item @manref{rmvq(9)} -- @tab remove a message from a @acronym{STREAMS} message queue.
+@item @manref{runqueues(9)} -- @tab run queue service procedures and other asynchronous @acronym{STREAMS} events.
 @item @manref{sd_get(9)} -- @tab acquire and release a reference to the Stream head.
 @item @manref{sd_put(9)} -- @tab acquire and release a reference to the Stream head.
 @item @manref{sdev_add(9)} -- @tab character device switch table helper functions.
@@ -2778,65 +2632,65 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{sdev_ini(9)} -- @tab character device switch table helper functions.
 @item @manref{sdev_put(9)} -- @tab character device switch table helper functions.
 @item @manref{sdev_rel(9)} -- @tab character device switch table helper functions.
-@item @manref{sealloc(9)} -- @tab @dfn{STREAMS} event allocators.
-@item @manref{sefree(9)} -- @tab @dfn{STREAMS} event allocators.
-@item @manref{setq(9)} -- @tab set sizes and procedures associated with a @dfn{STREAMS} message queue.
-@item @manref{setqsched(9)} -- @tab invoke the @dfn{STREAMS} scheduler.
-@item @manref{setsq(9)} -- @tab set synchronization queues, sizes and procedures associated with a @dfn{STREAMS} message queue.
-@item @manref{skballoc(9)} -- @tab allocate a @dfn{STREAMS} message and data block with a caller supplied socket buffer.
-@item @manref{spec_open(9)} -- @tab @dfn{STREAMS} special device shadow file system.
-@item @manref{spec_reparent(9)} -- @tab @dfn{STREAMS} special device shadow file system.
-@item @manref{specfs_mount(9)} -- @tab @dfn{STREAMS} special device shadow file system.
-@item @manref{specfs_umount(9)} -- @tab @dfn{STREAMS} special device shadow file system.
+@item @manref{sealloc(9)} -- @tab @acronym{STREAMS} event allocators.
+@item @manref{sefree(9)} -- @tab @acronym{STREAMS} event allocators.
+@item @manref{setq(9)} -- @tab set sizes and procedures associated with a @acronym{STREAMS} message queue.
+@item @manref{setqsched(9)} -- @tab invoke the @acronym{STREAMS} scheduler.
+@item @manref{setsq(9)} -- @tab set synchronization queues, sizes and procedures associated with a @acronym{STREAMS} message queue.
+@item @manref{skballoc(9)} -- @tab allocate a @acronym{STREAMS} message and data block with a caller supplied socket buffer.
+@item @manref{spec_open(9)} -- @tab @acronym{STREAMS} special device shadow file system.
+@item @manref{spec_reparent(9)} -- @tab @acronym{STREAMS} special device shadow file system.
+@item @manref{specfs_mount(9)} -- @tab @acronym{STREAMS} special device shadow file system.
+@item @manref{specfs_umount(9)} -- @tab @acronym{STREAMS} special device shadow file system.
 @item @manref{str_close(9)} -- @tab Stream head module procedures.
 @item @manref{str_open(9)} -- @tab Stream head module procedures.
-@item @manref{streamtab(9)} -- @tab @dfn{STREAMS} module definition structure.
-@item @manref{streamtab_t(9)} -- @tab @dfn{STREAMS} module definition structure.
+@item @manref{streamtab(9)} -- @tab @acronym{STREAMS} module definition structure.
+@item @manref{streamtab_t(9)} -- @tab @acronym{STREAMS} module definition structure.
 @item @manref{strgetpmsg(9)} -- @tab perform a @manpage{getpmsg(2s)} operation on a Stream head.
 @item @manref{strioctl(9)} -- @tab perform a @manpage{ioctl(2s)} operation on a Stream head.
-@item @manref{strlog(9)} -- @tab pass a message to the @dfn{STREAMS} logger.
+@item @manref{strlog(9)} -- @tab pass a message to the @acronym{STREAMS} logger.
 @item @manref{strm_f_ops(9)} -- @tab file operations for Stream heads.
-@item @manref{stroptions(9)} -- @tab @dfn{STREAMS} Stream head options structure.
+@item @manref{stroptions(9)} -- @tab @acronym{STREAMS} Stream head options structure.
 @item @manref{strpoll(9)} -- @tab perform a @manpage{poll(2s)} operation on a Stream head.
 @item @manref{strputpmsg(9)} -- @tab perform a @manpage{putpmsg(2s)} operation on a Stream head.
-@item @manref{strqget(9)} -- @tab get attributes of a @dfn{STREAMS} message queue.
-@item @manref{strqset(9)} -- @tab set attributes of a @dfn{STREAMS} message queue.
+@item @manref{strqget(9)} -- @tab get attributes of a @acronym{STREAMS} message queue.
+@item @manref{strqset(9)} -- @tab set attributes of a @acronym{STREAMS} message queue.
 @item @manref{strread(9)} -- @tab perform a @manpage{read(2s)} operation on a Stream head.
 @item @manref{strrput(9)} -- @tab Stream head module procedures.
 @item @manref{strsendpage(9)} -- @tab perform a @manpage{sendfile(2s)} operation on a Stream head.
-@item @manref{strthread(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} scheduler thread structure and array.
-@item @manref{strthreads(9)} -- @tab the @cite{SVR 4} @dfn{STREAMS} scheduler thread structure and array.
+@item @manref{strthread(9)} -- @tab the @cite{SVR 4} @acronym{STREAMS} scheduler thread structure and array.
+@item @manref{strthreads(9)} -- @tab the @cite{SVR 4} @acronym{STREAMS} scheduler thread structure and array.
 @item @manref{strwput(9)} -- @tab Stream head module procedures.
 @item @manref{strwrite(9)} -- @tab perform a @manpage{write(2s)} operation on a Stream head.
 @item @manref{strwsrv(9)} -- @tab Stream head module procedures.
-@item @manref{sysctl_str_nstrpush(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
-@item @manref{sysctl_str_strctlsz(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
-@item @manref{sysctl_str_strmsgsz(9)} -- @tab introduction to @dfn{STREAMS} kernel functions.
-@item @manref{testb(9)} -- @tab test if a @dfn{STREAMS} message can be allocated.
+@item @manref{sysctl_str_nstrpush(9)} -- @tab introduction to @acronym{STREAMS} kernel functions.
+@item @manref{sysctl_str_strctlsz(9)} -- @tab introduction to @acronym{STREAMS} kernel functions.
+@item @manref{sysctl_str_strmsgsz(9)} -- @tab introduction to @acronym{STREAMS} kernel functions.
+@item @manref{testb(9)} -- @tab test if a @acronym{STREAMS} message can be allocated.
 @item @manref{timeout(9)} -- @tab start a timer.
 @item @manref{timeout_id_t(9)} -- @tab start a timer.
 @item @manref{timo_fcn_t(9)} -- @tab start a timer.
 @item @manref{toid_t(9)} -- @tab start a timer.
-@item @manref{unbufcall(9)} -- @tab remove a @dfn{STREAMS} buffer callback.
+@item @manref{unbufcall(9)} -- @tab remove a @acronym{STREAMS} buffer callback.
 @item @manref{unfreezestr(9)} -- @tab thaw the state of a Stream queue.
-@item @manref{unlinkb(9)} -- @tab unlink a message block from a @dfn{STREAMS} message.
-@item @manref{unlinkmsg(9)} -- @tab unlink a message block from a @dfn{STREAMS} message.
+@item @manref{unlinkb(9)} -- @tab unlink a message block from a @acronym{STREAMS} message.
+@item @manref{unlinkmsg(9)} -- @tab unlink a message block from a @acronym{STREAMS} message.
 @item @manref{unregister_clone(9)} -- @tab unregister a @manpage{clone(4)} minor.
 @item @manref{unregister_cmajor(9)} -- @tab unregister external device major number.
 @item @manref{unregister_ioctl32(9)} -- @tab unregister a 32-bit IO control command.
-@item @manref{unregister_strdev(9)} -- @tab unregister a @dfn{STREAMS} device.
-@item @manref{unregister_strdrv(9)} -- @tab unregister a @dfn{STREAMS} driver.
-@item @manref{unregister_strmod(9)} -- @tab unregister a @dfn{STREAMS} module.
-@item @manref{unregister_strnod(9)} -- @tab unregister a @dfn{STREAMS} minor device node.
+@item @manref{unregister_strdev(9)} -- @tab unregister a @acronym{STREAMS} device.
+@item @manref{unregister_strdrv(9)} -- @tab unregister a @acronym{STREAMS} driver.
+@item @manref{unregister_strmod(9)} -- @tab unregister a @acronym{STREAMS} module.
+@item @manref{unregister_strnod(9)} -- @tab unregister a @acronym{STREAMS} minor device node.
 @item @manref{untimeout(9)} -- @tab stop a timer.
 @item @manref{unweldq(9)} -- @tab unweld two queues.
 @item @manref{vcmn_err(9)} -- @tab print a kernel command error.
-@item @manref{vstrlog(9)} -- @tab pass a message to the @dfn{STREAMS} logger.
-@item @manref{vstrlog_t(9)} -- @tab register a new @dfn{STREAMS} log device.
+@item @manref{vstrlog(9)} -- @tab pass a message to the @acronym{STREAMS} logger.
+@item @manref{vstrlog_t(9)} -- @tab register a new @acronym{STREAMS} log device.
 @item @manref{weld_arg_t(9)} -- @tab weld two (or four) queues together.
 @item @manref{weld_fcn_t(9)} -- @tab weld two (or four) queues together.
 @item @manref{weldq(9)} -- @tab weld two (or four) queues together.
-@item @manref{xmsgsize(9)} -- @tab calculate the size of message blocks in a @dfn{STREAMS} message.
+@item @manref{xmsgsize(9)} -- @tab calculate the size of message blocks in a @acronym{STREAMS} message.
 @end multitable
 
 @c ----------------------------------------------------------------------------
@@ -2853,65 +2707,65 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 * Porting from Mentat::
 @end menu
 
-@cite{@value{PACKAGE_TITLE}} provides a rich set of @dfn{STREAMS} functions, DDI/DKI functions and
-utilities based on @cite{SVR 4.2 MP} for the development of @dfn{STREAMS} modules and drivers.
+@cite{@value{PACKAGE_TITLE}} provides a rich set of @acronym{STREAMS} functions, DDI/DKI functions and
+utilities based on @cite{SVR 4.2 MP} for the development of @acronym{STREAMS} modules and drivers.
 Although these functions and capabilities provide all of the utilities necessary for the development
-of @dfn{STREAMS} modules and drivers, it represents the common set of functions provided by other
-@dfn{STREAMS} implementations.
+of @acronym{STREAMS} modules and drivers, it represents the common set of functions provided by other
+@acronym{STREAMS} implementations.
 
-Some other @dfn{STREAMS} implementations provide interfaces, utilities and helper functions specific
-to those implementations.  Where @dfn{STREAMS} implementations differ the most is in the manner in
-which they configure and register @dfn{STREAMS} drivers and modules for interface to the operating
+Some other @acronym{STREAMS} implementations provide interfaces, utilities and helper functions specific
+to those implementations.  Where @acronym{STREAMS} implementations differ the most is in the manner in
+which they configure and register @acronym{STREAMS} drivers and modules for interface to the operating
 system, including registration functions, device numbering, creation of minor device nodes,
 administration and other mechanisms not specified by the @cite{System V Release 4 Programmer's Guide
 -- STREAMS}.
 
-To assist with porting of @dfn{STREAMS} drivers and modules from other @dfn{STREAMS} implementations
+To assist with porting of @acronym{STREAMS} drivers and modules from other @acronym{STREAMS} implementations
 and @cite{UNIX} based operating systems to @cite{@value{PACKAGE_TITLE}},
-@cite{@value{PACKAGE_TITLE}} provides a separate @cite{@dfn{STREAMS} Compatibility} add-on package,
-called @file{strcompat-@value{VERSION_STRCOMPAT}},@footnote{Previously the @cite{@dfn{STREAMS}
+@cite{@value{PACKAGE_TITLE}} provides a separate @cite{@acronym{STREAMS} Compatibility} add-on package,
+called @file{strcompat-@value{VERSION_STRCOMPAT}},@footnote{Previously the @cite{@acronym{STREAMS}
 Compatibility} modules were part of the @cite{@value{PACKAGE_TITLE}} base package.  They were
 separated to an add-on package for a number of reasons that are described in the @cite{OpenSS7
 STREAMS Compatibility -- Installation and Reference Manual.}} that provide source level compatibility
-with a wide range of mainstream @dfn{STREAMS} implementations and significant groups of
+with a wide range of mainstream @acronym{STREAMS} implementations and significant groups of
 compatibility and helper functions (such as those from @cite{Solaris} and @cite{Mentat}).  These
 compatibility packages also provide separate demand loadable kernel modules that provide the
 additional compatibility functionality with @cite{@value{PACKAGE_TITLE}}.
 
-In general, when porting to @cite{@value{PACKAGE_TITLE}} from another @dfn{STREAMS} implementation,
+In general, when porting to @cite{@value{PACKAGE_TITLE}} from another @acronym{STREAMS} implementation,
 the following items will need the most attention:
 
 @table @emph
 
 @item Header Files
-The @dfn{STREAMS} and operating system specific header files that must be included by kernel modules
-to implement @dfn{STREAMS} drivers or modules are specific to each @cite{STREAMS} implementation.
+The @acronym{STREAMS} and operating system specific header files that must be included by kernel modules
+to implement @acronym{STREAMS} drivers or modules are specific to each @acronym{STREAMS} implementation.
 Although there are some basic header files to include (@file{sys/stream.h}, @file{sys/strconf.h},
 @file{sys/ddi.h}, @cite{sys/cmn_err.h}, @cite{sys/dki.h}, @cite{sys/kmem.h}), the order in which
 these headers are included and the additional operating system specific headers are implementation
 specific.  See the example drivers and modules for the header files that are necessary for
-@cite{@value{PACKAGE_TITLE}} @dfn{STREAMS} modules and drivers.
+@cite{@value{PACKAGE_TITLE}} @acronym{STREAMS} modules and drivers.
 
 @item Kernel Module Mechanism
 The mechanism for creating, configuring and loading kernel modules is specific to the operating
 system implementation.  @cite{@value{PACKAGE_TITLE}} uses the normal @cite{Linux} mechanisms for
-kernel modules also for @dfn{STREAMS} drivers and modules.
+kernel modules also for @acronym{STREAMS} drivers and modules.
 
 @item Configuration and Registration
-The @dfn{STREAMS} driver or module will need to be converted to use the @cite{@value{PACKAGE_TITLE}}
+The @acronym{STREAMS} driver or module will need to be converted to use the @cite{@value{PACKAGE_TITLE}}
 configuration and registration mechanisms.  See @manref{register_strdev(9)},
 @manref{unregister_strdev(9)}, @manref{register_strmod(9)} and @manref{unregister_strmod(9)} for
 more specific information on the @cite{@value{PACKAGE_TITLE}} configuration and registration
 mechanisms.
 
-@item Non-@dfn{STREAMS} DDI/DKI Facilities
-Any of the non-@dfn{STREAMS} DDI/DKI facilities or operating system specific facilities that are
-used by the @dfn{STREAMS} driver or module may need to be replaced with the @cite{Linux} equivalent.
+@item Non-@acronym{STREAMS} DDI/DKI Facilities
+Any of the non-@acronym{STREAMS} DDI/DKI facilities or operating system specific facilities that are
+used by the @acronym{STREAMS} driver or module may need to be replaced with the @cite{Linux} equivalent.
 Examples of such facilities include basic locks, read-write locks, semaphores and mutexes, atomic
 integers, interrupt suppression, bus access and memory mapping functions.
 
 @item Binary Modules
-When @dfn{STREAMS} drivers or modules are released as binary objects and source code is not
+When @acronym{STREAMS} drivers or modules are released as binary objects and source code is not
 available, it is still possible to convert the binary module for use with
 @cite{@value{PACKAGE_TITLE}}.  The facility to convert binary modules for use with
 @cite{@value{PACKAGE_TITLE}} is not, however, part of the base package and is not part of the
@@ -2927,7 +2781,7 @@ subscribers and sponsors of the @cite{OpenSS7 Project}.}
 @section Porting from SVR 4.2 MP
 @cindex porting from SVR 4.2 MP
 
-When porting from @cite{SVR 4.2 MP} or a @dfn{STREAMS} implementation based closely on @cite{SVR 4.2
+When porting from @cite{SVR 4.2 MP} or a @acronym{STREAMS} implementation based closely on @cite{SVR 4.2
 MP}, such as @cite{SUPER-UX}, @cite{UXP/V}, @cite{IRIX} or many of the real-time operating system
 implementations (e.g. @cite{VxWorks}), it is possible to port directly to
 @cite{@value{PACKAGE_TITLE}} without using the @cite{STREAMS Compatibility} package.  Event when
@@ -2943,9 +2797,9 @@ modules closest to the specific implementation being ported from.
 @section Porting from Solaris
 @cindex porting from Solaris
 
-When porting from @cite{Solaris} there are both @dfn{STREAMS} facilities and extensive DDI/DKI
-facilities that differ greatly from basic @cite{SVR 4.2 MP} @dfn{STREAMS} and DDI/DKI functions.
-For porting all but the most trivial of @dfn{STREAMS} drivers and modules written specifically for
+When porting from @cite{Solaris} there are both @acronym{STREAMS} facilities and extensive DDI/DKI
+facilities that differ greatly from basic @cite{SVR 4.2 MP} @acronym{STREAMS} and DDI/DKI functions.
+For porting all but the most trivial of @acronym{STREAMS} drivers and modules written specifically for
 @cite{Solaris}, it is better to use the @cite{STREAMS Compatibility} package and the @cite{Solaris}
 compatibility module provided by that package.@footnote{The compatibility package also provides a
 version of the @file{strsun.h} header file and the helper functions provided there.}
@@ -2966,7 +2820,7 @@ compatibility with most of these functions.  It is recommended that all but the 
 @section Porting from Mentat
 @cindex porting from Mentat
 
-When porting a @dfn{STREAMS} driver or module from a @cite{Mentat} implementation (such as
+When porting a @acronym{STREAMS} driver or module from a @cite{Mentat} implementation (such as
 @cite{AIX}, @cite{HP-UX}, @cite{OSF/1}, @cite{Mac OT}) that makes heavy use of the @cite{Mentat}
 @samp{mi_} or @samp{mps_} helper functions, it is best to use the OpenSS7 implementations of those
 functions available in the @cite{STREAMS Compatibility} package directly.  The @cite{STREAMS
@@ -3056,23 +2910,23 @@ For additional details,
 @cindex standard compliance
 
 @cite{@value{PACKAGE_TITLE}} was designed and implemented to be compliant with as many standards
-impinging on @dfn{STREAMS} as possible.  There are three areas of standards compliance as follows:
+impinging on @acronym{STREAMS} as possible.  There are three areas of standards compliance as follows:
 
 @subsection User Interface Compliance
 
-The @dfn{STREAMS} user interface standards are primarily specified by the @cite{IEEE} and
+The @acronym{STREAMS} user interface standards are primarily specified by the @cite{IEEE} and
 @cite{OpenGroup} standards and take the form of the @cite{POSIX 2003} and @cite{Single UNIX
 Specification} standards simultaneously released by the @cite{OpenGroup} in conjunction with
 @cite{IEEE}.  The latest @cite{POSIX/IEEE/OpenGroup} standard provide an @cite{XSI} extension that
-includes the @dfn{STREAMS} user interface.  For the most part, the @cite{OpenGroup} XSI interface is
+includes the @acronym{STREAMS} user interface.  For the most part, the @cite{OpenGroup} XSI interface is
 completely compatible with the user interface described in the @cite{System V Release 4
 Programmer's Manual -- STREAMS}, and where it does not, Stream head options are provided to select
 between the default @cite{OpenGroup} XSI behaviour and the traditional @cite{SVR 4} behaviour.
 
 Most of the XSI specifications of the @cite{OpenGroup} describe the behaviour of the Stream head and
-the behaviour of specific @dfn{STREAMS} drivers or modules (such as pipes, FIFOs and terminals).
+the behaviour of specific @acronym{STREAMS} drivers or modules (such as pipes, FIFOs and terminals).
 Also described is the @manpage{poll(2s)} behaviour, generation of signals, and @manpage{read(2s)} and
-@manpage{write(2s)} behaviour as it applies to @dfn{STREAMS} character special devices.
+@manpage{write(2s)} behaviour as it applies to @acronym{STREAMS} character special devices.
 
 User interface compliance of the @cite{@value{PACKAGE_TITLE}} is tested with custom validation test
 suites that ship with the package.  See @refman{Conformance Test Programs} for more information on
@@ -3086,31 +2940,31 @@ interface specifications usually concern networking interfaces such as the @cite
 Interface (DLPI)}, the @cite{Network Provider Interface (NPI)}, the @cite{Transport Provider
 Interface (TPI)}, the @cite{X/Open Transport Interface (XTI)} and the @cite{Sockets} API.  Although
 these standards impinge upon various networking add-on packages for @cite{@value{PACKAGE_TITLE}},
-they do not impinge upon the base @dfn{STREAMS} package documented here.  See the @cite{Installation
+they do not impinge upon the base @acronym{STREAMS} package documented here.  See the @cite{Installation
 and Reference Manual} for the appropriate add-on package.
 
 @subsection Kernel Interface Compliance
 
-The @dfn{STREAMS} kernel interfaces, DDI/DKI and other facilities available to the @dfn{STREAMS}
+The @acronym{STREAMS} kernel interfaces, DDI/DKI and other facilities available to the @acronym{STREAMS}
 driver or module writer has not been subjected to formal standardization.  For the most part, the
 descriptions that are present in the @cite{System V Programmer's Manual -- STREAMS} provide the most
-definitive ipso facto standard for @dfn{STREAMS} implementation.  In addition to this, some
-@dfn{STREAMS} implementations have provided some enhancements or restrictions over the @cite{SVR 4}
+definitive ipso facto standard for @acronym{STREAMS} implementation.  In addition to this, some
+@acronym{STREAMS} implementations have provided some enhancements or restrictions over the @cite{SVR 4}
 descriptions.  Perhaps the most extensive embellishments have been provided for the @cite{Solaris}
-implementation of @cite{STREAMS}.
+implementation of @acronym{STREAMS}.
 
 @cite{@value{PACKAGE_TITLE}} has been implemented to provide maximum compatibility over a wide range
-of @dfn{STREAMS} implementations based on @cite{SVR 4} and provides additional capabilities similar
+of @acronym{STREAMS} implementations based on @cite{SVR 4} and provides additional capabilities similar
 to those specific embellishments found in implementations such as @cite{Solaris} through an add-on
 @cite{STREAMS Compatibility} package.
 
-The most delicate areas of compatibility across @dfn{STREAMS} implementations regard, not the use of
-@dfn{STREAMS} or DDI/DKI functions from within the @dfn{STREAMS} environment, but the invocation of
-@dfn{STREAMS} functions from outside the @dfn{STREAMS} environment.  In particular, use of private
+The most delicate areas of compatibility across @acronym{STREAMS} implementations regard, not the use of
+@acronym{STREAMS} or DDI/DKI functions from within the @acronym{STREAMS} environment, but the invocation of
+@acronym{STREAMS} functions from outside the @acronym{STREAMS} environment.  In particular, use of private
 locks and synchronization in the face of interrupts and external asynchronous callbacks is where
 implementations deviate the greatest.  @cite{@value{PACKAGE_TITLE}} attempts to address these
 differences by providing a greater level of assurance and wider range of calling contexts for each
-of the @dfn{STREAMS} facilities.
+of the @acronym{STREAMS} facilities.
 
 Kernel interface compliance of the @cite{@value{PACKAGE_TITLE}} to @cite{SVR 4} specifications is
 tested with custom validation test suites, test modules and test drivers that ship with the package.
@@ -3121,7 +2975,7 @@ suites.
 @section STREAMS Compatibility
 @cindex compatibility
 
-@cite{@value{PACKAGE_TITLE}} provides a high degree of compatibility with other @dfn{STREAMS}
+@cite{@value{PACKAGE_TITLE}} provides a high degree of compatibility with other @acronym{STREAMS}
 implementation as listed below.  Through the separate add-on @cite{STREAMS Compatibility} package,
 source level compatibility is also provided.
 

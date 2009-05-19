@@ -108,6 +108,11 @@ EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
 EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);
 EXPORT_SYMBOL_GPL(sysctl_str_nstrpush);
 
+EXPORT_SYMBOL_GPL(sysctl_str_maxpsz);
+EXPORT_SYMBOL_GPL(sysctl_str_minpsz);
+EXPORT_SYMBOL_GPL(sysctl_str_hiwat);
+EXPORT_SYMBOL_GPL(sysctl_str_lowat);
+
 STATIC struct ctl_table_header *streams_sysctl_handle;
 
 STATIC ctl_table streams_table[] = {

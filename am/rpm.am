@@ -208,7 +208,7 @@ RPMTARGET		= $(target)
 #! above 1.
 #!
 $(rpm_tar_file)::
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
@@ -220,7 +220,7 @@ $(rpm_tar_file)::
 		cp -f -- $$d$$f $@; }
 
 $(rpm_spec_file) $(rpm_img_files)::
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
@@ -245,7 +245,7 @@ $(rpm_spec_file) $(rpm_img_files)::
 ##
 
 $(rpm_src_file):: $(rpm_source_files)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories)" ; \
 	$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories) ; \
 	test ":$(FORCE)" != :force -a -f "$@" || { \
@@ -256,7 +256,7 @@ $(rpm_src_file):: $(rpm_source_files)
 ## This rule must come after the one above.
 ##
 $(rpm_link_file)::
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
@@ -353,7 +353,7 @@ sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 #!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 	if test -z "$$rpms" -o -n '$(FORCE)'; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
@@ -401,7 +401,7 @@ rebuild:
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild rebuild"; \
@@ -456,7 +456,7 @@ endif
 # to do this too.  The same is true for build files.
 ##
 distclean-rpm:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -f $(rpm_spec_file); then \
 		echo '$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :'; \
 		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
@@ -476,7 +476,7 @@ DISTCLEANFILES		+= $(rpm_cache_files) \
 # cycle).  Therefore we provide a special set of release targets for this purpose.
 ##
 release-clean-rpm: distclean-rpm
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -f $(rpm_spec_file); then \
 		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :'; \
 		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
@@ -514,7 +514,7 @@ ALL_RECURSIVE_TARGETS	+= all-srpm \
 			   all-resign
 
 update-clean-rpm:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "rm -rf $(rpm_dir)"; \
 	rm -rf $(rpm_dir) ; \
 	list="$(rpm_tar_file) $(rpm_source_files) $(rpm_src_file) $(rpm_sig_file) $(rpm_binary_files)"; \
@@ -545,7 +545,7 @@ UPDATECLEANFILES	+= $(rpm_dir_stamp)
 ## the update stamp, and force is applied, remove and recreate the SRPM.
 ##
 update-srpm:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
 			$(ECHO) "D: $@: rebuild $$f"; \
@@ -558,7 +558,7 @@ update-srpm:
 	done
 
 update-n-rpm:
-	@$(ECHO) "D: Making $@ in `pwd`"; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	rebuild=yes; \
 	rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 	for f in $$rpms; do \
@@ -575,7 +575,7 @@ update-n-rpm:
 	fi
 
 update-k-rpm:
-	@$(ECHO) "D: Making $@ in `pwd`"; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	a=`echo '$(RPMTARGET)' | sed -e 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
 	test -e $(DESTDIR)/lib/modules/$(kversion)/build || exit 0; \
@@ -601,7 +601,7 @@ update-k-rpm:
 	fi
 
 update-t-rpm:
-	@$(ECHO) "D: Making $@ in `pwd`"; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	a=`echo '$(RPMTARGET)' | sed -e 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
 	rebuild=yes; \
@@ -620,7 +620,7 @@ update-t-rpm:
 	fi
 
 update-all-rpms:
-	@$(ECHO) "D: Making $@ in `pwd`"; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	$(ECHO) "D: $@: rebuild noarch"; \
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" all-update-n-rpm || :; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
@@ -655,7 +655,7 @@ ALL_RECURSIVE_TARGETS	+= all-update-n-rpm all-update-k-rpm all-update-t-rpm
 ##
 update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 update-rpms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rebuild=yes; \
 	rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 	for f in $$rpms; do \
@@ -724,7 +724,7 @@ update-rpms:
 ## file times.
 ##
 update-sign-srpm:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
 		if test ! -e "$$f"; then \
 			$(ECHO) "D: $@: rebuild update-rpm"; \
@@ -761,7 +761,7 @@ update-sign-srpm:
 ## times.
 ##
 update-sign-rpms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild update-rpm"; \
@@ -826,7 +826,7 @@ repomd_group		= $(repodir)/comps.xml
 #! manage repomd source repository meta data files.
 #!
 $(repomd_group)::
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test -f "$$d$$f" || { \
@@ -861,7 +861,7 @@ $(repodir)/openss7.repo: $(repodir)
 #!     directory on the target machine in the @PACKAGE_LCNAME@.repo file.
 #!
 repo-yum: $(repodir) $(repodir)/openss7.repo
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) $(repomd_group) | sed -e 's|^.*/||'`; \
 	d=`pwd`/scripts/; test -f $$d$$f || d=`(cd $(srcdir); pwd)`/scripts/; \
 	g=; test ! -f $$d$$f || g="-g $$d$$f"; \
@@ -909,14 +909,14 @@ if BUILD_REPO_YAST
 #! YaST install source repository meta data files.
 #!
 $(yastdir)/media.1/media:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@p=`$(RPM) --showrc | grep '\<packager\>' | sed -e 's,.*\<packager\>[[:space:]]*,,;s[[:space:]]*$$,,' 2>/dev/null`; \
 	if test -z "$$p"; then p='Unknown'; fi; \
 	$(ECHO) "( echo \"$$p\"; date +%Y%m%d%H%M%S; echo '1') >>$@"; \
 	( echo "$$p"; date +%Y%m%d%H%M%S; echo '1') >>$@
 
 $(yastdir)/content:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@v=`$(RPM) --showrc | grep '\<vendor\>' | sed -e 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
 	if test -z "$$v"; then v='Unknown'; fi; \
 	( \
@@ -934,7 +934,7 @@ $(yastdir)/content:
 
 $(yastdir)/content.asc:: \
 $(yastdir)/content
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
@@ -945,7 +945,7 @@ $(yastdir)/content
 	else touch "$@"; fi
 
 $(yastdir)/content.key:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@"; \
@@ -966,7 +966,7 @@ yast_desc_files		= $(yastdir)/setup/descr/packages
 am__yast_skipfiles = (^|/)(\.[^/]*|directory.yast|INDEX.gz|ARCHIVE.gz|ls-lR.gz|MD5SUMS(.meta)?|SHA1SUMS(.meta)?|md5sum.txt)
 
 repo-yast-listings:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	( echo "$(yastdir)"; find . -follow -type d ) | while read d; do \
 		p=`echo "$$d" | sed -e 's,.*/,,'`; \
 		case "$$p" in (RCS|CVS|.*) continue;; esac; \
@@ -978,7 +978,7 @@ repo-yast-listings:
 	done
 
 repo-yast-listings-clean:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n '$(yastdir)' || exit 1; \
 	find $(yastdir) -follow -name 'directory.yast' | while read f; do \
 		$(ECHO) "rm -f -- $$f"; \
@@ -993,7 +993,7 @@ repo-yast-listings-clean:
 #! 	installation source for use by YaST on the build system.
 #!
 repo-yast: $(yast_meta_files)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	( cd $(yastdir); create_package_descr -d RPMS/ )
 	$(MAKE) $(AM_MAKEFLAGS) repo-yast-listings
 

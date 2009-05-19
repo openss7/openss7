@@ -57,7 +57,7 @@ TESTSUITE		= testsuite
 
 ## my rule
 package.m4: $(top_srcdir)/configure
-	@( \
+	$(AM_V_GEN)( \
 		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
@@ -72,11 +72,11 @@ TESTSUITE_DEPS		= package.m4
 
 ## my rule
 $(TESTSUITE): $(TESTSUITE_DEPS)
-	$(AUTOTEST) -I $(srcdir) $@.at -o $@
+	$(AM_V_GEN)$(AUTOTEST) -I $(srcdir) $@.at -o $@
 
 ## my rule
 atconfig: $(top_builddir)/config.status
-	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
+	$(AM_V_GEN)( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 ## automake does this one for us
 ##
@@ -93,9 +93,9 @@ INSTALLCHECK_TESTS =
 
 ## my rule
 installcheck-test: $(TESTSUITE)
-	$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
+	$(AM_V_GEN)$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
 if WITH_32BIT_LIBS
-	$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='./lib32' $(TESTSUITE_OPTS)
+	$(AM_V_GEN)$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='./lib32' $(TESTSUITE_OPTS)
 endif
 
 INSTALLCHECK_TESTS += installcheck-test

@@ -82,7 +82,7 @@ $(DEPDIR)/BCM.Ph: Makefile
 		done ; \
 		$(ECHO) "stamp-pkgobjs: $$objs" ; $(ECHO) "" ; \
 	) >$(DEPDIR)/BCM.Tph || { rm -f $(DEPDIR)/BCM.Tph ; exit 1 ; } ; \
-	mv -f $(DEPDIR)/BCM.Tph $@
+	$(am__mv) $(DEPDIR)/BCM.Tph $@
 ## AMDEP
 endif
 
@@ -110,7 +110,7 @@ stamp-pkgobjs: $(BCM_SOURCES)
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
 		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(BCM_CPPFLAGS) $(CPPFLAGS) $(BCM_CFLAGS) $(CFLAGS) -MT BCM-$$r.o -MD -MP -MF "$(DEPDIR)/BCM-$$r.Tpo" -c -o BCM-$$r.o $$d$$s ; \
-		then mv -f "$(DEPDIR)/BCM-$$r.Tpo" "$(DEPDIR)/BCM-$$r.Po" ; else rm -f "$(DEPDIR)/BCM-$$r.Tpo" ; exit 1 ; fi ; \
+		then $(am__mv) "$(DEPDIR)/BCM-$$r.Tpo" "$(DEPDIR)/BCM-$$r.Po" ; else rm -f "$(DEPDIR)/BCM-$$r.Tpo" ; exit 1 ; fi ; \
 	done ; \
 	touch stamp-pkgobjs
 ## am__fastdepCC

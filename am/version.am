@@ -57,7 +57,7 @@
 ##
 
 .version: $(top_builddir)/config.status
-	echo "$(VERSION)" > $@
+	$(AM_V_GEN)echo "$(VERSION)" > $@
 
 ALL_LOCAL += .version
 DISTCLEANFILES += .version

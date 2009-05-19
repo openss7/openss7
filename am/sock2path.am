@@ -68,13 +68,13 @@ if RPM_BUILD_USER
 ##
 
 install-sock2path: src/util/sysconfig/sock2path
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sock2path.d
 	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/sock2path.d/@PACKAGE_LCNAME@
 
 post-sock2path:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@t="$(DESTDIR)$(sysconfdir)/sock2path" ; \
 	d="$(DESTDIR)$(sysconfdir)/sock2path.d" ; \
 	if test -e $$t ; then \
@@ -89,7 +89,7 @@ post-sock2path:
 	fi
 
 uninstall-sock2path:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)/$(sysconfdir)/sock2path.d/@PACKAGE_LCNAME@
 

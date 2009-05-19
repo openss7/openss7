@@ -240,6 +240,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
@@ -313,8 +342,8 @@ This manual provides a @cite{@value{MANUAL_TYPE}} for
 @unnumberedsubsec Objective
 @cindex manual objective
 
-The objective of this manual is to provide a porting guide for the @dfn{STREAMS}
-and @dfn{DLPI} programmer when porting @dfn{STREAMS} drivers, modules and
+The objective of this manual is to provide a porting guide for the @acronym{STREAMS}
+and @dfn{DLPI} programmer when porting @acronym{STREAMS} drivers, modules and
 applications to @cite{@value{PACKAGE_TITLE}} from other major implementations of
 @dfn{DLPI}, such as @cite{AIX}, @cite{AIXlink/X.25}, @cite{Digital UNIX},
 @cite{HP-UX}, @cite{IRIX}, @cite{OSF}, @cite{PowerMAX}, @cite{Solaris}, @cite{Solstice X.25},
@@ -329,7 +358,7 @@ systems.
 @cindex manual intent
 
 The intent of this manual is to act as a guide to porting @dfn{DLPI}
-@dfn{STREAMS} modules, drivers and applications programs from other @dfn{UNIX}
+@acronym{STREAMS} modules, drivers and applications programs from other @dfn{UNIX}
 implementations of @dfn{DLPI} to @cite{Linux Fast-STREAMS}@footnote{@xref{Top,
 Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS)
 Reference Manual}.}.  It is intended to be read alone and is not intended to
@@ -350,17 +379,17 @@ interrupts, software interrupt handling, scheduling, process contexts,
 multiprocessor locks, thread programming, POSIX porgramming, etc.
 
 This guide is intended for network and systems programmers, who use the
-@dfn{STREAMS} and @dfn{DLPI} mechanism at user and kernel levels for
+@acronym{STREAMS} and @dfn{DLPI} mechanism at user and kernel levels for
 @cite{Linux} and @cite{UNIX} system communications services.  Readers of the
 guide are expected to possess prior knowledge of the @cite{Linux} and
 @cite{UNIX} system, programming, networking, and data communication.
 
 To derive maximum use from this porting guide, it is intended that the reader
-also be familiar with the user of @dfn{STREAMS} and @dfn{DLPI} under @cite{UNIX}
+also be familiar with the user of @acronym{STREAMS} and @dfn{DLPI} under @cite{UNIX}
 and @cite{POSIX} systems implementing @dfn{DLPI} drivers and applications
 libraries.  The reader should certainly be familiar with the @dfn{DLPI}
 implementations on the @cite{UNIX} or @cite{POSIX} system from which
-@dfn{STREAMS} drivers, modules or applications are being ported.
+@acronym{STREAMS} drivers, modules or applications are being ported.
 
 @node Revisions
 @unnumberedsec Revisions
@@ -381,23 +410,6 @@ A current version of this manual is normally distributed with the
 @smallexample
 @verbatim
 $Log$
-Revision 0.9.2.6  2009-05-01 04:50:52  brian
-- update documentation for release
-
-Revision 0.9.2.5  2009-04-30 06:07:46  brian
-- more documentation updates for release
-
-Revision 0.9.2.4  2008-11-26 12:01:52  brian
-- updated to FDL 1.3
-
-Revision 0.9.2.3  2008-09-20 11:04:43  brian
-- added package patchlevel
-
-Revision 0.9.2.2  2008-08-03 06:03:41  brian
-- protected agains texinfo commands in log entries
-
-Revision 0.9.2.1  2008-06-18 16:43:15  brian
-- added new files for NLI and DLPI
 @end verbatim
 @end smallexample
 
@@ -462,7 +474,7 @@ regulations).
 @chapter Introduction
 @cindex introduction
 
-This guide documents the porting of @dfn{DLPI} @dfn{STREAMS} modules, drivers
+This guide documents the porting of @dfn{DLPI} @acronym{STREAMS} modules, drivers
 and applications programs from various @dfn{UNIX} implementations to @cite{Linux
 Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
 STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
@@ -489,7 +501,7 @@ Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
 STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
 
 @noindent
-In addition, it provides documentation on @dfn{STREAMS} drivers and modules for
+In addition, it provides documentation on @acronym{STREAMS} drivers and modules for
 @dfn{DLPI} including:
 
 @itemize
@@ -531,7 +543,7 @@ This manual uses @cite{texinfo} typographic conventions.
 * Porting Organization::
 @end menu
 
-This guide is largely focused on porting @dfn{STREAMS} drivers, modules and
+This guide is largely focused on porting @acronym{STREAMS} drivers, modules and
 applications programs that act in the capacity of a @dfn{DLS User}.  Whereas
 other documents tend to focus on simply porting drivers for specific interface
 cards, that topic is adequately addressed elsewhere for the @cite{Linux}
@@ -541,8 +553,8 @@ Linux Device Drivers} an its latest edition.}  Whenever a network device driver
 has been written for a device under @cite{Linux}, using @cite{Linux} paradigms
 and procedures, it can automatically work with @dfn{DLPI}.  Therefore, this
 guide focusses on the differences between the @dfn{DLPI} interfaces that would
-be experienced by the @dfn{DLS User}: @dfn{STREAMS} modules that push over DLPI
-Streams; @dfn{STREAMS} drivers under which DLPI Streams are linked; and
+be experienced by the @dfn{DLS User}: @acronym{STREAMS} modules that push over DLPI
+Streams; @acronym{STREAMS} drivers under which DLPI Streams are linked; and
 applications programs that access the DLPI interface directly as a user-space
 program.
 
@@ -550,7 +562,7 @@ program.
 @cite{@value{PACKAGE_TITLE}}, ship with a wide assortment of manual pages.  Most
 manual pages contain a section entitled ``@cite{COMPATIBILITY}'' that provides
 compatibility and porting information for various mainstream @cite{UNIX}
-implementations.  For information on the minor differences in the @dfn{STREAMS}
+implementations.  For information on the minor differences in the @acronym{STREAMS}
 environment, see the @cite{Linux Fast-STREAMS} package,
 @command{streams-@value{VERSION_STREAMS}}.
 
@@ -566,7 +578,7 @@ documented for other operating systems including @cite{AIX},
 supported functions, primitives and structures provide compatibilty and porting
 information, this document attempts to gather together pertinent information
 concerning porting @dfn{DLPI} modules, drivers and applications programs from
-various @dfn{UNIX} operating systems supporting @dfn{STREAMS} and @dfn{DLPI} to
+various @dfn{UNIX} operating systems supporting @acronym{STREAMS} and @dfn{DLPI} to
 @cite{@value{PACKAGE_TITLE}}.
 
 @node Porting Organization
@@ -708,7 +720,7 @@ protocol-specific, input-output controls provided in support of DLPI drivers,
 modules and add-on libraries.
 @item DLPI Device Drivers and Modules.
 
-This aspect includes the @dfn{STREAMS} device drivers and pushable modules that
+This aspect includes the @acronym{STREAMS} device drivers and pushable modules that
 are provided by an implementation.  It also includes the device driver
 organization (whether split into a generic interface component and a device
 specific component, or not).
@@ -909,7 +921,7 @@ state machines and also does not directly support connection-oriented mode data
 link service.  See @ref{LLC2 Mode}.
 
 @cite{@value{PACKAGE_TITLE}} supports both approaches to LLC Type 2.  The DLPI
-driver provides a direct LLC Type 2 approach for @dfn{STREAMS} drivers, modules
+driver provides a direct LLC Type 2 approach for @acronym{STREAMS} drivers, modules
 and applications needing full DLPI @pval{DL_CODLS} support, as well as a
 @pval{DL_CLDLS} @dfn{LLC2 Mode} that supports implementing LLC Type 2 in the DLS
 user and upper layer protocol modules such as X.25.
@@ -935,7 +947,7 @@ WAN links.
 
 The @cite{@value{PACKAGE_TITLE}} DLPI driver supports WAN links directly,
 accessing Linux native raw HDLC network devices supported by the Linux kernel.
-Additional packages for X.25 and ISDN support @dfn{STREAMS} based raw HDLC
+Additional packages for X.25 and ISDN support @acronym{STREAMS} based raw HDLC
 network devices in support of LAPB, LAPD and LAPF in a similar fashion.  The
 full range of standard DLPI primitives, implementation specific extension
 primitives, and implementation specific input-output controls are supported
@@ -1101,7 +1113,7 @@ DLSAP addresses again.  @cite{Solaris} and @cite{HP-UX} provide such a @dfn{Fast
 Path} mode of operation.
 
 @cite{@value{PACKAGE_TITLE}} also provides @dfn{Fast Path} modes compatible with
-@cite{Solaris} and @cite{HP-UX} in support of porting @dfn{STREAMS} drivers,
+@cite{Solaris} and @cite{HP-UX} in support of porting @acronym{STREAMS} drivers,
 modules and applications to @cite{Linux}.
 
 @subsubsection Combined Mode
@@ -1154,7 +1166,7 @@ for DLPI.
 @cite{@value{PACKAGE_TITLE}} supports all standard DLPI primitives and many
 extension primitives provided by other implementations, @cite{HP-UX},
 @cite{Solaris} and @cite{UnixWare}, for compatibilty and to ease porting of
-@dfn{STREAMS} @dfn{DLPI} drivers, modules and applications programs to
+@acronym{STREAMS} @dfn{DLPI} drivers, modules and applications programs to
 @cite{Linux Fast-STREAMS}.
 
 Each porting section includes a discussion of the supported standard DLPI
@@ -1169,7 +1181,7 @@ are source-compatible only.
 @cindex input-output controls
 
 Although the ability to perform input-output controls is always provided in
-conjunction with @dfn{STREAMS} drivers, the @dfn{DLPI} standards do not define
+conjunction with @acronym{STREAMS} drivers, the @dfn{DLPI} standards do not define
 or standardize on any input-output controls for @dfn{DLPI}.  As a result, almost
 all implementations of @dfn{DLPI} provide management and other input-output
 controls that are completely implementation-specific and not generic in any way.
@@ -1223,7 +1235,7 @@ routines, interacting with hardware) as well as the interface functions (passing
 of DLPI primitives).
 
 Under this organization, writing a new device driver consists of writing a
-complete monolithic @dfn{STREAMS} driver.
+complete monolithic @acronym{STREAMS} driver.
 @item The second organization consists of a device driver separated into a
 top-half and a bottom-half.  The top-half is concerned with the passing of DLPI
 primitives with the user of the Stream and can be largely generic, and certainly
@@ -1232,7 +1244,7 @@ hardware and is device specific.
 
 Under this organization it is possible to write a new bottom-half for a specific
 device without the need to write a new top-half nor to become involved with many
-@dfn{STREAMS} specifics.
+@acronym{STREAMS} specifics.
 @end enumerate
 
 @cite{AIX} uses the monolithic device driver approach, as does
@@ -1311,7 +1323,7 @@ application is interested.
 @end table
 
 @cite{@value{PACKAGE_TITLE}} provides these two ipso-facto standard
-@dfn{STREAMS} modules.  It also provides some useful modules not found in other
+@acronym{STREAMS} modules.  It also provides some useful modules not found in other
 implementations.
 
 Specific module names provided by the various implementations are detailed in
@@ -1364,7 +1376,7 @@ Although some utilities such as @manref{snoop(8)} are common, @cite{AIX},
 @cite{AIXlink/X.25}, @cite{HP-UX}, @cite{Solaris} and @cite{Solstice X.25} each
 provide their own set of utilities.
 
-As with @dfn{STREAMS} utilities, @cite{@value{PACKAGE_TITLE}} provides as many
+As with @acronym{STREAMS} utilities, @cite{@value{PACKAGE_TITLE}} provides as many
 of these utilities as can be implemented using the available documentation for
 the utility. 
 
@@ -1406,7 +1418,7 @@ information on management.
 * DLPI Summary::
 @end menu
 
-This section includes general porting information when porting @dfn{STREAMS}
+This section includes general porting information when porting @acronym{STREAMS}
 drivers or modules, or @dfn{DLPI} applications from any environment supporting
 the @dfn{DLPI} to @cite{Linux Fast-STREAMS}.
 
@@ -1596,7 +1608,7 @@ the data payload.  Otherwise, LLC data would normally be sent by a
 
 In some cases provided by the DLPI standard, the primitive interface may be
 unsuitable in comparison to the input-output control interface.  Under
-@dfn{STREAMS}, the identity of, and permissions afforded, the user passing the
+@acronym{STREAMS}, the identity of, and permissions afforded, the user passing the
 @msg{M_PROTO} or @msg{M_PCPROTO} primitive to the Stream are not provided by the
 put message, @manref{putpmsg(2s)}, system call.  On the other hand, the
 input-output control, @manref{ioctl(2s)}, system call both identifies and
@@ -3525,10 +3537,10 @@ available PPAs on the system.
 
 @cite{OSF} basically provides a similar type of module to that provided by
 @cite{@value{PACKAGE_TITLE}}: it is a DLPI driver that bridges between
-@dfn{STREAMS} and the underlying BSD network device interfaces that are provided
+@acronym{STREAMS} and the underlying BSD network device interfaces that are provided
 by @cite{OSF}'s basic BSD kernel.  Therefore, the driver, @command{dlb(7)}, is
 basically organized into a top-half and bottom-half, where the top-half is the
-DLPI @dfn{STREAMS} driver, and the BSD network device implementation is the
+DLPI @acronym{STREAMS} driver, and the BSD network device implementation is the
 bottom-half.
 
 Unfortunately, @cite{OSF} DLPI support is somewhat lacking compared to others.
@@ -3542,7 +3554,7 @@ to native Linux sockets rather than DLPI.
 @cindex OSF libraries
 
 @cite{OSF} does not provide any libraries or utilities (other than basic
-@dfn{STREAMS} facilities) in support of DLPI applications.
+@acronym{STREAMS} facilities) in support of DLPI applications.
 
 @node OSF Utilities
 @section OSF Utilities

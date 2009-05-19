@@ -68,7 +68,7 @@ if RPM_BUILD_USER
 ##
 
 install-netconfig: src/util/sysconfig/netconfig
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/netconfig.d
 	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/netconfig.d/@PACKAGE_LCNAME@
@@ -91,7 +91,7 @@ install-netconfig: src/util/sysconfig/netconfig
 ##
 
 post-netconfig:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@t="$(DESTDIR)$(sysconfdir)/netconfig" ; \
 	a="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
 	d="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
@@ -134,8 +134,8 @@ post-netconfig:
 		$(ECHO) "rm -f $$t $$t.tmp" ; \
 		rm -f $$t $$t.tmp ; \
 	else \
-		$(ECHO) "mv -f $$t.tmp $$t" ; \
-		mv -f $$t.tmp $$t ; \
+		$(ECHO) "$(am__mv) $$t.tmp $$t" ; \
+		$(am__mv) $$t.tmp $$t ; \
 	fi ; \
 	if test "$$t" != "$$a" ; then \
 		$(ECHO) "rm -f $$a" ; \
@@ -143,7 +143,7 @@ post-netconfig:
 	fi
 
 uninstall-netconfig:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)/$(sysconfdir)/netconfig.d/@PACKAGE_LCNAME@
 

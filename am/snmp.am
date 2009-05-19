@@ -68,7 +68,7 @@ if RPM_BUILD_USER
 
 
 install-snmp-conf: src/util/sysconfig/snmp
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/snmp/snmp.d
 	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
@@ -100,7 +100,7 @@ install-snmp-conf: src/util/sysconfig/snmp
 ##
 
 post-snmp-conf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@snmp_dir=$(DESTDIR)$(sysconfdir)/snmp ; \
 	if test ! -f $$snmp_dir/snmpd.conf ; then \
 		test -f $$snmp_dir/../snmpd.conf || exit 0 ; ( \
@@ -132,7 +132,7 @@ post-snmp-conf:
 			$(ECHO) "****" ; \
 			exit 0 ; \
 		elif test -e $$conf_fil ; then \
-			mv -f $$conf_fil $$conf_lcl ; \
+			$(am__mv) $$conf_fil $$conf_lcl ; \
 		else \
 			cat /dev/null > $$conf_lcl ; \
 		fi ; \
@@ -180,11 +180,11 @@ post-snmp-conf:
 		fi ; \
 	done ; \
 	if test :$$found = :yes ; then \
-		$(ECHO) "mv -f $$conf_tmp $$conf_fil" ; \
-		mv -f $$conf_tmp $$conf_fil ; \
+		$(ECHO) "$(am__mv) $$conf_tmp $$conf_fil" ; \
+		$(am__mv) $$conf_tmp $$conf_fil ; \
 	else \
-		$(ECHO) "mv -f $$conf_lcl $$conf_fil" ; \
-		mv -f $$conf_lcl $$conf_fil ; \
+		$(ECHO) "$(am__mv) $$conf_lcl $$conf_fil" ; \
+		$(am__mv) $$conf_lcl $$conf_fil ; \
 		$(ECHO) "rm -f $$conf_tmp" ; \
 		rm -f $$conf_tmp ; \
 	fi ; \
@@ -192,7 +192,7 @@ post-snmp-conf:
 	killall -HUP snmpd || : ;
 
 uninstall-snmp-conf:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
 

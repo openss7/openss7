@@ -62,10 +62,10 @@ if DEVELOPMENT
 info_TEXINFOS		+= mxi.texi
 
 mxi.h: $(top_srcdir)/src/include/ss7/mxi.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 mxi_ioctl.h: $(top_srcdir)/src/include/ss7/mxi_ioctl.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += mxi.h mxi_ioctl.h
 

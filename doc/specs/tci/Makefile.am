@@ -62,7 +62,7 @@ if DEVELOPMENT
 info_TEXINFOS		+= tci.texi
 
 tc.h: $(top_srcdir)/src/include/ss7/tc.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += tc.h
 

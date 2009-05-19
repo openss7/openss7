@@ -62,10 +62,10 @@ if DEVELOPMENT
 info_TEXINFOS		+= chi.texi
 
 chi.h: $(top_srcdir)/src/include/ss7/chi.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 chi_ioctl.h: $(top_srcdir)/src/include/ss7/chi_ioctl.h
-	cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
+	$(AM_V_GEN)cat $< | sed -e '1,/\*\//d;/doxygen/d;/#ident/d;/^\/\/\//d' | cat -s | expand > $@
 
 CLEANFILES += chi.h chi_ioctl.h
 

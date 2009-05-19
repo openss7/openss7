@@ -75,7 +75,8 @@ if WITH_KO_MODULES
 if AMDEP
 ## AMDEP
 $(DEPDIR)/modversions.Ph:
-	@$(ECHO) "Creating $@ dependencies..." ; \
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
 	( \
 		list="$(EXPORT_SRCFILES)" ; for s in $$list ; do \
 			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi ; \
@@ -96,7 +97,7 @@ $(DEPDIR)/modversions.Ph:
 		done ; \
 		$(ECHO) "stamp-verobjs: $$objs" ; $(ECHO) "" ; \
 	) >$(DEPDIR)/modversions.Tph || { rm -f $(DEPDIR)/modversions.Tph ; exit 1 ; } ; \
-	mv -f $(DEPDIR)/modversions.Tph $@
+	$(am__mv) $(DEPDIR)/modversions.Tph $@
 ## AMDEP
 endif
 
@@ -106,7 +107,7 @@ MY_SUFFIXES		+= .c .ver
 if am__fastdepCC
 ## am__fastdepCC
 	if ( $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || $(ECHO) '$(srcdir)/'`$< | $(KGENKSYMS) > $@ ) \
-	then mv -f "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
+	then $(am__mv) "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
 ## am__fastdepCC
 else
 ## !am__fastdepCC
@@ -128,7 +129,8 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	touch stamp-verfiles
@@ -141,7 +143,8 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		source="$$s" object="$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
@@ -154,7 +157,8 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	touch stamp-verfiles
@@ -171,7 +175,8 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "$(ECHO) '/* dummy load script */' > \"$$r.ver\"" ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(ECHO) '/* dummy load script */' > \"$$r.ver\"" ; \
 		$(ECHO) '/* dummy load script */' > "$$r.ver" ; \
 	done ; \
 	touch stamp-verfiles
@@ -193,12 +198,14 @@ stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS)
 		if $(OBJDUMP) -h $$obj | grep -q __ksymtab; then \
 			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
 			v=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,,;s,\.o$$,,'` ; \
-			$(ECHO) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj $$v.ver && mv -f -- a.$$$$.out $$a" ; \
-			$(LD) -r -o a.$$$$.out $$pkg_lds $$obj $$v.ver && mv -f -- a.$$$$.out $$a ; \
+			$(ECHO_Q) "  LD    " $$a ; \
+			$(ECHO_V) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
 		else \
 			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
-			$(ECHO) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a" ; \
-			$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a ; \
+			$(ECHO_Q) "  LD    " $$a ; \
+			$(ECHO_V) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 		fi ; \
 	done ; \
 	touch stamp-verobjs
@@ -221,7 +228,8 @@ else
 if AMDEP
 ## AMDEP
 $(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
-	@$(ECHO) "Creating $@ dependencies..." ; \
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
 	v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e s',/[^/]*$$,,'`/versions ; \
 	$(ECHO) "$(mkdir_p) $$v" ; \
 	$(mkdir_p) $$v ; \
@@ -245,7 +253,7 @@ $(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
 		done ; \
 		$(ECHO) "stamp-verobjs: $$objs" ; $(ECHO) "" ; \
 	) >$(DEPDIR)/modversions.Tph || { rm -f $(DEPDIR)/modversions.Tph ; exit 1 ; } ; \
-	mv -f $(DEPDIR)/modversions.Tph $@
+	$(am__mv) $(DEPDIR)/modversions.Tph $@
 ## !AMDEP
 endif
 
@@ -255,7 +263,7 @@ MY_SUFFIXES		+= .c .ver
 if am__fastdepCC
 ## am__fastdepCC
 	if ( $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || $(ECHO) '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@ ) \
-	then mv -f "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
+	then $(am__mv) "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
 ## am__fastdepCC
 else
 ## !am__fastdepCC
@@ -272,7 +280,8 @@ if KERNEL_VERSIONS
 ## KERNEL_VERSIONS
 
 $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
-	@$(ECHO) "Creating $@ header file..." ; \
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ header file..." ; \
 	v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e 's,/[^/]*$$,,'`/versions ; \
 	$(mkdir_p) $$v ; \
 	( \
@@ -289,7 +298,7 @@ $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 		done ; \
 		$(ECHO) "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */" ; \
 	) >$(MODVERSIONS_H).tmp || { rm -f $(MODVERSIONS_H).tmp ; exit 1 ; } ; \
-	mv -f $(MODVERSIONS_H).tmp $@
+	$(am__mv) $(MODVERSIONS_H).tmp $@
 
 if am__fastdepCC
 ## am__fastdepCC
@@ -299,7 +308,8 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
 	done
 ## am__fastdepCC
@@ -313,7 +323,8 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
 		source="$$s" object="$$v/$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
@@ -327,7 +338,8 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
 	done
 ## !AMDEP
@@ -342,7 +354,7 @@ else
 ## !KERNEL_VERSIONS
 
 $(MODVERSIONS_H):
-	$(mkdir_p) $(PKGINCL) ; \
+	$(AM_V_GEN)$(mkdir_p) $(PKGINCL) ; \
 	$(ECHO) "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>  $(MODVERSIONS_H) ; \
 	$(ECHO) "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>> $(MODVERSIONS_H) ; \
 	$(ECHO) "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */"	>> $(MODVERSIONS_H)
@@ -356,15 +368,16 @@ stamp-verobjs: $(KERNEL_OBJECTS)
 	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
 	list="$?" ; for obj in $$list ; do \
 		a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
-		$(ECHO) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a" ; \
-		$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a ; \
+		$(ECHO_Q) "  LD    " $$a ; \
+		$(ECHO_V) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+		$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 	done ; \
 	touch stamp-verobjs
 
 ALL_LOCAL		+= stamp-verobjs
 
 clean-verobjs:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed -e 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
 	$(ECHO) "rm -f -- stamp-verobjs $$objs" ; \
 	rm -f -- stamp-verobjs $$objs
@@ -372,13 +385,13 @@ clean-verobjs:
 CLEAN_LOCAL		+= clean-verobjs
 
 clean-ksyms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ##
 # Remove the stamp file autoconf doesn't know about.
 ##
 distclean-ksyms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -n "$(AUTOCONFIG_H)" ; then \
 		p=`$(ECHO) "$(AUTOCONFIG_H)" | sed -e 's,[^/]*$$,,'` ; \
 		if test -d "$$p" ; then \
@@ -388,10 +401,10 @@ distclean-ksyms:
 	rm -f -- $(BUILD_SPECIFIC_FILES)
 
 maintainer-clean-ksyms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 install-ksyms: $(BUILD_SPECIFIC_FILES)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	test -z "$(pkgincludedir)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)"
 	test -z "$(kversion)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)/$(kversion)"
@@ -409,10 +422,10 @@ install-ksyms: $(BUILD_SPECIFIC_FILES)
 	done
 
 post-ksyms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 uninstall-ksyms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@pkgstrip=`$(ECHO) "sys/$(PACKAGE_TARNAME)" | sed 's,.,.,g'`; \
 	dirstrip=`$(ECHO) "$(PKGINCL)" | sed "s,^$$pkgstrip,,"`; \
@@ -427,7 +440,7 @@ uninstall-ksyms:
 	done
 
 postun-ksyms:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 
 ksyms-all: $(BUILD_SPECIFIC_FILES)
 

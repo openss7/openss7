@@ -247,6 +247,35 @@ this document or the performance or implementation of the contents thereof.}
 @end iftex
 @page
 
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
+
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@syncodeindex mo cp
+@c @end ifnottex
+
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi

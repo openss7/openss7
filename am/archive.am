@@ -73,7 +73,7 @@
 # packages.
 ##
 deb-rules-check:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -e $(PACKAGE)-$(VERSION)/debian/rules -a ! -x $(PACKAGE)-$(VERSION)/debian/rules; then \
 		$(ECHO) "chmod +x $(PACKAGE)-$(VERSION)/debian/rules"; \
 		chmod +x $(PACKAGE)-$(VERSION)/debian/rules; \
@@ -126,7 +126,7 @@ RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR) $(tardir)
 # force has been specified or a force release target has been invoked.
 ##
 $(archive_files)::
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $$f"; \
@@ -142,7 +142,7 @@ $(archive_files)::
 # exist.
 ##
 $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist
 
 #! release-archives:
@@ -170,7 +170,7 @@ release-archives: $(archive_files)
 ##
 $(tardir)/$(PACKAGE)-$(VERSION).tar.gz.asc:: \
 $(tardir)/$(PACKAGE)-$(VERSION).tar.gz
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
@@ -182,7 +182,7 @@ $(tardir)/$(PACKAGE)-$(VERSION).tar.gz
 
 $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2.asc:: \
 $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
@@ -195,7 +195,7 @@ $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 if WITH_LZMA
 $(tardir)/$(PACKAGE)-$(VERSION).tar.lzma.asc:: \
 $(tardir)/$(PACKAGE)-$(VERSION).tar.lzma
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
@@ -274,7 +274,7 @@ endif
 ## tarball.  This applies to each tarball type.
 ##
 update-tar:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(archive_suffixes)"; for a in $$list; do \
 		f="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
@@ -295,7 +295,7 @@ update-tar:
 ## signature.  This applies to each signature type.
 ##
 update-sign-tar:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(archive_suffixes)"; for a in $$list; do \
 		t="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; f="$${t}.asc"; \
 		if test ! -e "$$t"; then \
@@ -322,7 +322,7 @@ update-sign-tar:
 ## remove it.
 ##
 update-clean-tar:
-	@$(ECHO) "D: Making $@ in `pwd`"
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(archive_suffixes)"; for a in $$list; do \
 		files="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}.asc $(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; for f in $$files; do \
 			if test -e "$$f" -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
