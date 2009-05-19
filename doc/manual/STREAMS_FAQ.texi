@@ -323,7 +323,7 @@ Copying
 
 @unnumberedsec Authors
 
-The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+The authors of the @cite{@value{PACKAGE_TITLE}} package include:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -331,7 +331,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 
 @unnumberedsec Maintainer
 
-The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -612,30 +612,7 @@ No, @b{Linux} does not have @dfn{STREAMS} as part of the kernel (yet).  That is 
 particularly since @b{Linux} normally follows SVR4 first and 4BSD second.  (Otherwise, it would just
 be another BSD.)
 
-Two open source @dfn{STREAMS} implementations are available for @b{Linux}: @cite{Linux STREAMS
-(LiS)} and @cite{@value{PACKAGE_TITLE}}.
-
-@subsection Linux STREAMS (LiS)
-@cindex Linux STREAMS (LiS)
-
-@cite{Linux STREAMS (LiS)} is a @dfn{STREAMS} implementation for @b{Linux} originally released and
-maintained by @uref{http://www.gcom.com/,GCOM Inc.}, and recently re-released under @dfn{GPL} by
-@uref{http://www.openss7.org/,The OpenSS7 Project}.
-
-A number of attempts were made to move the @cite{Linux STREAMS (LiS)} project into the @b{Linux}
-kernel, however, each attempt crashed and burned in a shower of flames from BSD advocates on LKML.
-Arguments against do not appear to be based on valid technical argument.  This is discussed more in
-the next section (@pxref{Why STREAMS?}).
-
-Nevertheless, the @cite{Linux STREAMS (LiS)} does not conform to @b{Linux} kernel coding standards
-and practises and could likely be rejected out of hand for mainline support on that basis.  Also,
-@cite{Linux STREAMS (LiS)} also has a number of problems with conformance and recent releases have
-bugs and races that make its production use questionable.@footnote{One of the major shortcomings of
-@cite{LiS} in the author's opinion is that, because the code was intendended on being portable, it
-is rather obfuscated and difficult to maintain or repair.}
-
-Versions of @cite{LiS} are available that supports 2.2, 2.4 and 2.6 @b{Linux} kernels, however,
-recent releases only support 2.4 and 2.6 kernels.
+An open source @dfn{STREAMS} implementations is available for @b{Linux}: @cite{Linux Fast-STREAMS}.
 
 @subsection Linux Fast-STREAMS (LfS)
 @cindex Linux Fast-STREAMS (LfS)
@@ -645,7 +622,7 @@ the @uref{http://www.openss7.org/, OpenSS7 Project} and with development princip
 @uref{http://www.openss7.com/,OpenSS7 Corporation}.  This is the implementation that corresponds to
 this manual.
 
-@cite{@value{PACKAGE_TITLE}} was developed as a production replacement for @cite{LiS} that was both
+@cite{@value{PACKAGE_TITLE}} was developed as a production implementation that was both
 maintainable and suitable for mainline adoption.  The principal behind the implementation was that
 portability was secondary to performance, conformance, maintainability and suitability for mainline
 adoption.
@@ -1167,32 +1144,20 @@ communications networking suites.
 
 @dfn{@value{PACKAGE_TITLE}} includes the word @cite{fast} in the name because of the original roots of
 the @dfn{@value{PACKAGE_TITLE}} development effort.  @dfn{@value{PACKAGE_TITLE}} was originally developed by
-the @url{http://www.openss7.org/, OpenSS7 Project} as a production replacement for the
-@cite{Linux STREAMS (LiS)}
-@cindex Linux STREAMS (LiS)
-package previously available from @url{http://www.gcom.com/, GCOM}.
-@cindex GCOM
-One of the reasons for contemplating a replacement for
-@cite{Linux STREAMS (LiS)}
-@cindex Linux STREAMS (LiS)
-was the dismal performance provided by
-@cite{Linux STREAMS (LiS)}.
-@cindex Linux STREAMS (LiS)
-Other reasons included:
+the @url{http://www.openss7.org/, OpenSS7 Project} as a production implementation.
 @itemize
 
 @item Mainline Adoption instead of Portability
 
-@cite{LiS} attempts to maintain portability across a number of operating systems.  The goals of
+Other implementations attempted to maintain portability across a number of operating systems.  The goals of
 portability and mainline adoption are usually at cross-purposes.  @dfn{@value{PACKAGE_TITLE}} proposes
 mainline adoption in contrast to portability.  Many @dfn{STREAMS} implementations are available for
 other operating systems.
 
 @item Production Grade
 
-@cite{LiS} attempts to always provide debugging facilities@footnote{In fact, these debugging
-facilities always point at the driver or module writer when a bug is encountered in LiS itself!} and
-does not trust the driver or module writer.  This leads to poor performance and in many cases the
+Other implementations attempted to always provide debugging facilities and
+did not trust the driver or module writer.  This leads to poor performance and in many cases the
 propagation of bugs to the field by failing to panic the kernel.  @dfn{@value{PACKAGE_TITLE}} aims at a
 production grade environment that implicitly trusts the driver or module while providing optional
 debugging facilities (both compile-time options as well as run-time options).
@@ -1200,14 +1165,15 @@ debugging facilities (both compile-time options as well as run-time options).
 @item SVR 4.2 MP Compatibility
 @cindex SVR 4.2 MP
 
-@cite{LiS} only provides @cite{SVR 4} uniprocessor capabilities.  @dfn{@value{PACKAGE_TITLE}} provides
+Other implementations only provided @cite{SVR 4} uniprocessor capabilities.  @dfn{@value{PACKAGE_TITLE}} provides
 @cite{SVR 4.2 MP}
 @cindex SVR 4.2 MP
 capabilities.
 
 @item Portability
 
-@cite{LiS} forces ported drivers and modules from other implementations to use the @cite{LiS} DDI
+Other implementations forced ported drivers and modules from other implementations to use
+implementation-specific DDI
 and configuration mechanisms.  @dfn{@value{PACKAGE_TITLE}} provides compatibility functions for all
 major implementations of @dfn{STREAMS} as well as providing a rich DDI based on @cite{SVR 4.2 MP},
 @cindex SVR 4.2 MP
@@ -1215,16 +1181,16 @@ major implementations of @dfn{STREAMS} as well as providing a rich DDI based on 
 
 @item Bug Circumvention
 
-@cite{LiS} implementation approach has resulted in @cite{LiS} masking its own internal bugs while
+Other implementation approaches resulted in masking their own internal bugs while
 pointing at the third-party module or driver (with log statements) whenever it fails to mask its own
-bugs.  In the process @cite{LiS} masks bugs even in the module or driver permitting defects to
+bugs.  In the process these implmentations masked bugs even in the module or driver permitting defects to
 propagate to the field.  @cite{@value{PACKAGE_TITLE}} uses industry standard programming by
 assertions approaches in its implementation avoiding these difficulties.
 
 @item New Implementation
 
 @cite{@value{PACKAGE_TITLE}} is a completely new implementation of @dfn{STREAMS} independent from
-@cite{LiS} and not derived from @cite{LiS}.  @cite{LiS} is a collection of software available under
+other implementations and not derived from other implementations.  Other implementations were a collection of software available under
 various licenses with little or no commercial licensing alternatives available.
 @cite{@value{PACKAGE_TITLE}} is released in entirety under the @dfn{AGPL}, but the implementation can
 be commercially licensed from @uref{http://www.openss7.com/,OpenSS7 Corporation} and can be
@@ -1232,7 +1198,7 @@ supported into application verticals by @uref{http://www.monavacon.com/,Monavaco
 
 @item Scalable
 
-@cite{LiS}, particularly on 2.4 kernels, has difficulty with the scalability of major and minor
+Other implementations, particularly on 2.4 kernels, has difficulty with the scalability of major and minor
 device numbers.  This is a limitation related to some @b{Linux} 2.4 kernels themselves, however,
 @cite{@value{PACKAGE_TITLE}} surmounts this difficulty by providing a @dfn{Shadow Special Filesystem
 (specfs)} that permits an almost unlimited number of major and minor devices on even the limited
@@ -1240,17 +1206,17 @@ device numbers.  This is a limitation related to some @b{Linux} 2.4 kernels them
 
 @item Soft Real Time Performance
 
-@cite{LiS} avoids use of high-performance @b{Linux}-specific facilities because of its aims at
+Other implementations avoid use of high-performance @b{Linux}-specific facilities because of aims at
 portability.  @dfn{@value{PACKAGE_TITLE}} being aimed at only @b{Linux} uses the highest-performance
 techniques available in the @b{Linux} kernel for implementation.  This includes kernel memory
 caches and other techniques.
 
 @item Maintainability
 
-Due to its initial objective to be portable to a number of environments, @cite{LiS} has a large
-volume of source code that never gets executed in the @b{Linux} environment.  Also, coding style
-does not seem to follow any mainstream practises.  Aside from log messages and a few debugging flag
-facilities, @cite{LiS} does not provide any debugging facilities.
+Due to thier initial objective to be portable to a number of environments, other implementations
+have a large volume of source code that never gets executed in the @b{Linux} environment.  Also,
+coding style does not seem to follow any mainstream practises.  Aside from log messages and a few
+debugging flag facilities, other implementations do not provide any debugging facilities.
 
 @cite{@value{PACKAGE_TITLE}} provides a fully functional @dfn{STREAMS} logging facility and
 @command{strerr} and @command{strace} utilities.  This permits the logging and tracing of live
@@ -1400,17 +1366,11 @@ user-space facilities and system calls are completely defined and described.
 
 @menu
 * GNU Affero General Public License::	AGPL
-* GNU General Public License::		GPL
-* GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 @end menu
 
 @page
 @include texi/agpl3.texi
-@page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
 @page
 @include texi/fdl13.texi
 

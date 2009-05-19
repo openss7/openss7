@@ -357,11 +357,7 @@ are MP-safe.
 .BR unregister_strdev_major (9),
 .BR unregister_strdev_minor (9),
 .BR register_strmod (9),
-.BR unregister_strmod (9),
-.BR lis_register_strdev (9),
-.BR lis_unregister_strdev (9),
-.BR lis_register_strmod (9),
-.BR lis_unregister_strmod (9).
+.BR unregister_strmod (9).
 .\"
 .\"
 .SH BUGS

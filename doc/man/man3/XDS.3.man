@@ -146,6 +146,11 @@ search-ignore T
 .BI "DS_status ds_version(DS_feature " feature_list[] ", OM_workspace " workspace );
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the OpenSS7 Standard XDS Library.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 The XDS Library contains the following functions:
@@ -185,9 +190,49 @@ The XDS Library contains the following functions:
 .BR ds_version (3)
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+.B libxds
+is compatible with XDS,
+.[
+xds c608
+.]
+and implementations based on XDS with the following portability
+considerations:
+.IP \(em w'\(em\(em'u
+.PP
+See
+.BR OSI (3)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+xds c608
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B libxds
+first appeared as
+XDS.
+.[
+xds c608
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of the XDS
+Library.
+.\"
+.\"
 .XX
 .[
-XDS c608
+xds c608
 .]
 .[
 XAP c303

@@ -407,12 +407,15 @@ functions that can be used by device drivers.
 .\".PP
 .\"
 .\"
-.\".SH CONTEXT
-.\".PP
+.SH CONTEXT
+.PP
+DDI functions can be called from various contexts.  See the paricular manual
+page for more information.
 .\"
 .\"
-.\".SH MP-STREAMS
-.\".PP
+.SH MP-STREAMS
+.PP
+All DDI functions are MP safe.
 .\"
 .\"
 .SH "SEE ALSO"

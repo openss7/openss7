@@ -128,6 +128,12 @@ XAP-ROSE
 .BR librose (3).
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the OpenSS7 standard X/Open ACSE/Presentation ROSE
+Library.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 XAP-ROSE is used in conjunction with XAP to establish an association with a remote ROSE service user
@@ -1131,6 +1137,149 @@ q771
 .]
 .\"
 .\"
+.SH SEE ALSO
+.PP
+.BR ap_ro_bind (3),
+.BR ap_ro_init (3),
+.BR ap_ro_release (3),
+.BR ap_ro_unbind (3),
+.BR AP_RO_BIND_CNF (7),
+.BR AP_RO_BIND_IND (7),
+.BR AP_RO_BIND_REQ (7),
+.BR AP_RO_BIND_RSP (7),
+.BR AP_RO_ERROR_IND (7),
+.BR AP_RO_ERROR_REQ (7),
+.BR AP_RO_INVOKE_IND (7),
+.BR AP_RO_INVOKE_REQ (7),
+.BR AP_RO_REJECTP_IND (7),
+.BR AP_RO_REJECTU_IND (7),
+.BR AP_RO_REJECTU_REQ (7),
+.BR AP_RO_RESULT_IND (7),
+.BR AP_RO_RESULT_REQ (7),
+.BR AP_RO_UNBIND_CNF (7),
+.BR AP_RO_UNBIND_IND (7),
+.BR AP_RO_UNBIND_REQ (7),
+.BR AP_RO_UNBIND_RSP (7),
+.BR RO_BIND_CNF (7),
+.BR RO_BIND_IND (7),
+.BR RO_BIND_REQ (7),
+.BR RO_BIND_RSP (7),
+.BR RO_ERROR_IND (7),
+.BR RO_ERROR_REQ (7),
+.BR RO_INVOKE_IND (7),
+.BR RO_INVOKE_REQ (7),
+.BR RO_REJECTP_IND (7),
+.BR RO_REJECTU_IND (7),
+.BR RO_REJECTU_REQ (7),
+.BR RO_RESULT_IND (7),
+.BR RO_RESULT_REQ (7),
+.BR ROSE (7),
+.BR RO_UNBIND_CNF (7),
+.BR RO_UNBIND_IND (7),
+.BR RO_UNBIND_REQ (7),
+.BR RO_UNBIND_RSP (7).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B librose
+is compatible with
+.BR XAP-ROSE ,
+.[
+xap-rose
+.]
+and implementations based on XAP-ROSE, such as
+.IR "USL ONP\(rg" ,
+.IR "Solaris\(rg Solstice OSI" ,
+.[
+sunlink-apli
+.]
+.IR "HP-UX\(rg OTS/9000" ,
+.[
+hpuxapli
+.]
+.IR "AIX\(rg OSI/6000" ,
+.IR "Digital\(rg DECnet/OSI" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+XAP-ROSE
+.[
+xap-rose
+.]
+is compatible with earlier APLI
+.[
+apli unix international
+.]
+versions of the ACSE/Presentation Library and ACSE/Presentation ROSE Library.
+See
+.BR libapli (3)
+or
+.BR libapri (3)
+for more information on using the legacy APLI libararies.
+.IP \(em
+Only source compatibility is supported.  Binary compatibility is not attempted: any exhibited binary
+compatibility is coincidental and is scheduled to be removed on the next release.
+.PP
+See also,
+.BR APLI (3),
+.BR APRI (3),
+and
+.BR STREAMS (4),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP,
+.[
+xap c303
+.]
+XAP-ROSE.
+.[
+xap-rose
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR librose
+appeared as XAP-ROSE.
+.[
+xap-rose
+.]
+.PP
+This library first appeared as APLI
+.[
+apli unix international
+.]
+as documented by
+.IR "Solaris\(rg SunLink"
+.[
+sunlink-apli
+.]
+and with ROSE
+.[
+x219
+.]
+extensions in
+.IR "HP-UX\(rg OTS/9000" ,
+.[
+hpuxapli
+.]
+and was later standardized by the OpenGroup as XAP,
+.[
+xap c303
+.]
+XAP-ROSE
+.[
+xap-rose
+.]
+and XAP-TP.
+.[
+xap-tp
+.]
+.\"
+.\"
 .XX
 .[
 xns99
@@ -1141,6 +1290,11 @@ xap c303
 .[
 xti/tli revision 1
 .]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of the XAP-ROSE Library.
 .\"
 .\"
 .[

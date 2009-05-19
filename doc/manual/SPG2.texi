@@ -427,7 +427,6 @@ Conformance
 * Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
 * SUX Compatibility::		Super/UX Compatibility
 * UXP Compatibility::		UXP/V Compatibility
-* LiS Compatibility::		LiS 2.18.4 Compatibility
 
 Portability
 
@@ -440,7 +439,6 @@ Portability
 * Solaris Portability::		Porting from Solaris 9/SunOS 5.9
 * SUX Portability::		Porting from Super/UX
 * UXP Portability::		Porting from UXP/V
-* LiS Portability::		Porting from LiS 2.18.4
 
 Development
 
@@ -514,7 +512,7 @@ Index
 
 @unnumberedsec Authors
 
-The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+The authors of the @cite{@value{PACKAGE_TITLE}} package include:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -522,7 +520,7 @@ The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
 
 @unnumberedsec Maintainer
 
-The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -649,7 +647,7 @@ Revision 0.9.2.13  2007/02/28 06:30:54  brian
 - updates and corrections, #ifdef instead of #if
 
 Revision 0.9.2.12  2006/10/21 10:31:30  brian
-- updated LiS release number
+- updated release number
 
 Revision 0.9.2.11  2006/09/18 01:06:55  brian
 - updated manuals and release texi docs
@@ -1033,12 +1031,6 @@ popping of @dfn{STREAMS} modules.  Internal networking implementation under @cit
 @cite{Linux} that supported the @dfn{XTI/TLI} interface and @file{socksys} system calls and
 input-output controls, but not the @dfn{STREAMS} framework (and therefore cannot push or pop
 modules).
-
-A @dfn{STREAMS} package for @cite{Linux} was written and eventually distributed and maintained by
-@uref{http://www.gcom.com/,GCOM Inc.}   This is the @cite{Linux STREAMS (LiS)} package.  This
-package had some failings and was repeatedly rejected for mainline adoption, which prompted the
-development of @cite{@value{PACKAGE_TITLE}}.  @cite{Linux STREAM (LiS)} is no longer supported (it
-does not have a maintainer).
 
 @cite{@value{PACKAGE_TITLE}} is the current open source implementation of @cite{STREAMS} for
 @cite{Linux} and provides all of the capabilities of @cite{UNIX System V Release 4.2 MP}, plus
@@ -2503,7 +2495,7 @@ a character special file within a @cite{GNU/Linux} file system, or as a FIFO spe
 @cite{UNIX System V Release 4.2} system and other @cite{UNIX} variants in the following respects: In
 @cite{SVR 4.2} all FIFOs are @dfn{STREAMS}-based.  In other @cite{UNIX} implementations FIFOs are
 either @cite{SVR 3.2}-style or, in some systems, optionally @dfn{STREAMS}-based.  In @cite{SVR 4.2}
-FIFOs are FIFO special files.  In other @cite{UNIX} implementations (and in @cite{LiS}), FIFOs are
+FIFOs are FIFO special files.  In other @cite{UNIX} implementations, FIFOs are
 character special files.  Under @cite{GNU/Linux}, system FIFOs are by default @cite{SVR 3.2}-style
 FIFOs.  To acheive the greatest possible degree of compatibility, @cite{@value{PACKAGE_TITLE}}
 provides the option of making all @cite{GNU/Linux} system FIFOs @dfn{STREAMS}-based, and also
@@ -5974,7 +5966,6 @@ functions (e.g, @samp{canputnext(q)} instead of @samp{canput(q->q_next)}).
 * Solaris Compatibility::	Solaris 9/SunOS 5.9 Compatibility
 * SUX Compatibility::		Super/UX Compatibility
 * UXP Compatibility::		UXP/V Compatibility
-* LiS Compatibility::		LiS 2.18.4 Compatibility
 @end menu
 
 
@@ -6002,9 +5993,6 @@ functions (e.g, @samp{canputnext(q)} instead of @samp{canput(q->q_next)}).
 @node UXP Compatibility
 @section UXP Compatibility
 
-@node LiS Compatibility
-@section LiS Compatibility
-
 @c ============================================================================
 @node Portability
 @chapter Portability
@@ -6018,7 +6006,6 @@ functions (e.g, @samp{canputnext(q)} instead of @samp{canput(q->q_next)}).
 * Solaris Portability::		Porting from Solaris 9/SunOS 5.9
 * SUX Portability::		Porting from Super/UX
 * UXP Portability::		Porting from UXP/V
-* LiS Portability::		Porting from LiS 2.18.4
 @end menu
 
 
@@ -6902,45 +6889,6 @@ equivalents.
 @cindex UXP/V, configuration
 @cindex UXP/V
 
-@node LiS Portability
-@section LiS Portability
-@cindex porting, LiS 2.18.4
-@cindex LiS 2.18.4, portability
-@cindex LiS 2.18.4
-@cindex LiS
-@cindex Linux STREAMS (LiS)
-
-@menu
-* Differences from LiS 2.18.4::
-* Commonalities with LiS 2.18.4::
-* Compatibility Functions for LiS 2.18.4::
-* Configuration ala LiS 2.18.4::
-@end menu
-
-@node Differences from LiS 2.18.4
-@subsection Differences from LiS 2.18.4
-@cindex differences, LiS 2.18.4
-@cindex LiS 2.18.4, differences
-@cindex LiS 2.18.4
-@cindex LiS
-@cindex Linux STREAMS (LiS)
-
-@node Commonalities with LiS 2.18.4
-@subsection Commonalities with LiS 2.18.4
-@cindex commonalities, LiS 2.18.4
-@cindex LiS 2.18.4, commonalities
-@cindex LiS 2.18.4
-@cindex LiS
-@cindex Linux STREAMS (LiS)
-
-@node Compatibility Functions for LiS 2.18.4
-@subsection Compatibility Functions for LiS 2.18.4
-@cindex compatibility functions, LiS 2.18.4
-@cindex LiS 2.18.4, compatibility functions
-@cindex LiS 2.18.4
-@cindex LiS
-@cindex Linux STREAMS (LiS)
-
 @subsubsection Extensions
 
 @multitable @columnfractions .40 .60
@@ -6971,14 +6919,6 @@ equivalents.
 @item @manpage{lis_unregister_strdev(9)} @tab Unregister a @dfn{STREAMS} device.
 @item @manpage{lis_unregsiter_strmod(9)} @tab Unregister a @dfn{STREAMS} module.
 @end multitable
-
-@node Configuration ala LiS 2.18.4
-@subsection Configuration ala LiS 2.18.4
-@cindex configuration, LiS 2.18.4
-@cindex LiS 2.18.4, configuration
-@cindex LiS 2.18.4
-@cindex LiS
-@cindex Linux STREAMS (LiS)
 
 @multitable @columnfractions .40 .60
 @end multitable
@@ -7129,22 +7069,6 @@ Linux 2.6 kernels (and some patched 2.4 kernels) now have larger device numbers.
 device numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits
 for the combined device number.
 
-@subsection LiS Device Numbering
-@cindex Linux STREAMS (LiS)
-
-@cite{LiS}
-@cindex Linux STREAMS (LiS)
-prior to the 2.18.0 release was incapable of providing an internal representation of the device
-number and the number of minor device numbers for a device driver was restricted to 256, just as in
-@cite{UNIX System V Release 3.2}.@footnote{Actually, 255 as the kernel reserved minor device number
-255 for expansion.}  Many @url{http://www.openss7.org/, OpenSS7} device drivers written for
-@cite{LiS}
-@cindex Linux STREAMS (LiS)
-would allocate additional major device numbers if required.  Good examples of devices that require
-more than 255 minor device numbers are @dfn{INET} clone devices, @dfn{SCTP} streams, @dfn{SS7} signalling link
-streams, MG media channels, etc.  These streams are often @streamio{I_PLINK}ed
-under a multiplexing driver and do not even consume a system file descriptor.
-
 @subsection @value{PACKAGE_TITLE} Device Numbering
 
 @dfn{@value{PACKAGE_TITLE}} began with extended device numbering.  The @file{specfs} shadow special
@@ -7278,17 +7202,11 @@ file system).
 @appendix Copying
 @menu
 * GNU Affero General Public License::	AGPL
-* GNU General Public License::		GPL
-* GNU Lesser General Public License::	LGPL
 * GNU Free Documentation License::	FDL
 @end menu
 
 @page
 @include texi/agpl3.texi
-@page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
 @page
 @include texi/fdl13.texi
 

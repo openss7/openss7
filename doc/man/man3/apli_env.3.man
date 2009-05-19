@@ -125,9 +125,14 @@ APLI UNIX International
 .B #include <osi_lib.h>
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This manual page describes the APLI library application environment.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-THe APLI environment is made up of a set of attributes that are used to keep state information and
+The APLI environment is made up of a set of attributes that are used to keep state information and
 to hold the various pieces of data required to establish and maintain an association with another
 application entity.  This manual page describes the environment attributes that are supported by the
 OpenSS7 APLI Library.
@@ -934,7 +939,7 @@ has no known bugs.
 .BR APLI (3).
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 .BR ap_env ()
 is compatible with APLI,
@@ -961,14 +966,6 @@ See
 and
 .BR STREAMS (4)
 for additional compatibility information.
-.\"
-.\"
-.SH CONFORMANCE
-.PP
-APLI.
-.[
-APLI UNIX International October 25, 1990
-.]
 .\"
 .\"
 .SH CONFORMANCE

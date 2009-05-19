@@ -286,7 +286,6 @@ Porting
 * Porting from Solaris 9/SunOS 5.9::
 * Porting from SUPER-UX::
 * Porting from UXP/V::
-* Porting from Linux STREAMS (LiS) 2.18.4::
 * Porting from Mac Open Transport::
 * Porting from Mentat Portable STREAMS::
 
@@ -372,7 +371,6 @@ Porting information is organized into sections as follows:
 * Porting from Solaris 9/SunOS 5.9::
 * Porting from SUPER-UX::
 * Porting from UXP/V::
-* Porting from Linux STREAMS (LiS) 2.18.4::
 * Porting from Mac Open Transport::
 * Porting from Mentat Portable STREAMS::
 * Development::
@@ -2024,224 +2022,6 @@ functions.
 @cindex configuration ala uxp/v
 
 @page
-@node Porting from Linux STREAMS (LiS) 2.18.4
-@section Porting from Linux STREAMS (LiS) 2.18.4
-@cindex Porting from Linux STREAMS (LiS) 2.18.4
-
-Detailed portability information for porting @dfn{STREAMS} modules and drivers
-from @cite{LiS} to @cite{@value{PACKAGE_TITLE}} is contained the the
-@cite{@dfn{STREAMS} Compatibility Modules} package, @file{strcompat}, under the
-@manref{@b{liscompat}(9)} manual page.  The @cite{@dfn{STREAMS} Compatibility
-Modules} package also provides some @cite{LiS} specific compatibility
-functions.
-
-@menu
-* Differences from LiS 2.18.4::
-* Commonalities with LiS 2.18.4::
-* Compatibility Functions for LiS 2.18.4::
-* Configuration ala LiS 2.18.4::
-@end menu
-
-In general, @cite{LiS} @dfn{STREAMS} drivers and modules are easily portable to
-@cite{@value{PACKAGE_TITLE}}.  @dfn{STREAMS} drivers and modules, up until
-recently, were capable of running under both @cite{LiS} and
-@cite{@value{PACKAGE_TITLE}}.  For the most part, @dfn{STREAMS} driver and
-modules ported from @cite{LiS} to @cite{@value{PACKAGE_TITLE}} experience
-performance, conformance and bug-free operation on @cite{@value{PACKAGE_TITLE}}.
-Mechanisms used to circumvent @cite{LiS} deficiencies, bugs and race conditions,
-are no longer necessary under @cite{@value{PACKAGE_TITLE}}.
-
-@node Differences from LiS 2.18.4
-@subsection Differences from LiS 2.18.4
-@cindex differences from lis 2.18.4
-
-The many manual pages included with the @command{streams} and
-@command{strcompat} packages describe areas where @cite{LiS} and @cite{Linux
-Fast-STREAMS} differ for specific DDI/DKI utilities and user interface
-functions, and also provide considerations for portability.
-
-The major difference between @cite{LiS} and @cite{Linux Fast-STREAMS} is bugs:
-@cite{LiS} is full of them.  @cite{LiS 2.18.4} fails about one-third of a
-thousand or so @cite{POSIX} conformance tests (and those test cases mostly test
-the Stream head).  @cite{Linux Fast-STREAMS} is certainly not bug-for-bug
-compatible with @cite{LiS}.
-
-Some significant differences are summarized as follows:
-
-@subsubsection 32-bit over 64-bit Compatibility
-
-@cite{LiS} is largely incapable of 32-bit over 64-bit compatibility.  The
-primary impediment is the inability of @cite{LiS} to properly register 32-bit
-input-output controls with a 64-bit kernel.  @cite{Linux Fast-STREAMS}, on the
-other hand, has tested 32-bit over 64-bit compatibility.  All test suites are
-run in 32-bit over 64-bit mode as well as native mode.
-
-@cite{@value{PACKAGE_TITLE}} passes the model of the calling process to the
-queue open procedure (in the @var{oflags} argument).  It also passes the model
-of the calling process to the @dfn{STREAMS} driver or module in the
-@manpage{@b{M_IOCTL}(9)} message (in the @var{ioc_flag} member), permitting
-modules and drivers with the ability to invoke 32-bit implicit or explicit
-@manpage{@b{M_COPYIN}(9)} or @manpage{@b{M_COPYOUT}(9)} operations.
-See section @cite{32-bit Compatibility Input-Output Controls} on the
-@manref{@b{M_IOCTL}(9)} manual page for more information.
-
-@subsubsection Proper Handling of M_IOCDATA
-
-@cite{LiS} improperly waits for an @manpage{@b{M_IOCNAK}(9)} after a failed
-@manpage{@b{M_COPYIN}(9)} or @manpage{@b{M_COPYOUT}(9)} operation.  All other
-@dfn{STREAMS} implementations (including @cite{Linux Fast-STREAMS}) expect the
-module or driver to abort the input-output control operation when the return
-value in the @manpage{@b{M_IOCDATA}(9)} is non-zero.
-
-@subsubsection Proper Stream Head Handling
-
-@cite{LiS} has many bugs and races in the Stream head.  Also, @cite{LiS} takes a
-very narrow view of Stream head functionality.  A significant area where
-@cite{LiS} lacks functionality is in proper signal handling for controlling and
-non-controlling terminals.  Also, the @cite{LiS} Stream head is largely unsafe
-for use by threaded applications.  The @cite{Linux Fast-STREAMS} Stream head
-properly supports FIFOs, pipes, terminals, and sockets, properly signals process
-groups, handles process orphans, and normal @cite{UNIX} job control (including
-signals).  @cite{LiS} does not handle polling correctly with regard to message
-bands.  @cite{Linux Fast-STREAMS} properly handles polling with regard to
-message bands, including extended @cite{POSIX} signals with regard to poll.
-
-@cite{LiS} is constructed with an annoying write side Stream head behaviour:
-messages written with @manpage{@b{write}(2s)} or @manpage{@b{putmsg}(2)} are
-queued to the Stream head write side queue and then processed from the Stream
-head write side queue service procedure.  This introduces one more level of
-write side buffering than is necessary.  @cite{@value{PACKAGE_TITLE}} directly
-calls the topmost module write side put procedure.  A Stream head write side
-service procedure is provided, not to pass messages, but to perform write side
-@manpage{@b{poll}(2s)} actions when back-enabled.
-
-@subsubsection Buffer Callbacks
-
-@cite{LiS} does not properly implement buffer callbacks.  @cite{LiS} sets a one
-second timer and invokes buffer callbacks upon timeout.  @cite{Linux
-Fast-STREAMS}, like @cite{SVR 4.2}, keeps track of buffers as they are allocated
-and freed and invokes a callback shortly after a buffer is freed.  The result is
-that the buffer callback under @cite{Linux Fast-STREAMS} is always invoked from
-within the @dfn{STREAMS} scheduler context.  For @cite{LiS}, the buffer callback
-is invoked under timeout (bottom half, soft irq) context.
-
-@subsubsection Queue Procedure On and Off
-
-@cite{LiS} does not have a workable mechanism for turning queue procedures on or
-off.  @cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to
-@cite{SVR 4.2 MP}.  @cite{SVR 4.2 MP} specifies that before the first call to
-@manpage{@b{qprocson}(9)}, messages flow around the module as though it did not
-exist in the Stream.  Also, that after the call to @manpage{@b{qprocsoff}(9)},
-messages flow around the module also.  @cite{LiS} does not ensure that this will
-happen and, in fact, will annoyingly discard messages that are put to the queue
-during this period.  @cite{@value{PACKAGE_TITLE}} performs half-insertion and
-half-deletion to permit message to flow around the module and properly protects
-against @var{q_next} pointer dereferencing while performing half-insertions and
-deletions.
-
-@subsubsection Freezing and Unfreezing Streams
-
-@cite{LiS} does not have a fully functional mechanism for freezing a Stream.
-@cite{Linux Fast-STREAMS} has a full MP-safe mechanism similar to @cite{SVR
-4.2}. When a Stream is frozen with @manpage{@b{freezestr}(9)} it is necessary
-not only to suppress interrupts and take a write lock on the queue structure
-passed as the argument to the call, but to also prohibit other queue procedures
-from being invoked by threads other than the caller along the entire Stream.
-Under @cite{LiS}, @manpage{@b{freezestr}(9)} only protects the state of the
-queue named in the argument to the call.  Under @cite{@value{PACKAGE_TITLE}},
-the state of the entire Stream including queue (along with the Stream head)
-is protected by the call in accordance with @cite{SVR 4.2 MP} specifications.
-
-@subsubsection Queue Pointer Dereferencing
-
-@cite{LiS} has no mechanism for protecting dereferencing of the @samp{q->q_next}
-pointer from race conditions.  Pushing or popping a module to or from a Stream
-in the process or passing message blocks can cause kernel crashes.  @cite{Linux
-Fast-STREAMS} has a full MP-safe mechanism for protecting @var{q_next} pointer
-dereferencing (Stream head read locks) while within a queue put or service
-procedure, timeouts and buffer callbacks.  The full
-@manpage{@b{qprocson}(9)}/@manpage{@b{qprocsoff}(9)} mechanism under @cite{Linux
-Fast-STREAMS} properly protects the queue open and close routines.
-
-@subsubsection Enhancements
-
-@cite{Linux Fast-STREAMS} provides a set of enhanced features not present in
-@cite{LiS} but present in other @dfn{STREAMS} implementations.  One important
-feature that @cite{LiS} lacks, that @cite{Linux Fast-STREAMS} provides, is a
-fully functional @manref{strlog(9)} capability.
-
-@node Commonalities with LiS 2.18.4
-@subsection Commonalities with LiS 2.18.4
-@cindex commonalities with lis 2.18.4
-
-For the most part, where @cite{LiS} properly follows @cite{SVR 4} behaviour and
-@cite{SVR 4} behaviour is consistent with @cite{SVR 4.2} behaviour, @cite{Linux
-Fast-STREAMS} is compatible with @cite{LiS}.
-
-@node Compatibility Functions for LiS 2.18.4
-@subsection Compatibility Functions for LiS 2.18.4
-@cindex compatibility functions for lis 2.18.4
-
-@ftable @manref
-
-@item @b{lis_appq}(9)
-Append one @cite{STREAMS} message after another.
-
-@item @b{lis_date}(9)
-Return the date of LiS.
-
-@item @b{lis_esbbcall}(9)
-Install a buffer callback for an extended @cite{STREAMS} message block.
-
-@item @b{lis_find_strdev}(9)
-
-@item @b{lis_mknod}(9)
-Make block or character special files.
-
-@item @b{lis_mount}(9)
-Mount a file system.
-
-@item @b{lis_OTHER}(9)
-Return the other queue of a @cite{STREAMS} queue pair.
-
-@item @b{lis_umount2}(9)
-Unmount a file system.
-
-@item @b{lis_umount}(9)
-Unmount a file system.
-
-@item @b{lis_unlink}(9)
-Remove a file.
-
-@item @b{lis_version}(9)
-Return the version of LiS.
-
-@item @b{lis_xmsgsize}(9)
-Calculate the size of message blocks in a @cite{STREAMS} message.
-
-@end ftable
-
-@node Configuration ala LiS 2.18.4
-@subsection Configuration ala LiS 2.18.4
-@cindex configuration ala lis 2.18.4
-
-@ftable @manref
-
-@item @b{lis_register_strdev}(9)
-Register a @cite{STREAMS} device.
-
-@item @b{lis_register_strmod}(9)
-Register a @cite{STREAMS} module.
-
-@item @b{lis_unregister_strdev}(9)
-Unregister a @cite{STREAMS} device.
-
-@item @b{lis_unregsiter_strmod}(9)
-Unregister a @cite{STREAMS} module.
-
-@end ftable
-
-@page
 @node Porting from Mac Open Transport
 @section Porting from Mac Open Transport
 @cindex Porting from Mac Open Transport
@@ -2832,21 +2612,6 @@ into a 16-bit combined device number.  Linux 2.6 kernels (and some patched 2.4
 kernels) now have larger device numbers.  These extended device numbers are 12
 bits for major device number and 20 bits for minor device number, with 32 bits
 for the combined device number.
-
-@subsubheading LiS Device Numbering
-
-@cite{LiS} prior to the 2.18.0 release was incapable of providing an internal
-representation of the device number and the number of minor device numbers for a
-device driver was restricted to 256.  @footnote{Actually, 255 as the kernel
-reserved minor device number 255 for expansion.}  Many
-@url{http://www.openss7.org/, OpenSS7} device drivers written for @cite{LiS}
-would allocate additional major device numbers if required.  Good examples of
-devices that require more than 255 minor device numbers are INET clone devices,
-SCTP streams, SS7 signalling link streams, MG media channels, etc.  These
-streams are often @var{I_PLINK}ed
-@vindex I_PLINK
-under a multiplexing driver and do not even
-consume a system file descriptor.
 
 @subsubheading Linux Fast-STREAMS Device Numbering
 

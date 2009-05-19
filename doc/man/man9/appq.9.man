@@ -440,7 +440,7 @@ or the message was placed with
 .PP
 .BR appq ()
 is an
-.IR LiS -specific
+.IR OpenSS7 -specific
 function that should not be called by portable
 .I STREAMS
 drivers and modules.
@@ -690,7 +690,7 @@ dereference is protected by the queue write lock.
 .PP
 .BR appq ()
 is a
-.IR LiS -specific
+.IR OpenSS7 -specific
 function:
 .B _LIS_SOURCE
 must be defined before including
@@ -743,7 +743,7 @@ has no known bugs.
 .PP
 .BR appq ()
 is compatible with
-.I LiS
+.I OpenSS7
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 When a banded message (a
@@ -814,32 +814,6 @@ follow
 as does
 .IR Solaris \(rg.
 .IP ""
-.I LiS
-allocates
-.BR qband (9)
-structures on demand, links them in a sparse array,
-and will also reuse
-.BR qband (9)
-structures that were previously allocated for bands that are currently empty.  This is not a good
-approach because user established band high- and low-water marks will be reset to those of the
-.BR queue (9)
-structure when a subsequent message is place on the reused band.
-Also, it is difficult to predict when
-.BR appq (),
-.BR insq (9),
-.BR putq (9),
-.BR putbq (9),
-will fail as a result of failure to allocate a
-.BR qband (9)
-structure.
-This
-.I LiS
-bug is not perpetuated in
-.BR "@PACKAGE_TITLE@" .
-.[
-@PACKAGE_TITLE@
-.]
-.IP ""
 Portable
 .I STREAMS
 drivers and modules can rely on intermediate band strutures being allocated when a
@@ -853,19 +827,6 @@ member of the
 structure to determine whether a
 .BR qband (9)
 exists for a given band number.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-.[
-@PACKAGE_TITLE@
-.]
-instead of
-.IR LiS .
-.[
-lis
-.]
 .IP \(em
 .BR appq ()
 orders the
@@ -887,18 +848,9 @@ soldoc
 lists
 .BR qband (9)
 structures from lowest to highest priority, without gaps (see consideration of allocation above).
-.I LiS
-.[
-lis
-.]
-lists
-.BR qband (9)
-structures from most recently allocated/reused to least recently allocated/reused.
-Neither the
+The
 .IR Solaris \(rg
-nor the
-.I LiS
-approach is very efficient.
+approach is not very efficient.
 .IP ""
 Portable
 .I STREAMS
@@ -920,179 +872,13 @@ utilities instead.
 .IP \(em
 .BR appq ()
 is an
-.IR LiS -specific
-function that is also provided by
+.IR OpenSS7 -specific
+function provided by
 .BR "@PACKAGE_TITLE@" .
 .IP ""
 Portable
 .I STREAMS
 drivers and modules should not call this function.
-.IP \(em
-.BR appq ()
-called with a
-.B NULL
-.IR q " or " nmp
-argument will panic or destabilize the kernel.
-.BR appq ()
-called with a
-.B NULL
-.I emp
-argument will have the same effect as
-.BI putq( q ", " nmp )\fR.
-Under
-.IR LiS ,
-.BR appq ()
-called with a
-.B NULL
-.IR q ", " emp " or " nmp
-argument, will fail silently (losing a reference to
-.IR nmp ).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules should not pass invalid arguments.
-.IP \(em
-.BR appq ()
-called with a
-.RB non- NULL
-.I q
-pointer that does not point to a valid queue structure will result in
-destabilization of the kernel.
-Under
-.IR LiS ,
-.BR appq ()
-called with a
-.RB non- NULL
-.I q
-pointer that does not point to a valid queue structure will result in the
-silent freeing of the
-.I emp
-message block.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules should not pass invalid arguments.
-.IP \(em
-.BR appq ()
-called with the the
-.B QNOENB
-flag set (see
-.BR noenable (9))
-will schedule the queue
-.IR qi_srvp (9)
-procedure if a
-high priority
-message is appended.
-.I LiS
-does not schedule the queue
-.IR qi_srvp (9)
-procedure when a
-high priority
-message is appended to the queue.
-.IP ""
-Portable
-.I STREAMS
-drivers and modules should not rely upon the queue
-.IR qi_srvp (9)
-procedure not being scheduled when a
-high priority
-message is appended.
-.IP \(em
-.BR appq ()
-protects dereferencing of the
-.I emp->b_next
-pointer with the queue write lock, making it safe to be called concurrent
-with
-.BR putq (9).
-Under
-.IR LiS ,
-.BR appq ()
-does not protect dereferencing of the
-.I emp->b_next
-pointer with the queue spin lock making it unsafe to be called concurrent
-with
-.BR putq (9).
-.IP ""
-Portable
-.I STREAMS
-drivers and modules will use
-.B "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
-.\".IP \(em
-.\".BR appq ()
-.\"cannot be called from an interrupt service routine.
-.\".IP ""
-.\".B @PACKAGE_TITLE@
-.\".[
-.\"@PACKAGE_TITLE@
-.\".]
-.\"does not permit
-.\".BR appq ()
-.\"to be called from an interrupt service routine context to remove the need for suppressing
-.\"local interrupts throughout the
-.\".I STREAMS
-.\"executive.  The only queue procedure that
-.\".B @PACKAGE_TITLE@
-.\".[
-.\"@PACKAGE_TITLE@
-.\".]
-.\"permits to be called from an interrupt service routine context is
-.\".BR put (9),
-.\"and that function defers until the next
-.\".BR runqueues (9)
-.\"pass.
-.\".IP ""
-.\"Portable
-.\".I STREAMS
-.\"drivers and modules will not call
-.\".BR appq ()
-.\"from any context outside a
-.\".I STREAMS
-.\"queue procedure or callback function.  At the Stream end (Stream head or driver), from a context
-.\"other than a
-.\".I STREAMS
-.\"coroutine, only
-.\".BR put (9)
-.\"will be used by a portable
-.\".I STREAMS
-.\"driver or module.
-.\".IP \(em
-.\"Symbol
-.\".BR lis_appq ()
-.\"is provided for compatibility with
-.\".IR LiS .
-.\"See
-.\".BR liscompat (9).
-.\".BR lis_appq ()
-.\"simply calls
-.\".BR appq ()
-.\"directly.
-.IP \(em
-All versions of
-.I LiS
-contain the bug that they keep track of message queue counts,
-.IR q_count ,
-.IR qb_count ,
-in terms of the sum of the absolute sizes of the data buffers referenced by message blocks,
-.RB ( "db_lim - db_base" ),
-and not the sizes of the message blocks themselves,
-.RB ( "b_wptr - b_rptr" ),
-which does not conform to
-.IR "SVR 4.2 STREAMS" .
-.[
-svr42spg
-.]
-See
-.BR msgsize (9).
-No other implementation has this bug.
-.IP ""
-Portable
-.I STREAMS
-applications programs, drivers and modules will use
-.BR "@PACKAGE_TITLE@"
-instead of
-.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -1103,23 +889,14 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.BR LfS
-.[
-LfS
-.]
-and
-.IR LiS
-.[
-LiS
-.]
-source code.
+OpenSS7.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR appq ()
-first appeared in
-.IR LiS .
+appeared in
+.IR OpenSS7 .
 .PP
 Before OpenSS7 release
 .BR LIS-2.16.18-17 ,

@@ -264,7 +264,7 @@ GetApliState(int fd)
 .BR APLI (3).
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 .BR ap_get_env ()
 is compatible with APLI,

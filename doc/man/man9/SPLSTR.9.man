@@ -108,7 +108,7 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B SPLSTR, lis_splstr, lis_splstr_fcn
+.B SPLSTR
 \- set priority level zero (0)
 .\"
 .\"
@@ -117,10 +117,6 @@ search-ignore T
 .B #include <sys/stream.h>
 .HP
 .BI "SPLSTR(pl_t " pl ");"
-.HP
-.BI "pl_t lis_splstr(void);"
-.HP
-.BI "pl_t lis_splstr_fcn(char *" file ", int " line ");"
 .\"
 .\"
 .SH ARGUMENTS

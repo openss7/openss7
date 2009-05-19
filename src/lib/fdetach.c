@@ -110,32 +110,12 @@ __streams_fdetach_r(const char *path)
 	return (ret);
 }
 
-/** @brief Detach a path from a Stream.
-  * @param path the path in the filesystem from which to detach.
-  * @version LIS_1.0
-  * @par Alias:
-  * This symbol is a weak alias of __streams_fdetach().
-  */
-int __lis_fdetach(const char *path)
-    __attribute__ ((weak, alias("__streams_fdetach")));
-
-/** @brief Detach a path from a Stream.
-  * @param path the path in the filesystem from which to detach.
-  * @version LIS_1.0 fdetach()
-  * @par Alias:
-  * This symbol is a weak alias of __streams_fdetach_r().
-  */
-int __lis_fdetach_r(const char *path)
-    __attribute__ ((weak, alias("__streams_fdetach_r")));
-
 /** @fn int fdetach(const char *path)
   * @brief Detach a path from a Stream.
   * @param path the path in the filesystem from which to detach.
   * @version STREAMS_1.0 __streams_fdetach_r()
-  * @version LIS_1.0 __lis_fdetach_r()
   */
 __asm__(".symver __streams_fdetach_r,fdetach@@STREAMS_1.0");
-__asm__(".symver __lis_fdetach_r,fdetach@LIS_1.0");
 
 /** @} */
 

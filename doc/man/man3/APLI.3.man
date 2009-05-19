@@ -481,16 +481,39 @@ The OpenSS7 APLI Library has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
+The OpenSS7 APLI library is compatible with
+APLI
+.[
+APLI UNIX International
+.]
+and implemntations based on APLI, such as
+.IR "USL ONP\(rg" ,
+.IR "Solaris\(rg SunLink" ,
+.[
+sunlink-apli
+.]
+.IR "HP-UX\(rg OTS/9000" ,
+.[
+hpuxapli
+.]
+.IR "AIX\(rg OSI/6000" ,
+.IR "Digital\(rg DECnet/OSI" ,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
 Note that
 .IR "Solaris\(rg SunLink" ,
 .[
 sunlink-apli
 .]
 .IR "Solaris\(rg Solstice" ,
+.[
+sunlink-apli
+.]
 and
 .IR "HP-UX\(rg OTS/9000"
+.[
+hpuxapli
+.]
 do not support the
 .BR ap_save ()
 and
@@ -498,13 +521,21 @@ and
 functions.
 .\"
 .\"
-.\".SH CONFORMANCE
-.\".PP
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
-The APLI interface was developed by UNIX Systems Laboratories and later standardized by the
+The APLI interface was developed by UNIX Systems Laboratories
+.[
+APLI UNIX International October 25, 1990
+.]
+and later standardized by the
 OpenGroup (then X/Open), the IEEE and ISO as the X/Open ACSE/Presentation API (XAP).
 .[
 xap c303

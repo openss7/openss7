@@ -488,11 +488,7 @@ validation test suite executable.
 .SH HISTORY
 .PP
 .B strinet 0.8.2
-was released in 2002 and was since part of the Linux STREAMS (LiS)
-.[
-LiS
-.]
-package, and is now part of
+was released in 2002 and is now part of
 .BR "Linux Fast-STREAMS" .
 .[
 LfS

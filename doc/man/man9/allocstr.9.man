@@ -108,7 +108,7 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B allocstr \", lis_alloc_stdata
+.B allocstr
 \- allocate a
 .I STREAMS
 stream head

@@ -123,6 +123,7 @@ search-ignore T
 .BI "void cmn_err_tag(int " sequence ", int " err_lvl ", const char *" fmt ", " ... ");
 .\"
 .\"
+.SH ARGUMENTS
 .TP \w'\ sequence\ 'u
 .I sequence
 the sequence number associated with the log.

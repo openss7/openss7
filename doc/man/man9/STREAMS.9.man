@@ -389,14 +389,6 @@ and probably not a very good one.
 .\"
 .SS History of STREAMS for Linux
 .PP
-In the mid-90's,
-.B GCOM, Inc.
-embarked on development on an open source implementation of
-.I STREAMS
-called
-.IR "Linux STREAMS (LiS)" ,
-likely driven by its use for porting existing OSI protocol stacks to
-.BR Linux .
 In 2000,
 .I The OpenSS7 Project
 abandoned using the
@@ -409,33 +401,16 @@ networking model under
 .BR Linux )
 and switched to using
 .I STREAMS
-as the basis for all future development.  The
-.B GCOM
-.I LiS
-release (2.2 at the time) was used as the
-.I STREAMS
-package.
+as the basis for all future development.
 Over the span of the next 5 years, (and not surprisingly given the body of software),
 almost all
 .I Signalling System No. 7
 products released on
 .B Linux
 used
-.I LiS
-for
 .IR STREAMS .
-In 2005, Dave Grothe
-(the
-.I G
-in
-.BR GCOM )
-announced that he would no longer be maintaining or developing
-.I LiS
-subsequent to the 2.18.0 release, stranding many users of the package.
 .PP
-Later in 2005, after briefly maintaining two GPL'ed releases of
-.IR LiS ,
-(2.18.1 and 2.18.2),
+In 2005
 .I The OpenSS7 Project
 released (after two years of development) the
 .B streams-0.7a.4
@@ -444,12 +419,12 @@ package: a re-implementation of
 with compatibility modules for all major
 .IR UNIX \(rg
 releases, called
-.IR "@PACKAGE_TITLE@" .
-.I @PACKAGE_TITLE@
+.IR "Linux Fast-STREAMS" .
+.I Linux Fast-STREAMS
 was intended as a
 .I POSIX/SUSv3 XSR
-conforming, high performance, production grade, replacement for
-.IR LiS ,
+conforming, high performance, production grade,
+implementation
 suitable for mainline
 .B Linux
 adoption, and a better foundation on which to base SIGTRAN, VoIP, ISDN and SS7 protocol stacks
@@ -465,106 +440,104 @@ package that contains the documentation that you are reading now.
 .\"
 .SS Why Fast?
 .PP
-After working with
-.I LiS
-releases for over 3 years, in late 2003,
+In late 2003,
 .I The OpenSS7 Project
-decided to begin implementation of a replacement for
-.IR LiS ,
-because of a number of shortcoming of the
-.I LiS
-releases:
+decided to begin implementation of a
+.I STREAMS
+package for
+.B Linux
+because of a number of shortcoming of
+other
+.B Linux
+.I STREAMS
+implementations:
 .IP a) \w'w)\(em'u
-unsuitable for mainline kernel adoption due to coding style and organization;
+proprietary;
 .PD 0
 .IP b)
-poorly adapted to distribution production kernels;
+unsuitable for mainline kernel adoption due to coding style or organization;
 .IP c)
-is unsuitable for packaging and repeatability;
+poorly adapted to distribution production kernels;
 .IP d)
-portability objective unsuitable for mainline kernel adoption;
+unsuitable for packaging or repeatability;
 .IP e)
-ports from the same baseline obfuscate the code;
+portability objective unsuitable for mainline kernel adoption;
 .IP f)
-performs poorly due to portability and coding style;
+ports from the same baseline obfuscate code;
 .IP g)
-code bloat and over-sized memory footprint;
+poor performance due to portability or coding style;
 .IP h)
-redundant debug statements obscuring defects and obfuscating code;
+code bloat or over-sized memory footprint;
 .IP i)
-overuse of sempahores;
+redundant debug statements obscuring defects or obfuscating code;
 .IP j)
-contains serious races and not suitable for threaded applications;
+overuse of sempahores;
 .IP k)
-does not conform to mainstream
+containing serious races or not suitable for threaded applications;
+.IP l)
+non-conformance to mainstream
 .IR UNIX \(rg
 implementations;
-.IP l)
-does not conform well to
+.IP m)
+non-conformance to
 .I POSIX
 or any release of the
 .IR "Single UNIX Specification" ;
-.IP m)
-limited set of standard drivers and modules;
 .IP n)
-limited set of diagnostic and administrative utilities;
+limited set of standard drivers or modules;
 .IP o)
-limited test programs;
+limited set of diagnostic or administrative utilities;
 .IP p)
+limited test programs;
+.IP q)
 poorly documented.
 .PD
 .PP
-The replacement, named
-.BR "@PACKAGE_TITLE@" ,
+The new implementation, named
+.BR "Linux Fast-STREAMS" ,
 was to correct all of these difficulties, and, by the initial
 .B streams-0.7a.4
-release, is:
+release, was:
 .IP a) \w'w)\(em'u
-completely Lindented and follows kernel coding practises;
+opensource;
 .PD 0
 .IP b)
-automatically adapts to production kernels with autoconf;
+completely Lindented and follows kernel coding practises;
 .IP c)
-packages itself into LSB compliant RPMs and DEBs;
+automatically adapts to production kernels with autoconf;
 .IP d)
+packages itself into LSB compliant RPMs and DEBs;
+.IP e)
 designed and implemented specifically for
 .BR GNU/Linux ;
-.IP e)
-no ports considered;
 .IP f)
-order of magnitude faster performance;
+no ports considered;
 .IP g)
-order of magnitude smaller memory footprint;
+order of magnitude faster performance;
 .IP h)
-proper programming by assertion;
+order of magnitude smaller memory footprint;
 .IP i)
-proper use of lightweight spinlocks;
+proper programming by assertion;
 .IP j)
-race free locking strategies and synchronization;
+proper use of lightweight spinlocks;
 .IP k)
+race free locking strategies and synchronization;
+.IP l)
 compatible with all mainstream
 .IR UNIX \(rg
 implementations;
-.IP l)
+.IP m)
 conforms to
 .IR "POSIX/SUSv3 XSR" ;
-.IP m)
-complete set of standard drivers and modules;
 .IP n)
-complete set of diagnostic and administrative utilities;
+complete set of standard drivers and modules;
 .IP o)
-integrated set of conformance testsuites;
+complete set of diagnostic and administrative utilities;
 .IP p)
+integrated set of conformance testsuites;
+.IP q)
 fully documented.
 .PD
-.PP
-Many specific difficulties encountered with
-.I LiS
-not repeated by
-.B @PACKAGE_TITLE@
-are contained in the
-.RI \(lq "COMPATIBILITY" \(rq
-section of most manual pages.
 .\"
 .\"
 .SH DESCRIPTION
@@ -1003,7 +976,7 @@ internal functions listed below:
 .BR setq "(9)\ \-\ assign a queue pair to a \fISTREAMS\fP module
 .PD
 .PP
-.SH "Linux Fast-STREAMS Extensions from LiS"
+.SH "Linux Fast-STREAMS Extensions"
 .PP
 .PP
 .PD 0
@@ -2213,7 +2186,6 @@ _
 .\"add_input_type   :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"add_netisr       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"add_netopt       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"add_timer        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"alenlist_append  :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"alenlist_clear   :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"alenlist_create  :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -2223,9 +2195,6 @@ _
 .\"alenlist_cursor_offset:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"alenlist_destroy :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"alenlist_get     :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"alloc_atomic     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"alloc_dma        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"alloc_kernel     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"anocancel        :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"aphysio          :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"assert_wait_mesg :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -2239,13 +2208,6 @@ _
 .\"as_remap64       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"as_seth64        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"as_unremap64     :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"atomic_add       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"atomic_dec       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"atomic_dec_and_test:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"atomic_inc       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"atomic_read      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"atomic_set       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"atomic_sub       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"audit_svcbcopy   :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"audit_svcfinis   :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"audit_svcstart   :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -2267,7 +2229,6 @@ _
 .\"biowait_sig      :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"blkclr           :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"blkflush         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"bprintf          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"bptophys         :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"bread            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"breada           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -2283,11 +2244,7 @@ _
 .\"cfgmgr_set_status:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"cfgnadd          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"cfgndel          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"check_mem        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"check_region     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"check_umem       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"clear_wait       :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"cli              :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"clrjmpx          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"cm_abort_trans   :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"cm_begin_trans   :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
@@ -2669,7 +2626,6 @@ _
 .\"del_input_type   :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"del_netisr       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"del_netopt       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"del_timer        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"devdump          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"device_admin_info_get:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"device_controller_num_get:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -2698,7 +2654,6 @@ _
 .\"devsw_add        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"devsw_del        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"devsw_get        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"disable_irq      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"disable_sysad_parity:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"disksort         :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"dki_dcache_inval:(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -2724,14 +2679,11 @@ _
 .\"dmp_add          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"dmp_del          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"dmp_prinit       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"down             :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"do_biostart      :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"do_config        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"do_devinfo       :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"do_drvctl        :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
-.\"do_gettimeofday  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"do_ioctl         :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
-.\"do_settimeofday  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"drvr_register_flush:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"drvr_register_shutdown:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"drv_attach       :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
@@ -2741,7 +2693,6 @@ _
 .\"drv_detach       :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"drv_open         :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"drv_shutdown     :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
-.\"dsecs            :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"DTOM             :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"d_align          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"d_cflush         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -2767,8 +2718,6 @@ _
 .\"eisa_ivec_alloc  :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"eisa_ivec_set    :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"eisa_parse_devconfig:(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
-.\"enable_intr      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"enable_irq       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"enable_sysad_parity:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"enque            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"errsave          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -2799,13 +2748,8 @@ _
 .\"fp_select        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"fp_write         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"fp_writev        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"free             :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"FREE             :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"freesema         :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"free_dma         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"free_irq         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"free_mem         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"free_pages       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"free_pktiopb     :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"fubyte64         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"fuibyte          :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -2820,17 +2764,12 @@ _
 .\"getcx            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"getexcept        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"gethrtime        :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"getint           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"getnewbuf        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"getpid           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"getppidx         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"gettimeofday     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"getuerror        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"get_config       :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"get_def_partitionmap:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"get_free_pages   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"get_free_pages_atomic:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"get_free_pages_kernel:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"get_info         :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"get_pktiopb      :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"gfsadd           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -2848,7 +2787,6 @@ _
 .\"handler_del      :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"handler_disable  :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"handler_enable   :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"hitime           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"htonl            :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"htons            :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"hwcpin           :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -2887,14 +2825,10 @@ _
 .\"initp            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"init_heap        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"insque           :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"interruptible_sleep_on:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"IOC_CONVERT_FROM :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"iohandle_to_phys :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"ioremap          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"ioremap_nocache  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"iostadd          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"iostdel          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"iounmap          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"iowait           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"io_att           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"io_copyin        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -2917,20 +2851,13 @@ _
 .\"i_reset          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"i_sched          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"i_unmask         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"jiffies          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"kernel_down      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"kernel_isrthread :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"kernel_thread_w_arg:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"kernel_up        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"kern_calloc      :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"kern_free        :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"kern_malloc      :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"kfree            :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"kgethostname     :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"kgettickd        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"kill_pg          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"kill_proc        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"kmalloc          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"kmem_alloc_phys  :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"kmem_alloc_physreq:(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"kmem_zalloc_physreq:(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
@@ -2961,59 +2888,6 @@ _
 .\"kthread_wait     :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"kvaddr_to_alenlist:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"kvtophys         :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"lis_add_timer    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_alloc_atomic :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_alloc_dma    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_alloc_kernel :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_assert_fail  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_basename     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_can_unload   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_check_guard  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_check_mem    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_check_mem_region:(9) : - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_check_q_magic:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_check_region :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_check_umem   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_date         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_debug_mask   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_debug_mask2  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_dec_mod_cnt  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_del_timer    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_deprec       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_dsecs        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_file_inode   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_file_str     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_flush_print_buffer:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_getint       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_inc_mod_cnt  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_loadable_load:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_maj_min_name :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_mark_mem     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_max_mem      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_membar       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_milli_to_ticks:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_msecs        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_msg_type_name:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_old_inode    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_open_cnt     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_own_spl      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_poll_2_1     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_poll_bits    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_poll_events  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_poll_file    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_block  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_data   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_mem    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_msg    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_queue  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_queues :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_spl_track:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_print_stream :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_secs         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_seq_cntr     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_usecs        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"lis_version      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"loadable_load    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"lockl            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"LOCK_DESTROY     :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"lock_done        :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -3039,12 +2913,8 @@ _
 .\"mask_wait        :(9): - : - : - : - : - : - : - :yes: - : - : - 
 .\"mb               :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"memccpy          :(9): - :yes: - : - : - : - : - : - : - : - : - 
-.\"milli_to_ticks   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"mkiocb           :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"mknod            :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"mount            :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"mpsleep          :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"msecs            :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"MTOCL            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"MTOD             :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"mutex            :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
@@ -3096,7 +2966,6 @@ _
 .\"NLuprintf        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"ntohl            :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"ntohs            :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"num_cpus         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"nvlist_add_boolean:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"nvlist_add_byte  :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"nvlist_add_byte_array:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
@@ -3158,17 +3027,6 @@ _
 .\"nvpair_value_uint32_array:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"nvpair_value_uint64:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"nvpair_value_uint64_array:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"pcibios_find_class:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_find_device:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_init     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_present  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_read_config_byte:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_read_config_dword:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_read_config_word:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_strerror :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_write_config_byte:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_write_config_dword:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pcibios_write_config_word:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"pciio_dmaaddr_drain:(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"pciio_dmalist_drain:(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"pciio_dmamap_addr:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -3212,8 +3070,6 @@ _
 .\"pciio_pio_slot_get:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"pciio_pio_space_get:( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"pciio_reset      :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"pci_alloc_consistent:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_cleanup      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"pci_config_get16 :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pci_config_get32 :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pci_config_get64 :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
@@ -3232,57 +3088,13 @@ _
 .\"pci_config_putw  :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pci_config_setup :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pci_config_teardown:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"pci_dac_dma_supported:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dac_dma_sync_single:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dac_dma_to_offset:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dac_dma_to_page:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dac_page_to_dma:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dac_set_dma_mask:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_disable_device:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_disable_device:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dma_supported:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dma_sync_sg  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_dma_sync_single:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_enable_device:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_enable_device:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_find_class   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_find_class   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_find_device  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_find_device  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_find_slot    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_find_slot    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_free_consistent:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_map_page     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_map_sg       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_map_single   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_module_init  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_read_config_byte:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_read_config_byte:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_read_config_dword:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_read_config_dword:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_read_config_word:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_read_config_word:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"pci_report_pmcap :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pci_restore_config_regs:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pci_save_config_regs:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"pci_set_dma_mask :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_set_master   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_set_master   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_unmap_page   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_unmap_sg     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_unmap_single :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_unregister_driver:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_write_config_byte:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_write_config_byte:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_write_config_dword:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_write_config_dword:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_write_config_word:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"pci_write_config_word:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"pfctlinput       :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"pffindproto      :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"pgsignal         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"PHYS_TO_KSEG     :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"phys_to_virt     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"pidsig           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"pin              :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"pincf            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -3317,8 +3129,6 @@ _
 .\"pm_raise_power   :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pm_set_normal_power:(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"pm_trans_check   :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"poll_events      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"printk           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"privileged       :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"prochadd         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"prochdel         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -3342,11 +3152,7 @@ _
 .\"READ_BUS_D8      :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"read_io_port     :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"register_callback:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"release_region   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"remque           :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"request_dma      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"request_irq      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"request_region   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"rmallocmap_wait  :(9): - : - : - : - : - : - :yes: - : - : - : - 
 .\"rmget            :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"rmmap_create64   :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -3367,24 +3173,9 @@ _
 .\"rw_exit          :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"rw_init          :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"RW_INIT          :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"rw_lock_alloc    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_lock_free     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_lock_init     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_read_lock     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"rw_read_locked   :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"rw_read_lock_irq :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_read_lock_irqsave:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_read_unlock   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_read_unlock_irq:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_read_unlock_irqrestore:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"rw_tryenter      :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"rw_tryupgrade    :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"rw_write_lock    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_write_lock_irq:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_write_lock_irqsave:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_write_unlock  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_write_unlock_irq:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"rw_write_unlock_irqrestore:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"scgth_free       :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"schednetisr      :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"scsi_abort       :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -3436,7 +3227,6 @@ _
 .\"scsi_unprobe     :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"scsi_unslave     :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"scsi_vu_errmsg   :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"secs             :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"select_dequeue   :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"select_dequeue_all:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"select_enqueue   :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -3449,9 +3239,6 @@ _
 .\"sema_p_sig       :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"sema_tryp        :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"sema_v           :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-.\"sem_alloc        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"sem_destroy      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"sem_init         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"setdisklabel     :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"setgioconfig     :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"setgiovector     :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -3459,8 +3246,6 @@ _
 .\"setpinit         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"setuerror        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"sgset            :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"sg_dma_address   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"sg_dma_len       :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"sig_chk          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"simple_lock      :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"simple_lock_init :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -3471,22 +3256,6 @@ _
 .\"SIZEOF_STRUCT    :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
 .\"SLEEP_DESTROY    :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"SLEEP_INIT       :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"sleep_on         :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_is_locked   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_lock        :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_lock_alloc  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_lock_free   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_lock_init   :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_lock_irq    :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_lock_irqsave:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_trylock     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_unlock      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_unlock_irq  :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"spin_unlock_irqrestore:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"SPL0             :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"SPLSTR           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"SPLX             :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"sti              :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"stoi             :(9): - : - : - : - : - : - :yes: - : - : - : - 
 .\"strcasecmp       :(9): - : - : - : - : - : - :yes: - : - : - : - 
 .\"strcspn          :(9): - :yes: - : - : - : - : - : - : - : - : - 
@@ -3517,8 +3286,6 @@ _
 .\"thread_block     :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"thread_halt_self :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"thread_set_timeout:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"thread_start     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"thread_stop      :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"thread_terminate :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"thread_wakeup    :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"thread_wakeup_one:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -3531,7 +3298,6 @@ _
 .\"trunc_page       :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"tstart           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"tstop            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"udelay           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"uexadd           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"uexblock         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"uexclear         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
@@ -3539,19 +3305,15 @@ _
 .\"ufdcreate        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"uiobuf           :(9): - : - : - : - : - : - : - : - :yes: - : - \"uw7
 .\"uiophysio        :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
-.\"umount           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"umount2          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"unconfigure_driver:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"undma            :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"unix_master      :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 .\"unix_release     :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"unlink           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"unlockl          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"unpin            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"unpincode        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"unpinu           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"unregister_callback:(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
-.\"up               :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"uphysio          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"userabi          :( ): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"userdma          :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -3559,10 +3321,7 @@ _
 .\"valusema         :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"vec_clear        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"vec_init         :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"vfree            :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"vfsrele          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"virt_to_phys     :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"vmalloc          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"vme_adapter      :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"vme_ivec_alloc   :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"vme_ivec_free    :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -3590,7 +3349,6 @@ _
 .\"vm_writep        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"vn_free          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"vn_get           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"vremap           :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"vsema            :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"v_getaddr        :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"v_gethandle      :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
@@ -3598,8 +3356,6 @@ _
 .\"v_mapphys        :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"waitcfree        :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"waitq            :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"wake_up          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
-.\"wake_up_interruptible:(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"wbadaddr         :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"wbadaddr_val     :(9): - : - : - : - : - :yes: - : - : - : - : - \"irix
 .\"writedisklabel   :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
@@ -3620,7 +3376,6 @@ _
 .\"xmemin           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"xmemout          :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
 .\"xmfree           :(9): - :yes: - : - : - : - : - : - : - : - : - \"aix
-.\"zmalloc          :(9): - : - : - : - : - : - : - : - : - : - :yes\"lis
 .\"_
 .\"_
 .\"_
@@ -4111,12 +3866,15 @@ _
 .\".PP
 .\"
 .\"
-.\".SH CONTEXT
-.\".PP
+.SH CONTEXT
+.PP
+STREAMS functions can be called from various contexts.  See the paricular manual
+page for more information.
 .\"
 .\"
-.\".SH MP-STREAMS
-.\".PP
+.SH MP-STREAMS
+.PP
+All STREAMS functions are MP safe.
 .\"
 .\"
 .\".SH NOTICES
@@ -4360,266 +4118,6 @@ drivers and modules.
 .\"
 .SH "SEE ALSO"
 .PP
-.\"      1 .BR lis_add_timer (9),
-.\"      1 .BR lis_alloc_atomic_fcn (9),
-.\"      1 .BR lis_alloc_dma_fcn (9),
-.\"      1 .BR lis_alloc_kernel_fcn (9),
-.\"      1 .BR lis_apush_get (9),
-.\"      1 .BR lis_apushm (9),
-.\"      1 .BR lis_apush_set (9),
-.\"      1 .BR lis_assert_fail (9),
-.\"      1 .BR lis_atomic_add (9),
-.\"      1 .BR lis_atomic_dec (9),
-.\"      1 .BR lis_atomic_dec_and_test (9),
-.\"      1 .BR lis_atomic_inc (9),
-.\"      1 .BR lis_atomic_read (9),
-.\"      1 .BR lis_atomic_set (9),
-.\"      1 .BR lis_atomic_sub (9),
-.\"      1 .BR lis_backq_fcn (9),
-.\"      1 .BR lis_bcanputnext_anyband (9),
-.\"      1 .BR lis_bprintf (9),
-.\"      1 .BR lis_can_unload (9),
-.\"      1 .BR lis_check_guard (9),
-.\"      1 .BR lis_check_mem (9),
-.\"      1 .BR lis_check_q_magic (9),
-.\"      1 .BR lis_check_region (9),
-.\"      1 .BR lis_check_umem (9),
-.\"      1 .BR lis_clone_major (9),
-.\"      1 .BR lis_copyin (9),
-.\"      1 .BR lis_copyout (9),
-.\"      1 .BR lis_debug_mask (9),
-.\"      1 .BR lis_debug_mask2 (9),
-.\"      1 .BR lis_dec_mod_cnt_fcn (9),
-.\"      1 .BR lis_del_timer (9),
-.\"      1 .BR lis_disable_irq (9),
-.\"      1 .BR lis_dobufcall (9),
-.\"      1 .BR lis_doclose (9),
-.\"      1 .BR lis_down_fcn (9),
-.\"      1 .BR lis_dsecs (9),
-.\"      1 .BR lis_enable_intr (9),
-.\"      1 .BR lis_enable_irq (9),
-.\"      1 .BR lis_fattach (9),
-.\"      1 .BR lis_fdetach (9),
-.\"      1 .BR lis_fdetach_all (9),
-.\"      1 .BR lis_fdetach_stream (9),
-.\"      1 .BR lis_fifo_close_sync (9),
-.\"      1 .BR lis_fifo_open_sync (9),
-.\"      1 .BR lis_fifo_write_sync (9),
-.\"      1 .BR lis_file_inode (9),
-.\"      1 .BR lis_file_str (9),
-.\"      1 .BR lis_flush_print_buffer (9),
-.\"      1 .BR lis_fmod_sw (9),
-.\"      1 .BR lis_free (9),
-.\"      1 .BR lis_freedb (9),
-.\"      1 .BR lis_free_dma (9),
-.\"      1 .BR lis_free_irq (9),
-.\"      1 .BR lis_free_mem_fcn (9),
-.\"      1 .BR lis_free_pages_fcn (9),
-.\"      1 .BR lis_free_passfp (9),
-.\"      1 .BR lis_fstr_sw (9),
-.\"      1 .BR lis_get_fifo (9),
-.\"      1 .BR lis_get_free_pages_atomic_fcn (9),
-.\"      1 .BR lis_get_free_pages_fcn (9),
-.\"      1 .BR lis_get_free_pages_kernel_fcn (9),
-.\"      1 .BR lis_getint (9),
-.\"      1 .BR lis_get_passfp (9),
-.\"      1 .BR lis_get_pipe (9),
-.\"      1 .BR lis_gettimeofday (9),
-.\"      1 .BR lis_hitime (9),
-.\"      1 .BR lis_inc_mod_cnt_fcn (9),
-.\"      1 .BR lis_init_bufcall (9),
-.\"      1 .BR lis_in_syscall (9),
-.\"      1 .BR lis_interruptible_sleep_on (9),
-.\"      1 .BR lis_ioc_fattach (9),
-.\"      1 .BR lis_ioc_fdetach (9),
-.\"      1 .BR lis_ioc_pipe (9),
-.\"      1 .BR lis_ioremap (9),
-.\"      1 .BR lis_ioremap_nocache (9),
-.\"      1 .BR lis_iounmap (9),
-.\"      1 .BR lis_jiffies (9),
-.\"      1 .BR lis_kernel_down (9),
-.\"      1 .BR lis_kernel_up (9),
-.\"      1 .BR lis_kernel_version (9),
-.\"      1 .BR lis_kfree (9),
-.\"      1 .BR lis__kfree (9),
-.\"      1 .BR lis_kill_pg (9),
-.\"      1 .BR lis_kill_proc (9),
-.\"      1 .BR lis_kmalloc (9),
-.\"      1 .BR lis__kmalloc (9),
-.\"      1 .BR lis_loadable_load (9),
-.\"      1 .BR lis_maj_min_name (9),
-.\"      1 .BR lis_major (9),
-.\"      1 .BR lis_malloc (9),
-.\"      1 .BR lis_mark_mem (9),
-.\"      1 .BR lis_max_mem (9),
-.\"      1 .BR lis_milli_to_ticks (9),
-.\"      1 .BR lis_msecs (9),
-.\"      1 .BR lis_msg_type_name (9),
-.\"      1 .BR lis_num_cpus (9),
-.\"      1 .BR lis_old_inode (9),
-.\"      1 .BR lis_open_cnt (9),
-.\"      1 .BR lis_osif_cli (9),
-.\"      1 .BR lis_osif_do_gettimeofday (9),
-.\"      1 .BR lis_osif_do_settimeofday (9),
-.\"      1 .BR lis_osif_pci_alloc_consistent (9),
-.\"      1 .BR lis_osif_pci_dac_dma_supported (9),
-.\"      1 .BR lis_osif_pci_dac_dma_sync_single (9),
-.\"      1 .BR lis_osif_pci_dac_dma_to_offset (9),
-.\"      1 .BR lis_osif_pci_dac_dma_to_page (9),
-.\"      1 .BR lis_osif_pci_dac_page_to_dma (9),
-.\"      1 .BR lis_osif_pci_dac_set_dma_mask (9),
-.\"      1 .BR lis_osif_pci_disable_device (9),
-.\"      1 .BR lis_osif_pci_dma_supported (9),
-.\"      1 .BR lis_osif_pci_dma_sync_sg (9),
-.\"      1 .BR lis_osif_pci_dma_sync_single (9),
-.\"      1 .BR lis_osif_pci_enable_device (9),
-.\"      1 .BR lis_osif_pci_find_class (9),
-.\"      1 .BR lis_osif_pci_find_device (9),
-.\"      1 .BR lis_osif_pci_find_slot (9),
-.\"      1 .BR lis_osif_pci_free_consistent (9),
-.\"      1 .BR lis_osif_pci_map_page (9),
-.\"      1 .BR lis_osif_pci_map_sg (9),
-.\"      1 .BR lis_osif_pci_map_single (9),
-.\"      1 .BR lis_osif_pci_module_init (9),
-.\"      1 .BR lis_osif_pci_read_config_byte (9),
-.\"      1 .BR lis_osif_pci_read_config_dword (9),
-.\"      1 .BR lis_osif_pci_read_config_word (9),
-.\"      1 .BR lis_osif_pci_set_dma_mask (9),
-.\"      1 .BR lis_osif_pci_set_master (9),
-.\"      1 .BR lis_osif_pci_unmap_page (9),
-.\"      1 .BR lis_osif_pci_unmap_sg (9),
-.\"      1 .BR lis_osif_pci_unmap_single (9),
-.\"      1 .BR lis_osif_pci_unregister_driver (9),
-.\"      1 .BR lis_osif_pci_write_config_byte (9),
-.\"      1 .BR lis_osif_pci_write_config_dword (9),
-.\"      1 .BR lis_osif_pci_write_config_word (9),
-.\"      1 .BR lis_osif_sg_dma_address (9),
-.\"      1 .BR lis_osif_sg_dma_len (9),
-.\"      1 .BR lis_osif_sti (9),
-.\"      1 .BR lis_own_spl (9),
-.\"      1 .BR lis_pcibios_find_class (9),
-.\"      1 .BR lis_pcibios_find_device (9),
-.\"      1 .BR lis_pcibios_init (9),
-.\"      1 .BR lis_pcibios_present (9),
-.\"      1 .BR lis_pcibios_read_config_byte (9),
-.\"      1 .BR lis_pcibios_read_config_dword (9),
-.\"      1 .BR lis_pcibios_read_config_word (9),
-.\"      1 .BR lis_pcibios_strerror (9),
-.\"      1 .BR lis_pcibios_write_config_byte (9),
-.\"      1 .BR lis_pcibios_write_config_dword (9),
-.\"      1 .BR lis_pcibios_write_config_word (9),
-.\"      1 .BR lis_pci_cleanup (9),
-.\"      1 .BR lis_pci_disable_device (9),
-.\"      1 .BR lis_pci_enable_device (9),
-.\"      1 .BR lis_pci_find_class (9),
-.\"      1 .BR lis_pci_find_device (9),
-.\"      1 .BR lis_pci_find_slot (9),
-.\"      1 .BR lis_pci_read_config_byte (9),
-.\"      1 .BR lis_pci_read_config_dword (9),
-.\"      1 .BR lis_pci_read_config_word (9),
-.\"      1 .BR lis_pci_set_master (9),
-.\"      1 .BR lis_pci_write_config_byte (9),
-.\"      1 .BR lis_pci_write_config_dword (9),
-.\"      1 .BR lis_pci_write_config_word (9),
-.\"      1 .BR lis_phys_to_virt (9),
-.\"      1 .BR lis_pipe (9),
-.\"      1 .BR lis_poll_2_1 (9),
-.\"      1 .BR lis_poll_bits (9),
-.\"      1 .BR lis_poll_events (9),
-.\"      1 .BR lis_poll_file (9),
-.\"      1 .BR lis_print_block (9),
-.\"      1 .BR lis_print_data (9),
-.\"      1 .BR lis_printk (9),
-.\"      1 .BR lis_print_mem (9),
-.\"      1 .BR lis_print_msg (9),
-.\"      1 .BR lis_print_queue (9),
-.\"      1 .BR lis_print_queues (9),
-.\"      1 .BR lis_print_spl_track (9),
-.\"      1 .BR lis_print_stream (9),
-.\"      1 .BR lis_putbyte (9),
-.\"      1 .BR lis_qcountstrm (9),
-.\"      1 .BR lis_qopen (9),
-.\"      1 .BR lis_queue_name (9),
-.\"      1 .BR lis_queuerun_cnts (9),
-.\"      1 .BR lis_queues_running (9),
-.\"      1 .BR lis_recvfd (9),
-.\"      1 .BR lis_release_region (9),
-.\"      1 .BR lis_request_dma (9),
-.\"      1 .BR lis_request_irq (9),
-.\"      1 .BR lis_request_region (9),
-.\"      1 .BR lis_runq_cnts (9),
-.\"      1 .BR lis_runq_req_cnt (9),
-.\"      1 .BR lis_rw_lock_alloc_fcn (9),
-.\"      1 .BR lis_rw_lock_free_fcn (9),
-.\"      1 .BR lis_rw_lock_init_fcn (9),
-.\"      1 .BR lis_rw_read_lock_fcn (9),
-.\"      1 .BR lis_rw_read_lock_irq_fcn (9),
-.\"      1 .BR lis_rw_read_lock_irqsave_fcn (9),
-.\"      1 .BR lis_rw_read_unlock_fcn (9),
-.\"      1 .BR lis_rw_read_unlock_irq_fcn (9),
-.\"      1 .BR lis_rw_read_unlock_irqrestore_fcn (9),
-.\"      1 .BR lis_rw_write_lock_fcn (9),
-.\"      1 .BR lis_rw_write_lock_irq_fcn (9),
-.\"      1 .BR lis_rw_write_lock_irqsave_fcn (9),
-.\"      1 .BR lis_rw_write_unlock_fcn (9),
-.\"      1 .BR lis_rw_write_unlock_irq_fcn (9),
-.\"      1 .BR lis_rw_write_unlock_irqrestore_fcn (9),
-.\"      1 .BR lis_safe_putmsg (9),
-.\"      1 .BR lis_secs (9),
-.\"      1 .BR lis_sem_alloc (9),
-.\"      1 .BR lis_sem_destroy (9),
-.\"      1 .BR lis_sem_init (9),
-.\"      1 .BR lis_sendfd (9),
-.\"      1 .BR lis_set_file_str (9),
-.\"      1 .BR lis_setq (9),
-.\"      1 .BR lis_setqsched (9),
-.\"      1 .BR lis_setqsched_cnts (9),
-.\"      1 .BR lis_setqsched_isr_cnts (9),
-.\"      1 .BR lis_sleep_on (9),
-.\"      1 .BR lis_spin_is_locked_fcn (9),
-.\"      1 .BR lis_spin_lock_alloc_fcn (9),
-.\"      1 .BR lis_spin_lock_fcn (9),
-.\"      1 .BR lis_spin_lock_free_fcn (9),
-.\"      1 .BR lis_spin_lock_init_fcn (9),
-.\"      1 .BR lis_spin_lock_irq_fcn (9),
-.\"      1 .BR lis_spin_lock_irqsave_fcn (9),
-.\"      1 .BR lis_spin_trylock_fcn (9),
-.\"      1 .BR lis_spin_unlock_fcn (9),
-.\"      1 .BR lis_spin_unlock_irq_fcn (9),
-.\"      1 .BR lis_spin_unlock_irqrestore_fcn (9),
-.\"      1 .BR lis_spl0_fcn (9),
-.\"      1 .BR lis_splstr_fcn (9),
-.\"      1 .BR lis_splx_fcn (9),
-.\"      1 .BR lis_sprintf (9),
-.\"      1 .BR lis_stdata_cnt (9),
-.\"      1 .BR lis_strclose (9),
-.\"      1 .BR lis_strcount (9),
-.\"      1 .BR lis_strgetpmsg (9),
-.\"      1 .BR lis_strioctl (9),
-.\"      1 .BR lis_strm_name (9),
-.\"      1 .BR lis_strm_name_from_queue (9),
-.\"      1 .BR lis_stropen (9),
-.\"      1 .BR lis_stropts_file (9),
-.\"      1 .BR lis_strputpmsg (9),
-.\"      1 .BR lis_strread (9),
-.\"      1 .BR lis_strstats (9),
-.\"      1 .BR lis_strwrite (9),
-.\"      1 .BR lis_thread_start (9),
-.\"      1 .BR lis_thread_stop (9),
-.\"      1 .BR lis_timeout_fcn (9),
-.\"      1 .BR lis_udelay (9),
-.\"      1 .BR lis_up_fcn (9),
-.\"      1 .BR lis_usecs (9),
-.\"      1 .BR lis_usectohz (9),
-.\"      1 .BR lis_valid_mod_list (9),
-.\"      1 .BR lis_vfree (9),
-.\"      1 .BR lis_virt_to_phys (9),
-.\"      1 .BR lis_vmalloc (9),
-.\"      1 .BR lis_vremap (9),
-.\"      1 .BR lis_vsprintf (9),
-.\"      1 .BR lis_wake_up (9),
-.\"      1 .BR lis_wake_up_interruptible (9),
-.\"      1 .BR lis_zmalloc (9),
 .BR adjmsg (9),
 .BR allocb (9),
 .BR allocb_physreq (9),
@@ -4690,95 +4188,6 @@ drivers and modules.
 .BR kmem_zalloc_node (9),
 .BR linkb (9),
 .BR linkmsg (9),
-.BR lis_adjmsg (9),
-.BR lis_allocb (9),
-.BR lis_allocb_physreq (9),
-.BR lis_allocq (9),
-.BR lis_appq (9),
-.BR lis_backq (9),
-.BR lis_bcanput (9),
-.BR lis_bcanputnext (9),
-.BR lis_bcopy (9),
-.BR lis_bufcall (9),
-.BR lis_bzero (9),
-.BR lis_canenable (9),
-.BR lis_canput (9),
-.BR lis_canputnext (9),
-.BR lis_cmn_err (9),
-.BR lis_copyb (9),
-.BR lis_copymsg (9),
-.BR lis_datamsg (9),
-.BR lis_date (9),
-.BR lis_dupb (9),
-.BR lis_dupmsg (9),
-.BR lis_enableok (9),
-.BR lis_esballoc (9),
-.BR lis_esbbcall (9),
-.BR lis_find_strdev (9),
-.BR lis_flushband (9),
-.BR lis_flushq (9),
-.BR lis_freeb (9),
-.BR lis_freemsg (9),
-.BR lis_freeq (9),
-.BR lis_getq (9),
-.BR lis_insq (9),
-.BR lis_isdatablk (9),
-.BR lis_isdatamsg (9),
-.BR lis_linkb (9),
-.BR lis_mknod (9),
-.BR lis_mount (9),
-.BR lis_msgdsize (9),
-.BR lis_msgpullup (9),
-.BR lis_msgsize (9),
-.BR lis_noenable (9),
-.BR lis_OTHER (9),
-.BR lis_OTHERQ (9),
-.BR lis_pullupmsg (9),
-.BR lis_putbq (9),
-.BR lis_putctl1 (9),
-.BR lis_putctl (9),
-.BR lis_putnext (9),
-.BR lis_putnextctl1 (9),
-.BR lis_putnextctl (9),
-.BR lis_putq (9),
-.BR lis_qattach (9),
-.BR lis_qclose (9),
-.BR lis_qdetach (9),
-.BR lis_qenable (9),
-.BR lis_qprocsoff (9),
-.BR lis_qprocson (9),
-.BR lis_qreply (9),
-.BR lis_qsize (9),
-.BR lis_RD (9),
-.BR lis_register_strdev (9),
-.BR lis_register_strmod (9),
-.BR lis_rmvb (9),
-.BR lis_rmvq (9),
-.BR lis_safe_canenable (9),
-.BR lis_safe_enableok (9),
-.BR lis_safe_noenable (9),
-.BR lis_safe_OTHERQ (9),
-.BR lis_safe_putnext (9),
-.BR lis_safe_qreply (9),
-.BR lis_safe_RD (9),
-.BR lis_safe_SAMESTR (9),
-.BR lis_safe_WR (9),
-.BR lis_SAMESTR (9),
-.BR lis_strqget (9),
-.BR lis_strqset (9),
-.BR lis_testb (9),
-.BR lis_timeout (9),
-.BR lis_umount2 (9),
-.BR lis_umount (9),
-.BR lis_unbufcall (9),
-.BR lis_unlink (9),
-.BR lis_unlinkb (9),
-.BR lis_unregister_strdev (9),
-.BR lis_unregister_strmod (9),
-.BR lis_untimeout (9),
-.BR lis_version (9),
-.BR lis_WR (9),
-.BR lis_xmsgsize (9),
 .BR makedevice (9),
 .BR max (9),
 .BR mblk_t (9),
@@ -4872,12 +4281,59 @@ drivers and modules.
 .\".PP
 .\"
 .\"
-.\".SH COMPATIBILITY
-.\".PP
+.SH COMPATIBILITY
+.PP
+.B Linux Fast-STREAMS
+is compatible with all major (and some not so major) implementations of
+STREAMS.
 .\"
 .\"
-.\".SH CONFORMANCE
-.\".PP
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP SPG,
+.[
+svr42spg
+.]
+and many others.
+.[
+uslspg
+.]
+.[
+svr42spg
+.]
+.[
+svr4spg
+.]
+.[
+svr3spg
+.]
+.[
+svr3sp
+.]
+.[
+aixspg
+.]
+.[
+cccsmad
+.]
+.[
+hpuxspg
+.]
+.[
+solspg
+.]
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.[
+uxpspg
+.]
+.[
+vxwspg
+.]
 .\"
 .\"
 .SH HISTORY

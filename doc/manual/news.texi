@@ -89,8 +89,7 @@ This is the seventh @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_T
 a sub-package listing, see
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}/README,@file{README}} in the release.  Most
 of the sub-packages in the release are production grade for @cite{Linux
-Fast-STREAMS}.@footnote{Sub-packages are no longer supported on the deprecated @cite{LiS} STREAMS
-package.}  All existing validation test suites run clean on supported distributions, production
+Fast-STREAMS}.  All existing validation test suites run clean on supported distributions, production
 kernels and architectures.
 
 The original intention was that the @cite{@value{PACKAGE_TITLE}} package not be released as often as

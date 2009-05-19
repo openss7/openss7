@@ -204,8 +204,6 @@ structure:
 .BR msgphysreq "(9) \- adjust a STREAMS message to conform to physical requirements
 .HP
 .BR msgpullup_physreq "(9) \- pull up a STREAMS message with physical requirements
-.HP
-.BR lis_allocb_physreq "(9) \- allocate a STREAMS message block with physical requirements
 .PD
 .PP
 .\"
@@ -240,8 +238,7 @@ structure largely ignore the members of the structure.
 .BR phys_free (9),
 .BR allocb_physreq (9),
 .BR msgphysreq (9),
-.BR msgpullup_physreq (9),
-.BR lis_allocb_physreq (9).
+.BR msgpullup_physreq (9).
 .\"
 .\"
 .SH COMPATIBILITY

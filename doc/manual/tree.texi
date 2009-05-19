@@ -89,7 +89,6 @@ describe some of the kernel modules installed by add-on packages in the @value{P
 * sigtran Kernel Modules::
 * strvoip Kernel Modules::
 * osr61 Kernel Modules::
-* LiS Kernel Modules::
 @end menu
 
 @node sctp Kernel Modules
@@ -309,14 +308,6 @@ See @manref{irixcompat(9)} for more information.
 
 This kernel module has been rolled into the @file{streams} kernel module.
 
-@item streams-liscompat
-
-This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
-@cite{LiS-@value{VERSION_LIS}}.
-See @manref{liscompat(9)} for more information.
-
-This kernel module has been discarded as @cite{LiS} compatibility is no longer necessary.
-
 @item streams-maccompat
 
 This kernel module provides compatibility to @dfn{STREAMS} modules and drivers written for
@@ -462,24 +453,11 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 The @command{strxns-@value{VERSION_STRXNS}} add-on packages provides kernel modules for sundry
 @dfn{STREAMS} drivers and modules written to the specifications for @cite{X/Open Networking
-Services} and the @dfn{CDI}, @dfn{DLPI} and @dfn{NPI} levels.  Many of these modules come from the
-deprecated @cite{LiS} package and were ported to @cite{Linux Fast-STREAMS} to aid migration.
+Services} and the @dfn{CDI}, @dfn{DLPI} and @dfn{NPI} levels.
 
 Kernel modules installed by @command{strxns-@value{VERSION_STRXNS}} are as follows:
 
 @table @file
-
-@item streams-ip_strm_mod
-
-This @dfn{STREAMS} module was originally part of the @cite{LiS} distribution.
-
-@item streams-ip_to_dlpi
-
-This @dfn{STREAMS} driver was originally part of the @cite{LiS} distribution.
-
-@item streams-ldl
-
-This @dfn{STREAMS} driver was originally part of the @cite{LiS} distribution.
 
 @item streams-np_ip
 
@@ -1055,7 +1033,3 @@ See @manref{ctimod(4)} for more information.
 
 @end table
 
-@node LiS Kernel Modules
-@subsubsection LiS
-
-The @command{LiS-@value{VERSION_LIS}} package is deprecated and this section is deleted.

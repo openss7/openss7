@@ -308,63 +308,6 @@ __old_streams_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, in
 }
 #endif
 
-/** @brief Get a message from a Stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
-  * @param bandp a pointer to the band returned for the received message.
-  * @param flagsp a pointer to the flags returned for the received message.
-  * @version LIS_1.0
-  * @par Alias:
-  * This symbol is a weak alias of __streams_getpmsg().
-  */
-int __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
-    __attribute__ ((weak, alias("__streams_getpmsg")));
-
-/** @brief Get a message from a Stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
-  * @param bandp a pointer to the band returned for the received message.
-  * @param flagsp a pointer to the flags returned for the received message.
-  * @version LIS_1.0 getpmsg()
-  * @par Alias:
-  * This symbol is a weak alias of __streams_getpmsg_r().
-  */
-int __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
-    __attribute__ ((weak, alias("__streams_getpmsg_r")));
-
-#if 0
-/** @brief Get a message from a Stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
-  * @param bandp a pointer to the band returned for the received message.
-  * @param flagsp a pointer to the flags returned for the received message.
-  * @version LIS_0.0
-  * @par Alias:
-  * This symbol is a weak alias of __old_streams_getpmsg().
-  */
-int __old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
-    __attribute__ ((weak, alias("__old_streams_getpmsg")));
-#endif
-
-#if 0
-/** @brief Get a message from a Stream band.
-  * @param fd a file descriptor representing the Stream.
-  * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
-  * @param datptr a pointer to a struct strbuf structure returning the data part of the message.
-  * @param bandp a pointer to the band returned for the received message.
-  * @param flagsp a pointer to the flags returned for the received message.
-  * @version LIS_0.0 getpmsg()
-  * @par Alias:
-  * This symbol is a weak alias of __old_streams_getpmsg_r().
-  */
-int __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp,
-			int *flagsp)
-    __attribute__ ((weak, alias("__old_streams_getpmsg_r")));
-#endif
-
 /** @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
@@ -373,16 +316,10 @@ int __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, in
   * @param flagsp a pointer to the flags returned for the received message.
   * @version STREAMS_1.0 __streams_getpmsg_r()
   * @version STREAMS_0.0 __old_streams_getpmsg_r()
-  * @version LIS_1.0 __lis_getpmsg_r()
-  * @version LIS_0.0 __old_lis_getpmsg_r()
   */
 __asm__(".symver __streams_getpmsg_r,getpmsg@@STREAMS_1.0");
 #if 0
 __asm__(".symver __old_streams_getpmsg_r,getpmsg@STREAMS_0.0");
-#endif
-__asm__(".symver __lis_getpmsg_r,getpmsg@LIS_1.0");
-#if 0
-__asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");
 #endif
 
 /** @} */

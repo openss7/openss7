@@ -163,6 +163,13 @@ When unsuccessful,
 returns a non-zero value.
 .\"
 .\"
+.SH ERRORS
+.PP
+When
+.BR x25_find_link_parameters ()
+encounters an error, it returns a non-zero value.
+.\"
+.\"
 .SH FILES
 .PP
 .TP

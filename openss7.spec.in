@@ -65,12 +65,12 @@
 
 %global binfiles    %{nil}
 %global sbinfiles   %{nil}
-%global modules     specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-liscompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat
+%global modules     specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat
 %global nonrpmmods  LiS lis streams STREAMS strbcm strcompat strutil strtty strchan strxns strxnet strnsl strsock strinet strsctp strisdn strvoip strss7 sigtran stratm
 %global preloads    specfs streams
-%global libraries   streams LiS pLiS
+%global libraries   streams
 %global locales     %{nil}
-%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
+%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo
 %global infofiles   %{virtual} STREAMS_FAQ SPG SPG2
 %global pngfiles    *.png
 %global initfiles   %{base} specfs streams strerr strace
@@ -1356,8 +1356,6 @@ fi
     %{?_without_solaris_cmn_err:            '%_without_solaris_cmn_err'} \
     %{?_with_solaris_consts:                '%_with_solaris_consts'} \
     %{?_without_solaris_consts:             '%_without_solaris_consts'} \
-    %{?_with_lis_regparms:                  '%_with_lis_regparms'} \
-    %{?_without_lis_regparms:               '%_without_lis_regparms'} \
     %{?_with_k_modversions:                 '%enable %_with_k_modversions'} \
     %{?_without_k_modversions:              '%disable %_without_k_modversions'} \
     %{?_with_k_cache:                       '%enable %_with_k_cache'} \
@@ -1368,8 +1366,6 @@ fi
     %{?_without_broken_cpu_flags:           '%disable %_without_broken_cpu_flags'} \
     %{?_with_atomic_stats:                  '%enable %_with_atomic_stats'} \
     %{?_without_atomic_stats:               '%disable %_without_atomic_stats'} \
-    %{?_with_lis_development:               '%enable %_with_lis_development'} \
-    %{?_without_lis_development:            '%disable %_without_lis_development'} \
     %{?_with_xns:                           '%_with_xns'} \
     %{?_without_xns:                        '%_without_xns'} \
     %{?_with_tli:                           '%_with_tli'} \
@@ -1450,10 +1446,6 @@ fi
     %{?_without_compat_hpux:                '%disable %_without_compat_hpux'} \
     %{?_with_compat_irix:                   '%enable %_with_compat_irix'} \
     %{?_without_compat_irix:                '%disable %_without_compat_irix'} \
-    %{?_with_compat_lis:                    '%enable %_with_compat_lis'} \
-    %{?_without_compat_lis:                 '%disable %_without_compat_lis'} \
-    %{?_with_compat_lfs:                    '%enable %_with_compat_lfs'} \
-    %{?_without_compat_lfs:                 '%disable %_without_compat_lfs'} \
     %{?_with_compat_mac:                    '%enable %_with_compat_mac'} \
     %{?_without_compat_mac:                 '%disable %_without_compat_mac'} \
     %{?_with_sctp_slow_verification:        '%enable %_with_sctp_slow_verification'} \

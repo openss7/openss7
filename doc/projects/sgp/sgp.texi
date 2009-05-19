@@ -275,6 +275,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Optional Management Support::
 * Programmatic Interfaces::
 * Platform Sizing::
+* Licences::
 * Indices::
 @end menu
 
@@ -494,6 +495,7 @@ This document is organized as follows:
 * Optional Management Support::
 * Programmatic Interfaces::
 * Platform Sizing::
+* Licences::
 * Indices::
 @end menu
 @end ifnottex
@@ -824,6 +826,10 @@ SSP and SCP nodes with A-, E-, or F-links.}
 From the IP network, the SG platforms appear in the SG as STP configuration for SIGTRAN.
 Although MGC's are shown within the IP network as being provided SS7 connectivity by the SG
 platforms, any SIGTRAN equipped SS7 user application may also be supported by this configuration.
+
+@node Reference Architecture
+@chapter Reference Architecture
+@cindex Reference architecture
 
 @node System Architecture
 @chapter System Architecture
@@ -1282,30 +1288,7 @@ For the current project, RedHat AS/EL5 or CentOS 5 is recommended.
 @section STREAMS Facility
 @cindex STREAMS Facility
 
-OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize a @dfn{SVR 4.2 ES/MP STREAMS} facility.  Two
-such facilities are available for Linux:
-
-@enumerate
-@item @dfn{Linux STREAMS} (referred to as LiS), and
-@item @dfn{Linux Fast-STREAMS} (referred to as LfS).
-For additional information on @dfn{Linux Fast-STREAMS}, @xref{Linux Fast-STREAMS (LfS)}.
-@end enumerate
-
-@menu
-* Linux STREAMS (LiS)::
-* Linux Fast-STREAMS (LfS)::
-@end menu
-
-@node Linux STREAMS (LiS)
-@subsection Linux STREAMS (LiS)
-@cindex Linux STREAMS (LiS)
-@cindex LiS
-
-@node Linux Fast-STREAMS (LfS)
-@subsection Linux Fast-STREAMS (LfS)
-@cindex Linux Fast-STREAMS (LfS)
-@cindex LfS
-
+OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize a @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
 @node OpenSS7 SS7 and SIGTRAN Stacks
 @section OpenSS7 SS7 and SIGTRAN Stacks
@@ -1381,6 +1364,39 @@ the signalling gateway.
 @chapter Logistics
 @cindex Logistics
 
+@menu
+* Schedule::
+@end menu
+
+@section Hardware
+
+@subsection Sizing Considerations
+
+@section Software
+
+@section Consulting
+
+@node Schedule
+@section Schedule
+@cindex schedule
+
+@subsection Gate 0 --- Concept
+
+@subsection Gate 1 --- High-Level Design
+
+@subsection Gate 2 --- Detailed Design
+
+@subsection Gate 3 --- Development and Implementation
+
+@subsection Gate 4 --- System Test
+
+@subsection Gate 5 --- Acceptance Testing
+
+@subsection Gate 6 --- Support Complete
+
+@section Cost
+
+
 @node Optional Application Support
 @appendix Optional Application Support
 @cindex Optional Application Support
@@ -1420,6 +1436,24 @@ the signalling gateway.
 @node Platform Sizing
 @appendix Platform Sizing
 @cindex Platform sizing
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+@dfn{Invariant Sections}, no @dfn{Front-Cover Texts} and no @dfn{Back-Cover Texts}.  Please note,
+however, that it is just plain wrong to modify statements of, or attribute statements to, the Author
+or @cite{OpenSS7 Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
 
 @node Indices
 @unnumbered Indices

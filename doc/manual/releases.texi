@@ -62,7 +62,6 @@
 
 This is the OpenSS7 Release of the @value{PACKAGE_TITLE} core, tools, drivers and modules that
 implement the @dfn{@value{PACKAGE_TITLE}} SVR 4.2 MP STREAMS utility for Linux.
-This package is intended as a replacement package for @dfn{Linux STREAMS (LiS)}.
 
 The following sections provide information on @value{PACKAGE_TITLE} releases as well as
 compatibility information of OpenSS7 release to mainstream UNIX releases of the core, modules and
@@ -103,30 +102,12 @@ This section discusses compatibility with major prerequisites.
 * GNU/Linux Distributions::	Compatibility to GNU/Linux Distributions
 * Linux Kernel::		Compatibility to Linux Kernels
 * Linux Architectures::		Compatibility to Linux Architectures
-* Linux STREAMS::		Compatibility to LiS
 * Linux Fast-STREAMS::		Compatibility to LfS
 @end menu
 
 @c ----------------------------------------------------------------------------
 
 @include texi/compat.texi
-
-@node Linux STREAMS
-@subsection Linux STREAMS
-@cindex Linux STREAMS
-
-@dfn{@value{PACKAGE_TITLE}} provides a suitable replacement for the (now deprecated) @dfn{Linux
-STREAMS (LiS) 2.18.0} package formerly maintained by Dave Goethe of @uref{http://www.gcom.com/,GCOM}.
-
-The @cite{@value{PACKAGE_TITLE}} package is currently compatible with
-@cite{Linux STREAMS},@footnote{@cite{Linux STREAMS} is buggy, unsupported and deprecated.  Do not use it.}
-however, to use the @cite{@value{PACKAGE_TITLE}} package with @cite{LiS} requires use of the OpenSS7
-release packages of @cite{LiS}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{LiS-@value{VERSION_LIS}} release that
-is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
-Page}.
-But, do not use @cite{LiS}: it is buggy, unsupported and deprecated.  Use @cite{Linux Fast-STREAMS}
-instead.
 
 @node Linux Fast-STREAMS
 @subsection Linux Fast-STREAMS

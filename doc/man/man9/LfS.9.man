@@ -657,12 +657,15 @@ an existing pipe end
 .\".PP
 .\"
 .\"
-.\".SH CONTEXT
-.\".PP
+.SH CONTEXT
+.PP
+LfS functions can be called from various contexts.  See the paricular manual
+page for more information.
 .\"
 .\"
-.\".SH MP-STREAMS
-.\".PP
+.SH MP-STREAMS
+.PP
+All LfS functions are MP safe.
 .\"
 .\"
 .\".SH NOTICES
@@ -1018,97 +1021,7 @@ drivers and modules.
 .BR timeout (9),
 .BR umount (9),
 .BR unlink (9),
-.BR untimeout (9),
-.BR lis_adjmsg (9),
-.BR lis_allocb (9),
-.BR lis_allocb_physreq (9),
-.BR lis_allocq (9),
-.BR lis_appq (9),
-.BR lis_backq (9),
-.BR lis_bcanput (9),
-.BR lis_bcanputnext (9),
-.BR lis_bcopy (9),
-.BR lis_bufcall (9),
-.BR lis_bzero (9),
-.BR lis_canenable (9),
-.BR lis_canput (9),
-.BR lis_canputnext (9),
-.BR lis_cmn_err (9),
-.BR lis_copyb (9),
-.BR lis_copymsg (9),
-.BR lis_datamsg (9),
-.BR lis_date (9),
-.BR lis_dupb (9),
-.BR lis_dupmsg (9),
-.BR lis_enableok (9),
-.BR lis_esballoc (9),
-.BR lis_esbbcall (9),
-.BR lis_find_strdev (9),
-.BR lis_flushband (9),
-.BR lis_flushq (9),
-.BR lis_freeb (9),
-.BR lis_freemsg (9),
-.BR lis_freeq (9),
-.BR lis_getq (9),
-.BR lis_insq (9),
-.BR lis_isdatablk (9),
-.BR lis_isdatamsg (9),
-.BR lis_linkb (9),
-.BR lis_mknod (9),
-.BR lis_mount (9),
-.BR lis_msgdsize (9),
-.BR lis_msgpullup (9),
-.BR lis_msgsize (9),
-.BR lis_noenable (9),
-.BR lis_OTHER (9),
-.BR lis_OTHERQ (9),
-.BR lis_pullupmsg (9),
-.BR lis_putbq (9),
-.BR lis_putctl1 (9),
-.BR lis_putctl (9),
-.BR lis_putnext (9),
-.BR lis_putnextctl1 (9),
-.BR lis_putnextctl (9),
-.BR lis_putq (9),
-.BR lis_qattach (9),
-.BR lis_qclose (9),
-.BR lis_qdetach (9),
-.BR lis_qenable (9),
-.BR lis_qopen (9),
-.BR lis_qprocsoff (9),
-.BR lis_qprocson (9),
-.BR lis_qreply (9),
-.BR lis_qsize (9),
-.BR lis_RD (9),
-.BR lis_register_strdev (9),
-.BR lis_register_strmod (9),
-.BR lis_rmvb (9),
-.BR lis_rmvq (9),
-.BR lis_safe_canenable (9),
-.BR lis_safe_enableok (9),
-.BR lis_safe_noenable (9),
-.BR lis_safe_OTHERQ (9),
-.BR lis_safe_putnext (9),
-.BR lis_safe_qreply (9),
-.BR lis_safe_RD (9),
-.BR lis_safe_SAMESTR (9),
-.BR lis_safe_WR (9),
-.BR lis_SAMESTR (9),
-.BR lis_strqget (9),
-.BR lis_strqset (9),
-.BR lis_testb (9),
-.BR lis_timeout (9),
-.BR lis_umount2 (9),
-.BR lis_umount (9),
-.BR lis_unbufcall (9),
-.BR lis_unlink (9),
-.BR lis_unlinkb (9),
-.BR lis_unregister_strdev (9),
-.BR lis_unregister_strmod (9),
-.BR lis_untimeout (9),
-.BR lis_version (9),
-.BR lis_WR (9),
-.BR lis_xmsgsize (9).
+.BR untimeout (9).
 .\"
 .\"
 .\".SH BUGS
@@ -1123,8 +1036,13 @@ See
 for additional compatibility information.
 .\"
 .\"
-.\".SH CONFORMANCE
-.\".PP
+.SH CONFORMANCE
+.PP
+SVR 4.2 SPG,
+.[
+svr42spg
+.]
+many others.
 .\"
 .\"
 .SH HISTORY

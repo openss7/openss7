@@ -2073,12 +2073,15 @@ for major device numbers.
 .\".PP
 .\"
 .\"
-.\".SH CONTEXT
-.\".PP
+.SH CONTEXT
+.PP
+SPG functions can be called from various contexts.  See the paricular manual
+page for more information.
 .\"
 .\"
-.\".SH MP-STREAMS
-.\".PP
+.SH MP-STREAMS
+.PP
+All SPG functions are MP safe.
 .\"
 .\"
 .\".SH NOTICES
@@ -2206,12 +2209,109 @@ for major device numbers.
 .PP
 .\"
 .\"
-.\".SH CONFORMANCE
-.\".PP
+.SH CONFORMANCE
+.PP
+SVR 4.2 SPG,
+.[
+svr42spg
+.]
+and many others.
+.[
+uslspg
+.]
+.[
+svr42spg
+.]
+.[
+svr4spg
+.]
+.[
+svr3spg
+.]
+.[
+svr3sp
+.]
+.[
+aixspg
+.]
+.[
+cccsmad
+.]
+.[
+hpuxspg
+.]
+.[
+solspg
+.]
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.[
+uxpspg
+.]
+.[
+vxwspg
+.]
 .\"
 .\"
-.\".SH HISTORY
-.\".PP
+.SH HISTORY
+.PP
+.I STREAMS
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+.\"
+.\"
+.SH VERIONS
+.PP
+This manual page was written for OpenSS7 standard
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.XX
+.[
+uslspg
+.]
+.[
+svr42spg
+.]
+.[
+svr4spg
+.]
+.[
+svr3spg
+.]
+.[
+svr3sp
+.]
+.[
+aixspg
+.]
+.[
+cccsmad
+.]
+.[
+hpuxspg
+.]
+.[
+solspg
+.]
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.[
+uxpspg
+.]
+.[
+vxwspg
+.]
 .\"
 .\"
 .[

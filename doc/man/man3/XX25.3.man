@@ -1722,16 +1722,45 @@ In case of PVC-connection mode,
 dissociates the user from the PVC and normally resets the PVC.
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+The OpenSS7 standard XX25 implementation
+is compatible with XX25,
+.[
+xx25
+.]
+and implementations based on XX25 with the following portability
+considerations:
+.IP \(em w'\(em\(em'u
+.PP
+See
+.BR SX25 (3)
+for additional compatibility information.
 .\"
 .\"
+.SH CONFORMANCE
+.PP
+XX25.
+.[
+xx25
+.]
 .\"
 .\"
+.SH HISTORY
+.PP
+The XX25 implementation for
+.B libxnet
+appeared in
+XX25.
+.[
+xx25
+.]
 .\"
 .\"
-.\"
-.\"
-.\"
-.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 standard version of the XX25
+implementation.
 .\"
 .\"
 .XX

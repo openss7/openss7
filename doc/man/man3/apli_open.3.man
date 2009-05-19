@@ -279,7 +279,7 @@ has no known bugs.
 .BR APLI (3).
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 .BR ap_open ()
 is compatible with APLI,

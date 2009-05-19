@@ -165,8 +165,9 @@ if the two structures are the same and false
 if they are not.
 .\"
 .\"
-.\".SH ERRORS
-.\".PP
+.SH ERRORS
+.PP
+None.
 .\"
 .\"
 .SH FILES

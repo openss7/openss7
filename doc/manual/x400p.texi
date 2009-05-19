@@ -437,17 +437,11 @@ currently available from Varion.
 
 @menu
 * GNU Affero General Public License::	The AGPL license
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
 @end menu
 
 @page
 @include texi/agpl3.texi
-@page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
 @page
 @include texi/fdl13.texi
 

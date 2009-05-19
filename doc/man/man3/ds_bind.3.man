@@ -149,7 +149,7 @@ this session will be returned as private objects in this workspace.  If the
 argument is a private object, it must be a private object in this workspace.
 .\"
 .\"
-.SH RESULTS
+.SH RETURN
 .PP
 .TP
 .I retval

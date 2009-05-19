@@ -221,7 +221,7 @@ has no known bugs.
 .BR APLI (3).
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 .BR ap_close ()
 is compatible with APLI,

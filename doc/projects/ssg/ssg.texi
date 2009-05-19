@@ -1616,37 +1616,7 @@ the Linux 2.4 kernel.
 @section STREAMS Facility
 @cindex STREAMS facility
 
-OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize an @dfn{SVR 4.2 ES/MP STREAMS} facility.  Two
-such facilities are available for Linux:
-@enumerate
-@cindex LiS
-@item @dfn{Linux STREAMS} (referred to as LiS), and
-@item @dfn{Linux Fast-STREAMS} (referred to as LfS).
-For additional information on @dfn{Linux Fast-STREAMS}, @xref{Linux Fast-STREAMS (LfS)}.
-@end enumerate
-
-@menu
-* Linux STREAMS (LiS)::
-@end menu
-
-@node Linux STREAMS (LiS)
-@subsection Linux STREAMS (LiS)
-@cindex Linux STREAMS (LiS)
-@cindex Linux STREAMS (LiS)
-@cindex LiS
-
-@dfn{Linux STREAMS (LiS)}
-@footnote{At the time that this document what written, GCOM had just announced that it is no longer
-supporting the Open Source Linux STREAMS package.  The OpenSS7 Project continues to support our
-autoconf/RPM 2.16.18 releases of LiS until such time that Linux Fast-STREAMS is complete and
-available as a replacement.  The newer 2.18 GCOM releases are not supported.}
-is a mixture of LGPL and GPL code that is available from GCOM.  OpenSS7
-provides stabilized autoconf/RPM releases of LiS on the OpenSS7 Project website.  Current
-recommendations for the use of LiS is the LiS-2.16.18-19 release available from the OpenSS7 Project
-website.  Direct releases from GCOM are not recommended as the OpenSS7 releases have a number of
-patches that correct difficulties with the GCOM releases.  Also, OpenSS7 Project releases of
-LiS-2.16.18-19 include the OpenSS7  X/Open XNS 5.2 compatible XTI Library, timod and tirdwr modules,
-and corrected INET and LDL drivers.
+OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 
 @node OpenSS7 SS7 and SIGTRAN Stack
 @section OpenSS7 SS7 and SIGTRAN Stack
@@ -1694,8 +1664,8 @@ evaluation platform.
 
 The High Performance GSM/UMTS GPRS HLR prototype platform consists of a medium end ix86 single
 processor PC in a hardened 19" rack mount chassis, loaded with WBEL3 Linux running a 2.4.21 kernel,
-@cindex LiS
-LiS 2.16.18-22, the OpenSS7 stack (strss7-0.9.2-1) software and the High Performance GSM/UMTS GPRS
+@cindex Linux Fast-STREAMS
+@value{PACKAGE}-@value{VERSION}, the OpenSS7 stack (strss7-0.9.2-1) software and the High Performance GSM/UMTS GPRS
 HLR application.
 
 SS7 or SIGTRAN signalling links are terminated either on E400P-SS7 cards (or other OpenSS7
@@ -2049,8 +2019,8 @@ WhiteBox EL3 Linux distribution (or equivalent)
 @item
 Linux 2.4.21 kernel (GPL, download)
 @item
-@cindex LiS
-@dfn{Linux STREAMS} (LiS 2.16.18-22 or equivalent, GPL download)
+@cindex Linux Fast-STREAMS
+@dfn{Linux Fast-STREAMS} (@value{PACKAGE}-@value{VERSION} or equivalent, GPL download)
 @item
 OpenSS7 CVS access
 @item
@@ -2620,19 +2590,11 @@ OpenSS7 components and applications support the following additional Linux Distr
 @cindex Linux Fast-STREAMS (LfS)
 
 @dfn{Linux Fast-STREAMS (LfS)} is a dual licensed original work of OpenSS7 Corporation.  It was
-designed an implemented as a directly replacement for LiS (@pxref{Linux STREAMS (LiS)}) for use with
+designed an implemented as a directly replacement for inferior implementations for use with
 OpenSS7 stack releases.  This complete reimplementation of an SVR 4.2 ES/MP compatible @dfn{STREAMS}
 facility exhibits simplified debugging and management, greatly increased performance, smaller memory
-footprint, wider compatibility.  Only alpha and beta release of @dfn{Linux Fast-STREAMS} are
-currently available. Current recommendations are to use the latest LiS (@pxref{Linux STREAMS (LiS)})
-release in preference to LfS until such time as LfS has been deemed production stable.  Because all
-OpenSS7 software beginning with the 0.9.2-1 releases are source level compatible with both
-@dfn{Linux STREAMS} (LiS) and @dfn{Linux Fast-STREAMS} (LfS), a later migration will be smooth.
-Once LfS has been deemed stable, LiS will no longer be supported.
-
-Depending upon timing of the High Performance GSM/UMTS GPRS HLR releases with respect to LfS
-releases, the High Performance GSM/UMTS GPRS HLR is released with the latest stable OpenSS7
-release of either LiS or LfS.
+footprint, wider compatibility.  Production releases of @dfn{Linux Fast-STREAMS} are
+currently available.
 
 @node Optional Hardware Support
 @appendix Optional Hardware Support

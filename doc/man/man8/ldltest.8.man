@@ -421,8 +421,8 @@ test programs are not subject to standardization.
 .SH HISTORY
 .PP
 .B ldltest
-first appeared in
-.IR LiS .
+appeared in
+.IR OpenSS7 .
 .\"
 .\"
 .[

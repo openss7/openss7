@@ -264,7 +264,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Porting from AIXlink/X.25::
 * Porting from HP-UX::
 * Porting from IRIX::
-* Porting from LiS::
 * Porting from OSF::
 * Porting from PowerMAX::
 * Porting from Solaris::
@@ -293,14 +292,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @unnumberedsec Notice
 @cindex manual notice
 @cindex licensing
-
-This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
-@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and
-modules previously part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About
-This Manual, LiS, Linux STREAMS (LiS) Installation and Reference Manual}.}.  In
-stark contrast to many other software packages released by
-@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code
-developed by other parties.
 
 This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU
 Affero General Public License}).  Please note, however, that there are different
@@ -569,7 +560,7 @@ for @dfn{DLPI}.  These manual pages can be explored best by starting with the
 2.0.0 standard behaviour, as well as the @cite{@value{PACKAGE_TITLE}}
 implementations of extension primitives, input-output controls, and features
 documented for other operating systems including @cite{AIX},
-@cite{AIXlink/X.25}, @cite{HP-UX}, @cite{IRIX}, @cite{LiS}, @cite{OSF}, @cite{PowerMAX},
+@cite{AIXlink/X.25}, @cite{HP-UX}, @cite{IRIX}, @cite{OSF}, @cite{PowerMAX},
 @cite{Solaris}, @cite{Solstice X.25}, @cite{SVR 4}, @cite{SVR 4.2MP},
 @cite{UnixWare 7}.  Although each of the @dfn{DLPI} related manual pages of
 supported functions, primitives and structures provide compatibilty and porting
@@ -589,7 +580,7 @@ implementation's portability information.  Porting information is included for
 porting from implementations based on a strict interpretation of the @dfn{DLPI}
 standards, the @cite{AIX} operating system and the @cite{AIXlink/X.25} package,
 the @cite{HP-UX} operating system, the @cite{IRIX} operating system, the
-@cite{LiS} package, the @cite{OSF}, @cite{Digital UNIX}, or @cite{Tru64 UNIX}
+the @cite{OSF}, @cite{Digital UNIX}, or @cite{Tru64 UNIX}
 operating system, the @cite{PowerMAX} operating system, the @cite{Solaris}
 operating system and the @cite{Solstice X.25} or @cite{SunLink X.25} packages,
 the @cite{SVR 4} and @cite{SVR 4.2MP} operating system, and the @cite{UnixWare
@@ -610,7 +601,6 @@ Porting information is organized into sections as follows:
 * Porting from AIXlink/X.25::
 * Porting from HP-UX::
 * Porting from IRIX::
-* Porting from LiS::
 * Porting from OSF::
 * Porting from PowerMAX::
 * Porting from Solaris::
@@ -632,8 +622,6 @@ Porting information is organized into sections as follows:
 @tab Porting HP-UX DLPI applications.
 @item @ref{Porting from IRIX}
 @tab Porting IRIX DLPI applications.
-@item @ref{Porting from LiS}
-@tab Porting LiS DLPI applications.
 @item @ref{Porting from OSF}
 @tab Porting OSF DLPI applications.
 @item @ref{Porting from PowerMAX}
@@ -662,8 +650,6 @@ Porting information is organized into sections as follows:
 @tab Porting HP-UX DLPI applications.
 @item @cite{Porting from IRIX}
 @tab Porting IRIX DLPI applications.
-@item @cite{Porting from LiS}
-@tab Porting LiS DLPI applications.
 @item @cite{Porting from OSF}
 @tab Porting OSF DLPI applications.
 @item @cite{Porting from PowerMAX}
@@ -1043,7 +1029,7 @@ using an input-output control, see @manref{dlpi_ioctl(4)}; @cite{HP-UX} uses a
 specialized @parm{dl_service_mode} setting of
 @pval{DL_HP_RAWDLS}.@footnote{For details on support for @cite{AIX}, see
 @ref{AIX Raw Mode}, and @ref{AIXlink/X.25 Raw Mode}; for @cite{HP-UX}, see
-@ref{HP-UX Raw Mode}; for @cite{LiS}, see @ref{LiS Raw Mode}; for @cite{OSF},
+@ref{HP-UX Raw Mode}; for @cite{OSF},
 see @ref{OSF Raw Mode}; for @cite{PowerMAX}, see @ref{PowerMAX Raw Mode}; for
 @cite{Solaris}, see @ref{Solaris Raw Mode}, and @ref{Solstice X.25 Raw Mode};
 for @cite{SVR4.2}, see @ref{SVR4.2 Raw Mode}; for @cite{UnixWare}, see
@@ -1074,8 +1060,8 @@ the @prim{DL_UNITDATA_IND} and @prim{DL_UNITDATA_REQ} primitives.  Other
 the DLS User to implement the ISO/IEC 8802-2 (IEEE 802.2) LLC Type 2 procedures
 within the DLS User.
 
-Implementations that support an @dfn{LLC2 Mode} are: @cite{LiS},@footnote{See
-@ref{LiS LLC2 Mode}.} @cite{SVR4.2},@footnote{See @ref{SVR4.2 LLC2 Mode}.}
+Implementations that support an @dfn{LLC2 Mode} are:
+@cite{SVR4.2},@footnote{See @ref{SVR4.2 LLC2 Mode}.}
 @cite{UnixWare}.@footnote{See @ref{UnixWare LLC2 Mode}.}
 
 Implementations that provide direct support in the DLPI driver for LLC Type 2
@@ -1151,7 +1137,7 @@ mode DLPI primitives in support of ISO/IEC 8208 (X.25) LAPB devices.  Several
 implementations also provide extension primitives that support specific
 management or extend the features of the DLPI.
 
-@cite{AIX}, @cite{AIXlink/X.25}, @cite{IRIX}, @cite{LiS}, @cite{OSF},
+@cite{AIX}, @cite{AIXlink/X.25}, @cite{IRIX}, @cite{OSF},
 @cite{PowerMAX}, @cite{Solstice X.25} and @cite{SVR4.2} do not document any
 extension primitives for DLPI.
 
@@ -3166,135 +3152,6 @@ See @manref{dlpi_ioctl(4)} for more detail.
 @node IRIX Summary
 @section IRIX Summary
 @cindex IRIX summary
-
-@c ----------------------------------------------------------------------------
-
-@page
-@node Porting from LiS
-@chapter Porting from LiS
-@cindex Porting from LiS
-
-@menu
-* LiS Driver Addressing::
-* LiS Driver Features::
-* LiS Primitives::
-* LiS Input-Output Controls::
-* LiS Drivers and Modules::
-* LiS Libraries::
-* LiS Utilities::
-* LiS Management::
-* LiS Summary::
-@end menu
-
-@node LiS Driver Addressing
-@section LiS Driver Addressing
-@cindex LiS addressing
-
-@menu
-* LiS Driver Naming::
-* LiS PPA Selection::
-* LiS SAP Addressing::
-* LiS Primitive Addresses::
-* LiS Quality of Service Parameters::
-@end menu
-
-@node LiS Driver Naming
-@subsection LiS Driver Naming
-
-@node LiS PPA Selection
-@subsection LiS PPA Selection
-
-@node LiS SAP Addressing
-@subsection LiS SAP Addressing
-
-@node LiS Primitive Addresses
-@subsection LiS Primitive Addresses
-
-@node LiS Quality of Service Parameters
-@subsection LiS Quality of Service Parameters
-
-@node LiS Driver Features
-@section LiS Driver Features
-@cindex LiS features
-
-@menu
-* LiS LAN Operation::
-* LiS WAN Operation::
-* LiS Driver Modes::
-@end menu
-
-@node LiS LAN Operation
-@subsection LiS LAN Operation
-@cindex LiS lan operation
-@cindex lan operation LiS
-
-@subsubsection LiS Ethernet and SNAP Operation
-
-@subsubsection LiS LLC Type 1 Operation
-
-@subsubsection LiS LLC Type 2 Operation
-
-@subsubsection LiS LLC Type 3 Operation
-
-@node LiS WAN Operation
-@subsection LiS WAN Operation
-@cindex LiS wan operation
-@cindex wan operation LiS
-
-@node LiS Driver Modes
-@subsection LiS Driver Modes
-
-@subsubsection LiS Promiscuous Mode
-
-@subsubsection LiS Raw Mode
-@anchor{LiS Raw Mode}
-@cindex raw mode LiS
-@cindex LiS raw mode
-
-@subsubsection LiS LLC2 Mode
-@anchor{LiS LLC2 Mode}
-@cindex llc2 mode LiS
-@cindex LiS llc2 mode
-
-@subsubsection LiS CSMA/CD Mode
-@anchor{LiS CSMA/CD Mode}
-@cindex csma/cd mode
-@cindex csma/cd mode LiS
-@cindex LiS csma/cd mode
-
-@subsubsection LiS Fast Path
-
-@subsubsection LiS Combined Mode
-
-@node LiS Primitives
-@section LiS Primitives
-@cindex LiS primitives
-
-@node LiS Input-Output Controls
-@section LiS Input-Output Controls
-@cindex LiS input-output controls
-
-See @manref{dlpi_ioctl(4)} for more detail.
-
-@node LiS Drivers and Modules
-@section LiS Drivers and Modules
-@cindex LiS drivers and modules
-
-@node LiS Libraries
-@section LiS Libraries
-@cindex LiS libraries
-
-@node LiS Utilities
-@section LiS Utilities
-@cindex LiS utilities
-
-@node LiS Management
-@section LiS Management
-@cindex LiS management
-
-@node LiS Summary
-@section LiS Summary
-@cindex LiS summary
 
 @c ----------------------------------------------------------------------------
 
@@ -5334,23 +5191,16 @@ See @manref{dlpi_ioctl(4)} for more detail.
 @cindex licenses
 
 @menu
-* UNIX International DLPI License::	The UII DLPI license
 * GNU Affero General Public License::	The AGPL license
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
+* UNIX International DLPI License::	The UII DLPI license
 @end menu
 
-@page
-@include texi/uidlpi.texi
-@page
 @include texi/agpl3.texi
 @page
-@include texi/gpl3.texi
-@page
-@include texi/lgpl3.texi
-@page
 @include texi/fdl13.texi
+@page
+@include texi/uidlpi.texi
 
 
 @ifnotplaintext

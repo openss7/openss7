@@ -1,1 +1,0 @@
-.so man3/t_snd.3.man

@@ -459,7 +459,7 @@ primitive descriptions layer in this Corrigendum.
 .IP \(em
 Except for optional parameters interpreted by the CCS provider as specified
 later in this Corrigendum, the optional parameters are treated as opaque and
-the optional parameter lis is only checked for syntax.  Opaque parameters will
+the optional parameter list is only checked for syntax.  Opaque parameters will
 be passed to the H.225 message without examination by the CCS provider.
 .\"
 .\"

@@ -389,11 +389,11 @@ which case the functional units of "X.410-1984" are implied by the mode.
 .TP
 .B AP_AFU_SEL
 The AP_AFU_SEL attribute indicates which optional ACSE functional units have been requested for use
-over the current association.  The attribute is an \fBunsigned long\fP with bit values \fINULL\fP.
-It is readable always and writable in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and
-\fBAP_WASSOCrsp_ASSOCind\fP.  In all other states, the value represents the selected optional ACSE
-functional units for the association.  This attribute is not applicable when AP_MODE_SEL is set to
-AP_X410_MODE, in which case the functional units available to "X.410-1984" is implied by the mode.
+over the current association.
+The attribute is an \fBunsigned long\fP with bit values \fINULL\fP.
+It is readable always and writable in states \fBAP_UNBOUND\fP, \fBAP_IDLE\fP and \fBAP_WASSOCrsp_ASSOCind\fP.
+In all other states, the value represents the selected optional ACSE functional units for the association.
+This attribute is not applicable when AP_MODE_SEL is set to AP_X410_MODE, in which case the functional units available to "X.410-1984" is implied by the mode.
 .TP
 .B AP_CNTX_NAME
 The AP_CNTX_NAME attribute is the application-context-name parameter of the AARQ and AARE APDUs.
@@ -1005,23 +1005,50 @@ This attribute is readable always and writable never.
 .TP
 .B AP_LIB_AVAIL
 The AP_LIB_AVAIL attribute indicates which versions of XAP are available to the user.
+The available library versions.
+Type \fBunsigned long\fP with bit values \fIAP_LIBVER1\fP.
+This attribute is readable always and writable never.
 .TP
 .B AP_LIB_SEL
 The AP_LIB_SEL attribute is used to indicate which version of XAP is used. This attribute must be
 set before any other attributes are set or any primitives are issued.
+The selected library version.
+Type \fBunsigned long\fP with bit values \fIAP_LIBVER1\fP and default none.
+This attribute is readable always and writable only in state \fBAP_UNBOUND\fP.
 .TP
 .B AP_OPT_AVAIL
 The AP_OPT_AVAIL attribute is used to indicate what optional functionality is supported in the
 underlying protocol implementation. AP_XXXX_WILD indicates whether address wildcarding is supported
 at the specified level. (XXXX can be NSAP, TSEL, SSEL or PSEL.) 
+.RS
+.TP \w'\fIAP_NSAP_WILD\fP\(em'u
+.I AP_NSAP_WILD
+NSAP can be wildcarded.
+.PD 0
+.TP
+.I AP_TSEL_WILD
+TSEL can be wildcarded.
+.TP
+.I AP_SSEL_WILD
+SSEL can be wildcarded.
+.TP
+.I AP_PSEL_WILD
+PSEL can be wildcarded.
+.PD
+.PP
+The available options.
+Type \fBunsigned long\fP with bit values \fIAP_NSAP_WILD\fP, \fIAP_TSEL_WILD\fP, \fIAP_SSEL_WILD\fP and \fIAP_PSEL_WILD\fP.
+This attribute is readable always and writable never.
+.RE
 .TP
 .B AP_QLEN
-The \fBAP_QLEN\fP attribute is used to indicate the number of connection indications that will be
-held by the provider when all of the connection endpoints bound for listening at \fBAP_BIND_PADDR\fP
-are in use.  The user can set this attribute to request a specific queue size. The provider may
-change the value if it cannot support the requested queue size or if another process bound to the
-same address has already requested a larger queue. The user can determine the current queue size by
-examining the value of \fBAP_QLEN\fI using \fBap_get_env\fP(3).
+The AP_QLEN attribute is used to indicate the number of connection indications that will be held by
+the provider when all of the connection endpoints bound for listening at AP_BIND_PADDR are in use.
+The user can set this attribute to request a specific queue size. The provider may change the value
+if it cannot support the requested queue size or if another process bound to the same address has
+already requested a larger queue. The user can determine the current queue size by examining the
+value of AP_QLEN using
+.BR ap_get_env ().
 .RS
 .PP
 The association indication queue length.
@@ -1056,6 +1083,7 @@ The additional diagnostic information.
 Type \fBap_diag_t\fP.
 This attribute is readable always and writable never.
 .RE
+.\"
 .\"
 .SH "RETURN VALUE"
 .PP

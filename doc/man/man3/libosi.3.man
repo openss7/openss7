@@ -164,6 +164,12 @@ write a TSAP into a \fBnetbuf\fP(3) structure
 .PD
 .\"
 .\"
+.SH OVERVIEW
+.PP
+.B libosi
+is an Open Systems Interconnect (OSI) application library for OpenSS7.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 The

@@ -272,6 +272,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Optional Hardware Support::
 * Programmatic Interfaces::
 * Platform Sizing::
+* Licences::
 * Index::
 @end menu
 
@@ -485,6 +486,7 @@ This document is organized as follows:
 * Optional Hardware Support::
 * Programmatic Interfaces::
 * Platform Sizing::
+* Licences::
 * Index::
 @end menu
 @end ifnottex
@@ -2220,29 +2222,6 @@ Although OpenSS7 @dfn{STREAMS} SS7 and VoIP stacks are tested primarily on ix86 
 stacks compile and install on PPC (MPC 8260), HPPA, and other processor architectures supported by
 the Linux 2.4 kernel.
 
-@menu
-* Linux STREAMS (LiS)::
-@end menu
-
-@node Linux STREAMS (LiS)
-@subsection Linux STREAMS (LiS)
-@cindex Linux STREAMS (LiS)
-@cindex Linux STREAMS (LiS)
-@cindex LiS
-
-@dfn{Linux STREAMS (LiS)}
-@footnote{At the time that this document what written, GCOM had just announced that it is no longer
-supporting the Open Source Linux STREAMS package.  The OpenSS7 Project continues to support our
-autoconf/RPM 2.16.18 releases of LiS until such time that Linux Fast-STREAMS is complete and
-available as a replacement.  The newer 2.18 GCOM releases are not supported.}
-is a mixture of LGPL and GPL code that is available from GCOM.  OpenSS7
-provides stabilized autoconf/RPM releases of LiS on the OpenSS7 Project website.  Current
-recommendations for the use of LiS is the LiS-2.16.18-19 release available from the OpenSS7 Project
-website.  Direct releases from GCOM are not recommended as the OpenSS7 releases have a number of
-patches that correct difficulties with the GCOM releases.  Also, OpenSS7 Project releases of
-LiS-2.16.18-19 include the OpenSS7  X/Open XNS 5.2 compatible XTI Library, timod and tirdwr modules,
-and corrected INET and LDL drivers.
-
 @node OpenSS7 SS7 and VoIP Stack
 @section OpenSS7 SS7 and VoIP Stack
 @cindex OpenSS7 SS7 and VoIP stack
@@ -2287,11 +2266,11 @@ evaluation platform.
 @figuresized{platconf,23,Platform Architecture,5in}
 
 The VoIP Switch prototype platform consists of a high-end ix86 single or multi processor PC loaded
-with Linux running a 2.4 production kernel, LiS 2.16.18-22 and the OpenSS7 stack software.
+with Linux running a 2.4 production kernel, @value{PACKAGE}-@value{VERSION} and the OpenSS7 stack software.
 
 As a highly scalable and carrier grade alternative, the prototype system could use the CompactPCI
 cards running embedded Linux on MPC8260 and performing backplane switching on H.100 and Ethernet
-rails on PCIMG 2.16 packet bus loaded with Linux, LiS 2.16.18-22 and the OpenSS7 stack software.
+rails on PCIMG 2.16 packet bus loaded with Linux, @value{PACKAGE}-@value{VERSION} and the OpenSS7 stack software.
 
 SS7 ISUP IMTs and signalling links are terminated on the telephone network side of the device on one
 of a number of TE410 cards installed in either platform.  On the other side of the platform, RTP
@@ -2976,6 +2955,24 @@ Following are the disadvantages of the BRI cards:
 @node Platform Sizing
 @appendix Platform Sizing
 @cindex Platform sizing
+
+@node Licenses
+@unnumbered Licenses
+
+All code presented in this manual is licensed under the @ref{GNU Affero General Public License}.
+The text of this manual is licensed under the @ref{GNU Free Documentation License}, with no
+@dfn{Invariant Sections}, no @dfn{Front-Cover Texts} and no @dfn{Back-Cover Texts}.  Please note,
+however, that it is just plain wrong to modify statements of, or attribute statements to, the Author
+or @cite{OpenSS7 Corporation}.
+
+@menu
+* GNU Affero General Public License::
+* GNU Free Documentation License::
+@end menu
+
+@include texi/agpl3.texi
+@page
+@include texi/fdl13.texi
 
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)

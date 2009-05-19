@@ -159,6 +159,14 @@ use, for example, with windowing programs.
 The address of the previous error function is returned.
 .\"
 .\"
+.SH ERRORS
+.PP
+When
+.BR x25_set_parse_error_function ()
+encounters an error, it returns
+.BR NULL .
+.\"
+.\"
 .SH FILES
 .PP
 .TP

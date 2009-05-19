@@ -532,7 +532,7 @@ Without their support, open software like this would not be possible.
 @section Authors
 @cindex authors
 
-The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+The authors of the @cite{@value{PACKAGE_TITLE}} package include:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -545,7 +545,7 @@ sections of this manual.
 @section Maintainer
 @cindex maintainer
 
-The maintainer of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+The maintainer of the @cite{@value{PACKAGE_TITLE}} package is:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
@@ -613,10 +613,6 @@ The @value{PACKAGE_TITLE} package is
 a STREAMS ATM Networking (ATM) package for Linux
 that can be used with
 @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
-@ignore
-or
-@cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
-@end ignore
 It includes development tools, header files and manual pages for
 @value{PACKAGE_TITLE}.
 
@@ -714,25 +710,10 @@ that the protocol layer cannot actually be stacked in the same fashion as is pos
 the Linux @type{sk_buff} was crude and did not have the capabilities of the BSD @type{mbuf}.  These
 and other difficulties led the project, in 2001, to pursue the STREAMS approach to networking.
 
-At the time (in 2000), there was an implementation for STREAMS for Linux, called Linux STREAMS, or
-@cite{LiS} for short.  The OpenSS7 Project worked extensively with enhancing the @cite{LiS} package
-for use with SS7 and SIGTRAN protocols.  The versions of @cite{LiS} that were available for the
-Linux 2.2 series kernels available at the time were quite stable.@footnote{Linux 2.2 series kernels
-did @emph{not} support symmetrical multi-processing (SMP) making it similar to SVR 4.0.}  The
-versions of @cite{LiS} that were available for the Linux 2.4 series kernels attempted to support SMP
-using the same SVR 4.0-like STREAMS model.  These versions of @cite{LiS} were incredibly difficult
-to stabilize on Linux 2.4 series kernels.  Much of the problems with @cite{LiS} appeared to be
-related to a poor coding style, and the attempt to maintain portability to systems other than Linux
-(even though it appears that ports were not even popular) resulting in obfuscation of the code.
-
-Therefore, in 2003, the OpenSS7 Project decided to replace @cite{LiS} with a completely new
+In 2003, the OpenSS7 Project decided to begin a completely new
 implementation of STREAMS for Linux based, on SVR 4.2 documentation, called @cite{Linux
-Fast-STREAMS}, or @cite{LfS}.  The OpenSS7 Project also decided to support a fork of @cite{LiS} in
-the meantime to developing @cite{Linux Fast-STREAMS} to production grade.  The project maintained a
-fork of @cite{LiS-2.16} for the Linux 2.4 kernel series, and later a fork of @cite{LiS-2.18} for the
-Linux 2.6 kernel series.  The development of @cite{Linux Fast-STREAMS} culminated with the first
-production grade release for Linux 2.4 and 2.6 kernel services at the beginning of 2006, after which
-the OpenSS7 forks of @cite{LiS} were completely deprecated.
+Fast-STREAMS}, or @cite{LfS}.  The development of @cite{Linux Fast-STREAMS} culminated with the first
+production grade release for Linux 2.4 and 2.6 kernel services at the beginning of 2006.
 
 Beginning in 2001, the OpenSS7 Project has developed STREAMS components over a wide range of
 applications, not just SS7.  These components are divided into groups of components that were
@@ -754,20 +735,9 @@ currently very mature and provides a simple way for users of the OpenSS7 compone
 and install all available OpenSS7 Project components without concern or consideration for intricate
 dependencies between components.
 
-Because OpenSS7 components first built with @dfn{Linux STREAMS (LiS)} but now builds with the superior
-@dfn{Linux Fast-STREAMS (LfS)}, the master package had the objective from the onset of being able to
-build all OpenSS7 packages against either @dfn{LiS} or @dfn{LfS} or both.  This was the case from
-@dfn{LiS} version @emph{2.18.1} through @emph{2.18.3} and @dfn{streams} version @emph{0.7a.3}
-through @emph{0.7a.5}, or master package releases @emph{0.9.2.A} through @emph{0.9.2.C}.  With the
-release of master package @emph{0.9.2.D} containing @dfn{streams} @emph{0.9.2.1}, @dfn{LiS} was no
-longer supported in the master package.  @dfn{LiS} @emph{2.18.3} was the final public release of
-@dfn{LiS} from the OpenSS7 Project.@footnote{Additional internal releases up to @emph{2.18.7} are
-available on the CVS archive.}
-
-Because @dfn{LiS} is now completely deprecated, and sub-packages forks such as @file{iperf} and
-@file{netperf} have outlived their usefulness, a new package was generated that collapsed all of the
-former subpackages, including STREAMS, into a single release package containing all OpenSS7
-components.
+Because sub-packages forks such as @file{iperf} and @file{netperf} have outlived their usefulness, a
+new package was generated that collapsed all of the former subpackages, including STREAMS, into a
+single release package containing all OpenSS7 components.
 
 Whereas in the old master package, protocol components and suites were organized by subpackage,
 components in the @value{PACKAGE_TITLE} package are now organized by protocol suite and application.
@@ -789,7 +759,7 @@ The last subpackage release was
 
 @item strutil-@value{VERSION_STRUTIL}
 The @file{strutil} package was a package that provided utilities that were
-missing in @cite{LiS}, but which were incoporporated into @cite{Linux
+missing in other implementations, but which were incoporporated into @cite{Linux
 Fast-STREAMS}.  All components are represented in the
 @file{openss7-@value{VERSION}} release.
 The last subpackage release was
@@ -798,7 +768,7 @@ The last subpackage release was
 @item strcompat-@value{VERSION_STRCOMPAT}
 All @cite{STREAMS Compatibility Module} components have been incorporated into
 the @file{openss7-@value{VERSION}} release with the exception of the
-@cite{LiS} compatibility modules, which have been discarded.  All @cite{STREAMS}
+deprecated compatibility modules, which have been discarded.  All @cite{STREAMS}
 compatibility modules now load as part of the @cite{STREAMS} base subsystem.
 The last subpackage release was
 @command{strcompat-@value{VERSION_STRCOMPAT}}.

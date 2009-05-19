@@ -275,55 +275,6 @@ The default is to include the
 @cite{Dialogic Open System Release 6.1} (@command{osr61-@value{VERSION_OSR}})
 add-on package in the build.
 
-@item --with-LIS
-@opindex LIS
-
-When enabled, includes the @command{LiS-@value{VERSION_LIS}} add-on package in the build.
-Because the @command{LiS} add-on package is no longer distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}})
-add-on package from the build.
-
-@item --with-lis[=LIS-DIR]
-@itemx --without-lis
-@opindex lis
-
-Specify the @samp{LIS-DIR} directory in which to find @cite{LiS} headers.  Also specifies that the
-build is to be made against @cite{Linux STREAMS}.  The default is the include directory of the
-add-on @cite{LiS} package, or the directory @file{/usr/@-include/@-LiS} if it exists, @samp{no}
-otherwise.  This directory is normally located by the @command{configure} script and need only be
-provided for special cross-build environments or when requested by a @command{configure} script
-error message.  This option has no effect on add-on packages that do not use the @dfn{STREAMS}
-subsystem.
-
-When enabled, @dfn{STREAMS} add-on packages will also have RedHat RPMs or Debian DEBs built for the
-@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}) @dfn{STREAMS} package.  @samp{--with-LIS}
-must also be specified.  The default is to not build RPMs nor DEBs for @cite{LiS} version of the
-add-on @dfn{STREAMS} packages.  As @cite{LiS} is deprecated and no longer included in the
-distribution, this option is only useful for CVS downloads.
-
-@item --without-lfs
-@itemx --with-lfs[=LFS-DIR]
-@opindex lfs
-
-Specify the @samp{LFS-DIR} directory in which to find @cite{LfS} headers.  Also specifies that the
-build is to be made against @cite{Linux Fast-STREAMS}.  The default is the include directory of the
-add-on @cite{LfS} package, or the directory @file{/usr/@-include/@-streams} if it exists, @samp{no}
-otherwise.  This directory is normally located by the @command{configure} script and need only be
-provided for special cross-build environments or when requested by a @command{configure} script
-error message.  This option has no effect on add-on packages that do not use the @dfn{STREAMS}
-subsystem.
-
-When disabled, @dfn{STREAMS} add-on packages will not have RedHat RPMS nor Debian DEBs built for the
-@cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) package.
-@samp{--without-STREAMS} may also be specified.  The default is to build RPMs nor DEBs for
-@cite{Linux Fast-STREAMS} version of the add-on @dfn{STREAMS} packages.  As @cite{LiS} is deprecated
-and no longer included in the distribution, and this option is only useful for suppressing
-@cite{Linux Fast-STREAMS} builds in favour of @cite{LiS}, this option is only useful for CVS
-downloads or where the @command{streams} package has otherwise already been installed on the target
-system.
-
 @end table
 
 Additional options specified to an add-on package may also be specified on the @command{configure}

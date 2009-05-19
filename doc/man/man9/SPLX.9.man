@@ -108,7 +108,7 @@ search-ignore T
 .\"
 .\"
 .SH NAME
-.B SPLX, lis_splx, lis_slpx_fcn
+.B SPLX
 \- set priority level zero (0)
 .\"
 .\"
@@ -117,10 +117,6 @@ search-ignore T
 .B #include <sys/stream.h>
 .HP
 .BI "SPLX(pl_t " pl ");"
-.HP
-.BI "lis_splx(pl_t " pl ");"
-.HP
-.BI "void lis_splx_fcn(pl_t " pl ", char *" file ", int " line ");
 .\"
 .\"
 .SH ARGUMENTS

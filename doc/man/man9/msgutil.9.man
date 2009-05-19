@@ -146,9 +146,16 @@ search-ignore T
 .PD
 .\"
 .\"
+.SH OVERVIEW
+.PP
+This man page describes a number of
+.I STREAMS
+message utility functions.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-This man page describes the
+This man page describes the following
 .I STREAMS
 message utility functions.
 .TP
