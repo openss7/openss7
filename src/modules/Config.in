@@ -81,7 +81,7 @@ module	ch-sdl	    ch_sdl
 module	cmot	    cmot
 module	dlaix	    dlaix
 module	hdlc	    hdlc
-module	ip_strms    ip_to_streams
+#module	ip_strms    ip_to_streams
 module	isot	    isot
 module	itot	    itot
 module	ldterm	    ldterm
@@ -153,7 +153,7 @@ objname	module	ch-sdl	    ch_x400p
 objname	module	cmot	    cmot
 objname	module	dlaix	    dlaix
 objname	module	hdlc	    hdlc
-objname	module	ip_strms    ip_strm_mod
+#objname	module	ip_strms    ip_strm_mod
 objname	module	isot	    isot
 objname	module	itot	    itot
 objname	module	ldterm	    ldterm
@@ -231,7 +231,7 @@ loadable	ch-pmod
 loadable	cmot
 loadable	dlaix
 #loadable	hdlc
-loadable	ip_strm_mod
+#loadable	ip_strm_mod
 loadable	isot
 loadable	itot
 loadable	ldterm

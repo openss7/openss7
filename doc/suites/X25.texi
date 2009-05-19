@@ -315,7 +315,7 @@ components as well as providing a basis for @value{PART} control for other @valu
 @cpindex STREAMS
 
 The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
-This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+This document is intended to be included with the OpenSS7 @acronym{STREAMS} software package released
 by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
 of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
 that are made available in the software package.
@@ -413,7 +413,186 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 @node Drivers and Modules
 @chapter Drivers and Modules
 
+@menu
+* Drivers::
+* Modules::
+* Interfaces::
+@end menu
+
+The X.25 Protocol Suite provides services using a number of @acronym{STREAMS} drivers and modules in
+addition to user-space libraries and applications.  @cite{OpenSS7} provides a range of
+@acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and pushable modules that complement
+the X.25 Packet Layer Protocol (PLP) driver that provides the primary X.25 network facilities.
+
+@figref{1} illustrates the @acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and
+pushable modules, and their organization.
+
 @figuresized{x2501,1,X.25 Drivers and Modules,5.0in}
+
+@node Drivers
+@section Drivers
+
+@subsection IP Multiplexing Driver
+
+@subsection IXE Multiplexing Driver
+
+The @dfn{IXE Multiplexing Driver} (@manref{ixe(4)}) provides @acronym{IP} over @acronym{X.25}
+encapsulation in accordance with @ref{X.37,,X.37}.
+
+@subsection NLI Multiplexing Driver
+
+@subsection MAC Pseudo-Device Driver
+
+@subsection WAN Pseudo-Device Driver
+
+@subsection PHYS Multiplexing Driver
+
+@node Modules
+@section Modules
+
+@subsection CONS Module
+
+@subsection LLC Module
+
+@subsection LAPB Module
+
+@subsection Conversion Modules
+
+A set of interface conversion modules are provided with the @cite{OpenSS7 @value{LONG}} that are
+implemented as @acronym{STREAMS} pushbaled modules and peform conversion between two interfaces: one
+at the @acronym{STREAMS} module's upper service interface and another at the module's lower service
+interface.  These can be summarized as follows:
+
+@multitable @columnfractions .34 .23 .23 .20
+@item @b{Name}
+@tab @b{Lower Service I/f}
+@tab @b{Upper Service I/f}
+@tab @b{Manual Page}
+@item XX25 Conversion Module
+@tab NPI Revision 2.0.0
+@tab TPI Revision 2.0.0
+@tab @manref{s_xx25(4)}
+@item NLI3 Conversion Module
+@tab NLI Version 3
+@tab NLI Version 1 or 2
+@tab @manref{s_nli3(4)}
+@item NLI Conversion Module
+@tab NPI Revision 2.0.0
+@tab NLI Version 3
+@tab @manref{s_nli(4)}
+@item LLI Conversion Module
+@tab DLPI Revision 2.0.0
+@tab LLI Version 3
+@tab @manref{s_lli(4)}
+@item WAN Conversion Module
+@tab CDI Revision 2.0.0
+@tab WAN Version 3
+@tab @manref{s_wan(4)}
+@item NPI Conversion Module
+@tab NLI Version 3
+@tab NPI Revision 2.0.0
+@tab @manref{s_npi(4)}
+@item DLPI Conversion Module
+@tab LLI Version 3
+@tab DLPI Revision 2.0.0
+@tab @manref{s_dlpi(4)}
+@item CDI Conversion Module
+@tab WAN Version 3
+@tab CDI Revision @value{PACKAGE_VERSION}.@value{PACKAGE_RELEASE}
+@tab @manref{s_cdi(4)}
+@end multitable
+
+@subsection XX25 Conversion Module
+
+The @dfn{XX25 Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_xx25(4)}) that
+converts between an @cite{OpenSS7} standard @acronym{NPI} interface at the lower service boundary
+and an @cite{OpenSS7} standard @acronym{TPI} interface at the upper service boudnary in support of
+the use of the XTI/TLI Library to provide @acronym{XX25} access to applications programs.
+
+The purpose of this module is to support the XTI/TLI Library and XX25 specification on driver
+Streams that only support the @cite{OpenSS7} standard @acronym{NPI} Revision 2.0.0 interface as
+applied to X.25 (CONS).
+
+@subsubsection NLI3 Convertion Module
+
+The @dfn{NLI3 Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_nli3(4)}) that
+converts between an @cite{OpenSS7} standard @acronym{NLI} Version 3 interface at its lower service
+boundary and an @cite{OpenSS7} standard @acronym{NLI} Version 1 or 2 interface at its upper service
+boundary.
+
+The purpose of the @dfn{NLI3 Conversion Module} is to extend @cite{OpenSS7} standard @acronym{NLI}
+Version 1 or 2 support from a driver Stream supporting only @cite{OpenSS7} standard @acronym{NLI}
+Version 3.
+
+@subsubsection NLI Conversion Module
+
+The @dfn{NLI Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_nli(4)}) that
+converts between an @cite{OpenSS7} standard @acronym{NPI} interface at its lower service boundary
+and an @cite{OpenSS7} standard @acronym{NLI} Version 3 interface at its upper service boundary.
+
+The purpose of the @dfn{NLI Conversion Module} is to extend @cite{OpenSS7} standard @acronym{NLI}
+Version 3 support to a driver Stream supporting only @acronym{NPI}.
+
+@subsubsection LLI Conversion Module
+
+The @dfn{LLI Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_lli(4)}) that
+converts between a @acronym{DLPI} interface at its lower service boundary and a @acronym{LLI}
+interface at its upper service boundary.
+
+@subsubsection WAN Conversion Module
+
+The @dfn{WAN Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_wan(4)}) that
+converts between a @acronym{CDI} interface at its lower service boundary and a @acronym{WAN}
+interface at its upper service boundary.
+
+@subsubsection NPI Conversion Module
+
+The @dfn{NPI Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_npi(4)}) that
+converts between a @acronym{NLI} interface at its lower service boundary and a @acronym{NPI}
+interface at its upper service boundary.
+
+@subsubsection DLPI Conversion Module
+
+The @dfn{DLPI Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_dlpi(4)}) that
+converts between a @acronym{LLI} interface at its lower service boundary and a @acronym{DLPI}
+interface at its upper service boundary.
+
+@subsubsection CDI Conversion Module
+
+The @dfn{CDI Conversion Module} is a @acronym{STREAMS} pushable module (@manref{s_cdi(4)}) that
+converts between a @acronym{WAN} interface at its lower service boundary and a @acronym{CDI}
+interface at its upper service boundary.
+
+@node Interfaces
+@section Interfaces
+
+The X.25 Protocol Suite utilizes the interfaces described below:
+
+@subsection Link Layer Interfaces
+
+@subsubsection LAPB Interface
+
+@subsubsection MLP Interface
+
+@subsubsection WAN Interface
+
+@subsubsection LLC Interface
+
+@subsubsection MAC Interface
+
+@subsubsection Data Link Provider Interface (DLPI)
+
+@subsection Network Layer Interfaces
+
+@subsubsection Network Layer Interface (NLI)
+
+@subsubsection Network Provider Interface (NPI)
+
+@subsection Transport Layer Interfaces
+
+@subsubsection Transport Layer Interface (TLI)
+
+@subsubsection Transport Provider Interface (TPI)
 
 @node Libraries
 @chapter Libraries
@@ -613,6 +792,12 @@ Circuit-terminating Equiment (DCE) for synchronous operation on Public Data
 Networks}, September 1992, (Geneva), ITU, ITU-T Telecommunication
 Standardization Sector of ITU.  (Previously ``CCITT Recommendation''),
 @url{http://www.itu.int/rec/T-REC-X.21/en/, T-REC-X.21}.
+
+@item [X.37] @anchor{X.37} @tab @b{ITU-T Recommendation X.37 (04/95)},
+@cite{Encapsulation in X.25 Packets of Various Protocols Including Frame Relay},
+April 1995, (Geneva), ITU, ITU-T Telecommunications Standardization Sector of
+ITU, (Previously ``CCITT Recommendation''),
+@url{http://www.itu.int/rec/T-REC-X.37/en/, T-REC-X.37}.
 
 @item [X.21 bis] @anchor{X.21 bis} @tab @b{ITU-T Recommendation X.21 bis (03/88)},
 @cite{Use on Public Data Networks of Data Terminal Equipment (DTE) which is

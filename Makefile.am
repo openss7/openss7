@@ -348,7 +348,6 @@ libOS7modules_a_SOURCES		= src/modules/pckt.c \
 				  src/modules/ttcompat.c \
 				  src/modules/ldterm.c \
 				  src/modules/debug.h \
-				  src/modules/ip_strm_mod.c src/modules/ip_strm_mod.h \
 				  src/modules/sockmod.c \
 				  src/modules/tpiperf.c \
 				  src/modules/ch_pmod.c \
