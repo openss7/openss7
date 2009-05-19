@@ -773,8 +773,6 @@ openss7_man_MANS = \
 	man4/ipcl.4 \
 	man4/ipco.4 \
 	man4/ipip.4 \
-	man4/ip_strm.4 \
-	man4/ip_strm_mod.4 \
 	man4/ip_to_dlpi.4 \
 	man4/ipx25.4 \
 	man4/ISDN.4 \
@@ -3439,13 +3437,8 @@ openss7_man_MANS = \
 	man9/makedevice.9 \
 	man9/malloc.9 \
 	man9/map_cv.9 \
-	man9/mapfree.9 \
 	man9/mapinit.9 \
 	man9/maplock.9 \
-	man9/mapname.9 \
-	man9/mapsize.9 \
-	man9/mapstart.9 \
-	man9/mapwant.9 \
 	man9/max.9 \
 	man9/M_BACKDONE.9 \
 	man9/M_BACKWASH.9 \
@@ -4711,8 +4704,6 @@ openss7_dist_noinst_MANS = \
 	man4/ipcl.4.man \
 	man4/ipco.4.man \
 	man4/ipip.4.man \
-	man4/ip_strm.4.man \
-	man4/ip_strm_mod.4.man \
 	man4/ip_to_dlpi.4.man \
 	man4/ipx25.4.man \
 	man4/ISDN.4.man \
@@ -7377,13 +7368,8 @@ openss7_dist_noinst_MANS = \
 	man9/makedevice.9.man \
 	man9/malloc.9.man \
 	man9/map_cv.9.man \
-	man9/mapfree.9.man \
 	man9/mapinit.9.man \
 	man9/maplock.9.man \
-	man9/mapname.9.man \
-	man9/mapsize.9.man \
-	man9/mapstart.9.man \
-	man9/mapwant.9.man \
 	man9/max.9.man \
 	man9/M_BACKDONE.9.man \
 	man9/M_BACKWASH.9.man \
@@ -8123,7 +8109,6 @@ MANS_UNUSED = \
 	man4/idlc.4 \
 	man4/ifnet.4 \
 	man4/ifr.4 \
-	man4/ip_strm.4 \
 	man4/ipx25.4 \
 	man4/isdn_ioctl.4 \
 	man4/ISO.4 \
@@ -8602,13 +8587,8 @@ MANS_UNUSED = \
 	man9/makedev.9 \
 	man9/malloc.9 \
 	man9/map_cv.9 \
-	man9/mapfree.9 \
 	man9/mapinit.9 \
 	man9/maplock.9 \
-	man9/mapname.9 \
-	man9/mapsize.9 \
-	man9/mapstart.9 \
-	man9/mapwant.9 \
 	man9/mdbblock_alloc.9 \
 	man9/mdbblock_free.9 \
 	man9/mfree.9 \
@@ -8693,9 +8673,9 @@ MANS_UNUSED = \
 	man9/vtop.9
 
 MANS_EXEMPT = \
-	man8/openss7.8.man \
-	man8/specfs.8.man \
-	man8/streams.8.man
+	man8/openss7.8 \
+	man8/specfs.8 \
+	man8/streams.8
 
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE
