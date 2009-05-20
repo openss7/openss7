@@ -201,8 +201,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (2|2.?)	rpm_cv_dist_extra=".EL"		;;
 			    (3|3.?)	rpm_cv_dist_extra=".E3"		;;
 			    (4|4.?)	rpm_cv_dist_extra=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra=".EL5"	;;
-			    (*)		rpm_cv_dist_extra2=".EL${dist_cv_host_release}" ;;
+			    (5|5.?)	rpm_cv_dist_extra=".el5"	;;
+			    (*)		rpm_cv_dist_extra2=".el${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (mandrake)
@@ -241,7 +241,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
 			    (*)		rpm_cv_dist_extra2=".COS${dist_cv_host_release}" ;;
 			esac
 			;;
@@ -249,7 +249,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
 			    (*)		rpm_cv_dist_extra2=".LEL${dist_cv_host_release}" ;;
 			esac
 			;;
@@ -257,7 +257,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
 			    (*)		rpm_cv_dist_extra2=".WB${dist_cv_host_release}" ;;
 			esac
 			;;
@@ -283,8 +283,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (2|2.?)	rpm_cv_dist_extra2=".EL"	;;
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
-			    (*)		rpm_cv_dist_extra2=".RH${dist_cv_host_release}" ;;
+			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
+			    (*)		rpm_cv_dist_extra2=".rh${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (mandrake)

@@ -2803,6 +2803,9 @@ include am/archive.am
 ##
 ## Rules for making rpms
 ##
+export RPMXOPTS="--nodeps"
+export DEBXOPTS="-d"
+
 AM_RPMFLAGS			= --define "_kversion $(kversion)"
 AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 

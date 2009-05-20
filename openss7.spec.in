@@ -51,12 +51,16 @@
 #
 # =============================================================================
 
+# Note: we have way too many devices to make traditional device nodes
+# any more, so these are commented out.  Only the traditional UNIX ABI
+# inet devices are created.  Use the /dev/streams directory for the rest.
+
 %global majbase     @STRCONF_MAJBASE@
-%global makedev     @STRCONF_MAKEDEV@
-#global mknods      /usr/sbin/inet_mkdev    # inet style install
-#global rmnods      /usr/sbin/inet_rmdev    # inet style removal
-%global mknods      /usr/sbin/@STRMAKENODES@
-%global rmnods      /usr/sbin/@STRMAKENODES@ --remove
+#global makedev     @STRCONF_MAKEDEV@
+%global mknods      /usr/sbin/inet_mkdev    # inet style install
+%global rmnods      /usr/sbin/inet_rmdev    # inet style removal
+#global mknods      /usr/sbin/@STRMAKENODES@
+#global rmnods      /usr/sbin/@STRMAKENODES@ --remove
 %global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
@@ -81,7 +85,7 @@
 %global sendpr      %{nil}
 %global mibfiles    *.mib
 %global snmpmods    strMIB
-%global gdmos       %{nil}
+#global gdmos       %{nil}
 %global netconfig   %{base}
 %global sock2path   %{base}
 %global manual      doc/manual
@@ -2451,7 +2455,7 @@ tarball or source rpm release.
 %endif
 
 # ===========================================================================
-%package -n %{_kversion}
+%package -n %{name}-%{_kversion}
 
 Summary:        %{title} kernel modules.
 Group:          System Environment/Kernel
@@ -2505,7 +2509,7 @@ Provides:       %{_kversion} = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n %{_kversion}
+%description -n %{name}-%{_kversion}
 %{descripline}
 The %{_kversion} binary package contains
 the kernel modules that provide the Linux kernel
@@ -2522,7 +2526,7 @@ matches your kernel, rebuild from the source rpm.
 %{descriptail}
 
 %if %{HAVE_modules}
-%pre -n %{_kversion}
+%pre -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
 arg="$1"
 function remove_depmods() {
@@ -2623,7 +2627,7 @@ fi
 %endif
 
 %if %{HAVE_modules}
-%post -n %{_kversion}
+%post -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -2647,7 +2651,7 @@ fi
 %endif
 
 %if %{HAVE_modules}
-%preun -n %{_kversion}
+%preun -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -2697,7 +2701,7 @@ fi
 %endif
 
 %if %{HAVE_modules}
-%postun -n %{_kversion}
+%postun -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
@@ -2759,7 +2763,7 @@ fi
 %endif
 
 %if %{PACKAGE_kmod}
-%files -n %{_kversion}
+%files -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%dir %{_kmoduledir}/%{base}}
@@ -2769,7 +2773,7 @@ fi
 %endif
 
 # ===========================================================================
-%package -n devel-%{_kversion}
+%package -n %{name}-devel-%{_kversion}
 
 Summary:        %{title} kernel module symbol versions and debug info.
 Group:          Development/Kernel
@@ -2822,7 +2826,7 @@ Provides:       devel-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n devel-%{_kversion}
+%description -n %{name}-devel-%{_kversion}
 %{descripline}
 The devel-%{_kversion} binary package
 contains the kernel modules symbol information for development
@@ -2838,7 +2842,7 @@ use this package or when debugging this package.
 %{descriptail}
 
 %if %{PACKAGE_kbug}
-%files -n devel-%{_kversion}
+%files -n %{name}-devel-%{_kversion}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
