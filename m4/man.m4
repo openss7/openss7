@@ -82,25 +82,25 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	[with_cooked_manpages='no'])
     if test :"${with_cooked_manpages:-yes}" != :no ; then
 	AC_MSG_RESULT([yes])
-	AC_ARG_VAR([SOELIM],
-		   [Roff source elminiation command. @<:@default=gsoelim,soelim@:>@])
-	AC_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat],
-		      [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_ARG_VAR([REFER],
-		   [Roff references command. @<:@default=grefer,refer@:>@])
-	AC_PATH_PROGS([REFER], [grefer refer], [/bin/cat],
-		      [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_ARG_VAR([TBL],
-		   [Roff table command. @<:@default=gtbl,tbl@:>@])
-	AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat],
-		      [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_ARG_VAR([PIC],
-		   [Roff picture command. @<:@default=gpic,pic@:>@])
-	AC_PATH_PROGS([PIC], [gpic pic], [/bin/cat],
-		      [$PATH:/usr/local/bin:/usr/bin:/bin])
     else
 	AC_MSG_RESULT([no])
     fi
+    AC_ARG_VAR([SOELIM],
+	       [Roff source elminiation command. @<:@default=gsoelim,soelim@:>@])
+    AC_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat],
+		  [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([REFER],
+	       [Roff references command. @<:@default=grefer,refer@:>@])
+    AC_PATH_PROGS([REFER], [grefer refer], [/bin/cat],
+		  [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([TBL],
+	       [Roff table command. @<:@default=gtbl,tbl@:>@])
+    AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat],
+		  [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PIC],
+	       [Roff picture command. @<:@default=gpic,pic@:>@])
+    AC_PATH_PROGS([PIC], [gpic pic], [/bin/cat],
+		  [$PATH:/usr/local/bin:/usr/bin:/bin])
     AC_MSG_CHECKING([for manpage compression])
     AC_ARG_ENABLE([compress-manpages],
 	AS_HELP_STRING([--disable-compress-manpages],
@@ -112,34 +112,34 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	AC_MSG_RESULT([no])
     else
 	AC_MSG_RESULT([yes])
-	AC_ARG_VAR([GZIP],
-		   [Gzip default compression options @<:@default=--best@:>@])
-	if test -z "$GZIP"; then
-	    GZIP='-f9v'
-	fi
-	AC_ARG_VAR([GZIP_CMD],
-		   [Gzip compression command @<:@default=gzip@:>@])
-	AC_PATH_PROG([GZIP_CMD], [gzip], [${am_missing_run}gzip],
-		     [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_ARG_VAR([BZIP2],
-		   [Bzip2 default compression options @<:@default=@:>@])
-	if test -z "$BZIP2"; then
-	    BZIP2='-f9v'
-	fi
-	AC_ARG_VAR([BZIP2_CMD],
-		   [Bzip2 compression command @<:@default=bzip2@:>@])
-	AC_PATH_PROG([BZIP2_CMD], [bzip2], [${am_missing_run}bzip2],
-		     [$PATH:/usr/local/bin:/usr/bin:/bin])
-	AC_ARG_VAR([LZMA],
-		   [Lzma default compression options @<:@default=--best@:>@])
-	if test -z "$LZMA"; then
-	    LZMA='-f9v'
-	fi
-	AC_ARG_VAR([LZMA_CMD],
-		   [Lzma compression command @<:@default=lzma@:>@])
-	AC_PATH_PROG([LZMA_CMD], [lzma], [${am_missing_run}lzma],
-		     [$PATH:/usr/local/bin:/usr/bin:/bin])
     fi
+    AC_ARG_VAR([GZIP],
+	       [Gzip default compression options @<:@default=--best@:>@])
+    if test -z "$GZIP"; then
+	GZIP='-f9v'
+    fi
+    AC_ARG_VAR([GZIP_CMD],
+	       [Gzip compression command @<:@default=gzip@:>@])
+    AC_PATH_PROG([GZIP_CMD], [gzip], [${am_missing_run}gzip],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([BZIP2],
+	       [Bzip2 default compression options @<:@default=@:>@])
+    if test -z "$BZIP2"; then
+	BZIP2='-f9v'
+    fi
+    AC_ARG_VAR([BZIP2_CMD],
+	       [Bzip2 compression command @<:@default=bzip2@:>@])
+    AC_PATH_PROG([BZIP2_CMD], [bzip2], [${am_missing_run}bzip2],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([LZMA],
+	       [Lzma default compression options @<:@default=--best@:>@])
+    if test -z "$LZMA"; then
+	LZMA='-f9v'
+    fi
+    AC_ARG_VAR([LZMA_CMD],
+	       [Lzma compression command @<:@default=lzma@:>@])
+    AC_PATH_PROG([LZMA_CMD], [lzma], [${am_missing_run}lzma],
+		 [$PATH:/usr/local/bin:/usr/bin:/bin])
     AC_ARG_VAR([MAKEWHATIS],
 	       [Makewhatis command. @<:@default=makewhatis@:>@])
     AC_PATH_PROG([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis],

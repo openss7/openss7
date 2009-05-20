@@ -527,6 +527,16 @@ Copying
 @c * Variable Index::		Variable Index
 @c * File Index::			File Index
 
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@c @page
+@c @heading List of Tables
+@c @listoffloats Table
+@end iftex
+
 
 @c --------------------------------------------------------------------------
 
@@ -19119,13 +19129,6 @@ A direction of data flow going from the @dfn{Stream head} toward a driver.  Also
 and output side.
 
 @end multitable
-
-@ifnotinfo
-@node List of Figures
-@unnumbered List of Figures
-
-@listoffloats Figure
-@end ifnotinfo
 
 @node Index
 @unnumbered Index

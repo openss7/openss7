@@ -64,7 +64,6 @@ et-al " et all" 1 2
 # reverse A
 .R2
 .if '\*(.T'ascii' \{\
-.\"'
 .ds #n <\\**>
 .m1 1
 .m2 1
@@ -89,7 +88,36 @@ et-al " et all" 1 2
 .nr bi 4n
 .\}
 .if '\*(.T'ps' \{\
-.\"'
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr si 0
+.nr ii \w'\0(000)\0'u
+.nr pi 0.24i
+.nr po 0
+.nr bs 1v
+.nr bi 0.5i
+.nr hi 0.5i
+.nr pp 10
+.nr fp 8
+.nr gp 9
+.nr sp 11
+.nr tp 9
+.\}
+.if '\*(.T'dvi' \{\
 .ds #n \\**
 .m1 0.25i \" top margin above header
 .m2 0.25i \" top margin below header
@@ -260,7 +288,6 @@ Added doc files.
 .(x 0
 .ie '\\$2'' \\$1
 .el \\$2 \\$1
-.\"'
 .)x \\n(ch-\\n%
 .\}
 .\}
@@ -326,10 +353,13 @@ and provides those services to a local instance of an application server.
 .+c "Data Model"
 .(b
 .sh 2 "Overview"
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so datamodel.fig1.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.fig1.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -483,10 +513,13 @@ There is a many-to-many relationship between SP and SG.
 .(b
 .sh 3 "AS Relationships"
 .sh 4 "AS to ASP Relationship"
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so datamodel.fig2.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.fig2.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -542,10 +575,13 @@ coming up, going down, up).
 There is a many-to-many relationship between AS and ASP.
 .(b
 .sh 4 "AS to SGP Relationship"
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so datamodel.fig3.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.fig3.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -602,10 +638,13 @@ coming up, going down, up).
 There is a many-to-many relationship between AS and SGP.
 .(b
 .sh 4 "AS to SP Relationship"
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so datamodel.fig2.pic
 .\}
-.el \{\
+.if '\*(.T'ps' \{\
+.so datamodel.fig2.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1421,10 +1460,10 @@ The relationship between the SG data structure and other UA data structures is
 illustrated in \fI\*(&f\n(&n\fR.
 .lp
 .(b M
-.ie '\*(.T'ps' \{\"'
+.ie '\*(.T'ps' \{\
 .so datamodel.fig5.pic
 .\}
-.el \{
+.el \{\
 .(c
 .nf
 .sz -1
@@ -1655,11 +1694,13 @@ graph nodes.
 .(b
 .sh 2 "ASP Examples"
 .sh 3 "Simple ASP Example"
-.ie '\*(.T'ps' \{\
-.\"'
+.if '\*(.T'ps' \{\
 .so datamodel.figx4.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.figx4.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1721,11 +1762,13 @@ to the SS7 User.
 .(b
 .sh 2 "SG Examples"
 .sh 3 "Simple SGP Example"
-.ie '\*(.T'ps' \{\
-.\"'
+.if '\*(.T'ps' \{\
 .so datamodel.figx5.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.figx5.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1775,12 +1818,13 @@ activates the SS7 Provider (if it is not already active) and moves the
 AS to the active state.
 .(b
 .sh 3 "Multiple peer SGP Example"
-.ie '\*(.T'ps' \{\
-.\"'
+.if '\*(.T'ps' \{\
 .so datamodel.figx1.pic
 .\}
-.el \{\
-.\"'
+.if '\*(.T'dvi' \{\
+.so datamodel.figx1.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1827,12 +1871,13 @@ AS to the active state.
 .(b
 .sh 2 "Combined Examples"
 .sh 3 "Simple Combined Example"
-.ie '\*(.T'ps' \{\
-.\"'
+.if '\*(.T'ps' \{\
 .so datamodel.figx6.pic
 .\}
-.el \{\
-.\"'
+.if '\*(.T'dvi' \{\
+.so datamodel.figx6.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1880,11 +1925,13 @@ AS to the active state.
 \fI\*(&f\n(&p\fR illustrates a simple Combined example.
 .(b
 .sh 3 "Simple Pass-Through Example"
-.ie '\*(.T'ps' \{\
-.\"'
+.if '\*(.T'ps' \{\
 .so datamodel.figx2.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.figx2.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1936,10 +1983,13 @@ Data and control primitives from the SS7 Provider are passed directly to the
 SS7 User through that Application Server (AS) in the same fashion.
 .(b
 .sh 3 "Pass-Through with Redundant Processor"
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so datamodel.figx3.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.figx3.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1
@@ -1992,10 +2042,13 @@ Data and control primitives are normally passed directly between the SS7 User
 and the local SS7 Provider on each processor.
 .(b C
 .sh 3 "Shared Redundant Processor"
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so datamodel.figx7.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so datamodel.figx7.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -1

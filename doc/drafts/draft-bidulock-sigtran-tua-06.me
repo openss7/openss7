@@ -55,6 +55,12 @@
 .ds expiry March\ 2008
 .nr levels 0
 .so draft4.me
+.if '\*(.T'ascii' \{
+.de PS
+.ig PE
+..
+.\}
+.lf 1
 .bp
 .sz \n(tp
 .he 'Internet Draft'SS7 TCAP-User Adaptation Layer'\\\\*[date]'
@@ -383,10 +389,13 @@ interface in the SG.  A Nodal Interworking Function (NIF) provides for
 interworking between the TCAP and TUA layers and provides for the transfer of
 the user messages as well as management messages.
 .(b
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig1.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig1.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2
@@ -431,10 +440,13 @@ IP network.  This allows extra flexibility in developing networks, especially
 when interaction between legacy signalling is not needed.  The architecture
 removes the need for a signalling gateway function.
 .(b
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig2.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig2.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2
@@ -904,10 +916,13 @@ TC-User; a lower boundary between TUA and SCTP; and a layer management
 boundary between TUA and the Layer Management Function.
 \fI\*(&f\n(&n\fR illustrates the TUA protocol boundaries.
 .(b
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig3.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig3.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2
@@ -7027,10 +7042,13 @@ TC-User at the IPSP or Nodal Interworking Function at the SG as illustrated in
 in \fI\)Table 2\fR, and the CH Messages in \fI\)Table 3\fR (see Section
 1.6.1).
 .(b
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig4.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig4.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2
@@ -7289,10 +7307,13 @@ reception of indications from the SCTP layer; or,
 .bu
 Local Management intervention.
 .(z
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig5.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig5.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2
@@ -7391,10 +7412,13 @@ alternative, the SGP may stop queuing messages and discard all previously
 queued messages.  The AS will move to the AS-INACTIVE state if at least one
 ASP is in ASP-INACTIVE state, otherwise it will move to AS-DOWN state.
 .(b
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig6.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig6.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2
@@ -8711,10 +8735,13 @@ distributed over at least two Hosts.
 One example of a physical network architecture relevant to SS7 carrier-grade
 operation in the IP network domain is shown in \fI\*(&f\n(&n\fR.
 .(b
-.ie '\*(.T'ps' \{\
+.if '\*(.T'ps' \{\
 .so tua-03.fig7.pic
 .\}
-.el \{\
+.if '\*(.T'dvi' \{\
+.so tua-03.fig7.pic
+.\}
+.if '\*(.T'ascii' \{\
 .(c
 .nf
 .sz -2

@@ -172,8 +172,8 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
-@value{LONG} (@value{SHORT}) interface to these components as well as providing a basis for
-@value{LONG} control for other @value{LONG} protocols.
+Signalling Connection Control Part (SCCP) interface to these components as well as providing a basis for
+Signalling Connection Control Part control for other Signalling Connection Control Part protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -293,26 +293,26 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @menu
 * Preface::
 * Introduction::
-* The @value{SHORT} Layer::
-* @value{INTERFACE} Services Definition::
-* @value{INTERFACE} Primitives::
+* The SCCP Layer::
+* SCCPI Services Definition::
+* SCCPI Primitives::
 * Diagnostics Requirements::
-* @value{INTERFACE} Input-Output Controls::
-* @value{INTERFACE} Management Information Base::
-* Addendum for @value{SHORT} Conformance::
-* Mapping @value{INTERFACE} Primitives::
+* SCCPI Input-Output Controls::
+* SCCPI Management Information Base::
+* Addendum for SCCP Conformance::
+* Mapping SCCPI Primitives::
 * State/Event Tables::
 * Precedence Tables::
-@c * Allowable Sequence of @value{INTERFACE} Primitives::
-@c * Precedence of @value{INTERFACE} Primitives::
-@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
-@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
-* @value{INTERFACE} Header Files::
-* @value{INTERFACE} Library::
-* @value{INTERFACE} Drivers and Modules::
-* @value{INTERFACE} Utilities::
-* @value{INTERFACE} File Formats::
-* @value{INTERFACE} Compatibility and Porting::
+@c * Allowable Sequence of SCCPI Primitives::
+@c * Precedence of SCCPI Primitives::
+@c * Guidelines for Protocol Independent SCCPI Users::
+@c * Required Information for SCCPI Provider-Specific Addenda::
+* SCCPI Header Files::
+* SCCPI Library::
+* SCCPI Drivers and Modules::
+* SCCPI Utilities::
+* SCCPI File Formats::
+* SCCPI Compatibility and Porting::
 * Glossary::
 * Acronyms::
 * References::
@@ -355,9 +355,9 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
-(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
-components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Connection Control Part
+(SCCP) protocol stacks.  It provides abstraction of the Signalling Connection Control interface to these
+components as well as providing a basis for Signalling Connection Control control for other Signalling Connection Control protocols.
 
 @subsection Purpose
 @cpindex STREAMS
@@ -460,14 +460,14 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 @cpindex STREAMS
 
 This document specifies a @acronym{STREAMS}-based kernel-level instantiation of the ITU-T
-@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a @value{PART}
-service to access and use any of a variety of conforming @value{PART} providers without specific
+@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a Signalling Connection Control
+service to access and use any of a variety of conforming Signalling Connection Control providers without specific
 knowledge of the provider's protocol.  The service interface is designed to support any network
-@value{PART} protocol and user @value{PART} protocol.  This interface only specifies access to
-@value{PART} service providers, and does not address issues concerning @value{PART} management,
+Signalling Connection Control protocol and user Signalling Connection Control protocol.  This interface only specifies access to
+Signalling Connection Control service providers, and does not address issues concerning Signalling Connection Control management,
 protocol performance, and performance analysis tools.
 
-This specification assumes that the reader is familiar with ITU-T state machines and @value{PART}
+This specification assumes that the reader is familiar with ITU-T state machines and Signalling Connection Control
 interfaces (e.g. Q.711, T1.112), and @acronym{STREAMS}.
 
 @section Related Documentation
@@ -484,7 +484,7 @@ interfaces (e.g. Q.711, T1.112), and @acronym{STREAMS}.
 This document specifies an interface that supports the services provided by the @dfn{Signalling
 System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation
 Q.711, ANSI T1.112, ETSI EN 300 009-1.  These specifications are targeted for use by developers
-and testers of protocol modules that require @value{PART} service.
+and testers of protocol modules that require Signalling Connection Control service.
 
 @section Definitions, Acronyms, Abbreviations
 
@@ -515,50 +515,50 @@ Quality of Service
 A communication services development facility first available with UNIX System V Release 3.
 @end table
 
-@node The @value{SHORT} Layer
-@chapter The @value{SHORT} Layer
+@node The SCCP Layer
+@chapter The SCCP Layer
 
 @menu
-* Model of the @value{INTERFACE}::
-* @value{INTERFACE} Services::
-* @value{SHORT} Service Primitives::
+* Model of the SCCPI::
+* SCCPI Services::
+* SCCP Service Primitives::
 @end menu
 
-The @value{SHORT} Layer provides the means to manage the NC of @value{SHORT}-Users into
+The SCCP Layer provides the means to manage the NC of SCCP-Users into
 connections.  It is responsible for the routing and management of data to and from SS7 network
-connections between @value{SHORT}-user entities.
+connections between SCCP-user entities.
 
-@node Model of the @value{INTERFACE}
-@section Model of the @value{INTERFACE}
+@node Model of the SCCPI
+@section Model of the SCCPI
 
-The @value{INTERFACE} defines the services provided by the signalling link layer to the signalling
+The SCCPI defines the services provided by the signalling link layer to the signalling
 link user at the boundary between the signalling link provider and the signalling link user entity.
 The interface consists of a set of primitives defined as @acronym{STREAMS} messages that provide access
-to the signalling link layer services, and are transferred between the @value{SHORT} user entity and
-the @value{SHORT} provider.  These primitives are of two types; ones that originate from the
-@value{SHORT} user, and other that originate from the @value{SHORT} provider.  The primitives that
-originate from the @value{SHORT} user make requests to the @value{SHORT} provider, or respond to an
-indication of an event of the @value{SHORT} provider.  The primitives that originate from the
-@value{SHORT} provider are either confirmations of a request or are indications to the CCS user that
-an event has occurred.  @figref{1} shows the model of the @value{INTERFACE}.
+to the signalling link layer services, and are transferred between the SCCP user entity and
+the SCCP provider.  These primitives are of two types; ones that originate from the
+SCCP user, and other that originate from the SCCP provider.  The primitives that
+originate from the SCCP user make requests to the SCCP provider, or respond to an
+indication of an event of the SCCP provider.  The primitives that originate from the
+SCCP provider are either confirmations of a request or are indications to the CCS user that
+an event has occurred.  @figref{1} shows the model of the SCCPI.
 
-@figuresized{sccpi01,1,Model of the @value{INTERFACE},4.0in}
+@figuresized{sccpi01,1,Model of the SCCPI,4.0in}
 
-The @value{INTERFACE} allows the @value{SHORT} provider to be configured with any @value{SHORT} user
-(such as TCAP) that also conforms to the @value{INTERFACE}.  A network layer user
-can also be a user program that conforms to the @value{INTERFACE} and accesses the @value{SHORT}
+The SCCPI allows the SCCP provider to be configured with any SCCP user
+(such as TCAP) that also conforms to the SCCPI.  A network layer user
+can also be a user program that conforms to the SCCPI and accesses the SCCP
 provider via @manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
 
-@node @value{INTERFACE} Services
-@section @value{INTERFACE} Services
+@node SCCPI Services
+@section SCCPI Services
 
-The features of the @value{INTERFACE} are defined in terms of the services provided by the
-@value{SHORT}, and the individual primitives that may flow between the @value{SHORT}-User and the
-@value{SHORT}.
+The features of the SCCPI are defined in terms of the services provided by the
+SCCP, and the individual primitives that may flow between the SCCP-User and the
+SCCP.
 
-The services supported by the @value{INTERFACE} are based on two distinct modes of communication,
-connectionless (CLNS) and connection oriented (CONS).  Within these modes, the @value{INTERFACE}
-provides support for both sequenced and unsequenced message transfer.  Also, the @value{INTERFACE}
+The services supported by the SCCPI are based on two distinct modes of communication,
+connectionless (CLNS) and connection oriented (CONS).  Within these modes, the SCCPI
+provides support for both sequenced and unsequenced message transfer.  Also, the SCCPI
 supports services for local mangement.
 
 @subsection CLNS
@@ -577,17 +577,17 @@ there is no logical relationship between these units of data.
 Connectionless mode communication has no separate phases.  Each unit of data is transmitted from
 source to destination independently, appropriate addressing information is included with each unit
 of data.  Although the units of data are transmitted independently from source to destination,
-@value{SHORT} provides a high level of assurance of sequencing if sequenced service is requested.
+SCCP provides a high level of assurance of sequencing if sequenced service is requested.
 When unsequenced service is requested, there are no guarantees of proper sequence.  Although
-@value{SHORT} services are inherently unreliable, @value{SHORT} provide a high level of assurance
+SCCP services are inherently unreliable, SCCP provide a high level of assurance
 that messages are not lost.
 
-The connectionless service of @value{SHORT} is suited to @value{SHORT} User protocols such as the
+The connectionless service of SCCP is suited to SCCP User protocols such as the
 Transaction Capabilities Application Part (TCAP).@footnote{@ref{Q.714,,Q.714}.}
 
 @subsection CONS
 
-The main features of the @value{SHORT} connection oriented mode of communication are:
+The main features of the SCCP connection oriented mode of communication are:
 
 @enumerate
 @item
@@ -601,48 +601,48 @@ and Connection Termination.  Units of data arrive at their destination in the sa
 departed their source when the sequenced delivery service is requested and the data is protected
 against duplication or loss of data within some specified quality of service.
 
-The connection oriented service of @value{SHORT} is suited to @value{SHORT} User protocols such as
+The connection oriented service of SCCP is suited to SCCP User protocols such as
 the Integrated Services Digital Network User Part (ISUP), [Q.764] Telephone User Part (TUP), [Q.724]
 and Bearer Indexed Call Control (BICC).@footnote{ISUP consists of @dfn{signalling relations} between
-two switches which also have digital facilities between them.  In general an ISUP @value{SHORT}-User
-can communicate with many other @value{SHORT}-User peers, however, signalling between any given two
+two switches which also have digital facilities between them.  In general an ISUP SCCP-User
+can communicate with many other SCCP-User peers, however, signalling between any given two
 enpoints only concerns the digital facilities which exist between the two endpoints.  So, management
 of ISUP switches is best performed on a pairing of endpoints (@dfn{signalling relations}).  Also,
 the CONS mode of operation is provided in support of DPC list Routing Keys for M3UA. [RFC 4666]}
 
 @subsection Local Management
 
-The @value{INTERFACE} specifications also defines a set of local management functions that apply to
+The SCCPI specifications also defines a set of local management functions that apply to
 CONS and CLNS modes of communication.  These services have local significance only.
 
 @subsection Provider Management
 
-The @value{INTERFACE} specification also defines a set of provider management functions that apply
-to the @value{SHORT} service provider.  These services have local and end-to-end significance.
+The SCCPI specification also defines a set of provider management functions that apply
+to the SCCP service provider.  These services have local and end-to-end significance.
 
-@node @value{SHORT} Service Primitives
-@section @value{SHORT} Service Primitives
+@node SCCP Service Primitives
+@section SCCP Service Primitives
 
-@tabref{1}, @tabref{2}, @tabref{3} and @tabref{4} summarize the @value{INTERFACE} service primitives
+@tabref{1}, @tabref{2}, @tabref{3} and @tabref{4} summarize the SCCPI service primitives
 by their state and service
 
-@tabfig{sccpi_tab01,1,@value{INTERFACE} Service Primitives for Local Management}
-@tabfig{sccpi_tab02,2,@value{INTERFACE} Service Primitives for Connectionless Mode Data Transfer}
-@tabfig{sccpi_tab03,3,@value{INTERFACE} Service Primitives for Connection Mode Data Transfer}
-@tabfig{sccpi_tab04,4,@value{INTERFACE} Service Primitives for @value{SHORT} Management}
+@tabfig{sccpi_tab01,1,SCCPI Service Primitives for Local Management}
+@tabfig{sccpi_tab02,2,SCCPI Service Primitives for Connectionless Mode Data Transfer}
+@tabfig{sccpi_tab03,3,SCCPI Service Primitives for Connection Mode Data Transfer}
+@tabfig{sccpi_tab04,4,SCCPI Service Primitives for SCCP Management}
 
-@node @value{INTERFACE} Services Definition
-@chapter @value{INTERFACE} Services Definition
-@cindex @value{INTERFACE} Services Definition
+@node SCCPI Services Definition
+@chapter SCCPI Services Definition
+@cindex SCCPI Services Definition
 
 @menu
 * Local Management Services::
 * Connectionless Services::
 * Connection Oriented Services::
-* @value{SHORT} Provider Management Services::
+* SCCP Provider Management Services::
 @end menu
 
-This section describes the services of the @value{INTERFACE} primitives.  Time-sequence diagrams
+This section describes the services of the SCCPI primitives.  Time-sequence diagrams
 that illustrate the sequence of primitives are included.@footnote{Conventions for the time-sequence
 diagrams are defined in ITU-T X.210. [X.210]} The format of the primitives will be defined later in
 this document.
@@ -652,130 +652,130 @@ this document.
 
 The services defined in this section are outside the scope of international standards.  These
 services apply to CONS and CLNS modes of communication.  They are invoked for the
-initialization/de-initialization of a stream connected to the @value{SHORT}.  They are also used to
-manage options supported by the @value{SHORT} and to report information on the supported parameter
+initialization/de-initialization of a stream connected to the SCCP.  They are also used to
+manage options supported by the SCCP and to report information on the supported parameter
 values.
 
-@subsection @value{LONG} Information Reporting Service
+@subsection Signalling Connection Control Part Information Reporting Service
 
-This service provides information on the options supported by the @value{SHORT} provider.
+This service provides information on the options supported by the SCCP provider.
 
 @table @strong
 @item N_INFO_REQ:
 @prindex N_INFO_REQ
-This primitive requests that the @value{SHORT} return the values of all the supported protocol
+This primitive requests that the SCCP return the values of all the supported protocol
 parameters.  This request may be invoked during any phase.
 @item N_INFO_ACK:
 @prindex N_INFO_ACK
 This primitive is in response to the @prim{N_INFO_REQ} primitive and returns the values of the
-supported protocol parameters to the @value{SHORT}-User.
+supported protocol parameters to the SCCP-User.
 @end table
 
 
-The sequence of primitives for @value{SHORT} information management is shown in @figref{2}.
+The sequence of primitives for SCCP information management is shown in @figref{2}.
 
-@figuresized{sccpi02,2,@value{LONG} Information Reporting Service,4.0in}
+@figuresized{sccpi02,2,Signalling Connection Control Part Information Reporting Service,4.0in}
 
-@subsection @value{SHORT} User Bind Service
+@subsection SCCP User Bind Service
 
 
-This service allows an @value{SHORT} address (@value{SHORT}-SAPI) to be associated with a Stream.
+This service allows an SCCP address (SCCP-SAPI) to be associated with a Stream.
 
-It allows the @value{SHORT}-User to negotiate the number of connect indications that can remain
-unacknowledged for that @value{SHORT}-User (a connect indication is considered unacknowledged while
-it is awaiting a corresponding connect response or release request from the @value{SHORT}-User).
-This service also defines a mechanism that allows a Stream (bound to an @value{SHORT} address of the
-@value{SHORT}-User) to be reserved to handle incoming connections only.  This Stream is referred to
+It allows the SCCP-User to negotiate the number of connect indications that can remain
+unacknowledged for that SCCP-User (a connect indication is considered unacknowledged while
+it is awaiting a corresponding connect response or release request from the SCCP-User).
+This service also defines a mechanism that allows a Stream (bound to an SCCP address of the
+SCCP-User) to be reserved to handle incoming connections only.  This Stream is referred to
 as the listener Stream.
 
 @table @strong
 @item N_BIND_REQ:
 @prindex N_BIND_REQ
-This primitive requests that the @value{SHORT}-User be bound to a particular @value{SHORT} address
-(@value{SHORT}-SAPI), and negotiate the number of allowable outstanding connect indications for that
+This primitive requests that the SCCP-User be bound to a particular SCCP address
+(SCCP-SAPI), and negotiate the number of allowable outstanding connect indications for that
 address.
 @item N_BIND_ACK:
 @prindex N_BIND_ACK
 This primitive is in response to the @prim{N_BIND_REQ} primitive and indicates to the user that
-the specified @value{SHORT}-User has been bound to an @value{SHORT} address.
+the specified SCCP-User has been bound to an SCCP address.
 @end table
 
 The sequence of primitives is shown in @figref{4}.
 
-@figuresized{sccpi03,4,@value{LONG} User Bind Service,4.0in}
+@figuresized{sccpi03,4,Signalling Connection Control Part User Bind Service,4.0in}
 
-@subsection @value{SHORT} User Unbind Service
+@subsection SCCP User Unbind Service
 
-This service allows the @value{SHORT}-User to be unbound from an @value{SHORT} address.
+This service allows the SCCP-User to be unbound from an SCCP address.
 
 @table @strong
 @item N_UNBIND_REQ:
 @prindex N_UNBIND_REQ
-This primitive requests that the @value{SHORT}-User be unbound from the @value{SHORT} address that
+This primitive requests that the SCCP-User be unbound from the SCCP address that
 it had previously been bound to.
 @end table
 
 
 The sequence of primitives is shown in @figref{5}.
 
-@figuresized{sccpi04,5,@value{LONG} User Unbind Service,4.0in}
+@figuresized{sccpi04,5,Signalling Connection Control Part User Unbind Service,4.0in}
 
 @subsection Receipt Acknowledgement Service
 
 @table @strong
 @item N_OK_ACK:
 @prindex N_OK_ACK
-This primitive indicates to the @value{SHORT}-User that the previous @value{SHORT}-User originated
-primitive was received successfully by the @value{SHORT}.
+This primitive indicates to the SCCP-User that the previous SCCP-User originated
+primitive was received successfully by the SCCP.
 @end table
 
 
 An example showing the sequence of primitives for successful receipt acknowledgement is depicted in
 @figref{6}.
 
-@figuresized{sccpi05,6,@value{LONG} Receipt Ackknowledgement Service,4.0in}
+@figuresized{sccpi05,6,Signalling Connection Control Part Receipt Ackknowledgement Service,4.0in}
 
 @subsection Options Management Service
 
-This service allows the @value{SHORT}-User to manage options parameter values associated wtih the
-@value{SHORT}.
+This service allows the SCCP-User to manage options parameter values associated wtih the
+SCCP.
 
 @table @strong
 @item N_OPTMGMT_REQ:
 @prindex N_OPTMGMT_REQ
-This primitive allows the @value{SHORT}-User to select default values for options parameters within
-the range supported by the @value{SHORT}, and to indicate the default selection of receipt
+This primitive allows the SCCP-User to select default values for options parameters within
+the range supported by the SCCP, and to indicate the default selection of receipt
 confirmation.
 @end table
 
-@figref{7} shows the sequence of primitives for @value{SHORT} options management.
+@figref{7} shows the sequence of primitives for SCCP options management.
 
-@figuresized{sccpi06,7,@value{LONG} Options Management Service,4.0in}
+@figuresized{sccpi06,7,Signalling Connection Control Part Options Management Service,4.0in}
 
 @subsection Error Acknowledgement Service
 
 @table @strong
 @item N_ERROR_ACK:
 @prindex N_ERROR_ACK
-This primitive indicates to the @value{SHORT}-User that a non-fatal error has occured in the last
-@value{SHORT}-User originated request or response primitive (listed in @figref{8}), on the stream.
+This primitive indicates to the SCCP-User that a non-fatal error has occured in the last
+SCCP-User originated request or response primitive (listed in @figref{8}), on the stream.
 @end table
 
 @figref{8} shows the sequence or primitives for the error management primitive.
 
-@figuresized{sccpi07,8,@value{LONG} Error Acknowledgement Service,4.0in}
+@figuresized{sccpi07,8,Signalling Connection Control Part Error Acknowledgement Service,4.0in}
 
 @node Connectionless Services
 @section Connectionless Services
 
-The CLNS allows for the transfer of @value{SHORT}-User data in one or both directions simultaneously
-without establishing an NC between @value{SHORT}-User peers.  A set of primitives are
-defined that carry user data and control information between the @value{SHORT}-User and
-@value{SHORT} entities.  The primitives are modeled as requests initiated by the @value{SHORT}-User
-and indications initiated by the @value{SHORT} provider.  Indications may be initiated by the
-@value{SHORT} independently from requests by the @value{SHORT}-User.
+The CLNS allows for the transfer of SCCP-User data in one or both directions simultaneously
+without establishing an NC between SCCP-User peers.  A set of primitives are
+defined that carry user data and control information between the SCCP-User and
+SCCP entities.  The primitives are modeled as requests initiated by the SCCP-User
+and indications initiated by the SCCP provider.  Indications may be initiated by the
+SCCP independently from requests by the SCCP-User.
 
-The connectionless @value{SHORT} service consists of one phase.
+The connectionless SCCP service consists of one phase.
 
 @subsection Data Transfer
 
@@ -784,7 +784,7 @@ The connectionless @value{SHORT} service consists of one phase.
 @table @strong
 @item N_UNITDATA_REQ:
 @prindex N_UNITDATA_REQ
-This primitive requests that the @value{SHORT} send the data unit to the specified destination with
+This primitive requests that the SCCP send the data unit to the specified destination with
 the specified sequence control.
 @end table
 
@@ -793,13 +793,13 @@ the specified sequence control.
 @table @strong
 @item N_UNITDATA_IND:
 @prindex N_UNITDATA_IND
-This primitive indicates to the @value{SHORT}-User that a data unit has been received from the
+This primitive indicates to the SCCP-User that a data unit has been received from the
 specified source address.
 @end table
 
 
 @figref{9} shows the sequence of primitives for the connectionless mode of data transfer.
-@figuresized{sccpi44,9,@value{LONG} Data Transfer,4.0in}
+@figuresized{sccpi44,9,Signalling Connection Control Part Data Transfer,4.0in}
 
 @c @subsection Error Management
 @c @subsubsection Provider Primitives for Error Management
@@ -807,52 +807,52 @@ specified source address.
 @c @table @strong
 @c @item MTP_PAUSE_IND:
 @c @prindex MTP_PAUSE_IND
-@c This primitive indicates to the @value{SHORT}-User that the specified destination address is no
+@c This primitive indicates to the SCCP-User that the specified destination address is no
 @c longer accessible.
 @c @item MTP_RESUME_IND:
 @c @prindex MTP_RESUME_IND
-@c This primitive indicates to the @value{SHORT}-User that the specified destination address is now
+@c This primitive indicates to the SCCP-User that the specified destination address is now
 @c accessible.
 @c @item MTP_STATUS_IND:
 @c @prindex MTP_STATUS_IND
-@c This primitive indicates ot the @value{SHORT}-User that the congestions status to the specified
-@c destination address has changed, or that the remote @value{SHORT}-User is no longer available.
+@c This primitive indicates ot the SCCP-User that the congestions status to the specified
+@c destination address has changed, or that the remote SCCP-User is no longer available.
 @c @end table
 @c 
 @c @figref{10} shows the sequence of primitives for the connectionless mode error management primitives.
 @c 
-@c @figuresized{mtpi31,10,@value{LONG} Error Management,4.0in}
+@c @figuresized{mtpi31,10,Signalling Connection Control Part Error Management,4.0in}
 
 
 @node Connection Oriented Services
 @section Connection Oriented Services
 
-This section describes the required @value{SHORT} service primitives that define the CLNS interface.
+This section describes the required SCCP service primitives that define the CLNS interface.
 
 The queue model for CLNS is discused in more detail in ITU-T Q.711. [Q.711] For Q.711 specific
 conformance considerations, see Addendum 1.
 
-The queue model represents the operation of an @value{SHORT} connection in the abstract by a pair of
-queues linking the two @value{SHORT} addresses.  There is one queue for each direction of signalling
+The queue model represents the operation of an SCCP connection in the abstract by a pair of
+queues linking the two SCCP addresses.  There is one queue for each direction of signalling
 transfer.  The ability of a user to add objects to a queue will be determined by the behavior of the
 user removing objects from that queue, and the state of the queue.  The pair of queues is considered
 to be available for each potential NC.  Objects that are entered or removed from the queue
-are either as a result of interactions at the two @value{SHORT} addresses, or as the result of
-@value{SHORT} initiatives.
+are either as a result of interactions at the two SCCP addresses, or as the result of
+SCCP initiatives.
 
 @itemize @minus{}
 @item
 A queue is empty until a connect object has been entered and can be returned to this state, with
-loss of its contents, by the @value{SHORT}.
+loss of its contents, by the SCCP.
 @item
-Objects may be entered into a queue as a result of the action of the source @value{SHORT}-User,
-subject to control by the @value{SHORT}.
+Objects may be entered into a queue as a result of the action of the source SCCP-User,
+subject to control by the SCCP.
 @item
-Objects may also be entered into a queue by the @value{SHORT}.
+Objects may also be entered into a queue by the SCCP.
 @item
-Objects are removed from the queue under the control of the receiving @value{SHORT} user.
+Objects are removed from the queue under the control of the receiving SCCP user.
 @item
-Objects are normally removed under the control of the @value{SHORT}-User in the same order as they
+Objects are normally removed under the control of the SCCP-User in the same order as they
 were entered except:
 @item
 if the object is of a type defined to be able to advance ahead of the preceding object (however, no
@@ -877,72 +877,72 @@ defined to be destructive with respect to all other objects.
 
 @subsection Connection Establishment Phase
 
-A pair of queues is associated with an @value{SHORT} NC between two @value{SHORT} addresses
-when the @value{SHORT} receives an @prim{N_CONN_REQ} primitive at one of the @value{SHORT}
+A pair of queues is associated with an SCCP NC between two SCCP addresses
+when the SCCP receives an @prim{N_CONN_REQ} primitive at one of the SCCP
 addresses resulting in a connect object being entered into the queue.  The queues will remain
-associated with the @value{SHORT} NC until an @prim{N_DISCON_REQ} primitive (resulting in
+associated with the SCCP NC until an @prim{N_DISCON_REQ} primitive (resulting in
 a disconnect object) is either entered or removed from a queue.  Similarly, in the queue from the
-remote @value{SHORT}-User, objects can be entered into the queue only after the connect object
+remote SCCP-User, objects can be entered into the queue only after the connect object
 associated with an @prim{N_CONN_REQ} has been entered into the queue.
 
-The @value{SHORT} NC procedure will fail if the @value{SHORT} is unable to route to the
-remote @value{SHORT}-User.
+The SCCP NC procedure will fail if the SCCP is unable to route to the
+remote SCCP-User.
 
-@subsubsection User primitives for Successful @value{SHORT} Association Establishment
+@subsubsection User primitives for Successful SCCP Association Establishment
 
 @table @strong
 @item N_CONN_REQ:
 @prindex N_CONN_REQ
-This primitive requests that the @value{SHORT} establish an NC between the local
-@value{SHORT}-User and the specified destination.
+This primitive requests that the SCCP establish an NC between the local
+SCCP-User and the specified destination.
 @end table
 
-@subsubsection Provider primitives for Successful @value{SHORT} Association Establishment
+@subsubsection Provider primitives for Successful SCCP Association Establishment
 
 @table @strong
 @item N_CONN_CON:
 @prindex N_CONN_CON
-This primitive indicates to the @value{SHORT}-User that an NC request has been confirmed.
+This primitive indicates to the SCCP-User that an NC request has been confirmed.
 @end table
 
 
-The sequence of primitives in a successful @value{SHORT} NC establishment is defined by the
+The sequence of primitives in a successful SCCP NC establishment is defined by the
 time sequence diagram as shown in @figref{11}.
 
-@figuresized{sccpi24,11,@value{LONG} Association Service,4.0in}
+@figuresized{sccpi24,11,Signalling Connection Control Part Association Service,4.0in}
 
 @subsection Data Transfer Phase
 
-Flow control on the @value{SHORT} NC is done by management of queue capacity, by allowing
+Flow control on the SCCP NC is done by management of queue capacity, by allowing
 objects of certain type to be inserted to the queues as shown in @tabref{5}.
 
-@subsubsection User primitives for @value{SHORT} Data Transfer
+@subsubsection User primitives for SCCP Data Transfer
 
 @table @strong
 @item N_DATA_REQ:
 @prindex N_DATA_REQ
-This primitive requests that the @value{SHORT} transfer the specified data.
+This primitive requests that the SCCP transfer the specified data.
 @end table
 
-@subsubsection Provider primitives for @value{SHORT} Data Transfer
+@subsubsection Provider primitives for SCCP Data Transfer
 
 @table @strong
 @item N_DATA_IND:
 @prindex N_DATA_IND
-This primitive indicates to the @value{SHORT}-User that this message contains data.
+This primitive indicates to the SCCP-User that this message contains data.
 @end table
 
 @figref{12} shows the sequence of primitives for successful data transfer.  The sequence of
 primitives may remain incomplete if an @prim{N_DISCON_REQ} primitive occurs.
 
-@figuresized{sccpi44,12,@value{LONG} Data Transfer,4.0in}
+@figuresized{sccpi44,12,Signalling Connection Control Part Data Transfer,4.0in}
 
 This sequence of primtives may remain incomplete if an @prim{N_RESET_IND} or @prim{N_RESET_CON}
-indication is received from the @value{SHORT}.
+indication is received from the SCCP.
 
 @subsection Error Management Primitives
 
-The @value{SHORT} error management service is used by the @value{SHORT} to report detected loss of
+The SCCP error management service is used by the SCCP to report detected loss of
 unrecoverable data.
 
 @subsubsection Provider Primitives for Management
@@ -958,45 +958,45 @@ unrecoverable data.
 The sequence of primitives may remain incomplete if an @prim{N_DISCON_REQ} or
 @prim{N_DISCON_IND} primitive occurs.
 
-@figuresized{sccpi31,13,@value{LONG} Error Management,4.0in}
+@figuresized{sccpi31,13,Signalling Connection Control Part Error Management,4.0in}
 
 @subsection Connection Termination Phase
 
-The @value{SHORT} NC release procedure is initialized by the insertion of a disconnect
+The SCCP NC release procedure is initialized by the insertion of a disconnect
 object (associated with an @prim{N_DISCON_REQ}) into the queue.  As shown if @figref{13}, the
 disconnect procedure is destructive with respect to other objects in the queue, and eventually
-results in the emptying of queues and termination of the @value{SHORT} NC.
+results in the emptying of queues and termination of the SCCP NC.
 
-@subsubsection User Primitives for @value{SHORT} Association Termination
+@subsubsection User Primitives for SCCP Association Termination
 
 @table @strong
 @item N_DISCON_REQ:
 @prindex N_DISCON_REQ
-This primitive requests that the @value{SHORT} disconnect an existing @value{SHORT} NC.
+This primitive requests that the SCCP disconnect an existing SCCP NC.
 @end table
 
 The sequence of primitives are shown in the time sequence diagram in @figref{14}.
-@figuresized{sccpi08,14, @value{LONG} Connection Termination,4.0in}
+@figuresized{sccpi08,14, Signalling Connection Control Part Connection Termination,4.0in}
 
 
-@node @value{SHORT} Provider Management Services
-@section @value{SHORT} Provider Management Services
+@node SCCP Provider Management Services
+@section SCCP Provider Management Services
 
-This section describes the required @value{SHORT} service primitives that define the @value{SHORT}
+This section describes the required SCCP service primitives that define the SCCP
 Provider Management interface.
 
-@value{SHORT} Provider Management allows for the coordination of @value{SHORT} management messages
-between @value{SHORT} Provider peers.  A set of primitives are defined that invoke management
-actions that are communicated from @value{SHORT} to @value{SHORT} entities.  The primitives are
-modeled as requires initiated by the @value{SHORT} management and indications initiated by the
-@value{SHORT}.  Indications may be initiated by the @value{SHORT} independently from requests by the
-@value{SHORT} management.
+SCCP Provider Management allows for the coordination of SCCP management messages
+between SCCP Provider peers.  A set of primitives are defined that invoke management
+actions that are communicated from SCCP to SCCP entities.  The primitives are
+modeled as requires initiated by the SCCP management and indications initiated by the
+SCCP.  Indications may be initiated by the SCCP independently from requests by the
+SCCP management.
 
-The @value{SHORT} Provider Management service consists of one phase.
+The SCCP Provider Management service consists of one phase.
 
 @subsection Subsystem Management
 
-The @value{SHORT} subsystem management service allows @value{SHORT} management to allow or prohibit
+The SCCP subsystem management service allows SCCP management to allow or prohibit
 a subsystem or a duplicated subsystem.
 
 @subsubsection User Primitives for Subsystem Management Service
@@ -1017,24 +1017,24 @@ a subsystem or a duplicated subsystem.
 @prindex N_COORD_CON
 @end table
 
-@node @value{INTERFACE} Primitives
-@chapter @value{INTERFACE} Primitives
-@cindex @value{INTERFACE} primitives
+@node SCCPI Primitives
+@chapter SCCPI Primitives
+@cindex SCCPI primitives
 
 @menu
 * Local Management Primitives::
 * Connection Mode Primitives::
 * Connectionless Mode Primitives::
-* @value{SHORT} Provider Management Primitives::
+* SCCP Provider Management Primitives::
 @end menu
 
-This section describes the format and parameters of the @value{INTERFACE} primitives (@ref{Mapping
-SCCPI Primitives}, shows the mapping of @value{INTERFACE} primitives for the primitives
+This section describes the format and parameters of the SCCPI primitives (@ref{Mapping
+SCCPI Primitives}, shows the mapping of SCCPI primitives for the primitives
 defined in Q.711 [Q.711] and T1.112 [T1.112]).
 
 Also, it discusses the states the primitive is valid in, the resulting state, and the
 acknowledgement that the primitive expects.  (The state/event tables for these primitives are shown
-in @ref{State/Event Tables}.  The precedence tables for the @value{INTERFACE} primitives are shown
+in @ref{State/Event Tables}.  The precedence tables for the SCCPI primitives are shown
 in @ref{Precedence Tables}.) Rules for ITU-T conformance [Q.711] are described in addendum to this
 document in @ref{Addendum for SCCP Conformance}, rules for ANSI conformance [T1.112] are
 described in addendum @ref{Addendum for SCCP Conformance}, and rules for JITC conformance
@@ -1047,20 +1047,20 @@ described in addendum @ref{Addendum for SCCP Conformance}, and rules for JITC co
 @section Local Management Primitives
 
 @menu
-* @value{SHORT} Information Request::
-* @value{SHORT} Information Acknowledgement::
+* SCCP Information Request::
+* SCCP Information Acknowledgement::
 * Bind Protocol Address Request::
 * Bind Protocol Address Acknowledgement::
 * Unbind Protocol Address Request::
-* @value{SHORT} Options Management Request::
+* SCCP Options Management Request::
 * Error Acknowledgement::
 * Successful Receipt Acknowledgements::
 @end menu
 
 These primitives apply to CLNS and CONS.
 
-@node @value{SHORT} Information Request
-@subsection @value{SHORT} Information Request
+@node SCCP Information Request
+@subsection SCCP Information Request
 
 @subsubheading N_INFO_REQ
 @anchor{N_INFO_REQ}
@@ -1118,7 +1118,7 @@ There are no errors associated with the issuance of this primitive.
 @subsubheading N_INFO_ACK
 @prindex N_INFO_ACK
 This primitive indicates to the NS user any relevant protocol-dependent parameters.@footnote{In the
-future, this primitive will be modified such that it will allow the @value{INTERFACE} to accept
+future, this primitive will be modified such that it will allow the SCCPI to accept
 either sub-network point of attachment addresses or network addresses.}  It should be initiated in
 response to the @prim{N_INFO_REQ} primitive described above.
 
@@ -1243,7 +1243,7 @@ Indicates the length of the protocol identifiers that were bound using the @prim
 Indicates the offset of the protocol identifiers that were bound using the @prim{N_BIND_REQ}, from
 the beginning of the @msg{M_PCPROTO} message block.
 @item @parm{NPI_version} @tab
-Indicates the current version of @value{INTERFACE} that is supported.
+Indicates the current version of SCCPI that is supported.
 Always @pval{N_VERSION_2} for this specificaiton.
 @end multitable
 
@@ -1254,18 +1254,18 @@ Always @pval{N_VERSION_2} for this specificaiton.
 When set, it indicates that the NS provider supports receipt confirmation.
 
 @emph{This flag is used only in the connection-mode environment.}
-Also, this flag is not applicable to @value{LONG}, because @value{SHORT} does not support receipt confirmation.
+Also, this flag is not applicable to Signalling Connection Control Part, because SCCP does not support receipt confirmation.
 @item EX_DATA_OPT
 When set, it indicates that the NS provider supports expedited data transfer.
 
 @emph{This flag is used only in the connection-mode environment.}
-@emph{Also, this flag is not applicable to any @value{LONG} protocol class except @dfn{Protocol Class 3}.}
+@emph{Also, this flag is not applicable to any Signalling Connection Control Part protocol class except @dfn{Protocol Class 3}.}
 @item DEFAULT_RC_SEL
 When set, indicates that the default selection is for the use of receipt confirmation for every
 @prim{N_DATA_REQ} primitive.  This flag is only applicable when use of receipt confirmation is
 successfully negotiated via the @prim{N_CONN_REQ} or @prim{N_CONN_RES} primitives.
 @emph{This flag is only used in the connection-mode environment.}
-@emph{This flag is not applicable to @value{LONG}, because @value{SHORT} does not support receipt confirmation.}
+@emph{This flag is not applicable to Signalling Connection Control Part, because SCCP does not support receipt confirmation.}
 @end table
 
 @subsubheading Service Types
@@ -1596,8 +1596,8 @@ primitive.
 @end itemize
 
 @page
-@node @value{SHORT} Options Management Request
-@subsection @value{SHORT} Options Management Request
+@node SCCP Options Management Request
+@subsection SCCP Options Management Request
 @subsubheading N_OPTMGMT_REQ
 @anchor{N_OPTMGMT_REQ}
 @prindex N_OPTMGMT_REQ
@@ -1907,15 +1907,15 @@ primitives.  The default values of the QOS parameters associated with an NC may 
 * N_CONN_CON::
 @end menu
 
-The following @value{SHORT} service primitives pertain to the establishment of an NC
-between local and remote @value{SHORT}-SAPs, provided the @value{SHORT} users exist, and are known
-to the @value{SHORT}.
+The following SCCP service primitives pertain to the establishment of an NC
+between local and remote SCCP-SAPs, provided the SCCP users exist, and are known
+to the SCCP.
 
 @node N_CONN_REQ
-@subsubsection @value{LONG} Connection Request
+@subsubsection Signalling Connection Control Part Connection Request
 @subsubheading N_CONN_REQ
 @prindex N_CONN_REQ
-This primitive requests that the @value{SHORT} form an NC to the specified destination.
+This primitive requests that the SCCP form an NC to the specified destination.
 @subsubheading Format
 The format of the message is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA}
 message blocks for the NS user data transfer.  The specification of the NS user data is optional.
@@ -2026,7 +2026,7 @@ primitive.
 
 @page
 @node N_CONN_IND
-@subsubsection @value{LONG} Connection Indication
+@subsubsection Signalling Connection Control Part Connection Indication
 @subsubheading N_CONN_IND
 @prindex N_CONN_IND
 This primitive indicates to the destination NS user that a network connect request has been made by
@@ -2119,7 +2119,7 @@ for user response is incremented by one).
 
 @page
 @node N_CONN_RES
-@subsubsection @value{LONG} Connection Response
+@subsubsection Signalling Connection Control Part Connection Response
 @subsubheading N_CONN_RES
 @prindex N_CONN_RES
 This primitive allows the destination NS user to request that the network provider accept a previous
@@ -2257,7 +2257,7 @@ primitive.
 
 @page
 @node N_CONN_CON
-@subsubsection @value{LONG} Connection Confirmation
+@subsubsection Signalling Connection Control Part Connection Confirmation
 @subsubheading N_CONN_CON
 @prindex N_CONN_CON
 This primitive indicates to the source NS user that the network connect request has been confirmed
@@ -2967,7 +2967,7 @@ The resulting state is @psta{NS_DATA_XFER}.
 @node Inform Service
 @subsection Inform Service
 
-@subsubsection @value{SHORT} Inform Request
+@subsubsection SCCP Inform Request
 @subsubheading N_INFORM_REQ
 @anchor{N_INFORM_REQ}
 @prindex N_INFORM_REQ
@@ -3020,7 +3020,7 @@ The new state remains unchanged.
 @subsubheading Acknowledgements
 
 @page
-@subsubsection @value{SHORT} Inform Indication
+@subsubsection SCCP Inform Indication
 @subsubheading N_INFORM_IND
 @anchor{N_INFORM_IND}
 @prindex N_INFORM_IND
@@ -3314,9 +3314,9 @@ Specifies the length of the destination address.
 @item @parm{DEST_offset} @tab
 Specifies the offset of the destination address from the beginning of the @msg{M_PROTO} message
 block.
-@item @parm{RESERVED_field[0]} @tab
+@item @parm{RESERVED_field}[0] @tab
 Specified the length of the Quality of Service parameters.
-@item @parm{RESERVED_field[1]} @tab
+@item @parm{RESERVED_field}[1] @tab
 Specified the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
 message block.
 @end multitable
@@ -3579,17 +3579,17 @@ This primitive is valid in state @psta{NS_IDLE}.
 The resulting state remains unchanged.
 
 @page
-@node @value{SHORT} Provider Management Primitives
-@section @value{SHORT} Provider Management Primitives
+@node SCCP Provider Management Primitives
+@section SCCP Provider Management Primitives
 
 @menu
-* @value{SHORT} Status Service::
-* @value{SHORT} PC Status Service::
-* @value{SHORT} Coordination Service::
+* SCCP Status Service::
+* SCCP PC Status Service::
+* SCCP Coordination Service::
 @end menu
 
-@node @value{SHORT} Status Service
-@subsection @value{SHORT} Status Service
+@node SCCP Status Service
+@subsection SCCP Status Service
 
 @subsubsection State Request
 @subsubheading N_STATE_REQ
@@ -3678,16 +3678,16 @@ Indicates the subsystem multiplicity indicator.
 @subsubheading New State
 
 @page
-@node @value{SHORT} PC Status Service
-@subsection @value{SHORT} PC Status Service
+@node SCCP PC Status Service
+@subsection SCCP PC Status Service
 
 @subsubsection PC State Indication
 @subsubheading N_PCSTATE_IND
 @anchor{N_PCSTATE_IND}
 @prindex N_PCSTATE_IND
-This primitive indicates to the @value{SHORT}-User that the indicated remote @value{SHORT}-entity
+This primitive indicates to the SCCP-User that the indicated remote SCCP-entity
 (signalling point) is temporarily inaccessible.  This implies the inaccessibility of remote
-@value{SHORT}-User at the affected signalling point.
+SCCP-User at the affected signalling point.
 @subsubheading Format
 @tpindex N_pcstate_ind_t
 The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO}
@@ -3721,8 +3721,8 @@ Indicates the user status.  (See ``Status'' below.)
 @subsubheading New State
 
 @page
-@node @value{SHORT} Coordination Service
-@subsection @value{SHORT} Coordination Service
+@node SCCP Coordination Service
+@subsection SCCP Coordination Service
 
 @subsubsection Coordination Request
 @subsubheading N_COORD_REQ
@@ -3869,47 +3869,47 @@ Indicates the user status.  (See ``Status'' below.)
 @node Diagnostics Requirements
 @chapter Diagnostics Requirements
 
-Two error handling facilities should be provided to the @value{SHORT} user: one to handle non-fatal
+Two error handling facilities should be provided to the SCCP user: one to handle non-fatal
 errors, and the other to handle fatal errors.
 
 @section Non-Fatal Error Handling Facility
 
-These are errors that do not change the state of the @value{SHORT} service interface as seen by the
-@value{SHORT} service user, and provide the user the option of reissuing the @value{SHORT} service
+These are errors that do not change the state of the SCCP service interface as seen by the
+SCCP service user, and provide the user the option of reissuing the SCCP service
 primitive with the corrected options specification.  The non-fatal error handling is provided only
 to those primitive that require acknowledgements, and uses the @prim{N_ERROR_ACK} primitive to
-report these errors.  These errors retain the state of hte @value{SHORT} service interface the same
-as it was before the @value{SHORT} service provider received the primitive that was in error.
+report these errors.  These errors retain the state of hte SCCP service interface the same
+as it was before the SCCP service provider received the primitive that was in error.
 Syntax errros and rule violations are reported via the non-fatal error handling facility.
 
 @section Fatal Error Handling Facility
 
-These errors are issued by the @value{SHORT} provider when it detects errors that are not
-correctable by the @value{SHORT} user, or if it is unable to report a correctible error to the
-@value{SHORT} user.  Fatal errors are indicated via the @acronym{STREAMS} message type @msg{M_ERROR} with the
+These errors are issued by the SCCP provider when it detects errors that are not
+correctable by the SCCP user, or if it is unable to report a correctible error to the
+SCCP user.  Fatal errors are indicated via the @acronym{STREAMS} message type @msg{M_ERROR} with the
 UNIX system error @errno{EPROTO}.  The @msg{M_ERROR} @acronym{STREAMS} message type will result in the failure
-of all the UNIX system calls on the stream.  The @value{SHORT} user can recover from a fatal error
+of all the UNIX system calls on the stream.  The SCCP user can recover from a fatal error
 by having all the processes close the files associated with the stream, and then reopening them for
 processing.
 
-These errors are issued by the @value{SHORT} when it detects errors that are not correctable by the
-@value{SHORT} service user, or if it is unable to report a correctable error to the @value{SHORT}
+These errors are issued by the SCCP when it detects errors that are not correctable by the
+SCCP service user, or if it is unable to report a correctable error to the SCCP
 service user.  Fatal errors are indicated via the @acronym{STREAMS} message type @msg{M_ERROR} with the UNIX
 system error @errno{EPROTO}.  The @msg{M_ERROR} @acronym{STREAMS} message type will result in the failure of
-all the UNIX system calls on the stream.  The @value{SHORT} service user can recover from a fatal
+all the UNIX system calls on the stream.  The SCCP service user can recover from a fatal
 error by having all the processes close the files associated with the stream, and then reopening
 them for processing.
 
-@node @value{INTERFACE} Input-Output Controls
-@chapter @value{INTERFACE} Input-Output Controls
-@cindex @value{INTERFACE} input-output controls
+@node SCCPI Input-Output Controls
+@chapter SCCPI Input-Output Controls
+@cindex SCCPI input-output controls
 
-@node @value{INTERFACE} Management Information Base
-@chapter @value{INTERFACE} Management Information Base
-@cindex @value{INTERFACE} management information base
+@node SCCPI Management Information Base
+@chapter SCCPI Management Information Base
+@cindex SCCPI management information base
 
-@node Addendum for @value{SHORT} Conformance
-@unnumbered Addendum for @value{SHORT} Conformance
+@node Addendum for SCCP Conformance
+@unnumbered Addendum for SCCP Conformance
 
 @menu
 * Addendum for ITU-T Q.711 Conformance::
@@ -3921,13 +3921,13 @@ them for processing.
 @unnumberedsec Addendum for ITU-T Q.711 Conformance
 
 This addendum describes the formats and rules that are specific to ETSI EN 300 009-1 V3.2.2.  The
-addendum must be used along with the generic @value{INTERFACE} as defined in the main document, and
-the EN 300 009-1 conformance defined in Addendum 2, when implementing an @value{SHORT} that will be
-configured with the EN 300 008-1 @value{LONG}.
+addendum must be used along with the generic SCCPI as defined in the main document, and
+the EN 300 009-1 conformance defined in Addendum 2, when implementing an SCCP that will be
+configured with the EN 300 008-1 Signalling Connection Control Part.
 
 @unnumberedsec Primitives and Rules for ETSI EN 300 009-1 V3.2.2 Conformance
 
-The following are the additional rules that apply to the @value{INTERFACE} primitives for ETSI EN
+The following are the additional rules that apply to the SCCPI primitives for ETSI EN
 300 009-1 V3.2.2 compatibility.
 
 @unnumberedsubsec Local Management Primitives
@@ -3968,58 +3968,58 @@ The following are the additional rules that apply to the @value{INTERFACE} primi
 @node Addendum for ETSI EN 300 009-1 Conformance
 @unnumberedsec Addendum for ETSI EN 300 009-1 Conformance
 
-@node Mapping @value{INTERFACE} Primitives
-@appendix Mapping @value{INTERFACE} Primitives
+@node Mapping SCCPI Primitives
+@appendix Mapping SCCPI Primitives
 
 @menu
-* Mapping @value{INTERFACE} Primitives to Q.711::
-* Mapping @value{INTERFACE} Primitives to ANSI T1.112::
-* Mapping @value{INTERFACE} Primitives to ETSI EN 300 009-1::
+* Mapping SCCPI Primitives to Q.711::
+* Mapping SCCPI Primitives to ANSI T1.112::
+* Mapping SCCPI Primitives to ETSI EN 300 009-1::
 @end menu
 
-@node Mapping @value{INTERFACE} Primitives to Q.711
-@section Mapping @value{INTERFACE} Primitives to Q.711
+@node Mapping SCCPI Primitives to Q.711
+@section Mapping SCCPI Primitives to Q.711
 
-Table A-1 shows the mapping of the @value{INTERFACE} primitives to the @value{SHORT} definition
+Table A-1 shows the mapping of the SCCPI primitives to the SCCP definition
 primitives listed in ITU-T Recommendation Q.711.
 
-The mapping of @value{INTERFACE} primitives to Q.711 primitives is shown in @tabref{6}.  For the
+The mapping of SCCPI primitives to Q.711 primitives is shown in @tabref{6}.  For the
 most part, this mapping is a one to one mapping of service primitives, with the exception of
 @emph{Connect Request} and @emph{Disconnect Request}.
 
-In Q.711 there is no concept of an @dfn{NC} between @value{SHORT}-entities.  In OpenSS7
-@value{INTERFACE}, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
-establish and release an NC between @value{SHORT}-entities.
+In Q.711 there is no concept of an @dfn{NC} between SCCP-entities.  In OpenSS7
+SCCPI, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
+establish and release an NC between SCCP-entities.
 
-@c @tabfig{sccpi_tab06,6,Mapping of @value{INTERFACE} primitives to Q.711 Primitives}
+@c @tabfig{sccpi_tab06,6,Mapping of SCCPI primitives to Q.711 Primitives}
 
 @page
-@node Mapping @value{INTERFACE} Primitives to ANSI T1.112
-@section Mapping @value{INTERFACE} Primitives to ANSI T1.112
+@node Mapping SCCPI Primitives to ANSI T1.112
+@section Mapping SCCPI Primitives to ANSI T1.112
 
-The mapping of @value{INTERFACE} primitives to T1.112 primitives is shown in @tabref{7}.  For the
+The mapping of SCCPI primitives to T1.112 primitives is shown in @tabref{7}.  For the
 most part, this mapping is a one to one mapping of service primitives, with the exception of
 @emph{Connect Request} and @emph{Disconnect Request}.
 
-In T1.112 there is no concept of an @dfn{NC} between @value{SHORT}-entities.  In OpenSS7
-@value{INTERFACE}, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
-establish and release an NC between @value{SHORT}-entities.
+In T1.112 there is no concept of an @dfn{NC} between SCCP-entities.  In OpenSS7
+SCCPI, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
+establish and release an NC between SCCP-entities.
 
-@c @tabfig{sccpi_tab07,7,Mapping of @value{INTERFACE} primitives to T1.112 Primitives}
+@c @tabfig{sccpi_tab07,7,Mapping of SCCPI primitives to T1.112 Primitives}
 
 @page
-@node Mapping @value{INTERFACE} Primitives to ETSI EN 300 009-1
-@section Mapping @value{INTERFACE} Primitives to ETSI EN 300 009-1
+@node Mapping SCCPI Primitives to ETSI EN 300 009-1
+@section Mapping SCCPI Primitives to ETSI EN 300 009-1
 
-The mapping of @value{INTERFACE} primitives to EN 300 009-1 primitives is shown in @tabref{8}.  For the
+The mapping of SCCPI primitives to EN 300 009-1 primitives is shown in @tabref{8}.  For the
 most part, this mapping is a one to one mapping of service primitives, with the exception of
 @emph{Connect Request} and @emph{Disconnect Request}.
 
-In EN 300 009-1 there is no concept of an @dfn{NC} between @value{SHORT}-entities.  In OpenSS7
-@value{INTERFACE}, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
-establish and release an NC between @value{SHORT}-entities.
+In EN 300 009-1 there is no concept of an @dfn{NC} between SCCP-entities.  In OpenSS7
+SCCPI, the @prim{N_CONN_REQ} and @prim{N_DISCON_REQ} primitives are used to
+establish and release an NC between SCCP-entities.
 
-@c @tabfig{sccpi_tab08,8,Mapping of @value{INTERFACE} primitives to EN 300 009-1 Primitives}
+@c @tabfig{sccpi_tab08,8,Mapping of SCCPI primitives to EN 300 009-1 Primitives}
 
 @node State/Event Tables
 @appendix State/Event Tables
@@ -4027,42 +4027,42 @@ establish and release an NC between @value{SHORT}-entities.
 @node Precedence Tables
 @appendix Precedence Tables
 
-@c @node Allowable Sequence of @value{INTERFACE} Primitives
-@c @chapter Allowable Sequence of @value{INTERFACE} Primitives
+@c @node Allowable Sequence of SCCPI Primitives
+@c @chapter Allowable Sequence of SCCPI Primitives
 
-@c @node Precedence of @value{INTERFACE} Primitives
-@c @chapter Precedence of @value{INTERFACE} Primitives
+@c @node Precedence of SCCPI Primitives
+@c @chapter Precedence of SCCPI Primitives
 
-@c @node Guidelines for Protocol Independent @value{INTERFACE} Users
-@c @appendix Guidelines for Protocol Independent @value{INTERFACE} Users
+@c @node Guidelines for Protocol Independent SCCPI Users
+@c @appendix Guidelines for Protocol Independent SCCPI Users
 
-@c @node Required Information for @value{INTERFACE} Provider-Specific Addenda
-@c @appendix Required Information for @value{INTERFACE} Provider-Specific Addenda
+@c @node Required Information for SCCPI Provider-Specific Addenda
+@c @appendix Required Information for SCCPI Provider-Specific Addenda
 
-@node @value{INTERFACE} Header Files
-@appendix @value{INTERFACE} Header Files
+@node SCCPI Header Files
+@appendix SCCPI Header Files
 
 @noindent
 @smallformat
 @c @verbatiminclude sccpi.h
 @end smallformat
 
-@node @value{INTERFACE} Library
-@appendix @value{INTERFACE} Library
+@node SCCPI Library
+@appendix SCCPI Library
 
-@node @value{INTERFACE} Drivers and Modules
-@appendix @value{INTERFACE} Drivers and Modules
+@node SCCPI Drivers and Modules
+@appendix SCCPI Drivers and Modules
 
-@c @figuresized{sccpi_figc1,C-1,@value{INTERFACE} Drivers and Modules,5.5in}
+@c @figuresized{sccpi_figc1,C-1,SCCPI Drivers and Modules,5.5in}
 
-@node @value{INTERFACE} Utilities
-@appendix @value{INTERFACE} Utilities
+@node SCCPI Utilities
+@appendix SCCPI Utilities
 
-@node @value{INTERFACE} File Formats
-@appendix @value{INTERFACE} File Formats
+@node SCCPI File Formats
+@appendix SCCPI File Formats
 
-@node @value{INTERFACE} Compatibility and Porting
-@appendix @value{INTERFACE} Compatibility and Porting
+@node SCCPI Compatibility and Porting
+@appendix SCCPI Compatibility and Porting
 
 @node Glossary
 @unnumbered Glossary

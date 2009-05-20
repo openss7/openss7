@@ -114,7 +114,6 @@ PNG_PNGS		= \
 PS_PSS			= \
 			mtp2.ps \
 			mtp3.ps \
-			osimap.ps \
 			platconf.ps \
 			sccp.ps \
 			sdt.ps \
