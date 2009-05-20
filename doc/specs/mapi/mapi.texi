@@ -545,7 +545,7 @@ MAP user, and others that originate from the MAP provider.  The primitives that 
 MAP user make requests to the MAP provider, or respond to an event of the MAP provider.  The
 primitives that originate from the MAP provider are either confirmation of a request or are
 indications to the MAP user that the event has occurred.  @emph{Figure 1} shows the model of the
-MAPI.  (See @ref{Modelling Principles, , , ,3GPP TS 29.002 V6.6.0}.)
+MAPI.  (See Modelling Principles in 3GPP TS 29.002 V6.6.0.)
 
 @cartouche
 @center Figure 1 -- @emph{Module of the MAP Interface}

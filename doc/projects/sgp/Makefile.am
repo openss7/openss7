@@ -92,7 +92,6 @@ PS_PSS			= \
 			cnam_protconf.ps \
 			mtp2.ps \
 			mtp3.ps \
-			osimap.ps \
 			sccp.ps \
 			sdt.ps \
 			sl.ps \

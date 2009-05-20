@@ -294,21 +294,21 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @menu
 * Preface::
 * Introduction::
-* @value{INTERFACE}::
-@c * Addendum for @value{SHORT} Conformance::
-* Mapping @value{INTERFACE} Primitives::
+* TPI-SCCP::
+@c * Addendum for SCCP Conformance::
+* Mapping TPI-SCCP Primitives::
 @c * State/Event Tables::
 @c * Precedence Tables::
-@c * Allowable Sequence of @value{INTERFACE} Primitives::
-@c * Precedence of @value{INTERFACE} Primitives::
-@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
-@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
-* @value{INTERFACE} Header Files::
-* @value{INTERFACE} Library::
-* @value{INTERFACE} Drivers and Modules::
-* @value{INTERFACE} Utilities::
-@c * @value{INTERFACE} File Formats::
-@c * @value{INTERFACE} Compatibility and Porting::
+@c * Allowable Sequence of TPI-SCCP Primitives::
+@c * Precedence of TPI-SCCP Primitives::
+@c * Guidelines for Protocol Independent TPI-SCCP Users::
+@c * Required Information for TPI-SCCP Provider-Specific Addenda::
+* TPI-SCCP Header Files::
+* TPI-SCCP Library::
+* TPI-SCCP Drivers and Modules::
+* TPI-SCCP Utilities::
+@c * TPI-SCCP File Formats::
+@c * TPI-SCCP Compatibility and Porting::
 * Glossary::
 * Acronyms::
 * References::
@@ -351,9 +351,9 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
-(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
-components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Connection Control Part
+(SCCP) protocol stacks.  It provides abstraction of the Signalling Connection Control interface to these
+components as well as providing a basis for Signalling Connection Control control for other Signalling Connection Control protocols.
 
 @subsection Purpose
 @cpindex STREAMS
@@ -457,8 +457,8 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 
 @section Definitions, Acronyms, and Abbreviations
 
-@node @value{INTERFACE}
-@chapter @value{INTERFACE}
+@node TPI-SCCP
+@chapter TPI-SCCP
 
 A document describing using XTI for SCCP has been generated to support the use of the OpenSS7 SCCPI
 (SCCP Interface) using the methods of the X/Open Transport Interface described in XNS 5.2.  This
@@ -473,7 +473,7 @@ addresses and options.  Aside from that, SCCP Transport resembles X.213 (NS) ISO
 
 @section Addressing
 
-@value{INTERFACE} uses SCCP formatted addresses instead of ISO Network Service Access Point addresses.
+TPI-SCCP uses SCCP formatted addresses instead of ISO Network Service Access Point addresses.
 
 @subsection Address Format
 
@@ -799,8 +799,8 @@ Reason codes for disconnection:
 @subsubheading T_UDERROR_IND
 
 
-@node Mapping @value{INTERFACE} Primitives
-@appendix Mapping @value{INTERFACE} Primitives
+@node Mapping TPI-SCCP Primitives
+@appendix Mapping TPI-SCCP Primitives
 
 @menu
 * Mapping TPI Primitives to ITU-T Q.711::
@@ -977,18 +977,18 @@ primitives and the TPI connectionless data transfer error primitives.
 @section Mapping TPI Primitives to ITU-T X.213
 
 
-@node @value{INTERFACE} Header Files
-@appendix @value{INTERFACE} Header Files
+@node TPI-SCCP Header Files
+@appendix TPI-SCCP Header Files
 
-@node @value{INTERFACE} Library
-@appendix @value{INTERFACE} Library
+@node TPI-SCCP Library
+@appendix TPI-SCCP Library
 
 Because this Corrigendum provides an SCCP interface that conforms to the Transport Provider Interface
 (TPI) Revision 2.0.0, it can use the libraries provided for use by the TPI.  In particular, the
 @manref{libxti(3)} library can be used.
 
-@node @value{INTERFACE} Drivers and Modules
-@appendix @value{INTERFACE} Drivers and Modules
+@node TPI-SCCP Drivers and Modules
+@appendix TPI-SCCP Drivers and Modules
 
 @menu
 * SCCP Driver and Module::
@@ -1031,8 +1031,8 @@ this module.
 
 Similarly, a minor device number on the TUA driver is so defined.
 
-@node @value{INTERFACE} Utilities
-@appendix @value{INTERFACE} Utilities
+@node TPI-SCCP Utilities
+@appendix TPI-SCCP Utilities
 
 In general, any of the utilities provided by the underlying SCCP or SUA provider that support
 input-output controls defined in the SCCPI specification can be used on SCCP or SUA Streams upon
@@ -1041,11 +1041,11 @@ Conversion Module} passes input-output controls transparently to the underlying 
 
 Therefore, this specification does not define any utilities of its own.
 
-@c @node @value{INTERFACE} File Formats
-@c @appendix @value{INTERFACE} File Formats
+@c @node TPI-SCCP File Formats
+@c @appendix TPI-SCCP File Formats
 @c 
-@c @node @value{INTERFACE} Compatibility and Porting
-@c @appendix @value{INTERFACE} Compatibility and Porting
+@c @node TPI-SCCP Compatibility and Porting
+@c @appendix TPI-SCCP Compatibility and Porting
 @c 
 @node Glossary
 @unnumbered Glossary

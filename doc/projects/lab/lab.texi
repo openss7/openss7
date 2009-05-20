@@ -296,6 +296,19 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Index::
 @end menu
 
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@c @page
+@c @heading List of Listings
+@c @listoffloats Table
+@end iftex
+
 @node Executive Overview
 @unnumbered Executive Overview
 
@@ -2739,14 +2752,6 @@ not included.
 @item @code{}  @tab =========================== @tab @code{}          @tab @code{==========}
 @item @code{}  @tab TOTAL			@tab @code{}	      @tab @code{$56,135.00}
 @end multitable
-
-@node List of Figures
-@unnumbered List of Figures
-@listoffloats Figure
-
-@node List of Tables
-@unnumbered List of Tables
-@listoffloats Table
 
 @node Index
 @unnumbered Index

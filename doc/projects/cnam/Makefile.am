@@ -137,7 +137,6 @@ PS_PSS			= \
 			cnam_protconf.ps \
 			mtp2.ps \
 			mtp3.ps \
-			osimap.ps \
 			platconf.ps \
 			sccp.ps \
 			sdt.ps \

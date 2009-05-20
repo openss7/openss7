@@ -64,10 +64,10 @@ EPSS  = $(FIG_FIGS:.fig=.eps)
 
 ME_DEPS = fixup idrefs draft.me draft2.me draft3.me draft4.me
 
-.me.txt:  ; $(AM_V_GEN)cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tascii -me | $(srcdir)/fixup > $@
-.me.dvi:  ; $(AM_V_GEN)cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tdvi   -me > $@
-.me.ps:   ; $(AM_V_GEN)cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Tps    -me > $@
-.me.html: ; $(AM_V_GEN)cat $< | soelim -I$(srcdir) | sed -e 's,database idrefs,database $(srcdir)/idrefs,' | groff -R -p -t -e -Thtml  -me > $@
+.me.txt:  ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | nroff -s -p -e -t -me -Tascii | $(srcdir)/fixup > $@
+.me.dvi:  ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | groff -s -p -e -t -me -Tdvi  > $@ 2>/dev/null
+.me.ps:   ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | groff -s -p -e -t -me -Tps   > $@ 2>/dev/null
+.me.html: ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | groff -s -p -e -t -me -Thtml > $@ 2>/dev/null
 
 ##.me.txt:  ; $(AM_V_GEN)groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
 ##.me.dvi:  ; $(AM_V_GEN)groff -R -s -p -t -e -Tdvi   -me $< > $@
@@ -75,10 +75,11 @@ ME_DEPS = fixup idrefs draft.me draft2.me draft3.me draft4.me
 ##.me.html: ; $(AM_V_GEN)groff -R -s -p -t -e -Thtml  -me $< > $@
 
 .ps.pdf:  ; $(AM_V_GEN)ps2pdf $< $@
+#.dvi.pdf: ; $(AM_V_GEN)dvipdf $< $@
 
-.fig.pic: ; $(AM_V_GEN)$(FIG2DEV) -L pic -p allps $< $@
+.fig.pic: ; $(AM_V_GEN)$(FIG2DEV) -L pic -s 10 -p allps $< $@
 .fig.gif: ; $(AM_V_GEN)$(FIG2DEV) -L gif $< $@
-.fig.eps: ; $(AM_V_GEN)$(FIG2DEV) -L ps $< $@
+.fig.eps: ; $(AM_V_GEN)$(FIG2DEV) -L ps -p dummy $< $@
 
 #$(TXTS) : %.txt : %.me $(ME_DEPS) ; $(AM_V_GEN)groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
 #$(DVIS) : %.dvi : %.me $(ME_DEPS) ; $(AM_V_GEN)groff -R -s -p -t -e -Tdvi   -me $< > $@

@@ -299,22 +299,22 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Supported Services::
 * Rules for Conformance::
 * Extension Primitives::
-* @value{INTERFACE} Input-Output Controls::
-* @value{INTERFACE} Management Information Base::
-@c * Addendum for @value{SHORT} Conformance::
-* Mapping @value{INTERFACE} Primitives::
+* NPI-SCCP Input-Output Controls::
+* NPI-SCCP Management Information Base::
+@c * Addendum for SCCP Conformance::
+* Mapping NPI-SCCP Primitives::
 @c * State/Event Tables::
 @c * Precedence Tables::
-@c * Allowable Sequence of @value{INTERFACE} Primitives::
-@c * Precedence of @value{INTERFACE} Primitives::
-@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
-@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
-* @value{INTERFACE} Header Files::
-* @value{INTERFACE} Library::
-* @value{INTERFACE} Drivers and Modules::
-* @value{INTERFACE} Utilities::
-@c * @value{INTERFACE} File Formats::
-* @value{INTERFACE} Compatibility and Porting::
+@c * Allowable Sequence of NPI-SCCP Primitives::
+@c * Precedence of NPI-SCCP Primitives::
+@c * Guidelines for Protocol Independent NPI-SCCP Users::
+@c * Required Information for NPI-SCCP Provider-Specific Addenda::
+* NPI-SCCP Header Files::
+* NPI-SCCP Library::
+* NPI-SCCP Drivers and Modules::
+* NPI-SCCP Utilities::
+@c * NPI-SCCP File Formats::
+* NPI-SCCP Compatibility and Porting::
 * Glossary::
 * Acronyms::
 * References::
@@ -357,9 +357,9 @@ the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software a
 as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
-(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
-components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Connection Control Part
+(SCCP) protocol stacks.  It provides abstraction of the Signalling Connection Control interface to these
+components as well as providing a basis for Signalling Connection Control control for other Signalling Connection Control protocols.
 
 @subsection Purpose
 @cpindex STREAMS
@@ -2951,14 +2951,14 @@ typedef struct {
 @unnumberedsubsubsec State
 @unnumberedsubsubsec Rules
 
-@node @value{INTERFACE} Input-Output Controls
-@chapter @value{INTERFACE} Input-Output Controls
+@node NPI-SCCP Input-Output Controls
+@chapter NPI-SCCP Input-Output Controls
 
-@node @value{INTERFACE} Management Information Base
-@chapter @value{INTERFACE} Management Information Base
+@node NPI-SCCP Management Information Base
+@chapter NPI-SCCP Management Information Base
 
-@node Mapping @value{INTERFACE} Primitives
-@appendix Mapping @value{INTERFACE} Primitives
+@node Mapping NPI-SCCP Primitives
+@appendix Mapping NPI-SCCP Primitives
 
 @menu
 * Mapping NPI Primitives to ITU-T X.213::
@@ -3023,8 +3023,8 @@ necessary that two primitive are necessary for each data transmission.  Worse, w
 primitive before issuing any other primitives, meaning the outgoing queueing must clear before the
 message may be sent.
 
-To circumvent this deficiency, the @cite{OpenSS7 Project} uses the @parm{RESERVED_field[0]} and
-@parm{RESERVED_field[1]} as @parm{QOS_length} and @parm{QOS_offset} respectively.  This is
+To circumvent this deficiency, the @cite{OpenSS7 Project} uses the @parm{RESERVED_field}[0] and
+@parm{RESERVED_field}[1] as @parm{QOS_length} and @parm{QOS_offset} respectively.  This is
 compatible with implementations expecting the old behavior, because @parm{QOS_length} and
 @parm{QOS_offset} will simply be coded zero (@samp{0}).
 
@@ -3171,8 +3171,8 @@ Interface (NPI) Revision 2.0.0 specification when applied to SCCP:
 @item
 NPI Revision 2.0.0 does not have a usable way of setting the per-primitive @dfn{Quality of Service
 parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance} using the
-@prim{N_UNITDATA_REQ} primtive.  The @cite{OpenSS7 Project} uses the @parm{RESERVED_field[0]} and
-@parm{RESERVED_field[1]} in the @prim{N_UNITDATA_REQ} primitive as though they were a
+@prim{N_UNITDATA_REQ} primtive.  The @cite{OpenSS7 Project} uses the @parm{RESERVED_field}[0] and
+@parm{RESERVED_field}[1] in the @prim{N_UNITDATA_REQ} primitive as though they were a
 @parm{QOS_length} and @parm{QOS_offset} field, respectively, to pass the @dfn{Quality of Service
 parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance}.
 
@@ -3207,8 +3207,8 @@ illustrated in @tabref{A-7}.
 @node Mapping NPI Primitives to ANSI T1.112
 @section Mapping NPI Primitives to ANSI T1.112
 
-@node @value{INTERFACE} Header Files
-@appendix @value{INTERFACE} Header Files
+@node NPI-SCCP Header Files
+@appendix NPI-SCCP Header Files
 
 Applications using the Network Provider Interface (NPI) for Signalling Connection Control Part
 (SCCP) need to include several system header files:
@@ -3272,15 +3272,15 @@ declarations.
 Note that the input-output control defintions are the same as those provided by the Signalling
 Connection Control Part interface (SCCPI) described in a separate document.
 
-@node @value{INTERFACE} Library
-@appendix @value{INTERFACE} Library
+@node NPI-SCCP Library
+@appendix NPI-SCCP Library
 
 Because this Addendum provides an SCCP interface that conforms to the Network Provider Interface
 (NPI) Revision 2.0.0, it can use the libraries provided for use by the NPI.  In particular, the
 @manref{libnpiapi(3)} library can be used.
 
-@node @value{INTERFACE} Drivers and Modules
-@appendix @value{INTERFACE} Drivers and Modules
+@node NPI-SCCP Drivers and Modules
+@appendix NPI-SCCP Drivers and Modules
 
 @menu
 * TCI Module::
@@ -3362,8 +3362,8 @@ conversion assistance to this module.
 
 Similarly, a minor device number on the SUA driver is also defined.
 
-@node @value{INTERFACE} Utilities
-@appendix @value{INTERFACE} Utilities
+@node NPI-SCCP Utilities
+@appendix NPI-SCCP Utilities
 
 In general, any of the utilities provided by the underlying SCCP or SUA provider that support
 input-output controls defined in the SCCPI specification can be used on SCCP or SUA Streams upon
@@ -3372,11 +3372,11 @@ Conversion Module} passes input-output controls transparently to the underlying 
 
 Therefore, this specification does not define any utilities of its own.
 
-@c @node @value{INTERFACE} File Formats
-@c @appendix @value{INTERFACE} File Formats
+@c @node NPI-SCCP File Formats
+@c @appendix NPI-SCCP File Formats
 @c 
-@node @value{INTERFACE} Compatibility and Porting
-@appendix @value{INTERFACE} Compatibility and Porting
+@node NPI-SCCP Compatibility and Porting
+@appendix NPI-SCCP Compatibility and Porting
 
 @node License
 @unnumbered License

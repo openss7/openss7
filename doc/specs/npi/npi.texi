@@ -461,14 +461,14 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @menu
 * Introduction::
 * The Network Layer::
-* @value{INTERFACE} Services Definition::
-* @value{INTERFACE} Primitives::
+* NPI Services Definition::
+* NPI Primitives::
 * Diagnostics Requirements::
 * Addendum for OSI Conformance::
-* Mapping @value{INTERFACE} to ISO 8348 and CCITT X.213::
+* Mapping NPI to ISO 8348 and CCITT X.213::
 * State/Event Tables::
 * Primitive Precedence Tables::
-* @value{INTERFACE} Header File Listing::
+* NPI Header File Listing::
 * Glossary::
 * Acronyms::
 * References::
@@ -621,18 +621,18 @@ A communication services development facility first available with
 
 @ifnotinfo
 @menu
-* Model of the @value{INTERFACE}::
-* @value{INTERFACE} Services::
+* Model of the NPI::
+* NPI Services::
 @end menu
 @end ifnotinfo
 
 The Network Layer provides the means to manage the operation of the network.  It is responsible for
 the routing and management of data exchange between network-user entities.
 
-@node Model of the @value{INTERFACE}
-@section Model of the @value{INTERFACE}
+@node Model of the NPI
+@section Model of the NPI
 
-The @value{INTERFACE} defines the services provided by the network layer to the network-user at the boundary
+The NPI defines the services provided by the network layer to the network-user at the boundary
 between the network layer and the network layer user entity.  The interface consists of a set of
 primitives defined as @acronym{STREAMS} messages that provide access to the network layer services, and
 are transferred between the NS user entity and the NS provider.  These primitives are of two types;
@@ -640,17 +640,17 @@ ones that originate from the NS user, and others that originate from the NS prov
 primitives that originate from the NS user make requests to the NS provider, or respond to an event
 of the NS provider.  The primitives that originate from the NS provider are either confirmations of
 a request or are indications to the NS user that the event has occurred.  @figref{1} shows the model
-of the @value{INTERFACE}.
+of the NPI.
 
-@figuresized{npi_fig1,1,Model of the @value{INTERFACE},4in}
+@figuresized{npi_fig1,1,Model of the NPI,4in}
 
-The @value{INTERFACE} allows the @value{SHORT} provider to be configured with any @value{SHORT} user
-(such as the OSI Transport Layer) that also conforms to the @value{INTERFACE}.  A network layer user
-can also be a user program that conforms to the @value{INTERFACE} and accesses the @value{SHORT}
+The NPI allows the NS provider to be configured with any NS user
+(such as the OSI Transport Layer) that also conforms to the NPI.  A network layer user
+can also be a user program that conforms to the NPI and accesses the NS
 provider via @manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
 
-@node @value{INTERFACE} Services
-@section @value{INTERFACE} Services
+@node NPI Services
+@section NPI Services
 
 @ifnotinfo
 @menu
@@ -660,11 +660,11 @@ provider via @manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
 @end menu
 @end ifnotinfo
 
-The features of the @value{INTERFACE} are defined in terms of the services provided by the NS
+The features of the NPI are defined in terms of the services provided by the NS
 provider, and the individual primitives that may flow between the NS user and the NS provider.
 
-The services supported by the @value{INTERFACE} are based on two distinct modes of communication,
-connection (CONS) and connectionless (CLNS).  In addition, the @value{INTERFACE} supports services
+The services supported by the NPI are based on two distinct modes of communication,
+connection (CONS) and connectionless (CLNS).  In addition, the NPI supports services
 for local management.
 
 @node CONS
@@ -712,17 +712,17 @@ in general, no guarantees of proper sequence and completeness of the data Stream
 @node Local Management
 @subsection Local Management
 
-The @value{INTERFACE} specifications also define a set of local management functions that apply to both CONS and
+The NPI specifications also define a set of local management functions that apply to both CONS and
 CLNS modes of communication.  These services have local significance only.
 
-@tabref{1} and @tabref{2} summarizes the @value{INTERFACE} service primitives by their state and service.
+@tabref{1} and @tabref{2} summarizes the NPI service primitives by their state and service.
 
 @tabfig{npi_tab1,1,Service Primitives for Connection Mode Data Transfer}
 
 @tabfig{npi_tab2,2,Service Primitives for Connectionless Mode Data Transfer}
 
-@node @value{INTERFACE} Services Definition
-@chapter @value{INTERFACE} Services Definition
+@node NPI Services Definition
+@chapter NPI Services Definition
 
 @menu
 * Local Management Services Definition::
@@ -730,7 +730,7 @@ CLNS modes of communication.  These services have local significance only.
 * Connectionless Network Services Definition::
 @end menu
 
-This section describes the services of the @value{INTERFACE} primitives.  Time-sequence diagrams
+This section describes the services of the NPI primitives.  Time-sequence diagrams
 that illustrate the sequence of primitives are included.@footnote{Conventions for the time-sequence
 diagrams are defined in CCITT X.210 (@pxref{X.210,,X.210}).) The format of the primitives will be defined later in
 this document.}
@@ -1259,8 +1259,8 @@ primitive.
 
 @figuresized{npi_fi23,23,Sequence of Primitives; CLNS Error Indication Service,4in}
 
-@node @value{INTERFACE} Primitives
-@chapter @value{INTERFACE} Primitives
+@node NPI Primitives
+@chapter NPI Primitives
 
 @menu
 * Management Primitives::
@@ -1268,14 +1268,14 @@ primitive.
 * CLNS Primitive Format and Rules::
 @end menu
 
-This section describes the format and parameters of the @value{INTERFACE} primitives
+This section describes the format and parameters of the NPI primitives
 (@ref{Mapping NPI to ISO 8348 and CCITT X.213}, shows the mapping of the
-@value{INTERFACE}
+NPI
 primitives to the primitives defined in ISO 8348 (@pxref{ISO8348,,ISO8348}) and
 CCITT X.213 (@pxref{X.213,,X.213})).  In addition, it discusses the states the
 primitive is valid in, the resulting state, and the acknowledgement that the
 primitive expects.  (The state/event tables for these primitives are shown in
-@ref{State/Event Tables}.  The precedence tables for the @value{INTERFACE} primitives are
+@ref{State/Event Tables}.  The precedence tables for the NPI primitives are
 shown in @ref{Primitive Precedence Tables}.) Rules for OSI conformance are
 described in @ref{Addendum for OSI Conformance}, to this document.
 
@@ -1368,7 +1368,7 @@ There are no errors associated with the issuance of this primitive.
 @subsubheading N_INFO_ACK
 @prindex N_INFO_ACK
 This primitive indicates to the NS user any relevant protocol-dependent parameters.@footnote{In the
-future, this primitive will be modified such that it will allow the @value{INTERFACE} to accept
+future, this primitive will be modified such that it will allow the NPI to accept
 either sub-network point of attachment addresses or network addresses.}  It should be initiated in
 response to the @prim{N_INFO_REQ} primitive described above.
 
@@ -1493,7 +1493,7 @@ Indicates the length of the protocol identifiers that were bound using the @prim
 Indicates the offset of the protocol identifiers that were bound using the @prim{N_BIND_REQ}, from
 the beginning of the @msg{M_PCPROTO} message block.
 @item @parm{NPI_version} @tab
-Indicates the current version of @value{INTERFACE} that is supported.
+Indicates the current version of NPI that is supported.
 Always @pval{N_VERSION_2} for this specificaiton.
 @end multitable
 
@@ -3447,9 +3447,9 @@ Specifies the length of the destination address.
 @item @parm{DEST_offset} @tab
 Specifies the offset of the destination address from the beginning of the @msg{M_PROTO} message
 block.
-@item @parm{RESERVED_field[0]} @tab
+@item @parm{RESERVED_field}[0] @tab
 Specified the length of the Quality of Service parameters.
-@item @parm{RESERVED_field[1]} @tab
+@item @parm{RESERVED_field}[1] @tab
 Specified the offset of the Quality of Service parameters from the beginning of the @msg{M_PROTO}
 message block.
 @end multitable

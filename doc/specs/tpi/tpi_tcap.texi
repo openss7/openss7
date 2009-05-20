@@ -294,21 +294,21 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @menu
 * Preface::
 * Introduction::
-* @value{INTERFACE}::
-@c * Addendum for @value{SHORT} Conformance::
-* Mapping @value{INTERFACE} Primitives::
+* TPI-TCAP::
+@c * Addendum for TCAP Conformance::
+* Mapping TPI-TCAP Primitives::
 @c * State/Event Tables::
 @c * Precedence Tables::
-@c * Allowable Sequence of @value{INTERFACE} Primitives::
-@c * Precedence of @value{INTERFACE} Primitives::
-@c * Guidelines for Protocol Independent @value{INTERFACE} Users::
-@c * Required Information for @value{INTERFACE} Provider-Specific Addenda::
-* @value{INTERFACE} Header Files::
-* @value{INTERFACE} Library::
-* @value{INTERFACE} Drivers and Modules::
-* @value{INTERFACE} Utilities::
-@c * @value{INTERFACE} File Formats::
-@c * @value{INTERFACE} Compatibility and Porting::
+@c * Allowable Sequence of TPI-TCAP Primitives::
+@c * Precedence of TPI-TCAP Primitives::
+@c * Guidelines for Protocol Independent TPI-TCAP Users::
+@c * Required Information for TPI-TCAP Provider-Specific Addenda::
+* TPI-TCAP Header Files::
+* TPI-TCAP Library::
+* TPI-TCAP Drivers and Modules::
+* TPI-TCAP Utilities::
+@c * TPI-TCAP File Formats::
+@c * TPI-TCAP Compatibility and Porting::
 * Glossary::
 * Acronyms::
 * References::
@@ -346,23 +346,23 @@ sections, no front-cover texts and no back-cover texts.
 
 @section Abstract
 
-This document is a Corrigendum for @value{SHORT} Conformance to the Transport Provider Interface
-containing technical details concerning the implementation of the @value{LONG} (@value{SHORT}) using
+This document is a Corrigendum for TCAP Conformance to the Transport Provider Interface
+containing technical details concerning the implementation of the Transaction Capabilities Application Part (TCAP) using
 the X/Open Transport Provider Interface (TPI).  It contains recommendations on software architecture
-as well as platform and system applicability of @value{INTERFACE}.
+as well as platform and system applicability of TPI-TCAP.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 @value{LONG}
-(@value{SHORT}) protocol stacks.  It provides abstraction of the @value{PART} interface to these
-components as well as providing a basis for @value{PART} control for other @value{PART} protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Transaction Capabilities Application Part
+(TCAP) protocol stacks.  It provides abstraction of the Transaction Capabilities Application interface to these
+components as well as providing a basis for Transaction Capabilities Application control for other Transaction Capabilities Application protocols.
 
 @subsection Purpose
 @cpindex STREAMS
 
-The purpose of this document is to provide technical documentation of the @value{SHORT} Transport
-Provider Interface (@value{INTERFACE}).  This document is intended to be included with the OpenSS7
+The purpose of this document is to provide technical documentation of the TCAP Transport
+Provider Interface (TPI-TCAP).  This document is intended to be included with the OpenSS7
 @acronym{STREAMS} software package released by @cite{OpenSS7 Corporation}.  It is intended to assist
-software developers, maintainers and users of the @value{INTERFACE} with understanding the software
+software developers, maintainers and users of the TPI-TCAP with understanding the software
 architecture and technical interfaces that are made available in the software package.
 
 @subsection Intent
@@ -461,8 +461,8 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 
 @section Definitions, Acronyms, and Abbreviations
 
-@node @value{INTERFACE}
-@chapter @value{INTERFACE}
+@node TPI-TCAP
+@chapter TPI-TCAP
 
 A document describing using XTI and mOSI for TCAP has been generated to support the use of the
 OpenSS7 TCAP TRI (Transaction Interface) using the methods of the X/Open minmal OSI interface
@@ -477,7 +477,7 @@ options.  Aside from that, TCAP Transport resembles X.217 (ACSE) ISO/OSI Present
 
 @section Addressing
 
-@value{INTERFACE} uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
+TPI-TCAP uses SCCP formatted addresses instead of ISO Presentation Layer addresses.
 
 @subsection Address Format
 
@@ -734,8 +734,8 @@ Connection rejected, no common version.
 
 @subsubheading T_REJECT_IND
 
-@node Mapping @value{INTERFACE} Primitives
-@appendix Mapping @value{INTERFACE} Primitives
+@node Mapping TPI-TCAP Primitives
+@appendix Mapping TPI-TCAP Primitives
 
 @menu
 * Mapping TPI Primitives to ITU-T Q.771::
@@ -1271,18 +1271,18 @@ stream.
 @section Mapping TPI Primitives to ITU-T X.219
 
 
-@node @value{INTERFACE} Header Files
-@appendix @value{INTERFACE} Header Files
+@node TPI-TCAP Header Files
+@appendix TPI-TCAP Header Files
 
-@node @value{INTERFACE} Library
-@appendix @value{INTERFACE} Library
+@node TPI-TCAP Library
+@appendix TPI-TCAP Library
 
 Because this Corrigendum provides a TCAP interface that conforms to the Transport Provider Interface
 (TPI) Revision 2.0.0, it can use the libraries provided for use by the TPI.  In particular, the
 @manref{libxti(3)} library can be used.
 
-@node @value{INTERFACE} Drivers and Modules
-@appendix @value{INTERFACE} Drivers and Modules
+@node TPI-TCAP Drivers and Modules
+@appendix TPI-TCAP Drivers and Modules
 
 @menu
 * TCI Module::
@@ -1329,8 +1329,8 @@ and then push the special-purpose @dfn{TPI Conversion Module} that is part of th
 
 Similarly, a minor device number on the TUA driver is so defined.
 
-@node @value{INTERFACE} Utilities
-@appendix @value{INTERFACE} Utilities
+@node TPI-TCAP Utilities
+@appendix TPI-TCAP Utilities
 
 In general, any of the utilities provided by the underlying TCAP or TUA provider that support
 input-output controls defined in the TRI/TCI specification can be used on TCAP or TUA Streams upon
@@ -1339,11 +1339,11 @@ Conversion Module} passes input-output controls transparently to the underlying 
 
 Therefore, this specification does not define any utilities of its own.
 
-@c @node @value{INTERFACE} File Formats
-@c @appendix @value{INTERFACE} File Formats
+@c @node TPI-TCAP File Formats
+@c @appendix TPI-TCAP File Formats
 @c 
-@c @node @value{INTERFACE} Compatibility and Porting
-@c @appendix @value{INTERFACE} Compatibility and Porting
+@c @node TPI-TCAP Compatibility and Porting
+@c @appendix TPI-TCAP Compatibility and Porting
 @c 
 @node Glossary
 @unnumbered Glossary

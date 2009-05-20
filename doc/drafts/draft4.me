@@ -1,3 +1,4 @@
+.\"
 .R1
 abbreviate A
 label L
@@ -28,7 +29,7 @@ reverse A
 .)x
 .\}
 ..
-.if !'\*(.T'ps' \{\
+.if '\*(.T'ascii' \{\
 .fo 'B. Bidulock'\\\\*[version]'FORMFEED[Page %]'
 .ds |x txt
 .ds #n <\\**>
@@ -93,6 +94,46 @@ reverse A
 .if '\*(.T'ps' \{\
 .fo 'B. Bidulock'\\\\*[version]'Page %'
 .ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr si 0
+.nr ii 0.5i
+.nr pi 0.25i
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr bt 44v
+.nr pp 11
+.nr qp 9
+.nr fp 8
+.nr gp 10
+.nr sp 12
+.nr tp 12
+.de #v
+.ad b
+.hy 6
+..
+.ds sc \\(sc
+.\}
+.if '\*(.T'dvi' \{\
+.fo 'B. Bidulock'\\\\*[version]'Page %'
+.ds |x dvi
 .ds #n \\**
 .m1 0.25i \" top margin above header
 .m2 0.25i \" top margin below header

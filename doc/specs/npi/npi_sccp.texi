@@ -3024,8 +3024,8 @@ necessary that two primitive are necessary for each data transmission.  Worse, w
 primitive before issuing any other primitives, meaning the outgoing queueing must clear before the
 message may be sent.
 
-To circumvent this deficiency, the @cite{OpenSS7 Project} uses the @parm{RESERVED_field[0]} and
-@parm{RESERVED_field[1]} as @parm{QOS_length} and @parm{QOS_offset} respectively.  This is
+To circumvent this deficiency, the @cite{OpenSS7 Project} uses the @parm{RESERVED_field}[0] and
+@parm{RESERVED_field}[1] as @parm{QOS_length} and @parm{QOS_offset} respectively.  This is
 compatible with implementations expecting the old behavior, because @parm{QOS_length} and
 @parm{QOS_offset} will simply be coded zero (@samp{0}).
 
@@ -3172,8 +3172,8 @@ Interface (NPI) Revision 2.0.0 specification when applied to SCCP:
 @item
 NPI Revision 2.0.0 does not have a usable way of setting the per-primitive @dfn{Quality of Service
 parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance} using the
-@prim{N_UNITDATA_REQ} primtive.  The @cite{OpenSS7 Project} uses the @parm{RESERVED_field[0]} and
-@parm{RESERVED_field[1]} in the @prim{N_UNITDATA_REQ} primitive as though they were a
+@prim{N_UNITDATA_REQ} primtive.  The @cite{OpenSS7 Project} uses the @parm{RESERVED_field}[0] and
+@parm{RESERVED_field}[1] in the @prim{N_UNITDATA_REQ} primitive as though they were a
 @parm{QOS_length} and @parm{QOS_offset} field, respectively, to pass the @dfn{Quality of Service
 parameter set}, @dfn{Sequence control}, @dfn{Return option}, and @dfn{Importance}.
 

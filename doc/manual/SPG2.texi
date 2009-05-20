@@ -530,6 +530,16 @@ Index
 
 @end menu
 
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Listings
+@listoffloats Table
+@end iftex
+
 @c --------------------------------------------------------------------------
 @c --------------------------------------------------------------------------
 
@@ -7464,22 +7474,6 @@ A direction of data flow going from the @dfn{Stream head} toward a driver.  Also
 and output side.
 
 @end table
-
-@c ============================================================================
-@ifnotinfo
-@node List of Figures
-@unnumbered List of Figures
-
-@listoffloats Figure
-@end ifnotinfo
-
-@c ============================================================================
-@iftex
-@node List of Listings
-@unnumbered List of Listings
-
-@listoffloats Listing
-@end iftex
 
 @c ============================================================================
 @node Index
