@@ -246,7 +246,7 @@ typedef struct OM_descriptor_struct {
 /* Macro to allocate memory for class constants within a compilation unit */
 #define OM_EXPORT(class_name) \
 	char OMP_STRING(class_name)[] = OMP_OBJECT(class_name); \
-	OM_string class_name = { OMP_LENGTH(class_name), OMD_D_ ## class_name };
+	OM_string class_name = { OMP_LENGTH(class_name), OMP_D_ ## class_name };
 
 /* Constant for the OM package */
 #define OMP_O_OM_OM		"\x2A\x86\x48\xCE\x21\x00"
@@ -400,7 +400,7 @@ OM_return_code om_copy_value(const OM_private_object source, const OM_type sourc
 
 #define om_copy_value(s,st,svp,d,dt,svp) om_copy_value(s,st,svp,d,dt,dvp)
 
-OM_return_code om_create(const OM_object_identifier class, const OM_boolean initialize,
+OM_return_code om_create(const OM_object_identifier _class, const OM_boolean initialize,
 			 const OM_workspace workspace, OM_private_object *object);
 
 #define om_create(c,i,w,o) om_create(c,i,w,o)
@@ -425,7 +425,7 @@ OM_return_code om_get(const OM_private_object original, const OM_exclusions excl
 
 #define om_get(o,e,i,l,iv,lv,c,t) om_get(o,e,i,l,iv,lv,c,t)
 
-OM_return_code om_instance(const OM_object subject, const OM_object_identifier class,
+OM_return_code om_instance(const OM_object subject, const OM_object_identifier _class,
 			   OM_boolean *instance);
 
 #define om_instance(s,c,i) om_instance(s,c,i)
@@ -463,7 +463,7 @@ OM_return_code om_write(const OM_private_object subject, const OM_type type,
 			const OM_value_position value_position, OM_syntax syntax,
 			const OM_string_length *string_offet, OM_string elements);
 
-const char *omp_strerrors[] = {
+char **omp_strerrors = {
 	"The function completed successfully.",
 	"The octets that constitute the value of an encoding's Object Encoding attribute are invalid.",
 	"The function does not apply to the object to which it is addressed.",
@@ -494,7 +494,8 @@ const char *omp_strerrors[] = {
 	"An attribute has, or would have, a value the violates the value number constraints in force.",
 	"The usage of value position(s) identified in the argument(s) of a function is invalid.",
 	"An attribute has, or would have, a value whose syntax is not permitted.",
-	"An object has, or would have, an attribute whose type is not permitted."
+	"An object has, or would have, an attribute whose type is not permitted.",
+        NULL
 };
 
 #endif				/* __XOM_H__ */

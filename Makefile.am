@@ -2595,6 +2595,8 @@ if WITH_32BIT_LIBS
 SUBDIRS += lib32
 endif
 
+SUBDIRS += src/java
+
 SUBDIRS += tests
 
 if DEVELOPMENT

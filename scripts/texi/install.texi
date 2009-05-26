@@ -159,7 +159,7 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 @end example
 
 Note that it is also possible to point to these repositories as an additional installation source
-when installing CentOS, RedHat, Fedora, or others.  You will have an additional @cite{STREAMS}
+when installing CentOS, RedHat, Fedora, or others.  You will have an additional @acronym{STREAMS}
 category from which to choose installation packages.
 
 Some additional installation real or virtual package names and the installations they accomplish are
@@ -412,16 +412,16 @@ packages from the next section.
 
 @subsubheading Independent RPM
 Independent RPM are
-dependent on neither the Linux kernel version, nor the @dfn{STREAMS} package.
+dependent on neither the Linux kernel version, nor the @acronym{STREAMS} package.
 For example, the
 source package
 @samp{@value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm},
 is not dependent on
 kernel
-nor @dfn{STREAMS} package.
+nor @acronym{STREAMS} package.
 
 @noindent
-All of the following kernel and @dfn{STREAMS} independent RPM are required for your architecture.
+All of the following kernel and @acronym{STREAMS} independent RPM are required for your architecture.
 Binary RPMs listed here are for example only: additional binary RPMs are
 available from the downloads site.  If your architecture is not available, you
 can build binary RPM from the source RPM (see @pxrefman{Building from the Source
@@ -436,7 +436,7 @@ all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
 8.0 distribution which uses an older version of @manpage{rpm(1)}.  Distributions
 that do not support the @samp{%dev} macro will build devices as a @samp{%post}
 operation.  Note also that not all release packages contain devices.  Only
-packages that provide @dfn{STREAMS} character device drivers need devices, and then
+packages that provide @acronym{STREAMS} character device drivers need devices, and then
 only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
 @item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
@@ -444,7 +444,7 @@ The @file{@value{PACKAGE}@--doc} package contains this manual in plain text,
 postscript, @file{pdf} and @file{html} forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
-@value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
+@value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
 @item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides
@@ -484,15 +484,15 @@ configuration test utilities and commands associated with the
 @end table
 
 @subsubheading STREAMS-Dependent RPM
-@dfn{STREAMS}-Dependent RPM are dependent upon the specific @dfn{STREAMS} package being
+@acronym{STREAMS}-Dependent RPM are dependent upon the specific @acronym{STREAMS} package being
 used, either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.  Packages
 dependent upon @cite{Linux STREAMS} will have @file{LiS} in the package name.
 Packages dependent upon @cite{Linux Fast-STREAMS} will have @file{streams} in
-the package name.  Note that some @dfn{STREAMS}-Dependent RPM are also
+the package name.  Note that some @acronym{STREAMS}-Dependent RPM are also
 Kernel-Dependent RPM as described below.
 
 @noindent
-One of the following @dfn{STREAMS}-Dependent packages is required for your
+One of the following @acronym{STREAMS}-Dependent packages is required for your
 architecture.  If your architecture is not on the list, you can build binary RPM
 from the source RPM (see @pxrefman{Building from the Source RPM}).
 
@@ -501,14 +501,14 @@ from the source RPM (see @pxrefman{Building from the Source RPM}).
 The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
+@acronym{STREAMS}-specific library, it is a @acronym{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--LiS@--util} package if you have @cite{LiS} installed.
 
 @item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
+@acronym{STREAMS}-specific library, it is a @acronym{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 
@@ -551,16 +551,16 @@ compiled.  This particular package applies to kernel version
 
 @item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
-heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @acronym{STREAMS} modules and drivers.  This package is
+heavily tied to the @acronym{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
 @item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
 The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
-heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @acronym{STREAMS} modules and drivers.  This package is
+heavily tied to the @acronym{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
@@ -572,7 +572,7 @@ contain a @file{LiS@--info} subpackage.} contains the module symbol version
 information for the @file{LiS@--core} subpackage, above.  It is possible to load
 this subpackage and compile modules that use the exported symbols without loaded
 the actual kernel modules (from the @file{LiS@--core} subpackage above).  This
-package is heavily tied to the @dfn{STREAMS} package and kernel for which it was
+package is heavily tied to the @acronym{STREAMS} package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
@@ -584,7 +584,7 @@ contain a @file{streams@--info} subpackage.} contains the module symbol version
 information for the @file{streams@--core} subpackage, above.  It is possible to
 load this subpackage and compile modules that use the exported symbols without
 loaded the actual kernel modules (from the @file{streams@--core} subpackage
-above).  This package is heavily tied to the @dfn{STREAMS} package and kernel for
+above).  This package is heavily tied to the @acronym{STREAMS} package and kernel for
 which it was compiled.  This particular package applies to @file{streams}
 (@cite{Linux Fast@--STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
@@ -612,13 +612,13 @@ independent packages for your architecture,
 and one of the kernel-dependent packages from the next section.
 
 @subsubheading Independent DEB
-Independent DEB are dependent on neither the Linux kernel version, nor the @dfn{STREAMS} package.  For
+Independent DEB are dependent on neither the Linux kernel version, nor the @acronym{STREAMS} package.  For
 example, the source package
 @samp{@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}, is not
-dependent on kernel nor @dfn{STREAMS} package.
+dependent on kernel nor @acronym{STREAMS} package.
 
 @noindent
-All of the following kernel and @dfn{STREAMS}
+All of the following kernel and @acronym{STREAMS}
 independent DEB are required for your architecture.
 Binary DEBs listed here are for example only: additional binary DEBs are available from the
 downloads site.  If your architecture is not available, you can build binary DEB from the Debian DSC
@@ -629,14 +629,14 @@ downloads site.  If your architecture is not available, you can build binary DEB
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary to run
 applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
-packages contain devices.  Only packages that provide @dfn{STREAMS} character device drivers need
+packages contain devices.  Only packages that provide @acronym{STREAMS} character device drivers need
 devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--doc} package contains this manual in plain text, postscript, @file{pdf} and @file{html}
 forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.  It also
 contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
-@value{PACKAGE_TITLE} @dfn{STREAMS} modules or drivers.
+@value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides the @command{postinst}
@@ -676,15 +676,15 @@ configuration test utilities and commands associated with the
 @end table
 
 @subsubheading STREAMS-Dependent DEB
-@dfn{STREAMS}-Dependent DEB are dependent upon the specific @dfn{STREAMS} package being
+@acronym{STREAMS}-Dependent DEB are dependent upon the specific @acronym{STREAMS} package being
 used, either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.  Packages
 dependent upon @cite{Linux STREAMS} will have @file{LiS} in the package name.
 Packages dependent upon @cite{Linux Fast-STREAMS} will have @file{streams} in
-the package name.  Note that some @dfn{STREAMS}-Dependent DEB are also
+the package name.  Note that some @acronym{STREAMS}-Dependent DEB are also
 Kernel-Dependent DEB as described below.
 
 @noindent
-One of the following @dfn{STREAMS}-Dependent packages is required for your
+One of the following @acronym{STREAMS}-Dependent packages is required for your
 architecture.  If your architecture is not on the list, you can build binary DEB
 from the Debian DSC (see @pxrefman{Building from the Debian DSC}).
 
@@ -693,14 +693,14 @@ from the Debian DSC (see @pxrefman{Building from the Debian DSC}).
 The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
+@acronym{STREAMS}-specific library, it is a @acronym{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--LiS@--util} package if you have @cite{LiS} installed.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--streams@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
-@dfn{STREAMS}-specific library, it is a @dfn{STREAMS}-Dependent package.  Use the
+@acronym{STREAMS}-specific library, it is a @acronym{STREAMS}-Dependent package.  Use the
 @file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 
@@ -743,16 +743,16 @@ compiled.  This particular package applies to kernel version
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--LiS@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
-heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @acronym{STREAMS} modules and drivers.  This package is
+heavily tied to the @acronym{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--streams@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
-provide the @value{PACKAGE_TITLE} @dfn{STREAMS} modules and drivers.  This package is
-heavily tied to the @dfn{STREAMS} package and kernel for which it was compiled.  This
+provide the @value{PACKAGE_TITLE} @acronym{STREAMS} modules and drivers.  This package is
+heavily tied to the @acronym{STREAMS} package and kernel for which it was compiled.  This
 particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
@@ -764,7 +764,7 @@ contain a @file{LiS@--info} subpackage.} contains the module symbol version
 information for the @file{LiS@--core} subpackage, above.  It is possible to load
 this subpackage and compile modules that use the exported symbols without loaded
 the actual kernel modules (from the @file{LiS@--core} subpackage above).  This
-package is heavily tied to the @dfn{STREAMS} package and kernel for which it was
+package is heavily tied to the @acronym{STREAMS} package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
@@ -776,7 +776,7 @@ contain a @file{streams@--info} subpackage.} contains the module symbol version
 information for the @file{streams@--core} subpackage, above.  It is possible to
 load this subpackage and compile modules that use the exported symbols without
 loaded the actual kernel modules (from the @file{streams@--core} subpackage
-above).  This package is heavily tied to the @dfn{STREAMS} package and kernel for
+above).  This package is heavily tied to the @acronym{STREAMS} package and kernel for
 which it was compiled.  This particular package applies to @file{streams}
 (@cite{Linux Fast@--STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
@@ -1109,7 +1109,7 @@ customization.  Relocations that are available on the binary RPM are as follows:
 @table @asis
 @item @file{@value{_rootdir}/lib/@-modules/@-@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
-@value{PACKAGE_NAME} @dfn{STREAMS} core, drivers and modules.@footnote{Note that the
+@value{PACKAGE_NAME} @acronym{STREAMS} core, drivers and modules.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 @end table
 
@@ -1269,8 +1269,8 @@ This is a generic description of common @manpage{rpmbuild(1)} options.  Not all 
 options are applicable to all SRPMs.
 Options that are kernel module specific are only applicable to SRPMs that
 build kernel modules.
-@dfn{STREAMS} options are only applicable to SRPMs that provide or require
-@dfn{STREAMS}.
+@acronym{STREAMS} options are only applicable to SRPMs that provide or require
+@acronym{STREAMS}.
 
 @table @code
 @item --define "_kversion $PACKAGE_KVERSION"
@@ -1469,8 +1469,8 @@ provided by @manpage{autoconf(1)}, @manpage{automake(1)}, @manpage{libtool(1)} a
 Not all @file{configure} options are applicable to all @value{pkgtype} packages.
 Options that are kernel module specific are only applicable to @value{pkgtype}
 packages that build kernel modules.
-@dfn{STREAMS} options are only applicable to @value{pkgtype} packages that
-provide or require @dfn{STREAMS}.
+@acronym{STREAMS} options are only applicable to @value{pkgtype} packages that
+provide or require @acronym{STREAMS}.
 
 Following are the additional @file{configure} options, their meaning and use:
 
@@ -1833,7 +1833,7 @@ to be made against Linux STREAMS.  The default is @file{/usr/@-include/@-LiS} if
 @samp{no} otherwise.  This directory is normally located by the @file{configure} script and need
 only be provided for special cross-build environments or when requested by a @file{configure}
 script error message.  This option has no effect on @value{pkgtype} packages that do not use the
-@dfn{STREAMS} subsystem.
+@acronym{STREAMS} subsystem.
 
 @item --with-lfs[=LFS-DIR]
 @itemx --without-lfs
@@ -1843,13 +1843,13 @@ to be made against Linux Fast-STREAMS.  The default is @file{/usr/@-include/@-st
 @samp{no} otherwise.  This directory is normally located by the @file{configure} script and need
 only be provided for special cross-build environments or when requested by a @file{configure}
 script error message.  This option has no effect on @value{pkgtype} packages that do not use the
-@dfn{STREAMS} subsystem.
+@acronym{STREAMS} subsystem.
 
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master file is written.  The
 default is @file{Config.master}.
-This option has no effect on @value{pkgtype} packages that do not use the @dfn{STREAMS} subsystem
+This option has no effect on @value{pkgtype} packages that do not use the @acronym{STREAMS} subsystem
 and the strconf scripts.
 This option should not be specified when configuring the master package as the setting for all
 add-on packages will conflict.
@@ -1857,7 +1857,7 @@ add-on packages will conflict.
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
 Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @samp{230}.
-This option has no effect on @value{pkgtype} packages that do not use the @dfn{STREAMS} subsystem
+This option has no effect on @value{pkgtype} packages that do not use the @acronym{STREAMS} subsystem
 and the strconf scripts.
 This option should not be specified when configuring the master package as the setting for all
 add-on packages will conflict.
@@ -2109,7 +2109,7 @@ command line.  For example:
 @noindent
 will rebuild binary RPM
 for the @samp{@value{_kversion}} kernel
-for the @samp{athlon} architecture against the @cite{Linux Fast-STREAMS} @dfn{STREAMS} package.
+for the @samp{athlon} architecture against the @cite{Linux Fast-STREAMS} @acronym{STREAMS} package.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
@@ -2158,7 +2158,7 @@ binaries, @xrefman{Configuring the Debian DSC}.  These options are provided in t
 @noindent
 will rebuild binary DEB
 for the @samp{@value{_kversion}} kernel
-for the @samp{athlon} architecture against the @cite{Linux Fast-STREAMS} @dfn{STREAMS} package.
+for the @samp{athlon} architecture against the @cite{Linux Fast-STREAMS} @acronym{STREAMS} package.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
@@ -2465,7 +2465,7 @@ The convention for @file{@value{PACKAGE}} kernel loadable object files is:
 @end itemize
 
 If your kernel has been built using the @file{kerneld} daemon, then @file{@value{PACKAGE_NAME}}
-kernel modules will automatically load as soon as the @dfn{STREAMS} module is pushed or the driver
+kernel modules will automatically load as soon as the @acronym{STREAMS} module is pushed or the driver
 is opened.  The @samp{make install} process makes the necessary changes to the
 @file{@value{_rootdir}/@-etc/@-modules.conf} file.  After the install, you will see lines like the
 following added to your @file{@value{_rootdir}/@-etc/@-modules.conf} file:
@@ -2491,16 +2491,12 @@ alias char-major-246  streams-@var{other_driver}
 @end smallexample
 @end cartouche
 
-Note that @dfn{STREAMS} modules are not listed in this file, but will be loaded by name using
+Note that @acronym{STREAMS} modules are not listed in this file, but will be loaded by name using
 @file{kerneld} if available.
 
-@cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than is provided by
-the deprecated @cite{LiS}.  For mechanisms used for kernel module loading under @cite{Linux
+@cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than previously provided.
+For mechanisms used for kernel module loading under @cite{Linux
 Fast-STREAMS}, @xref{Top, About This Manual, , STREAMS, Linux Fast-STREAMS Reference Manual}.
-
-@subsubsection Linux STREAMS Module Loading
-
-@cite{LiS} is deprecated and this section has been deleted.
 
 @node Maintenance
 @section Maintenance

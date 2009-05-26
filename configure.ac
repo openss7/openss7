@@ -107,8 +107,11 @@ AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 AC_PROG_LEX
 AC_PROG_YACC
+AM_PROG_GCJ
 
 LT_INIT([dlopen])
+LT_LANG([C++])
+LT_LANG([Java])
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT
@@ -247,7 +250,8 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 src/drivers/Config
 		 src/modules/Config
-		 src/include/Makefile])
+		 src/include/Makefile
+		 src/java/Makefile])
 
 _OPENSS7_OUTPUT
 

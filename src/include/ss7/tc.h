@@ -421,7 +421,7 @@ typedef struct TC_begin_req {
 	t_scalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
 } TC_begin_req_t;
 
-typedef struct TC_begin_req TC_query_req;
+typedef struct TC_begin_req TC_query_req_t;
 
 /*
  *  TC_BEGIN_IND.  Indicates the opening of a dialog.  One M_PROTO block followed by one or more
@@ -444,7 +444,7 @@ typedef struct TC_begin_ind {
 	t_scalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
 } TC_begin_ind_t;
 
-typedef struct TC_begin_ind TC_query_ind;
+typedef struct TC_begin_ind TC_query_ind_t;
 
 /*
  *  TC_END_REQ.
