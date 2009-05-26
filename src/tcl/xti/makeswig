@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+all: xti
+
+xti: xti_wrap.c
+
+.PRECIOUS: makeswig
+
+xti_wrap.cxx: xti.i makeswig
+	swig -c++ -tcl -I../../include/ xti.i
+
+
+xti_wrap.c: xti.i makeswig
+	swig -tcl -I../../include/ -includeall xti.i
+
+clean:
+	rm -f *.java
+	rm -f xti_wrap.c
+	rm -f xti_wrap.cxx
+
+.PHONY: clean all xti
+
