@@ -60,7 +60,7 @@
 @c =========================================================================
 
 @set pkgtype release
-@set PACKAGE_CVSMODULE os7
+@set PACKAGE_CVSMODULE @value{PACKAGE}
 @set package @value{PACKAGE_LCNAME}
 @set pkgexample @value{PACKAGE_LCNAME}
 
@@ -75,6 +75,15 @@
 * Maintenance::			Maintaining the package
 @end menu
 
+@quotation
+@emph{Please note that the installation instructions have changed.  Previously @cite{OpenSS7} releases
+consisted of a number of subpackages to a master package: this is no longer the case.  All
+@cite{OpenSS7} release software is now contained in a single package.  This change was necessary to
+reduce the maintenance burden cause by a growing number of subpackages.  The net benefit of this
+changes is that the resulting tarballs, RPMs and DEBs are far less error prone due to far fewer
+dependencies between RPMs and DEBs.}
+@end quotation
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -88,24 +97,22 @@ package is available in a @manpage{yum(8)} repository based on @file{repomd} XML
 accessed using @manpage{zypper(8)} or @manpage{yast(8)}.  For @manpage{dpkg(1)} based systems, the
 package is available in an @manpage{apt(8)} repository.
 
-By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
-packages is to install packages from the @manpage{yum(8)} or @manpage{apt(8)} repositories.  If your
-distribution does not support @manpage{yum(8)}, @manpage{zypper(8)}, @manpage{yast(8)} or
-@manpage{apt(8)}, then it is still possible to install the RPMs or DEBs from the repositories using
-@manpage{rpm(1)}, @manpage{dpkg(1)}; or by using @manpage{wget(1)} and then installing them from RPM
-or DEB using @manpage{rpm(1)} or @manpage{dpkg(1)} locally.
+By far the easiest (most repeatable and manageable) form for installing and using the
+@value{PACKAGE_TITLE} package is to install from the @manpage{yum(8)} or @manpage{apt(8)}
+repositories.  If your distribution does not support @manpage{yum(8)}, @manpage{zypper(8)},
+@manpage{yast(8)} or @manpage{apt(8)}, then it is still possible to install the RPMs or DEBs from the
+repositories using @manpage{rpm(1)}, @manpage{dpkg(1)}; or by using @manpage{wget(1)} and then
+installing them from RPM or DEB using @manpage{rpm(1)} or @manpage{dpkg(1)} locally.
 
-If binaries are not available for your distribution or specific kernel, but your distribution
-supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
-@cite{OpenSS7} packages is to download and rebuild the source RPMs or DSCs from the repository.
+If binaries are not available for your distribution or specific kernel, but your distribution supports
+@manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
+@value{PACKAGE_TITLE} package is to download and rebuild the source RPMs or DSCs from the repository.
 This can also be performed with @manpage{yum(8)}, @manpage{zypper(8)}, @manpage{yast(8)},
 @manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(1)} or @manpage{dpkg(1)}.
 
 If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
-special needs (such as cross-compiling for embedded targets), the final resort method is to
-download, configure, build and install from tarball.  In this later case, the easiest way to build
-and install @cite{OpenSS7} packages from tarball is to use the tarball for the @cite{OpenSS7 Master
-Package}, @command{openss7-@value{VERSION_OPENSS7}}.
+special needs (such as cross-compiling for embedded targets or for development), the last method is to
+download, configure, build and install from the tarball.
 
 @menu
 Repositories for YUM::			the @manpage{yum(8)} repository
@@ -121,42 +128,56 @@ To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories, you wi
 your @file{/etc/yum.repo.d/} directory.  This file can be obtained directly from the @cite{OpenSS7}
 @uref{http://www.openss7.org/repos, repository}, like so:
 
-@example
+@smallexample
 $> REPOS="http://www.openss7.org/repos/rpms"
-$> wget $REPOS/centos/5.2/x86_64/repodata/openss7.repo
+$> wget $REPOS/centos/5.3/x86_64/repodata/openss7.repo
 $> sudo cp -f openss7.repo /etc/yum.repo.d/
 $> sudo yum makecache
-@end example
+@end smallexample
 
 This example assumes the the distribution is @samp{centos} and the distribution release is
-@samp{5.2} and the architecture requires is @samp{x86_64}.  Another example would be
+@samp{5.3} and the architecture requires is @samp{x86_64}.  Another example would be
 @file{$REPOS/i686/suse/11.0/i686/repodata/openss7.repo}, for using @manpage{yum(8)} with SUSE.
 
 Once the repository is set up, @cite{OpenSS7} includes a number of virtual package definitions that
 ease the installation and removal of kernel modules, libraries and utilities.  Downloading,
 configuring, building and installation for a single-kernel distribution is as easy as:
 
-@example
+@smallexample
+$> sudo yum groupinstall @value{PACKAGE_TITLE}
+@end smallexample
+
+@noindent
+or
+
+@smallexample
 $> sudo yum install @value{PACKAGE}
-@end example
+@end smallexample
 
 Removing the package is as easy as:
 
-@example
+@smallexample
+$> sudo yum groupremove @value{PACKAGE_TITLE}
+@end smallexample
+
+@noindent
+or
+
+@smallexample
 $> sudo yum remove @value{PACKAGE}
-@end example
+@end smallexample
 
 If you have difficulty downloading the @file{openss7.repo} file, edit the following information into
 the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 
-@example
+@smallexample
 -| [openss7]
 -| enabled = 1
 -| name = OpenSS7 Repository
--| baseurl = http://www.openss7.org/repos/rpms/centos/5.2/x86_64
+-| baseurl = http://www.openss7.org/repos/rpms/centos/5.3/x86_64
 -| gpgcheck = 1
 -| gpgkey = http://www.openss7.org/pubkey.asc
-@end example
+@end smallexample
 
 Note that it is also possible to point to these repositories as an additional installation source
 when installing CentOS, RedHat, Fedora, or others.  You will have an additional @acronym{STREAMS}
@@ -216,29 +237,21 @@ For assistance with specific DEBs, see @ref{Downloading the Debian DEB}.
 @section Downloading
 @cindex downloading
 
-The @value{PACKAGE_TITLE} package releases can be downloaded from the downloads page of
-@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.
-The master package is currently only available as a tar ball.@footnote{At a later date this
-@value{PACKAGE_TITLE} might be enhanced to build separate master package RPMs and DEBs, but as the
-objective of the @value{PACKAGE_TITLE} was for development purposes, this is on the back-burner.}
-@ignore
-The package is available as a binary RPM (for popular architectures) a source RPM, Debian binary DEB
-and source DSC, or as a tar ball.
-@end ignore
-If you are using a browsable viewer, you can obtain the OpenSS7 release of
-@command{@value{PACKAGE_NAME}} from the links in the sections that follow.
+Package releases can be downloaded from the downloads page of
+@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The package is available as a
+binary RPM (for popular architectures) a source RPM, Debian binary DEB and source DSC, or as a tar
+ball.  If you are using a browsable viewer, you can obtain the release from the links in the sections
+that follow.
 
-By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
-packages is to download and install individual packages from binary RPM or DEB.  If binary RPMs or
-DEBs are not available for your distribution, but your distribution supports @manref{rpm(1)} or
-@manref{dpkg(1)}, the next best method for installing and using @cite{OpenSS7} packages is to
-download and rebuild the source RPMs or DSCs.
+By far the easiest (most repeatable and manageable) form for installing and using the package is to
+download and install it from binary RPM or DEB.  If binary RPMs or DEBs are not available for your
+distribution, but your distribution supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method
+for installing and using the package is to download and rebuild the source RPMs or DSCs.
 
 If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
-special needs (such as cross-compiling for embedded targets), the final resort method is to
-download, configure, build and install from tarball.  In this later case, the easiest way to build
-and install @cite{OpenSS7} packages from tarball is to use the tarball for the
-@cite{OpenSS7 Master Package}, @command{openss7-@value{VERSION_OPENSS7}}.
+special needs (such as cross-compiling for embedded targets or for development), the last method is to
+download, configure, build and install from tarball.  In this later case, the easiest way to build and
+install the package from tarball.
 
 @menu
 * Downloading with YUM::		the easiest YUM based system approach
@@ -258,19 +271,14 @@ and install @cite{OpenSS7} packages from tarball is to use the tarball for the
 @cindex downloading, yum
 @cindex yum
 
-OpenSS7 repositories support @manref{yum(8)} and @manref{zypper(8)} in repomd XML format as well as
-YaST and YaST2 formats.
+@cite{OpenSS7} repositories support @manref{yum(8)} and @manref{zypper(8)} in repomd XML format as
+well as YaST and YaST2 formats.  The repository includes virtual packages that ease the installation
+and removal of kernel modules, libraries and utilities.  Downloading, configuration, building and
+installation for a single-kernel distribution installation is as easy as:
 
-OpenSS7 includes virtual packages that ease the installation and removal of kernel modules,
-libraries and utilities.
-Downloading, configuration, building and installation for a single-kernel distribution installation
-is as easy as:
-
-@cartouche
-@example
-% sudo yum install @value{PACKAGE}
-@end example
-@end cartouche
+@smallexample
+% sudo yum groupinstall @value{PACKAGE_TITLE}
+@end smallexample
 
 This and additional packages for installation are detailed as follows:
 
@@ -401,11 +409,132 @@ OpenSS7 repositories support @manref{apt(8)} repository digests and signatures.
 @cindex downloading, binary rpms
 @cindex binary rpms
 
-The @cite{@value{PACKAGE_TITLE}} does not provide any binary RPMs directly.  Downloading binary RPMs
-consists of downloading the binary RPMs for the individual @value{pkgtype} packages contained in the
-@cite{@value{PACKAGE_TITLE}}.  For instructions on downloading the binary RPMs for each individual
-@value{pkgtype} package, see the @cite{Downloading the Binary RPM} section of the @cite{Installation and
-Reference Manual} for the appropriate @value{pkgtype} package.
+To install from binary RPM, you will need several of the RPM for a complete installation.  Binary
+RPM fall into several categories.  To download and install a complete package requires the
+appropriate RPM from each of the several categories below, as applicable.  Some release packages do
+not provide RPMs in each of the several categories.
+
+To install from Binary RPM, you will need all of the following kernel
+independent packages for your architecture, and one of the kernel-dependent
+packages from the next section.
+
+@subsubheading Independent RPM
+Independent RPM are
+not dependent on the Linux kernel version.
+For example, the
+source package
+@samp{@value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm},
+is not dependent on
+kernel.
+
+@noindent
+All of the following kernel independent RPM are required for your architecture.
+Binary RPMs listed here are for example only: additional binary RPMs are
+available from the downloads site.  If your architecture is not available, you
+can build binary RPM from the source RPM (see @pxrefman{Building from the Source
+RPM}).
+
+@subsubheading Architecture Independent
+@table @asis
+@ignore
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
+to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
+all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
+8.0 distribution which uses an older version of @manpage{rpm(1)}.  Distributions
+that do not support the @samp{%dev} macro will build devices as a @samp{%post}
+operation.  Note also that not all release packages contain devices.  Only
+packages that provide @acronym{STREAMS} character device drivers need devices, and then
+only when the @samp{specfs} or @samp{devfsd} is not being used.}
+
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--doc} package contains this manual in plain text,
+postscript, @file{pdf} and @file{html} forms, along with the meta-information from the
+@file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
+necessary for developing @value{PACKAGE_TITLE} applications and
+@value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
+
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides
+the @samp{postinst} scripts necessary to create kernel module preloads and modules
+definitions for all kernel module @samp{core} subpackages.
+
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--source} package contains the source code necessary for
+building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
+configuration utilities necessary to create and distribute tarballs, @file{rpm} and
+@file{deb}/@file{dsc}.
+@end ignore
+
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}} package contains this manual in plain texit, postscript, @samp{pdf}, and
+@samp{html} forms, along with the meta-information from the package.  It also contains the @file{init}
+scripts and provides @command{postinst} scriptlets necessary to create kernel module preloads and
+modules definintions for all kernel module subpackages.  It also includes @acronym{SNMP MIB} files and
+@acronym{TMN GDMO} files.
+@end table
+
+@subsubheading Architecture Dependent
+@table @asis
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--devel} package contains library archives for static
+compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
+This also includes the header files and static libraries required to compile
+@value{PACKAGE_TITLE} applications programs.
+
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
+necessary to run application programs and utilities developed for the
+@file{@value{PACKAGE_NAME}} package.
+
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--util} package provides administrative and
+configuration test utilities and commands associated with the
+@value{PACKAGE_TITLE} package.
+@end table
+
+@subsubheading Kernel-Dependent RPM
+Kernel-Dependent RPM are dependent on specific Linux Kernel Binary RPM releases.
+Packages are provided for popular released @cite{RedHat} kernels.  Packages
+dependent upon @cite{RedHat} or other kernel RPM will have the @samp{_kversion}
+kernel package version in the package name.
+
+One of the following Kernel-Dependent packages is required for your architecture
+and kernel version.  If your architecture or kernel version is not on the list,
+you can build binary RPM from the source RPM (see @pxrefman{Building from the
+Source RPM}).@footnote{Note that on @cite{Mandrakelinux}, unlike other RPM
+kernel distributions, kernel packages for the ix86 architectures are always
+placed in i586 architecture packages regardless of the true processor
+architecture of the kernel package.  @file{configure} detects this and builds
+the appropriate packages.}
+
+@table @asis
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
+that depend only on the kernel.  This package is heavily tied to the kernel for
+which it was compiled.  This particular package applies to kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.  Note also that only release
+packages that contain kernel modules will contain a @file{core} subpackage.}
+
+@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
+that contain kernel modules and that export versioned symbols will contain a
+@file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
+kernels and is not necessary and not built for 2.6 series kernels.} contains the
+module symbol version information for the @file{core} subpackage, above.  It is
+possible to load this subpackage and compile modules that use the exported
+symbols without loading the actual kernel modules (from the @file{core}
+subpackage above).  This package is heavily tied to the kernel for which it was
+compiled.  This particular package applies to kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.}
+
+@end table
+
+@subsubheading Configuration and Installation
+To configure, build and install the binary RPM, @xrefman{Configuring the Binary
+RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -414,11 +543,117 @@ Reference Manual} for the appropriate @value{pkgtype} package.
 @cindex downloading, debian debs
 @cindex binary debs
 
-The @cite{@value{PACKAGE_TITLE}} does not provide any binary DEBs directly.  Downloading binary DEBs
-consists of downloading the binary DEBs for the individual @value{pkgtype} packages contained in the
-@cite{@value{PACKAGE_TITLE}}.  For instructions on downloading the binary DEBs for each individual
-@value{pkgtype} package, see the @cite{Downloading the Binary DEB} section of the @cite{Installation and
-Reference Manual} for the appropriate @value{pkgtype} package.
+To install from binary DEB, you will need several of the DEB for a complete installation.  Binary
+DEB fall into several categories.  To download and install a complete package requires the
+appropriate DEB from each of the several categories below,
+as applicable.  Some release packages do not provide DEBs in each of the several categories.
+
+To install from Binary DEB, you will need all of the following kernel
+independent packages for your architecture,
+and one of the kernel-dependent packages from the next section.
+
+@subsubheading Independent DEB
+Independent DEB are not dependent on the Linux kernel version.  For
+example, the source package
+@samp{@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}, is not
+dependent on kernel.
+
+@noindent
+All of the following kernel
+independent DEB are required for your architecture.
+Binary DEBs listed here are for example only: additional binary DEBs are available from the
+downloads site.  If your architecture is not available, you can build binary DEB from the Debian DSC
+(see @pxrefman{Building from the Debian DSC}).
+
+@subsubheading Architecture Independent
+@table @asis
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary to run
+applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
+packages contain devices.  Only packages that provide @acronym{STREAMS} character device drivers need
+devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--doc} package contains this manual in plain text, postscript, @file{pdf} and @file{html}
+forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.  It also
+contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
+@value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides the @command{postinst}
+scripts necessary to create kernel module preloads and modules definitions for all kernel module
+@samp{core} subpackages.
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--source} package contains the source code necessary for
+building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
+configuration utilities necessary to create and distribute tarballs, rpms and
+deb/dscs.
+@end table
+
+@subsubheading Architecture Dependent
+@table @asis
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--devel_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--devel} package contains library archives for static
+compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
+This also includes the header files and static libraries required to compile
+@value{PACKAGE_TITLE} applications programs.
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--lib_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
+necessary to run application programs and utilities developed for the
+@file{@value{PACKAGE_NAME}} package.
+
+@ignore
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--util} package provides administrative and
+configuration test utilities and commands associated with the
+@value{PACKAGE_TITLE} package.
+@end ignore
+@end table
+
+@subsubheading Kernel-Dependent DEB
+Kernel-Dependent DEB are dependent on specific Linux Kernel Binary DEB releases.
+Packages are provided for popular released @cite{Debian} kernels.  Packages
+dependent upon @cite{Debian} or other kernel DEB will have the @samp{_kversion}
+kernel package version in the package name.
+
+One of the following Kernel-Dependent packages is required for your architecture
+and kernel version.  If your architecture or kernel version is not on the list,
+you can build binary DEB from the source DEB (see @pxrefman{Building from the
+Debian DSC}).@footnote{Note that on @cite{Mandrakelinux}, unlike other DEB
+kernel distributions, kernel packages for the ix86 architectures are always
+placed in i586 architecture packages regardless of the true processor
+architecture of the kernel package.  @file{configure} detects this and builds
+the appropriate packages.}
+
+@table @asis
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
+that depend only on the kernel.  This package is heavily tied to the kernel for
+which it was compiled.  This particular package applies to kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.  Note also that only release
+packages that contain kernel modules will contain a @file{core} subpackage.}
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
+that contain kernel modules and that export versioned symbols will contain a
+@file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
+kernels and is not necessary and not built for 2.6 series kernels.} contains the
+module symbol version information for the @file{core} subpackage, above.  It is
+possible to load this subpackage and compile modules that use the exported
+symbols without loading the actual kernel modules (from the @file{core}
+subpackage above).  This package is heavily tied to the kernel for which it was
+compiled.  This particular package applies to kernel version
+@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
+@samp{@value{_kversion}} is only an example.}
+
+@end table
+
+@subsubheading Configuration and Installation
+To configure, build and install the Debian DEB, @xrefman{Configuring the Debian
+DEB}.
 
 @c ----------------------------------------------------------------------------
 
@@ -427,11 +662,17 @@ Reference Manual} for the appropriate @value{pkgtype} package.
 @cindex downloading, source srpm
 @cindex source rpms
 
-The @cite{@value{PACKAGE_TITLE}} does not provide any source RPMs directly.  Downloading source RPMs
-consists of downloading the source RPMs for the individual @value{pkgtype} packages contained in the
-@cite{@value{PACKAGE_TITLE}}.  For instructions on downloading the source RPMs for each individual
-@value{pkgtype} package, see the @cite{Downloading the Source RPM} section of the @cite{Installation and
-Reference Manual} for the appropriate @value{pkgtype} package.
+If you cannot obtain a binary RPM for your architecture, or would like to roll you own binary RPM,
+download the following source RPM.
+
+@table @asis
+@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
+This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
+any supported architecture and for any 2.4 or 2.6 kernel.
+@end table
+
+@subsubheading Configuration
+To configure the source RPM, @xrefman{Configuring the Source RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -440,11 +681,18 @@ Reference Manual} for the appropriate @value{pkgtype} package.
 @cindex downloading, debian dscs
 @cindex source dscs
 
-The @cite{@value{PACKAGE_TITLE}} does not provide any source DSCs directly.  Downloading source DSCs
-consists of downloading the source DSCs for the individual @value{pkgtype} packages contained in the
-@cite{@value{PACKAGE_TITLE}}.  For instructions on downloading the source DSCs for each individual
-@value{pkgtype} package, see the @cite{Downloading the Debian DSC} section of the @cite{Installation and
-Reference Manual} for the appropriate @value{pkgtype} package.
+If you cannot obtain a binary DEB for your architecture, or would like to roll your own DEB,
+download the following Debian DSC.
+
+@table @asis
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc,, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc}
+@itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz,, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
+This is the Debian DSC for the package.  From this Debian DSC it is possible to build binary DEB for
+any supported architecture and for any 2.4 or 2.6 kernel.
+@end table
+
+@subsubheading Configuration
+To configure the source RPM, @xrefman{Configuring the Debian DSC}.
 
 @c ----------------------------------------------------------------------------
 
@@ -462,25 +710,24 @@ download the tarball as follows:
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on
-@manpage{rpm(1)} architectures and Debian DSC and DEB on @manpage{dpkg(1)} architectures,
-for each of the individual @value{pkgtype} packages.
+@manpage{rpm(1)} architectures and Debian DSC and DEB on @manpage{dpkg(1)} architectures.
 @end table
 
 The tar ball may be downloaded easily with @manpage{wget(1)} as follows:
 
 @cartouche
-@example
+@smallexample
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
-@end example
+@end smallexample
 @end cartouche
 
 @noindent
 or
 
 @cartouche
-@example
+@smallexample
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
-@end example
+@end smallexample
 @end cartouche
 
 Note that you will need an @cite{OpenSS7 Project} user name and password to download release
@@ -492,20 +739,20 @@ After downloading one of the tar balls, unpack the archive using one of the
 following commands:
 
 @cartouche
-@example
+@smallexample
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
 % tar -xzvf @value{PACKAGE}-@value{VERSION}.tar.gz
-@end example
+@end smallexample
 @end cartouche
 
 @noindent
 or
 
 @cartouche
-@example
+@smallexample
 % wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
-@end example
+@end smallexample
 @end cartouche
 
 @noindent
@@ -536,13 +783,13 @@ To access the archive from the project CVS pserver, use the following commands t
 version from the archive:
 
 @cartouche
-@example
+@smallexample
 % export CVSROOT=':pserver:@var{username}@@cvs.openss7.org:2401/var/cvs'
 % cvs login
 Password: *********
 % cvs co -r @value{PACKAGE}_@value{VERSION} @value{PACKAGE_CVSMODULE}
 % cvs logout
-@end example
+@end smallexample
 @end cartouche
 
 It is, of course, possible to check out by date or by other criteria.  For more information, see
@@ -620,18 +867,18 @@ For uncooked manual pages, the entire @manpage{groff(1)} package is required on 
 uncooked manual pages).  The following will get what you need on older systems:
 
 @cartouche
-@example
+@smallexample
 Debian: % apt-get install groff_ext
 Ubuntu: % apt-get install groff
-@end example
+@end smallexample
 @end cartouche
 
 On newer systems, simply:
 
 @cartouche
-@example
+@smallexample
 % apt-get install groff
-@end example
+@end smallexample
 @end cartouche
 
 In addition, the build host requires a complete tool chain for compiling for the target host,
@@ -644,19 +891,19 @@ typically have the necessary tool chain available, however, @manpage{dpkg(1)} sy
 following on a @cite{Debian} or @cite{Ubuntu} system will get what you need:
 
 @cartouche
-@example
+@smallexample
 % apt-get install debhelper
 % apt-get install fakeroot
-@end example
+@end smallexample
 @end cartouche
 
 To generate a configuration script and the necessary scriptlets required by the GNU
 @manpage{autoconf(1)} system, execute the following commands on the working directory:
 
 @cartouche
-@example
+@smallexample
 % autoreconf -fiv @value{PACKAGE_CVSMODULE}
-@end example
+@end smallexample
 @end cartouche
 
 @noindent
@@ -668,10 +915,10 @@ Make sure that @samp{autoreconf --version} returns @samp{2.63}.  Otherwise, you 
 something like the following:
 
 @cartouche
-@example
+@smallexample
 % PATH="/usr/local/bin:$PATH"
 % autoreconf -fiv @value{PACKAGE_CVSMODULE}
-@end example
+@end smallexample
 @end cartouche
 
 @noindent
@@ -716,9 +963,93 @@ directory.
 @cindex configuring, binary rpms
 @cindex binary rpms
 
-@value{PACKAGE_TITLE} is not currently distributed as binary RPM.  For configuring the binary RPMs
-of the included @value{pkgtype} packages, see the @cite{Configuring the Binary RPM} section of the
-@cite{Installation and Reference Manual} for the individual @value{pkgtype} package.
+In general the binary RPM do not require any configuration, however, during installation it is
+possible to relocate some of the installation directories.  This allows some degree of
+customization.  Relocations that are available on the binary RPM are as follows:
+
+@table @file
+@item @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}/lib/@-modules/@-@value{_kversion}}
+This relocatable directory contains the kernel modules that provide the
+@value{PACKAGE_NAME} core, drivers and modules.@footnote{Note that the
+@samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+@end table
+
+@item @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}/usr/@-include/@-@value{PACKAGE}/@-@value{_kversion}}
+This relocatable directory contains the kernel module exported symbol
+information that allows other kernel modules to be compiled against the correct
+version of the @value{PACKAGE} package.@footnote{Note that the @samp{_kversion}
+of @samp{@value{_kversion}} is only an example.  Also, note that the @samp{info}
+subpackage is only applicable to the 2.4 kernel series.}
+@end table
+
+@item @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+(not relocatable)
+
+@item @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}@value{_libdir}}
+This relocatable directory contains @value{PACKAGE} libraries.
+@item @file{@value{_rootdir}@value{_includedir}/@-@value{PACKAGE}}
+This relocatable directory contains @value{PACKAGE} header files.
+@end table
+
+@item @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}@value{_datadir}/@-doc}
+This relocatable directory contains all package specific documentation
+(including this manual).  The subdirectory in this directory is the
+@file{@value{PACKAGE}@--@value{VERSION}} directory.
+@item @file{@value{_rootdir}@value{_infodir}}
+This relocatable directory contains info files (including the info version of
+this manual).
+@item @file{@value{_rootdir}@value{_mandir}}
+This relocatable directory contains manual pages.
+@end table
+
+@item @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}@value{_libdir}}
+This relocatable directory contains the run-time shared libraries necessary to
+run applications programs and utilities developed for @value{PACKAGE_TITLE}.
+@item @file{@value{_rootdir}@value{_datadir}/@-locale}
+This relocatable directory contains the locale information for shared library
+files.
+@end table
+
+@item @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}@value{_prefix}/@-src}
+This relocatable directory contains the source code.
+@end table
+
+@item @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@table @asis
+@item @file{@value{_rootdir}@value{_bindir}}
+This relocatable directory contains binary programs and utilities.
+@item @file{@value{_rootdir}@value{_sbindir}}
+This relocatable directory contains system binary programs and utilities.
+@item @file{@value{_rootdir}@value{_libexecdir}}
+This relocatable directory contains test programs.
+@item @file{@value{_rootdir}@value{_sysconfdir}}
+This relocatable directory contains @command{init} scripts and configuration information.
+@end table
+
+@end table
+
+@subsubheading Installation
+To install the binary RPM, @xrefman{Installing the Binary RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -727,9 +1058,10 @@ of the included @value{pkgtype} packages, see the @cite{Configuring the Binary R
 @cindex configuring, binary debs
 @cindex binary debs
 
-@value{PACKAGE_TITLE} is not currently distributed as binary DEB.  For configuring the binary DEBs
-of the included @value{pkgtype} packages, see the @cite{Configuring the Binary DEB} section of the
-@cite{Installation and Reference Manual} for the individual @value{pkgtype} package.
+In general the binary DEB do not require any configuration.
+
+@subsubheading Installation
+To install the Debian DEB, @xrefman{Installing the Debian DEB}.
 
 @c ----------------------------------------------------------------------------
 
@@ -738,9 +1070,199 @@ of the included @value{pkgtype} packages, see the @cite{Configuring the Binary D
 @cindex configuring, source srpm
 @cindex source rpms
 
-@value{PACKAGE_TITLE} is not currently distributed as source RPM.  For configuring the source RPMs
-of the included @value{pkgtype} packages, see the @cite{Configuring the Source RPM} section of the
-@cite{Installation and Reference Manual} for the individual @value{pkgtype} package.
+When building from the source RPM (@pxrefman{Building from the Source RPM}), the rebuild process uses a
+number of macros from the user's @file{.rpmmacros} file as described in @manref{rpm(8)}.
+
+Following is an example of the @file{~/.rpmmacros} file that I use for rebuilding RPMS:
+
+@cartouche
+@smallexample
+#
+# RPM macros for building rpms
+#
+
+%vendor OpenSS7 Corporation
+%distribution OpenSS7
+%disturl http://www.openss7.org/
+%packager Brian Bidulock <bidulock@@openss7.org>
+%url http://www.openss7.org/
+
+%_signature gpg
+%_gpg_path /home/brian/.gnupg
+%_gpg_name openss7@@openss7.org
+%_gpgbin /usr/bin/gpg
+
+%_source_payload w9.bzdio
+%_binary_payload w9.bzdio
+
+%_unpackaged_files_terminate_build 1
+%_missing_doc_files_terminate_build 1
+%_use_internal_dependency_generator 0
+%_repackage_all_erasures 0
+%_rollback_transaction_on_failure 0
+
+%configure2_5x %configure
+%make make
+
+@end smallexample
+@end cartouche
+
+
+When building from the source RPM (@pxrefman{Building from the Source RPM}), it is possible to pass a
+number of additional configuration options to the @manpage{rpmbuild(1)} process.
+
+The additional configuration options are described below.
+
+Note that distributions that use older versions of rpm do not have the @option{--with} or
+@option{--without} options defined.  To achieve the same effect as:
+@smallexample
+--with someparm=somearg
+@end smallexample
+do:
+@smallexample
+--define "_with_someparm --with-someparm=somearg"
+@end smallexample
+
+@table @code
+@item --define "_kversion $PACKAGE_KVERSION"
+@vindex PACKAGE_KVERSION
+@opindex k-release
+Specifies the kernel version other than the running kernel for which to build.  If
+@command{_kversion} is not defined when rebuilding, the environment variable @var{PACKAGE_KVERSION}
+is used.  If the environment variable @var{PACKAGE_KVERSION} is not defined, then the version of the
+running kernel (i.e. discovered with @samp{uname -r}) is used as the target version for
+kernel-dependent packages.  This option can also be defined in an @file{.rpmspec} file using the
+macro name @samp{_kversion}.
+
+@item --with checks
+@itemx --without checks
+@opindex checks
+Enable or disable preinstall checks.  Each packages supports a number of preinstall checks that can
+be performed by invoking the @samp{check} target with @manpage{automake(1)}.  These currently consist of
+checking each kernel module for unresolved kernel symbols, checking for documentation for exported
+kernel module symbols, checking for documentation for exported library symbols, checking for
+standard options for build and installable programs, checking for documentation for built and
+installable programs.  Normally these checks are only run in maintainer mode, but can be enabled and
+disabled with this option.
+
+@ignore
+@item --with autotest
+@itemx --without autotest
+@opindex autotest
+@end ignore
+
+@item --with k-optimize=HOW
+@itemx --without k-optimize
+@opindex k-optimize
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or @var{quick}.  @var{size}
+compiles kernel modules @code{-Os}, @var{speed} compiles kernel modules @code{-O3}, and @var{quick}
+compiles kernel modules @code{-O0}.  The default is @var{normal}.  Use with care.
+
+@item --with cooked-manpages
+@itemx --without cooked-manpages
+@opindex cooked-manpages
+Some systems do not like @manpage{grefer(1)} references in manual pages.@footnote{In particular, some
+@cite{Debian} systems do not load the @manpage{groff(1)} extensions package and do not have
+@manpage{grefer(1)} installed.  Although this is an oversight on the configuration of the particular
+@cite{Debian} system, we accomodate such misconfiguration with this feature.}  This option will cook
+@manpage{soelim(1)}, @manpage{refer(1)}, @manpage{tbl(1)} and @manpage{pic(1)} commands from the manual pages and
+also strip @manpage{groff(1)} comments.  The default is to leave manual pages uncooked: they are actually
+smaller that way.
+
+@item --with public
+@itemx --without public
+@opindex public
+Release public packages or private packages.  This option has no effect on the
+@file{@value{PACKAGE_NAME}} package.  The default is to release public packages.
+
+@item --with k-debug
+@itemx --without k-debug
+@opindex k-debug
+Specifies whether kernel debugging is to be performed on the build kernel modules.  Mutually
+exclusive with @code{test} and @code{safe} below.  This has the effect of removing static and inline
+attributes from functions and invoking all debugging macros in the code.  The default is to not
+perform kernel debugging.
+
+@item --with k-test
+@itemx --without k-test
+@opindex k-test
+Specifies whether kernel testing is to be performed.  Mutually exclusive with @code{debug} above and
+@code{safe} below.  This has the effect of removing static and inline attributes from functions and
+invoking most debugging macros in the code.  The default is to not perform kernel testing.
+
+@item --with k-safe
+@itemx --without k-safe
+@opindex k-safe
+Specifies whether kernel saftey is to be performed.  Mutually exclusive with @code{debug} and
+@code{test} above.  This has the effect of invoking some more pedantic assertion macros in the code.
+The default is not to apply kernel safety.
+
+@item --with k-inline
+@itemx --without k-inline
+@opindex k-inline
+Specifies whether kernel @code{inline} functions are to be placed inline.  This has the effect of
+adding the @option{-finline-functions} flag to @var{CFLAGS} for compiling kernel modules.  Linux 2.4
+kernels are normally compiled @option{-O2} which does not respect the @code{inline} directive.  This
+compiles kernel modules with @option{-finline-functions} to get closer to @option{-O3} optimization.
+For better optimization controls, @xrefman{Configuring the Tar Ball}.
+
+@item --with k-modversions
+@itemx --without k-modversions
+@opindex k-modversions
+Specifies whether kernel symbol versions are to be applied to symbols exported by package kernel
+modules.  The default is to version exported module symbols.  This package does not export symbols
+so this option has no effect.
+
+@item --with devfs
+@itemx --without devfs
+Specifies whether the build is for a device file system daemon enabled system with autoloading, or
+not.  The default is to build for @manpage{devfsd(1)} autoloading when @var{CONFIG_DEVFS_FS} is defined in the
+target kernel.  The @samp{rebuild} target uses this option to signal to the RPM spec file that the
+@samp{dev} subpackage need not be built.  This option does not appear when the package has no
+devices.
+
+@item --with devel
+@itemx --without devel
+@opindex devel
+Specifies whether to build development environment packages such as those that include header files,
+static libraries, manual pages and @manpage{texinfo(1)} documentation.  The default is to build development
+environment packages.  This option can be useful when building for an embedded target where only the
+runtime components are desired.
+
+@item --with docs
+@itemx --without docs
+@opindex docs
+Specifies whether to build and install major documentation such manual pages and
+@manpage{texinfo(1)} documentation.  The default is to build and install documentation.  This option
+can be useful when building for an embedded target where only the runtime and static compile
+components are desired, but not major documentation.  This option does not override the setting of
+@code{--without devel}.
+
+@item --with tools
+@itemx --without tools
+@opindex tools
+Specifies whether user space packages are to be built.  The default is to build user space packages.
+This option can be useful when rebuilding for multiple architectures and target kernels.  The
+@samp{rebuild} @manpage{automake(1)} target uses this feature when rebuilding for all available architectures
+and kernels, to rebuild user packages once per architecture instead of once per kernel.
+
+@item --with modules
+@itemx --without modules
+@opindex modules
+Specifies whether kernel modules packages are to be built.  The default is to build kernel module
+packages.  This option can be useful when rebuilding for multiple architectures and target kernels.
+The @samp{rebuild} @manpage{automake(1)} target uses this feature to rebuild for all available architectures
+and kernels.
+
+@end table
+
+@include rpm.texi
+
+In general, the default values of these options are sufficient for most purposes and no options need
+be provided when rebuilding the Source RPMs.
+
+@subsubheading Build
+To build from the source RPM, @xrefman{Building from the Source RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -749,9 +1271,13 @@ of the included @value{pkgtype} packages, see the @cite{Configuring the Source R
 @cindex configuring, source dscs
 @cindex source dscs
 
-@value{PACKAGE_TITLE} is not currently distributed as Debian DSC.  For configuring the Debian DSCs
-of the included @value{pkgtype} packages, see the @cite{Configuring the Debian DSC} section of the
-@cite{Installation and Reference Manual} for the individual @value{pkgtype} package.
+The Debian DSC can be configured by passing options in the environment variable
+@var{BUILD_DEBOPTIONS}.  The options placed in this variable take the same form as those passed to
+the @file{configure} script, @xrefman{Configuring the Tar Ball}.  For an example, @xrefman{Building
+from the Debian DSC}.
+
+@subsubheading Build
+To build from the Debian DSC, @xrefman{Building from the Debian DSC}.
 
 @c ----------------------------------------------------------------------------
 
@@ -774,15 +1300,6 @@ described below.
 @node Configure Options
 @subsubsection Configure Options
 @cindex configure options
-
-This is a generic description of common @file{configure} options that are in addition to those
-provided by @manpage{autoconf(1)}, @manpage{automake(1)}, @manpage{libtool(1)} and @manpage{gettext(1)}.
-
-Not all @file{configure} options are applicable to all @value{pkgtype} packages.
-Options that are kernel module specific are only applicable to @value{pkgtype}
-packages that build kernel modules.
-@acronym{STREAMS} options are only applicable to @value{pkgtype} packages that
-provide or require @acronym{STREAMS}.
 
 Following are the additional @file{configure} options, their meaning and use:
 
@@ -872,7 +1389,6 @@ kernel modules.  This option can be useful when rebuilding for multiple architec
 kernels, particularly under @manpage{rpm(1)} or @manpage{dpkg(1)}.  The @samp{rebuild}
 @manpage{automake(1)} target uses this feature to rebuild for all available architectures and
 kernels.
-This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 
 @item --enable-arch
 @opindex arch
@@ -880,8 +1396,6 @@ Specifies whether architectural dependent package components are to be built and
 option can be useful when rebuilding for multiple architectures and target kernels, particularly
 under @manpage{dpkg(1)}.  The default is to configure, build and install architecture dependent
 package components.
-This option has no effect for @value{pkgtype} packages that do not provide architecture dependent
-components.
 
 @item --enable-indep
 @opindex indep
@@ -889,15 +1403,12 @@ Specifies whether architecture independent package components are to be built an
 option can be useful when rebuilding for multiple architectures and target kernels, particularly
 under @manpage{dpkg(1)}.  The default is to configure, build and install architecture independent
 package components.
-This options has no effect for @value{pkgtype} packages that do not provide architecture independent
-components.
 
 @item --enable-k-inline
 @opindex k-inline
 Enable kernel inline functions.  Most Linux kernels build without @option{-finline-functions}.  This
 option adds the @option{-finline-functions} and @option{-Winline} flags to the compilation of kernel
 modules.  Use with care.
-This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 
 @item --enable-k-safe
 @opindex k-safe
@@ -905,7 +1416,6 @@ Enable kernel module run-time safety checks.  Specifies whether kernel safety is
 This option is mutually exclusive with @option{--enable-k-test} and @option{--enable-k-debug} below.
 This has the effect of invoking some more pedantic assertion macros in the code.  The default is not
 to apply kernel safety.
-This option has no effect for @value{pkgtype} packages that have are no kernel modules.
 
 @item --enable-k-test
 @opindex k-test
@@ -914,7 +1424,6 @@ option is mutually exclusive with @option{--enable-k-safe} above and @option{--e
 below.  This has the effect of remove @code{static} and @code{inline} attributes from functions and
 invoking most non-performance affecting debugging macros in the code.  The default is not to perform
 kernel testing.
-This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 
 @item --enable-k-debug
 @opindex k-debug
@@ -923,14 +1432,15 @@ This option is mutually exclusive with @option{--enable-k-safe} and @option{--en
 This has the effect of removing @code{static} and @code{inline} attributes from functions and
 invoking all debugging macros in the code (including performance-affecting debug macros).  The
 default is to not perform kernel debugging.
-This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
 
+@ignore
 @itemx --disable-k-modversions
 @opindex k-modversions
 Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies whether kernel symbol
 versions are to be used on symbols exported from built @command{@value{PACKAGE_NAME}} modules.  The
 default is to provide kernel symbol versions on all exported symbols.
 This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
+@end ignore
 
 @item --enable-devfs
 @itemx --disable-devfs
@@ -1141,18 +1651,10 @@ modules will only be about 5% faster.
 @opindex strconf-master
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master file is written.  The
 default is @file{Config.master}.
-This option has no effect on @value{pkgtype} packages that do not use the @acronym{STREAMS} subsystem
-and the strconf scripts.
-This option should not be specified when configuring the master package as the setting for all
-add-on packages will conflict.
 
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
 Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @samp{230}.
-This option has no effect on @value{pkgtype} packages that do not use the @acronym{STREAMS} subsystem
-and the strconf scripts.
-This option should not be specified when configuring the master package as the setting for all
-add-on packages will conflict.
 
 @end table
 
@@ -1371,9 +1873,42 @@ To build from the tar ball, @xrefman{Building from the Tar Ball}.
 @cindex building, source srpm
 @cindex source rpms
 
-@value{PACKAGE_TITLE} does not directly provide Source RPMs.  For building from the source RPMs of
-the individual @value{pkgtype} packages, see the @cite{Building from the Source RPM} section of the
-@cite{Installation and Reference Manual} for the individual @value{pkgtype} package.
+If you have downloaded the necessary source RPM (@pxrefman{Downloading the Source RPM}), then the
+following instructions will rebuild the binary RPMs on your system.  Once the binary RPMs are
+rebuilt, you may install them as described above (@pxrefman{Installing the Binary RPM}).
+
+@noindent
+The source RPM is rebuilt to binary RPMs as follows:
+
+@cartouche
+@smallexample
+% wget http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
+% rpmbuild --rebuild -vv @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
+@end smallexample
+@end cartouche
+
+@noindent
+The rebuild process can also recognize a number of options that can be used to tweak the resulting
+binaries, @xrefman{Configuring the Source RPM}.  These options are provided on the @manpage{rpm(1)}
+command line.  For example:
+
+@cartouche
+@smallexample
+% rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
+  --define "_kversion @value{_kversion}" \ 
+  -- @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
+@end smallexample
+@end cartouche
+
+@noindent
+will rebuild binary RPM
+for the @samp{@value{_kversion}} kernel
+for the @samp{athlon} architecture.
+@footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+
+@subsubheading Installation
+
+To install the resulting binary RPM, @xrefman{Installing the Binary RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1382,9 +1917,46 @@ the individual @value{pkgtype} packages, see the @cite{Building from the Source 
 @cindex building, source dscs
 @cindex source dscs
 
-@value{PACKAGE_TITLE} does not directly provide Debian DSCs.  For building from the Debian DSCs of
-the individual @value{pkgtype} packages, see the @cite{Building from the Debian DSC} section of the
-@cite{Installation and Reference Manual} for the individual @value{pkgtype} package.
+If you have downloaded the necessary Debian DSC (@pxrefman{Downloading the Debian DSC}), then the
+following instructions will rebuild the binary DEBs on your system.  Once the binary DEBs are
+rebuilt, you may install them as described above (@pxrefman{Installing the Debian DEB}).
+
+@noindent
+The Debian DSC is rebuilt to binary DEBs as follows:
+
+@cartouche
+@smallexample
+% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc
+% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz
+% dpkg-buildpackage -v @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
+@end smallexample
+@end cartouche
+
+@noindent
+The rebuild process can also recognize a number of options that can be used to tweak the resulting
+binaries, @xrefman{Configuring the Debian DSC}.  These options are provided in the environment variable
+@var{BUILD_DPKGOPTIONS} and have the same form as the options to @file{configure},
+@xrefman{Configuring the Tar Ball}.  For example:
+
+@cartouche
+@smallexample
+% BUILD_DEBOPTIONS='
+        --with-k-release=@value{_kversion}
+        --host=athlon-debian-linux-gnu'
+  dpkg-buildpackage -v \
+  @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
+@end smallexample
+@end cartouche
+
+@noindent
+will rebuild binary DEB
+for the @samp{@value{_kversion}} kernel
+for the @samp{athlon} architecture.
+@footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+
+@subsubheading Installation
+
+To install the resulting binary DEB, @xrefman{Installing the Debian DEB}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1402,14 +1974,14 @@ required @command{root} privilege.)
 Following is an example of a native build against the running kernel:
 
 @cartouche
-@example
+@smallexample
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
 % make
 % popd
-@end example
+@end smallexample
 @end cartouche
 
 @subsubsection Cross-Build
@@ -1424,7 +1996,7 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 @file{configure} command line.
 
 @cartouche
-@example
+@smallexample
 % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % pushd @value{PACKAGE}@--@value{VERSION}
@@ -1432,7 +2004,7 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 	--with-k-release=2.4.18 --host sparc-linux
 % make
 % popd
-@end example
+@end smallexample
 @end cartouche
 
 @c ----------------------------------------------------------------------------
@@ -1455,9 +2027,38 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 @cindex installing, binary rpms
 @cindex binary rpms
 
-@value{PACKAGE_TITLE} does not directly provide binary RPMs.  For installation of the binary RPMs
-for any of the @value{pkgtype} packages, see the @cite{Installing the Binary RPM} section of the
-@cite{Installation and Reference Manual} for the particular @value{pkgtype} package.
+If you have downloaded the necessary binary RPMs (@pxrefman{Downloading the Binary RPM}), or have
+rebuilt binary RPMs using the source RPM (@pxrefman{Building from the Source RPM}), then the following
+instructions will install the RPMs on your system. For additional information on @manpage{rpm(1)}, see
+@manref{rpm(8)}.
+
+@cartouche
+@smallexample
+% pushd RPMS/i686
+% rpm -ihv @value{PACKAGE}-*-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@end smallexample
+@end cartouche
+
+@noindent
+You must have the correct binary RPMs downloaded or built for this to be successful.
+
+Some of the packages are relocatable and can have final installation directories altered with the
+@option{--relocate} option to @manpage{rpm(1)}, see @manref{rpm(8)}.
+For example, the following will relocate the documentation and info directories:
+
+@cartouche
+@smallexample
+% pushd RPMS/i686
+% rpm -ihv \ 
+        --relocate '/usr/share/doc=/usr/local/share/doc' \ 
+        --relocate '/usr/share/info=/usr/local/share/info' \ 
+        -- @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@end smallexample
+@end cartouche
+
+@noindent
+The previous example will install the @file{@value{PACKAGE}-doc} package by will relocate the
+documentation an info directory contents to the @file{/usr/local} version.
 
 @c ----------------------------------------------------------------------------
 
@@ -1466,9 +2067,22 @@ for any of the @value{pkgtype} packages, see the @cite{Installing the Binary RPM
 @cindex installing, binary debs
 @cindex binary debs
 
-@value{PACKAGE_TITLE} does not directly provide binary DEBs.  For installation of the binary DEBs
-for any of the @value{pkgtype} packages, see the @cite{Installing the Binary DEB} section of the
-@cite{Installation and Reference Manual} for the particular @value{pkgtype} package.
+If you have downloaded the necessary Debian DEBs (@pxrefman{Downloading the Debian DEB}), or have
+rebuild binary DEBs using the Debian DSC (@pxrefman{Building from the Debian DSC}), then the following
+instructions will install the DEBs on your system.  For additional information see @manref{dpkg(8)}.
+
+@cartouche
+@smallexample
+% pushd debian
+% dpkg -iv @value{PACKAGE}-*_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_*.deb
+@end smallexample
+@end cartouche
+
+@noindent
+You must have the correct @file{.deb} files downloaded or build for this to be successful.@footnote{Depending
+on the release, and if you have used option @samp{--enable-maintainer-mode} to @command{configure}
+and have generated DEBs with @samp{make release}, you should be able to issue @samp{make
+install-debs} from the build directory.}
 
 @c ----------------------------------------------------------------------------
 
@@ -1513,9 +2127,20 @@ privilege is required to successfully invoke this target.
 @cindex removing, binary rpms
 @cindex binary rpms
 
-@value{PACKAGE_TITLE} does not directly provide Binary RPMs.  For removing the binary RPMs of a
-given @value{pkgtype} package, see the @cite{Removing the Binary RPM} section of the @cite{Installation and
-Reference Manual} for the individual @value{pkgtype} package.
+To remove an installed version of the binary RPMs (whether obtained from the OpenSS7 binary RPM
+releases, or whether created by the source RPM), execute the following command:
+
+@cartouche
+@smallexample
+% rpm -evv `rpm -qa | grep '^@value{PACKAGE}-'`
+@end smallexample
+@end cartouche
+
+@noindent
+should uninstall all installed @file{@value{PACKAGE_NAME}} RPMs from your system.@footnote{Depending
+on the release, you should be able to issue @samp{make uninstall-rpms} from the build directory.}
+
+For more information see @manref{rpm(1)}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1524,9 +2149,20 @@ Reference Manual} for the individual @value{pkgtype} package.
 @cindex removing, binary debs
 @cindex binary debs
 
-@value{PACKAGE_TITLE} does not directly provide Debian DEBs.  For removing the Debian DEBs of a
-given @value{pkgtype} package, see the @cite{Removing the Debian DEB} section of the @cite{Installation and
-Reference Manual} for the individual @value{pkgtype} package.
+To remove and installed version of the Debian DEB (whether obtained from the OpenSS7 binary DEB
+releases, or whether created by the Debian DSC), execute the following command:
+
+@cartouche
+@smallexample
+% dpkg -ev `dpkg -l | grep '^@value{PACKAGE}-'`
+@end smallexample
+@end cartouche
+
+@noindent
+should uninstall all installed @file{@value{PACKAGE_NAME}} DEBs from your system.@footnote{Depending
+on the release, you should be able to issue @samp{make uninstall-debs} from the build directory.}
+
+For more information see @manref{dpkg(8)}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1535,9 +2171,18 @@ Reference Manual} for the individual @value{pkgtype} package.
 @cindex removing, source srpm
 @cindex source rpms
 
-@value{PACKAGE_TITLE} does not directly provide Source RPMs.  For removing the source RPM of a
-given @value{pkgtype} package, see the @cite{Removing the Source RPM} section of the @cite{Installation and
-Reference Manual} for the individual @value{pkgtype} package.
+To remove all the installed binary RPM build from the source RPM, see @refman{Removing the Binary RPM}.
+Then simply remove the binary RPM package files and source RPM file.  A command such as:
+
+@cartouche
+@smallexample
+% find / -name '@value{PACKAGE}-*.rpm' -type f -print0 | xargs --null rm -f
+@end smallexample
+@end cartouche
+
+@noindent
+should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.@footnote{Depending on the
+release, you might be able to issue @samp{make remove-rpms} from the build directory.}
 
 @c ----------------------------------------------------------------------------
 
@@ -1546,9 +2191,22 @@ Reference Manual} for the individual @value{pkgtype} package.
 @cindex removing, source dscs
 @cindex source dscs
 
-@value{PACKAGE_TITLE} does not directly provide Debian DSCs.  For removing the Debian DSC of a
-given @value{pkgtype} package, see the @cite{Removing the Debian DSC} section of the @cite{Installation and
-Reference Manual} for the individual @value{pkgtype} package.
+To remove all the installed binary DEB build from the Debian DSC, see @refman{Removing the Debian DEB}.
+Then simply remove the binary DEB package files and Debian DSC file.  A command such as:
+
+@cartouche
+@smallexample
+% find / \( -name '@value{PACKAGE}-*.deb' \
+         -o -name '@value{PACKAGE}-*.dsc' \
+         -o -name '@value{PACKAGE}-*.tar.* \
+         \) -type f -print0 | xargs --null rm -f
+@end smallexample
+@end cartouche
+
+@noindent
+should remove all @file{@value{PACKAGE_NAME}} DEBs, DSCs and TARs from your
+system.@footnote{Depending on the release, you might be able to issue @samp{make remove-debs} from
+the build directory.}
 
 @c ----------------------------------------------------------------------------
 
@@ -1561,14 +2219,14 @@ To remove a version installed from tar ball, change to the build directory where
 built and use the @samp{uninstall} @manpage{automake(1)} target as follows:
 
 @cartouche
-@example
+@smallexample
 % cd /usr/src/@value{PACKAGE}
 % make uninstall
 % cd ..
 % rm -fr @value{PACKAGE}-@value{VERSION}
 % rm -f @value{PACKAGE}-@value{VERSION}.tar.gz
 % rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
-@end example
+@end smallexample
 @end cartouche
 
 If you have inadvertently removed the build directory and, therefore, no longer have a configured
@@ -1620,12 +2278,12 @@ is opened.  The @samp{make install} process makes the necessary changes to the
 following added to your @file{@value{_rootdir}/@-etc/@-modules.conf} file:
 
 @cartouche
-@example
+@smallexample
 prune modules.@value{pkgexample}
 if -f /lib/modules/`uname -r`/modules.@value{pkgexample}
 include /lib/modules/`uname -r`/modules.@value{pkgexample}
 endif
-@end example
+@end smallexample
 @end cartouche
 
 @noindent
