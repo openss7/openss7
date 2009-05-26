@@ -1,0 +1,105 @@
+/*
+ *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *  Copyrights:
+ *
+ *  Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
+ *  901 San Antonio Road, Palo Alto, California 94043, U.S.A.
+ *
+ *  This product and related documentation are protected by copyright and
+ *  distributed under licenses restricting its use, copying, distribution, and
+ *  decompilation. No part of this product or related documentation may be
+ *  reproduced in any form by any means without prior written authorization of
+ *  Sun and its licensors, if any.
+ *
+ *  RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
+ *  States Government is subject to the restrictions set forth in DFARS
+ *  252.227-7013 (c)(1)(ii) and FAR 52.227-19.
+ *
+ *  The product described in this manual may be protected by one or more U.S.
+ *  patents, foreign patents, or pending applications.
+ *
+ *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *  Author:
+ *
+ *  Mahindra British Telecom
+ *  155 , Bombay - Pune Road 
+ *  Pimpri ,
+ *  Pune - 411 018.
+ *
+ *  Module Name   : JAIN INAP API
+ *  File Name     : AbortReason.java
+ *  Approver      : Jain Inap Edit Group
+ *  Version       : 1.0
+ *
+ *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
+package javax.jain.ss7.inap.constants;
+
+
+import java.io.*;
+import java.util.*;
+import java.lang.*;
+
+/**
+This class gives the reason for aborting the transaction.
+*/
+
+public class UAbortReason {
+
+    public static final int M_APPLICATION_CONTEXT_NOT_SUPPORTED=1;
+    public static final int M_USER_PROBLEM=2;
+	
+	//Internal variable to store the constant value
+	private int uAbortReason;
+	
+	
+    
+/**
+Constructor for AbortReason datatype
+*/
+    
+	private UAbortReason (int uAbortReason)
+	{
+	
+	
+	this.uAbortReason=uAbortReason;
+	
+	}
+	
+	
+	
+	/**
+	*AbortReason: APPLICATION_CONTEXT_NOT_SUPPROTED:	
+	*/
+	
+	public static final UAbortReason APPLICATION_CONTEXT_NOT_SUPPORTED=new 
+		UAbortReason(M_APPLICATION_CONTEXT_NOT_SUPPORTED);
+	
+	public static final UAbortReason USER_PROBLEM=new
+		UAbortReason (M_USER_PROBLEM);
+		
+	
+	/**
+	*gets the integer string representation of constant class and 
+	 return Integer provides the value of constants
+	 */
+	 
+	
+	public int  getAbortReason()
+	{
+		return uAbortReason;
+		
+	}
+	
+	
+	
+	
+	
+	
+        
+    
+}
+//end class
