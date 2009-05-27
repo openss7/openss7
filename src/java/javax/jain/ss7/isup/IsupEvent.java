@@ -107,9 +107,7 @@ public abstract class IsupEvent extends java.util.EventObject implements java.la
       * @return The ISUP primtiive value in an ISUP event.
       * @exception MandatoryParameterNotSetException Thrown when mandatory ISUP parameter is not set.
       */
-    public abstract int getIsupPrimitive() {
-        throw MandatoryParameterNotSetException("IsupPrimitive not set.");
-    }
+    public abstract int getIsupPrimitive();
     /**
       * Gets the destination point code.  The destination point code is a signaling point code, the
       * format of which is described in the IsupUserAddress class.  Refer SignalingPointCode for a
@@ -223,7 +221,7 @@ public abstract class IsupEvent extends java.util.EventObject implements java.la
       * 8-bit ANSI SLS.
       * @param isls The SLS value in the ISUP event.
       */
-    public void setSls(byte isls);
+    public void setSls(byte isls) {
         m_sls = isls;
     }
     /**

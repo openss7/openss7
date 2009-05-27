@@ -61,7 +61,7 @@ package javax.jain.protocol.ss7;
   * This exception is thrown if a parameter of a Jain MAP API primitive is not
   * set.
   */
-public class ParameterNotSetException extends SS7Exception {
+public class SS7ParameterNotSetException extends SS7Exception {
     /**
       * Constructs a new SS7ParameterNotSetException with the specified detail
       * message.

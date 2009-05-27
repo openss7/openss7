@@ -63,7 +63,7 @@ import java.io.Serializable;
 /**
   * This class is an abstract base class for parameters specific to Jain SS7.
   */
-public abstract SS7Parameter implements Serializable, Cloneable {
+public abstract class SS7Parameter implements Serializable, Cloneable {
     /**
       * The constructor.
       */

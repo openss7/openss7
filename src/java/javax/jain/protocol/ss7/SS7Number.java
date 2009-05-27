@@ -58,6 +58,7 @@
 package javax.jain.protocol.ss7;
 
 import java.lang.Object;
+import javax.jain.*;
 
 /**
   * This class can represent any "telephone number"/"address" including
@@ -93,7 +94,7 @@ import java.lang.Object;
   * <li>npi - Numbering plan indicator, mandatory component with no default.
   * <li>number - Number, mandatory component with no default.
   */
-public SS7Number extends SS7Parameter {
+public class SS7Number extends SS7Parameter {
     /** Type of number: minimum value used for range check. */
     public static final int TON_MIN = 0;
     /** Type of number: unspecified or unknown type. */
@@ -158,7 +159,7 @@ public SS7Number extends SS7Parameter {
       * @exception SS7InvalidParamException Thrown if paraemeter(s) are invalid
       * or out of range.
       */
-    public SS7Number(int ton, int npi, Object number) throws SS7InvalidParameterException {
+    public SS7Number(int ton, int npi, Object number) throws SS7InvalidParamException {
         if (ton != null) {
             m_ton = ton;
             m_ton_is_set = true;
@@ -175,7 +176,7 @@ public SS7Number extends SS7Parameter {
     /**
       * Empty constructor needed for serializable objects and beans.
       */
-    public SS7Number() throws SS7InvalidParmException {
+    public SS7Number() throws SS7InvalidParamException {
     }
     /**
       * Change the Type of Number (TON) parameter.

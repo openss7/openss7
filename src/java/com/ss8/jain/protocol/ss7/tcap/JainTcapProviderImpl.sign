@@ -1,0 +1,161 @@
+Compiled from JainTcapProviderImpl.java
+public class com.ss8.jain.protocol.ss7.tcap.JainTcapProviderImpl extends java.lang.Object implements jain.protocol.ss7.tcap.JainTcapProvider {
+    static final int NONE;
+	/*   I   */
+    static final int DEFAULT_BUF_SIZE;
+	/*   I   */
+    static final int DEFAULT_NUM_BUFS;
+	/*   I   */
+    static final int DEFAULT_NUM_DLGS;
+	/*   I   */
+    static final int SUCCESS;
+	/*   I   */
+    static final int FAIL;
+	/*   I   */
+    static final int FAIL_SYSAPI;
+	/*   I   */
+    static final int FAIL_INVINP;
+	/*   I   */
+    static final int FAIL_NOTREG;
+	/*   I   */
+    static final int FAIL_MAXCON;
+	/*   I   */
+    static final int FAIL_ILL_IDX;
+	/*   I   */
+    static final int FAIL_WRONG_SIZE;
+	/*   I   */
+    static final int FAIL_WRONG_PROTO;
+	/*   I   */
+    static final int FAIL_SYSTEM;
+	/*   I   */
+    static final int FAIL_MTP;
+	/*   I   */
+    private int bufSize;
+	/*   I   */
+    private int numBufs;
+	/*   I   */
+    private int numDlgs;
+	/*   I   */
+    com.ss8.jain.protocol.ss7.tcap.JainTcapStackImpl ownStack;
+	/*   Lcom/ss8/jain/protocol/ss7/tcap/JainTcapStackImpl;   */
+    jain.protocol.ss7.tcap.JainTcapListener listener;
+	/*   Ljain/protocol/ss7/tcap/JainTcapListener;   */
+    int regIdx;
+	/*   I   */
+    int ssn;
+	/*   I   */
+    int invokeId;
+	/*   I   */
+    com.ss8.jain.protocol.ss7.tcap.JainTcapProviderImpl(com.ss8.jain.protocol.ss7.tcap.JainTcapStackImpl) throws java.lang.ClassNotFoundException;
+	/*   (Lcom/ss8/jain/protocol/ss7/tcap/JainTcapStackImpl;)V   */
+    public void addJainTcapListener(jain.protocol.ss7.tcap.JainTcapListener, jain.protocol.ss7.SccpUserAddress) throws java.util.TooManyListenersException, jain.ListenerAlreadyRegisteredException, jain.InvalidAddressException;
+	/*   (Ljain/protocol/ss7/tcap/JainTcapListener;Ljain/protocol/ss7/SccpUserAddress;)V   */
+    public void addJainTcapListener(jain.protocol.ss7.tcap.JainTcapListener, jain.protocol.ss7.tcap.TcapUserAddress) throws java.util.TooManyListenersException, jain.ListenerAlreadyRegisteredException, jain.protocol.ss7.tcap.InvalidUserAddressException;
+	/*   (Ljain/protocol/ss7/tcap/JainTcapListener;Ljain/protocol/ss7/tcap/TcapUserAddress;)V   */
+    public void cleanup();
+	/*   ()V   */
+    private static jain.protocol.ss7.tcap.dialogue.DialoguePortion constructDialoguePortion(byte[], byte[], int, byte[], int, byte[], int, int);
+	/*   ([B[BI[BI[BII)Ljain/protocol/ss7/tcap/dialogue/DialoguePortion;   */
+    public jain.protocol.ss7.tcap.JainTcapStack getAttachedStack();
+	/*   ()Ljain/protocol/ss7/tcap/JainTcapStack;   */
+    private int getBeginIndEvent(int, int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, boolean, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean);
+	/*   (IILjain/protocol/ss7/tcap/dialogue/DialoguePortion;ZZIZIIIII[BIIIIZIZIIIII[BIIIIZ)I   */
+    private int getContinueIndEvent(int, int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, boolean, boolean);
+	/*   (IILjain/protocol/ss7/tcap/dialogue/DialoguePortion;ZZ)I   */
+    private native int getDlgId(int);
+	/*   (I)I   */
+    private int getEndIndEvent(int, int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, boolean);
+	/*   (IILjain/protocol/ss7/tcap/dialogue/DialoguePortion;Z)I   */
+    private int getErrorIndEvent(int, int, int, int, byte[], int, byte[], boolean);
+	/*   (IIII[BI[BZ)I   */
+    private int getInvokeIndEvent(int, int, int, int, byte[], int, byte[], boolean, boolean);
+	/*   (IIII[BI[BZZ)I   */
+    private int getLocalCancelIndEvent(int, int, boolean);
+	/*   (IIZ)I   */
+    public int getNewDialogueId() throws jain.protocol.ss7.IdNotAvailableException;
+	/*   ()I   */
+    public int getNewInvokeId(int) throws jain.protocol.ss7.IdNotAvailableException;
+	/*   (I)I   */
+    private int getNoticeIndEvent(int, jain.protocol.ss7.tcap.dialogue.DialoguePortion);
+	/*   (ILjain/protocol/ss7/tcap/dialogue/DialoguePortion;)I   */
+    private int getProviderAbortIndEvent(int, int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, int);
+	/*   (IILjain/protocol/ss7/tcap/dialogue/DialoguePortion;I)I   */
+    private int getRejectIndEvent(int, int, int, int, int, int, int, byte[], boolean);
+	/*   (IIIIIII[BZ)I   */
+    private int getResultIndEvent(int, int, int, int, byte[], int, byte[], boolean, boolean);
+	/*   (IIII[BI[BZZ)I   */
+    public jain.protocol.ss7.tcap.JainTcapStack getStack();
+	/*   ()Ljain/protocol/ss7/tcap/JainTcapStack;   */
+    private int getUnidirectionalIndEvent(int, int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean);
+	/*   (IILjain/protocol/ss7/tcap/dialogue/DialoguePortion;ZIZIIIII[BIIIIZIZIIIII[BIIIIZ)I   */
+    private int getUserAbortIndEvent(int, int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, int, byte[]);
+	/*   (IILjain/protocol/ss7/tcap/dialogue/DialoguePortion;I[B)I   */
+    public boolean isAttached();
+	/*   ()Z   */
+    private native int putBeginReqEvent(int, int, int, boolean, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean);
+	/*   (IIIZZIZIIIII[BIIIIZIZIIIII[BIIIIZ)I   */
+    private native int putContinueReqEvent(int, int, int, boolean, boolean);
+	/*   (IIIZZ)I   */
+    private native int putDialoguePortion(int, int, byte[], byte[], int, byte[], int, byte[], int, int, int);
+	/*   (II[B[BI[BI[BIII)I   */
+    private native int putEndReqEvent(int, int, int, boolean, int);
+	/*   (IIIZI)I   */
+    private native int putErrorComp(int, int, int, int, int, byte[], int, byte[]);
+	/*   (IIIII[BI[B)I   */
+    private native int putInvokeComp(int, int, int, int, int, int, byte[], long, int, byte[], boolean);
+	/*   (IIIIII[BJI[BZ)I   */
+    private native int putRejectComp(int, int, int, int, int, int, int, byte[]);
+	/*   (IIIIIII[B)I   */
+    private native int putResultComp(int, int, int, int, int, byte[], int, byte[], boolean);
+	/*   (IIIII[BI[BZ)I   */
+    private native int putTimerResetComp(int, int, int);
+	/*   (III)I   */
+    private native int putUnidirectionalReqEvent(int, int, int, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean, int, boolean, int, int, int, int, int, byte[], int, int, int, int, boolean);
+	/*   (IIIZIZIIIII[BIIIIZIZIIIII[BIIIIZ)I   */
+    private native int putUserAbortReqEvent(int, int, int, boolean, int, byte[]);
+	/*   (IIIZI[B)I   */
+    private native int putUserCancelComp(int, int, int);
+	/*   (III)I   */
+    public void releaseDialogueId(int) throws jain.protocol.ss7.IdNotAvailableException;
+	/*   (I)V   */
+    public void releaseInvokeId(int, int) throws jain.protocol.ss7.IdNotAvailableException;
+	/*   (II)V   */
+    public void removeJainTcapListener(jain.protocol.ss7.tcap.JainTcapListener) throws jain.ListenerNotRegisteredException;
+	/*   (Ljain/protocol/ss7/tcap/JainTcapListener;)V   */
+    private native int rlsDlgId(int, int);
+	/*   (II)I   */
+    void sendBeginReqEvent(jain.protocol.ss7.tcap.dialogue.BeginReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/dialogue/BeginReqEvent;)V   */
+    public void sendComponentReqEvent(jain.protocol.ss7.tcap.ComponentReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/ComponentReqEvent;)V   */
+    void sendContinueReqEvent(jain.protocol.ss7.tcap.dialogue.ContinueReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/dialogue/ContinueReqEvent;)V   */
+    void sendDeregistrationEvent(int);
+	/*   (I)V   */
+    private void sendDialoguePortion(int, jain.protocol.ss7.tcap.dialogue.DialoguePortion, int, int) throws jain.MandatoryParameterNotSetException;
+	/*   (ILjain/protocol/ss7/tcap/dialogue/DialoguePortion;II)V   */
+    public void sendDialogueReqEvent(jain.protocol.ss7.tcap.DialogueReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/DialogueReqEvent;)V   */
+    void sendEndReqEvent(jain.protocol.ss7.tcap.dialogue.EndReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/dialogue/EndReqEvent;)V   */
+    private void sendErrorReqEvent(jain.protocol.ss7.tcap.component.ErrorReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/component/ErrorReqEvent;)V   */
+    private void sendInvokeReqEvent(jain.protocol.ss7.tcap.component.InvokeReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/component/InvokeReqEvent;)V   */
+    private void sendRejectReqEvent(jain.protocol.ss7.tcap.component.RejectReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/component/RejectReqEvent;)V   */
+    private void sendResultReqEvent(jain.protocol.ss7.tcap.component.ResultReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/component/ResultReqEvent;)V   */
+    private void sendTimerResetReqEvent(jain.protocol.ss7.tcap.component.TimerResetReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/component/TimerResetReqEvent;)V   */
+    void sendUnidirectionalReqEvent(jain.protocol.ss7.tcap.dialogue.UnidirectionalReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/dialogue/UnidirectionalReqEvent;)V   */
+    void sendUserAbortReqEvent(jain.protocol.ss7.tcap.dialogue.UserAbortReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/dialogue/UserAbortReqEvent;)V   */
+    private void sendUserCancelReqEvent(jain.protocol.ss7.tcap.component.UserCancelReqEvent) throws jain.MandatoryParameterNotSetException;
+	/*   (Ljain/protocol/ss7/tcap/component/UserCancelReqEvent;)V   */
+    private native synchronized int tcapDereg(int);
+	/*   (I)I   */
+    private native synchronized int tcapSccpReg(int, int, int, int, int, int);
+	/*   (IIIIII)I   */
+}

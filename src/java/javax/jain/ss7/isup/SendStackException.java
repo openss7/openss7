@@ -85,7 +85,7 @@ public class SendStackException extends IsupException {
     public java.lang.String toString() {
         java.lang.String text = "SendStackException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";
-        txt
+        return text;
     }
 }
 

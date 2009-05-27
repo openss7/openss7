@@ -57,6 +57,9 @@
 
 package javax.jain.protocol.ss7.map;
 
+import javax.jain.protocol.ss7.*;
+import javax.jain.*;
+
 /**
   * This parameter class represents an Internation Mobile Subscriber Identity
   * (IMSI) as defined in the sepcification 3G TS 23.003 and ITU-T E.212. <p>
@@ -111,7 +114,7 @@ public class Imsi extends SS7Parameter {
                 case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
                     break;
                 default:
-                    throw SS7InvalidParamException("Mobile Country Mobile Code bad digit '" + mcc.charAt(i) + "' at position " + i ".");
+                    throw SS7InvalidParamException("Mobile Country Mobile Code bad digit '" + mcc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_mcc = mcc;
@@ -143,7 +146,7 @@ public class Imsi extends SS7Parameter {
                 case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
                     break;
                 default:
-                    throw SS7InvalidParamException("Mobile Network Code bad digit '" + mnc.charAt(i) + "' at position " + i ".");
+                    throw SS7InvalidParamException("Mobile Network Code bad digit '" + mnc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_mnc = mnc;
@@ -173,7 +176,7 @@ public class Imsi extends SS7Parameter {
                 case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
                     break;
                 default:
-                    throw SS7InvalidParamException("Mobile Subscriber Nr bad digit '" + msin.charAt(i) + "' at position " + i ".");
+                    throw SS7InvalidParamException("Mobile Subscriber Nr bad digit '" + msin.charAt(i) + "' at position " + i + ".");
             }
         }
         m_msin = msin;

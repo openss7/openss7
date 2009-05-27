@@ -111,7 +111,7 @@ public class E164Number extends SS7Parameter {
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                     break;
                 default:
-                    throw SS7InvalidParamException("Country Code invalid digit '" + cc.charAt(i) + "' at position " + i ".");
+                    throw SS7InvalidParamException("Country Code invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_cc = cc;
@@ -167,7 +167,7 @@ public class E164Number extends SS7Parameter {
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                     break;
                 default:
-                    throw SS7InvalidParamException("Subscriber Number invalid digit '" + cc.charAt(i) + "' at position " + i ".");
+                    throw SS7InvalidParamException("Subscriber Number invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_sn = sn;
@@ -204,7 +204,7 @@ public class E164Number extends SS7Parameter {
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                     break;
                 default:
-                    throw SS7InvalidParamException("Nat Dest Code invalid digit '" + cc.charAt(i) + "' at position " + i ".");
+                    throw SS7InvalidParamException("Nat Dest Code invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_ndc = ndc;

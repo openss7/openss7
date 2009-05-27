@@ -55,7 +55,9 @@
 //  $Log$
 //  ==========================================================================
 
-package javax,jain.protocol.ss7;
+package javax.jain.protocol.ss7;
+
+import javax.jain.*;
 
 /**
   * This exception is thrown if the remove Jain Listener method of a Jain

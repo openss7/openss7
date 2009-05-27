@@ -58,6 +58,7 @@
 package javax.jain.protocol.ss7.map;
 
 import javax.jain.protocol.ss7.SS7InvalidParamException;
+import java.util.Date;
 
 /**
   * This class is a base class of different classes with position information.
@@ -97,7 +98,7 @@ public abstract class Position extends MapParameter {
     }
     /** Set the Age of Position information.
       * @param ageOfPositionInfo Age of position information.  */
-    public void setAgeOfPositionInfo(Data ageOfPositionInfo) {
+    public void setAgeOfPositionInfo(Date ageOfPositionInfo) {
         Date date = Date.now();
         if (ageOfPositionInfo != null)
             m_age = ageOfPositionInfo;
