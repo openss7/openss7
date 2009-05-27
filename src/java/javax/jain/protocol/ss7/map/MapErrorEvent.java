@@ -64,7 +64,7 @@ import java.io.Serializable;
 /**
   * This class is the base class for all error events returned to the listener from the provider.
   */
-public class MapErrorEvent extends EventObject implements Serializable, Cloneable {
+public class MapErrorEvent extends java.util.EventObject implements Serializable, Cloneable {
     /**
       * The constructor.
       *
@@ -103,7 +103,7 @@ public class MapErrorEvent extends EventObject implements Serializable, Cloneabl
         m_source = source;
         m_source_is_set = true;
     }
-    public Object getSource(void) {
+    public Object getSource() {
         Object source = null;
         if (m_source_is_set)
             source = m_source;

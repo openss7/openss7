@@ -61,7 +61,7 @@ package javax.jain.protocol.ss7.map;
   * This interface is used for typing different identifiers (e.g, MsIsdn and Min) for Mobile Stations in the Message
   * Transaciton Capability.
   */
-public interface MsNumber {
+public class MsNumber {
     /** Type of MS Number is MSISDN (E.164). */
     public static final int MS_NUMBER_MSISDN = 1;
     /** Type of MS Number is MIN. */

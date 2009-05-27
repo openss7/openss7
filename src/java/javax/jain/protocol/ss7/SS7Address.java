@@ -62,11 +62,8 @@ import java.lang.Cloneable;
 
 import java.io.Serializable;
 
-import javax.jain.protocol.ss7.JainSS7Utility;
-import javax.jain.protocol.ss7.E164Number;
-import javax.jain.protocol.ss7.SS7Parameter;
-import javax.jain.protocol.ss7.SS7InvalidParamException;
-import javax.jain.protocol.ss7.SS7ParameterNotSetException;
+import javax.jain.protocol.ss7.*;
+import javax.jain.*;
 
 /**
   * This class represents an address o a Jain MAP API User.  This address
@@ -88,7 +85,7 @@ import javax.jain.protocol.ss7.SS7ParameterNotSetException;
   *
   * (At least one of the components has to be present.)
   */
-public interface SS7Address extends SS7Parameter implements Cloneable, Serializable {
+public class SS7Address extends SS7Parameter implements Cloneable, Serializable {
 
     /**
       * The constructor.
@@ -147,7 +144,7 @@ public interface SS7Address extends SS7Parameter implements Cloneable, Serializa
       * @exception SS7InvalidParamException Thrown if parameter(s) are invalid
       * or out of range.
       */
-    public void  setSubSystemNumber(int ssn) throws SS7InvalidParameterException {
+    public void  setSubSystemNumber(int ssn) throws SS7InvalidParamException {
         switch (ssn) {
             case 0:
             case 1:
@@ -290,5 +287,7 @@ public interface SS7Address extends SS7Parameter implements Cloneable, Serializa
     private E164Number m_gt;
     private boolean m_gt_is_set = false;
 }
+
+
 
 // vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

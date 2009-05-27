@@ -97,7 +97,7 @@ public final class IsupUserAddress extends java.lang.Object implements SS7Addres
       * @param networkInd Newtork indicator in the User Address.
       * @exception Thrown when value is out of range.
       */
-    public IsupUserAddress(SignalingPointCode dpc, int startCIC, int endCIC, networkIndicator networkInd)
+    public IsupUserAddress(SignalingPointCode dpc, int startCIC, int endCIC, NetworkIndicator networkInd)
         throws ParameterRangeInvalidException {
         try {
             int[] pc = new int[3];
