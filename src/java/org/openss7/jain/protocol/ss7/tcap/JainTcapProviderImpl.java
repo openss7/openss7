@@ -62,248 +62,29 @@ import java.util.*;
 import jain.*;
 import jain.protocol.ss7.*;
 import jain.protocol.ss7.tcap.*;
-// import jain.protocol.ss7.tcap.component.*;
-// import jain.protocol.ss7.tcap.dialogue.*;
 
 public class JainTcapProviderImpl implements JainTcapProvider {
-    static {
-        try {
-            System.loadLibrary("openss7TcapJNI");
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load. \n" + e);
-            System.exit(1);
-        }
-    }
-    private JainTcapStackImpl stack;
-    private int stackSpecification;
-    private native void getProvider(int stackSpecification)
-        throws PeerUnavailableException;
-    private native void putProvider();
-
-    /**
-      * Create a JainTcapProviderImpl instance.
-      *
-      * Note that the only thing that we specify now is the stackSpecification.
-      * The native method can support a wider range of values than is provided in
-      * TcapConstants.
-      */
-    JainTcapProviderImpl(JainTcapStackImpl stack)
-        throws PeerUnavailableException {
-
-        try {
-            this.stack = stack;
-            this.stackSpecification = stack.getStackSpecification();
-            getProvider(stackSpecification);
-        } catch (Exception e) {
-            throw new PeerUnavailableException("Cannot instantiate provider.");
-        }
-    }
-
-    /**
-      * Destructor for the JAIN TCAP provider implementation.  When a
-      * provider is finalized, we need to release the underlying file
-      * descriptor.  It is ok if this is not called at system exit
-      * because all file descriptors will be closed at that point
-      * anyway.
-      */
-    protected void finalize() {
-        putProvider();
-    }
-
-    /**
-      * Returns a unique Dialogue Id to initiate a dialog with another
-      * TCAP user.
-      *
-      * @return the newe Dialogue Id returned by the underlying TCAP layer
-      * @exception IdNotAvailableException if a new Dialogue Id is not available.
-      */
     public native int getNewDialogueId()
         throws IdNotAvailableException;
-    /**
-      * Release the dialogue Id back to the system. <br>
-      * <b>Note:</b> In some SS7 stacks the TCAP Dialogue Id is automatically
-      * released following the end of a TCAP transaction. In such instances the
-      * implementation of this method may be left null.
-      *
-      * <p><b>Implementation Notes:</b>
-      * Dialogue Ids are automatically released.
-      *
-      * @param  dialogueId  the dialogue Id supplied to the method
-      * @exception  IdNotAvailableException  if a new Dialogue Id is not available
-      */
-    public void releaseDialogueId(int dialogueId)
-        throws IdNotAvailableException {
-    }
-    /**
-      * Returns a unique Invoke Id for identifying invoke requests within the
-      * dialogue identified by the supplied Dialogue Id. Each dialogue between two
-      * <CODE>JainTcapListeners</CODE> is identified by a unique Dialogue Id. Note
-      * that the returned Invoke Id will be unique for a particular Dialogue Id.
-      *
-      * @param  dialogueId the dialogue Id supplied to the method
-      * @return an unused unique Invoke Id
-      * @exception  IdNotAvailableException  if an invoke Id is not available to
-      * the specified dialogue Id
-      */
+    public native void releaseDialogueId(int dialogueId)
+        throws IdNotAvailableException;
     public native int getNewInvokeId(int dialogueId)
         throws IdNotAvailableException;
-    /**
-      * Releases the unique Invoke Id, allowing it to be reused within the
-      * dialogue identified by the supplied Dialogue Id.
-      *
-      * <p><b>Implementation Notes:</b>
-      * Invoke Ids are automatically released.
-      *
-      * @param  invokeId the invoke Id to be released
-      * @param  dialogueId the dialogue Id from which to release the dialogue Id
-      * @exception  IdNotAvailableException if an invoke Id is not available to
-      * the specified dialogue Id
-      */
-    public void releaseInvokeId(int invokeId, int dialogueId)
-        throws IdNotAvailableException {
-    }
-    /**
-      * Sends a Component Request primitive into the TCAP layer of the SS7
-      * protocol stack.
-      *
-      * @param  event the new component event supplied to the method
-      * @exception  MandatoryParameterNotSetException  thrown if all of the
-      * mandatory parameters required by this JainTcapProviderImpl, to send the
-      * Component Request are not set. <BR>
-      * Note that different implementations of this JainTcapProvider interface
-      * will mandate that different parameters must be set for each
-      * <CODE>ComponentReqEvent</CODE> . It is recommended that the message detail
-      * returned in the <CODE>MandatoryParameterNotSetException</CODE> should be a
-      * <CODE>String</CODE> of the form: <BR>
-      * <CENTER><B>"Parameter: <parameterName> not set"</B></CENTER>
-      */
+    public native void releaseInvokeId(int invokeId, int dialogueId)
+        throws IdNotAvailableException;
     public native void sendComponentReqEvent(ComponentReqEvent event)
         throws MandatoryParameterNotSetException;
-    /**
-      * Sends a Dialogue Request primitive into the TCAP layer of the SS7 protocol
-      * stack. This will trigger the transmission to the destination node of the
-      * Dialogue request primitive along with any associated Component request
-      * primitives that have previously been passed to this JainTcapProviderImpl.
-      * Since the same JainTcapProviderImpl will be used to handle a particular
-      * transaction, Dialogue Request Events with the same Originating Transaction
-      * Id must be sent to the same JainTcapProviderImpl.
-      *
-      * @param  event the new dialogue event supplied to the method
-      * @exception  MandatoryParameterNotSetException  thrown if all of the
-      * mandatory parameters required by this JainTcapProviderImpl to send the
-      * Dialogue Request are not set. <p>
-      *
-      * <b>Note to developers</b> :- different implementations of this
-      * JainTcapProvider interface will mandate that different parameters must be
-      * set for each <CODE>DialogueReqEvent</CODE> . It is recommended that the
-      * detail message returned in the
-      * <CODE>MandatoryParameterNotSetException</CODE> should be a
-      * <CODE>String</CODE>of the form: <P>
-      *
-      * <CENTER><B>"Parameter: <parameterName> not set"</B></CENTER>
-      */
     public native void sendDialogueReqEvent(DialogueReqEvent event)
         throws MandatoryParameterNotSetException;
-    /**
-      * Adds a <a href="JainTcapListener.html">JainTcapListener</a> to the list of
-      * registered Event Listeners of this JainTcapProviderImpl.
-      *
-      * <p><b>Implementation Notes:</b> This could be implemented by converting the
-      * TcapUserAddress to an SccpUserAddress and calling the replacement version
-      * for this deprecated method.
-      *
-      * @param  listener the feature to be added to the JainTcapListener attribute
-      * @param  userAddress the feature to be added to the JainTcapListener
-      * attribute
-      * @exception  TooManyListenersException thrown if a limit is placed on the
-      * allowable number of registered JainTcapListeners, and this limit is
-      * exceeded.
-      * @exception  ListenerAlreadyRegisteredException thrown if the listener
-      * listener supplied is already registered
-      * @exception  InvalidUserAddressException thrown if the user address
-      * supplied is not a valid address
-      *
-      * @deprecated As of JAIN TCAP version 1.1. This method is replaced by the
-      * {@link #addJainTcapListener(JainTcapListener, SccpUserAddress)} method.
-      */
     public native void addJainTcapListener(JainTcapListener listener, TcapUserAddress userAddress)
         throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidUserAddressException; 
-    /**
-      * Adds a <a href="JainTcapListener.html">JainTcapListener</a> to the list of
-      * registered Event Listeners of this JainTcapProviderImpl.
-      *
-      * <p><b>Implementation Notes:</b>
-      * Nowhere does the specification say the maximum number of listeners that
-      * must be accepted.  Is suppose the value could be zero (0).  It might be
-      * easier for us to restrict this value to one (1).  Otherwise, we need to
-      * open a new underlying TCAP Stream for each listener.  This is no problem I
-      * suppose.  One non-listening TCAP Stream will be opened for each TCAP
-      * provider instantiated for TCAP initators.  TCAP responders will use the
-      * dialogue ID of the indication.  Because we have only on initiating Stream,
-      * it is easy to obtain a dialogue Id unique to that Stream.  However, for
-      * initiators, it is not necessary for the underlying stack to acquire a
-      * Dialogue Id as one can be provided automatically by the provider.  But
-      * this interface cannot handle that. <p>
-      *
-      * To allow this the native method will need to map a listenerHandle returned
-      * from the native method to the specific listener.
-      *
-      * @param  listener the feature to be added to the JainTcapListener attribute
-      * @param  userAddress the feature to be added to the JainTcapListener
-      * attribute
-      * @exception  TooManyListenersException thrown if a limit is placed on the
-      * allowable number of registered JainTcapListeners, and this limit is
-      * exceeded.
-      * @exception  ListenerAlreadyRegisteredException thrown if the listener
-      * listener supplied is already registered
-      * @exception  InvalidAddressException thrown if the user address supplied is
-      * not a valid address
-      */
     public native void addJainTcapListener(JainTcapListener listener, SccpUserAddress userAddress)
         throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException;
-    /**
-      * Removes a <a href="JainTcapListener.html">JainTcapListener</a> from the
-      * list of registered JainTcapListeners of this JainTcapProviderImpl.
-      *
-      * @param  listener the listener to be removed from this provider
-      * @exception  ListenerNotRegisteredException thrown if there is no such
-      * listener registered with this provider
-      */
     public native void removeJainTcapListener(JainTcapListener listener)
         throws ListenerNotRegisteredException;
-    /**
-      * Returns the JainTcapStackImpl to which this JainTcapProviderImpl is
-      * attached.
-      *
-      * @return the attached JainTcapStack.
-      * @deprecated As of JAIN TCAP v1.1. This class is no longer needed as a
-      * result of the addition of the {@link
-      * jain.protocol.ss7.tcap.JainTcapProvider#getStack} class.
-      * The reason for deprecating this method is that the provider is attached
-      * implicitly.
-      */
-    public JainTcapStack getAttachedStack() {
-        return getStack();
-    }
-    /**
-      * Returns the JainTcapStackImpl to which this JainTcapProviderImpl is
-      * attached.
-      *
-      * @return the attached JainTcapStack.
-      * @since version 1.1
-      */
-    public JainTcapStack getStack() {
-        return this.stack;
-    }
-    /**
-      * @deprecated    As of JAIN TCAP v1.1. No replacement, the JainTcapProvider
-      * is attached implicitly within the <a href =
-      * "JainTcapStack.html#createProvider()">createProvider</a> method call in
-      * the <code>JainTcapStack</code> Interface.
-      */
-    public boolean isAttached() {
-        return true;
-    }
+    public native JainTcapStack getAttachedStack();
+    public native JainTcapStack getStack();
+    public native boolean isAttached();
 }
 
 // vim: ft=java tw=72 sw=4 et com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

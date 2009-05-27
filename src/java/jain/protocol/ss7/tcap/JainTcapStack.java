@@ -73,9 +73,7 @@ import jain.protocol.ss7.VersionNotSupportedException;
  *
  * It follows that a proprietary implementation of a JainTcapStack will be
  * located at: <BR>
- * <I><pathname>
- *
- * <B>.</B> jain.protocol.ss7.tcap.JainTcapStackImpl</I> <BR>
+ * <I>&lt;pathname&gt;<B>.</B>jain.protocol.ss7.tcap.JainTcapStackImpl</I> <BR>
  * <B>Where:</B> <BR>
  * <I>pathname</I> = reverse domain name, e.g. com.sun' <BR>
  * The resulting Peer JAIN SS7 Object would be located at: <I><B>com.sun</B>

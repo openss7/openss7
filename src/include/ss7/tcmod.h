@@ -1,6 +1,6 @@
-/* ***************************************************************************
+/*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -10,9 +10,9 @@
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -54,72 +54,49 @@
  $Log$
  *****************************************************************************/
 
-package javax.jain.ss7.isup.ansi;
+#ifndef __SS7_TCMOD_H__
+#define __SS7_TCMOD_H__
 
-import javax.jain.*;
-import javax.jain.ss7.*;
-import javax.jain.ss7.isup.*;
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
+/* This file can be processed by doxygen(1). */
 
+/** @addtogroup tcmod
+  * @{ */
 
+/** @file
+  * Transaction Capabilities Sub-layer Module "tcmod" Header file.  */
 
-public class CircuitReservationAnsiEvent extends IsupEvent{
+/*
+ * Transaction Capabilities "tcmod" Header File.
+ */
 
-	public CircuitReservationAnsiEvent(java.lang.Object source,
-                                   SignalingPointCode dpc,
-                                   SignalingPointCode opc,
-                                   byte sls,
-                                   int cic,
-                                   byte congestionPriority,
-                                   NatureConnInd in_natureConnInd)
-                            throws ParameterRangeInvalidException{
+#define TCMOD	    ('C'<<8)
 
-		super(source,dpc,opc,sls,cic,congestionPriority);
-		natureConnInd = in_natureConnInd;
-		m_natureConnIndPresent     = true;
-	}
+/** @name tcmod Input/Output Controls
+  * @{*/
+#define TC_GETINFO	(TCMOD|100)	/**< Get information from TC. */
+#define TC_OPTMGMT	(TCMOD|101)	/**< Manage options for TC. */
+#define TC_BIND		(TCMOD|102)	/**< Bind TC endpoint. */
+#define TC_UNBIND	(TCMOD|103)	/**< Unbind a TC endpoint. */
 
-	public void checkMandatoryParameters()
-                              throws MandatoryParameterNotSetException{
-		if(m_natureConnIndPresent == true) 
-			return;
-		else throw new MandatoryParameterNotSetException();
-	}
+#define TC_BEGIN	(TCMOD|104)	/**< Begin a dialogue. */
+#define TC_ACCEPT	(TCMOD|105)	/**< Accept a dialogue. */
+#define TC_CONT		(TCMOD|106)	/**< Continue a dialogue. */
+#define TC_END		(TCMOD|107)	/**< End a dialogue. */
+#define TC_ABORT	(TCMOD|108)	/**< Abort a dialogue. */
 
-	public int getIsupPrimitive(){
-		return IsupConstants.ISUP_PRIMITIVE_CIRCUIT_RESERVATION;
-	}
-		
-	public NatureConnInd getNatureConnInd()
-                               throws	MandatoryParameterNotSetException{
-		if(m_natureConnIndPresent == true)
-			return natureConnInd;
-		else throw new MandatoryParameterNotSetException();
-		
-	}
-	
-	public void setNatureConnInd(NatureConnInd in_natureConnInd){
-		natureConnInd = in_natureConnInd;
-		m_natureConnIndPresent = true;
-	}
-		
-	/**
-    * String representation of class CircuitReservationAnsiEvent
-    *
-    * @return    String provides description of class CircuitReservationAnsiEvent
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nnatureConnInd = ");
-				buffer.append(natureConnInd);
-				return buffer.toString();
-		
-		}
+#define TC_INVOKE	(TCMOD|109)	/**< Invoke an operation. */
+#define TC_RESULT	(TCMOD|110)	/**< Result of an operation. */
+#define TC_CANCEL	(TCMOD|111)	/**< Cancel an operation. */
+#define TC_ERROR	(TCMOD|112)	/**< Error for an operation. */
+#define TC_REJECT	(TCMOD|113)	/**< Reject an operation. */
 
-	NatureConnInd natureConnInd;
+#define TC_COORD	(TCMOD|114)	/**< Request coordinated withdrawal from mate. */
+#define TC_ALLOW	(TCMOD|115)	/**< Allow coordinated withdrawal to mate. */
+#define TC_STATUS	(TCMOD|116)	/**< Set endpoint TC user status. */
+/** @} */
 
-	protected boolean m_natureConnIndPresent     = false;
-}
+#endif				/* __SS7_TCMOD_H__ */
 
-// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
