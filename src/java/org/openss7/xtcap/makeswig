@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+all: xtcap
+
+xtcap: xtcap_wrap.c
+
+.PRECIOUS: makeswig
+
+xtcap_wrap.cxx: xtcap.i makeswig
+	swig -c++ -java -I../../../../include/ -package org.openss7.xtcap xtcap.i
+
+
+xtcap_wrap.c: xtcap.i makeswig
+	swig -java -I../../../../include/ -package org.openss7.xtcap xtcap.i
+
+clean:
+	rm -f *.java
+	rm -f xtcap_wrap.c
+	rm -f xtcap_wrap.cxx
+
+.PHONY: clean all xtcap
+

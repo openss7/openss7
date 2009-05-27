@@ -1,6 +1,6 @@
-/* ***************************************************************************
+/*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
@@ -10,9 +10,9 @@
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -54,72 +54,26 @@
  $Log$
  *****************************************************************************/
 
-package javax.jain.ss7.isup.ansi;
+#ifndef __TCMOD_H__
+#define __TCMOD_H__
 
-import javax.jain.*;
-import javax.jain.ss7.*;
-import javax.jain.ss7.isup.*;
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
 
+#include <sys/tcmod.h>
 
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif
 
+/* We might expose some internal library functions here. */
 
-public class CircuitReservationAnsiEvent extends IsupEvent{
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif
 
-	public CircuitReservationAnsiEvent(java.lang.Object source,
-                                   SignalingPointCode dpc,
-                                   SignalingPointCode opc,
-                                   byte sls,
-                                   int cic,
-                                   byte congestionPriority,
-                                   NatureConnInd in_natureConnInd)
-                            throws ParameterRangeInvalidException{
+#endif				/* __TCMOD_H__ */
 
-		super(source,dpc,opc,sls,cic,congestionPriority);
-		natureConnInd = in_natureConnInd;
-		m_natureConnIndPresent     = true;
-	}
-
-	public void checkMandatoryParameters()
-                              throws MandatoryParameterNotSetException{
-		if(m_natureConnIndPresent == true) 
-			return;
-		else throw new MandatoryParameterNotSetException();
-	}
-
-	public int getIsupPrimitive(){
-		return IsupConstants.ISUP_PRIMITIVE_CIRCUIT_RESERVATION;
-	}
-		
-	public NatureConnInd getNatureConnInd()
-                               throws	MandatoryParameterNotSetException{
-		if(m_natureConnIndPresent == true)
-			return natureConnInd;
-		else throw new MandatoryParameterNotSetException();
-		
-	}
-	
-	public void setNatureConnInd(NatureConnInd in_natureConnInd){
-		natureConnInd = in_natureConnInd;
-		m_natureConnIndPresent = true;
-	}
-		
-	/**
-    * String representation of class CircuitReservationAnsiEvent
-    *
-    * @return    String provides description of class CircuitReservationAnsiEvent
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nnatureConnInd = ");
-				buffer.append(natureConnInd);
-				return buffer.toString();
-		
-		}
-
-	NatureConnInd natureConnInd;
-
-	protected boolean m_natureConnIndPresent     = false;
-}
-
-// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

@@ -56,18 +56,465 @@
 ##
 include ../../am/openss7.am
 
-javadir = $(datadir)/java
+#############################################################################
+# General Rules
+#############################################################################
 
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES = \
+####javadir = $(datadir)/java
+####dist_java_JAVA =
+####JAVAROOT = $(builddir)
+#####CLASSPATH =
+####AM_JAVAFLAGS = -target 1.2 -warn:all
+
+EXTRA_LTLIBRARIES =
+
+#############################################################################
+# This is for generating JAR modules
+#############################################################################
+
+# this is where the regular java jar files go
+jardir = $(datadir)/java
+
+jar_DATA =
+
+JAR = fastjar
+
+my_jar_LINKS =
+
+my_jar_CLASSFILES =
+
+$(my_jar_LINKS): %.jar : %-$(VERSION).jar
+	$(AM_V_GEN)ln -sf $< $@
+
+my_jar_LINKS += openss7.jar
+ALL_LOCAL += openss7.jar
+jar_DATA += openss7-$(VERSION).jar
+CLEANFILES += openss7.jar openss7-$(VERSION).jar
+
+openss7-$(VERSION).jar: $(my_jar_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+#############################################################################
+# This is for generating GCJ modules
+#############################################################################
+
+# this where the gcj compiled libraries go
+gcjlibdir = $(libdir)/gcj/$(PACKAGE_LCNAME)
+gcjlib_LTLIBRARIES =
+
+AM_GCJFLAGS = -I$(builddir) -I$(srcdir) -Wno-deprecated -Wno-unused
+GCJLIB_INCLUDES = -I$(builddir) -I$(srcdir) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+
+.java.class:
+@am__fastdepGCJ_TRUE@	$(AM_V_GCJ)$(GCJCOMPILE) -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/%.Tpo -C -d $(abs_builddir) $<
+@am__fastdepGCJ_TRUE@	$(AM_V_at)$(am__mv) $(@D)/$(DEPDIR)/%.Tpo $(@D)/$(DEPDIR)/%.Po
+@am__fastdepGCJ_FALSE@	$(AM_V_GCJ) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -C -d $(abs_buiddir) $<
+
+#############################################################################
+# These are the CNI modules
+#############################################################################
+
+AM_GCJHFLAGS = -I$(builddir) -I$(srcdir)
+
+MY_SUFFIXES += .class
+
+# This is how we build CNI headers and stub files
+
+.class.h: %.class
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	gcjh $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,;s,/,.,g'`
+
+.class.cc:
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	gcjh -stubs $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,;s,/,.,g'`
+
+#############################################################################
+# This is how we build JAIN TCAP CNI classes for Java.
+#############################################################################
+
+my_jtcap_JAVAFILES = \
 	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.java \
 	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.java
 
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CPPFLAGS 	= $(JAVALIB_INCLUDES) -fno-strict-aliasing
+my_jtcap_CLASSFILES = \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.class \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.class
+
+my_jtcap_INCLUDES = \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.h \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.h \
+	jain/protocol/ss7/AddressConstants.h \
+	jain/protocol/ss7/GlobalTitle.h \
+	jain/protocol/ss7/GTIndicator0001.h \
+	jain/protocol/ss7/GTIndicator0010.h \
+	jain/protocol/ss7/GTIndicator0011.h \
+	jain/protocol/ss7/GTIndicator0100.h \
+	jain/protocol/ss7/IdNotAvailableException.h \
+	jain/protocol/ss7/JainSS7Factory.h \
+	jain/protocol/ss7/JainSS7Utility.h \
+	jain/protocol/ss7/oam/CommitException.h \
+	jain/protocol/ss7/oam/OamAlarmNotification.h \
+	jain/protocol/ss7/SccpUserAddress.h \
+	jain/protocol/ss7/SignalingPointCode.h \
+	jain/protocol/ss7/SS7Address.h \
+	jain/protocol/ss7/SS7Exception.h \
+	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.h \
+	jain/protocol/ss7/SS7ListenerNotRegisteredException.h \
+	jain/protocol/ss7/SS7PeerUnavailableException.h \
+	jain/protocol/ss7/SubSystemAddress.h \
+	jain/protocol/ss7/tcap/component/ComponentConstants.h \
+	jain/protocol/ss7/tcap/component/ErrorIndEvent.h \
+	jain/protocol/ss7/tcap/component/ErrorReqEvent.h \
+	jain/protocol/ss7/tcap/ComponentIndEvent.h \
+	jain/protocol/ss7/tcap/component/InvokeIndEvent.h \
+	jain/protocol/ss7/tcap/component/InvokeReqEvent.h \
+	jain/protocol/ss7/tcap/component/LocalCancelIndEvent.h \
+	jain/protocol/ss7/tcap/component/Operation.h \
+	jain/protocol/ss7/tcap/component/Parameters.h \
+	jain/protocol/ss7/tcap/component/RejectIndEvent.h \
+	jain/protocol/ss7/tcap/component/RejectReqEvent.h \
+	jain/protocol/ss7/tcap/ComponentReqEvent.h \
+	jain/protocol/ss7/tcap/component/ResultIndEvent.h \
+	jain/protocol/ss7/tcap/component/ResultReqEvent.h \
+	jain/protocol/ss7/tcap/component/TimerResetReqEvent.h \
+	jain/protocol/ss7/tcap/component/UserCancelReqEvent.h \
+	jain/protocol/ss7/tcap/dialogue/BeginIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/BeginReqEvent.h \
+	jain/protocol/ss7/tcap/dialogue/ContinueIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/ContinueReqEvent.h \
+	jain/protocol/ss7/tcap/dialogue/DialogueConstants.h \
+	jain/protocol/ss7/tcap/dialogue/DialoguePortion.h \
+	jain/protocol/ss7/tcap/dialogue/EndIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/EndReqEvent.h \
+	jain/protocol/ss7/tcap/DialogueIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/NoticeIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/ProviderAbortIndEvent.h \
+	jain/protocol/ss7/tcap/DialogueReqEvent.h \
+	jain/protocol/ss7/tcap/dialogue/UnidirectionalIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/UnidirectionalReqEvent.h \
+	jain/protocol/ss7/tcap/dialogue/UserAbortIndEvent.h \
+	jain/protocol/ss7/tcap/dialogue/UserAbortReqEvent.h \
+	jain/protocol/ss7/tcap/GlobalTitle.h \
+	jain/protocol/ss7/tcap/GTIndicator0001.h \
+	jain/protocol/ss7/tcap/GTIndicator0010.h \
+	jain/protocol/ss7/tcap/GTIndicator0011.h \
+	jain/protocol/ss7/tcap/GTIndicator0100.h \
+	jain/protocol/ss7/tcap/InvalidUserAddressException.h \
+	jain/protocol/ss7/tcap/JainTcapListener.h \
+	jain/protocol/ss7/tcap/JainTcapProvider.h \
+	jain/protocol/ss7/tcap/JainTcapStack.h \
+	jain/protocol/ss7/tcap/ProviderNotAttachedException.h \
+	jain/protocol/ss7/tcap/TcapConstants.h \
+	jain/protocol/ss7/tcap/TcapErrorEvent.h \
+	jain/protocol/ss7/tcap/TcapException.h \
+	jain/protocol/ss7/tcap/TcapUserAddress.h \
+	jain/protocol/ss7/tcap/UnableToDeleteProviderException.h \
+	jain/protocol/ss7/UserAddressEmptyException.h \
+	jain/protocol/ss7/UserAddressLimitException.h \
+	jain/protocol/ss7/VersionNotSupportedException.h
+
+my_jtcap_HEADERCLASSES = \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.class \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.class \
+	jain/protocol/ss7/AddressConstants.class \
+	jain/protocol/ss7/GlobalTitle.class \
+	jain/protocol/ss7/GTIndicator0001.class \
+	jain/protocol/ss7/GTIndicator0010.class \
+	jain/protocol/ss7/GTIndicator0011.class \
+	jain/protocol/ss7/GTIndicator0100.class \
+	jain/protocol/ss7/IdNotAvailableException.class \
+	jain/protocol/ss7/JainSS7Factory.class \
+	jain/protocol/ss7/JainSS7Utility.class \
+	jain/protocol/ss7/oam/CommitException.class \
+	jain/protocol/ss7/oam/OamAlarmNotification.class \
+	jain/protocol/ss7/SccpUserAddress.class \
+	jain/protocol/ss7/SignalingPointCode.class \
+	jain/protocol/ss7/SS7Address.class \
+	jain/protocol/ss7/SS7Exception.class \
+	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.class \
+	jain/protocol/ss7/SS7ListenerNotRegisteredException.class \
+	jain/protocol/ss7/SS7PeerUnavailableException.class \
+	jain/protocol/ss7/SubSystemAddress.class \
+	jain/protocol/ss7/tcap/component/ComponentConstants.class \
+	jain/protocol/ss7/tcap/component/ErrorIndEvent.class \
+	jain/protocol/ss7/tcap/component/ErrorReqEvent.class \
+	jain/protocol/ss7/tcap/ComponentIndEvent.class \
+	jain/protocol/ss7/tcap/component/InvokeIndEvent.class \
+	jain/protocol/ss7/tcap/component/InvokeReqEvent.class \
+	jain/protocol/ss7/tcap/component/LocalCancelIndEvent.class \
+	jain/protocol/ss7/tcap/component/Operation.class \
+	jain/protocol/ss7/tcap/component/Parameters.class \
+	jain/protocol/ss7/tcap/component/RejectIndEvent.class \
+	jain/protocol/ss7/tcap/component/RejectReqEvent.class \
+	jain/protocol/ss7/tcap/ComponentReqEvent.class \
+	jain/protocol/ss7/tcap/component/ResultIndEvent.class \
+	jain/protocol/ss7/tcap/component/ResultReqEvent.class \
+	jain/protocol/ss7/tcap/component/TimerResetReqEvent.class \
+	jain/protocol/ss7/tcap/component/UserCancelReqEvent.class \
+	jain/protocol/ss7/tcap/dialogue/BeginIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/BeginReqEvent.class \
+	jain/protocol/ss7/tcap/dialogue/ContinueIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/ContinueReqEvent.class \
+	jain/protocol/ss7/tcap/dialogue/DialogueConstants.class \
+	jain/protocol/ss7/tcap/dialogue/DialoguePortion.class \
+	jain/protocol/ss7/tcap/dialogue/EndIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/EndReqEvent.class \
+	jain/protocol/ss7/tcap/DialogueIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/NoticeIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/ProviderAbortIndEvent.class \
+	jain/protocol/ss7/tcap/DialogueReqEvent.class \
+	jain/protocol/ss7/tcap/dialogue/UnidirectionalIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/UnidirectionalReqEvent.class \
+	jain/protocol/ss7/tcap/dialogue/UserAbortIndEvent.class \
+	jain/protocol/ss7/tcap/dialogue/UserAbortReqEvent.class \
+	jain/protocol/ss7/tcap/GlobalTitle.class \
+	jain/protocol/ss7/tcap/GTIndicator0001.class \
+	jain/protocol/ss7/tcap/GTIndicator0010.class \
+	jain/protocol/ss7/tcap/GTIndicator0011.class \
+	jain/protocol/ss7/tcap/GTIndicator0100.class \
+	jain/protocol/ss7/tcap/InvalidUserAddressException.class \
+	jain/protocol/ss7/tcap/JainTcapListener.class \
+	jain/protocol/ss7/tcap/JainTcapProvider.class \
+	jain/protocol/ss7/tcap/JainTcapStack.class \
+	jain/protocol/ss7/tcap/ProviderNotAttachedException.class \
+	jain/protocol/ss7/tcap/TcapConstants.class \
+	jain/protocol/ss7/tcap/TcapErrorEvent.class \
+	jain/protocol/ss7/tcap/TcapException.class \
+	jain/protocol/ss7/tcap/TcapUserAddress.class \
+	jain/protocol/ss7/tcap/UnableToDeleteProviderException.class \
+	jain/protocol/ss7/UserAddressEmptyException.class \
+	jain/protocol/ss7/UserAddressLimitException.class \
+	jain/protocol/ss7/VersionNotSupportedException.class
+
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES = \
+	$(my_jtcap_INCLUDES) \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.cc \
+	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.cc \
+	$(my_jtcap_CLASSFILES)
+
+
+
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CFLAGS	= $(USER_CFLAGS)
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LIBADD	= $(top_builddir)/libstreams.la
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LDFLAGS	= -module -avoid-version -shared
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	= -findirect-dispatch
 
-lib_org_openss7_tcap_jar_la_SOURCES = \
+gcjlib_LTLIBRARIES += lib-org-openss7-jain-protocol-ss7-tcap.jar.la
+
+## we either have to clean them or mark them intermediate
+##CLEANFILES += org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.cc
+##CLEANFILES += org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.cc
+MY_PRECIOUS += org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.cc
+MY_PRECIOUS += org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.cc
+
+CLEANFILES += $(my_jtcap_INCLUDES) $(my_jtcap_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jtcap_INCLUDES) $(my_jtcap_HEADERCLASSES)
+
+my_jar_LINKS += openss7Jtcap.jar
+ALL_LOCAL += openss7Jtcap.jar
+jar_DATA += openss7Jtcap-$(VERSION).jar
+CLEANFILES += openss7Jtcap.jar openss7Jtcap-$(VERSION).jar
+
+openss7Jtcap-$(VERSION).jar: $(my_jtcap_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+#############################################################################
+# These are the SWIG JNI modules
+#############################################################################
+
+# this is where the JNI libraries go
+jnilibdir = $(libdir)/java
+jnilib_LTLIBRARIES =
+
+SWIG = swig
+
+my_c_WRAPPERS =
+
+# this is how we use SWIG to generate headers and wrapper files for C
+
+$(my_c_WRAPPERS): %_wrap.c: %.i
+	$(AM_V_at)$(MKDIR_P) `dirname $@`
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	$(SWIG) -java -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
+
+# this is how we use SWIG to generate headers and wrapper files for C++
+
+my_cxx_WRAPPERS =
+
+$(my_cxx_WRAPPERS): %_wrap.cxx : %.i %.hh
+	$(AM_V_at)$(MKDIR_P) `dirname $@`
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	$(SWIG) -java -c++ -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
+
+#############################################################################
+# This is how we build STREAMS JNI classes for Java.
+#############################################################################
+
+my_streams_JAVAFILES = \
+	org/openss7/streams/bandinfo.java \
+	org/openss7/streams/strbuf.java \
+	org/openss7/streams/StreamsConstants.java \
+	org/openss7/streams/Streams.java \
+	org/openss7/streams/StreamsJNI.java \
+	org/openss7/streams/strfdinsert.java \
+	org/openss7/streams/strioctl.java \
+	org/openss7/streams/str_list.java \
+	org/openss7/streams/str_mlist.java \
+	org/openss7/streams/strpeek.java \
+	org/openss7/streams/strpmsg.java
+
+my_streams_CLASSFILES = \
+	org/openss7/streams/bandinfo.class \
+	org/openss7/streams/strbuf.class \
+	org/openss7/streams/StreamsConstants.class \
+	org/openss7/streams/Streams.class \
+	org/openss7/streams/StreamsJNI.class \
+	org/openss7/streams/strfdinsert.class \
+	org/openss7/streams/strioctl.class \
+	org/openss7/streams/str_list.class \
+	org/openss7/streams/str_mlist.class \
+	org/openss7/streams/strpeek.class \
+	org/openss7/streams/strpmsg.class
+
+lib_org_openss7_streams_jar_la_SOURCES = \
+	$(my_streams_CLASSFILES) \
+	org/openss7/streams/streams_wrap.c
+
+lib_org_openss7_streams_jar_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_streams_jar_la_CFLAGS	= $(USER_CFLAGS)
+lib_org_openss7_streams_jar_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+lib_org_openss7_streams_jar_la_LDFLAGS	= -module -avoid-version -shared
+lib_org_openss7_streams_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
+
+#gcjlib_LTLIBRARIES += lib-org-openss7-streams.jar.la
+EXTRA_LTLIBRARIES += lib-org-openss7-streams.jar.la
+
+my_jar_LINKS += openss7Streams.jar
+ALL_LOCAL += openss7Streams.jar
+jar_DATA += openss7Streams-$(VERSION).jar
+CLEANFILES += openss7Streams.jar openss7Streams-$(VERSION).jar
+
+openss7Streams-$(VERSION).jar: $(my_streams_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+libopenss7StreamsJNI_la_SOURCES 	= org/openss7/streams/streams_wrap.c
+## Note: SWIG is really bad at using aliasing in Java JNI files.
+libopenss7StreamsJNI_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7StreamsJNI_la_CFLAGS		= $(USER_CFLAGS)
+libopenss7StreamsJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7StreamsJNI_la_LDFLAGS		= -module -avoid-version -shared
+
+#jnilib_LTLIBRARIES += libopenss7StreamsJNI.la
+EXTRA_LTLIBRARIES += libopenss7StreamsJNI.la
+
+my_c_WRAPPERS += org/openss7/streams/streams_wrap.c
+my_cxx_WRAPPERS += org/openss7/streams/streams_wrap.cxx
+CLEANFILES += org/openss7/streams/streams_wrap.c
+CLEANFILES += org/openss7/streams/streams_wrap.cxx
+CLEANFILES += $(my_streams_JAVAFILES) $(my_streams_CLASSFILES)
+MY_INTERMEDIATE += org/openss7/streams/streams_wrap.c
+MY_INTERMEDIATE += org/openss7/streams/streams_wrap.cxx
+MY_INTERMEDIATE += $(my_streams_JAVAFILES) $(my_streams_CLASSFILES)
+$(my_streams_JAVAFILES): org/openss7/streams/streams_wrap.c
+
+#############################################################################
+# This is how we build XTI JNI classes for Java.
+#############################################################################
+
+my_xti_JAVAFILES = \
+	org/openss7/xti/netbuf.java \
+	org/openss7/xti/rate.java \
+	org/openss7/xti/reqvalue.java \
+	org/openss7/xti/t_ap_pc_item.java \
+	org/openss7/xti/t_ap_pco_el.java \
+	org/openss7/xti/t_ap_syn_off.java \
+	org/openss7/xti/t_bind.java \
+	org/openss7/xti/t_call.java \
+	org/openss7/xti/t_discon.java \
+	org/openss7/xti/thrpt.java \
+	org/openss7/xti/t_info.java \
+	org/openss7/xti/t_iovec.java \
+	org/openss7/xti/t_leaf_status.java \
+	org/openss7/xti/t_mosiaddr.java \
+	org/openss7/xti/t_optmgmt.java \
+	org/openss7/xti/transdel.java \
+	org/openss7/xti/t_uderr.java \
+	org/openss7/xti/t_unitdata.java \
+	org/openss7/xti/XtiConstants.java \
+	org/openss7/xti/Xti.java \
+	org/openss7/xti/XtiJNI.java
+
+my_xti_CLASSFILES = \
+	org/openss7/xti/netbuf.class \
+	org/openss7/xti/rate.class \
+	org/openss7/xti/reqvalue.class \
+	org/openss7/xti/t_ap_pc_item.class \
+	org/openss7/xti/t_ap_pco_el.class \
+	org/openss7/xti/t_ap_syn_off.class \
+	org/openss7/xti/t_bind.class \
+	org/openss7/xti/t_call.class \
+	org/openss7/xti/t_discon.class \
+	org/openss7/xti/thrpt.class \
+	org/openss7/xti/t_info.class \
+	org/openss7/xti/t_iovec.class \
+	org/openss7/xti/t_leaf_status.class \
+	org/openss7/xti/t_mosiaddr.class \
+	org/openss7/xti/t_optmgmt.class \
+	org/openss7/xti/transdel.class \
+	org/openss7/xti/t_uderr.class \
+	org/openss7/xti/t_unitdata.class \
+	org/openss7/xti/XtiConstants.class \
+	org/openss7/xti/Xti.class \
+	org/openss7/xti/XtiJNI.class
+
+lib_org_openss7_xti_jar_la_SOURCES = \
+	$(my_xti_CLASSFILES) \
+	org/openss7/xti/xti_wrap.c
+
+lib_org_openss7_xti_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_xti_jar_la_CFLAGS	= $(USER_CFLAGS)
+lib_org_openss7_xti_jar_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+lib_org_openss7_xti_jar_la_LDFLAGS	= -module -avoid-version -shared
+lib_org_openss7_xti_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
+
+gcjlib_LTLIBRARIES += lib-org-openss7-xti.jar.la
+
+my_jar_LINKS += openss7Tcap.jar
+ALL_LOCAL += openss7Tcap.jar
+jar_DATA += openss7Tcap-$(VERSION).jar
+CLEANFILES += openss7Tcap.jar openss7Tcap-$(VERSION).jar
+
+openss7Tcap-$(VERSION).jar: $(my_tcap_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+libopenss7XtiJNI_la_SOURCES 		= org/openss7/xti/xti_wrap.c
+## Note: SWIG is really bad at using aliasing in Java JNI files.
+libopenss7XtiJNI_la_CPPFLAGS 		= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7XtiJNI_la_CFLAGS		= $(USER_CFLAGS)
+libopenss7XtiJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7XtiJNI_la_LDFLAGS		= -module -avoid-version -shared
+
+jnilib_LTLIBRARIES += libopenss7XtiJNI.la
+
+my_c_WRAPPERS += org/openss7/xti/xti_wrap.c
+my_cxx_WRAPPERS += org/openss7/xti/xti_wrap.cxx
+CLEANFILES += org/openss7/xti/xti_wrap.c
+CLEANFILES += org/openss7/xti/xti_wrap.cxx
+CLEANFILES += $(my_xti_JAVAFILES) $(my_xti_CLASSFILES)
+MY_INTERMEDIATE += org/openss7/xti/xti_wrap.c
+MY_INTERMEDIATE += org/openss7/xti/xti_wrap.cxx
+MY_INTERMEDIATE += $(my_xti_JAVAFILES) $(my_xti_CLASSFILES)
+$(my_xti_JAVAFILES): org/openss7/xti/xti_wrap.c
+
+#############################################################################
+# This is how we build TCAP JNI classes for Java.
+#############################################################################
+
+my_tcap_JAVAFILES = \
 	org/openss7/tcap/SccpAddress.java \
 	org/openss7/tcap/sccp_addr_t.java \
 	org/openss7/tcap/SWIGTYPE_p_listTTcapOptions_R_t.java \
@@ -99,50 +546,89 @@ lib_org_openss7_tcap_jar_la_SOURCES = \
 	org/openss7/tcap/TcapUni.java \
 	org/openss7/tcap/TciError.java
 
-lib_org_openss7_tcap_jar_la_CPPFLAGS 	= $(JAVALIB_INCLUDES) -fno-strict-aliasing
+my_tcap_CLASSFILES = \
+	org/openss7/tcap/SccpAddress.class \
+	org/openss7/tcap/sccp_addr_t.class \
+	org/openss7/tcap/SWIGTYPE_p_listTTcapOptions_R_t.class \
+	org/openss7/tcap/SWIGTYPE_p_listTtci__TcapOption_R_t.class \
+	org/openss7/tcap/TcapAbort.class \
+	org/openss7/tcap/TcapAccept.class \
+	org/openss7/tcap/TcapAllow.class \
+	org/openss7/tcap/TcapBegin.class \
+	org/openss7/tcap/TcapCancel.class \
+	org/openss7/tcap/TcapComponentEvent.class \
+	org/openss7/tcap/TcapCont.class \
+	org/openss7/tcap/TcapCoord.class \
+	org/openss7/tcap/TcapData.class \
+	org/openss7/tcap/TcapDialogueEvent.class \
+	org/openss7/tcap/TcapEnd.class \
+	org/openss7/tcap/TcapEndPoint.class \
+	org/openss7/tcap/TcapError.class \
+	org/openss7/tcap/TcapEvent.class \
+	org/openss7/tcap/TcapInvoke.class \
+	org/openss7/tcap/Tcap.class \
+	org/openss7/tcap/TcapJNI.class \
+	org/openss7/tcap/TcapManagement.class \
+	org/openss7/tcap/TcapOptionBuffer.class \
+	org/openss7/tcap/TcapOption.class \
+	org/openss7/tcap/TcapReject.class \
+	org/openss7/tcap/TcapResult.class \
+	org/openss7/tcap/TcapState.class \
+	org/openss7/tcap/TcapStream.class \
+	org/openss7/tcap/TcapUni.class \
+	org/openss7/tcap/TciError.class
+
+lib_org_openss7_tcap_jar_la_SOURCES = \
+	$(my_tcap_CLASSFILES)
+
+lib_org_openss7_tcap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
 lib_org_openss7_tcap_jar_la_CFLAGS	= $(USER_CFLAGS)
 lib_org_openss7_tcap_jar_la_LIBADD	= $(top_builddir)/libstreams.la
 lib_org_openss7_tcap_jar_la_LDFLAGS	= -module -avoid-version -shared
+lib_org_openss7_tcap_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
 
-my_xti_JAVAFILES = \
-	org/openss7/xti/netbuf.java \
-	org/openss7/xti/rate.java \
-	org/openss7/xti/reqvalue.java \
-	org/openss7/xti/t_ap_pc_item.java \
-	org/openss7/xti/t_ap_pco_el.java \
-	org/openss7/xti/t_ap_syn_off.java \
-	org/openss7/xti/t_bind.java \
-	org/openss7/xti/t_call.java \
-	org/openss7/xti/t_discon.java \
-	org/openss7/xti/thrpt.java \
-	org/openss7/xti/t_info.java \
-	org/openss7/xti/t_iovec.java \
-	org/openss7/xti/t_leaf_status.java \
-	org/openss7/xti/t_mosiaddr.java \
-	org/openss7/xti/t_optmgmt.java \
-	org/openss7/xti/transdel.java \
-	org/openss7/xti/t_uderr.java \
-	org/openss7/xti/t_unitdata.java \
-	org/openss7/xti/XtiConstants.java \
-	org/openss7/xti/Xti.java \
-	org/openss7/xti/XtiJNI.java
+gcjlib_LTLIBRARIES += lib-org-openss7-tcap.jar.la
 
-lib_org_openss7_xti_jar_la_SOURCES = \
-	$(my_xti_JAVAFILES) \
-	org/openss7/xti/xti_wrap.c
+my_jar_LINKS += openss7Xti.jar
+ALL_LOCAL += openss7Xti.jar
+jar_DATA += openss7Xti-$(VERSION).jar
+CLEANFILES += openss7Xti.jar openss7Xti-$(VERSION).jar
 
-lib_org_openss7_xti_jar_la_CPPFLAGS 	= $(JAVALIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_xti_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_xti_jar_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-lib_org_openss7_xti_jar_la_LDFLAGS	= -module -avoid-version -shared
+openss7Xti-$(VERSION).jar: $(my_xti_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
 
-lib_org_openss7_xtcap_jar_la_SOURCES = \
+libopenss7TcapJNI_la_SOURCES 		= org/openss7/tcap/tcap_wrap.cxx
+## Note: SWIG is really bad at using aliasing in Java JNI files.
+libopenss7TcapJNI_la_CPPFLAGS 		= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7TcapJNI_la_CFLAGS		= $(USER_CFLAGS)
+libopenss7TcapJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7TcapJNI_la_LDFLAGS		= -module -avoid-version -shared
+
+#jnilib_LTLIBRARIES += libopenss7TcapJNI.la
+EXTRA_LTLIBRARIES += libopenss7TcapJNI.la
+
+my_c_WRAPPERS += org/openss7/tcap/tcap_wrap.c
+my_cxx_WRAPPERS += org/openss7/tcap/tcap_wrap.cxx
+CLEANFILES += org/openss7/tcap/tcap_wrap.c
+CLEANFILES += org/openss7/tcap/tcap_wrap.cxx
+CLEANFILES += $(my_tcap_JAVAFILES) $(my_tcap_CLASSFILES)
+MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.c
+MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.cxx
+MY_INTERMEDIATE += $(my_tcap_JAVAFILES) $(my_tcap_CLASSFILES)
+$(my_tcap_JAVAFILES): org/openss7/tcap/tcap_wrap.cxx
+
+#############################################################################
+# This is how we build XTCAP JNI classes for Java.
+#############################################################################
+
+my_xtcap_JAVAFILES = \
 	org/openss7/xtcap/OM_descriptor.java \
 	org/openss7/xtcap/OM_padded_object.java \
 	org/openss7/xtcap/OMP_return_code.java \
 	org/openss7/xtcap/OM_string.java \
 	org/openss7/xtcap/OM_value.java \
 	org/openss7/xtcap/SWIGTYPE_p_OM_value.java \
+	org/openss7/xtcap/SWIGTYPE_p_p_char.java \
 	org/openss7/xtcap/SWIGTYPE_p_p_OM_descriptor_struct.java \
 	org/openss7/xtcap/SWIGTYPE_p_void.java \
 	org/openss7/xtcap/TCAP_feature.java \
@@ -151,221 +637,62 @@ lib_org_openss7_xtcap_jar_la_SOURCES = \
 	org/openss7/xtcap/Xtcap.java \
 	org/openss7/xtcap/XtcapJNI.java
 
-lib_org_openss7_xtcap_jar_la_CPPFLAGS 	= $(JAVALIB_INCLUDES) -fno-strict-aliasing
+my_xtcap_CLASSFILES = \
+	org/openss7/xtcap/OM_descriptor.class \
+	org/openss7/xtcap/OM_padded_object.class \
+	org/openss7/xtcap/OMP_return_code.class \
+	org/openss7/xtcap/OM_string.class \
+	org/openss7/xtcap/OM_value.class \
+	org/openss7/xtcap/SWIGTYPE_p_OM_value.class \
+	org/openss7/xtcap/SWIGTYPE_p_p_char.class \
+	org/openss7/xtcap/SWIGTYPE_p_p_OM_descriptor_struct.class \
+	org/openss7/xtcap/SWIGTYPE_p_void.class \
+	org/openss7/xtcap/TCAP_feature.class \
+	org/openss7/xtcap/TCAP_waiting_sessions.class \
+	org/openss7/xtcap/XtcapConstants.class \
+	org/openss7/xtcap/Xtcap.class \
+	org/openss7/xtcap/XtcapJNI.class
+
+lib_org_openss7_xtcap_jar_la_SOURCES = \
+	$(my_xtcap_CLASSFILES)
+
+lib_org_openss7_xtcap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
 lib_org_openss7_xtcap_jar_la_CFLAGS	= $(USER_CFLAGS)
 lib_org_openss7_xtcap_jar_la_LIBADD	= $(top_builddir)/libstreams.la
 lib_org_openss7_xtcap_jar_la_LDFLAGS	= -module -avoid-version -shared
+lib_org_openss7_xtcap_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
 
-jarlibdir = $(libdir)/gcj/$(PACKAGE_LCNAME)
+gcjlib_LTLIBRARIES += lib-org-openss7-xtcap.jar.la
 
-jarlib_LTLIBRARIES = \
-	lib-org-openss7-xtcap.jar.la \
-	lib-org-openss7-tcap.jar.la \
-	lib-org-openss7-xti.jar.la
+my_jar_LINKS += openss7Xtcap.jar
+ALL_LOCAL += openss7Xtcap.jar
+jar_DATA += openss7Xtcap-$(VERSION).jar
+CLEANFILES += openss7Xtcap.jar openss7Xtcap-$(VERSION).jar
 
-EXTRA_LTLIBRARIES = \
-	lib-org-openss7-jain-protocol-ss7-tcap.jar.la
+openss7Xtcap-$(VERSION).jar: $(my_xtcap_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
 
-dist_java_JAVA =
+libopenss7XtcapJNI_la_SOURCES 		= org/openss7/xtcap/xtcap_wrap.c
+## Note: SWIG is really bad at using aliasing in Java JNI files.
+libopenss7XtcapJNI_la_CPPFLAGS 		= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7XtcapJNI_la_CFLAGS		= $(USER_CFLAGS)
+libopenss7XtcapJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7XtcapJNI_la_LDFLAGS		= -module -avoid-version -shared
 
-#dist_java_JAVA = \
-#	$(lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES) \
-#	$(my_xti_JAVAFILES) \
-#	$(lib_org_openss7_xtcap_jar_la_SOURCES) \
-#	$(lib_org_openss7_tcap_jar_la_SOURCES)
+#jnilib_LTLIBRARIES += libopenss7XtcapJNI.la
+EXTRA_LTLIBRARIES += libopenss7XtcapJNI.la
 
-JAVAROOT = $(top_builddir)/src/java
-#CLASSPATH =
-AM_JAVAFLAGS = -target 1.2 -warn:all
+my_c_WRAPPERS += org/openss7/xtcap/xtcap_wrap.c
+my_cxx_WRAPPERS += org/openss7/xtcap/xtcap_wrap.cxx
+CLEANFILES += org/openss7/xtcap/xtcap_wrap.c
+CLEANFILES += org/openss7/xtcap/xtcap_wrap.cxx
+CLEANFILES += $(my_xtcap_JAVAFILES) $(my_xtcap_CLASSFILES)
+MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.c
+MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.cxx
+MY_INTERMEDIATE += $(my_xtcap_JAVAFILES) $(my_xtcap_CLASSFILES)
+$(my_xtcap_JAVAFILES): org/openss7/xtcap/xtcap_wrap.c
 
-JAVALIB_INCLUDES		= -I$(top_builddir)/src/java -I$(top_srcdir)/src/java $(PKG_INCLUDES) $(USER_CPPFLAGS)
-
-javalibdir = $(libdir)/java
-javalib_LTLIBRARIES = libopenss7XtiJNI.la
-
-##
-## Note: SWIG is really bad at using aliasing in Java JNI files, so we need to suppress this
-## optimization in the GNU compiler or things will break.
-##
-libopenss7XtiJNI_la_SOURCES 	= org/openss7/xti/xti_wrap.c
-libopenss7XtiJNI_la_CPPFLAGS 	= $(JAVALIB_INCLUDES) -fno-strict-aliasing
-libopenss7XtiJNI_la_CFLAGS	= $(USER_CFLAGS)
-libopenss7XtiJNI_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7XtiJNI_la_LDFLAGS	= -module -avoid-version -shared
-
-SWIG = swig
-
-JAR = fastjar
-
-org/openss7/tcap/tcap_wrap.cxx: org/openss7/tcap/tcap.hh
-
-org/openss7/tcap/tcap_wrap.cxx: org/openss7/tcap/tcap.i
-	$(AM_V_at)$(MKDIR_P) `dirname $@`
-	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(SWIG) -java -c++ -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
-
-$(lib_org_openss7_tcap_jar_la_SOURCES:%.java=%.class): classes_tcap_java.stamp
-
-openss7Tcap-$(VERSION).jar: $(lib_org_openss7_tcap_jar_la_SOURCES:%.java=%.class)
-	$(AM_V_GEN)$(JAR) cf $@ `find org/openss7/tcap -name '*.class'`
-
-$(lib_org_openss7_tcap_jar_la_SOURCES): org/openss7/tcap/tcap_wrap.cxx
-
-$(my_xti_JAVAFILES): org/openss7/xti/xti_wrap.c
-
-org/openss7/xti/xti_wrap.c: org/openss7/xti/xti.i
-	$(AM_V_at)$(MKDIR_P) `dirname $@`
-	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(SWIG) -java -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
-
-$(my_xti_JAVAFILES:%.java=%.class): classes_xti_java.stamp
-
-openss7Xti-$(VERSION).jar: $(my_xti_JAVAFILES:%.java=%.class)
-	$(AM_V_GEN)$(JAR) cf $@ `find org/openss7/xti -name '*.class'`
-
-$(lib_org_openss7_xtcap_jar_la_SOURCES): org/openss7/xtcap/xtcap_wrap.c
-
-org/openss7/xtcap/xtcap_wrap.c: org/openss7/xtcap/xtcap.i
-	$(AM_V_at)$(MKDIR_P) `dirname $@`
-	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(SWIG) -java -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
-
-$(lib_org_openss7_xtcap_jar_la_SOURCES:%.java=%.class): classes_xtcap_java.stamp
-
-openss7Xtcap-$(VERSION).jar: $(lib_org_openss7_xtcap_jar_la_SOURCES:%.java=%.class)
-	$(AM_V_GEN)$(JAR) cf $@ `find org/openss7/xtcap -name '*.class'`
-
-ALL_LOCAL += openss7Tcap-$(VERSION).jar  org/openss7/tcap/tcap_wrap.cxx
-ALL_LOCAL += openss7Xti-$(VERSION).jar   org/openss7/xti/xti_wrap.c
-ALL_LOCAL += openss7Xtcap-$(VERSION).jar org/openss7/xtcap/xtcap_wrap.c
-
-CLEANFILES += *.jar
-CLEANFILES += org/openss7/tcap/tcap_wrap.c org/openss7/tcap/tcap_wrap.cxx org/openss7/tcap/*.java org/openss7/tcap/*.class
-CLEANFILES += org/openss7/xti/xti_wrap.c org/openss7/xti/xti_wrap.cxx org/openss7/xti/*.java org/openss7/xti/*.class
-CLEANFILES += org/openss7/xtcap/xtcap_wrap.c org/openss7/xtcap/xtcap_wrap.cxx org/openss7/xtcap/*.java org/openss7/xtcap/*.class
-
-classes_xti_java.stamp: $(my_xti_JAVAFILES)
-	@list1='$?'; list2=; if test -n "$$list1"; then \
-	  for p in $$list1; do \
-	    if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	    list2="$$list2 $$d$$p"; \
-	    $(ECHO_Q) "  GEN   " `basename $$p .java`.class; \
-	  done; \
-	  $(ECHO_V) '$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) '"$$list2"; \
-	  $(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $$list2; \
-	else :; fi
-	$(AM_V_at)echo timestamp > classes_xti_java.stamp
-
-ALL_LOCAL += classes_xti_java.stamp
-
-install-my_xti_JAVAFILES: classes_xti_java.stamp
-	@$(NORMAL_INSTALL)
-	test -z "$(javadir)" || $(MKDIR_P) "$(DESTDIR)$(javadir)"
-	@test -n "$(my_xti_JAVAFILES)" && test -n "$(javadir)" || exit 0; \
-	set x *.class; shift; test "$$1" != "*.class" || exit 0; \
-	echo " $(INSTALL_DATA)" "$$@" "'$(DESTDIR)$(javadir)/$$p'"; \
-	$(INSTALL_DATA) "$$@" "$(DESTDIR)$(javadir)"
-
-INSTALL_DATA_LOCAL += install-my_xti_JAVAFILES
-
-uninstall-my_xti_JAVAFILES:
-	@$(NORMAL_UNINSTALL)
-	@test -n "$(my_xti_JAVAFILES)" && test -n "$(javadir)" || exit 0; \
-	set x *.class; shift; test "$$1" != "*.class" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(javadir)' && rm -f" "$$@" ")"; \
-	cd "$(DESTDIR)$(javadir)" && rm -f "$$@"
-
-UNINSTALL_LOCAL += uninstall-my_xti_JAVAFILES
-
-clean-my_xti_JAVAFILES:
-	-rm -f *.class classes_xti_java.stamp
-
-CLEAN_LOCAL += clean-my_xti_JAVAFILES
-
-
-CLEANFILES += classes_xti_java.stamp
-
-classes_tcap_java.stamp: $(lib_org_openss7_tcap_jar_la_SOURCES)
-	@list1='$?'; list2=; if test -n "$$list1"; then \
-	  for p in $$list1; do \
-	    if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	    list2="$$list2 $$d$$p"; \
-	    $(ECHO_Q) "  GEN   " `basename $$p .java`.class; \
-	  done; \
-	  $(ECHO_V) '$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) '"$$list2"; \
-	  $(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $$list2; \
-	else :; fi
-	$(AM_V_at)echo timestamp > classes_tcap_java.stamp
-
-ALL_LOCAL += classes_tcap_java.stamp
-
-install-lib_org_openss7_tcap_jar_la_SOURCES: classes_tcap_java.stamp
-	@$(NORMAL_INSTALL)
-	test -z "$(javadir)" || $(MKDIR_P) "$(DESTDIR)$(javadir)"
-	@test -n "$(lib_org_openss7_tcap_jar_la_SOURCES)" && test -n "$(javadir)" || exit 0; \
-	set x *.class; shift; test "$$1" != "*.class" || exit 0; \
-	echo " $(INSTALL_DATA)" "$$@" "'$(DESTDIR)$(javadir)/$$p'"; \
-	$(INSTALL_DATA) "$$@" "$(DESTDIR)$(javadir)"
-
-INSTALL_DATA_LOCAL += install-lib_org_openss7_tcap_jar_la_SOURCES
-
-uninstall-lib_org_openss7_tcap_jar_la_SOURCES:
-	@$(NORMAL_UNINSTALL)
-	@test -n "$(lib_org_openss7_tcap_jar_la_SOURCES)" && test -n "$(javadir)" || exit 0; \
-	set x *.class; shift; test "$$1" != "*.class" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(javadir)' && rm -f" "$$@" ")"; \
-	cd "$(DESTDIR)$(javadir)" && rm -f "$$@"
-
-UNINSTALL_LOCAL += uninstall-lib_org_openss7_tcap_jar_la_SOURCES
-
-clean-lib_org_openss7_tcap_jar_la_SOURCES:
-	-rm -f *.class classes_tcap_java.stamp
-
-CLEAN_LOCAL += clean-lib_org_openss7_tcap_jar_la_SOURCES
-
-CLEANFILES += classes_tcap_java.stamp
-
-classes_xtcap_java.stamp: $(lib_org_openss7_xtcap_jar_la_SOURCES)
-	@list1='$?'; list2=; if test -n "$$list1"; then \
-	  for p in $$list1; do \
-	    if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	    list2="$$list2 $$d$$p"; \
-	    $(ECHO_Q) "  GEN   " `basename $$p .java`.class; \
-	  done; \
-	  $(ECHO_V) '$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) '"$$list2"; \
-	  $(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(AM_JAVACFLAGS) $(JAVACFLAGS) $$list2; \
-	else :; fi
-	$(AM_V_at)echo timestamp > classes_xtcap_java.stamp
-
-ALL_LOCAL += classes_xtcap_java.stamp
-
-install-lib_org_openss7_xtcap_jar_la_SOURCES: classes_xtcap_java.stamp
-	@$(NORMAL_INSTALL)
-	test -z "$(javadir)" || $(MKDIR_P) "$(DESTDIR)$(javadir)"
-	@test -n "$(lib_org_openss7_xtcap_jar_la_SOURCES)" && test -n "$(javadir)" || exit 0; \
-	set x *.class; shift; test "$$1" != "*.class" || exit 0; \
-	echo " $(INSTALL_DATA)" "$$@" "'$(DESTDIR)$(javadir)/$$p'"; \
-	$(INSTALL_DATA) "$$@" "$(DESTDIR)$(javadir)"
-
-INSTALL_DATA_LOCAL += install-lib_org_openss7_xtcap_jar_la_SOURCES
-
-uninstall-lib_org_openss7_xtcap_jar_la_SOURCES:
-	@$(NORMAL_UNINSTALL)
-	@test -n "$(lib_org_openss7_xtcap_jar_la_SOURCES)" && test -n "$(javadir)" || exit 0; \
-	set x *.class; shift; test "$$1" != "*.class" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(javadir)' && rm -f" "$$@" ")"; \
-	cd "$(DESTDIR)$(javadir)" && rm -f "$$@"
-
-UNINSTALL_LOCAL += uninstall-lib_org_openss7_xtcap_jar_la_SOURCES
-
-clean-lib_org_openss7_xtcap_jar_la_SOURCES:
-	-rm -f *.class classes_xtcap_java.stamp
-
-CLEAN_LOCAL += clean-lib_org_openss7_xtcap_jar_la_SOURCES
-
-CLEANFILES += classes_xtcap_java.stamp
-
-
+.INTERMEDIATE: $(MY_INTERMEDIATE)
 
 # =============================================================================
 #

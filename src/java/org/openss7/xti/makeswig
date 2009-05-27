@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+all: xti
+
+xti: xti_wrap.c
+
+.PRECIOUS: makeswig
+
+xti_wrap.cxx: xti.i makeswig
+	swig -c++ -java -I../../../../include/ -package org.openss7.xti xti.i
+
+
+xti_wrap.c: xti.i makeswig
+	swig -java -I../../../../include/ -includeall -package org.openss7.xti xti.i
+
+clean:
+	rm -f *.java
+	rm -f xti_wrap.c
+	rm -f xti_wrap.cxx
+
+.PHONY: clean all xti
+
