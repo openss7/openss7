@@ -56,14 +56,14 @@
 
 package javax.jain.ss7.isup;
 
-import javax.jain.*;
 import javax.jain.ss7.*;
+import javax.jain.*;
 
-
-/**
-  * The IsupConstants class defines the ISUP constants of primitive type.
+/** The IsupConstants class defines the ISUP constants of primitive type.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public class IsupConstants extends java.lang.Object {
+public class IsupConstants {
     public IsupConstants(){
     }
     /** Access Delivery Indicator, no set-up message generated (ITU). */

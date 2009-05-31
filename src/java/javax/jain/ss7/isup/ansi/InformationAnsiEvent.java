@@ -1,239 +1,289 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:24:10 $
-* 
-* MODULE NAME  : $RCSfile: InformationAnsiEvent.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class InformationAnsiEvent extends InformationEvent{
+/** An ISUP Event: The InformationAnsiEvent class is a sub class of ISUP Core
+    InformationEvent class and is to handle the ANSI variant of INF message.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public class InformationAnsiEvent extends InformationEvent {
+    /** Constructs a new InformationAnsiEvent, with only the JAIN ISUP Mandatory
+        parameters being supplied to the constructor, using the super class's constructor.
+        @param source  The source of this event.
+        @param primitive  Primitive value is ISUP_PRIMITIVE_INFORMATION. Refer to
+        IsupEvent class for more details.
+        @param dpc  The destination point code.
+        @param opc  The origination point code.
+        @param sls  The signaling link selection.
+        @param cic  The CIC on which the call has been established.
+        @param congestionPriority  Priority of the ISUP message which may be used in the
+        optional national congestion control procedures at MTP3. Refer to
+        getCongestionPriority method in IsupEvent class for more details.
+        @param in_infoInd  Information Indicator parameter.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public InformationAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
+            SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
+            InfoIndAnsi in_infoInd)
+        throws ParameterRangeInvalidException {
+        super(source, dpc, opc, sls, cic, congestionPriority, in_infoInd);
+    }
+    /** Gets the AccessTransport parameter of the message.
+        @return The AccessTransport parameter of the event.
+        @exception ParameterNotSetException  Thrown when the parameter is not set in the
+        event.
+      */
+    public byte[] getAccessTransport()
+        throws ParameterNotSetException {
+        if (m_accessTransport != null)
+            return m_accessTransport;
+        throw new ParameterNotSetException("AccessTransport not set.");
+    }
+    /** Sets the AccessTransport parameter of the message.
+        @param in_accessTransport  AccessTransport parameter.
+      */
+    public void setAccessTransport(byte[] in_accessTransport) {
+        m_accessTransport = in_accessTransport;
+    }
+    /** Indicates if the AccessTransport parameter is present in this Event.
+        @return True if the parameter is set.
+      */
+    public boolean isAccessTransportPresent() {
+        return (m_accessTransport != null);
+    }
+    /** Gets the BusinessGroupAnsi parameter of the message.
+        @return The BusinessGroupAnsi parameter of the event.
+        @exception ParameterNotSetException  Thrown when the parameter is not set in the
+        event.
+      */
+    public BusinessGroupAnsi getBusinessGroup()
+        throws ParameterNotSetException {
+        if (m_bgp != null)
+            return m_bgp;
+        throw new ParameterNotSetException("BusinessGroupAnsi not set.");
+    }
+    /** Sets the Business Group parameter of the message.
+        @param bgp  Business group parameter.
+      */
+    public void setBusinessGroup(BusinessGroupAnsi bgp) {
+        m_bgp = bgp;
+    }
+    /** Indicates if the BusinessGroupAnsi parameter is present in this Event.
+        @return True if the parameter is set.
+      */
+    public boolean isBusinessGroupPresent() {
+        return (m_bgp != null);
+    }
+    /** Gets the ChargeNumberAnsi parameter of the message.
+        Refer to ChargeNumberAnsi parameter for greater details.
+        @return The ChargeNumber parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public ChargeNumberAnsi getChargeNumber()
+        throws ParameterNotSetException {
+        if (m_chargeNumAnsi != null)
+            return m_chargeNumAnsi;
+        throw new ParameterNotSetException("ChargeNumberAnsi not set.");
+    }
+    /** Sets the ChargeNumberAnsi parameter of the message.
+        Refer to ChargeNumberAnsi parameter for greater details.
+        @param chargeNumAnsi  The ChargeNumberAnsi parameter of the event.
+      */
+    public void setChargeNumber(ChargeNumberAnsi chargeNumAnsi) {
+        m_chargeNumAnsi = chargeNumAnsi;
+    }
+    /** Indicates if the ChargeNumberAnsi parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isChargeNumberPresent() {
+        return (m_chargeNumAnsi != null);
+    }
+    /** Gets the Originating Line Information parameter of the message.
+        @return The OrigLineInfo parameter of the event.
+        @exception this  Exception is thrown if ITU.
+      */
+    public byte getOrigLineInfo()
+        throws ParameterNotSetException {
+        if (m_oliIsSet)
+            return m_oli;
+        throw new ParameterNotSetException("OrigLineInfo not set.");
+    }
+    /** Sets the Originating Line Information parameter of the message.
+        @param oli  Originating Line Information parameter.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setOrigLineInfo(byte oli)
+        throws ParameterRangeInvalidException {
+        m_oli = oli;
+        m_oliIsSet = true;
+    }
+    /** Indicates if the OrigLineInfo parameter is present in this Event.
+        @return True if the parameter is set else false.
+      */
+    public boolean isOrigLineInfoPresent() {
+        return m_oliIsSet;
+    }
+    /** Gets the RedirectionInfo parameter of the message.
+        @return The RedirectionInfo parameter of the event.
+        @exception ParameterNotSetException  Thrown when the parameter is not set in the
+        event.
+      */
+    public RedirectionInfo getRedirectionInfo()
+        throws ParameterNotSetException {
+        if (m_ri != null)
+            return m_ri;
+        throw new ParameterNotSetException("RedirectionInfo not set.");
+    }
+    /** Sets the RedirectionInfo parameter of the message.
+        @param ri  Redirection Information parameter.
+      */
+    public void setRedirectionInfo(RedirectionInfo ri) {
+        m_ri = ri;
+    }
+    /** Indicates if the RedirectionInfo parameter is present in this Event.
+        @return True if the parameter is set.
+      */
+    public boolean isRedirectionInfoPresent() {
+        return (m_ri != null);
+    }
+    /** Gets the Redirecting Number parameter of the message.
+        Refer to RedirectingNumber parameter class for more information.
+        @return The Redirecting Number parameter of the event.
+        @exception ParameterNotSetException  Thrown when mandatory ISUP parameter is not
+        set.
+      */
+    public RedirectingNumber getRedirectingNumber()
+        throws ParameterNotSetException {
+        if (m_rn != null)
+            return m_rn;
+        throw new ParameterNotSetException("RedirectingNumber not set.");
+    }
+    /** Sets the Redirecting Number parameter of the message.
+        Refer to RedirectingNumber parameter class for more information.
+        @param ncithe  Redirecting Number parameter of the event.
+      */
+    public void setRedirectingNumber(RedirectingNumber rn) {
+        m_rn = rn;
+    }
+    /** Indicates if the RedirectingNumber parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isRedirectingNumberPresent() {
+        return (m_rn != null);
+    }
+    /** Gets the UserToUserInformation parameter of the message.
+        @return The byte array for UserToUserInformation parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public byte[] getUserToUserInformation()
+        throws ParameterNotSetException {
+        if (m_userToUserInfo != null)
+            return m_userToUserInfo;
+        throw new ParameterNotSetException("UserToUserInformation not set.");
+    }
+    /** Sets the UserToUserInformation parameter of the message.
+        @param userToUserInfo  The UserToUserInformation parameter of the event.
+      */
+    public void setUserToUserInformation(byte[] userToUserInfo) {
+        m_userToUserInfo = userToUserInfo;
+    }
+    /** Indicates if the UserToUserInformation parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isUserToUserInformationPresent() {
+        return (m_userToUserInfo != null);
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+        InformationAnsiEvent class.
+        @return A string representation of the member variables.
+      */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.ansi.InformationAnsiEvent");
+        b.append("\n\tm_accessTransport: ");
+        if (m_accessTransport != null)
+            b.append(JainSS7Utility.bytesToHex(m_accessTransport, 0, m_accessTransport.length));
+        b.append("\n\tm_bgp: " + m_bgp );
+        b.append("\n\tm_chargeNumAnsi: " + m_chargeNumAnsi );
+        if (m_oliIsSet)
+            b.append("\n\tm_oli: " + m_oli );
+        b.append("\n\tm_ri: " + m_ri );
+        b.append("\n\tm_rn: " + m_rn );
+        b.append("\n\tm_userToUserInfo: ");
+        if (m_userToUserInfo != null)
+            b.append(JainSS7Utility.bytesToHex(m_userToUserInfo , 0, m_userToUserInfo.length));
+        return b.toString();
+    }
+    protected byte[] m_accessTransport = null;
+    protected BusinessGroupAnsi m_bgp = null;
+    protected ChargeNumberAnsi m_chargeNumAnsi = null;
+    protected byte m_oli;
+    protected boolean m_oliIsSet = false;
+    protected RedirectionInfo m_ri = null;
+    protected RedirectingNumber m_rn = null;
+    protected byte[] m_userToUserInfo = null;
+}
 
-	public InformationAnsiEvent(java.lang.Object source,
-                            SignalingPointCode dpc,
-                            SignalingPointCode opc,
-                            byte sls,
-                            int cic,
-                            byte congestionPriority,
-                            InfoIndAnsi in_infoInd)
-                     throws ParameterRangeInvalidException{
-	
-
-
-		super(source,dpc,opc,sls,cic,congestionPriority,in_infoInd);
-		
-
-	}
-
-	public byte[] getAccessTransport()
-                          throws ParameterNotSetException{
-		if(isAccessTransport == true)
-			return accessTransport;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setAccessTransport(byte[] in_accessTransport){
-		accessTransport = in_accessTransport;
-		isAccessTransport  = true;
-	}
-
-	public boolean isAccessTransportPresent(){
-		return isAccessTransport;
-	}
-
-	public BusinessGroupAnsi getBusinessGroup()
-                                   throws ParameterNotSetException{
-		if(isBusinessGroupAnsi == true)
-			return businessGroupAnsi;
-		else throw new ParameterNotSetException();
-	}
-	public void setBusinessGroup(BusinessGroupAnsi bgp){
-		businessGroupAnsi = bgp;
-		isBusinessGroupAnsi = true;
-	}
-	public boolean isBusinessGroupPresent(){
-		return isBusinessGroupAnsi;
-	}
-	
-	public ChargeNumberAnsi getChargeNumber()
-                                 throws ParameterNotSetException{
-		if(isChargeNumberAnsi == true)
-			return chargeNumberAnsi;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setChargeNumber(ChargeNumberAnsi chargeNumAnsi){
-		chargeNumberAnsi   = chargeNumAnsi;
-		isChargeNumberAnsi = true;
-	}
-
-	public boolean isChargeNumberPresent(){
-		return isChargeNumberAnsi;
-	}
-
-	public byte getOrigLineInfo()
-                     throws ParameterNotSetException{
-		if(isOrigLineInfo == true)
-			return origLineInfo;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setOrigLineInfo(byte oli)
-                     throws ParameterRangeInvalidException{
-		origLineInfo   = oli;
-		isOrigLineInfo = true;
-	}
-
-	public boolean isOrigLineInfoPresent(){
-		return isOrigLineInfo;
-	}
-
-	public RedirectingNumber getRedirectingNumber()
-                                       throws ParameterNotSetException{
-		if(isRedirectingNumber == true)
-			return redirectingNumber;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setRedirectingNumber(RedirectingNumber rn){
-		redirectingNumber   = rn;
-		isRedirectingNumber = true;
-	}
-
-	public boolean isRedirectingNumberPresent(){
-		return isRedirectingNumber;
-	}
-
-
-	public RedirectionInfo getRedirectionInfo()
-                                   throws ParameterNotSetException{
-		if(isRedirectionInfo == true)
-			return redirectionInfo;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setRedirectionInfo(RedirectionInfo ri){
-		redirectionInfo   = ri;
-		isRedirectionInfo = true;
-	}
-
-	public boolean isRedirectionInfoPresent(){
-		return isRedirectionInfo;
-	}
-
-	public byte[] getUserToUserInformation()
-                                throws ParameterNotSetException{
-		if(isUserToUserInformation == true)
-			return userToUserInformation;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setUserToUserInformation(byte[] userToUserInfo){
-		userToUserInformation   = userToUserInfo;
-		isUserToUserInformation = true;
-	}
-
-	public boolean isUserToUserInformationPresent(){
-		return isUserToUserInformation;
-	}
-
-
-	/**
-    * String representation of class InformationAnsiEvent
-    *
-    * @return    String provides description of class InformationAnsiEvent
-    */
-        public java.lang.String toString(){
-		int i;
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\n\nisAccessTransport = ");
-				buffer.append(isAccessTransport);
-				if(isAccessTransport == true){
-					buffer.append("\naccessTransport = ");
-					for(i=0;i<accessTransport.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(accessTransport[i] & 0xFF)));
-				}
-				buffer.append("\n\nisBusinessGroupAnsi = ");
-				buffer.append(isBusinessGroupAnsi);
-				buffer.append("\nbusinessGroupAnsi = ");
-				buffer.append(businessGroupAnsi);
-				buffer.append("\n\nisChargeNumberAnsi = ");
-				buffer.append(isChargeNumberAnsi);
-				buffer.append("\nchargeNumberAnsi = ");
-				buffer.append(chargeNumberAnsi);
-				buffer.append("\n\nisOrigLineInfo = ");
-				buffer.append(isOrigLineInfo);
-				buffer.append("\norigLineInfo = ");
-				buffer.append(origLineInfo);
-				buffer.append("\n\nisRedirectingNumber = ");
-				buffer.append(isRedirectingNumber);
-				buffer.append("\nredirectingNumber = ");
-				buffer.append(redirectingNumber);
-				buffer.append("\n\nisRedirectionInfo = ");
-				buffer.append(isRedirectionInfo);
-				buffer.append("\nredirectionInfo = ");
-				buffer.append(redirectionInfo);
-				buffer.append("\n\nisUserToUserInformation = ");
-				buffer.append(isUserToUserInformation);
-				if(isUserToUserInformation == true){
-					buffer.append("\nuserToUserInformation = ");
-					for(i=0;i<userToUserInformation.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(userToUserInformation[i] & 0xFF)));
-				}
-				return buffer.toString();
-		
-		}
-
-
-	byte[]            accessTransport;
-	BusinessGroupAnsi businessGroupAnsi;
-	ChargeNumberAnsi  chargeNumberAnsi;
-	boolean           isAccessTransport;
-	boolean           isBusinessGroupAnsi;
-	boolean           isChargeNumberAnsi;
-	boolean           isOrigLineInfo;
-	boolean           isRedirectingNumber;
-	boolean           isRedirectionInfo;
-	boolean           isUserToUserInformation;
-	byte              origLineInfo;
-	RedirectingNumber redirectingNumber;
-	RedirectionInfo   redirectionInfo;
-	byte[]            userToUserInformation;
-
-	
-}	
-
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

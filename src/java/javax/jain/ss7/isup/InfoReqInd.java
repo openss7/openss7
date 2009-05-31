@@ -1,195 +1,181 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:24:02 $
-* 
-* MODULE NAME  : $RCSfile: InfoReqInd.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup;
 
-import javax.jain.*;
 import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class InfoReqInd extends java.lang.Object implements java.io.Serializable{
-
-	
-	public InfoReqInd(){
-
-	}
-
-	public InfoReqInd(boolean in_callingAddrReqInd,
-                  boolean in_holdingInd,
-                  boolean in_callingCatReqInd,
-                  boolean in_chargeInfoReqInd,
-                  boolean in_mciReqInd){
-
-		
-		m_callingAddrReqInd = in_callingAddrReqInd;
-		m_holdInd           = in_holdingInd;
-		m_callingCatReqInd  = in_callingCatReqInd;
-		m_chargeInfoReqInd  = in_chargeInfoReqInd;
-		m_mciReqInd         = in_mciReqInd;
-	}
-
-	public boolean getCallingPartyAddressReqInd(){
-		return m_callingAddrReqInd;
-
-	}
-
-	public boolean getCallingPartyCatReqInd(){
-		return m_callingCatReqInd;
-	}
-
-	public boolean getChargeInfoReqInd(){
-		return m_chargeInfoReqInd;
-	}
-
-	public boolean getHoldingInd(){
-		return m_holdInd;
-	}
-
-	public boolean getMCIReqInd(){
-		return m_mciReqInd;
-	}
-
-	public void setCallingPartyAddressReqInd(
-				boolean callingPartyAddressReqInd){
-		m_callingAddrReqInd = callingPartyAddressReqInd;
-	}
-
-	public void setCallingPartyCatReqInd(
-				boolean callingPartyCatReqInd){
-		m_callingCatReqInd = callingPartyCatReqInd;
-	}
-	
-	public void setChargeInfoReqInd(boolean aChargeInfoReqInd){
-		
-		m_chargeInfoReqInd = aChargeInfoReqInd;
-	}
-
-	public void setHoldingInd(boolean holdingInd){
-		m_holdInd = holdingInd;
-	}
-		
-	public void setMCIReqInd(boolean MCIReqInd){
-		m_mciReqInd = MCIReqInd;
-	}
-	
-	public void  putInfoReqInd(byte[] arr, int index, byte par_len){
-
-		if(((arr[index]) & IsupMacros.L_BIT1_MASK) == 1)	
-			m_callingAddrReqInd = true;
-		if(((arr[index] >> 1) & IsupMacros.L_BIT1_MASK) == 1)	
-			m_holdInd = true;
-		if(((arr[index] >> 3) & IsupMacros.L_BIT1_MASK) == 1)	
-			m_callingCatReqInd = true;	
-		if(((arr[index] >> 4) & IsupMacros.L_BIT1_MASK) == 1)										
-			m_chargeInfoReqInd = true;
-		if(((arr[index] >> 7) & IsupMacros.L_BIT1_MASK) == 1)
-			m_mciReqInd = true;					
-	}
-
-	public byte[] flatInfoReqInd(){
-		
-			byte[] rc = ByteArray.getByteArray(2);	
-			byte callingAddrReqInd=0, callingCatReqInd=0, chargeInfoReqInd=0, holdInd=0, mciReqInd=0;
-
-			if(m_callingAddrReqInd == true)
-				callingAddrReqInd = 1;
-			if(m_callingCatReqInd == true)
-				callingCatReqInd = 1;
-			if(m_chargeInfoReqInd == true)
-				chargeInfoReqInd = 1;
-			if(m_holdInd == true)
-				holdInd = 1;
-			if(m_mciReqInd == true)
-				mciReqInd = 1;
-			
-							
-			rc[0] = (byte)((callingAddrReqInd & IsupMacros.L_BIT1_MASK)|
-						(( holdInd << 1) & IsupMacros.L_BIT2_MASK)|
-						(( callingCatReqInd << 3) & IsupMacros.L_BIT4_MASK)|
-						(( chargeInfoReqInd << 4) & IsupMacros.L_BIT5_MASK)|
-						(( mciReqInd << 7) & IsupMacros.L_BIT8_MASK));
-
-			rc[1] = 0;
-		
-			return rc;
-		}
-
-	/**
-    * String representation of class InfoReqInd
-    *
-    * @return    String provides description of class InfoReqInd
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\ncallingAddrReqInd = ");
-				buffer.append(m_callingAddrReqInd);
-				buffer.append("\ncallingCatReqInd  = ");
-				buffer.append(m_callingCatReqInd);
-				buffer.append("\nchargeInfoReqInd = ");
-				buffer.append(m_chargeInfoReqInd);
-				buffer.append("\nholdInd  = ");
-				buffer.append(m_holdInd);
-				buffer.append("\nmciReqInd  = ");
-				buffer.append(m_mciReqInd);				
-				return buffer.toString();
-		
-		}		
-	
-	
-		
-		boolean m_callingAddrReqInd;
-		boolean m_callingCatReqInd;
-		boolean m_chargeInfoReqInd;
-		boolean m_holdInd;
-		boolean m_mciReqInd;
-
-
-		public static final boolean CPARI_CALLING_PARTY_ADDRESS_NOT_REQUESTED = false; 
-		public static final boolean CPARI_CALLING_PARTY_ADDRESS_REQUESTED = true; 	
-		public static final boolean HPI_HOLD_NOT_REQUESTED = false; 
-		public static final boolean HPI_HOLD_REQUESTED = true; 
-		public static final boolean CPCRI_CALLING_PARTY_CATEGORY_NOT_REQUESTED = false; 
-		public static final boolean CPCRI_CALLING_PARTY_CATEGORY_REQUESTED = true; 	
-		public static final boolean CIRI_CHARGE_INFORMATION_NOT_REQUESTED = false; 
-		public static final boolean CIRI_CHARGE_INFORMATION_REQUESTED = true; 
-		public static final boolean MCIRI_MALICIOUS_CALL_IDENTIFICATION_NOT_REQUESTED = false; 
-		public static final boolean MCIRI_RESERVED_FOR_MCIRI_MALICIOUS_CALL_IDENTIFICATION_REQUESTED = true; 
-
-
+/** A class representing an ISUP Information Request Indicators.
+  * This core class provides access methods for all the common sub-fields in ITU and
+  * ANSI variant. ITU variant has no additional sub-fields. The ANSI class inherits
+  * from this core class to add the ANSI specific sub-fields.
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public class InfoReqInd implements java.io.Serializable {
+    public static final boolean CPARI_CALLING_PARTY_ADDRESS_NOT_REQUESTED = false;
+    public static final boolean CPARI_CALLING_PARTY_ADDRESS_REQUESTED = true;
+    public static final boolean HPI_HOLD_NOT_REQUESTED = false;
+    public static final boolean HPI_HOLD_REQUESTED = true;
+    public static final boolean CPCRI_CALLING_PARTY_CATEGORY_NOT_REQUESTED = false;
+    public static final boolean CPCRI_CALLING_PARTY_CATEGORY_REQUESTED = true;
+    public static final boolean CIRI_CHARGE_INFORMATION_NOT_REQUESTED = false;
+    public static final boolean CIRI_CHARGE_INFORMATION_REQUESTED = true;
+    public static final boolean MCIRI_MALICIOUS_CALL_IDENTIFICATION_NOT_REQUESTED = false;
+    public static final boolean MCIRI_RESERVED_FOR_MCIRI_MALICIOUS_CALL_IDENTIFICATION_REQUESTED = true;
+    /** Constructs a new InfoReqInd class, parameters with default values.  */
+    public InfoReqInd() {
+    }
+    /** Constructs a InfoReqInd class from the input parameters specified.
+      * @param in_callingAddrReqInd  The calling party address request indicator; <ul>
+      * <li>CPARI_CALLING_PARTY_ADDRESS_NOT_REQUESTED and
+      * <li>CPARI_CALLING_PARTY_ADDRESS_REQUESTED. </ul>
+      * @param in_holdInd  The holding indicator; <ul> <li>HPI_HOLD_NOT_REQUESTED and
+      * <li>HPI_HOLD_REQUESTED. </ul>
+      * @param in_callingCatReqInd  The calling party's category request indicator;
+      * <ul> <li>CPCRI_CALLING_PARTY_CATEGORY_NOT_REQUESTED and
+      * <li>CPCRI_CALLING_PARTY_CATEGORY_REQUESTED. </ul>
+      * @param in_chargeInfoReqInd  The charge information request indicator; <ul>
+      * <li>CIRI_CHARGE_INFORMATION_NOT_REQUESTED and
+      * <li>CIRI_CHARGE_INFORMATION_REQUESTED. </ul>
+      * @param in_mciReqInd  The malicious call identification request indicator; <ul>
+      * <li>MCIRI_MALICIOUS_CALL_IDENTIFICATION_NOT_REQUESTED and
+      * <li>MCIRI_RESERVED_FOR_MCIRI_MALICIOUS_CALL_IDENTIFICATION_REQUESTED. </ul> */
+    public InfoReqInd(boolean in_callingAddrReqInd, boolean in_holdingInd,
+            boolean in_callingCatReqInd, boolean in_chargeInfoReqInd,
+            boolean in_mciReqInd) {
+        this();
+        this.setCallingPartyAddressReqInd(in_callingAddrReqInd);
+        this.setHoldingInd(in_holdingInd);
+        this.setCallingPartyCatReqInd(in_callingCatReqInd);
+        this.setChargeInfoReqInd(in_chargeInfoReqInd);
+        this.setMCIReqInd(in_mciReqInd);
+    }
+    /** Gets the Calling Party Address Request Ind field of the parameter.
+      * @return boolean  The InfoReqInd value, see InfoReqInd().  */
+    public boolean getCallingPartyAddressReqInd() {
+        return m_callingPartyAddressReqInd;
+    }
+    /** Sets the Calling Party Address Request Ind field of the parameter.  */
+    public void setCallingPartyAddressReqInd(boolean callingPartyAddressReqInd) {
+        m_callingPartyAddressReqInd = callingPartyAddressReqInd;
+    }
+    /** Gets the Holding Indicator field of the parameter.
+      * @return boolean  The Holding Indicator value, see InfoReqInd().  */
+    public boolean getHoldingInd() {
+        return m_holdingInd;
+    }
+    /** Sets the Holding Indicator field of the parameter.
+      * @param holdingIndicator  The Holding Indicator value, see InfoReqInd().  */
+    public void setHoldingInd(boolean holdingInd) {
+        m_holdingInd = holdingInd;
+    }
+    /** Gets the Calling Party's Category Request Ind field of the parameter.
+      * @return boolean  The Calling Party Category Request Indicator value, see
+      * InfoReqInd().  */
+    public boolean getCallingPartyCatReqInd() {
+        return m_callingPartyCatReqInd;
+    }
+    /** Sets the Calling Party's Category Request Ind field of the parameter.
+      * @param callingPartyCatReqInd  CallingPartyCatReqInd value, see InfoReqInd().  */
+    public void setCallingPartyCatReqInd(boolean callingPartyCatReqInd) {
+        m_callingPartyCatReqInd = callingPartyCatReqInd;
+    }
+    /** Gets the Charge Information Request Ind field of the parameter.
+      * @return boolean  The ChargeInformation Request Indicator value, see
+      * InfoReqInd().  */
+    public boolean getChargeInfoReqInd() {
+        return m_chargeInfoReqInd;
+    }
+    /** Sets the Charge Information Request Ind field of the parameter.
+      * @param aChargeInfoReqInd  The ChargeInfoReqInd value, see InfoReqInd().  */
+    public void setChargeInfoReqInd(boolean aChargeInfoReqInd) {
+        m_chargeInfoReqInd = aChargeInfoReqInd;
+    }
+    /** Gets the Malicious Call Identification Request Ind field of the parameter.
+      * @return boolean  The Malicious Call Identification Request Ind value, see
+      * InfoReqInd().  */
+    public boolean getMCIReqInd() {
+        return m_MCIReqInd;
+    }
+    /** Sets the Malicious Call Identification Request Ind field of the parameter.
+      * @param MCIReqInd  The MCIReqInd value, see InfoReqInd().  */
+    public void setMCIReqInd(boolean MCIReqInd) {
+        m_MCIReqInd = MCIReqInd;
+    }
+    /** The toString method retrieves a string containing the values of the members of
+      * the InfoReqInd class.
+      * @return A string representation of the member variables.  */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.InfoReqInd");
+        b.append("\n\tm_callingPartyAddressReqInd: " + m_callingPartyAddressReqInd);
+        b.append("\n\tm_holdingInd: " + m_holdingInd);
+        b.append("\n\tm_callingPartyCatReqId: " + m_callingPartyCatReqInd);
+        b.append("\n\tm_chargeInfoReqInd: " + m_chargeInfoReqInd);
+        b.append("\n\tm_MCIReqInd: " + m_MCIReqInd);
+        return b.toString();
+    }
+    protected boolean m_callingPartyAddressReqInd;
+    protected boolean m_holdingInd;
+    protected boolean m_callingPartyCatReqInd;
+    protected boolean m_chargeInfoReqInd;
+    protected boolean m_MCIReqInd;
 }
 
-
-
-
+// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

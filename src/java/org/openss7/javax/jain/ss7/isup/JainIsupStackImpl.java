@@ -1,9 +1,9 @@
 
 package org.openss7.javax.jain.ss7.isup;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
 public class JainIsupStackImpl implements JainIsupStack {
     public native JainIsupProvider createProvider() throws ParameterNotSetException;

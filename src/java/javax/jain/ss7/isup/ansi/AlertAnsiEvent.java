@@ -56,160 +56,126 @@
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-/**
-  * An ISUP Event: The AlertAnsiEvent class is a subclass of the JAIN ISUP core AlertEvent class and is used for
-  * handling of parameters for the ANSI variant of Address Complete Message.
+/** An ISUP Event: The AlertAnsiEvent class is a subclass of the JAIN ISUP core
+  * AlertEvent class and is used for handling of parameters for the ANSI variant of
+  * Address Complete Message.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class AlertAnsiEvent extends AlertEvent {
-    /**
-      * Constructs a new AlertEvent for ANSI variant, with only the JAIN ISUP Mandatory parameters using the super
-      * class constructor.
+    /** Constructs a new AlertEvent for ANSI variant, with only the JAIN ISUP Mandatory
+      * parameters using the super class constructor.
       * @param source The source of the event.
       * @param dpc The destination point code.
       * @param opc The origination point code.
       * @param sls The signaling link selection.
       * @param cic The CIC on which the cal lhas been established.
-      * @param congestionPriority Priority of the ISUP message that may be used in the optional national congestion
-      * control procedures of MTP.  Refer to getCongestionPriority method in IsupEvent calss for details.
+      * @param congestionPriority Priority of the ISUP message that may be used in the
+      * optional national congestion control procedures of MTP.  Refer to
+      * getCongestionPriority method in IsupEvent calss for details.
       * @param bci Backward call indicators.
-      * @exception ParameterRangeInvalidException  Thrown when a value is out of range.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when a value is out of range.  */
     public AlertAnsiEvent(java.lang.Object source, SignalingPointCode dpc, SignalingPointCode opc, byte sls, int cic, byte congestionPriority, BwdCallIndAnsi bci)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority, bci);
     }
-    /**
-      * Gets the BusinessGroupAnsi parameter of the message.
+    /** Gets the BusinessGroupAnsi parameter of the message.
       * @return The Business Group parameter of the event.
-      * @exception ParameterNotSetException Thrown when the parameter is not set in the event.
-      */
+      * @exception ParameterNotSetException Thrown when the parameter is not set in the
+      * event.  */
     public BusinessGroupAnsi getBusinessGroup() throws ParameterNotSetException {
         if (m_bgp != null)
             return m_bgp;
-        throw ParameterNotSetException("Business Group parameter not set.");
+        throw new ParameterNotSetException("Business Group parameter not set.");
     }
-    /**
-      * Sets the Business Group parameter of the message.
-      * @param bgp The Business Group parameter of the event.
-      */
+    /** Sets the Business Group parameter of the message.
+      * @param bgp The Business Group parameter of the event.  */
     public void setBusinessGroup(BusinessGroupAnsi bgp) {
         m_bgp = bgp;
     }
-    /**
-      * Indicates if the Business Group parameter is present in this Event.
-      * @return True if present, false otherwise.
-      */
+    /** Indicates if the Business Group parameter is present in this Event.
+      * @return True if present, false otherwise.  */
     public boolean isBusinessGroupPresent() {
         if (m_bgp != null)
             return true;
         return false;
     }
-
-
-    /**
-      * Gets  the ConReq parameters of rht message.
-      * @exception ParameterNotSetException Thrown when the parameter is not set in the event.
-      */
+    /** Gets  the ConReq parameters of rht message.
+      * @exception ParameterNotSetException Thrown when the parameter is not set in the
+      * event.  */
     public ConReq getConReq() throws ParameterNotSetException {
         if (m_crp != null)
             return m_crp;
-        throw ParameterNotSetException("Connection Request parameter not set.");
+        throw new ParameterNotSetException("Connection Request parameter not set.");
     }
-    /**
-      * Sets the Connection Request parameter of the message.
-      */
+    /** Sets the Connection Request parameter of the message.  */
     public void setConReq(ConReq connectionReq) {
         m_crp = connectionReq;
     }
-    /**
-      * Indicates if the Connection Request parameter is present in this Event.
-      * @return True if present, false otherwise.
-      */
+    /** Indicates if the Connection Request parameter is present in this Event.
+      * @return True if present, false otherwise.  */
     public boolean isConReqPresent() {
         return (m_crp != null);
     }
-
-
-    /**
-      * Gets the InformationIndicators parameter of the message.
-      * @exception ParameterNotSetException Thrown when the parameter is not set in the event.
-      */
+    /** Gets the InformationIndicators parameter of the message.
+      * @exception ParameterNotSetException Thrown when the parameter is not set in the
+      * event.  */
     public InfoInd getInfoInd() throws ParameterNotSetException {
-        if (m_iip != NULL)
+        if (m_iip != null)
             return m_iip;
-        throw ParameterNotSetException("Information Indicators parameter not set.");
+        throw new ParameterNotSetException("Information Indicators parameter not set.");
     }
-    /**
-      * Sets the Information Indicators parameter of the message.
-      */
+    /** Sets the Information Indicators parameter of the message.  */
     public void setInfoInd(InfoIndAnsi ini) {
         m_iip = ini;
     }
-    /**
-      * Indicates if the Information Indicators parameter is present in this Event.
-      * @return True if present, false otherwise.
-      */
+    /** Indicates if the Information Indicators parameter is present in this Event.
+      * @return True if present, false otherwise.  */
     public boolean isInfoIndPresent() {
         return (m_iip != null);
     }
-
-
-    /**
-      * Gets the Network Transport parameter of the message.
-      * @exception ParameterNotSetException Thrown when the parameter is not set in the event.
-      */
+    /** Gets the Network Transport parameter of the message.
+      * @exception ParameterNotSetException Thrown when the parameter is not set in the
+      * event.  */
     public byte[] getNetworkTransport() throws ParameterNotSetException  {
-        if (m_ntp != NULL)
+        if (m_ntp != null)
             return m_ntp;
-        throw ParameterNotSetException("Network Transport parameter not set.");
+        throw new ParameterNotSetException("Network Transport parameter not set.");
     }
-    /**
-      * Sets the Network Transport parameter of the message.
-      */
+    /** Sets the Network Transport parameter of the message.  */
     public void setNetworkTransport(byte[] ntp) {
         m_ntp = ntp;
     }
-    /**
-      * Indicates if the Network Transport parameter is present in this Event.
-      * @exception ParameterNotSetException Thrown when the parameter is not set in the event.
-      * @return True if present, false otherwise.
-      */
+    /** Indicates if the Network Transport parameter is present in this Event.
+      * @exception ParameterNotSetException Thrown when the parameter is not set in the
+      * event.
+      * @return True if present, false otherwise.  */
     public boolean isNetworkTransportPresent() {
         return (m_ntp != null);
     }
-
-
-    /**
-      * Gets the Redirection info parameter of the message.
-      * @exception ParameterNotSetException Thrown when the parameter is not set in the event.
-      */
+    /** Gets the Redirection info parameter of the message.
+      * @exception ParameterNotSetException Thrown when the parameter is not set in the
+      * event.  */
     public RedirectionInfo getRedirectionInfo() throws ParameterNotSetException {
-        if (m_rip != NULL)
+        if (m_rip != null)
             return m_rip;
-        throw ParameterNotSetException("Redirection Information parameter not set.");
+        throw new ParameterNotSetException("Redirection Information parameter not set.");
     }
-    /**
-      * Sets the Redirection Information prameter of the message.
-      */
+    /** Sets the Redirection Information prameter of the message.  */
     public void setRedirectionInfo(RedirectionInfo ri) {
         m_rip = ri;
     }
-    /**
-      * Indicates if the Redirection Information parameter is present in this Event.
-      * @return True if present, false otherwise.
-      */
+    /** Indicates if the Redirection Information parameter is present in this Event.
+      * @return True if present, false otherwise.  */
     public boolean isRedirectionInfoPresent() {
         return (m_rip != null);
     }
-
-
-    /**
-      * The toString method retrieves a string containing the values of the members of the class.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the class.  */
     public java.lang.String toString() {
         StringBuffer buffer = new StringBuffer(500);
         buffer.append(super.toString());
@@ -221,9 +187,8 @@ public class AlertAnsiEvent extends AlertEvent {
         buffer.append("\n\tRedirection Information:" + m_rip);
         return buffer.toString();
     }
-    
     private BusinessGroupAnsi m_bgp = null;
-    private ConnReq m_crp = null;
+    private ConReq m_crp = null;
     private InfoInd m_iip = null;
     private byte[] m_ntp = null;
     private RedirectionInfo m_rip = null;

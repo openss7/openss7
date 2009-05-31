@@ -56,25 +56,22 @@
 
 package javax.jain.ss7.isup;
 
-/**
-  * This Exception is thrown when a call to the corresponding parameter setter
-  * is done twice under a certain condition.  For example, the signaling point
-  * code, vendor name, network indicator, and stack specification in a
-  * JainIsupStack instance cann not be set or modified after creating a provider
-  * object (after createProvider is called).
+/** This Exception is thrown when a call to the corresponding parameter setter is done
+  * twice under a certain condition.  For example, the signaling point code, vendor
+  * name, network indicator, and stack specification in a JainIsupStack instance cann
+  * not be set or modified after creating a provider object (after createProvider is
+  * called).
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class ParameterAlreadySetException extends IsupException {
-    /**
-      * Constructs a new ParameterAlreadySetException with the specified detail
+    /** Constructs a new ParameterAlreadySetException with the specified detail
       * message.
-      * @param msg The detail message giving the parameter name.
-      */
+      * @param msg The detail message giving the parameter name.  */
     public ParameterAlreadySetException(java.lang.String msg) {
         super(msg);
     }
-    /**
-      * Constructs a new ParameterAlreadySetException.
-      */
+    /** Constructs a new ParameterAlreadySetException.  */
     public ParameterAlreadySetException() {
         super();
     }

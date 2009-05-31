@@ -56,80 +56,63 @@
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-/**
-  * A class representing the ANSI ISUP Circuit Assignment Map parameter.  This
-  * class provides the access methods for getting and setting the different
-  * sub-fields of the parameter.
+/** A class representing the ANSI ISUP Circuit Assignment Map parameter.  This class
+  * provides the access methods for getting and setting the different sub-fields of the
+  * parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public class CircuitAssignMapAnsi extends java.lang.Object implements java.io.Serializable {
+public class CircuitAssignMapAnsi implements java.io.Serializable {
     public static final byte MP_DS1 = 0;
-    /**
-      * Constructs a new Ansi CircuitAssignMap class, parameters with default
-      * values
-      */
+    /** Constructs a new Ansi CircuitAssignMap class, parameters with default values.  */
     public CircuitAssignMapAnsi() {
     }
-    /**
-      * Constructs an ANSI CircuitAssignMap class from the input parameters specified
-      * @param in_mapType  The map type, range 0 - 0x3f.
-      * <li>MP_DS1
+    /** Constructs an ANSI CircuitAssignMap class from the input parameters specified.
+      * @param in_mapType  The map type, range 0 - 0x3f; <ul> <li>MP_DS1.  </ul>
       * @param in_mapFormat  The map format, range 0 - 0xffffff.
-      * @exception ParameterRangeInvalidException  Thrown when value is out of
-      * range.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public CircuitAssignMapAnsi(byte in_mapType, int in_mapFormat) throws ParameterRangeInvalidException {
         this();
         this.setMapType(in_mapType);
         this.setMapFormat(in_mapFormat);
     }
-    /**
-      * Gets the Map Type field of the parameter.
-      * @return The map type value, range 0 - 0x3f, see CircuitAssignMapAnsi().
-      */
+    /** Gets the Map Type field of the parameter.
+      * @return The map type value, range 0 - 0x3f, see CircuitAssignMapAnsi().  */
     public byte getMapType() {
         return m_mapType;
     }
-    /**
-      * Sets the Map Type field of the parameter.
+    /** Sets the Map Type field of the parameter.
       * @param aMapType  Map type, range 0 - 0x3f, see CircuitAssignMapAnsi().
-      * @exception ParameterRangeInvalidException  Thrown if the sub-field value
-      * is out of the specified range.
-      */
+      * @exception ParameterRangeInvalidException  Thrown if the sub-field value is out
+      * of the specified range.  */
     public void setMapType(byte aMapType) throws ParameterRangeInvalidException {
         if (0 > aMapType || aMapType > 0x3f)
-            throw ParameterRangeInvalidException("Map Type " + aMapType + " out of range.");
+            throw new ParameterRangeInvalidException("Map Type " + aMapType + " out of range.");
         m_mapType = aMapType;
     }
-    /**
-      * Gets the Map Format field of the parameter. The map format range is 0 -
-      * 0xffffff, where each bit indicates whether the 64Kbps circuit is used in
-      * the NxDS0 connection or not. A value of one in a bit position specified
-      * that that circuit is used in the connection otherwise the bit is coded
-      * as zero.
-      * @return The map format, the range being 0 - 0xffffff.
-      */
+    /** Gets the Map Format field of the parameter. The map format range is 0 -
+      * 0xffffff, where each bit indicates whether the 64Kbps circuit is used in the
+      * NxDS0 connection or not. A value of one in a bit position specified that that
+      * circuit is used in the connection otherwise the bit is coded as zero.
+      * @return The map format, the range being 0 - 0xffffff.  */
     public int getMapFormat() {
         return m_mapFormat;
     }
-    /**
-      * Sets the Map Format field of the parameter. Refer to getMapFormat for
-      * more details.
-      * @param aMapFormat  Map Format, range 0 - 0xffffff.
-      */
+    /** Sets the Map Format field of the parameter. Refer to getMapFormat for more
+      * details.
+      * @param aMapFormat  Map Format, range 0 - 0xffffff.  */
     public void setMapFormat(int aMapFormat) throws ParameterRangeInvalidException {
         if (0 > aMapFormat || aMapFormat > 0xffffff)
-            throw ParameterRangeInvalidException("Map Format " + aMapFormat + " out of range.");
+            throw new ParameterRangeInvalidException("Map Format " + aMapFormat + " out of range.");
         m_mapFormat = aMapFormat;
     }
-    /**
-      * The toString method retrieves a string containing the values of the
-      * members of the CircuitAssignMapAnsi class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the CircuitAssignMapAnsi class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());
@@ -138,8 +121,8 @@ public class CircuitAssignMapAnsi extends java.lang.Object implements java.io.Se
         b.append("\n\tMap Format: " + m_mapFormat);
         return b.toString();
     }
-    private byte m_mapType = null;
-    private int m_mapFormat = null;
+    private byte m_mapType;
+    private int m_mapFormat;
 }
 
 // vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

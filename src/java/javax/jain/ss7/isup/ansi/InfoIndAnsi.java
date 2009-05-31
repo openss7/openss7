@@ -1,124 +1,127 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:24:10 $
-* 
-* MODULE NAME  : $RCSfile: InfoIndAnsi.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class InfoIndAnsi extends InfoInd{
-
-
-
-	public InfoIndAnsi(){
-		multiLocBGInfoRespInd = false;
-	}
-
-	public InfoIndAnsi(byte in_callingAddrRespInd,
-                   boolean in_holdInd,
-                   boolean in_callingCatResInd,
-                   boolean in_chargeInfoResInd,
-                   boolean in_solInfoInd,
-                   boolean in_multiLocBGInfoRespInd){
-
-		super(in_callingAddrRespInd,
-				in_holdInd,
-				in_callingCatResInd,
-				in_chargeInfoResInd,
-				in_solInfoInd);
-
-
-		multiLocBGInfoRespInd = in_multiLocBGInfoRespInd;
-
-	}
-
-	public boolean getMultiLocBusinessGroupInfoRespInd(){
-		return multiLocBGInfoRespInd;
-	}
-
-	public void setMultiLocBusinessGroupInfoRespInd(boolean aMultiLocationBGInfoRespIndicator){
-		multiLocBGInfoRespInd = aMultiLocationBGInfoRespIndicator;
-	}
-		
-	public void  putInfoIndAnsi(byte[] arr, int index, byte par_len){
-
-			if(((arr[index+1] >> 7) & IsupMacros.L_BIT1_MASK) == 1)
-				multiLocBGInfoRespInd = true;
-
-			super.putInfoInd(arr,index,par_len);											
-								
-	}
-	
-	public byte[] flatInfoIndAnsi(){
-		
-			byte[] rc;
-			byte multiLocBGInfoResp = 0;
-
-			rc = super.flatInfoInd();
-
-			if(multiLocBGInfoRespInd == true)
-				multiLocBGInfoResp = 1;
-			
-			rc[1] = (byte)(rc[1] | (( multiLocBGInfoResp  << 7 ) & IsupMacros.L_BIT8_MASK));
-		
-			return rc;
-		}		
-
-
-	/**
-    * String representation of class InfoIndAnsi
-    *
-    * @return    String provides description of class InfoIndAnsi
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nmultiLocBGInfoRespInd = ");
-				buffer.append(multiLocBGInfoRespInd);
-				return buffer.toString();
-		
-		}
-
-	boolean multiLocBGInfoRespInd;
-		
-	public static final boolean MLBGIRI_MULTI_LOCATION_BUSINESS_GROUP_INFORMATION_NOT_INCLUDED = false; 
-	public static final boolean MLBGIRI_MULTI_LOCATION_BUSINESS_GROUP_INFORMATION_INCLUDED = true; 
-
-
-    
+/** A class representing the ANSI ISUP Information Indicator parameter.
+    This class inherits from the core class and adds methods to access the ANSI specific
+    sub-fields of Information Indicator parameter class.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public class InfoIndAnsi extends InfoInd {
+    public static final boolean MLBGIRI_MULTI_LOCATION_BUSINESS_GROUP_INFORMATION_NOT_INCLUDED = false;
+    public static final boolean MLBGIRI_MULTI_LOCATION_BUSINESS_GROUP_INFORMATION_INCLUDED = true;
+    /** Constructs a new ANSI InfoInd class, parameters with default values.  */
+    public InfoIndAnsi() {
+    }
+    /** Constructs an ANSI InfoInd class from the input parameters specified.
+        @param in_callingAddrResInd  The calling party address response indicator, range
+        0 to 3, see InfoInd().
+        @param in_holdInd  The hold provided indicator, see InfoInd().
+        @param in_callingCatResInd  The calling party's category response indicator, see
+        InfoInd().
+        @param in_chargeInfoResInd  The charge information response indicator, see
+        InfoInd().
+        @param in_solInfoInd  The solicited information indicator, see InfoInd().
+        @param in_multiLocBGInfoRespInd  The multi-location business group information
+        response indicator. <ul>
+        <li>MLBGIRI_MULTI_LOCATION_BUSINESS_GROUP_INFORMATION_NOT_INCLUDED and
+        <li>MLBGIRI_MULTI_LOCATION_BUSINESS_GROUP_INFORMATION_INCLUDED. </ul>
+      */
+    public InfoIndAnsi(byte in_callingAddrRespInd, boolean in_holdInd,
+            boolean in_callingCatResInd, boolean in_chargeInfoResInd,
+            boolean in_solInfoInd, boolean in_multiLocBGInfoRespInd)
+            throws ParameterRangeInvalidException {
+            super(in_callingAddrRespInd, in_holdInd, in_callingCatResInd, in_chargeInfoResInd, in_solInfoInd);
+            this.setMultiLocBusinessGroupInfoRespInd(in_multiLocBGInfoRespInd);
+    }
+    /** Gets the Multi Location Business Group Information Response Indicator field of the
+        parameter.
+        @return boolean  The MultiLocationBusinessGroupInformationResponseIndicator value,
+        see InfoIndAnsi().
+      */
+    public boolean getMultiLocBusinessGroupInfoRespInd() {
+        return m_multiLocationBGInfoRespIndicator;
+    }
+    /** Sets the Multi Location Business Group Information Response Indicator field of the
+        parameter.
+        @param aMultiLocationBGInfoRespIndicator  The
+        MultiLocationBusinessGroupInformationResponseIndicator value, see InfoIndAnsi().
+      */
+    public void setMultiLocBusinessGroupInfoRespInd(boolean aMultiLocationBGInfoRespIndicator) {
+        m_multiLocationBGInfoRespIndicator = aMultiLocationBGInfoRespIndicator;
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+        InfoIndAnsi class.
+        @return A string representation of the member variables.
+      */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.ansi.InfoIndAnsi");
+        b.append("\n\tm_multiLocationBGInfoRespIndicator: " + m_multiLocationBGInfoRespIndicator);
+        return b.toString();
+    }
+    protected boolean m_multiLocationBGInfoRespIndicator;
 }
 
 
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

@@ -56,15 +56,15 @@
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-
-/**
-  * A class representing the ansi ISUP CircuitGrpCharacteristicsInd parameter.
+/** A class representing the ansi ISUP CircuitGrpCharacteristicsInd parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public class CircuitGrpCharacteristicsIndAnsi extends java.lang.Object implements java.io.Serializable {
+public class CircuitGrpCharacteristicsIndAnsi implements java.io.Serializable {
     public static final byte CGCI_UNKNOWN = 0;
     public static final byte CGCI_ANALOG = 1;
     public static final byte CGCI_DIGITAL = 2;
@@ -84,39 +84,25 @@ public class CircuitGrpCharacteristicsIndAnsi extends java.lang.Object implement
     public static final byte CCRI_STATISTICAL = 2;
     public static final byte CCRI_PER_CALL = 3;
 
-    /**
-      * Constructs a new ANSI CircuitGrpCharacteristicsInd class, parameters
-      * with default values.
-      */
+    /** Constructs a new ANSI CircuitGrpCharacteristicsInd class, parameters
+      * with default values.  */
     public CircuitGrpCharacteristicsIndAnsi() {
     }
-    /**
-      * Constructs an ANSI CircuitGrpCharacteristicsInd class from the input
-      * parameters specified.
-      * @param in_cktGrpCarrierInd  The circuit group carrier indicator, range 0-3.
-      * <li>CGCI_UNKNOWN
-      * <li>CGCI_ANALOG
-      * <li>CGCI_DIGITAL
-      * <li>CGCI_ANALOG_AND_DIGITAL
-      * @param in_doubleSeizingControlInd  The double seizing control indicator,
-      * range 0-3.
-      * <li>DSCI_NO_CIC_CONTROL
-      * <li>DSCI_ODD_CIC_CONTROL
-      * <li>DSCI_EVEN_CIC_CONTROL
-      * <li>DSCI_ALL_CIC_CONTROL
-      * @param in_alarmCarrierInd  The alarm carrier indicator value, range 0-3.
-      * <li>ACI_UNKNOWN
-      * <li>ACI_SOFTWARE_CARRIER_HANDELING
-      * <li>ACI_HARDWARE_CARRIER_HANDELING
+    /** Constructs an ANSI CircuitGrpCharacteristicsInd class from the input parameters
+      * specified.
+      * @param in_cktGrpCarrierInd  The circuit group carrier indicator, range 0-3;
+      * <ul><li>CGCI_UNKNOWN, <li>CGCI_ANALOG, <li>CGCI_DIGITAL and
+      * <li>CGCI_ANALOG_AND_DIGITAL.</ul>
+      * @param in_doubleSeizingControlInd  The double seizing control indicator, range
+      * 0-3; <ul><li>DSCI_NO_CIC_CONTROL, <li>DSCI_ODD_CIC_CONTROL,
+      * <li>DSCI_EVEN_CIC_CONTROL and <li>DSCI_ALL_CIC_CONTROL.</ul>
+      * @param in_alarmCarrierInd  The alarm carrier indicator value, range 0-3;
+      * <ul><li>ACI_UNKNOWN, <li>ACI_SOFTWARE_CARRIER_HANDELING and
+      * <li>ACI_HARDWARE_CARRIER_HANDELING.</ul>
       * @param in_continuityCheckRequirementsInd  The continuity check
-      * requirements indicator, range 0-3.
-      * <li>CCRI_UNKNOWN
-      * <li>CCRI_NONE
-      * <li>CCRI_STATISTICAL
-      * <li>CCRI_PER_CALL
-      * @exception ParameterRangeInvalidException  Thrown when value is out of
-      * range.
-      */
+      * requirements indicator, range 0-3; <ul><li>CCRI_UNKNOWN, <li>CCRI_NONE,
+      * <li>CCRI_STATISTICAL and <li>CCRI_PER_CALL.</ul>
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public CircuitGrpCharacteristicsIndAnsi(byte in_cktGrpCarrierInd,
             byte in_doubleSeizingControlInd, byte in_alarmCarrierInd,
             byte in_continuityCheckRequirementsInd)
@@ -127,115 +113,89 @@ public class CircuitGrpCharacteristicsIndAnsi extends java.lang.Object implement
         this.setAlarmCarrierInd(in_alarmCarrierInd);
         this.setContinuityCheckRequirementsInd(in_continuityCheckRequirementsInd);
     }
-    /**
-      * Gets the CircuitGrpCarrierInd field of CircuitGrpCharacteristicsInd
-      * parameter.
+    /** Gets the CircuitGrpCarrierInd field of CircuitGrpCharacteristicsInd parameter.
       * @return CircuitGrpCarrierInd, range 0-3, see
-      * CircuitGrpCharacteristicsIndAnsi().
-      */
+      * CircuitGrpCharacteristicsIndAnsi().  */
     public byte getCircuitGrpCarrierInd() {
         return m_cktGrpCarrierInd;
     }
-    /**
-      * Sets the CircuitGrpCarrierInd field of CircuitGrpCharacteristicsInd
-      * parameter
+    /** Sets the CircuitGrpCarrierInd field of CircuitGrpCharacteristicsInd parameter.
       * @param in_cktGrpCarrierInd  The CircuitGrpCarrierInd value, range 0-3,
-      * see CircuitGrpCharacteristicsIndAnsi().
-      */
+      * see CircuitGrpCharacteristicsIndAnsi().  */
     public void setCircuitGrpCarrierInd(byte in_cktGrpCarrierInd) throws ParameterRangeInvalidException {
         if (0 > in_cktGrpCarrierInd || in_cktGrpCarrierInd > 3)
-            throw ParameterRangeInvalidException("CircuitGroupCarrierInd " + in_cktGrpCarrierInd + " is out of range.");
+            throw new ParameterRangeInvalidException("CircuitGroupCarrierInd " + in_cktGrpCarrierInd + " is out of range.");
         m_cktGrpCarrierInd = in_cktGrpCarrierInd;
     }
-    /**
-      * Gets the DoubleSeizingControlInd field of CircuitGrpCharacteristicsInd
+    /** Gets the DoubleSeizingControlInd field of CircuitGrpCharacteristicsInd
       * parameter.
       * @return DoubleSeizingControlInd, range 0-3, see
-      * CircuitGrpCharacteristicsIndAnsi().
-      */
+      * CircuitGrpCharacteristicsIndAnsi().  */
     public byte getDoubleSeizingControlInd() {
         return m_doubleSeizingControlInd;
     }
-    /**
-      * Sets the DoubleSeizingControlInd field of CircuitGrpCharacteristicsInd
+    /** Sets the DoubleSeizingControlInd field of CircuitGrpCharacteristicsInd
       * parameter.
-      * @param in_doubleSeizingControlInd,  The DoubleSeizingControlInd value,
-      * range 0-3, see CircuitGrpCharacteristicsIndAnsi().
-      * @exception ParameterRangeInvalidException  Thrown when the sub-field is
-      * out of the range specified.
-      */
+      * @param in_doubleSeizingControlInd,  The DoubleSeizingControlInd value, range
+      * 0-3, see CircuitGrpCharacteristicsIndAnsi().
+      * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of
+      * the range specified.  */
     public void setDoubleSeizingControlInd(byte in_doubleSeizingControlInd) throws ParameterRangeInvalidException {
         if (0 > in_doubleSeizingControlInd || in_doubleSeizingControlInd > 3)
-            throw ParameterRangeInvalidException("DoubleSeizingControlInd " + in_doubleSeizingControlInd + " is out of range.");
+            throw new ParameterRangeInvalidException("DoubleSeizingControlInd " + in_doubleSeizingControlInd + " is out of range.");
         m_doubleSeizingControlInd = in_doubleSeizingControlInd;
     }
-    /**
-      * Gets the AlarmCarrierInd field of CircuitGrpCharacteristicsInd
-      * parameter.
-      * @return AlarmCarrierInd, range 0-3, see CircuitGrpCharacteristicsIndAnsi().
-      */
+    /** Gets the AlarmCarrierInd field of CircuitGrpCharacteristicsInd parameter.
+      * @return AlarmCarrierInd, range 0-3, see CircuitGrpCharacteristicsIndAnsi().  */
     public byte getAlarmCarrierInd() {
         return m_alarmCarrierInd;
     }
-    /**
-      * Sets the AlarmCarrierInd field of CircuitGrpCharacteristicsInd
-      * parameter.
+    /** Sets the AlarmCarrierInd field of CircuitGrpCharacteristicsInd parameter.
       * @param in_alarmCarrierInd   The AlarmCarrierInd value, range 0-3, see
       * CircuitGrpCharacteristicsIndAnsi().
-      * @exception ParameterRangeInvalidException  Thrown when the sub-field is
-      * out of the range specified.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of
+      * the range specified.  */
     public void setAlarmCarrierInd(byte in_alarmCarrierInd) throws ParameterRangeInvalidException {
         if (0 > in_alarmCarrierInd || in_alarmCarrierInd > 3)
-            throw ParameterRangeInvalidException("AlarmCarrierInd " + in_alarmCarrierInd + " is out of range.");
+            throw new ParameterRangeInvalidException("AlarmCarrierInd " + in_alarmCarrierInd + " is out of range.");
         m_alarmCarrierInd = in_alarmCarrierInd;
     }
-    /**
-      * Gets the ContinuityCheckRequirementsInd field of
-      * CircuitGrpCharacteristicsInd parameter.
+    /** Gets the ContinuityCheckRequirementsInd field of CircuitGrpCharacteristicsInd
+      * parameter.
       * @return ContinuityCheckRequirementsInd, range 0-3, see
-      * CircuitGrpCharacteristicsIndAnsi().
-      */
+      * CircuitGrpCharacteristicsIndAnsi().  */
     public byte getContinuityCheckRequirementsInd() {
         return m_continuityCheckRequirementsInd;
     }
-    /**
-      * Sets the ContinuityCheckRequirementsInd field of
-      * CircuitGrpCharacteristicsInd parameter.
-      * @param in_continuityCheckRequirementsInd  The
-      * ContinuityCheckRequirementsInd value, range 0-3.
-      * @exception ParameterRangeInvalidException  Thrown when the sub-field is
-      * out of the range specified.
-      */
+    /** Sets the ContinuityCheckRequirementsInd field of CircuitGrpCharacteristicsInd
+      * parameter.
+      * @param in_continuityCheckRequirementsInd  The ContinuityCheckRequirementsInd
+      * value, range 0-3.
+      * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of
+      * the range specified.  */
     public void setContinuityCheckRequirementsInd(byte in_continuityCheckRequirementsInd)
         throws ParameterRangeInvalidException {
         if (0 > in_continuityCheckRequirementsInd || in_continuityCheckRequirementsInd > 3)
-            throw ParameterRangeInvalidException("ContinuityCheckRequirementsInd " + in_continuityCheckRequirementsInd + " is out of range.");
+            throw new ParameterRangeInvalidException("ContinuityCheckRequirementsInd " + in_continuityCheckRequirementsInd + " is out of range.");
         m_continuityCheckRequirementsInd = in_continuityCheckRequirementsInd;
     }
-    /**
-      * The toString method retrieves a string containing the values of the
-      * members of the CircuitGrpCharacteristicsIndAnsi class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the CircuitGrpCharacteristicsIndAnsi class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());
         b.append("\nCircuitGrpCharacteristicsIndAnsi:");
-        if (m_cktGrpCarrierInd != null)
-            b.append("\n\tCktGrpCarrierInd: " + m_cktGrpCarrierInd);
-        if (m_doubleSeizingControlInd != null)
-            b.append("\n\tDoubleSeizingControlInd: " + m_doubleSeizingControlInd);
-        if (m_alarmCarrierInd != null)
-            b.append("\n\tAlarmCarrierInd: " + m_alarmCarrierInd);
-        if (m_continuityCheckRequirementsInd != null)
-            b.append("\n\tContinuityCheckRequirementsInd: " + m_continuityCheckRequirementsInd);
+        b.append("\n\tCktGrpCarrierInd: " + m_cktGrpCarrierInd);
+        b.append("\n\tDoubleSeizingControlInd: " + m_doubleSeizingControlInd);
+        b.append("\n\tAlarmCarrierInd: " + m_alarmCarrierInd);
+        b.append("\n\tContinuityCheckRequirementsInd: " + m_continuityCheckRequirementsInd);
         return b.toString();
     }
-    private byte m_cktGrpCarrierInd = null;
-    private byte m_doubleSeizingControlInd = null;
-    private byte m_alarmCarrierInd = null;
-    private byte m_continuityCheckRequirementsInd = null;
+    private byte m_cktGrpCarrierInd;
+    private byte m_doubleSeizingControlInd;
+    private byte m_alarmCarrierInd;
+    private byte m_continuityCheckRequirementsInd;
 }
 
 // vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

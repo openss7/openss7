@@ -56,37 +56,36 @@
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-/**
-  * A class representing the ANSI ISUP Charge Number parameter. This class provides the methods to access the
-  * different sub-fields of the parameter.
+/** A class representing the ANSI ISUP Charge Number parameter. This class provides the
+  * methods to access the different sub-fields of the parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class ChargeNumberAnsi extends NumberParameter {
-    /**
-      * Constructs a new Ansi Charge Number.
-      */
+    /** Constructs a new Ansi Charge Number.  */
     public ChargeNumberAnsi() {
     }
-    /**
-      * Constructs a new Charge Number by using the NumberParameter class constructor Refer to NumberParameter class for
-      * more details.
-      * @param natureOfAddressIndicator  The nature of address indicator, range 0-127, see NumberParameter().
-      * @param numberingPlanIndicator  The numbering plan indicator, range 0-7, see NumberParameter().
-      * @param addressPresentationRestrictedIndicator  The address presentation restricted indicator, range 0-3, see NumberParameter().
+    /** Constructs a new Charge Number by using the NumberParameter class constructor
+      * Refer to NumberParameter class for more details.
+      * @param natureOfAddressIndicator  The nature of address indicator, range 0-127,
+      * see NumberParameter().
+      * @param numberingPlanIndicator  The numbering plan indicator, range 0-7, see
+      * NumberParameter().
+      * @param addressPresentationRestrictedIndicator  The address presentation
+      * restricted indicator, range 0-3, see NumberParameter().
       * @param addressSignal  The address signal.
-      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public ChargeNumberAnsi(byte natureOfAddressIndicator, byte numberingPlanIndicator, byte[] addressSignal)
         throws ParameterRangeInvalidException {
         super(natureOfAddressIndicator, numberingPlanIndicator, addressSignal);
     }
-    /**
-      * The toString method retrieves a string containing the values of the members of the ChargeNumberAnsi class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the ChargeNumberAnsi class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());

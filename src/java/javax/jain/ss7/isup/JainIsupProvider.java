@@ -56,106 +56,93 @@
 
 package javax.jain.ss7.isup;
 
+import javax.jain.ss7.*;
 import javax.jain.*;
 
-/**
-  * This interface represents the JAIN ISUP layer that interfaces directly with
-  * a proprietary (vendor-specific) implementation of the ISUP stack.  Any
-  * object that interfaces between a JAIN ISUP application and an ISUP stack
-  * must implement this interface.  This interface defines the methods that will
-  * be used by any registered ISUP User application implementing the
-  * JainIsupListener interface to send and receive ISUP Events.  An IsupEvent is
-  * a java event version of ISUP protocol messages and other interface related
-  * information (service primitives) exchanged between the Provider and the
-  * Listener. <p>
+/** This interface represents the JAIN ISUP layer that interfaces directly with a
+  * proprietary (vendor-specific) implementation of the ISUP stack.  Any object that
+  * interfaces between a JAIN ISUP application and an ISUP stack must implement this
+  * interface.  This interface defines the methods that will be used by any registered
+  * ISUP User application implementing the JainIsupListener interface to send and
+  * receive ISUP Events.  An IsupEvent is a java event version of ISUP protocol
+  * messages and other interface related information (service primitives) exchanged
+  * between the Provider and the Listener. <p>
   *
-  * Henceforth, the object implementing the JainIsupListener and
-  * JainIsupProvider interface will be referred to as JainIsupListener object
-  * and JainIsupProvider object.  JainIsupListener object registers with a
-  * JainIsupProvider object for receiving ISUP Events.  At the time of
-  * registration , the Listener object supplies an ISUP User Address to the
-  * Provider object.  An ISUP User Address consists of a destination point code,
-  * along with a network indicator for indicating whether the point code belongs
-  * to the national or international network, and a set of CICs.  The
-  * JainIsupListener object can add more ISUP User Addresses by invoking the
-  * addIsupListener method.  A JainIsupListener calls the sendIsupEvent method
-  * on the JainIsupProvider to send an ISUP message to the network. <p>
+  * Henceforth, the object implementing the JainIsupListener and JainIsupProvider
+  * interface will be referred to as JainIsupListener object and JainIsupProvider
+  * object.  JainIsupListener object registers with a JainIsupProvider object for
+  * receiving ISUP Events.  At the time of registration , the Listener object supplies
+  * an ISUP User Address to the Provider object.  An ISUP User Address consists of a
+  * destination point code, along with a network indicator for indicating whether the
+  * point code belongs to the national or international network, and a set of CICs.
+  * The JainIsupListener object can add more ISUP User Addresses by invoking the
+  * addIsupListener method.  A JainIsupListener calls the sendIsupEvent method on the
+  * JainIsupProvider to send an ISUP message to the network. <p>
   *
-  * A JainIsupProvider object encapsulates the received protocol messages from
-  * the ISUP stack into Java events and passes the information to the Listener.
+  * A JainIsupProvider object encapsulates the received protocol messages from the ISUP
+  * stack into Java events and passes the information to the Listener.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public abstract interface JainIsupProvider extends java.util.EventListener {
-    /**
-      * Adds a JainIsupListener object to the list of registered Event Listeners
-      * being serviced by this JainIsupProvider object. THis is also used to add
-      * new ISUP User Addresses being handled by an ISUP Listener so that a
-      * Listener can register for more than one ISUP User Address by repeatedly
-      * calling this method.
-      *
+    /** Adds a JainIsupListener object to the list of registered Event Listeners being
+      * serviced by this JainIsupProvider object. THis is also used to add new ISUP
+      * User Addresses being handled by an ISUP Listener so that a Listener can
+      * register for more than one ISUP User Address by repeatedly calling this method.
       * @param isupListener The JainIsupListener object to be added.
-      * @param isupAddress The ISUP User Address handled by the JainIsupListener object.
-      *
+      * @param isupAddress The ISUP User Address handled by the JainIsupListener
+      * object.
       * @exception java.util.TooManyListeners Thrown if a limit is placed on the
-      * allowable number of registered JainIsupListener obects, and this limit
-      * would be exceeded.
-      * @exception ListenerAlreadyRegisteredException Thrown if the Listener is
-      * already in the list of registered ones handled by the Provider.
+      * allowable number of registered JainIsupListener obects, and this limit would be
+      * exceeded.
+      * @exception ListenerAlreadyRegisteredException Thrown if the Listener is already
+      * in the list of registered ones handled by the Provider.
       * @exception InvalidListenerException Thrown if the Listener is null.
-      * @exception InvalidAddressException Thrown if the IsupAddress has an
-      * invalid format or is null.
-      * @exception SendStackException Thrown if the registration could not be
-      * sent to the underlying stack.
-      */
+      * @exception InvalidAddressException Thrown if the IsupAddress has an invalid
+      * format or is null.
+      * @exception SendStackException Thrown if the registration could not be sent to
+      * the underlying stack.  */
     public void addIsupListener(JainIsupListener isupListener, IsupUserAddress isupAddress)
         throws java.util.TooManyListenersException, ListenerAlreadyRegisteredException,
                           InvalidListenerException, InvalidAddressException, SendStackException;
-    /**
-      * This method is used to remove the ISUP User Address being handled by a
-      * JainIsupListener.  This removes a JainIsupListener from the list of
-      * registered Listeners being services by this Provider, if it is the last
-      * User Address being handled by the ISUP Listener.
-      *
-      * @param isupListener The JainIsupListener object to be removed from this JainIsupProvider object.
+    /** This method is used to remove the ISUP User Address being handled by a
+      * JainIsupListener.  This removes a JainIsupListener from the list of registered
+      * Listeners being services by this Provider, if it is the last User Address being
+      * handled by the ISUP Listener.
+      * @param isupListener The JainIsupListener object to be removed from this
+      * JainIsupProvider object.
       * @param isupAddress The ISUP User Adress handled by the JainIsupListener object.
-      * @exception ListenerNotRegisteredException Thrown when the
-      * JainIsupListener object to be removed is not registered as an Event
-      * Listener of this JainIsupProvider object.
+      * @exception ListenerNotRegisteredException Thrown when the JainIsupListener
+      * object to be removed is not registered as an Event Listener of this
+      * JainIsupProvider object.
       * @exception InvalidListenerException Thrown if the isupListener is null.
-      * @exception InvalidAddressException THrown if the isupAddress has an
-      * invalid format.
-      */
+      * @exception InvalidAddressException THrown if the isupAddress has an invalid
+      * format.  */
     public void removeIsupListener(JainIsupListener isupListener, IsupUserAddress isupAddress)
         throws ListenerNotRegisteredException, InvalidListenerException, InvalidAddressException;
-    /**
-      * This method is for sending an IsupEvent from a JainIsupListener object
-      * to the ISUP layer of the SS7 stack.  THis method is invoked by the JAIN
-      * ISUP Listener on the Provider for delivering an event to the Stack.
-      *
+    /** This method is for sending an IsupEvent from a JainIsupListener object to the
+      * ISUP layer of the SS7 stack.  THis method is invoked by the JAIN ISUP Listener
+      * on the Provider for delivering an event to the Stack.
       * @param isupEvent The IsupEvent to be sent to the stack.
-      * @exception MandatoryParameterNotSetException Thrown if all of the
-      * mandatory parameters required by this JainIsupProvider object to send
-      * the ISUP message out to the network are not set.  Note that different
-      * implementations of this JainIsupProvider interface will mandate that
-      * a different set of parameters be set for each of the IsupEvents.  It is
-      * recommended that the detail message returned in the
-      * MandatoryParameterNotSetException should be a String of the form:<p>
-      * <center><code>"Parameter: not set"</code></center><p>
-      * @exception SendStackException Thrown if the event could not be sent to
-      * the underlying stack.
-      * @exception ParameterRangeInvalidException Thrown if the event being sent
-      * has a Circuit Identification Code or a Destination Point Code that has
-      * not been registered fro by the Listener application.
+      * @exception MandatoryParameterNotSetException Thrown if all of the mandatory
+      * parameters required by this JainIsupProvider object to send the ISUP message
+      * out to the network are not set.  Note that different implementations of this
+      * JainIsupProvider interface will mandate that a different set of parameters be
+      * set for each of the IsupEvents.  It is recommended that the detail message
+      * returned in the MandatoryParameterNotSetException should be a String of the
+      * form, <p> <center><code>"Parameter: not set"</code></center><p>
+      * @exception SendStackException Thrown if the event could not be sent to the
+      * underlying stack.
+      * @exception ParameterRangeInvalidException Thrown if the event being sent has a
+      * Circuit Identification Code or a Destination Point Code that has not been
+      * registered for by the Listener application.
       * @exception VersionNotSupportedException Thrown if the event is a variant
-      * specific event that is different from the underlying stack variant.
-      */
+      * specific event that is different from the underlying stack variant.  */
     public void sendIsupEvent(IsupEvent isupEvent)
         throws MandatoryParameterNotSetException, SendStackException,
                           ParameterRangeInvalidException, VersionNotSupportedException;
-    /**
-      * Returns the JainIsupStackImpl to whic this JainIsupProvider object is
-      * attached.
-      * @return The attached JainIsupStack.
-      */
+    /** Returns the JainIsupStackImpl to whic this JainIsupProvider object is attached.
+      * @return The attached JainIsupStack.  */
     public JainIsupStack getAttachedStack();
 }
 

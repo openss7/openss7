@@ -56,36 +56,34 @@
 
 package javax.jain.ss7.isup;
 
-/**
-  * This Exception is thrown when a parameter sub-field value is out of the
-  * specified range for that sub-field in that parameter.  This exception is
-  * also thrown if the listener application registers with a particular User
-  * Address but sends the event for an unregistered Circuit Identification Code
-  * or Destination Point Code.  For example, if the application registered for a
-  * User Address with CIC range <code>0-100</code> and then sends an event for a
-  * CIC that is outside this CIC range, then the sendIsupEvent method of the
-  * JainIsupProvider interface will throw this exception.
+import javax.jain.ss7.*;
+import javax.jain.*;
+
+/** This Exception is thrown when a parameter sub-field value is out of the specified
+  * range for that sub-field in that parameter.  This exception is also thrown if the
+  * listener application registers with a particular User Address but sends the event
+  * for an unregistered Circuit Identification Code or Destination Point Code.  For
+  * example, if the application registered for a User Address with CIC range
+  * <code>0-100</code> and then sends an event for a CIC that is outside this CIC
+  * range, then the sendIsupEvent method of the JainIsupProvider interface will throw
+  * this exception.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class ParameterRangeInvalidException extends IsupException {
-    /**
-      * Constructs a new ParameterRangeInvalidException with the specified
-      * detail message.
-      * @param msg The detail message.
-      */
+    /** Constructs a new ParameterRangeInvalidException with the specified detail
+      * message.
+      * @param msg The detail message.  */
     public ParameterRangeInvalidException(java.lang.String msg) {
         super(msg);
     }
-    /**
-      * Constructs a new ParameterRangeInvalidException.
-      */
+    /** Constructs a new ParameterRangeInvalidException.  */
     public ParameterRangeInvalidException() {
         super();
     }
-    /**
-      * The toString method retrieves a string containing the values of the
-      * members of the ParameterRangeInvalidException class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the ParameterRangeInvalidException class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         java.lang.String text = "ParameterRangeInvalid\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";

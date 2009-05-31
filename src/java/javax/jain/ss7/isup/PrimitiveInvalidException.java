@@ -56,33 +56,27 @@
 
 package javax.jain.ss7.isup;
 
-/**
-  * This Exception is thrown when the primitive value of the ISUP event is not
-  * set correctly.
+/** This Exception is thrown when the primitive value of the ISUP event is not set
+  * correctly.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class PrimitiveInvalidException extends IsupException {
-    /**
-      * Construct a new PrimitiveInvalidException with the specified detail
-      * message.
-      * @param msg The detail message giving the parameter name.
-      */
+    /** Construct a new PrimitiveInvalidException with the specified detail message.
+      * @param msg The detail message giving the parameter name.  */
     public  PrimitiveInvalidException(java.lang.String msg) {
         super(msg);
     }
-    /**
-      * Construct a new PrimitiveInvalidException.
-      */
+    /** Construct a new PrimitiveInvalidException.  */
     public  PrimitiveInvalidException() {
         super();
     }
-    /**
-      * The toString method retrieves a string containing the value of the
-      * members of the PrimitiveInvalid
-      */
+    /** The toString method retrieves a string containing the value of the members of
+      * the PrimitiveInvalid */
     public java.lang.String toString() {
         java.lang.String text = "PrimitiveInvalidException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";
-        txt
+        return text;
     }
 }
 

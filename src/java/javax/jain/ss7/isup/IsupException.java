@@ -56,23 +56,21 @@
 
 package javax.jain.ss7.isup;
 
+import javax.jain.ss7.*;
 import javax.jain.*;
 
-/**
-  * This Exception is thrown when a general ISUP error is encountered.  This
-  * Exception may be used when no other exception is relevant.
+/** This Exception is thrown when a general ISUP error is encountered.  This Exception
+  * may be used when no other exception is relevant.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class IsupException extends JainException {
-    /**
-      * Constructs a new IsupException with the specified detail message.
-      * @param msg The detail message.
-      */
+    /** Constructs a new IsupException with the specified detail message.
+      * @param msg The detail message.  */
     public IsupException(java.lang.String msg) {
         super(msg);
     }
-    /**
-      * Constructs a new IsupException.
-      */
+    /** Constructs a new IsupException.  */
     public IsupException() {
         super();
     }

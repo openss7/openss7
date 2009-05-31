@@ -56,32 +56,26 @@
 
 package javax.jain.ss7.isup;
 
-/**
-  * This Exception is thrown whenever there is a communication failure with the
+/** This Exception is thrown whenever there is a communication failure with the
   * protocol stack.  This exception will be thrown when a Listener calls a
-  * sendIsupEvent method on the Provider but the Provider is not able to deliver
-  * the message to the protocol stack.  It will also be thrown whn
-  * addIsupListener is called.
+  * sendIsupEvent method on the Provider but the Provider is not able to deliver the
+  * message to the protocol stack.  It will also be thrown whn addIsupListener is
+  * called.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class SendStackException extends IsupException {
-    /**
-      * Construct a new SendStackException with the specified detail
-      * message.
-      * @param msg The detail message giving the parameter name.
-      */
+    /** Construct a new SendStackException with the specified detail message.
+      * @param msg The detail message giving the parameter name.  */
     public  SendStackException(java.lang.String msg) {
         super(msg);
     }
-    /**
-      * Construct a new SendStackException.
-      */
+    /** Construct a new SendStackException.  */
     public SendStackException() {
         super();
     }
-    /**
-      * The toString method retrieves a string containing the value of the
-      * members of the PrimitiveInvalid
-      */
+    /** The toString method retrieves a string containing the value of the members of
+      * the PrimitiveInvalid */
     public java.lang.String toString() {
         java.lang.String text = "SendStackException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";

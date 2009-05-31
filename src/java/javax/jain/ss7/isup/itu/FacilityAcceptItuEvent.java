@@ -1,187 +1,237 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:55 $
-* 
-* MODULE NAME  : $RCSfile: FacilityAcceptItuEvent.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup.itu;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class FacilityAcceptItuEvent extends IsupEvent{
-
-	public FacilityAcceptItuEvent(java.lang.Object source,
-                              SignalingPointCode dpc,
-                              SignalingPointCode opc,
-                              byte sls,
-                              int cic,
-                              byte congestionPriority,
-                              short facilityInd)
-                       throws ParameterRangeInvalidException{
-
-		super(source,dpc,opc,sls,cic,congestionPriority);
-		facInd   = facilityInd;
-	}
-
-
-	public int getIsupPrimitive(){
-
-		return IsupConstants.ISUP_PRIMITIVE_FACILITY_ACCEPT; 
-
-	}
-
-	public CallReference getCallReference()
-                               throws ParameterNotSetException{
-		if(isCallReference == true)
-			return callReference;
-		else throw new ParameterNotSetException();
-
-	}
-
-	public void setCallReference(CallReference callRef){
-		callReference   = callRef;
-		isCallReference = true;
-	}
-
-	public boolean isCallReferencePresent(){
-		return isCallReference;
-	}
-	
-	public ConReq getConReq()
-                 throws ParameterNotSetException{
-		if(isConReq == true)
-			return conReq;
-		else throw new ParameterNotSetException();
-	}
-	
-	public void setConReq(ConReq connectionReq){
-		conReq   = connectionReq;
-		isConReq = true;
-	}
-
-	public boolean isConReqPresent(){
-		return isConReq;
-	}
-
-	public short getFacilityInd(){
-		return facInd;
-	}
-
-	public void setFacilityInd(short in_facInd)
-                    throws ParameterRangeInvalidException{
-		if((in_facInd >=0) && (in_facInd<=255))
-			facInd = in_facInd;		
-		else throw new ParameterRangeInvalidException();
-	}
-	
-	public ParamCompatibilityInfoItu getParamCompatibilityInfo()
-                                                    throws ParameterNotSetException{
-		if(isParamCompatibilityInfoItu == true)
-			return paramCompatibilityInfoItu;
-		else throw new ParameterNotSetException();
-	}
-
-	public void setParamCompatibilityInfo(ParamCompatibilityInfoItu pci){
-		paramCompatibilityInfoItu   = pci;
-		isParamCompatibilityInfoItu = true;
-	}
-
-	public boolean isParamCompatibilityInfoPresent(){
-		return isParamCompatibilityInfoItu;
-	}
-	
-	public UserToUserIndicatorsItu getUserToUserIndicators()
-                                                throws ParameterNotSetException{
-		if(isUserToUserIndicatorsItu == true)
-			return userToUserIndicatorsItu;
-		else throw new ParameterNotSetException();
-	}
-		
-	public void setUserToUserIndicators(UserToUserIndicatorsItu uui){
-
-		userToUserIndicatorsItu   = uui; 
-		isUserToUserIndicatorsItu = true;
-	}
-
-	public boolean isUserToUserIndicatorsPresent(){
-		return  isUserToUserIndicatorsItu;
-	}
-
-	/**
-    * String representation of class FacilityAcceptItuEvent
-    *
-    * @return    String provides description of class FacilityAcceptItuEvent
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\n\nisCallReference = ");
-				buffer.append(isCallReference);
-				buffer.append("\ncallReference = ");
-				buffer.append(callReference);
-				buffer.append("\n\nisConReq = ");
-				buffer.append(isConReq);
-				buffer.append("\nconReq  = ");
-				buffer.append(conReq);	
-				buffer.append("\n\nfacInd  = ");
-				buffer.append(facInd);		
-				buffer.append("\n\nisParamCompatibilityInfoItu = ");
-				buffer.append(isParamCompatibilityInfoItu);
-				buffer.append("\nparamCompatibilityInfoItu = ");
-				buffer.append(paramCompatibilityInfoItu);
-				buffer.append("\n\nisUserToUserIndicatorsItu = ");
-				buffer.append(isUserToUserIndicatorsItu);
-				buffer.append("\nuserToUserIndicatorsItu  = ");
-				buffer.append(userToUserIndicatorsItu);	
-				return buffer.toString();
-		
-		}
-
-	
-
-
-	CallReference             callReference;
-	ConReq                    conReq;
-	short                     facInd;
-	boolean                   isCallReference;
-	boolean                   isConReq;
-	boolean                   isParamCompatibilityInfoItu;
-	boolean                   isUserToUserIndicatorsItu;	
-	ParamCompatibilityInfoItu paramCompatibilityInfoItu;
-	UserToUserIndicatorsItu   userToUserIndicatorsItu;
-
-    
+/** An ISUP EVENT: The FacilityAcceptItuEvent class is a sub class of the
+    IsupEvent class and is exchanged between an ISUP Provider and an ISUP Listener for
+    sending and receiving the ISUP FacilityAccept message.
+    Listener would send a FacilityEventAccept object to the provider for sending a FAA
+    message to the ISUP stack. ISUP Provider would send a FacilityEventAccept object to
+    the listener on the reception of a FAA message from the stack for the user address
+    handled by that listener.  The mandatory parameters are supplied to the constructor.
+    Optional parameters may then be set using the set methods The primitive field is
+    filled as ISUP_PRIMITIVE_FACILITY_ACCEPT.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public class FacilityAcceptItuEvent extends IsupEvent {
+    /** Constructs a new FacilityAcceptItuEvent, with only the JAIN ISUP Mandatory
+        parameters being supplied to the constructor.
+        @param source  The source of this event.
+        @param dpc  The destination point code.
+        @param opc  The origination point code.
+        @param sls  The signaling link selection.
+        @param cic  The CIC on which the call has been established.
+        @param congestionPriority  Priority of the ISUP message which may be used in the
+        optional national congestion control procedures at MTP3. Refer to
+        getCongestionPriority method in IsupEvent class for more details.
+        @param facilityInd  Facility indicator.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public FacilityAcceptItuEvent(java.lang.Object source, SignalingPointCode dpc,
+            SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
+            short facilityInd)
+        throws ParameterRangeInvalidException {
+        super(source, dpc, opc, sls, cic, congestionPriority);
+        this.setFacilityInd(facilityInd);
+    }
+    /** Gets the ISUP FACILITY ACCEPT primtive value.
+        @return The ISUP FACILITY ACCEPT primitive value.
+      */
+    public int getIsupPrimitive() {
+        return IsupConstants.ISUP_PRIMITIVE_FACILITY;
+    }
+    /** Gets the Facility Indicator parameter of the message.
+        @return The FacilityInd parameter of the event, range 0 to 255.
+      */
+    public short getFacilityInd() {
+        return m_facInd;
+    }
+    /** Sets the Facility Indicator parameter of the message.
+        @param in_facInd  The Facility Indicator parameter of the event, range 0 to 255.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setFacilityInd(short in_facInd)
+        throws ParameterRangeInvalidException {
+        if (0 <= in_facInd && in_facInd <= 255) {
+            m_facInd = in_facInd;
+            return;
+        }
+        throw new ParameterRangeInvalidException("FacilityInd value " + in_facInd + " out of range.");
+    }
+    /** Gets the CallReference parameter of the message.
+        Refer to CallReference parameter for greater details.
+        @return The CallReference parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public CallReference getCallReference()
+        throws ParameterNotSetException {
+        if (m_callRef != null)
+            return m_callRef;
+        throw new ParameterNotSetException("CallReference not set.");
+    }
+    /** Sets the CallReference parameter of the message.
+        Refer to CallReference parameter for greater details.
+        @param callRef  The CallReference parameter of the event.
+      */
+    public void setCallReference(CallReference callRef) {
+        m_callRef = callRef;
+    }
+    /** Indicates if the CallReference parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isCallReferencePresent() {
+        return (m_callRef != null);
+    }
+    /** Gets the ConReq parameter of the message.
+        @return The ConReq parameter of the event.
+        @exception ParameterNotSetException  Thrown when the parameter is not set in the
+        event ITU.
+      */
+    public ConReq getConReq()
+        throws ParameterNotSetException {
+        if (m_connectionReq != null)
+            return m_connectionReq;
+        throw new ParameterNotSetException("ConnectionRequest not set.");
+    }
+    /** Sets the connection request parameter.
+        @param connectionReq  Connection Request parameter.
+      */
+    public void setConReq(ConReq connectionReq) {
+        m_connectionReq = connectionReq;
+    }
+    /** Indicates if the ConReq parameter is present in this Event.
+        @return True if the parameter is set.
+      */
+    public boolean isConReqPresent() {
+        return (m_connectionReq != null);
+    }
+    /** Gets the ParamCompatibilityInfoItu parameter of the message.
+        @return The ParamCompatibilityInfoItu parameter of the event.
+        @exception ParameterNotSetException  Thrown when the parameter is not set in the
+        event.
+      */
+    public ParamCompatibilityInfoItu getParamCompatibilityInfo()
+        throws ParameterNotSetException {
+        if (m_pci != null)
+            return m_pci;
+        throw new ParameterNotSetException("ParamCompatibilityInfoItu is not set.");
+    }
+    /** Sets the ParamCompatibilityInfoItu parameter of the message.
+        @param pci  The ParamCompatibilityInfoItu parameter of the event.
+      */
+    public void setParamCompatibilityInfo(ParamCompatibilityInfoItu pci) {
+        m_pci = pci;
+    }
+    /** Indicates if the ParamCompatibilityInfoItu parameter is present in this Event.
+        @Return True if the parameter is set.
+      */
+    public boolean isParamCompatibilityInfoPresent() {
+        return (m_pci != null);
+    }
+    /** Gets the UserToUserIndicatorsItu parameter of the message.
+        Refer to UserToUserIndicatorsItu parameter for greater details.
+        @return The UserToUserIndicatorsItu parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public UserToUserIndicatorsItu getUserToUserIndicators()
+        throws ParameterNotSetException {
+        if (m_uui != null)
+            return m_uui;
+        throw new ParameterNotSetException("UserToUserIndicatorsItu is not set.");
+    }
+    /** Sets the UserToUserIndicatorsItu parameter of the message.
+        Refer to UserToUserIndicatorsItu parameter for greater details.
+        @param uui  The UserToUserIndicatorsItu parameter of the event.
+      */
+    public void setUserToUserIndicators(UserToUserIndicatorsItu uui) {
+        m_uui = uui;
+    }
+    /** Indicates if the UserToUserIndicatorsItu parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isUserToUserIndicatorsPresent() {
+        return (m_uui != null);
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+        FacilityAcceptItuEvent class.
+        @return A string representation of the member variables.
+     */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.iut.AcceptItuEvent");
+        b.append("\n\tm_facInd:" + m_facInd);
+        b.append("\n\tm_connectionReq:" + m_connectionReq);
+        b.append("\n\tm_pci:" + m_pci);
+        b.append("\n\t:m_uui" + m_uui);
+        return b.toString();
+    }
+    protected short m_facInd;
+    protected CallReference m_callRef = null;
+    protected ConReq m_connectionReq = null;
+    protected ParamCompatibilityInfoItu m_pci = null;
+    protected UserToUserIndicatorsItu m_uui = null;
 }
 
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

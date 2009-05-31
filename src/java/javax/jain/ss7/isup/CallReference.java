@@ -1,151 +1,122 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:52 $
-* 
-* MODULE NAME  : $RCSfile: CallReference.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup;
 
-import javax.jain.*;
 import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class CallReference extends java.lang.Object implements java.io.Serializable{
-
-
-
-		public CallReference(){
-
-		}
-		
-		public CallReference(int in_callId,
-                     SignalingPointCode in_spc)
-              throws ParameterRangeInvalidException{
-		
-			m_callId = in_callId;
-			m_spc    = in_spc;
-
-		}
-
-		public int getCallIdentity(){
-
-				return m_callId;
-		}
-		
-		public SignalingPointCode getSignalingPointCode(){
-
-				return m_spc;
-		}
-
-		public void setCallIdentity(int aCallIdentity)
-                     throws ParameterRangeInvalidException{
-
-			    /* no valid range specified in the specs to throw an exception */
-			    m_callId = aCallIdentity;
-
-		}
-
-		public void setSignalingPointCode(SignalingPointCode aPointCode)
-                           throws ParameterRangeInvalidException{
-
-				/* no valid range specified in the specs to throw an exception */
-				m_spc = aPointCode;
-		}
-
-		public void  putCallReference(byte[] arr,int index,byte par_len,int pcsize){
-		
-			int cluster; 		
-			
-			m_callId = (arr[index+2]<< 16) + (arr[index+1] << 8) + arr[index]; 
-		
-			if(pcsize == PC_SIZE_14){
-				cluster = (arr[index+3] >> 3 & IsupMacros.L_bits51_MASK) |
-					  ((arr[index+4]& IsupMacros.L_bits31_MASK)<<5);
-
-				
-				m_spc = new SignalingPointCode((arr[index+3] & IsupMacros.L_bits31_MASK),
-											cluster,
-										((arr[index+4] >> 3) & IsupMacros.L_bits31_MASK));
-			}
-			else
-      			m_spc = new SignalingPointCode(arr[index+5],
-      											arr[index+4],
-      											arr[index+3]);
-		}			
-
-		public byte[] flatCallReference()
-		{
-			byte[] rc = ByteArray.getByteArray(7);
-		
-			byte ext = 0;
-			int i=0;
-				
-			rc[0] = (byte)((m_callId & 0xFF0000) >> 16);
-			rc[1] = (byte)((m_callId & 0x00FF00) >> 8);
-			rc[2] = (byte)((m_callId & 0x0000FF));
-			rc[3] = 0;
-
-			try{
-				rc[4] = (byte)(m_spc.getMember() & 0x000000FF);
-				rc[5] = (byte)(m_spc.getCluster() & 0x000000FF);
-				rc[6] = (byte)(m_spc.getZone() & 0x000000FF);
-
-			} catch (Exception exception) {};														
-
-			return rc;
-		}
-		
-	/**
-    * String representation of class CallReference
-    *
-    * @return    String provides description of class CallReference
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\ncallId = ");
-				buffer.append(m_callId);
-				buffer.append("\nspc  = ");
-				buffer.append(m_spc);					
-				return buffer.toString();
-		
-		}		
-	
-	int m_callId;
-	SignalingPointCode m_spc;
-
-	public static final byte PC_SIZE_14 = 1;
-    public static final byte PC_SIZE_24 = 2;
-	
+/** A class representing ISUP Call Reference parameter.
+    This parameter is common to ITU and ANSI variant.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public class CallReference implements java.io.Serializable {
+    /** Constructs a new CallReference class, parameters with default values.  */
+    public CallReference() {
+    }
+    /** Constructs a CallReference class from the input parameters specified.
+      * @param in_callInd  The call identity.
+      * @param in_spc  Point code in the JAIN ISUP Signaling Point Code format.
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
+    public CallReference(int in_callId, SignalingPointCode in_spc)
+        throws ParameterRangeInvalidException {
+        this.setCallIdentity(in_callId);
+        this.setSignalingPointCode(in_spc);
+    }
+    /** Gets the call Identity field of the parameter.
+      * @return The CallIdentity value.  */
+    public int getCallIdentity() {
+        return m_callIdentity;
+    }
+    /** Sets the call Indentity field of the parameter.
+      * @exception ParameterRangeInvalidException  Thrown if the value is out of
+      * range.  */
+    public void setCallIdentity(int aCallIdentity)
+        throws ParameterRangeInvalidException {
+        m_callIdentity = aCallIdentity;
+    }
+    /** Gets the point code field of the parameter.
+      * @return The PointCode value which is in the JAIN ISUP Signaling Point Code
+      * format.  */
+    public SignalingPointCode getSignalingPointCode() {
+        return m_pointCode;
+    }
+    /** Sets the point code field of the parameter.
+      * @param aPointCode  The point code value which is in the JAIN ISUP Signaling
+      * Point Code format.
+      * @exception ParameterRangeInvalidException  Thrown if the value is out of
+      * range.  */
+    public void setSignalingPointCode(SignalingPointCode aPointCode)
+        throws ParameterRangeInvalidException {
+        m_pointCode = aPointCode;
+    }
+    /** The toString method retrieves a string containing the values of the members of
+      * the CallReference class.
+      * @return A string representation of the member variables.  */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.CallReference");
+        b.append("\n\tm_callIdentity: " + m_callIdentity);
+        b.append("\n\tm_pointCode: " + m_pointCode);
+        return b.toString();
+    }
+    protected int m_callIdentity;
+    protected SignalingPointCode m_pointCode;
 }
 
-
-
-
+// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

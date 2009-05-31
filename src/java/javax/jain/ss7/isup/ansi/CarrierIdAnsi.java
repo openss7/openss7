@@ -56,94 +56,85 @@
 
 package javax.jain.ss7.isup.ansi;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-/* ***************************************************************************/
 
-
-public class CarrierIdAnsi extends java.lang.Object implements java.io.Serializable {
+/** A class representing the ANSI ISUP Carrier Identification parameter.
+  * This class provides the methods to access the sub-fields of this parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public class CarrierIdAnsi implements java.io.Serializable {
     public static final byte TNI_NATIONAL_NETWORK = 0x00; 
     public static final byte NIP_UNKNOWN = 0x00; 
     public static final byte NIP_3_DIGIT_CARRIER_IDENTIFICATION = 0x01; 
     public static final byte NIP_4_DIGIT_CARRIER_IDENTIFICATION = 0x02; 
-    /**
-      * Constructs an ANSI CarrierId class from the input parameters specified.
-      * @param in_nwIdPlan  The network identification plan, range 0 - 15.
-      * <li>TNI_NATIONAL_NETWORK
-      * @param in_typeOfNwId  The type of network identification, range 0 - 15.
-      * <li>NIP_UNKNOWN
-      * <li>NIP_3_DIGIT_CARRIER_IDENTIFICATION
-      * <li>NIP_4_DIGIT_CARRIER_IDENTIFICATION
+    /** Constructs an ANSI CarrierId class from the input parameters specified.
+      * @param in_nwIdPlan  The network identification plan, range 0 - 15; <ul>
+      * <li>TNI_NATIONAL_NETWORK.  </ul>
+      * @param in_typeOfNwId  The type of network identification, range 0 - 15; <ul>
+      * <li>NIP_UNKNOWN, <li>NIP_3_DIGIT_CARRIER_IDENTIFICATION and
+      * <li>NIP_4_DIGIT_CARRIER_IDENTIFICATION.  </ul>
       * @param in_digits  The BCD coded digits as specified in ANSI.
-      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public CarrierIdAnsi(byte in_nwIdPlan, byte in_typeOfNwId, byte[] in_digits) throws ParameterRangeInvalidException {
         this();
-        this.setnetworkIdPlan(in_nwIdPlan);
+        this.setNetworkIdPlan(in_nwIdPlan);
         this.setTypeOfNetworkId(in_typeOfNwId);
         this.setDigits(in_digits);
     }
-    /**
-      * Constructs a new ANSI CarrierId class, parameters with default values.
-      */
+    /** Constructs a new ANSI CarrierId class, parameters with default values.  */
     public CarrierIdAnsi() {
     }
-    /**
-      * Gets the Network Identification plan field of the parameter.
-      * @return The network id. plan, range 0 - 15, see CarrierIdAnsi().
-      */
+    /** Gets the Network Identification plan field of the parameter.
+      * @return The network id. plan, range 0 - 15, see CarrierIdAnsi().  */
     public byte getNetworkIdPlan() {
         return m_nip;
     }
-    /**
-      * Sets the Network Identification Plan field of the parameter.
-      * @param networkIdPlan  The network identification plan, range 0 - 15, see CarrierIdAnsi().
-      * @exception ParameterRangeInvalidException  Thrown if the sub-field is out of the specified range.
-      */
+    /** Sets the Network Identification Plan field of the parameter.
+      * @param networkIdPlan  The network identification plan, range 0 - 15, see
+      * CarrierIdAnsi().
+      * @exception ParameterRangeInvalidException  Thrown if the sub-field is out of
+      * the specified range.  */
     public void setNetworkIdPlan(byte networkIdPlan) throws ParameterRangeInvalidException {
-        if (0 > m_npi || m_npi > 15)
-            throw ParameterRangeInvalidException("Network Plan " + networkIdPlan + " is out of range.");
+        if (0 > m_nip || m_nip > 15)
+            throw new ParameterRangeInvalidException("Network Plan " + networkIdPlan + " is out of range.");
         m_nip = networkIdPlan;
     }
-    /**
-      * Gets the Type of Network Identification field of the parameter.
-      * @return The type of network id, range 0 - 15, see CarrierIdAnsi().
-      */
+    /** Gets the Type of Network Identification field of the parameter.
+      * @return The type of network id, range 0 - 15, see CarrierIdAnsi().  */
     public byte getTypeOfNetworkId() {
         return m_ton;
     }
-    /**
-      * Sets the Type of Network Identification field of the parameter.  
-      * @param typeOfNetworkId  The type of network id., range 0 - 15, see CarrierIdAnsi().
-      * @exception ParameterRangeInvalidException  Thrown if the sub-field is out of the specified range.
-      */
+    /** Sets the Type of Network Identification field of the parameter.  
+      * @param typeOfNetworkId  The type of network id., range 0 - 15, see
+      * CarrierIdAnsi().
+      * @exception ParameterRangeInvalidException  Thrown if the sub-field is out of
+      * the specified range.  */
     public void setTypeOfNetworkId(byte typeOfNetworkId) throws ParameterRangeInvalidException {
         if (0 > m_ton || m_ton > 15)
-            throw ParameterRangeInvalidException("Network Type " + typeOfNetworkId + " is out of range.");
+            throw new ParameterRangeInvalidException("Network Type " + typeOfNetworkId + " is out of range.");
         m_ton = typeOfNetworkId;
     }
-    /**
-      * Gets the Digits field of the parameter. Each digit is represented as one byte, e.g. number 9876543210 can be
-      * represented as digits[0]=9, digits[1]=8, digits[2]=7, and so on.
-      * @return The digits array with one digit stored in a byte.
-      */
+    /** Gets the Digits field of the parameter. Each digit is represented as one byte,
+      * e.g. number 9876543210 can be represented as digits[0]=9, digits[1]=8,
+      * digits[2]=7, and so on.
+      * @return The digits array with one digit stored in a byte.  */
     public byte[] getDigits() {
         return m_dig;
     }
-    /**
-      * Sets the Digits field of the parameter. Each digit is represented as one byte, e.g. number 9876543210 can be
-      * represented as digits[0]=9, digits[0]=8, digits[0]=7, and so on.
-      * @param aDigits  Array of digits with one digit stored in a byte.
-      */
+    /** Sets the Digits field of the parameter. Each digit is represented as one byte,
+      * e.g. number 9876543210 can be represented as digits[0]=9, digits[0]=8,
+      * digits[0]=7, and so on.
+      * @param aDigits  Array of digits with one digit stored in a byte.  */
     public void setDigits(byte[] aDigits) {
         m_dig = aDigits;
     }
-    /**
-      * The toString method retrieves a string containing the values of the members of the CarrierIdAnsi class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the CarrierIdAnsi class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());
@@ -154,9 +145,9 @@ public class CarrierIdAnsi extends java.lang.Object implements java.io.Serializa
         return b.toString();
     }
 
-    private byte m_nip = null;
-    private byte m_ton = null;
-    private byte[] m_dig = new byte[];
+    private byte m_nip;
+    private byte m_ton;
+    private byte[] m_dig;
 }
 
 // vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
