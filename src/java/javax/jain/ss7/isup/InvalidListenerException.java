@@ -56,28 +56,26 @@
 
 package javax.jain.ss7.isup;
 
-/**
-  * This Exception is thrown when the Listener Reference is null.
+import javax.jain.ss7.*;
+import javax.jain.*;
+
+/** This Exception is thrown when the Listener Reference is null.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class InvalidListenerException extends IsupException{
-    /**
-      * Constructs a new InvalidListenerException withe the specified detail message.
-      * @param msg The detail message giving the parameter name.
-      */
+    /** Constructs a new InvalidListenerException withe the specified detail message.
+      * @param msg The detail message giving the parameter name.  */
     public InvalidListenerException(java.lang.String msg) {
         super(msg);
     }
-    /**
-      * Constructs a new InvalidListenerException.
-      */
+    /** Constructs a new InvalidListenerException.  */
     public InvalidListenerException() {
         super();
     }
-    /**
-      * The toString method retrieves a string contianing the values of the
-      * members of the InvalidListenerException class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string contianing the values of the members of
+      * the InvalidListenerException class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         java.lang.String text = "InvalidListenerException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";

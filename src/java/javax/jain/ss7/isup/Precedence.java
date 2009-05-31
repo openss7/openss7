@@ -1,199 +1,187 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:24:06 $
-* 
-* MODULE NAME  : $RCSfile: Precedence.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup;
 
-import javax.jain.*;
 import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class Precedence extends java.lang.Object implements java.io.Serializable{
-
-	
-	
-	public Precedence(){
-
-	}
-
-	public Precedence(byte in_precLevel,
-                  byte in_lfb,
-                  byte[] in_nwId,
-                  int in_mlppServDomain)
-           throws ParameterRangeInvalidException{
-
-
-		 if ((in_lfb >= LFB_ALLOWED) &&
-		  (in_lfb <= LFB_NOT_ALLOWED)) {
-			m_lfb            = in_lfb;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-
-		 if ((in_precLevel >= PL_FLASH_OVERIDE) &&
-		  (in_precLevel <= PL_ROUTINE)) {
-			m_precLevel      = in_precLevel;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-
-		m_nwId           = in_nwId;
-		m_mlppServDomain = in_mlppServDomain;
-
-	}
-
-	public byte getLookAheadForBusyInd(){
-		return m_lfb;
-	}
-
-	public int getMLPPServiceDomain(){
-		return m_mlppServDomain;
-	}
-
-	public byte[] getNetworkId(){
-		return m_nwId;
-	}
-
-	public byte getPrecedenceLevel(){
-		return m_precLevel;
-	}
-
-	public void setLookAheadForBusyInd(byte aLookAheadForBusy)
-                            throws ParameterRangeInvalidException{
-		 if ((aLookAheadForBusy >= LFB_ALLOWED) &&
-		  (aLookAheadForBusy <= LFB_NOT_ALLOWED)) {
-			m_lfb = aLookAheadForBusy;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public void setMLPPServiceDomain(int aMLPPServiceDomain)
-                          throws ParameterRangeInvalidException{
-		/* no valid range found to theow an exception */
-		m_mlppServDomain = aMLPPServiceDomain;
-	}
-
-	public void setNetworkId(byte[] networkId){
-		m_nwId = networkId;
-	}
-
-	public void setPrecedenceLevel(byte aPrecedenceLevel)
-                        throws ParameterRangeInvalidException{
-		 if ((aPrecedenceLevel >= PL_FLASH_OVERIDE) &&
-		  (aPrecedenceLevel <= PL_ROUTINE)) {
-			m_precLevel = aPrecedenceLevel;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-	}
-	
-	public void  putPrecedence(byte[] arr, int index, byte par_len){
-		
-		int i;		
-
-		m_lfb      = (byte)((arr[index] >> 5) & IsupMacros.L_bits21_MASK);
-		m_precLevel= (byte)(arr[index] & IsupMacros.L_bits41_MASK);
-		m_nwId = new byte[2];
-		for(i=0;i<2;i++)
-			m_nwId[i] = (byte)arr[index+1+i];
-
-		m_mlppServDomain = 	(arr[index+3] << 16) & 0xFF0000 |
-							(arr[index+4] << 8) & 0x00FF00 |
-							(arr[index+5]) & 0x0000FF;	
-			
-	}
-
-	public byte[] flatPrecedence()
-	{
-		byte[] rc = ByteArray.getByteArray(4+m_nwId.length);		
-			
-		int i=0;
-		
-			
-		rc[0] = (byte)(((m_lfb & IsupMacros.L_bits21_MASK) << 5) |
-						(m_precLevel & IsupMacros.L_bits41_MASK));
-		for( i=0; i<m_nwId.length; i++)
-			rc[i+1] = (byte)(m_nwId[i]);
-		rc[m_nwId.length+1] = (byte)((m_mlppServDomain >> 16)&0x0000FF);
-		rc[m_nwId.length+2] = (byte)((m_mlppServDomain >> 8)&0x0000FF);
-		rc[m_nwId.length+3] = (byte)((m_mlppServDomain)&0x0000FF);
-		return rc;
-
-	}
-	/**
-    * String representation of class Precedence
-    *
-    * @return    String provides description of class Precedence
-    */
-        public java.lang.String toString(){
-		int i;
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nlfb = ");
-				buffer.append(m_lfb);
-				buffer.append("\nmlppServDomain  = ");
-				buffer.append(m_mlppServDomain);
-				if(m_nwId != null){
-					buffer.append("\nnwId = ");				
-					for(i=0;i<m_nwId.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(m_nwId[i] & 0xFF)));
-				}
-				buffer.append("\nprecLevel  = ");
-				buffer.append(m_precLevel);			
-				return buffer.toString();
-		
-		}		
-	
-	
-	
-	byte   m_lfb;
-	int    m_mlppServDomain;
-	byte[] m_nwId;
-	byte   m_precLevel;
-	
-	public static final byte LFB_ALLOWED = 0; 
-	public static final byte LFB_PATH_RESERVED = 0x02; 
-	public static final byte LFB_NOT_ALLOWED = 0x04; 
-	public static final byte PL_FLASH_OVERIDE = 0x00; 
-	public static final byte PL_FLASH = 0x01; 
-	public static final byte PL_IMMEDIATE = 0x02; 
-	public static final byte PL_PRIORITY = 0x03; 
-	public static final byte PL_ROUTINE = 0x04; 
-
-
+/** A class representing the ISUP ANSI Precedence parameter and ITU MLPP Precedence
+  * parameter.
+  * This class is common to ITU and the ANSI variants of the parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public class Precedence extends java.lang.Object implements java.io.Serializable {
+    public static final byte LFB_ALLOWED = 0;
+    public static final byte LFB_PATH_RESERVED = 2;
+    public static final byte LFB_NOT_ALLOWED = 4;
+    public static final byte PL_FLASH_OVERIDE = 0;
+    public static final byte PL_FLASH = 1;
+    public static final byte PL_IMMEDIATE = 2;
+    public static final byte PL_PRIORITY = 3;
+    public static final byte PL_ROUTINE = 4;
+    /** Constructs a new Precedence class, parameters with default values.  */
+    public Precedence() {
+    }
+    /** Constructs a new Precedence class from the input parameters specified.
+      * @param in_precLevel  The precedence level, range 0 to 5 <ul> <li>PL_FLASH_OVERIDE,
+      * <li>PL_FLASH, <li>PL_IMMEDIATE, <li>PL_PRIORITY and <li>PL_ROUTINE. </ul>
+      * @param in_lfb  The look ahead for busy, range 0 to 3 <ul> <li>LFB_ALLOWED,
+      * <li>LFB_PATH_RESERVED and <li>LFB_NOT_ALLOWED. </ul>
+      * @param in_nwId  The network identity, maximum array size is 4.
+      * @param in_mlppServDomain  The MLPP service domain, range 0 to 0xffffff.
+      * @exception ParameterRangeInvalidException  thrown when value is out of range.
+      */
+    public Precedence(byte in_precLevel, byte in_lfb, byte[] in_nwId,
+            int in_mlppServDomain)
+        throws ParameterRangeInvalidException {
+        this.setPrecedenceLevel(in_precLevel);
+        this.setLookAheadForBusyInd(in_lfb);
+        this.setNetworkId(in_nwId);
+        this.setMLPPServiceDomain(in_mlppServDomain);
+    }
+    /** Gets the Precedence Level field of the parameter.
+      * @return Byte the PrecedenceLevel value, range 0 to 15, see Precedence().
+      */
+    public byte getPrecedenceLevel() {
+        return m_precedenceLevel;
+    }
+    /** Sets the Precedence Level field of the parameter.
+      * @param aPrecedenceLevel  The PrecedenceLevel value, range 0 to 15, see
+      * Precedence().
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setPrecedenceLevel(byte aPrecedenceLevel)
+        throws ParameterRangeInvalidException {
+        if (0 <= aPrecedenceLevel && aPrecedenceLevel <= 15) {
+            m_precedenceLevel = aPrecedenceLevel;
+            return;
+        }
+        throw new ParameterRangeInvalidException("PrecedenceLevel value " + aPrecedenceLevel + " out of range.");
+    }
+    /** Gets the Look Ahead for Busy field of the parameter.
+      * @return Byte the Look Ahead for Busy value, range 0 to 3, see Precedence().
+      */
+    public byte getLookAheadForBusyInd() {
+        return m_lookAheadForBusy;
+    }
+    /** Sets the Look Ahead for Busy field of the parameter.
+      * @param aLookAheadForBusy  The Look Ahead For Busy value, range 0 to 3, see
+      * Precedence().
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setLookAheadForBusyInd(byte aLookAheadForBusy)
+        throws ParameterRangeInvalidException {
+        if (0 <= aLookAheadForBusy && aLookAheadForBusy <= 3) {
+            m_lookAheadForBusy = aLookAheadForBusy;
+            return;
+        }
+        throw new ParameterRangeInvalidException("LookAheadForBusyInd value " + aLookAheadForBusy + " out of range.");
+    }
+    /** Gets the Network Identity field of the parameter.
+      * @return The Network Identity Digit array. The digits are coded in binary format.
+      * Array size is 4.
+      */
+    public byte[] getNetworkId() {
+        return m_networkId;
+    }
+    /** Sets the NI Digit field of the parameter.
+      * @param networkId  Network identity digits. The digits array is coded in binary
+      * format and the maximum size of the array is 4.
+      */
+    public void setNetworkId(byte[] networkId) {
+        m_networkId = networkId;
+    }
+    /** Gets the MLPP Service Domain field of the parameter.
+      * @return The MLPP Service Domain, range 0 to 0xffffff.
+      */
+    public int getMLPPServiceDomain() {
+        return m_MLPPServiceDomain;
+    }
+    /** Sets the MLPP Service Domain field of the parameter.
+      * @param aMLPPServiceDomain  The MLPP Service Domain, range 0 to 0xffffff.
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setMLPPServiceDomain(int aMLPPServiceDomain)
+        throws ParameterRangeInvalidException {
+        if (0 <= aMLPPServiceDomain && aMLPPServiceDomain <= 0xffffff) {
+            m_MLPPServiceDomain = aMLPPServiceDomain;
+            return;
+        }
+        throw new ParameterRangeInvalidException("MLPPServiceDomain value " + aMLPPServiceDomain + " out of range.");
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+      * Precedence class.
+      * @return A string representation of the member variables.
+      */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.Precedence");
+        b.append("\n\tm_precedenceLevel: " + m_precedenceLevel);
+        b.append("\n\tm_lookAheadForBusy: " + m_lookAheadForBusy);
+        b.append("\n\tm_networkId: " + JainSS7Utility.bytesToHex(m_networkId, 0, m_networkId.length));
+        b.append("\n\tm_MLPPServiceDomain: " + m_MLPPServiceDomain);
+        return b.toString();
+    }
+    protected byte m_precedenceLevel;
+    protected byte m_lookAheadForBusy;
+    protected byte[] m_networkId;
+    protected int m_MLPPServiceDomain;
 }
 
-
-
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

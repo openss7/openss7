@@ -1,215 +1,225 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:55 $
-* 
-* MODULE NAME  : $RCSfile: EchoControlInfoItu.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup.itu;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class EchoControlInfoItu extends java.lang.Object implements java.io.Serializable{
-
-
-	public EchoControlInfoItu(){
-	}
-
-	public EchoControlInfoItu(byte in_ogHalfEchoControlDevRespInd,
-                          byte in_icHalfEchoControlDevRespInd,
-                          byte in_ogHalfEchoControlDevReqInd,
-                          byte in_icHalfEchoControlDevReqInd)
-                   throws ParameterRangeInvalidException{
-		
-		if ((in_icHalfEchoControlDevReqInd >= IRQI_NO_INFORMATION) && 
-		(in_icHalfEchoControlDevReqInd <= IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST)) {
-			icHalfEchoControlDevReqInd = in_icHalfEchoControlDevReqInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-
-		if ((in_icHalfEchoControlDevRespInd >= IRPI_NO_INFORMATION) && 
-		(in_icHalfEchoControlDevRespInd <= IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_INCLUDED)) {
-			icHalfEchoControlDevRespInd = in_icHalfEchoControlDevRespInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-
-		if ((in_ogHalfEchoControlDevReqInd >= ORQI_NO_INFORMATION) && 
-		(in_ogHalfEchoControlDevReqInd <= ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST)) {
-			ogHalfEchoControlDevReqInd = in_ogHalfEchoControlDevReqInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-
-		if ((in_ogHalfEchoControlDevRespInd >= ORPI_NO_INFORMATION) && 
-		(in_ogHalfEchoControlDevRespInd <= ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED)) {
-			ogHalfEchoControlDevRespInd = in_ogHalfEchoControlDevRespInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-
-	}
-
-	public byte getIcHalfEchoControlDevReqInd(){
-		return icHalfEchoControlDevReqInd;
-	}
-
-	public void setIcHalfEchoControlDevReqInd(byte aIcHalfEchoControlDevReqInd)
-                                   throws ParameterRangeInvalidException{
-		if ((aIcHalfEchoControlDevReqInd >= IRQI_NO_INFORMATION) && 
-		(aIcHalfEchoControlDevReqInd <= IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST)) {
-			icHalfEchoControlDevReqInd = aIcHalfEchoControlDevReqInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public byte getIcHalfEchoControlDevRespInd(){
-		return icHalfEchoControlDevRespInd;
-	}
-
-	public void setIcHalfEchoControlDevRespInd(byte aIcHalfEchoDevRespInd)
-                                    throws ParameterRangeInvalidException{
-		if ((aIcHalfEchoDevRespInd >= IRPI_NO_INFORMATION) && 
-		(aIcHalfEchoDevRespInd <= IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_INCLUDED)) {
-			icHalfEchoControlDevRespInd = aIcHalfEchoDevRespInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public byte getOgHalfEchoControlDevReqInd(){
-		return ogHalfEchoControlDevReqInd;
-	}
-
-	public void setOgHalfEchoControlDevReqInd(byte aOgHalfEchoDevReqInd)
-                                   throws ParameterRangeInvalidException{
-		if ((aOgHalfEchoDevReqInd >= ORQI_NO_INFORMATION) && 
-		(aOgHalfEchoDevReqInd <= ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST)) {
-			ogHalfEchoControlDevReqInd = aOgHalfEchoDevReqInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-	
-	public byte getOgHalfEchoControlDevRespInd(){
-		return ogHalfEchoControlDevRespInd;
-	}
-
-	public void setOgHalfEchoControlDevRespInd(byte aOgHalfEchoDevRespInd)
-                                    throws ParameterRangeInvalidException{
-		if ((aOgHalfEchoDevRespInd >= ORPI_NO_INFORMATION) && 
-		(aOgHalfEchoDevRespInd <= ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED)) {
-			ogHalfEchoControlDevRespInd = aOgHalfEchoDevRespInd;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public void putEchoControlInfoItu(byte[] arr, int index, byte par_len)
-	{
-		ogHalfEchoControlDevRespInd = (byte)(arr[index] & IsupMacros.L_bits21_MASK);
-		icHalfEchoControlDevRespInd = (byte)((arr[index]>>2) &IsupMacros.L_bits21_MASK);
-		ogHalfEchoControlDevReqInd  = (byte)((arr[index]>>4) &IsupMacros.L_bits21_MASK);
-		icHalfEchoControlDevReqInd  = (byte)((arr[index]>>6) &IsupMacros.L_bits21_MASK);
-
-	}		
-
-	public byte flatEchoControlInfoItu()
-	{
-
-		byte rc = 0;
-		
-		rc = (byte)((ogHalfEchoControlDevRespInd & IsupMacros.L_bits21_MASK) | 
-			((icHalfEchoControlDevRespInd & IsupMacros.L_bits21_MASK)<< 2) |
-			((ogHalfEchoControlDevReqInd & IsupMacros.L_bits21_MASK)<< 4)|
-			((icHalfEchoControlDevReqInd & IsupMacros.L_bits21_MASK)<< 6));
-		
-		return rc;
-	}
-
-
-	/**
-    * String representation of class EchoControlInfoItu
-    *
-    * @return    String provides description of class EchoControlInfoItu
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nicHalfEchoControlDevReqInd  = ");
-				buffer.append(icHalfEchoControlDevReqInd);	
-				buffer.append("\nicHalfEchoControlDevRespInd  = ");
-				buffer.append(icHalfEchoControlDevRespInd);	
-				buffer.append("\nogHalfEchoControlDevReqInd  = ");
-				buffer.append(ogHalfEchoControlDevReqInd);	
-				buffer.append("\nogHalfEchoControlDevRespInd  = ");
-				buffer.append(ogHalfEchoControlDevRespInd);	
-				return buffer.toString();
-		
-		}
-
-
-	byte icHalfEchoControlDevReqInd;
-	byte icHalfEchoControlDevRespInd;
-	byte ogHalfEchoControlDevReqInd;
-	byte ogHalfEchoControlDevRespInd;
-	
-	public static final byte ORPI_NO_INFORMATION = 0x00; 
-	public static final byte ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED = 0x01; 
-	public static final byte ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED = 0x02; 
-	public static final byte IRPI_NO_INFORMATION = 0x00; 
-	public static final byte IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED = 0x01; 
-	public static final byte IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_INCLUDED = 0x02; 
-	public static final byte ORQI_NO_INFORMATION = 0x00; 
-	public static final byte ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_ACTIVATION_REQUEST = 0x01; 
-	public static final byte ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST = 0x02; 
-	public static final byte IRQI_NO_INFORMATION = 0x00; 
-	public static final byte IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_ACTIVATION_REQUEST = 0x01; 
-	public static final byte IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST = 0x02; 
-
-	
+/** A class representing the ITU ISUP Echo control information parameter.
+    This class provides access methods for setting and getting the sub-fields of this
+    parameter.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public class EchoControlInfoItu extends java.lang.Object implements java.io.Serializable {
+    public static final byte ORPI_NO_INFORMATION = 0;
+    public static final byte ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED = 1;
+    public static final byte ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED = 2;
+    public static final byte IRPI_NO_INFORMATION = 0;
+    public static final byte IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED = 1;
+    public static final byte IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_INCLUDED = 2;
+    public static final byte ORQI_NO_INFORMATION = 0;
+    public static final byte ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_ACTIVATION_REQUEST = 1;
+    public static final byte ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST = 2;
+    public static final byte IRQI_NO_INFORMATION = 0;
+    public static final byte IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_ACTIVATION_REQUEST = 1;
+    public static final byte IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST = 2;
+    /** Constructs a EchoControlInfoItu class, parameters with default values.  */
+    public EchoControlInfoItu() {
+    }
+    /** Constructs a EchoControlInfoItu class from the input parameters specified.
+        @param in_ogHalfEchoControlDevRespInd  The outgoing half echo control device
+        response indicator, range 0 to 3. <ul> <li>ORPI_NO_INFORMATION,
+        <li>ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED and
+        <li>ORPI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED. </ul>
+        @param in_icHalfEchoControlDevRespInd  The incoming half echo control device
+        response indicator, range 0 to 3. <ul> <li>IRPI_NO_INFORMATION,
+        <li>IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED and
+        <li>IRPI_INCOMING_HALF_ECHO_CONTROL_DEVICE_INCLUDED. </ul>
+        @param in_ogHalfEchoControlDevReqInd  The outgoing half echo control device
+        request indicator, range 0 to 3. <ul> <li>ORQI_NO_INFORMATION,
+        <li>ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_ACTIVATION_REQUEST and
+        <li>ORQI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST. </ul>
+        @param in_icHalfEchoControlDevReqInd  The incoming half echo control device
+        request indicator, range 0 to 3.  <li>IRQI_NO_INFORMATION,
+        <li>IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_ACTIVATION_REQUEST and
+        <li>IRQI_INCOMING_HALF_ECHO_CONTROL_DEVICE_DEACTIVATION_REQUEST. </ul>
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public EchoControlInfoItu(
+            byte in_ogHalfEchoControlDevRespInd,
+            byte in_icHalfEchoControlDevRespInd,
+            byte in_ogHalfEchoControlDevReqInd,
+            byte in_icHalfEchoControlDevReqInd)
+        throws ParameterRangeInvalidException {
+        this.setOgHalfEchoControlDevRespInd(in_ogHalfEchoControlDevRespInd);
+        this.setIcHalfEchoControlDevRespInd(in_icHalfEchoControlDevRespInd);
+        this.setOgHalfEchoControlDevReqInd(in_ogHalfEchoControlDevReqInd);
+        this.setIcHalfEchoControlDevReqInd(in_icHalfEchoControlDevReqInd);
+    }
+    /** Gets the Outgoing Half Echo Control Device Response Indicator field of the
+        parameter.
+        @return The OgHalfEchoDevRespInd value, range 0 to 3, see EchoControlInfoItu().
+      */
+    public byte getOgHalfEchoControlDevRespInd() {
+        return m_ogHalfEchoDevRespInd;
+    }
+    /** Sets the Outgoing Half Echo Control Device Response Indicator field of the
+        parameter.
+        @param aOgHalfEchoDevRespInd  The OgHalfEchoDevRespInd value, range 0 to 3, see
+        EchoControlInfoItu().
+        @exception ParameterRangeInvalidException  Thrown when the sub-field is out of the
+        specified range.
+      */
+    public void setOgHalfEchoControlDevRespInd(byte aOgHalfEchoDevRespInd)
+        throws ParameterRangeInvalidException {
+        if (0 <= aOgHalfEchoDevRespInd && aOgHalfEchoDevRespInd <= 3) {
+            m_ogHalfEchoDevRespInd = aOgHalfEchoDevRespInd;
+            return;
+        }
+        throw new ParameterRangeInvalidException("OgHalfEchoControlDevRespInd value " + aOgHalfEchoDevRespInd + " out of range.");
+    }
+    /** Gets the Incoming Half Echo Control Device Response Indicator field of the
+      * parameter.
+      * @return The IcHalfEchoDevRespInd value, range 0 to 3, see EchoControlInfoItu().
+      */
+    public byte getIcHalfEchoControlDevRespInd() {
+        return m_icHalfEchoDevRespInd;
+    }
+    /** Sets the Incoming Half Echo Control Device Response Indicator field of the
+        parameter.
+        @param aIcHalfEchoDevRespInd  The IcHalfEchoDevRespInd value, range 0 to 3, see
+        EchoControlInfoItu().
+        @exception ParameterRangeInvalidException  Thrown when the sub-field is out of the
+        specified range.
+      */
+    public void setIcHalfEchoControlDevRespInd(byte aIcHalfEchoDevRespInd)
+        throws ParameterRangeInvalidException {
+        if (0 <= aIcHalfEchoDevRespInd && aIcHalfEchoDevRespInd <= 3) {
+            m_icHalfEchoDevRespInd =  aIcHalfEchoDevRespInd;
+            return;
+        }
+        throw new ParameterRangeInvalidException("IcHalfEchoControlDevRespInd value " + aIcHalfEchoDevRespInd + " out of range.");
+    }
+    /** Gets the Outgoing Half Echo Control Device Request Indicator field of the
+        parameter.
+        @return The Outgoing Half Echo Control Device Request Indicator value, range 0 to
+        3, see EchoControlInfoItu().
+      */
+    public byte getOgHalfEchoControlDevReqInd() {
+        return m_ogHalfEchoDevReqInd;
+    }
+    /** Sets the Outgoing Half Echo Control Device Request Indicator field of the
+        parameter.
+        @param aOgHalfEchoDevReqInd  The Outgoing Half Echo Control Device Request
+        Indicator value, range 0 to 3, see EchoControlInfoItu().
+        @exception ParameterRangeInvalidException  Thrown when the sub-field is out of the
+        specified range.
+      */
+    public void setOgHalfEchoControlDevReqInd(byte aOgHalfEchoDevReqInd)
+        throws ParameterRangeInvalidException {
+        if (0 <= aOgHalfEchoDevReqInd && aOgHalfEchoDevReqInd <= 3) {
+            m_ogHalfEchoDevReqInd = aOgHalfEchoDevReqInd;
+            return;
+        }
+        throw new ParameterRangeInvalidException("OgHalfEchoControlDevReqInd value " + aOgHalfEchoDevReqInd + " out of range.");
+    }
+    /** Gets the Incoming Half Echo Control Device Request Indicator field of the
+        parameter.
+        @return The Incoming Half Echo Control Device Request Indicator value, range 0 to
+        3, see EchoControlInfoItu().
+      */
+    public byte getIcHalfEchoControlDevReqInd() {
+        return m_icHalfEchoControlDevReqInd;
+    }
+    /** Sets the Incoming Half Echo Control Device Request Indicator field of the
+        parameter.
+        @param aIcHalfEchoControlDevRespInd  The Incoming Half Echo Control Device Request
+        Indicator value, range 0 to 3, see EchoControlInfoItu().
+        @exception ParameterRangeInvalidException  Thrown when the sub-field is out of the
+        specified range.
+      */
+    public void setIcHalfEchoControlDevReqInd(byte aIcHalfEchoControlDevReqInd)
+        throws ParameterRangeInvalidException {
+        if (0 <= aIcHalfEchoControlDevReqInd && aIcHalfEchoControlDevReqInd <= 3) {
+            m_icHalfEchoControlDevReqInd = aIcHalfEchoControlDevReqInd;
+            return;
+        }
+        throw new ParameterRangeInvalidException("IcHalfEchoControlDevReqInd value " + aIcHalfEchoControlDevReqInd + " out of range.");
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+        EchoControlInfoItu class.
+        @return A string representation of the member variables.
+      */
+    public java.lang.String toString(){
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.itu.EchoControlInfoItu");
+        b.append("\n\tm_ogHalfEchoDevRespInd:" + m_ogHalfEchoDevRespInd);
+        b.append("\n\tm_icHalfEchoDevRespInd:" + m_icHalfEchoDevRespInd);
+        b.append("\n\t:m_ogHalfEchoDevReqInd" + m_ogHalfEchoDevReqInd);
+        b.append("\n\tm_icHalfEchoControlDevReqInd:" + m_icHalfEchoControlDevReqInd);
+        return b.toString();
+    }
+    protected byte m_ogHalfEchoDevRespInd;
+    protected byte m_icHalfEchoDevRespInd;
+    protected byte m_ogHalfEchoDevReqInd;
+    protected byte m_icHalfEchoControlDevReqInd;
 }
 
-
-
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

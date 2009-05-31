@@ -1,158 +1,172 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:24:04 $
-* 
-* MODULE NAME  : $RCSfile: NotificationInd.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup;
 
+import javax.jain.ss7.*;
 import javax.jain.*;
 
-public class NotificationInd extends java.lang.Object implements java.io.Serializable{
-		
-	
-	public NotificationInd(){
-
-	}
-
-	public NotificationInd(byte in_notificationInd,
-                       boolean in_extInd)
-                throws ParameterRangeInvalidException{
-		 if ((in_notificationInd >= NI_USER_SUSPENDED) &&
-		  (in_notificationInd <= NI_CALL_IS_DIVERTING)) {
-			m_notificationInd = in_notificationInd;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-			
-		m_extInd          = in_extInd;
-	}
-
-	public boolean getExtensionIndicator(){
-		return m_extInd;
-	}
-
-	public byte getNotificationInd(){
-		return m_notificationInd;
-	}
-	
-	public void setExtensionIndicator(boolean aExtensionIndicator){
-		m_extInd = aExtensionIndicator;
-	}
-
-	public void setNotificationInd(byte aNotificationIndicator)
-                        throws ParameterRangeInvalidException{
-		 if ((aNotificationIndicator >= NI_USER_SUSPENDED) &&
-		  (aNotificationIndicator <= NI_CALL_IS_DIVERTING)) {
-			m_notificationInd = aNotificationIndicator;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public byte[] flatNotificationInd()
-	{
-		byte[] rc = ByteArray.getByteArray(2);
-
-		byte ext = 1;
-		
-		if(m_extInd == true)
-				ext = 0;
-		
-		rc[0] = ext;
-		rc[1] = m_notificationInd;		
-	
-		return rc;
-
-	}
-
-	public void  putNotificationInd(byte[] arr, int index, byte par_len){
-
-		
-		m_notificationInd = (byte)(arr[index] & IsupMacros.L_bits71_MASK);
-		if((byte)((arr[index] >> 7)& IsupMacros.L_BIT1_MASK) == 1 )
-			m_extInd = false;		
-	}
-
-	/**
-    * String representation of class NotificationInd
-    *
-    * @return    String provides description of class NotificationConnInd
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nextInd = ");
-				buffer.append(m_extInd);
-				buffer.append("\nnotificationInd  = ");
-				buffer.append(m_notificationInd);		
-				return buffer.toString();
-		
-		}
-
-		
-	
-	boolean m_extInd;
-	byte    m_notificationInd;
-
-	
-	public static final byte NI_USER_SUSPENDED = 0x00; 
-	public static final byte NI_USER_RESUMED = 0x01; 
-	public static final byte NI_BEARER_SERVICE_CHANGE = 0x02; 
-	public static final byte NI_DISCRIMINATOR_FOR_EXTENSION_TO_ASN1_ENCODED_COMPONENT = 0x03; 
-	public static final byte NI_CALL_COMPLETION_DELAY = 0x04; 
-	public static final byte NI_CONFERENCE_ESTABLISHED = 0x42; 
-	public static final byte NI_CONFERENCE_DISCONNECTED = 0x43; 
-	public static final byte NI_OTHER_PARTY_ADDED = 0x44; 
-	public static final byte NI_ISOLATED = 0x45; 
-	public static final byte NI_REATTACHED = 0x46; 
-	public static final byte NI_OTHER_PARTY_ISOLATED = 0x47; 
-	public static final byte NI_OTHER_PARTY_ATTACHED = 0x48; 
-	public static final byte NI_OTHER_PARTY_SPLIT = 0x49; 
-	public static final byte NI_OTHER_PARTY_DISCONNECTED = 0x4A; 
-	public static final byte NI_CONFERENCE_FLOATING = 0x4B; 
-	public static final byte NI_CALL_IS_WAITING_CALL = 0x60; 
-	public static final byte NI_DIVERSION_ACTIVATED = 0x68; 
-	public static final byte NI_CALL_TRANSFER_ALERTING = 0x69; 
-	public static final byte NI_CALL_TRANSFER_ACTIVE = 0x6A; 
-	public static final byte NI_REMOTE_HOLD = 0x71; 
-	public static final byte NI_REMOTE_RETRIEVAL = 0x7A; 
-	public static final byte NI_CALL_IS_DIVERTING = 0x7B; 
-	public static final boolean EI_NEXT_OCTET_EXIST = false; 
-	public static final boolean EI_LAST_OCTET = true; 
-
-
+/** A class representing the ANSI Notification Indication parameter and the ITU
+  * Generic Notification Indicator parameter.
+  * This class is common to ITU and ANSI variants. The values returned by the get
+  * method for the two variants may be different.
+  */
+public class NotificationInd implements java.io.Serializable {
+    public static final byte NI_USER_SUSPENDED = 0;
+    public static final byte NI_USER_RESUMED = 1;
+    public static final byte NI_BEARER_SERVICE_CHANGE = 2;
+    public static final byte NI_DISCRIMINATOR_FOR_EXTENSION_TO_ASN1_ENCODED_COMPONENT = 3;
+    public static final byte NI_CALL_COMPLETION_DELAY = 4;
+    public static final byte NI_CONFERENCE_ESTABLISHED = 66;
+    public static final byte NI_CONFERENCE_DISCONNECTED = 67;
+    public static final byte NI_OTHER_PARTY_ADDED = 68;
+    public static final byte NI_ISOLATED = 69;
+    public static final byte NI_REATTACHED = 70;
+    public static final byte NI_OTHER_PARTY_ISOLATED = 71;
+    public static final byte NI_OTHER_PARTY_ATTACHED = 72;
+    public static final byte NI_OTHER_PARTY_SPLIT = 73;
+    public static final byte NI_OTHER_PARTY_DISCONNECTED = 74;
+    public static final byte NI_CONFERENCE_FLOATING = 75;
+    public static final byte NI_CALL_IS_WAITING_CALL = 96;
+    public static final byte NI_DIVERSION_ACTIVATED = 104;
+    public static final byte NI_CALL_TRANSFER_ALERTING = 105;
+    public static final byte NI_CALL_TRANSFER_ACTIVE = 106;
+    public static final byte NI_REMOTE_HOLD = 113;
+    public static final byte NI_REMOTE_RETRIEVAL = 122;
+    public static final byte NI_CALL_IS_DIVERTING = 123;
+    public static final boolean EI_NEXT_OCTET_EXIST = false;
+    public static final boolean EI_LAST_OCTET = true;
+    /** Constructs a new NotificationInd class, parameters with default values.  */
+    public NotificationInd() {
+    }
+    /** Constructs a NotificationInd class from the input parameters specified.
+      * @param in_notificationInd  The notification indicator, range 0 to 127; <ul>
+      * <li>NI_USER_SUSPENDED (ITU only),
+      * <li>NI_USER_RESUMED (ITU only),
+      * <li>NI_BEARER_SERVICE_CHANGE (ITU only),
+      * <li>NI_DISCRIMINATOR_FOR_EXTENSION_TO_ASN1_ENCODED_COMPONENT (ITU only),
+      * <li>NI_CALL_COMPLETION_DELAY (ITU only),
+      * <li>NI_CONFERENCE_ESTABLISHED (ITU only),
+      * <li>NI_CONFERENCE_DISCONNECTED (ITU only),
+      * <li>NI_OTHER_PARTY_ADDED (ITU only),
+      * <li>NI_ISOLATED (ITU only),
+      * <li>NI_REATTACHED (ITU only),
+      * <li>NI_OTHER_PARTY_ISOLATED (ITU only),
+      * <li>NI_OTHER_PARTY_ATTACHED (ITU only),
+      * <li>NI_OTHER_PARTY_SPLIT (ITU only),
+      * <li>NI_OTHER_PARTY_DISCONNECTED (ITU only),
+      * <li>NI_CONFERENCE_FLOATING (ITU only),
+      * <li>NI_CALL_IS_WAITING_CALL,
+      * <li>NI_DIVERSION_ACTIVATED (ITU only),
+      * <li>NI_CALL_TRANSFER_ALERTING,
+      * <li>NI_CALL_TRANSFER_ALERTING,
+      * <li>NI_CALL_TRANSFER_ACTIVE,
+      * <li>NI_REMOTE_HOLD,
+      * <li>NI_REMOTE_RETRIEVAL and
+      * <li>NI_CALL_IS_DIVERTING. </ul>
+      * @param in_extInd  The extensition indicator; <ul>
+      * <li>EI_NEXT_OCTET_EXIST and
+      * <li>EI_LAST_OCTET. </ul>
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
+    public NotificationInd(byte in_notificationInd, boolean in_extInd)
+        throws ParameterRangeInvalidException {
+        this.setNotificationInd(in_notificationInd);
+        this.setExtensionIndicator(in_extInd);
+    }
+    /** Gets the Notification Indicator field of the parameter.
+      * @return The NotificationIndicator value, range 0 to 127, see
+      * NotificationInd().  */
+    public byte getNotificationInd() {
+        return m_notificationIndicator;
+    }
+    /** Sets the Notification Indicator field of the parameter.
+      * @param aNotificationIndicator  Notification indicator, range 0 to 127, see
+      * NotificationInd().
+      * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of
+      * the parameter range specified.  */
+    public void setNotificationInd(byte aNotificationIndicator)
+        throws ParameterRangeInvalidException {
+        if (0 > aNotificationIndicator || aNotificationIndicator > 127)
+            throw new ParameterRangeInvalidException("NotificationInd value " + aNotificationIndicator + " out of range.");
+        m_notificationIndicator = aNotificationIndicator;
+    }
+    /** Gets the Extension indicator field of the parameter.
+      * @return boolean  The extension indicator, see NotificationInd().  */
+    public boolean getExtensionIndicator() {
+        return m_extensionIndicator;
+    }
+    /** Sets the Extension indicator field of the parameter.
+      * @param aExtensionIndicator  The ExtensionIndicator value, see
+      * NotificationInd().  */
+    public void setExtensionIndicator(boolean aExtensionIndicator) {
+        m_extensionIndicator = aExtensionIndicator;
+    }
+    /** The toString method retrieves a string containing the values of the members of
+      * the NotificationInd class.
+      * @return A string representation of the member variables.  */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.siup.NotificaitonInd");
+        b.append("\n\tm_notificationIndicator: " + m_notificationIndicator);
+        b.append("\n\tm_extensionIndicator: " + m_extensionIndicator);
+        return b.toString();
+    }
+    protected byte m_notificationIndicator;
+    protected boolean m_extensionIndicator;
 }
 
-
-
-
+// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

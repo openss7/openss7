@@ -56,44 +56,36 @@
 
 package javax.jain.ss7.isup;
 
+import javax.jain.ss7.*;
 import javax.jain.*;
 
-/**
-  * This class is used to represent arbitrary ISUP parameters using a byte
-  * encoding of the parameter.  The first byte in the byte string must be the
-  * tag of the parameter.  The second byte in the byte string must be the proper
-  * length of the parameter.  The remaining bytes in the byte string are
-  * the contents of the parameter.  This form can only be used to represent
-  * optional parameters in ISUP messages.
+/** This class is used to represent arbitrary ISUP parameters using a byte encoding of
+  * the parameter.  The first byte in the byte string must be the tag of the parameter.
+  * The second byte in the byte string must be the proper length of the parameter.  The
+  * remaining bytes in the byte string are the contents of the parameter.  This form
+  * can only be used to represent optional parameters in ISUP messages.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public class IsupParameter extends java.lang.Object implements java.io.Serializable {
-    /**
-      * An emptry constructor as required by serial and bean objects.
-      */
+public class IsupParameter implements java.io.Serializable {
+    /** An emptry constructor as required by serial and bean objects.  */
     public IsupParameter() {
     }
-    /**
-      * Sets the parameter using the byte string representation (encoding) of
-      * the parameter.
-      * @param param The byte string representation (encoding) of the parameter.
-      */
+    /** Sets the parameter using the byte string representation (encoding) of the
+      * parameter.
+      * @param param The byte string representation (encoding) of the parameter.  */
     public void setParameter(byte[] param) {
         m_parameter = param;
     }
-    /**
-      * Gets the parameter byte string representation (encoding) of the
-      * parameter.
-      * @return The byte string representation (encoding) of the parameter.
-      */
+    /** Gets the parameter byte string representation (encoding) of the parameter.
+      * @return The byte string representation (encoding) of the parameter.  */
     public byte[] getParameter() {
         return m_parameter;		
     }
-    /**
-      * The toString method retrieves a string containing the values of the
-      * members of the isupParameter class.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the isupParameter class.  */
     public java.lang.String toString() {
-        StringBuffer buffer = new StringBuffer(500);
+        StringBuffer buffer = new StringBuffer(512);
         buffer.append(super.toString());
         if(m_parameter != null){
             buffer.append("\nparameter = ");

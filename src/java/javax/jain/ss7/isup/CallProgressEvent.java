@@ -1,370 +1,439 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:51 $
-* 
-* MODULE NAME  : $RCSfile: CallProgressEvent.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup;
 
-import javax.jain.*;
 import javax.jain.ss7.*;
+import javax.jain.*;
 
-public abstract class CallProgressEvent extends IsupEvent{
-
-	
-	protected CallProgressEvent(java.lang.Object source,
-                            SignalingPointCode dpc,
-                            SignalingPointCode opc,
-                            byte sls,
-                            int cic,
-                            byte congestionPriority,
-                            EventInformation eventInformation)
-                     throws ParameterRangeInvalidException{
-
-		super(source,dpc,opc,sls,cic,congestionPriority);
-		eventInfo = eventInformation;
-		m_eventInfoPresent = true;
-	}
-
-	public void checkMandatoryParameters()
-                      throws MandatoryParameterNotSetException{
-		if(m_eventInfoPresent == true)
-			return;
-		else throw new MandatoryParameterNotSetException();		
-	}
-
-	public byte[] getAccessTransport()
-                          throws ParameterNotSetException{
-                if(isAccessTransport == true)
-                                return accessTransport;
-
-                else throw new ParameterNotSetException();
-	}
-
-    public void setAccessTransport(byte[] accessTrans){
-
-                accessTransport   = accessTrans;
-                isAccessTransport = true;
+/** An ISUP EVENT: The CallProgressEvent class is a sub class of the IsupEvent class and
+    is exchanged between an ISUP Provider and an ISUP Listener for sending and receiving
+    the ISUP Call Progress Message (CPG).
+    Listener would send a CallProgressEvent object to the provider for sending a CPG
+    message to the ISUP stack. ISUP Provider would send a CallProgressEvent object to the
+    listener on the reception of a CPG message from the stack for the user address handled
+    by that listener The primitive field is filled as ISUP_PRIMITIVE_CALL_PROGRESS.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public abstract class CallProgressEvent extends IsupEvent {
+    /** Constructs a new CallProgressEvent, with only the JAIN ISUP Mandatory parameters
+        being supplied to the constructor.
+        @param source  The source of this event.
+        @param dpc  The destination point code.
+        @param opc  The origination point code.
+        @param sls  The signaling link selection.
+        @param cic  The CIC on which the call has been established.
+        @param congestionPriority  Priority of the ISUP message which may be used in the
+        optional national congestion control procedures at MTP3. Refer to
+        getCongestionPriority method in IsupEvent class for more details.
+        @param eventInformation  Event Information parameter.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    protected CallProgressEvent(java.lang.Object source, SignalingPointCode dpc,
+            SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
+            EventInformation eventInformation)
+        throws ParameterRangeInvalidException {
+        super(source, dpc, opc, sls, cic, congestionPriority);
+        this.setEventInformation(eventInformation);
     }
-
-    public boolean isAccessTransportPresent(){
-                return isAccessTransport;
-
-	}
-
-	public BwdCallInd getBwdCallInd()
-                         throws ParameterNotSetException{
-                if(isBwdCallInd == true)
-                                return bwdCallInd;
-                else throw new ParameterNotSetException();
-	}
-
-    public boolean isBwdCallIndPresent(){
-                return isBwdCallInd;
+    /** Gets the ISUP Call Progress primtive value.
+        @return The ISUP Call Progress primitive value.
+      */
+    public int getIsupPrimitive() {
+        return IsupConstants.ISUP_PRIMITIVE_CALL_PROGRESS;
     }
-
-	public void setBwdCallInd(BwdCallInd bci){
-                bwdCallInd = bci;
-                isBwdCallInd = true;
-	}
-
-	public CallReference getCallReference()
-                               throws ParameterNotSetException{
-                if(isCallReference == true)
-                                return callReference;
-                else throw new ParameterNotSetException();
+    /** Checks if the mandatory parameters have been set.
+        @exception MandatoryParameterNotSetException  Thrown when the mandatory parameter
+        is not set.
+      */
+    public void checkMandatoryParameters()
+        throws MandatoryParameterNotSetException {
+        super.checkMandatoryParameters();
+        getEventInformation();
     }
-
-    public boolean isCallReferencePresent(){
-                return isCallReference;
+    /** Gets the CallProgress Event Information parameter of the message.
+        Refer to EventInformation parameter class for more information.
+        @return The Event Information parameter of the event.
+        @exception MandatoryParameterNotSetException  Thrown when mandatory ISUP parameter
+        is not set.
+      */
+    public EventInformation getEventInformation()
+        throws MandatoryParameterNotSetException {
+        if (m_eventInformation != null)
+            return m_eventInformation;
+        throw new MandatoryParameterNotSetException("EventInformation not set.");
     }
-
-    public void setCallReference(CallReference callRef){
-                callReference = callRef;
-                isCallReference = true;
+    /** Sets the CallProgress Event Information parameter of the message.
+        Refer to EventInformation parameter class for more information.
+        @param eventInformationthe  Event Information parameter of the event.
+      */
+    public void setEventInformation(EventInformation eventInformation) {
+        m_eventInformation = eventInformation;
     }
-
-	public CauseInd getCauseInd()
-                     throws ParameterNotSetException{
-                if(isCauseInd == true)
-                                return causeInd;
-                else throw new ParameterNotSetException();
-	}
-
-    public boolean isCauseIndPresent(){
-                return isCauseInd;
+    /** Gets the AccessTransport parameter of the message.
+        @return The AccessTransport parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public byte[] getAccessTransport()
+        throws ParameterNotSetException {
+        if (m_accessTrans != null)
+            return m_accessTrans;
+        throw new ParameterNotSetException("AccessTransport not set.");
     }
-
-    public void setCauseInd(CauseInd causeIndicator){
-                causeInd = causeIndicator;
-                isCauseInd = true;
+    /** Sets the AccessTransport parameter of the message.
+        @param accessTrans  The AccessTransport parameter of the event.
+      */
+    public void setAccessTransport(byte[] accessTrans) {
+        m_accessTrans = accessTrans;
     }
-
-	public EventInformation getEventInformation()
-                              throws MandatoryParameterNotSetException{
-
-		if(m_eventInfoPresent == true)		
-			return eventInfo;		
-		else throw new MandatoryParameterNotSetException();
-		
-	}
-
-	public void setEventInformation(EventInformation eventInformation){
-		eventInfo           = eventInformation;
-		m_eventInfoPresent  = true;
-	}
-
-	public int getIsupPrimitive(){
-		return IsupConstants.ISUP_PRIMITIVE_CALL_PROGRESS;
-	}
-
-	public NotificationInd getNotificationInd()
-                                   throws ParameterNotSetException{
-                if(isNotificationInd == true)
-                                return notificationInd;
-                else throw new ParameterNotSetException();
+    /** Indicates if the AccessTransport parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isAccessTransportPresent() {
+        return (m_accessTrans != null);
     }
-
-    public boolean isNotificationIndPresent(){
-                return isNotificationInd;
+    /** Gets the BackwarCallIndicators parameter of the message.
+        Refer to BwdCallInd parameter for greater details.
+        @return The BackwarCallIndicators parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public BwdCallInd getBwdCallInd()
+        throws ParameterNotSetException {
+        if (m_bci != null)
+            return m_bci;
+        throw new ParameterNotSetException("BwdCallInd not set.");
     }
-
-    public void setNotificationInd(NotificationInd noi){
-                notificationInd = noi;
-                isNotificationInd = true;
+    /** Sets the BackwarCallIndicators parameter of the message.
+        Refer to BwdCallInd parameter for greater details.
+        @param bcithe  BackwarCallIndicators parameter of the event.
+      */
+    public void setBwdCallInd(BwdCallInd bci) {
+        m_bci = bci;
     }
-
-	public OptionalBwdCallInd getOptionalBwdCallInd()
-                                 throws ParameterNotSetException{
-                if(isOptionalBwdCallInd == true)
-                                return optionalBwdCallInd;
-                else throw new ParameterNotSetException();
+    /** Indicates if the BwdCallInd parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isBwdCallIndPresent() {
+        return (m_bci != null);
     }
-
-    public boolean isOptionalBwdCallIndPresent(){
-                return isOptionalBwdCallInd;
+    /** Gets the CallReference parameter of the message.
+        Refer to CallReference parameter for greater details.
+        @return The CallReference parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public CallReference getCallReference()
+        throws ParameterNotSetException {
+        if (m_callRef != null)
+            return m_callRef;
+        throw new ParameterNotSetException("CallReference not set.");
     }
-
-    public void setOptionalBwdCallInd(OptionalBwdCallInd obci){
-                optionalBwdCallInd = obci;
-                isOptionalBwdCallInd = true;
+    /** Sets the CallReference parameter of the message.
+        Refer to CallReference parameter for greater details.
+        @param callRef  The CallReference parameter of the event.
+      */
+    public void setCallReference(CallReference callRef) {
+        m_callRef = callRef;
     }
-
-	public RemoteOperations getRemoteOperations()
-                                     throws ParameterNotSetException{
-                if(isRemoteOperations == true)
-                                return remoteOperations;
-                else throw new ParameterNotSetException();
+    /** Indicates if the CallReference parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isCallReferencePresent() {
+        return (m_callRef != null);
     }
-
-    public boolean isRemoteOperationsPresent(){
-                return isRemoteOperations;
+    /** Gets the Cause Indicator parameter of the message.
+        Refer to CauseInd parameter for greater details.
+        @return The CauseInd parameter of the event.  
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public CauseInd getCauseInd()
+        throws ParameterNotSetException {
+        if (m_causeIndicator != null)
+            return m_causeIndicator;
+        throw new ParameterNotSetException("CuaseInd not set.");
     }
-
-    public void setRemoteOperations(RemoteOperations remoteOp){
-                remoteOperations = remoteOp;
-                isRemoteOperations = true;
+    /** Sets the Cause Indicator parameter of the message.
+        @param causeIndicator  The CauseInd parameter of the event.
+      */
+    public void setCauseInd(CauseInd causeIndicator)
+        throws ParameterNotSetException {
+        m_causeIndicator = causeIndicator;
     }
-
+    /** Indicates if the CauseInd parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isCauseIndPresent() {
+        return (m_causeIndicator != null);
+    }
+    /** Gets the NotificationInd parameter of the message.
+        @return The NotificationInd parameter of the event.
+        @exception ParameterNotSetException  Thrown when the parameter is not set in the
+        event.
+      */
+    public NotificationInd getNotificationInd()
+        throws ParameterNotSetException {
+        if (m_noi != null)
+            return m_noi;
+        throw new ParameterNotSetException("NotificationInd not set.");
+    }
+    /** Sets the NotificationInd parameter of the message.
+        @param noi  Notification Indicator parameter.
+      */
+    public void setNotificationInd(NotificationInd noi) {
+        m_noi = noi;
+    }
+    /** Indicates if the NotificationInd parameter is present in this Event.
+        @return True if the parameter is set.
+      */
+    public boolean isNotificationIndPresent() {
+        return (m_noi != null);
+    }
+    /** Gets the Optional Backward call indicator parameter of the message.
+        Refer to OptionalBwdCallInd parameter for greater details.
+        @return The OptionalBwdCallInd parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public OptionalBwdCallInd getOptionalBwdCallInd()
+        throws ParameterNotSetException {
+        if (m_obci != null)
+            return m_obci;
+        throw new ParameterNotSetException("OptionalBwdCallInd not set.");
+    }
+    /** Sets the Optional Backward call indicator parameter of the message.
+        Refer to OptionalBwdCallInd parameter for greater details.
+        @param obci  The Optional Backward Call Indicator parameter of the event.
+      */
+    public void setOptionalBwdCallInd(OptionalBwdCallInd obci) {
+        m_obci = obci;
+    }
+    /** Indicates if the OptionalBwdCallInd parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isOptionalBwdCallIndPresent() {
+        return (m_obci != null);
+    }
+    /** Gets the RemoteOperations parameter of the message.
+        Refer to RemoteOperations parameter for greater details.
+        @return Remote operation parameter.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public RemoteOperations getRemoteOperations()
+        throws ParameterNotSetException {
+        if (m_remoteOp != null)
+            return m_remoteOp;
+        throw new ParameterNotSetException("RemoteOperations not set.");
+    }
+    /** Sets the RemoteOperations parameter of the message.
+        Refer to RemoteOperations parameter for greater details.
+        @param remoteOp  The RemoteOperations parameter of the event.
+      */
+    public void setRemoteOperations(RemoteOperations remoteOp) {
+        m_remoteOp = remoteOp;
+    }
+    /** Indicates if the RemoteOperations parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isRemoteOperationsPresent() {
+        return (m_remoteOp != null);
+    }
+    /** Gets the ServiceActivation parameter of the message.
+        @return The ServiceActivation parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
     public byte[] getServiceActivation()
-                            throws ParameterNotSetException{
-                if(isServiceActivation == true)
-                                return serviceActivation;
-                else throw new ParameterNotSetException();
+        throws ParameterNotSetException {
+        if (m_servAct != null)
+            return m_servAct;
+        throw new ParameterNotSetException("ServiceActivation not set.");
     }
-
-    public boolean isServiceActivationPresent(){
-                return isServiceActivation;
+    /** Sets the ServiceActivation parameter of the message.
+        @param servAct  The ServiceActivation parameter of the event.
+      */
+    public void setServiceActivation(byte[] servAct) {
+        m_servAct = servAct;
     }
-
-    public void setServiceActivation(byte[] servAct){
-                serviceActivation = servAct;
-                isServiceActivation = true;
+    /** Indicates if the ServiceActivation parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isServiceActivationPresent() {
+        return (m_servAct != null);
     }
-
+    /** Gets the TransmissionMediumUsed parameter of the message.
+        @return The TransmissionMediumUsed parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
     public byte getTransmissionMediumUsed()
-                               throws ParameterNotSetException{
-                if(isTransmissionMediumUsed == true)
-                                return transmissionMediumUsed;
-                else throw new ParameterNotSetException();
+        throws ParameterNotSetException {
+        if (m_tmuIsSet)
+            return m_tmu;
+        throw new ParameterNotSetException("TransmissionMediumUsed not set.");
     }
-
-    public boolean isTransmissionMediumUsedPresent(){
-                return isTransmissionMediumUsed;
-    }
-
+    /** Sets the TransmissionMediumUsed parameter of the message.
+        @param tmu  The TransmissionMediumUsed parameter of the event.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
     public void setTransmissionMediumUsed(byte tmu)
-                               throws ParameterRangeInvalidException{
-		if ((tmu == TMR_SPEECH) || ((tmu >= TMR_64_KBPS_UNRESTRICTED) 
-		 && (tmu <= TMR_1920_KBPS_UNRESTRICTED))) {
-			transmissionMediumUsed = tmu;
-			isTransmissionMediumUsed = true;
-		}
-		else 
-			throw new ParameterRangeInvalidException();
+        throws ParameterRangeInvalidException {
+        m_tmu = tmu;
+        m_tmuIsSet = true;
     }
-
-	public UserToUserIndicators getUserToUserIndicators()
-                                             throws ParameterNotSetException{
-                if(isUserToUserIndicators == true)
-                                return  userToUserIndicators;
-                else throw new ParameterNotSetException();
+    /** Indicates if the TransmissionMediumUsed parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isTransmissionMediumUsedPresent() {
+        return m_tmuIsSet;
     }
-
-    public boolean isUserToUserIndicatorsPresent(){
-                return isUserToUserIndicators;
+    /** Gets the UserToUserIndicators parameter of the message.
+        Refer to UserToUserIndicators parameter for greater details.
+        @return The UserToUserIndicators parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public UserToUserIndicators getUserToUserIndicators()
+        throws ParameterNotSetException {
+        if (m_uui != null)
+            return m_uui;
+        throw new ParameterNotSetException("UserToUserIndicators not set.");
     }
-
-    public void setUserToUserIndicators(UserToUserIndicators uui){
-                userToUserIndicators = uui;
-                isUserToUserIndicators = true;
+    /** Sets the UserToUserIndicators parameter of the message.
+        Refer to UserToUserIndicators parameter for greater details.
+        @param uui  The UserToUserIndicators parameter of the event.
+      */
+    public void setUserToUserIndicators(UserToUserIndicators uui) {
+        m_uui = uui;
     }
-
-	public byte[] getUserToUserInformation()
-                                throws ParameterNotSetException{
-                if(isUserToUserInformation == true)
-                                return userToUserInformation;
-                else throw new ParameterNotSetException();
+    /** Indicates if the UserToUserIndicators parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isUserToUserIndicatorsPresent() {
+        return (m_uui != null);
     }
-
-    public boolean isUserToUserInformationPresent(){
-                return isUserToUserInformation;
+    /** Gets the UserToUserInformation parameter of the message.
+        @return The byte array for UserToUserInformation parameter of the event.
+        @exception ParameterNotSetException  Thrown when the optional parameter is not
+        set.
+      */
+    public byte[] getUserToUserInformation()
+        throws ParameterNotSetException {
+        if (m_userToUserInfo != null)
+            return m_userToUserInfo;
+        throw new ParameterNotSetException("UserToUserInfo not set.");
     }
-
-    public void setUserToUserInformation(byte[] userToUserInfo){
-                userToUserInformation = userToUserInfo;
-                isUserToUserInformation = true;
-
+    /** Sets the UserToUserInformation parameter of the message.
+        @param userToUserInfo  The UserToUserInformation parameter of the event.
+      */
+    public void setUserToUserInformation(byte[] userToUserInfo) {
+        m_userToUserInfo = userToUserInfo;
     }
-
-	/**
-    * String representation of class CallProgressEvent
-    *
-    * @return    String provides description of class CallProgressEvent
-    */
-        public java.lang.String toString(){
-		int i;
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\n\nisAccessTransport = ");
-				buffer.append(isAccessTransport);
-				if(isAccessTransport == true){
-					buffer.append("\naccessTransport = ");	
-					for(i=0;i<accessTransport.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(accessTransport[i] & 0xFF)));
-				}
-				buffer.append("\n\nisBwdCallInd = ");
-				buffer.append(isBwdCallInd);
-				buffer.append("\nbwdCallInd = ");
-				buffer.append(bwdCallInd);	
-				buffer.append("\n\nisCallReference = ");
-				buffer.append(isCallReference);	
-				buffer.append("\ncallReference = ");
-				buffer.append(callReference);
-				buffer.append("\n\nisCauseInd = ");
-				buffer.append(isCauseInd);
-				buffer.append("\ncauseInd = ");
-				buffer.append(causeInd);	
-				buffer.append("\n\neventInfo = ");
-				buffer.append(eventInfo);
-				buffer.append("\n\nisNotificationInd = ");
-				buffer.append(isNotificationInd);
-				buffer.append("\nnotificationInd = ");
-				buffer.append(notificationInd);		
-				buffer.append("\n\nisOptionalBwdCallInd= ");
-				buffer.append(isOptionalBwdCallInd);
-				buffer.append("\noptionalBwdCallInd = ");
-				buffer.append(optionalBwdCallInd);
-				buffer.append("\n\nisRemoteOperations = ");
-				buffer.append(isRemoteOperations);
-				buffer.append("\nremoteOperations = ");
-				buffer.append(remoteOperations);	
-				buffer.append("\n\nisServiceActivation = ");
-				buffer.append(isServiceActivation);
-				if(isServiceActivation == true){
-					buffer.append("\nserviceActivation = ");
-					for(i=0;i<serviceActivation.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(serviceActivation[i] & 0xFF)));
-				}
-				buffer.append("\n\nisTransmissionMediumUsed = ");
-				buffer.append(isTransmissionMediumUsed);
-				buffer.append("\ntransmissionMediumUsed = ");
-				buffer.append(transmissionMediumUsed);	
-				buffer.append("\n\nisUserToUserIndicators = ");
-				buffer.append(isUserToUserIndicators);
-				buffer.append("\nuserToUserIndicators = ");
-				buffer.append(userToUserIndicators);
-				buffer.append("\n\nisUserToUserInformation = ");
-				buffer.append(isUserToUserInformation);
-				if(isUserToUserInformation == true){
-					buffer.append("\nuserToUserInformation = ");
-					for(i=0;i<userToUserInformation.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(userToUserInformation[i] & 0xFF)));
-				}
-				return buffer.toString();
-		
-		}
-
-	byte[]               accessTransport;
-	BwdCallInd           bwdCallInd;
-	CallReference        callReference;
-	CauseInd             causeInd;
-	EventInformation     eventInfo;	
-	boolean              isAccessTransport;
-	boolean              isBwdCallInd;
-	boolean              isCallReference;
-	boolean              isCauseInd;
-	boolean              isNotificationInd;
-	boolean              isOptionalBwdCallInd;
-	boolean              isRemoteOperations;
-	boolean              isServiceActivation;
-	boolean              isTransmissionMediumUsed;
-	boolean              isUserToUserIndicators;
-	boolean              isUserToUserInformation;	
-	NotificationInd      notificationInd;
-	OptionalBwdCallInd   optionalBwdCallInd;
-	RemoteOperations     remoteOperations;
-	byte[]               serviceActivation;
-	byte                 transmissionMediumUsed;
-	UserToUserIndicators userToUserIndicators;
-	byte[]               userToUserInformation;
-
-	
-	protected boolean m_eventInfoPresent = false;
-
-	public static final byte TMR_SPEECH = 0x00; 
-	public static final byte TMR_64_KBPS_UNRESTRICTED = 0x02; 
-	public static final byte TMR_1920_KBPS_UNRESTRICTED = 0x0A;
-
+    /** Indicates if the UserToUserInformation parameter is present in this Event.
+        @return True if the parameter has been set.
+      */
+    public boolean isUserToUserInformationPresent() {
+        return (m_userToUserInfo != null);
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+        CallProgressEvent class.
+        @return A string representation of the member variables.
+      */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.CallProgressEvent");
+        b.append("\n\tm_eventInformation: " + m_eventInformation);
+        b.append("\n\tm_accessTrans: ");
+        if (m_accessTrans!= null)
+            b.append(JainSS7Utility.bytesToHex(m_accessTrans, 0, m_accessTrans.length));
+        b.append("\n\tm_bci: " + m_bci);
+        b.append("\n\tm_callRef: " + m_callRef);
+        b.append("\n\tm_causeIndicator: " + m_causeIndicator);
+        b.append("\n\tm_noi: " + m_noi);
+        b.append("\n\tm_obci: " + m_obci);
+        b.append("\n\tm_remoteOp: " + m_remoteOp);
+        b.append("\n\tm_servAct: ");
+        if (m_servAct!= null)
+            b.append(JainSS7Utility.bytesToHex(m_servAct, 0, m_servAct.length));
+        if (m_tmuIsSet)
+            b.append("\n\tm_tmu: " + m_tmu);
+        b.append("\n\tm_uui: " + m_uui);
+        b.append("\n\tm_userToUserInfo: ");
+        if (m_userToUserInfo!= null)
+            b.append(JainSS7Utility.bytesToHex(m_userToUserInfo, 0, m_userToUserInfo.length));
+        return b.toString();
+    }
+    protected EventInformation m_eventInformation = null;
+    protected byte[] m_accessTrans = null;
+    protected BwdCallInd m_bci = null;
+    protected CallReference m_callRef = null;
+    protected CauseInd m_causeIndicator = null;
+    protected NotificationInd m_noi = null;
+    protected OptionalBwdCallInd m_obci = null;
+    protected RemoteOperations m_remoteOp = null;
+    protected byte[] m_servAct = null;
+    protected byte m_tmu;
+    protected boolean m_tmuIsSet = false;
+    protected UserToUserIndicators m_uui = null;
+    protected byte[] m_userToUserInfo = null;
 }
 
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

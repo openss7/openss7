@@ -1,183 +1,169 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:24:04 $
-* 
-* MODULE NAME  : $RCSfile: NatureConnInd.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup;
 
+import javax.jain.ss7.*;
 import javax.jain.*;
 
-public class NatureConnInd extends java.lang.Object implements java.io.Serializable{
-
-
-		
-	public NatureConnInd(){
-
-	}
-
-	public NatureConnInd(byte in_satInd,
-                     byte in_contCheckInd,
-                     boolean in_echoControlDevInd)
-              throws ParameterRangeInvalidException{
-		
-		 if ((in_contCheckInd >= CCI_CONTINUITY_CHECK_NOT_REQUIRED) &&
-		  (in_contCheckInd <= CCI_CONTINUITY_CHECK_PERFORMED_ON_PREVIOUS_CIRCUIT)) {
-			m_contCheckInd      = in_contCheckInd;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-
-		 if ((in_satInd >= SI_NO_SATELLITE_CIRCUIT) &&
-		  (in_satInd <= SI_TWO_SATELLITE_CIRCUIT)) {
-			m_satInd            = in_satInd;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-
-		m_echoControlDevInd = in_echoControlDevInd;
-
-	}
-
-	public byte getContCheckInd(){
-		return m_contCheckInd;
-	}
-		
-	public boolean getEchoControlDevInd(){
-		return m_echoControlDevInd;
-	}
-
-	public byte getSatelliteInd(){
-		return m_satInd;
-	}
-
-	public void setContCheckInd(byte continuityCheckInd)
-                     throws ParameterRangeInvalidException{
-		 if ((continuityCheckInd >= CCI_CONTINUITY_CHECK_NOT_REQUIRED) &&
-		  (continuityCheckInd <= CCI_CONTINUITY_CHECK_PERFORMED_ON_PREVIOUS_CIRCUIT)) {
-			m_contCheckInd = continuityCheckInd;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public void setEchoControlDevInd(boolean echoDevInd){
-		m_echoControlDevInd = echoDevInd;
-	}
-
-	public void setSatelliteInd(byte satelliteInd)
-                     throws ParameterRangeInvalidException{
-		 if ((satelliteInd >= SI_NO_SATELLITE_CIRCUIT) &&
-		  (satelliteInd <= SI_TWO_SATELLITE_CIRCUIT)) {
-			m_satInd = satelliteInd;
-		 }
-		 else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public byte flatNatureConnInd()
-	{
-		byte rc = 0;
-		byte echo = 0;
-		
-		if(m_echoControlDevInd == true)
-			echo = 1;
-
-		rc = (byte) ((m_satInd & IsupMacros.L_bits21_MASK) |  
-			((m_contCheckInd<< 2) &  IsupMacros.L_bits43_MASK) |
-			((echo << 4) & IsupMacros.L_BIT5_MASK));
-
-		return rc;
-
-	}
-	
-	public void  putNatureConnInd(byte[] arr, int index, byte par_len){
-		
-		m_satInd            = (byte)(arr[index] &  IsupMacros.L_bits21_MASK);
-		m_contCheckInd      = (byte)((arr[index] >> 2)& IsupMacros.L_bits21_MASK);
-		if((byte)((arr[index] >> 4) &  IsupMacros.L_BIT1_MASK) == 1)
-				m_echoControlDevInd = true;
-	}
-
-	/**
-    * String representation of class NatureConnInd
-    *
-    * @return    String provides description of class NatureConnInd
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\ncontCheckInd = ");
-				buffer.append(m_contCheckInd);
-				buffer.append("\nechoControlDevInd  = ");
-				buffer.append(m_echoControlDevInd);
-				buffer.append("\nsatInd = ");
-				buffer.append(m_satInd);				
-				return buffer.toString();
-		
-		}
-
-		
-		
-		byte    m_contCheckInd;
-
-		boolean m_echoControlDevInd;
-
-		byte    m_satInd;
-
-
-		public static final byte SI_NO_SATELLITE_CIRCUIT = 0x00; 
-
-		public static final byte SI_ONE_SATELLITE_CIRCUIT = 0x01; 
-
-		public static final byte SI_TWO_SATELLITE_CIRCUIT = 0x02; 
-
-		public static final byte CCI_CONTINUITY_CHECK_NOT_REQUIRED = 0x00; 
-
-		public static final byte CCI_CONTINUITY_CHECK_REQUIRED = 0x01; 
-
-		public static final byte CCI_CONTINUITY_CHECK_PERFORMED_ON_PREVIOUS_CIRCUIT = 0x02; 
-
-		public static final boolean ECDI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED = false; 
-
-		public static final boolean ECDI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED = true; 
-		
-		public static final byte CI_CONTINUITY_CHECK_FAILED = 0x00; 
-		
-		public static final byte CI_CONTINUITY_CHECK_SUCCESSFUL = 0x01; 
+/** A class representing the ITU and ANSI ISUP Nature Connection Indicator.
+  * This class provides the access methods for the different sub-fields of this
+  * parameter. This is a common class for both ITU and ANSI variants.
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public class NatureConnInd implements java.io.Serializable {
+    public static final byte SI_NO_SATELLITE_CIRCUIT = 0;
+    public static final byte SI_ONE_SATELLITE_CIRCUIT = 1;
+    public static final byte SI_TWO_SATELLITE_CIRCUIT = 2;
+    public static final byte CCI_CONTINUITY_CHECK_NOT_REQUIRED = 0;
+    public static final byte CCI_CONTINUITY_CHECK_REQUIRED = 1;
+    public static final byte CCI_CONTINUITY_CHECK_PERFORMED_ON_PREVIOUS_CIRCUIT = 2;
+    public static final boolean ECDI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED = false;
+    public static final boolean ECDI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED = true;
+    /** Constructs a new NatureConnInd class, parameters with default values.  */
+    public NatureConnInd() {
+    }
+    /** Constructs a NatureConnInd class from the input parameters specified.
+      * @param in_satInd  The satellite indicator, range 0 to 3; <ul>
+      * <li>SI_NO_SATELLITE_CIRCUIT <li>SI_ONE_SATELLITE_CIRCUIT and
+      * <li>SI_TWO_SATELLITE_CIRCUIT. </ul>
+      * @param in_contCheckInd  The continuity check indicator, range 0 to 3; <ul>
+      * <li>CCI_CONTINUITY_CHECK_NOT_REQUIRED, <li>CCI_CONTINUITY_CHECK_REQUIRED and
+      * <li>CCI_CONTINUITY_CHECK_PERFORMED_ON_PREVIOUS_CIRCUIT. </ul>
+      * @param in_echoControlDevInd  The echo control device indicator; <ul>
+      * <li>ECDI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_NOT_INCLUDED and
+      * <li>ECDI_OUTGOING_HALF_ECHO_CONTROL_DEVICE_INCLUDED. </ul>
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
+    public NatureConnInd(byte in_satInd, byte in_contCheckInd,
+            boolean in_echoControlDevInd)
+        throws ParameterRangeInvalidException {
+        this.setSatelliteInd(in_satInd);
+        this.setContCheckInd(in_contCheckInd);
+        this.setEchoControlDevInd(in_echoControlDevInd);
+    }
+    /** Gets the Satellite Indicator field of the parameter.
+      * @return byte The satellite indicator value, range 0 to 3, see NatureConnInd().  */
+    public byte getSatelliteInd() {
+        return m_satInd;
+    }
+    /** Sets the Satellite Indicator field of the parameter.
+      * @param satelliteInd  The Satellite Indicator value, range 0 to 3, see
+      * NatureConnInd().
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
+    public void setSatelliteInd(byte satelliteInd)
+        throws ParameterRangeInvalidException {
+        switch (satelliteInd) {
+            case SI_NO_SATELLITE_CIRCUIT:
+            case SI_ONE_SATELLITE_CIRCUIT:
+            case SI_TWO_SATELLITE_CIRCUIT:
+                break;
+            default:
+                throw new ParameterRangeInvalidException("satelliteInd value " + satelliteInd + " out of range.");
+        }
+        m_satInd = satelliteInd;
+    }
+    /** Gets the Continuity Check Indicator field of the parameter.
+      * @return The continuity check indicator value, range 0 - 3, see
+      * NatureConnInd().  */
+    public byte getContCheckInd() {
+        return m_contCheckInd;
+    }
+    /** Sets the Continuity Check Indicator field of the parameter.
+      * @param continuityCheckInd  The Continuity Check Indicator value, range 0 to 3,
+      * see NatureConnInd().
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
+    public void setContCheckInd(byte continuityCheckInd)
+        throws ParameterRangeInvalidException {
+        switch (continuityCheckInd) {
+            case CCI_CONTINUITY_CHECK_NOT_REQUIRED:
+            case CCI_CONTINUITY_CHECK_REQUIRED:
+            case CCI_CONTINUITY_CHECK_PERFORMED_ON_PREVIOUS_CIRCUIT:
+                break;
+            default:
+                throw new ParameterRangeInvalidException("continuityCheckInd value " + continuityCheckInd + " out of range.");
+        }
+        m_contCheckInd = continuityCheckInd;
+    }
+    /** Gets the Echo Control Device Indicator field of the parameter.
+      * @return Boolean the echo control device indicator, see NatureConnInd().  */
+    public boolean getEchoControlDevInd() {
+        return m_echoControlDevInd;
+    }
+    /** Sets the Echo Control Device Indicator field of the parameter.
+      * @param echoDevInd  The Echo Control Device Indicator value, see
+      * NatureConnInd().  */
+    public void setEchoControlDevInd(boolean echoDevInd) {
+        m_echoControlDevInd = echoDevInd;
+    }
+    /** The toString method retrieves a string containing the values of the members of
+      * the NatureConnInd class.
+      * @return A string representation of the member variables.  */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.NatureConnInd");
+        b.append("\n\tm_satInd: " + m_satInd);
+        b.append("\n\tm_contCheckInd: " + m_contCheckInd);
+        b.append("\n\tm_echoControlDevInd: " + m_echoControlDevInd);
+        return b.toString();
+    }
+    protected byte m_satInd;
+    protected byte m_contCheckInd;
+    protected boolean m_echoControlDevInd;
 }
 
-
-
-
-
-
+// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

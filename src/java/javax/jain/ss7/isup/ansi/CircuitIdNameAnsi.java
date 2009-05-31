@@ -60,23 +60,20 @@ import javax.jain.*;
 import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
 
-/**
-  * A class representing the ansi ISUP CircuitIdName parameter.
+/** A class representing the ansi ISUP CircuitIdName parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public class CircuitIdNameAnsi extends java.lang.Object implements java.io.Serializable {
-    /**
-      * Constructs a new ANSI CircuitIdName class, parameters with default values.
-      */
+public class CircuitIdNameAnsi implements java.io.Serializable {
+    /** Constructs a new ANSI CircuitIdName class, parameters with default values.  */
     public CircuitIdNameAnsi() {
         super();
     }
-    /**
-      * Constructs an ANSI CircuitIdName class from the input parameters specified.
+    /** Constructs an ANSI CircuitIdName class from the input parameters specified.
       * @param in_trunkNumber  The trunkNumber, range 0-4 octets.
       * @param in_clliCodeA  The CLLICodeA field.
       * @param in_clliCodeB  The CLLICodeB field.
-      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public CircuitIdNameAnsi(long in_trunkNumber, CommonLangLocationIdAnsi in_clliCodeA,
             CommonLangLocationIdAnsi in_clliCodeB)
         throws ParameterRangeInvalidException {
@@ -85,55 +82,42 @@ public class CircuitIdNameAnsi extends java.lang.Object implements java.io.Seria
         m_clliCodeA = in_clliCodeA;
         m_clliCodeB = in_clliCodeB;
     }
-    /**
-      * Gets the TrunkNumber field of CircuitIdName parameter
-      * @return TrunkNumber, range 0-32 bits.
-      */
+    /** Gets the TrunkNumber field of CircuitIdName parameter
+      * @return TrunkNumber, range 0-32 bits.  */
     public long getTrunkNumber() {
         return m_trunkNumber;
     }
-    /**
-      * Sets the TrunkNumber field of CircuitIdName parameter.
+    /** Sets the TrunkNumber field of CircuitIdName parameter.
       * @param in_trunkNumber  The TrunkNumber value, range 0-32 bits.
-      * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of the range specified.
-      */
+      * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of
+      * the range specified.  */
     public void setTrunkNumber(long in_trunkNumber) throws ParameterRangeInvalidException {
         if (0 > in_trunkNumber | in_trunkNumber > 0xffffffff)
-            throw ParameterRangeInvalidException();
+            throw new ParameterRangeInvalidException();
         m_trunkNumber = in_trunkNumber;
     }
-    /**
-      * Gets the CLLICodeA field of CircuitIdName parameter.
-      * @return CLLICodeA, range s.
-      */
+    /** Gets the CLLICodeA field of CircuitIdName parameter.
+      * @return CLLICodeA, range s.  */
     public CommonLangLocationIdAnsi getCLLICodeA() {
         return m_clliCodeA;
     }
-    /**
-      * Sets the CLLICodeA field of CircuitIdName parameter.
-      * @param in_clliCodeA  The CLLICodeA value, range s.
-      */
+    /** Sets the CLLICodeA field of CircuitIdName parameter.
+      * @param in_clliCodeA  The CLLICodeA value, range s.  */
     public void setCLLICodeA(CommonLangLocationIdAnsi in_clliCodeA) {
         m_clliCodeA = in_clliCodeA;
     }
-    /**
-      * Gets the CLLICodeB field of CircuitIdName parameter.
-      * @return CLLICodeB, range.
-      */
+    /** Gets the CLLICodeB field of CircuitIdName parameter.
+      * @return CLLICodeB, range.  */
     public CommonLangLocationIdAnsi getCLLICodeB() {
         return m_clliCodeB;
     }
-    /**
-      * Sets the CLLICodeB field of CircuitIdName parameter.
-      * @param in_clliCodeB,  The CLLICodeB value, range.
-      */
+    /** Sets the CLLICodeB field of CircuitIdName parameter.
+      * @param in_clliCodeB,  The CLLICodeB value, range.  */
     public void setCLLICodeB(CommonLangLocationIdAnsi in_clliCodeB) {
         m_clliCodeB = in_clliCodeB;
     }
-    /**
-      * The toString method retrieves a string containing the values of the members of the CircuitIdNameAnsi class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of the CircuitIdNameAnsi class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());

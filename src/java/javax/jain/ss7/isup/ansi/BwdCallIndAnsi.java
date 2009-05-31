@@ -60,37 +60,37 @@ import javax.jain.*;
 import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
 
-/**
-  * A class representing an ISUP Backward Call Indicators for ANSI variant. This
-  * class inherits from the base BwdCallInd parameter class for adds the ANSI
-  * sub-fields to the parameter.
+/** A class representing an ISUP Backward Call Indicators for ANSI variant. This class
+  * inherits from the base BwdCallInd parameter class for adds the ANSI sub-fields to
+  * the parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public class BwdCallIndAnsi extends BwdCallInd {
     public static final boolean ISI_NO_IAM_SEGMENTATION_IND = false;
     public static final boolean ISI_IAM_SEGMENTATION_USED = true;
 
-    /**
-      * Constructs a new ANSI BwdCallInd class, parameters with default values.
-      */
+    /** Constructs a new ANSI BwdCallInd class, parameters with default values.  */
     public BwdCallIndAnsi() {
     }
-    /**
-      * Constructs an ANSI BwdCallInd class from the input parameters specified.
+    /** Constructs an ANSI BwdCallInd class from the input parameters specified.
       * @param in_chargeInd  The charge indicator, range 0-3, see BwdCallInd.
-      * @param in_calledStatusInd  The called party's status indicator, range 0-3, see BwdCallInd.
-      * @param in_calledCateInd  The called party's category indicator, range 0-3, see BwdCallInd.
-      * @param in_eteMethodInd  The end-to-end method indicator, range 0-3, see BwdCallInd.
+      * @param in_calledStatusInd  The called party's status indicator, range 0-3, see
+      * BwdCallInd.
+      * @param in_calledCateInd  The called party's category indicator, range 0-3, see
+      * BwdCallInd.
+      * @param in_eteMethodInd  The end-to-end method indicator, range 0-3, see
+      * BwdCallInd.
       * @param in_iwInd  The interworking indicator, see BwdCallInd.
       * @param in_isupInd  The ISDN User Part indicator, see BwdCallInd.
       * @param in_holdInd  The holding indicator, see BwdCallInd.
       * @param in_isdnAccessInd  The ISDB access indicator, see BwdCallInd.
       * @param in_echoDevInd  The echo control device indicator, see BwdCallInd.
       * @param in_sccpMethodInd  The SCCP method indicator, range 0-3, see BwdCallInd.
-      * @param in_iamSegInd  The IAM segmentation indicator, see BwdCallInd.
-      * <li>ISI_NO_IAM_SEGMENTATION_IND
-      * <li>ISI_ADDITIONAL_INFORMATION_RECEIVED_INCOPORATED
-      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
-      */
+      * @param in_iamSegInd  The IAM segmentation indicator, see BwdCallInd; <ul>
+      * <li>ISI_NO_IAM_SEGMENTATION_IND and
+      * <li>ISI_ADDITIONAL_INFORMATION_RECEIVED_INCOPORATED.  </ul>
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public BwdCallIndAnsi(byte in_chargeInd, byte in_calledStatusInd,
             byte in_calledCatInd, byte in_eteMethodInd, boolean in_iwInd,
             boolean in_isupInd, boolean in_holdInd, boolean in_isdnAccessInd,
@@ -101,24 +101,20 @@ public class BwdCallIndAnsi extends BwdCallInd {
                 in_isdnAccessInd, in_echoDevInd, in_sccpMethodInd);
         m_iamSegInd = in_iamSegInd;	
     }
-    /**
-      * Gets the IAM segmentation Indicator field of the parameter.
-      * @return The IAMSegmentationIndicator value, see BwdCallIndAnsi().
-      */
+    /** Gets the IAM segmentation Indicator field of the parameter.
+      * @return The IAMSegmentationIndicator value, see BwdCallIndAnsi().  */
     public boolean getIAMSegInd() {
         return m_iamSegInd;
     }
-    /**
-      * Sets the IAM segmentation Indicator field of the parameter.
-      * @param aIAMSegmentationIndicator  The IAM segmentation indicator value, see BwdCallIndAnsi().
-      */
+    /** Sets the IAM segmentation Indicator field of the parameter.
+      * @param aIAMSegmentationIndicator  The IAM segmentation indicator value, see
+      * BwdCallIndAnsi().  */
     public void setIAMSegInd(boolean aIAMSegmentationIndicator) {
         m_iamSegInd = aIAMSegmentationIndicator;
     }
-    /**
-      * The toString method retrieves a string containing the values of the members of the BwdCallIndAnsi class.
-      * @return A string representation of the member variables.
-      */
+    /** The toString method retrieves a string containing the values of the members of
+      * the BwdCallIndAnsi class.
+      * @return A string representation of the member variables.  */
     public java.lang.String toString() {
         StringBuffer buffer = new StringBuffer(500);
         buffer.append(super.toString());

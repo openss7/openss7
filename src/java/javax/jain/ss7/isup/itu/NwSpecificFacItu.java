@@ -1,245 +1,216 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:58 $
-* 
-* MODULE NAME  : $RCSfile: NwSpecificFacItu.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup.itu;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class NwSpecificFacItu extends java.lang.Object implements java.io.Serializable{
-
-
-	public NwSpecificFacItu(){
-
-	}
-
-	public NwSpecificFacItu(short in_nwIdLen,
-                        byte in_nwIdPlan,
-                        byte in_typeOfNwId,
-                        boolean in_extNwId,
-                        byte[] in_nwId,
-                        byte[] in_nwSpecificFac)
-                 throws ParameterRangeInvalidException{
-
-		nwIdLen       = in_nwIdLen;
-		nwIdPlan      = in_nwIdPlan;
-		typeOfNwId    = in_typeOfNwId;
-		extNwId       = in_extNwId;
-		nwId          = in_nwId;
-		nwSpecificFac = in_nwSpecificFac;
-		
-		
-	}
-	
-	public byte[] getNetworkId(){
-		return nwId;
-	}
-	
-	public void setNetworkId(byte[] aNetworkIdentification)
-                  throws ParameterRangeInvalidException{
-		nwId = aNetworkIdentification;
-	}
-
-	public boolean getNetworkIdExtensionInd(){
-		return extNwId;
-	}
-
-	public void setNetworkIdExtensionInd(boolean nwIdExtension){
-		extNwId = nwIdExtension;
-	}	
-
-	public short getNetworkIdLength(){
-		return nwIdLen;
-	}
-
-	public void setNetworkIdLength(short networkIdLength)
-                        throws ParameterRangeInvalidException{
-		nwIdLen = networkIdLength;
-	}
-
-	public byte getNetworkIdPlan(){
-		return nwIdPlan;
-	}
-
-	public void setNetworkIdPlan(byte aNetworkIdentificationPlan)
-                      throws ParameterRangeInvalidException{
-		nwIdPlan = aNetworkIdentificationPlan;
-	}
-
-	public byte[] getNetworkSpecificFac(){
-		return nwSpecificFac;
-	}
-
-	public void setNetworkSpecificFac(byte[] aNwSpecificFac){
-		nwSpecificFac = aNwSpecificFac;
-	}
-	
-	public byte getTypeOfNetworkId(){
-		return typeOfNwId;
-	}
-
-	public void setTypeOfNetworkId(byte aTypeOfNetworkIdentification)
-                        throws ParameterRangeInvalidException{
-		typeOfNwId = aTypeOfNetworkIdentification;
-	}
-
-	public byte[] flatNwSpecificFacItu()
-	{
-		int size = 2;
-		byte ext = 1;
-		int i=0;			
-
-		size+= nwIdLen;
-
-		if(nwSpecificFac != null)
-			size += nwSpecificFac.length;
-
-		byte[] rc = ByteArray.getByteArray(size);
-			
-		if(extNwId == true)
-			ext = 0;
-
-		rc[0] = (byte)nwIdLen;
-		if(nwIdLen >  0){
-			
-			rc[1] = (byte)(((ext << 7)&	IsupMacros.L_BIT8_MASK) |
-					((typeOfNwId << 4) & IsupMacros.L_bits75_MASK) |
-					(nwIdPlan &IsupMacros. L_bits41_MASK));
-			if(nwId != null){
-				for(i=0;i<nwId.length;i++)
-				{		
-						
-						rc[i+2] = (byte)(nwId[i] & IsupMacros.L_bits71_MASK);			
-				}
-				i= i+nwId.length+1;
-			}
-			else
-				i+=2;
-		}
-		else{
-				
-				i++ ;
-		}
-		
-		
-		rc[i++] = (byte)nwSpecificFac.length;
-
-		for(int j=0;j<nwSpecificFac.length;j++)
-		{
-			rc[i++] = nwSpecificFac[j];
-		}
-
-		return rc;
-	}
-
-	public void putNwSpecificFacItu(byte[] arr, int index, byte par_len)
-	{
-		int i;
-		int nsf_len = 0;
-				
-		nwIdLen = arr[index];
-		
-		nsf_len = arr[index+nwIdLen+1];
-							
-
-		nwSpecificFac =  new byte[nsf_len];
-
-		if(nwIdLen > 0){
-			nwId =  new byte[nwIdLen-1];	
-			if((byte)((arr[index+1]>>7) & IsupMacros.L_BIT1_MASK) == 1)
-				extNwId = true;
-			typeOfNwId = (byte)((arr[index+1]>>4) & IsupMacros.L_bits31_MASK);
-			nwIdPlan   = (byte)(arr[index+1] & IsupMacros.L_bits41_MASK);
-		
-			for(i=0;i<nwIdLen-1;i++)
-				nwId[i] = (byte)(arr[index+i+2] & IsupMacros.L_bits71_MASK);
-		}
-
-		for(i=0;i<nsf_len;i++)
-			nwSpecificFac[i] = (byte)(arr[index+nwIdLen+2+i]);
-		 		
-		
-	}
-
-	/**
-    * String representation of class NwSpecificFacItu
-    *
-    * @return    String provides description of class NwSpecificFacItu
-    */
-        public java.lang.String toString(){
-		int i;
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nextNwId = ");
-				buffer.append(extNwId);
-				if(nwId != null){
-					buffer.append("\nnwId = ");
-					for(i=0;i<nwId.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(nwId[i] & 0xFF)));
-				}						
-				buffer.append("\nnwIdLen = ");
-				buffer.append(nwIdLen);
-				buffer.append("\nnwIdPlan = ");
-				buffer.append(nwIdPlan);	
-				if(nwSpecificFac != null){
-					buffer.append("\nnwSpecificFac = ");
-					for(i=0;i<nwSpecificFac.length;i++)
-						buffer.append(" "+Integer.toHexString((int)(nwSpecificFac[i] & 0xFF)));
-				}	
-				buffer.append("\ntypeOfNwId = ");
-				buffer.append(typeOfNwId);
-				return buffer.toString();
-		
-		}
-
-
-	boolean extNwId;
-	byte[]  nwId;
-	short   nwIdLen;
-	byte    nwIdPlan;
-	byte[]  nwSpecificFac;
-	byte    typeOfNwId;
-
-	public static final byte TNI_NATIONAL_NETWORK_IDENTIFICATION = 0x02;
-	public static final byte TNI_INTERNATIONAL_NETWORK_IDENTIFICATION = 0x03;
-	public static final boolean EI_NEXT_OCTET_EXIST = false; 
-	public static final boolean EI_LAST_OCTET = true; 				
-	
+/** A class representing the ITU ISUP Network Specific Facility parameter.
+  * This has methods for accessing the sub-fields of this parameter.
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public class NwSpecificFacItu extends java.lang.Object implements java.io.Serializable {
+    public static final byte TNI_NATIONAL_NETWORK_IDENTIFICATION = 2;
+    public static final byte TNI_INTERNATIONAL_NETWORK_IDENTIFICATION = 3;
+    public static final boolean EI_NEXT_OCTET_EXIST = false;
+    public static final boolean EI_LAST_OCTET = true;
+    /** Constructs a NwSpecificFacItu.  */
+    public NwSpecificFacItu() {
+    }
+    /** Constructs a NwSpecificFacItu class from the input parameters specified.
+      * @param in_nwIdLen  The length Of network identification value, range 0 to 255.
+      * @param in_nwIdPlan  The network identification plan value, ranges from 0 to 15.
+      * @param in_typeOfNwId  The type of network identification, range 0 to 7. <ul>
+      * <li>TNI_NATIONAL_NETWORK_IDENTIFICATION and
+      * <li>TNI_INTERNATIONAL_NETWORK_IDENTIFICATION. </ul>
+      * @param in_extNwId  The network id extension flag. <ul> <li>EI_NEXT_OCTET_EXIST and
+      * <li>EI_LAST_OCTET. </ul>
+      * @param in_nwId  The network identification.
+      * @param in_nwSpecificFac  The network specific facility.
+      * @exception ParameterRangeInvalidException  thrown when value is out of range.
+      */
+    public NwSpecificFacItu(short in_nwIdLen, byte in_nwIdPlan, byte in_typeOfNwId,
+            boolean in_extNwId, byte[] in_nwId, byte[] in_nwSpecificFac)
+        throws ParameterRangeInvalidException {
+        this.setNetworkIdLength(in_nwIdLen);
+        this.setNetworkIdPlan(in_nwIdPlan);
+        this.setTypeOfNetworkId(in_typeOfNwId);
+        this.setNetworkIdExtensionInd(in_extNwId);
+        this.setNetworkId(in_nwId);
+        this.setNetworkSpecificFac(in_nwSpecificFac);
+    }
+    /** Gets the Length Of Network Indentification field of the parameter.
+      * @return short. The LenghtOfNetwork Indentification value range is 0 to 255.
+      */
+    public short getNetworkIdLength() {
+        return m_networkIdLength;
+    }
+    /** Sets the Length Of Network Indentification field of the parameter.
+      * @param networkIdLength  The Length Of Network Identification value, range 0 to
+      * 255.
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setNetworkIdLength(short networkIdLength)
+        throws ParameterRangeInvalidException {
+        if (0 <= networkIdLength && networkIdLength <= 255) {
+            m_networkIdLength = networkIdLength;
+            return;
+        }
+        throw new ParameterRangeInvalidException("NetworkIdLength value " + networkIdLength + " out of range.");
+    }
+    /** Gets the Network Identification Plan field of the parameter.
+      * @return byte. The NetworkIdentificationPlan value ranges from 0 to 15.
+      */
+    public byte getNetworkIdPlan() {
+        return m_networkIdentificationPlan;
+    }
+    /** Sets the Network Identification Plan field of the parameter.
+      * @param aNetworkIdentificationPlan  The network id plan value, range 0 to 15.
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setNetworkIdPlan(byte aNetworkIdentificationPlan)
+        throws ParameterRangeInvalidException {
+        if (0 <= aNetworkIdentificationPlan && aNetworkIdentificationPlan <= 15) {
+            m_networkIdentificationPlan = aNetworkIdentificationPlan;
+            return;
+        }
+        throw new ParameterRangeInvalidException("NetworkIdPlan value " + aNetworkIdentificationPlan + " out of range.");
+    }
+    /** Gets the Type Of Network Identification field of the parameter.
+      * @return The TypeOfNetworkIdentification value, range 0 to 7, see
+      * NwSpecificFacItu().
+      */
+    public byte getTypeOfNetworkId() {
+        return m_typeOfNetworkIdentification;
+    }
+    /** Sets the Type Of Network Identification field of the parameter.
+      * @param aTypeOfNetworkIdentification  The TypeOfNetworkIdentification value, range
+      * 0 to 7, see NwSpecificFacItu().
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public void setTypeOfNetworkId(byte aTypeOfNetworkIdentification)
+        throws ParameterRangeInvalidException {
+        if (0 <= aTypeOfNetworkIdentification && aTypeOfNetworkIdentification <= 7) {
+            m_typeOfNetworkIdentification = aTypeOfNetworkIdentification;
+            return;
+        }
+        throw new ParameterRangeInvalidException("TypeOfNetworkId value " + aTypeOfNetworkIdentification + " out of range.");
+    }
+    /** Gets the network id extension flag.
+      * @return The Extension flag value, see NwSpecificFacItu().
+      */
+    public boolean getNetworkIdExtensionInd() {
+        return m_nwIdExtension;
+    }
+    /** Sets the network id extension flag.
+      * @param nwIdExtension  Network id extension flag value, see NwSpecificFacItu().
+      */
+    public void setNetworkIdExtensionInd(boolean nwIdExtension) {
+        m_nwIdExtension = nwIdExtension;
+    }
+    /** Gets the Network Identification field of the parameter.
+      * @return byte[] the Network Identification value.
+      */
+    public byte[] getNetworkId() {
+        return m_networkIdentification;
+    }
+    /** Sets the Network Identification field of the parameter.
+      * @param aNetworkIdentification  The Network Identification value.
+      */
+    public void setNetworkId(byte[] aNetworkIdentification)
+        throws ParameterRangeInvalidException {
+        m_networkIdentification = aNetworkIdentification;
+    }
+    /** Gets the Network Specific Facility field of the parameter.
+      * @return byte[] the NwSpecificFac value.
+      */
+    public byte[] getNetworkSpecificFac() {
+        return m_wSpecificFac;
+    }
+    /** Sets the Network Specific Facility field of the parameter.
+      * @param aNwSpecificFac  The Network Specific Fac value.
+      */
+    public void setNetworkSpecificFac(byte[] aNwSpecificFac) {
+        m_wSpecificFac = aNwSpecificFac;
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+      * NwSpecificFacItu class.
+      * @return A string representation of the member variables.
+      */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.itu.NwSpecificFacItu");
+        b.append("\n\tm_networkIdLength: " + m_networkIdLength);
+        b.append("\n\tm_networkIdentificationPlan: " + m_networkIdentificationPlan);
+        b.append("\n\tm_typeOfNetworkIdentification: " + m_typeOfNetworkIdentification);
+        b.append("\n\tm_nwIdExtension: " + m_nwIdExtension);
+        b.append("\n\tm_networkIdentification: " + JainSS7Utility.bytesToHex(m_networkIdentification, 0, m_networkIdentification.length));
+        b.append("\n\tm_wSpecificFac: " + JainSS7Utility.bytesToHex(m_wSpecificFac, 0, m_wSpecificFac.length));
+        return b.toString();
+    }
+    protected short m_networkIdLength;
+    protected byte m_networkIdentificationPlan;
+    protected byte m_typeOfNetworkIdentification;
+    protected boolean m_nwIdExtension;
+    protected byte[] m_networkIdentification;
+    protected byte[] m_wSpecificFac;
 }
 
-
-
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

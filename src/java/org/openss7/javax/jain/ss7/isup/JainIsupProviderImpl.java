@@ -1,9 +1,9 @@
 
 package org.openss7.javax.jain.ss7.isup;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
 public class JainIsupProviderImpl implements JainIsupProvider {
     public native void addIsupListener(JainIsupListener isupListener, IsupUserAddress isupAddress)

@@ -1,162 +1,154 @@
-/******************************************************************************
-*                                                                             *
-*                                                                             *
-* Copyright (c) SS8 Networks, Inc.                                            *
-* All rights reserved.                                                        *
-*                                                                             *
-* This document contains confidential and proprietary information in which    *
-* any reproduction, disclosure, or use in whole or in part is expressly       *
-* prohibited, except as may be specifically authorized by prior written       *
-* agreement or permission of SS8 Networks, Inc.                               *
-*                                                                             *
-*******************************************************************************
-* VERSION      : $Revision: 1.1 $
-* DATE         : $Date: 2008/05/16 12:23:55 $
-* 
-* MODULE NAME  : $RCSfile: ConnectedNumberItu.java,v $
-* AUTHOR       : Nilgun Baykal [SS8]
-* DESCRIPTION  : 
-* DATE 1st REL : 
-* REV.HIST.    : 
-* 
-* Date      Owner  Description
-* ========  =====  ===========================================================
-* 
-* 
-*******************************************************************************
-*                                                                             *
-*                     RESTRICTED RIGHTS LEGEND                                *
-* Use, duplication, or disclosure by Government Is Subject to restrictions as *
-* set forth in subparagraph (c)(1)(ii) of the Rights in Technical Data and    *
-* Computer Software clause at DFARS 252.227-7013                              *
-*                                                                             *
-******************************************************************************/
+/* ***************************************************************************
 
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
 
 package javax.jain.ss7.isup.itu;
 
-import javax.jain.*;
-import javax.jain.ss7.*;
 import javax.jain.ss7.isup.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-public class ConnectedNumberItu extends NumberParameter{
-
-	
-	public ConnectedNumberItu(){
-	}
-
-	public ConnectedNumberItu(byte natureOfAddressIndicator,
-                          byte numberingPlanIndicator,
-                          byte addressPresentationRestrictedIndicator,
-                          byte screeningIndicator,
-                          byte[] addressSignal)
-                   throws ParameterRangeInvalidException{
-
-		super(	natureOfAddressIndicator,
-				numberingPlanIndicator,
-				addressSignal);
-		if ((addressPresentationRestrictedIndicator >= APRI_PRESENTATION_ALLOWED) && 
-		(addressPresentationRestrictedIndicator <= APRI_ADDRESS_NOT_AVAILABLE)) {
-			m_addressPresentationRestrictedIndicator  = addressPresentationRestrictedIndicator;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-			
-		if ((screeningIndicator >= SI_USER_PROVIDED_NOT_VERIFIED) && 
-		(screeningIndicator <= SI_NETWORK_PROVIDED)) {
-			m_screeningIndicator = screeningIndicator;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-	
-	public byte getAddrPresRestInd(){
-		return m_addressPresentationRestrictedIndicator ;
-	}
-
-	public void setAddrPresRestInd(byte addressPresentationRestrictedIndicator)
-                        throws ParameterRangeInvalidException{
-		if ((addressPresentationRestrictedIndicator >= APRI_PRESENTATION_ALLOWED) && 
-		(addressPresentationRestrictedIndicator <= APRI_ADDRESS_NOT_AVAILABLE)) {
-			m_addressPresentationRestrictedIndicator  = addressPresentationRestrictedIndicator;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public byte getScreeningInd(){
-		return m_screeningIndicator;
-	}
-
-	public void setScreeningInd(byte screeningIndicator)
-                     throws ParameterRangeInvalidException{
-		if ((screeningIndicator >= SI_USER_PROVIDED_NOT_VERIFIED) && 
-		(screeningIndicator <= SI_NETWORK_PROVIDED)) {
-			m_screeningIndicator = screeningIndicator;
-
-		}
-		else 
-			throw new ParameterRangeInvalidException();
-	}
-
-	public void  putConnectedNumberItu(byte[] arr, int index, byte par_len){
-		
-		super.putNumberParameter(arr,index,par_len);
-		m_addressPresentationRestrictedIndicator = (byte)((arr[index+1]>>2)&
-														IsupMacros.L_bits21_MASK);
-		m_screeningIndicator = (byte)(arr[index+1] & IsupMacros.L_bits21_MASK);
-	}
-
-	public byte[] flatConnectedNumberItu()
-	{
-			byte[] rc;
-			
-			rc = super.flatNumberParameter();
-
-			rc[1] = (byte) (rc[1] |
-				((m_addressPresentationRestrictedIndicator << 2) & IsupMacros.L_bits43_MASK)|
-				(m_screeningIndicator & IsupMacros.L_bits21_MASK));
-
-			return rc;
-
-	}
-		
-	/**
-    * String representation of class ConnectedNumberItu
-    *
-    * @return    String provides description of class ConnectedNumberItu
-    */
-        public java.lang.String toString(){
-        StringBuffer buffer = new StringBuffer(500);
-		        buffer.append(super.toString());
-				buffer.append("\nm_addressPresentationRestrictedIndicator = ");
-				buffer.append(m_addressPresentationRestrictedIndicator);	
-				buffer.append("\nm_screeningIndicator = ");
-				buffer.append(m_screeningIndicator);
-				return buffer.toString();
-		
-		}
-
-
-	byte m_addressPresentationRestrictedIndicator;
-	byte m_screeningIndicator;
-
-	public static final byte APRI_PRESENTATION_ALLOWED = 0x00; 
-	public static final byte APRI_PRESENTATION_RESTRICTED = 0x01; 
-	public static final byte APRI_ADDRESS_NOT_AVAILABLE = 0x02; 
-	public static final byte SI_USER_PROVIDED_NOT_VERIFIED = 0x00; 
-	public static final byte SI_USER_PROVIDED_VERIFIED_PASSED = 0x01; 
-	public static final byte SI_NETWORK_PROVIDED = 0x03; 
-	
-
-
-	
-	
+/** A class representing a Connected Number parameter.
+    This class contains all the subfields for the ITU variant.
+    @author Monavacon Limited
+    @version 1.2.2
+  */
+public class ConnectedNumberItu extends NumberParameter {
+    public static final byte APRI_PRESENTATION_ALLOWED = 0;
+    public static final byte APRI_PRESENTATION_RESTRICTED = 1;
+    public static final byte APRI_ADDRESS_NOT_AVAILABLE = 2;
+    public static final byte SI_USER_PROVIDED_VERIFIED_PASSED = 1;
+    public static final byte SI_NETWORK_PROVIDED = 3;
+    /** Constructs a new ConnectedNumberItu taking no parameters.
+        This constructor sets all the sub-field values to their spare value (which is
+        zero).
+      */
+    public ConnectedNumberItu() {
+    }
+    /** Constructs a new ConnectedNumberItu.
+        @param natureOfAddressIndicator  The nature of address indicator, range 0-127, see
+        NumberParameter().
+        @param numberingPlanIndicator  The numbering plan indicator, range 0-7, see
+        NumberParameter().
+        @param addressPresentationRestrictedIndicator  The address presentation restricted
+        indicator. <ul> <li>APRI_ADDRESS_PRESENTATION_ALLOWED,
+        <li>APRI_ADDRESS_PRESENTATION_RESTRICTED and <li>APRI_ADDRESS_NOT_AVAILABLE. </ul>
+        @param screeningIndicator  The screening indicator. <ul>
+        <li>SI_USER_PROVIDED_VERIFIED_PASSED and <li>SI_NETWORK_PROVIDED. </ul>
+        @param addressSignal  The address signal.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
+      */
+    public ConnectedNumberItu(byte natureOfAddressIndicator, byte numberingPlanIndicator,
+            byte addressPresentationRestrictedIndicator, byte screeningIndicator,
+            byte[] addressSignal)
+        throws ParameterRangeInvalidException {
+        super(natureOfAddressIndicator, numberingPlanIndicator, addressSignal);
+        this.setAddrPresRestInd(addressPresentationRestrictedIndicator);
+        this.setScreeningInd(screeningIndicator);
+    }
+    /** Gets the Address Presentation Restricted Ind field of the parameter, range 0 to 3.
+        @return The address presentation indicator, range 0 to 3, see
+        ConnectedNumberItu().
+      */
+    public byte getAddrPresRestInd() {
+        return m_addressPresentationRestrictedIndicator;
+    }
+    /** Sets the Address Presentation Restricted Ind field of the parameter.
+        @param addrPresRestInd  Address presentation restriction indicator value, range 0
+        to 3, see ConnectedNumberItu().
+      */
+    public void setAddrPresRestInd(byte addressPresentationRestrictedIndicator)
+        throws ParameterRangeInvalidException {
+        if (0 <= addressPresentationRestrictedIndicator && addressPresentationRestrictedIndicator <= 3) {
+            m_addressPresentationRestrictedIndicator = addressPresentationRestrictedIndicator;
+            return;
+        }
+        throw new ParameterRangeInvalidException("AddrPresRestInd value " + addressPresentationRestrictedIndicator + " out of range.");
+    }
+    /** Gets the Screening Ind field of the parameter.
+        @return Screening indicator, range 0 to 3, see ConnectedNumberItu().
+      */
+    public byte getScreeningInd() {
+        return m_screeningIndicator;
+    }
+    /** Sets the Screening Ind field of the parameter.
+        @param screeningIndicator  Screening indicator, range 0 to 3, see
+        ConnectedNumberItu().
+        @exception ParameterRangeInvalidException  Thrown when the value is out of range.
+      */
+    public void setScreeningInd(byte screeningIndicator)
+        throws ParameterRangeInvalidException {
+        if (0 <= screeningIndicator && screeningIndicator <= 3) {
+            m_screeningIndicator = screeningIndicator;
+        }
+        throw new ParameterRangeInvalidException("ScreeningInd value " + screeningIndicator + " out of range.");
+    }
+    /** The toString method retrieves a string containing the values of the members of the
+        ConnectedNumberItu class.
+        @return A string representation of the member variables.
+      */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append(super.toString());
+        b.append("\njavax.jain.ss7.isup.itu.ConnectedNumberItu");
+        b.append("\n\tm_addressPresentationRestrictedIndicator: " + m_addressPresentationRestrictedIndicator);
+        b.append("\n\tm_screeningIndicator: " + m_screeningIndicator);
+        return b.toString();
+    }
+    protected byte m_addressPresentationRestrictedIndicator;
+    protected byte m_screeningIndicator;
 }
 
-
-
-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

@@ -57,29 +57,26 @@
 package javax.jain.ss7.isup;
 
 import javax.jain.ss7.*;
+import javax.jain.*;
 
-/**
-  * This interface defines the methods required for a JAIN ISUP user application
-  * to receive and process ISUP Events that are sent out by an object
-  * implementing the JainIsupProvider interface.  Henceforth, a JainIsupProvider
-  * implementation would be referred to as a JainIsupProvider object and an
-  * implementation of a JainIsupListener interface would be referred to as a
-  * JainIsupListener object.  When the JainIsupListener object registers with a
-  * JainIsupProvider object, it is ready to receive IsupEvents being sent out by
-  * the JainIsupProvider object.  During event registration, the
-  * JainIsupListener object provides the JainIsupProvider object with a
-  * IsupUserAddress for which it is interested in receiving events.  This is
-  * done by invoking the addJainIsupListener method on the JainIsupProvider
-  * object.
+/** This interface defines the methods required for a JAIN ISUP user application to
+  * receive and process ISUP Events that are sent out by an object implementing the
+  * JainIsupProvider interface.  Henceforth, a JainIsupProvider implementation would be
+  * referred to as a JainIsupProvider object and an implementation of a
+  * JainIsupListener interface would be referred to as a JainIsupListener object.  When
+  * the JainIsupListener object registers with a JainIsupProvider object, it is ready
+  * to receive IsupEvents being sent out by the JainIsupProvider object.  During event
+  * registration, the JainIsupListener object provides the JainIsupProvider object with
+  * a IsupUserAddress for which it is interested in receiving events.  This is done by
+  * invoking the addJainIsupListener method on the JainIsupProvider object.
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
 public abstract interface JainIsupListener extends java.util.EventListener {
-    /**
-      * This method processes ISUP Events received form a JainIsupProvider
-      * object.  This includes the events for protocol messages, timeouts,
-      * network status change events and ISUP error events.
-      *
-      * @param isupEvent The ISUP event to be processed.
-      */
+    /** This method processes ISUP Events received form a JainIsupProvider object.
+      * This includes the events for protocol messages, timeouts, network status change
+      * events and ISUP error events.
+      * @param isupEvent The ISUP event to be processed.  */
     public void processIsupEvent(IsupEvent isupEvent);
 }
 
