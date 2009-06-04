@@ -145,7 +145,7 @@ import java.lang.Math;
  * @version    1.0
  */
 public class SignalingPointCode implements Serializable{
-		   
+
     /**
     * Constructs a SignalingPointCode with the specified Member, Cluster, and Zone.
     *
@@ -177,7 +177,7 @@ public class SignalingPointCode implements Serializable{
       }
     }
 
-   
+
     /**
     * Returns a hash code value for the object. This method is supported
     * for the benefit of hashtables such as those provided by
@@ -194,9 +194,9 @@ public class SignalingPointCode implements Serializable{
 
          int hashCode = str.hashCode( );
          return hashCode;
-    }
+     }
 
-   
+
     /**
     * Sets the Member field of the Signaling Point Code
     *
@@ -204,7 +204,7 @@ public class SignalingPointCode implements Serializable{
     */
     public void setMember(int member){
         m_spc[0] = member;
-        }
+    }
 
     /**
     * Gets the Member field of the Signaling Point Code

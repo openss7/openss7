@@ -59,7 +59,7 @@ public final class GTIndicator0010 extends GlobalTitle {
     * required for an ANSI and ITU implementation of the GTIndicator-0010.
     *
     * @param  translationType     the new translation type supplied to the constructor
-    * @param  addressInformation  the new address Information supplied to the constructor
+    * @param  addressInformation  the new address Information supplied to the constructo
     *
     */
     public GTIndicator0010(byte translationType, byte[] addressInformation) {

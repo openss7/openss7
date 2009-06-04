@@ -6,7 +6,7 @@ import javax.jain.protocol.ss7.map.*;
 import javax.jain.protocol.ss7.*;
 import javax.jain.*;
 
-public class MsPosProviderImpl implements MsPosProvider {
+public class MsPosProviderImpl implements java.rmi.Remote, MsPosProvider {
     public native long processMsPosOperation(MsPosReqEvent event, MsPosListener listener)
         throws SS7MandatoryParameterNotSetException;
     public native void processMsPosOperation(MsPosRespEvent event, long transactionId)

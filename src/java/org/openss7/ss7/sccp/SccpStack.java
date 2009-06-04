@@ -1,6 +1,8 @@
 
 package org.openss7.ss7.sccp;
 
+import org.openss7.ss7.*;
+
 public interface SccpStack {
     public SignalingPointCode getSignalingPointCode();
     public SccpProvider createProvider()

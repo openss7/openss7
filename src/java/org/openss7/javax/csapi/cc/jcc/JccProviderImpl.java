@@ -3,7 +3,7 @@ package org.openss7.javax.csapi.cc.jcc;
 
 import javax.csapi.cc.jcc.*;
 
-public class JccProviderImpl implements JccProvider {
+public class JccProviderImpl implements java.rmi.Remote, JccProvider {
     public native EventFilter createEventFilterEventSet(int blockEvents[], int notifyEvents[])
         throws ResourceUnavailableException, InvalidArgumentException;
     public native EventFilter createEventFilterMidCallEvent(int midCallType, String midCallValue, int matchDisposition, int nomatchDisposition)

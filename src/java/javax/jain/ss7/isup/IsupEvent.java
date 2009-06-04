@@ -270,6 +270,9 @@ public abstract class IsupEvent extends java.util.EventObject implements java.la
             return true;
         return false;
     }
+    public void setSource(java.lang.Object in_source) {
+        source = in_source;
+    }
     /** The toString method retrieves a string containing the values of the members of
       * the IsupEvent class.
       * @return A string representation of the member variables.  */

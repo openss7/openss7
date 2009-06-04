@@ -1,4 +1,59 @@
-
+//  ==========================================================================
+//  
+//  @(#) $Id$
+//  
+//  --------------------------------------------------------------------------
+//  
+//  Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+//  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+//  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+//  
+//  All Rights Reserved.
+//  
+//  This program is free software; you can redistribute it and/or modify it
+//  under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation; version 3 of the License.
+//  
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+//  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
+//  License for more details.
+//  
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+//  write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+//  02139, USA.
+//  
+//  --------------------------------------------------------------------------
+//  
+//  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+//  behalf of the U.S. Government ("Government"), the following provisions
+//  apply to you.  If the Software is supplied by the Department of Defense
+//  ("DoD"), it is classified as "Commercial Computer Software" under
+//  paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+//  Regulations ("DFARS") (or any successor regulations) and the Government is
+//  acquiring only the license rights granted herein (the license rights
+//  customarily provided to non-Government users).  If the Software is
+//  supplied to any unit or agency of the Government other than DoD, it is
+//  classified as "Restricted Computer Software" and the Government's rights
+//  in the Software are defined in paragraph 52.227-19 of the Federal
+//  Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+//  cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+//  (or any successor regulations).
+//  
+//  --------------------------------------------------------------------------
+//  
+//  Commercial licensing and support of this software is available from
+//  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+//  
+//  --------------------------------------------------------------------------
+//  
+//  Last Modified $Date$ by $Author$
+//  
+//  --------------------------------------------------------------------------
+//  
+//  $Log$
+//  ==========================================================================
 
 package javax.jain.protocol.ss7.map.position.etsipar;
 
@@ -7,65 +62,213 @@ import javax.jain.protocol.ss7.map.*;
 import javax.jain.protocol.ss7.*;
 import javax.jain.*;
 
+/** This parameter identifies the client or type of client positioning application. (See
+  * specification GSM 03.71 version 8.0.0 Release 1999, section 7.6.1.1.  for guidance.)
+  * <p>
+  *
+  * The following rules applies for the setting of parameter components:- <ul>
+  * <li>Mandatory component with no default value must be provided to the constructor.
+  * <li>Mandatory component with default value need not be set.
+  * <li>Optional / conditional component is by default not present. Such a component
+  * becomes present by setting it. </ul> <p>
+  *
+  * Parameter components:- <ul>
+  * <li>lcsClientType, mandatory component with no default
+  * <li>lcsClientExternalId, optional component
+  * <li>lcsClientDialedByMS, optional component
+  * <li>lcsClientInternalId, optional component
+  * <li>lcsClientName, optional component </ul>
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
 public class LcsClientId extends MapParameter {
+    /** An undefined service is requesting position information.  */
     public static final int UNDEFINED_SERVICES = 0;
+    /** An emergency service is requesting position information.  */
     public static final int EMERGENCY_SERVICES = 1;
+    /** A value added service is requesting position information.  */
     public static final int VALUE_ADDED_SERVICES = 2;
+    /** A PLMN operator service is requesting position information.  */
     public static final int PLMN_OPERATOR_SERVICES = 3;
+    /** A lawful intercept service is requesting position information.  */
     public static final int LAWFUL_INTERCEPT_SERVICES = 4;
+    /** Client Internal ID in the visited network: broadcast service.  */
     public static final int CLIENT_BROADCAST_SERVICE = 5;
+    /** Client Internal ID in the visited network: OAM in home-PLMN.  */
     public static final int CLIENT_OAM_HPLMN = 6;
+    /** Client Internal ID in the visited network: OAM in visited-PLMN.  */
     public static final int CLIENT_OAM_VPLMN = 7;
+    /** Client Internal ID in the visited network: anonymous location.  */
     public static final int CLIENT_ANONYMOUS_LOCATION = 8;
+    /** Client Internal ID in the visited network: subscribed service.  */
     public static final int CLIENT_MS_SUBSCRIBED_SERVICE = 9;
+    /** The constructor.
+      * @param lcsClientType  Indicates what kind of service that is requesting position.
+      * Possible values: <ul>
+      * <li>EMERGENCY_SERVICES,
+      * <li>VALUE_ADDED_SERVICES,
+      * <li>PLMN_OPERATOR_SERVICES and
+      * <li>LAWFUL_INTERCEPT_SERVICES. </ul>
+      * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
+      * range.
+      */
     public LcsClientId(int lcsClientType)
         throws SS7InvalidParamException {
+        setLcsClientType(lcsClientType);
     }
+    /** Empty constructor; needed for serializable objects and beans.  */
     public LcsClientId()
         throws SS7InvalidParamException {
     }
+    /** Change the Client Type parameter whcih indicates what kind of service that is
+      * requesting position.
+      * @param lcsClientType  Integer indicating type of client. (See constructor for
+      * possible values.)
+      * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
+      * range.
+      */
     public void setLcsClientType(int lcsClientType)
         throws SS7InvalidParamException {
+        switch (lcsClientType) {
+            case UNDEFINED_SERVICES:
+            case EMERGENCY_SERVICES:
+            case VALUE_ADDED_SERVICES:
+            case PLMN_OPERATOR_SERVICES:
+            case LAWFUL_INTERCEPT_SERVICES:
+                m_lcsClientType = lcsClientType;
+                return;
+        }
+        throw new SS7InvalidParamException("LCS Client Type value " + lcsClientType + " out of range.");
     }
+    /** Get the Client Type parameter whcih indicates what kind of service that is
+      * requesting position.
+      * @return Integer indicating type of client. (See constructor for possible values.)
+      */
     public int getLcsClientType() {
-        return null;
+        return m_lcsClientType;
     }
+    /** Set the Client External Id parameter whcih is an address ("telephone number") that
+      * identifies the LCS Client.
+      * @param lcsClientExternalId  Number that identifies the client.
+      * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
+      * range.
+      */
     public void setLcsClientExternalId(SS7Number lcsClientExternalId)
         throws SS7InvalidParamException {
+        m_lcsClientExternalId = lcsClientExternalId;
     }
+    /** Get the Client External Id parameter whcih is an address ("telephone number") that
+      * identifies the LCS Client. It shall be checked if this parameter is present before
+      * getting it.
+      * @return Number that identifies the client.
+      */
     public SS7Number getLcsClientExternalId() {
-        return null;
+        return m_lcsClientExternalId;
     }
+    /** Check if the Client External Id parameter is present.
+      * @return True or false.
+      */
     public boolean isLcsClientExternalIdPresent() {
-        return null;
+        return (m_lcsClientExternalId != null);
     }
+    /** Set the LCS Client Dialed by MS parameter whcih is the number that a Mobile
+      * Station dialed in order to get access to a specific positioning service in the
+      * client. (See specification GSM 03.71 version 8.0.0 Release 1999, annex A3 for
+      * description.)
+      * @param lcsClientDialedByMS  Number that was dialed to the client.
+      * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
+      * range.
+      */
     public void setLcsClientDialedByMS(SS7Number lcsClientDialedByMS)
         throws SS7InvalidParamException {
+        m_lcsClientDialedByMS = lcsClientDialedByMS;
     }
+    /** Get the LCS Client Dialed by MS parameter whcih is the number that a Mobile
+      * Station dialed in order to get access to a specific positioning service in the
+      * client. It shall be checked if this parameter is present before getting it.
+      * @return Number that was dialed to the client.
+      */
     public SS7Number getLcsClientDialedByMS() {
-        return null;
+        return m_lcsClientDialedByMS;
     }
+    /** Check if the LCS Client Dialed by MS parameter is present.
+      * @return True or false.
+      */
     public boolean isLcsClientDialedByMSPresent() {
-        return null;
+        return (m_lcsClientDialedByMS != null);
     }
+    /** Set the Client Internal Id parameter whcih identifies the type of client in the
+      * case that the client is within or associated with the visited network. (See
+      * specification GSM 03.71 version 8.0.0 Release 1999, section 7.12.3.)
+      * @param lcsClientInternalId  Integer indicating type of client.  Possible values:
+      * <ul>
+      * <li>CLIENT_BROADCAST_SERVICE,
+      * <li>CLIENT_OAM_HPLMN,
+      * <li>CLIENT_OAM_VPLMN,
+      * <li>CLIENT_ANONYMOUS_LOCATION and
+      * <li>CLIENT_MS_SUBSCRIBED_SERVICE. </ul>
+      * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
+      * range.
+      */
     public void setLcsClientInternalId(int lcsClientInternalId)
         throws SS7InvalidParamException {
+        switch (lcsClientInternalId) {
+            case CLIENT_BROADCAST_SERVICE:
+            case CLIENT_OAM_HPLMN:
+            case CLIENT_OAM_VPLMN:
+            case CLIENT_ANONYMOUS_LOCATION:
+            case CLIENT_MS_SUBSCRIBED_SERVICE:
+                m_lcsClientInternalId = lcsClientInternalId;
+                return;
+        }
+        throw new SS7InvalidParamException("LCS Client value " + lcsClientInternalId + " out of range.");
     }
+    /** Get the Client Internal Id parameter whcih identifies the type of client in the
+      * case that the client is within or associated with the visited network. It shall be
+      * checked if this parameter is present before getting it.
+      * @return Integer indicating type of client. (See setLcsClientInternalId for
+      * possible values.)
+      */
     public int getLcsClientInternalId() {
-        return null;
+        return m_lcsClientInternalId;
     }
+    /** Check if the Client Internal Id parameter is present.
+      * @return True or false.
+      */
     public boolean isLcsClientInternalIdPresent() {
-        return null;
+        return m_lcsClientInternalIdPresent;
     }
+    /** Set the Client Name parameter that names the client requesting position. Only
+      * characters from the "7 bit default alphabet" specified in 3G TS 23.038 V4.0.0
+      * should be used.
+      * @param lcsClientName  A String with the client name; maximum 63 characters.
+      * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
+      * range.
+      */
     public void setLcsClientName(String lcsClientName)
         throws SS7InvalidParamException {
+        m_lcsClientName = lcsClientName;
     }
+    /** Get the Client Name parameter that names the client requesting position. It shall
+      * be checked if this parameter is present before getting it.
+      * @return A String with the client name.
+      */
     public String getLcsClientName() {
-        return null;
+        return m_lcsClientName;
     }
+    /** Check if the Client Name parameter is present.
+      * @return True or false.
+      */
     public boolean isLcsClientNamePresent() {
-        return null;
+        return (m_lcsClientName != null);
     }
+    protected int m_lcsClientType;
+    protected SS7Number m_lcsClientExternalId = null;
+    protected SS7Number m_lcsClientDialedByMS = null;
+    protected int m_lcsClientInternalId;
+    protected boolean m_lcsClientInternalIdPresent = false;
+    protected String m_lcsClientName = null;
 }
 
-// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

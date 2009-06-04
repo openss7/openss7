@@ -62,12 +62,12 @@ public class SPCFormat {
       switch(m_Value){
         case M_ITU_SPC_FORMAT:
             return "ITU_SPC_FORMAT";
-			case M_ANSI_SPC_FORMAT:
+        case M_ANSI_SPC_FORMAT:
             return "ANSI_SPC_FORMAT";
-			default:
+        default:
             return "ERROR";
-		}
-	}
+      }
+   }
 
    /**
     * Gets the integer representation of the Constant class
@@ -76,7 +76,7 @@ public class SPCFormat {
     */
    public int intValue() {
       return m_Value;
-	}
+   }
 
    // Internal variable to store the Constant Value in a useful format
    private int m_Value;
@@ -93,8 +93,8 @@ public class SPCFormat {
    /**
    * ITU SPC Format Constant
    */
-	public static final SPCFormat ITU_SPC_FORMAT = new SPCFormat(M_ITU_SPC_FORMAT);
-	
+   public static final SPCFormat ITU_SPC_FORMAT    = new SPCFormat(M_ITU_SPC_FORMAT);
 
-		
+
+
 }

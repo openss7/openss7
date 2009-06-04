@@ -93,13 +93,11 @@ public abstract class Position extends MapParameter {
     /** The constructor.
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.  */
     public Position() throws SS7InvalidParamException {
-        this();
-        this.setAgeOfPositionInfo();
+        setAgeOfPositionInfo(new Date());
     }
     /** Set the Age of Position information.
       * @param ageOfPositionInfo Age of position information.  */
     public void setAgeOfPositionInfo(Date ageOfPositionInfo) {
-        Date date = Date.now();
         if (ageOfPositionInfo != null)
             m_age = ageOfPositionInfo;
         m_age_is_set = true;
@@ -107,7 +105,7 @@ public abstract class Position extends MapParameter {
     /** Get the Age of Position information.
       * @return Age of position information.  */
     public Date getAgeOfPositionInfo() {
-        Date date = Date.now();
+        Date date = new Date();
         if (m_age_is_set == true)
             date = m_age;
         return date;
@@ -118,10 +116,10 @@ public abstract class Position extends MapParameter {
         return m_age_is_set;
     }
 
-    private int m_tos = TOS_POINT;
-    private boolean m_tos_is_set = false;
-    private Date m_age;
-    private boolean m_age_is_set = false;
+    protected int m_tos = TOS_POINT;
+    protected boolean m_tos_is_set = false;
+    protected Date m_age;
+    protected boolean m_age_is_set = false;
 }
 
 // vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

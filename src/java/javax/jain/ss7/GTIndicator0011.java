@@ -85,7 +85,7 @@ public final class GTIndicator0011 extends GlobalTitle {
     *
     * @param  numberingPlan one of the following:-
     *      <UL>
-    *        <LI> NP_UNKNOWN - Indicates an unknown Numbering Plan
+    *        <LI> NP_UNKOWN - Indicates an unknown Numbering Plan
     *        <LI> NP_ISDN_TEL - Indicates ISDN/Telephony Numbering Plan
     *        <LI> NP_RESERVED - Indicates a reserved Numbering plan in ANSI.
     *        <LI> NP_DATA - Indicates Data Numbering Plan
@@ -133,7 +133,7 @@ public final class GTIndicator0011 extends GlobalTitle {
     *
     * @return the Numbering Plan - one of the following:-
     *      <UL>
-    *        <LI> NP_UNKNOWN - Indicates an unknown Numbering Plan
+    *        <LI> NP_UNKOWN - Indicates an unknown Numbering Plan
     *        <LI> NP_ISDN_TEL - Indicates ISDN/Telephony Numbering Plan
     *        <LI> NP_RESERVED - Indicates a reserved Numbering plan in ANSI.
     *        <LI> NP_DATA - Indicates Data Numbering Plan
@@ -185,11 +185,11 @@ public final class GTIndicator0011 extends GlobalTitle {
         buffer.append("\n\nGlobal Title Indicator = GTINDICATOR_0011");
         buffer.append(super.toString());
         buffer.append("\n\ntranslationType = ");
-        buffer.append(m_TranslationType);
+        buffer.append(this.m_TranslationType);
         buffer.append("\n\nnumberingPlan = ");
-        buffer.append(m_NumberingPlan.toString());
+        buffer.append(this.m_NumberingPlan.toString());
         buffer.append("\n\nencodingScheme = ");
-        buffer.append(m_EncodingScheme.toString());
+        buffer.append(this.m_EncodingScheme.toString());
 
         return buffer.toString();
     }

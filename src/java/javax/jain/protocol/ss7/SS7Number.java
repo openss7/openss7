@@ -160,14 +160,10 @@ public class SS7Number extends SS7Parameter {
       * or out of range.
       */
     public SS7Number(int ton, int npi, Object number) throws SS7InvalidParamException {
-        if (ton != null) {
-            m_ton = ton;
-            m_ton_is_set = true;
-        }
-        if (npi != null) {
-            m_npi = npi;
-            m_npi_is_set = true;
-        }
+        m_ton = ton;
+        m_ton_is_set = true;
+        m_npi = npi;
+        m_npi_is_set = true;
         if (number != null) {
             m_number = number;
             m_number_is_set = true;
@@ -195,7 +191,7 @@ public class SS7Number extends SS7Parameter {
       * @return Type of number.
       */
     public int getTypeOfNumber() {
-        int r_ton = null;
+        int r_ton = TON_UNKNOWN;
 
         if (m_ton_is_set)
             r_ton = m_ton;
@@ -217,7 +213,7 @@ public class SS7Number extends SS7Parameter {
       * @return Numbering plan indicator.
       */
     public int getNumPlanId() {
-        int r_npi = null;
+        int r_npi = NPI_UNKNOWN;
 
         if (m_npi_is_set)
             r_npi = m_npi;
@@ -265,20 +261,24 @@ public class SS7Number extends SS7Parameter {
       * @param e164 E.164 Number to be compared with this E.164 Number.
       * @return True if equal, otherwise false.
       */
-    public boolean equals(Object nr) {
-        if (m_ton_is_set != nr.m_ton_is_set)
-            return false;
-        if (m_npi_is_set != nr.m_npi_is_set)
-            return false;
-        if (m_number_is_set != nr.m_number_is_set)
-            return false;
-        if (m_ton != nr.m_ton)
-            return false;
-        if (m_npi != nr.m_npi)
-            return false;
-        if (m_number.equals(nr.m_number) != true)
-            return false;
-        return true;
+    public boolean equals(Object object) {
+        if (object != null && object instanceof SS7Number) {
+            SS7Number nr = (SS7Number) object;
+            if (m_ton_is_set != nr.m_ton_is_set)
+                return false;
+            if (m_npi_is_set != nr.m_npi_is_set)
+                return false;
+            if (m_number_is_set != nr.m_number_is_set)
+                return false;
+            if (m_ton != nr.m_ton)
+                return false;
+            if (m_npi != nr.m_npi)
+                return false;
+            if (m_number.equals(nr.m_number) != true)
+                return false;
+            return true;
+        }
+        return false;
     }
 
     private int m_ton = TON_UNKNOWN;

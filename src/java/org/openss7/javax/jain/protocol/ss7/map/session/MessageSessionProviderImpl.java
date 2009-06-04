@@ -6,7 +6,7 @@ import javax.jain.protocol.ss7.map.*;
 import javax.jain.protocol.ss7.*;
 import javax.jain.*;
 
-public class MessageSessionProviderImpl implements MessageSessionProvider {
+public class MessageSessionProviderImpl implements java.rmi.Remote, MessageSessionProvider {
     public native long processMessageSessionOperation(SessionOpenReqEvent event, MessageSessionListener listener)
         throws SS7MandatoryParameterNotSetException;
     public native void processMessageSessionOperation(SessionDataReqEvent event, long sessionId)

@@ -79,22 +79,27 @@ public class CommitException extends SS7Exception {
     }
     /**
       * Adds an entry to the log file of this CommitException.
-      * @param success  Either:
+      * @param success
+      * Either: <ul>
       * <li>SUCCESS - the operation successfully completed.
       * <li>FAILED - the operation failed
-      * <li>UNKNOWN - could not determine whether the operation was successful or not.
-      * @param mBeanObjectName  The ObjectName of the MBean.
-      * @param operation  The opertion that was to be committed.
-      * @exception java.lang.NullPointerException  If any of the Objects
-      * supplied as parameters are null.
+      * <li>UNKNOWN - could not determine whether the operation was successful or not. </ul>
+      * @param mBeanObjectName
+      * The ObjectName of the MBean.
+      * @param operation
+      * The opertion that was to be committed.
+      * @exception java.lang.NullPointerException
+      * If any of the Objects supplied as parameters are null.
       */
     public void addEntry(int success, java.lang.String mBeanObjectName, java.lang.String operation)
         throws java.lang.NullPointerException {
-        if (success == null || mBeanObjectName == null || operation == null)
-            throw java.lang.NullPointerException();
+        /*
+        if (mBeanObjectName == null || operation == null)
+            throw new java.lang.NullPointerException();
         m_success = success;
         m_mBeanObjectName = mBeanObjectName;
         m_operation = operation;
+        */
     }
     /**
       * Returns a log of the operations.
@@ -113,6 +118,7 @@ public class CommitException extends SS7Exception {
       * </code>
       */
     public java.lang.String getLog() {
+        return new String("");
     }
 }
 

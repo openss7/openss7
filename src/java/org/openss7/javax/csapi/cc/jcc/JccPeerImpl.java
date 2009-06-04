@@ -3,7 +3,7 @@ package org.openss7.javax.csapi.cc.jcc;
 
 import javax.csapi.cc.jcc.*;
 
-public class JccPeerImpl implements JccPeer {
+public class JccPeerImpl implements java.rmi.Remote, JccPeer {
     public native String getName();
     public native String[] getServices();
     public native JccProvider getProvider(String providerString)

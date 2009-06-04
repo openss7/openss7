@@ -108,13 +108,13 @@ public class Imsi extends SS7Parameter {
         if (max > 3)
             max = 3;
         if (len > max)
-            throw SS7InvalidParamException("Mobile Country Code is too long by " + (len - max) + " digits.");
+            throw new SS7InvalidParamException("Mobile Country Code is too long by " + (len - max) + " digits.");
         for (int i=0; i < len; i++) {
             switch (mcc.charAt(i)) {
                 case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
                     break;
                 default:
-                    throw SS7InvalidParamException("Mobile Country Mobile Code bad digit '" + mcc.charAt(i) + "' at position " + i + ".");
+                    throw new SS7InvalidParamException("Mobile Country Mobile Code bad digit '" + mcc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_mcc = mcc;
@@ -140,13 +140,13 @@ public class Imsi extends SS7Parameter {
         if (max > 3)
             max = 3;
         if (len > max)
-            throw SS7InvalidParamException("Mobile Network Code is too long by " + (len - max) + " digits.");
+            throw new SS7InvalidParamException("Mobile Network Code is too long by " + (len - max) + " digits.");
         for (int i=0; i < len; i++) {
             switch (mnc.charAt(i)) {
                 case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
                     break;
                 default:
-                    throw SS7InvalidParamException("Mobile Network Code bad digit '" + mnc.charAt(i) + "' at position " + i + ".");
+                    throw new SS7InvalidParamException("Mobile Network Code bad digit '" + mnc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_mnc = mnc;
@@ -170,13 +170,13 @@ public class Imsi extends SS7Parameter {
         int len = msin.length();
         int max = 15 - length() + getMobileSubscriberNr().length();
         if (len > max)
-            throw SS7InvalidParamException("Mobile Subscriber Nr is too long by " + (len - max) + " digits.");
+            throw new SS7InvalidParamException("Mobile Subscriber Nr is too long by " + (len - max) + " digits.");
         for (int i=0; i < len; i++) {
             switch (msin.charAt(i)) {
                 case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
                     break;
                 default:
-                    throw SS7InvalidParamException("Mobile Subscriber Nr bad digit '" + msin.charAt(i) + "' at position " + i + ".");
+                    throw new SS7InvalidParamException("Mobile Subscriber Nr bad digit '" + msin.charAt(i) + "' at position " + i + ".");
             }
         }
         m_msin = msin;
@@ -208,9 +208,10 @@ public class Imsi extends SS7Parameter {
       * @param imsi IMSI to be compared with this IMSI.
       * @return True if equal, otherwise false.
       */
-    public boolean equals(Object imsi) {
+    public boolean equals(Object object) {
         try {
-            if (imsi instanceof Imsi) {
+            if (object != null && object instanceof Imsi) {
+                Imsi imsi = (Imsi) object;
                 if (m_mcc_is_set != imsi.m_mcc_is_set)
                     return false;
                 if (m_mnc_is_set != imsi.m_mnc_is_set)

@@ -5,7 +5,7 @@ import javax.sip.message.*;
 import javax.sip.header.*;
 import javax.sip.*;
 
-public class SipProviderImpl implements SipProvider {
+public class SipProviderImpl implements java.rmi.Remote, SipProvider {
     public native void addSipListener(SipListener sipListener)
         throws java.util.TooManyListenersException;
     public native void removeSipListener(SipListener sipListener);
