@@ -6,7 +6,7 @@ import javax.sip.message.*;
 import javax.sip.header.*;
 import javax.sip.*;
 
-public class SipStackImpl implements SipStack {
+public class SipStackImpl implements java.rmi.Remote, SipStack {
     public native SipProvider createSipProvider(ListeningPoint listeningPoint)
         throws ObjectInUseException;
     public native void deleteSipProvider(SipProvider sipProvider)

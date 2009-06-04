@@ -93,28 +93,29 @@ public class PositionArc extends PositionPoint {
       * @param includedAngle Angle width from left edge to the right edge of the arc (1 &lt;= width &lt;= 360).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
-    public PositionArc(float latitude, float longitude, float innerRadius, float uncertaintyRadius, float offsetAngle, float includedAngle) {
-        this();
-        m_latitude = latitude;
-        m_longitude = longitude;
-        this.setInnerRadius(innerRadius);
-        this.setUncertaintyRadius(uncertaintyRadius);
-        this.setOffsetAngle(offsetAngle);
-        this.setIncludedAngle(includedAngle);
+    public PositionArc(float latitude, float longitude, float innerRadius, float uncertaintyRadius, float offsetAngle, float includedAngle)
+        throws SS7InvalidParamException {
+        super(latitude, longitude);
+        setInnerRadius(innerRadius);
+        setUncertaintyRadius(uncertaintyRadius);
+        setOffsetAngle(offsetAngle);
+        setIncludedAngle(includedAngle);
     }
     /**
       * Empty constructor; needed for serializable objects and beans.
       */
-    public PositionArg() throws SS7InvalidParamException {
+    public PositionArc()
+        throws SS7InvalidParamException {
     }
     /**
       * Change the parameter specifying the inner radius of the arc.
       * @param innerRadius Inner radius of the arg in meters (0 &lt;= radius &lt;= 327675).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
-    public void setInnerRadius() throws SS7InvalidParamException {
+    public void setInnerRadius(float innerRadius)
+        throws SS7InvalidParamException {
         if (innerRadius < 0 || 327675 < innerRadius)
-            throw SS7InvalidParamException("Inner Radius " + innerRadius + " out of range.");
+            throw new SS7InvalidParamException("Inner Radius " + innerRadius + " out of range.");
         m_radius = innerRadius;
         m_radius_is_set = true;
     }
@@ -133,9 +134,10 @@ public class PositionArc extends PositionPoint {
       * @param uncertaintyRadius Arc depth from the inner radius to the outer radius in meters (0 &lt;= arc depth &lt;= 1800000).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
-    public void setUncertaintyRadius(float uncertaintyRadius) throws SS7InvalidParamException {
+    public void setUncertaintyRadius(float uncertaintyRadius)
+        throws SS7InvalidParamException {
         if (uncertaintyRadius < 0 || 1800000 < uncertaintyRadius)
-            throw SS7InvalidParamException("Uncertainty Radius " + uncertaintyRadius + " is out of range.");
+            throw new SS7InvalidParamException("Uncertainty Radius " + uncertaintyRadius + " is out of range.");
         m_uradius = uncertaintyRadius;
         m_uradius_is_set = true;
     }
@@ -143,7 +145,7 @@ public class PositionArc extends PositionPoint {
       * Get the parameter specifying the uncertainty radius of the arc.
       * @return Arc depth from the inner radius to the outer radius in meters (0 &lt;= arc depth &lt;= 1800000).
       */
-    public float getUncertaintyRadius(void) {
+    public float getUncertaintyRadius() {
         float uradius = 0;
         if (m_uradius_is_set)
             uradius = m_uradius;
@@ -154,9 +156,10 @@ public class PositionArc extends PositionPoint {
       * @param offsetAngle Angle clockwise from north to the left edge of the arc in degrees (0 &lt;= offset &lt;= 359).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
-    public void setOffsetAngle(float offsetAngle) throws SS7InvalidParamException {
+    public void setOffsetAngle(float offsetAngle)
+        throws SS7InvalidParamException {
         if (offsetAngle < 0 || 359 < offsetAngle)
-            throw SS7InvalidParamException("Offset Angle " + offsetAngle + " is out of range.");
+            throw new SS7InvalidParamException("Offset Angle " + offsetAngle + " is out of range.");
         m_offset = offsetAngle;
         m_offset_is_set = true;
     }
@@ -175,9 +178,10 @@ public class PositionArc extends PositionPoint {
       * @param includedAngle Angle width from left edge to the right edge of the arc (1 &lt;= width &lt;= 360).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
-    public void setIncludedAngle(float includedAngle) throws SS7InvalidParamException {
+    public void setIncludedAngle(float includedAngle)
+        throws SS7InvalidParamException {
         if (includedAngle < 1 || 360 < includedAngle)
-            throw SS7InvalidParamException("Included Angle " + includedAngle + " is out of range.");
+            throw new SS7InvalidParamException("Included Angle " + includedAngle + " is out of range.");
         m_angle = includedAngle;
         m_angle_is_set = true;
     }
@@ -196,9 +200,10 @@ public class PositionArc extends PositionPoint {
       * @param confidence The probability in percent that the target is within the uncertainty area (0 &lt;= confidence &lt;= 100).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
-    public void setConfidence(float confidence) throws SS7InvalidParamException {
+    public void setConfidence(float confidence)
+        throws SS7InvalidParamException {
         if (confidence < 0 || 100 < confidence)
-            throw SS7InvalidParamException("Confidence " + confidence + " is out of range.");
+            throw new SS7InvalidParamException("Confidence " + confidence + " is out of range.");
         m_confidence = confidence;
         m_confidence_is_set = true;
     }
@@ -219,55 +224,9 @@ public class PositionArc extends PositionPoint {
         return m_confidence_is_set;
     }
 
-    /**
-      * Change the parameter specifying the latitude.
-      * @param latitude Latitude in degrees (-90 &lt;= latitude &lt;= 90).
-      * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
-      */
-    protected void setLatitude(float latitude) throws SS7InvalidParamException {
-        if (latitude < -90 || 90 < latitude)
-            throw SS7InvalidParamException("Latitude " + latitude + " is out of range.");
-        m_latitude = latitude;
-        m_latitude_is_set = true;
-    }
-    /**
-      * Get the parameter specifying the latitude.
-      * @return Latitude in degrees (-90 &lt;= latitude &lt;= 90).
-      */
-    protected float getLatitude() {
-        float latitude = 0;
-        if (m_latitude_is_set)
-            latitude = m_latitude;
-        return latitude;
-    }
-    /**
-      * Change the parameter specifying the longitude.
-      * @param longitude Longitude in degrees (-180 &lt;= longitude &lt;= 180).
-      * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
-      */
-    protected void setLongitude(float latitude) throws SS7InvalidParamException {
-        if (longitude < -180 || 180 < longitude)
-            throw SS7InvalidParamException("Longitude " + longitude + " is out of range.");
-        m_longitude = longitude;
-        m_longitude_is_set = true;
-    }
-    /**
-      * Get the parameter specifying the longitude.
-      * @return Longitude in degrees (-180 &lt;= longitude &lt;= 180).
-      */
-    protected float getLongitude() {
-        float longitude = 0;
-        if (m_longitude_is_set)
-            longitude = m_longitude;
-        return longitude;
-    }
     /*
      * Private fields;
      */
-    private boolean m_latitude_is_set = false;
-    private float m_latitude = 0;
-    private boolean m_longitude_is_set = false;
-    private float m_longitude = 0;
     private boolean m_radius_is_set = false;
     private float m_radius;
     private boolean m_uradius_is_set = false;

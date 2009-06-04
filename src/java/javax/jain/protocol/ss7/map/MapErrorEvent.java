@@ -72,14 +72,14 @@ public class MapErrorEvent extends java.util.EventObject implements Serializable
       * @param error A vendor-defined object containing the error.
       */
     public MapErrorEvent(Object source, Object error) {
-        this();
-        this.setSource(source);
-        this.setError(error);
+        super(source);
+        setError(error);
     }
     /**
       * Empty constructure needed for serializable objects and beans.
       */
     public MapErrorEvent() {
+        super(null);
     }
     /**
       * Change the object contianing the error.
@@ -98,10 +98,6 @@ public class MapErrorEvent extends java.util.EventObject implements Serializable
         if (m_error_is_set)
             error = m_error;
         return error;
-    }
-    protected void setSource(Object source) {
-        m_source = source;
-        m_source_is_set = true;
     }
     public Object getSource() {
         Object source = null;

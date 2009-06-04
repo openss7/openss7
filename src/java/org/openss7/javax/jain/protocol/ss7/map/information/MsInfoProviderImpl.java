@@ -6,7 +6,7 @@ import javax.jain.protocol.ss7.map.*;
 import javax.jain.protocol.ss7.*;
 import javax.jain.*;
 
-public class MsInfoProviderImpl implements MsInfoProvider {
+public class MsInfoProviderImpl implements java.rmi.Remote, MsInfoProvider {
     public native long processMsInfoOperation(MsInfoReqEvent event, MsInfoListener listener)
         throws SS7MandatoryParameterNotSetException;
 }

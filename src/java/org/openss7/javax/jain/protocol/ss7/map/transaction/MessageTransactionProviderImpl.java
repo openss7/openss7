@@ -6,7 +6,7 @@ import javax.jain.protocol.ss7.map.*;
 import javax.jain.protocol.ss7.*;
 import javax.jain.*;
 
-public class MessageTransactionProviderImpl implements MessageTransactionProvider {
+public class MessageTransactionProviderImpl implements java.rmi.Remote, MessageTransactionProvider {
     public native long processMessageTransactionOperation(MtMessageReqEvent event, MessageTransactionListener listener)
         throws SS7MandatoryParameterNotSetException;
     public native void processMessageTransactionOperation(MoMessageRespEvent event, long transactionId)

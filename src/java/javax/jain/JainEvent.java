@@ -74,7 +74,7 @@ public abstract class JainEvent extends java.util.EventObject implements java.io
       * Empty constructor needed for serializable objects and beans.
       */
     public JainEvent() {
-        super();
+        super(null);
     }
     /**
       * Sets the sources of this event. This method may be used as an

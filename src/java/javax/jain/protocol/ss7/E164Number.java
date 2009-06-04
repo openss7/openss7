@@ -105,13 +105,13 @@ public class E164Number extends SS7Parameter {
       */
     public void setCountryCode(String cc) throws SS7InvalidParamException {
         if (cc.length() > 3)
-            throw SS7InvalidParamException("Country Code \"" + cc + "\" is too long.");
+            throw new SS7InvalidParamException("Country Code \"" + cc + "\" is too long.");
         for (int i = 0; i < cc.length(); i++) {
             switch (cc.charAt(i)) {
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                     break;
                 default:
-                    throw SS7InvalidParamException("Country Code invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
+                    throw new SS7InvalidParamException("Country Code invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_cc = cc;
@@ -148,7 +148,7 @@ public class E164Number extends SS7Parameter {
       * @return True or false.
       */
     public boolean isNatDestCodePresent() {
-        return m_ndc_is_present;
+        return m_ndc_is_set;
     }
     /**
       * Change the value of the Subscriber Number (SN).
@@ -157,17 +157,17 @@ public class E164Number extends SS7Parameter {
       */
     public void setSubscriberNumber(String sn) throws SS7InvalidParamException {
         if (sn == null)
-            throw SS7InvalidParamException("Subscriber Number must be specified.");
+            throw new SS7InvalidParamException("Subscriber Number must be specified.");
         int len = sn.length();
         int max = 15 - getCountryCode().length() - getNatDestCode().length();
         if (len > max)
-            throw SS7InvalidParamException("Subscriber Number invalid, " + (len - max) + " digits too long.");
+            throw new SS7InvalidParamException("Subscriber Number invalid, " + (len - max) + " digits too long.");
         for (int i=0; i < len; i++) {
-            switch (ndc.charAt(i)) {
+            switch (sn.charAt(i)) {
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                     break;
                 default:
-                    throw SS7InvalidParamException("Subscriber Number invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
+                    throw new SS7InvalidParamException("Subscriber Number invalid digit '" + sn.charAt(i) + "' at position " + i + ".");
             }
         }
         m_sn = sn;
@@ -198,13 +198,13 @@ public class E164Number extends SS7Parameter {
         int len = ndc.length();
         int max = 15 - getCountryCode().length() - getSubscriberNumber().length();
         if (len > max)
-            throw SS7InvalidParamException("Nat Dest Code invalid, " + (len - max) + " digits too long.");
+            throw new SS7InvalidParamException("Nat Dest Code invalid, " + (len - max) + " digits too long.");
         for (int i=0; i < len; i++) {
             switch (ndc.charAt(i)) {
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                     break;
                 default:
-                    throw SS7InvalidParamException("Nat Dest Code invalid digit '" + cc.charAt(i) + "' at position " + i + ".");
+                    throw new SS7InvalidParamException("Nat Dest Code invalid digit '" + ndc.charAt(i) + "' at position " + i + ".");
             }
         }
         m_ndc = ndc;
@@ -232,9 +232,10 @@ public class E164Number extends SS7Parameter {
       *	    Number.
       * @return True if equal, otherwise false.
       */
-    public boolean equals(Object e164) {
+    public boolean equals(Object object) {
         try {
-            if (e164 instanceof E164Number) {
+            if (object instanceof E164Number) {
+                E164Number e164 = (E164Number) object;
                 if (m_cc_is_set != e164.m_cc_is_set)
                     return false;
                 if (m_ndc_is_set != e164.m_ndc_is_set)
@@ -267,7 +268,7 @@ public class E164Number extends SS7Parameter {
         return len;
     }
 
-    private byte[] m_cc;
+    private String m_cc;
     private boolean m_cc_is_set = false;
     private String m_ndc;
     private boolean m_ndc_is_set = false;

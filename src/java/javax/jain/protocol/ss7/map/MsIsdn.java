@@ -57,7 +57,8 @@
 
 package javax.jain.protocol.ss7.map;
 
-import javax.jain.protocol.ss7.E164Number;
+import javax.jain.protocol.ss7.*;
+import javax.jain.*;
 
 /**
   * This parameter class represents an MS International PSTN/ISDN number (MSISDN).
@@ -71,6 +72,7 @@ public class MsIsdn extends E164Number implements MsNumber {
       * @exception SS7InvalidParamException Thrown if parameter(s) are invalid or out of range.
       */
     public MsIsdn(String cc, String sn) throws SS7InvalidParamException {
+        super(cc, sn);
     }
     /**
       * Empty constructure; needed for serializable objects and beans.

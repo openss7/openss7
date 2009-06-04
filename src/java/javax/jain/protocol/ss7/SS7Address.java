@@ -124,7 +124,7 @@ public class SS7Address extends SS7Parameter implements Cloneable, Serializable 
             byte[] spc = m_spc;
             return spc;
         }
-        throw SS7ParameterNotSetException("Signaling Point Code is not set.");
+        throw new SS7ParameterNotSetException("Signaling Point Code is not set.");
     }
 
     /**
@@ -149,7 +149,7 @@ public class SS7Address extends SS7Parameter implements Cloneable, Serializable 
             case 0:
             case 1:
             case 255:
-                throw SS7InvalidParameterException("SubSystem Number value " + ssn + " is invalid.");
+                throw new SS7InvalidParamException("SubSystem Number value " + ssn + " is invalid.");
         }
         m_ssn = ssn;
         m_ssn_is_set = true;
@@ -168,7 +168,7 @@ public class SS7Address extends SS7Parameter implements Cloneable, Serializable 
         if (m_ssn_is_set) {
             return m_ssn;
         }
-        throw SS7ParameterNotSetException("SubSystem Number is not set.");
+        throw new SS7ParameterNotSetException("SubSystem Number is not set.");
     }
 
     /**
@@ -194,7 +194,7 @@ public class SS7Address extends SS7Parameter implements Cloneable, Serializable 
             m_gt_is_set = true;
             return;
         }
-        throw SS7InvalidParamException("E164 Number is invalid.");
+        throw new SS7InvalidParamException("E164 Number is invalid.");
     }
 
     /**
@@ -210,7 +210,7 @@ public class SS7Address extends SS7Parameter implements Cloneable, Serializable 
         if (m_gt_is_set) {
             return m_gt;
         }
-        throw SS7ParameterNotSetException("Global Title (GT) not set.");
+        throw new SS7ParameterNotSetException("Global Title (GT) not set.");
     }
 
     /**
@@ -253,26 +253,27 @@ public class SS7Address extends SS7Parameter implements Cloneable, Serializable 
       */
     public boolean equals(Object sa) {
         if (sa instanceof SS7Address) {
-            if (m_spc_is_set != sa.m_spc_is_set)
+            SS7Address other = (SS7Address) sa;
+            if (m_spc_is_set != other.m_spc_is_set)
                 return false;
-            if (m_ssn_is_set != sa.m_ssn_is_set)
+            if (m_ssn_is_set != other.m_ssn_is_set)
                 return false;
-            if (m_gt_is_set != sa.m_gt_is_set)
+            if (m_gt_is_set != other.m_gt_is_set)
                 return false;
             if (m_spc_is_set) {
-                if (m_spc.length != sa.m_spc.length)
+                if (m_spc.length != other.m_spc.length)
                     return false;
                 for (int i=0; i < m_spc.length; i++) {
-                    if (m_spc[i] != sa.m_spc[i])
+                    if (m_spc[i] != other.m_spc[i])
                         return false;
                 }
             }
             if (m_ssn_is_set) {
-                if (m_ssn != sa.m_ssn)
+                if (m_ssn != other.m_ssn)
                     return false;
             }
             if (m_gt_is_set) {
-                if (!m_gt.equals(sa.m_gt))
+                if (!m_gt.equals(other.m_gt))
                     return false;
             }
             return true;

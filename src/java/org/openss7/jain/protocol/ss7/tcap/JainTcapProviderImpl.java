@@ -59,11 +59,19 @@ package org.openss7.jain.protocol.ss7.tcap;
 
 import java.util.*;
 
-import jain.*;
-import jain.protocol.ss7.*;
+import jain.protocol.ss7.tcap.component.*;
+import jain.protocol.ss7.tcap.dialogue.*;
 import jain.protocol.ss7.tcap.*;
+import jain.protocol.ss7.*;
+import jain.*;
 
-public class JainTcapProviderImpl implements JainTcapProvider {
+public class JainTcapProviderImpl implements java.rmi.Remote, Runnable, JainTcapProvider {
+    protected JainTcapProviderImpl() {
+    }
+    public JainTcapProviderImpl(JainTcapStackImpl stack) {
+        m_stack = stack;
+    }
+    public native void finalize();
     public native int getNewDialogueId()
         throws IdNotAvailableException;
     public native void releaseDialogueId(int dialogueId)
@@ -82,9 +90,61 @@ public class JainTcapProviderImpl implements JainTcapProvider {
         throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException;
     public native void removeJainTcapListener(JainTcapListener listener)
         throws ListenerNotRegisteredException;
-    public native JainTcapStack getAttachedStack();
-    public native JainTcapStack getStack();
+    public JainTcapStack getAttachedStack() {
+        return getStack();
+    }
+    public JainTcapStack getStack() {
+        return m_stack;
+    }
     public native boolean isAttached();
+
+    public void run() {
+        while (running) {
+            try {
+                EventObject rawevent;
+                rawevent = recvTcapEvent();
+                if (rawevent != null) {
+                    Object source;
+
+                    /* The source of the event is really the destination
+                     * JainTcapListener object registered for this event.
+                     * So we cast the object and pass it to the listener,
+                     * resetting the source to us.  When the event is
+                     * destined to more than one listener, it is the
+                     * responsibility of the native method to duplicate
+                     * it. */
+                    source = rawevent.getSource();
+                    if (source instanceof JainTcapListener) {
+                        JainTcapListener listener = (JainTcapListener) source;
+                        /* TODO: we might want to spawn a thread from a
+                         * thread pool to process the event. */
+                        if (rawevent instanceof DialogueIndEvent) {
+                            DialogueIndEvent event = (DialogueIndEvent) rawevent;
+                            event.setSource((Object) this);
+                            listener.processDialogueIndEvent(event);
+                        } else if (rawevent instanceof ComponentIndEvent) {
+                            ComponentIndEvent event = (ComponentIndEvent) rawevent;
+                            event.setSource((Object) this);
+                            listener.processComponentIndEvent(event);
+                        } else if (rawevent instanceof TcapErrorEvent) {
+                            TcapErrorEvent event = new TcapErrorEvent(this, ((TcapErrorEvent)rawevent).getError());
+                            listener.processTcapError(event);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                /* If there is an exception, discard the event. */
+            }
+        }
+    }
+    public void shutdown() {
+        running = false;
+    }
+
+    protected native EventObject recvTcapEvent();
+
+    private JainTcapStackImpl m_stack;
+    private boolean running = true;
 }
 
 // vim: ft=java tw=72 sw=4 et com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

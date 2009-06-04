@@ -80,12 +80,12 @@ public class NetworkIndicator {
             return "NI_NATIONAL_10";
         case M_NI_INTERNATIONAL_01:
             return "NI_INTERNATIONAL_01";
-			case M_NI_INTERNATIONAL_00:
+        case M_NI_INTERNATIONAL_00:
             return "NI_INTERNATIONAL_00";
-			default:
+        default:
             return "ERROR";
-	 }
-	}
+      }
+   }
 
    /**
     * Gets the integer representation of the Constant class
@@ -94,12 +94,12 @@ public class NetworkIndicator {
     */
    public int intValue() {
       return m_Value;
-	}
+   }
 
    // Internal variable to store the Constant Value in a useful format
    private final int m_Value;
 
-		
+
     /**
     * Indicates the International Network 00, which is International.
     */
