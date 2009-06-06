@@ -52,7 +52,7 @@
 ##
 ## =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.10 dist-bzip2 std-options -Wall color-tests
+AUTOMAKE_OPTIONS = gnits 1.11 dist-bzip2 std-options -Wall color-tests
 
 ECHO = echo
 

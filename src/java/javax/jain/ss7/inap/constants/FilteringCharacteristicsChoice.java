@@ -103,6 +103,6 @@ public static final FilteringCharacteristicsChoice  NUMBER_OF_CALLS  = new  Filt
 	}
 
 
-}// end class
+}
 
 

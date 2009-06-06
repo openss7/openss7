@@ -72,6 +72,8 @@ m4_include([m4/lib32.m4])
 m4_include([m4/perl.m4])
 m4_include([m4/snmp.m4])
 m4_include([m4/agent.m4])
+m4_include([m4/jar.m4])
+m4_include([m4/gcj.m4])
 
 
 # =============================================================================
@@ -80,9 +82,11 @@ m4_include([m4/agent.m4])
 AC_DEFUN([AC_OPENSS7], [dnl
     _OPENSS7_PACKAGE([OpenSS7], [OpenSS7])
     PKGINCL="src/include/sys/${PACKAGE_LCNAME}"
+    _GCJ_CONFIG
     _OS7_OPTIONS
     _AUTOPR
     _MAN_CONVERSION
+    _JAR
     _PUBLIC_RELEASE
     _INIT_SCRIPTS
     _RPM_SPEC

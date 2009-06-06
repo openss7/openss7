@@ -254,4 +254,3 @@ public static final ErrorCode CHAINING_REFUSED=new ErrorCode (M_CHAINING_REFUSED
 	}
 	
 }
-// end class

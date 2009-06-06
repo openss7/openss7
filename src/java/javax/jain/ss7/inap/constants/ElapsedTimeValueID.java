@@ -105,7 +105,7 @@ public static final ElapsedTimeValueID CALL_CONNECTED_ELAPSED_TIME_VALUE=new Ela
 	
 	}
 	
-}// end class
+}
 
 
 

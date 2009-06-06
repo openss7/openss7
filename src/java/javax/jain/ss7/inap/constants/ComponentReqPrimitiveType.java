@@ -160,7 +160,7 @@ public static final ComponentReqPrimitiveType TIMER_RESET=new ComponentReqPrimit
 	
 	}
 
-}//end class
+}
 
 
 

@@ -113,6 +113,5 @@ public static final ExtensionType STRING_TYPE =new ExtensionType (M_STRING_TYPE)
 	}
 	
 }
-// end class
 
 

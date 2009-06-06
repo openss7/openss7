@@ -122,4 +122,4 @@ Constructor for Received Status datatype
 	}
 	
 		   
-}// end class 
+}

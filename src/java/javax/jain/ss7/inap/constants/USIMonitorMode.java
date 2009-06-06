@@ -97,4 +97,4 @@ Constructor for USIMonitorMode datatype
 	}
 
 
-}// end class 
+}

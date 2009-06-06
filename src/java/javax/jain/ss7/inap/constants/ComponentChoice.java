@@ -99,5 +99,5 @@ public static final ComponentChoice RELAYED_COMPONENT= new ComponentChoice (M_RE
 	
 	}
 	
-}//end class
+}
 

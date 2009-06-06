@@ -58,7 +58,6 @@ package javax.jain.ss7.isup;
 
 import javax.jain.ss7.*;
 import javax.jain.*;
-import javax.*;
 
 /** This is the base class for all the NumberParameter/ID subclasses.
   * These subclasses extend this NumberParameter Class and add their own specific methods

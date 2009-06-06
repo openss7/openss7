@@ -300,4 +300,4 @@ public static final EventTypeBCSM CALL_ACCPETED  = new EventTypeBCSM (M_CALL_ACC
 	}
 	
    
-}//end class
+}

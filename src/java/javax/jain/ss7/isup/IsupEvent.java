@@ -58,7 +58,6 @@ package javax.jain.ss7.isup;
 
 import javax.jain.ss7.*;
 import javax.jain.*;
-import javax.*;
 
 /** The IsupEvent class is the supercalss of all ISUP primitives that can be exchanged
   * between an object implementing the JainIsupProvider interface and an object
@@ -188,7 +187,7 @@ public abstract class IsupEvent extends java.util.EventObject implements java.la
             pc[0] = destpc.getMember();
             pc[1] = destpc.getCluster();
             pc[2] = destpc.getZone();
-        } catch (MandatoryParameterNotSetException e) {
+        } catch (Exception e) {
             throw new ParameterRangeInvalidException("Destination Point Code out of range.");
         }
         m_dpc = destpc;
@@ -204,7 +203,7 @@ public abstract class IsupEvent extends java.util.EventObject implements java.la
             pc[0] = origpc.getMember();
             pc[1] = origpc.getCluster();
             pc[2] = origpc.getZone();
-        } catch (MandatoryParameterNotSetException e) {
+        } catch (Exception e) {
             throw new ParameterRangeInvalidException("Origination Point Code out of range.");
         }
         m_opc = origpc;

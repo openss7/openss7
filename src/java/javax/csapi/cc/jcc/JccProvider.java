@@ -662,7 +662,7 @@ public interface JccProvider {
 
      */
     public void addConnectionListener( JccConnectionListener connectionlistener, EventFilter filter)throws ResourceUnavailableException, 
-    MethodNotSupportedException;;
+    MethodNotSupportedException;
 
     /**
 		Removes a connection listener that was registered previously.

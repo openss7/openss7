@@ -109,5 +109,5 @@ public static final InfoToSendChoice DISPLAY_INFORMATION   = new InfoToSendChoic
 	
 		return infoToSendChoice;
 	}
-}// end class
+}
 

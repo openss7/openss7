@@ -106,5 +106,5 @@ public static final Media FAX_GROUP_4 =new  Media (M_FAX_GROUP_4);
 	}
 	
 	
-}// end class 
+}
 

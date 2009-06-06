@@ -107,4 +107,4 @@ Constructor for ResponseCondition datatype
 	 
 	 
 	 
-}// end Class 
+}

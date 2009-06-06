@@ -124,5 +124,4 @@ public static final FacilityGroupChoice  ROUTE_INDEX = new FacilityGroupChoice (
 	}
 	
 }
-//end class
 

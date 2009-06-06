@@ -316,5 +316,5 @@ public static final EventSpecificInformationBCSMChoice T_ABANDON  =new EventSpec
 	}
 		
 	
-} //end class
+}
 

@@ -81,7 +81,7 @@ public class PrivilegeViolationException extends Exception {
     public int getType()
     {
         return _type; 
-    };
+    }
 
 /**
     A privilege violation occurred at the origination. 

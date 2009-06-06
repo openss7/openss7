@@ -115,4 +115,3 @@ public static final MessageIDChoice  VARIABLE_MESSAGE =new MessageIDChoice (M_VA
 	}
 	
 }
-// end class

@@ -99,4 +99,4 @@ Constructor for SideID datatype
 		return sideID ;
 		
 	}
-}// end class 
+}

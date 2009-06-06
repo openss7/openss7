@@ -134,5 +134,5 @@ public static final GapCriteriaChoice CALLING_ADDRESS_AND_SERVICE  =new GapCrite
 			return gapCriteriaChoice;
 	}
 	
-}// end class
+}
 

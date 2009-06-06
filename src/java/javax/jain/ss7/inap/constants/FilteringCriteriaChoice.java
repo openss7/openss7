@@ -121,4 +121,3 @@ public static final FilteringCriteriaChoice  ADDRESS_AND_SERVICE = new Filtering
 	}
 
 }
-//end class

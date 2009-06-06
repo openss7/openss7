@@ -68,6 +68,76 @@ m4_ifdef([AC_COPYRIGHT],
 ]m4_bpatsubst([[$1]], [^], [ * ])[
  */])])])
 
+# AC_LANG_FLAG(FLAG, [ACTION-IF-WORKS], [ACTION-IF-NOT-WORK])
+# -----------------------------------------------------------
+# Test compilation with FLAG.
+AC_DEFUN([AC_LANG_FLAG],
+[_AC_LANG_DISPATCH([$0], _AC_LANG, $@)])
+
+# AC_LANG_FLAG(C)(FLAG, [IF-WORKS], [IF-DOES-NOT-WORK])
+# --------------------------------------------------------
+# Test whether a flag works on its own.  Consider the flag to not work if it
+# generates warnings when plain compiles do not.
+m4_define([AC_LANG_FLAG(C)],
+[ac_test_CFLAGS=${CFLAGS+set}
+ac_save_CFLAGS=$CFLAGS
+AS_VAR_PUSHDEF([CacheVar], [AS_TR_SH(ac_cv_prog_c[]$1)])dnl
+AC_CACHE_CHECK(whether $GCJ accepts $1, CacheVar,
+    [ac_save_c_werror_flag=$ac_c_werror_flag
+     ac_c_werror_flag=yes
+     AS_VAR_SET([CacheVar], [no])
+     CFLAGS="$1"
+     _AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+	AS_VAR_SET([CacheVar], [yes]),
+	[CFLAGS=""
+	_AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+	    [],
+	    [ac_c_werror_flag=$ac_save_c_werror_flag
+	     CFLAGS="$1"
+	     _AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+		AS_VAR_SET([CacheVar], [yes]))])])
+     ac_c_werror_flag=$ac_save_c_werror_flag])
+if test :AS_VAR_GET([CacheVar]) = :yes
+then :;
+$2
+else :;
+$3
+fi[]dnl
+AS_VAR_POPDEF([CacheVar])dnl
+])
+
+# AC_LANG_FLAG(C++)(FLAG, [IF-WORKS], [IF-DOES-NOT-WORK])
+# --------------------------------------------------------
+# Test whether a flag works on its own.  Consider the flag to not work if it
+# generates warnings when plain compiles do not.
+m4_define([AC_LANG_FLAG(C++)],
+[ac_test_CFLAGS=${CFLAGS+set}
+ac_save_CFLAGS=$CFLAGS
+AS_VAR_PUSHDEF([CacheVar], [AS_TR_SH(ac_cv_prog_cxx[]$1)])dnl
+AC_CACHE_CHECK(whether $GCJ accepts $1, CacheVar,
+    [ac_save_cxx_werror_flag=$ac_cxx_werror_flag
+     ac_cxx_werror_flag=yes
+     AS_VAR_SET([CacheVar], [no])
+     CFLAGS="$1"
+     _AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+	AS_VAR_SET([CacheVar], [yes]),
+	[CFLAGS=""
+	_AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+	    [],
+	    [ac_cxx_werror_flag=$ac_save_cxx_werror_flag
+	     CFLAGS="$1"
+	     _AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+		AS_VAR_SET([CacheVar], [yes]))])])
+     ac_cxx_werror_flag=$ac_save_cxx_werror_flag])
+if test :AS_VAR_GET([CacheVar]) = :yes
+then :;
+$2
+else :;
+$3
+fi[]dnl
+AS_VAR_POPDEF([CacheVar])dnl
+])
+
 # =============================================================================
 # _OPENSS7_PACKAGE([SHORT-TITLE], [LONG-TITLE])
 # -----------------------------------------------------------------------------

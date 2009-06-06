@@ -160,23 +160,23 @@ import javax.csapi.cc.jcc.*;
   */
 public interface JcatTerminalConnection {
     /** This state is the initial state for a JcatTerminalConnection object.  */
-    public static final int IDLE;
+    public static final int IDLE = 1;
     /** This state indicates the JcatTerminal is ringing and that the JcatTerminal has an
       * incoming JcatCall.  */
-    public static final int RINGING;
+    public static final int RINGING = 2;
     /** This state indicates that a particular JcatTerminal has permanently left the call.
       * */
-    public static final int DROPPED;
+    public static final int DROPPED = 3;
     /** This state indicates that a JcatTerminal is currently bridged into a Call.  */
-    public static final int BRIDGED;
+    public static final int BRIDGED = 4;
     /** This state indicates that the JcatTerminal is actively part of a JcatCall.  */
-    public static final int TALKING;
+    public static final int TALKING = 5;
     /** This state indicates that a JcatTerminal hardware resource is currently in use.
       * */
-    public static final int INUSE;
+    public static final int INUSE = 6;
     /** This state indicates that a JcatTerminal is part of a JcatCall, but is on hold.
       * */
-    public static final int HELD;
+    public static final int HELD = 7;
     /**
       * Answers an incoming telephone call on this Terminal Connection.  This operation
       * waits (i.e. the invoking thread blocks) until the telephone call has been answered

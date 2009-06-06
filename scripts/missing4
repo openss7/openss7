@@ -1,0 +1,297 @@
+#!/bin/sh
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+# missing4 for more commands ala missing
+#
+# This particular missing script is used for missing java and swig comamnds.
+# Some commands can be replaced by scripts themselves and can be simplified
+# here to do just the things needed by our makefiles.
+
+scriptversion=2009-06-04.01
+
+if test $# -eq 0; then
+    cat 1>&2 <<-EOF
+	Try \'$0 --help' for more information
+	EOF
+    exit 1
+fi
+
+script="$0"
+scriptname=$(basename $0)
+run=:
+sed_output='s/.* --output[ =]\([^ ]*\).*/\1/p'
+sed_minuso='s/.* -o \([^ ]*\).*/\1/p'
+
+msg="missing on your system"
+
+case $1 in
+    (--run)
+	# Try to run requested program, and just exit if it succeeds.
+	run=
+	shift
+	"$@" && exit 0
+	# Exit code 63 means version mismatch.  This often happens when the
+	# user tries to use an ancient version of a tool on a file that
+	# requires a minimum version.  In this case we should proceed as
+	# thorugh the program has been absent, or as though --run has not been
+	# passed.
+	if test $? = 63 ; then
+	    run=:
+	    msg="probably too old"
+	fi
+	;;
+
+    (-h|--h|--he|--hel|--help)
+	cat <<-EOF
+		$0 [OPTION]... PROGRAM [ARGUMENT]...
+		
+		Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
+		an error status if there is no known handling for PROGRAM.
+		
+		Options:
+		  -h, --help	    display this help and exit
+		  -v, --version	    output version information and exit
+		  -c, --copying	    output copying information and exit
+		  --run		    try to run PROGRAM, and emulate if it fails
+		
+		Supported PROGRAM values:
+		  Scripting Interface commands:
+		      swig			    touch the output files
+		
+		  Java commands:
+		      jar			    create an archive using zip
+		
+		
+		
+		Send problem reports to <bugs@openss7.org>.
+		EOF
+	exit $?
+	;;
+
+    (-v|--v|--ve|--ver|--vers|--versi|--versio|--version)
+	;;
+
+    (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
+	cat <<-EOF
+		Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+		Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+		
+		All Rights Reserved.
+		
+		This program is free software; you can redistribute it and/or modify it
+		under the terms of the GNU Affero General Public License as published by
+		the Free Software Foundation; version 3 of the License.
+		
+		This program is distributed in the hope that it will be useful, but
+		WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
+		General Public License for more details.
+		
+		You should have received a copy of the GNU Affero General Public License
+		along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+		write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+		02139, USA.
+		
+		U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+		on behalf of the U.S. Government ("Government"), the following
+		provisions apply to you.  If the Software is supplied by the Department
+		of Defense ("DoD"), it is classified as "Commercial Computer Software"
+		under paragraph 252.227-7014 of the DoD Supplement to the Federal
+		Acquisition Regulations ("DFARS") (or any successor regulations) and the
+		Government is acquiring only the license rights granted herein (the
+		license rights customarily provided to non-Government users).  If the
+		Software is supplied to any unit or agency of the Government other than
+		DoD, it is classified as "Restricted Computer Software" and the
+		Government's rights in the Software are defined in paragraph 52.227-19
+		of the Federal Acquisition Regulations ("FAR") (or any successor
+		regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+		NASA Supplement to the FAR (or any successor regulations).
+		
+		Commercial licensing and support of this software is available from
+		OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+		EOF
+	;;
+
+    (-*)
+	cat 1>&2 <<-EOF
+		$0: Unknown \`$1' option
+		Try \`$0 --help' for more information
+		EOF
+	exit 1
+	;;
+
+esac
+
+program="$1" ; shift
+
+zeroarg=`which $program 2>/dev/null` ; test -n $zeroarg || zeroarg="$program"
+
+# Now exit if we have PROGRAM, but it failed.  Also exit now if we do not have
+# PROGRAM and --version, --help or --copying was passed to PROGRAM (most likely
+# to detect the program).
+
+case $program in
+    (swig)
+	# does not handle --version or --help, but handles -version or -help
+	if test -z "$run" && ($program -version) >/dev/null 2>&1 ; then
+	elif test ":$2" = ":-version" || test ":$2" = ":-help" ; then
+	    # Could not run -version or -help.  This is probably someone
+	    # running `$TOOL -version' or `$TOOL -help' to check whether $TOOL
+	    # exists and not knowing $TOOL uses missing4.
+	    exit 1
+	fi
+	;;
+    (*)
+	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
+	elif test ":$2" = ":--version" || test ":$2" = ":--help" ; then
+	    # Could not run --version or --help.  This is probably someone
+	    # running `$TOOL --version' or `$TOOL --help' to check whether
+	    # $TOOL exists and not knowing $TOOL uses missing4.
+	    exit 1
+	fi
+	;;
+esac
+
+# If PROGRAM does not exist, or fails to run (possibly an outdated version),
+# try to emulate PROGRAM.
+case $program in
+    (swig)
+	cat 1>&2 <<-EOF
+		*** 
+		*** WARNING: \`$program' is needed, and is $msg.
+		*** 
+		*** You may have altered some SWIG module files that need to create
+		*** corresponding wrapper files.  You may need an appropriate version of
+		*** the \`swig' program to convert those module files to wrapper files.
+		*** You can normally get \'swig' as part of many popular Linux
+		*** distributions.  On recent RPM based systems, try \`yum install
+		*** swig'.  On recent DEB based systems, try \`apt-get install swig'.
+		*** On SuSE, \`zypper install swig'.  \`Swig' has been available for
+		*** many years: you can get \`Swig' from sourceforge.  A recent version
+		*** of swig is also available from the OpenSS7 project site at
+		*** http://www.openss7.org/repo/tarballs/swig-1.3.39.tar.gz
+		***
+		EOF
+	file=`echo "$*" | sed -n "$sed_output"`
+	test -z "$file" && file=`echo "$*" | sed -n "$sed_minuso"`
+	if test -z "$file" ; then
+	    # figure out the default output file name
+	    input=`echo "$*" | sed -n 's/.* \([^ ]*\)/\1/p'`
+	    if test -f "$input" ; then
+		# look for %module statement
+		module=`grep '^%module' $input | sed -n 's/%module.* \([^ ]*\)/\1/p'`
+		if test -n "$module" ; then
+		    case "$*" in
+			(* -c++ *)
+			    # c++ wrapper file
+			    file="${module}_wrap.cxx"
+			    ;;
+			(*)
+			    # c wrapper file
+			    file="${module}_wrap.c"
+			    ;;
+		    esac
+		else
+		    exit 1
+		fi
+	    else
+		exit 1
+	    fi
+	fi
+	if test -n "$file" -a -f "$file" ; then
+	    touch $file
+	else
+	    exit 1
+	fi
+	;;
+    (jar)
+	cat 1>&2 <<-EOF
+		*** 
+		*** WARNING: \`$program' is needed, and is $msg.
+		*** 
+		*** You may have altered some Java files that need to create
+		*** corresponding Java archive.  You may need an appropriate version of
+		*** the \`jar' program to convert those module files to wrapper files.
+		*** You can normally get \'jar' as part of many popular Linux
+		*** distributions.  On recent RPM based systems, try \`yum install
+		*** fastjar'.  On recent DEB based systems, try \`apt-get install
+		*** fastjar'.  On SuSE, \`zypper install fastjar'.  \`Jar' has been
+		*** available for many years: you can get \`Jar' as part of any JDK.
+		***
+		EOF
+	    # should be able to use zip, but what the hey...
+	    exit 1
+	;;
+    (*)
+	cat 1>&2 <<-EOF
+		*** 
+		*** WARNING: \`$program' is needed, and is $msg.
+		*** 
+		*** You might have modified some files without having the proper tools
+		*** for further handling them.  Check the \`README' file, it often tells
+		*** you about the needed prerequisites for installing this package.  You
+		*** may also peek at any GNU archive site, in case some other package
+		*** would contain this missing \`$program' program.
+		*** 
+		EOF
+	exit 1
+	;;
+esac
+
+exit 0
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

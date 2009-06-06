@@ -103,4 +103,4 @@ public class ReceivedInformationChoice {
 		return receivedInformationChoice;
 	}
 	
-}// end class
+}

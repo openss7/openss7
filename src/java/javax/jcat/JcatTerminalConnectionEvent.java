@@ -67,33 +67,33 @@ import javax.csapi.cc.jcc.*;
   */
 public interface JcatTerminalConnectionEvent extends JccEvent {
     /** Cause code indicating the event is related to the park feature. */
-    public static final int CAUSE_PARK;
+    public static final int CAUSE_PARK = 1;
     /** Cause code indicating the event is related to the unhold feature. */
-    public static final int CAUSE_UNHOLD;
+    public static final int CAUSE_UNHOLD = 2;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.IDLE.  */
-    public static final int TERMINALCONNECTION_IDLE;
+    public static final int TERMINALCONNECTION_IDLE = 1;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.RINGING.  */
-    public static final int TERMINALCONNECTION_RINGING;
+    public static final int TERMINALCONNECTION_RINGING = 2;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.DROPPED.  */
-    public static final int TERMINALCONNECTION_DROPPED;
+    public static final int TERMINALCONNECTION_DROPPED = 3;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.BRIDGED.  */
-    public static final int TERMINALCONNECTION_BRIDGED;
+    public static final int TERMINALCONNECTION_BRIDGED = 4;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.TALKING.  */
-    public static final int TERMINALCONNECTION_TALKING;
+    public static final int TERMINALCONNECTION_TALKING = 5;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.INUSE.  */
-    public static final int TERMINALCONNECTION_INUSE;
+    public static final int TERMINALCONNECTION_INUSE = 6;
     /** This event indicates that the state of the JcatTerminalConnection object has
       * changed to JcatTerminalConnection.HELD.  */
-    public static final int TERMINALCONNECTION_HELD;
+    public static final int TERMINALCONNECTION_HELD = 7;
     /** This event indicates that event transmissions associated with the associated
       * JcatTerminalConnection object have ended.  */
-    public static final int TERMINALCONNECTION_EVENT_TRANSMISSION_ENDED;
+    public static final int TERMINALCONNECTION_EVENT_TRANSMISSION_ENDED = 8;
     /**
       * This method returns the JcatTerminalConnection associated with this
       * JcatTerminalConnectionEvent. The result of this call might be a cast of the result of

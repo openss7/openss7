@@ -111,4 +111,3 @@ public int getGapTreatmentChoice()
 }
 
 }
-// end class

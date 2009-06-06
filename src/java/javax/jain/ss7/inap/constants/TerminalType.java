@@ -134,4 +134,4 @@ Constructor for TerminalType datatype
 	{
 			return terminalType ;
 	}
-} // end class 
+}

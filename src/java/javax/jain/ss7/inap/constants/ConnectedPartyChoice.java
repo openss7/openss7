@@ -102,6 +102,6 @@ public static final ConnectedPartyChoice CALL_SEGMENT_ID =new ConnectedPartyChoi
 	}
 	
        
-}//end class
+}
 
 

@@ -265,7 +265,7 @@ Constructor for TriggerType datatype
 	}
 
 	   
-}// end class 
+}
 
 
 

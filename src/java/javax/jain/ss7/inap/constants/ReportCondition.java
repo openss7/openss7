@@ -113,4 +113,3 @@ Constructor for ReportCondition datatype
 	}	
 	
 }
-// end Class 

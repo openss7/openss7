@@ -118,4 +118,3 @@ public static final MonitorMode  TRANSPARENT =new MonitorMode (M_TRANSPARENT);
 	}
 
 }
-// end class

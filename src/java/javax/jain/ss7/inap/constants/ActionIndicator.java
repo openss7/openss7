@@ -104,4 +104,4 @@ Constructor for ActionIndicator datatype
   
     
     
-}//end class
+}

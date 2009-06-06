@@ -134,4 +134,3 @@ public static final FeatureRequestIndicator SPARE_N  =new FeatureRequestIndicato
 	}
 
 }
-//end class
