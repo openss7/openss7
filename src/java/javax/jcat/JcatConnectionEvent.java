@@ -67,7 +67,7 @@ import javax.csapi.cc.jcc.*;
   */
 public interface JcatConnectionEvent extends JccConnectionEvent, JcatCallEvent {
     /** This event indicates that the state of the JcatConnection object has changed to JcatConnection.SUSPENDED.  */
-    public static final int CONNECTION_SUSPENDED;
+    public static final int CONNECTION_SUSPENDED = 1;
 }
 
 // vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

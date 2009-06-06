@@ -115,5 +115,5 @@ Constructor for GeneralProblem datatype
 		return generalProblem;
 	}
 
-}// end class
+}
 

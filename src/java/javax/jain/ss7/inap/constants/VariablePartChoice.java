@@ -120,4 +120,4 @@ public class VariablePartChoice {
 		return variablePartChoice;
 	}
     
-}// end class
+}

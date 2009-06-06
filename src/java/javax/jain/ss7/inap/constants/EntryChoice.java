@@ -101,5 +101,5 @@ public static final EntryChoice NETWORK_SPECIFIC  =new EntryChoice (M_NETWORK_SP
 		return entryChoice;
 	}
 	
-}// end class
+}
 

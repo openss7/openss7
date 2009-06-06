@@ -118,5 +118,4 @@ public static final ErrorTreatment REPEAT_PROMPT =new ErrorTreatment (M_REPEAT_P
 	}
     
 }
-// end class
 

@@ -135,5 +135,5 @@ Constructor for RequestedInformationType datatype
 		
 	}
 	
-}// end class 
+}
 

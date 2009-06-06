@@ -139,4 +139,3 @@ Constructor for DialoguePrimitiveType datatype
     	
     
 }
-//end class

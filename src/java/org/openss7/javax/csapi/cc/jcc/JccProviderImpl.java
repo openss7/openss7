@@ -32,7 +32,7 @@ public class JccProviderImpl implements java.rmi.Remote, JccProvider {
         throws MethodNotSupportedException, ResourceUnavailableException;
     public native void removeCallListener( JccCallListener calllistener );
     public native void addConnectionListener( JccConnectionListener connectionlistener, EventFilter filter)
-        throws ResourceUnavailableException, MethodNotSupportedException;;
+        throws ResourceUnavailableException, MethodNotSupportedException;
     public native void removeConnectionListener( JccConnectionListener connectionlistener);
     public native void setCallLoadControl(JccAddress[] address, double duration, double[] mechanism,int[] treatment)
         throws MethodNotSupportedException;

@@ -102,4 +102,4 @@ public static final MessageType NOTIFICATION  = new MessageType (M_NOTIFICATION)
 	
 	
 
-}// end class 
+}

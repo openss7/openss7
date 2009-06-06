@@ -109,4 +109,4 @@ Constructor for VariablePartID datatype
 	
 	}
     	 
-}// end class 
+}

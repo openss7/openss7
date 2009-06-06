@@ -60,11 +60,11 @@ include ../../am/openss7.am
 # General Rules
 #############################################################################
 
-####javadir = $(datadir)/java
-####dist_java_JAVA =
-####JAVAROOT = $(builddir)
-#####CLASSPATH =
-####AM_JAVAFLAGS = -target 1.2 -warn:all
+javadir = $(datadir)/java
+dist_java_JAVA =
+JAVAROOT = $(builddir)
+CLASSPATH = $(builddir):$(srcdir)
+AM_JAVACFLAGS = -nowarn # -target 1.2 -nowarn # -warn:none # -target 1.2 -warn:none
 
 EXTRA_LTLIBRARIES =
 EXTRA_DATA =
@@ -80,8 +80,6 @@ jardir = $(datadir)/java
 
 jar_DATA =
 
-JAR = fastjar
-
 my_jar_LINKS =
 
 my_jar_CLASSFILES =
@@ -94,7 +92,7 @@ ALL_LOCAL += openss7.jar
 jar_DATA += openss7-$(VERSION).jar
 CLEANFILES += openss7.jar openss7-$(VERSION).jar
 
-openss7-$(VERSION).jar: $(my_jar_CLASSFILES)
+openss7-$(VERSION).jar: classdist_java.stamp $(my_jar_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 #############################################################################
@@ -106,18 +104,22 @@ gcjlibdir = $(libdir)/gcj/$(PACKAGE_LCNAME)
 gcjlib_LTLIBRARIES 	=
 gcjlib_DATA		=
 
-GCJDBTOOL		= gcj-dbtool
+#GCJDBTOOL		= gcj-dbtool
 
-AM_GCJFLAGS = -I$(builddir) -I$(srcdir) -Wno-deprecated -Wno-unused -Wno-out-of-date
+AM_GCJFLAGS = -I$(builddir) -I$(srcdir)
 GCJLIB_INCLUDES = -I$(builddir) -I$(srcdir) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+
+##JNIFLAGS = -fjni
+##CNIFLAGS = -findirect-dispatch
 
 .java.class:
 @am__fastdepGCJ_TRUE@	$(AM_V_GCJ)$(GCJCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$$(basename $@ .class).Tpo -C -d $(abs_builddir) $<
+@am__fastdepGCJ_TRUE@	$(AM_V_at)touch $(DEPDIR)/$$(basename $@ .class).Tpo
 @am__fastdepGCJ_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$$(basename $@ .class).Tpo $(DEPDIR)/$$(basename $@ .class).Po
 @am__fastdepGCJ_FALSE@	$(AM_V_GCJ) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -C -d $(abs_buiddir) $<
+@am__fastdepGCJ_FALSE@	$(GCJCOMPILE) -C -d $(abs_builddir) $<
 
 #############################################################################
 # This is how we build JAIN TCAP CNI classes for Java.
@@ -132,90 +134,91 @@ MY_SUFFIXES += .class
 .class.h: %.class
 	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
 	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	gcjh $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,;s,/,.,g'`
+	$(GCJH) $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,'`
 
 .class.cc:
 	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
 	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	gcjh -stubs $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,;s,/,.,g'`
+	$(GCJH) -stubs $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,'`
 
 #############################################################################
 # These are simple jars and their compiled equivalents.
 #############################################################################
 
-my_javax_jain_ss7_JAVAFILES = \
-	javax/jain/ss7/EncodingScheme.java \
-	javax/jain/ss7/GlobalTitle.java \
-	javax/jain/ss7/GTIndicator0001.java \
-	javax/jain/ss7/GTIndicator0010.java \
-	javax/jain/ss7/GTIndicator0011.java \
-	javax/jain/ss7/GTIndicator0100.java \
-	javax/jain/ss7/GTIndicator.java \
-	javax/jain/ss7/JainSS7Factory.java \
-	javax/jain/ss7/JainSS7Utility.java \
-	javax/jain/ss7/NAddressIndicator.java \
-	javax/jain/ss7/NetworkIndicator.java \
-	javax/jain/ss7/NumberingPlan.java \
-	javax/jain/ss7/RoutingIndicator.java \
-	javax/jain/ss7/SccpUserAddress.java \
-	javax/jain/ss7/SignalingPointCode.java \
-	javax/jain/ss7/SPCFormat.java \
-	javax/jain/ss7/SS7Address.java \
-	javax/jain/ss7/SubSystemAddress.java
-
-my_javax_jain_ss7_CLASSFILES = \
-	javax/jain/ss7/EncodingScheme.class \
-	javax/jain/ss7/GlobalTitle.class \
-	javax/jain/ss7/GTIndicator0001.class \
-	javax/jain/ss7/GTIndicator0010.class \
-	javax/jain/ss7/GTIndicator0011.class \
-	javax/jain/ss7/GTIndicator0100.class \
-	javax/jain/ss7/GTIndicator.class \
-	javax/jain/ss7/JainSS7Factory.class \
-	javax/jain/ss7/JainSS7Utility.class \
-	javax/jain/ss7/NAddressIndicator.class \
-	javax/jain/ss7/NetworkIndicator.class \
-	javax/jain/ss7/NumberingPlan.class \
-	javax/jain/ss7/RoutingIndicator.class \
-	javax/jain/ss7/SccpUserAddress.class \
-	javax/jain/ss7/SignalingPointCode.class \
-	javax/jain/ss7/SPCFormat.class \
-	javax/jain/ss7/SS7Address.class \
-	javax/jain/ss7/SubSystemAddress.class
-
-MY_SECONDARY += $(my_javax_jain_ss7_CLASSFILES)
-my_jar_CLASSFILES += $(my_javax_jain_ss7_CLASSFILES)
-my_jar_LINKS += javax-jain-ss7.jar
-ALL_LOCAL += javax-jain-ss7.jar
-jar_DATA += javax-jain-ss7-$(VERSION).jar
-
-javax-jain-ss7-$(VERSION).jar: $(my_javax_jain_ss7_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
-
-my_JAVAFILES += $(my_javax_jain_ss7_JAVAFILES)
-
-clean-javax_jain_ss7:
-	rm -f -- $(my_javax_jain_ss7_CLASSFILES)
-	rm -f -- javax-jain-ss7.jar javax-jain-ss7-$(VERSION).jar
-	rm -f -- lib-javax-jain-ss7.jar.db
-
-CLEAN_LOCAL += clean-javax_jain_ss7
-
-## Build the whole jar into a library
-lib_javax_jain_ss7_jar_la_SOURCES 	= javax-jain-ss7.jar
-lib_javax_jain_ss7_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES)
-lib_javax_jain_ss7_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_javax_jain_ss7_jar_la_LIBADD	=
-lib_javax_jain_ss7_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_javax_jain_ss7_jar_la_GCJFLAGS	= -findirect-dispatch
-
-gcjlib_LTLIBRARIES 	+= lib-javax-jain-ss7.jar.la
-gcjlib_DATA		+= lib-javax-jain-ss7.jar.db
-ALL_LOCAL		+= lib-javax-jain-ss7.jar.db
-
-lib-javax-jain-ss7.jar.db: javax-jain-ss7.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
-
+##my_javax_jain_ss7_JAVAFILES = \
+##	javax/jain/ss7/EncodingScheme.java \
+##	javax/jain/ss7/GlobalTitle.java \
+##	javax/jain/ss7/GTIndicator0001.java \
+##	javax/jain/ss7/GTIndicator0010.java \
+##	javax/jain/ss7/GTIndicator0011.java \
+##	javax/jain/ss7/GTIndicator0100.java \
+##	javax/jain/ss7/GTIndicator.java \
+##	javax/jain/ss7/JainSS7Factory.java \
+##	javax/jain/ss7/JainSS7Utility.java \
+##	javax/jain/ss7/NAddressIndicator.java \
+##	javax/jain/ss7/NetworkIndicator.java \
+##	javax/jain/ss7/NumberingPlan.java \
+##	javax/jain/ss7/RoutingIndicator.java \
+##	javax/jain/ss7/SccpUserAddress.java \
+##	javax/jain/ss7/SignalingPointCode.java \
+##	javax/jain/ss7/SPCFormat.java \
+##	javax/jain/ss7/SS7Address.java \
+##	javax/jain/ss7/SubSystemAddress.java
+##
+##my_javax_jain_ss7_CLASSFILES = \
+##	javax/jain/ss7/EncodingScheme.class \
+##	javax/jain/ss7/GlobalTitle.class \
+##	javax/jain/ss7/GTIndicator0001.class \
+##	javax/jain/ss7/GTIndicator0010.class \
+##	javax/jain/ss7/GTIndicator0011.class \
+##	javax/jain/ss7/GTIndicator0100.class \
+##	javax/jain/ss7/GTIndicator.class \
+##	javax/jain/ss7/JainSS7Factory.class \
+##	javax/jain/ss7/JainSS7Utility.class \
+##	javax/jain/ss7/NAddressIndicator.class \
+##	javax/jain/ss7/NetworkIndicator.class \
+##	javax/jain/ss7/NumberingPlan.class \
+##	javax/jain/ss7/RoutingIndicator.class \
+##	javax/jain/ss7/SccpUserAddress.class \
+##	javax/jain/ss7/SignalingPointCode.class \
+##	javax/jain/ss7/SPCFormat.class \
+##	javax/jain/ss7/SS7Address.class \
+##	javax/jain/ss7/SubSystemAddress.class
+##
+##MY_SECONDARY += $(my_javax_jain_ss7_CLASSFILES)
+##my_jar_CLASSFILES += $(my_javax_jain_ss7_CLASSFILES)
+##my_jar_LINKS += javax-jain-ss7.jar
+##ALL_LOCAL += javax-jain-ss7.jar
+##jar_DATA += javax-jain-ss7-$(VERSION).jar
+##
+##javax-jain-ss7-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_ss7_CLASSFILES)
+##	$(AM_V_GEN)$(JAR) cf $@ $^
+##
+##my_JAVAFILES += $(my_javax_jain_ss7_JAVAFILES)
+###dist_java_JAVA += $(my_javax_jain_ss7_JAVAFILES)
+##
+##clean-javax_jain_ss7:
+##	rm -f -- $(my_javax_jain_ss7_CLASSFILES)
+##	rm -f -- javax-jain-ss7.jar javax-jain-ss7-$(VERSION).jar
+##	rm -f -- lib-javax-jain-ss7.jar.db
+##
+##CLEAN_LOCAL += clean-javax_jain_ss7
+##
+#### Build the whole jar into a library (older GCJ cannot handle this)
+###nodist_lib_javax_jain_ss7_jar_la_SOURCES	= javax-jain-ss7.jar
+##lib_javax_jain_ss7_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-ss7.jar
+##nodist_lib_javax_jain_ss7_jar_la_SOURCES	= $(my_javax_jain_ss7_CLASSFILES)
+##lib_javax_jain_ss7_jar_la_LIBADD		=
+##lib_javax_jain_ss7_jar_la_LDFLAGS		= -module -avoid-version -shared
+##lib_javax_jain_ss7_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+##
+##gcjlib_LTLIBRARIES 	+= lib-javax-jain-ss7.jar.la
+##gcjlib_DATA		+= lib-javax-jain-ss7.jar.db
+##ALL_LOCAL		+= lib-javax-jain-ss7.jar.db
+##
+##lib-javax-jain-ss7.jar.db: javax-jain-ss7.jar
+##	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+##
 
 #############################################################################
 
@@ -549,10 +552,11 @@ my_jar_LINKS += javax-jain-ss7-isup.jar
 ALL_LOCAL += javax-jain-ss7-isup.jar
 jar_DATA += javax-jain-ss7-isup-$(VERSION).jar
 
-javax-jain-ss7-isup-$(VERSION).jar: $(my_javax_jain_ss7_isup_CLASSFILES)
+javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_ss7_isup_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 my_JAVAFILES += $(my_jain_isup_JAVAFILES)
+#dist_java_JAVA += $(my_jain_isup_JAVAFILES)
 
 clean-javax_jain_ss7_isup:
 	rm -f -- $(my_javax_jain_ss7_isup_CLASSFILES)
@@ -561,13 +565,13 @@ clean-javax_jain_ss7_isup:
 
 CLEAN_LOCAL += clean-javax_jain_ss7_isup
 
-## Build the whole jar into a library
-lib_javax_jain_ss7_isup_jar_la_SOURCES	= javax-jain-ss7-isup.jar
-lib_javax_jain_ss7_isup_jar_la_CPPFLAGS = $(GCJLIB_INCLUDES)
-lib_javax_jain_ss7_isup_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_javax_jain_ss7_isup_jar_la_LIBADD	=
-lib_javax_jain_ss7_isup_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_javax_jain_ss7_isup_jar_la_GCJFLAGS	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_javax_jain_ss7_isup_jar_la_SOURCES	= javax-jain-ss7-isup.jar
+lib_javax_jain_ss7_isup_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-ss7-isup.jar
+nodist_lib_javax_jain_ss7_isup_jar_la_SOURCES	= $(my_javax_jain_ss7_isup_CLASSFILES)
+lib_javax_jain_ss7_isup_jar_la_LIBADD		=
+lib_javax_jain_ss7_isup_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jain_ss7_isup_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-javax-jain-ss7-isup.jar.la
 gcjlib_DATA		+= lib-javax-jain-ss7-isup.jar.db
@@ -1238,10 +1242,11 @@ my_jar_LINKS += javax-jain-ss7-inap.jar
 ALL_LOCAL += javax-jain-ss7-inap.jar
 jar_DATA += javax-jain-ss7-inap-$(VERSION).jar
 
-javax-jain-ss7-inap-$(VERSION).jar: $(my_javax_jain_ss7_inap_CLASSFILES)
+javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_ss7_inap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 my_JAVAFILES += $(my_javax_jain_ss7_inap_JAVAFILES)
+#dist_java_JAVA += $(my_javax_jain_ss7_inap_JAVAFILES)
 
 clean-javax_jain_ss7_inap:
 	rm -f -- $(my_javax_jain_ss7_inap_CLASSFILES)
@@ -1250,13 +1255,13 @@ clean-javax_jain_ss7_inap:
 
 CLEAN_LOCAL += clean-javax_jain_ss7_inap
 
-## Build the whole jar into a library
-lib_javax_jain_ss7_inap_jar_la_SOURCES	= javax-jain-ss7-inap.jar
-lib_javax_jain_ss7_inap_jar_la_CPPFLAGS = $(GCJLIB_INCLUDES)
-lib_javax_jain_ss7_inap_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_javax_jain_ss7_inap_jar_la_LIBADD	=
-lib_javax_jain_ss7_inap_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_javax_jain_ss7_inap_jar_la_GCJFLAGS	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_javax_jain_ss7_inap_jar_la_SOURCES	= javax-jain-ss7-inap.jar
+lib_javax_jain_ss7_inap_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-ss7-inap.jar
+nodist_lib_javax_jain_ss7_inap_jar_la_SOURCES	= $(my_javax_jain_ss7_inap_CLASSFILES)
+lib_javax_jain_ss7_inap_jar_la_LIBADD		=
+lib_javax_jain_ss7_inap_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jain_ss7_inap_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-javax-jain-ss7-inap.jar.la
 gcjlib_DATA		+= lib-javax-jain-ss7-inap.jar.db
@@ -1453,10 +1458,11 @@ my_jar_LINKS += javax-jain-protocol-ss7-map.jar
 ALL_LOCAL += javax-jain-protocol-ss7-map.jar
 jar_DATA += javax-jain-protocol-ss7-map-$(VERSION).jar
 
-javax-jain-protocol-ss7-map-$(VERSION).jar: $(my_javax_jain_protocol_ss7_map_CLASSFILES)
+javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_protocol_ss7_map_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 my_JAVAFILES += $(my_javax_jain_protocol_ss7_map_JAVAFILES)
+#dist_java_JAVA += $(my_javax_jain_protocol_ss7_map_JAVAFILES)
 
 clean-javax_jain_protocol_ss7_map:
 	rm -f -- $(my_javax_jain_protocol_ss7_map_CLASSFILES)
@@ -1465,13 +1471,13 @@ clean-javax_jain_protocol_ss7_map:
 
 CLEAN_LOCAL += clean-javax_jain_protocol_ss7_map
 
-## Build the whole jar into a library
-lib_javax_jain_protocol_ss7_map_jar_la_SOURCES	= javax-jain-protocol-ss7-map.jar
-lib_javax_jain_protocol_ss7_map_jar_la_CPPFLAGS = $(GCJLIB_INCLUDES)
-lib_javax_jain_protocol_ss7_map_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_javax_jain_protocol_ss7_map_jar_la_LIBADD	=
-lib_javax_jain_protocol_ss7_map_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_javax_jain_protocol_ss7_map_jar_la_GCJFLAGS	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_javax_jain_protocol_ss7_map_jar_la_SOURCES	= javax-jain-protocol-ss7-map.jar
+lib_javax_jain_protocol_ss7_map_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-protocol-ss7-map.jar
+nodist_lib_javax_jain_protocol_ss7_map_jar_la_SOURCES	= $(my_javax_jain_protocol_ss7_map_CLASSFILES)
+lib_javax_jain_protocol_ss7_map_jar_la_LIBADD		=
+lib_javax_jain_protocol_ss7_map_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jain_protocol_ss7_map_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-javax-jain-protocol-ss7-map.jar.la
 gcjlib_DATA		+= lib-javax-jain-protocol-ss7-map.jar.db
@@ -1542,10 +1548,11 @@ my_jar_LINKS += javax-csapi-cc-jcc.jar
 ALL_LOCAL += javax-csapi-cc-jcc.jar
 jar_DATA += javax-csapi-cc-jcc-$(VERSION).jar
 
-javax-csapi-cc-jcc-$(VERSION).jar: $(my_javax_csapi_cc_jcc_CLASSFILES)
+javax-csapi-cc-jcc-$(VERSION).jar: classdist_java.stamp $(my_javax_csapi_cc_jcc_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 my_JAVAFILES += $(my_javax_csapi_cc_jcc_JAVAFILES)
+#dist_java_JAVA += $(my_javax_csapi_cc_jcc_JAVAFILES)
 
 clean-javax_csapi_cc_jcc:
 	rm -f -- $(my_javax_csapi_cc_jcc_CLASSFILES)
@@ -1555,218 +1562,221 @@ CLEAN_LOCAL += clean-javax_csapi_cc_jcc
 
 #############################################################################
 
-my_javax_jcat_JAVAFILES = \
-	javax/jcat/JcatAddressEvent.java \
-	javax/jcat/JcatAddress.java \
-	javax/jcat/JcatAddressListener.java \
-	javax/jcat/JcatCallEvent.java \
-	javax/jcat/JcatCall.java \
-	javax/jcat/JcatConnectionEvent.java \
-	javax/jcat/JcatConnection.java \
-	javax/jcat/JcatConnectionListener.java \
-	javax/jcat/JcatProvider.java \
-	javax/jcat/JcatTerminalCapabilities.java \
-	javax/jcat/JcatTerminalConnectionEvent.java \
-	javax/jcat/JcatTerminalConnection.java \
-	javax/jcat/JcatTerminalConnectionListener.java \
-	javax/jcat/JcatTerminalEvent.java \
-	javax/jcat/JcatTerminal.java \
-	javax/jcat/JcatTerminalListener.java
-
-my_javax_jcat_CLASSFILES = \
-	javax/jcat/JcatAddressEvent.class \
-	javax/jcat/JcatAddress.class \
-	javax/jcat/JcatAddressListener.class \
-	javax/jcat/JcatCallEvent.class \
-	javax/jcat/JcatCall.class \
-	javax/jcat/JcatConnectionEvent.class \
-	javax/jcat/JcatConnection.class \
-	javax/jcat/JcatConnectionListener.class \
-	javax/jcat/JcatProvider.class \
-	javax/jcat/JcatTerminalCapabilities.class \
-	javax/jcat/JcatTerminalConnectionEvent.class \
-	javax/jcat/JcatTerminalConnection.class \
-	javax/jcat/JcatTerminalConnectionListener.class \
-	javax/jcat/JcatTerminalEvent.class \
-	javax/jcat/JcatTerminal.class \
-	javax/jcat/JcatTerminalListener.class
-
-MY_SECONDARY += $(my_javax_jcat_CLASSFILES)
-my_jar_CLASSFILES += $(my_javax_jcat_CLASSFILES)
-my_jar_LINKS += javax-jcat.jar
-ALL_LOCAL += javax-jcat.jar
-jar_DATA += javax-jcat-$(VERSION).jar
-
-javax-jcat-$(VERSION).jar: $(my_javax_jcat_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
-
-my_JAVAFILES += $(my_javax_jcat_JAVAFILES)
-
-clean-javax_jcat:
-	rm -f -- $(my_javax_jcat_CLASSFILES)
-	rm -f -- javax-jcat.jar javax-jcat-$(VERSION).jar
-	rm -f -- lib-javax-jcat.jar.db
-
-CLEAN_LOCAL += clean-javax_jcat
-
-## Build the whole jar into a library
-lib_javax_jcat_jar_la_SOURCES	= javax-jcat.jar
-lib_javax_jcat_jar_la_CPPFLAGS	= $(GCJLIB_INCLUDES)
-lib_javax_jcat_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_javax_jcat_jar_la_LIBADD	=
-lib_javax_jcat_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_javax_jcat_jar_la_GCJFLAGS	= -findirect-dispatch
-
-gcjlib_LTLIBRARIES 	+= lib-javax-jcat.jar.la
-gcjlib_DATA		+= lib-javax-jcat.jar.db
-ALL_LOCAL		+= lib-javax-jcat.jar.db
-
-lib-javax-jcat.jar.db: javax-jcat.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
-
-#############################################################################
-
-my_jain_JAVAFILES = \
-	jain/CreateProviderException.java \
-	jain/DeleteProviderException.java \
-	jain/InvalidAddressException.java \
-	jain/InvalidArgumentException.java \
-	jain/InvalidPathNameException.java \
-	jain/JainException.java \
-	jain/ListenerAlreadyRegisteredException.java \
-	jain/ListenerNotRegisteredException.java \
-	jain/MandatoryParameterNotSetException.java \
-	jain/MethodNotSupportedException.java \
-	jain/ParameterNotSetException.java \
-	jain/PeerUnavailableException.java \
-	jain/PlatformException.java
-
-my_jain_CLASSFILES = \
-	jain/CreateProviderException.class \
-	jain/DeleteProviderException.class \
-	jain/InvalidAddressException.class \
-	jain/InvalidArgumentException.class \
-	jain/InvalidPathNameException.class \
-	jain/JainException.class \
-	jain/ListenerAlreadyRegisteredException.class \
-	jain/ListenerNotRegisteredException.class \
-	jain/MandatoryParameterNotSetException.class \
-	jain/MethodNotSupportedException.class \
-	jain/ParameterNotSetException.class \
-	jain/PeerUnavailableException.class \
-	jain/PlatformException.class
-
-MY_SECONDARY += $(my_jain_CLASSFILES)
-my_jar_CLASSFILES += $(my_jain_CLASSFILES)
-my_jar_LINKS += jain.jar
-ALL_LOCAL += jain.jar
-jar_DATA += jain-$(VERSION).jar
-
-jain-$(VERSION).jar: $(my_jain_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
-
-my_JAVAFILES += $(my_jain_JAVAFILES)
-
-clean-jain:
-	rm -f -- $(my_jain_CLASSFILES)
-	rm -f -- jain.jar jain-$(VERSION).jar
-	rm -f -- lib-jain.jar.db
-
-CLEAN_LOCAL += clean-jain
-
-## Build the whole jar into a library
-lib_jain_jar_la_SOURCES		= jain.jar
-lib_jain_jar_la_CPPFLAGS	= $(GCJLIB_INCLUDES)
-lib_jain_jar_la_CFLAGS		= $(USER_CFLAGS)
-lib_jain_jar_la_LIBADD		=
-lib_jain_jar_la_LDFLAGS		= -module -avoid-version -shared
-lib_jain_jar_la_GCJFLAGS	= -findirect-dispatch
-
-gcjlib_LTLIBRARIES 	+= lib-jain.jar.la
-gcjlib_DATA		+= lib-jain.jar.db
-ALL_LOCAL		+= lib-jain.jar.db
-
-lib-jain.jar.db: jain.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+#my_javax_jcat_JAVAFILES = \
+#	javax/jcat/JcatAddressEvent.java \
+#	javax/jcat/JcatAddress.java \
+#	javax/jcat/JcatAddressListener.java \
+#	javax/jcat/JcatCallEvent.java \
+#	javax/jcat/JcatCall.java \
+#	javax/jcat/JcatConnectionEvent.java \
+#	javax/jcat/JcatConnection.java \
+#	javax/jcat/JcatConnectionListener.java \
+#	javax/jcat/JcatProvider.java \
+#	javax/jcat/JcatTerminalCapabilities.java \
+#	javax/jcat/JcatTerminalConnectionEvent.java \
+#	javax/jcat/JcatTerminalConnection.java \
+#	javax/jcat/JcatTerminalConnectionListener.java \
+#	javax/jcat/JcatTerminalEvent.java \
+#	javax/jcat/JcatTerminal.java \
+#	javax/jcat/JcatTerminalListener.java
+#
+#my_javax_jcat_CLASSFILES = \
+#	javax/jcat/JcatAddressEvent.class \
+#	javax/jcat/JcatAddress.class \
+#	javax/jcat/JcatAddressListener.class \
+#	javax/jcat/JcatCallEvent.class \
+#	javax/jcat/JcatCall.class \
+#	javax/jcat/JcatConnectionEvent.class \
+#	javax/jcat/JcatConnection.class \
+#	javax/jcat/JcatConnectionListener.class \
+#	javax/jcat/JcatProvider.class \
+#	javax/jcat/JcatTerminalCapabilities.class \
+#	javax/jcat/JcatTerminalConnectionEvent.class \
+#	javax/jcat/JcatTerminalConnection.class \
+#	javax/jcat/JcatTerminalConnectionListener.class \
+#	javax/jcat/JcatTerminalEvent.class \
+#	javax/jcat/JcatTerminal.class \
+#	javax/jcat/JcatTerminalListener.class
+#
+#MY_SECONDARY += $(my_javax_jcat_CLASSFILES)
+#my_jar_CLASSFILES += $(my_javax_jcat_CLASSFILES)
+#my_jar_LINKS += javax-jcat.jar
+#ALL_LOCAL += javax-jcat.jar
+#jar_DATA += javax-jcat-$(VERSION).jar
+#
+#javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_javax_jcat_CLASSFILES)
+#	$(AM_V_GEN)$(JAR) cf $@ $^
+#
+#my_JAVAFILES += $(my_javax_jcat_JAVAFILES)
+##dist_java_JAVA += $(my_javax_jcat_JAVAFILES)
+#
+#clean-javax_jcat:
+#	rm -f -- $(my_javax_jcat_CLASSFILES)
+#	rm -f -- javax-jcat.jar javax-jcat-$(VERSION).jar
+#	rm -f -- lib-javax-jcat.jar.db
+#
+#CLEAN_LOCAL += clean-javax_jcat
+#
+### Build the whole jar into a library (older GCJ cannot handle this)
+##nodist_lib_javax_jcat_jar_la_SOURCES	= javax-jcat.jar
+#lib_javax_jcat_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jcat.jar
+#nodist_lib_javax_jcat_jar_la_SOURCES	= $(my_javax_jcat_CLASSFILES)
+#lib_javax_jcat_jar_la_LIBADD		=
+#lib_javax_jcat_jar_la_LDFLAGS		= -module -avoid-version -shared
+#lib_javax_jcat_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+#
+#gcjlib_LTLIBRARIES 	+= lib-javax-jcat.jar.la
+#gcjlib_DATA		+= lib-javax-jcat.jar.db
+#ALL_LOCAL		+= lib-javax-jcat.jar.db
+#
+#lib-javax-jcat.jar.db: javax-jcat.jar
+#	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
 #############################################################################
 
-my_jain_protocol_ss7_JAVAFILES = \
-	jain/protocol/ss7/AddressConstants.java \
-	jain/protocol/ss7/GlobalTitle.java \
-	jain/protocol/ss7/GTIndicator0001.java \
-	jain/protocol/ss7/GTIndicator0010.java \
-	jain/protocol/ss7/GTIndicator0011.java \
-	jain/protocol/ss7/GTIndicator0100.java \
-	jain/protocol/ss7/IdNotAvailableException.java \
-	jain/protocol/ss7/JainSS7Factory.java \
-	jain/protocol/ss7/JainSS7Utility.java \
-	jain/protocol/ss7/SccpUserAddress.java \
-	jain/protocol/ss7/SignalingPointCode.java \
-	jain/protocol/ss7/SS7Address.java \
-	jain/protocol/ss7/SS7Exception.java \
-	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.java \
-	jain/protocol/ss7/SS7ListenerNotRegisteredException.java \
-	jain/protocol/ss7/SS7PeerUnavailableException.java \
-	jain/protocol/ss7/SubSystemAddress.java \
-	jain/protocol/ss7/UserAddressEmptyException.java \
-	jain/protocol/ss7/UserAddressLimitException.java \
-	jain/protocol/ss7/VersionNotSupportedException.java
+##my_jain_JAVAFILES = \
+##	jain/CreateProviderException.java \
+##	jain/DeleteProviderException.java \
+##	jain/InvalidAddressException.java \
+##	jain/InvalidArgumentException.java \
+##	jain/InvalidPathNameException.java \
+##	jain/JainException.java \
+##	jain/ListenerAlreadyRegisteredException.java \
+##	jain/ListenerNotRegisteredException.java \
+##	jain/MandatoryParameterNotSetException.java \
+##	jain/MethodNotSupportedException.java \
+##	jain/ParameterNotSetException.java \
+##	jain/PeerUnavailableException.java \
+##	jain/PlatformException.java
+##
+##my_jain_CLASSFILES = \
+##	jain/CreateProviderException.class \
+##	jain/DeleteProviderException.class \
+##	jain/InvalidAddressException.class \
+##	jain/InvalidArgumentException.class \
+##	jain/InvalidPathNameException.class \
+##	jain/JainException.class \
+##	jain/ListenerAlreadyRegisteredException.class \
+##	jain/ListenerNotRegisteredException.class \
+##	jain/MandatoryParameterNotSetException.class \
+##	jain/MethodNotSupportedException.class \
+##	jain/ParameterNotSetException.class \
+##	jain/PeerUnavailableException.class \
+##	jain/PlatformException.class
+##
+##MY_SECONDARY += $(my_jain_CLASSFILES)
+##my_jar_CLASSFILES += $(my_jain_CLASSFILES)
+##my_jar_LINKS += jain.jar
+##ALL_LOCAL += jain.jar
+##jar_DATA += jain-$(VERSION).jar
+##
+##jain-$(VERSION).jar: classdist_java.stamp $(my_jain_CLASSFILES)
+##	$(AM_V_GEN)$(JAR) cf $@ $^
+##
+##my_JAVAFILES += $(my_jain_JAVAFILES)
+###dist_java_JAVA += $(my_jain_JAVAFILES)
+##
+##clean-jain:
+##	rm -f -- $(my_jain_CLASSFILES)
+##	rm -f -- jain.jar jain-$(VERSION).jar
+##	rm -f -- lib-jain.jar.db
+##
+##CLEAN_LOCAL += clean-jain
+##
+#### Build the whole jar into a library (older GCJ cannot handle this)
+###nodist_lib_jain_jar_la_SOURCES		= jain.jar
+##lib_jain_jar_la_DEPENDENCIES		= classdist_java.stamp jain.jar
+##nodist_lib_jain_jar_la_SOURCES		= $(my_jain_CLASSFILES)
+##lib_jain_jar_la_LIBADD		=
+##lib_jain_jar_la_LDFLAGS		= -module -avoid-version -shared
+##lib_jain_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+##
+##gcjlib_LTLIBRARIES 	+= lib-jain.jar.la
+##gcjlib_DATA		+= lib-jain.jar.db
+##ALL_LOCAL		+= lib-jain.jar.db
+##
+##lib-jain.jar.db: jain.jar
+##	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
-my_jain_protocol_ss7_CLASSFILES = \
-	jain/protocol/ss7/AddressConstants.class \
-	jain/protocol/ss7/GlobalTitle.class \
-	jain/protocol/ss7/GTIndicator0001.class \
-	jain/protocol/ss7/GTIndicator0010.class \
-	jain/protocol/ss7/GTIndicator0011.class \
-	jain/protocol/ss7/GTIndicator0100.class \
-	jain/protocol/ss7/IdNotAvailableException.class \
-	jain/protocol/ss7/JainSS7Factory.class \
-	jain/protocol/ss7/JainSS7Utility.class \
-	jain/protocol/ss7/SccpUserAddress.class \
-	jain/protocol/ss7/SignalingPointCode.class \
-	jain/protocol/ss7/SS7Address.class \
-	jain/protocol/ss7/SS7Exception.class \
-	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.class \
-	jain/protocol/ss7/SS7ListenerNotRegisteredException.class \
-	jain/protocol/ss7/SS7PeerUnavailableException.class \
-	jain/protocol/ss7/SubSystemAddress.class \
-	jain/protocol/ss7/UserAddressEmptyException.class \
-	jain/protocol/ss7/UserAddressLimitException.class \
-	jain/protocol/ss7/VersionNotSupportedException.class
+#############################################################################
 
-MY_SECONDARY += $(my_jain_protocol_ss7_CLASSFILES)
-my_jar_CLASSFILES += $(my_jain_protocol_ss7_CLASSFILES)
-my_jar_LINKS += jain-protocol-ss7.jar
-ALL_LOCAL += jain-protocol-ss7.jar
-jar_DATA += jain-protocol-ss7-$(VERSION).jar
-
-jain-protocol-ss7-$(VERSION).jar: $(my_jain_protocol_ss7_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
-
-my_JAVAFILES += $(my_jain_protocol_ss7_JAVAFILES)
-
-clean-jain_protocol_ss7:
-	rm -f -- $(my_jain_protocol_ss7_CLASSFILES)
-	rm -f -- jain-protocol-ss7.jar jain-protocol-ss7-$(VERSION).jar
-	rm -f -- lib-jain-protocol-ss7.jar.db
-
-CLEAN_LOCAL += clean-jain_protocol_ss7
-
-## Build the whole jar into a library
-lib_jain_protocol_ss7_jar_la_SOURCES	= jain-protocol-ss7.jar
-lib_jain_protocol_ss7_jar_la_CPPFLAGS	= $(GCJLIB_INCLUDES)
-lib_jain_protocol_ss7_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_jain_protocol_ss7_jar_la_LIBADD	=
-lib_jain_protocol_ss7_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_jain_protocol_ss7_jar_la_GCJFLAGS	= -findirect-dispatch
-
-gcjlib_LTLIBRARIES 	+= lib-jain-protocol-ss7.jar.la
-gcjlib_DATA		+= lib-jain-protocol-ss7.jar.db
-ALL_LOCAL		+= lib-jain-protocol-ss7.jar.db
-
-lib-jain-protocol-ss7.jar.db: jain-protocol-ss7.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+##my_jain_protocol_ss7_JAVAFILES = \
+##	jain/protocol/ss7/AddressConstants.java \
+##	jain/protocol/ss7/GlobalTitle.java \
+##	jain/protocol/ss7/GTIndicator0001.java \
+##	jain/protocol/ss7/GTIndicator0010.java \
+##	jain/protocol/ss7/GTIndicator0011.java \
+##	jain/protocol/ss7/GTIndicator0100.java \
+##	jain/protocol/ss7/IdNotAvailableException.java \
+##	jain/protocol/ss7/JainSS7Factory.java \
+##	jain/protocol/ss7/JainSS7Utility.java \
+##	jain/protocol/ss7/SccpUserAddress.java \
+##	jain/protocol/ss7/SignalingPointCode.java \
+##	jain/protocol/ss7/SS7Address.java \
+##	jain/protocol/ss7/SS7Exception.java \
+##	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.java \
+##	jain/protocol/ss7/SS7ListenerNotRegisteredException.java \
+##	jain/protocol/ss7/SS7PeerUnavailableException.java \
+##	jain/protocol/ss7/SubSystemAddress.java \
+##	jain/protocol/ss7/UserAddressEmptyException.java \
+##	jain/protocol/ss7/UserAddressLimitException.java \
+##	jain/protocol/ss7/VersionNotSupportedException.java
+##
+##my_jain_protocol_ss7_CLASSFILES = \
+##	jain/protocol/ss7/AddressConstants.class \
+##	jain/protocol/ss7/GlobalTitle.class \
+##	jain/protocol/ss7/GTIndicator0001.class \
+##	jain/protocol/ss7/GTIndicator0010.class \
+##	jain/protocol/ss7/GTIndicator0011.class \
+##	jain/protocol/ss7/GTIndicator0100.class \
+##	jain/protocol/ss7/IdNotAvailableException.class \
+##	jain/protocol/ss7/JainSS7Factory.class \
+##	jain/protocol/ss7/JainSS7Utility.class \
+##	jain/protocol/ss7/SccpUserAddress.class \
+##	jain/protocol/ss7/SignalingPointCode.class \
+##	jain/protocol/ss7/SS7Address.class \
+##	jain/protocol/ss7/SS7Exception.class \
+##	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.class \
+##	jain/protocol/ss7/SS7ListenerNotRegisteredException.class \
+##	jain/protocol/ss7/SS7PeerUnavailableException.class \
+##	jain/protocol/ss7/SubSystemAddress.class \
+##	jain/protocol/ss7/UserAddressEmptyException.class \
+##	jain/protocol/ss7/UserAddressLimitException.class \
+##	jain/protocol/ss7/VersionNotSupportedException.class
+##
+##MY_SECONDARY += $(my_jain_protocol_ss7_CLASSFILES)
+##my_jar_CLASSFILES += $(my_jain_protocol_ss7_CLASSFILES)
+##my_jar_LINKS += jain-protocol-ss7.jar
+##ALL_LOCAL += jain-protocol-ss7.jar
+##jar_DATA += jain-protocol-ss7-$(VERSION).jar
+##
+##jain-protocol-ss7-$(VERSION).jar: classdist_java.stamp $(my_jain_protocol_ss7_CLASSFILES)
+##	$(AM_V_GEN)$(JAR) cf $@ $^
+##
+##my_JAVAFILES += $(my_jain_protocol_ss7_JAVAFILES)
+###dist_java_JAVA += $(my_jain_protocol_ss7_JAVAFILES)
+##
+##clean-jain_protocol_ss7:
+##	rm -f -- $(my_jain_protocol_ss7_CLASSFILES)
+##	rm -f -- jain-protocol-ss7.jar jain-protocol-ss7-$(VERSION).jar
+##	rm -f -- lib-jain-protocol-ss7.jar.db
+##
+##CLEAN_LOCAL += clean-jain_protocol_ss7
+##
+#### Build the whole jar into a library (older GCJ cannot handle this)
+###nodist_lib_jain_protocol_ss7_jar_la_SOURCES	= jain-protocol-ss7.jar
+##lib_jain_protocol_ss7_jar_la_DEPENDENCIES	= classdist_java.stamp jain-protocol-ss7.jar
+##nodist_lib_jain_protocol_ss7_jar_la_SOURCES	= $(my_jain_protocol_ss7_CLASSFILES)
+##lib_jain_protocol_ss7_jar_la_LIBADD		=
+##lib_jain_protocol_ss7_jar_la_LDFLAGS		= -module -avoid-version -shared
+##lib_jain_protocol_ss7_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+##
+##gcjlib_LTLIBRARIES 	+= lib-jain-protocol-ss7.jar.la
+##gcjlib_DATA		+= lib-jain-protocol-ss7.jar.db
+##ALL_LOCAL		+= lib-jain-protocol-ss7.jar.db
+##
+##lib-jain-protocol-ss7.jar.db: jain-protocol-ss7.jar
+##	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
 #############################################################################
 
@@ -1941,10 +1951,11 @@ my_jar_LINKS += jain-protocol-ss7-tcap.jar
 ALL_LOCAL += jain-protocol-ss7-tcap.jar
 jar_DATA += jain-protocol-ss7-tcap-$(VERSION).jar
 
-jain-protocol-ss7-tcap-$(VERSION).jar: $(my_jain_protocol_ss7_tcap_CLASSFILES)
+jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_jain_protocol_ss7_tcap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 my_JAVAFILES += $(my_jain_protocol_ss7_tcap_JAVAFILES)
+#dist_java_JAVA += $(my_jain_protocol_ss7_tcap_JAVAFILES)
 
 clean-jain_protocol_ss7_tcap:
 	rm -f -- $(my_jain_protocol_ss7_tcap_CLASSFILES)
@@ -1953,13 +1964,13 @@ clean-jain_protocol_ss7_tcap:
 
 CLEAN_LOCAL += clean-jain_protocol_ss7_tcap
 
-## Build the whole jar into a library
-lib_jain_protocol_ss7_tcap_jar_la_SOURCES	= jain-protocol-ss7-tcap.jar
-lib_jain_protocol_ss7_tcap_jar_la_CPPFLAGS	= $(GCJLIB_INCLUDES)
-lib_jain_protocol_ss7_tcap_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_jain_protocol_ss7_tcap_jar_la_LIBADD	=
-lib_jain_protocol_ss7_tcap_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_jain_protocol_ss7_tcap_jar_la_SOURCES = jain-protocol-ss7-tcap.jar
+lib_jain_protocol_ss7_tcap_jar_la_DEPENDENCIES	  = classdist_java.stamp jain-protocol-ss7-tcap.jar
+nodist_lib_jain_protocol_ss7_tcap_jar_la_SOURCES  = $(my_jain_protocol_ss7_tcap_CLASSFILES)
+lib_jain_protocol_ss7_tcap_jar_la_LIBADD	  =
+lib_jain_protocol_ss7_tcap_jar_la_LDFLAGS	  = -module -avoid-version -shared
+lib_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-jain-protocol-ss7-tcap.jar.la
 gcjlib_DATA		+= lib-jain-protocol-ss7-tcap.jar.db
@@ -2082,10 +2093,11 @@ my_jar_LINKS += jain-protocol-ss7-oam.jar
 ALL_LOCAL += jain-protocol-ss7-oam.jar
 jar_DATA += jain-protocol-ss7-oam-$(VERSION).jar
 
-jain-protocol-ss7-oam-$(VERSION).jar: $(my_jain_protocol_ss7_oam_CLASSFILES)
+jain-protocol-ss7-oam-$(VERSION).jar: classdist_java.stamp $(my_jain_protocol_ss7_oam_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 my_JAVAFILES += $(my_jain_protocol_ss7_oam_JAVAFILES)
+#dist_java_JAVA += $(my_jain_protocol_ss7_oam_JAVAFILES)
 
 clean-jain_protocol_ss7_oam:
 	rm -f -- $(my_jain_protocol_ss7_oam_CLASSFILES)
@@ -2194,12 +2206,17 @@ my_oam_INCLUDES = \
 	org/openss7/jain/protocol/ss7/oam/tcap/TcapNode.h
 my_oam_HEADERCLASSES =
 
-lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES 	= org-openss7-jain-protocol-ss7-oam.jar $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
-lib_org_openss7_jain_protocol_ss7_oam_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_jain_protocol_ss7_oam_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_jain_protocol_ss7_oam_jar_la_LIBADD	= $(top_builddir)/libstreams.la
-lib_org_openss7_jain_protocol_ss7_oam_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_org_openss7_jain_protocol_ss7_oam_jar_la_GCJFLAGS	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES = org-openss7-jain-protocol-ss7-oam.jar
+#lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES	     = $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-jain-protocol-ss7-oam.jar $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
+nodist_lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES  = $(my_oam_CLASSFILES)
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES	     = $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_CPPFLAGS	     = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_CFLAGS	     = $(USER_CFLAGS)
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_LIBADD	     = $(top_builddir)/libstreams.la
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_LDFLAGS	     = -module -avoid-version -shared
+lib_org_openss7_jain_protocol_ss7_oam_jar_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-jain-protocol-ss7-oam.jar.la
 gcjlib_DATA		+= lib-org-openss7-jain-protocol-ss7-oam.jar.db
@@ -2219,13 +2236,14 @@ my_jar_LINKS += org-openss7-jain-protocol-ss7-oam.jar
 ALL_LOCAL += org-openss7-jain-protocol-ss7-oam.jar
 jar_DATA += org-openss7-jain-protocol-ss7-oam-$(VERSION).jar
 
-org-openss7-jain-protocol-ss7-oam-$(VERSION).jar: $(my_oam_CLASSFILES)
+org-openss7-jain-protocol-ss7-oam-$(VERSION).jar: classdist_java.stamp $(my_oam_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_oam_CLASSFILES)
 my_jar_CLASSFILES += $(my_oam_CLASSFILES)
 
 my_JAVAFILES += $(my_oam_JAVAFILES)
+#dist_java_JAVA += $(my_oam_JAVAFILES)
 
 clean-org_openss7_jain_protocol_ss7_oam:
 	rm -f -- $(my_oam_CLASSFILES)
@@ -2254,12 +2272,17 @@ my_jtcap_HEADERCLASSES = \
 	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.class \
 	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.class
 
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES 	= org-openss7-jain-protocol-ss7-tcap.jar $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LIBADD	= $(top_builddir)/libstreams.la
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES = org-openss7-jain-protocol-ss7-tcap.jar
+#lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES	      = $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-jain-protocol-ss7-tcap.jar $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
+nodist_lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES  = $(my_jtcap_CLASSFILES)
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES	      = $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CPPFLAGS	      = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CFLAGS	      = $(USER_CFLAGS)
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LIBADD	      = $(top_builddir)/libstreams.la
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LDFLAGS	      = -module -avoid-version -shared
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-jain-protocol-ss7-tcap.jar.la
 gcjlib_DATA		+= lib-org-openss7-jain-protocol-ss7-tcap.jar.db
@@ -2279,13 +2302,14 @@ my_jar_LINKS += org-openss7-jain-protocol-ss7-tcap.jar
 ALL_LOCAL += org-openss7-jain-protocol-ss7-tcap.jar
 jar_DATA += org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar
 
-org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar: $(my_jtcap_CLASSFILES)
+org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_jtcap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jtcap_CLASSFILES)
 my_jar_CLASSFILES += $(my_jtcap_CLASSFILES)
 
 my_JAVAFILES += $(my_jtcap_JAVAFILES)
+#dist_java_JAVA += $(my_jtcap_JAVAFILES)
 
 clean-org_openss7_jain_protocol_ss7_tcap:
 	rm -f -- $(my_jtcap_CLASSFILES)
@@ -2314,12 +2338,17 @@ my_jsip_HEADERCLASSES = \
 	org/openss7/javax/sip/SipProviderImpl.class \
 	org/openss7/javax/sip/SipStackImpl.class
 
-lib_org_openss7_javax_sip_jar_la_SOURCES 	= org-openss7-javax-sip.jar $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
-lib_org_openss7_javax_sip_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_sip_jar_la_CFLAGS 	= $(USER_CFLAGS)
-lib_org_openss7_javax_sip_jar_la_LIBADD 	= $(top_builddir)/libstreams.la
-lib_org_openss7_javax_sip_jar_la_LDFLAGS 	= -module -avoid-version -shared
-lib_org_openss7_javax_sip_jar_la_GCJFLAGS 	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_javax_sip_jar_la_SOURCES = org-openss7-javax-sip.jar
+#lib_org_openss7_javax_sip_jar_la_SOURCES	 = $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
+lib_org_openss7_javax_sip_jar_la_DEPENDENCIES	 = classdist_java.stamp org-openss7-javax-sip.jar $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
+nodist_lib_org_openss7_javax_sip_jar_la_SOURCES	 = $(my_jsip_CLASSFILES)
+lib_org_openss7_javax_sip_jar_la_SOURCES	 = $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
+lib_org_openss7_javax_sip_jar_la_CPPFLAGS	 = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_javax_sip_jar_la_CFLAGS		 = $(USER_CFLAGS)
+lib_org_openss7_javax_sip_jar_la_LIBADD		 = $(top_builddir)/libstreams.la
+lib_org_openss7_javax_sip_jar_la_LDFLAGS	 = -module -avoid-version -shared
+lib_org_openss7_javax_sip_jar_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-sip.jar.la
 gcjlib_DATA		+= lib-org-openss7-javax-sip.jar.db
@@ -2339,13 +2368,14 @@ my_jar_LINKS += org-openss7-javax-sip.jar
 ALL_LOCAL += org-openss7-javax-sip.jar
 jar_DATA += org-openss7-javax-sip-$(VERSION).jar
 
-org-openss7-javax-sip-$(VERSION).jar: $(my_jsip_CLASSFILES)
+org-openss7-javax-sip-$(VERSION).jar: classdist_java.stamp $(my_jsip_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jsip_CLASSFILES)
 my_jar_CLASSFILES += $(my_jsip_CLASSFILES)
 
 my_JAVAFILES += $(my_jsip_JAVAFILES)
+#dist_java_JAVA += $(my_jsip_JAVAFILES)
 
 clean-org_openss7_javax_sip:
 	rm -f -- $(my_jsip_CLASSFILES)
@@ -2373,12 +2403,17 @@ my_jcat_HEADERCLASSES = \
 	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.class \
 	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.class
 
-lib_org_openss7_javax_jcat_jar_la_SOURCES 	= org-openss7-javax-jcat.jar $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
-lib_org_openss7_javax_jcat_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jcat_jar_la_CFLAGS 	= $(USER_CFLAGS)
-lib_org_openss7_javax_jcat_jar_la_LIBADD 	= $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jcat_jar_la_LDFLAGS 	= -module -avoid-version -shared
-lib_org_openss7_javax_jcat_jar_la_GCJFLAGS 	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_javax_jcat_jar_la_SOURCES	= org-openss7-javax-jcat.jar
+#lib_org_openss7_javax_jcat_jar_la_SOURCES	 = $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
+lib_org_openss7_javax_jcat_jar_la_DEPENDENCIES	 = classdist_java.stamp org-openss7-javax-jcat.jar $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
+nodist_lib_org_openss7_javax_jcat_jar_la_SOURCES = $(my_jcat_CLASSFILES)
+lib_org_openss7_javax_jcat_jar_la_SOURCES	 = $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
+lib_org_openss7_javax_jcat_jar_la_CPPFLAGS	 = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_javax_jcat_jar_la_CFLAGS	 = $(USER_CFLAGS)
+lib_org_openss7_javax_jcat_jar_la_LIBADD	 = $(top_builddir)/libstreams.la
+lib_org_openss7_javax_jcat_jar_la_LDFLAGS	 = -module -avoid-version -shared
+lib_org_openss7_javax_jcat_jar_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jcat.jar.la
 gcjlib_DATA		+= lib-org-openss7-javax-jcat.jar.db
@@ -2398,13 +2433,14 @@ my_jar_LINKS += org-openss7-javax-jcat.jar
 ALL_LOCAL += org-openss7-javax-jcat.jar
 jar_DATA += org-openss7-javax-jcat-$(VERSION).jar
 
-org-openss7-javax-jcat-$(VERSION).jar: $(my_jcat_CLASSFILES)
+org-openss7-javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_jcat_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jcat_CLASSFILES)
 my_jar_CLASSFILES += $(my_jcat_CLASSFILES)
 
 my_JAVAFILES += $(my_jcat_JAVAFILES)
+#dist_java_JAVA += $(my_jcat_JAVAFILES)
 
 clean-org_openss7_javax_jcat:
 	rm -f -- $(my_jcat_CLASSFILES)
@@ -2430,12 +2466,17 @@ my_jisup_INCLUDES = \
 	org/openss7/javax/jain/ss7/isup/JainIsupProviderImpl.h \
 	org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.h
 
-lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES 	= org-openss7-javax-jain-ss7-isup.jar $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
-lib_org_openss7_javax_jain_ss7_isup_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jain_ss7_isup_jar_la_CFLAGS 	= $(USER_CFLAGS)
-lib_org_openss7_javax_jain_ss7_isup_jar_la_LIBADD 	= $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jain_ss7_isup_jar_la_LDFLAGS 	= -module -avoid-version -shared
-lib_org_openss7_javax_jain_ss7_isup_jar_la_GCJFLAGS 	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES = org-openss7-javax-jain-ss7-isup.jar
+#lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES	   = $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
+lib_org_openss7_javax_jain_ss7_isup_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-javax-jain-ss7-isup.jar $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
+nodist_lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES  = $(my_jisup_CLASSFILES)
+lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES	   = $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
+lib_org_openss7_javax_jain_ss7_isup_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_javax_jain_ss7_isup_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_javax_jain_ss7_isup_jar_la_LIBADD	   = $(top_builddir)/libstreams.la
+lib_org_openss7_javax_jain_ss7_isup_jar_la_LDFLAGS	   = -module -avoid-version -shared
+lib_org_openss7_javax_jain_ss7_isup_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jain-ss7-isup.jar.la
 gcjlib_DATA		+= lib-org-openss7-javax-jain-ss7-isup.jar.db
@@ -2455,13 +2496,14 @@ my_jar_LINKS += org-openss7-javax-jain-ss7-isup.jar
 ALL_LOCAL += org-openss7-javax-jain-ss7-isup.jar
 jar_DATA += org-openss7-javax-jain-ss7-isup-$(VERSION).jar
 
-org-openss7-javax-jain-ss7-isup-$(VERSION).jar: $(my_jisup_CLASSFILES)
+org-openss7-javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp $(my_jisup_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jisup_CLASSFILES)
 my_jar_CLASSFILES += $(my_jisup_CLASSFILES)
 
 my_JAVAFILES += $(my_jisup_JAVAFILES)
+#dist_java_JAVA += $(my_jisup_JAVAFILES)
 
 clean-org_openss7_javax_jain_ss7_isup:
 	rm -f -- $(my_jisup_CLASSFILES)
@@ -2490,12 +2532,17 @@ my_jinap_HEADERCLASSES = \
 	org/openss7/javax/jain/ss7/inap/JainInapProviderImpl.class \
 	org/openss7/javax/jain/ss7/inap/JainInapStackImpl.class
 
-lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES 	= org-openss7-javax-jain-ss7-inap.jar $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
-lib_org_openss7_javax_jain_ss7_inap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jain_ss7_inap_jar_la_CFLAGS 	= $(USER_CFLAGS)
-lib_org_openss7_javax_jain_ss7_inap_jar_la_LIBADD 	= $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jain_ss7_inap_jar_la_LDFLAGS 	= -module -avoid-version -shared
-lib_org_openss7_javax_jain_ss7_inap_jar_la_GCJFLAGS 	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES = org-openss7-javax-jain-ss7-inap.jar
+#lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES	   = $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
+lib_org_openss7_javax_jain_ss7_inap_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-javax-jain-ss7-inap.jar $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
+nodist_lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES  = $(my_jinap_CLASSFILES)
+lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES	   = $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
+lib_org_openss7_javax_jain_ss7_inap_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_javax_jain_ss7_inap_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_javax_jain_ss7_inap_jar_la_LIBADD	   = $(top_builddir)/libstreams.la
+lib_org_openss7_javax_jain_ss7_inap_jar_la_LDFLAGS	   = -module -avoid-version -shared
+lib_org_openss7_javax_jain_ss7_inap_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jain-ss7-inap.jar.la
 gcjlib_DATA		+= lib-org-openss7-javax-jain-ss7-inap.jar.db
@@ -2515,13 +2562,14 @@ my_jar_LINKS += org-openss7-javax-jain-ss7-inap.jar
 ALL_LOCAL += org-openss7-javax-jain-ss7-inap.jar
 jar_DATA += org-openss7-javax-jain-ss7-inap-$(VERSION).jar
 
-org-openss7-javax-jain-ss7-inap-$(VERSION).jar: $(my_jinap_CLASSFILES)
+org-openss7-javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp $(my_jinap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jinap_CLASSFILES)
 my_jar_CLASSFILES += $(my_jinap_CLASSFILES)
 
 my_JAVAFILES += $(my_jinap_JAVAFILES)
+#dist_java_JAVA += $(my_jinap_JAVAFILES)
 
 clean-org_openss7_javax_jain_ss7_inap:
 	rm -f -- $(my_jinap_CLASSFILES)
@@ -2585,12 +2633,17 @@ my_jmap_HEADERCLASSES = \
 	org/openss7/javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStackImpl.class \
 	org/openss7/javax/jain/protocol/ss7/map/transaction/MessageTransactionProviderImpl.class
 
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES 	= org-openss7-javax-jain-protocol-ss7-map.jar $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CFLAGS 	= $(USER_CFLAGS)
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_LIBADD 	= $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_LDFLAGS 	= -module -avoid-version -shared
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_GCJFLAGS 	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES = org-openss7-javax-jain-protocol-ss7-map.jar
+#lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES 	   = $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-javax-jain-protocol-ss7-map.jar $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
+nodist_lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES  = $(my_jmap_CLASSFILES)
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES	   = $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_LIBADD	   = $(top_builddir)/libstreams.la
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_LDFLAGS	   = -module -avoid-version -shared
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.la
 gcjlib_DATA		+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.db
@@ -2610,13 +2663,14 @@ my_jar_LINKS += org-openss7-javax-jain-protocol-ss7-map.jar
 ALL_LOCAL += org-openss7-javax-jain-protocol-ss7-map.jar
 jar_DATA += org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar
 
-org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar: $(my_jmap_CLASSFILES)
+org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp $(my_jmap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jmap_CLASSFILES)
 my_jar_CLASSFILES += $(my_jmap_CLASSFILES)
 
 my_JAVAFILES += $(my_jmap_JAVAFILES)
+#dist_java_JAVA += $(my_jmap_JAVAFILES)
 
 clean-org_openss7_javax_jain_protocol_ss7_map:
 	rm -f -- $(my_jmap_CLASSFILES)
@@ -2645,12 +2699,17 @@ my_jcc_HEADERCLASSES = \
 	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.class \
 	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.class
 
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES 	= org-openss7-javax-csapi-cc-jcc.jar $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_CFLAGS 	= $(USER_CFLAGS)
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_LIBADD 	= $(top_builddir)/libstreams.la
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_LDFLAGS 	= -module -avoid-version -shared
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_GCJFLAGS 	= -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES = org-openss7-javax-csapi-cc-jcc.jar
+#lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES	  = $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_DEPENDENCIES	  = classdist_java.stamp org-openss7-javax-csapi-cc-jcc.jar $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
+nodist_lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES  = $(my_jcc_CLASSFILES)
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES	  = $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_CPPFLAGS	  = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_CFLAGS	  = $(USER_CFLAGS)
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_LIBADD	  = $(top_builddir)/libstreams.la
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_LDFLAGS	  = -module -avoid-version -shared
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-csapi-cc-jcc.jar.la
 gcjlib_DATA		+= lib-org-openss7-javax-csapi-cc-jcc.jar.db
@@ -2670,13 +2729,14 @@ my_jar_LINKS += org-openss7-javax-csapi-cc-jcc.jar
 ALL_LOCAL += org-openss7-javax-csapi-cc-jcc.jar
 jar_DATA += org-openss7-javax-csapi-cc-jcc-$(VERSION).jar
 
-org-openss7-javax-csapi-cc-jcc-$(VERSION).jar: $(my_jcc_CLASSFILES)
+org-openss7-javax-csapi-cc-jcc-$(VERSION).jar: classdist_java.stamp $(my_jcc_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_jcc_CLASSFILES)
 my_jar_CLASSFILES += $(my_jcc_CLASSFILES)
 
 my_JAVAFILES += $(my_jcc_JAVAFILES)
+#dist_java_JAVA += $(my_jcc_JAVAFILES)
 
 clean-org_openss7_javax_csapi_cc_jcc:
 	rm -f -- $(my_jcc_CLASSFILES)
@@ -2747,12 +2807,17 @@ my_streams_CLASSFILES = \
 my_streams_SOURCEFILES = \
 	org/openss7/streams/streams_wrap.c
 
-lib_org_openss7_streams_jar_la_SOURCES	= org-openss7-streams.jar $(my_streams_SOURCEFILES)
-lib_org_openss7_streams_jar_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_streams_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_streams_jar_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-lib_org_openss7_streams_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_org_openss7_streams_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_streams_jar_la_SOURCES	= org-openss7-streams.jar
+#lib_org_openss7_streams_jar_la_SOURCES	= $(my_streams_SOURCEFILES)
+lib_org_openss7_streams_jar_la_DEPENDENCIES   = classdist_java.stamp org-openss7-streams.jar $(my_streams_SOURCEFILES)
+nodist_lib_org_openss7_streams_jar_la_SOURCES = $(my_streams_CLASSFILES)
+lib_org_openss7_streams_jar_la_SOURCES	      = $(my_streams_SOURCEFILES)
+lib_org_openss7_streams_jar_la_CPPFLAGS       = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_streams_jar_la_CFLAGS	      = $(USER_CFLAGS)
+lib_org_openss7_streams_jar_la_LIBADD	      = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+lib_org_openss7_streams_jar_la_LDFLAGS	      = -module -avoid-version -shared
+lib_org_openss7_streams_jar_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 EXTRA_LTLIBRARIES 	+= lib-org-openss7-streams.jar.la
 EXTRA_DATA		+= lib-org-openss7-streams.jar.db
@@ -2767,18 +2832,18 @@ my_jar_LINKS += org-openss7-streams.jar
 ALL_LOCAL += org-openss7-streams.jar
 jar_DATA += org-openss7-streams-$(VERSION).jar
 
-org-openss7-streams-$(VERSION).jar: $(my_streams_CLASSFILES)
+org-openss7-streams-$(VERSION).jar: classdist_java.stamp $(my_streams_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_streams_CLASSFILES)
 my_jar_CLASSFILES += $(my_streams_CLASSFILES)
 
-libopenss7StreamsJNI_la_SOURCES 	= $(my_streams_SOURCEFILES)
+libopenss7StreamsJNI_la_SOURCES	 = $(my_streams_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7StreamsJNI_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7StreamsJNI_la_CFLAGS		= $(USER_CFLAGS)
-libopenss7StreamsJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7StreamsJNI_la_LDFLAGS		= -module -avoid-version -shared
+libopenss7StreamsJNI_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7StreamsJNI_la_CFLAGS	 = $(USER_CFLAGS)
+libopenss7StreamsJNI_la_LIBADD	 = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7StreamsJNI_la_LDFLAGS	 = -module -avoid-version -shared
 
 #jnilib_LTLIBRARIES += libopenss7StreamsJNI.la
 EXTRA_LTLIBRARIES += libopenss7StreamsJNI.la
@@ -2792,6 +2857,7 @@ MY_SECONDARY += $(my_streams_CLASSFILES)
 $(my_streams_JAVAFILES): $(my_streams_SOURCEFILES)
 
 my_JAVAFILES += $(my_streams_JAVAFILES)
+#dist_java_JAVA += $(my_streams_JAVAFILES)
 
 clean-org_openss7_streams:
 	rm -f -- $(my_streams_JAVAFILES)
@@ -2856,12 +2922,17 @@ my_xti_CLASSFILES = \
 my_xti_SOURCEFILES = \
 	org/openss7/xti/xti_wrap.c
 
-lib_org_openss7_xti_jar_la_SOURCES 	= org-openss7-xti.jar $(my_xti_SOURCEFILES)
-lib_org_openss7_xti_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_xti_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_xti_jar_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-lib_org_openss7_xti_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_org_openss7_xti_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_xti_jar_la_SOURCES = org-openss7-xti.jar
+#lib_org_openss7_xti_jar_la_SOURCES	   = $(my_xti_SOURCEFILES)
+lib_org_openss7_xti_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-xti.jar $(my_xti_SOURCEFILES)
+nodist_lib_org_openss7_xti_jar_la_SOURCES  = $(my_xti_CLASSFILES)
+lib_org_openss7_xti_jar_la_SOURCES	   = $(my_xti_SOURCEFILES)
+lib_org_openss7_xti_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_xti_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_xti_jar_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+lib_org_openss7_xti_jar_la_LDFLAGS	   = -module -avoid-version -shared
+lib_org_openss7_xti_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-xti.jar.la
 gcjlib_DATA		+= lib-org-openss7-xti.jar.db
@@ -2874,18 +2945,18 @@ my_jar_LINKS += org-openss7-xti.jar
 ALL_LOCAL += org-openss7-xti.jar
 jar_DATA += org-openss7-xti-$(VERSION).jar
 
-org-openss7-xti-$(VERSION).jar: $(my_tcap_CLASSFILES)
+org-openss7-xti-$(VERSION).jar: classdist_java.stamp $(my_tcap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_tcap_CLASSFILES)
 my_jar_CLASSFILES += $(my_tcap_CLASSFILES)
 
-libopenss7XtiJNI_la_SOURCES 		= $(my_xti_SOURCEFILES)
+libopenss7XtiJNI_la_SOURCES  = $(my_xti_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7XtiJNI_la_CPPFLAGS 		= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7XtiJNI_la_CFLAGS		= $(USER_CFLAGS)
-libopenss7XtiJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7XtiJNI_la_LDFLAGS		= -module -avoid-version -shared
+libopenss7XtiJNI_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7XtiJNI_la_CFLAGS   = $(USER_CFLAGS)
+libopenss7XtiJNI_la_LIBADD   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7XtiJNI_la_LDFLAGS  = -module -avoid-version -shared
 
 jnilib_LTLIBRARIES += libopenss7XtiJNI.la
 
@@ -2898,6 +2969,7 @@ MY_SECONDARY += $(my_xti_CLASSFILES)
 $(my_xti_JAVAFILES): $(my_xti_SOURCEFILES)
 
 my_JAVAFILES += $(my_xti_JAVAFILES)
+#dist_java_JAVA += $(my_xti_JAVAFILES)
 
 clean-org_openss7_xti:
 	rm -f -- $(my_xti_JAVAFILES)
@@ -2916,8 +2988,8 @@ CLEAN_LOCAL += clean-org_openss7_xti
 my_tcap_JAVAFILES = \
 	org/openss7/tcap/SccpAddress.java \
 	org/openss7/tcap/sccp_addr_t.java \
-	org/openss7/tcap/SWIGTYPE_p_listTTcapOptions_R_t.java \
-	org/openss7/tcap/SWIGTYPE_p_listTtci__TcapOption_R_t.java \
+	org/openss7/tcap/SWIGTYPE_p_listT_TcapOptions_R_t.java \
+	org/openss7/tcap/SWIGTYPE_p_listT_tci__TcapOption_R_t.java \
 	org/openss7/tcap/TcapAbort.java \
 	org/openss7/tcap/TcapAccept.java \
 	org/openss7/tcap/TcapAllow.java \
@@ -2948,8 +3020,8 @@ my_tcap_JAVAFILES = \
 my_tcap_CLASSFILES = \
 	org/openss7/tcap/SccpAddress.class \
 	org/openss7/tcap/sccp_addr_t.class \
-	org/openss7/tcap/SWIGTYPE_p_listTTcapOptions_R_t.class \
-	org/openss7/tcap/SWIGTYPE_p_listTtci__TcapOption_R_t.class \
+	org/openss7/tcap/SWIGTYPE_p_listT_TcapOptions_R_t.class \
+	org/openss7/tcap/SWIGTYPE_p_listT_tci__TcapOption_R_t.class \
 	org/openss7/tcap/TcapAbort.class \
 	org/openss7/tcap/TcapAccept.class \
 	org/openss7/tcap/TcapAllow.class \
@@ -2980,12 +3052,17 @@ my_tcap_CLASSFILES = \
 my_tcap_SOURCEFILES = \
 	org/openss7/tcap/tcap_wrap.cxx
 
-lib_org_openss7_tcap_jar_la_SOURCES 	= org-openss7-tcap.jar $(my_tcap_SOURCEFILES)
-lib_org_openss7_tcap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_tcap_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_tcap_jar_la_LIBADD	= $(top_builddir)/libstreams.la
-lib_org_openss7_tcap_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_org_openss7_tcap_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_tcap_jar_la_SOURCES = org-openss7-tcap.jar
+#lib_org_openss7_tcap_jar_la_SOURCES	    = $(my_tcap_SOURCEFILES)
+lib_org_openss7_tcap_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-tcap.jar $(my_tcap_SOURCEFILES)
+nodist_lib_org_openss7_tcap_jar_la_SOURCES  = $(my_tcap_CLASSFILES)
+lib_org_openss7_tcap_jar_la_SOURCES	    = $(my_tcap_SOURCEFILES)
+lib_org_openss7_tcap_jar_la_CPPFLAGS	    = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_tcap_jar_la_CFLAGS	    = $(USER_CFLAGS)
+lib_org_openss7_tcap_jar_la_LIBADD	    = $(top_builddir)/libstreams.la
+lib_org_openss7_tcap_jar_la_LDFLAGS	    = -module -avoid-version -shared
+lib_org_openss7_tcap_jar_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 EXTRA_LTLIBRARIES 	+= lib-org-openss7-tcap.jar.la
 EXTRA_DATA		+= lib-org-openss7-tcap.jar.db
@@ -3000,18 +3077,18 @@ my_jar_LINKS += org-openss7-tcap.jar
 ALL_LOCAL += org-openss7-tcap.jar
 jar_DATA += org-openss7-tcap-$(VERSION).jar
 
-org-openss7-tcap-$(VERSION).jar: $(my_xti_CLASSFILES)
+org-openss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_xti_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_xti_CLASSFILES)
 my_jar_CLASSFILES += $(my_xti_CLASSFILES)
 
-libopenss7TcapJNI_la_SOURCES 		= $(my_tcap_SOURCEFILES)
+libopenss7TcapJNI_la_SOURCES	= $(my_tcap_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7TcapJNI_la_CPPFLAGS 		= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7TcapJNI_la_CFLAGS		= $(USER_CFLAGS)
-libopenss7TcapJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7TcapJNI_la_LDFLAGS		= -module -avoid-version -shared
+libopenss7TcapJNI_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7TcapJNI_la_CFLAGS	= $(USER_CFLAGS)
+libopenss7TcapJNI_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7TcapJNI_la_LDFLAGS	= -module -avoid-version -shared
 
 #jnilib_LTLIBRARIES += libopenss7TcapJNI.la
 EXTRA_LTLIBRARIES += libopenss7TcapJNI.la
@@ -3025,6 +3102,7 @@ MY_SECONDARY += $(my_tcap_CLASSFILES)
 $(my_tcap_JAVAFILES): $(my_tcap_SOURCEFILES)
 
 my_JAVAFILES += $(my_tcap_JAVAFILES)
+#dist_java_JAVA += $(my_tcap_JAVAFILES)
 
 clean-org_openss7_tcap:
 	rm -f -- $(my_tcap_JAVAFILES)
@@ -3073,12 +3151,17 @@ my_xtcap_CLASSFILES = \
 my_xtcap_SOURCEFILES = \
 	org/openss7/xtcap/xtcap_wrap.c
 
-lib_org_openss7_xtcap_jar_la_SOURCES 	= org-openss7-xtcap.jar $(my_xtcap_SOURCEFILES)
-lib_org_openss7_xtcap_jar_la_CPPFLAGS 	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_xtcap_jar_la_CFLAGS	= $(USER_CFLAGS)
-lib_org_openss7_xtcap_jar_la_LIBADD	= $(top_builddir)/libstreams.la
-lib_org_openss7_xtcap_jar_la_LDFLAGS	= -module -avoid-version -shared
-lib_org_openss7_xtcap_jar_la_GCJFLAGS	= -fjni -findirect-dispatch
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_org_openss7_xtcap_jar_la_SOURCES = org-openss7-xtcap.jar
+#lib_org_openss7_xtcap_jar_la_SOURCES	     = $(my_xtcap_SOURCEFILES)
+lib_org_openss7_xtcap_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-xtcap.jar $(my_xtcap_SOURCEFILES)
+nodist_lib_org_openss7_xtcap_jar_la_SOURCES  = $(my_xtcap_CLASSFILES)
+lib_org_openss7_xtcap_jar_la_SOURCES	     = $(my_xtcap_SOURCEFILES)
+lib_org_openss7_xtcap_jar_la_CPPFLAGS	     = $(GCJLIB_INCLUDES) -fno-strict-aliasing
+lib_org_openss7_xtcap_jar_la_CFLAGS	     = $(USER_CFLAGS)
+lib_org_openss7_xtcap_jar_la_LIBADD	     = $(top_builddir)/libstreams.la
+lib_org_openss7_xtcap_jar_la_LDFLAGS	     = -module -avoid-version -shared
+lib_org_openss7_xtcap_jar_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 EXTRA_LTLIBRARIES 	+= lib-org-openss7-xtcap.jar.la
 EXTRA_DATA		+= lib-org-openss7-xtcap.jar.db
@@ -3093,18 +3176,18 @@ my_jar_LINKS += org-openss7-xtcap.jar
 ALL_LOCAL += org-openss7-xtcap.jar
 jar_DATA += org-openss7-xtcap-$(VERSION).jar
 
-org-openss7-xtcap-$(VERSION).jar: $(my_xtcap_CLASSFILES)
+org-openss7-xtcap-$(VERSION).jar: classdist_java.stamp $(my_xtcap_CLASSFILES)
 	$(AM_V_GEN)$(JAR) cf $@ $^
 
 MY_SECONDARY += $(my_xtcap_CLASSFILES)
 my_jar_CLASSFILES += $(my_xtcap_CLASSFILES)
 
-libopenss7XtcapJNI_la_SOURCES 		= $(my_xtcap_SOURCEFILES)
+libopenss7XtcapJNI_la_SOURCES	= $(my_xtcap_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7XtcapJNI_la_CPPFLAGS 		= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7XtcapJNI_la_CFLAGS		= $(USER_CFLAGS)
-libopenss7XtcapJNI_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7XtcapJNI_la_LDFLAGS		= -module -avoid-version -shared
+libopenss7XtcapJNI_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
+libopenss7XtcapJNI_la_CFLAGS	= $(USER_CFLAGS)
+libopenss7XtcapJNI_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
+libopenss7XtcapJNI_la_LDFLAGS	= -module -avoid-version -shared
 
 #jnilib_LTLIBRARIES += libopenss7XtcapJNI.la
 EXTRA_LTLIBRARIES += libopenss7XtcapJNI.la
@@ -3128,9 +3211,12 @@ clean-org_openss7_xtcap:
 CLEAN_LOCAL += clean-org_openss7_xtcap
 
 my_JAVAFILES += $(my_xtcap_JAVAFILES)
+#dist_java_JAVA += $(my_xtcap_JAVAFILES)
 
-.INTERMEDIATE: $(MY_INTERMEDIATE)
-.SECONDARY: $(MY_SECONDARY)
+EXTRA_DIST += $(my_JAVAFILES)
+
+#.INTERMEDIATE: $(MY_INTERMEDIATE)
+.SECONDARY: $(MY_SECONDARY) $(MY_INTERMEDIATE)
 
 # =============================================================================
 #

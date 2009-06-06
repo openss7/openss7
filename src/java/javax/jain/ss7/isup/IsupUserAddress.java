@@ -98,7 +98,7 @@ public final class IsupUserAddress implements SS7Address, java.io.Serializable {
             pc[0] = dpc.getMember();
             pc[1] = dpc.getCluster();
             pc[2] = dpc.getZone();
-        } catch (MandatoryParameterNotSetException e) {
+        } catch (Exception e) {
             throw new ParameterRangeInvalidException("Signaling Point Code out of range.");
         }
         if (startCIC > endCIC)

@@ -113,6 +113,5 @@ public static final ExtensionChoice STRING_TYPE =new ExtensionChoice (M_STRING_T
 	}
 	
 }
-// end class
 
 

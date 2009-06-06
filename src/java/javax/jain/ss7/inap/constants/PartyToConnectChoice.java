@@ -103,5 +103,5 @@ public class PartyToConnectChoice {
 	
 	}
 	       
-}// end class 
+}
 

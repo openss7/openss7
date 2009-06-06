@@ -67,9 +67,9 @@ import javax.csapi.cc.jcc.*;
   */
 public interface JcatCallEvent extends JccCallEvent {
     /** Cause code indicating the event is related to the conference feature.  */
-    public static final int CAUSE_CONFERENCE;
+    public static final int CAUSE_CONFERENCE = 1;
     /** Cause code indicating the event is related to the transfer feature.  */
-    public static final int CAUSE_TRANFER;
+    public static final int CAUSE_TRANFER = 2;
 }
 
 // vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

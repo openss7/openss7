@@ -100,4 +100,4 @@ Constructor for ResourceStatus datatype
 	
 	}
 
-}// end class 
+}

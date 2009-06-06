@@ -160,7 +160,7 @@ public interface JcatConnection extends JccConnection {
       * <li>A disconnect indication is received from the suspended party (e.g.
       *     JccConnection.release(int)). </ul>
       */
-    public static final int SUSPENDED;
+    public static final int SUSPENDED = 1;
     /**
       * Returns a set of JcatTerminalConnection objects associated with this
       * JcatConnection. JcatTerminalConnection objects represent the relationship between

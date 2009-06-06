@@ -126,4 +126,4 @@ Constructor for RejectType datatype
 	
 	}
 	
-}// end class
+}

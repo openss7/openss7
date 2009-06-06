@@ -103,4 +103,3 @@ Constructor for ResourceAddressID datatype
 	}
 
 }
-//end class

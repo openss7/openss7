@@ -102,4 +102,4 @@ public static final TargetLineIdentifierChoice  GROUP= new TargetLineIdentifierC
 		return targetLineIdentifierChoice ;
 	}
     	    
-}// end class 
+}

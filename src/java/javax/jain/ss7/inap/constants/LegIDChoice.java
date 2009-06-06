@@ -99,5 +99,5 @@ public static final LegIDChoice  RECEIVING_SIDE_ID = new LegIDChoice (M_RECEIVIN
 		return legIDChoice;
 	}
 		
-}// end class 
+}
 

@@ -102,4 +102,4 @@ Constructor for CollectedInfo Choice.
 	}
 		
 
-}//end class
+}

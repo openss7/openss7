@@ -107,6 +107,5 @@ public static final CGEncountered SCP_OVERLOAD=new CGEncountered(M_SCP_OVERLOAD)
 	}
 
 }
-//end class
 
 

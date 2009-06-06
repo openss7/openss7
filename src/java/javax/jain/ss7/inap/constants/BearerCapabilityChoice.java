@@ -104,4 +104,3 @@ public static final BearerCapabilityChoice TMR=new BearerCapabilityChoice (M_TMR
 	
 }
 
-//end class

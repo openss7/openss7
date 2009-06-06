@@ -807,4 +807,4 @@ public static final OperationCode  COLLECTED_INFORMATION = new OperationCode (M_
 		
 	}    
 
-}// end class 
+}

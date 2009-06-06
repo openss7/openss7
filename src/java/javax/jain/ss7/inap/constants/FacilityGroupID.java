@@ -123,5 +123,4 @@ public static final FacilityGroupID ROUTE_INDEX  =new  FacilityGroupID (M_ROUTE_
 	
 	}
 }
-//end class
 

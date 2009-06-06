@@ -86,4 +86,4 @@ Constructor for TimerID datatype
 		return timerID;
 	}
 	
-}// end class
+}

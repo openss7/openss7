@@ -105,5 +105,5 @@ public class PartyToDisconnectChoice {
 	}
 	
        
-}// end class 
+}
 

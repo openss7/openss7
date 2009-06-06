@@ -114,4 +114,4 @@ public static final InformationToSendChoice  DISPLAY_INFORMATION = new  Informat
 	}
 	
 	
-}// end class
+}

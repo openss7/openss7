@@ -115,4 +115,4 @@ public class ResourceIDChoice {
 		return resourceIDChoice;
 	}
 
-}// end class 
+}

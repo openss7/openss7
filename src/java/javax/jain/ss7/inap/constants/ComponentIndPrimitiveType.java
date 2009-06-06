@@ -175,7 +175,7 @@ public static final ComponentIndPrimitiveType L_CANCEL=new ComponentIndPrimitive
 	
 	}
 
-}//end class
+}
 
 
 
