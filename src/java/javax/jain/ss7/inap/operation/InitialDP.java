@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
@@ -52,7 +51,7 @@ This class represents the InitialDP Operation.
 */
 
 
-public class InitialDP  extends Operation   implements Serializable
+public class InitialDP  extends Operation   implements java.io.Serializable
 {
     
 
@@ -323,7 +322,7 @@ Returns: TRUE if present , FALSE otherwise.
 
 /** Gets  Calling Party Business Group ID */
 
-    public String getCallingPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCallingPartyBusinessGroupID() throws ParameterNotSetException
 
     {
         if(isCallingPartyBusinessGroupIDPresent()) 
@@ -335,7 +334,7 @@ Returns: TRUE if present , FALSE otherwise.
 
 /** Sets  Calling Party Business Group ID */
 
-    public void setCallingPartyBusinessGroupID (String  callingPartyBusinessGroupID)
+    public void setCallingPartyBusinessGroupID (java.lang.String  callingPartyBusinessGroupID)
     {
         this.callingPartyBusinessGroupID=callingPartyBusinessGroupID;
         isCallingPartyBusinessGroupID = true;
@@ -358,7 +357,7 @@ Returns: TRUE if present , FALSE otherwise.
 /** Gets Calling Party's Category */
 
 
-    public String getCallingPartysCategory() throws ParameterNotSetException
+    public java.lang.String getCallingPartysCategory() throws ParameterNotSetException
 
     {
         if(isCallingPartysCategoryPresent())
@@ -370,7 +369,7 @@ Returns: TRUE if present , FALSE otherwise.
 
 /** Sets Calling Party's Category */
 
-    public void setCallingPartysCategory (String  callingPartysCategory)
+    public void setCallingPartysCategory (java.lang.String  callingPartysCategory)
     {
         this.callingPartysCategory=callingPartysCategory;
         isCallingPartysCategory = true;
@@ -474,7 +473,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Gets IP SSP Capabilities */
 
 
-    public String getIPSSPCapabilities() throws ParameterNotSetException
+    public java.lang.String getIPSSPCapabilities() throws ParameterNotSetException
 
     {
         if(isIPSSPCapabilitiesPresent())
@@ -486,7 +485,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /** Sets IP SSP Capabilities */
 
-    public void setIPSSPCapabilities (String iPSSPCapabilities)
+    public void setIPSSPCapabilities (java.lang.String iPSSPCapabilities)
     {
         this.iPSSPCapabilities=iPSSPCapabilities;
         isIPSSPCapabilities = true; 
@@ -510,7 +509,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Gets  IPAvailable */
 
 
-    public String getIPAvailable() throws ParameterNotSetException
+    public java.lang.String getIPAvailable() throws ParameterNotSetException
 
     {
         if(isIPAvailablePresent()) 
@@ -522,7 +521,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /** Sets  IPAvailable */
 
-    public void setIPAvailable (String iPAvailable)
+    public void setIPAvailable (java.lang.String iPAvailable)
     {
         this.iPAvailable=iPAvailable;
         isIPAvailable = true;
@@ -790,7 +789,7 @@ Returns:TRUE if present , FALSE otherwise.
     }
 /**Sets Service Interaction Indicators*/
 
-    public void setServiceInteractionIndicators(String   serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String   serviceInteractionIndicators)
     {
        this.serviceInteractionIndicators=serviceInteractionIndicators;
        isServiceInteractionIndicators = true;
@@ -1372,7 +1371,7 @@ Returns:TRUE if present , FALSE otherwise.
 /**Gets USI Service Indicator*/
 
 
-    public String getUSIServiceIndicator() throws ParameterNotSetException
+    public java.lang.String getUSIServiceIndicator() throws ParameterNotSetException
 
     {
         if(isUSIServiceIndicatorPresent())
@@ -1407,7 +1406,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /**Gets USI Information*/
 
-    public String getUSIInformation() throws ParameterNotSetException
+    public java.lang.String getUSIInformation() throws ParameterNotSetException
 
     {
         if(isUSIInformationPresent())

@@ -2663,7 +2663,7 @@ public class JainIsupProviderImpl implements JainIsupProvider {
 			case IsupParameterValues.ISUP_PMT_OTGN:
 				tmp_array = ByteArray.getByteArray(par_len);
 				System.arraycopy(par_array,index, tmp_array,0,par_len);		
-				java.lang.String otgn = new String(tmp_array);
+				String otgn = new String(tmp_array);
 				if(event instanceof ExitAnsiEvent)						
 					((ExitAnsiEvent)event).setOutgoingTrunkGrpNumber(otgn);
 				ByteArray.returnByteArray(tmp_array);	

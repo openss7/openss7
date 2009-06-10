@@ -35,7 +35,6 @@ package com.ss8.javax.jain.ss7.isup;
 
 import java.util.*;
 import java.io.*;
-import java.lang.*;
 
 import javax.jain.*;
 import javax.jain.ss7.*;

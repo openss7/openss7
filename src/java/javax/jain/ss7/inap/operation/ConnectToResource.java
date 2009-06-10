@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the ConnectToResource Operation.
 */
 
-public class ConnectToResource   extends Operation implements Serializable
+public class ConnectToResource   extends Operation implements java.io.Serializable
 {
 
     private ResourceAddress resourceAddress;
@@ -108,7 +107,7 @@ Sets Resource Address
 /**
 Gets Service Interaction Indicators
 */
-    public String getServiceInteractionIndicators() throws ParameterNotSetException
+    public java.lang.String getServiceInteractionIndicators() throws ParameterNotSetException
     {
         if(isServiceInteractionIndicatorsPresent())
              return serviceInteractionIndicators;
@@ -119,7 +118,7 @@ Gets Service Interaction Indicators
 /**
 Sets Service Interaction Indicators
 */
-    public void setServiceInteractionIndicators(String serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String serviceInteractionIndicators)
     {
         this.serviceInteractionIndicators = serviceInteractionIndicators;
         isServiceInteractionIndicators = true;

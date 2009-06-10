@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the HoldCallInNetwork Operation.
 */
 
-public class HoldCallInNetwork  extends Operation   implements Serializable
+public class HoldCallInNetwork  extends Operation   implements java.io.Serializable
 {
 	private String holdCause;
 	private boolean isHoldCause = false ;
@@ -82,7 +81,7 @@ Gets Operation Code
 /**
 Gets Hold Cause
 */
-    public String getHoldCause() throws ParameterNotSetException
+    public java.lang.String getHoldCause() throws ParameterNotSetException
     {
         if(isHoldCausePresent()) 
              return holdCause;
@@ -92,7 +91,7 @@ Gets Hold Cause
 /**
 Sets Hold Cause
 */
-    public void setHoldCause(String holdCause)
+    public void setHoldCause(java.lang.String holdCause)
     {
         this.holdCause = holdCause;
         isHoldCause = true;

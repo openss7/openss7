@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents OMidCall Operation.
 */
 
-public class OMidCall  extends Operation   implements Serializable
+public class OMidCall  extends Operation   implements java.io.Serializable
 {
 
     private DPSpecificCommonParameters dPSpecificCommonParameters;
@@ -126,7 +125,7 @@ Sets DP Specific Common Parameter
 /**
 Gets Called Party Business Group ID
 */
-    public String getCalledPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCalledPartyBusinessGroupID() throws ParameterNotSetException
     {
         if(isCalledPartyBusinessGroupIDPresent())
              return calledPartyBusinessGroupID;
@@ -137,7 +136,7 @@ Gets Called Party Business Group ID
 /**
 Sets Called Party Business Group ID
 */
-    public void setCalledPartyBusinessGroupID(String calledPartyBusinessGroupID)
+    public void setCalledPartyBusinessGroupID(java.lang.String calledPartyBusinessGroupID)
     {
         this.calledPartyBusinessGroupID = calledPartyBusinessGroupID;
         isCalledPartyBusinessGroupID = true;
@@ -189,7 +188,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Calling Party Business Group ID
 */
-    public String getCallingPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCallingPartyBusinessGroupID() throws ParameterNotSetException
     {
         if(isCallingPartyBusinessGroupIDPresent())
                return callingPartyBusinessGroupID;
@@ -201,7 +200,7 @@ Gets Calling Party Business Group ID
 /**
 Sets Calling Party Business Group ID
 */
-    public void setCallingPartyBusinessGroupID(String callingPartyBusinessGroupID)
+    public void setCallingPartyBusinessGroupID(java.lang.String callingPartyBusinessGroupID)
     {
         this.callingPartyBusinessGroupID = callingPartyBusinessGroupID;
         isCallingPartyBusinessGroupID = true;

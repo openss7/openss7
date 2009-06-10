@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 
@@ -48,7 +47,7 @@ import javax.jain.ss7.inap.constants.*;
 This class defines the CalledAddressAndService DataType
 */
 
-public class CalledAddressAndService implements Serializable
+public class CalledAddressAndService implements java.io.Serializable
 {
 	
 	private DigitsGenericNumber calledAddressValue;

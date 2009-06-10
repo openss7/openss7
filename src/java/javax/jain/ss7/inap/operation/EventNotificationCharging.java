@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the EventNotificationCharging Operation.
 */
 
-public class EventNotificationCharging  extends Operation   implements Serializable
+public class EventNotificationCharging  extends Operation   implements java.io.Serializable
 {
 	
 
@@ -72,7 +71,7 @@ public class EventNotificationCharging  extends Operation   implements Serializa
 /**
 Constructor For EventNotificationCharging
 */
-	public EventNotificationCharging(String eventTypeCharging)
+	public EventNotificationCharging(java.lang.String eventTypeCharging)
 	{
 		operationCode = OperationCode.EVENT_NOTIFICATION_CHARGING;
 		setEventTypeCharging(eventTypeCharging);
@@ -95,14 +94,14 @@ Gets Operation Code
 /**
 Gets Event Type Charging
 */
-    public String getEventTypeCharging() 
+    public java.lang.String getEventTypeCharging() 
     {
         return eventTypeCharging;
     }
 /**
 Sets Event Type Charging
 */
-    public void setEventTypeCharging(String eventTypeCharging)
+    public void setEventTypeCharging(java.lang.String eventTypeCharging)
     {
         this.eventTypeCharging = eventTypeCharging;
     }
@@ -112,7 +111,7 @@ Sets Event Type Charging
 /**
 Gets Event Specific Information Charging
 */
-    public String getEventSpecificInformationCharging() throws ParameterNotSetException
+    public java.lang.String getEventSpecificInformationCharging() throws ParameterNotSetException
     {
         if(isEventSpecificInformationChargingPresent())
               return eventSpecificInformationCharging;
@@ -122,7 +121,7 @@ Gets Event Specific Information Charging
 /**
 Sets Event Specific Information Charging
 */
-    public void setEventSpecificInformationCharging(String eventSpecificInformationCharging)
+    public void setEventSpecificInformationCharging(java.lang.String eventSpecificInformationCharging)
     {
         this.eventSpecificInformationCharging = eventSpecificInformationCharging;
         isEventSpecificInformationCharging = true;

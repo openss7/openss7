@@ -39,7 +39,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -47,7 +46,7 @@ import javax.jain.*;
 This class defines the ControlDigits Datatype
 */
 
-public class ControlDigits implements Serializable
+public class ControlDigits implements java.io.Serializable
 {
 
 	 private String endOfRecordingDigit;
@@ -69,7 +68,7 @@ public class ControlDigits implements Serializable
 /**
 Gets End Of Recording Digit
 */
-    public String getEndOfRecordingDigit() throws ParameterNotSetException
+    public java.lang.String getEndOfRecordingDigit() throws ParameterNotSetException
     {
         if(isEndOfRecordingDigitPresent())
 		{
@@ -84,7 +83,7 @@ Gets End Of Recording Digit
 /**
 Sets End Of Recording Digit
 */
-    public void setEndOfRecordingDigit(String endOfRecordingDigit)
+    public void setEndOfRecordingDigit(java.lang.String endOfRecordingDigit)
     {
         this.endOfRecordingDigit = endOfRecordingDigit;
         isEndOfRecordingDigit=true;         
@@ -106,7 +105,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Cancel Digit
 */
-    public String getCancelDigit() throws ParameterNotSetException
+    public java.lang.String getCancelDigit() throws ParameterNotSetException
     {
         if(isCancelDigitPresent())
 		{
@@ -121,7 +120,7 @@ Gets Cancel Digit
 /**
 Sets Cancel Digit
 */
-    public void setCancelDigit(String cancelDigit)
+    public void setCancelDigit(java.lang.String cancelDigit)
     {
         this.cancelDigit = cancelDigit;
         isCancelDigit=true;
@@ -143,7 +142,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Replay Digit
 */
-    public String getReplayDigit() throws ParameterNotSetException
+    public java.lang.String getReplayDigit() throws ParameterNotSetException
     {
         if(isReplayDigitPresent())
 		{
@@ -158,7 +157,7 @@ Gets Replay Digit
 /**
 Sets Replay  Digit
 */
-    public void setReplayDigit(String replayDigit)
+    public void setReplayDigit(java.lang.String replayDigit)
     {
         this.replayDigit = replayDigit;
         isReplayDigit=true; 
@@ -179,7 +178,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Restart Recording Digit
 */
-    public String getRestartRecordingDigit() throws ParameterNotSetException
+    public java.lang.String getRestartRecordingDigit() throws ParameterNotSetException
     {
         if(isRestartRecordingDigitPresent())
 		{
@@ -194,7 +193,7 @@ Gets Restart Recording Digit
 /**
 Sets Restart  Recording Digit
 */
-    public void setRestartRecordingDigit(String restartRecordingDigit)
+    public void setRestartRecordingDigit(java.lang.String restartRecordingDigit)
     {
         this.restartRecordingDigit = restartRecordingDigit;
         isRestartRecordingDigit=true;

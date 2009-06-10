@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class represents the SendChargingInformation Operation.
 */
 
-public class SendChargingInformation  extends Operation   implements Serializable {
+public class SendChargingInformation  extends Operation   implements java.io.Serializable {
 
 
 
@@ -63,7 +62,7 @@ public class SendChargingInformation  extends Operation   implements Serializabl
 /**c
 Constructor For SendChargingInformation
 */
-	public SendChargingInformation(String sCIBillingChargingCharacteristics,
+	public SendChargingInformation(java.lang.String sCIBillingChargingCharacteristics,
 	 								LegID partyToCharge)
 	{
 		operationCode = OperationCode.SEND_CHARGING_INFORMATION;
@@ -85,7 +84,7 @@ Gets Operation Code
 /**
 Gets SCI Billing and Charging Characteristics
 */
-    public String getSCIBillingChargingCharacteristics() 
+    public java.lang.String getSCIBillingChargingCharacteristics() 
     {
         return sCIBillingChargingCharacteristics;
     }

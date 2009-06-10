@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This Class defines the BackwardServiceInteractionIndicator Datatype
 */
 
-public class BackwardServiceInteractionInd  implements Serializable 
+public class BackwardServiceInteractionInd  implements java.io.Serializable 
 {
 
     private String conferenceTreatmentIndicator;
@@ -61,7 +60,7 @@ public class BackwardServiceInteractionInd  implements Serializable
 /**
 Gets Conference Treatment Indicator
 */
-    public String getConferenceTreatmentIndicator() throws ParameterNotSetException 
+    public java.lang.String getConferenceTreatmentIndicator() throws ParameterNotSetException 
     {
         if(isConferenceTreatmentIndicatorPresent())
 		{
@@ -76,7 +75,7 @@ Gets Conference Treatment Indicator
 Sets Conference Treatment Indicator
 */
 
-    public void setConferenceTreatmentIndicator(String conferenceTreatmentIndicator)
+    public void setConferenceTreatmentIndicator(java.lang.String conferenceTreatmentIndicator)
     {
         this.conferenceTreatmentIndicator=conferenceTreatmentIndicator;
         isConferenceTreatmentIndicator=true;        
@@ -98,7 +97,7 @@ Returns: TRUE if present, FALSE otherwise.
 Gets Call Completion Treatment Indicator
 */
 
-    public String getCallCompletionTreatmentIndicator() throws ParameterNotSetException  
+    public java.lang.String getCallCompletionTreatmentIndicator() throws ParameterNotSetException  
     {
         if(isCallCompletionTreatmentIndicatorPresent())
 		{
@@ -113,7 +112,7 @@ Gets Call Completion Treatment Indicator
 Sets Call Completion Treatment Indicator
 */
 
-    public void setCallCompletionTreatmentIndicator(String callCompletionTreatmentIndicator)
+    public void setCallCompletionTreatmentIndicator(java.lang.String callCompletionTreatmentIndicator)
     {
         this.callCompletionTreatmentIndicator=callCompletionTreatmentIndicator;
         isCallCompletionTreatmentIndicator=true;

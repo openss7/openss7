@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 /**
 This class identifies the terminal type so that the SCF can specify, to the SRF,
 the appropriate type of capability (voice recognition, DTMF, display capability etc.)

@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This Class defines the Global Title Datatype
 */
 
-public class GlobalTitle  implements Serializable 
+public class GlobalTitle  implements java.io.Serializable 
 {
 
     private int globalTitleIndicator;
@@ -56,7 +55,7 @@ public class GlobalTitle  implements Serializable
 /**
 Constructor For GlobalTitle
 */
-	public GlobalTitle(int globalTitleIndicator, String globalTitleAddress)
+	public GlobalTitle(int globalTitleIndicator, java.lang.String globalTitleAddress)
 	{
 		setGlobalTitleIndicator(globalTitleIndicator);
 		setGlobalTitleAddress (globalTitleAddress);
@@ -86,7 +85,7 @@ Sets  Global Title Indicator
 /**
 Gets  Global Title Address
 */
-    public String getGlobalTitleAddress()
+    public java.lang.String getGlobalTitleAddress()
     {
         return globalTitleAddress ;
     }
@@ -95,7 +94,7 @@ Gets  Global Title Address
 Sets  Global Title Address
 */
 
-    public void  setGlobalTitleAddress (String globalTitleAddress)
+    public void  setGlobalTitleAddress (java.lang.String globalTitleAddress)
     {
         this.globalTitleAddress = globalTitleAddress ;
     }

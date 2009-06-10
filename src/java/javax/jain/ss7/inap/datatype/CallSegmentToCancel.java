@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the CallSegmentToCancel Datatype
 */
 
-public class CallSegmentToCancel implements Serializable
+public class CallSegmentToCancel implements java.io.Serializable
 {
     private int invokeID;
 

@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class defines the Cause Datatype.(Encoded as in Q.763)
 */
 
-public class Cause implements Serializable
+public class Cause implements java.io.Serializable
 {
 
     private int location;
@@ -64,7 +63,7 @@ public class Cause implements Serializable
 /**
 Constructor For Cause
 */
-	public Cause(int location, int codingStandard, String causeValue)
+	public Cause(int location, int codingStandard, java.lang.String causeValue)
 	{
 		setLocation (location);
 		setCodingStandard (codingStandard);
@@ -113,7 +112,7 @@ Sets  Coding Standard
 /**
 Gets  Cause Value
 */
-    public String getCauseValue ()
+    public java.lang.String getCauseValue ()
     {
         return causeValue ;
     }
@@ -131,7 +130,7 @@ Sets  Cause Value
 Gets  Dignostics
 */
 
-    public String getDiagnostics () throws ParameterNotSetException
+    public java.lang.String getDiagnostics () throws ParameterNotSetException
     {
         if(isDiagnosticsPresent())
 		{

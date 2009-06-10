@@ -510,6 +510,37 @@ AC_DEFUN([_GCJ_TOOLS], [dnl
 *** the JAVAC environment variable when rerunning configure.
 ***])
     fi
+
+    AC_ARG_VAR([JAVADOC],
+	[Java documentation doclet. @<:@default=gjdoc@:>@])
+    AC_ARG_VAR([JAVADOCFLAGS],
+	[Java documentation flags. @<:@default=auto@:>@])
+    AC_PATH_PROGS([JAVADOC], [gjdoc javadoc], [],
+	[$PATH:/usr/local/bin:/usr/bin:/bin])
+    if test -z "$JAVADOC"; then
+	AC_MSG_ERROR([
+***
+*** Configure could not find the Java documentation program
+*** 'javadoc' (nor 'gjdoc').  This program is part of the
+*** GNU Compiler Colleciton, but is not always loaded on
+*** recent distributions.  It is also part of most Java SDKs.
+***
+*** On RPM based distributions, try 'yum install gcc-java'.
+*** On DEB based distributions, try 'apt-get install gcj'.
+***
+*** Alternatively, you can specify an equivalent command with
+*** the JAVADOC environment variable when rerunning configure.
+***])
+    fi
+    if test $(basename "$JAVADOC") = 'gjdoc'; then
+	JAVADOCFLAGS=
+	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-validhtml"
+	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-licensetext"
+    else
+	if test $(basename "$JAVADOC") = 'javadoc'; then
+	    JAVADOCFLAGS=
+	fi
+    fi
 ])# _GCJ_TOOLS
 # =============================================================================
 

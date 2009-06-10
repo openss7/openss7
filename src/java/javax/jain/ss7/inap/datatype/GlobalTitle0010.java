@@ -41,14 +41,13 @@
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This Class defines the Global Title 0010 datatype (Encoded as in Q.713)
 */
 
-public class GlobalTitle0010 extends GlobalTitle implements Serializable 
+public class GlobalTitle0010 extends GlobalTitle implements java.io.Serializable 
 {
 
     private int translationType;
@@ -56,7 +55,7 @@ public class GlobalTitle0010 extends GlobalTitle implements Serializable
 /**
 Constructor For GlobalTitle0010
 */
-	public GlobalTitle0010(int translationType, int globalTitleIndicator, String globalTitleAddress)
+	public GlobalTitle0010(int translationType, int globalTitleIndicator, java.lang.String globalTitleAddress)
 	{
 		super(globalTitleIndicator, globalTitleAddress);
 		setTranslationType(translationType);

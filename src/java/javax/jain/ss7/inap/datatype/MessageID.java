@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
  This class defines the MessageId DataType
  */
 
-public class MessageID implements Serializable
+public class MessageID implements java.io.Serializable
 {
 
 	 private int elementaryMessageID;

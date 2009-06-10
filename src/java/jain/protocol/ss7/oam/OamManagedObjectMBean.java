@@ -1,58 +1,47 @@
-/* ***************************************************************************
-
- @(#) $RCSfile$ $Name$($Revision$) $Date$
-
- -----------------------------------------------------------------------------
-
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-
- All Rights Reserved.
-
+/*
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
  This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
-
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
- details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>, or
- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
- 02139, USA.
-
- -----------------------------------------------------------------------------
-
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
- behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
-
- -----------------------------------------------------------------------------
-
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
  Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
  Last Modified $Date$ by $Author$
-
- -----------------------------------------------------------------------------
-
- $Log$
- *****************************************************************************/
+ */
 
 package jain.protocol.ss7.oam;
 
@@ -94,73 +83,73 @@ import jain.*;
   * <center> [NotificationHierarchy.jpg] </center><br>
   * <center> Inheritance hierarchy for JAIN OAM Notification </center><br>
   *
-  * @version 1.1
-  * @author Colm Hayden and Phelim O'Doherty
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public abstract interface OamManagedObjectMBean extends NotificationBroadcaster, MBeanRegistration, java.lang.Cloneable, java.io.Serializable {
+public abstract interface OamManagedObjectMBean extends javax.management.NotificationBroadcaster,javax.management.MBeanRegistration, java.lang.Cloneable, java.io.Serializable {
     /** The Object Type for a Mtp2SapMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP2_SAP".  */
-    public static final java.lang.String OBJECT_TYPE_MTP2_SAP = "OBJECT_TYPE_MTP2_SAP";
+    public static final String OBJECT_TYPE_MTP2_SAP = "OBJECT_TYPE_MTP2_SAP";
     /** The Object Type for a Mtp2TimerProfileMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_MTP2_TIMER_PROFILE".  */
-    public static final java.lang.String OBJECT_TYPE_MTP2_TIMER_PROFILE = "OBJECT_TYPE_MTP2_TIMER_PROFILE";
+    public static final String OBJECT_TYPE_MTP2_TIMER_PROFILE = "OBJECT_TYPE_MTP2_TIMER_PROFILE";
     /** The Object Type for a LinkMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_LINK".  */
-    public static final java.lang.String OBJECT_TYPE_LINK = "OBJECT_TYPE_LINK";
+    public static final String OBJECT_TYPE_LINK = "OBJECT_TYPE_LINK";
     /** The Object Type for a LinksetMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_LINKSET".  */
-    public static final java.lang.String OBJECT_TYPE_LINKSET = "OBJECT_TYPE_LINKSET";
+    public static final String OBJECT_TYPE_LINKSET = "OBJECT_TYPE_LINKSET";
     /** The Object Type for a RouteMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_ROUTE".  */
-    public static final java.lang.String OBJECT_TYPE_ROUTE = "OBJECT_TYPE_ROUTE";
+    public static final String OBJECT_TYPE_ROUTE = "OBJECT_TYPE_ROUTE";
     /** The Object Type for a RoutesetMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_ROUTESET".  */
-    public static final java.lang.String OBJECT_TYPE_ROUTESET = "OBJECT_TYPE_ROUTESET";
+    public static final String OBJECT_TYPE_ROUTESET = "OBJECT_TYPE_ROUTESET";
     /** The Object Type for a Mtp3SapMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP3_SAP".  */
-    public static final java.lang.String OBJECT_TYPE_MTP3_SAP = "OBJECT_TYPE_MTP3_SAP";
+    public static final String OBJECT_TYPE_MTP3_SAP = "OBJECT_TYPE_MTP3_SAP";
     /** The Object Type for an OwnSignallingPointMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_OWN_SIGNALLING_POINT".  */
-    public static final java.lang.String OBJECT_TYPE_OWN_SIGNALLING_POINT = "OBJECT_TYPE_OWN_SIGNALLING_POINT";
+    public static final String OBJECT_TYPE_OWN_SIGNALLING_POINT = "OBJECT_TYPE_OWN_SIGNALLING_POINT";
     /** The Object Type for a ScreeningTableMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_SCREENING_TABLE".  */
-    public static final java.lang.String OBJECT_TYPE_SCREENING_TABLE = "OBJECT_TYPE_SCREENING_TABLE";
+    public static final String OBJECT_TYPE_SCREENING_TABLE = "OBJECT_TYPE_SCREENING_TABLE";
     /** The Object Type for a Mtp3TimerProfileMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_MTP3_TIMER_PROFILE".  */
-    public static final java.lang.String OBJECT_TYPE_MTP3_TIMER_PROFILE = "OBJECT_TYPE_MTP3_TIMER_PROFILE";
+    public static final String OBJECT_TYPE_MTP3_TIMER_PROFILE = "OBJECT_TYPE_MTP3_TIMER_PROFILE";
     /** The Object Type for a ConcernedAreaMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_CONCERNED_AREA".  */
-    public static final java.lang.String OBJECT_TYPE_CONCERNED_AREA = "OBJECT_TYPE_CONCERNED_AREA";
+    public static final String OBJECT_TYPE_CONCERNED_AREA = "OBJECT_TYPE_CONCERNED_AREA";
     /** The Object Type for a GlobalTitleEntryMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_GLOBAL_TITLE_ENTRY".  */
-    public static final java.lang.String OBJECT_TYPE_GLOBAL_TITLE_ENTRY = "OBJECT_TYPE_GLOBAL_TITLE_ENTRY";
+    public static final String OBJECT_TYPE_GLOBAL_TITLE_ENTRY = "OBJECT_TYPE_GLOBAL_TITLE_ENTRY";
     /** The Object Type for a SccpEntitySetMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_SCCP_ENTITY_SET".  */
-    public static final java.lang.String OBJECT_TYPE_SCCP_ENTITY_SET = "OBJECT_TYPE_SCCP_ENTITY_SET";
+    public static final String OBJECT_TYPE_SCCP_ENTITY_SET = "OBJECT_TYPE_SCCP_ENTITY_SET";
     /** The Object Type for a SccpRoutingControlMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_SCCP_ROUTING_CONTROL".  */
-    public static final java.lang.String OBJECT_TYPE_SCCP_ROUTING_CONTROL = "OBJECT_TYPE_SCCP_ROUTING_CONTROL";
+    public static final String OBJECT_TYPE_SCCP_ROUTING_CONTROL = "OBJECT_TYPE_SCCP_ROUTING_CONTROL";
     /** The Object Type for a SccpTimerProfileMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_SCCP_TIMER_PROFILE".  */
-    public static final java.lang.String OBJECT_TYPE_SCCP_TIMER_PROFILE = "OBJECT_TYPE_SCCP_TIMER_PROFILE";
+    public static final String OBJECT_TYPE_SCCP_TIMER_PROFILE = "OBJECT_TYPE_SCCP_TIMER_PROFILE";
     /** The Object Type for a TcapNodeMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_TCAP_NODE".  */
-    public static final java.lang.String OBJECT_TYPE_TCAP_NODE = "OBJECT_TYPE_TCAP_NODE";
+    public static final String OBJECT_TYPE_TCAP_NODE = "OBJECT_TYPE_TCAP_NODE";
     /** The Object Type for a OamTimerValMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_OAM_TIMER_VAL".  */
-    public static final java.lang.String OBJECT_TYPE_OAM_TIMER_VAL = "OBJECT_TYPE_OAM_TIMER_VAL";
+    public static final String OBJECT_TYPE_OAM_TIMER_VAL = "OBJECT_TYPE_OAM_TIMER_VAL";
     /** The Object Type for a Mtp2LayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP2_LAYER_MANAGER".  */
-    public static final java.lang.String OBJECT_TYPE_MTP2_LAYER_MANAGER = "OBJECT_TYPE_MTP2_LAYER_MANAGER";
+    public static final String OBJECT_TYPE_MTP2_LAYER_MANAGER = "OBJECT_TYPE_MTP2_LAYER_MANAGER";
     /** The Object Type for a Mtp3LayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP3_LAYER_MANAGER".  */
-    public static final java.lang.String OBJECT_TYPE_MTP3_LAYER_MANAGER = "OBJECT_TYPE_MTP3_LAYER_MANAGER";
+    public static final String OBJECT_TYPE_MTP3_LAYER_MANAGER = "OBJECT_TYPE_MTP3_LAYER_MANAGER";
     /** The Object Type for a SccpLayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_SCCP_LAYER_MANAGER".  */
-    public static final java.lang.String OBJECT_TYPE_SCCP_LAYER_MANAGER = "OBJECT_TYPE_SCCP_LAYER_MANAGER";
+    public static final String OBJECT_TYPE_SCCP_LAYER_MANAGER = "OBJECT_TYPE_SCCP_LAYER_MANAGER";
     /** The Object Type for a TcapLayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_TCAP_LAYER_MANAGER".  */
-    public static final java.lang.String OBJECT_TYPE_TCAP_LAYER_MANAGER = "OBJECT_TYPE_TCAP_LAYER_MANAGER";
+    public static final String OBJECT_TYPE_TCAP_LAYER_MANAGER = "OBJECT_TYPE_TCAP_LAYER_MANAGER";
     /**
       * Returns an OamStatisticNotification of the specified statistic type containing the
       * value of the statistic. For example, if the object implementing this interface is
@@ -189,7 +178,7 @@ public abstract interface OamManagedObjectMBean extends NotificationBroadcaster,
       * if the specifiecd statistic type cannot be collected for this
       * OamManagedObjectMBean
       */
-    public OamStatisticNotification getStatistic(java.lang.Integer statisticType)
+    public OamStatisticNotification getStatistic(Integer statisticType)
         throws StatisticNotSupportedException, IllegalOperationException;
     /**
       * Initiates the polling of statistic of the specified statistic type on this
@@ -230,7 +219,7 @@ public abstract interface OamManagedObjectMBean extends NotificationBroadcaster,
       * if the specifiecd statistic type cannot be collected for this
       * OamManagedObjectMBean.
       */
-    public void startPollingStatistic(java.lang.Integer statisticType, java.lang.Integer interval)
+    public void startPollingStatistic(Integer statisticType, Integer interval)
         throws StatisticNotSupportedException, IllegalOperationException;
     /**
       * Stops the polling of statistic of the specified statistic type. <p>
@@ -256,7 +245,7 @@ public abstract interface OamManagedObjectMBean extends NotificationBroadcaster,
       * if the statistic is not being polled on this OamManagedObjectMBean or the
       * specified statistic type cannot be collected for this OamManagedObjectMBean.
       */
-    public void stopPollingStatistic(java.lang.Integer statisticType)
+    public void stopPollingStatistic(Integer statisticType)
         throws IllegalOperationException;
     /**
       * Sets the name of this OamManagedBean. This can be used to store a proprietary
@@ -265,11 +254,11 @@ public abstract interface OamManagedObjectMBean extends NotificationBroadcaster,
       * @param name
       * the name of this Managed Bean (MBean)
       *
-      * @exception java.lang.NullPointerException
+      * @exception NullPointerException
       * if the supplied name is null
       */
     public void setName(java.lang.String name)
-        throws java.lang.NullPointerException;
+        throws NullPointerException;
     /**
       * Gets the name of this OamManagedBean. This may take the form of a proprietary
       * Managed Bean identifier.
@@ -323,7 +312,7 @@ public abstract interface OamManagedObjectMBean extends NotificationBroadcaster,
       * id when an object is created. The String equivalent of this method is used as the
       * 'id' property in the objectName.
       */
-    public java.lang.String getObjectId();
+    public String getObjectId();
     /**
       * Returns an Object that may contain proprietary methods for this Managed Bean
       * (MBean).
@@ -341,8 +330,7 @@ public abstract interface OamManagedObjectMBean extends NotificationBroadcaster,
       * @return
       * the object type of this Managed Bean (MBean)
       */
-    public java.lang.String getObjectType();
+    public String getObjectType();
 }
 
-// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
-
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

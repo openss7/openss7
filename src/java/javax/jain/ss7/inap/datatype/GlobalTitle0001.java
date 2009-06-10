@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This Class defines the Global Title 0001 Datatype (Encoded as in Q.713)
 */
 
-public class GlobalTitle0001 extends GlobalTitle implements Serializable 
+public class GlobalTitle0001 extends GlobalTitle implements java.io.Serializable 
 {
 
     private int natureOfAddressIndicator;
@@ -55,7 +54,7 @@ public class GlobalTitle0001 extends GlobalTitle implements Serializable
 /**
 Constructor For GlobalTitle0001
 */
-	public GlobalTitle0001(int natureOfAddressIndicator, int globalTitleIndicator, String globalTitleAddress)
+	public GlobalTitle0001(int natureOfAddressIndicator, int globalTitleIndicator, java.lang.String globalTitleAddress)
 	{
 		super(globalTitleIndicator, globalTitleAddress);
 		setNatureOfAddressIndicator (natureOfAddressIndicator);

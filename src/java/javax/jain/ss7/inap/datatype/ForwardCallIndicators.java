@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
@@ -48,7 +47,7 @@ This Class defines the Forward Call Indicators Format (Encoded as in Q.763)
 */
 
 
-public class ForwardCallIndicators implements Serializable 
+public class ForwardCallIndicators implements java.io.Serializable 
 {
 	private boolean nationalInternationalCallIndicator;
 	 

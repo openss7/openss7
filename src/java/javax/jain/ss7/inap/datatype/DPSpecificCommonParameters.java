@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -50,7 +49,7 @@ This class defines DPSpecificCommonParameters Datatype
 */
 
 
-public class DPSpecificCommonParameters implements Serializable 
+public class DPSpecificCommonParameters implements java.io.Serializable 
 {
 
 
@@ -248,7 +247,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Gets Calling Partys Category */
 
 
-    public String getCallingPartysCategory() throws ParameterNotSetException
+    public java.lang.String getCallingPartysCategory() throws ParameterNotSetException
     {
         if(isCallingPartysCategoryPresent())
 		{
@@ -262,7 +261,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /** Sets Calling Partys Category */
 
-    public void setCallingPartysCategory (String  callingPartysCategory)
+    public void setCallingPartysCategory (java.lang.String  callingPartysCategory)
     {
         this.callingPartysCategory=callingPartysCategory;
         isCallingPartysCategory=true;
@@ -286,7 +285,7 @@ Returns: TRUE if present , FALSE otherwise.
 /** Gets IP SSP Capabilities parameter*/
 
 
-    public String getIPSSPCapabilities() throws ParameterNotSetException
+    public java.lang.String getIPSSPCapabilities() throws ParameterNotSetException
     {
         if( isIPSSPCapabilitiesPresent())
 		{
@@ -300,7 +299,7 @@ Returns: TRUE if present , FALSE otherwise.
 
 /** Sets IP SSP Capabilities parameter*/
 
-    public void setIPSSPCapabilities (String iPSSPCapabilities)
+    public void setIPSSPCapabilities (java.lang.String iPSSPCapabilities)
     {
         this.iPSSPCapabilities=iPSSPCapabilities;
         isIPSSPCapabilities=true;
@@ -323,7 +322,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Gets IP Available*/
 
 
-    public String getIPAvailable() throws ParameterNotSetException
+    public java.lang.String getIPAvailable() throws ParameterNotSetException
     {
        if(isIPAvailablePresent())
 	   { 
@@ -337,7 +336,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /** Sets IP Available*/
 
-    public void setIPAvailable (String iPAvailable)
+    public void setIPAvailable (java.lang.String iPAvailable)
     {
         this.iPAvailable=iPAvailable;
         isIPAvailable=true;
@@ -658,7 +657,7 @@ Returns:TRUE if present , FALSE otherwise.
     }
 /**Sets Service Interaction Indicators*/
 
-    public void setServiceInteractionIndicators(String   serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String   serviceInteractionIndicators)
     {
        this.serviceInteractionIndicators=serviceInteractionIndicators;
        isServiceInteractionIndicators=true; 
@@ -756,7 +755,7 @@ Returns: TRUE if present , FALSE otherwise.
 
 /**Gets USI Service Indicator*/
 
-    public String getUSIServiceIndicator() throws ParameterNotSetException
+    public java.lang.String getUSIServiceIndicator() throws ParameterNotSetException
     {
        if(isUSIServiceIndicatorPresent())
 	   { 
@@ -791,7 +790,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /**Gets USI Information*/
 
-    public String getUSIInformation() throws ParameterNotSetException
+    public java.lang.String getUSIInformation() throws ParameterNotSetException
     {
         if(isUSIInformationPresent())
 		{

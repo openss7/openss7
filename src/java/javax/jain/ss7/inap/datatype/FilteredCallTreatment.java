@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This class represents the FilteredCallTreatment DataType
 */
 
-public class FilteredCallTreatment implements Serializable
+public class FilteredCallTreatment implements java.io.Serializable
 {
 
      private String sFBillingChargingCharacteristics;
@@ -65,7 +64,7 @@ public class FilteredCallTreatment implements Serializable
 /**
 Constructor For FilteredCallTreatment
 */
-	public FilteredCallTreatment(String sFBillingChargingCharacteristics)
+	public FilteredCallTreatment(java.lang.String sFBillingChargingCharacteristics)
 	{
 		setSFBillingChargingCharacteristics( sFBillingChargingCharacteristics);
 	}
@@ -77,7 +76,7 @@ Constructor For FilteredCallTreatment
   Gets Service Filtering Information
 */
 
-    public String getSFBillingChargingCharacteristics()
+    public java.lang.String getSFBillingChargingCharacteristics()
     {
         return sFBillingChargingCharacteristics;
     }

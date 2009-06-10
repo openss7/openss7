@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 
@@ -49,7 +48,7 @@ import javax.jain.ss7.inap.constants.*;
 This class represents the DisconnectForwardConnection Operation.
 */
 
-public class DisconnectForwardConnection  extends Operation   implements Serializable {
+public class DisconnectForwardConnection  extends Operation   implements java.io.Serializable {
 
 	 
 

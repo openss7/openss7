@@ -42,8 +42,9 @@
  */
 package jain.protocol.ss7.tcap;
 
-import jain.*;
 import jain.protocol.ss7.tcap.dialogue.DialoguePortion;
+import jain.*;
+import java.util.EventObject;
 
 /**
  * A DialogueIndEvent is the superclass of all Dialogue Indication primitives,
@@ -54,10 +55,10 @@ import jain.protocol.ss7.tcap.dialogue.DialoguePortion;
  * the Listener and the Provider. This type of Event will be processed by the
  * <a href="JainTcapListener.html#processDialogueIndEvent(jain.protocol.ss7.tcap.DialogueIndEvent)">
  * processDialogueIndEvent method</a> of the <a href="JainTcapListener.html">
- * JainTcapListener</a> . This class implements the <B>java.lang.Cloneable</B>
+ * JainTcapListener</a> . This class implements the <B>Cloneable</B>
  * interface, therefore all Dialogue Indication primitives that extend this
  * Event can be cloned using the <B>clone()</B> method inherited from <B>
- * java.lang.Object</B> .
+ * Object</B> .
  *
  * @author     Sun Microsystems Inc.
  * @version    1.1

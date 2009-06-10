@@ -1,59 +1,47 @@
-//  ==========================================================================
-//  
-//  @(#) $Id$
-//  
-//  --------------------------------------------------------------------------
-//  
-//  Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-//  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-//  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-//  
-//  All Rights Reserved.
-//  
-//  This program is free software; you can redistribute it and/or modify it
-//  under the terms of the GNU Affero General Public License as published by
-//  the Free Software Foundation; version 3 of the License.
-//  
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-//  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
-//  License for more details.
-//  
-//  You should have received a copy of the GNU Affero General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-//  write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-//  02139, USA.
-//  
-//  --------------------------------------------------------------------------
-//  
-//  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-//  behalf of the U.S. Government ("Government"), the following provisions
-//  apply to you.  If the Software is supplied by the Department of Defense
-//  ("DoD"), it is classified as "Commercial Computer Software" under
-//  paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
-//  Regulations ("DFARS") (or any successor regulations) and the Government is
-//  acquiring only the license rights granted herein (the license rights
-//  customarily provided to non-Government users).  If the Software is
-//  supplied to any unit or agency of the Government other than DoD, it is
-//  classified as "Restricted Computer Software" and the Government's rights
-//  in the Software are defined in paragraph 52.227-19 of the Federal
-//  Acquisition Regulations ("FAR") (or any successor regulations) or, in the
-//  cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-//  (or any successor regulations).
-//  
-//  --------------------------------------------------------------------------
-//  
-//  Commercial licensing and support of this software is available from
-//  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-//  
-//  --------------------------------------------------------------------------
-//  
-//  Last Modified $Date$ by $Author$
-//  
-//  --------------------------------------------------------------------------
-//  
-//  $Log$
-//  ==========================================================================
+/*
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
+ */
 
 package javax.jain.protocol.ss7.map.session;
 
@@ -62,45 +50,150 @@ import javax.jain.protocol.ss7.map.*;
 import javax.jain.protocol.ss7.*;
 import javax.jain.*;
 
+/**
+  * This primitive (event) is used by the MAP API User to open a session
+  * with a Mobile Station for exchange of service data.
+  * (Service data must be included in the open message itself.) <p>
+  *
+  * The following rules applies for the setting of primitive parameters:
+  * <ul>
+  *
+  * <li>Mandatory parameters with no default value must be provided to
+  * the constructor.
+  *
+  * <li>Mandatory parameters with default value need not be set.
+  *
+  * <li>Optional / conditional parameter is by default not present. Such
+  * a parameter becomes present by setting it. </ul>
+  *
+  * <h4>Primitive parameters:</h4><ul>
+  *
+  * <li>msId (Mobile Station Id), mandatory parameter with no default
+  *
+  * <li>serviceData, mandatory parameter with no default
+  *
+  * <li>notify, mandatory parameter with no default
+  *
+  * <li>alerting, optional parameter </ul>
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
 public final class SessionOpenReqEvent extends SessionEvent {
-    public SessionOpenReqEvent(Object source, E164Number msId, ServiceData serviceData, boolean notify)
+    /**
+      * The constructor.
+      * @param source
+      * The source of this event. Should be set to the Listner object
+      * for the session.
+      * @param msId
+      * The MSISDN (an E.164 number) of the Mobile Station with which
+      * the session is established.
+      * @param serviceData
+      * The data to be sent.
+      * @param notify
+      * Flag to indicate if this is a notification to the MS, in which
+      * case the MS shall not send data back.
+      * @exception SS7InvalidParamException
+      * Thrown if parameter(s) are invalid / out of range.
+      */
+    public SessionOpenReqEvent(java.lang.Object source, E164Number msId, ServiceData serviceData, boolean notify)
         throws SS7InvalidParamException {
         super(source, SESSION_OPEN_REQ_ID);
         setMsId(msId);
         setServiceData(serviceData);
         setNotify(notify);
     }
+    /** Empty constructor; needed for serializable objects and beans.  */
     public SessionOpenReqEvent()
         throws SS7InvalidParamException {
         super(null, SESSION_OPEN_REQ_ID);
     }
+    /**
+      * Change the Id of the Mobile Station to establish session with.
+      * @param msId
+      * The MSISDN (an E.164 number) of the Mobile Station with which
+      * the session is established.
+      * @exception SS7InvalidParamException
+      * Thrown if parameter(s) are invalid / out of range.
+      */
     public void setMsId(E164Number msId)
         throws SS7InvalidParamException {
         // FIXME: check validity of msId
         m_msId = msId;
         m_msIdIsSet = true;
     }
+    /**
+      * Get the Id of the Mobile Station to establish session with.
+      * @return
+      * The MSISDN (an E.164 number) of the Mobile Station with which
+      * the session is established.
+      */
     public E164Number getMsId() {
         return m_msId;
     }
+    /**
+      * Change the data to be sent on the session.
+      * @param serviceData
+      * The data to be sent.
+      * @exception SS7InvalidParamException
+      * Thrown if parameter(s) are invalid / out of range.
+      */
     public void setServiceData(ServiceData serviceData)
         throws SS7InvalidParamException {
         // FIXME: check validity of service data
         m_serviceData = serviceData;
         m_serviceDataIsSet = true;
     }
+    /**
+      * Get the data to be sent on the session.
+      * @return
+      * The data to be sent.
+      */
     public ServiceData getServiceData() {
         return m_serviceData;
     }
+    /**
+      * Change the notify flag.
+      * @param notify
+      * Flag to indicate if this is a notification to the MS, in which
+      * case the MS shall not send data back.
+      * @exception SS7InvalidParamException
+      * Thrown if parameter(s) are invalid / out of range.
+      */
     public void setNotify(boolean notify)
         throws SS7InvalidParamException {
         // XXX: don't think that a boolean can be invalid
         m_notify = notify;
         m_notifyIsSet = true;
     }
+    /**
+      * Get the notify flag.
+      * @return
+      * Flag to indicate if this is a notification to the MS, in which
+      * case the MS shall not send data back.
+      */
     public boolean getNotify() {
         return m_notifyIsSet;
     }
+    /**
+      * Set the alerting information to be used to alert the user of the
+      * MS.
+      * When using this primitive to open a new session it might be
+      * appropriate to alert the user.
+      * @param alerting
+      * Parameter indicating level of ugency or type (category) of
+      * traffic. Possible values: <ul>
+      * <li>ALERTING_LEVEL_0_SILENT
+      * <li>ALERTING_LEVEL_1_NORMAL
+      * <li>ALERTING_LEVEL_2_URGENT
+      * <li>ALERTING_CATEGORY_1
+      * <li>ALERTING_CATEGORY_2
+      * <li>ALERTING_CATEGORY_3
+      * <li>ALERTING_CATEGORY_4
+      * <li>ALERTING_CATEGORY_5 </ul>
+      * @exception SS7InvalidParamException
+      * Thrown if parameter(s) are invalid / out of range.
+      */
     public void setAlerting(int alerting)
         throws SS7InvalidParamException {
         switch (alerting) {
@@ -115,9 +208,23 @@ public final class SessionOpenReqEvent extends SessionEvent {
                 throw new SS7InvalidParamException("Alerting Level " + alerting + " out of range.");
         }
     }
+    /**
+      * Get the alerting information to be used to alert the user of the
+      * MS.
+      * It shall be checked if this parameter is present before getting
+      * it.
+      * @return
+      * Parameter indicating level of ugency or type (category) of
+      * traffic. (See setAlerting for possible values.)
+      */
     public int getAlerting() {
         return m_alerting;
     }
+    /**
+      * Check if the Alerting parameter is present.
+      * @return
+      * True or false.
+      */
     public boolean isAlertingPresent() {
         return m_alertingIsSet;
     }
@@ -131,4 +238,4 @@ public final class SessionOpenReqEvent extends SessionEvent {
     protected boolean m_alertingIsSet = false;
 }
 
-// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

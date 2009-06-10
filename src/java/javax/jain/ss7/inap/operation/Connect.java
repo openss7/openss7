@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the Connect Operation.
 */
 
-public class Connect   extends Operation implements Serializable
+public class Connect   extends Operation implements java.io.Serializable
 {
 
     private DestinationRoutingAddress destinationRoutingAddress;
@@ -175,7 +174,7 @@ Sets Destination Routing Address
 /**
 Gets Alerting Pattern
 */
-    public String getAlertingPattern() throws ParameterNotSetException
+    public java.lang.String getAlertingPattern() throws ParameterNotSetException
     {
         if(isAlertingPatternPresent())
              return alertingPattern;
@@ -185,7 +184,7 @@ Gets Alerting Pattern
 /**
 Sets Alerting Pattern
 */
-    public void setAlertingPattern(String alertingPattern)
+    public void setAlertingPattern(java.lang.String alertingPattern)
     {
         this.alertingPattern = alertingPattern;
         isAlertingPattern = true; 
@@ -308,7 +307,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets ISDN Access Related Information
 */
-    public String getISDNAccessRelatedInformation() throws ParameterNotSetException
+    public java.lang.String getISDNAccessRelatedInformation() throws ParameterNotSetException
     {
         if(isISDNAccessRelatedInformationPresent())
              return iSDNAccessRelatedInformation;
@@ -488,7 +487,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Service Interaction Indicators
 */
-    public String getServiceInteractionIndicators() throws ParameterNotSetException
+    public java.lang.String getServiceInteractionIndicators() throws ParameterNotSetException
     {
         if(isServiceInteractionIndicatorsPresent())
               return serviceInteractionIndicators;
@@ -548,7 +547,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Calling Party Category
 */
-    public String getCallingPartyCategory() throws ParameterNotSetException
+    public java.lang.String getCallingPartyCategory() throws ParameterNotSetException
     {
         if(isCallingPartyCategoryPresent())
               return callingPartyCategory;
@@ -638,7 +637,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Display Information
 */
-    public String getDisplayInformation() throws ParameterNotSetException
+    public java.lang.String getDisplayInformation() throws ParameterNotSetException
     {
         if(isDisplayInformationPresent()) 
               return displayInformation;

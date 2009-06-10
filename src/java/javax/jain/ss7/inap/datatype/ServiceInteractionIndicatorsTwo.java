@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This Class defines the ServiceInteractionIndicatorsTwo Datatype
 */
 
-public class ServiceInteractionIndicatorsTwo  implements Serializable {
+public class ServiceInteractionIndicatorsTwo  implements java.io.Serializable {
 
     private ForwardServiceInteractionInd	 forwardServiceInteractionInd;
 	 private boolean isForwardServiceInteractionInd = false ;

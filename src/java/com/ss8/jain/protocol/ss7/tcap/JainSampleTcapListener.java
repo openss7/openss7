@@ -2,7 +2,6 @@
 package com.ss8.jain.protocol.ss7.tcap;
 
 import java.util.*;
-import java.lang.*;
 import java.io.*;
 
 import jain.*;

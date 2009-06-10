@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the Generic Numbers format
 */
 
-public class GenericNumbers implements Serializable
+public class GenericNumbers implements java.io.Serializable
 {
 
     private DigitsGenericNumber genericNumber[];

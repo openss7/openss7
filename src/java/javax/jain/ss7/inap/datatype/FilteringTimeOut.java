@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 
@@ -48,7 +47,7 @@ import javax.jain.ss7.inap.exception.*;
 This class represents the FilteringTimeOut DataType
 */
 
-public class FilteringTimeOut implements Serializable
+public class FilteringTimeOut implements java.io.Serializable
 {
 
 	 private int duration;
@@ -61,7 +60,7 @@ public class FilteringTimeOut implements Serializable
 /**
 Constructor For FilteringTimeOut
 */
-	public FilteringTimeOut(String stopTime) throws IllegalArgumentException
+	public FilteringTimeOut(java.lang.String stopTime) throws IllegalArgumentException
 	{
 		setStopTime( stopTime);
 	}
@@ -108,7 +107,7 @@ Constructor For FilteringTimeOut
   Gets Stop Time
  */
 
-    public String getStopTime()
+    public java.lang.String getStopTime()
     {
         return stopTime;
             

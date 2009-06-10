@@ -40,7 +40,6 @@
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class represents the Component DataType
 */
 
-public class Component implements Serializable
+public class Component implements java.io.Serializable
 {
 	
 	private String componentInfo;
@@ -63,7 +62,7 @@ public class Component implements Serializable
 /**
 Constructor For Component 
 */
-	public Component(String componentData, ComponentID componentID)
+	public Component(java.lang.String componentData, ComponentID componentID)
 	{
 		if(componentID.getComponentID() == ComponentID.COMPONENT_INFO.getComponentID())
 			setComponentInfo(componentData);
@@ -83,7 +82,7 @@ Gets ComponentChoice
 /**
 Gets Component Info
 */
-	public String getComponentInfo() throws ParameterNotSetException
+	public java.lang.String getComponentInfo() throws ParameterNotSetException
     	{
         	if(componentChoice.getComponentChoice() ==ComponentChoice.COMPONENT_INFO.getComponentChoice())
 			{	
@@ -97,7 +96,7 @@ Gets Component Info
 /**
 Sets Component Info
 */
-	public void setComponentInfo(String componentInfo)
+	public void setComponentInfo(java.lang.String componentInfo)
     	{
         	this.componentInfo = componentInfo;
             componentChoice =ComponentChoice.COMPONENT_INFO;
@@ -107,7 +106,7 @@ Sets Component Info
 /**
 Gets Relayed Component
 */
-	public String getRelayedComponent() throws ParameterNotSetException
+	public java.lang.String getRelayedComponent() throws ParameterNotSetException
     	{
         		if(componentChoice.getComponentChoice() ==ComponentChoice.RELAYED_COMPONENT.getComponentChoice())
 				{
@@ -121,7 +120,7 @@ Gets Relayed Component
 /**
 Sets Relayed Component
 */
-	public void setRelayedComponent(String relayedComponent)
+	public void setRelayedComponent(java.lang.String relayedComponent)
     	{
 			this.relayedComponent = relayedComponent;
             componentChoice =ComponentChoice.RELAYED_COMPONENT;

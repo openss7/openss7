@@ -39,7 +39,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 import javax.jain.*;
@@ -48,7 +47,7 @@ import javax.jain.*;
 This class defines the CollectedDigits Datatype
 */
 
-public class CollectedDigits implements Serializable
+public class CollectedDigits implements java.io.Serializable
 {
 
     private int minimumNbOfDigits = 1;
@@ -147,7 +146,7 @@ Sets Maximum Number Of Digits
 /**
 Gets End Of Reply Digit
 */
-    public String getEndOfReplyDigit() throws ParameterNotSetException
+    public java.lang.String getEndOfReplyDigit() throws ParameterNotSetException
     {
         if(isEndOfReplyDigitPresent())
 		{
@@ -162,7 +161,7 @@ Gets End Of Reply Digit
 /**
 Sets End Of Reply Digit
 */
-    public void setEndOfReplyDigit(String endOfReplyDigit)
+    public void setEndOfReplyDigit(java.lang.String endOfReplyDigit)
     {
         
          this.endOfReplyDigit = endOfReplyDigit;
@@ -185,7 +184,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Cancel Digit
 */
-    public String getCancelDigit() throws ParameterNotSetException
+    public java.lang.String getCancelDigit() throws ParameterNotSetException
     {
          if(isCancelDigitPresent())
 		 {
@@ -199,7 +198,7 @@ Gets Cancel Digit
 /**
 Sets Cancel Digit
 */
-    public void setCancelDigit(String cancelDigit)
+    public void setCancelDigit(java.lang.String cancelDigit)
     {
         this.cancelDigit = cancelDigit;
         isCancelDigit=true;
@@ -221,7 +220,7 @@ public boolean isCancelDigitPresent()
 /**
 Gets Start Digit
 */
-    public String getStartDigit() throws ParameterNotSetException
+    public java.lang.String getStartDigit() throws ParameterNotSetException
     {
         if(isStartDigitPresent())
 		{ 
@@ -236,7 +235,7 @@ Gets Start Digit
 /**
 Sets Start Digit
 */
-    public void setStartDigit(String startDigit)
+    public void setStartDigit(java.lang.String startDigit)
     {
         this.startDigit = startDigit;
         isStartDigit=true;      

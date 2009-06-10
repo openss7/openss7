@@ -42,14 +42,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
 /**
 This class represents the Gap Criteria DataType
 */
-public class GapCriteria  implements Serializable
+public class GapCriteria  implements java.io.Serializable
 {
 
     private DigitsGenericNumber calledAddressValue;

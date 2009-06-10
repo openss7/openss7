@@ -44,6 +44,7 @@
 package jain.protocol.ss7.tcap;
 
 import jain.*;
+import java.util.EventObject;
 /**
  * A ComponentIndEvent is the super class of all Component Indication
  * primitives, which represent TCAP Component Indications sent from a <a
@@ -53,10 +54,10 @@ import jain.*;
  * the Listener and the Provider. This type of Event will be processed by the
  * <a href="JainTcapListener.html#processComponentIndEvent(jain.protocol.ss7.tcap.ComponentIndEvent)">
  * processComponentIndEvent method</a> of the <a href="JainTcapListener.html">
- * JainTcapListener</a> . This class implements the <B>java.lang.Cloneable</B>
+ * JainTcapListener</a> . This class implements the <B>Cloneable</B>
  * interface, therefore all Component Indication primitives that extend this
  * Event can be cloned using the <B>clone()</B> method inherited from <B>
- * java.lang.Object</B> .
+ * Object</B> .
  *
  * @author     Sun Microsystems Inc.
  * @version    1.1

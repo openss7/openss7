@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 /**
 The class Requested Information Type specifies a list of specific items of 
 information which is requested.*/

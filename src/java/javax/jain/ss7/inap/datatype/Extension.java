@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class represents the Extension DataType
 */
 
-public class Extension implements Serializable
+public class Extension implements java.io.Serializable
 { 
 	
 	private int integerType;
@@ -72,7 +71,7 @@ Constructors For Extension
 		setBooleanType(booleanType);
 	}
 
-	public Extension(String stringType)
+	public Extension(java.lang.String stringType)
 	{
 		setStringType(stringType);
 	}
@@ -122,14 +121,14 @@ Sets Boolean  Type data
 /**
 Gets String Type data
 */
-	public String getStringType()
+	public java.lang.String getStringType()
     	{
         		return stringType;
     	}
 /**
 Sets String Type data
 */
-	public void setStringType(String stringType)
+	public void setStringType(java.lang.String stringType)
     	{
         		this.stringType = stringType;
 	      	this.extensionChoice = ExtensionChoice.STRING_TYPE;

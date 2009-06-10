@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the RequestedUTSI Datatype
 */
 
-public class RequestedUTSI implements Serializable
+public class RequestedUTSI implements java.io.Serializable
 {
 	 
 	 private String uSIServiceIndicator;
@@ -58,7 +57,7 @@ public class RequestedUTSI implements Serializable
 /**
 Constructor For RequestedUTSI
 */
-	public RequestedUTSI(String usiServiceIndicator, USIMonitorMode usiMonitorMode) 
+	public RequestedUTSI(java.lang.String usiServiceIndicator, USIMonitorMode usiMonitorMode) 
 	{
 		setUSIServiceIndicator(usiServiceIndicator);
 		setUSIMonitorMode(usiMonitorMode);
@@ -71,7 +70,7 @@ Constructor For RequestedUTSI
 /**
 Gets USI Service Indicator
 */
-    public String  getUSIServiceIndicator()
+    public java.lang.String  getUSIServiceIndicator()
     {
         return uSIServiceIndicator;
     }
@@ -79,7 +78,7 @@ Gets USI Service Indicator
 /**
 Sets USI Service Indicator
 */
-    public void setUSIServiceIndicator(String usiServiceIndicator)
+    public void setUSIServiceIndicator(java.lang.String usiServiceIndicator)
     {
         this.uSIServiceIndicator = usiServiceIndicator;
     }

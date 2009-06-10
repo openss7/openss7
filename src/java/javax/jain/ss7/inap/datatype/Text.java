@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 /**
  This class defines the Text Datatype
 */
 
-public class Text implements Serializable{
+public class Text implements java.io.Serializable{
 
 	 private String messageContent;
 	 
@@ -56,7 +55,7 @@ public class Text implements Serializable{
 /**
 Constructor For Text
 */
-	public Text(String messageContent)
+	public Text(java.lang.String messageContent)
 	{
 		setMessageContent(messageContent);
 	}
@@ -67,7 +66,7 @@ Constructor For Text
   Gets Message Content
 */
 
-    public String getMessageContent()
+    public java.lang.String getMessageContent()
     {
         return messageContent;
     }
@@ -75,7 +74,7 @@ Constructor For Text
 /**
   Sets Message Content
 */
-    public void setMessageContent(String messageContent)
+    public void setMessageContent(java.lang.String messageContent)
     {
         this.messageContent = messageContent;
     }
@@ -86,7 +85,7 @@ Constructor For Text
   Gets Attributes
 */
 
-    public String getAttributes() throws ParameterNotSetException
+    public java.lang.String getAttributes() throws ParameterNotSetException
     {
         if(isAttributesPresent()){
         return attributes;
@@ -98,7 +97,7 @@ Constructor For Text
 /**
   Sets Attributes
 */
-    public void setAttributes(String attributes)
+    public void setAttributes(java.lang.String attributes)
     {
         this.attributes = attributes;
         isAttributes=true;

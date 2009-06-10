@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
@@ -48,7 +47,7 @@ This Class defines the RedirectingPartyID datatype. (Encoded as Redirecting Numb
 */
 
 
-public class RedirectingPartyID implements Serializable {
+public class RedirectingPartyID implements java.io.Serializable {
 
 
     private int natureOfAddressIndicator;
@@ -136,7 +135,7 @@ Sets Address Presentation Restricted Indicator
 Gets Address Signal
 */
 
-    public String getAddressSignal()
+    public java.lang.String getAddressSignal()
     {
         return addressSignal ;
     }
@@ -145,7 +144,7 @@ Gets Address Signal
 Sets Address Signal
 */
 
-    public void  setAddressSignal (String addressSignal)
+    public void  setAddressSignal (java.lang.String addressSignal)
     {
         this.addressSignal = addressSignal ;
     }

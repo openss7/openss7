@@ -40,12 +40,11 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 
 /**
 This class indicates the Return Result Problem.*/
 
-public class ReturnResultProblem extends Hashtable {
+public class ReturnResultProblem extends java.util.Hashtable {
 
     public static final int UNRECOGNIZED_INVOKE_ID=0;
     public static final int RETURN_RESULT_UNEXPECTED=1;

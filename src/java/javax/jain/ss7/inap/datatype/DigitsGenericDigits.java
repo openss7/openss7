@@ -40,13 +40,12 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 /**
 This Class defines the digits in the Generic Digits Format. (Encoded as in Q.763)
 */
 
-public class DigitsGenericDigits implements Serializable 
+public class DigitsGenericDigits implements java.io.Serializable 
 {
 
 
@@ -59,7 +58,7 @@ public class DigitsGenericDigits implements Serializable
 /**
 Constructor For DigitsGenericDigits
 */
-	public DigitsGenericDigits(int typeOfDigits, int encodingScheme, String digit)
+	public DigitsGenericDigits(int typeOfDigits, int encodingScheme, java.lang.String digit)
 	{
 		setTypeOfDigits (typeOfDigits);
 		setEncodingScheme (encodingScheme);
@@ -112,7 +111,7 @@ Sets  Encoding Scheme
 Gets  Digits
 */
 
-    public String getDigit()
+    public java.lang.String getDigit()
     {
         return digit ;
     }
@@ -121,7 +120,7 @@ Gets  Digits
 Sets  Digits
 */
 
-    public void  setDigit (String digit)
+    public void  setDigit (java.lang.String digit)
     {
         this.digit = digit ;
     }

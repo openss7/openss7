@@ -1,75 +1,79 @@
 /*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Copyrights:
- *
- * Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
- * 901 San Antonio Road, Palo Alto, California 94043, U.S.A.
- *
- * This product and related documentation are protected by copyright and
- * distributed under licenses restricting its use, copying, distribution, and
- * decompilation. No part of this product or related documentation may be
- * reproduced in any form by any means without prior written authorization of
- * Sun and its licensors, if any.
- *
- * RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
- * States Government is subject to the restrictions set forth in DFARS
- * 252.227-7013 (c)(1)(ii) and FAR 52.227-19.
- *
- * The product described in this manual may be protected by one or more U.S.
- * patents, foreign patents, or pending applications.
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Author        : Sun Microsystems Inc.
- * Module Name   : JAIN Common API
- * File Name     : IDNotAvailableException.java
- * Originator    : Phelim O'Doherty
- * Approver      : Jain Common Expert Group
- *
- * HISTORY
- * Version   Date      Author              Comments
- *  1.0     25/09/01   Phelim O'Doherty    Created for JAIN Exception strategy
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
  */
+
 package javax.jain;
 
 /**
- * This Exception is thrown when a specifed ID is unavailable for operation due
- * to being locked with existing operations.
- *
- * @author     Sun Micorsystems
- * @version    1.0
- */
+  * This Exception is thrown when a specifed ID is unavailable for
+  * operation due to being locked with existing operations.
+  * @serial
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
 public class IDNotAvailableException extends JainException {
-
-    /**
-    * Constructs a new <code>IDNotAvailableException</code>
-    */
-    public IDNotAvailableException() {
+    /** Constructs a new IDNotAvailableException. */
+    public IDNotAvailableException() { }
+    /** Constructs a new IDNotAvailableException with the specified
+      * error message.
+      * @param msg
+      * The detail of the exception.  */
+    public IDNotAvailableException(java.lang.String msg) {
+        super(msg);
     }
-
-    /**
-    * Constructs a new <code>IDNotAvailableException</code> with the specified error
-    * message.
-    *
-    * @param  error the detail of the error message
-    */
-    public IDNotAvailableException(String error) {
-        super(error);
-    }
-
-    /**
-    * Constructs a new <code>IDNotAvailableException</code> with the specified
-    * error message and specialized exception that triggered this error condition.
-    *
-    * @param  error the detail of the error message
-    * @param  excp  the specialized exception that triggered this exception
-    */
-    public IDNotAvailableException(String error, Exception excp) {
+    /** Constructs a new IDNotAvailableException with the specified
+      * error message and specialized exception that triggered this
+      * error condition.
+      * @param error
+      * The detail of the error message.
+      * @param excp
+      * The specialized exception that triggered this exception.  */
+    public IDNotAvailableException(java.lang.String error,
+            java.lang.Exception excp) {
         super(error, excp);
     }
-
 }
 
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the Leg Datatype
 */
 
-public class Leg implements Serializable
+public class Leg implements java.io.Serializable
 {
     private LegID sourceLeg;
 

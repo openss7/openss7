@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
@@ -48,7 +47,7 @@ This Class defines the digits in the Generic Number Format (Encoded as in Q.763)
 */
 
 
-public class DigitsGenericNumber implements Serializable 
+public class DigitsGenericNumber implements java.io.Serializable 
 {
 
     private int numberQualifierIndicator;
@@ -65,7 +64,7 @@ Constructor For DigitsGenericNumber
 	public DigitsGenericNumber(int numberQualifierIndicator, int natureOfAddressIndicator,
 								int numberIncompleteIndicator, int numberingPlanIndicator,
 								int addressPresentationRestrictedIndicator,
-								int screeningIndicator, String addressSignal)
+								int screeningIndicator, java.lang.String addressSignal)
 	{
 		setNumberQualifierIndicator (numberQualifierIndicator);
 		setNatureOfAddressIndicator (natureOfAddressIndicator);
@@ -201,7 +200,7 @@ Sets  Screening Indicator
 Gets  Address Signal
 */
 
-    public String getAddressSignal()
+    public java.lang.String getAddressSignal()
     {
         return addressSignal ;
     }
@@ -210,7 +209,7 @@ Gets  Address Signal
 Sets  Address Signal
 */
 
-    public void  setAddressSignal (String addressSignal)
+    public void  setAddressSignal (java.lang.String addressSignal)
     {
         this.addressSignal = addressSignal ;
     }

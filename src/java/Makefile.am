@@ -72,6 +72,215 @@ EXTRA_DATA =
 my_JAVAFILES =
 
 #############################################################################
+# This is for generating Java documentation
+#############################################################################
+
+javadoc.stamp: $(my_JAVAFILES) $(srcdir)/overview
+	$(AM_V_GEN)$(JAVADOC) $(JAVADOCFLAGS) \
+		-d api-docs \
+		-sourcepath $(builddir):$(srcdir) \
+		-linkoffline http://developer.classpath.org/doc/ /usr/share/doc/gcj-4.1/html/ \
+		-protected \
+		-splitindex \
+		-linksource \
+		-use \
+		-author \
+		-version \
+		-docfilessubdirs \
+		-doctitle "OpenSS7 Jain APIs" \
+		-header "<a href=\"http://www.openss7.org/\">OpenSS7</a> Jain ($(VERSION))" \
+		-footer "<a href=\"http://www.openss7.org/\">OpenSS7</a> Jain ($(VERSION))" \
+		-bottom "Copyright &copy; `date +%Y` Monavacon Limited.  All Rights Reserved." \
+		-overview $(srcdir)/overview \
+		-group "Base Jain API Packages" jain:javax.jain \
+		-group "Base Jain SS7 API Packages" jain.protocol.ss7:javax.jain.ss7:javax.jain.protocol.ss7:org.openss7.ss7 \
+		-group "Jain OAM API (JSR 18) Packages" jain.protocol.ss7.oam*:org.openss7.jain.protocol.ss7.oam* \
+		-group "Jain TCAP API (JSR 11) Packages" jain.protocol.ss7.tcap*:org.openss7.jain.protocol.ss7.tcap* \
+		-group "Jain MAP API (JSR 29) Packages" javax.jain.protocol.ss7.map*:org.openss7.javax.jain.protocol.ss7.map* \
+		-group "Jain INAP API (JSR 35) Packages" javax.jain.ss7.inap*:org.openss7.javax.jain.ss7.inap* \
+		-group "Jain ISUP API (JSR 17) Packages" javax.jain.ss7.isup*:org.openss7.javax.jain.ss7.isup* \
+		-group "Jain SCCP API Packages" org.openss7.ss7.sccp* \
+		-group "Jain MTP API Packages" org.openss7.ss7.mtp* \
+		-group "Jain JCC API (JSR 21) Packages" javax.csapi.cc.jcc*:org.openss7.javax.csapi.cc.jcc* \
+		-group "Jain JCAT API (JSR 122) Packages" javax.jcat*:org.openss7.javax.jcat* \
+		-group "Base Jain IP API Packages" jain.protocol.ip \
+		-group "Jain MGCP API (JSR 23) Packages" jain.protocol.ip.mgcp* \
+		-group "Jain MEGACO API (JSR 79) Packages" javax.megaco* \
+		-group "Jain H323 API (JSR 81) Packages" jain.protocol.h323* \
+		-group "Jain SIP API (JSR 32) Packages" javax.sip*:org.openss7.javax.sip* \
+		-group "Jain ENUM API (JSR 161) Packages" javax.enum* \
+		-group "Jain TAPI API (JSR 43) Packages" javax.telephony* \
+		-quiet \
+		jain \
+		jain.protocol.ss7 \
+		jain.protocol.ss7.oam \
+		jain.protocol.ss7.oam.mtp2 \
+		jain.protocol.ss7.oam.mtp3 \
+		jain.protocol.ss7.oam.sccp \
+		jain.protocol.ss7.oam.tcap \
+		jain.protocol.ss7.tcap \
+		jain.protocol.ss7.tcap.component \
+		jain.protocol.ss7.tcap.dialogue \
+		javax \
+		javax.csapi \
+		javax.csapi.cc \
+		javax.csapi.cc.jcc \
+		javax.jain \
+		javax.jain.protocol \
+		javax.jain.protocol.ss7 \
+		javax.jain.protocol.ss7.map \
+		javax.jain.protocol.ss7.map.information \
+		javax.jain.protocol.ss7.map.information.etsipar \
+		javax.jain.protocol.ss7.map.position \
+		javax.jain.protocol.ss7.map.position.etsipar \
+		javax.jain.protocol.ss7.map.session \
+		javax.jain.protocol.ss7.map.session.etsipar \
+		javax.jain.protocol.ss7.map.transaction \
+		javax.jain.protocol.ss7.map.transaction.etsipar \
+		javax.jain.protocol.ss7.map.transaction.etsipar.message \
+		javax.jain.protocol.ss7.map.transaction.etsipar.pdu \
+		javax.jain.ss7 \
+		javax.jain.ss7.inap \
+		javax.jain.ss7.inap.constants \
+		javax.jain.ss7.inap.datatype \
+		javax.jain.ss7.inap.event \
+		javax.jain.ss7.inap.exception \
+		javax.jain.ss7.inap.operation \
+		javax.jain.ss7.isup \
+		javax.jain.ss7.isup.ansi \
+		javax.jain.ss7.isup.itu \
+		javax.jcat \
+		javax.management \
+		javax.management.event \
+		javax.management.loading \
+		javax.management.modelmbean \
+		javax.management.monitor \
+		javax.management.namespaces \
+		javax.management.openmbean \
+		javax.management.relation \
+		javax.management.remote \
+		javax.management.remote.generic \
+		javax.management.remote.jmxmp \
+		javax.management.remote.message \
+		javax.management.remote.rmi \
+		javax.management.timer \
+		javax.media \
+		javax.media.mscontrol \
+		javax.media.mscontrol.mediagroup \
+		javax.media.mscontrol.mediagroup.asrtts \
+		javax.media.mscontrol.mediagroup.fax \
+		javax.media.mscontrol.mediagroup.http \
+		javax.media.mscontrol.mediagroup.rtsp \
+		javax.media.mscontrol.mediagroup.signals \
+		javax.media.mscontrol.mediagroup.sms \
+		javax.media.mscontrol.mixer \
+		javax.media.mscontrol.networkconnection \
+		javax.media.mscontrol.resource \
+		javax.media.mscontrol.resource.common \
+		javax.media.mscontrol.resource.symbols \
+		javax.media.mscontrol.resource.video \
+		javax.media.mscontrol.vxml \
+		javax.oss \
+		javax.oss.fault \
+		javax.sip \
+		javax.sip.address \
+		javax.sip.header \
+		javax.sip.message \
+		javax.slee \
+		javax.slee.connection \
+		javax.slee.facilities \
+		javax.slee.management \
+		javax.slee.nullactivity \
+		javax.slee.profile \
+		javax.slee.profile.query \
+		javax.slee.resource \
+		javax.slee.serviceactivity \
+		javax.slee.transaction \
+		javax.slee.usage \
+		javax.telephony \
+		javax.telephony.callcenter \
+		javax.telephony.callcenter.capabilities \
+		javax.telephony.callcenter.events \
+		javax.telephony.callcontrol \
+		javax.telephony.callcontrol.capabilities \
+		javax.telephony.callcontrol.events \
+		javax.telephony.capabilities \
+		javax.telephony.events \
+		javax.telephony.media \
+		javax.telephony.media.async \
+		javax.telephony.media.capabilities \
+		javax.telephony.media.connection \
+		javax.telephony.media.connection.async \
+		javax.telephony.media.container \
+		javax.telephony.media.container.async \
+		javax.telephony.media.events \
+		javax.telephony.media.messaging \
+		javax.telephony.media.provider \
+		javax.telephony.media.symbols \
+		javax.telephony.mobile \
+		javax.telephony.phone \
+		javax.telephony.phone.capabilities \
+		javax.telephony.phone.events \
+		javax.telephony.privatedata \
+		javax.telephony.privatedata.capabilities \
+		javax.telephony.privatedata.events \
+		org \
+		org.omg \
+		org.omg.stub \
+		org.omg.stub.javax \
+		org.omg.stub.javax.management \
+		org.omg.stub.javax.management.remote \
+		org.omg.stub.javax.management.remote.rmi \
+		org.openss7 \
+		org.openss7.jain \
+		org.openss7.jain.protocol \
+		org.openss7.jain.protocol.ss7 \
+		org.openss7.jain.protocol.ss7.oam \
+		org.openss7.jain.protocol.ss7.oam.mtp2 \
+		org.openss7.jain.protocol.ss7.oam.mtp3 \
+		org.openss7.jain.protocol.ss7.oam.sccp \
+		org.openss7.jain.protocol.ss7.oam.tcap \
+		org.openss7.jain.protocol.ss7.tcap \
+		org.openss7.javax \
+		org.openss7.javax.csapi \
+		org.openss7.javax.csapi.cc \
+		org.openss7.javax.csapi.cc.jcc \
+		org.openss7.javax.jain \
+		org.openss7.javax.jain.protocol \
+		org.openss7.javax.jain.protocol.ss7 \
+		org.openss7.javax.jain.protocol.ss7.map \
+		org.openss7.javax.jain.protocol.ss7.map.information \
+		org.openss7.javax.jain.protocol.ss7.map.position \
+		org.openss7.javax.jain.protocol.ss7.map.session \
+		org.openss7.javax.jain.protocol.ss7.map.transaction \
+		org.openss7.javax.jain.ss7 \
+		org.openss7.javax.jain.ss7.inap \
+		org.openss7.javax.jain.ss7.isup \
+		org.openss7.javax.jcat \
+		org.openss7.javax.sip \
+		org.openss7.jcat \
+		org.openss7.ss7 \
+		org.openss7.ss7.mtp \
+		org.openss7.ss7.sccp \
+		org.openss7.streams \
+		org.openss7.tcap \
+		org.openss7.tcapi \
+		org.openss7.xtcap \
+		org.openss7.xti
+	$(AM_V_at)date > javadoc.stamp
+
+javadoc: javadoc.stamp
+
+ALL_LOCAL += javadoc
+
+clean-javadoc:
+	rm -rf -- api-docs
+	rm -f -- javadoc.stamp
+
+CLEAN_LOCAL += clean-javadoc
+
+
+#############################################################################
 # This is for generating JAR modules
 #############################################################################
 

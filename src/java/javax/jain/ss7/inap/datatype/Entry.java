@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ This Class defines the Entry Datatype
 */ 
 
 
-public class Entry implements Serializable {
+public class Entry implements java.io.Serializable {
 
     private int agreements[];
 

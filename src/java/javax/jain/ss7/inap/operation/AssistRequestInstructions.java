@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the AssistRequestInstructions Operation.
 */
 
-public class AssistRequestInstructions  extends Operation implements Serializable
+public class AssistRequestInstructions  extends Operation implements java.io.Serializable
 {
     
 
@@ -107,7 +106,7 @@ Sets CorrelationID
 
 /**
 Gets IP Available */
-    public String getIPAvailable() throws ParameterNotSetException
+    public java.lang.String getIPAvailable() throws ParameterNotSetException
     {
        if(isIPAvailablePresent())
            return iPAvailable;
@@ -117,7 +116,7 @@ Gets IP Available */
 /**
 Sets IP Available
 */
-    public void setIPAvailable(String iPAvailable)
+    public void setIPAvailable(java.lang.String iPAvailable)
     {
         this.iPAvailable = iPAvailable;
         isIPAvailable = true;
@@ -136,7 +135,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets IP SSP Capabilities
 */
-    public String getIPSSPCapabilities() throws ParameterNotSetException
+    public java.lang.String getIPSSPCapabilities() throws ParameterNotSetException
     {
        if(isIPSSPCapabilitiesPresent())
             return iPSSPCapabilities;
@@ -147,7 +146,7 @@ Gets IP SSP Capabilities
 /**
 Sets IP SSP Capabilities
 */
-    public void setIPSSPCapabilities(String iPSSPCapabilities)
+    public void setIPSSPCapabilities(java.lang.String iPSSPCapabilities)
     {
         this.iPSSPCapabilities = iPSSPCapabilities;
         isIPSSPCapabilities = true;

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
@@ -48,7 +47,7 @@ This Class defines the Location Number Datatype (Encoded as in Q.763)
 */
 
 
-public class LocationNumber implements Serializable 
+public class LocationNumber implements java.io.Serializable 
 { 
 
 
@@ -64,7 +63,7 @@ Constructor For LocationNumber
 */
 	public LocationNumber(int natureOfAddressIndicator, int internalNetworkNumberIndicator,
     						int numberingPlanIndicator, int addressPresentationRestrictedIndicator,
-    						int screeningIndicator, String addressSignal)
+    						int screeningIndicator, java.lang.String addressSignal)
 	{
 		setNatureOfAddressIndicator (natureOfAddressIndicator);
     	setInternalNetworkNumberIndicator (internalNetworkNumberIndicator);
@@ -179,7 +178,7 @@ Sets Screening Indicator
 Gets Address Signal
 */
 
-    public String getAddressSignal()
+    public java.lang.String getAddressSignal()
     {
         return addressSignal ;
     }
@@ -188,7 +187,7 @@ Gets Address Signal
 Sets Address Signal
 */
 
-    public void  setAddressSignal (String addressSignal)
+    public void  setAddressSignal (java.lang.String addressSignal)
     {
         this.addressSignal = addressSignal ;
     }

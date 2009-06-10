@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the CounterAndValue Datatype.
 */
 
-public class CounterAndValue implements Serializable 
+public class CounterAndValue implements java.io.Serializable 
 {
 
 	private int counterID;

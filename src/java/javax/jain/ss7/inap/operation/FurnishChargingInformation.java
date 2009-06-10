@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 
@@ -49,7 +48,7 @@ import javax.jain.ss7.inap.constants.*;
 This class represents FurnishChargingInformation Operation.
 */
 
-public class FurnishChargingInformation  extends Operation   implements Serializable
+public class FurnishChargingInformation  extends Operation   implements java.io.Serializable
 {
     
     private String fCIBillingChargingCharacteristics;
@@ -57,7 +56,7 @@ public class FurnishChargingInformation  extends Operation   implements Serializ
 /**
 Constructor For FurnishChargingInformation
 */
-	public FurnishChargingInformation(String fCIBillingChargingCharacteristics)
+	public FurnishChargingInformation(java.lang.String fCIBillingChargingCharacteristics)
 	{
 		operationCode = OperationCode.FURNISH_CHARGING_INFORMATION;
 		setFCIBillingChargingCharacteristics(fCIBillingChargingCharacteristics);
@@ -79,14 +78,14 @@ Gets Operation Code
 /**
 Gets FCI Billing and Charging Characteristics parameter
 */
-    public String getFCIBillingChargingCharacteristics()
+    public java.lang.String getFCIBillingChargingCharacteristics()
     {
         return fCIBillingChargingCharacteristics;
     }
 /**
 Sets FCI Billing and Charging Characteristics parameter
 */
-    public void setFCIBillingChargingCharacteristics(String fCIBillingChargingCharacteristics)
+    public void setFCIBillingChargingCharacteristics(java.lang.String fCIBillingChargingCharacteristics)
     {
         this.fCIBillingChargingCharacteristics = fCIBillingChargingCharacteristics;
     }

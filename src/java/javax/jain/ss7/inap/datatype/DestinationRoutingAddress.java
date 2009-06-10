@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
@@ -48,7 +47,7 @@ This Class defines the Destination Routing Address Datatype
 */
 
 
-public class DestinationRoutingAddress implements Serializable 
+public class DestinationRoutingAddress implements java.io.Serializable 
 {
 
     private CalledPartyNumber calledPartyNumber[];

@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
@@ -52,7 +51,7 @@ import javax.jain.*;
 */
 
 
-public class RequestFirstStatusMatchReport  extends Operation    implements Serializable
+public class RequestFirstStatusMatchReport  extends Operation    implements java.io.Serializable
 {
 
     private ResourceID resourceID;

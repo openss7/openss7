@@ -1,58 +1,47 @@
-/* ***************************************************************************
-
- @(#) $RCSfile$ $Name$($Revision$) $Date$
-
- -----------------------------------------------------------------------------
-
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-
- All Rights Reserved.
-
+/*
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
  This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
-
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
- details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>, or
- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
- 02139, USA.
-
- -----------------------------------------------------------------------------
-
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
- behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
-
- -----------------------------------------------------------------------------
-
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
  Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
  Last Modified $Date$ by $Author$
-
- -----------------------------------------------------------------------------
-
- $Log$
- *****************************************************************************/
+ */
 
 package jain.protocol.ss7.oam;
 
@@ -81,33 +70,31 @@ import jain.*;
   * The Oam Notifications are to be categorised according to the
   * following priorites (in increasing order of priority): <ol>
   *
-  * <li><tt>PRIORITY_INFORMATIONAL</tt> - The cause of this
-  * OamAlarmNotification does not affect the functional state of
-  * the system and may be ignored.  This OamAlarmNotification is
-  * for purely informational purposes only.
+  * <li><tt>{@link #PRIORITY_INFORMATIONAL}</tt> - The cause of this
+  * OamAlarmNotification does not affect the functional state of the
+  * system and may be ignored.  This OamAlarmNotification is for purely
+  * informational purposes only.
   *
-  * <li><tt>PRIORITY_LOW</tt> - Indicates that the state of the
-  * MBean that emitted this OamAlarmNotification has changed as
-  * a result of an operation explicitly invoked by an
-  * application.
+  * <li><tt>{@link #PRIORITY_LOW}</tt> - Indicates that the state of the
+  * MBean that emitted this OamAlarmNotification has changed as a result
+  * of an operation explicitly invoked by an application.
   *
-  * <li><tt>PRIORITY_HIGH</tt> - Indicates that the physical
+  * <li><tt>{@link #PRIORITY_HIGH}</tt> - Indicates that the physical
   * network element associated with the MBean that emitted this
-  * OamAlarmNotification has gone out of service.  Without
-  * corrective action, service reliability can be severely
-  * affected.
+  * OamAlarmNotification has gone out of service.  Without corrective
+  * action, service reliability can be severely affected.
   *
-  * <li><tt>PRIORITY_CRITICAL</tt> Indicates the complete
-  * failure of the physical network element associated with the
-  * MBean that emitted this AlarmNotification.  Immediate
-  * recovery action is required.
+  * <li><tt>{@link #PRIORITY_CRITICAL}</tt> Indicates the complete
+  * failure of the physical network element associated with the MBean
+  * that emitted this AlarmNotification.  Immediate recovery action is
+  * required.
   *
-  * <li><tt>PRIORITY_VENDOR_DEFINED</tt> - Indicates that this
-  * alarm has a severity that is defined by the SS7 stack
-  * vendor. An alarm of this priority may have either none or
-  * very severe ramifications and it is the responsibilty of a
-  * Stack vendor to inform JAIN OAM application developers the
-  * severity of this alarm.  </ol>
+  * <li><tt>{@link #PRIORITY_VENDOR_DEFINED}</tt> - Indicates that this
+  * alarm has a severity that is defined by the SS7 stack vendor. An
+  * alarm of this priority may have either none or very severe
+  * ramifications and it is the responsibilty of a Stack vendor to
+  * inform JAIN OAM application developers the severity of this alarm.
+  * </ol>
   *
   * The Notification class extends the java.util.EventObject
   * base class and defines the minimal information contained in
@@ -144,8 +131,11 @@ import jain.*;
   * implementation dependant, and it the responsibility of the
   * Stack Vendor to make the implementation dependent
   * assignments known.
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-public abstract class OamAlarmNotification extends Notification implements java.io.Serializable, java.lang.Cloneable {
+public abstract class OamAlarmNotification extends javax.management.Notification implements java.io.Serializable, java.lang.Cloneable {
     protected OamAlarmNotification() {
         super("",null,0);
     }
@@ -236,45 +226,40 @@ public abstract class OamAlarmNotification extends Notification implements java.
     /**
       * Sets the Priority of this Alarm.
       * @param priority
-      * One of the following (in increasing order of priority):
-      * <ol>
+      * One of the following (in increasing order of priority): <ol>
       *
-      * <li><tt>PRIORITY_INFORMATIONAL</tt> - The cause of this
-      * OamAlarmNotification does not affect the functional
-      * state of the system and may be ignored.  This
-      * OamAlarmNotification is for purely informational
-      * purposes only.
+      * <li><tt>{@link #PRIORITY_INFORMATIONAL}</tt> - The cause of this
+      * OamAlarmNotification does not affect the functional state of the
+      * system and may be ignored.  This OamAlarmNotification is for
+      * purely informational purposes only.
       *
-      * <li><tt>PRIORITY_LOW</tt> - Indicates that the state of
-      * the MBean that emitted this OamAlarmNotification has
-      * changed as a result of an operation explicitly invoked
-      * by an application.
+      * <li><tt>{@link #PRIORITY_LOW}</tt> - Indicates that the state of
+      * the MBean that emitted this OamAlarmNotification has changed as
+      * a result of an operation explicitly invoked by an application.
       *
-      * <li><tt>PRIORITY_HIGH</tt> - Indicates that the physical
-      * network element associated with the MBean that emitted
-      * this OamAlarmNotification has gone out of service.
-      * Without corrective action, service reliability can be
-      * severely affected.
+      * <li><tt>{@link #PRIORITY_HIGH}</tt> - Indicates that the
+      * physical network element associated with the MBean that emitted
+      * this OamAlarmNotification has gone out of service.  Without
+      * corrective action, service reliability can be severely affected.
       *
-      * <li><tt>PRIORITY_CRITICAL</tt> - Indicates the complete
-      * failure of the physical network element associated with
-      * the MBean that emitted this OamAlarmNotification.
-      * Immediate recovery action is required.
+      * <li><tt>{@link #PRIORITY_CRITICAL}</tt> - Indicates the complete
+      * failure of the physical network element associated with the
+      * MBean that emitted this OamAlarmNotification.  Immediate
+      * recovery action is required.
       *
-      * <li><tt>PRIORITY_VENDOR_DEFINED</tt> - Indicates that
-      * this alarm has a severity that is defined by the SS7
-      * stack vendor. An alarm of this priority may have either
-      * none or very severe ramifications and it is the
-      * responsibilty of a Stack vendor to inform JAIN OAM
-      * application developers the severity of this alarm.
-      * </ol>
+      * <li><tt>{@link #PRIORITY_VENDOR_DEFINED}</tt> - Indicates that
+      * this alarm has a severity that is defined by the SS7 stack
+      * vendor. An alarm of this priority may have either none or very
+      * severe ramifications and it is the responsibilty of a Stack
+      * vendor to inform JAIN OAM application developers the severity of
+      * this alarm.  </ol>
       *
-      * @exception java.lang.IllegalArgumentException
+      * @exception IllegalArgumentException
       * If the supplied priority is not one of the defined
       * types.
       */
     public void setPriority(int priority)
-        throws java.lang.IllegalArgumentException {
+        throws IllegalArgumentException {
         switch (priority) {
             case PRIORITY_INFORMATIONAL:
             case PRIORITY_LOW:
@@ -284,44 +269,39 @@ public abstract class OamAlarmNotification extends Notification implements java.
                 m_priority = priority;
                 break;
             default:
-                throw new java.lang.IllegalArgumentException();
+                throw new IllegalArgumentException();
         }
     }
     /**
       * Returns the Priority of this OamAlarmNotification.
       * @return
-      * One of the following (in increasing order of priority):
-      * <ol>
+      * One of the following (in increasing order of priority): <ol>
       *
-      * <li><tt>PRIORITY_INFORMATIONAL</tt> - The cause of this
-      * OamAlarmNotification does not affect the functional
-      * state of the system and may be ignored.  This
-      * OamAlarmNotification is for purely informational
-      * purposes only.
+      * <li><tt>{@link #PRIORITY_INFORMATIONAL}</tt> - The cause of this
+      * OamAlarmNotification does not affect the functional state of the
+      * system and may be ignored.  This OamAlarmNotification is for
+      * purely informational purposes only.
       *
-      * <li><tt>PRIORITY_LOW</tt> - Indicates that the state of
-      * the MBean that emitted this OamAlarmNotification has
-      * changed as a result of an operation explicitly invoked
-      * by an application.
+      * <li><tt>{@link #PRIORITY_LOW}</tt> - Indicates that the state of
+      * the MBean that emitted this OamAlarmNotification has changed as
+      * a result of an operation explicitly invoked by an application.
       *
-      * <li><tt>PRIORITY_HIGH</tt> - Indicates that the physical
-      * network element associated with the MBean that emitted
-      * this OamAlarmNotification has gone out of service.
-      * Without corrective action, service reliability can be
-      * severely affected.
+      * <li><tt>{@link #PRIORITY_HIGH}</tt> - Indicates that the
+      * physical network element associated with the MBean that emitted
+      * this OamAlarmNotification has gone out of service.  Without
+      * corrective action, service reliability can be severely affected.
       *
-      * <li><tt>PRIORITY_CRITICAL</tt> - Indicates the complete
-      * failure of the physical network element associated with
-      * the MBean that emitted this OamAlarmNotification.
-      * Immediate recovery action is required.
+      * <li><tt>{@link #PRIORITY_CRITICAL}</tt> - Indicates the complete
+      * failure of the physical network element associated with the
+      * MBean that emitted this OamAlarmNotification.  Immediate
+      * recovery action is required.
       *
-      * <li><tt>PRIORITY_VENDOR_DEFINED</tt> - Indicates that
-      * this alarm has a severity that is defined by the SS7
-      * stack vendor. An alarm of this priority may have either
-      * none or very severe ramifications and it is the
-      * responsibilty of a Stack vendor to inform JAIN OAM
-      * application developers the severity of this alarm.
-      * </ol>
+      * <li><tt>{@link #PRIORITY_VENDOR_DEFINED}</tt> - Indicates that
+      * this alarm has a severity that is defined by the SS7 stack
+      * vendor. An alarm of this priority may have either none or very
+      * severe ramifications and it is the responsibilty of a Stack
+      * vendor to inform JAIN OAM application developers the severity of
+      * this alarm.  </ol>
       */
     public int getPriority() {
         return m_priority;
@@ -381,12 +361,12 @@ public abstract class OamAlarmNotification extends Notification implements java.
       * The Id of the Timer that caused a Timer Expired
       * Notification.
       *
-      * @exception java.lang.IllegalArgumentException
+      * @exception IllegalArgumentException
       * If the supplied timer ID does not represent a legal
       * Timer ID.
       */
     public void setTimerId(int timerId)
-        throws java.lang.IllegalArgumentException {
+        throws IllegalArgumentException {
         m_timerId = timerId;
     }
 
@@ -396,5 +376,4 @@ public abstract class OamAlarmNotification extends Notification implements java.
     protected int m_timerId = 0;
 }
 
-// vim: sw=4 et tw=0 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
-
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

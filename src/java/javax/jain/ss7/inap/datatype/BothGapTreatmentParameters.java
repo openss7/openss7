@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 
@@ -48,7 +47,7 @@ import javax.jain.ss7.inap.constants.*;
 This class defines the BothGapTreatmentParameters DataType
 */
 
-public class BothGapTreatmentParameters implements Serializable
+public class BothGapTreatmentParameters implements java.io.Serializable
 {
 
 	 private InformationToSend informationToSend;

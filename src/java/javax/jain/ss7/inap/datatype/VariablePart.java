@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
  This class represents the Variable Part DataType
  */
 
-public class VariablePart implements Serializable{
+public class VariablePart implements java.io.Serializable{
 
 	 private int integer;
           
@@ -80,7 +79,7 @@ Constructor For VariablePart
 		setNumber(number);
 	}
 
-	public VariablePart(String value, VariablePartID variablepartid)
+	public VariablePart(java.lang.String value, VariablePartID variablepartid)
 	{
 		if(variablepartid.getVariablePartID() == VariablePartID.DATE.getVariablePartID())
 			setDate(value);
@@ -140,7 +139,7 @@ Constructor For VariablePart
   Gets Time
 */
 
-    public String getTime()
+    public java.lang.String getTime()
     {
         return time;
     }
@@ -148,7 +147,7 @@ Constructor For VariablePart
 /**
   Sets Time
 */
-    public void setTime(String time)
+    public void setTime(java.lang.String time)
     {
         this.time = time;
         this.variablePartChoice=VariablePartChoice.TIME;
@@ -162,7 +161,7 @@ Constructor For VariablePart
   Gets Date
 */
 
-    public String getDate()
+    public java.lang.String getDate()
     {
         return date;
     }
@@ -170,7 +169,7 @@ Constructor For VariablePart
 /**
   Sets Date
 */
-    public void setDate(String date)
+    public void setDate(java.lang.String date)
     {
         this.date = date;
         this.variablePartChoice=VariablePartChoice.DATE;
@@ -182,7 +181,7 @@ Constructor For VariablePart
   Gets Price
 */
 
-    public String getPrice()
+    public java.lang.String getPrice()
     {
         return price;
     }
@@ -190,7 +189,7 @@ Constructor For VariablePart
 /**
   Sets Price
 */
-    public void setPrice(String price)
+    public void setPrice(java.lang.String price)
     {
         this.price = price;
         this.variablePartChoice=VariablePartChoice.PRICE;

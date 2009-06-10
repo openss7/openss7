@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This Class defines the BearerCapability Datatype. 
 */
 
-public class BearerCapability implements Serializable 
+public class BearerCapability implements java.io.Serializable 
 {
     private BearerCap bearerCap;
     

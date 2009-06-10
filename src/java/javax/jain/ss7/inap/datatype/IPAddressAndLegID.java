@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the IP Address And Leg ID Datatype 
 */
 
-public class IPAddressAndLegID implements Serializable
+public class IPAddressAndLegID implements java.io.Serializable
 {
     private CalledPartyNumber iPRoutingAddress;
     

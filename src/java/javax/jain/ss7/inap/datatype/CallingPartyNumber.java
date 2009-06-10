@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This Class defines the Calling Party Number Format (Encoded as in Q.763)
 */
 
-public class CallingPartyNumber implements Serializable 
+public class CallingPartyNumber implements java.io.Serializable 
 {
 
 
@@ -187,7 +186,7 @@ Sets Screening Indicator
 Gets Address Signal
 */
 
-    public String getAddressSignal()
+    public java.lang.String getAddressSignal()
     {
         return addressSignal ;
     }
@@ -196,7 +195,7 @@ Gets Address Signal
 Sets Address Signal
 */
 
-    public void  setAddressSignal (String addressSignal)
+    public void  setAddressSignal (java.lang.String addressSignal)
     {
         this.addressSignal = addressSignal ;
     }

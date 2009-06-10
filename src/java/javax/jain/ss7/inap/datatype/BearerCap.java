@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ This Class defines the BearerCap Datatype. (Encoded as in Q.931)
 */
 
 
-public class BearerCap implements Serializable 
+public class BearerCap implements java.io.Serializable 
 {
 
     private int codingStandard;
