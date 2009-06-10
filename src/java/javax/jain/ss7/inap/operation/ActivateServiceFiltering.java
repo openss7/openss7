@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the ActivateServiceFiltering Operation.
 */
 
-public class ActivateServiceFiltering extends Operation implements Serializable 
+public class ActivateServiceFiltering extends Operation implements java.io.Serializable 
 {
  
     private FilteredCallTreatment filteredCallTreatment;
@@ -168,7 +167,7 @@ Sets Filtering Criteria
 /**
 Gets Start Time
 */
-    public String getStartTime() throws ParameterNotSetException
+    public java.lang.String getStartTime() throws ParameterNotSetException
     {
       if(isStartTimePresent()) 
          return startTime;
@@ -180,7 +179,7 @@ Gets Start Time
 /**
 Sets Start Time
 */
-    public void setStartTime(String startTime)
+    public void setStartTime(java.lang.String startTime)
     {
         this.startTime = startTime;
         isStartTime = true;

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import java.net.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the TransportAddress DataType
 */
 
-public class TransportAddress implements Serializable{
+public class TransportAddress implements java.io.Serializable{
 
 	 private InetAddress ipAddress;
 	

@@ -39,7 +39,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 import javax.jain.*;
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class defines the InfromationToRecord Datatype
 */
 
-public class InformationToRecord implements Serializable
+public class InformationToRecord implements java.io.Serializable
 {
 
     private int messageID;

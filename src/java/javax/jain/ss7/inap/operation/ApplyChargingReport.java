@@ -41,7 +41,6 @@ package  javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 
@@ -50,7 +49,7 @@ import javax.jain.ss7.inap.constants.*;
 This  class represents the ApplyChargingReport Operation.
 */
 
-public  class ApplyChargingReport extends Operation implements Serializable
+public  class ApplyChargingReport extends Operation implements java.io.Serializable
 {
  	  
 
@@ -59,7 +58,7 @@ public  class ApplyChargingReport extends Operation implements Serializable
 /**
 Constructor For ApplyChargingReport
 */
-	public ApplyChargingReport(String callresult)
+	public ApplyChargingReport(java.lang.String callresult)
 	{	
 	   operationCode = OperationCode.APPLY_CHARGING_REPORT;
 		setCallResult(callresult);
@@ -79,7 +78,7 @@ Gets Operation Code
 /** 
 Gets Call Result 
 */
-    public String getCallResult() 
+    public java.lang.String getCallResult() 
     {
         return callResult;
     }

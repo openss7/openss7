@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -50,7 +49,7 @@ This Class defines the FacilityGroup Datatype
 */
 
 
-public class FacilityGroup implements Serializable 
+public class FacilityGroup implements java.io.Serializable 
 {
 
     private int trunkGroupID;
@@ -82,7 +81,7 @@ public FacilityGroup(FacilityGroupID groupID, FacilityGroupID facilityGroupID)
 		setTrunkGroupID(facilityGroupID.getFacilityGroupID());
 	}
 	
-public FacilityGroup(FacilityGroupID groupID, String facilityGroupID) 
+public FacilityGroup(FacilityGroupID groupID, java.lang.String facilityGroupID) 
 {
    if(groupID.getFacilityGroupID() == FacilityGroupID.HUNT_GROUP.getFacilityGroupID())
 		setHuntGroup(facilityGroupID);
@@ -170,7 +169,7 @@ Sets  Private Facility ID
 Gets  Hunt Group
 */
 
-    public String getHuntGroup() throws ParameterNotSetException
+    public java.lang.String getHuntGroup() throws ParameterNotSetException
     {
        if(facilityGroupChoice.getFacilityGroupChoice() ==FacilityGroupChoice.HUNT_GROUP.getFacilityGroupChoice())
 	   { 
@@ -186,7 +185,7 @@ Gets  Hunt Group
 Sets  Hunt Group
 */
 
-    public void  setHuntGroup (String huntGroup)
+    public void  setHuntGroup (java.lang.String huntGroup)
     {
         this.huntGroup = huntGroup;
         facilityGroupChoice =FacilityGroupChoice.HUNT_GROUP;
@@ -198,7 +197,7 @@ Sets  Hunt Group
 Gets  Route Index
 */
 
-    public String getRouteIndex() throws ParameterNotSetException
+    public java.lang.String getRouteIndex() throws ParameterNotSetException
     {
         if(facilityGroupChoice.getFacilityGroupChoice() ==FacilityGroupChoice.ROUTE_INDEX.getFacilityGroupChoice())
 		{
@@ -214,7 +213,7 @@ Gets  Route Index
 Sets  Route Index
 */
 
-    public void  setRouteIndex (String routeIndex)
+    public void  setRouteIndex (java.lang.String routeIndex)
     {
         this.routeIndex = routeIndex;
         facilityGroupChoice =FacilityGroupChoice.ROUTE_INDEX;

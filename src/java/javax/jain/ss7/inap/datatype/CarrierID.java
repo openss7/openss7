@@ -40,13 +40,12 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 /**
 This Class defines the CarrierID DataType 
 */
 
-public class CarrierID  implements Serializable
+public class CarrierID  implements java.io.Serializable
 {
 
     private int numberOfDigits;
@@ -56,7 +55,7 @@ public class CarrierID  implements Serializable
 /**
 Constructor For CarrierID
 */
-	public CarrierID(int numberOfDigits, String digits)
+	public CarrierID(int numberOfDigits, java.lang.String digits)
 	{
 		setNumberOfDigits(numberOfDigits);
 		setDigits (digits);
@@ -86,7 +85,7 @@ Sets Number Of Digits
 /**
 Gets Carrier Digits
 */
-    public String getDigits()
+    public java.lang.String getDigits()
     {
         return digits ;
     }
@@ -95,7 +94,7 @@ Gets Carrier Digits
 Sets Carrier Digits
 */
 
-    public void  setDigits (String digits)
+    public void  setDigits (java.lang.String digits)
     {
         this.digits = digits ;
     }

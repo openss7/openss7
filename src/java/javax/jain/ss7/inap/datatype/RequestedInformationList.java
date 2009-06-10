@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This Class defines the RequestedInformationList Datatype 
 */
 
-public class RequestedInformationList implements Serializable {
+public class RequestedInformationList implements java.io.Serializable {
 
 	 private RequestedInformation requestedInformation[];
 

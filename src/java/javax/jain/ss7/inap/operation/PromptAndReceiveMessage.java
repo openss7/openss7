@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents the PromptAndReceiveMessage Operation.
 */
 
-public class PromptAndReceiveMessage  extends Operation   implements Serializable
+public class PromptAndReceiveMessage  extends Operation   implements java.io.Serializable
 {
 	private OperationCode operationCode;
 
@@ -183,7 +182,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets MailBox ID
 */
-    public String getMailBoxID() throws ParameterNotSetException
+    public java.lang.String getMailBoxID() throws ParameterNotSetException
     {
         if(isMailBoxIDPresent())
             return mailBoxID;
@@ -195,7 +194,7 @@ Gets MailBox ID
 /**
 Sets MailBox ID
 */
-    public void setMailBoxID(String mailBoxID)
+    public void setMailBoxID(java.lang.String mailBoxID)
     {
         this.mailBoxID = mailBoxID;
         isMailBoxID = true;

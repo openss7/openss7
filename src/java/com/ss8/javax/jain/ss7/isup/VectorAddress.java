@@ -77,7 +77,7 @@ public class VectorAddress{
 
     }
 
-	public boolean equals(java.lang.Object obj){
+	public boolean equals(Object obj){
 		
 		if (obj instanceof VectorAddress)      
 		{

@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents the EstablishTemporaryConnection Operation.
 */
 
-public class EstablishTemporaryConnection  extends Operation   implements Serializable {
+public class EstablishTemporaryConnection  extends Operation   implements java.io.Serializable {
 
 	 
 
@@ -268,7 +267,7 @@ Sets Carrier
 Gets Service Interaction Indicators (CS-1)
 */
 
-    public String getServiceInteractionIndicators() throws ParameterNotSetException
+    public java.lang.String getServiceInteractionIndicators() throws ParameterNotSetException
     {
         if(isServiceInteractionIndicatorsPresent ()) 
                   return serviceInteractionIndicators;
@@ -282,7 +281,7 @@ Sets Service Interaction Indicators (CS-1)
 */
 
 
-    public void setServiceInteractionIndicators(String serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String serviceInteractionIndicators)
     {
         this.serviceInteractionIndicators = serviceInteractionIndicators;
         isServiceInteractionIndicators = true;

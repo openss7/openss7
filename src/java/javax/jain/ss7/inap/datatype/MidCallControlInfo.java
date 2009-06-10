@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class contains the Mid Call Control Info
 */
 
-public class MidCallControlInfo implements Serializable
+public class MidCallControlInfo implements java.io.Serializable
 {
 
     private MidCallControlInformation midCallControlInformation[];

@@ -77,7 +77,7 @@ import java.io.Serializable;
 * @deprecated As of JAIN TCAP v1.1. This class is no longer needed as a result
 * of the addition of the {@link jain.protocol.ss7.SccpUserAddress} class.
 */
-public final class TcapUserAddress implements Serializable{
+public final class TcapUserAddress implements java.io.Serializable {
 
     /**
     * Constructs a TcapUserAddress with the specified Signalling Point Code and

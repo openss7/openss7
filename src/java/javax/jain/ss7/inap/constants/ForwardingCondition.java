@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 
 /**
 The class for Forwarding Condition indicates the condition that must be met 

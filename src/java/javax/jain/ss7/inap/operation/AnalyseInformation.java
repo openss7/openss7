@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents the AnalyseInformation Operation.
 */
 
-public class AnalyseInformation extends Operation implements Serializable
+public class AnalyseInformation extends Operation implements java.io.Serializable
 {
 
 
@@ -156,7 +155,7 @@ Sets Destination Routing Address
 /**
 Gets Alerting Pattern
 */
-    public String getAlertingPattern() throws ParameterNotSetException
+    public java.lang.String getAlertingPattern() throws ParameterNotSetException
     {
       if(isAlertingPatternPresent())
           return alertingPattern;
@@ -166,7 +165,7 @@ Gets Alerting Pattern
 /**
 Sets Alerting Pattern
 */
-    public void setAlertingPattern(String alertingPattern)
+    public void setAlertingPattern(java.lang.String alertingPattern)
     {
         this.alertingPattern = alertingPattern;
         isAlertingPattern = true;
@@ -185,7 +184,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets ISDN Access Related Information
 */
-    public String getISDNAccessRelatedInformation() throws ParameterNotSetException
+    public java.lang.String getISDNAccessRelatedInformation() throws ParameterNotSetException
     {
       if(isISDNAccessRelatedInformationPresent())
           return iSDNAccessRelatedInformation;
@@ -196,7 +195,7 @@ Gets ISDN Access Related Information
 /**
 Sets ISDN Access Related Information
 */
-    public void setISDNAccessRelatedInformation(String iSDNAccessRelatedInformation)
+    public void setISDNAccessRelatedInformation(java.lang.String iSDNAccessRelatedInformation)
     {
         this.iSDNAccessRelatedInformation = iSDNAccessRelatedInformation;
         isISDNAccessRelatedInformation = true; 
@@ -275,7 +274,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Calling Party Category
 */
-    public String getCallingPartysCategory() throws ParameterNotSetException
+    public java.lang.String getCallingPartysCategory() throws ParameterNotSetException
     {
        if(isCallingPartysCategoryPresent())
               return callingPartysCategory;
@@ -286,7 +285,7 @@ Gets Calling Party Category
 /**
 Sets Calling Party Category
 */
-    public void setCallingPartysCategory(String callingPartysCategory)
+    public void setCallingPartysCategory(java.lang.String callingPartysCategory)
     {
         this.callingPartysCategory = callingPartysCategory;
         isCallingPartysCategory = true;
@@ -425,7 +424,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Service Interaction Indicators
 */
-    public String getServiceInteractionIndicators() throws ParameterNotSetException
+    public java.lang.String getServiceInteractionIndicators() throws ParameterNotSetException
     {
        if(isServiceInteractionIndicatorsPresent())
             return serviceInteractionIndicators;
@@ -436,7 +435,7 @@ Gets Service Interaction Indicators
 /**
 Sets Service Interaction Indicators
 */
-    public void setServiceInteractionIndicators(String serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String serviceInteractionIndicators)
     {
         this.serviceInteractionIndicators = serviceInteractionIndicators;
         isServiceInteractionIndicators = true;

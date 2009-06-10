@@ -40,21 +40,20 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the Route List
 */
 
-public class RouteList implements Serializable{
+public class RouteList implements java.io.Serializable{
 
     private String routeDetails[];
 
 /**
 Constructor For RouteList
 */
-	public RouteList(String routeDetails[])
+	public RouteList(java.lang.String routeDetails[])
 	{
 		setRouteDetails(routeDetails);
 	}
@@ -74,7 +73,7 @@ Gets  Route Details
 Gets  a partcular Route Detail
 */
 
-    public String getRouteDetails(int index)
+    public java.lang.String getRouteDetails(int index)
     {
         return routeDetails[index] ;
     }
@@ -83,7 +82,7 @@ Gets  a partcular Route Detail
 Sets  Route Details
 */
 
-    public void  setRouteDetails(String routeDetails[])
+    public void  setRouteDetails(java.lang.String routeDetails[])
     {
         this.routeDetails = routeDetails ;
     }
@@ -93,7 +92,7 @@ Sets  Route Details
 Sets  Particular Route Details
 */
 
-    public void  setRouteDetails(int index , String routeDetails)
+    public void  setRouteDetails(int index , java.lang.String routeDetails)
     {
         this.routeDetails[index] = routeDetails ;
     }

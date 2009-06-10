@@ -206,12 +206,12 @@ the code */
     //  get/setStackName()
     ////////////////////////////////////////////////////////////////////////////////
 		
-	public java.lang.String getStackName(){
+	public String getStackName(){
 		return stackName;
 	}
 		
 
-	public void setStackName(java.lang.String stackName){
+	public void setStackName(String stackName){
 		this.stackName = stackName;
 	}
 
@@ -241,11 +241,11 @@ the code */
 	////////////////////////////////////////////////////////////////////////////////
     //  get/setVendorName()
     ////////////////////////////////////////////////////////////////////////////////
-	public java.lang.String getVendorName(){
+	public String getVendorName(){
 		return vendorName;
 	}
 
-	public void setVendorName(java.lang.String vendorName)
+	public void setVendorName(String vendorName)
                    throws ParameterAlreadySetException{
 		// customer can change the default vendor name
 		this.vendorName =  vendorName;

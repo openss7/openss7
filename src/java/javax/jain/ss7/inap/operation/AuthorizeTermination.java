@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the AuthorizeTermination Operation.
 */
 
-public class AuthorizeTermination  extends Operation implements Serializable
+public class AuthorizeTermination  extends Operation implements java.io.Serializable
 {
   	
 
@@ -115,7 +114,7 @@ Gets Operation Code
 /**
 Gets Alerting Pattern
 */
-    public String getAlertingPattern() throws ParameterNotSetException
+    public java.lang.String getAlertingPattern() throws ParameterNotSetException
     {
        if(isAlertingPatternPresent())
              return alertingPattern;
@@ -125,7 +124,7 @@ Gets Alerting Pattern
 /**
 Sets Alerting Pattern
 */
-    public void setAlertingPattern(String alertingPattern)
+    public void setAlertingPattern(java.lang.String alertingPattern)
     {
         this.alertingPattern = alertingPattern;
         isAlertingPattern = true;
@@ -206,7 +205,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Display Information
 */
-    public String getDisplayInformation() throws ParameterNotSetException
+    public java.lang.String getDisplayInformation() throws ParameterNotSetException
     {
        if(isDisplayInformationPresent())  
             return displayInformation;
@@ -236,7 +235,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets ISDN Access Related Information
 */
-    public String getISDNAccessRelatedInformation() throws ParameterNotSetException
+    public java.lang.String getISDNAccessRelatedInformation() throws ParameterNotSetException
     {
        if(isISDNAccessRelatedInformationPresent())
                return iSDNAccessRelatedInformation;

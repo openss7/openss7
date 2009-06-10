@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ This class defines the LegID Datatype.
 */
 
 
-public class LegID implements Serializable
+public class LegID implements java.io.Serializable
 {
 
     private String sendingSideID;
@@ -63,7 +62,7 @@ public class LegID implements Serializable
 /**
 Constructor For LegID
 */
-	public LegID(String sendReceive, LegIDChoice legIDChoice)
+	public LegID(java.lang.String sendReceive, LegIDChoice legIDChoice)
 	{
 		if(legIDChoice.getLegIDChoice()== LegIDChoice.SENDING_SIDE_ID.getLegIDChoice())
 			setSendingSideID( sendReceive);
@@ -84,7 +83,7 @@ public LegIDChoice getLegIDChoice()
 /**
 Gets the Sending Side ID
 */
-    public String getSendingSideID() throws ParameterNotSetException
+    public java.lang.String getSendingSideID() throws ParameterNotSetException
     {
         if(legIDChoice==LegIDChoice.SENDING_SIDE_ID)
 		{
@@ -113,7 +112,7 @@ Sets the Sending Side ID
 Gets the Receiving Side ID
 */
 
-    public String getReceivingSideID() throws ParameterNotSetException
+    public java.lang.String getReceivingSideID() throws ParameterNotSetException
     {
         if(legIDChoice==LegIDChoice.RECEIVING_SIDE_ID)
 		{

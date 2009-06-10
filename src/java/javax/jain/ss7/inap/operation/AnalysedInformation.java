@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
@@ -52,7 +51,7 @@ import javax.jain.*;
 This class represents the AnalysedInformation Operation.
 */
 
-public class AnalysedInformation extends Operation implements Serializable
+public class AnalysedInformation extends Operation implements java.io.Serializable
 {
 	
 
@@ -182,7 +181,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Calling Party BusinessGroupID
 */
-	public String getCallingPartyBusinessGroupID() throws ParameterNotSetException
+	public java.lang.String getCallingPartyBusinessGroupID() throws ParameterNotSetException
     	{
            if(isCallingPartyBusinessGroupIDPresent())  
         		return callingPartyBusinessGroupID;

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 /**
 This class specifies the cause of sending the 'StatusReport' operation to the SCF.
 */

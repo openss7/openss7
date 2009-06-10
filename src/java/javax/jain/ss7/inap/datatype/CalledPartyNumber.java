@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 
@@ -49,7 +48,7 @@ This Class defines the Called Party Number Datatype.(Encoded as in Q.763)
 */
 
 
-public class CalledPartyNumber implements Serializable
+public class CalledPartyNumber implements java.io.Serializable
 {
 
     private int natureOfAddressIndicator;
@@ -140,7 +139,7 @@ Sets Numbering Plan Indicator
 Gets Address Signal
 */
 
-    public String getAddressSignal()
+    public java.lang.String getAddressSignal()
     {
         return addressSignal ;
     }
@@ -149,7 +148,7 @@ Gets Address Signal
 Sets Address Signal
 */
 
-    public void  setAddressSignal (String addressSignal)
+    public void  setAddressSignal (java.lang.String addressSignal)
     {
         this.addressSignal = addressSignal ;
     }

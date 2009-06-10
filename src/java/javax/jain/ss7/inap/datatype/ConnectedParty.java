@@ -39,7 +39,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -47,7 +46,7 @@ import javax.jain.*;
 This class defines the ConnectedParty Datatype
 */
 
-public class ConnectedParty implements Serializable
+public class ConnectedParty implements java.io.Serializable
 {
     private LegID legID;
 

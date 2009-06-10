@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 
 /**
 * This class represents the GapIndicators DataType*/ 
 
-public class GapIndicators implements Serializable
+public class GapIndicators implements java.io.Serializable
 {
 
 	private int duration;

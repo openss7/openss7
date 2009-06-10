@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 /**
 This class is used to identify the reason, why the ServiceFilteringResponse operation is sent.
       Intermediate response indicates that service filtering is active.

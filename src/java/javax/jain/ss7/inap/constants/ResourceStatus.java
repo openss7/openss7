@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 /**
 The class Resource Status indicates the busy/idle status of the resource.
 */

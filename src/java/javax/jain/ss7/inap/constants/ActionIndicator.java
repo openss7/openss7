@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 
 /**
 This class indicates the action to be performed by the Manage Trigger Data operation.

@@ -1,147 +1,139 @@
 /*
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- *  Copyrights:
- *
- *  Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
- *  901 San Antonio Road, Palo Alto, California 94043, U.S.A.
- *
- *  This product and related documentation are protected by copyright and
- *  distributed under licenses restricting its use, copying, distribution, and
- *  decompilation. No part of this product or related documentation may be
- *  reproduced in any form by any means without prior written authorization of
- *  Sun and its licensors, if any.
- *
- *  RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
- *  States Government is subject to the restrictions set forth in DFARS
- *  252.227-7013 (c)(1)(ii) and FAR 52.227-19.
- *
- *  The product described in this manual may be protected by one or more U.S.
- *  patents, foreign patents, or pending applications.
- *
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- *  Author:
- *
- *  Mahindra British Telecom
- *  155 , Bombay - Pune Road 
- *  Pimpri ,
- *  Pune - 411 018.
- *
- *  Module Name   : JAIN INAP API
- *  File Name     : JainInapStack.java
- *  Approver      : Jain Inap Edit Group
- *  Version       : 1.0
- *
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
  */
-
 
 package javax.jain.ss7.inap;
 
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import javax.jain.ss7.inap.event.*;
 import javax.jain.ss7.*;
 import javax.jain.*;
 
 /**
- <P>
-This interface defines the methods required to represent a proprietary
- JAIN INAP protocol stack, the implementation of which will be vendor specific. 
- Each vendor's protocol stack will have an object
- that implements this interface to control the creation/deletion of proprietary
- <CODE>JainInapProvider</CODE> <P>
- It must be noted that any object that implements the:
-<UL>
-<LI>JainInapProvider Interface is referred to as JainInapProviderImpl.
-<LI>JainInapStack Interface is referred to as JainInapStackImpl.
-</UL>
- An application may create a JainInapStackImpl by invoking the 
- <a href="JainFactory.html#createSS7Object()">JainFactory.createSS7Object()</a>
- method on the JainSS7Factory object. The <b>PathName</b> of the vendor specific implementation of which you want to 
- instantiate needs to be set on the JainSS7Factory object using the <a href="JainFactory.html#setPathName()">JainFactory.setPathName()</a>before calling the createSS7Object method.
-<P>
-*/
-
-public interface JainInapStack 
-{
- 
- 
-/**
-<DL>
-<DD>Creates a new Peer (vendor specific) instance of the class JainInapProviderImpl that
-<DD>is attached to this instance of JainInapStackImpl.
-<DL>
-*/
- 
-public JainInapProvider createProvider()throws PeerUnavailableException;
- 
-/**
-<DL>
-<DD>Deletes the specified JainInapProviderImpl attached to this JainInapStackImpl.
- <P><DD><DL>
-<DT><B>Parameters:</B><DD><CODE><var>providerToBeDeleted</var></CODE> - the JainInapProviderImpl to be deleted from this JainInapStackImpl.<DT></DL>
-</DD>
-</DL>
-*/
-public void deleteProvider(JainInapProvider providerToBeDeleted) throws DeleteProviderException;
-  
-
-/**
-<DL>
-<DD>Returns the vector of JainInapProviderImpls that have been created by this JainInapStackImpl. All of the JainInapProviderImpls of this
-    JainInapStackImpl will be proprietary objects belonging to the same stack vendor. Note that the JainInapProviderImpls in this vector may
-     be either attached or detached.<DD><DL>
-<DT><B>Returns:</B><DD>a Vector containing all the of JainInapProviderImpls created by this JainInapStackImpl.<DT></DL>
-</DD>
-</DL>
-*/
-
-
-  public java.util.Vector getProviderList();
-  
-  /**
-  * Returns the name of the stack as a string
+  * This interface defines the methods required to represent a
+  * proprietary JAIN INAP protocol stack, the implementation of which
+  * will be vendor specific.
+  * Each vendor's protocol stack will have an object that implements
+  * this interface to control the creation/deletion of proprietary
+  * JainInapProvider <p>
   *
-  * @return  a string describing the Stack Name
+  * It must be noted that any object that implements the: <ul>
+  *
+  * <li>JainInapProvider Interface is referred to as JainInapProviderImpl.
+  *
+  * <li>JainInapStack Interface is referred to as JainInapStackImpl.  </ul>
+  *
+  * An application may create a JainInapStackImpl by invoking the
+  * JainFactory.createSS7Object() method on the JainSS7Factory object.
+  * The PathName of the vendor specific implementation of which you want
+  * to instantiate needs to be set on the JainSS7Factory object using
+  * the JainFactory.setPathName()before calling the createSS7Object
+  * method.
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
   */
-
-    public String getStackName();
-
-	/**
-    * Sets the name of the stack as a string
-    *
-    * @param  stackName  The new Stack Name value
-    */
-    public void setStackName(String stackName);
-
+public interface JainInapStack {
+    /** Creates a new Peer (vendor specific) instance of the class
+      * JainInapProviderImpl that is attached to this instance of
+      * JainInapStackImpl.  */
+    public JainInapProvider createProvider()
+        throws PeerUnavailableException;
     /**
-     * Returns the Vendor's name for this stack
-     *
-     *  @return  a string describing the Vendor's name
-     */
-    public String getVendorName();
-
+      * Deletes the specified JainInapProviderImpl attached to this
+      * JainInapStackImpl.
+      * @param providerToBeDeleted
+      * The JainInapProviderImpl to be deleted from this
+      * JainInapStackImpl.
+      */
+    public void deleteProvider(JainInapProvider providerToBeDeleted)
+        throws DeleteProviderException;
     /**
-     * Sets the Vendors name for this stack, this name may be the Vendor's domain
-     * name i.e. "com.sun" 
-     */
-     public void setVendorName(String vendorName);
-
+      * Returns the vector of JainInapProviderImpls that have been
+      * created by this JainInapStackImpl.
+      * All of the JainInapProviderImpls of this JainInapStackImpl will
+      * be proprietary objects belonging to the same stack vendor. Note
+      * that the JainInapProviderImpls in this vector may be either
+      * attached or detached.
+      * @return
+      * A Vector containing all the of JainInapProviderImpls created by
+      * this JainInapStackImpl.
+      */
+    public java.util.Vector getProviderList();
     /**
-     * Returns the Signalling Point Code of the JainInapStcak
-     *
-	  * @return    the signalingPointCode of this JainInapStack.
-     */
-     public SignalingPointCode getSignalingPointCode();
-
+      * Returns the name of the stack as a string.
+      * @return
+      * A string describing the Stack Name.
+      */
+    public java.lang.String getStackName();
     /**
-     * Returns the Sub System Number of the JainInapStack
-     *
-	  * @return    the Sub System Number of this JainInapStack.
-     */
-     public int getSubSystemNumber();
+      * Sets the name of the stack as a string.
+      * @param stackName
+      * The new Stack Name value.
+      */
+    public void setStackName(java.lang.String stackName);
+    /**
+      * Returns the Vendor's name for this stack.
+      * @return
+      * A string describing the Vendor's name.
+      */
+    public java.lang.String getVendorName();
+    /**
+      * Sets the Vendors name for this stack, this name may be the
+      * Vendor's domain name i.e, "com.sun"
+      */
+    public void setVendorName(java.lang.String vendorName);
+    /**
+      * Returns the Signalling Point Code of the JainInapStcak.
+      * @return
+      * The signalingPointCode of this JainInapStack.
+      */
+    public SignalingPointCode getSignalingPointCode();
+    /**
+      * Returns the Sub System Number of the JainInapStack.
+      * @return The Sub System Number of this JainInapStack.
+      */
+    public int getSubSystemNumber();
+}
 
-}  
-
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

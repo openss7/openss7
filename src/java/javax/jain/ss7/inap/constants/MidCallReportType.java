@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 /**
 The class MidCallReportType indicates whether to report the event when the SSF is in either
  the "monitoring state" only or in any state.

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This class defines the BCSMfailure Datatype
 */
 
-public class BCSMFailure implements Serializable{
+public class BCSMFailure implements java.io.Serializable{
 
     private LegID legID;
     
@@ -90,7 +89,7 @@ Sets Leg ID
 /**
 Gets Reason
 */
-    public String  getReason () throws ParameterNotSetException
+    public java.lang.String  getReason () throws ParameterNotSetException
     {
         if(isReasonPresent())
 		{

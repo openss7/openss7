@@ -39,13 +39,12 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 /**
 This Class defines the SCF ID (Encoded as in Q.713)
 */
 
- public class ScfID  implements Serializable {
+ public class ScfID  implements java.io.Serializable {
 
     private int subSystemNumber;
     private int translationType;
@@ -64,7 +63,7 @@ This Class defines the SCF ID (Encoded as in Q.713)
 /**
 Constructor For ScfID
 */
-	public ScfID(boolean pointCodeIndicator, boolean subSystemNumberIndicator, int globalTranslationIndicator, boolean routeIndicator, int subSystemNumber, int translationType, int encodingScheme, int numberinigPlan, int natureOfAddressIndicator, String countryCode, String nsnDigit)
+	public ScfID(boolean pointCodeIndicator, boolean subSystemNumberIndicator, int globalTranslationIndicator, boolean routeIndicator, int subSystemNumber, int translationType, int encodingScheme, int numberinigPlan, int natureOfAddressIndicator, java.lang.String countryCode, java.lang.String nsnDigit)
 	{
 		setPointCodeIndicator(pointCodeIndicator);
 		setSubSystemNumberIndicator(subSystemNumberIndicator);
@@ -252,7 +251,7 @@ Sets  Nature Of Address Indicator
 Gets  Country Code
 */
 
-    public String getCountryCode()
+    public java.lang.String getCountryCode()
     {
         return countryCode ;
     }
@@ -261,7 +260,7 @@ Gets  Country Code
 Sets  Country Code
 */
 
-    public void  setCountryCode (String countryCode)
+    public void  setCountryCode (java.lang.String countryCode)
     {
         this.countryCode = countryCode ;
     }
@@ -271,7 +270,7 @@ Sets  Country Code
 Gets  NSN Digit
 */
 
-    public String getNsnDigit()
+    public java.lang.String getNsnDigit()
     {
         return nsnDigit ;
     }
@@ -280,7 +279,7 @@ Gets  NSN Digit
 Sets  NSN Digit
 */
 
-    public void  setNsnDigit (String nsnDigit)
+    public void  setNsnDigit (java.lang.String nsnDigit)
     {
         this.nsnDigit = nsnDigit ;
     }

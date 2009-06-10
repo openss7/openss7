@@ -39,13 +39,12 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
 /**
 * This class represents the GapTreatment DataType*/
-public class GapTreatment implements Serializable
+public class GapTreatment implements java.io.Serializable
 {
 
 	 private InformationToSend informationToSend;

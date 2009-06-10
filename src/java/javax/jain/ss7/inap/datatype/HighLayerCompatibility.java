@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ import javax.jain.*;
 This Class defines the High layer Compatibitilty Format (Encoded as in Q.931)
 */
 
-public class HighLayerCompatibility implements Serializable 
+public class HighLayerCompatibility implements java.io.Serializable 
 {
 
 
@@ -145,7 +144,7 @@ Sets Presentation Method Of Protocol Profile
 Gets High Layer Characteristics Identification
 */
 
-    public String getHighLayerCharacteristicsIdentification()
+    public java.lang.String getHighLayerCharacteristicsIdentification()
     {
         return highLayerCharacteristicsIdentification ;
     }
@@ -154,7 +153,7 @@ Gets High Layer Characteristics Identification
 Sets High Layer Characteristics Identification
 */
 
-    public void  setHighLayerCharacteristicsIdentification (String highLayerCharacteristicsIdentification)
+    public void  setHighLayerCharacteristicsIdentification (java.lang.String highLayerCharacteristicsIdentification)
     {
         this.highLayerCharacteristicsIdentification= highLayerCharacteristicsIdentification ;
     }
@@ -165,7 +164,7 @@ Sets High Layer Characteristics Identification
 Gets Extended High Layer Characteristics Identification
 */
 
-    public String getExtendedHighLayerCharacteristicsIdentification() throws ParameterNotSetException
+    public java.lang.String getExtendedHighLayerCharacteristicsIdentification() throws ParameterNotSetException
     {
         if(isExtendedHighLayerCharacteristicsIdentificationPresent())
 		{
@@ -182,7 +181,7 @@ Gets Extended High Layer Characteristics Identification
 Sets Extended High Layer Characteristics Identification
 */
 
-    public void  setExtendedHighLayerCharacteristicsIdentification (String extendedHighLayerCharacteristicsIdentification)
+    public void  setExtendedHighLayerCharacteristicsIdentification (java.lang.String extendedHighLayerCharacteristicsIdentification)
     {
         this.extendedHighLayerCharacteristicsIdentification= extendedHighLayerCharacteristicsIdentification ;
         isExtendedHighLayerCharacteristicsIdentification=true;

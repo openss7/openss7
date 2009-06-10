@@ -40,7 +40,6 @@
 package javax.jain.ss7.inap.operation;
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class represents the Select Route Operation. 
 */ 
 
-public class SelectRoute  extends Operation   implements Serializable 
+public class SelectRoute  extends Operation   implements java.io.Serializable 
 { 
     
 
@@ -144,7 +143,7 @@ Sets Destination Routing Address
 /** 
 Gets Alerting Pattern 
 */ 
-    public String getAlertingPattern()  throws ParameterNotSetException
+    public java.lang.String getAlertingPattern()  throws ParameterNotSetException
     { 
         if(isAlertingPatternPresent()){
         return alertingPattern;
@@ -156,7 +155,7 @@ Gets Alerting Pattern
 /** 
 Sets Alerting Pattern 
 */ 
-    public void setAlertingPattern(String alertingPattern) 
+    public void setAlertingPattern(java.lang.String alertingPattern) 
     { 
         this.alertingPattern = alertingPattern;
         isAlertingPattern=true; 
@@ -206,7 +205,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets ISDN Access Related Information
 */
-    public String getISDNAccessRelatedInformation() throws ParameterNotSetException
+    public java.lang.String getISDNAccessRelatedInformation() throws ParameterNotSetException
     {
         if(isISDNAccessRelatedInformationPresent()){
           return iSDNAccessRelatedInformation;
@@ -388,7 +387,7 @@ Returns: TRUE if present, FALSE otherwise.
 /**
 Gets Service Interaction Indicators
 */
-    public String getServiceInteractionIndicators() throws ParameterNotSetException
+    public java.lang.String getServiceInteractionIndicators() throws ParameterNotSetException
     {
         if(isServiceInteractionIndicatorsPresent()){
          return serviceInteractionIndicators;

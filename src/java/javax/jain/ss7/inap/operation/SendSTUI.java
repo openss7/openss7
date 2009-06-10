@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 */
 
 
-public class SendSTUI  extends Operation   implements Serializable
+public class SendSTUI  extends Operation   implements java.io.Serializable
 {
 
     private String uSIServiceIndicator;
@@ -67,7 +66,7 @@ public class SendSTUI  extends Operation   implements Serializable
 /**
 Constructor For SendSTUI
 */
-	public SendSTUI(String uSIServiceIndicator, String uSIInformation, LegID legID)
+	public SendSTUI(java.lang.String uSIServiceIndicator, java.lang.String uSIInformation, LegID legID)
 	{
 		operationCode = OperationCode.SEND_STUI;
 		setUSIServiceIndicator(uSIServiceIndicator);
@@ -89,7 +88,7 @@ Gets Operation Code
 /**Gets USI Service Indicator*/
 
 
-    public String getUSIServiceIndicator() 
+    public java.lang.String getUSIServiceIndicator() 
     {
         return uSIServiceIndicator;
     }
@@ -106,7 +105,7 @@ Gets Operation Code
 /**Gets USI Information*/
 
 
-    public String getUSIInformation() 
+    public java.lang.String getUSIInformation() 
     {
         return uSIInformation;
     }

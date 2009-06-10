@@ -91,7 +91,7 @@ public class  PutAnsiParam{
 		byte[]                      Jurisdiction					= null;
 		byte[]                      ntp								= null;
 		byte                        hop								= NONE;
-		java.lang.String            otgn							= null; 
+		String            otgn							= null; 
 
 		byte bci_len,cam_len, cinm_len,clli_len,cref_len, cgpn_len, cic_len, crgn_len, csi_len,bga_len, conr_len, gad_len,gnd_len,
 gnm_len,iind_len,irind_len, nind_len,ocdn_len, rop_len, xns_len, usip_len, rdtg_len,

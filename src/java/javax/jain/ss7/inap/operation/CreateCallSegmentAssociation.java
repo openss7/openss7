@@ -43,7 +43,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -53,7 +52,7 @@ This class represents the CreateCallSegmentAssociation Operation.
 
 */
 
-public class CreateCallSegmentAssociation   extends Operation implements Serializable{
+public class CreateCallSegmentAssociation   extends Operation implements java.io.Serializable{
 
  	
 	 private ExtensionField extensions[];

@@ -42,6 +42,7 @@
 package jain.protocol.ss7.tcap;
 
 import jain.*;
+import java.util.EventObject;
 /**
  * A ComponentReqEvent is the superclass of all Component request primitives,
  * which represent TCAP Component requests sent from a <a
@@ -51,10 +52,10 @@ import jain.*;
  * the Listener and the Provider. This type of Event will be processed by the
  * <a href="JainTcapProvider.html#sendComponentReqEvent(jain.protocol.ss7.tcap.ComponentReqEvent)">
  * sendComponentReqEvent() method</a> of the <a href="JainTcapProvider.html">
- * JainTcapProvider</a> . This class implements the <B>java.lang.Cloneable</B>
+ * JainTcapProvider</a> . This class implements the <B>Cloneable</B>
  * interface, therefore all Component Request primitives that extend this Event
  * can be cloned using the <B>clone()</B> method inherited from <B>
- * java.lang.Object</B> .
+ * Object</B> .
  *
  * @author     Sun Microsystems Inc.
  * @version    1.1

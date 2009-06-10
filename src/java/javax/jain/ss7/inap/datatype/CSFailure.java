@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This class defines the CSFailure Datatype
 */
 
-public class CSFailure implements Serializable
+public class CSFailure implements java.io.Serializable
 {
 
     private int callSegmentID;
@@ -93,7 +92,7 @@ Sets Call Segment ID
 Gets Reason
 */
 
-    public String  getReason () throws ParameterNotSetException
+    public java.lang.String  getReason () throws ParameterNotSetException
     {
        if(isReasonPresent())
 	   {

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This class defines the ChargingEvent datatype
 */
 
-public class ChargingEvent implements Serializable
+public class ChargingEvent implements java.io.Serializable
 {
 
     private String eventTypeCharging;
@@ -61,7 +60,7 @@ public class ChargingEvent implements Serializable
 /**
 Constructor For ChargingEvent
 */
-	public ChargingEvent(String eventTypeCharging, MonitorMode monitorMode) 
+	public ChargingEvent(java.lang.String eventTypeCharging, MonitorMode monitorMode) 
 	{
 		setEventTypeCharging(eventTypeCharging);
 		setMonitorMode(monitorMode);
@@ -72,7 +71,7 @@ Constructor For ChargingEvent
 /**
 Gets  Event Type Charging
 */
-    public String getEventTypeCharging()
+    public java.lang.String getEventTypeCharging()
     {
         return eventTypeCharging;
     }
@@ -80,7 +79,7 @@ Gets  Event Type Charging
 /**
 Sets  Event Type Charging
 */
- public void  setEventTypeCharging(String eventTypeCharging)
+ public void  setEventTypeCharging(java.lang.String eventTypeCharging)
     {
         this.eventTypeCharging = eventTypeCharging;
     }

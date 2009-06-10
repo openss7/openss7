@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 
@@ -49,7 +48,7 @@ This Class defines the Called Party Sub Address Format. (Encoded as in Q.931)
 */
 
 
-public class CalledPartySubaddress implements Serializable 
+public class CalledPartySubaddress implements java.io.Serializable 
 {
 
     private int typeOfSubaddress;
@@ -59,7 +58,7 @@ public class CalledPartySubaddress implements Serializable
 /**
 Constructor For CalledPartySubaddress
 */
-	public CalledPartySubaddress(int typeOfSubaddress, String subaddressInformation)
+	public CalledPartySubaddress(int typeOfSubaddress, java.lang.String subaddressInformation)
 	{
 		setTypeOfSubaddress(typeOfSubaddress);
 		setSubaddressInformation(subaddressInformation);
@@ -88,7 +87,7 @@ Sets Type of Sub Address
 /**
 Gets Sub Address Information
 */
-    public String getSubaddressInformation()
+    public java.lang.String getSubaddressInformation()
     {
         return subaddressInformation ;
     }
@@ -97,7 +96,7 @@ Gets Sub Address Information
 Sets Sub Address Information
 */
 
-    public void  setSubaddressInformation(String subaddressInformation)
+    public void  setSubaddressInformation(java.lang.String subaddressInformation)
     {
         this.subaddressInformation = subaddressInformation ;
     }

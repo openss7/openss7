@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ import javax.jain.*;
 This Class identifies the Party to Connect Datatype
 */
 
-public class PartyToConnect  implements Serializable
+public class PartyToConnect  implements java.io.Serializable
 {
 
     private LegID legID;

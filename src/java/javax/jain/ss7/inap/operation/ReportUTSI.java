@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 */
 
 
-public class ReportUTSI  extends Operation   implements Serializable
+public class ReportUTSI  extends Operation   implements java.io.Serializable
 {
     
 
@@ -68,7 +67,7 @@ public class ReportUTSI  extends Operation   implements Serializable
 /**
 Constructor For ReportUTSI
 */
-	public ReportUTSI(String uSIServiceIndicator, String uSIInformation, LegID legID)
+	public ReportUTSI(java.lang.String uSIServiceIndicator, java.lang.String uSIInformation, LegID legID)
 	{
 		operationCode = OperationCode.REPORT_UTSI;
 		setUSIServiceIndicator(uSIServiceIndicator);
@@ -91,7 +90,7 @@ Gets Operation Code
 /**Gets USI Service Indicator*/
 
 
-    public String getUSIServiceIndicator()
+    public java.lang.String getUSIServiceIndicator()
     {
         return uSIServiceIndicator;
     }
@@ -127,7 +126,7 @@ Sets Leg ID
 /**Gets USI Information*/
 
 
-    public String getUSIInformation()
+    public java.lang.String getUSIInformation()
     {
         return uSIInformation;
     }

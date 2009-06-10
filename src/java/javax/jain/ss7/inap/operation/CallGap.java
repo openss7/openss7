@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the CallGap Operation.
 */
 
-public class CallGap  extends Operation implements Serializable
+public class CallGap  extends Operation implements java.io.Serializable
 {
     
     private GapCriteria gapCriteria;

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 import javax.jain.*;
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class represents the FilteringCriteria DataType 
 */
 
-public class FilteringCriteria implements Serializable
+public class FilteringCriteria implements java.io.Serializable
 {
 
 	

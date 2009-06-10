@@ -39,14 +39,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This Class defines the RedirectionInformation datatype (Encoded as in Q.763)
 */
 
-public class RedirectionInformation implements Serializable {
+public class RedirectionInformation implements java.io.Serializable {
 
 
     private int redirectingIndicator;

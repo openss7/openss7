@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 
 /**
 The Time Out Error Class defines the type of 'time out' indication given by the Provider/ Stack.

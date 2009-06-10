@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.ss7.inap.exception.*;
 
@@ -50,7 +49,7 @@ import javax.jain.ss7.inap.exception.*;
 This Class defines the RequestedInformationValue Datatype
 */
 
-public class RequestedInformationValue implements Serializable {
+public class RequestedInformationValue implements java.io.Serializable {
 
          private int callAttemptElapsedTimeValue;   
 
@@ -76,7 +75,7 @@ Constructors For RequestedInformationValue
 		setCallConnectedElapsedTimeValue(callElapsedTimeValue);
 	}
 
-	public RequestedInformationValue(String callStopTimeValue)
+	public RequestedInformationValue(java.lang.String callStopTimeValue)
 	{
 		setCallStopTimeValue(callStopTimeValue);
 	}
@@ -126,7 +125,7 @@ Constructors For RequestedInformationValue
   Gets Call Stop Time Value
 */
 
-    public String getCallStopTimeValue()
+    public java.lang.String getCallStopTimeValue()
     {
         return callStopTimeValue;
     }
@@ -134,7 +133,7 @@ Constructors For RequestedInformationValue
 /**
   Sets Call Stop Time Value
 */
-    public void setCallStopTimeValue(String callStopTimeValue)
+    public void setCallStopTimeValue(java.lang.String callStopTimeValue)
     {
         this.callStopTimeValue= callStopTimeValue;
         requestedInformationValueChoice = RequestedInformationValueChoice.CALL_STOP_TIME_VALUE;

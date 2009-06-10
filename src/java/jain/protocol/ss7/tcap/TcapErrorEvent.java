@@ -40,7 +40,8 @@
  */
 package jain.protocol.ss7.tcap;
 
-import java.util.EventObject;
+import jain.protocol.ss7.*;
+import jain.*;
 
 /**
  * This Event may be emitted by a <a href="JainTcapProvider.html">
@@ -51,7 +52,7 @@ import java.util.EventObject;
  * @author     Sun Microsystems Inc.
  * @version    1.1
  */
-public class TcapErrorEvent extends EventObject implements java.io.Serializable, Cloneable {
+public class TcapErrorEvent extends java.util.EventObject implements java.io.Serializable, java.lang.Cloneable {
 
     /**
     * Constructs a new TcapErrorEvent containing the user defined error object.
@@ -59,7 +60,7 @@ public class TcapErrorEvent extends EventObject implements java.io.Serializable,
     * @param  source             the new Object source supplied to the constructor
     * @param  error              the new error supplied to the constructor
     */
-    public TcapErrorEvent(Object source, Object error) {
+    public TcapErrorEvent(java.lang.Object source, java.lang.Object error) {
         super(source);
         this.setError(error);
     }
@@ -69,7 +70,7 @@ public class TcapErrorEvent extends EventObject implements java.io.Serializable,
     *
     * @param  error  The new Error value
     */
-    public void setError(Object error) {
+    public void setError(java.lang.Object error) {
         m_error = error;
     }
 
@@ -78,7 +79,7 @@ public class TcapErrorEvent extends EventObject implements java.io.Serializable,
     *
     * @return    The Error value
     */
-    public Object getError() {
+    public java.lang.Object getError() {
         return m_error;
     }
 
@@ -87,7 +88,7 @@ public class TcapErrorEvent extends EventObject implements java.io.Serializable,
     *
     * @return    String provides description of class TcapErrorEvent
     */
-    public String toString() {
+    public java.lang.String toString() {
         StringBuffer buffer = new StringBuffer(500);
         buffer.append(super.toString());
         buffer.append("\n\nerror = ");
@@ -102,6 +103,6 @@ public class TcapErrorEvent extends EventObject implements java.io.Serializable,
     /**
     * @serial    m_error - a default serializable field
     */
-    private Object m_error;
+    private java.lang.Object m_error;
 }
 

@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents the ManageTriggerData Operation
 */
 
-public class ManageTriggerData  extends Operation   implements Serializable
+public class ManageTriggerData  extends Operation   implements java.io.Serializable
 {
     
     private ActionIndicator actionIndicator;
@@ -130,7 +129,7 @@ Sets Trigger Data Identifier
 /**
 Gets Registrator Identifier
 */
-    public String getRegistratorIdentifier() throws ParameterNotSetException
+    public java.lang.String getRegistratorIdentifier() throws ParameterNotSetException
     {
         if(isRegistratorIdentifierPresent())
               return registratorIdentifier;
@@ -141,7 +140,7 @@ Gets Registrator Identifier
 /**
 Sets Registrator Identifier
 */
-    public void setRegistratorIdentifier(String registratorIdentifier)
+    public void setRegistratorIdentifier(java.lang.String registratorIdentifier)
     {
         this.registratorIdentifier = registratorIdentifier;
         isRegistratorIdentifier = true;

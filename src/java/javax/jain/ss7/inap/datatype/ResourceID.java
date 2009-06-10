@@ -39,7 +39,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 /** 
@@ -47,7 +46,7 @@ This class represents the ResourceID Datatype.
 */
 
 
-public class ResourceID implements Serializable
+public class ResourceID implements java.io.Serializable
 {
 	 private DigitsGenericDigits lineID;
 

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ This Class defines the BackwardGVNS Datatype . (Encoded as in Q.763)
 */
  
 
-public class BackwardGVNS implements Serializable
+public class BackwardGVNS implements java.io.Serializable
 {
 
     private int terminatingAccessIndicator;
@@ -113,7 +112,7 @@ Sets Extension Indicator
 Gets Extension
 */
 
-    public String getExtension() throws ParameterNotSetException 
+    public java.lang.String getExtension() throws ParameterNotSetException 
     {
         if(isExtensionPresent())
 		{
@@ -129,7 +128,7 @@ Gets Extension
 Sets Extension
 */
 
-    public void  setExtension (String extension)
+    public void  setExtension (java.lang.String extension)
     {
         this.extension = extension ;
         isExtension=true;

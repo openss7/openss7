@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents the TDisconnect Operation.
 */
 
-public class TDisconnect extends Operation  implements Serializable
+public class TDisconnect extends Operation  implements java.io.Serializable
 {
     
     private DPSpecificCommonParameters dPSpecificCommonParameters;
@@ -124,7 +123,7 @@ Sets DP Specific Common Parameter
 /**
 Gets Called Party Business Group ID
 */
-    public String getCalledPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCalledPartyBusinessGroupID() throws ParameterNotSetException
     {
         if(isCalledPartyBusinessGroupIDPresent()){
         return calledPartyBusinessGroupID;
@@ -135,7 +134,7 @@ Gets Called Party Business Group ID
 /**
 Sets Called Party Business Group ID
 */
-    public void setCalledPartyBusinessGroupID(String calledPartyBusinessGroupID)
+    public void setCalledPartyBusinessGroupID(java.lang.String calledPartyBusinessGroupID)
     {
         this.calledPartyBusinessGroupID = calledPartyBusinessGroupID;
        isCalledPartyBusinessGroupID=true;

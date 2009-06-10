@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.constants;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 
 /**The Error Treatment class defines what specific action should be taken by the SRF in the event of error conditions occurring. 
 The default value is Report_Error_To_SCF.

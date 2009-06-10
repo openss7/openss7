@@ -39,13 +39,12 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 /**
 This Class defines the Forward Global Virtual Network Service Format (Encoded as in Q.763)
 */
 
-public class ForwardGVNS implements Serializable 
+public class ForwardGVNS implements java.io.Serializable 
 {
 
     private int oPSPLengthIndicator;
@@ -60,10 +59,10 @@ public class ForwardGVNS implements Serializable
 /**
 Constructor For ForwardGVNS
 */
-	public ForwardGVNS(int oPSPLengthIndicator, String oPSPDigit, 
-  		  				int gUGLengthIndicator, String gUGDigit, 
+	public ForwardGVNS(int oPSPLengthIndicator, java.lang.String oPSPDigit, 
+  		  				int gUGLengthIndicator, java.lang.String gUGDigit, 
     					int numberingPlanIndicator, int tNRNLengthIndicator, 
-    					int natureOfAddressIndicator, String tNRNDigit)
+    					int natureOfAddressIndicator, java.lang.String tNRNDigit)
 	{
 		setOPSPLengthIndicator (oPSPLengthIndicator);
     	setOPSPDigit (oPSPDigit);
@@ -102,7 +101,7 @@ Sets Originating Participation Service Provider (OPSP) Indicator
 Gets OPSP Digits
 */
 
-    public String getOPSPDigit()
+    public java.lang.String getOPSPDigit()
     {
         return oPSPDigit ;
     }
@@ -111,7 +110,7 @@ Gets OPSP Digits
 Sets OPSP Digits
 */
 
-    public void  setOPSPDigit (String oPSPDigit)
+    public void  setOPSPDigit (java.lang.String oPSPDigit)
     {
         this.oPSPDigit = oPSPDigit ;
     }
@@ -142,7 +141,7 @@ Sets GVNS User Group Indicator
 Gets GUG Digits
 */
 
-    public String getGUGDigit()
+    public java.lang.String getGUGDigit()
     {
         return gUGDigit ;
     }
@@ -151,7 +150,7 @@ Gets GUG Digits
 Sets GUG Digits
 */
 
-    public void  setGUGDigit (String gUGDigit)
+    public void  setGUGDigit (java.lang.String gUGDigit)
     {
         this.gUGDigit = gUGDigit ;
     }
@@ -223,7 +222,7 @@ Sets Nature Of Address Indicator
 Gets TNRN Digits
 */
 
-    public String getTNRNDigit()
+    public java.lang.String getTNRNDigit()
     {
         return tNRNDigit ;
     }
@@ -232,7 +231,7 @@ Gets TNRN Digits
 Sets TNRN Digits
 */
 
-    public void  setTNRNDigit (String tNRNDigit)
+    public void  setTNRNDigit (java.lang.String tNRNDigit)
     {
         this.tNRNDigit = tNRNDigit ;
     }

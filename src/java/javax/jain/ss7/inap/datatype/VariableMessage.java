@@ -40,13 +40,12 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 /**
  This class defines the Variable Message DataType
  */
 
-public class VariableMessage implements Serializable{
+public class VariableMessage implements java.io.Serializable{
 
 	 private int elementaryMessageID;
 

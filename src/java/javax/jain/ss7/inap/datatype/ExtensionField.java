@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class represents the ExtensionField DataType
 */
 
-public class ExtensionField implements Serializable
+public class ExtensionField implements java.io.Serializable
 {
 	
 	private ExtensionChoice extensionChoice = null;

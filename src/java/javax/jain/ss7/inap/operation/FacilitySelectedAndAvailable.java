@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -51,7 +50,7 @@ import javax.jain.*;
 This class represents the FacilitySelectedAndAvailable Operation.
 */
 
-public class FacilitySelectedAndAvailable  extends Operation   implements Serializable {
+public class FacilitySelectedAndAvailable  extends Operation   implements java.io.Serializable {
 
     
     private DPSpecificCommonParameters dPSpecificCommonParameters;
@@ -139,7 +138,7 @@ Gets Operation Code
 /** Gets Called Party Business Group ID */
 
 
-    public String getCalledPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCalledPartyBusinessGroupID() throws ParameterNotSetException
     {
         if(isCalledPartyBusinessGroupIDPresent())
              return calledPartyBusinessGroupID;
@@ -205,7 +204,7 @@ Gets Operation Code
 /** Gets Calling Party Business Group ID */
 
 
-    public String getCallingPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCallingPartyBusinessGroupID() throws ParameterNotSetException
     {
         if(isCallingPartyBusinessGroupIDPresent())
                return callingPartyBusinessGroupID;

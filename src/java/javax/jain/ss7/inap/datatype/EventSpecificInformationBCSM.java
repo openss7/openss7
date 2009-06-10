@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class contains the EventSpecificInformationBCSM
 */
 
-public class EventSpecificInformationBCSM implements Serializable{
+public class EventSpecificInformationBCSM implements java.io.Serializable{
 
     private CalledPartyNumber collectedInfoSpecificInfo;
     private CalledPartyNumber analysedInfoSpecificInfo;    
@@ -129,7 +128,7 @@ Constructors For EventSpecificInformationBCSM
 	}
 
 
-	public EventSpecificInformationBCSM(String specificInfo , EventSpecificInformationBCSMChoice eventSpecificInfoID)
+	public EventSpecificInformationBCSM(java.lang.String specificInfo , EventSpecificInformationBCSMChoice eventSpecificInfoID)
 	{
 		if(eventSpecificInfoID.getEventSpecificInformationBCSMChoice() == EventSpecificInformationBCSMChoice.O_NO_ANSWER_SPECIFIC_INFO.getEventSpecificInformationBCSMChoice())
 			setONoAnswerSpecificInfo(specificInfo);
@@ -247,14 +246,14 @@ Sets oCalledPartyBusySpecificInfo
 Gets oNoAnswerSpecificInfo
 */
 
-	public String getONoAnswerSpecificInfo()
+	public java.lang.String getONoAnswerSpecificInfo()
 	{
 		return oNoAnswerSpecificInfo;
 	}
 /**
 Sets oNoAnswerSpecificInfo
 */
-	public void setONoAnswerSpecificInfo(String oNoAnswerSpecificInfo)
+	public void setONoAnswerSpecificInfo(java.lang.String oNoAnswerSpecificInfo)
 	{
 		this.oNoAnswerSpecificInfo = oNoAnswerSpecificInfo;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.O_NO_ANSWER_SPECIFIC_INFO;
@@ -342,14 +341,14 @@ Sets tBusySpecificInfo
 Gets tNoAnswerSpecificInfo
 */
 
-	public String getTNoAnswerSpecificInfo()
+	public java.lang.String getTNoAnswerSpecificInfo()
 	{
 		return tNoAnswerSpecificInfo;
 	}
 /**
 Sets tNoAnswerSpecificInfo
 */
-	public void setTNoAnswerSpecificInfo(String tNoAnswerSpecificInfo)
+	public void setTNoAnswerSpecificInfo(java.lang.String tNoAnswerSpecificInfo)
 	{
 		this.tNoAnswerSpecificInfo = tNoAnswerSpecificInfo;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.T_NO_ANSWER_SPECIFIC_INFO;
@@ -361,14 +360,14 @@ Sets tNoAnswerSpecificInfo
 Gets tAnswerSpecificInfo
 */
 
-	public String getTAnswerSpecificInfo()
+	public java.lang.String getTAnswerSpecificInfo()
 	{
 		return tAnswerSpecificInfo;
 	}
 /**
 Sets tAnswerSpecificInfo
 */
-	public void setTAnswerSpecificInfo(String tAnswerSpecificInfo)
+	public void setTAnswerSpecificInfo(java.lang.String tAnswerSpecificInfo)
 	{
 		this.tAnswerSpecificInfo = tAnswerSpecificInfo;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.T_ANSWER_SPECIFIC_INFO;
@@ -418,14 +417,14 @@ Sets tDisconnectSpecificInfo
 Gets oTermSeizedSpecificInfo
 */
 
-	public String getOTermSeizedSpecificInfo()
+	public java.lang.String getOTermSeizedSpecificInfo()
 	{
 		return oTermSeizedSpecificInfo;
 	}
 /**
 Sets oTermSeizedSpecificInfo
 */
-	public void setOTermSeizedSpecificInfo(String oTermSeizedSpecificInfo)
+	public void setOTermSeizedSpecificInfo(java.lang.String oTermSeizedSpecificInfo)
 	{
 		this.oTermSeizedSpecificInfo = oTermSeizedSpecificInfo;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.O_TERM_SEIZED_SPECIFIC_INFO;
@@ -437,14 +436,14 @@ Sets oTermSeizedSpecificInfo
 Gets oSuspended
 */
 
-	public String getOSuspended()
+	public java.lang.String getOSuspended()
 	{
 		return oSuspended;
 	}
 /**
 Sets oSuspended
 */
-	public void setOSuspended(String oSuspended)
+	public void setOSuspended(java.lang.String oSuspended)
 	{
 		this.oSuspended = oSuspended;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.O_SUSPENDED;
@@ -456,14 +455,14 @@ Sets oSuspended
 Gets tSuspended
 */
 
-	public String getTSuspended()
+	public java.lang.String getTSuspended()
 	{
 		return tSuspended;
 	}
 /**
 Sets tSuspended
 */
-	public void setTSuspended(String tSuspended)
+	public void setTSuspended(java.lang.String tSuspended)
 	{
 		this.tSuspended = tSuspended;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.T_SUSPENDED;
@@ -475,14 +474,14 @@ Sets tSuspended
 Gets origAttemptAuthorized
 */
 
-	public String getOrigAttemptAuthorized()
+	public java.lang.String getOrigAttemptAuthorized()
 	{
 		return origAttemptAuthorized;
 	}
 /**
 Sets origAttemptAuthorized
 */
-	public void setOrigAttemptAuthorized(String origAttemptAuthorized)
+	public void setOrigAttemptAuthorized(java.lang.String origAttemptAuthorized)
 	{
 		this.origAttemptAuthorized = origAttemptAuthorized;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.ORIG_ATTEMPT_AUTHORIZED;
@@ -494,14 +493,14 @@ Sets origAttemptAuthorized
 Gets oReAnswer
 */
 
-	public String getOReAnswer()
+	public java.lang.String getOReAnswer()
 	{
 		return oReAnswer;
 	}
 /**
 Sets oReAnswer
 */
-	public void setOReAnswer(String oReAnswer)
+	public void setOReAnswer(java.lang.String oReAnswer)
 	{
 		this.oReAnswer = 	oReAnswer;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.O_RE_ANSWER;
@@ -513,14 +512,14 @@ Sets oReAnswer
 Gets tReAnswer
 */
 
-	public String getTReAnswer()
+	public java.lang.String getTReAnswer()
 	{
 		return tReAnswer;
 	}
 /**
 Sets tReAnswer
 */
-	public void setTReAnswer(String tReAnswer)
+	public void setTReAnswer(java.lang.String tReAnswer)
 	{
 		this.tReAnswer = tReAnswer;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.T_RE_ANSWER;
@@ -532,14 +531,14 @@ Sets tReAnswer
 Gets facilitySelectedAndAvailable
 */
 
-	public String getFacilitySelectedAndAvailable()
+	public java.lang.String getFacilitySelectedAndAvailable()
 	{
 		return facilitySelectedAndAvailable;
 	}
 /**
 Sets facilitySelectedAndAvailable
 */
-	public void setFacilitySelectedAndAvailable(String facilitySelectedAndAvailable)
+	public void setFacilitySelectedAndAvailable(java.lang.String facilitySelectedAndAvailable)
 	{
 		this.facilitySelectedAndAvailable = facilitySelectedAndAvailable;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.FACILITY_SELECTED_AND_AVAILABLE;
@@ -551,14 +550,14 @@ Sets facilitySelectedAndAvailable
 Gets callAccepted
 */
 
-	public String getCallAccepted()
+	public java.lang.String getCallAccepted()
 	{
 		return callAccepted;
 	}
 /**
 Sets callAccepted
 */
-	public void setCallAccepted(String callAccepted)
+	public void setCallAccepted(java.lang.String callAccepted)
 	{
 		this.callAccepted = callAccepted;
 		eventSpecificChoice = EventSpecificInformationBCSMChoice.CALL_ACCEPTED;

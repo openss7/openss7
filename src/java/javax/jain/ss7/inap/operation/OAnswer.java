@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class represents the OAnswer Operation.
 */
 
-public class OAnswer  extends Operation   implements Serializable
+public class OAnswer  extends Operation   implements java.io.Serializable
 {
     
 
@@ -126,7 +125,7 @@ Sets DP Specific Common Parameter
 /**
 Gets Calling Party Business Group ID
 */
-    public String getCallingPartyBusinessGroupID() throws ParameterNotSetException
+    public java.lang.String getCallingPartyBusinessGroupID() throws ParameterNotSetException
     {
         if(isCallingPartyBusinessGroupIDPresent())
              return callingPartyBusinessGroupID;
@@ -137,7 +136,7 @@ Gets Calling Party Business Group ID
 /**
 Sets Calling Party Business Group ID
 */
-    public void setCallingPartyBusinessGroupID(String callingPartyBusinessGroupID)
+    public void setCallingPartyBusinessGroupID(java.lang.String callingPartyBusinessGroupID)
     {
         this.callingPartyBusinessGroupID = callingPartyBusinessGroupID;
         isCallingPartyBusinessGroupID = true;

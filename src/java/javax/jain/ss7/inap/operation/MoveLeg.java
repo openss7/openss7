@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -50,7 +49,7 @@ import javax.jain.*;
 This class defines the MoveLeg Operation
 */
 
-public class MoveLeg  extends Operation   implements Serializable
+public class MoveLeg  extends Operation   implements java.io.Serializable
 {
 	 
 

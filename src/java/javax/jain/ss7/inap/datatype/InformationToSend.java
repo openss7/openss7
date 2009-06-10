@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
  This class represents the InformationToSend DataType
  */
 
-public class InformationToSend implements Serializable
+public class InformationToSend implements java.io.Serializable
 {
 
 	 private InbandInfo inbandInfo;
@@ -76,7 +75,7 @@ Constructors For InformationToSend
 		setTone(tone);
 	}
 
-	public InformationToSend(String displayInformation)
+	public InformationToSend(java.lang.String displayInformation)
 	{
 		setDisplayInformation( displayInformation);
 	}
@@ -150,7 +149,7 @@ public InformationToSendChoice getInformationToSendChoice()
 /**
   Gets Display Information */
 
-    public String getDisplayInformation() throws ParameterNotSetException
+    public java.lang.String getDisplayInformation() throws ParameterNotSetException
     {
         if(informationToSendChoice.getInformationToSendChoice()==InformationToSendChoice.DISPLAY_INFORMATION.getInformationToSendChoice())
 		{

@@ -40,7 +40,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -48,7 +47,7 @@ import javax.jain.*;
 This Class defines ForwardServiceInteractionInd Datatype
 */
 
-public class ForwardServiceInteractionInd implements Serializable 
+public class ForwardServiceInteractionInd implements java.io.Serializable 
 {
 
     private String conferenceTreatmentIndicator;
@@ -63,7 +62,7 @@ public class ForwardServiceInteractionInd implements Serializable
 /**
 Gets Conference Treatment Indicator
 */
-    public String getConferenceTreatmentIndicator() throws ParameterNotSetException
+    public java.lang.String getConferenceTreatmentIndicator() throws ParameterNotSetException
     {
         if(isConferenceTreatmentIndicatorPresent())
 		{
@@ -78,7 +77,7 @@ Gets Conference Treatment Indicator
 Sets Conference Treatment Indicator
 */
 
-    public void setConferenceTreatmentIndicator(String conferenceTreatmentIndicator)
+    public void setConferenceTreatmentIndicator(java.lang.String conferenceTreatmentIndicator)
     {
         this.conferenceTreatmentIndicator=conferenceTreatmentIndicator;
         isConferenceTreatmentIndicator=true;
@@ -99,7 +98,7 @@ Returns: TRUE if present, FALSE otherwise.
 Gets Call Diversion Treatment Indicator
 */
 
-    public String getCallDiversionTreatmentIndicator() throws ParameterNotSetException
+    public java.lang.String getCallDiversionTreatmentIndicator() throws ParameterNotSetException
     {
         if(isCallDiversionTreatmentIndicatorPresent())
 		{
@@ -114,7 +113,7 @@ Gets Call Diversion Treatment Indicator
 Sets Call Diversion Treatment Indicator
 */
 
-    public void setCallDiversionTreatmentIndicator(String callDiversionTreatmentIndicator)
+    public void setCallDiversionTreatmentIndicator(java.lang.String callDiversionTreatmentIndicator)
     {
         this.callDiversionTreatmentIndicator=callDiversionTreatmentIndicator;
         isCallDiversionTreatmentIndicator=true;
@@ -135,7 +134,7 @@ Returns: TRUE if present, FALSE otherwise.
 Gets Call Offering Treatment Indicator
 */
 
-    public String getCallOfferingTreatmentIndicator() throws ParameterNotSetException
+    public java.lang.String getCallOfferingTreatmentIndicator() throws ParameterNotSetException
     {
         if(isCallOfferingTreatmentIndicatorPresent())
 		{
@@ -151,7 +150,7 @@ Gets Call Offering Treatment Indicator
 Sets Call Offering Treatment Indicator
 */
 
-    public void setCallOfferingTreatmentIndicator(String callOfferingTreatmentIndicator)
+    public void setCallOfferingTreatmentIndicator(java.lang.String callOfferingTreatmentIndicator)
     {
         this.callOfferingTreatmentIndicator=callOfferingTreatmentIndicator;
         isCallOfferingTreatmentIndicator=true;

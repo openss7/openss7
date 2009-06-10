@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.operation;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.datatype.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class represents the Received Information Operation.
 */
 
-public class ReceivedInformation  extends Operation   implements Serializable
+public class ReceivedInformation  extends Operation   implements java.io.Serializable
 {
     private DigitsGenericDigits digitsResponse;
  
@@ -69,7 +68,7 @@ Constructors For ReceivedInformation
 		setDigitsResponse(digitsResponse);
 	}
 
-	public ReceivedInformation(String iA5Response)
+	public ReceivedInformation(java.lang.String iA5Response)
 	{
 		operationCode = OperationCode.PROMPT_AND_COLLECT_USER_INFORMATION;
 		setIA5Response(iA5Response);
@@ -125,7 +124,7 @@ Sets Digits Response
 /**
 Gets IA5Response 
 */
-    public String getIA5Response() throws ParameterNotSetException
+    public java.lang.String getIA5Response() throws ParameterNotSetException
     {
         if(receivedInformationChoice.getReceivedInformationChoice() == ReceivedInformationChoice.IA5_RESPONSE.getReceivedInformationChoice())
                return iA5Response;
@@ -137,7 +136,7 @@ Gets IA5Response
 /**
 Sets IA5Response 
 */
-    public void setIA5Response(String iA5Response)
+    public void setIA5Response(java.lang.String iA5Response)
     {
         this.iA5Response = iA5Response;
         receivedInformationChoice = ReceivedInformationChoice.IA5_RESPONSE;

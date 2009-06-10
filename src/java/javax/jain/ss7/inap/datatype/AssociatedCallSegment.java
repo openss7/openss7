@@ -41,7 +41,6 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 import javax.jain.*;
 
@@ -49,7 +48,7 @@ import javax.jain.*;
 This class defines the Associated Call Segment Datatype
 */
 
-public class AssociatedCallSegment implements Serializable
+public class AssociatedCallSegment implements java.io.Serializable
 {
 
     private int callSegment;

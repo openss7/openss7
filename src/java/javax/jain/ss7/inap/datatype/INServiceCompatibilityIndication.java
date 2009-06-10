@@ -40,14 +40,13 @@ package javax.jain.ss7.inap.datatype;
 
 import java.io.*;
 import java.util.*;
-import java.lang.*;
 import javax.jain.ss7.inap.constants.*;
 
 /**
 This class defines the INServiceCompatibilityIndication Datatype
 */
 
-public class INServiceCompatibilityIndication implements Serializable
+public class INServiceCompatibilityIndication implements java.io.Serializable
 {
 
     private Entry entry[];

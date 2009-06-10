@@ -1,332 +1,275 @@
 /*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Copyrights:
- *
- * Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
- * 901 San Antonio Road, Palo Alto, California 94043, U.S.A.
- *
- * This product and related documentation are protected by copyright and
- * distributed under licenses restricting its use, copying, distribution, and
- * decompilation. No part of this product or related documentation may be
- * reproduced in any form by any means without prior written authorization of
- * Sun and its licensors, if any.
- *
- * RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
- * States Government is subject to the restrictions set forth in DFARS
- * 252.227-7013 (c)(1)(ii) and FAR 52.227-19.
- *
- * The product described in this manual may be protected by one or more U.S.
- * patents, foreign patents, or pending applications.
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Module Name   : JAIN Common API
- * File Name     : SignalingPointCode.java
- * Originator    : Phelim O'Doherty
- * Approver      : Jain Community
- *
- *  HISTORY
- *  Version   Date      Author              Comments
- *  1.0     28/09/2001  Phelim O'Doherty    Initial version
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
  */
+
+
 package javax.jain.ss7;
 
-import java.io.Serializable;
 import javax.jain.*;
 
-import java.lang.Math;
-
 /**
- * The Signaling Point Code can be implemented in one of the following 2 ways
- *
- * <li>ITU_14bit - Split 3-8-3 across member/cluster/zone.
- * <li>ANSI_24bit - Split 8-8-8 across member/cluster/zone.
- *
- *
- *
- *  <B>SSSAAAZZZ</B> <P>
- *
- *  where: <P>
- *
- *  <B>SSS</B> == Member <BR>
- *  <B>AAA</B> == Cluster <BR>
- *  <B>ZZZ</B> == Zone <P>
- *
- *  The permitted ranges for each value are outlined in the table below.
- *  <TABLE BORDER CELLSPACING=2 BORDERCOLOR="#000000" CELLPADDING=7 WIDTH=500>
- *
- *    <TR>
- *
- *      <TD WIDTH="11%" VALIGN="TOP">
- *        &nbsp;
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP">
- *        <B><P ALIGN="CENTER">
- *
- *        Member</P> </B>
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP">
- *        <B><P ALIGN="CENTER">
- *
- *       Cluster</P> </B>
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP">
- *        <B><P ALIGN="CENTER">
- *
- *        Zone </P> </B>
- *      </TD>
- *
- *    </TR>
- *
- *    <TR>
- *
- *      <TD WIDTH="11%" VALIGN="TOP" BGCOLOR="#ffffff">
- *        <B><P ALIGN="CENTER">
- *
- *        ANSI</B>
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP" BGCOLOR="#ffffff">
- *        <P ALIGN="CENTER">
- *
- *        000-255
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP" BGCOLOR="#ffffff">
- *        <P ALIGN="CENTER">
- *
- *        000-255
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP" BGCOLOR="#ffffff">
- *        <P ALIGN="CENTER">
- *
- *        000-255
- *      </TD>
- *
- *    </TR>
- *
- *    <TR>
- *
- *      <TD WIDTH="11%" VALIGN="TOP">
- *        <B><P ALIGN="CENTER">
- *
- *        ITU</B>
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP">
- *        <P ALIGN="CENTER">
- *
- *        000-007
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP">
- *        <P ALIGN="CENTER">
- *
- *        000-255
- *      </TD>
- *
- *      <TD WIDTH="30%" VALIGN="TOP">
- *        <P ALIGN="CENTER">
- *
- *        000-007
- *      </TD>
- *
- *    </TR>
- *
- *  </TABLE>
- *
- * @author     Sun Microsystems Inc.
- * @version    1.0
- */
-public class SignalingPointCode implements Serializable{
-
+  * Represents the SS7 signaling point code.
+  * The Signaling Point Code can be implemented in one of the following
+  * 2 ways <ul>
+  * <li> ITU_14bit - Split 3-8-3 across member/cluster/zone.
+  * <li> ANSI_24bit - Split 8-8-8 across member/cluster/zone. <ul>
+  *
+  * <code>SSSAAAZZZ</code> <p>
+  *
+  * where: <p>
+  *
+  * <code> SSS == Member </code><br>
+  * <code> AAA == Cluster </code><br>
+  * <code> ZZZ == Zone </code><br> <p>
+  *
+  * The permitted ranges for each value are outlined in the table below.
+  * <p>
+  *
+  * <table align="center" border=1 cellpadding=1>
+  * <tr>
+  * <th>Variant</th>
+  * <th>Member</th>
+  * <th>Cluster</th>
+  * <th>Zone</th>
+  * </tr>
+  * <tr>
+  * <th>ANSI</th>
+  * <td align="center">000-255</td>
+  * <td align="center">000-255</td>
+  * <td align="center">000-255</td>
+  * </tr>
+  * <tr>
+  * <th>ITU</th>
+  * <td align="center">000-007</td>
+  * <td align="center">000-255</td>
+  * <td align="center">000-007</td>
+  * </tr>
+  * </table> <p>
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public class SignalingPointCode implements java.io.Serializable {
     /**
-    * Constructs a SignalingPointCode with the specified Member, Cluster, and Zone.
-    *
-    * @param  member the new member field supplied to the constructor
-    * @param  cluster the new cluster field supplied to the constructor
-    * @param  zone the new zone field supplied to the constructor
-    */
+      * Constructs a SignalingPointCode with the specified Member,
+      * Cluster, and Zone.
+      * @param member
+      * The new member field supplied to the constructor.
+      * @param cluster
+      * The new cluster field supplied to the constructor.
+      * @param zone
+      * The new zone field supplied to the constructor.
+      */
     public SignalingPointCode(int member, int cluster, int zone) {
-        setSignalingPointCode(member, cluster, zone);
+        super();
+        setSignalingPointCode(member,cluster,zone);
     }
-
     /**
-    * Indicates whether some other object is "equal to"
-    * this one, i.e. same member, cluster and zone value.
-    *
-    * @param  o the reference object which to compare
-    * @return true if this Signaling Point Code is the same as the argument
-    * object; <i>false</i> otherwise.
-    */
-    public boolean equals(Object o) {
-
-      if(!(o instanceof SignalingPointCode)) {
-          return false;
-      } else {
-        SignalingPointCode spc = (SignalingPointCode)o;
-        return (this.getCluster() == spc.getCluster()
-          && this.getMember() == spc.getMember()
-          && this.getZone() == spc.getZone());
-      }
+      * Indicates whether some other object is "equal to" this one, i.e,
+      * same member, cluster and zone value.
+      * @param o
+      * The reference object which to compare.
+      * @return
+      * True if this Signaling Point Code is the same as the argument
+      * object; false otherwise.
+      */
+    public boolean equals(java.lang.Object o) {
+        if (o == null)
+            return false;
+        if (o instanceof SignalingPointCode) {
+            SignalingPointCode spc = (SignalingPointCode) o;
+            if (spc.m_member != m_member ||
+                    spc.m_memberIsSet != m_memberIsSet)
+                return false;
+            if (spc.m_cluster!= m_cluster||
+                    spc.m_clusterIsSet != m_clusterIsSet)
+                return false;
+            if (spc.m_network != m_network ||
+                    spc.m_networkIsSet != m_networkIsSet)
+                return false;
+            return true;
+        }
+        return false;
     }
-
-
     /**
-    * Returns a hash code value for the object. This method is supported
-    * for the benefit of hashtables such as those provided by
-    * java.util.Hashtable.
-    *
-    * @return a hashcode value for this object.
-    */
-    public int hashCode( ) {
-         StringBuffer strBuff = new StringBuffer( );
-         strBuff.append(m_spc[0]);
-         strBuff.append(m_spc[1]);
-         strBuff.append(m_spc[2]);
-         String str = strBuff.toString();
-
-         int hashCode = str.hashCode( );
-         return hashCode;
-     }
-
-
-    /**
-    * Sets the Member field of the Signaling Point Code
-    *
-    * @param  member the member field of the Signaling Point Code
-    */
-    public void setMember(int member){
-        m_spc[0] = member;
+      * Returns a hash code value for the object.
+      * This method is supported for the benefit of hashtables such as
+      * those provided by java.util.Hashtable.
+      * @return
+      * A hashcode value for this object.
+      */
+    public int hashCode() {
+        StringBuffer b = new StringBuffer();
+        b.append(m_member);
+        b.append(m_cluster);
+        b.append(m_network);
+        java.lang.String s = b.toString();
+        return s.hashCode();
     }
-
     /**
-    * Gets the Member field of the Signaling Point Code
-    *
-    * @returns  member the new member of the Signaling Point Code
-    */
-    public int getMember(){
-        return m_spc[0];
+      * Sets the Member field of the Signaling Point Code.
+      * @param member
+      * The member field of the Signaling Point Code.
+      */
+    public void setMember(int member) {
+        m_member = member;
+        m_memberIsSet = true;
     }
-
     /**
-    * Sets the Cluster field of the Signaling Point Code
-    *
-    * @param  cluster the new cluster of the Signaling Point Code
-    */
+      * Gets the Member field of the Signaling Point Code.
+      * @return
+      * The member field of the signaling point code.
+      */
+    public int getMember() {
+        return m_member;
+    }
+    /**
+      * Sets the Cluster field of the Signaling Point Code.
+      * @param cluster
+      * The new cluster of the Signaling Point Code.
+      */
     public void setCluster(int cluster) {
-        m_spc[1] = cluster;
+        m_cluster = cluster;
+        m_clusterIsSet = true;
     }
-
     /**
-    * Gets the Cluster field of the Signaling Point Code
-    *
-    * @returns  cluster the new cluster of the Signaling Point Code
-    */
+      * Gets the Cluster field of the Signaling Point Code.
+      * @return
+      * The cluster field of the signaling point code.
+      */
     public int getCluster() {
-        return m_spc[1];
+        return m_cluster;
     }
-
     /**
-    * Sets the Zone field of the Signaling Point Code
-    *
-    * @param  zone the new zone of the Signaling Point Code
-    */
+      * Sets the Zone field of the Signaling Point Code.
+      * @param zone
+      * The new zone of the Signaling Point Code.
+      */
     public void setZone(int zone) {
-        m_spc[2] = zone;
+        m_network = zone;
+        m_networkIsSet = true;
     }
-
     /**
-    * Gets the Zone field of the Signaling Point Code
-    *
-    * @returns  zone the new zone of the Signaling Point Code
-    */
+      * Gets the Zone field of the Signaling Point Code.
+      * @return
+      * The zone of the signaling point code.
+      */
     public int getZone() {
-        return m_spc[2];
+        return m_network;
     }
-
     /**
-    * Sets the member field, containing the member field of the
-    * signaling point code.
-    *
-    * @param  member  the new member field
-    * @param  cluster the new cluster field
-    * @param  zone    the new zone field
-    */
+      * Sets the member field, containing the member field of the
+      * signaling point code.
+      * @param member
+      * The new member field.
+      * @param cluster
+      * The new cluster field.
+      * @param zone
+      * The new zone field.
+      */
     public void setSignalingPointCode(int member, int cluster, int zone) {
         setMember(member);
         setCluster(cluster);
         setZone(zone);
     }
-
     /**
-    * Gets the SignalingPointCode, containing the member, cluster and zone fields  of the
-    * SignalingPointCode.
-    *
-    * @return the SignalingPointCode of this Address
-    *
-    */
+      * Gets the SignalingPointCode, containing the member, cluster and
+      * zone fields of the SignalingPointCode.
+      * @return
+      * The SignalingPointCode of this Address.
+      */
     public int[] getSignalingPointCode() {
-        return m_spc;
+        int[] result = new int[3];
+        result[0] = getMember();
+        result[1] = getCluster();
+        result[2] = getZone();
+        return result;
     }
-
     /**
-    * Separates a Signaling Point Code out into the three fields member, cluster, and zone.
-    *
-    * @param bitcode the Signaling Point Code stored as a bitfield
-    * @param variant the stack specification of the signaling point code to be decoded (ANSI/ITU)
-    * @throws InvalidArgumentException throw if an invalid SPCformat is supplied to this method
-    * @return the member,cluster,zone stored in an array
-    */
-    public static int[] convertSPCToMemberClusterZone(int bitCode, SPCFormat variant) throws InvalidArgumentException{
-
-        int[] bitSplit = new int[3];
-        int[] spc = new int[3];
-
-        // set up the number of bits per field we want to extract
-        if (variant == SPCFormat.ITU_SPC_FORMAT) {
-            bitSplit[0] = 3;
-            bitSplit[1] = 8;
-            bitSplit[2] = 3;
-        } else if (variant == SPCFormat.ANSI_SPC_FORMAT) {
-            bitSplit[0] = 8;
-            bitSplit[1] = 8;
-            bitSplit[2] = 8;
-        } else {
-            throw new IllegalArgumentException("Invalid variant Supplied");
+      * Separates a Signaling Point Code out into the three fields
+      * member, cluster, and zone.
+      * @param bitcode
+      * The Signaling Point Code stored as a bitfield.
+      * @param variant
+      * The stack specification of the signaling point code to be
+      * decoded (ANSI/ITU).
+      * @return
+      * The member,cluster,zone stored in an array.
+      * @exception InvalidArgumentException
+      * Throw if an invalid SPCformat is supplied to this method.
+      */
+    public static int[] convertSPCToMemberClusterZone(int bitCode, SPCFormat variant)
+        throws InvalidArgumentException {
+        int[] result = new int[3];
+        switch (variant.intValue()) {
+            case SPCFormat.M_ANSI_SPC_FORMAT:
+                result[0] = ((bitCode & 0x000000FF) >>  0);
+                result[1] = ((bitCode & 0x0000FF00) >>  8);
+                result[2] = ((bitCode & 0x00FF0000) >> 16);
+                break;
+            case SPCFormat.M_ITU_SPC_FORMAT:
+                result[0] = ((bitCode & 0x00000007) >>  0);
+                result[1] = ((bitCode & 0x000007F8) >>  3);
+                result[2] = ((bitCode & 0x00003800) >> 11);
+                break;
         }
-        // shift the bits right until the ones we want are the lsbs, and mask
-        // them with the appropriate number ((2^n)-1)
-        spc[2] = bitCode & (int)((Math.pow(2, bitSplit[0])) - 1);
-        spc[1] = (bitCode >> bitSplit[0]) & (int)((Math.pow(2, bitSplit[1])) - 1);
-        spc[0] = (bitCode >> (bitSplit[0] + bitSplit[1])) & (int)((Math.pow(2, bitSplit[2])) - 1);
-        return spc;
+        return result;
     }
-
     /**
-    * String representation of class SignalingPointCode
-    *
-    * @return    String provides description of class SignalingPointCode
-    */
-    public String toString() {
-        StringBuffer buffer = new StringBuffer(500);
-        buffer.append("\n\nMember = ");
-        buffer.append(this.m_spc[0]);
-        buffer.append("\n\nCluster = ");
-        buffer.append(this.m_spc[1]);
-        buffer.append("\n\nZone = ");
-        buffer.append(this.m_spc[2]);
-
-        return buffer.toString();
+      * String representation of class SignalingPointCode.
+      * @return
+      * String provides description of class SignalingPointCode.
+      */
+    public java.lang.String toString() {
+        return new String(m_network + "." + m_cluster + "." + m_member);
     }
-
-    //private static int[] spc = new int[3];
-    private int[] m_spc = new int[] {-1, -1, -1};
-
+    protected int m_member = 0;
+    protected boolean m_memberIsSet = false;
+    protected int m_cluster = 0;
+    protected boolean m_clusterIsSet = false;
+    protected int m_network = 0;
+    protected boolean m_networkIsSet = false;
 }
+
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
