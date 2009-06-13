@@ -1,33 +1,60 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
 @c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
 @c
-@c Permission is granted to make and distribute verbatim copies of this
-@c manual provided the copyright notice and this permission notice are
-@c preserved on all copies.
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
 @c
-@c Permission is granted to copy and distribute modified versions of this
-@c manual under the conditions for verbatim copying, provided that the
-@c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one.
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
 @c responsibility for errors or omissions, or for damages resulting from
-@c the use of the information contained herein.  The author(s) may not
-@c have taken the same level of care in the production of this manual,
-@c which is licensed free of charge, as they might when working
-@c professionally.
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
 @c 
-@c Formatted or processed versions of this manual, if unaccompanied by
-@c the source, must acknowledge the copyright and authors of this work.
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
 @c
 @c -------------------------------------------------------------------------
 @c
@@ -60,224 +87,483 @@
 @c This file is include from install.texi and contains the descriptions for
 @c package-specific enable/disable and with/without options
 
-Options specific to the @value{PACKAGE_TITLE} control primarily whether add-on packages are included
-or excluded from the build, install or RPM or DEB packaging.  The following @command{configure}
-options, specific to the @value{PACKAGE_TITLE}, are available:
+The following @command{configure} options, specific to the @value{PACKAGE_TITLE}, are available:
 
 @table @command
 
-@item --without-SCTP
-@opindex SCTP
+@item --disable-streams-irq
+@opindex streams-irq
+Disables STREAMS irq suppression.  Normally the STREAMS scheduler protects itself and its
+datastructures from races due to hard interrupts by suppressing interrupts during critical sections.
+As not all drivers and modules contain hard interrupts, this option allows hard interrupts to be
+enabled while running critical sections.  The purpose of this option was primarily for profiling.
+The default is to enable STREAMS irq suppression.
 
-When disabled, excludes the @command{sctp-@value{VERSION_SCTP}} add-on package from the build.
-This function is useful only for disabling build of the @command{sctp} add-on package on a 2.4
-series @cite{Linux} kernel.
-This option defaults differently depending upon for which kernel the add-on package is being built.
-For 2.4 kernels, this option defaults to include the @command{sctp} add-on package; 2.6 kernels,
-defaults to exclude the @command{sctp} add-on package.
+@item --disable-streams-stats
+@opindex streams-stats
+Disable STREAMS statistics counting.  Normally the STREAMS scheduler will automatically count the
+number of entries to open, close, put and service procedures for a queue pair whenever the
+@type{module_stats} structure is defined and attached to the @type{qinit} structure by the module or
+driver.  This is not exact SVR4.2 MP behaviour (where it is the responsibility of the module or
+drive to perform these counts).  This option disables the feature.  The default is to enable STREAMS
+statistics counting.
 
-@item --without-IPERF
-@opindex IPERF
+@item --disable-streams-syncqs
+@opindex streams-syncqs
+Disable STREAMS synchronization queues.  Normally the STREAMS scheduler will permit modules and
+drivers that are written for syncrhonization (such as SVR4.2 MP synchronization, Solaris perimeters,
+etc.) and will perform synchronization protection for these modules.  This option disables
+synchronization queues.  When disabled, only fully multiprocessor safe drivers and modules (marked
+with the D_MP flag), will be loaded.  The default is to enable STREAMS synchronization queues.
 
-When disabled, excludes the @command{iperf-@value{VERSION_IPERF}} add-on package from the build.
-This function is useful only for disabling build of the @command{sctp} add-on package on a 2.4
-series @cite{Linux} kernel.
-This option defaults differently depending upon for which kernel the add-on package is being built.
-For 2.4 kernels, this option defaults to include the @command{sctp} add-on package; 2.6 kernels,
-defaults to exclude the @command{sctp} add-on package.
+@item --disable-streams-utils
+@opindex streams-utils
+Disable additional STREAMS utilities.  Normally @command{strsetup} and @command{strload} utility
+configuration files are included in the build and installed.  This option disables build and
+installation of the @command{strsetup} and @command{strload} configuration files.  The default is to
+enable additional STREAMS utilities.
 
-@item --without-STREAMS
-@opindex STREAMS
+@item --disable-big-compile
+@opindex big-compile
+Disable compilation as one big computational unit.
+The default is to build as one big computational unit.
+Do not use this option.
 
-When disabled, excludes the @command{streams-@value{VERSION_STREAMS}} add-on package from the build.
-When the @command{streams} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{streams} package was otherwise installed on the build system.
-The default is to include the
-@cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}})
-add-on package in the build.
+@item --enable-streams-fifos
+@opindex streams-fifos
+Enable overriding of system FIFOs with STREAMS-based FIFOs.
+The default is to not override system FIFOs with STREAMS-based FIFOs.
 
-@item --without-STRCOMPAT
-@opindex STRCOMPAT
+@item --with-streams-kthreads
+@opindex streams-kthreads
+Set STREAMS kernel thread operation to @var{nice}, @var{normal}, @var{rt} or @var{no}.  When set to
+@var{nice}, the STREAMS scheduler will be based on kernel threads that run with a @samp{nice -19}
+priority.  When set to @var{normal}, the STREAMS scheduler sill be based on kernel threas thar run
+with @samp{nice -0} priority.  When set to @var{rt}, the STREAMS scheduler will be based on kernel
+threads that run with real-time priority @samp{nice -99}.  When set to @var{no}, soft-interrupts
+will be used for the STREAMS scheduler rather than kernel threads.  This option was primarily for
+performance testing.  Do no use this option.  The default STREAMS kernel thread pirority is
+@var{nice}.
 
-When disabled, excludes the @command{strcompat-@value{VERSION_STRCOMPAT}} add-on package from the
-build.
-When the @command{strcompat} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strcompat} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}})
-add-on package in the build.
+@item --enable-module-sth
+@itemx --disable-module-sth
+@opindex module-sth
+Enables or disables the @file{sth} (Stream head) module.  When enabled, the @file{sth} module will
+be compiled into the @file{streams} kernel module; when disabled, the @file{sth} module will not be
+included at all.  Note that disabling the @file{sth} module will cause all Streams to fail.  The
+default is for the @file{sth} module to be created as a separate module.
 
-@item --with-STRUTIL
-@opindex STRUTIL
+@item --enable-module-bufmod
+@itemx --disable-module-bufmod
+@opindex module-bufmod
+Enables or disables the @file{bufmod} module.  When enabled, the @file{bufmod} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{bufmod} module will not be
+included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+The default is for the @file{bufmod} module to be created as a separate module.
 
-When enabled, includes the @command{strutil-@value{VERSION_STRUTIL}} add-on package in the build.
-Because the @command{strutil} add-on package is not distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{STREAMS Utilities} (@command{strutil-@value{VERSION_STRUTIL}})
-add-on package from the build.
+@item --enable-module-nullmod
+@itemx --disable-module-nullmod
+@opindex module-nullmod
+Enables or disables the @file{nullmod} module.  When enabled, the @file{nullmod} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{nullmod} module will not be
+included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+The default is for the @file{nuls} module to be created as a separate module.
 
-@item --with-STRTTY
-@opindex STRTTY
+@item --enable-module-pipemod
+@itemx --disable-module-pipemod
+@opindex module-pipemod
+Enables or disables the @file{pipemod} module.  When enabled, the @file{pipemod} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{pipemod} module will not be
+included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+The default is for the @file{pipemod} module to be created as a separate module.
 
-When enabled, includes the @command{strtty-@value{VERSION_STRTTY}} add-on package in the build.
-Because the @command{strtty} add-on package is not distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{STREAMS Terminals} (@command{strtty-@value{VERSION_STRTTY}})
-add-on package from the build.
+@item --enable-module-connld
+@itemx --disable-module-connld
+@opindex module-connld
+Enables or disables the @file{connld} module.  When enabled, the @file{connld} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{connld} module will not be
+included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+The default is for the @file{connld} module to be created as a separate module.
 
-@item --without-STRXNS
-@opindex STRXNS
+@item --enable-module-sc
+@itemx --disable-module-sc
+@opindex module-sc
+Enables or disables the @file{sc} module.  When enabled, the @file{sc} module will be compiled into
+the @file{streams} kernel module; when disabled, the @file{sc} module will not be included at all.
+Note that disabling the @file{sth} module will cause conformance suites to fail.  The default is for
+the @file{sc} module to be created as a separate module.
 
-When disabled, excludes the @command{strxns-@value{VERSION_STRXNS}} add-on package from the build.
-When the @command{strxns} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strxns} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS X/Open Networking Services (XNS)} (@command{strxns-@value{VERSION_STRXNS}})
-add-on package in the build.
+@item --enable-module-testmod
+@itemx --disable-module-testmod
+@opindex module-testmod
+Enables or disables the @file{testmod} module.  When enabled, the @file{testmod} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{testmod} module will not be
+included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+The default is for the @file{testmod} module to be created as a separate module.
 
-@item --without-STRXNET
-@opindex STRXNET
+@item --enable-module-timod
+@itemx --disable-module-timod
+@opindex module-timod
+Enables or disables the @file{timod} module.  When enabled, the @file{timod} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{timod} module will not be included
+at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The
+default is for the @file{timod} module to be created as a separate module.
 
-When disabled, excludes the @command{strxnet-@value{VERSION_STRXNET}} add-on package from the build.
-When the @command{strxnet} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strxnet} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS X/Open Transport Interface (XTI)} (@command{strxnet-@value{VERSION_STRXNET}})
-add-on package in the build.
+@item --enable-module-tirdwr
+@itemx --disable-module-tirdwr
+@opindex module-tirdwr
+Enables or disables the @file{tirdwr} module.  When enabled, the @file{tirdwr} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{tirdwr} module will not be
+included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+The default is for the @file{tirdwr} module to be created as a separate module.
 
-@item --with-STRSOCK
-@opindex STRSOCK
+@item --enable-driver-clone
+@itemx --disable-driver-clone
+@opindex driver-clone
+Enables or disables the @file{clone} module.  When enabled, the @file{clone} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{clone} module will not be included
+at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The
+default is for the @file{clone} driver to be created as a separate module.
 
-When enabled, includes the @command{strsock-@value{VERSION_STRSOCK}} add-on package in the build.
-Because the @command{strsock} add-on package is not distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{STREAMS Sockets} (@command{strsock-@value{VERSION_STRSOCK}})
-add-on package from the build.
+@item --enable-driver-echo
+@itemx --disable-driver-echo
+@opindex driver-echo
+Enables or disables the @file{echo} module.  When enabled, the @file{echo} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{echo} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{echo} driver to be created as a separate module.
 
-@item --without-STRINET
-@opindex STRINET
+@item --enable-driver-fifo
+@itemx --disable-driver-fifo
+@opindex driver-fifo
+Enables or disables the @file{fifo} module.  When enabled, the @file{fifo} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{fifo} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{fifo} driver to be created as a separate module.
 
-When disabled, excludes the @command{strinet-@value{VERSION_STRINET}} add-on package from the build.
-When the @command{strinet} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strinet} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS Internet Protocol (INET)} (@command{strinet-@value{VERSION_STRINET}})
-add-on package in the build.
+@item --enable-driver-log
+@itemx --disable-driver-log
+@opindex driver-log
+Enables or disables the @file{log} module.  When enabled, the @file{log} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{log} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{log} driver to be created as a separate module.
 
-@item --without-STRSCTP
-@opindex STRSCTP
+@item --enable-driver-loop
+@itemx --disable-driver-loop
+@opindex driver-loop
+Enables or disables the @file{loop} module.  When enabled, the @file{loop} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{loop} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{loop} driver to be created as a separate module.
 
-When disabled, excludes the @command{strsctp-@value{VERSION_STRSCTP}} add-on package from the build.
-When the @command{strsctp} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strsctp} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS Stream Control Transmission Protocol (SCTP)} (@command{strsctp-@value{VERSION_STRSCTP}})
-add-on package in the build.
+@item --enable-driver-nsdev
+@itemx --disable-driver-nsdev
+@opindex driver-nsdev
+Enables or disables the @file{nsdev} module.  When enabled, the @file{nsdev} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{nsdev} module will not be included
+at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The
+default is for the @file{nsdev} driver to be created as a separate module.
 
-@item --without-STRCHAN
-@opindex STRCHAN
+@item --enable-driver-mux
+@itemx --disable-driver-mux
+@opindex driver-mux
+Enables or disables the @file{mux} module.  When enabled, the @file{mux} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{mux} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{mux} driver to be created as a separate module.
 
-When disabled, excludes the @command{strchan-@value{VERSION_STRCHAN}} add-on package from the build.
-When the @command{strchan} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strchan} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}})
-add-on package in the build.
+@item --enable-driver-nuls
+@itemx --disable-driver-nuls
+@opindex driver-nuls
+Enables or disables the @file{nuls} module.  When enabled, the @file{nuls} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{nuls} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{nuls} driver to be created as a separate module.
 
-@item --with-STRX25
-@opindex STRX25
+@item --enable-driver-pipe
+@itemx --disable-driver-pipe
+@opindex driver-pipe
+Enables or disables the @file{pipe} module.  When enabled, the @file{pipe} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{pipe} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{pipe} driver to be created as a separate module.
 
-When enabled, includes the @command{strx25-@value{VERSION_STRX25}} add-on package in the build.
-Because the @command{strx25} add-on package is not distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}})
-add-on package from the build.
+@item --enable-driver-sad
+@itemx --disable-driver-sad
+@opindex driver-sad
+Enables or disables the @file{sad} module.  When enabled, the @file{sad} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{sad} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{sad} driver to be created as a separate module.
 
-@item --with-STRISO
-@opindex STRISO
+@item --enable-driver-sfx
+@itemx --disable-driver-sfx
+@opindex driver-sfx
+Enables or disables the @file{sfx} module.  When enabled, the @file{sfx} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{sfx} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{sfx} driver to be created as a separate module.
 
-When enabled, includes the @command{striso-@value{VERSION_STRISO}} add-on package in the build.
-Because the @command{striso} add-on package is not distributed by default, this option only has a
-use on development copies and CVS checkouts.
-The default is to exclude the
-@cite{STREAMS Open Standards Interconnect (ISO/OSI)} (@command{striso-@value{VERSION_STRISO}})
-add-on package from the build.
+@item --enable-driver-spx
+@itemx --disable-driver-spx
+@opindex driver-spx
+Enables or disables the @file{spx} module.  When enabled, the @file{spx} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{spx} module will not be included at
+all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+is for the @file{spx} driver to be created as a separate module.
 
-@item --without-NETPERF
-@opindex NETPERF
+@item --enable-compat-os7
+@itemx --disable-compat-os7
+@opindex compat-os7
+Enables or disables the @file{os7} compatibility module.  When enabled, the @file{os7} compatibility
+module will be compiled into the @file{stream} kernel module; when disabled, the @file{os7}
+compatibility module will not be included at all.  The default is for the @file{os7} compatibility
+module to be created as a separate module.
 
-When disabled, excludes the @command{netperf-@value{VERSION_NETPERF}} add-on package from the build.
-The default is to include the
-@cite{Netperf} (@command{netperf-@value{VERSION_NETPERF}})
-add-on package in the build.
+@item --enable-compat-svr3
+@itemx --disable-compat-svr3
+@opindex compat-svr3
+Enables or disables the @file{svr3} compatibility module.  When enabled, the @file{svr3}
+compatibility module will be compiled into the @file{stream} kernel module; when disabled, the
+@file{svr3} compatibility module will not be included at all.  The default is for the @file{svr3}
+compatibility module to be created as a separate module.
 
-@item --without-STRISDN
-@opindex STRISDN
+@item --enable-compat-svr4
+@itemx --disable-compat-svr4
+@opindex compat-svr4
+Enables or disables the @file{svr4} compatibility module.  When enabled, the @file{svr4}
+compatibility module will be compiled into the @file{stream} kernel module; when disabled, the
+@file{svr4} compatibility module will not be included at all.  The default is for the @file{svr4}
+compatibility module to be created as a separate module.
 
-When disabled, excludes the @command{strisdn-@value{VERSION_STRISDN}} add-on package from the build.
-When the @command{strisdn} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strisdn} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS ISDN Stacks} (@command{strisdn-@value{VERSION_STRISDN}})
-add-on package in the build.
+@item --enable-compat-mps
+@itemx --disable-compat-mps
+@opindex compat-mps
+Enables or disables the @file{mps} compatibility module.  When enabled, the @file{mps} compatibility
+module will be compiled into the @file{stream} kernel module; when disabled, the @file{mps}
+compatibility module will not be included at all.  The default is for the @file{mps} compatibility
+module to be created as a separate module.
 
-@item --without-STRATM
-@opindex STRATM
+@item --enable-compat-sol8
+@itemx --disable-compat-sol8
+@opindex compat-sol8
+Enables or disables the @file{sol8} compatibility module.  When enabled, the @file{sol8}
+compatibility module will be compiled into the @file{stream} kernel module; when disabled, the
+@file{sol8} compatibility module will not be included at all.  The default is for the @file{sol8}
+compatibility module to be created as a separate module.
 
-When disabled, excludes the @command{stratm-@value{VERSION_STRATM}} add-on package from the build.
-When the @command{stratm} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{stratmp} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS ATM Stacks} (@command{stratm-@value{VERSION_STRATM}})
-add-on package in the build.
+@item --enable-compat-uw7
+@itemx --disable-compat-uw7
+@opindex compat-uw7
+Enables or disables the @file{uw7} compatibility module.  When enabled, the @file{uw7} compatibility
+module will be compiled into the @file{stream} kernel module; when disabled, the @file{uw7}
+compatibility module will not be included at all.  The default is for the @file{uw7} compatibility
+module to be created as a separate module.
 
-@item --without-STACKS
-@opindex STACKS
+@item --enable-compat-osf
+@itemx --disable-compat-osf
+@opindex compat-osf
+Enables or disables the @file{osf} compatibility module.  When enabled, the @file{osf} compatibility
+module will be compiled into the @file{stream} kernel module; when disabled, the @file{osf}
+compatibility module will not be included at all.  The default is for the @file{osf} compatibility
+module to be created as a separate module.
 
-When disabled, excludes the @command{strss7-@value{VERSION_STRSS7}} add-on package from the build.
-When the @command{strss7} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strss7} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS SS7 Stacks} (@command{strss7-@value{VERSION_STRSS7}})
-add-on package in the build.
+@item --enable-compat-aix
+@itemx --disable-compat-aix
+@opindex compat-aix
+Enables or disables the @file{aix} compatibility module.  When enabled, the @file{aix} compatibility
+module will be compiled into the @file{stream} kernel module; when disabled, the @file{aix}
+compatibility module will not be included at all.  The default is for the @file{aix} compatibility
+module to be created as a separate module.
 
-@item --without-SIGTRAN
-@opindex SIGTRAN
+@item --enable-compat-hpux
+@itemx --disable-compat-hpux
+@opindex compat-hpux
+Enables or disables the @file{hpux} compatibility module.  When enabled, the @file{hpux}
+compatibility module will be compiled into the @file{stream} kernel module; when disabled, the
+@file{hpux} compatibility module will not be included at all.  The default is for the @file{hpux}
+compatibility module to be created as a separate module.
 
-When disabled, excludes the @command{sigtran-@value{VERSION_SIGTRAN}} add-on package from the build.
-When the @command{sigtran} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{sigtran} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS SIGTRAN Stacks} (@command{sigtran-@value{VERSION_SIGTRAN}})
-add-on package in the build.
+@item --enable-compat-irix
+@itemx --disable-compat-irix
+@opindex compat-irix
+Enables or disables the @file{irix} compatibility module.  When enabled, the @file{irix}
+compatibility module will be compiled into the @file{stream} kernel module; when disabled, the
+@file{irix} compatibility module will not be included at all.  The default is for the @file{irix}
+compatibility module to be created as a separate module.
 
-@item --without-STRVOIP
-@opindex STRVOIP
+@item --enable-compat-mac
+@itemx --disable-compat-mac
+@opindex compat-mac
+Enables or disables the @file{mac} compatibility module.  When enabled, the @file{mac} compatibility
+module will be compiled into the @file{stream} kernel module; when disabled, the @file{mac}
+compatibility module will not be included at all.  The default is for the @file{mac} compatibility
+module to be created as a separate module.
 
-When disabled, excludes the @command{strvoip-@value{VERSION_STRVOIP}} add-on package from the build.
-When the @command{strvoip} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{strvoip} package was otherwise installed on the build system.
-The default is to include the
-@cite{STREAMS VoIP Stacks} (@command{strvoip-@value{VERSION_STRVOIP}})
-add-on package in the build.
+@item --disable-xti-servtype
+@opindex xti-servtype
+Disables XTI service type checks in the XTI/TLI Library.  Normally, the XTI/TLI Library will check
+for the service type of the endpoint and will reject commands that are not defined for the
+corresponding service type.  When enabled, this option causes the XTI/TLI Library to simply issue
+the corresponding primitive to the underlying driver and to allow the driver to determine whether
+the primitive is supported.  The default is for the XTI/TLI Library to check for XTI service type.
 
-@item --without-OSR61
-@opindex OSR61
+@item --disable-xti-states
+@opindex xti-states
+Disables XTI state checks in the XTI/TLI Library.  Normally the XTI/TLI Library will check for the
+state of the endpoint and will reject commands that would place the interface out of state.  When
+enabled, this option causes the XTI/TLI Library to simply issue the corresponding primitive to the
+underlying driver and to allow the driver to determine whether the interface is out of state.  The
+default is for the XTI/TLI Library to check for XTI state.
 
-When disabled, excludes the @command{osr61-@value{VERSION_OSR}} add-on package from the build.
-When the @command{osr61} add-on package is excluded, none of the packages which depend upon it
-can be built unless the @command{osr61} package was otherwise installed on the build system.
-The default is to include the
-@cite{Dialogic Open System Release 6.1} (@command{osr61-@value{VERSION_OSR}})
-add-on package in the build.
+@item --enable-sctp-slow-verification
+@opindex sctp-slow-verification
+Enable slow verification of addresses and tags.  When a message comes from an SCTP endpoint with the
+correct verification tag, it is not necessary to check whether it is from a correct source address
+to identify the SCTP association to which it belongs.  When you disable this feature
+(@command{--disable-sctp-slow-verification}), source addresses are not checked and it is up to
+firewall implementations to thwart attackers of the verification tag.  When you enable this feature
+(@command{--enable-sctp-slow-verification}), you get RFC 2960 compliant operation, but at great cost
+to SCTP performance.  This option defaults to @samp{disabled}.
+
+@item --enable-sctp-throttle-heartbeats
+@opindex sctp-throttle-heartbeats
+Enable heartbeat throttling.  Special feature of @value{PACKAGE_TITLE} that is not mentioned in RFC
+2960.  When you enable this feature (@command{--enable-sctp-throttle-heartbeats}),
+@value{PACKAGE_TITLE} will throttle the rate at which it responds to heartbeats to the system
+control @var{heartbeat_interval}.  This makes SCTP more resilient to implementations which flood
+heartbeat messages.  For RFC 2960 compliant operation, disable this feature
+(@command{--disable-sctp-throttle-heartbeats}).  This option defaults to @samp{disabled}.
+
+@item --enable-sctp-discard-ootb
+@opindex sctp-discard-ootb
+Enable discard of out-of-the-blue packets.  RFC 2960 requires the implementation to send
+@code{ABORT} to some OOTB packets (packets for which no SCTP association exists).  Sending
+@code{ABORT} chunks to unverified source addresses with the T bit set opens SCTP to blind masquerade
+attacks.  Not sending them may lead to delays at the peer endpoint aborting associations where our
+@code{ABORT} has been lost and the socket is already closed or if we have restarted and the peer
+still has open associations to us.  If you enable this feature
+(@command{--enable-sctp-discard-ootb}), SCTP will discard all OOTB packets.  This is necessary if
+another SCTP stack is being run on the same machine.  Therefore, if the @value{PACKAGE_TITLE}
+package is included on an OpenSS7 SCTP kernel, this feature is automatically enabled.  For RFC 2960
+compliant operation, disable this feature (@command{--disable-sctp-discard-ootb}).  This option
+defaults to @samp{disabled} for non-OpenSS7 SCTP kernels, and @samp{enabled} for OpenSS7 SCTP
+kernels.
+
+@item --enable-sctp-exteded-ip-support
+@opindex sctp-exteded-ip-support
+Enable extended IP support for SCTP.  This provides extended IP support for SCTP for things like IP
+Transparent Proxy and IP Masquerading.  This is experimental stuff.  If in doubt, disable this
+feature (@command{--disable-sctp-expended-ip-support}).  This option defaults to @samp{disabled}.
+
+@item --disable-sctp-hmac-sha1
+@opindex sctp-hmac-sha1
+Disable SHA-1 HMAC.  This provides the ability to use the FIPS 180-1 (SHA-1) message authentication
+code in SCTP cookies.  If you enable this feature (@command{--enable-sctp-hmac-sha1}), when the
+appropriate sysctl is set, SCTP will use the SHA-1 HMAC when signing cookies in the @code{INIT-ACK}
+chunk.  If disable this feature (@command{--disable-sctp-hmac-sha1}), the SHA-1 HMAC will be
+unavailable for use with SCTP.  This option defaults to @samp{enabled} on big-endian architectures,
+and @samp{disabled} otherwise.
+
+@item --disable-sctp-hmac-md5
+@opindex sctp-hmac-md5
+Disable MD5 HMAC.  This provides the ability to use the MD5 (RFC 1321) message authentication code
+in SCTP cookies.  If you enable this feature (@command{--enable-sctp-hmac-md5}), when the
+appropriate sysctl is set, SCTP will use the MD5 HMAC when signing cookies in the INIT ACK chunk.
+If you disable this feature (@command{--disable-sctp-hmac-md5}), the MD5 HMAC will be unavailable
+for use with SCTP.  This option defaults to @samp{enabled} on little-endian architectures, and
+@samp{disabled} otherwise.
+
+@item --enable-sctp-adler32
+@opindex sctp-adler32
+Enable Adler32 checksum.  This provides the ability to use the older RFC 2960 Adler32 checksum.  If
+CONFIG_SCTP_CRC_32 below is not selected, the Adler32 checksum is always provided.  This option
+defaults to @samp{disabled}.
+
+@item --disable-sctp-crc32c
+@opindex sctp-crc32c
+Disable CRC-32C checksum.  This provides the ability to use the newer CRC-32c checksum as described
+in RFC 3309.  When this is selected and CONFIG_SCTP_ADLER_32 is not selected above, then the only
+checksum that will be used is the CRC-32c checksum.  This option defaults to @samp{enabled}.
+
+@item --enable-sctp-throttle-passiveopens
+@opindex sctp-throttle-passiveopens
+Enable throttling of passive opens.  Special feature of Linux SCTP not mentioned in RFC 2960.  When
+secure algorithms are used for signing cookies, the implementation becomes vulnerable to INIT and
+@code{COOKIE-ECHO} flooding.  If you enable this feature
+(@command{--enable-sctp-throttle-passiveopens}), SCTP will only allow one INIT and one
+@code{COOKIE-ECHO} to be processed in each interval corresponding to the sysctl sctp_throttle_itvl.
+Setting sctp_throttle_itvl to 0 defeats this function.  If you disable this feature
+(@command{--disable-sctp-throttle-passiveopens}), each INIT and @code{COOKIE-ECHO} will be
+processed.  This option defaults to @samp{disabled}.
+
+@item --disable-sctp-ecn
+@opindex sctp-ecn
+Enable explicit congestion notification.  This enables support for Explicit Congestion Notification
+(ECN) chunks in SCTP messages as defined in RFC 2960 and RFC 3168.  It also adds syctl
+(/proc/net/ipv4/sctp_ecn) which allows ECN for SCTP to be disabled at runtime.  This option defaults
+to @samp{enabled}.
+
+@item --disable-sctp-lifetimes
+@opindex sctp-lifetimes
+Enable SCTP message lifetimes.  This enables support for message lifetimes as described in RFC 2960.
+When enabled, message lifetimes can be set on messages.  See sctp(7).  This feature is always
+enabled when Partial Reliability Support is set.  This option defaults to @samp{enabled}.
+
+@item --disable-sctp-add-ip
+@opindex sctp-add-ip
+Enable ADD-IP.  This enables support for ADD-IP as described in draft-ietf-tsvwg-addip-sctp-07.txt.
+This allows the addition and removal of IP addresses from existing connections.  This is
+experimental stuff.  This option defaults to @samp{enabled}.
+
+@item --disable-sctp-adaptation-layer-info
+@opindex sctp-adaptation-layer-info
+Enable ALI.  This enables support for the Adaptation Layer Information parameter described in
+draft-ietf-tsvwg-addip-sctp-07.txt for communicating application layer information bits at
+initialization.  This is experimental stuff.  This option defaults to @samp{enabled}.
+
+@item --disable-sctp-partial-reliability
+@opindex sctp-partial-reliability
+Enable SCTP Partial Reliability (PR-SCTP).  This enables support for PR-SCTP as described in
+draft-stewart-tsvwg-prsctp-03.txt.  This allows for partial reliability of message delivery on a
+"timed reliability" basis.  This is experimental stuff.  This option defaults to @samp{enabled}.
+
+@item --disable-sctp-error-generator
+@opindex sctp-error-generator
+Disable the SCTP error generator.  This provides an internal error generator that can be accessed
+with socket options for testing SCTP operation under packet loss.  You will need this option to run
+some of the test programs distributed with the SCTP module.  This option defaults to @samp{enabled}.
+
+@item --without-ip
+@opindex ip
+Remove the second generation IP driver from the build.
+The default is to include the second generation IP driver in the build.
+
+@item --without-udp
+@opindex udp
+Remove the second generation UDP driver from the build.
+The default is to include the second generation UDP driver in the build.
+
+@item --without-raw
+@opindex raw
+Remove the second generation RAWIP driver from the build.
+The default is to include the second generation RAWIP driver in the build.
+
+@item --without-tcp
+@opindex tcp
+Remove the second generation TCP driver from the build.
+The default is to include the second generation TCP driver in the build.
+
+@item --with-sctp
+@opindex sctp
+Enable the version 1 driver in the build.
+This option defaults to @samp{disabled}.
+
+@item --without-sctp2
+@opindex sctp2
+Enable the Release 2 driver in the build.
+This option defaults to @samp{enabled}.
 
 @end table
 
-Additional options specified to an add-on package may also be specified on the @command{configure}
-command line and they will be passed to all sub-packages.  Therefore, any of the add-on package
-specific options described by the @cite{Installation and Reference Manual} for the add-on package
-may also be specified on the command line.

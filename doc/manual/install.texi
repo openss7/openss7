@@ -1,4 +1,4 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
 @c @(#) $Id$
@@ -11,25 +11,50 @@
 @c
 @c All Rights Reserved.
 @c
-@c Permission is granted to make and distribute verbatim copies of this
-@c manual provided the copyright notice and this permission notice are
-@c preserved on all copies.
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
 @c
-@c Permission is granted to copy and distribute modified versions of this
-@c manual under the conditions for verbatim copying, provided that the
-@c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one.
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
 @c responsibility for errors or omissions, or for damages resulting from
-@c the use of the information contained herein.  The author(s) may not
-@c have taken the same level of care in the production of this manual,
-@c which is licensed free of charge, as they might when working
-@c professionally.
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
 @c 
-@c Formatted or processed versions of this manual, if unaccompanied by
-@c the source, must acknowledge the copyright and authors of this work.
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
 @c
 @c -------------------------------------------------------------------------
 @c
@@ -1174,8 +1199,7 @@ smaller that way.
 @item --with public
 @itemx --without public
 @opindex public
-Release public packages or private packages.  This option has no effect on the
-@file{@value{PACKAGE_NAME}} package.  The default is to release public packages.
+Release public packages or private packages.  The default is to release public packages.
 
 @item --with k-debug
 @itemx --without k-debug
@@ -1212,16 +1236,14 @@ For better optimization controls, @xrefman{Configuring the Tar Ball}.
 @itemx --without k-modversions
 @opindex k-modversions
 Specifies whether kernel symbol versions are to be applied to symbols exported by package kernel
-modules.  The default is to version exported module symbols.  This package does not export symbols
-so this option has no effect.
+modules.  The default is to version exported module symbols.
 
 @item --with devfs
 @itemx --without devfs
 Specifies whether the build is for a device file system daemon enabled system with autoloading, or
 not.  The default is to build for @manpage{devfsd(1)} autoloading when @var{CONFIG_DEVFS_FS} is defined in the
 target kernel.  The @samp{rebuild} target uses this option to signal to the RPM spec file that the
-@samp{dev} subpackage need not be built.  This option does not appear when the package has no
-devices.
+@samp{dev} subpackage need not be built.
 
 @item --with devel
 @itemx --without devel
@@ -1415,34 +1437,45 @@ modules.  Use with care.
 @item --enable-k-safe
 @opindex k-safe
 Enable kernel module run-time safety checks.  Specifies whether kernel safety is to be performed.
-This option is mutually exclusive with @option{--enable-k-test} and @option{--enable-k-debug} below.
-This has the effect of invoking some more pedantic assertion macros in the code.  The default is not
-to apply kernel safety.
+This option is mutually exclusive with @option{--enable-k-test}, @option{--enable-k-debug} and
+@option{--enable-k-none} below.  This has the effect of invoking some more pedantic assertion macros
+in the code.  The default is to apply kernel safety.
 
 @item --enable-k-test
 @opindex k-test
 Enable kernel module run-time testing.  Specifies whether kernel testing is to be performed.  This
-option is mutually exclusive with @option{--enable-k-safe} above and @option{--enable-k-debug}
-below.  This has the effect of remove @code{static} and @code{inline} attributes from functions and
-invoking most non-performance affecting debugging macros in the code.  The default is not to perform
-kernel testing.
+option is mutually exclusive with @option{--enable-k-safe} above and @option{--enable-k-debug} and
+@option{--enable-k-none} below.  This has the effect of removing @code{static} and @code{inline}
+attributes from functions and invoking most non-performance affecting debugging macros in the code.
+The default is not to perform kernel testing.
 
 @item --enable-k-debug
 @opindex k-debug
 Enable kernel module run-time debugging.  Specifies whether kernel debugging is to be performed.
-This option is mutually exclusive with @option{--enable-k-safe} and @option{--enable-k-test} above.
-This has the effect of removing @code{static} and @code{inline} attributes from functions and
-invoking all debugging macros in the code (including performance-affecting debug macros).  The
-default is to not perform kernel debugging.
+This option is mutually exclusive with @option{--enable-k-safe} and @option{--enable-k-test} above,
+and @option{--enable-k-none} below.  This has the effect of removing @code{static} and @code{inline}
+attributes from functions and invoking all debugging macros in the code (including
+performance-affecting debug macros).  The default is to not perform kernel debugging.
 
-@ignore
-@itemx --disable-k-modversions
+@item --enable-k-none
+@opindex none
+Enable no kenrel module run-time checks.  Specifies whether kernel run-time checks are to be
+performed.  THis option is mutually exclusive with @option{--enable-k-safe},
+@option{--enable-k-test} and @option{--enable-k-debug}.  This has the effect of removing all
+assertion macros from the code.  The default is to not to remove all assertion macros.
+
+@item --disable-k-modversions
 @opindex k-modversions
 Disable module versions on @command{@value{PACKAGE_NAME}} symbols.  Specifies whether kernel symbol
 versions are to be used on symbols exported from built @command{@value{PACKAGE_NAME}} modules.  The
 default is to provide kernel symbol versions on all exported symbols.
-This option has no effect for @value{pkgtype} packages that do not provide kernel modules.
-@end ignore
+
+@item --enable-k-package
+@opindex k-package
+Enable generation of a kernel source package.  Specifies whether the source package: installation
+of configured source in @file{/usr/src/@value{PACKAGE_NAME}}, will be generated.  This also affects
+@manpage{rpm(1)} and @manpage{dpkg(1)} builds to include a source package.  Generation of source
+pacakges is disabled by default.
 
 @item --enable-devfs
 @itemx --disable-devfs
@@ -1481,11 +1514,25 @@ contents of the @file{.pkgrelease} file in the @value{pkgtype} package source di
 file does not exist, one (1).  This is the number after the last point in the package version
 number.
 
+@item --with-pkg-patchlevel=PATCHLEVEL
+@opindex pkg-patchlevel
+Specifies the patch level for the package.  This is neither used fro @manpage{rpm(1)} nor
+@manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
+contents of the @file{.pkgpatchlevel} file in the @value{pkgtype} package source directory or, if
+that file does not exist, the null string.  This is an additional suffix after the package release
+in the package version number.  It is intended for bug fix releases or release candidates.
+
 @item --with-pkg-distdir=DIR
 @opindex pkg-distdir
 Specifies the distribution directory for the package.  This is used by the maintainer for building
-distributions of tarballs.  This is the directory into which archives are copied for distribution.
-The default is the top build directory.
+distribution repositories.  This is the directory into which binary packages are copied for
+distribution.  The default is the top build directory.
+
+@item --with-pkg-tardir=DIR
+@opindex pkg-tardir
+Specifies the tarball distribution directory for the package.  This is used by the maintainer for
+building distributions of tarballs.  This is the directory into which archives are copied for
+distribution.  The default is the top build directory.
 
 @item --with-cooked-manpages
 @opindex cooked-manpages
@@ -1649,6 +1696,16 @@ use of this option is to specify @option{--with-k-optimize=speed --disable-k-saf
 maximum performance.  Nevertheless, even these setting are @dfn{ricing} and the resulting kernel
 modules will only be about 5% faster.
 
+@item --with-optimize=HOW
+@itemx --without-optimize
+@opindex optimize
+Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or @var{quick}.  @var{size}
+compiles user programs @code{-Os}, @var{speed} compiles user programs @code{-O3}, and @var{quick}
+compiles user programs @code{-O0}.  The default is @var{normal}.  Use with care.  The most common
+use of this option is to specify @option{--with-optimize=speed} to compile for maximum performance.
+Nevertheless, even these setting are @dfn{ricing} and the resulting user programs will only be about
+5% faster.
+
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
 Specify the @samp{STRCONF_CONFIG} file name to which the configuration master file is written.  The
@@ -1656,7 +1713,104 @@ default is @file{Config.master}.
 
 @item --with-base-major=STRCONF_MAJBASE
 @opindex base-major
-Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @samp{230}.
+Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @samp{230} on 16-bit
+device number systems, and @samp{2000} on 32-bit device number systems.
+
+@item --with-base-modid=STRCONF_MODBASE
+@opindex base-modid
+Start numbering for module indentifiers at @samp{STRCONF_MODBASE}.  The default is @samp{5000}.
+
+@item --with-strconf-pkgdir=DIRECTORY
+@opindex strconf-pkgdir
+Specifies the relative or absolute path to the binary package configuration directory in which to
+look for binary packages.  The default is the @file{pkg} subdirectory in the build or source
+directory.
+
+@item --with-strconf-pkgrules=FILENAME
+@opindex strconf-pkgrules
+Specifies the relative or absolute file name to which package rules are written.  The default is the
+@file{pkgrules} file in the build directory.
+
+@item --without-snmp-agent
+@opindex snmp-agent
+Normally SNMP agents are included in the build.  By specifying @samp{--without-snmp-agent}, the SNMP
+argents are not included in the build.  This option is only for exceptional circumstances where SNMP
+support cannot be included in the runtime.
+
+@item --with-perl-headers HEADERS
+@opindex perl-headers
+Normally @command{configure} can find the perl headers necessary for generating SNMP agents based on
+NET-SNMP.  This option may be used to direct @command{configure} to the location of the perl headers.
+The default is @samp{$INCLUDEDIR/perl}.
+
+@item --with-snmp HEADERS
+@opindex snmp
+Normally @command{configure} can find the NET-SNMP headers necessary for generating SNMP argents
+based on NET-SNMP.  This option may be used to direct @command{configure} to the location of the
+NET-SNMP headers.  The default is @samp{$INCLUDEDIR/ucd-snmp}.
+
+@item --enable-lzma
+@opindex lzma
+Unfortunately, @manpage{automake(1)} does not detect the presence of the necessary tools to build
+@file{lzma} archives, breaking distribution on systems that do not have @file{lzma} tools.  This
+option tells @command{configure} to configure distribution to include @file{lzma} archives.  As the
+generation of @file{lzma} takes a significant amount of time, generation of @file{lzma} archives is
+disabled by default.
+
+@item --disable-repo-tar
+@itemx --enable-repo-tar
+@opindex repo-tar
+Disable tar repository construction.  Normally in maintainer mode, tarball repositories will be
+constructed.  This optoin disables construction of the tarball repository.
+
+@item --disable-rpms
+@itemx --enable-rpms
+@opindex rpms
+Disable building of RPMs.  Normally @command{configure} can determine whether it is possible to
+build RPMs on the current system and automatically determines whether to build RPMs as part of the
+@samp{release} makefile target.  This option explicitly disables or enable building of RPMs.
+
+@item --disable-srpms
+@itemx --enable-srpms
+@opindex srpms
+Disable building of SRPMs.  Normally @command{configure} can determine whether it is possible to
+build SRPMs on the current system and automatically determines whether to build SRPMs as part of the
+@samp{release} makefile target.  This option explicitly disables or enable building of SRPMs.
+
+@item --disable-repo-yum
+@itemx --enable-repo-yum
+@opindex repo-yum
+Disable building of @manpage{yum(1)} repositories.  Normally @command{configure} can determine
+whether there are sufficient tools to create @manpage{yum(1)} repositories.  This option explicitly
+disables or enables generation of @manpage{yum(1)} repositories.
+
+@item --disable-repo-yast
+@itemx --enable-repo-yast
+@opindex repo-yast
+Disable building of @manpage{yast(1)} repositories.  Normally @command{configure} can determine
+whether there are sufficient tools to create @manpage{yast(1)} repositories.  This option explicitly
+disables or enables generation of @manpage{yast(1)} repositories.
+
+@item --disable-debs
+@itemx --enable-debs
+@opindex debs
+Disable building of DEBs.  Normally @command{configure} can determine whether it is possible to
+build DEBs on the current system and automatically determines whether to build DEBs as part of the
+@samp{release} makefile target.  This option explicitly disables or enable building of DEBs.
+
+@item --disable-dscs
+@itemx --enable-dscs
+@opindex dscs
+Disable building of DSCs.  Normally @command{configure} can determine whether it is possible to
+build DSCs on the current system and automatically determines whether to build DSCs as part of the
+@samp{release} makefile target.  This option explicitly disables or enable building of DSCs.
+
+@item --disable-repo-apt
+@itemx --enable-repo-apt
+@opindex repo-apt
+Disable building of @manpage{apt-get(1)} repositories.  Normally @command{configure} can determine
+whether there are sufficient tools to create @manpage{apt-get(1)} repositories.  This option explicitly
+disables or enables generation of @manpage{apt-get(1)} repositories.
 
 @end table
 
@@ -1671,6 +1825,82 @@ Start numbering for major devices at @samp{STRCONF_MAJBASE}.  The default is @sa
 Following are additional environment variables to @file{configure}, their meaning and use:
 
 @vtable @var
+@item CC
+C compiler command.  Defaults to @command{gcc}.
+
+@item CFLAGS
+C compiler flags.  Defaults to an automatically determined set of flags.
+
+@item LDFLAGS
+Linker flags.  Defaults to an automatically determined set of flags.
+
+@item CPPFLAGS
+C/C++/Objective C preprocessor flags.  Defaults to an automatically determined set of flags.
+
+@item CPP
+C preprocessor.  Defaults to @command{gcc -E}.
+
+@item CCAS
+Assembler compiler command (defaults to @samp{CC}).
+
+@item CCASFLAGS
+Assembler compiler flags (defaults to CFLAGS).  Defaults to an automatically determined set of
+flags.
+
+@item CXX
+C++ compiler command.  Defaults to @command{g++}.
+
+@item CXXFLAGS
+C++ compiler flags.  Defaults to an automatically determined set of flags.
+
+@item CXXCPP
+C++ preprocessor.  Defaults to @command{g++ -E}.
+
+@item LD
+Linker loader command.  Defaults to @command{gcc}.
+
+@item YACC
+The `Yet Another C Compler' implementation to use.  Defaults to the first program found out of:
+`bison -y', `byacc', `yacc'.
+
+@item YFLAGS
+The list of arguments that will be passed by default to @samp{$YACC}.  This script will default
+@samp{YFLAGS} to the empty string to avoid a default value of @option{-d} given by some make
+applications.
+
+@item GCJ
+Java compiler command.  Defaults to @command{gcj}.
+
+@item GCJFLAGS
+Java complier flags.  Defaults to an automatically determined set of flags.
+
+@item GCJDBTOOL
+GCJ database tool.  Defaults to @command{gcj-dbtool}.
+
+@item GCJH
+Java CNI header command.  Defaults to @command{gcjh}.
+
+@item GCJHFLAGS
+Java CNI header command flags.  Defaults to an automatically determined set of flags.
+
+@item JAVAH
+Java JNI header command.  Defaults to @command{gcjh}.
+
+@item JAVAHFLAGS
+Java JNI header command flags.  Defaults to an automatically determined set of flags.
+
+@item JAVAC
+Java class compiler.  Defaults to @command{gcj}.
+
+@item JAVACFLAGS
+Java class compiler flags.  Defaults to an automatically determined set of flags.
+
+@item JAVADOC
+Java documentation doclet.  Defaults to @command{gjdoc}.
+
+@item JAVADOCFLAGS
+Java documentation flags.  Defaults to an automatically determined set of flags.
+
 @item GPG
 GPG signature command.  This is used for signing distributions by the maintainer.  By default,
 @file{configure} will search for this tool.
@@ -1707,7 +1937,7 @@ Roff picture command, @manref{pic(1)}.  This is only necessary when the option
 @manpage{pic(1)} command.  By default, @file{configure} will search for this tool.
 
 @item GZIP
-Default compression options provided to @command{GZIP_CMD}.
+Default compression options provided to @command{GZIP_CMD}.  The default is @samp{--best}.
 
 @item GZIP_CMD
 Manpages (and kernel modules) compression commands, @manref{gzip(1)}.  This is only necessary when
@@ -1716,7 +1946,7 @@ the option @option{--without-compressed-manpages} has @emph{not} been specified 
 @file{configure} will search for this tool.
 
 @item BZIP2
-Default compression options provided to @command{BZIP2_CMD}
+Default compression options provided to @command{BZIP2_CMD}.
 
 @item BZIP2_CMD
 Manpages compression commands, @manref{bzip2(1)}.  This is only necessary when the option
@@ -1724,14 +1954,29 @@ Manpages compression commands, @manref{bzip2(1)}.  This is only necessary when t
 find the proper @manpage{bzip2(1)} command.  By default, @file{configure} will search for this
 tool.
 
+@item LZMA
+Default compression options given to @command{LZMA_CMD}. is @samp{--best}.
+
+@item LZMA_CMD
+Lzma compression command.  Defaults to @command{lzma}.
+
 @item MAKEWHATIS
 Manpages apropros database rebuild command, @manref{makewhatis(8)}.  By default, @file{configure}
 will search for this tool.  By default, @file{configure} will search for this tool.
+
+@item JAR
+Java archive command.  Defaults to this first found of @command{fastjar}, or @command{jar}.
+
+@item ZIP
+Zip archive command.  Defaults to @command{zip}.
 
 @item CHKCONFIG
 Chkconfig command, @manref{chkconfig(8)}.  This was used for installation of @command{init} scripts.  All
 packages now come with @manpage{init_install(8)} and @manpage{init_remove(8)} scripts used to install and
 remove @command{init} scripts on both RPM and Debian systems.
+
+@item INSSERV
+Insert service command.  Defautls to @command{insserv}.
 
 @item RPM
 Rpm command, @manref{rpm(1)}.  This is only necessary for RPM builds.  By default,
@@ -1741,6 +1986,14 @@ Rpm command, @manref{rpm(1)}.  This is only necessary for RPM builds.  By defaul
 Build RPM command, @manref{rpmbuild(1)}.  This is only necessary for RPM builds.  By default,
 @file{configure} will search for this tool.  @manpage{rpm(1)} will be used instead of
 @manpage{rpmbuild(1)} only if @manpage{rpmbuild(1)} cannot be found.
+
+@item CREATEREPO
+Create repomd repository command.  This command is used when building @manpage{yum(1)} repositories.
+By default, @command{configure} will search for this tool.
+
+@item CREATE_PACKGE_DESC
+Create YaST package descriptions command.  This command is used when building @manpage{yast(1)}
+repositories.  By default, @command{configure} will search for this tool.
 
 @item DPKG
 Dpkg comand, @manref{dpkg(1)}.  This command is used for building Debian packages.  By default,
@@ -1754,45 +2007,23 @@ packages.  By default, @file{configure} will search for this tool.
 Dpkg-buildpackage command, @manref{dpkg-buildpackage(1)}.  This command is used for building Debian
 deb packages.  By default, @file{configure} will search for this tool.
 
-@item DEB_BUILD_ARCH
-Debian build architecture.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} build architecture.
+@item APT_FTPARCHIVE
+Apt-ftparchive command, @manref{apt-ftparchive(1)}.  This command is used to building Debian apt
+repositories.  By default, @file{configure} will search for this tool.
 
-@item DEB_BUILD_GNU_CPU
-Debian build cpu.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} build cpu.
+@item DPKG_SCANSOURCES
+Dpkg-scansources command, @manref{dpkg-scansources(1)}.  This command is used to create the sources
+file when building Debian apt repositories.  By default, @command{configure} will search for this
+tool.
 
-@item DEB_BUILD_GNU_SYSTEM
-Debian build os.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} build os.
+@item DPKG_SCANPAKCAGES
+Dpkg-scanpackages command, @manref{dpkg-scanpackages(1)}.  This command is used to create the
+packages file when building Debian apt repositories.  By default, @command{configure} will search
+for this tool.
 
-@item DEB_BUILD_GNU_TYPE
-Debian build alias.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} build alias.
-
-@item DEB_HOST_ARCH
-Debian host architecture.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} host architecture.
-
-@item DEB_HOST_GNU_CPU
-Debian host cpu.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} host cpu.
-
-@item DEB_HOST_GNU_SYSTEM
-Debian host os.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} host os.
-
-@item DEB_HOST_GNU_TYPE
-Debian host alias.
-This variable is used for building Debian packages.
-The default is the @command{autoconf} host alias.
+@item DPKG_DEB
+Dpkg-deb command, @manpage{dpkg-deb(1)}.  THis command is used when building Debian apt
+repositories.  By default, @command{configure} will search for this tool.
 
 @item LDCONFIG
 Configure loader command, @manref{ldconfig(8)}.  Command used to configure the loader when libraries
@@ -1850,6 +2081,73 @@ post-installation checks.  By default, @file{configure} will search for this too
 @item AUTOTEST
 Autotest macro build command, @manpage{autom4te(1)}.  This is the executable used by @command{autotest} for
 pre- and post-installation checks.  By default, @file{configure} will search for this tool.
+
+@item DOXYGEN
+Doxygen command, @manref{doxygen(1)}.  This command is used when building Doxygen documentation.  By
+default, @command{configure} will search for this tool.
+
+@item LATEX
+Latex command.  Defaults to @command{latex}.
+By default, @command{configure} will search for this tool.
+
+@item PSLATEX
+PS Latex command.  Defaults to @command{pslatex}.
+By default, @command{configure} will search for this tool.
+
+@item PDFLATEX
+PDF Latex command.  Defaults to @command{pdflatex}.
+By default, @command{configure} will search for this tool.
+
+@item LATEX2HTML
+LaTeX to HTML command.  Defaults to @command{latex2html}.
+By default, @command{configure} will search for this tool.
+
+@item DVI2PS
+DVI to PS conversion command.  Defaults to @command{dvips}.
+By default, @command{configure} will search for this tool.
+
+@item DVIPDF
+DVI to PDF conversion command.  Defatuls to @command{dvipdf}.
+By default, @command{configure} will search for this tool.
+
+@item GNUPLOT
+GNU plot command.  Defaults to @command{gnuplot}.
+By default, @command{configure} will search for this tool.
+
+@item FIG2DEV
+Fig to graphics format command.  Defaults to @command{fig2dev}.
+By default, @command{configure} will search for this tool.
+
+@item CONVERT
+Graphics format conversion command.  Defaults to @command{convert}.
+By default, @command{configure} will search for this tool.
+
+@item PS2EPSI
+PS to EPSI conversion command.  Defaults to @command{ps2epsi}.
+By default, @command{configure} will search for this tool.
+
+@item EPSTOPDF
+EPS to PDF conversion command. Defaults to @command{epstopdf}.
+By default, @command{configure} will search for this tool.
+
+@item MD5SUM
+MD5 sum command, @manref{md5sum(1)}.
+This command is used to checksum tarballs when creating FTP archive respositories.
+By default, @command{configure} will search for this tool.
+It normally defaults to @command{md5sum}.
+
+@item SHA1SUM
+SHA1 sum command, @manref{sha1sum(1)}.
+This command is used to checksum tarballs when creating FTP archive respositories.
+By default, @command{configure} will search for this tool.
+It normally defaults to @command{sha1sum}.
+
+@item SHA256SUM
+SHA256 sum command, @manref{sha256sum(1)}.
+This command is used to checksum tarballs when creating FTP archive respositories.
+By default, @command{configure} will search for this tool.
+It normally defaults to @command{sha256sum}.
+
 @end vtable
 
 @subsubsection Build

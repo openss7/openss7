@@ -1613,11 +1613,15 @@ The static version of the library,
 @node Kernel Module Development
 @section Kernel Modules
 
-Developing TPI kernel modules is similar to user space programs with regard to header files.
-@file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
-command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
-@acronym{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
-should be considered:
+@menu
+* Using Kbuild::
+@end menu
+
+Developing Linux Fast-STREAMS kernel modules is similar to user space programs with regard to header
+files.  @file{/usr/include/openss7} should be placed as an include directory to search on the
+@command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules and the rules for
+compiling @acronym{STREAMS} modules and drivers should be followed.  In particular, several
+important intricacies should be considered:
 
 @itemize @bullet
 
@@ -1638,6 +1642,54 @@ kernel version, @samp{@value{_kversion}}, is just an example.  For the running k
 output of @samp{uname -r}.}
 
 @end itemize
+
+@node Using Kbuild
+@subsection Using Kbuild
+
+Support is provided for the development of Linux Fast-STREAMS kernel modules using @cite{Kbuild}.
+
+@ref{example:kbuild} provides an example listing of a @cite{Kbuild} makefile for building the
+@file{example} driver.
+
+@cartouche
+@float Example,example:kbuild
+@caption{@emph{Example Kbuild Makefile}}
+@smallexample
+@verbatim
+KDIR := /lib/modules/$(shell uname -r)/build
+obj-m := streams_example.o
+streams_example-objs := example.o
+moduledir = /lib/modules/$(shell uname -r)/openss7/
+
+all: modules
+modules:
+        cp /usr/src/openss7/Module.symvers Module.symvers
+        $(MAKE) -C $(KDIR) M=$(PWD) modules MODFLAGS='-DMODULE -I/usr/include/openss7'
+
+clean-modules:
+        rm -f -- example.o
+        rm -f -- .example.o.cmd
+        rm -f -- Module.markers
+        rm -f -- Module.symvers
+        rm -f -- streams_example.ko
+        rm -f -- .streams_example.ko.cmd
+        rm -f -- streams_example.mod.c
+        rm -f -- streams_example.mod.o
+        rm -f -- .streams_example.mod.o.cmd
+        rm -f -- streams_example.o
+        rm -f -- .streams_example.o.cmd
+        rm -rf -- .tmp_versions
+
+install-modules:
+        cp streams_example.ko $(moduledir)/streams_example.ko
+        depmod -ae
+        
+remove-modules:
+        rm -f -- $(moduledir)/streams_example.ko
+@end verbatim
+@end smallexample
+@end float
+@end cartouche
 
 @node Manual Pages
 @section Manual Pages
