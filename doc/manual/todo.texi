@@ -1,33 +1,60 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
 @c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
 @c
-@c Permission is granted to make and distribute verbatim copies of this
-@c manual provided the copyright notice and this permission notice are
-@c preserved on all copies.
+@c Permission is granted to copy, distribute and/or modify this document
+@c under the terms of the GNU Free Documentation License, Version 1.3 or
+@c any later version published by the Free Software Foundation; with no
+@c Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+@c copy of the license is included in the section entitled "GNU Free
+@c Documentation License".
 @c
-@c Permission is granted to copy and distribute modified versions of this
-@c manual under the conditions for verbatim copying, provided that the
-@c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one.
+@c Permission to use, copy and distribute this documentation without
+@c modification, for any purpose and without fee or royalty is hereby
+@c granted, provided that both the above copyright notice and this
+@c permission notice appears in all copies and that the name of OpenSS7
+@c Corporation not be used in advertising or publicity pertaining to
+@c distribution of this documentation or its contents without specific,
+@c written prior permission.  OpenSS7 Corporation makes no representation
+@c about the suitability of this documentation for any purpose.  It is
+@c provided "as is" without express or implied warranty.
+@c 
+@c Permission is granted to process this file through Tex and print the
+@c results, provided the printed document carries copying permission notice
+@c identical to this one except for the removal of this paragraph (this
+@c paragraph not being relevant to the printed manual).
+@c 
+@c OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+@c DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
+@c FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE
+@c CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE
+@c IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY
+@c PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL
+@c OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR
+@c CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+@c USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+@c OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+@c THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS
+@c THEREOF.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
 @c responsibility for errors or omissions, or for damages resulting from
-@c the use of the information contained herein.  The author(s) may not
-@c have taken the same level of care in the production of this manual,
-@c which is licensed free of charge, as they might when working
-@c professionally.
+@c the use of the information contained herein.  The author(s) may not have
+@c taken the same level of care in the production of this manual, which is
+@c licensed free of charge, as they might when working professionally.
 @c 
-@c Formatted or processed versions of this manual, if unaccompanied by
-@c the source, must acknowledge the copyright and authors of this work.
+@c Formatted or processed versions of this manual, if unaccompanied by the
+@c source, must acknowledge the copyright and authors of this work.
 @c
 @c -------------------------------------------------------------------------
 @c
@@ -57,30 +84,396 @@
 @c
 @c =========================================================================
 
-@subsubheading Current Plan
+@menu
+* Current Plan::
+* Things to Do::
+@end menu
 
-The OpenSS7 master package is a mature collection of all of the OpenSS7 STREAMS and protocol modules
-that builds all packages on a wide range of supported Linux distributions and kernels.  The master
-package is a good way to build and validate all packages against a given distribution.
+@c --------------------------------------------------------------------
 
-Therefore, the current plan for the OpenSS7 Master Package is largely a maintenance plan.  The
-OpenSS7 Project intends to release regularly new versions of the Master Package that build and
-validate against upcoming releases of the supported Linux Distributions available from major
-distributors and upcoming releases of the Linux kernel, both mainline and as patched by major
-distributions.  This release schedule is approximately every 3 to 6 months.  More recent corrections
-and support for new distributions and kernels can be obtained by sponsoring the OpenSS7 Project and
-obtaining access to the live CVS repository (also available as a git repository).
+@node Current Plan
+@subheading Current Plan
 
-Two significant plans for the master package include providing cross-compiling support for more
+@menu
+* STREAMS Current Plan::
+* COMPAT Current Plan::
+* BCM Current Plan::
+* TTY Current Plan::
+* CHAN Current Plan::
+* XNS Current Plan::
+* XNET Current Plan::
+* NSL Current Plan::
+* SOCK Current Plan::
+* INET Current Plan::
+* SCTP Current Plan::
+* X25 Current Plan::
+* ISO Current Plan::
+* ISDN Current Plan::
+* SS7 Current Plan::
+* SIGTRAN Current Plan::
+* ATM Current Plan::
+* VOIP Current Plan::
+@end menu
+
+The @cite{@value{PACKAGE_TITLE}} package is a mature collection of all of the OpenSS7 STREAMS and
+protocol modules that builds all components on a wide range of supported Linux distributions and
+kernels.  The @cite{@value{PACKAGE_TITLE}} package is a builds and validates all components against
+a given distribution.
+
+Therefore, the current plan for packaging is largely a maintenance plan.  The
+@uref{http://www.openss7.org/,OpenSS7 Project} intends to release regularly new versions of the
+package that build and validate against upcoming releases of the supported Linux Distributions
+available from major distributors and upcoming releases of the Linux kernel, both mainline and as
+patched by major distributions.  This release schedule is approximately every 3 to 6 months.  More
+recent corrections and support for new distributions and kernels can be obtained by sponsoring the
+@uref{http://www.openss7.org/,OpenSS7 Project} and obtaining access to the live CVS repository (also
+available as a git repository).
+
+Two significant plans for the package include providing cross-compiling support for more
 cross-platform development distributions, such as the Denx ELDK.  Also, support for real-time
-distributions such as Montavista Linux and upcoming RT releases of SuSE and RedHat are within the
-scope of the development plan.
+distributions such as Montavista Linux and RT releases of SuSE and RedHat are within the scope of
+the development plan.
 
-No additional subpackages are currently planned although development within the existing subpackages
-are planned.  See the TODO files in the subpackage for a current development plan for a specific
-subpackage.
+No additional components are currently planned although development within the existing components
+are planned.  See the section for the component below, for a current development plan for a specific
+component.
 
-@subsubheading Things to Do
+@c --------------------------------------------------------------------
+
+@node STREAMS Current Plan
+@subsubheading STREAMS Current Plan
+
+There are not many things left to be done on the production Linux Fast-STREAMS component.  As of the
+streams-0.9.3 release, performance modifications are complete.  The component now exhibits
+performance on STREAMS-based pipes and TPI drivers that is significantly (factor of 2 or more)
+superior to that experienced by legacy Linux facilities.
+
+Therefore, the current plan for Linux Fast-STREAMS is largely a maintenance plan.  Items on the todo
+list, below, will be picked up as time permits.  The OpenSS7 Project intends to release regularly
+new versions of Linux Fast-STREAMS that build and validate against upcoming releases of the
+supported Linux Distributions available from major distributors and upcoming releases of the Linux
+kernel, both mainline and as patched by major distributors.  This release schedule is approximately
+every 3 to 6 months.  More recent corrections and support for new distributions and kernels can be
+obtained by sponsoring the OpenSS7 Project and obtaining access to the live CVS repository (also
+available as a git repository).
+
+One development activity in the works for Linux Fast-STREAMS is to provide integral support for more
+embedded cross-platform development systems such as the Denx ELDK, as well a existing and emerging
+RT kernels such as Montavista and the upcoming SuSE and RedHat RT kernels.  This is a significant
+undertaking and will only be embarked upon when the OpenSS7 Project is given free access to these RT
+kernels and distributions.
+
+@c --------------------------------------------------------------------
+
+@node COMPAT Current Plan
+@subsubheading COMPAT Current Plan
+
+There are not many things left to be done on the production OpenSS7 STREAMS Compatibility Modules
+component.  The current plan for the component is largely a maintenance plan including support for
+current distributions and kernels.
+
+There are currently a large array of Solaris DDI compatibility functions that are not implemented;
+however, there have not been many requests for this capability.  Perhaps the advent of OpenSolaris
+has forstalled porting of many drivers to Linux, but, regardless of the cause, there is just not a
+demand.  If there are any functions that you need the OpenSS7 Project to support that are not
+currently supported in one of the compatibility modules, please request support for them on the
+openss7-develop mailing list.
+
+@c --------------------------------------------------------------------
+
+@node BCM Current Plan
+@subsubheading BCM Current Plan
+
+The OpenSS7 Project has made several stabs at making this component available and providing it in a
+production grade form.  All attempts are currently incomplete.  All in all there does not appear to
+be sufficient interest in this capability to actually fund the work.  Therefore, this component will
+remain incomplete until some entity can justify funding the remainder of the development.  The
+OpenSS7 Project remains committed to the open source model and providing this support runs somewhat
+against that.  However, if your organization has a pressing need for this capability and can offer
+funding for its completion, please contact the project on the openss7 mailing list.
+
+@c --------------------------------------------------------------------
+
+@node TTY Current Plan
+@subsubheading TTY Current Plan
+
+This component is still incomplete.  It is missing a fully functional ldterm module.  Also,
+performance testing of STREAMS-based pipes from the Linux Fast-STREAMS indicates that STREAMS-based
+pseudo-terminals could exhibit far superior performance to that exhibited by the legacy Linux (SVR 3
+style) pseduo-terminals.  To accomplish this requires fully implementing ldterm, creating validation
+test suites, and peformance analysis and comparison with legacy Linux mechanisms.
+
+This component is not currently a priority for the OpenSS7 Project, which is focussed on more
+telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this component is
+important in your industry and your organization is able to fund further development or contribute
+the missing items, contact us on the openss7-develop mailing list.  Until funding or a mandate
+surfaces, this component will likely continue as a proof-of-concept only.  It will be maintained in a
+compilable and installable state (that is, it will be updated for current Linux distributions and
+kernels) on the same basis as other components in the OpenSS7 package.
+
+@c --------------------------------------------------------------------
+
+@node CHAN Current Plan
+@subsubheading CHAN Current Plan
+
+This component, which contains hard-switch or MG capabilities is not currently planned.  Of priority
+is the production deployment of soft-switch or MGC and Signalling Gateway components from the
+@file{SIGTRAN}, @file{SS7} and @file{VOIP} components.  This component will only receive maintenance
+releases until those priorities have been sufficiently met (over the course of Summer 2009).
+
+@c --------------------------------------------------------------------
+
+@node XNS Current Plan
+@subsubheading XNS Current Plan
+
+This component is mature and complete and in production release.  The current plan is to provide
+only maintenance releases supporting more recent Linux distributions, kernels and tool chains as
+they evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
+
+@c --------------------------------------------------------------------
+
+@node XNET Current Plan
+@subsubheading XNET Current Plan
+
+This component is mature and complete and in production release.  The current plan is to provide
+only maintenance releases supporting more recent Linux distributions, kernels and tool chains as
+they evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
+
+@c --------------------------------------------------------------------
+
+@node NSL Current Plan
+@subsubheading NSL Current Plan
+
+Current plans are to just maintain this component for recent distributions, kernels and tool chains.
+Although at some point the relation of this component to TI-RPC 2.8 needs to be worked out, when that
+will happen is not currently on a schedule.  I do not really know how much of a requirement there is
+for ONC RPC running over other transports such as ISO transports and SCTP transports, although it
+would surely be interesting to run NFS4 over SCTP.
+
+This component is not currently a priority for the OpenSS7 Project, which is focussed on more
+telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this component is
+important in your industry and your organization is able to fund further development or contribute
+the missing items, contact us on the openss7-develop mailing list.  Until funding or a mandate
+surfaces, this component will likely continue as a proof-of-concept only.  It will be maintained in a
+compilable and installable component (that is, it will be updated for current Linux distributions and
+kernels) on the same basis as other components in the OpenSS7 package.
+
+@c --------------------------------------------------------------------
+
+@node SOCK Current Plan
+@subsubheading SOCK Current Plan
+
+This component is still incomplete.  It is missing a fully functional Stream head socket library,
+module or driver implementation.  Also, performance testing of STREAMS INET drivers indicates that
+STREAMS-based networking components could exhibit far superior performance to that exhibited by
+legacy Linux sockets.  To accomplish this requires fully implementing @manref{socklib(3)},
+@manref{sockmod(4)} module or @manref{socksys(4)} driver, creating validation test suites, and
+performance analysis and comparison with legacy Linux mechanisms.
+
+This component is not currently a priority for the OpenSS7 project, which is focussed on more
+telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this component is
+important to your industry and your organization is able to fund further development or contribute
+the missing items, contact us on the openss7-develop maling list.  Until funding or a mandate
+surfaces, this component will likely continue as a proof-of-concept only.  It will be maintained ina
+compilable and installable component (that is, it will be updated for current Linux distributions and
+kernels) on the same basis as other components in the OpenSS7 package.
+
+@c --------------------------------------------------------------------
+
+@node INET Current Plan
+@subsubheading INET Current Plan
+
+This component is mature and complete and in production release.  The current plan is to provide
+only maintenance releases supporting more recent Linux distributions and kernels as they evolve.
+Expect public maintenance releases on a 3 to 6 month cycle.
+
+@c --------------------------------------------------------------------
+
+@node SCTP Current Plan
+@subsubheading SCTP Current Plan
+
+This component is mature and complete and in production release.  The current plan is to provide
+only maintenance releases supporting more recent Linux distributions, kernels and tool chains as
+they evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
+
+@c --------------------------------------------------------------------
+
+@node X25 Current Plan
+@subsubheading X25 Current Plan
+
+This component was initially started to provide managment interfaces to platforms using the OpenSS7
+protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
+some of the old @file{isode} package into this component to provide some GDMO facilities.
+
+Since then, it was discovered that these ISO protocols are still very important to a number of
+industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
+industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
+communications for the Aviation industry.
+
+While the OpenSS7 Project's focus over the Summer of 2009 is going to be soft-switch enabling
+protocols, that may change if the Aviation industry steps up to this component with some funding to
+complete the work or by contributing changes, improvements or development to this component.
+Otherwise, expect this component to receive only maintenance releases over the next 8 months or so.
+
+@c --------------------------------------------------------------------
+
+@node ISO Current Plan
+@subsubheading ISO Current Plan
+
+This component was initially started to provide managment interfaces to platforms using the OpenSS7
+protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
+some of the old @file{isode} package into this component to provide some GDMO facilities.
+
+Since then, it was discovered that these ISO protocols are still very important to a number of
+industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
+industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
+communications for the Aviation industry.
+
+While the OpenSS7 Project's focus over the Summer of 2009 is going to be soft-switch enabling
+protocols, that may change if the Aviation industry steps up to this component with some funding to
+complete the work or by contributing changes, improvements or development to this component.
+Otherwise, expect this component to receive only maintenance releases over the next 8 months or so.
+
+@c --------------------------------------------------------------------
+
+@node ISDN Current Plan
+@subsubheading ISDN Current Plan
+
+This component is lower down on the priority list.  Current focus is on pushing through the
+@file{SIGTRAN}, @file{SS7} and @file{VOIP} components instead.  This components sits at about the
+same status as the @file{CHAN} component.  there exists modules and drivers in this component that
+have not yet been publicly released and are only available to sponsors of the OpenSS7 Project on the
+CVS archive.  When the project gets back to this component (sometime 2H2009), the plan will be to move
+the private modules and drivers into the public release, place conformance validation test cases
+around them and release this component as production grade.
+
+@c --------------------------------------------------------------------
+
+@node SS7 Current Plan
+@subsubheading SS7 Current Plan
+
+The current plan includes the public production release of SCCP, ISUP and TCAP components.  MTP3 has
+not yet been publicly released and is not currently scheduled. (Implementing the AS-side of M3UA is
+taking precedence.)  The first public production releases of SCCP, ISUP and TCAP are planned for the
+end of July 2009.  This will be followed by lab and limitied field trial testing with a lead
+customer in August and production deployment in the lead customer's network in 1Q2009.  Expect that
+over the next 8 months releases of this component will include major new development and validation
+testing as well as including SCCP, ISUP and TCAP components that have nor heretofore been publicly
+released.
+
+@c --------------------------------------------------------------------
+
+@node SIGTRAN Current Plan
+@subsubheading SIGTRAN Current Plan
+
+The current plan of the next several months (over the summer of 2009) is to actively move this
+component forward.  This consists of the following:
+
+@itemize @bullet
+
+@item
+Move SIGTRAN modules and drivers that have not yet been publicly released into the public release.
+
+@item
+Write test cases for complete AS-side implementations of all of the UAs (including ISUA and TUA).
+
+@item
+Perform production testing of the UAs against Tekelec Eagle and Cisco ITP equipment.
+
+@item
+Rigorous lab and limited field testing of AS-side components.
+
+@item
+Production deployment in customer's network for 1Q2009.
+
+@end itemize
+
+Note that M2PA is complete.  Aside from that, the order of testing and implementation will be M3UA
+followed by M2UA or SUA and then TUA, IUA (including V5UA and GR303UA) and ISUA.
+
+Production public releases of the AS side of M3UA can be expected by the end of July 2009.
+
+@c --------------------------------------------------------------------
+
+@node ATM Current Plan
+@subsubheading ATM Current Plan
+
+This component was initially started to provide managment interfaces to platforms using the OpenSS7
+protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
+some of the old @file{isode} package into this component to provide some GDMO facilities.
+
+Since then, it was discovered that these ISO protocols are still very important to a number of
+industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
+industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
+communications for the Aviation industry.
+
+While the OpenSS7 Project's focus over the Summer of 2009 is going to be soft-switch enabling
+protocols, that may change if the Aviation industry steps up to this component with some funding to
+complete the work or by contributing changes, improvements or development to this component.
+Otherwise, expect this component to receive only maintenance releases over the next 8 months or so.
+
+@c --------------------------------------------------------------------
+
+@node VOIP Current Plan
+@subsubheading VOIP Current Plan
+
+The current plan of the next several months (over the summer of 2009) is to actively move this
+component forward.  This consists of the following:
+
+@itemize @bullet
+
+@item
+Implementation and testing of MGCP (MGC-side) using the MGI and TCP transport from the
+@command{INET} component.
+
+@item
+Implementation and testing of MEGACO/H.248 (MGC-side, binary format) using the MGI and SCTP
+transport from the @command{SCTP} component.
+
+@item
+Implementation of SIP-T and SIP call control using the CCI and TCP transport from the
+@command{INET} component and later SCTP transport from the @command{SCTP} component.
+
+@item
+Perform production testing of MEGACO/H.248 and MGCP against the Veraz iGATE, the Cisco 5400 and the
+Sonus Media Gateways.
+
+@item
+Rigorous lab and limited field testing of the MGC-side components.
+
+@item
+Production deployment in customer's network for 1Q2009.
+
+@end itemize
+
+The order of testing will be MEGACO/H.248 and then SIP-T and SIP followed by MGCP.  Production
+public releases of the MGC side of MEGACO/H.248 and SIP-T acan be expected by the end of July 2009.
+
+@c --------------------------------------------------------------------
+
+@node Things to Do
+@subheading Things to Do
+
+@menu
+* STREAMS Things to Do::
+* COMPAT Things to Do::
+* BCM Things to Do::
+* TTY Things to Do::
+* CHAN Things to Do::
+* XNS Things to Do::
+* XNET Things to Do::
+* NSL Things to Do::
+* SOCK Things to Do::
+* INET Things to Do::
+* SCTP Things to Do::
+* X25 Things to Do::
+* ISO Things to Do::
+* ISDN Things to Do::
+* SS7 Things to Do::
+* SIGTRAN Things to Do::
+* ATM Things to Do::
+* VOIP Things to Do::
+@end menu
 
 @itemize @minus
 
@@ -112,6 +505,7 @@ distributed conformance test cases quite possible.  Note that TETware does not r
 external tools but does require network access and installation on the target systems (unlike
 DejaGNU that can execute test cases over a serial port if necessary).
 
+@ignore
 @item Documentation generation.
 
 I have all these @samp{/**} comments that use either kerneldoc or doxygen format sprinkled
@@ -133,6 +527,7 @@ package with the string 'doxygen(1)' in them.  What I really put in there was
 
 Then html documentation is automatically generated in the doc/html or html directory.  I still need
 to do the same for kerneldoc.
+@end ignore
 
 @item Dynamic configuration.
 
@@ -160,6 +555,7 @@ various administrative files for each of seven or so packages.
 The result will be just a streams-0.9.4 release.  The only two (STREAMS) packages left will be
 strbcm and strss7.
 
+@ignore
 @item STREAMS Terminals
 
 I want to someday write an ldterm for Linux Fast-STREAMS and provide truly STREAMS-based pseudo
@@ -169,7 +565,9 @@ terminals.
 
 Added package @command{strtty-0.9.2.1} for @acronym{STREAMS}-based terminals.  Pick up the todo list
 there...
+@end ignore
 
+@ignore
 @item Bug reporting.
 
 We have these nice autotest test suites that generate a lot of information when a test case fails in
@@ -192,7 +590,9 @@ Better still, it might be a good idea to modify the logging targets to automatic
 problem report when they fail.  That would be better.
 
 @emph{*done*}
+@end ignore
 
+@ignore
 @item Embedded install.
 
 Provide an option for not installing documentation and development headers, etc.  Just the runtime.
@@ -200,33 +600,13 @@ This is mostly for embedded targets.  Make it a @option{--without-devel} configu
 defaults to including documentation and development environment.
 
 @emph{*done*}
+@end ignore
 @end itemize
 
 
 @c --------------------------------------------------------------------
 
-@subsubheading STREAMS Current Plan
-
-There are not many things left to be done on the production Linux Fast-STREAMS package.  As of the
-streams-0.9.3 release, performance modifications are complete.  The package now exhibits performance
-on STREAMS-based pipes and TPI drivers that is significantly (factor of 2 or more) superior to that
-experienced by legacy Linux facilities.
-
-Therefore, the current plan for Linux Fast-STREAMS is largely a maintenance plan.  Items on the todo
-list, below, will be picked up as time permits.  The OpenSS7 Project intends to release regularly
-new versions of Linux Fast-STREAMS that build and validate against upcoming releases of the
-supported Linux Distributions available from major distributors and upcoming releases of the Linux
-kernel, both mainline and as patched by major distributors.  This release schedule is approximately
-every 3 to 6 months.  More recent corrections and support for new distributions and kernels can be
-obtained by sponsoring the OpenSS7 Project and obtaining access to the live CVS repository (also
-available as a git repository).
-
-One development activity in the works for Linux Fast-STREAMS is to provide integral support for more
-embedded cross-platform development systems such as the Denx ELDK, as well a existing and emerging
-RT kernels such as Montavista and the upcoming SuSE and RedHat RT kernels.  This is a significant
-undertaking and will only be embarked upon when the OpenSS7 Project is given free access to these RT
-kernels and distributions.
-
+@node STREAMS Things to Do
 @subsubheading STREAMS Things to Do
 
 @itemize @minus
@@ -316,6 +696,7 @@ Wrote the manual pages and added them to the build.  Placed function skeletons t
 Implement @manpage{I_EGETSIG(7)} and @manpage{I_ESETSIG(7)}.
 @end table
 
+@ignore
 @item
 It is possible on 2.6 kernels to use the ability to determine the module that owns a function to
 perform module reference counting for @manref{esballoc(9)} callback functions.  That is, when
@@ -328,7 +709,9 @@ module_text_address() that returns the module in which a text address resides.
 @item DONE:
 Module reference counting performed when module_text_address() is available.
 @end table
+@end ignore
 
+@ignore
 @item
 Add a tail padding amount to the stream head as a option to facilitate conversion of mblks to
 sk_bufs.
@@ -337,6 +720,7 @@ sk_bufs.
 @item DONE:
 Implemented as SO_WRPAD.
 @end table
+@end ignore
 
 @item
 Socket buffer handling:
@@ -401,6 +785,7 @@ panics caused by misbehaving STREAMS modules or drivers.
 Register panic notifier.
 @end table
 
+@ignore
 @item
 Timers and Buffer callbacks:- Still haven't tested these.
 
@@ -412,7 +797,9 @@ tested.
 
 Even mi_timers on M2PA are working fine.
 @end table
+@end ignore
 
+@ignore
 @item
 More performance testing and profiling on SMP.  On the same kernel running non-SMP we get pipe
 performance of about 80-90% of a Linux native pipe.  Just running an SMP kernel drops this to 60%
@@ -424,7 +811,9 @@ profiling information is out of date and needs to be updated.
 @item DONE:
 Profile and performance tests on SMP.
 @end table
+@end ignore
 
+@ignore
 @item
 I am interested to convert the perftest program to use a FIFO instead of a pipe.  This is because a
 FIFO is more closely related to a Linux Native pipe (i.e it has a read side and a write side, is
@@ -435,7 +824,9 @@ to STREAMS-based pipes should be interesting.
 @item DONE:
 Tested.  Results were unimpressive.  STREAMS FIFOs perform about 1% better than STREAMS-based pipes.
 @end table
+@end ignore
 
+@ignore
 @item
 32bit compatibility:- Not done yet, but a plan in place.  Override stupid CDROM ioctl conversions on
 kernels before 2.6.11, use compat_ioctl after that.  For the older read/write interface it will be
@@ -450,7 +841,9 @@ Tested on x86_64 with i686.
 @item DONE:
 Documentation of new registration functions.
 @end table
+@end ignore
 
+@ignore
 @item
 SMP:- Finally got at least a Hyper-Threaded Intel 630 for testing.  There are some issues discovered
 when running the test suites.  Initial debugging is done (everything runs and doesn't crash) it is
@@ -463,7 +856,9 @@ compatibility with SVR4 but not examine them).
 @item DONE:
 Tested on X86_64 SMP.
 @end table
+@end ignore
 
+@ignore
 @item
 64bit clean:- Pretty good now.  I have clean compiles and test suite runs on 2.6.9-22.EL x86_64
 kernels.
@@ -472,7 +867,9 @@ kernels.
 @item DONE:
 Tested on x86_64.
 @end table
+@end ignore
 
+@ignore
 @item
 Finish the documentation.
 
@@ -480,7 +877,9 @@ Finish the documentation.
 @item MOSTLY DONE:
 updated documentation alot.
 @end table
+@end ignore
 
+@ignore
 @item
 Finish the full STREAMS logger and proper implementation of the strlog() utility.
 
@@ -488,7 +887,9 @@ Finish the full STREAMS logger and proper implementation of the strlog() utility
 @item DONE:
 Added to strutil package.  Needs testing.
 @end table
+@end ignore
 
+@ignore
 @item
 Need to rework the specfs.  There are now several situations to consider:
 
@@ -542,6 +943,7 @@ So, what we need now is to rework data structures and the specfs to be a little 
 @item DONE:
 Tested.
 @end table
+@end ignore
 
 @item
 Kernel objects are another thing.  For 2.6 kernels, we need to hold our data structures in the
@@ -559,20 +961,8 @@ more for us.
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRCOMPAT Current Plan
-
-There are not many things left to be done on the production OpenSS7 STREAMS Compatibility Modules
-package.  The current plan for the package is largely a maintenance plan including support for
-current distributions and kernels.
-
-There are currently a large array of Solaris DDI compatibility functions that are not implemented;
-however, there have not been many requests for this capability.  Perhaps the advent of OpenSolaris
-has forstalled porting of many drivers to Linux, but, regardless of the cause, there is just not a
-demand.  If there are any functions that you need the OpenSS7 Project to support that are not
-currently supported in one of the compatibility modules, please request support for them on the
-openss7-develop mailing list.
-
-@subsubheading STRCOMPAT Things to Do
+@node COMPAT Things to Do
+@subsubheading COMPAT Things to Do
 
 @itemize @minus
 
@@ -651,17 +1041,8 @@ to be done.
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRBCM Current Plan
-
-The OpenSS7 Project has made several stabs at making this package available and providing it in a
-production grade form.  All attempts are currently incomplete.  All in all there does not appear to
-be sufficient interest in this capability to actually fund the work.  Therefore, this package will
-remain incomplete until some entity can justify funding the remainder of the development.  The
-OpenSS7 Project remains committed to the open source model and providing this support runs somewhat
-against that.  However, if your organization has a pressing need for this capability and can offer
-funding for its completion, please contact the project on the openss7 mailing list.
-
-@subsubheading STRBCM Things to Do
+@node BCM Things to Do
+@subsubheading BCM Things to Do
 
 @itemize @minus
 @item
@@ -680,24 +1061,8 @@ provides a separable way of incorporating 3rd party binary modules.
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRTTY Current Plan
-
-This package is still incomplete.  It is missing a fully functional ldterm module.  Also,
-performance testing of STREAMS-based pipes from the Linux Fast-STREAMS base package indicates that
-STREAMS-based pseudo-terminals could exhibit far superior performance to that exhibited by the
-legacy Linux (SVR 3 style) pseduo-terminals.  To accomplish this requires fully implementing ldterm,
-creating validation test suites, and peformance analysis and comparison with legacy Linux
-mechanisms.
-
-This package is not currently a priority for the OpenSS7 Project, which is focussed on more
-telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this package is
-important in your industry and your organization is able to fund further development or contribute
-the missing items, contact us on the openss7-develop mailing list.  Until funding or a mandate
-surfaces, this package will likely continue as a proof-of-concept only.  It will be maintained in a
-compilable and installable package (that is, it will be updated for current Linux distributions and
-kernels) on the same basis as other packages in the OpenSS7 master package.
-
-@subsubheading STRTTY Things to Do
+@node TTY Things to Do
+@subsubheading TTY Things to Do
 
 @itemize @minus
 @item
@@ -725,6 +1090,7 @@ right now is a skeleton module.
 
 @emph{*todo*}
 
+@ignore
 @item
 Create a @manref{ttcompat(4)} @cite{TTY Compatibility} @acronym{STREAMS} module.
 
@@ -733,7 +1099,9 @@ Create a @manref{ttcompat(4)} @cite{TTY Compatibility} @acronym{STREAMS} module.
 Created a @manref{ttcompat(4)} module.  This module compiles and installs and
 is fully documented, but is completely untested.
 @end table
+@end ignore
 
+@ignore
 @item
 Create a @manref{pckt(4)} @cite{Packet Mode} @acronym{STREAMS} module.
 
@@ -742,7 +1110,9 @@ Create a @manref{pckt(4)} @cite{Packet Mode} @acronym{STREAMS} module.
 Created a @manref{pckt(4)} module.  This module compiles and installs and is
 fully documented, but is completely untested.
 @end table
+@end ignore
 
+@ignore
 @item
 Create a @manref{ptem(4)} @cite{Pseudo-Terminal Emulation} @acronym{STREAMS}
 module.
@@ -752,7 +1122,9 @@ module.
 Created a @manref{ptem(4)} module.  This module compiles and installs and is
 fully documented,  but is completely untested.
 @end table
+@end ignore
 
+@ignore
 @item
 Create a @manref{pty(4)} @cite{Pseudo-Terminal} @acronym{STREAMS} driver.  This
 driver will provide both slave (@manref{pts(4)}) and master (@manref{ptm(4)})
@@ -763,7 +1135,9 @@ driver will provide both slave (@manref{pts(4)}) and master (@manref{ptm(4)})
 Created @manref{ptm(4)} and @manref{pts(4)} driver.  This driver compiles and
 installs and is fully documented, but is completely untested.
 @end table
+@end ignore
 
+@ignore
 @item
 Move already written code from the @file{stacks} or @file{strss7} directories
 into the @file{src} directory.
@@ -771,7 +1145,9 @@ into the @file{src} directory.
 @table @emph
 @item *done*
 @end table
+@end ignore
 
+@ignore
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a subpackage in the @cite{OpenSS7 Master Package}.
@@ -780,6 +1156,7 @@ a subpackage in the @cite{OpenSS7 Master Package}.
 @item *done*
 You are reading it.
 @end table
+@end ignore
 @end itemize
 
 The @command{@value{PACKAGE}} package is currently incomplete.
@@ -793,15 +1170,8 @@ If someone is interested in this package, a contribution of a working
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRCHAN Current Plan
-
-This package, which contains hard-switch or MG capabilities is not currently planned.  Of priority
-is the production deployment of soft-switch or MGC and Signalling Gateway components from the
-@file{sigtran}, @file{strss7} and @file{strvoip} packages.  This package will only receive
-maintenance releases until those priorities have been sufficiently met (over the course of Summer
-2007).
-
-@subsubheading STRCHAN Things to Do
+@node CHAN Things to Do
+@subsubheading CHAN Things to Do
 
 @itemize @minus
 
@@ -826,13 +1196,8 @@ CDI interface should be moved here.
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRXNS Current Plan
-
-This package is mature and complete and in production release.  The current plan is to provide only
-maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
-evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
-
-@subsubheading STRXNS Things to Do
+@node XNS Things to Do
+@subsubheading XNS Things to Do
 
 @itemize @minus
 @item
@@ -857,6 +1222,7 @@ Test.  Almost none of the modules or drivers in this package have been tested th
 Linux Fast-STREAMS.  One of the primary reasons for this is that The OpenSS7 Project
 does not really use any of these modules or drivers.
 
+@ignore
 @item
 Write an NPI interface driver to the Linux IP subsystem.  That is, the rough NPI equivalent of a raw
 IP TPI Stream.
@@ -896,6 +1262,7 @@ Yes, the approach still has some validity.)
 
 The np_ip driver performs many of these functions now.  Test suites for the driver are also
 provided.
+@end ignore
 
 @item
 This might be a useful place to drop all of the DLPI drivers from the strss7 package, particularly
@@ -904,13 +1271,8 @@ those for X.25, Frame Relay, and ISDN LAPD and LAPB.
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRXNET Current Plan
-
-This package is mature and complete and in production release.  The current plan is to provide only
-maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
-evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
-
-@subsubheading STRXNET Things to Do
+@node XNET Things to Do
+@subsubheading XNET Things to Do
 
 @itemize @bullet
 
@@ -930,29 +1292,14 @@ user program.  This capability is not yet implemented in this XTI library and re
 @emph{*todo*}
 
 @item
-Need to remove the following functions:
-
-@multitable {t_rcvopt(3) and}
-@item @manref{t_sndopt(3)},
-@item @manref{t_sndvopt(3)},
-@item @manref{t_rcvopt(3)} and
-@item @manref{t_rcvvopt(3)},
-@end multitable
-
-as they are non-standard and non-portable.  Instead use the following functions:
-
-@multitable {t_rcvudata(3) and}
-@item @manref{t_sndudata(3)},
-@item @manref{t_sndvudata(3)},
-@item @manref{t_rcvudata(3)} and
-@item @manref{t_rcvvudata(3)}.
-@end multitable
-
-because they have precisely the same argument templates as the other.  These functions are described
-in the OpenGroup documentation as inapplicable to connection-oriented transports, however, we could
-relieve that restriction for SCTP.  The characteristics to check is if T_CLTS, okay, T_COTS or
-T_COTS_ORD, only okay if the tsdu_size is not T_INVALID (as it is for TCP).  (It would be okay to be
-T_INFINITE as it is for SCTP.)
+Need to remove the following functions: @manref{t_sndopt(3)}, @manref{t_sndvopt(3)},
+@manref{t_rcvopt(3)} and @manref{t_rcvvopt(3)}; as they are non-standard and non-portable.  Instead
+use the following functions: @manref{t_sndudata(3)}, @manref{t_sndvudata(3)}, @manref{t_rcvudata(3)}
+and @manref{t_rcvvudata(3)}; because they have precisely the same argument templates as the other.
+These functions are described in the OpenGroup documentation as inapplicable to connection-oriented
+transports, however, we could relieve that restriction for SCTP.  The characteristics to check is if
+T_CLTS, okay, T_COTS or T_COTS_ORD, only okay if the tsdu_size is not T_INVALID (as it is for TCP).
+(It would be okay to be T_INFINITE as it is for SCTP.)
 
 @emph{*todo*}
 
@@ -971,43 +1318,23 @@ TPI ATM support under the strss7 package, then this item will be investigated.
 
 @emph{*todo*}
 
+@ignore
 @item
 Addition of a (unfortunately non-standard) send with options commands for SCTP.
 
 @emph{*done*}
 
-Actually this was already done a long time ago.  See manual pages:
-
-@multitable {t_rcvopt(3) and}
-@item @manref{t_sndopt(3)},
-@item @manref{t_sndvopt(3)},
-@item @manref{t_rcvopt(3)} and
-@item @manref{t_rcvvopt(3)}.
-@end multitable
-
+Actually this was already done a long time ago.  See manual pages: @manref{t_sndopt(3)},
+@manref{t_sndvopt(3)}, @manref{t_rcvopt(3)} and @manref{t_rcvvopt(3)}.
 Perhaps what needs to be done is to test them?
+@end ignore
 
 @end itemize
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRNSL Current Plan
-
-Current plans are to just maintain this package for recent distributions, kernels and tool chains.
-Although at some point the relation of this package to TI-RPC 2.8 needs to be worked out, when that
-will happen is not currently on a schedule.  I do not really know how much of a requirement there is
-for ONC RPC running over other transports such as ISO transports and SCTP transports, although it
-would surely be interesting to run NFS4 over SCTP.
-
-This package is not currently a priority for the OpenSS7 Project, which is focussed on more
-telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this package is
-important in your industry and your organization is able to fund further development or contribute
-the missing items, contact us on the openss7-develop mailing list.  Until funding or a mandate
-surfaces, this package will likely continue as a proof-of-concept only.  It will be maintained in a
-compilable and installable package (that is, it will be updated for current Linux distributions and
-kernels) on the same basis as other packages in the OpenSS7 master package.
-
-@subsubheading STRNSL Things to Do
+@node NSL Things to Do
+@subsubheading NSL Things to Do
 
 @itemize @bullet
 @item
@@ -1034,6 +1361,7 @@ with a separate strrpc package, or addressed directly by this package.
 
 @emph{*todo*}
 
+@ignore
 @item
 One of the primary purposes of providing this package for the OpenSS7 Project was to provide access
 to the network configuration database and name-to-address translation functions for the purpose of
@@ -1045,6 +1373,7 @@ Provide a mechanism for implementations of transport protocols to add their defi
 @manref{netconfig(5)} database files.
 
 @emph{*done*}
+@end ignore
 
 @item
 The texinfo manual, @file{libxnsl.texi}, is incomplete.  For the time being, the manual pages,
@@ -1063,24 +1392,8 @@ This package is largely untested.  A conformance test suite and some test cases 
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRSOCK Current Plan
-
-This package is still incomplete.  It is missing a fully functional Stream head socket library,
-module or driver implementation.  Also, performance testing of STREAMS INET drivers indicates that
-STREAMS-based networking components could exhibit far superior performance to that exhibited by
-legacy Linux sockets.  To accomplish this requires fully implementing @manref{socklib(3)},
-@manref{sockmod(4)} module or @manref{socksys(4)} driver, creating validation test suites, and
-performance analysis and comparison with legacy Linux mechanisms.
-
-This package is not currently a priority for the OpenSS7 project, which is focussed on more
-telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this package is
-important to your industry and your organization is able to fund further development or contribute
-the missing items, contact us on the openss7-develop maling list.  Until funding or a mandate
-surfaces, this package will likely continue as a proof-of-concept only.  It will be maintained ina
-compilable and installable package (that is, it will be updated for current Linux distributions and
-kernels) on the same basis as other packages in the OpenSS7 master package.
-
-@subsubheading STRSOCK Things to Do
+@node SOCK Things to Do
+@subsubheading SOCK Things to Do
 
 @itemize @minus
 @item
@@ -1121,6 +1434,7 @@ into the @file{src} directory.
 
 @itemize @bullet
 
+@ignore
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a sub-package in the @cite{OpenSS7 Master Package}.
@@ -1130,6 +1444,7 @@ a sub-package in the @cite{OpenSS7 Master Package}.
 
 You are reading it.
 @end table
+@end ignore
 
 @end itemize
 
@@ -1143,13 +1458,8 @@ can be combined once again (or still) with @cite{Linux Fast-STREAMS}.
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRINET Current Plan
-
-This package is mature and complete and in production release.  The current plan is to provide only
-maintenance releases supporting more recent Linux distributions and kernels as they evolve.  Expect
-public maintenance releases on a 3 to 6 month cycle.
-
-@subsubheading STRINET Things to Do
+@node INET Things to Do
+@subsubheading INET Things to Do
 
 @itemize @minus
 @item
@@ -1199,6 +1509,7 @@ functions.
 
 @emph{*todo*}
 
+@ignore
 @item
 Pure STREAMS RAW and UDP implementation.  A higher performance RAW and UDP implementation supporting
 both TPI and NPI would be nice to have.  The OpenSS7 Project needs an NPI RAW implementation that
@@ -1211,6 +1522,7 @@ differences between STREAMS UDP and Sockets UDP.
 udp2 and rawip2 drivers implemented and tested.  strxns package now has an np_ip driver for raw
 access to IP (primarily for SCTP conformance testing).  RTP drivers should be based on udp2 driver.
 @end table
+@end ignore
 
 
 @item
@@ -1219,6 +1531,7 @@ modify netperf to use (pseudo-)connection-oriented UDP for better comparison.
 
 @emph{*todo*}
 
+@ignore
 @item
 32bit compatibility testing.
 
@@ -1231,8 +1544,10 @@ Ran ix86 test suite binaries on x86_64.
 constituent part of all packages.  32-bit libraries and test programs are built automatically and
 multiple test runs of the test suite performed: once for native and once for compatibility.)
 @end table
+@end ignore
 
 
+@ignore
 @item
 SMP Testing.
 
@@ -1243,17 +1558,13 @@ What I did was to perform SMP testing for Intel Pentium IV 630 HT at least.
 
 (Note that SMP testing on Pentium IV 630 HT is not a constituent part of the release cycle.)
 @end table
+@end ignore
 @end itemize
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRSCTP Current Plan
-
-This package is mature and complete and in production release.  The current plan is to provide only
-maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
-evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
-
-@subsubheading STRSCTP Things to Do
+@node SCTP Things to Do
+@subsubheading SCTP Things to Do
 
 @itemize @minus
 
@@ -1310,6 +1621,7 @@ only perform the IP packet-level testing later.
 
 @itemize @bullet
 
+@ignore
 @item
 Retest performance using the OpenSS7 Modified Netperf package.
 
@@ -1319,7 +1631,9 @@ Retest performance using the OpenSS7 Modified Netperf package.
 Performance testing on loopback using the @file{netperf} package has been completed.  A performance
 results paper is included in the distribution.
 @end table
+@end ignore
 
+@ignore
 @item
 Perform profiling and use the hot text techniques from Linux Fast-STREAMS to make the package run
 even faster.
@@ -1330,7 +1644,9 @@ even faster.
 Common performance profiling and text sections have been incorporated into the code as a part of
 performance testing.
 @end table
+@end ignore
 
+@ignore
 @item
 SCTP Interoperability testing.  Take the STREAMS package to the SCTP Interop tests at UBC and
 perform interoperability testing.
@@ -1342,7 +1658,9 @@ Tested perfect against all functional implementations present.  Passed 720 Mbps 
 optimizations and debugging assertions turned on.  Still have to go through the logs and collect
 warnings and investigate them.  Still have to complete optimized performance testing.
 @end table
+@end ignore
 
+@ignore
 @item
 Testing and Validation using existing test suites.
 
@@ -1351,7 +1669,9 @@ Testing and Validation using existing test suites.
 
 Full regression performed.
 @end table
+@end ignore
 
+@ignore
 @item
 Complete documentation.  Particularly the npi_sctp(7) and tpi_sctp(7) manual pages.  The xti_sctp
 manual page is fairly complete but needs updating in several places where there are gaps.
@@ -1363,29 +1683,15 @@ npi_sctp(7) manual page heavily updated and now complete.
 tpi_sctp(7) close to complete, a few options undocumented.
 xti_sctp(3) quite complete, a few options undocumented in a few sections.
 @end table
+@end ignore
 
 @end itemize
 
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRX25 Current Plan
-
-This package was initially started to provide managment interfaces to platforms using the OpenSS7
-protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
-some of the old @file{isode} package into this package to provide some GDMO facilities.
-
-Since then, it was discovered that these ISO protocols are still very important to a number of
-industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
-industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
-communications for the Aviation industry.
-
-While the OpenSS7 Project's focus over the Summer of 2007 is going to be soft-switch enabling
-protocols, that may change if the Aviation industry steps up to this package with some funding to
-complete the work or by contributing changes, improvements or development to this package.
-Otherwise, expect this package to receive only maintenance releases over the next 8 months or so.
-
-@subsubheading STRX25 Things to Do
+@node X25 Things to Do
+@subsubheading X25 Things to Do
 
 @itemize @minus
 @item
@@ -1451,6 +1757,7 @@ Create @manpage{isot(4)}, @manpage{itot(4)}, @manpage{lpp(4)} and
 @item *todo*
 @end table
 
+@ignore
 @item
 Move already written code from the @file{stacks} or @file{strss7} directories
 into the @file{src} directory.
@@ -1458,7 +1765,9 @@ into the @file{src} directory.
 @table @emph
 @item *done*
 @end table
+@end ignore
 
+@ignore
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a subpackage in the @cite{OpenSS7 Master Package}.
@@ -1467,6 +1776,7 @@ a subpackage in the @cite{OpenSS7 Master Package}.
 @item *done*
 You are reading it.
 @end table
+@end ignore
 
 @end itemize
 
@@ -1478,23 +1788,8 @@ If you are interested in the completion of this add-on package, contact @email{i
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRISO Current Plan
-
-This package was initially started to provide managment interfaces to platforms using the OpenSS7
-protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
-some of the old @file{isode} package into this package to provide some GDMO facilities.
-
-Since then, it was discovered that these ISO protocols are still very important to a number of
-industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
-industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
-communications for the Aviation industry.
-
-While the OpenSS7 Project's focus over the Summer of 2007 is going to be soft-switch enabling
-protocols, that may change if the Aviation industry steps up to this package with some funding to
-complete the work or by contributing changes, improvements or development to this package.
-Otherwise, expect this package to receive only maintenance releases over the next 8 months or so.
-
-@subsubheading STRISO Things to Do
+@node ISO Things to Do
+@subsubheading ISO Things to Do
 
 @itemize @minus
 @item
@@ -1560,6 +1855,7 @@ Create @manpage{isot(4)}, @manpage{itot(4)}, @manpage{lpp(4)} and
 @item *todo*
 @end table
 
+@ignore
 @item
 Move already written code from the @file{stacks} or @file{strss7} directories
 into the @file{src} directory.
@@ -1567,7 +1863,9 @@ into the @file{src} directory.
 @table @emph
 @item *done*
 @end table
+@end ignore
 
+@ignore
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a subpackage in the @cite{OpenSS7 Master Package}.
@@ -1576,6 +1874,7 @@ a subpackage in the @cite{OpenSS7 Master Package}.
 @item *done*
 You are reading it.
 @end table
+@end ignore
 
 @end itemize
 
@@ -1587,17 +1886,8 @@ If you are interested in the completion of this add-on package, contact @email{i
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRISDN Current Plan
-
-This package is lower down on the priority list.  Current focus is on pushing through the
-@file{sigtran}, @file{strss7} and @file{strvoip} packages instead.  This package sits at about the
-same status as the @file{strchan} package.  There exists modules and drivers in this package that
-have not yet been publicly released and are only available to sponsors of the OpenSS7 Project on the
-CVS archive.  When the project gets back to this package (sometime 2H2007), the plan will be to move
-the private modules and drivers into the public release, place conformance validation test cases
-around them and release this package as production grade.
-
-@subsubheading STRISDN Things to Do
+@node ISDN Things to Do
+@subsubheading ISDN Things to Do
 
 @itemize @minus
 
@@ -1609,6 +1899,7 @@ This remains to be done.
 @item
 Actually implement all of the package.
 
+@ignore
 @item
 Copy all of the ISDN drivers, multiplexers and modules as well as the test programs from the strss7
 package and place them here.
@@ -1616,23 +1907,14 @@ package and place them here.
 Note that this package should load after strchan and strxns but before sigtran.
 
 @emph{*done*}
+@end ignore
 
 @end itemize
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRSS7 Current Plan
-
-The current plan includes the public production release of SCCP, ISUP and TCAP components.  MTP3 has
-not yet been publicly released and is not currently scheduled. (Implementing the AS-side of M3UA is
-taking precedence.)  The first public production releases of SCCP, ISUP and TCAP are planned for the
-end of July 2007.  This will be followed by lab and limitied field trial testing with a lead
-customer in August and production deployment in the lead customer's network in 1Q2008.  Expect that
-over the next 8 months releases of this package will include major new development and validation
-testing as well as including SCCP, ISUP and TCAP components that have nor heretofore been publicly
-released.
-
-@subsubheading STRSS7 Things to Do
+@node SS7 Things to Do
+@subsubheading SS7 Things to Do
 
 There is a great long list of these, but here is a crack
 at the first ones:
@@ -1670,35 +1952,7 @@ Complete the libslpcap library (@manpage{pcap(3)}) for live capture of SS7 link 
 
 @c --------------------------------------------------------------------
 
-@subsubheading SIGTRAN Current Plan
-
-The current plan of the next several months (over the summer of 2007) is to actively move this
-package forward.  This consists of the following:
-
-@itemize @bullet
-
-@item
-Move SIGTRAN modules and drivers that have not yet been publicly released into the public release.
-
-@item
-Write test cases for complete AS-side implementations of all of the UAs (including ISUA and TUA).
-
-@item
-Perform production testing of the UAs against Tekelec Eagle and Cisco ITP equipment.
-
-@item
-Rigorous lab and limited field testing of AS-side components.
-
-@item
-Production deployment in customer's network for 1Q2008.
-
-@end itemize
-
-Note that M2PA is complete.  Aside from that, the order of testing and implementation will be M3UA
-followed by M2UA or SUA and then TUA, IUA (including V5UA and GR303UA) and ISUA.
-
-Production public releases of the AS side of M3UA can be expected by the end of July 2007.
-
+@node SIGTRAN Things to Do
 @subsubheading SIGTRAN Things to Do
 
 @itemize @minus
@@ -1711,6 +1965,7 @@ This remains to be done.
 @item
 Actually implement all of the package.
 
+@ignore
 @item
 Copy all of the SIGTRAN drivers, multiplexers and modules as well as the test programs from the
 strss7 package and place them here.
@@ -1718,28 +1973,14 @@ strss7 package and place them here.
 Note that this package should load after strss7 but before strvoip.
 
 @emph{*done*}
+@end ignore
 
 @end itemize
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRATM Current Plan
-
-This package was initially started to provide managment interfaces to platforms using the OpenSS7
-protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
-some of the old @file{isode} package into this package to provide some GDMO facilities.
-
-Since then, it was discovered that these ISO protocols are still very important to a number of
-industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
-industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
-communications for the Aviation industry.
-
-While the OpenSS7 Project's focus over the Summer of 2007 is going to be soft-switch enabling
-protocols, that may change if the Aviation industry steps up to this package with some funding to
-complete the work or by contributing changes, improvements or development to this package.
-Otherwise, expect this package to receive only maintenance releases over the next 8 months or so.
-
-@subsubheading STRATM Things to Do
+@node ATM Things to Do
+@subsubheading ATM Things to Do
 
 @itemize @minus
 @item
@@ -1805,6 +2046,7 @@ Create @manpage{isot(4)}, @manpage{itot(4)}, @manpage{lpp(4)} and
 @item *todo*
 @end table
 
+@ignore
 @item
 Move already written code from the @file{stacks} or @file{strss7} directories
 into the @file{src} directory.
@@ -1812,7 +2054,9 @@ into the @file{src} directory.
 @table @emph
 @item *done*
 @end table
+@end ignore
 
+@ignore
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a subpackage in the @cite{OpenSS7 Master Package}.
@@ -1821,6 +2065,7 @@ a subpackage in the @cite{OpenSS7 Master Package}.
 @item *done*
 You are reading it.
 @end table
+@end ignore
 
 @end itemize
 
@@ -1831,41 +2076,8 @@ If you are interested in the completion of this add-on package, contact @email{i
 
 @c --------------------------------------------------------------------
 
-@subsubheading STRVOIP Current Plan
-
-The current plan of the next several months (over the summer of 2007) is to actively move this
-package forward.  This consists of the following:
-
-@itemize @bullet
-
-@item
-Implementation and testing of MGCP (MGC-side) using the MGI and TCP transport from the
-@command{strinet} package.
-
-@item
-Implementation and testing of MEGACO/H.248 (MGC-side, binary format) using the MGI and SCTP
-transport from the @command{strsctp} package.
-
-@item
-Implementation of SIP-T and SIP call control using the CCI and TCP transport from the
-@command{strinet} package and later SCTP transport from the @command{strsctp} package.
-
-@item
-Perform production testing of MEGACO/H.248 and MGCP against the Veraz iGATE, the Cisco 5400 and the
-Sonus Media Gateways.
-
-@item
-Rigorous lab and limited field testing of the MGC-side components.
-
-@item
-Production deployment in customer's network for 1Q2008.
-
-@end itemize
-
-The order of testing will be MEGACO/H.248 and then SIP-T and SIP followed by MGCP.  Production
-public releases of the MGC side of MEGACO/H.248 and SIP-T acan be expected by the end of July 2007.
-
-@subsubheading STRVOIP Things to Do
+@node VOIP Things to Do
+@subsubheading VOIP Things to Do
 
 @itemize @minus
 

@@ -1,5 +1,4 @@
-% -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
 % @(#) $Id$
@@ -18,7 +17,7 @@
 % Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 % copy of the license is included in the section entitled "GNU Free
 % Documentation License".
-% 
+%
 % Permission to use, copy and distribute this documentation without
 % modification, for any purpose and without fee or royalty is hereby
 % granted, provided that both the above copyright notice and this
@@ -30,9 +29,9 @@
 % provided "as is" without express or implied warranty.
 % 
 % Permission is granted to process this file through Tex and print the
-% results, provided the printed document carries copying permission
-% notice identical to this one except for the removal of this paragraph
-% (this paragraph not being relevant to the printed manual).
+% results, provided the printed document carries copying permission notice
+% identical to this one except for the removal of this paragraph (this
+% paragraph not being relevant to the printed manual).
 % 
 % OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
 % DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY,
@@ -50,13 +49,12 @@
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
 % responsibility for errors or omissions, or for damages resulting from
-% the use of the information contained herein.  The author(s) may not
-% have taken the same level of care in the production of this manual,
-% which is licensed free of charge, as they might when working
-% professionally.
+% the use of the information contained herein.  The author(s) may not have
+% taken the same level of care in the production of this manual, which is
+% licensed free of charge, as they might when working professionally.
 % 
-% Formatted or processed versions of this manual, if unaccompanied by
-% the source, must acknowledge the copyright and authors of this work.
+% Formatted or processed versions of this manual, if unaccompanied by the
+% source, must acknowledge the copyright and authors of this work.
 %
 % -------------------------------------------------------------------------
 %
