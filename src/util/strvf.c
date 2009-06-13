@@ -206,7 +206,7 @@ Options:\n\
     -e, --errfile ERRFILE\n\
         redirect errors to ERRFILE, default: ${BASENAME}.err\n\
     -D, --devname DEVNAME\n\
-        test device to open, default: '/dev/echo'\n\
+        test device to open, default: '/dev/streams/clone/echo'\n\
     -q, --quiet\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -d, --debug [LEVEL]\n\

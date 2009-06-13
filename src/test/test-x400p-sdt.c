@@ -790,12 +790,12 @@ do_tests(void)
 	uint16_t ppa[2] = { 0x0012, 0x0112 };
 
 	printf("Opening one stream\n");
-	if ((pfd[0] = open("/dev/x400p-sl", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((pfd[0] = open("/dev/streams/clone/x400p-sl", O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		exit(2);
 	}
 	printf("Opening other stream\n");
-	if ((pfd[1] = open("/dev/x400p-sl", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((pfd[1] = open("/dev/streams/clone/x400p-sl", O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		exit(2);
 	}

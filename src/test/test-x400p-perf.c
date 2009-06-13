@@ -794,7 +794,7 @@ do_tests(void)
 	for (i = 0; i < 96; i++) {
 		printf(".");
 		fflush(stdout);
-		if ((pfd[i] = open("/dev/x400p-sdt", O_NONBLOCK | O_RDWR)) < 0) {
+		if ((pfd[i] = open("/dev/streams/clone/x400p-sdt", O_NONBLOCK | O_RDWR)) < 0) {
 			perror("open");
 			exit(2);
 		}

@@ -84,7 +84,7 @@ static int extended = 0;		/* extended format */
 static int dryrun = 0;			/* dry run */
 
 static char subnetid[BUFSIZ] = "A";
-static char device[BUFSIZ] = "/dev/streams/x25plp,/dev/x25plp";
+static char device[BUFSIZ] = "/dev/streams/clone/x25plp,/dev/x25plp";
 static char filename[BUFSIZ] = "-";	/* stdin or stdout */
 static char tmpbuf[BUFSIZ];
 
@@ -92,8 +92,8 @@ static int islapb = 0;			/* is link an LAPB link */
 static int isllc2 = 0;			/* is link an LLC2 link */
 static int usedev = 0;			/* was device specified */
 
-static char lapbdevice[BUFSIZ] = "/dev/streams/lapb,/dev/lapb";
-static char llc2device[BUFSIZ] = "/dev/streams/llc2,/dev/llc2";
+static char lapbdevice[BUFSIZ] = "/dev/streams/clone/lapb,/dev/lapb";
+static char llc2device[BUFSIZ] = "/dev/streams/clone/llc2,/dev/llc2";
 
 static const char *lapbparms[] = {
 	[0] = "N2_VAL",			/* N2_VAL */
@@ -616,7 +616,7 @@ Options:\n\
     -p, --protocol PROTOCOL\n\
         specifies protcol of link (lapb or llc2)\n\
     -d, --device DEVICE\n\
-        specifies the device to use [default: /dev/x25plp]\n\
+        specifies the device to use [default: /dev/streams/clone/x25plp]\n\
   Other:\n\
     -n, --dryrun\n\
         check but do not write [default: false]\n\

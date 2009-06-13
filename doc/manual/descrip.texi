@@ -57,10 +57,57 @@
 @c
 @c =========================================================================
 
-This is the @cite{@value{PACKAGE_TITLE}} package.  It consists of a master package that contains all
-other @uref{http://www.openss7.org/,, OpenSS7 Project} package releases.  Use this package if you are
-interested in ease of installation of a wide range of @uref{http://www.openss7.org/,, OpenSS7
-Project} packages.
+This is the @cite{@value{PACKAGE_TITLE}} package.  It contains all of the
+@uref{http://www.openss7.org/,, OpenSS7 Project}
+release code.  This is the only package released by the
+@uref{http://www.openss7.org/,, OpenSS7 Project}.
+
+The package contains all of the former subpackages of the OpenSS7 Master
+Package, including:
+
+@multitable @columnfractions 0.05 0.95
+@item @tab @bullet{} Linux Fast-STREAMS
+@item @tab @bullet{} STREAMS Compatibility Modules
+@item @tab @bullet{} STREAMS Utilities
+@item @tab @bullet{} STREAMS Terminals
+@item @tab @bullet{} STREAMS X/Open Networking Services
+@item @tab @bullet{} STREAMS X/Open Networking XTI/TLI Library
+@item @tab @bullet{} STREAMS Sockets
+@item @tab @bullet{} STREAMS Internet Protocol Drivers
+@item @tab @bullet{} STREAMS SCTP
+@item @tab @bullet{} STREAMS Channels and Multiplexing
+@item @tab @bullet{} STREAMS X.25 and Frame Relay Stack
+@item @tab @bullet{} STREAMS Open Systems Interconnect (OSI) Stack
+@item @tab @bullet{} STREAMS ISDN Stack
+@item @tab @bullet{} STREAMS ATM Stack
+@item @tab @bullet{} STREAMS SS7 Stack
+@item @tab @bullet{} STREAMS SIGTRAN Stack
+@item @tab @bullet{} STREAMS VoiP Stack
+@end multitable
+
+Fully deprecated by this release and no longer released by the
+@uref{http://www.openss7.org/,, OpenSS7 Project} are the following former
+subpackages of the OpenSS7 Master Package:@footnote{With the exception of Linux
+Native Sockets SCTP, these packages can be obtained from the projects or
+companites that originated them.}
+
+@multitable @columnfractions 0.05 0.95
+@item @tab @bullet{} Linux Native Sockets SCTP
+@item @tab @bullet{} Internet Performance (the OpenSS7 iperf fork)
+@item @tab @bullet{} Network Performance (the OpenSS7 netperf fork)
+@item @tab @bullet{} Dialogic Open System Release 6.1
+@end multitable
+
+This distribution is applicable to both @cite{Linux} 2.4 and 2.6 kernels as was
+targeted at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64}
+architectures, but should build and install for other architectures as well.
+
+@ignore
+This is the @cite{@value{PACKAGE_TITLE}} package.  It consists of a master
+package that contains all other
+@uref{http://www.openss7.org/,, OpenSS7 Project} package releases.  Use this
+package if you are interested in ease of installation of a wide range of
+@uref{http://www.openss7.org/,, OpenSS7 Project} packages.
 
 The @cite{@value{PACKAGE_TITLE}} package contains:
 
@@ -91,7 +138,8 @@ The @cite{@value{PACKAGE_TITLE}} package contains:
 If you need to build an install a significant number of these packages, the
 @cite{@value{PACKAGE_TITLE}} package is the easiest way to do so.
 
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
-at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
-install for other architectures as well.
-
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
+kernels and was targeted at @code{ix86}, @code{x86_64}, @code{ppc} and
+@code{ppc64} architectures, but should build and install for other
+architectures as well.
+@end ignore

@@ -66,7 +66,7 @@ dnl
 dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
-function test_xnet_thr() {
+function test_xnsl_thr() {
     test_prog test-xnsl_thr "$@"
 }
 function test_xnsl_thr_root() {

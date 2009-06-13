@@ -36321,7 +36321,7 @@ test_case_13_5_10_resp(int child)
 	if (test_close(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_open(child, "/dev/udp", O_RDWR | O_NONBLOCK) != __RESULT_SUCCESS)
+	if (test_open(child, "/dev/streams/inet/udp", O_RDWR | O_NONBLOCK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)

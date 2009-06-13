@@ -62,13 +62,30 @@ are still being designed and will not be available until a later date.  Most of 
 complete and for the most part bugs are currently available.
 
 @table @code
+@item streams 030.  2009-06-13T03:47:32+0000
+There was an qput()/qget() reference counting imbalance in the enter_syncq_writer(),
+enter_inner_syncq_func() and enter_inner_syncq_putp() functions.  The most symptomatic of these was
+the enter_inner_syncq_putp() function that affected regular put(9) and putnext(9) functions on
+synchronized modules and drivers having an inner perimeter.  The reference imbalance resulted in
+leaking the module queue pair, stream head and stream head queue pair on driver close.
+
+@emph{*fixed*} in @command{openss7-1.2.2}
+
+@item streams 029.  2009-06-12T08:16:08+0000
+@manref{qattach(9)} was taking a reference on a synchronization queue without the reference being
+released in @manref{qdelete(9)}.  @manref{qdelete(9)} was fixed to release the reference taken by
+@manref{setsq(9)} in @manref{qattach(9)}.  Thanks to Tony Abo for identifying and reporting this
+bug.
+
+@emph{*fixed*} in @command{openss7-1.2.2}
+
 @item streams 028.  2009-04-17T11:56:06+0000
 
 The strace, strerr daemons and the pstrlog call in the streams library were not initializing ltime
 before the call to ctime_r() resulting in an epoch timestamp (Jan 1, 1970).  Thanks to Pierre
 Crepieux for identifying and reporting this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.1}
+@emph{*fixed*} in @command{openss7-1.2.2}
 
 @item strutil 001.  2009-04-17T11:56:06+0000
 
@@ -76,7 +93,7 @@ The strace, strerr daemons and the pstrlog call in the streams library were not 
 before the call to ctime_r() resulting in an epoch timestamp (Jan 1, 1970).  Thanks to Pierre
 Crepieux for identifying and reporting this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.1}
+@emph{*fixed*} in @command{openss7-1.2.2}
 
 @item streams 027.  2009-03-26T07:56:40+0000
 
@@ -90,7 +107,7 @@ Also, additional timer problems were encountered.  Cancelling timers from within
 sufficient list protection (irq suppression) potentially resulting in list corruption or queue
 reference counting problem.
 
-@emph{*fixed*} in @command{openss7-1.2.1}
+@emph{*fixed*} in @command{openss7-1.2.2}
 
 @item streams 026.  2008-12-16T08:17:47+0000
 
@@ -104,7 +121,7 @@ There was also a minor possibility of a strevent structure identifier overlap af
 long period of intensive operation, and that has been fixed as well.  Thanks to Angel Diaz for
 reporting this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.1}
+@emph{*fixed*} in @command{openss7-1.2.2}
 
 @item strinet 004.  2008-10-24T08:04:16+0000
 UDP and RAWIP drivers cannot receive zero-length messages in accordances with UNIX '98 and XNS 5.2.

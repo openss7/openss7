@@ -92,8 +92,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define MAX_MAJOR_DEVICE    254
 #define MAX_MINOR_DEVICE    255
 
-#define SAD_USER_FILENAME   "/dev/sad"
-#define SAD_ADMIN_FILENAME  "/dev/sad"
+#define SAD_USER_FILENAME   "/dev/streams/clone/sad"
+#define SAD_ADMIN_FILENAME  "/dev/streams/clone/sad"
 
 static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */

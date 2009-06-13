@@ -106,8 +106,8 @@ file (or
 @pxrefman{Downloading from CVS}).
 An abbreviated installation procedure that works for most applications appears below.
 
-This release of the package is published strictly under Version 3 of the @cite{GNU Affero Public License}
-which can be found in the file
+This release of the package is published strictly under Version 3 of the @cite{Affero GNU Public
+License} which can be found in the file
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/COPYING,, @file{COPYING}}.
 Package specific licensing terms (if any) can be found in the file
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/LICENSES,, @file{LICENSES}}.
@@ -123,13 +123,15 @@ See
 
 @include prerequisites.texi
 
+@ignore
 When configuring and building multiple @cite{OpenSS7 Project} release packages, place all of the
 source packages (unpacked tarballs) at the same directory level and all build directories at the
 same directory level (e.g. all source packages under @file{/usr/src}).
+@end ignore
 
-When configuring and building packages that install kernel modules, it is necessary to have the
-correct kernel development package installed.  For the following distributions, use the following
-commands:
+The package builds and installs kernel modules.  When configuring and building the package, it is
+necessary to have the kernel development package installed.  For the following distributions, use
+the following commands:
 
 @example
 Ubuntu:  $> apt-get install linux-headers
@@ -138,9 +140,16 @@ Fedora:  $> yum install kernel-devel
 CentOS:  $> yum install kernel-devel
 @end example
 
-When configuring and building packages that provide SNMP agents, it is necessary to have the
-necessary net-snmp development packages installed.  For the following distributions, use the
-following commands:
+You also need the same version of @manpage{gcc(1)} compiler with which the kernel was built.  If it
+is not the default, add @samp{CC=kgcc} on the line after @samp{./configure}, for example:
+
+@example
+$> ../@value{PACKAGE}-@value{VERSION}/configure CC='gcc-3.4'
+@end example
+
+The package builds and installs SNMP agents.  When configuring and building the package, it is
+necessary to have the net-snmp development packages installed.  For the following distributions, use
+the following commands:
 
 @example
 Ubuntu:  $> apt-get install libsnmp libsnmp-perl snmp snmpd lm-sensors
@@ -153,11 +162,15 @@ CentOS:  $> yum install net-snmp net-snmp-perl net-snmp-utils lm_sensors
          $> yum install net-snmp-devel lm_sensors-devel
 @end example
 
-You also need the same version of @manpage{gcc(1)} compiler with which the kernel was built.  If it is not the
-default, add @samp{CC=kgcc} on the line after @samp{./configure}, for example:
+The package builds and installs Java archives and compiled Java.  When configuring and building the
+package, it is necessary to have the GNU GCJ Java Compiler front-end and GNU Classpath archives
+installed.  For the following distributions, use the following commands:
 
 @example
-$> ../@value{PACKAGE}-@value{VERSION}/configure CC='gcc-3.4'
+Ubuntu:  $> apt-get install gcj
+Debian:  $> apt-get install gcj
+Fedora:  $> yum install gcc-java
+CendOS:  $> yum install gcc-java
 @end example
 
 @unnumberedsubsec Installation
@@ -170,8 +183,8 @@ $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
 $> tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 $> mkdir build
 $> pushd build
-$> ../@value{PACKAGE}-@value{VERSION}/configure --enable-autotest
-$> make
+$> ../@value{PACKAGE}-@value{VERSION}/configure --enable-autotest --enable-silent-rules
+$> make V=0
 $> make check
 $> sudo make install
 $> sudo make installcheck
@@ -196,8 +209,8 @@ $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
 $> tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 $> mkdir build
 $> pushd build
-$> ../@value{PACKAGE}-@value{VERSION}/configure --enable-autotest
-$> make compile.log
+$> ../@value{PACKAGE}-@value{VERSION}/configure --enable-autotest --enable-silent-rules
+$> make V=1 compile.log
 $> make check.log
 $> sudo make install.log
 $> sudo make installcheck.log
@@ -271,7 +284,7 @@ After configuring the package, the package can be compiled simply by issuing the
 command:
 
 @example
-$> make
+$> make V=0
 @end example
 
 Some specialized makefile targets exists, see the
@@ -296,6 +309,15 @@ make target (as root) like so:
 $> sudo make install
 @end example
 
+The @command{info} documentation is automatically installed; however, the text, html and pdf
+documentation must be installed separately like so:
+
+@example
+$> sudo make install-txt
+$> sudo make install-html
+$> sudo make install-pdf
+@end example
+
 The test suites that ship with the package can be invoked after the package has been installed by
 invoking the @samp{installcheck} target.  This target can either be invoked as root, or as a normal
 user, like so:
@@ -307,7 +329,8 @@ $> make installcheck
 (Note: you must add the @option{--enable-autotest} flag to @file{configure}, above for the
 test suites to be invoked with @samp{make installcheck}.)
 
-The package can be cleanly removed by invoking the @samp{uninstall} target (as root):
+The package can be cleanly removed (including installed documentation) by invoking the
+@samp{uninstall} target (as root):
 
 @example
 $> sudo make uninstall

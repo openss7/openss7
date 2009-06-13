@@ -276,7 +276,7 @@ char **my_argv = NULL;
 
 int output = 1;
 
-char devname[256] = "/dev/x400p-sl";
+char devname[256] = "/dev/streams/clone/x400p-sl";
 char cfgfile[256] = "/etc/sysconfig/ss7/sdl.config";
 
 static void

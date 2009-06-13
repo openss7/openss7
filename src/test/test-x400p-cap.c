@@ -8348,7 +8348,7 @@ print_ppa(ppa_t * ppa)
 	FFLUSH(stdout);
 }
 
-#define PT_SDT_DEVICE "/dev/x400p-sl"
+#define PT_SDT_DEVICE "/dev/streams/clone/x400p-sl"
 
 static int
 pt_open(void)
@@ -8722,7 +8722,7 @@ pt_end(void)
 	return SUCCESS;
 }
 
-#define IUT_SL_DEVICE "/dev/x400p-sl"
+#define IUT_SL_DEVICE "/dev/streams/clone/x400p-sl"
 
 #if 0
 static int

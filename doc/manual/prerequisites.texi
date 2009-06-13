@@ -177,6 +177,10 @@ GNU bison and flex (for config programs).
 @item @tab @minus{}
 net-snmp (for SNMP agents).@footnote{A wide range of net-snmp releases are supported, from UCD-SNMP
 4.2.5 through net-snmp 5.4.}
+@item @tab @minus{}
+GNU gcj and classpath (for Java modules).
+@item @tab @minus{}
+swig (for Java, Tcl, Perl and Ruby interfaces).
 @end multitable
 @end enumerate
 

@@ -2011,8 +2011,8 @@ strExtConsoleLog_start()
 	if (my_fd_console < 0) {
 		struct strioctl ioc;
 
-		if ((my_fd_console = open("/dev/strlog", O_RDWR | O_NONBLOCK)) < 0) {
-			snmp_log_perror("write_strExtConsoleLog: open(/dev/strlog)");
+		if ((my_fd_console = open("/dev/streams/clone/log", O_RDWR | O_NONBLOCK)) < 0) {
+			snmp_log_perror("write_strExtConsoleLog: open(/dev/streams/clone/log)");
 			return SNMP_ERR_GENERR;
 		}
 		register_readfd(my_fd_console, strExtConsoleLog_fd_handler, (void *) 0);
@@ -2136,8 +2136,8 @@ strExtErrorLog_start()
 	if (my_fd_error < 0) {
 		struct strioctl ioc;
 
-		if ((my_fd_error = open("/dev/strlog", O_RDWR | O_NONBLOCK)) < 0) {
-			snmp_log_perror("write_strExtErrorLog: open(/dev/strlog)");
+		if ((my_fd_error = open("/dev/streams/clone/log", O_RDWR | O_NONBLOCK)) < 0) {
+			snmp_log_perror("write_strExtErrorLog: open(/dev/streams/clone/log)");
 			return SNMP_ERR_GENERR;
 		}
 		register_readfd(my_fd_error, strExtErrorLog_fd_handler, (void *) 0);
@@ -2288,8 +2288,8 @@ strExtTraceLog_start()
 				i++;
 			}
 		}
-		if ((my_fd_trace = open("/dev/strlog", O_RDWR | O_NONBLOCK)) < 0) {
-			snmp_log_perror("write_strExtTraceLog: open(/dev/strlog)");
+		if ((my_fd_trace = open("/dev/streams/clone/log", O_RDWR | O_NONBLOCK)) < 0) {
+			snmp_log_perror("write_strExtTraceLog: open(/dev/streams/clone/log)");
 			SNMP_FREE(tid);
 			return SNMP_ERR_GENERR;
 		}

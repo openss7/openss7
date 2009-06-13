@@ -191,7 +191,7 @@ Options:\n\
     -c, --check\n\
         check only, do not alter kernel mapping\n\
     -C, --chardev PATH\n\
-        use PATH instead of /dev/ticlts for control\n\
+        use PATH instead of /dev/streams/inet/ticlts for control\n\
     -q, --quiet\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -d, --debug [LEVEL]\n\

@@ -91,7 +91,7 @@ int nomead = 1;
 #define SLSTATS_DEFAULT_CFGFILE "/etc/sysconfig/slstats.conf"
 #endif				/* SLSTATS_DEFAULT_CFGFILE */
 #ifndef SLSTATS_DEFAULT_DEVICE
-#define SLSTATS_DEFAULT_DEVICE "/dev/sl-mux-stats"
+#define SLSTATS_DEFAULT_DEVICE "/dev/streams/sl-mux/stats"
 #endif				/* SLSTATS_DEFAULT_DEVICE */
 
 char *outpdir[MAX_PATH_LENGTH] = SLSTATS_DEFAULT_OUTPDIR;

@@ -469,7 +469,7 @@ __streams_vstrlog(short mid, short sid, char level, unsigned short flags, const 
 	int err, pri, band, flag;
 
 	if (log_fd == 0) {
-		if ((log_fd = open("/dev/strlog", O_RDWR)) < 0) {
+		if ((log_fd = open("/dev/streams/clone/log", O_RDWR)) < 0) {
 			log_fd = 0;
 			return (-1);
 		}

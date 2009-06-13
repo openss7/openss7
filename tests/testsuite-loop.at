@@ -85,13 +85,11 @@ AT_CLEANUP
 
 AT_SETUP([loop test 1.1])
 AT_KEYWORDS([loop])
-AT_XFAIL_IF([test -d /dev/loop])
 AT_CHECK([test_loop 1.1], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([loop test 1.2])
 AT_KEYWORDS([loop])
-AT_XFAIL_IF([test -d /dev/loop])
 AT_CHECK([test_loop 1.2], [], [ignore], [], [], [])
 AT_CLEANUP
 

@@ -84,7 +84,7 @@ static int dryrun = 0;			/* dry run */
 
 static char subnetid[BUFSIZ] = "A";
 static char address[BUFSIZ] = "";
-static char device[BUFSIZ] = "/dev/streams/x25plp,/dev/x25plp";
+static char device[BUFSIZ] = "/dev/streams/clone/x25plp,/dev/x25plp";
 static char filename[BUFSIZ] = "-";	/* stdin or stdout */
 static char tmpbuf[BUFSIZ];
 
@@ -1103,7 +1103,7 @@ Options:\n\
     -a, --address ADDRESS\n\
         sets the local X.25 address for the subnet\n\
     -d, --device DEVICE\n\
-        specifies the device to use [default: /dev/x25plp]\n\
+        specifies the device to use [default: /dev/streams/clone/x25plp]\n\
   Other:\n\
     -n, --dryrun\n\
         check but do not write [default: false]\n\

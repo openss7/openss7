@@ -2291,7 +2291,7 @@ refresh_strModTable(int force)
 		struct sc_list *list = NULL;
 		struct header_complex_index *hciptr, *hciptr_next;
 
-		if ((fd = open("/dev/sad", O_RDWR)) < 0)
+		if ((fd = open("/dev/streams/clone/sad", O_RDWR)) < 0)
 			goto error_out;
 		if (ioctl(fd, I_PUSH, "sc") < 0)
 			goto error_out;
@@ -2860,7 +2860,7 @@ refresh_strApshTable_row(struct strApshTable_data *StorageTmp, int force)
 		struct strapush sap;
 		char *tmp, *ptr;
 
-		if ((fd = open("/dev/sad", O_RDWR)) < 0) {
+		if ((fd = open("/dev/streams/clone/sad", O_RDWR)) < 0) {
 			snmp_log_perror(__FUNCTION__);
 			return (StorageTmp);
 		}
@@ -2919,7 +2919,7 @@ refresh_strApshTable(int force)
 	/* XXX: Here, update the table as required... */
 	strApshTable_refresh = 0;
 	refresh_strModTable(force);
-	if ((fd = open("/dev/sad", O_RDWR)) < 0) {
+	if ((fd = open("/dev/streams/clone/sad", O_RDWR)) < 0) {
 		snmp_log_perror(__FUNCTION__);
 		return;
 	}
@@ -3101,8 +3101,8 @@ refresh_strStatsTable(int force)
 		struct sc_slist *sc = NULL;
 		struct header_complex_index *h, *h_next;
 
-		if ((fd = open("/dev/sad", O_RDWR)) < 0) {
-			snmp_log_perror("refresh_strStatsTable: open(/dev/sad)");
+		if ((fd = open("/dev/streams/clone/sad", O_RDWR)) < 0) {
+			snmp_log_perror("refresh_strStatsTable: open(/dev/streams/clone/sad)");
 			return;
 		}
 		if (ioctl(fd, I_PUSH, "sc") < 0) {
@@ -4854,8 +4854,8 @@ strModTable_consistent(struct strModTable_data *thedata)
 	struct sc_tlist sc;
 	struct sc_tune t[4];
 
-	if ((fd = open("/dev/sad", O_RDWR)) < 0) {
-		snmp_log_perror("strModTable_consistent: open(/dev/sad)");
+	if ((fd = open("/dev/streams/clone/sad", O_RDWR)) < 0) {
+		snmp_log_perror("strModTable_consistent: open(/dev/streams/clone/sad)");
 		return SNMP_ERR_GENERR;
 	}
 	if (ioctl(fd, I_PUSH, "sc") < 0) {

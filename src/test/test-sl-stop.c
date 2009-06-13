@@ -795,7 +795,7 @@ static int mymain(int argc, char **argv)
 		channel);
 	printf("Opening mux.\n");
 	fflush(stdout);
-	if ((mux = open("/dev/sl-mux", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((mux = open("/dev/streams/clone/sl-mux", O_NONBLOCK | O_RDWR)) < 0) {
 		perror(argv[0]);
 		exit(1);
 	}

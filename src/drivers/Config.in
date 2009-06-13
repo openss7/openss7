@@ -104,8 +104,7 @@ driver	mx	    mx		*
 driver	np_ip	    np_ip	*		    
 driver	ptm	    ptm		127	256	    2
 driver	pts	    pts		128	256	    2
-driver	rawip2	    raw		*		    
-#driver	rawip	    raw		*		    
+driver	rawip	    raw		*		    
 driver	sccp	    sccp	*		    
 driver	sdl-acb56   sdl_acb56	*	4	    
 driver	sdl-mux	    sdlm	*	*	    2
@@ -120,14 +119,12 @@ driver	sua-as	    sua_as	*
 driver	sua	    sua		*		    
 driver	tali	    tali	*		    
 driver	tcap	    tcap	*		    
-driver	tcp2	    tcp		*		    
-#driver	tcp	    tcp		*		    
+driver	tcp	    tcp		*		    
 driver	tp	    tp		*		    
 driver	tua-as	    tua_as	*		    
 driver	tua	    tua		*		    
 driver	ua-as	    ua_as	*		    
-driver	udp2	    udp		*		    
-#driver	udp	    udp		*		    
+driver	udp	    udp		*		    
 driver	unix	    unix	*		    
 driver	x100p-mx    mx_x100p	*		    
 driver	x100p-sdl   sdl_x100p	*		    
@@ -199,8 +196,7 @@ objname	driver	mx	    mx
 objname	driver	np_ip	    np_ip
 objname	driver	ptm	    pty
 objname	driver	pts	    pty
-objname	driver	rawip2	    rawip
-#objname	driver	rawip	    rawip
+objname	driver	rawip	    rawip
 objname	driver	sccp	    sccp
 objname	driver	sdl-acb56   sdl_acb56
 objname	driver	sdl-mux	    sdl
@@ -215,13 +211,11 @@ objname	driver	sua-as	    sua_as
 objname	driver	sua	    sua
 objname	driver	tali	    tali
 objname	driver	tcap	    tcap
-objname	driver	tcp2	    tcp
-#objname	driver	tcp	    tcp
+objname	driver	tcp	    tcp
 objname	driver	tp	    tp
 objname	driver	tua-as	    tua_as
 objname	driver	ua-as	    ua_as
-objname	driver	udp2	    udp
-#objname	driver	udp	    udp
+objname	driver	udp	    udp
 objname	driver	unix	    unix
 objname	driver	x100p-mx    x100p_mx
 objname	driver	x100p-sdl   sdl_x100p
@@ -388,17 +382,14 @@ node	/dev/loop_clone	    c	    *	    clone	loop
 node	/dev/mux	    c	    *	    clone	mux
 node	/dev/nuls	    c	    *	    clone	nuls
 node	/dev/sad	    c	    *	    clone	sad
-#node	/dev/ip		    c	    *	    clone	ip
+node	/dev/ip2	    c	    *	    clone	ip
 node	/dev/ip2xinet	    c	    *	    clone	ip_to_dlpi
 node	/dev/ldl	    c	    *	    clone	link-driver
 #node	/dev/ptmx	    c	    0666    clone	ptm
-#node	/dev/rawip2	    c	    0666    clone	rawip
-node	/dev/rawip2	    c	    0666    clone	rawip2
-#node	/dev/tcp2	    c	    0666    clone	tcp
-node	/dev/tcp2	    c	    0666    clone	tcp2
+node	/dev/rawip2	    c	    0666    clone	rawip
+node	/dev/tcp2	    c	    0666    clone	tcp
 node	/dev/tp		    c	    0666    clone	tp
-#node	/dev/udp2	    c	    0666    clone	udp
-node	/dev/udp2	    c	    0666    clone	udp2
+node	/dev/udp2	    c	    0666    clone	udp
 node	/dev/x25-lapb	    c	    0666    clone	x25-lapb
 node	/dev/x25-llc2	    c	    0666    clone	x25-llc2
 node	/dev/x25-plp	    c	    0666    clone	x25-plp

@@ -1033,9 +1033,9 @@ main(int argc, char *argv[])
 	if (filed >= 0)
 		fd = filed;
 	else {
-		fd = open("/dev/ldl", O_RDWR);
+		fd = open("/dev/streams/clone/ldl", O_RDWR);
 		if (fd < 0) {
-			perror("/dev/ldl");
+			perror("/dev/streams/clone/ldl");
 			exit(1);
 		}
 	}

@@ -236,7 +236,7 @@ mymain(int argc, char *argv[])
 
 	fprintf(stdout, "Opening channel.\n");
 	fflush(stdout);
-	if ((fd = open("/dev/x400p-sl", O_RDWR)) == -1) {
+	if ((fd = open("/dev/streams/clone/x400p-sl", O_RDWR)) == -1) {
 		perror(argv[0]);
 		exit (1);
 	}

@@ -569,7 +569,7 @@ do_global_stats(void)
 	ldl_gstats_ioctl_t st;
 
 	if ((fd = open(ldlname, O_RDWR)) < 0) {
-		perror("open(\"/dev/ldl\")");
+		perror("open(\"/dev/streams/clone/ldl\")");
 		exit(1);
 	}
 
@@ -614,7 +614,7 @@ do_set_debug_mask(unsigned long msk)
 	struct strioctl strioctl;
 
 	if ((fd = open(ldlname, O_RDWR)) < 0) {
-		perror("open(\"/dev/ldl\")");
+		perror("open(\"/dev/streams/clone/ldl\")");
 		exit(1);
 	}
 
@@ -2374,7 +2374,7 @@ initialize(void)
 		hw_type = ARPHRD_IEEE802;
 
 	if ((fd = open(ldlname, O_RDWR)) < 0) {
-		perror("open(\"/dev/ldl\")");
+		perror("open(\"/dev/streams/clone/ldl\")");
 		exit(1);
 	}
 	ppa = do_findppa(fd, interface);

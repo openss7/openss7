@@ -66,7 +66,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * 2.5 Identifying Available PPAs
  *
  * When compiled and run as root, the following program opens the STREAMS
- * device /dev/streams/dlb and prints to the screen the PPAs available on the
+ * device /dev/streams/clone/dlb and prints to the screen the PPAs available on the
  * system.  The PPA number should be passed in using the dl_ppa field of the
  * DL_ATTACH_REQ DLPI primitive.
  *
@@ -90,7 +90,7 @@ main(int argc, char *argv[])
 	char buf[BUFSIZE];
 	struct strioctl stri;
 
-	fd = open("/dev/streams/dlb", O_RDWR, 0);
+	fd = open("/dev/streams/clone/dlb", O_RDWR, 0);
 	if (fd < 0) {
 		perror("open");
 		exit(1);
