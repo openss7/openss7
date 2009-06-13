@@ -127,7 +127,7 @@ modpost_fpathize="$SED -r -e s%(\.mod)?\.(k)?o(\.gz)?$%%"
 
 # defaults
 
-defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion modules command cachefile"
+defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion modules command cachefile pkgdirectory"
 
 #default_sysmap=/boot/System.map-`uname -r`
 #default_moddir=/lib/modules/`uname -r`
@@ -151,6 +151,7 @@ default_allsrcversion=n
 default_modules=
 default_command=process
 default_cachefile=$MODPOST_CACHE
+default_pkgdirectory=openss7
 
 debug=0
 verbose=1
@@ -214,6 +215,8 @@ Options:
         module versions are supported ['$modversions']
     -a, --allsrcversion
         source version all modules ['$allsrcversion']
+    -p, --pkgdirectory SUBDIRECTORY
+        subdirectory for modules ['$pkgdirectory']
     -n, --dryrun
         don't perform the actions, just check them
     -q, --quiet
@@ -324,7 +327,8 @@ do
 	 --infile=*|--infil=*|--infi=*|--inf=*|--in=*|--i=*|\
 	 --outfile=*|--outfil=*|--outfi=*|--outf=*|--out=*|--ou=*|--o=*|\
 	 --sysfile=*|--sysfil=*|--sysfi=*|--sysf=*|--sys=*|--sy=*|--s=*|\
-	 --cachefile=*|--cachefil=*|--cachefi=*|--cachef=*|--cache=*|--cach=*|--cac=*|--ca=*|--c=*)
+	 --cachefile=*|--cachefil=*|--cachefi=*|--cachef=*|--cache=*|--cach=*|--cac=*|--ca=*|--c=*|\
+	 --pkgdirectory=*|--pkgdirect=*|--pkgdir=*|--pkgdi=*|--pkgd=*|--pkg=*|--pk=*|--p=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
 	(--*=*)
 	    option_noarg $arg ;;
@@ -349,7 +353,7 @@ do
 		case $prev in
 		    (debug|verbose) eval "(($prev++))" ;;
 		    # the rest have required arguments
-		    (sysmap|moddir|infile|outfile|sysfile|cachefile)
+		    (sysmap|moddir|infile|outfile|sysfile|cachefile|pkgdirectory)
 			option_needarg $prevopt ;;
 		esac
 		prev= ; prevopt=
@@ -464,6 +468,13 @@ do
 	(--allsrcversion|--allsrcversio|--allsrcversi|--allsrcvers|--allsrcver|--allsrcve|--allsrcv|--allsrc|--allsr|--alls|--all|--al|--a|-a)
 	    allsrcversion=y
 	    ;;
+	(--pkgdirectory|--pkgdirect|--pkgdir|--pkgdi|--pkgd|--pkg|--pk|--p|-p)
+	    prevopt="$arg"
+	    prev=pkgdirectory
+	    ;;
+	(--pkgdirectory=*|--pkgdirect=*|--pkgdir=*|--pkgdi=*|--pkgd=*|--pkg=*|--pk=*|--p=*|-p*)
+	    pkgdirectory="$optarg"
+	    ;;
 	(--)
 	    # end of options
 	    break
@@ -482,7 +493,7 @@ case $prev in
     # these have optional arguments
     (debug|verbose) eval "(($prev++))" ;;
     # the rest have required arguments
-    (sysmap|moddir|infile|outfile|sysfile|cachefile)
+    (sysmap|moddir|infile|outfile|sysfile|cachefile|pkgdirectoy)
 	option_needarg $prevopt ;;
 esac
 
@@ -730,19 +741,26 @@ write_dump_ours() {
 	token=`echo "$name" | $modpost_tokenize`
 	eval "path=\"\$mod_${token}_path\""
 	eval "syms=\"\$mod_${token}_syms\""
-	command_info "dumping module symbols for module $name"
+	test -n "$path" || path="$name"
+	test -z "$pkgdirectory" || path="$pkgdirectory/$path"
+	command_info "dumping module symbols for module $path"
 	((modcnt++))
 	count=0
 	for sym in $syms ; do
 	    eval "crc=\"\$mod_${token}_sym_${sym}_crc\""
+	    eval "exp=\"\$mod_${token}_sym_${sym}_exp\""
 	    if test :"$crc" != : ; then
 		((count++))
-		printf "0x%08x\t%s\t%s\n" $crc $sym ${path:-$name}
+		if test :"$exp" != : ; then
+		    printf "0x%08x\t%s\t%s\t%s\n" $crc $sym $path $exp
+		else
+		    printf "0x%08x\t%s\t%s\n" $crc $sym $path
+		fi
 	    else
 		command_warn "symbol without crc $sym"
 	    fi
 	done
-	command_info "wrote $count symbols for module $name"
+	command_info "wrote $count symbols for module $path"
 	((symcnt=symcnt+count))
     done
     command_info "wrote $symcnt symbols for $modcnt modules"
@@ -772,9 +790,14 @@ write_dump_others() {
 	count=0
 	for sym in $syms ; do
 	    eval "crc=\"\$mod_${token}_sym_${sym}_crc\""
+	    eval "exp=\"\$mod_${token}_sym_${sym}_exp\""
 	    if test :"$crc" != : ; then
 		((count++))
-		printf "0x%08x\t%s\t%s\n" $crc $sym $name
+		if test :"$exp" != : ; then
+		    printf "0x%08x\t%s\t%s\t%s\n" $crc $sym $name $exp
+		else
+		    printf "0x%08x\t%s\t%s\n" $crc $sym $name
+		fi
 	    else
 		command_warn "symbol without crc $sym"
 	    fi
@@ -831,8 +854,10 @@ read_dump() {
 	eval "mod_${tok}_path=\"$path\""
 	eval "mod_${tok}_syms=\"\$mod_${tok}_syms $sym\""
 	eval "mod_${tok}_sym_${sym}_crc=\"$crc\""
+	eval "mod_${tok}_sym_${sym}_exp=\"$exp\""
 	eval "sym_${sym}_name=\"$name\""
 	eval "sym_${sym}_crc=\"$crc\""
+	eval "sym_${sym}_exp=\"$exp\""
 	cache_dirty=yes
     done
     command_info "processed $count symbols"

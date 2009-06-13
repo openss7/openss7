@@ -91,10 +91,10 @@ __streams_pipe(int fds[2])
 	int fd1, fd2;
 	int error;
 
-	if (unlikely((fd1 = open("/dev/pipe", O_RDWR)) < 0)) {
+	if (unlikely((fd1 = open("/dev/streams/clone/pipe", O_RDWR)) < 0)) {
 		return (-1);
 	}
-	if (unlikely((fd2 = open("/dev/pipe", O_RDWR)) < 0)) {
+	if (unlikely((fd2 = open("/dev/streams/clone/pipe", O_RDWR)) < 0)) {
 		error = errno;
 		close(fd1);
 		errno = error;

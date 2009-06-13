@@ -108,7 +108,7 @@ char errpath[256] = "";
 char lnkname[256] = "";
 char cfgfile[256] = "";
 char outpdir[256] = "/var/log/ss7capd";
-char devname[256] = "/dev/x400p-sl";
+char devname[256] = "/dev/streams/clone/x400p-sl";
 
 #define BUFSIZE 512
 

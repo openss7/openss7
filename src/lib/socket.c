@@ -405,7 +405,7 @@ __sock_ioctl(struct socksysreq *args)
 	struct strioctl ioc;
 
 	if (__sock_control_fd == -1) {
-		if ((__sock_control_fd = open("/dev/socksys", O_RDWR)) == -1) {
+		if ((__sock_control_fd = open("/dev/streams/clone/socksys", O_RDWR)) == -1) {
 			fprintf(stderr, "Cannot open control socket\n");
 			return (-1);
 		}

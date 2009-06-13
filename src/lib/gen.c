@@ -315,7 +315,7 @@ __slog_openlog(struct __slog_info_struct *info, const char *ident, int option, i
 	if (option & LOG_NDELAY) {
 		int flags = (options & LOG_NOWAIT) ? (O_NONBLOCK | O_NELAY) : 0;
 
-		if ((info->slog_fd = open("/dev/strlog", flags)) == -1) {
+		if ((info->slog_fd = open("/dev/streams/clone/log", flags)) == -1) {
 			info->slog_fd = 0;
 			perror(__FUNCTION__);
 			return (-1);
@@ -408,7 +408,7 @@ __slog_vsyslog(struct __slog_info_struct *info, int pri, const char *fmt, va_lis
 	int ret = -1;
 
 	if (info->slog_fd == 0) {
-		if ((ret = open("/dev/strlog", O_NONBLOCK | O_NDELAY)) == -1) {
+		if ((ret = open("/dev/streams/clone/log", O_NONBLOCK | O_NDELAY)) == -1) {
 			perror(__FUNCTION__);
 			return (ret);
 		}

@@ -68,7 +68,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /** @file
   * STREAMS Library fdetach() implementation file. */
 
-#define DUMMY_STREAM "/dev/fifo.0"	/* FIXME: /dev/stream,... */
+#define DUMMY_STREAM "/dev/streams/clone/nuls"
 #define DUMMY_MODE   O_RDWR|O_NONBLOCK
 
 /** @brief Detach a path from a Stream.

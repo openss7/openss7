@@ -110,7 +110,7 @@ char pidfile[256] = "";
 
 /* search path for log devices */
 static const char *logdevices[] = {
-	"/dev/streams/strlog",
+	"/dev/streams/clone/log",
 	"/dev/streams/log",
 	"/dev/strlog",
 	"/dev/log",
@@ -786,7 +786,7 @@ Options:\n\
     -p, --pidfile PIDFILE\n\
         when running as daemon, output pid to PIDFILE, default: /var/run/%2$s.pid\n\
     -l, --logdev LOGDEVICE\n\
-        log device to open, default: '/dev/strlog'\n\
+        log device to open, default: '/dev/streams/clone/log'\n\
     -q, --quiet\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -D, --debug [LEVEL]\n\

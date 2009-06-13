@@ -60,7 +60,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is
- * to open signalling link monitoring streams, /dev/sl-mon, on the SL-MUX driver, and attach them to
+ * to open signalling link monitoring streams, /dev/streams/sl-mux/mon, on the SL-MUX driver, and attach them to
  * specific signalling links using the global PPA or CLEI for the signalling link.  The utility then
  * outputs configuration and monitoring information obtained from the signalling link service
  * interface and formats the information and outputs it to either standard output of a file.  When a
@@ -114,7 +114,7 @@ char errpath[256] = "";
 char lnkname[256] = "";
 char cfgfile[256] = "";
 char outpdir[256] = "/var/log/slmon";
-char devname[256] = "/dev/sl-mon";
+char devname[256] = "/dev/streams/sl-mux/mon";
 
 int alm_signal = 0;
 int hup_signal = 0;

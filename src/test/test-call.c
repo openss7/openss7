@@ -919,7 +919,7 @@ static int mymain(int argc, char **argv)
 	int ret;
 	printf("Opening mux.\n");
 	fflush(stdout);
-	if ((fd = open("/dev/sl-mux", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open("/dev/streams/clone/sl-mux", O_NONBLOCK | O_RDWR)) < 0) {
 		perror(argv[0]);
 		exit(1);
 	}

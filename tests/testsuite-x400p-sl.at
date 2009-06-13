@@ -88,10 +88,10 @@ function check_x400p() {
     esac
 }
 function test_x400p_sl() {
-    check_x400p && test_prog test-x400p "$1" "$2" -d /dev/x400p-sl
+    check_x400p && test_prog test-x400p "$1" "$2" -d /dev/streams/clone/x400p-sl
 }
 function test_x400p_sl_root() {
-    check_x400p && test_prog_root test-x400p "$1" "$2" -d /dev/x400p-sl
+    check_x400p && test_prog_root test-x400p "$1" "$2" -d /dev/streams/clone/x400p-sl
 }
 m4_divert_pop([DEFAULTS])
 

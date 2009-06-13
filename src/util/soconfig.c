@@ -269,7 +269,7 @@ cmn_set(int family, int type, int protocol, const char *path)
 	prot.proto = protocol;
 	prot.dev = st.st_rdev;
 	prot.flags = 0;
-	if ((fd = open("/dev/socksys", O_RDWR)) == -1) {
+	if ((fd = open("/dev/streams/clone/socksys", O_RDWR)) == -1) {
 		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		exit(1);
 	}
@@ -295,7 +295,7 @@ cmn_reset(void)
 	int fd;
 	struct strioctl ioc;
 
-	if ((fd = open("/dev/socksys", O_RDWR)) == -1) {
+	if ((fd = open("/dev/streams/clone/socksys", O_RDWR)) == -1) {
 		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));
 		exit(1);
 	}

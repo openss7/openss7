@@ -122,7 +122,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "PIPE";
-static char devname[256] = "/dev/pipe";
+static char devname[256] = "/dev/streams/clone/pipe";
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;
@@ -1699,7 +1699,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
 			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
@@ -1792,7 +1792,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				if (last_errno == EINTR || last_errno == ERESTART)
+				if (last_errno == ERESTART)
 					continue;
 				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
@@ -1812,7 +1812,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				if (last_errno == EINTR || last_errno == ERESTART)
+				if (last_errno == ERESTART)
 					continue;
 				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
@@ -1830,7 +1830,7 @@ test_write(int child, const void *buf, size_t len)
 	print_datcall(child, "write(2)------", len);
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1847,7 +1847,7 @@ test_writev(int child, const struct iovec *iov, int num)
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
 		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1864,7 +1864,7 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	print_datcall(child, "getmsg(2)-----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1881,7 +1881,7 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 	print_datcall(child, "getpmsg(2)----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1898,7 +1898,7 @@ test_read(int child, void *buf, size_t count)
 	print_datcall(child, "read(2)-------", count);
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1915,7 +1915,7 @@ test_readv(int child, const struct iovec *iov, int count)
 	print_syscall(child, "readv(2)------");
 	for (;;) {
 		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1934,7 +1934,7 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1945,7 +1945,7 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1964,7 +1964,7 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1975,7 +1975,7 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -1994,7 +1994,7 @@ test_isastream(int child)
 	print_syscall(child, "isastream(2)--");
 	for (;;) {
 		if ((result = last_retval = isastream(test_fd[child])) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -2014,7 +2014,7 @@ test_poll(int child, const short events, short *revents, long ms)
 	print_poll(child, events);
 	for (;;) {
 		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
-			if (last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -2040,7 +2040,7 @@ test_pipe(int child)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		if (last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
@@ -2083,7 +2083,7 @@ test_open(int child, const char *name, int flags)
 			test_fd[child] = fd;
 			return (__RESULT_SUCCESS);
 		}
-		if (last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
@@ -2099,7 +2099,7 @@ test_close(int child)
 	for (;;) {
 		if (test_fclose(child, fd) == __RESULT_SUCCESS)
 			return (__RESULT_SUCCESS);
-		if (last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
 		return __RESULT_FAILURE;

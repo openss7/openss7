@@ -1220,8 +1220,7 @@ dnl----------------------------------------------------------------------------
 	__release_sock,
 	skb_linearize,
 	__symbol_get,
-	__symbol_put,
-	sysctl_ip_default_ttl])
+	__symbol_put])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_EXPORTS([
 	add_wait_queue,
@@ -1377,6 +1376,7 @@ dnl----------------------------------------------------------------------------
 	sock_alloc,
 	socket_get_info,
 	sysctl_check_table,
+	sysctl_ip_default_ttl,
 	sysctl_ip_dynaddr,
 	sysctl_ip_nonlocal_bind,
 	sysctl_local_port_range,

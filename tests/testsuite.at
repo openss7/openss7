@@ -181,7 +181,7 @@ m4_include([testsuite-sad.at])
 m4_include([testsuite-sc.at])
 m4_include([testsuite-admin.at])
 
-m4_include([testsuite-ip.at])
+#m4_include([testsuite-ip.at])
 m4_include([testsuite-np_ip.at])
 
 m4_include([testsuite-timod.at])
@@ -193,12 +193,12 @@ m4_include([testsuite-xnsl_thr.at])
 
 m4_include([testsuite-inet_raw2.at])
 m4_include([testsuite-inet_raw.at])
-m4_include([testsuite-inet_sctp.at])
+#m4_include([testsuite-inet_sctp.at])
 m4_include([testsuite-inet_tcp.at])
 m4_include([testsuite-inet_udp2.at])
 m4_include([testsuite-inet_udp.at])
 
-m4_include([testsuite-sctp.at])
+#m4_include([testsuite-sctp.at])
 m4_include([testsuite-sctp_n2.at])
 m4_include([testsuite-sctp_n.at])
 m4_include([testsuite-sctp_t.at])
@@ -209,7 +209,7 @@ m4_include([testsuite-m2pa.at])
 #m4_include([testsuite-m2ua_as.at])
 m4_include([testsuite-m3ua-raw.at])
 
-m4_include([testsuite-usage.at])
+#m4_include([testsuite-usage.at])
 
 #m4_include([dummy1.m4])
 #m4_include([dummy2.m4])

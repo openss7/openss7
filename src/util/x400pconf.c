@@ -80,7 +80,7 @@ char clei[MAX_CLEI_LENGTH] = "";
 
 #define MAX_DEVICE_LENGTH 64
 
-char device[MAX_DEVICE_LENGTH] = "/dev/x400p-sl";
+char device[MAX_DEVICE_LENGTH] = "/dev/streams/clone/x400p-sl";
 
 char modules[FMNAMESZ][8] = { "", };
 

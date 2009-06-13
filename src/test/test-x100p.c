@@ -143,12 +143,12 @@ int verbose = 1;
  *  be used to test itself.
  */
 
-#define PT_SDT_DEVICE "/dev/x100p-sl"
+#define PT_SDT_DEVICE "/dev/streams/clone/x100p-sl"
 #define PT_TEST_SLOT	0
 #define PT_TEST_SPAN	0
 #define PT_TEST_CHAN	19
 
-#define IUT_SL_DEVICE "/dev/x100p-sl"
+#define IUT_SL_DEVICE "/dev/streams/clone/x100p-sl"
 #define IUT_TEST_SLOT	0
 #define IUT_TEST_SPAN	0
 #define IUT_TEST_CHAN	19

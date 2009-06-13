@@ -85,6 +85,159 @@ The sections that follow provide information on OpenSS7 releases of the
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+This the third @cite{OpenSS7 Project} respin of the @cite{@value{PACKAGE_TITLE}} package.  This is a
+production grade release.  All existing validation test suites run clean on supported distributions,
+production kernels and architectures.
+
+The @cite{@value{PACKAGE_TITLE}} package has undergone significant changes, so follow closely.  In
+it first incarnation, epoch zero (0), the @file{openss7} package was an add-on package to a now
+deprecated version of STREAMS.  This changed due to the deprecation of the old versions of STREAMS.
+In its second incarnation, epoch one (1), the @file{openss7} package contained Linux Fast-STREAMS
+and a number of other sub-packages, each capable of building and installing separately.  This
+changed due to the increasing maintenance overhead as additional sub-packages were added.  In its
+latest incarnation, epoch two (2), the @cite{@value{PACKAGE_TITLE}} package is a monolithic package
+containing Linux Fast-STREAMS and most of the other subpackages in a single build package.
+
+Major feature additions since the last public release are:
+
+@itemize @minus
+@item
+SNMP agents are more thorough and complete.
+
+@item
+Java JAIN SS7 OAM, MTP, SCCP, TCAP, INAP, MAP, ISUP, ISDN, H.323, IUA, M3UA, SUA, TUA, SPIRITS
+components, with JAIN JCC 1.2 and MSCONTROL.
+
+@item
+Interfaces provided for major scripting languages including Java, Tcl, Perl and Ruby using Swig.
+@end itemize
+
+Major packaging changes since the last public release, epoch one (1), are:
+
+@itemize @minus
+@item
+The package only compiles with Linux Fast-STREAMS, which is included.
+
+@item
+Only OpenSS7 Project developed modules, drivers, libraries and utilities have been included.
+
+@item
+Forks of other test utilities such as Iperf and Netperf have been removed.
+
+@item
+Sub-package source and installation sub-directories have all been collapsed into the one
+@file{openss7} sub-directory.
+
+@item
+A single tarball, SRPM and DSC generates a simple set of 3 binary RPMs or DEBs.
+
+@item
+The entire package is now released under the Affero GNU Public License Version 3; however,
+commercial licensing is also available for the entire package.
+@end itemize
+
+Major upgrades from the last public release are:
+
+@itemize @minus
+@item
+Updated build system to @file{swig-1.3.39}.
+
+@item
+Updated build system to @file{automake-1.11} with full silent build.
+
+@item
+Excluded deprecated sub-packages as follows:
+@multitable @columnfractions .05 .95
+@item @tab -- @file{sctp-@value{VERSION_SCTP}}
+@item @tab -- @file{iperf-@value{VERSION_IPERF}}
+@item @tab -- @file{netperf-@value{VERSION_NETPERF}}
+@item @tab -- @file{osr61-@value{VERSION_OSR}}
+@end multitable
+
+@item
+Documentation license for all documentation upgraded to GFDL 1.3 with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts, for full Debian policy compatibility.
+
+@item
+Updated build system tool chain to @file{m4-1.4.13}, @file{automake-1.10.2}, @file{bison-2.4.1},
+@file{libtool-2.2.6a}, @file{texinfo-4.13a}.
+
+@item
+Addition of the following sub-packages:
+@multitable @columnfractions .05 .95
+@item @tab -- @file{stratm-@value{VERSION_STRATM}}
+@end multitable
+This subpackage was then instantly absorbed into the new @cite{@value{PACKAGE_TITLE}} package.
+
+@item
+Significant feature updates were made to:
+@multitable @columnfractions .05 .95
+@item @tab -- @file{strchan-@value{VERSION_STRCHAN}}
+@item @tab -- @file{strsock-@value{VERSION_STRSOCK}}
+@item @tab -- @file{strnsl-@value{VERSION_STRNSL}}
+@item @tab -- @file{sigtran-@value{VERSION_SIGTRAN}}
+@end multitable
+
+@item
+Significant rework of the @file{strchan} sub-package into the @file{strss7}, @file{strisdn},
+@file{strx25} and @file{striso} packages.  One single driver now meets the needs of all sub-packages.
+
+@item
+Completion of the @file{strsock} package, moves from pre-alpha to beta.
+
+@item
+The @file{strnsl} subpackage moves from alpha to production.
+
+@item
+Significant completion of the @file{sigtran} package: all components moved back to production.
+
+@end itemize
+
+Major maintenance items since the last public release are:
+
+@itemize @minus
+@item
+Fixed timer reporting in the pstrlog() call resulting in near-epoch invalid timestamps.  This was an
+annoyance.  (Bug# strutil 001.)
+
+@item 
+Fixed assurances in untimeout and unbufcall utilities.  This could be service affecting on many-way
+machines.  (Bug# streams 027.)
+
+@item
+Timer cancellation directly from ICS races removed.  This could be service affecting on many-way
+machines.  (Bug# streams 027.)
+
+@item
+Corrected removal of SLAP_NO_REAP flag from recent kernels causing timeout problems on many-way
+machines under memory pressure.  (Bug# streams 026.)
+@end itemize
+
+For complete detail on maintenance items, see
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}/BUGS,@file{BUGS}} in the release.
+
+@emph{This is a public, stable, production grade release of the package: it deprecates previous
+releases.  Please upgrade to the current release before reporting bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 @manref{rpm(8)} and @manref{dpkg(1)} based distributions, and
+can be used on production kernels without patching or recompiling the kernel.
+
+This package is publicly released strictly under the @cite{GNU Affero General Public License Version
+3}; however, commercial licensing is available.  The release is available as an @manref{autoconf(1)}
+tarball, SRPM, DSC, and a set of binary RPMs and DEBs for popular distributions.  See the
+@uref{http://www.openss.org/@value{PACKAGE}_pkg.html,package page} for the @mantype{autoconf(1)}
+tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/repos.html,repository page} for information concerning network
+installation and update sources.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog} and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the release for more
+information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
+
+For the news release, see @uref{http://www.openss7.org/rel2009XXXX_L.html}.
+@ignore
 This is the seventh @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}} package.  For
 a sub-package listing, see
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}/README,@file{README}} in the release.  Most
@@ -182,6 +335,7 @@ information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (al
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
 
 For the news release, see @uref{http://www.openss7.org/rel2009XXXX_L.html}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 

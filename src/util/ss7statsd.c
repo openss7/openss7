@@ -129,34 +129,34 @@ long interval = 300000;			/* 5 minutes in milliseconds. */
 #endif				/* SS7STATSD_DEFAULT_CFGFILE */
 
 #ifndef SS7STATSD_DEFAULT_DEVSLMX
-#define SS7STATSD_DEFAULT_DEVSLMX "/dev/sl-stats"
+#define SS7STATSD_DEFAULT_DEVSLMX "/dev/streams/sl-mux/stats"
 #endif				/* SS7STATSD_DEFAULT_DEVSLMX */
 #ifndef SS7STATSD_DEFAULT_EVTSLMX
-#define SS7STATSD_DEFAULT_EVTSLMX "/dev/sl-events"
+#define SS7STATSD_DEFAULT_EVTSLMX "/dev/streams/sl-mux/events"
 #endif				/* SS7STATSD_DEFAULT_EVTSLMX */
 #ifndef SS7STATSD_DEFAULT_DEVMTPX
-#define SS7STATSD_DEFAULT_DEVMTPX "/dev/mtp-stats"
+#define SS7STATSD_DEFAULT_DEVMTPX "/dev/streams/mtp/stats"
 #endif				/* SS7STATSD_DEFAULT_DEVMTPX */
 #ifndef SS7STATSD_DEFAULT_EVTMTPX
-#define SS7STATSD_DEFAULT_EVTMTPX "/dev/mtp-events"
+#define SS7STATSD_DEFAULT_EVTMTPX "/dev/streams/mtp/events"
 #endif				/* SS7STATSD_DEFAULT_EVTMTPX */
 #ifndef SS7STATSD_DEFAULT_DEVSCCP
-#define SS7STATSD_DEFAULT_DEVSCCP "/dev/sccp-stats"
+#define SS7STATSD_DEFAULT_DEVSCCP "/dev/streams/sccp/stats"
 #endif				/* SS7STATSD_DEFAULT_DEVSCCP */
 #ifndef SS7STATSD_DEFAULT_EVTSCCP
-#define SS7STATSD_DEFAULT_EVTSCCP "/dev/sccp-events"
+#define SS7STATSD_DEFAULT_EVTSCCP "/dev/streams/sccp/events"
 #endif				/* SS7STATSD_DEFAULT_EVTSCCP */
 #ifndef SS7STATSD_DEFAULT_DEVTCAP
-#define SS7STATSD_DEFAULT_DEVTCAP "/dev/tcap-stats"
+#define SS7STATSD_DEFAULT_DEVTCAP "/dev/streams/tcap/stats"
 #endif				/* SS7STATSD_DEFAULT_DEVTCAP */
 #ifndef SS7STATSD_DEFAULT_EVTTCAP
-#define SS7STATSD_DEFAULT_EVTTCAP "/dev/tcap-events"
+#define SS7STATSD_DEFAULT_EVTTCAP "/dev/streams/tcap/events"
 #endif				/* SS7STATSD_DEFAULT_EVTTCAP */
 #ifndef SS7STATSD_DEFAULT_DEVISUP
-#define SS7STATSD_DEFAULT_DEVISUP "/dev/isup-stats"
+#define SS7STATSD_DEFAULT_DEVISUP "/dev/streams/isup/stats"
 #endif				/* SS7STATSD_DEFAULT_DEVISUP */
 #ifndef SS7STATSD_DEFAULT_EVTISUP
-#define SS7STATSD_DEFAULT_EVTISUP "/dev/isup-events"
+#define SS7STATSD_DEFAULT_EVTISUP "/dev/streams/isup/events"
 #endif				/* SS7STATSD_DEFAULT_EVTISUP */
 
 char outpdir[MAX_PATH_LENGTH] = "";

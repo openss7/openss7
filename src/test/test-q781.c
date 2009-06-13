@@ -8269,7 +8269,7 @@ print_ppa(ppa_t * ppa, int len)
 	}
 }
 
-#define PT_SDT_DEVICE "/dev/udp"
+#define PT_SDT_DEVICE "/dev/streams/inet/udp"
 
 static int
 pt_open(void)
@@ -8660,7 +8660,7 @@ pt_end(void)
 	return SUCCESS;
 }
 
-#define IUT_SL_DEVICE "/dev/udp"
+#define IUT_SL_DEVICE "/dev/streams/inet/udp"
 
 static int
 iut_open(void)

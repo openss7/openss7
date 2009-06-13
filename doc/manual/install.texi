@@ -803,15 +803,16 @@ the other releases.
 
 The build host requires the following GNU tools:
 
-@itemize
-@item @command{m4 1.4.13}
-@item @command{autoconf 2.63}
-@item @command{automake 1.11}
-@item @command{libtool 2.2.6a}
-@item @command{gettext 0.17}
-@item @command{flex 2.5.33}
-@item @command{bison 2.4.1}
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @command{m4 1.4.13}
+@item @tab @bullet{} @command{autoconf 2.63}
+@item @tab @bullet{} @command{automake 1.11}
+@item @tab @bullet{} @command{libtool 2.2.6a}
+@item @tab @bullet{} @command{gettext 0.17}
+@item @tab @bullet{} @command{flex 2.5.33}
+@item @tab @bullet{} @command{bison 2.4.1}
+@item @tab @bullet{} @command{swig 1.3.39}
+@end multitable
 
 Most desktop development GNU/Linux distributions will have these tools; however, some non-development
 or server-style installations might not and they must be installed separately.@footnote{Older
@@ -829,6 +830,7 @@ software directory, and also at the following locations:
 @item @url{http://www.openss7.org/tarballs/gettext-0.17.tar.gz,gettext-0.17}
 @item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}
 @item @url{http://www.openss7.org/tarballs/bison-2.4.1.tar.bz2,bison-2.4.1}
+@item @url{http://www.openss7.org/tarballs/swig-1.3.39.tar.bz2,swig-1.3.39}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
@@ -841,16 +843,16 @@ distribution installed versions.
 
 For building documentation, the build host also requires the following documentation tools:
 
-@itemize
-@item @command{gs 6.51} or @command{ghostscript 6.51}, or newer.
-@item @command{tetex 3.0} or @command{texlive 2007}, or newer.
-@item @command{texinfo 4.13a} or newer.
-@item @command{transfig 3.2.3d} or newer.
-@item @command{imagemagick 5.3.8} or @command{ImageMagick 5.3.8}, or newer.
-@item @command{groff 1.17.2} or newer.
-@item @command{gnuplot 3.7} or newer.
-@item @command{latex2html 1.62} or newer.
-@end itemize
+@multitable @columnfractions .05 .95
+@item @tab @bullet{} @command{gs 6.51} or @command{ghostscript 6.51}, or newer.
+@item @tab @bullet{} @command{tetex 3.0} or @command{texlive 2007}, or newer.
+@item @tab @bullet{} @command{texinfo 4.13a} or newer.
+@item @tab @bullet{} @command{transfig 3.2.3d} or newer.
+@item @tab @bullet{} @command{imagemagick 5.3.8} or @command{ImageMagick 5.3.8}, or newer.
+@item @tab @bullet{} @command{groff 1.17.2} or newer.
+@item @tab @bullet{} @command{gnuplot 3.7} or newer.
+@item @tab @bullet{} @command{latex2html 1.62} or newer.
+@end multitable
 
 Most desktop GNU/Linux distributions will have these tools; however, some server-style installations
 (e.g. @cite{Ubuntu}-server, @cite{SLES 9} or @cite{Fedora 6 or 7}) will not and they must be

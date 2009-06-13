@@ -68,10 +68,10 @@ dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_inet_raw2() {
-    test_prog test-inet_raw "$1" "$2" -d /dev/rawip2
+    test_prog test-inet_raw "$1" "$2" -d /dev/streams/clone/rawip
 }
 function test_inet_raw2_root() {
-    test_prog_root test-inet_raw "$1" "$2" -d /dev/rawip2
+    test_prog_root test-inet_raw "$1" "$2" -d /dev/streams/clone/rawip
 }
 m4_divert_pop([DEFAULTS])
 

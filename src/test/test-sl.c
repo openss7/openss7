@@ -1394,7 +1394,7 @@ mymain(int argc, char **argv)
 		channel);
 	printf("Opening device.\n");
 	fflush(stdout);
-	if ((fd = open("/dev/x400p-sl", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open("/dev/streams/clone/x400p-sl", O_NONBLOCK | O_RDWR)) < 0) {
 		perror(argv[0]);
 		exit(1);
 	}

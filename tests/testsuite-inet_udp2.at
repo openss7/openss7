@@ -68,10 +68,10 @@ dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_inet_udp2() {
-    test_prog test-inet_udp "$1" "$2" -d /dev/udp2
+    test_prog test-inet_udp "$1" "$2" -d /dev/streams/clone/udp
 }
 function test_inet_udp2_root() {
-    test_prog_root test-inet_udp "$1" "$2" -d /dev/udp2
+    test_prog_root test-inet_udp "$1" "$2" -d /dev/streams/clone/udp
 }
 m4_divert_pop([DEFAULTS])
 
