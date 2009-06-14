@@ -116,6 +116,8 @@ release.}
 @item Fedora 7 (FC7)
 @item Fedora 8 (FC8)
 @item Fedora 9 (FC9)
+@item Fedora 10 (FC10)
+@item Fedora 11 (FC11)
 @item Gentoo 2006.1 (untested) TBD
 @item Gentoo 2007.1 (untested) TBD
 @item Lineox 4.026 (LEL4) TBD
@@ -146,12 +148,15 @@ release.}
 @item SLES 9 SP2 (SLES9) TBD
 @item SLES 9 SP3 (SLES9) TBD
 @item SLES 10 (SLES10)
+@item SLES 10 SP2 (SLES10)
 @item Ubuntu 5.10 (ubu5.10) TBD
 @item Ubuntu 6.03 LTS (ubu6.03) TBD
 @item Ubuntu 6.10 (ubu6.10) TBD
 @item Ubuntu 7.04 (ubu7.04) TBD
 @item Ubuntu 7.10 (ubu7.10)
 @item Ubuntu 8.04 (ubu8.04)
+@item Ubuntu 8.10 (ubu8.10)
+@item Ubunto 9.04 (ubu9.04)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3) TBD
 @item WhiteBox Enterprise Linux 4 (WBEL4) TBD
 @end itemize
