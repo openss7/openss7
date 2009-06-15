@@ -67,19 +67,19 @@ import javax.jain.protocol.ss7.SS7InvalidParamException;
   *
   * <h4>Parameter components:</h4><ul>
   *
-  * <li><var>innerRadius</var> (0 &lt;= meters &lt;=  327675), mandatory
+  * <li><var>innerRadius</var> (0 &le; meters &le;  327675), mandatory
   * componet with no default;
   *
-  * <li><var>uncertaintyRadius</var>, (0 &lt;= meters &lt;= 18000000)
+  * <li><var>uncertaintyRadius</var>, (0 &le; meters &le; 18000000)
   * mandatory component with no default;
   *
-  * <li><var>offsetAngle</var>, (0 &lt;= degrees &lt;= 359) mandatory
+  * <li><var>offsetAngle</var>, (0 &le; degrees &le; 359) mandatory
   * component with no default;
   *
-  * <li><var>includeAngle</var>, (1 &lt;= degrees &lt;= 360) mandatory
+  * <li><var>includeAngle</var>, (1 &le; degrees &le; 360) mandatory
   * component with no default;
   *
-  * <li><var>confidence</var>, (1 &lt;= percent &lt;= 100), optional
+  * <li><var>confidence</var>, (1 &le; percent &le; 100), optional
   * component. </ul>
   *
   * @author Monavacon Limited
@@ -89,12 +89,12 @@ public class PositionArc extends PositionPoint {
     /**
       * The constructor.
       *
-      * @param latitude Latitude in degrees (-90 &lt;= latitude &lt;= 90).
-      * @param longitude Longitude in degrees (-180 &lt;= longitude &lt;= 180).
-      * @param innerRadius Inner radius of the arg in meters (0 &lt;= radius &lt;= 327675).
-      * @param uncertaintyRadius Arc depth from the inner radius to the outer radius in meters (0 &lt;= arc depth &lt;= 1800000).
-      * @param offsetAngle Angle clockwise from north to the left edge of the arc in degrees (0 &lt;= offset &lt;= 359).
-      * @param includedAngle Angle width from left edge to the right edge of the arc (1 &lt;= width &lt;= 360).
+      * @param latitude Latitude in degrees (-90 &le; latitude &le; 90).
+      * @param longitude Longitude in degrees (-180 &le; longitude &le; 180).
+      * @param innerRadius Inner radius of the arg in meters (0 &le; radius &le; 327675).
+      * @param uncertaintyRadius Arc depth from the inner radius to the outer radius in meters (0 &le; arc depth &le; 1800000).
+      * @param offsetAngle Angle clockwise from north to the left edge of the arc in degrees (0 &le; offset &le; 359).
+      * @param includedAngle Angle width from left edge to the right edge of the arc (1 &le; width &le; 360).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
     public PositionArc(float latitude, float longitude, float innerRadius, float uncertaintyRadius, float offsetAngle, float includedAngle)
@@ -113,7 +113,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Change the parameter specifying the inner radius of the arc.
-      * @param innerRadius Inner radius of the arg in meters (0 &lt;= radius &lt;= 327675).
+      * @param innerRadius Inner radius of the arg in meters (0 &le; radius &le; 327675).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
     public void setInnerRadius(float innerRadius)
@@ -135,7 +135,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Change the parameter specifying the uncertainty radius of the arc.
-      * @param uncertaintyRadius Arc depth from the inner radius to the outer radius in meters (0 &lt;= arc depth &lt;= 1800000).
+      * @param uncertaintyRadius Arc depth from the inner radius to the outer radius in meters (0 &le; arc depth &le; 1800000).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
     public void setUncertaintyRadius(float uncertaintyRadius)
@@ -147,7 +147,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Get the parameter specifying the uncertainty radius of the arc.
-      * @return Arc depth from the inner radius to the outer radius in meters (0 &lt;= arc depth &lt;= 1800000).
+      * @return Arc depth from the inner radius to the outer radius in meters (0 &le; arc depth &le; 1800000).
       */
     public float getUncertaintyRadius() {
         float uradius = 0;
@@ -157,7 +157,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Change the parameter specifying the offset angle of the arc.
-      * @param offsetAngle Angle clockwise from north to the left edge of the arc in degrees (0 &lt;= offset &lt;= 359).
+      * @param offsetAngle Angle clockwise from north to the left edge of the arc in degrees (0 &le; offset &le; 359).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
     public void setOffsetAngle(float offsetAngle)
@@ -169,7 +169,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Get the parameter specifying the offset angle of the arc.
-      * @return Angle clockwise from north to the left edge of the arc in degrees (0 &lt;= offset &lt;= 359).
+      * @return Angle clockwise from north to the left edge of the arc in degrees (0 &le; offset &le; 359).
       */
     public float getOffsetAngle() {
         float offset = 0;
@@ -179,7 +179,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Change the parameter specifying the included angle of the arc.
-      * @param includedAngle Angle width from left edge to the right edge of the arc (1 &lt;= width &lt;= 360).
+      * @param includedAngle Angle width from left edge to the right edge of the arc (1 &le; width &le; 360).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
     public void setIncludedAngle(float includedAngle)
@@ -191,7 +191,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Get the parameter specifying the included angle of the arc.
-      * @return Angle width from left edge to the right edge of the arc (1 &lt;= width &lt;= 360).
+      * @return Angle width from left edge to the right edge of the arc (1 &le; width &le; 360).
       */
     public float getIncludedAngle() {
         float angle = 360;
@@ -201,7 +201,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Set the parameter specifying the confidence by which the target is within the unrectainty area.
-      * @param confidence The probability in percent that the target is within the uncertainty area (0 &lt;= confidence &lt;= 100).
+      * @param confidence The probability in percent that the target is within the uncertainty area (0 &le; confidence &le; 100).
       * @exception SS7InvalidParamException Thrown if parameters are invalid or out of range.
       */
     public void setConfidence(float confidence)
@@ -213,7 +213,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Get the parameter specifying the confidence by which a target is within the uncertaintly area.
-      * @return The probability in percent that the target is within the uncertainty area (0 &lt;= confidence &lt;= 100).
+      * @return The probability in percent that the target is within the uncertainty area (0 &le; confidence &le; 100).
       */
     public float getConfidence() {
         float confidence = 0;

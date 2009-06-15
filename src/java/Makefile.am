@@ -271,7 +271,11 @@ javadoc.stamp: $(my_JAVAFILES) $(srcdir)/overview
 
 javadoc: javadoc.stamp
 
+if DEVELOPMENT
+if DOCUMENTATION
 ALL_LOCAL += javadoc
+endif
+endif
 
 clean-javadoc:
 	rm -rf -- api-docs

@@ -1,472 +1,333 @@
 /*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Copyrights:
- *
- * Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
- * 901 San Antonio Road, Palo Alto, California 94043, U.S.A.
- *
- * This product and related documentation are protected by copyright and
- * distributed under licenses restricting its use, copying, distribution, and
- * decompilation. No part of this product or related documentation may be
- * reproduced in any form by any means without prior written authorization of
- * Sun and its licensors, if any.
- *
- * RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
- * States Government is subject to the restrictions set forth in DFARS
- * 252.227-7013 (c)(1)(ii) and FAR 52.227-19.
- *
- * The product described in this manual may be protected by one or more U.S.
- * patents, foreign patents, or pending applications.
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Author:
- *
- * AePONA Limited, Interpoint Building
- * 20-24 York Street, Belfast BT15 1AQ
- * N. Ireland.
- *
- *
- * Module Name   : JAIN TCAP API
- * File Name     : BeginIndEvent.java
- * Originator    : Colm Hayden & Phelim O'Doherty [AePONA]
- * Approver      : Jain Tcap Edit Group
- *
- * HISTORY
- * Version   Date      Author              Comments
- * 1.1     15/11/2000  Phelim O'Doherty    Updated after public release and
- *                                         certification process comments.
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
  */
 
 package jain.protocol.ss7.tcap.dialogue;
 
-import jain.*;
 import jain.protocol.ss7.tcap.*;
-import jain.protocol.ss7.SccpUserAddress;
+import jain.protocol.ss7.*;
+import jain.*;
 
 /**
- *  An event representing a TCAP Begin indication dialogue primitive. This event
- *  will be passed from the Provider (TCAP) to the Listener (the TC User) to
- *  indicate the initiation of a structured dialogue with the originating node.
- *  <BR>
- *  The mandatory parameters of this primitive are supplied to the constructor.
- *  Optional parameters may then be set using the set methods. <p>
- *
- *  The optional parameters 'Application Context Name' and 'User Information'
- *  are centrally located in the Dialogue Portion class, therefore to manipulate
- *  them it is necessary to instantiate the Dialogue Portion Object and use the
- *  acessors method for the two parameters in that Dialogue Portion Object.
- *
- *@author     Sun Microsystems Inc.
- *@version    1.1
- *@see        DialogueIndEvent
- *@see        DialoguePortion
- */
-
-public final class BeginIndEvent extends jain.protocol.ss7.tcap.DialogueIndEvent {
-
-	/**
-	 *  Constructs a new BeginIndEvent, with only the Event Source and the <a
-	 *  href="package-summary.html">JAIN TCAP Mandatory</a> parameters being
-	 *  supplied to the constructor.
-	 *
-	 * Within this method TcapUserAddress has been changed to SccpUserAddress.
-	 * The method has not been deprecated as a new method using type SccpUserAddress
-	 * would have to be created with a different method name. This is less desirable
-	 * than the effective removal of the old method.
-	 *
-	 *@param  source      the Event Source supplied to the constructor
-	 *@param  dialogueId  the Dialogue Identifier supplied to the constructor
-	 *@param  originAddress      the Originating Address supplied to the constructor
-	 *@param  destAddress        the Destination Address supplied to the constructor
-	 *@param  componentsPresent  the Components Present Flag supplied to the constructor
-	 */
-
-	public BeginIndEvent(Object source, int dialogueId, SccpUserAddress originAddress,
-			SccpUserAddress destAddress, boolean componentsPresent) {
-		super(source);
-		setDialogueId(dialogueId);
-		setOriginatingAddress(originAddress);
-		setDestinationAddress(destAddress);
-		setComponentsPresent(componentsPresent);
-	}
-
-
-	/**
-	 *  Sets the Destination Address parameter of the Begin indication primitive.
-	 *  Destination Address is an SCCP parameter that is required from the
-	 *  application.
-	 *
-	 * Within this method TcapUserAddress has been changed to SccpUserAddress.
-	 * The method has not been deprecated as a new method using type SccpUserAddress
-	 * would have to be created with a different method name. This is less desirable
-	 * than the effective removal of the old method.
-	 *
-	 *@param  destination   The new Destination Address value
-	 */
-
-	public void setDestinationAddress(SccpUserAddress destination) {
-
-                m_destinationAddress = destination;
-		m_destinationAddressPresent = true;
-	}
-
-
-	/**
-	 *  Sets the Originating Address parameter of the Begin indication primitive.
-	 *  Origination Address is an SCCP parameter that is required from the
-	 *  application.
-	 *
-	 * Within this method TcapUserAddress has been changed to SccpUserAddress.
-	 * The method has not been deprecated as a new method using type SccpUserAddress
-	 * would have to be created with a different method name. This is less desirable
-	 * than the effective removal of the old method.
-	 *
-	 *@param  origin The new Originating Address value
-	 */
-
-	public void setOriginatingAddress(SccpUserAddress origin) {
-
-                m_originatingAddress = origin;
-		m_originatingAddressPresent = true;
-	}
-
-
-	/**
-	 *  Sets the Quality of Service parameter of the Begin indication primitive.
-	 *
-	 *@param  qualityOfService  The new Quality Of Service value
-	 */
-
-	public void setQualityOfService(byte qualityOfService) {
-
-		m_qualityOfService = qualityOfService;
-		m_qualityOfServicePresent = true;
-	}
-
-
-	/*
-	 * Sets the Allowed Permission parameter of the Begin dialogue primitive.
-	 * The Allowed Permission parameter indicates whether or not permission has been
-	 * granted to the receiving TC-User by the sending TC-User to terminate this dialogue.
-	 * <P>
-	 * Permission should <B>not</B>have been granted whenever the sending TC-User
-	 * anticipates sending more components that it would like the receiving TC-User
-	 * to treat as part of the same transaction.
-	 * <P>
-	 * Permission <B>should</B> have been granted when the converse applies.
-	 * <P>
-	 * <B>Note to Developers:</B> Permission to end (release) a transaction is an ANSI concept only.
-         *
-	 * @param <var>allowedPermission</var> whether permission has been granted. This may be either:
-	 * <UL>
-	 * <LI><B>true</B> if the receiving node <em>has</em> the permission to end the dialogue
-	 * <LI><B>false</B> if the receiving node has <em>not</em> the permission to end the dialogue
-	 * </UL>
-	 */
-	public void setAllowedPermission(boolean allowedPermission) {
-
-		m_allowedPermission = allowedPermission;
-		m_allowedPermissionPresent = true;
-	}
-
-
-	/**
-	 *  Sets the Components present parameter of this Begin indication primitive.
-	 *  This flag is used to determine if their are any components associated with
-	 *  this primitive. This flag will be reset to false when the <a
-	 *  href="#clearAllParameters">clearAllParameters()</a> method is invoked.
-	 *
-	 *@param  componentsPresent The new Components Present value
-	 */
-
-	public void setComponentsPresent(boolean componentsPresent) {
-
-		m_componentsPresent = componentsPresent;
-	}
-
-
-	/**
-	 *  Gets the Destination Address parameter of the Begin indication primitive.
-	 *  Destination Address is an SCCP parameter that is required from the
-	 *  application.
-	 *
-	 * The return type of this get method has been changed from TcapUserAddress.
-	 * The TcapUserAddress class has been deprecated in this release (V1.1). This
-	 * method has not been deprecated as it's replacement would then have to have
-	 * a different name.
-	 *
-	 *@return the SccpUserAddress representing the Destination Address of
-         *      the Begin indication primtive.
-	 *@exception  MandatoryParameterNotSetException  this exception is thrown if
-	 *      this Mandatory JAIN parameter has not yet been set
-	 */
-
-	public SccpUserAddress getDestinationAddress() throws MandatoryParameterNotSetException {
-		if (m_destinationAddressPresent == true) {
-			return m_destinationAddress;
-		}
-		else {
-			throw new MandatoryParameterNotSetException();
-		}
-	}
-
-
-	/**
-	 *  Gets the Originating Address parameter of the Begin indication primitive.
-	 *  Origination Address is an SCCP parameter that is required from the
-	 *  application.
-	 *
-	 * The return type of this get method has been changed from TcapUserAddress.
-	 * The TcapUserAddress class has been deprecated in this release (V1.1). This
-	 * method has not been deprecated as it's replacement would then have to have
-	 * a different name.
-	 *
-	 *@return the SccpUserAddress representing the Originating Address of
-         *      the BeginEvent.
-	 *@exception  MandatoryParameterNotSetException  this exception is thrown if
-	 *      this Mandatory JAIN parameter has not yet been set
-	 */
-
-	public SccpUserAddress getOriginatingAddress() throws MandatoryParameterNotSetException {
-		if (m_originatingAddressPresent == true) {
-			return m_originatingAddress;
-		}
-		else {
-			throw new MandatoryParameterNotSetException();
-		}
-	}
-
-
-	/**
-	 *  Indicates if the Quality of Service parameter is present in this Event.
-	 *
-	 *@return true if Quality of Service has been set, false otherwise.
-	 */
-
-	public boolean isQualityOfServicePresent() {
-		return m_qualityOfServicePresent;
-	}
-
-
-	/**
-	 *  Gets the Quality of Service parameter of the Begin indication primitive.
-	 *  Quality of Service is an SCCP parameter that is required from the
-	 *  application.
-	 *
-	 *@return the Quality of Service parameter of the BeginEvent
-	 *@exception  ParameterNotSetException  this exception is thrown if this
-	 *      parameter has not yet been set
-	 */
-
-	public byte getQualityOfService() throws ParameterNotSetException {
-		if (m_qualityOfServicePresent == true) {
-			return m_qualityOfService;
-		}
-		else {
-			throw new ParameterNotSetException();
-		}
-	}
-
-
-	/**
-	 *  Indicates if the Allowed Permission parameter is present in this Event.
-	 *
-	 *@return  true if Allowed Permission Flag has been set, false otherwise.
-	 */
-
-	public boolean isAllowedPermissionPresent() {
-		return m_allowedPermissionPresent;
-	}
-
-
-	/**
-	 *  Gets the Allowed Permission parameter of the Begin dialogue primitive. The
-	 *  Allowed Permission parameter indicates whether or not permission has been
-	 *  granted to the receiving TC-User by the sending TC-User, to terminate this
-	 *  dialogue. <P>
-	 *
-	 *  Permission should <B>not</B> have been granted whenever the sending TC-User
-	 *  anticipates sending more components that it would like the receiving
-	 *  TC-User to treat as part of the same transaction. <P>
-	 *
-	 *  Permission <B>should</B> have been granted when the converse applies.
-	 *
-	 *@return whether permission to release has been granted. This may be either:
-	 *      <UL>
-	 *        <LI> <B>true</B> if the receiving node <em>has</em> the permission to
-	 *        end the dialogue
-	 *        <LI> <B>false</B> if the receiving node has <em>not</em> the
-	 *        permission to end the dialogue
-	 *      </UL>
-	 *
-	 *@exception  ParameterNotSetException  this exception is thrown if this
-	 *      parameter has not yet been set
-	 */
-
-	public boolean isAllowedPermission() throws ParameterNotSetException {
-		if (m_allowedPermissionPresent == true) {
-			return (m_allowedPermission);
-		}
-		else {
-			throw new ParameterNotSetException();
-		}
-	}
-
-
-	/**
-	 *  Returns the Components present flag of this Begin indication primitive.
-	 *  This flag is used to determine if there are any components associated with
-	 *  this primitive. This flag will be reset to false when the <a
-	 *  href="#clearAllParameters">clearAllParameters()</a> method is invoked.
-	 *
-	 *@return    the Components Present of the BeginEvent.
-	 */
-
-	public boolean isComponentsPresent() {
-		return (m_componentsPresent);
-	}
-
-
-	/**
-	 *  This method returns the type of this primitive, the primitive type
-	 *  constants are defined with the JainTcapProvider.
-	 *
-	 *@return The Primitive Type of this Event
-	 */
-
-	public int getPrimitiveType() {
-		return (jain.protocol.ss7.tcap.TcapConstants.PRIMITIVE_BEGIN);
-	}
-
-
-	/**
-	 *  Clears all previously set parameters and resets the 'Components Present'
-	 *  flag to false.
-	 */
-
-	public void clearAllParameters() {
-		m_dialoguePortionPresent = false;
-		m_dialogueIdPresent = false;
-		m_destinationAddressPresent = false;
-		m_originatingAddressPresent = false;
-		m_qualityOfServicePresent = false;
-		m_allowedPermissionPresent = false;
-		m_componentsPresent = false;
-	}
-
-
-
-	/**
-	 *  String representation of class BeginIndEvent
-	 *
-	 *@return    String provides description of class BeginIndEvent
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer(500);
-		buffer.append("\n\nBeginIndEvent");
-		buffer.append(super.toString());
-		buffer.append("\n\ndestinationAddress = ");
-		if (m_destinationAddress != null) {
-			buffer.append(m_destinationAddress.toString());
-		}
-		else {
-			buffer.append("value is null");
-		}
-		buffer.append("\n\noriginatingAddress = ");
-		if (m_originatingAddress != null) {
-			buffer.append(m_originatingAddress.toString());
-		}
-		else {
-			buffer.append("value is null");
-		}
-		buffer.append("\n\nqualityOfService = ");
-		buffer.append(m_qualityOfService);
-		buffer.append("\n\nallowedPermission = ");
-		buffer.append(m_allowedPermission);
-		buffer.append("\n\nallowedPermissionPresent = ");
-		buffer.append(m_allowedPermissionPresent);
-		buffer.append("\n\ndestinationAddressPresent = ");
-		buffer.append(m_destinationAddressPresent);
-		buffer.append("\n\noriginatingAddressPresent = ");
-		buffer.append(m_originatingAddressPresent);
-		buffer.append("\n\nqualityOfServicePresent = ");
-		buffer.append(m_qualityOfServicePresent);
-		buffer.append("\n\ncomponentsPresent = ");
-		buffer.append(m_componentsPresent);
-
-		return buffer.toString();
-	}
-
-
-	/**
-	 *  The Destination User Address parameter of the Begin indication dialogue
-	 *  primitive
-	 *
-	 *@serial    m_destinationAddress - a default serializable field
-	 */
-
+  * An event representing a TCAP Begin indication dialogue primitive.
+  * This event will be passed from the Provider (TCAP) to the Listener
+  * (the TC User) to indicate the initiation of a structured dialogue
+  * with the originating node. <p>
+  *
+  * The mandatory parameters of this primitive are supplied to the
+  * constructor. Optional parameters may then be set using the set
+  * methods. <p>
+  *
+  * The optional parameters 'Application Context Name' and 'User
+  * Information' are centrally located in the Dialogue Portion class,
+  * therefore to manipulate them it is necessary to instantiate the
+  * Dialogue Portion Object and use the acessors method for the two
+  * parameters in that Dialogue Portion Object.
+  *
+  * @version 1.2.2
+  * @author Monavacon Limited
+  * @see DialogueIndEvent
+  * @see DialoguePortion
+  */
+public final class BeginIndEvent extends DialogueIndEvent {
+    /** Constructs a new BeginIndEvent, with only the Event Source and
+      * the JAIN TCAP Mandatory parameters being supplied to the
+      * constructor. Within this method TcapUserAddress has been changed
+      * to SccpUserAddress. The method has not been deprecated as a new
+      * method using type SccpUserAddress would have to be created with
+      * a different method name. This is less desirable than the
+      * effective removal of the old method.
+      * @param source
+      * The Event Source supplied to the constructor.
+      * @param dialogueId
+      * The Dialogue Identifier supplied to the constructor.
+      * @param originAddress
+      * The Originating Address supplied to the constructor.
+      * @param destAddress
+      * The Destination Address supplied to the constructor.
+      * @param componentsPresent
+      * The Components Present Flag supplied to the constructor.  */
+    public BeginIndEvent(java.lang.Object source, int dialogueId,
+            SccpUserAddress originAddress, SccpUserAddress destAddress,
+            boolean componentsPresent) {
+        super(source);
+        setDialogueId(dialogueId);
+        setOriginatingAddress(originAddress);
+        setDestinationAddress(destAddress);
+        setComponentsPresent(componentsPresent);
+    }
+    /** Sets the Destination Address parameter of the Begin indication
+      * primitive. Destination Address is an SCCP parameter that is
+      * required from the application. Within this method
+      * TcapUserAddress has been changed to SccpUserAddress. The method
+      * has not been deprecated as a new method using type
+      * SccpUserAddress would have to be created with a different method
+      * name. This is less desirable than the effective removal of the
+      * old method.
+      * @param destinationAddress
+      * The new Destination Address value.  */
+    public void setDestinationAddress(SccpUserAddress destinationAddress) {
+        m_destinationAddress = destinationAddress;
+        m_destinationAddressPresent = true;
+    }
+    /** Sets the Originating Address parameter of the Begin indication
+      * primitive. Origination Address is an SCCP parameter that is
+      * required from the application. Within this method
+      * TcapUserAddress has been changed to SccpUserAddress. The method
+      * has not been deprecated as a new method using type
+      * SccpUserAddress would have to be created with a different method
+      * name. This is less desirable than the effective removal of the
+      * old method.
+      * @param originatingAddress
+      * The new Originating Address value.  */
+    public void setOriginatingAddress(SccpUserAddress originatingAddress) {
+        m_originatingAddress = originatingAddress;
+        m_originatingAddressPresent = true;
+    }
+    /** Sets the Quality of Service parameter of the Begin indication
+      * primitive.
+      * @param qualityOfService
+      * The new Quality Of Service value.  */
+    public void setQualityOfService(byte qualityOfService) {
+        m_qualityOfService = qualityOfService;
+        m_qualityOfServicePresent = true;
+    }
+    /**
+      */
+    public void setAllowedPermission(boolean allowedPermission) {
+        m_allowedPermission = allowedPermission;
+        m_allowedPermissionPresent = true;
+    }
+    /** Sets the Components present parameter of this Begin indication
+      * primitive. This flag is used to determine if their are any
+      * components associated with this primitive. This flag will be
+      * reset to false when the clearAllParameters() method is invoked.
+      * @param componentsPresent
+      * The new Components Present value.  */
+    public void setComponentsPresent(boolean componentsPresent) {
+        m_componentsPresent = componentsPresent;
+    }
+    /** Gets the Destination Address parameter of the Begin indication
+      * primitive. Destination Address is an SCCP parameter that is
+      * required from the application. The return type of this get
+      * method has been changed from TcapUserAddress. The
+      * TcapUserAddress class has been deprecated in this release
+      * (V1.1). This method has not been deprecated as it's replacement
+      * would then have to have a different name.
+      * @return
+      * The SccpUserAddress representing the Destination Address of the
+      * Begin indication primtive.
+      * @exception MandatoryParameterNotSetException
+      * This exception is thrown if this Mandatory JAIN parameter has
+      * not yet been set.  */
+    public SccpUserAddress getDestinationAddress()
+        throws MandatoryParameterNotSetException {
+        if (m_destinationAddressPresent)
+            return m_destinationAddress;
+        throw new MandatoryParameterNotSetException("Destination Address: not set.");
+    }
+    /** Gets the Originating Address parameter of the Begin indication
+      * primitive. Origination Address is an SCCP parameter that is
+      * required from the application. The return type of this get
+      * method has been changed from TcapUserAddress. The
+      * TcapUserAddress class has been deprecated in this release
+      * (V1.1). This method has not been deprecated as it's replacement
+      * would then have to have a different name.
+      * @return
+      * The SccpUserAddress representing the Originating Address of the
+      * BeginEvent.
+      * @exception MandatoryParameterNotSetException
+      * This exception is thrown if this Mandatory JAIN parameter has
+      * not yet been set.  */
+    public SccpUserAddress getOriginatingAddress()
+        throws MandatoryParameterNotSetException {
+        if (m_originatingAddressPresent)
+            return m_originatingAddress;
+        throw new MandatoryParameterNotSetException("Originating Address: not set.");
+    }
+    /** Indicates if the Quality of Service parameter is present in this
+      * Event.
+      * @return
+      * True if Quality of Service has been set, false otherwise.  */
+    public boolean isQualityOfServicePresent() {
+        return m_qualityOfServicePresent;
+    }
+    /** Gets the Quality of Service parameter of the Begin indication
+      * primitive. Quality of Service is an SCCP parameter that is
+      * required from the application.
+      * @return
+      * The Quality of Service parameter of the BeginEvent.
+      * @exception ParameterNotSetException
+      * This exception is thrown if this parameter has not yet been set.
+      * */
+    public byte getQualityOfService()
+        throws ParameterNotSetException {
+        if (m_qualityOfServicePresent)
+            return m_qualityOfService;
+        throw new ParameterNotSetException("Quality of Service: not set.");
+    }
+    /** Indicates if the Allowed Permission parameter is present in this
+      * Event.
+      * @return
+      * True if Allowed Permission Flag has been set, false otherwise.  */
+    public boolean isAllowedPermissionPresent() {
+        return m_allowedPermissionPresent;
+    }
+    /** Gets the Allowed Permission parameter of the Begin dialogue
+      * primitive. The Allowed Permission parameter indicates whether or
+      * not permission has been granted to the receiving TC-User by the
+      * sending TC-User, to terminate this dialogue. <p>
+      *
+      * Permission should not have been granted whenever the sending
+      * TC-User anticipates sending more components that it would like
+      * the receiving TC-User to treat as part of the same transaction.
+      * <p>
+      *
+      * Permission should have been granted when the converse applies.
+      * @return
+      * Whether permission to release has been granted. This may be either: <ul>
+      * <li>true if the receiving node has the permission to end the
+      * dialogue
+      * <li>false if the receiving node has not the permission to end
+      * the dialogue </ul>
+      * @exception ParameterNotSetException
+      * This exception is thrown if this parameter has not yet been set.  */
+    public boolean isAllowedPermission()
+        throws ParameterNotSetException {
+        if (m_allowedPermissionPresent)
+            return (m_allowedPermission);
+        throw new ParameterNotSetException("Allowed Permission: not set.");
+    }
+    /** Returns the Components present flag of this Begin indication
+      * primitive. This flag is used to determine if there are any
+      * components associated with this primitive. This flag will be
+      * reset to false when the clearAllParameters() method is invoked.
+      * @return
+      * The Components Present of the BeginEvent.  */
+    public boolean isComponentsPresent() {
+        return m_componentsPresent;
+    }
+    /** This method returns the type of this primitive, the primitive
+      * type constants are defined with the JainTcapProvider.
+      * @return
+      * The Primitive Type of this Event.  */
+    public int getPrimitiveType() {
+        return jain.protocol.ss7.tcap.TcapConstants.PRIMITIVE_BEGIN;
+    }
+    /** Clears all previously set parameters and resets the 'Components
+      * Present' flag to false.  */
+    public void clearAllParameters() {
+        m_dialoguePortionPresent = false;
+        m_dialogueIdPresent = false;
+        m_destinationAddressPresent = false;
+        m_originatingAddressPresent = false;
+        m_qualityOfServicePresent = false;
+        m_allowedPermissionPresent = false;
+        m_componentsPresent = false;
+    }
+    /** String representation of class BeginIndEvent.
+      * @return
+      * String provides description of class BeginIndEvent.  */
+    public java.lang.String toString() {
+        StringBuffer b = new StringBuffer(512);
+        b.append("\n\nBeginIndEvent");
+        b.append(super.toString());
+        b.append("\n\tm_destinationAddress = ");
+        if (m_destinationAddress != null)
+            b.append(m_destinationAddress.toString());
+        b.append("\n\tm_originatingAddress = ");
+        if (m_originatingAddress != null)
+            b.append(m_originatingAddress.toString());
+        b.append("\n\tm_qualityOfService = " + m_qualityOfService);
+        b.append("\n\tm_allowedPermission = " + m_allowedPermission);
+        b.append("\n\tm_allowedPermissionPresent = " + m_allowedPermissionPresent);
+        b.append("\n\tm_destinationAddressPresent = " + m_destinationAddressPresent);
+        b.append("\n\tm_originatingAddressPresent = " + m_originatingAddressPresent);
+        b.append("\n\tm_qualityOfServicePresent = " + m_qualityOfServicePresent);
+        b.append("\n\tm_componentsPresent = " + m_componentsPresent);
+        return b.toString();
+    }
+        /** The Destination User Address parameter of the Begin
+          * indication dialogue primitive.
+          * @serial m_destinationAddress
+          * - a default serializable field.  */
 	private SccpUserAddress m_destinationAddress = null;
-
-	/**
-	 *  The Originating User Address parameter of the Begin indication dialogue
-	 *  primitive
-	 *
-	 *@serial    m_originatingAddress - a default serializable field
-	 */
-
+        /** The Originating User Address parameter of the Begin
+          * indication dialogue primitive.
+          * @serial m_originatingAddress
+          * - a default serializable field.  */
 	private SccpUserAddress m_originatingAddress = null;
-
-	/**
-	 *  The Quality of Service parameter of the Begin indication dialogue primitive
-	 *
-	 *@serial    m_qualityOfService - a default serializable field
-	 */
-
+        /** The Quality of Service parameter of the Begin indication
+          * dialogue primitive.
+          * @serial m_qualityOfService
+          * - a default serializable field.  */
 	private byte m_qualityOfService = 0;
-
-	/**
-	 *  The Allowed Permission parameter of the Begin indication dialogue primitive
-	 *
-	 *@serial    m_allowedPermission - a default serializable field
-	 */
-
+        /** The Allowed Permission parameter of the Begin indication
+          * dialogue primitive.
+          * @serial m_allowedPermission
+          * - a default serializable field.  */
 	private boolean m_allowedPermission = true;
-
-	/**
-	 *@serial    m_allowedPermissionPresent - a default serializable field
-	 */
-
+	/** Whether Allowed Permission is present.
+          * @serial m_allowedPermissionPresent
+          * - a default serializable field.  */
 	private boolean m_allowedPermissionPresent = false;
-
-	/**
-	 *@serial    m_destinationAddressPresent - a default serializable field
-	 */
-
+	/** Whether Destination Address is present.
+          * @serial m_destinationAddressPresent
+          * - a default serializable field.  */
 	private boolean m_destinationAddressPresent = false;
-
-	/**
-	 *@serial    m_originatingAddressPresent - a default serializable field
-	 */
-
+	/** Whether Originating Address is present.
+          * @serial m_originatingAddressPresent
+          * - a default serializable field.  */
 	private boolean m_originatingAddressPresent = false;
-
-	/**
-	 *@serial    m_qualityOfServicePresent - a default serializable field
-	 */
-
+	/** Whether Quality of Service is present.
+          * @serial m_qualityOfServicePresent
+          * - a default serializable field.  */
 	private boolean m_qualityOfServicePresent = false;
-
-	/**
-	 *  The Components Present parameter of the Dialogue Indication primitive.
-	 *
-	 *@serial    m_componentsPresent - a default serializable field
-	 */
-
+	/** The Components Present parameter of the Dialogue Indication primitive.
+          * @serial m_componentsPresent
+          * - a default serializable field.  */
 	private boolean m_componentsPresent = false;
-
 }
 
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

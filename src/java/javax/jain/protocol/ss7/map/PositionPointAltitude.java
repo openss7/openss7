@@ -71,7 +71,7 @@ import javax.jain.*;
   *
   * <h5>Parameter components:</h5> <ul>
   *
-  * <li>altitude (-32767 &lt;= metres &lt;= 32767), mandatory component
+  * <li>altitude (-32767 &le; metres &le; 32767), mandatory component
   * with no default. </ul>
   *
   * @author Monavacon Limited
@@ -82,14 +82,14 @@ public class PositionPointAltitude extends PositionPoint {
       * The constructor.  
       *
       * @param latitude
-      * Latitude in degrees (-90 &lt;= latitude &lt;= 90).
+      * Latitude in degrees (-90 &le; latitude &le; 90).
       *
       * @param longitude
-      * Longitude in degrees (-180 &lt;= longitude &lt;= 180).
+      * Longitude in degrees (-180 &le; longitude &le; 180).
       *
       * @param altitude
       * Altitude in metres; up or down from the surface of the earth
-      * (-32767 &lt;= altitude &lt;= 32767).
+      * (-32767 &le; altitude &le; 32767).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -111,7 +111,7 @@ public class PositionPointAltitude extends PositionPoint {
       *
       * @param altitude
       * Altitude in metres; up or down from the surface of the earth
-      * (-32767 &lt;= altitude &lt;= 32767).
+      * (-32767 &le; altitude &le; 32767).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -130,7 +130,7 @@ public class PositionPointAltitude extends PositionPoint {
       * 
       * @return
       * Altitude in metres; up or down from the surface of the earth
-      * (-32767 &lt;= altitude &lt;= 32767).
+      * (-32767 &le; altitude &le; 32767).
       */
     public float getAltitude() {
         return m_altitude;
