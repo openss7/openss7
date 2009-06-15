@@ -71,7 +71,7 @@ import javax.jain.*;
   *
   * <h5>Parameter components:</h5><ul>
   *
-  * <li>uncertaintyRadius (0 &lt;= metres &lt;= 1800000), mandatory component
+  * <li>uncertaintyRadius (0 &le; metres &le; 1800000), mandatory component
   * with no default </ul>
   *
   * @author Monavacon Limited
@@ -82,13 +82,13 @@ public class PositionPointUncertCircle extends PositionPoint {
       * The constructor.
       *
       * @param latitude
-      * Latitude in degrees (-90 &lt;= latitude &lt;= 90).
+      * Latitude in degrees (-90 &le; latitude &le; 90).
       *
       * @param longitude
-      * Longitude in degrees (-180 &lt;= longitude &lt;= 180).
+      * Longitude in degrees (-180 &le; longitude &le; 180).
       *
       * @param uncertaintyRadius
-      * Radius of the uncertainty circle (0 &lt;= metres &lt;= 1800000).
+      * Radius of the uncertainty circle (0 &le; metres &le; 1800000).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -111,7 +111,7 @@ public class PositionPointUncertCircle extends PositionPoint {
       * circle.
       *
       * @param uncertaintyRadius
-      * Radius of the uncertainty circle (0 &lt;= metres &lt;= 1800000).
+      * Radius of the uncertainty circle (0 &le; metres &le; 1800000).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -129,7 +129,7 @@ public class PositionPointUncertCircle extends PositionPoint {
       * Get the parameter specifying the radius of uncertainty circle.
       *
       * @return
-      * Radius of the uncertainty circle (0 &lt;= metres &lt;= 1800000).
+      * Radius of the uncertainty circle (0 &le; metres &le; 1800000).
       */
     public float getUncertaintyRadius() {
         return m_uncertaintyRadius;

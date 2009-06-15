@@ -73,10 +73,10 @@ import javax.jain.*;
   *
   * <li>typeOfShape, read-only
   *
-  * <li>latitude (-90 &lt;= degrees &lt;= 90), mandatory component with
+  * <li>latitude (-90 &le; degrees &le; 90), mandatory component with
   * no default,
   *
-  * <li>longitude (-180 &lt;= degrees &lt;= 180), mandatory component
+  * <li>longitude (-180 &le; degrees &le; 180), mandatory component
   * with no default, </ul>
   *
   * @author Monavacon Limited
@@ -87,10 +87,10 @@ public class PositionPoint extends Position {
       * The constructor.
       *
       * @param latitude
-      * Latitude in degrees (-90 &lt;= latitude &lt;= 90).
+      * Latitude in degrees (-90 &le; latitude &le; 90).
       *
       * @param longitude
-      * Longitude in degrees (-180 &lt;= longitude &lt;= 180).
+      * Longitude in degrees (-180 &le; longitude &le; 180).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -130,7 +130,7 @@ public class PositionPoint extends Position {
       * Change the latitude parameter.
       *
       * @param latitude
-      * Latitude in degrees (-90 &lt;= latitude &lt;= 90).
+      * Latitude in degrees (-90 &le; latitude &le; 90).
       * 
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -148,7 +148,7 @@ public class PositionPoint extends Position {
       * Get the latitude parameter.
       *
       * @return
-      * Latitude in degrees (-90 &lt;= latitude &lt;= 90).
+      * Latitude in degrees (-90 &le; latitude &le; 90).
       */
     public float getLatitude() {
         return m_latitude;
@@ -157,7 +157,7 @@ public class PositionPoint extends Position {
       * Change the longitude parameter.
       *
       * @param longitude
-      * Longitude in degrees (-180 &lt;= longitude &lt;= 180).
+      * Longitude in degrees (-180 &le; longitude &le; 180).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -175,7 +175,7 @@ public class PositionPoint extends Position {
       * Get the longitude parameter.
       *
       * @return
-      * Longitude in degrees (-180 &lt;= longitude &lt;= 180).
+      * Longitude in degrees (-180 &le; longitude &le; 180).
       */
     public float getLongitude() {
         return m_longitude;

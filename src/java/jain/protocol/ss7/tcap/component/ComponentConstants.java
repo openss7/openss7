@@ -1,332 +1,232 @@
 /*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Copyrights:
- *
- * Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
- * 901 San Antonio Road, Palo Alto, California 94043, U.S.A.
- *
- * This product and related documentation are protected by copyright and
- * distributed under licenses restricting its use, copying, distribution, and
- * decompilation. No part of this product or related documentation may be
- * reproduced in any form by any means without prior written authorization of
- * Sun and its licensors, if any.
- *
- * RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
- * States Government is subject to the restrictions set forth in DFARS
- * 252.227-7013 (c)(1)(ii) and FAR 52.227-19.
- *
- * The product described in this manual may be protected by one or more U.S.
- * patents, foreign patents, or pending applications.
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * Author:
- *
- * AePONA Limited, Interpoint Building
- * 20-24 York Street, Belfast BT15 1AQ
- * N. Ireland.
- *
- *
- * Module Name   : JAIN TCAP API
- * File Name     : ComponentConstants.java
- * Originator    : Colm Hayden & Phelim O'Doherty [AePONA]
- * Approver      : Jain Tcap Edit Group
- *
- * HISTORY
- * Version   Date      Author              Comments
- * 1.1     16/10/2000  Phelim O'Doherty    Updated problem types and
- *                                         inserted ommited problem codes.
- *                                         Made constructor private.
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
  */
+
 package jain.protocol.ss7.tcap.component;
 
+import jain.protocol.ss7.tcap.*;
+import jain.protocol.ss7.*;
+import jain.*;
+
 /**
- * Constants used in package jain.protocol.ss7.tcap.component
- *
- * @author     Sun Microsystems Inc.
- * @version    1.1
- */
+  * Constants used in package jain.protocol.ss7.tcap.component.
+  * @version 1.2.2
+  * @author Monavacon Limited
+  */
 public class ComponentConstants {
-
-    /**
-    * Constructor for the ComponentConstants object
-    */
-    private ComponentConstants() {
-    }
-
-    private final static int CLASS_TYPE = 0;
-
-    /**
-    * Class Type constants (used byInvokeReqEvent): Both success and failure are
-    * reported. It has an integer value of 1.
-    */
-    public final static int CLASS_1 = CLASS_TYPE | 1;
-
-    /**
-    * Class Type constants (used byInvokeReqEvent): Only failure is reported. It
-    * has an integer value of 2.
-    */
-    public final static int CLASS_2 = CLASS_TYPE | 2;
-
-    /**
-    * Class Type constants (used byInvokeReqEvent): Only success is reported. It
-    * has an integer value of 3.
-    */
-    public final static int CLASS_3 = CLASS_TYPE | 3;
-
-    /**
-    * Class Type constants (used byInvokeReqEvent): Neither success nor failure
-    * are reported. It has an integer value of 4.
-    */
-    public final static int CLASS_4 = CLASS_TYPE | 4;
-
-    private final static int ERROR_TYPE = 0;
-
-    /**
-    * Error Type constant (used by the Error events): Indicates a Global
-    * Error(ITU) or National Error(ANSI), this has an integer value of 1.
-    */
-    public final static int ERROR_GLOBAL = ERROR_TYPE | 1;
-
-    /**
-    * Error Type constant (used by the Error events): Indicates a Local
-    * Error(ITU) or Private Error(ANSI), this has an integer value of 2.
-    */
-    public final static int ERROR_LOCAL = ERROR_TYPE | 2;
-
-    private final static int REJECT_TYPE = 0;
-
-    /**
-    * Reject Type Constant (used by Reject Events): Indicates that this Reject
-    * Component is a Local Reject. It has an integer value of 1.
-    */
-    public final static int REJECT_TYPE_LOCAL = REJECT_TYPE | 1;
-
-    /**
-    * Reject Type Constant (used by Reject Events):Indicates that this Reject
-    * Component is a Remote Reject. It has an integer value of 2.
-    */
-    public final static int REJECT_TYPE_REMOTE = REJECT_TYPE | 2;
-
-    /**
-    * Reject Type Constant (used by Reject Events): Indicates that this Reject
-    * Component is a User Reject. It has an integer value of 3.
-    */
-    public final static int REJECT_TYPE_USER = REJECT_TYPE | 3;
-
-    private final static int PROBLEM_TYPE = 0;
-
-    /**
-    * Problem Type constant: This problem type applies to the component sublayer
-    * in <b>General</b> , and does not relate to any specific component type. All
-    * of these are generated by the component sublayer. It has an integer value
-    * of 1.
-    */
-    public final static int PROBLEM_TYPE_GENERAL = PROBLEM_TYPE | 1;
-
-    /**
-    * Problem Type constant: This problem type relates only to the <b>Invoke</b>
-    * component type. It has an integer value of 2.
-    */
-    public final static int PROBLEM_TYPE_INVOKE = PROBLEM_TYPE | 2;
-
-    /**
-    * Problem Type constant: This element contains one of the problem codes which
-    * relate only to the <b>Return Result</b> component type. It has an integer
-    * value of 3.
-    */
-    public final static int PROBLEM_TYPE_RETURN_RESULT = PROBLEM_TYPE | 3;
-
-    /**
-    * Problem Type constant: This problem type relates only to the <b>Return
-    * Error</b> component type. It has an integer value of 4.
-    */
-    public final static int PROBLEM_TYPE_RETURN_ERROR = PROBLEM_TYPE | 4;
-
-    /**
-    * Problem Type constant: This describes a problem specific to a <b>
-    * Transaction</b> primitive. This classification of problem type is an ANSI
-    * type only. It has an integer value of 5.
-    */
-    public final static int PROBLEM_TYPE_TRANSACTION = PROBLEM_TYPE | 5;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): The component
-    * type is not recognised. It has an integer value of 1
-    */
-    public final static int PROBLEM_CODE_UNRECOGNISED_COMPONENT = 1;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): The element
-    * structure of a component does not conform to the defined structure of that
-    * component. <b>This constant is the equivalent of the Incorrect Component
-    * Portion in ANSI</b> . It has an integer value of 2.
-    */
-    public final static int PROBLEM_CODE_MISTYPED_COMPONENT = 2;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): The contents of
-    * the component do not conform to the encoding rules. It has an integer value
-    * of 3.
-    */
-    public final static int PROBLEM_CODE_BADLY_STRUCTURED_COMPONENT = 3;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): General
-    * encoding problems not covered by the other General Problem codes. <b>Can
-    * only be used by an ANSI 1996 implementation of the JAIN TCAP API.</b> It
-    * has an integer value of 4.
-    */
-    public final static int PROBLEM_CODE_INCORRECT_COMPONENT_CODING = 4;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The invoke ID is
-    * that of a previously invoked operation which has not been completed. This
-    * code is generated by a TcapListener. It has an integer value of 5.
-    */
-    public final static int PROBLEM_CODE_DUPLICATE_INVOKE_ID = 5;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The operation
-    * code is not one of those agreed by the two TcapListeners. It has an integer
-    * value of 6.
-    */
-    public final static int PROBLEM_CODE_UNRECOGNIZED_OPERATION = 6;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE or
-    * PROBLEM_TYPE_RETURN_RESULT or PROBLEM_TYPE_RETURN_ERROR): Signifies that
-    * the type of parameter in an invoke/return_result/return error component is
-    * not that agreed by the two TcapListeners. Equivalent to <i>Incorrect
-    * Parameter</i> in the ANSI T1.114 recommendations. It has an integer value
-    * of 7.
-    */
-    public final static int PROBLEM_CODE_MISTYPED_PARAMETER = 7;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): Sufficient
-    * resources are not available to perform the requested operation. This code
-    * is generated by the TcapListener. Specific to an ITU implementation of the
-    * JAIN TCAP API. It has an integer value of 8.
-    */
-    public final static int PROBLEM_CODE_RESOURCE_LIMITATION = 8;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The requested
-    * operation cannot be invoked because the dialogue is about to be released.
-    * Specific to an ITU implementation of the JAIN TCAP API. This code is
-    * generated only by the TcapListener. It has an integer value of 9.
-    */
-    public final static int PROBLEM_CODE_INITIATING_RELEASE = 9;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The linked ID
-    * does not correspond to an active invoke operation. This code is generated
-    * only by the Provider. This code is equivalent to the <i>Correlation Id</I>
-    * in an ANSI implemetaion of the JAIN TCAP API. It has an integer value of
-    * 10.
-    */
-    public final static int PROBLEM_CODE_UNRECOGNIZED_LINKED_ID = 10;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The operation
-    * referred to by the linked ID is not an operation for which linked invokes
-    * are allowed. Specific to an ITU implementation of the JAIN TCAP API. This
-    * code is generated only by the TcapListener. It has an integer value of 11.
-    */
-    public final static int PROBLEM_CODE_LINKED_RESPONSE_UNEXPECTED = 11;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The operation
-    * referred to by the linked ID does not allow this linked operation. This
-    * code is generated only by the TcapListener. Specific to an ITU
-    * implementation of the JAIN TCAP API. It has an integer value of 12.
-    */
-    public final static int PROBLEM_CODE_UNEXPECTED_LINKED_OPERATION = 12;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_RESULT or
-    * PROBLEM_TYPE_RETURN_ERROR): No operation with the specified invoke ID is in
-    * progress. This code is generated by the Provider. Equivalent to the <i>
-    * Correlation Id</I> in an ANSI implemetaion of the JAIN TCAP API. It has an
-    * integer value of 13.
-    */
-    public final static int PROBLEM_CODE_UNRECOGNIZED_INVOKE_ID = 13;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_RESULT): The
-    * invoked operation does not report success. This code is generated by the
-    * Provider. It has an integer value of 14.
-    */
-    public final static int PROBLEM_CODE_RETURN_RESULT_UNEXPECTED = 14;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_ERROR): The
-    * invoked operation does not report failure. This code is generated by the
-    * Provider. It has an integer value of 15.
-    */
-    public final static int PROBLEM_CODE_RETURN_ERROR_UNEXPECTED = 15;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_ERROR): The error
-    * code is not one of those agreed by the two TcapListeners. It has an integer
-    * value of 16.
-    */
-    public final static int PROBLEM_CODE_UNRECOGNIZED_ERROR = 16;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_ERROR): An
-    * unexpected or undefined parameter was received. This code is generated by
-    * the Provider. It has an integer value of 17.
-    */
-    public final static int PROBLEM_CODE_UNEXPECTED_ERROR = 17;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION): Indicates
-    * that the package type has not been defined. Specific to an ANSI
-    * implementation of the JAIN TCAP API. It has an integer value of 18.
-    */
-    public final static int PROBLEM_CODE_UNRECOGNIZED_PACKAGE_TYPE = 18;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION): An
-    * unexpected or undefined error was received within the Dialogue/Transaction
-    * handling primitive. Specific to an ANSI implementation of the JAIN TCAP
-    * API. It has an integer value of 19.
-    */
-    public final static int PROBLEM_CODE_INCORRECT_TRANSACTION = 19;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION): A
-    * fundamental encoding problem (e.g. bad length). Specific to an ANSI
-    * implementation of the JAIN TCAP API. It has an integer value of 20.
-    */
-    public final static int PROBLEM_CODE_BADLY_STRUCTURED_TRANSACTION = 20;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION): The
-    * received transaction id is derivable, but does not reflect a transaction
-    * currently in progress. Specific to an ANSI implementation of the JAIN TCAP
-    * API. It has an integer value of 21.
-    */
-    public final static int PROBLEM_CODE_UNASSIGNED_RESPONDING_ID = 21;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION): For further
-    * study. Specific to an ANSI implementation of the JAIN TCAP API. It has an
-    * integer value of 22.
-    */
-    public final static int PROBLEM_CODE_PERMISSION_TO_RELEASE = 22;
-
-    /**
-    * Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION): Sufficient
-    * resources are not available for the Provider to establish a dialogue.
-    * Specific to an ANSI implementation of the JAIN TCAP API. It has an integer
-    * value of 23.
-    */
-    public final static int PROBLEM_CODE_RESOURCE_UNAVAILABLE = 23;
+    /** Class Type constants (used byInvokeReqEvent): Both success and
+      * failure are reported. It has an integer value of 1.  */
+    public static final int CLASS_1 = 1;
+    /** Class Type constants (used byInvokeReqEvent): Only failure is
+      * reported. It has an integer value of 2.  */
+    public static final int CLASS_2 = 2;
+    /** Class Type constants (used byInvokeReqEvent): Only success is
+      * reported. It has an integer value of 3.  */
+    public static final int CLASS_3 = 3;
+    /** Class Type constants (used byInvokeReqEvent): Neither success
+      * nor failure are reported. It has an integer value of 4.  */
+    public static final int CLASS_4 = 4;
+    /** Error Type constant (used by the Error events): Indicates a
+      * Global Error(ITU) or National Error(ANSI), this has an integer
+      * value of 1.  */
+    public static final int ERROR_GLOBAL = 1;
+    /** Error Type constant (used by the Error events): Indicates a
+      * Local Error(ITU) or Private Error(ANSI), this has an integer
+      * value of 2.  */
+    public static final int ERROR_LOCAL = 2;
+    /** Reject Type Constant (used by Reject Events): Indicates that
+      * this Reject Component is a Local Reject. It has an integer value
+      * of 1.  */
+    public static final int REJECT_TYPE_LOCAL = 1;
+    /** Reject Type Constant (used by Reject Events):Indicates that this
+      * Reject Component is a Remote Reject. It has an integer value of
+      * 2.  */
+    public static final int REJECT_TYPE_REMOTE = 2;
+    /** Reject Type Constant (used by Reject Events): Indicates that
+      * this Reject Component is a User Reject. It has an integer value
+      * of 3.  */
+    public static final int REJECT_TYPE_USER = 3;
+    /** Problem Type constant: This problem type applies to the
+      * component sublayer in General , and does not relate to any
+      * specific component type. All of these are generated by the
+      * component sublayer. It has an integer value of 1.  */
+    public static final int PROBLEM_TYPE_GENERAL = 1;
+    /** Problem Type constant: This problem type relates only to the
+      * Invoke component type. It has an integer value of 2.  */
+    public static final int PROBLEM_TYPE_INVOKE = 2;
+    /** Problem Type constant: This element contains one of the problem
+      * codes which relate only to the Return Result component type. It
+      * has an integer value of 3.  */
+    public static final int PROBLEM_TYPE_RETURN_RESULT = 3;
+    /** Problem Type constant: This problem type relates only to the
+      * Return Error component type. It has an integer value of 4.  */
+    public static final int PROBLEM_TYPE_RETURN_ERROR = 4;
+    /** Problem Type constant: This describes a problem specific to a
+      * Transaction primitive. This classification of problem type is an
+      * ANSI type only. It has an integer value of 5.  */
+    public static final int PROBLEM_TYPE_TRANSACTION = 5;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): The
+      * component type is not recognised. It has an integer value of 1
+      * */
+    public static final int PROBLEM_CODE_UNRECOGNISED_COMPONENT = 1;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): The
+      * element structure of a component does not conform to the defined
+      * structure of that component. This constant is the equivalent of
+      * the Incorrect Component Portion in ANSI. It has an integer
+      * value of 2.  */
+    public static final int PROBLEM_CODE_MISTYPED_COMPONENT = 2;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL): The
+      * contents of the component do not conform to the encoding rules.
+      * It has an integer value of 3.  */
+    public static final int PROBLEM_CODE_BADLY_STRUCTURED_COMPONENT = 3;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_GENERAL):
+      * General encoding problems not covered by the other General
+      * Problem codes. Can only be used by an ANSI 1996 implementation
+      * of the JAIN TCAP API. It has an integer value of 4.  */
+    public static final int PROBLEM_CODE_INCORRECT_COMPONENT_CODING = 4;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The
+      * invoke ID is that of a previously invoked operation which has
+      * not been completed. This code is generated by a TcapListener.
+      * It has an integer value of 5.  */
+    public static final int PROBLEM_CODE_DUPLICATE_INVOKE_ID = 5;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The
+      * operation code is not one of those agreed by the two
+      * TcapListeners. It has an integer value of 6.  */
+    public static final int PROBLEM_CODE_UNRECOGNIZED_OPERATION = 6;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE or
+      * PROBLEM_TYPE_RETURN_RESULT or PROBLEM_TYPE_RETURN_ERROR):
+      * Signifies that the type of parameter in an
+      * invoke/return_result/return error component is not that agreed
+      * by the two TcapListeners. Equivalent to Incorrect Parameter in
+      * the ANSI T1.114 recommendations. It has an integer value of 7.
+      * */
+    public static final int PROBLEM_CODE_MISTYPED_PARAMETER = 7;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE):
+      * Sufficient resources are not available to perform the requested
+      * operation. This code is generated by the TcapListener. Specific
+      * to an ITU implementation of the JAIN TCAP API. It has an integer
+      * value of 8.  */
+    public static final int PROBLEM_CODE_RESOURCE_LIMITATION = 8;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The
+      * requested operation cannot be invoked because the dialogue is
+      * about to be released. Specific to an ITU implementation of the
+      * JAIN TCAP API. This code is generated only by the TcapListener.
+      * It has an integer value of 9.  */
+    public static final int PROBLEM_CODE_INITIATING_RELEASE = 9;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The
+      * linked ID does not correspond to an active invoke operation.
+      * This code is generated only by the Provider. This code is
+      * equivalent to the Correlation Id in an ANSI implemetaion of the
+      * JAIN TCAP API. It has an integer value of 10.  */
+    public static final int PROBLEM_CODE_UNRECOGNIZED_LINKED_ID = 10;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The
+      * operation referred to by the linked ID is not an operation for
+      * which linked invokes are allowed. Specific to an ITU
+      * implementation of the JAIN TCAP API. This code is generated only
+      * by the TcapListener. It has an integer value of 11.  */
+    public static final int PROBLEM_CODE_LINKED_RESPONSE_UNEXPECTED = 11;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_INVOKE): The
+      * operation referred to by the linked ID does not allow this
+      * linked operation. This code is generated only by the
+      * TcapListener. Specific to an ITU implementation of the JAIN TCAP
+      * API. It has an integer value of 12.  */
+    public static final int PROBLEM_CODE_UNEXPECTED_LINKED_OPERATION = 12;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_RESULT
+      * or PROBLEM_TYPE_RETURN_ERROR): No operation with the specified
+      * invoke ID is in progress. This code is generated by the
+      * Provider. Equivalent to the Correlation Id in an ANSI
+      * implemetaion of the JAIN TCAP API. It has an integer value of
+      * 13.  */
+    public static final int PROBLEM_CODE_UNRECOGNIZED_INVOKE_ID = 13;
+    /** Problem Code constant (ProblemType =
+      * PROBLEM_TYPE_RETURN_RESULT): The invoked operation does not
+      * report success. This code is generated by the Provider. It has
+      * an integer value of 14.  */
+    public static final int PROBLEM_CODE_RETURN_RESULT_UNEXPECTED = 14;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_ERROR):
+      * The invoked operation does not report failure. This code is
+      * generated by the Provider. It has an integer value of 15.  */
+    public static final int PROBLEM_CODE_RETURN_ERROR_UNEXPECTED = 15;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_ERROR):
+      * The error code is not one of those agreed by the two
+      * TcapListeners. It has an integer value of 16.  */
+    public static final int PROBLEM_CODE_UNRECOGNIZED_ERROR = 16;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_RETURN_ERROR):
+      * An unexpected or undefined parameter was received. This code is
+      * generated by the Provider.  It has an integer value of 17.  */
+    public static final int PROBLEM_CODE_UNEXPECTED_ERROR = 17;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION):
+      * Indicates that the package type has not been defined. Specific
+      * to an ANSI implementation of the JAIN TCAP API. It has an
+      * integer value of 18.  */
+    public static final int PROBLEM_CODE_UNRECOGNIZED_PACKAGE_TYPE = 18;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION):
+      * An unexpected or undefined error was received within the
+      * Dialogue/Transaction handling primitive. Specific to an ANSI
+      * implementation of the JAIN TCAP API. It has an integer value of
+      * 19.  */
+    public static final int PROBLEM_CODE_INCORRECT_TRANSACTION = 19;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION):
+      * A fundamental encoding problem (e.g. bad length). Specific to an
+      * ANSI implementation of the JAIN TCAP API. It has an integer
+      * value of 20.  */
+    public static final int PROBLEM_CODE_BADLY_STRUCTURED_TRANSACTION = 20;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION):
+      * The received transaction id is derivable, but does not reflect a
+      * transaction currently in progress. Specific to an ANSI
+      * implementation of the JAIN TCAP API. It has an integer value of
+      * 21.  */
+    public static final int PROBLEM_CODE_UNASSIGNED_RESPONDING_ID = 21;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION):
+      * For further study. Specific to an ANSI implementation of the
+      * JAIN TCAP API. It has an integer value of 22.  */
+    public static final int PROBLEM_CODE_PERMISSION_TO_RELEASE = 22;
+    /** Problem Code constant (ProblemType = PROBLEM_TYPE_TRANSACTION):
+      * Sufficient resources are not available for the Provider to
+      * establish a dialogue. Specific to an ANSI implementation of the
+      * JAIN TCAP API. It has an integer value of 23.  */
+    public static final int PROBLEM_CODE_RESOURCE_UNAVAILABLE = 23;
 }
 
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

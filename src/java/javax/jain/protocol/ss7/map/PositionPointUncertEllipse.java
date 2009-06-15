@@ -70,16 +70,16 @@ import javax.jain.*;
   * a component becomes present by setting it. </ul>
   *
   * <h5>Parameter components:</h5><ul>
-  * <li>uncertaintyMajorAxis (0 &lt;= metres &lt;= 1800000), mandatory
+  * <li>uncertaintyMajorAxis (0 &le; metres &le; 1800000), mandatory
   * component with no default
   *
-  * <li>uncertaintyMinorAxis (0 &lt;= metres &lt;= 1800000), mandatory
+  * <li>uncertaintyMinorAxis (0 &le; metres &le; 1800000), mandatory
   * component with no default
   *
-  * <li>orientationOfMajorAxis (0 &lt;= degrees &lt;= 179; clockwise
+  * <li>orientationOfMajorAxis (0 &le; degrees &le; 179; clockwise
   * from north), mandatory component with no default
   *
-  * <li>confidence (0 &lt;= percent &lt;= 100), optional component </ul>
+  * <li>confidence (0 &le; percent &le; 100), optional component </ul>
   *
   * @serial
   * @author Monavacon Limited
@@ -90,22 +90,22 @@ public class PositionPointUncertEllipse extends PositionPoint {
       * The constructor.
       *
       * @param latitude
-      * Latitude in degrees (-90 &lt;= latitude &lt;= 90).
+      * Latitude in degrees (-90 &le; latitude &le; 90).
       *
       * @param longitude
-      * Longitude in degrees (-180 &lt;= longitude &lt;= 180).
+      * Longitude in degrees (-180 &le; longitude &le; 180).
       *
       * @param uncertaintyMajorAxis
       * Length of major semi-axis of uncertainty ellipse in metres (0
-      * &lt;= major semi-axis &lt;= 1800000).
+      * &le; major semi-axis &le; 1800000).
       *
       * @param uncertaintyMinorAxis
       * Length of minor semi-axis of uncertainty ellipse in metres (0
-      * &lt;= minor semi-axis &lt;= 1800000).
+      * &le; minor semi-axis &le; 1800000).
       *
       * @param orientationOfMajorAxis
-      * Orientation of major axis; degrees clockwise from north (0 &lt;=
-      * orientation &lt;= 179).
+      * Orientation of major axis; degrees clockwise from north (0 &le;
+      * orientation &le; 179).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -132,7 +132,7 @@ public class PositionPointUncertEllipse extends PositionPoint {
       *
       * @param uncertaintyMajorAxis
       * Length of major semi-axis of uncertainty ellipse in metres (0
-      * &lt;= major semi-axis &lt;= 1800000).
+      * &le; major semi-axis &le; 1800000).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -152,7 +152,7 @@ public class PositionPointUncertEllipse extends PositionPoint {
       *
       * @return
       * Length of major semi-axis of uncertainty ellipse in metres (0
-      * &lt;= major semi-axis &lt;= 1800000).
+      * &le; major semi-axis &le; 1800000).
       */
     public float getUncertaintyMajorAxis() {
         return m_uncertaintyMajorAxis;
@@ -163,7 +163,7 @@ public class PositionPointUncertEllipse extends PositionPoint {
       *
       * @param uncertaintyMinorAxis
       * Length of minor semi-axis of uncertainty ellipse in metres (0
-      * &lt;= minor semi-axis &lt;= 1800000).
+      * &le; minor semi-axis &le; 1800000).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -183,7 +183,7 @@ public class PositionPointUncertEllipse extends PositionPoint {
       *
       * @return
       * Length of minor semi-axis of uncertainty ellipse in metres (0
-      * &lt;= minor semi-axis &lt;= 1800000).
+      * &le; minor semi-axis &le; 1800000).
       */
     public float getUncertaintyMinorAxis() {
         return m_uncertaintyMinorAxis;
@@ -193,8 +193,8 @@ public class PositionPointUncertEllipse extends PositionPoint {
       * axis of the uncertainty ellipse.
       *
       * @param orientationOfMajorAxis
-      * Orientation of major axis; degrees clockwise from north (0 &lt;=
-      * orientation &lt;= 179).
+      * Orientation of major axis; degrees clockwise from north (0 &le;
+      * orientation &le; 179).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -213,8 +213,8 @@ public class PositionPointUncertEllipse extends PositionPoint {
       * of the uncertainty ellipse.
       *
       * @return
-      * Orientation of major axis; degrees clockwise from north (0 &lt;=
-      * orientation &lt;= 179).
+      * Orientation of major axis; degrees clockwise from north (0 &le;
+      * orientation &le; 179).
       */
     public float getOrientationOfMajorAxis() {
         return m_orientationOfMajorAxis;
@@ -225,7 +225,7 @@ public class PositionPointUncertEllipse extends PositionPoint {
       *
       * @param confidence
       * The probability in percent that the target is within the
-      * uncertainty area (0 &lt;= confidence &lt;= 100).
+      * uncertainty area (0 &le; confidence &le; 100).
       *
       * @exception SS7InvalidParamException
       * Thrown if parameter(s) are invalid / out of range.
@@ -247,7 +247,7 @@ public class PositionPointUncertEllipse extends PositionPoint {
       *
       * @return
       * The probability in percent that the target is within the
-      * uncertainty area (0 &lt;= confidence &lt;= 100).
+      * uncertainty area (0 &le; confidence &le; 100).
       */
     public float getConfidence() {
         return m_confidence;
