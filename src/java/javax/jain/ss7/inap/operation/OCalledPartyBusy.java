@@ -58,7 +58,7 @@ public class OCalledPartyBusy  extends Operation   implements java.io.Serializab
     private Cause busyCause;
     private boolean isBusyCause = false ;
     
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID= false ;
     
     private CallingPartySubaddress callingPartySubaddress;

@@ -57,7 +57,7 @@ public class TBusy extends Operation implements java.io.Serializable
     private Cause busyCause;
     private boolean isBusyCause = false ;
 
-    private String calledPartyBusinessGroupID;
+    private java.lang.String calledPartyBusinessGroupID;
     private boolean isCalledPartyBusinessGroupID =false ;
 
     private CalledPartySubaddress calledPartySubaddress;

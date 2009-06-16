@@ -58,10 +58,10 @@ public class Reconnect  extends Operation   implements java.io.Serializable
     private int notificationDuration;
     private boolean isNotificationDuration = false ;
 
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern =false ;
 
-    private String displayInformation;
+    private java.lang.String displayInformation;
     private boolean isDisplayInformation =false ;
 
     private int callSegmentID;
@@ -176,7 +176,7 @@ Gets Display Information
 /**
 Sets Display Information
 */
-    public void setDisplayInformation(String displayInformation)
+    public void setDisplayInformation(java.lang.String displayInformation)
     {
         this.displayInformation = displayInformation;
         isDisplayInformation = true; 

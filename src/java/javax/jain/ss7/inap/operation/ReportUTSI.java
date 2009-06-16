@@ -54,11 +54,11 @@ public class ReportUTSI  extends Operation   implements java.io.Serializable
 {
     
 
-    private String uSIServiceIndicator;
+    private java.lang.String uSIServiceIndicator;
     
     private LegID legID;
 
-    private String uSIInformation;
+    private java.lang.String uSIInformation;
     
 	private ExtensionField extensions[];
   private boolean isExtensions = false ;      
@@ -97,7 +97,7 @@ Gets Operation Code
 
 /**Sets USI Service Indicator*/
 
-    public void setUSIServiceIndicator( String uSIServiceIndicator)
+    public void setUSIServiceIndicator( java.lang.String uSIServiceIndicator)
     {
        this.uSIServiceIndicator=uSIServiceIndicator;
     }
@@ -133,7 +133,7 @@ Sets Leg ID
 
 /**Sets USI Information*/
 
-    public void setUSIInformation( String uSIInformation)
+    public void setUSIInformation( java.lang.String uSIInformation)
     {
        this.uSIInformation=uSIInformation;
     }

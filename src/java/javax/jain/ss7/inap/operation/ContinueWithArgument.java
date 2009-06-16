@@ -55,10 +55,10 @@ public class ContinueWithArgument   extends Operation implements java.io.Seriali
     
     private LegID legID;
 
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern = false ;
 
-    private String genericName;
+    private java.lang.String genericName;
     private boolean isGenericName = false ;
 
     private Entry iNServiceCompatibilityResponse;
@@ -160,7 +160,7 @@ Gets Generic Name
 /**
 Sets Generic Name
 */
-    public void setGenericName(String genericName)
+    public void setGenericName(java.lang.String genericName)
     {
         this.genericName = genericName;
         isGenericName = true;

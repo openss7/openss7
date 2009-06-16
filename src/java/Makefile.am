@@ -164,22 +164,6 @@ javadoc.stamp: $(my_JAVAFILES) $(srcdir)/overview
 		javax.management.remote.message \
 		javax.management.remote.rmi \
 		javax.management.timer \
-		javax.media \
-		javax.media.mscontrol \
-		javax.media.mscontrol.mediagroup \
-		javax.media.mscontrol.mediagroup.asrtts \
-		javax.media.mscontrol.mediagroup.fax \
-		javax.media.mscontrol.mediagroup.http \
-		javax.media.mscontrol.mediagroup.rtsp \
-		javax.media.mscontrol.mediagroup.signals \
-		javax.media.mscontrol.mediagroup.sms \
-		javax.media.mscontrol.mixer \
-		javax.media.mscontrol.networkconnection \
-		javax.media.mscontrol.resource \
-		javax.media.mscontrol.resource.common \
-		javax.media.mscontrol.resource.symbols \
-		javax.media.mscontrol.resource.video \
-		javax.media.mscontrol.vxml \
 		javax.oss \
 		javax.oss.fault \
 		javax.sip \
@@ -268,6 +252,23 @@ javadoc.stamp: $(my_JAVAFILES) $(srcdir)/overview
 		org.openss7.xtcap \
 		org.openss7.xti
 	$(AM_V_at)date > javadoc.stamp
+
+#		javax.media
+#		javax.media.mscontrol
+#		javax.media.mscontrol.mediagroup
+#		javax.media.mscontrol.mediagroup.asrtts
+#		javax.media.mscontrol.mediagroup.fax
+#		javax.media.mscontrol.mediagroup.http
+#		javax.media.mscontrol.mediagroup.rtsp
+#		javax.media.mscontrol.mediagroup.signals
+#		javax.media.mscontrol.mediagroup.sms
+#		javax.media.mscontrol.mixer
+#		javax.media.mscontrol.networkconnection
+#		javax.media.mscontrol.resource
+#		javax.media.mscontrol.resource.common
+#		javax.media.mscontrol.resource.symbols
+#		javax.media.mscontrol.resource.video
+#		javax.media.mscontrol.vxml
 
 javadoc: javadoc.stamp
 

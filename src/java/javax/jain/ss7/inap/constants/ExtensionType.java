@@ -78,7 +78,7 @@ public class ExtensionType {
     /** ExtensionType : STRING_TYPE */
     public static final ExtensionType STRING_TYPE
         = new ExtensionType(M_STRING_TYPE);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Integer value of constant class.  */
     public int getExtensionType() {

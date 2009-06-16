@@ -52,7 +52,7 @@ This class represents the HoldCallInNetwork Operation.
 
 public class HoldCallInNetwork  extends Operation   implements java.io.Serializable
 {
-	private String holdCause;
+	private java.lang.String holdCause;
 	private boolean isHoldCause = false ;
 
 /**

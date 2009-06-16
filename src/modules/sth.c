@@ -179,8 +179,7 @@ MODULE_DESCRIPTION(STH_DESCRIP);
 MODULE_SUPPORTED_DEVICE(STH_DEVICE);
 MODULE_LICENSE(STH_LICENSE);
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif				/* MODULE_VERSION */
 #endif				/* CONFIG_STREAMS_STH_MODULE */
 
@@ -423,8 +422,7 @@ strremove_locked(struct inode *inode, struct stdata *sd)
 		struct stdata **sdp;
 
 		_ptrace(("removing stream %p from inode %p\n", sd, inode));
-		for (sdp = (struct stdata **) &(inode->i_str); *sdp && *sdp != sd;
-		     sdp = &((*sdp)->sd_clone)) ;
+		for (sdp = (struct stdata **) &(inode->i_str); *sdp && *sdp != sd; sdp = &((*sdp)->sd_clone)) ;
 		assert(*sdp && *sdp == sd);
 		/* delete stream head from clone list */
 		*sdp = sd->sd_clone;
@@ -892,8 +890,7 @@ STATIC streams_fastcall __unlikely pid_t
 pgrp_session(pid_t pgrp)
 {
 #if defined HAVE_SESSION_OF_PGRP_ADDR
-	static pid_t (*session_of_pgrp) (pid_t) =
-	    (typeof(session_of_pgrp)) HAVE_SESSION_OF_PGRP_ADDR;
+	static pid_t (*session_of_pgrp) (pid_t) = (typeof(session_of_pgrp)) HAVE_SESSION_OF_PGRP_ADDR;
 #endif
 	return (session_of_pgrp(pgrp));
 }
@@ -948,19 +945,16 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 	static int (*is_ignored) (int sig) = (typeof(is_ignored)) HAVE_IS_IGNORED_ADDR;
 #endif
 #if defined HAVE_IS_ORPHANED_PGRP_ADDR
-	static int (*is_orphaned_pgrp) (int pgrp) =
-	    (typeof(is_orphaned_pgrp)) HAVE_IS_ORPHANED_PGRP_ADDR;
+	static int (*is_orphaned_pgrp) (int pgrp) = (typeof(is_orphaned_pgrp)) HAVE_IS_ORPHANED_PGRP_ADDR;
 #endif
 #if defined HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
-	static int (*is_current_pgrp_orphaned) (void) =
-	    (typeof(is_current_pgrp_orphaned)) HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR;
+	static int (*is_current_pgrp_orphaned) (void) = (typeof(is_current_pgrp_orphaned)) HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR;
 #endif
 
 	/* POSIX semantics for pipes and FIFOs */
 	if (likely(access & (FREAD | FWRITE))) {
 		if (likely((flags & STRISPIPE) != 0)) {
-			if (unlikely(sd->sd_other == NULL
-				     || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
+			if (unlikely(sd->sd_other == NULL || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
 				goto estrpipe;
 		} else if ((unlikely(flags & STRISFIFO) != 0)) {
 			if (likely((access & FREAD) != 0))
@@ -1061,7 +1055,7 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 			   they are allocated as a controlling terminal, and by any process if they
 			   are not allocated as a controlling terminal.  This way, the hangup error
 			   can be cleared without forcing all file descriptors to be closed first.
-			   If the reopen is successful, the hung-up condition is cleared." The above 
+			   If the reopen is successful, the hung-up condition is cleared." The above
 			   used to always returns EIO on such a reopen.  Note that a hangup on a
 			   pipe is permanent. */
 			if ((access & FREAD) == 0)
@@ -1098,8 +1092,7 @@ straccess_fifo(struct stdata *sd, const register int access, const register int 
 	if (likely((flags & (STRISPIPE | STRISFIFO)) != 0)) {
 		if (likely(access & (FREAD | FWRITE))) {
 			if (likely((flags & STRISPIPE) != 0)) {
-				if (unlikely(sd->sd_other == NULL
-					     || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
+				if (unlikely(sd->sd_other == NULL || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
 					goto go_slow;
 			}
 			if ((likely(flags & STRISFIFO) != 0)) {
@@ -1263,13 +1256,11 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 		if (likely(dlen > 0)) {
 			int err = 0;
 
-			switch (__builtin_expect
-				((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
+			switch (__builtin_expect((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
 			case STRCRC32C:
 #if 0
 				/* not doing this just yet */
-				dp->b_csum =
-				    crc32c_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
+				dp->b_csum = crc32c_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
 				dp->b_flag |= MSGCRC32C;
 				break;
 #endif
@@ -1277,8 +1268,7 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 				err = strcopyin(dbuf, dp->b_rptr, dlen);
 				break;
 			case STRCSUM:
-				dp->b_csum =
-				    csum_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
+				dp->b_csum = csum_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
 				dp->b_flag |= MSGCSUM;
 				break;
 			}
@@ -1460,8 +1450,7 @@ __strevent_find(const struct stdata *sd)
 	struct task_struct *p, *c = current;
 	struct strevent *se;
 
-	for (se = sd->sd_siglist; se && ((p = se->se_procp) != c) && (p->tgid != c->tgid);
-	     se = se->se_next) ;
+	for (se = sd->sd_siglist; se && ((p = se->se_procp) != c) && (p->tgid != c->tgid); se = se->se_next) ;
 	return (se);
 }
 
@@ -1489,8 +1478,7 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 	int err = 0;
 
 	_printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
-	for (sep = &sd->sd_siglist;
-	     (se = *sep) && ((p = se->se_procp) != c) && (p->tgid != c->tgid); sep = &se->se_next) ;
+	for (sep = &sd->sd_siglist; (se = *sep) && ((p = se->se_procp) != c) && (p->tgid != c->tgid); sep = &se->se_next) ;
 	if (se) {
 		_printd(("%s: found existing registration se = %p\n", __FUNCTION__, se));
 		if (events) {
@@ -1532,8 +1520,7 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		se->se_procp = procp;
 		se->se_events = events;
 		se->se_fd = fd;
-		_printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events,
-			 procp, fd));
+		_printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events, procp, fd));
 		/* calc sig flags */
 		sd->sd_sigflags |= events;
 		_ptrace(("%s: new events %lu\n", __FUNCTION__, sd->sd_sigflags));
@@ -1575,8 +1562,7 @@ STATIC __unlikely void
 strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 {
 #if defined HAVE_KILL_PROC_INFO_ADDR
-	static int (*kill_proc_info) (int sig, struct siginfo * sip, pid_t pid) =
-	    (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
+	static int (*kill_proc_info) (int sig, struct siginfo * sip, pid_t pid) = (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
 #endif
 	struct strevent *se;
 	struct siginfo si;
@@ -2368,7 +2354,7 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 	add_wait_queue(&sd->sd_iwaitq, &wait);
 #endif
 	/* Wait for the IOCWAIT bit.  Only one ioctl can be performed on a stream at a time. See
-	   Magic Garden.  However, only wait as long as we would have waited for a response to our
+	   Magic Garden. However, only wait as long as we would have waited for a response to our
 	   input output control. */
 	if (timeo) {
 		for (;;) {
@@ -2691,8 +2677,7 @@ strmcopyout(mblk_t **mpp, caddr_t uaddr, size_t len, bool protdis)
 }
 
 STATIC int
-strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const bool user,
-	       const uint model)
+strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const bool user, const uint model)
 {
 	union ioctypes *ioc;
 	mblk_t *mb;
@@ -2780,8 +2765,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		case M_IOCACK:
 			/* implicit copyout for I_STR ioctl */
 			if (ioc->iocblk.ioc_count > 0) {
-				if (!(err = strcopyoutb(mb->b_cont, ic->ic_dp,
-							ioc->iocblk.ioc_count, user))) {
+				if (!(err = strcopyoutb(mb->b_cont, ic->ic_dp, ioc->iocblk.ioc_count, user))) {
 					ic->ic_len = ioc->iocblk.ioc_count;
 					err = ioc->iocblk.ioc_rval;
 				} else
@@ -2793,11 +2777,9 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		case M_COPYOUT:
 			/* yes we permit I_STR ioctls to do this */
 			if (mb->b_datap->db_type == M_COPYIN)
-				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
-						 ioc->copyreq.cq_size, user);
+				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont, ioc->copyreq.cq_size, user);
 			else
-				err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
-						  ioc->copyreq.cq_size, user);
+				err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr, ioc->copyreq.cq_size, user);
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_flag = (ulong) model;
 			if (!err) {
@@ -2823,8 +2805,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 }
 
 STATIC int
-strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const int access,
-		 const bool user, const uint model)
+strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const int access, const bool user, const uint model)
 {
 	union ioctypes *ioc;
 	mblk_t *mb, *db;
@@ -2894,11 +2875,9 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 		case M_COPYIN:
 		case M_COPYOUT:
 			if (mb->b_datap->db_type == M_COPYIN)
-				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont,
-						 ioc->copyreq.cq_size, user);
+				err = strcopyinb(ioc->copyreq.cq_addr, &mb->b_cont, ioc->copyreq.cq_size, user);
 			else
-				err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr,
-						  ioc->copyreq.cq_size, user);
+				err = strcopyoutb(mb->b_cont, ioc->copyreq.cq_addr, ioc->copyreq.cq_size, user);
 			mb->b_datap->db_type = M_IOCDATA;
 			ioc->copyresp.cp_flag = (ulong) model;
 			if (!err) {
@@ -2936,8 +2915,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
  *  locks held.
  */
 STATIC int
-strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, unsigned int cmd,
-		const int access, const uint model)
+strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, unsigned int cmd, const int access, const uint model)
 {
 	union ioctypes *ioc;
 	struct linkblk *lbp;
@@ -3120,8 +3098,8 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 		/* When multiplexed, there is no strrput procedure on the STREAM head read queue
 		   pair to respond to a message.  It is, therefore, necessary to intercept ioctl
 		   response messages (M_IOCACK, M_IOCNAK, M_COPYIN and M_COPYOUT) from the
-		   multiplexed read queue.  This is done by overwriting our strirput() procedure to 
-		   the put procedure cache pointer on the queue. */
+		   multiplexed read queue.  This is done by overwriting our strirput() procedure
+		   to the put procedure cache pointer on the queue. */
 		sd->sd_rq->q_putp = &strirput;	/* intercept */
 	}
 
@@ -3210,8 +3188,7 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
  *  write() rules to q_maxpsz.
  */
 STATIC streams_inline streams_fastcall __hot_put ssize_t
-strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
-	      const int user)
+strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp, const int user)
 {
 	ssize_t clen = -1;
 	ssize_t dlen = -1;
@@ -3265,8 +3242,7 @@ strpsizecheck(const struct stdata *sd, const struct strbuf *ctlp, const struct s
  *  access permissions.
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
-strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
-	     const int band, const int flags)
+strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp, const int band, const int flags)
 {
 	mblk_t *mp;
 	int err;
@@ -3325,8 +3301,7 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
  *  LOCKING: must hold a read lock on the stream head.
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
-strputpmsg_common(struct stdata *sd, const int f_flags, const struct strbuf *ctlp,
-		  const struct strbuf *datp, const int band, const int flags)
+strputpmsg_common(struct stdata *sd, const int f_flags, const struct strbuf *ctlp, const struct strbuf *datp, const int band, const int flags)
 {
 	queue_t *q = sd->sd_wq;
 	int err;
@@ -3414,12 +3389,10 @@ STATIC __unlikely int
 __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 {
 #if defined HAVE_SEND_GROUP_SIG_INFO_ADDR
-	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) =
-	    (typeof(send_group_sig_info)) HAVE_SEND_GROUP_SIG_INFO_ADDR;
+	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) = (typeof(send_group_sig_info)) HAVE_SEND_GROUP_SIG_INFO_ADDR;
 #else
 #if defined HAVE_GROUP_SEND_SIG_INFO_ADDR
-	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) =
-	    (typeof(&group_send_sig_info)) HAVE_GROUP_SEND_SIG_INFO_ADDR;
+	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) = (typeof(&group_send_sig_info)) HAVE_GROUP_SEND_SIG_INFO_ADDR;
 #endif
 #endif
 	struct task_struct *p;
@@ -3756,10 +3729,8 @@ strpoll_except(struct stdata *sd, unsigned int flag)
 
 								set_bit(WSLEEP_BIT, &sd->sd_flag);
 								/* set them all */
-								for (; q_nband > 0;
-								     qb = qb->qb_next, q_nband--)
-									set_bit(QB_WANTW_BIT,
-										&qb->qb_flag);
+								for (; q_nband > 0; qb = qb->qb_next, q_nband--)
+									set_bit(QB_WANTW_BIT, &qb->qb_flag);
 							}
 						}
 						qwunlock(fq, pl);
@@ -3803,8 +3774,7 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 
 			{
 				register const unsigned int flag = (volatile int) sd->sd_flag;
-				static const unsigned int exceptions =
-				    (STPLEX | STRHUP | STRDERR | STWRERR);
+				static const unsigned int exceptions = (STPLEX | STRHUP | STRDERR | STWRERR);
 
 				if (unlikely(flag & exceptions))
 					return (strpoll_except(sd, flag));
@@ -3856,8 +3826,7 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 
 							set_bit(WSLEEP_BIT, &sd->sd_flag);
 							/* set them all */
-							for (; q_nband > 0;
-							     qb = qb->qb_next, q_nband--)
+							for (; q_nband > 0; qb = qb->qb_next, q_nband--)
 								set_bit(QB_WANTW_BIT, &qb->qb_flag);
 						}
 					}
@@ -4056,8 +4025,7 @@ stropen(struct inode *inode, struct file *file)
 
 		/* need new STREAM head */
 		dev = file->private_data ? *((dev_t *) file->private_data) : inode->i_ino;
-		_ptrace(("no stream head, allocating stream for dev %hu:%hu\n", getmajor(dev),
-			 getminor(dev)));
+		_ptrace(("no stream head, allocating stream for dev %hu:%hu\n", getmajor(dev), getminor(dev)));
 		if (IS_ERR(sd = stralloc(dev))) {
 			err = PTR_ERR(sd);
 			goto error;
@@ -4074,14 +4042,13 @@ stropen(struct inode *inode, struct file *file)
 		}
 		/* 2nd step: check for redirected return */
 		if (dev != sd->sd_dev) {
-			/* This only occurs if we allocated a new STREAM head and the device number
+			/* This only occurs if we allocated a new STREAM head and the device number 
 			   returned from the qopen() is different from the device number we passed
 			   it.  In this case, we need to attach the new stream head to the final
 			   inode rather than the initial inode. */
 			struct cdevsw *cdev;
 
-			_ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev),
-				 getminor(dev)));
+			_ptrace(("open redirected on sd %p to dev %hu:%hu\n", sd, getmajor(dev), getminor(dev)));
 			if (!(cdev = cdrv_get(getmajor(dev)))) {
 				err = -ENODEV;
 				_ptrace(("Error path taken for sd %p\n", sd));
@@ -4152,7 +4119,7 @@ stropen(struct inode *inode, struct file *file)
 		/* SVR4 SPG says: "When a Stream head receives an M_HANGUP message, it is marked as 
 		   hung-up.  Streams that are marked as hung-up are allowed to be reopened by their 
 		   session leader if they are allocated as a controlling terminal, and by any
-		   process if they are not allocated as a controlling terminal.  This way, the
+		   process if they are not allocated as a controlling terminal. This way, the
 		   hangup error can be cleared without forcing all file descriptors to be closed
 		   first. If the reopen is successful, the hung-up condition is cleared." */
 		if (was_hungup && !err)
@@ -4318,8 +4285,7 @@ strclose(struct inode *inode, struct file *file)
 			_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 			stri_unlock(inode);
 			_ptrace(("putting inode %p\n", inode));
-			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino,
-				 atomic_read(&inode->i_count) - 1));
+			_ptrace(("inode %p no %lu refcount now %d\n", inode, inode->i_ino, atomic_read(&inode->i_count) - 1));
 			iput(inode);	/* to cancel igrab() from strinsert */
 			/* closing stream head */
 			_ctrace(strlastclose(sd, oflag));
@@ -4727,8 +4693,7 @@ __strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, in
 }
 
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
-strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, const int band,
-	    ssize_t mread)
+strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, const int band, ssize_t mread)
 {
 	mblk_t *mp = NULL;
 	int err = 0, error = likely(mread > 0) ? -ERESTARTSYS : -EINTR, first = (mread > 0), mode;
@@ -5061,8 +5026,7 @@ EXPORT_SYMBOL_GPL(strread);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
-STATIC int streams_fastcall _strgetpmsg(struct file *, struct strbuf __user *,
-					struct strbuf __user *, int __user *, int __user *);
+STATIC int streams_fastcall _strgetpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int __user *, int __user *);
 STATIC __hot_get ssize_t
 _strread_getpmsg(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 {
@@ -5173,8 +5137,7 @@ strhold(struct stdata *sd, queue_t *q, const int f_flags, const char *buf, ssize
 				rtn = nbytes;
 				if (unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
 					b->b_flag |= MSGDELIM;
-				if (unlikely
-				    ((b->b_flag & MSGDELIM) || b->b_wptr >= b->b_datap->db_lim)
+				if (unlikely((b->b_flag & MSGDELIM) || b->b_wptr >= b->b_datap->db_lim)
 				    && likely(bcanputnext(q, 0)))
 					putnext(q, b);
 				else
@@ -5332,8 +5295,7 @@ EXPORT_SYMBOL_GPL(strwrite);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
-STATIC int streams_fastcall _strputpmsg(struct file *, struct strbuf __user *,
-					struct strbuf __user *, int, int);
+STATIC int streams_fastcall _strputpmsg(struct file *, struct strbuf __user *, struct strbuf __user *, int, int);
 STATIC __hot_put ssize_t
 _strwrite_putpmsg(struct file *file, const char __user *buf, size_t len, loff_t *ppos)
 {
@@ -5441,8 +5403,7 @@ __strfreepage(caddr_t data)
  *  @timeo: the amount of time remaining to wait
  */
 STATIC __unlikely mblk_t *
-strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int band, int type,
-	    caddr_t base, struct free_rtn *frtn, unsigned long *timeo)
+strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int band, int type, caddr_t base, struct free_rtn *frtn, unsigned long *timeo)
 {
 	mblk_t *mp;
 	int err;
@@ -5453,8 +5414,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 	if ((err = straccess_rlock(sd, FWRITE)))
 		return ERR_PTR(err);
 
-	if (type == M_DATA
-	    && (sd->sd_minpsz > size || (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0)))
+	if (type == M_DATA && (sd->sd_minpsz > size || (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0)))
 		return ERR_PTR(-ERANGE);
 
 	if ((band != -1 && !bcanputnext(sd->sd_wq, band))) {
@@ -5474,9 +5434,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 			prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? 
 											 */
 #endif
-			if (type == M_DATA
-			    && (sd->sd_minpsz > size
-				|| (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0))) {
+			if (type == M_DATA && (sd->sd_minpsz > size || (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0))) {
 				err = -ERANGE;
 				break;
 			}
@@ -5539,8 +5497,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 		char *base = kmap(page) + offset;
 		struct free_rtn frtn = { __strfreepage, (caddr_t) page };
 		unsigned long timeo = ((file->f_flags & FNDELAY)
-				       && !test_bit(STRNDEL_BIT,
-						    &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
+				       && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 
 		mp = strwaitpage(sd, file->f_flags, size, BPRI_MED, 0, M_DATA, base, &frtn, &timeo);
 		if (IS_ERR(mp)) {
@@ -5645,8 +5602,7 @@ strcopyin_pstrbuf(const int f_flags, struct strbuf __user *from, struct strbuf *
  *  NOTICES: GLIBC2 puts -1 in band when it is called as putmsg().
  */
 STATIC streams_inline streams_fastcall __hot_put int
-strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
-		int flags)
+strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
 {
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp;
@@ -5684,7 +5640,7 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 			if (unlikely(dat.len < 0))
 				/* no data part */
 				/* POSIX says: "If a control part part and data part are not
-				   specified and flags is set to MSG_BAND, no message shall be sent
+				   specified and flags is set to MSG_BAND, no message shall be sent 
 				   and 0 shall be returned." */
 				goto done;
 			if (unlikely((dat.len == 0) && !(sd->sd_wropt & SNDZERO)))
@@ -5717,15 +5673,13 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 }
 
 streams_noinline streams_fastcall int
-strputpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
-		int flags)
+strputpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
 {
 	return strputpmsg_fast(file, ctlp, datp, band, flags);
 }
 
 streams_fastcall int
-strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
-	   int flags)
+strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
 {
 	return strputpmsg_slow(file, ctlp, datp, band, flags);
 }
@@ -5733,8 +5687,7 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 EXPORT_SYMBOL_GPL(strputpmsg);
 
 STATIC streams_fastcall __hot_put int
-_strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
-	    int flags)
+_strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band, int flags)
 {
 	struct stdata *sd;
 	int err;
@@ -5773,8 +5726,7 @@ strcopyin_gstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *
 			if (likely(user)) {
 				struct strbuf32 to32;
 
-				if (unlikely
-				    ((err = strcopyin(from32, &to32, sizeof(struct strbuf32)))))
+				if (unlikely((err = strcopyin(from32, &to32, sizeof(struct strbuf32)))))
 					goto error;
 				to->maxlen = to32.maxlen;
 				to->len = to32.len;
@@ -5835,8 +5787,7 @@ strcopyin_gstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *
  *  GLIBC2 puts NULL in bandp for getmsg().
  */
 STATIC streams_inline streams_fastcall __hot_get int
-strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
-		int __user *bandp, int __user *flagsp)
+strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd = stri_lookup(file);
 	struct strbuf ctl, dat;
@@ -5904,8 +5855,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 
 			if (likely(!IS_ERR(mp))) {
 				/* got something - set return flags */
-				flags = (mp->b_datap->db_type < QPCTL) ?
-				    ((bandp) ? MSG_BAND : 0) : MSG_HIPRI;
+				flags = (mp->b_datap->db_type < QPCTL) ? ((bandp) ? MSG_BAND : 0) : MSG_HIPRI;
 				band = mp->b_band;
 			} else {
 				err = PTR_ERR(mp);
@@ -5945,15 +5895,13 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 						break;
 					*mpp = unlinkb(b);
 					freeb(b);
-				} while (likely((b = *mpp) != NULL) &&
-					 unlikely(b->b_datap->db_type != M_DATA));
+				} while (likely((b = *mpp) != NULL) && unlikely(b->b_datap->db_type != M_DATA));
 			}
 			if (b && b->b_datap->db_type != M_DATA) {
 				b->b_flag = b_flag;
 				b->b_band = band;
 				retval |= MORECTL;
-				for (b = *mpp; b && b->b_datap->db_type != M_DATA;
-				     mpp = &b->b_cont, b = *mpp) ;
+				for (b = *mpp; b && b->b_datap->db_type != M_DATA; mpp = &b->b_cont, b = *mpp) ;
 			}
 
 		}
@@ -6038,15 +5986,13 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 }
 
 streams_noinline streams_fastcall int
-strgetpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
-		int __user *bandp, int __user *flagsp)
+strgetpmsg_slow(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
 {
 	return strgetpmsg_fast(file, ctlp, datp, bandp, flagsp);
 }
 
 streams_fastcall int
-strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
-	   int __user *bandp, int __user *flagsp)
+strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
 {
 	return strgetpmsg_slow(file, ctlp, datp, bandp, flagsp);
 }
@@ -6054,8 +6000,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 EXPORT_SYMBOL_GPL(strgetpmsg);
 
 STATIC streams_fastcall __hot_get int
-_strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
-	    int __user *bandp, int __user *flagsp)
+_strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int __user *bandp, int __user *flagsp)
 {
 	struct stdata *sd;
 	int err;
@@ -6222,8 +6167,7 @@ tty_tiocspgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
-STATIC int streams_fastcall str_i_atmark(const struct file *file, struct stdata *sd,
-					 unsigned long arg);
+STATIC int streams_fastcall str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg);
 
 /**
  *  sock_siocatmark:	- process %SIOCATMARK ioctl
@@ -6598,7 +6542,7 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 			if (_ctrace(sd2 = sd_get(stri_lookup(f2)))) {
 				/* POSIX says to return ENXIO when the passed in stream is hung up. 
 				   Note that we do not care if the stream is linked under a
-				   multiplexing driver or not, we can still pass its queue pointer.
+				   multiplexing driver or not, we can still pass its queue pointer. 
 				   For closing, it is the responsibility of the receiving driver to
 				   determine whether the referenced queue pair still exists before
 				   acting upon the message.  We return an error (EIO) if the Stream
@@ -6611,8 +6555,7 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 					   queue pointer at the bottom of the stream. It doesn't
 					   say that it is the read queue pointer, but we already
 					   know that from experience. */
-					for (qbot = sd2->sd_wq; SAMESTR(qbot);
-					     qbot = qbot->q_next) ;
+					for (qbot = sd2->sd_wq; SAMESTR(qbot); qbot = qbot->q_next) ;
 					token = (typeof(token)) (ulong) _RD(qbot);
 					srunlock(sd2);
 				}
@@ -6625,8 +6568,7 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 		if (!err) {
 			mblk_t *mp;
 
-			mp = strputpmsg_common(sd, f_flags, &fdi->ctlbuf, &fdi->databuf, 0,
-					       fdi->flags);
+			mp = strputpmsg_common(sd, f_flags, &fdi->ctlbuf, &fdi->databuf, 0, fdi->flags);
 			if (!IS_ERR(mp)) {
 				bcopy(&token, mp->b_rptr + fdi->offset, sizeof(token));
 				srunlock(sd);
@@ -7253,8 +7195,7 @@ extern struct fmodsw sth_fmod;
  *  attempted from a background process.
  */
 streams_noinline streams_fastcall int
-str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, const unsigned int cmd,
-	    const uint model)
+str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, const unsigned int cmd, const uint model)
 {
 	struct linkblk *l;
 	struct file *f;
@@ -7514,8 +7455,7 @@ str_i_plink32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  take a subsequent MUXID_ALL call to complete the job.
  */
 streams_noinline streams_fastcall int
-str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const unsigned int cmd,
-	      const uint model)
+str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const unsigned int cmd, const uint model)
 {
 	struct stdata *sd, **sdp;
 	int err;
@@ -7708,10 +7648,8 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 		if ((sl.sl_nmods = min(sd->sd_pushcnt + drivers, sl.sl_nmods))) {
 			struct str_mlist *smp;
 
-			for (q = sd->sd_wq->q_next, i = 0, smp = sm;
-			     q && i < sl.sl_nmods; q = q->q_next, i++, smp++) {
-				strncpy(smp->l_name, _RD(q)->q_qinfo->qi_minfo->mi_idname,
-					FMNAMESZ);
+			for (q = sd->sd_wq->q_next, i = 0, smp = sm; q && i < sl.sl_nmods; q = q->q_next, i++, smp++) {
+				strncpy(smp->l_name, _RD(q)->q_qinfo->qi_minfo->mi_idname, FMNAMESZ);
 				size += sizeof(*smp);
 			}
 		}
@@ -7871,9 +7809,7 @@ __str_i_peek(const struct file *file, struct stdata *sd, struct strpeek *sp)
 					if (sp->databuf.len < 0)
 						sp->databuf.len = 0;
 					copylen = (blen > dlen) ? dlen : blen;
-					if (strcopyout
-					    (b->b_rptr, sp->databuf.buf + sp->databuf.len,
-					     copylen)) {
+					if (strcopyout(b->b_rptr, sp->databuf.buf + sp->databuf.len, copylen)) {
 						err = -EFAULT;
 						break;
 					}
@@ -7886,8 +7822,7 @@ __str_i_peek(const struct file *file, struct stdata *sd, struct strpeek *sp)
 					if (sp->ctlbuf.len < 0)
 						sp->ctlbuf.len = 0;
 					copylen = (blen > clen) ? clen : blen;
-					if (strcopyout
-					    (b->b_rptr, sp->ctlbuf.buf + sp->ctlbuf.len, copylen)) {
+					if (strcopyout(b->b_rptr, sp->ctlbuf.buf + sp->ctlbuf.len, copylen)) {
 						err = -EFAULT;
 						break;
 					}
@@ -8153,8 +8088,7 @@ freefd_func(caddr_t arg)
 	/* sneaky trick to free the file pointer when mblk freed, this means that M_PASSFP messages 
 	   flushed from a queue will free the file pointers referenced by them */
 	_trace();
-	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file,
-		 file_count(file) - 1));
+	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, file, file_count(file) - 1));
 	fput(file);
 	return;
 }
@@ -8198,11 +8132,11 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 	_printd(("%s: file pointer %p count is now %d\n", __FUNCTION__, f2, file_count(f2)));
 
 	/* Ok, with this approach we have a problem with passing a file pointer that is associated
-	   with the stream head to which it is passed.  The problem is that if the M_PASSFP message
+	   with the stream head to which it is passed.  The problem is that if the M_PASSFP message 
 	   containing a file pointer to the stream head sits on that stream head's read queue when
-	   the last file descriptor is closed, that stream head will never close.  Therefore, if the
+	   the last file descriptor is closed, that stream head will never close. Therefore, if the 
 	   file pointer passed is associated with the stream head to which we are passing the file
-	   pointer, we return EINVAL.  In general it is not very useful to pass a stream head its own 
+	   pointer, we return EINVAL.  In general it is not very useful to pass a stream head its own
 	   file pointer. */
 	err = -EINVAL;
 	if (f2->f_op && f2->f_op->release == &strclose && stri_lookup(f2) == s2)
@@ -8431,8 +8365,7 @@ str_i_str(const struct file *file, struct stdata *sd, unsigned long arg)
 		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
-	if ((rtn = err =
-	     strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1, IOC_NATIVE)) < 0) {
+	if ((rtn = err = strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1, IOC_NATIVE)) < 0) {
 		_ptrace(("Error path taken! err = %d\n", err));
 		return (err);
 	}
@@ -8477,8 +8410,7 @@ str_i_str32(const struct file *file, struct stdata *sd, unsigned long arg)
 	ic.ic_len = ic32.ic_len;
 	ic.ic_dp = compat_ptr(ic32.ic_dp);
 
-	if ((rtn = err =
-	     strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1, IOC_ILP32)) < 0)
+	if ((rtn = err = strdoioctl_str(sd, &ic, (FREAD | FWRITE | FEXCL | FNDELAY), 1, IOC_ILP32)) < 0)
 		goto error;
 
 	ic32.ic_len = ic.ic_len;
@@ -8988,8 +8920,7 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 
 						err = -EINVAL;
 						if (test_bit(STRISPIPE_BIT, &sd2->sd_flag)
-						    && sd2->sd_other == NULL
-						    && sd2->sd_wq->q_next == sd2->sd_rq) {
+						    && sd2->sd_other == NULL && sd2->sd_wq->q_next == sd2->sd_rq) {
 							unsigned long pl;
 
 							/* always lock 'em in the same order */
@@ -9045,8 +8976,7 @@ str_i_pipe32(struct file *file, struct stdata *sd, unsigned long arg)
 #endif				/* WITH_32BIT_CONVERSION */
 
 streams_noinline streams_fastcall int
-str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg,
-	      size_t len, int access, const uint model)
+str_i_default(const struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg, size_t len, int access, const uint model)
 {
 	/* FIXME: This is a little bit off: the ic_len of the strioctl structure is the amount of
 	   data to copy in.  The amount of data to copy out is determined by the driver. */
@@ -10183,8 +10113,7 @@ struct ioctl_trans {
 #endif
 
 #ifdef HAVE_IOCTL32_HASH_TABLE_ADDR
-STATIC struct ioctl_trans **ioctl32_hash_table =
-    (struct ioctl_trans **) HAVE_IOCTL32_HASH_TABLE_ADDR;
+STATIC struct ioctl_trans **ioctl32_hash_table = (struct ioctl_trans **) HAVE_IOCTL32_HASH_TABLE_ADDR;
 #endif
 
 #ifdef HAVE_IOCTL32_SEM_ADDR
@@ -10751,7 +10680,7 @@ streams_noinline streams_fastcall int
 str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	/* Notes: OpenSolaris has this RFLUSHPCPROT read option to not flush M_PCPROTO messages
-	   from the STREAM head.  I don't really understand the need for this. Because strrput
+	   from the STREAM head. I don't really understand the need for this. Because strrput
 	   ensures that there is only one M_PCPROTO message on the STREAM head read queue, if one
 	   exists, it is first on the queue.  It would be easy enough to hold onto it, but I don't
 	   see the need. */
@@ -10834,7 +10763,7 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 		if (so->so_flags & SO_ISTTY) {
 			set_bit(STRISTTY_BIT, &sd->sd_flag);
 			/* FIXME: Do we have to do more here? This bit indicates that this Stream
-			   is a controlling tty.  Do we need to figure out the process group of the 
+			   is a controlling tty. Do we need to figure out the process group of the
 			   user and set sd->sd_pgrp? (Done by I_PUSH, see str_i_push().) */
 		}
 		if (so->so_flags & SO_ISNTTY)

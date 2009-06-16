@@ -60,7 +60,7 @@ public class ManageTriggerData  extends Operation   implements java.io.Serializa
 {
     private ActionIndicator actionIndicator;
     private TriggerDataIdentifier triggerDataIdentifier;
-    private String registratorIdentifier;
+    private java.lang.String registratorIdentifier;
     private boolean isRegistratorIdentifier = false ;
     private ExtensionField extensions[];
     private boolean isExtensions = false ;         

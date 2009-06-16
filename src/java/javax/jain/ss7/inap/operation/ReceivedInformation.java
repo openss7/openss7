@@ -53,7 +53,7 @@ public class ReceivedInformation  extends Operation   implements java.io.Seriali
     private DigitsGenericDigits digitsResponse;
  
 	  
-    private String iA5Response;
+    private java.lang.String iA5Response;
  
     private ReceivedInformationChoice receivedInformationChoice;
     

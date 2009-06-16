@@ -89,7 +89,7 @@ public class GapCriteriaChoice {
     /** GapCriteriaChoice : CALLING_ADDRESS_AND_SERVICE */
     public static final GapCriteriaChoice CALLING_ADDRESS_AND_SERVICE
         = new GapCriteriaChoice(M_CALLING_ADDRESS_AND_SERVICE);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getGapCriteriaChoice() {

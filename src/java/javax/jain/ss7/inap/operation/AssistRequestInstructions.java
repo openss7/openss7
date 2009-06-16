@@ -56,10 +56,10 @@ public class AssistRequestInstructions  extends Operation implements java.io.Ser
 
     private DigitsGenericNumber correlationID;
     
-    private String iPAvailable;
+    private java.lang.String iPAvailable;
     private boolean isIPAvailable = false ;
     
-    private String iPSSPCapabilities;
+    private java.lang.String iPSSPCapabilities;
     private boolean isIPSSPCapabilities = false ;
     
     private ExtensionField extensions[];

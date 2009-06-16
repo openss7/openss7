@@ -74,7 +74,7 @@ public class ComponentID {
     /** ComponentID : RELAYED_COMPONENT */
     public static final ComponentID RELAYED_COMPONENT
         = new ComponentID(M_RELAYED_COMPONENT);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getComponentID() {

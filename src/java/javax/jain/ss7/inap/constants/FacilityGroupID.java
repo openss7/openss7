@@ -83,7 +83,7 @@ public class FacilityGroupID {
     /** FacilityGroupID : ROUTE_INDEX */
     public static final FacilityGroupID ROUTE_INDEX
         = new FacilityGroupID(M_ROUTE_INDEX);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Integer value of constant class.  */
     public int getFacilityGroupID() {

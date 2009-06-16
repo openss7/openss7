@@ -55,13 +55,13 @@ public class FacilitySelectedAndAvailable  extends Operation   implements java.i
     
     private DPSpecificCommonParameters dPSpecificCommonParameters;
 
-    private String calledPartyBusinessGroupID;
+    private java.lang.String calledPartyBusinessGroupID;
     private boolean isCalledPartyBusinessGroupID;
 
     private CalledPartySubaddress calledPartySubaddress;
     private boolean isCalledPartySubaddress;
 
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID;
 
     private CallingPartyNumber callingPartyNumber;
@@ -149,7 +149,7 @@ Gets Operation Code
 /** Sets Called Party Business Group ID */
 
 
-    public void setCalledPartyBusinessGroupID( String  calledPartyBusinessGroupID)
+    public void setCalledPartyBusinessGroupID( java.lang.String  calledPartyBusinessGroupID)
     {
         this.calledPartyBusinessGroupID=calledPartyBusinessGroupID;
         isCalledPartyBusinessGroupID = true;
@@ -216,7 +216,7 @@ Gets Operation Code
 /** Sets Calling Party Business Group ID */
 
 
-    public void setCallingPartyBusinessGroupID( String  callingPartyBusinessGroupID)
+    public void setCallingPartyBusinessGroupID( java.lang.String  callingPartyBusinessGroupID)
     {
         this.callingPartyBusinessGroupID=callingPartyBusinessGroupID;
          isCallingPartyBusinessGroupID = true;

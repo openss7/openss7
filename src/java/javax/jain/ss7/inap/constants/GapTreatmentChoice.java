@@ -79,7 +79,7 @@ public class GapTreatmentChoice {
     /** GapTreatmentChoice  :BOTH */
     public static final GapTreatmentChoice BOTH
         = new GapTreatmentChoice(M_BOTH);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class. */
     public int getGapTreatmentChoice() {

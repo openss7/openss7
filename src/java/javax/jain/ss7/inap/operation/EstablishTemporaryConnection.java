@@ -67,7 +67,7 @@ public class EstablishTemporaryConnection  extends Operation   implements java.i
     private Carrier carrier;
     private boolean isCarrier = false ;
     
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
     
     private ServiceInteractionIndicatorsTwo serviceInteractionIndicatorsTwo;

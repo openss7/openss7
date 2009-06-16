@@ -83,7 +83,7 @@ public class RejectType {
     /** RejectType  :RETURN_ERROR_PROBLEM */
     public static final  RejectType RETURN_ERROR_PROBLEM
         = new RejectType(M_RETURN_ERROR_PROBLEM);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getRejectType() {

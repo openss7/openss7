@@ -95,7 +95,7 @@ public class ComponentType {
     /** ComponentType :R_RESULT_NOT_LAST */
     public static final ComponentType R_RESULT_NOT_LAST
         = new ComponentType(M_R_RESULT_NOT_LAST);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getComponentType() {

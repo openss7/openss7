@@ -55,16 +55,16 @@ public class InitiateCallAttempt   extends Operation   implements java.io.Serial
     
     private DestinationRoutingAddress destinationRoutingAddress;
     
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern = false ;
     
-    private String iSDNAccessRelatedInformation;
+    private java.lang.String iSDNAccessRelatedInformation;
     private boolean isISDNAccessRelatedInformation = false ;
     
     private LocationNumber travellingClassMark;
     private boolean isTravellingClassMark = false ;
     
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
     
     private CallingPartyNumber callingPartyNumber;

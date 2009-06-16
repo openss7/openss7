@@ -54,7 +54,7 @@ public class AuthorizeTermination  extends Operation implements java.io.Serializ
 {
   	
 
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern = false ;
     
     private CallingPartyNumber callingPartyNumber;
@@ -63,10 +63,10 @@ public class AuthorizeTermination  extends Operation implements java.io.Serializ
     private CalledPartyNumber destinationNumberRoutingAddress;
     private boolean isDestinationNumberRoutingAddress = false ;
     
-    private String displayInformation;
+    private java.lang.String displayInformation;
     private boolean isDisplayInformation = false ;
     
-    private String iSDNAccessRelatedInformation;
+    private java.lang.String iSDNAccessRelatedInformation;
     private boolean isISDNAccessRelatedInformation = false ;
     
     private OriginalCalledPartyID originalCalledPartyID;
@@ -216,7 +216,7 @@ Gets Display Information
 /**
 Sets Display Information
 */
-    public void setDisplayInformation(String displayInformation)
+    public void setDisplayInformation(java.lang.String displayInformation)
     {
         this.displayInformation = displayInformation;
         isDisplayInformation = true;
@@ -246,7 +246,7 @@ Gets ISDN Access Related Information
 /**
 Sets ISDN Access Related Information
 */
-    public void setISDNAccessRelatedInformation(String iSDNAccessRelatedInformation)
+    public void setISDNAccessRelatedInformation(java.lang.String iSDNAccessRelatedInformation)
     {
         this.iSDNAccessRelatedInformation = iSDNAccessRelatedInformation;
         isISDNAccessRelatedInformation = true;

@@ -84,7 +84,7 @@ public class MessageIDChoice {
     /** MessageIDChoice :VARIABLE_MESSAGE */
     public static final MessageIDChoice VARIABLE_MESSAGE
         = new MessageIDChoice(M_VARIABLE_MESSAGE);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getMessageIDChoice() {

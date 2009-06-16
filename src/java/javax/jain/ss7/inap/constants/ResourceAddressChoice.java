@@ -94,7 +94,7 @@ public class ResourceAddressChoice {
     /** ResourceAddressChoice :IP_ADDRESS_AND_CALL_SEGMENT_ID */
     public static final ResourceAddressChoice  IP_ADDRESS_AND_CALL_SEGMENT_ID
         = new ResourceAddressChoice(M_IP_ADDRESS_AND_CALL_SEGMENT_ID);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getResourceAddressChoice() {

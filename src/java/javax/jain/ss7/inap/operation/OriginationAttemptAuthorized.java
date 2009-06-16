@@ -58,7 +58,7 @@ public class OriginationAttemptAuthorized  extends Operation   implements java.i
     private CalledPartyNumber dialledDigits;
     private boolean isDialledDigits = false;   
     
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID = false ;
     
     private CallingPartySubaddress callingPartySubaddress;
@@ -174,7 +174,7 @@ Returns: TRUE if present , FALSE otherwise.
 /** Sets Calling Party Business Group ID */
 
 
-    public void setCallingPartyBusinessGroupID( String  callingPartyBusinessGroupID)
+    public void setCallingPartyBusinessGroupID( java.lang.String  callingPartyBusinessGroupID)
     {
         this.callingPartyBusinessGroupID=callingPartyBusinessGroupID;
         isCallingPartyBusinessGroupID = true;

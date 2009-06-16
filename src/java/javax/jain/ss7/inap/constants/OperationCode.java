@@ -457,7 +457,7 @@ public class OperationCode extends java.lang.Object {
     public static final OperationCode PROMPT_AND_RECEIVE_MESSAGE
         = new OperationCode(M_PROMPT_AND_RECEIVE_MESSAGE);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Integer value of constant class.
       */

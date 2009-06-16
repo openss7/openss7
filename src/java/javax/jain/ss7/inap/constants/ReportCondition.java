@@ -79,7 +79,7 @@ public class ReportCondition  {
     /** ReportCondition :CANCELLED */
     public static final ReportCondition CANCELLED
         = new ReportCondition(M_CANCELLED);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getReportCondition() {

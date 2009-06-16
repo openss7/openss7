@@ -82,7 +82,7 @@ public class ComponentReqPrimitiveType extends ComponentPrimitiveType {
     private ComponentReqPrimitiveType(int componentReqPrimitiveType) {
         super(componentReqPrimitiveType);
     }
-    /** Gets the integer String representation of the Constant class.  */
+    /** Gets the integer value representation of the Constant class.  */
     public int getComponentReqPrimitiveType() {
         return super.getComponentPrimitiveType();
     }

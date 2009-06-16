@@ -83,7 +83,7 @@ public class FacilityGroupChoice {
     /** FacilityGroupChoice : ROUTE_INDEX */
     public static final FacilityGroupChoice ROUTE_INDEX
         = new FacilityGroupChoice(M_ROUTE_INDEX);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getFacilityGroupChoice() {

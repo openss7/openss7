@@ -52,7 +52,7 @@ This class represents the CollectInformation Operation.
 public class CollectInformation   extends Operation implements java.io.Serializable
 {
 
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern = false ;
 
     private int numberingPlan;
@@ -70,7 +70,7 @@ public class CollectInformation   extends Operation implements java.io.Serializa
     private CalledPartyNumber dialledDigits;
 	 private boolean isDialledDigits = false ;
 	 
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
 
     private Entry iNServiceCompatibilityResponse;
@@ -314,7 +314,7 @@ Gets Service Interaction Indicators
 /**
 Sets Service Interaction Indicators
 */
-    public void setServiceInteractionIndicators(String serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String serviceInteractionIndicators)
     {
         this.serviceInteractionIndicators = serviceInteractionIndicators;
         isServiceInteractionIndicators = true;

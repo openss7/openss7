@@ -78,7 +78,7 @@ public class ResourceAddressID extends java.lang.Object {
     public static final ResourceAddressID CALL_SEGMENT_ID
         = new ResourceAddressID(M_CALL_SEGMENT_ID);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Integer value of constant class.
       */

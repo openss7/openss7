@@ -101,7 +101,7 @@ public class CallProcessingOperationCorrelationID {
     /** callProcessingOperationCorrelationID:FACILITY */
     public static final CallProcessingOperationCorrelationID FACILITY
         = new CallProcessingOperationCorrelationID(M_FACILITY);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Integer value of constant class.  */
     public int getCallProcessingOperationCorrelationID() {
