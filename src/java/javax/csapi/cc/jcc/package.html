@@ -1,0 +1,525 @@
+<body>
+This package contains Java Call Control (JCC) API interfaces. <p>
+
+The following tables give an overview of the side effects of the JccCall and
+JccConnection methods.  These tables are here given for convenience: for
+details, see the method description. <p>
+
+<table align="center" border=1 cellpadding=1>
+<caption>Table 1: JccConnection state acronym mapping</caption>
+<tr>
+<td>S1=IDLE</td>
+<td>S4=ADDRESS_ANALYZE</td>
+<td>S7=CONNECTED</td>
+</tr>
+<tr>
+<td>S2=AUTHORIZE_CALL_ATTEMPT</td>
+<td>S5=CALL_DELIVERY</td>
+<td>S8=DISCONNECTED</td>
+</tr>
+<tr>
+<td>S3=ADDRESS_COLLECT</td>
+<td>S6=ALERTING</td>
+<td>S9=FAILED</td>
+</tr>
+</table><p>
+
+Table 1 gives a number of JccConnection states: S1 to S9.  This shorthand is
+introducted to reduce the size of the columns in subsequent tables.
+
+<table align="center" border=1 cellpadding=1>
+<caption>Table 2: method invocation</caption>
+<tr>
+	<th>Method</th>
+	<th>Implicit processing resume?</th>
+	<th>Invoke when blocked?</th>
+	<th>S1</th>
+	<th>S2</th>
+	<th>S3</th>
+	<th>S4</th>
+	<th>S5</th>
+	<th>S6</th>
+	<th>S7</th>
+	<th>S8</th>
+	<th>S9</th>
+</tr>
+<tr>
+	<td>JccCall.routeCall()</td>
+	<td align="center">No</td>
+	<td align="center">Yes</td>
+	<td align="center">S1</td>
+	<td align="center">S2</td>
+	<td align="center">S3</td>
+	<td align="center">S4</td>
+	<td align="center">S5</td>
+	<td align="center">S6</td>
+	<td align="center">S7</td>
+	<td align="center">S8</td>
+	<td align="center">S9</td>
+</tr>
+<tr>
+	<td>JccCall.release()</td>
+	<td align="center">Yes</td>
+	<td align="center">Yes</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+</tr>
+<tr>
+	<td>JccCall.createConnection()</td>
+	<td align="center">No</td>
+	<td align="center">Yes</td>
+	<td align="center">S1</td>
+	<td align="center">S2</td>
+	<td align="center">S3</td>
+	<td align="center">S4</td>
+	<td align="center">S5</td>
+	<td align="center">S6</td>
+	<td align="center">S7</td>
+	<td align="center">S8</td>
+	<td align="center">S9</td>
+</tr>
+<tr>
+	<td>JccConnection.connect()</td>
+	<td align="center">N/A</td>
+	<td align="center">Yes</td>
+	<td align="center">S1</td>
+	<td align="center">S2</td>
+	<td align="center">S3</td>
+	<td align="center">S4</td>
+	<td align="center">S5</td>
+	<td align="center">S6</td>
+	<td align="center">S7</td>
+	<td align="center">S8</td>
+	<td align="center">S9</td>
+</tr>
+<tr>
+	<td>JccConnection.routeConnection()</td>
+	<td align="center">Yes</td>
+	<td align="center">No</td>
+	<td align="center">S5</td>
+	<td align="center">S5</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+</tr>
+<tr>
+	<td>JccConnection.selectRoute()</td>
+	<td align="center">Yes</td>
+	<td align="center">No</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center">S5</td>
+	<td align="center">S5</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+</tr>
+<tr>
+	<td>JccConnection.answer()</td>
+	<td align="center">Yes</td>
+	<td align="center">No</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center">S7</td>
+	<td align="center">S7</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+</tr>
+<tr>
+	<td>JccConnection.continueProcessing()</td>
+	<td align="center">Yes</td>
+	<td align="center">No</td>
+	<td align="center">S2</td>
+	<td align="center">S2</td>
+	<td align="center">S3</td>
+	<td align="center">S4</td>
+	<td align="center">S5</td>
+	<td align="center">S6</td>
+	<td align="center">S7</td>
+	<td align="center">S8</td>
+	<td align="center">S9</td>
+</tr>
+<tr>
+	<td>JccConnection.release()</td>
+	<td align="center">Yes</td>
+	<td align="center">Yes</td>
+	<td align="center"></td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center">S8</td>
+	<td align="center"></td>
+	<td align="center">S8</td>
+</tr>
+<tr>
+	<td>JccConnection.attachMedia()</td>
+	<td align="center">No</td>
+	<td align="center">Yes</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center">S7</td>
+	<td align="center"></td>
+	<td align="center"></td>
+</tr>
+<tr>
+	<td>JccConnection.detachMedia()</td>
+	<td align="center">No</td>
+	<td align="center">Yes</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center">S7</td>
+	<td align="center"></td>
+	<td align="center"></td>
+</tr>
+<tr>
+	<td>JccConnection.getMidCallData()</td>
+	<td align="center">No</td>
+	<td align="center">Yes</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center">S7</td>
+	<td align="center"></td>
+	<td align="center"></td>
+</tr>
+</table><p>
+
+The answer() method can only be successfully invoked on a Terminating
+Connection; invoking it on an Originating Connection will not cause a
+transition to the CONNECTED state. <p>
+
+Table 2 contains a list of methods and 3 different types of columns.  A "Yes"
+in the first column, labelled "Implicit processing resume?", denotes that
+invoking the method causes blocked processing to resume.  A "Yes" in the second
+column, labeled "Invoke when not blocked?", denotes a method can be invoked if
+the processing is not blocked.  The remaining columns list al states where a
+method can be successfully invoked in the state and the resulting state.
+
+<table align="center" border=1 cellpadding=1>
+<caption>Table 3: Terminating and Originating connection states</caption>
+<tr>
+	<th></th>
+	<th>S1</th>
+	<th>S2</th>
+	<th>S3</th>
+	<th>S4</th>
+	<th>S5</th>
+	<th>S6</th>
+	<th>S7</th>
+	<th>S8</th>
+	<th>S9</th>
+</tr>
+<tr>
+	<th>Originating Connection States</th>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center"></td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+</tr>
+<tr>
+	<th>Terminating Connection States</th>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center"></td>
+	<td align="center"></td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+</tr>
+</table><p>
+
+Table 3 shows all valid states for originating or terminating connections.
+
+<table align="center" border=1 cellpadding=1>
+<caption>Table 4: state change relationships</caption>
+<tr>
+	<th colspan=2>When this connection changes state,</th>
+	<th colspan=2>then this connection also changes state.</th>
+</tr>
+<tr>
+	<th>From</th>
+	<th>To</th>
+	<th>From</th>
+	<th>To</th>
+</tr>
+<tr>
+	<td colspan=2 align="center">Originating Connection</td>
+	<td colspan=2 align="center">Terminating Connection</td>
+</tr>
+<tr>
+	<td align="center">ADRESS_ANALYZE</td>
+	<td align="center">CALL_DELIVERY</td>
+	<td align="center">Non-existent or IDLE</td>
+	<td align="center">IDLE</td>
+</tr>
+<tr>
+	<td colspan=2 align="center">Terminating Connection</td>
+	<td colspan=2 align="center">Originating Connection</td>
+</tr>
+<tr>
+	<td align="center">IDLE</td>
+	<td align="center">not IDLE</td>
+	<td align="center">CALL_DELIVERY</td>
+	<td align="center">CONNECTED</td>
+</tr>
+<tr>
+	<td colspan=2 align="center">Either connection</td>
+	<td colspan=2 align="center">Other connection</td>
+</tr>
+<tr>
+	<td align="center">Any state</td>
+	<td align="center">DISCONNECTED</td>
+	<td align="center">Any state</td>
+	<td align="center">DISCONNECTED</td>
+</tr>
+<tr>
+	<td colspan=2 align="center">Either connection</td>
+	<td colspan=2 align="center">Other connection</td>
+</tr>
+<tr>
+	<td align="center">Any state</td>
+	<td align="center">FAILED</td>
+	<td align="center">Any state</td>
+	<td align="center">DISCONNECTED</td>
+</tr>
+</table><p>
+
+All of the transitions sketched in Table 4 only apply in case of a two-party
+call.  The table demonstrates what a state change has for effect on other
+connections in the call.
+
+<table align="center" border=1 cellpadding=1>
+<caption>Table 5: method results</caption>
+<tr>
+	<th rowspan=2></th>
+	<th colspan=9>Originating Connection</th>
+	<th colspan=9>Terminating Connection</th>
+</tr>
+<tr>
+	<th>S1</th>
+	<th>S2</th>
+	<th>S3</th>
+	<th>S4</th>
+	<th>S5</th>
+	<th>S6</th>
+	<th>S7</th>
+	<th>S8</th>
+	<th>S9</th>
+	<th>S1</th>
+	<th>S2</th>
+	<th>S3</th>
+	<th>S4</th>
+	<th>S5</th>
+	<th>S6</th>
+	<th>S7</th>
+	<th>S8</th>
+	<th>S9</th>
+</tr>
+<tr>
+	<th>getDestinationAddress()</th>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+</tr>
+<tr>
+	<th>getOriginatingAddress()</th>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+</tr>
+<tr>
+	<th>getLastAddress()</th>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+</tr>
+<tr>
+	<th>getOriginalAddress()</th>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+</tr>
+<tr>
+	<th>getRedirectedAddress()</th>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">X</td>
+	<td align="center">O</td>
+	<td align="center">X</td>
+</tr>
+<tr>
+	<th>getAddress()</th>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+	<td align="center">O</td>
+</tr>
+</table><p>
+
+In Table 5, X denotes that the method returnes null and O denotes that the
+method returns and valid value if possible.  The table shows the in what states
+a return value can be expected.
+<hr/><div class="boilerplate" style="font-size: x-small;">
+Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+All Rights Reserved. <p>
+ 
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 of the license. <p>
+ 
+This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+License for more details. <p>
+
+ You should have received a copy of the GNU Affero General Public License along
+with this program.  If not, see
+<a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA. <p>
+ 
+<em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of
+Defense ("DoD"), it is classified as "Commercial Computer Software" under
+paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights
+customarily provided to non-Government users).  If the Software is supplied to
+any unit or agency of the Government other than DoD, it is classified as
+"Restricted Computer Software" and the Government's rights in the Software are
+defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+(or any successor regulations) or, in the cases of NASA, in paragraph
+18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See
+<a href="http://www.openss7.com/">http://www.openss7.com/</a>
+</div><hr/>
+</body>

@@ -1,0 +1,197 @@
+<HTML>
+<HEAD>
+<title>
+JTAPI Media provider package
+</title>
+</head>
+<BODY BGCOLOR="#FFFFFF" LINK="#0000ff" VLINK="#800080">
+<p>
+A reference implementation, MediaPeer and MediaProvider developer's toolkit 
+and interoperability framework for the media package. 
+</P>
+<h3>
+Package Overview 
+</h3>
+<p>
+The provider package is <b>not</b> part of the media package 
+Application Programmer's Interface (API). 
+This package is included to help platform vendors develop
+compatible and interoperable MediaPeer and MediProvider objects.
+<p>
+To obtain source or binary implemetation of the provider package contact the
+<a href="mailto: jeff.peck@intel.com">JSR-043 spec lead</a>.
+</p>
+<h4></h4>
+<p>
+The <tt>provider</tt> package defines interfaces for interoperability
+between the standard MediaService object [<tt>BasicMediaService</tt>], 
+and a vendor-specific implementation.  As a reference implementation,
+the provider package 
+(in particular <tt>Base.Event</tt> and <tt>Base_MediaService</tt>) 
+defines the relationships and sequencing for bind and release, synch/async
+event management, add/remove Listeners and dispatching of events
+to the appropriate Listener.
+<p>
+<tt>provider.Base.Event</tt> is a reference implementation of
+<tt>Async.Event</tt> [and its subclasses].
+<tt>Base.Event</tt> is integrated with the <tt>EventQueue</tt>
+and <tt>Dispatcher</tt> classes
+that manage Listeners and asynchronous Event dispatching.
+<p>
+The interface from the provider package framework to the 
+vendor-specific or platform-specific code is defined by the 
+"Media Provider's Interface" (MPI). To use the provider package,
+the MPI and its sub-interfaces must be implemented by a
+vendor's platform-specific code.
+<p>
+<a href="Base_MediaService.html"><tt>Base_MediaService</tt></a> 
+defines the operational relationship between
+the API (the standard <tt>BasicMediaService</tt> class) and the MPI.
+<p>
+<a href="MPI.html">MPI</a> defines the interface between the components of the 
+provider package [Base_MediaService, Events, Dispatcher, Request, etc.]
+and the vendor supplied objects:
+<tt>MPI.MediaPeer</tt>, <tt>MPI.GroupProvider</tt>, <tt>MPI.MediaGroup</tt>,
+and <tt>MPI.Resource</tt>. The other MPI interface (<tt>MPI.Owner</tt>)
+is implemented by <tt>Base_MediaService</tt>.
+<p>
+Stub implementations of the vendor specific code are provided as:
+<tt>NullMediaPeer</tt>, <tt>NullGroupProvider</tt>, <tt>NullMediaGroup</tt>. 
+A vendor can extend these classes to build a working system.
+<p>
+[Sorry, there is not yet a <tt>NullResource</tt>,
+that would get into the Resource SPI... @see ECTF-S.300 ]
+<p>
+<tt>Base.Event</tt> and its sub-classes provides a reference implementation 
+of the <tt>Async.Event</tt> interfaces.
+<tt>Base.Event</tt> works with the <tt>MPI.Owner</tt> interface as
+implemented by <tt>Base_MediaService</tt>. That implementation uses the
+<tt>EventQueue</tt> and <tt>Dispatcher</tt> mechanisms to allow
+<tt>Base.Events</tt> to dispatch themselves to the appropriate Listeners.
+<p>
+<tt>Dispatcher</tt> implements the <tt>addListener</tt>
+and <tt>removeListener</tt> methods, and defines a framework for 
+queues and threads to handle asynchronous event processing.
+</p>
+<h3> Provider Package </h3>
+<ul> <li>
+The interfaces between the main components are defined in <tt>MPI</tt>.
+</li> <li>
+A <tt>MediaPeer</tt> supplies a <tt>MediaProvider</tt>. [to parallel JTAPI core]
+</li> <li>
+A <tt>MediaProvider</tt> supplies a <tt>GroupProvider</tt> [akin to the S.100 SCR]
+</li> <li> 
+A <tt>GroupProvider</tt> supplies the <tt>MediaGroups</tt>.
+</li> <li> 
+A <tt>MediaGroup</tt> is bound to a <tt>Base_MediaService</tt>,
+and delivers <tt>MediaEvents</tt> to Listeners
+of the <tt>Base_MediaService</tt>.
+</li> <li> 
+<tt>Base.Event</tt> implements the required MediaEvents.
+</li> <li> 
+<tt>Dispatcher</tt> works with the <tt>Base.Events</tt> to dispatch events
+to the correct Listeners of the <tt>Base_MediaService</tt>.
+</li> </ul>
+
+<a name="msb"></a>
+<h5>Base_MediaService</h5>
+<p>
+<a href="Base_MediaService.html"><tt>Base_MediaService</tt></a> 
+is the key to everything, and it is largely machine generated code
+that passes API calls coming from the <tt>BasicMediaService</tt>
+to the <tt>MediaGroup</tt> or the <tt>GroupProvider</tt> (via the <tt>MPI</tt>).
+</p>
+<p>
+The <tt>Base_MediaService</tt> implementation contains code to handle events
+and holds the <tt>GroupProvider</tt> and the currently bound
+<tt>MediaGroup</tt>.  That is, <tt>Base_MediaService</tt> implements the
+record-keeping for bind and release.
+</p>
+<h5>MediaProvider</h5>
+<p>
+The <tt>GroupProvider</tt> is obtained from the associated
+<tt>MediaProvider</tt> 
+(specified by name or value in the <tt>Base_MediaService</tt> constructor).  
+A <tt>Base_MediaService</tt> object is associated with a <tt>MediaProvider</tt> 
+(by name or by value)
+when the <tt>Base_MediaService</tt> object is created.
+</p>
+<p>
+How and where one gets a <tt>MediaProvider</tt> is intentionally vague.
+The simplest is to use the <tt>JtapiPeerFactory</tt> to get a <tt>JtapiPeer</tt>,
+and from there use <tt>getProvider(...)</tt>.  
+If that <tt>Provider</tt> implements <tt>MediaProvider</tt>, 
+it can be used directly.
+Alternatively,
+the default <tt>Base_MediaService</tt> object will use "system properties" 
+to find the name of a <tt>MediaProvider</tt> implementation class. 
+You can override the system property values by supplying
+the name and "login" arguments directly to the
+<tt>BasicMediaService</tt> constructor.
+</p>
+<p>
+A <tt>MediaProvider</tt> supplies a "<tt>GroupProvider</tt>" 
+(the agency responsible for handling bind/release requests; 
+the S.410 abstraction of the SCR).
+</p>
+<p>
+The <tt>GroupProvider</tt> handles bind requests by delivering instances of
+a <tt>MediaGroup</tt> to the <tt>MediaService</tt> object 
+[in <tt>Base_MediaService</tt>]. That constitutes the "binding" 
+of the <tt>MediaService</tt> to that <tt>MediaGroup</tt>.
+</p>
+<p>
+The various Media objects can be distinguished by their cardinality:
+the collection of Providers (of a given JTAPIPeer) for one or
+more actual "servers" could have *one* GroupProvider; each telephony
+media stream (a CCR in S.100) would be associated with a MediaGroup;
+and a MediaGroup can be passed among a series of MediaService objects
+</p>
+
+<h5>Other methods</h5>
+<p>
+After binding, API method invocations on the <tt>BasicMediaService</tt>
+are passed to the <tt>MediaGroup</tt> and <tt>MediaEvents</tt> are returned. 
+The <tt>MediaEvent</tt> (a <tt>Base.Event</tt>) contains 
+the synchronizing info, status, "out" values, and any Exceptions
+generated in the implementation thread. 
+<p><b>Note:</b> the Exceptions are passed as data elements of the 
+<tt>MediaEvent</tt>, and are only "thrown" if the API layer 
+(<tt>BasicMediaService</tt>) 
+invoked the operation as a synchronous call.
+</p>
+<p>
+The "<tt>Request</tt>" object allows arbitrary [Resource] methods 
+to be passed from the API (<tt>BasicMediaService</tt>) to the implementation
+(whever implements the Resource inteface) without the middleware
+(<tt>Base_MediaService</tt>) knowing about that method.  
+[and without the API knowing about the Resource implementation object]
+In effect, <tt>Base_MediaService</tt> acts as an aggregator for all the
+<tt>MPI.Resource</tt> objects and their interfaces.
+</p>
+<a name="events"></a>
+<h5>Events, Listeners and dispatch</h5>
+<p>
+All the events are implemented in Base.java.  Base.<tt>Event</tt> is 
+designed to work with the <tt>Dispatcher</tt> and <tt>EventQueue</tt> 
+supplied in the provider package.
+Events in this scheme are "self-dispatching";
+</p>
+<p>
+The <tt>Dispatcher</tt> sends Events to the correct Listener as follows:
+<p>
+For each Listener on the <tt>Base_MediaService</tt>, the Event is told:
+"here is a Listener, if the Listener should be informed about you (this Event), 
+then take care of it".  
+Each Event has a "<tt>dispatch(Listener)</tt>" method that checks the type
+of the Listener, and if the Listener supports this Event's interface,  
+<tt>dispatch</tt> invokes the appropriate Listener callback method.
+<p>
+Thus, the EventQueue/Dispatcher don't need to know how or
+where to send the event; each Event is specialized with a <tt>dispatch</tt>
+method to test for its Listener, and invoke the documented callback method.
+</p>
+
+</body>
+</html>
+</page>

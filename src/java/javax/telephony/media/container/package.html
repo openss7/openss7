@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<title>
+Container package for S.410
+</title>
+<!--  
+ Copyright 1999, 2000, 2001 by Dialogic Corporation.
+ 1515 Route 10, Parsippany NJ.
+ All rights reserved.
+ -->
+</head>
+<BODY LINK="#0000ff" VLINK="#800080">
+<p>
+Defines the Media ContainerService and Media DataObject interfaces
+for the media package.
+</p>
+
+<H3>
+Package Overview
+</h3>
+<p>
+The ContainerProvider is an <i>optional</i> interface that may
+be implemented by a MediaProvider.
+
+<h3>Overview</h3>
+The Container Management API provides an operating system independent
+mechanism for the storage and interchange of system data.
+A Container is an object logically residing in the file system of
+a CT Server and containing zero or more Data Objects. 
+Data Objects are made up of data and a set
+of attributes describing the properties of the data.
+
+<h3>Why Use Containers?</h3>
+The API uses containers, rather than simply specifying pathnames in either
+the client or server operating systems, so that the server can augment
+the normal features found in OS file systems with the features required by
+Resources to manipulate media data in a convenient manner. For example, 
+a directory on the server containing a <tt>.WAV</tt> file may be manipulated
+more conveniently by using the Container API that treats it as a 
+a Container with a Media Data Object (or possibly a collection of such objects)
+with appropriate coder, data rate, and other parameters defined for it.
+<p>
+In many ways Containers and Data Objects are analogous to file systems and
+their files. The primary difference is that the Container interface is
+independent of the actual storage strategies employed. That is, it is
+independent of the storage medium, and of the data type, formatting and
+organization.
+<p>
+<h3> Using Containers </h3>
+The working methods for this package are in the ContainerService interface.
+A ContainerService object is obtained from the ContainerProvider/MediaProvider.
+<p>
+A ContainerProvider object is obtained by checking <tt>instanceof</tt> 
+and then casting the MediaProvider to a ContainerProvider.
+<br>
+For example: <pre>
+    MediaProvider mp = ...;
+    ContainerService cs = null;
+    if (mp instanceof ContainerProvider) 
+       cs = ((ContainerProvider)mp).getContainerService();
+    ...
+</pre>
+<p>
+Most of the interesting methods are defined in
+<a href="ContainerService.html">ContainerService</a>
+and <a href="DataObject.html">DataObject</a>.
+</p>
+@since JTAPI-1.4
+</body>
+</html>
+</page>

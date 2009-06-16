@@ -1,0 +1,130 @@
+<body>
+This package contains the interfaces that represent ISUP protocol stack and JAIN ISUP
+applications, and methods for sending and receiving JAIN ISUP events between them, along
+with class definitions for common ITU and ANSI events and parameters. <p>
+
+The implementation of the two stack vendor specific interfaces, namely JainIsupStack and
+JainIsupProvider will be vendor specific, however the naming of JainIsupStack proprietory
+implementations is mandated.  This is as per JAIN convention.  The class name of the
+vendor specific implementations must be the JAIN ISUP "InterfaceName" of which that class
+implements with "Impl" appended to the end of it. For example a vendor implementation of
+the JainIsupStack Interface must be called "JainIsupStackImpl". Therefore once each vendor
+has implemented the JAIN ISUP API specification they must has two proprietary classes
+called JainIsupStackImpl.class and .class implementing the JainIsupProvider interface.
+The characteristics of the three main interfaces are listed below: <ul>
+
+<li> <a href="JainIsupStack.html">JainIsupStack</a>: This Interface is the central point
+for the creation of JainIsupProviders.  From within the JainIsupStack Object it is
+possible for any application to get a list of JainIsupProvider objects that are attached
+to the underlying JainIsupStack by using the
+<a href="JainIsupStack.html#getProviderList()">getProviderList</a> method with the
+JainIsupStack Object. This method returns an ArrayList of JainIsupProvider references to
+which a JainIsupListener Object may register.  The purpose of defining a JainIsupStack
+object is to use it as a means of provisioning the ISUP stack via the JAIN OAM&amp;P
+interface.
+
+<li> <a href="JainIsupProvider.html">JainIsupProvider</a>: This Interface defines the
+methods for adding &amp; deleteing JainIsupListeners from a list of registered
+JainIsupListeners held within the JainIsupProvider.  The JainIsupListener registers with a
+JainIsupProvider for one or more <a href="IsupUserAddress.html">User Address</a>. User
+Address consists of a destination point code and a set of CICs between the self point code
+and the destination point code. The User Address also contains a Network Indicator field
+which indicates whether the point code is an International or a National point code.
+
+<li> <a href="JainIsupListener.html">JainIsupListener</a>: This Interface defines the
+methods required by all JainIsupListeners to receive and process the ISUP Events generated
+by a JainIsupProvider. A JainIsupProvider receives ISUP protocol messages out of the ISUP
+stack layer and encapsulates them into Events and passes them to the JainIsupListener.  As
+mentioned above this occurs by Event passing, were the JainIsupProvider invokes the
+<a href="JainIsupListener.html#processIsupEvent()">processIsupEvent</a> and passes the
+relevant Event within the method to the JainIsupListener.  <p>
+
+A JainIsupListener registers with a JainIsupProvider to become an Event Listener of that
+JainIsupProvider. It registers with an object reference to itself along with a ISUP User
+Address. These two values are stored by the JainIsupProvider and the User Address is used
+as a lookup to obtain an object reference to a specific JainIsupListener. A
+JainIsupListener can listen on multiple User Addresses and this is done by repeatedly
+calling the <a href="JainIsupProvider.html#addIsupListener()">addIsupListener</a> method
+with the different User Addresses the Listener wants to monitor.  <p>
+
+The multiple User Address, allows the JainIsupListener to operate with many nodes in the
+network using different destination point code parameter and CIC ranges in the User
+Address. </ul>
+
+Besides the above three key interfaces, the isup package also contains the following
+classes : <ul>
+
+<li> <a href="IsupEvent.html">IsupEvent</a>: This class is the parent class of all ISUP
+Events and provides methods to access all the parameters that are common to all the ISUP
+Events. In JAIN ISUP, the "Event" prefix is attached to all Event classes to distinguish
+them from the Parameter classes and the interfaces . eg. EventAlert, EventAnswer etc.
+Each ISUP Event is composed of different parameters, some mandatory and some optional. The
+constructors for the Event classes are a function of the mandatory parameters.  The
+optional parameters may be set by additionally calling the appropriate methods.
+Parameters which make up the Events may be of either the base type or may be classes
+themselves.  The parameter class constructors initialize the parameter sub-fields to their
+spare values. Each of the sub-field in a parameter may be set by calling the appropriate
+method on the parameter class.  <p>
+
+The isup package contains the Events and Parameter classes common to ITU and ANSI
+variants.  <p>
+
+The list of ISUP events specified in the JAIN ISUP API phase I are as follows:
+Alert,
+Answer,
+CallFailureInd,
+IsupErrorInd,
+MaintControl,
+MaintTmoInd,
+NwStatusInd,
+ReattemptInd,
+Release,
+ReleaseResponse,
+Setup,
+StartResetInd and
+StopMaintReq.
+
+<li> <a href="IsupUserAddress.html">IsupUserAddress</a>: This class defines the ISUP User
+Address object which is used in the registration process for message distribution by the
+ISUP Provider to the different Listener applications.  </ul>
+<hr/><div class="boilerplate" style="font-size: x-small;">
+Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+All Rights Reserved. <p>
+ 
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 of the license. <p>
+ 
+This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+License for more details. <p>
+
+ You should have received a copy of the GNU Affero General Public License along
+with this program.  If not, see
+<a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA. <p>
+ 
+<em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of
+Defense ("DoD"), it is classified as "Commercial Computer Software" under
+paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights
+customarily provided to non-Government users).  If the Software is supplied to
+any unit or agency of the Government other than DoD, it is classified as
+"Restricted Computer Software" and the Government's rights in the Software are
+defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+(or any successor regulations) or, in the cases of NASA, in paragraph
+18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See
+<a href="http://www.openss7.com/">http://www.openss7.com/</a>
+</div><hr/>
+</body>

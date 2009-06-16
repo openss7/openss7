@@ -1,0 +1,94 @@
+<body>
+This package provides the <a href="http://www.openss7.org/">OpenSS7 Project</a>
+implementations of the vendor-specific components of the JAIN ISUP API.  In
+particular, it provides the JAIN ISUP stack and provider implementation classes.
+
+The
+<a href="JainIsupStackImpl.html">JainIsupStackImpl</a>
+class implements the vendor-specification stack implementation class of the
+JAIN ISUP API as provided by the
+<a href="../../../../../../javax/jain/ss7/isup/JainIsupStack.html">JainIsupStack</a>
+interface.  Instances of this class are obtained using the
+<a href="../../../../../../javax/jain/ss7/JainSS7Factory.html">JainSS7Factory</a>
+object with a path name of <code>org.openss7</code> and an object name of
+<code>javax.jain.ss7.isup.JainIsupStackImpl</code>. <p>
+
+Each
+<a href="JainIsupStackImpl.html">JainIsupStackImpl</a>
+object created in this fashion represents a single, unique, local network and
+signalling point code (network appearance).  For additional local signalling
+point codes, an additional
+<a href="JainIsupStackImpl.html">JainIsupStackImpl</a>
+object should be acquired and appropriately configured using the
+<a href="JainIsupStackImpl.html#setNetworkIndicator:NetworkIndicator">setNetworkIndicator()</a>,
+<a href="JainIsupStackImpl.html#setSignalingPointCode:SignalingPointCode">setSignalingPointCode()</a> or
+<a href="JainIsupStackImpl.html#setVendorName:String">setVendorName()</a>
+methods.
+In the <a href="http://www.openss7.org/">OpenSS7</a> implementation of the JAIN
+ISUP stack vendor class, each instance of the vendor class corresponds to a
+local binding of the ISUP stack. <p>
+
+Each
+<a href="JainIsupStackImpl.html">JainIsupStackImpl</a>
+can be used to acquire new instances of the
+<a href="JainIsupProviderImpl.html">JainIsupProviderImpl</a>
+object using the
+<a href="JainIsupStackImpl.html#createProvider:">createProvider()</a> method.
+The vendor-specific provider class happens to be called
+<code>org.openss7.javax.jain.ss7.isup.JainIsupProviderImpl</code>, but this is
+not mandated by the JAIN ISUP API specification as it is for the
+<a href="JainIsupStackImpl.html">JainIsupStackImpl</a>
+object.
+In the <a href="http://www.openss7.org/">OpenSS7</a> implementation of the JAIN
+ISUP provider vendor class, each instance of the vendor class corresponds to a
+locallly bound ISUP stack stream. <p>
+
+User classes that implement the
+<a href="../../../../../../javax/jain/ss7/isup/JainIsupListener.html">JainIsupListener</a>
+interface can register to send and receive events with a
+<a href="JainIsupProviderImpl.html">JainIsupProviderImpl</a>
+object for a given ISUP address.  The ISUP address consists of the local
+signalling point code to which the provider is already bound, the remote
+signalling point code (of the remote switch), and the circuit identification
+code range identifying circuits between the two signalling points.
+<hr/><div class="boilerplate" style="font-size: x-small;">
+Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+All Rights Reserved. <p>
+ 
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 of the license. <p>
+ 
+This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+License for more details. <p>
+
+ You should have received a copy of the GNU Affero General Public License along
+with this program.  If not, see
+<a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA. <p>
+ 
+<em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of
+Defense ("DoD"), it is classified as "Commercial Computer Software" under
+paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights
+customarily provided to non-Government users).  If the Software is supplied to
+any unit or agency of the Government other than DoD, it is classified as
+"Restricted Computer Software" and the Government's rights in the Software are
+defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+(or any successor regulations) or, in the cases of NASA, in paragraph
+18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See
+<a href="http://www.openss7.com/">http://www.openss7.com/</a>
+</div><hr/>
+</body>

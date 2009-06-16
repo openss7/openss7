@@ -1,0 +1,979 @@
+<HTML>
+<HEAD>
+<TITLE>
+The Java Telephony API Call Control Package
+</TITLE>
+<!-- Changed by: , 22-Sep-1996 -->
+<!-- Changed by: Gary Adams - SMI Software Development,  4-May-1999 -->
+<!-- Changed by: Alexey Roytman, Marc Petit-Huguenin, Juan Bernabó, Bob Andreasen, Daniel Petrie, Rich Pennenga - JTAPI 1.4 team,  28-July-2001 -->
+</HEAD>
+
+
+<BODY BGCOLOR="#ffffff">
+
+The JTAPI advanced Call Control package provides more detailed information
+about the core call model and supplies an extended set of states for
+the Connection and TerminalConnection objects.
+
+<H1>
+Java Telephony API
+- Call Control Extension Package
+</H1>
+
+<H2>
+Introduction
+</H2>
+
+<P>
+This document provides an overview of the Call Control Extension Package to
+the Java Telephony API. The Call Control Package extends the Core API by
+providing more advanced features and more detailed information about the
+call model. The more advanced features take the form of additional methods
+on the call control objects: Call, Connection, Terminal, Address, and
+TerminalConnection. The Call Control Package provides more detailed information
+about the call model, using an extended set of states on the Connection
+and TerminalConnection objects.
+</P>
+
+<OL>
+<LI><A HREF="#METHODS">Call Control Package Methods</A>
+This section briefly summarizes the methods and features made available by
+the Call Control Package. It provides this summary for each of the interfaces
+in this package.
+<BR><BR>
+<LI><A HREF="#STATES">Call Control Package Extended
+States</A> The detailed set of states available in the Call Control
+Package are described in this section of the overview. The Call Control
+Package extends both the core Connection states and the core TerminalConnection
+states.
+<BR><BR>
+<LI><A HREF="#CONNECT">Object and State Diagram for
+the telephone calls</A> Similar to the presentation of the timeline
+of objects and states for the Call.connect() method in the overview document
+for the core API, this section presents an analysis of what applications might
+expect to see in terms of objects and their states when a telephone call is
+placed. It gives the most accurate and clearest view of when certain objects
+are created and their likely state transitions.
+<BR><BR>
+<LI><A HREF="#OUTCALL">OutCall.java Code Example</A>
+This section provides a code example of an application that places an
+outgoing telephone call. Although it invokes Call.connect(), a core method,
+it monitors the advanced states associated with the Call Control Package.
+<BR><BR>
+<LI><A HREF="#INCALL">InCall.java Code Example</A>
+This section provides a code example of answering a telephone call incoming
+to a Terminal. This example shows how an application uses the accept(),
+reject(), or redirect() methods in addition to the core
+TerminalConnection.answer() method.
+</OL>
+
+
+<H2>
+<A NAME="METHODS">Call Control Package Methods</A>
+</H2>
+
+<P>
+This section outlines, for each interface defined in the Call Control Package,
+the methods and features provided. It is meant to provide a general overview
+of the additional features of each object, allowing application developers to
+ascertain whether the Call Control Package satisfies their requirements.
+</P>
+
+<H3>
+The CallControlCall Interface
+</H3>
+
+<P>
+The CallControlCall interfaces provides additional methods extending the
+core Call interface. The primary methods this extension interface provides
+are: conference(), transfer(), drop(), and consult(). This conference()
+method, as commonly known, conferences two calls together into a single
+call. When conference() returns control to the application, 
+all of the parties on each of the two individual calls
+are connected to one another. The transfer() method moves the parties of
+one call to another call, where one party typically drops off of the call.
+The drop() method provides a convenience functionality for the core
+disconnect()
+method located on Connections. The drop() method drops the entire call
+rather than an individual Connection. The consult() method begins a
+consultation call from an existing call. Applications perform the consult()
+action in order to eventually conference() or transfer() the two calls.
+</P>
+
+
+
+<H3>
+The CallControlAddress Interface
+</H3>
+
+<P>
+The CallControlAddress interface provides additional methods extending the
+core Address interface. The primary methods this extension interface provides
+are: setForwarding(), setDoNotDisturb(), and setMessageWaiting(). These
+methods do not pertain to an existing call, rather they provide instructions
+to the Provider pertaining to the designated Address. The setForwarding()
+method instructs the switch to forward all incoming calls to that address
+according to certain rules. The setDoNotDisturb() method instructs the switch
+not to allow any incoming calls to that Address to alert at the Address. The
+setMessageWaiting() method informs the switch that a message is waiting at
+this address.
+</P>
+
+
+<H3>
+The CallControlConnection Interface
+</H3>
+
+<P>
+The CallControlConnection interface provides additional methods extending the
+core Connection interface. The primary methods this extension interface
+provides are: accept(), reject(), redirect(), and park(). The accept() method
+accepts an incoming call offered to this Address, resulting in the call
+alerting at the Address. Conversely, the reject() method rejects an incoming
+call offered to this address. This rejected call never alerts at the Address
+and dies. The redirect() method transfers an incoming call which is either
+offered to an Address or already alerting at an Address to another Address.
+The redirect() method is similar to the transfer() method on the 
+CallControlCall interface, except the redirect() method is used on Connections
+before they are connected and active in a call. The park() method "parks" a
+Connection at a destination Address. "Parking" a Connection moves the Connection
+from its current Address into a special "waiting" state on the destination
+Address.
+</P>
+
+<H3>
+The CallControlTerminal Interface
+</H3>
+
+<P>
+The CallControlTerminal interface provides additional methods extending the
+core Terminal interface. The primary method this extension interface provides
+is the pickup() method. The pickup() method "picks up" a Connection from a
+number of situations. Applications may use the pickup() method at a Terminal
+for a Connection which was previously "parked". Applications may also use
+the pickup() method to answer telephony calls which are not alerting at their
+Terminal, but at a different Address entirely.
+</P>
+
+
+<H3>
+The CallControlTerminalConnection Interface
+</H3>
+
+<P>
+The CallControlTerminalConnection interface provides additional methods
+extending the core TerminalConnection interface. The primary methods this
+extension interface provides are: hold(), unhold(), join(), and leave(). The
+hold() method, as commonly known, places a TerminalConnection on hold with
+respect to the telephone call it is part of. The unhold() method takes a
+TerminalConnection off hold and makes it active once again. The join() method
+takes a TerminalConnection which is bridged in a telephone call and makes it
+active. The leave() method takes an active TerminalConnection in a telephone
+call and returns it to the bridged state.
+</P>
+
+<BR><BR>
+
+<H2>
+<A NAME="STATES">Call Control Package Extended States</A>
+</H2>
+
+<P>
+The Call Control Package provides both additional features and
+additional information about the current state
+of telephone calls in the call model. This additional information takes the
+form of an expanded set of states for the Connection and TerminalConnection
+objects, above the set of states provided by the core package for each of
+these objects. This expanded set of states allows the
+implementation to describe more accurately to the application what is going
+on in a telephone call. Most of the methods in the package rely upon
+these expanded states.
+</P>
+
+<P>
+If an application wants to use the Call Control Package, it is expected that
+it will only monitor the states provided by the Call Control Package, and
+not monitor the core states. In several cases, the Call Control Package
+does not expand upon a state and uses the exact states as in the core with
+the same meaning.
+</P>
+
+<P>
+As mentioned above, the Call Control Package expands upon the states in the
+core Connection and TerminalConnection objects. Listed below are the states
+found in the CallControlConnection and CallControlTerminalConnection interfaces
+that expand upon their respective core states. With each state is
+a brief, real-world description of their meaning.
+</P>
+
+<H3>CallControlConnection States</H3>
+
+
+IDLE state
+
+<P>
+The IDLE state carries the same meaning as the Connection's IDLE state. It is
+the initial state for all Connections and is transitory in nature. Most
+Connections do not stay in the IDLE state for long.
+</P>
+
+INITIATED state
+
+<P>
+The INITIATED state represents that an originating Connection is involved with
+placing a telephone call, however the telephone corresponding to the
+originating side has not been taken off-hook
+yet.
+</P>
+
+DIALING state
+
+<P>
+The DIALING state represents that an origination
+Connection is involved with placing a telephone call and has begun dialing the
+digits of the destination address but has not yet completed.
+</P>
+
+ESTABLISHED
+
+<P>
+The ESTABLISHED state represents that a
+Connection is actively part of a telephone call. This Connection's CONNECTED
+state most closely corresponds to this state, however Connection's CONNECTED
+is more general than ESTABLISHED.
+</P>
+
+OFFERED state
+
+<P>
+The OFFERED state indicates for a destination
+Connection that a Call is being offered to an address. Typically, applications
+either accept or reject this offered call.
+</P>
+
+QUEUED state
+
+<P>
+The QUEUED state indicates that a Connection
+is waiting at an Address, however, is not actively part of a telephone call.
+Applications may send a Connection to another Address in the
+QUEUED state to wait to be picked up. Another example of
+when Connections enter the QUEUED state is when the
+destination is busy and a "queueing" feature is turned on allowing the incoming
+Call to wait until the destination is no longer busy.
+</P>
+
+ 
+NETWORK_REACHED state
+
+<P>
+The NETWORK_REACHED state indicates that
+a Call has reached the network on the destination end, however no confirmation
+that the actual destination has been reached. This may be the last state reached
+by a destination Connection and applications often treat this as if the
+Connection is in the ESTABLISHED state.
+</P>
+
+
+NETWORK_ALERTING state
+
+<P>
+The NETWORK_ALERTING state indicates that a Connection which was previously in
+the NETWORK_REACHED state is now alerting at the destination.
+When the destination answers the telephone call, the Connection will move
+into the ESTABLISHED state from this state.
+</P>
+
+
+ALERTING state
+
+<P>
+The ALERTING state has the same meaning as the
+Connection's ALERTING state. It implies that a telephone call is alerting at
+its destination.
+</P>
+
+
+DISCONNECTED state
+
+<P>
+The DISCONNECTED state has the same
+meaning as the Connection's DISCONNECTED state. It implies that a Connection is
+no longer active in a telephone call. It is the final state for Connections
+in the Call Control Package as well as in the core.
+</P>
+
+
+FAILED state
+
+<P>
+The FAILED state has the same meaning as the
+Connection's FAILED state. It implies that a Connection has failed for some
+reason and is no longer able to perform additional actions in the Call.
+</P>
+
+
+UNKNOWN state
+<P>
+The UNKNOWN state has the same meaning as the
+Connection's UNKNOWN state. It implies that the state of a Connection is not
+known to the Provider as the application cannot take any action on this
+Connection.
+</P>
+
+<BR>
+
+<H3>State Transitions for the CallControlConnection Interface</H3>
+<P>
+In the overview of the core Connection states, a finite state machine
+described the allowable transitions from one Connection state to the other.
+This state diagram provides insight to the application developer on how
+Connections may move from one state to another. The following diagram is
+the analogous state diagram for the CallControlConnection states. Because
+the CallControlConnection interface possesses more states than the core, the
+state diagram is more complex. Applications that perform only
+the simple tasks provided by the core need not concern themselves with this
+more complicated set of states.
+</P>
+<P>
+To make the state diagram more clear, the ESTABLISHED state has been
+replicated three times. All of the transitions into the ESTABLISHED state
+can be viewed as the union of all of the transitions into each separate
+ESTABLISHED state below. Similarly, all of the transitions out of the
+ESTABLISHED state can be viewed as the union of all of the transitions out
+of each separate ESTABLISHED state below. The FAILED, DISCONNECTED, and
+UNKNOWN states are unique because they have transitions into, and out of, virtually
+every other state. The asterisk (*) next to the transition arrows denote
+this. There are several exceptions, however. There are no transitions out
+of the DISCONNECTED state and the IDLE state may not transition into the
+DISCONNECTED state. All states may transition into the FAILED state except
+for the DISCONNECTED state. Neither FAILED nor DISCONNECTED states may 
+transition into the UNKNOWN state. Also, the FAILED state may transition only to the
+DISCONNECTED.
+</P>
+<IMG SRC="doc-files/CallCtlConnStates.gif" align="middle"
+	 ALT="Call Control Connection States">
+
+<BR>
+<H3>Relationship between Connection and CallControlConnection States</H3>
+<P>
+In addition to the allowable transitions of Connection states in the Call
+Control Package, the mapping of the Connection states to the
+CallControlConnection states is important. This mapping implies that when
+the CallControlConnection state is a certain states, it implies the
+Connection state must be a certain state. Although applications should only
+monitor one set of states, it is neccessary to provide this mapping to
+maintain consistency.
+</P>
+<P>
+The following chart describes the state of the Connection in the Call Control
+Package (on the right) and the state of the Connection in the core package
+(on the left). Note that applications may obtain the core Connection state
+via the method Connection.getState() and applications may obtain the
+Call Control Package Connection states via the
+CallControlConnection.getCallControlState() method.
+</P>
+<IMG SRC="doc-files/CallCtlConnRelation.gif" align="middle"
+	 ALT="Call Control Connection Relations">
+
+<BR>
+
+<H3>CallControlTerminalConnection States</H3>
+
+IDLE state
+
+<P>
+The IDLE state has the same meaning as in the TerminalConnection. It is the
+initial state for all CallControlTerminalConnection objects.
+</P>
+
+
+RINGING state
+
+<P>
+The RINGING state has the same meaning
+as the TerminalConnection's RINGING state. It implies that a Terminal is ringing
+because of an incoming telephone call.
+</P>
+
+BRIDGED state
+
+<P>
+The BRIDGED state indicates that a
+Terminal is bridged into an active telephone call. Although the Terminal
+is not actively part of the telephone call is may become so by joining the
+call. Although not actively part of the telephone call, the resource
+associated with this bridge on the Terminal is being used.
+</P>
+
+
+INUSE state
+
+<P>
+The INUSE state indicates that a
+Terminal is not actively part of a call nor bridged into a call, but still
+part of the telephone call. Although the Terminal cannot join the Call, the
+resource on the Terminal associated with this Call is still being used.
+</P>
+
+
+TALKING state
+
+<P>
+The TALKING state indicates that a
+Terminal is actively part of a telephone call. It is similar to the
+TerminalConnection's TALKING state, however that state has a more general
+definition. The TALKING state implies that
+Terminal is talking on the telephone call versus being held.
+</P>
+
+
+HELD state
+
+<P>
+The HELD state indicates that a Terminal
+is actively part of a telephone call, however it is currently on hold.
+</P>
+
+
+DROPPED state
+
+<P>
+The DROPPED state has the same meaning
+as the TerminalConnection's DROPPED state. The Terminal was once part of a
+telephone call but no longer is. As in the core, this state is the final
+state for all TerminalConnections in the Call Control Package.
+</P>
+
+
+UNKNOWN state
+
+<P>
+The UNKNOWN state has the same meaning as the TerminalConnection's UNKNOWN
+state.
+</P>
+
+<BR>
+
+<H3>State Transitions for the CallControlTerminalConnection Interface</H3>
+<P>
+In the overview of the core TerminalConnection states, a finite state machine
+described the allowable transitions from one TerminalConnection state to the
+other. This state diagram illustrates how TerminalConnections may move from one 
+state to an other. The following diagram is the analogous state diagram for the 
+CallControlTerminalConnection states.
+</P>
+<IMG SRC="doc-files/CallCtlTermConnStates.gif" align="middle" 
+	 ALT="Call Control Terminal Connection States">
+
+<BR>
+
+<H3>Relationshiop between TerminalConnection and
+CallControlTerminalConnection States</H3>
+<P>
+In addition to the allowable transitions of TerminalConnection states in the Call Control Package, the mapping of the TerminalConnection states to the
+CallControlTerminalConnection states is important. This mapping implies that
+when the CallControlConnection state is a certain states, it implies the
+TerminalConnection state must be a certain state. Although applications should
+only monitor one set of states, it is necessary to provide this mapping to
+maintain consistency.
+</P>
+<P>
+The following chart describes the state of the TerminalConnection in the Call
+Control Package (on the right) and the state of the TerminalConnection in the
+core package (on the left). Note that applications may obtain the core
+TerminalConnection state via the method TerminalConnection.getState() and
+applications may obtain the Call Control Package TerminalConnection states via
+the CallControlTerminalConnection.getCallControlState() method.
+</P>
+
+<IMG SRC="doc-files/CallCtlTermConnRelation.gif" align="middle"
+	 ALT="Call Control Terminal Connection Relations">
+
+
+<BR>
+
+<H2>
+<A NAME="CONNECT">Timeline for Telephone Calls</A>
+</H2>
+
+
+<P>
+The Overview document for the core Java Telephony API presented a timeline
+diagram of the state transitions for Connections and TerminalConnections in
+a likely scenario resulting from a Call.connect() invocation. These diagrams
+are the best means to understand the API during different situations. In this
+section, a similar diagram is presented describing the outcome of placing
+a telephone call in terms of the CallControl states.
+</P>
+<P>
+In the diagram below, time is the vertical axis where time increases going
+down the page. The solid vertical lines denote various objects: Call, Terminal,
+and Address. The solid horizontal lines between the Call and Address represent
+a Connection and the dotted horizontal lines between the Address and Terminal
+represent TerminalConnections. Each discrete change in the call model is
+denoted by a number along the left-hand side of the page. More than one change
+may occur to the call model during a single discrete step; the application
+sees these changes as happening all at once.
+</P>
+<P>
+In the scenario below, the originating side has one Terminal associated with
+it and the destination side has two Terminals (denoted in the diagram as
+'A' and 'B') associated with it. The switch is configured to bridge all
+Terminals that are not actively part of a telephone call but share an address
+which is active. This scenario shows how a telephone call is placed and
+completed to one of the destination Terminals. Then, the second terminal joins
+the call using the join() method from this package. Finally, the originator
+hangs up his phone and the entire call becomes disconnected.
+</P>
+<IMG SRC="doc-files/CallCtlConnect.gif" align="middle"
+	 ALT="Call Control Connect">
+
+<BR><BR>
+
+<H2>
+<A NAME="OUTCALL">OutCall Code Example</A>
+</H2>
+
+<P>
+The following code example shows placing a telephone call using the core
+<CODE>Call.connect()</CODE> method while examining states in the Call Control 
+extension package.
+
+</P>
+
+<PRE>
+import javax.telephony.*;
+import javax.telephony.callcontrol.*;
+
+/*
+ * The MyCallCtlOutConnectionListener class implements the CallControlConnectionListener
+ * interface and receives all events associated with the Call. 
+ */
+
+public class MyCallCtlOutConnectionListener implements CallControlConnectionListener {
+    private String getAddressName(ConnectionEvent event) {
+        String name = null;
+        try {
+          Connection connection = event.getConnection();
+          Address addr = connection.getAddress();
+          name = addr.getName();
+        } catch (Exception excp) {
+          // Handle Exceptions
+		}
+		return name;
+	}
+		
+	public void callActive(CallEvent event) {
+	}
+
+	public void callInvalid(CallEvent event) {
+	}
+
+	public void callEventTransmissionEnded(CallEvent event) {
+	}
+
+	public void singleCallMetaProgressStarted(MetaEvent event) {
+	}
+
+	public void singleCallMetaProgressEnded(MetaEvent event) {
+	}
+
+	public void singleCallMetaSnapshotStarted(MetaEvent event) {
+	}
+
+	public void singleCallMetaSnapshotEnded(MetaEvent event) {
+	}
+
+	public void multiCallMetaMergeStarted(MetaEvent event) {
+	}
+
+	public void multiCallMetaMergeEnded(MetaEvent event) {
+	}
+
+	public void multiCallMetaTransferStarted(MetaEvent event) {
+	}
+
+	public void multiCallMetaTransferEnded(MetaEvent event) {
+	}
+
+	public void connectionAlerting(ConnectionEvent event) {
+	}
+
+	public void connectionConnected(ConnectionEvent event) {
+	}
+	
+	public void connectionCreated(ConnectionEvent event) {
+	}
+
+	public void connectionDisconnected(ConnectionEvent event) {
+	}
+	
+	public void connectionFailed(ConnectionEvent event) {
+	}
+
+	public void connectionInProgress(ConnectionEvent event) {
+	}
+
+	public void connectionUnknown(ConnectionEvent event) {
+	}
+	
+	public void connectionAlerting(CallControlConnectionEvent event) {
+        System.out.println("Connection to Address: " 
+			+ getAddressName(event) + " is ALERTING");
+	}
+	
+	public void connectionDialing(CallControlConnectionEvent event) {
+        System.out.println("Connection to Address: " 
+			+ getAddressName(event) + " is DIALING");
+	}
+	
+	public void connectionDisconnected(CallControlConnectionEvent event) {
+        System.out.println("Connection to Address: " 
+			+ getAddressName(event) + " is DISCONNECTED");
+	}
+	
+	public void connectionEstablished(CallControlConnectionEvent event) {
+        System.out.println("Connection to Address: " 
+			+ getAddressName(event) + " is ESTABLISHED");
+	}
+	
+	public void connectionFailed(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionInitiated(CallControlConnectionEvent event) {
+        System.out.println("Connection to Address: " 
+			+ getAddressName(event) + " is INITIATED");
+	}
+	
+	public void connectionNetworkAlerting(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionNetworkReached(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionOffered(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionQueued(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionUnknown(CallControlConnectionEvent event) {
+	}
+}
+
+
+  -------------------------------------------
+
+
+import javax.telephony.*;
+import javax.telephony.callcontrol.*;
+
+/*
+ * Places a telephone call from 476111 to 5551212
+ */
+public class CallCtlOutcall {
+
+  public static final void main(String args[]) {
+
+    /*
+     * Create a provider by first obtaining the default implementation of
+     * JTAPI and then the default provider of that implementation.
+     */
+    Provider myprovider = null;
+    try {
+      JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+      myprovider = peer.getProvider(null);
+    } catch (Exception excp) {
+      System.out.println("Can't get Provider: " + excp.toString());
+      System.exit(0);
+    }
+
+   /*
+    * We need to get the appropriate objects associated with the
+    * originating side of the telephone call. We ask the Address for a list
+    * of Terminals on it and arbitrarily choose one.
+    */
+    Address origaddr = null;
+    Terminal origterm = null;
+    try {
+      origaddr = myprovider.getAddress("4761111");
+
+      /* Just get some Terminal on this Address */
+      Terminal[] terminals = origaddr.getTerminals();
+      if (terminals == null) {
+        System.out.println("No Terminals on Address.");
+        System.exit(0);
+      }
+      origterm = terminals[0];
+    } catch (Exception excp) {
+      // Handle exceptions;
+    }
+
+
+    /*
+     * Create the telephone call object and add an listener.
+     */
+    Call mycall = null;
+    try {
+      mycall = myprovider.createCall();
+      mycall.addCallListener(new MyCallCtlOutConnectionListener());
+    } catch (Exception excp) {
+      // Handle exceptions
+    }
+
+    /*
+     * Place the telephone call.
+     */
+    try {
+      Connection c[] = mycall.connect(origterm, origaddr, "5551212");
+    } catch (Exception excp) {
+      // Handle all Exceptions
+    }
+  }
+}
+</PRE>
+
+
+<BR>
+
+<H2>
+<A NAME="INCALL">InCall Code Example</A>
+</H2>
+
+
+<P>
+The following code example illustrates how an application answers a Call
+at a particular Terminal. It shows how application accept incoming calls 
+offered to it. This code example closely resembles the core InCall
+code example.
+</P>
+
+<PRE>
+import javax.telephony.*;
+import javax.telephony.events.*;
+import javax.telephony.callcontrol.*;
+
+/*
+ * The MyCallCtlInTermConnListener class implements the CallControlTermConnListener and
+ * receives all Call-related events.
+ */
+
+public class MyCallCtlInTermConnListener implements CallControlTerminalConnectionListener {
+    private String getTerminalName(TerminalConnectionEvent event) {
+        String name = null;
+        try {
+          TerminalConnection termConn = event.getTerminalConnection();
+          Terminal term = termConn.getTerminal();
+          name = term.getName();
+        } catch (Exception excp) {
+          // Handle Exceptions
+		}
+		return name;
+	}
+
+	public void terminalConnectionActive(TerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionCreated(TerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionDropped(TerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionPassive(TerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionRinging(TerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionUnknown(TerminalConnectionEvent event) {
+	}
+
+	public void connectionAlerting(ConnectionEvent event) {
+	}
+
+	public void connectionConnected(ConnectionEvent event) {
+	}
+	
+	public void connectionCreated(ConnectionEvent event) {
+	}
+
+	public void connectionDisconnected(ConnectionEvent event) {
+	}
+	
+	public void connectionFailed(ConnectionEvent event) {
+	}
+
+	public void connectionInProgress(ConnectionEvent event) {
+	}
+
+	public void connectionUnknown(ConnectionEvent event) {
+	}
+
+	public void callActive(CallEvent event) {
+	}
+
+	public void callInvalid(CallEvent event) {
+	}
+
+	public void callEventTransmissionEnded(CallEvent event) {
+	}
+
+	public void singleCallMetaProgressStarted(MetaEvent event) {
+	}
+
+	public void singleCallMetaProgressEnded(MetaEvent event) {
+	}
+
+	public void singleCallMetaSnapshotStarted(MetaEvent event) {
+	}
+
+	public void singleCallMetaSnapshotEnded(MetaEvent event) {
+	}
+
+	public void multiCallMetaMergeStarted(MetaEvent event) {
+	}
+
+	public void multiCallMetaMergeEnded(MetaEvent event) {
+	}
+
+	public void multiCallMetaTransferStarted(MetaEvent event) {
+	}
+
+	public void multiCallMetaTransferEnded(MetaEvent event) {
+	}
+
+	public void connectionAlerting(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionDialing(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionDisconnected(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionEstablished(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionFailed(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionInitiated(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionNetworkAlerting(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionNetworkReached(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionOffered(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionQueued(CallControlConnectionEvent event) {
+	}
+	
+	public void connectionUnknown(CallControlConnectionEvent event) {
+	}
+
+	public void terminalConnectionBridged(CallControlTerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionDropped(CallControlTerminalConnectionEvent event) {
+		System.out.println("TerminalConnection to Terminal: " 
+			+ getTerminalName(event) + " is DROPPED");
+	}
+
+	public void terminalConnectionHeld(CallControlTerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionInUse(CallControlTerminalConnectionEvent event) {
+	}
+
+	public void terminalConnectionRinging(CallControlTerminalConnectionEvent event) {
+		System.out.println("TerminalConnection to Terminal: " 
+			+ getTerminalName(event) + " is RINGING");
+		/* Answer the telephone Call using "inner class" thread */
+
+		try {
+			final TerminalConnection termconn = event.getTerminalConnection();
+	     	Runnable runnable = new Runnable() {
+				public void run() {
+					try {
+						termconn.answer();
+				  	} 
+					catch (Exception excp) {
+			    		// Handle answer exceptions
+				  	}
+				};
+			};
+			Thread thread = new Thread(runnable);
+			thread.start();
+        } 
+		catch (Exception excp) {
+            // Handle Exceptions;
+        }
+	}
+
+	public void terminalConnectionTalking(CallControlTerminalConnectionEvent event) {
+		System.out.println("TerminalConnection to Terminal: " 
+			+ getTerminalName(event) + " is TALKING");
+	}
+
+	public void terminalConnectionUnknown(CallControlTerminalConnectionEvent event) {
+	}
+}
+
+
+
+
+  -------------------------------------------
+
+
+import javax.telephony.*;
+import javax.telephony.callcontrol.*;
+
+
+/*
+ * Create a provider and monitor a particular terminal for an incoming call.
+ */
+public class CallCtlIncall {
+
+  public static final void main(String args[]) {
+ 
+    /*
+     * Create a provider by first obtaining the default implementation of
+     * JTAPI and then the default provider of that implementation.
+     */
+    Provider myprovider = null;
+    try {
+      JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+      myprovider = peer.getProvider(null);
+    } catch (Exception excp) {
+      System.out.println("Can't get Provider: " + excp.toString());
+      System.exit(0);
+    }
+
+    /*
+     * Get the terminal we wish to monitor and add a call observer to that
+     * Terminal. This will place a call observer on all call which come to
+     * that terminal. We are assuming that Terminals are named after some
+     * primary telephone number on them.
+     */
+    try {
+      Terminal terminal = myprovider.getTerminal("4761111");
+      terminal.addCallListener(new MyCallCtlInTermConnListener());
+    } catch (Exception excp) {
+      System.out.println("Can't get Terminal: " + excp.toString());
+      System.exit(0);
+    }
+  }
+}
+
+
+</PRE>
+
+</BODY>
+</HTML>
+
