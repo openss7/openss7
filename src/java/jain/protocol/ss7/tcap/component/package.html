@@ -1,0 +1,1359 @@
+<body>
+the component primitives and their specified
+parameters, if the coding of a paramater
+is not included in any specific class, it
+is common to all the specified components
+and therefore coded within that components
+parent class. The parent classes can be either
+<a href="../ComponentIndEvent.html">ComponentIndEvent</a> or <a href="../ComponentReqEvent.html">ComponentReqEvent</a>
+depending on whether the component is an indication or request primitive where: 
+<ul>
+<li><b>Indication</b> component primitives - are primitives that can only be sent from a JainTcapProvider.
+to a JainTcapListener
+<li><b>Request</b> component primitives - are primitives that can only be sent from a JainTcapListener to a JainTcapProvider.
+</ul>
+A generic set of Components primitives has
+been created that abstracts the functionality
+of the Component primitives for the supported
+variants. The mapping between these generic
+primitives and the variant specific primitives
+they represent is illustrated in Table 1:
+&nbsp;
+<P><BR>
+</P>
+<center><table BORDER CELLPADDING=7 WIDTH="718" BORDERCOLOR="#008080" >
+<tr>
+<td VALIGN=CENTER WIDTH="20%" BGCOLOR="#C0C0C0"><b><i><font color="#800000"><font size=-1>Request
+Primitves</font></font></i></b></td>
+
+<td VALIGN=TOP WIDTH="20%" BGCOLOR="#C0C0C0"><b><i><font color="#800000"><font size=-1>Indication
+Primitives</font></font></i></b></td>
+
+<td VALIGN=CENTER WIDTH="14%" BGCOLOR="#C0C0C0"><b><i><font color="#800000"><font size=-1>ITU‘1993</font></font></i></b></td>
+
+<td VALIGN=CENTER WIDTH="18%" BGCOLOR="#C0C0C0"><b><i><font color="#800000"><font size=-1>ITU 1997</font></font></i></b></td>
+
+<td VALIGN=CENTER WIDTH="12%" BGCOLOR="#C0C0C0"><b><i><font color="#800000"><font size=-1>ANSI 1992</font></font></i></b></td>
+
+<td VALIGN=CENTER WIDTH="15%" BGCOLOR="#C0C0C0"><b><i><font color="#800000"><font size=-1>ANSI 1996</font></font></i></b></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%" BGCOLOR="#C0C0C0"><font size=-1><a href="InvokeReqEvent.html">InvokeReqEvent</a></font></td>
+
+<td VALIGN=CENTER WIDTH="20%" BGCOLOR="#C0C0C0"><font size=-1><a href="InvokeIndEvent.html">InvokeIndEvent</a></font></td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="32%" BGCOLOR="#C0C0C0">
+<center><font size=-1>TC_INVOKE</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%" BGCOLOR="#C0C0C0">
+<center><font size=-1>TC_INVOKE</font>
+<br><font size=-1>TC_INVOKE_NL</font></center>
+</td>
+</tr>
+
+<tr BGCOLOR="#ffffff">
+<td VALIGN=CENTER WIDTH="20%"><font size=-1><a href="ResultReqEvent.html">ResultReqEvent</a></font></td>
+
+<td VALIGN=CENTER WIDTH="20%"><font size=-1><A href="ResultIndEvent.html">ResultIndEvent</a></font></td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="32%">
+<center><font size=-1>TC_RESULT_L</font>
+<br><font size=-1>TC_RESULT_NL</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%">
+<center><font size=-1>TC_RESULT_L</font>
+<br><font size=-1>TC_RESULT_NL</font></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%" HEIGHT="4" BGCOLOR="#C0C0C0"><font size=-1><a href="ErrorReqEvent.html">ErrorReqEvent</a></font></td>
+
+<td VALIGN=TOP WIDTH="20%" HEIGHT="4" BGCOLOR="#C0C0C0"><font size=-1><a href="ErrorIndEvent.html">ErrorIndEvent</a></font></td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="32%" HEIGHT="4" BGCOLOR="#C0C0C0">
+<center><font size=-1>TC_U_ERROR</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%" HEIGHT="4" BGCOLOR="#C0C0C0">
+<center><font size=-1>TC_ERROR</font></center>
+</td>
+</tr>
+
+<tr BGCOLOR="#ffffff">
+<td VALIGN=CENTER WIDTH="20%"><font size=-1><a href="RejectReqEvent.html">RejectReqEvent</a></font></td>
+
+<td VALIGN=CENTER WIDTH="20%"><font size=-1><a href="RejectIndEvent.html">RejectIndEvent</a></font></td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="32%">
+<center><font size=-1>TC_U_REJECT</font>
+<br><font size=-1>TC_L_REJECT (indication only)</font>
+<br><font size=-1>TC_R_REJECT (indication only)</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%">
+<center><font size=-1>TC_REJECT</font></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%" BGCOLOR="#C0C0C0">&nbsp;</td>
+
+<td VALIGN=TOP WIDTH="20%" BGCOLOR="#C0C0C0"><font size=-1><a href="LocalCancelIndEvent.html">LocalCancelIndEvent</a></font></td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="32%" BGCOLOR="#C0C0C0">
+<center><font size=-1>TC_L_CANCEL</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%" BGCOLOR="#C0C0C0">&nbsp;</td>
+</tr>
+
+<tr BGCOLOR="#ffffff">
+<td VALIGN=CENTER WIDTH="20%"><font size=-1><a href="UserCancelReqEvent.html">UserCancelReqEvent</a></font></td>
+
+<td VALIGN=TOP WIDTH="20%">&nbsp;</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="32%">
+<center><font size=-1>TC_U_CANCEL</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%">&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%" BGCOLOR="#C0C0C0"><font size=-1><a href="TimerResetReqEvent.html">TimerResetReqEvent</a></font></td>
+
+<td VALIGN=TOP WIDTH="20%" BGCOLOR="#C0C0C0">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="14%" BGCOLOR="#C0C0C0">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="18%" BGCOLOR="#C0C0C0">
+<center><font size=-1>TC_TIMER_RESET</font></center>
+</td>
+
+<td VALIGN=CENTER COLSPAN="2" WIDTH="27%" BGCOLOR="#C0C0C0">&nbsp;</td>
+</tr>
+</table></center>
+
+<center><b><i>Table 1 : Mapping of Component primitives</i></b></center>
+
+<p><b>NOTE:</b>
+<br>
+<UL>
+<LI>The <a href="InvokeReqEvent.html">InvokeReqEvent</a> and the <a href="InvokeIndEvent.html">InvokeIndEvent</a> can represent either a '<i>Last</i>' or '<i>Not Last</i>' Invoke Component primitive for the an ANSI
+  implementation of the JAIN TCAP API, where
+  a flag is included within the primitive to
+  indicate the components function, this flag
+  should be ignored within an ITU implementation.<LI> Similarly, the <a href="ResultReqEvent.html">ResultReqEvent</a>
+and the <a href="ResultIndEvent.html">ResultIndEvent</a> can represent either a '<i>Last</i>' or '<i>Not Last</i>' Result Component primitive, therefore a
+  flag is also included in these Events to
+  indicate which case applies for both an ITU
+  and ANSI implementation of the JAIN TCAP
+  API.<LI>Within the <a href="RejectIndEvent.html">RejectIndEvent</a> a flag will indicate whether the primitive is a '<i>User</i>', a '<i>Local</i>' or a '<i>Remote</i>' Reject for an ITU implementation of the
+  JAIN TCAP API.
+</UL>
+<P>
+<b><FONT size=+1><u>Mapping of JAIN Mandatory and Optional parameters of Component primitives</U></FONT></B>
+
+<P ALIGN="JUSTIFY">The following tables identify the mapping between the ITU and
+  ANSI TCAP Component primitives and parameters. The standards supported in JAIN 
+  TCAP v1.0 include:</P>
+
+<UL><LI>ITU-T (03/93) Q series (Q.771-775) – SS7 Functional description of Transaction 
+    Capabilities.</LI>
+  
+  <LI>ITU-T (06/97) Q series (Q.771-775) – SS7 Functional description of Transaction 
+    Capabilities.</LI>
+  
+  <LI>ANSI (1992) T1.114.1 - T1.114.5 – SS7 Transaction Capabilities Application 
+    Part.</LI>
+  
+  <LI>ANSI (1996) T1.114.1 - T1.114.5 – SS7 Transaction Capabilities Application 
+    Part.</LI>
+  
+</UL>
+<P><u><font size=+1><b>Mandatory and Optional Parameters</b></FONT></u></P>
+<P ALIGN="JUSTIFY">Each of the supported standards defines mandatory and optional 
+  parameters for each primitive. As JAIN TCAP supports all the mandatory and optional 
+  parameters of each primitive of the supported variants within the one specification, 
+  it is necessary to redefine the mandatory and optional parameters of the standards. 
+  This new definition of mandatory and optional parameters will be referred to 
+  as JAIN TCAP mandatory and optional and will accommodate the mandatory and optional 
+  parameter differences within the standards supported.</P>
+
+<P ALIGN="JUSTIFY"><b>JAIN TCAP MANDATORY: </b>A JAIN TCAP mandatory parameter 
+  is a parameter within a primitive that is mandatory for all the supported variants. 
+  In the tables below if any parameter is mandatory (M) for all the variants then 
+  it will be mandatory for that JAIN TCAP primitive.</P>
+
+<P ALIGN="JUSTIFY"><b>JAIN TCAP OPTIONAL:</b> A JAIN TCAP optional parameter is 
+  a parameter within a primitive that is <B><U>either</u></B> optional or not 
+  supported by any of the supported variants. In the tables below if a parameter 
+  is regarded as mandatory for a specific variant and optional or not supported 
+  by the other variant it will be regarded as a JAIN TCAP optional. </P>
+<P><b><u>Table Key:<br></u></b><br>
+  M = mandatory<br>
+  O = optional<br>
+  Blank = not-supported </P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="MIDDLE" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Invoke Req</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P align="center"><B><I><FONT SIZE=2 COLOR="#800000">TC_INVOKE</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_INVOKE_NL<br>
+      TC_INVOKE</font></i></B></P>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Class</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Linked Id</FONT> <FONT size="-1">(Correlation Id)</FONT></TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Operation</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Timeout</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">&nbsp</TD>
+      <TD WIDTH="17%" VALIGN="TOP">&nbsp</TD>
+    </TR>
+    <TR>
+      <TD width="33%" valign="TOP" bgcolor="#c0c0c0" align="center"><FONT size="-1">Last Invoke Event</FONT></TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp</TD>
+      <TD width="17%" valign="TOP" bgcolor="#c0c0c0" align="center"><FONT size="-1">M</FONT></TD>
+      <TD width="17%" valign="TOP" bgcolor="#c0c0c0" align="center"><FONT size="-1">M</FONT></TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 2 : Mapping of the Invoke Request Component Parameters</i></b>
+</center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="MIDDLE" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Invoke Ind</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_INVOKE</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_INVOKE_NL<br>
+      TC_INVOKE</font></i></B></P>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O (see note)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O (see note)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Linked Id</FONT> <FONT size="-1">(Correlation Id)</FONT></TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Operation</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=22>
+      <P ALIGN="CENTER"><FONT SIZE=2>Last Component</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=22>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=22>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=22>
+      <P ALIGN="CENTER"><FONT SIZE=2>M </FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=22>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD align="center"><FONT size="-1">Last Invoke Event</FONT></TD>
+      <TD>&nbsp</TD>
+      <TD>&nbsp</TD>
+      <TD align="center"><FONT size="-1">M</FONT></TD>
+      <TD align="center"><FONT size="-1">M</FONT></TD>
+    </TR>
+  </TABLE>
+</CENTER>
+<center>
+<b><i>Table 3 : Mapping of the Invoke Indication Component Parameters</i></b><br>
+NOTE: the Dialogue Id is Mandatory in ITU
+except for the invocation<BR>
+of a class 4 operation received in a Unidirectional message.
+</center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="MIDDLE" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Result Req</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_RESULT_L<br>
+      TC_RESULT_NL</font></i></B></P>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_RESULT_L<br>
+      TC_RESULT_NL</font></i></B></P>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id (Correlation Id)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Last Result Event</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Operation</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 4 : Mapping of the Result Request Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="MIDDLE" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Result Ind</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_RESULT_L<br>
+      TC_RESULT_NL</font></i></B></P>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_RESULT_L<br>
+      TC_RESULT_NL</font></i></B></P>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id (Correlation Id)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Operation</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Last Component</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Last Result Event</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 5 : Mapping of the Result Indication Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Error Req</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="TOP" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_U_ERROR</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="TOP" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_ERROR</font></i></B>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id (Correlation Id)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Error</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 6 : Mapping of the Error Request Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Error Ind</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="TOP" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_U_ERROR</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="TOP" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_ERROR</font></i></B>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id (Correlation Id)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP" height="30">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" height="30">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" height="30">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" height="30">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" height="30">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Error</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Last Component</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 7 : Mapping of the Error Indication Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="MIDDLE" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Reject Req</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_U_REJECT</font></i></B></P>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_REJECT</font></i></B>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id (Correlation Id)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Problem Code</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    
+    
+</TABLE>
+</CENTER>
+<center><b><i>Table 8 : Mapping of the Reject Request Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="499">
+  
+    <TR>
+      <TD WIDTH="33%" VALIGN="MIDDLE" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">Reject Ind</font></i></B>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_R_REJECT<br>
+      TC_U_REJECT<br>
+      TC_L_REJECT</font></i></B></P>
+      </TD>
+      <TD WIDTH="34%" VALIGN="MIDDLE" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_REJECT</font></i></B>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1992</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ANSI 1996</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id (Correlation Id)</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>O</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Parameters</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP">&nbsp;</TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="33%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Problem Code</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="33%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>Last Component</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="17%" VALIGN="TOP" >
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD width="33%" valign="TOP" bgcolor="#c0c0c0" align="center">
+	<FONT size="2">Reject Type</FONT>
+	</TD>
+      <TD width="17%" valign="TOP" bgcolor="#c0c0c0" align="center">
+	<FONT size="-1">M</FONT>
+	</TD>
+      <TD width="17%" valign="TOP" bgcolor="#c0c0c0" align="center">
+	<FONT size="-1">M</FONT>
+	</TD>
+      <TD width="17%" valign="TOP" bgcolor="#c0c0c0" align="center">
+	<FONT size="-1">O</FONT>
+	</TD>
+      <TD width="17%" valign="TOP" bgcolor="#c0c0c0" align="center">
+	<FONT size="-1">O</FONT>
+	</TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 9 : Mapping of the Reject Indication Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="331">
+  
+    <TR>
+      <TD WIDTH="49%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">LocalCancel Ind</font></i></B>
+      </TD>
+      <TD WIDTH="51%" VALIGN="TOP" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_L_CANCEL</font></i></B>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="49%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="49%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="49%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0" HEIGHT=15>
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 10 : Mapping of the Local Cancel Indication Component Parameters</i></b></center>
+<P><BR>
+</P>
+<CENTER>
+<TABLE border cellspacing="1" bordercolor="#008080" cellpadding="7" width="331">
+  
+    <TR>
+      <TD WIDTH="49%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">UserCancel Req</font></i></B>
+      </TD>
+      <TD WIDTH="51%" VALIGN="TOP" COLSPAN=2 BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><B><I><FONT SIZE=2 COLOR="#800000">TC_U_CANCEL</font></i></B>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="49%" VALIGN="TOP" BGCOLOR="#c0c0c0">&nbsp;</TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1993</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>ITU 1997</FONT>
+      </TD>
+    </TR>
+    <TR BGCOLOR="#ffffff">
+      <TD WIDTH="49%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>Dialogue Id</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+    <TR>
+      <TD WIDTH="49%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>Invoke Id</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+      <TD WIDTH="25%" VALIGN="TOP" BGCOLOR="#c0c0c0">
+      <P ALIGN="CENTER"><FONT SIZE=2>M</FONT>
+      </TD>
+    </TR>
+  
+</TABLE>
+</CENTER>
+<center><b><i>Table 11 : Mapping of User Cancel Request Component Parameters</i></b></center>
+
+
+
+
+<hr/><div class="boilerplate" style="font-size: x-small;">
+Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+All Rights Reserved. <p>
+ 
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 of the license. <p>
+ 
+This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+License for more details. <p>
+
+ You should have received a copy of the GNU Affero General Public License along
+with this program.  If not, see
+<a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA. <p>
+ 
+<em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of
+Defense ("DoD"), it is classified as "Commercial Computer Software" under
+paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights
+customarily provided to non-Government users).  If the Software is supplied to
+any unit or agency of the Government other than DoD, it is classified as
+"Restricted Computer Software" and the Government's rights in the Software are
+defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+(or any successor regulations) or, in the cases of NASA, in paragraph
+18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See
+<a href="http://www.openss7.com/">http://www.openss7.com/</a>
+</div><hr/>
+</body>

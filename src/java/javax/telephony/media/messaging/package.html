@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<title>
+Messaging package for S.410
+</title>
+</head>
+<BODY LINK="#0000ff" VLINK="#800080">
+<p>
+Defines the means to communicate to and exchange information
+with other media application services.
+</p>
+
+<H3>
+Package Overview
+</h3>
+<p>
+The MessagingProvider is an <i>optional</i> interface that may
+be implemented by a MediaProvider.
+<p>
+The working methods for this package are in 
+the <tt>MessagingService</tt> interface.
+A <tt>MessagingService</tt> object is obtained 
+from the <tt>MessagingProvider</tt>.
+<p>
+A <tt>MessagingProvider</tt> object is obtained by 
+checking <tt>instanceof</tt> and then casting 
+a <tt>Provider/MediaProvider</tt> to a <tt>MessagingProvider</tt>.
+<br>
+For example: <pre>
+    MediaProvider mp = ...;
+    MessagingService ms = null;
+    if (mp instanceof MessagingProvider) 
+       ms = ((MessagingProvider)mp).getMessagingService();
+    ...
+</pre>
+<p>
+Most of the interesting methods are defined in
+<a href="MessagingService.html">MessagingService</a>
+and <a href="NamedService.html">NamedService</a>.
+</p>
+</body>
+</html>
+</page>

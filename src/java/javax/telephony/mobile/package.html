@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+  <HEAD>
+	<TITLE>JTAPI Mobile Package Overview (24-May-1999)</TITLE>
+	<!-- Created by: Gary Adams - SMI Software Development, 17-Feb-1999 -->
+	<!-- Changed by: Gary Adams - SMI Software Development, 24-May-1999 -->
+
+
+  </HEAD>
+  <BODY>
+	<P>
+	  The JTAPI Mobile package extends the core capabilities of 
+	  a JTAPI implementation with capabilities specific
+	  to mobile networks.
+	</P>
+
+	<H2>Introduction</H2>
+	<P>
+	  The overall architecture of the JTAPI packages was designed 
+	  to flexibly represent a wide range of telephony devices. While 
+	  the advanced call control and call center packages provide added 
+	  features for third party world view at switches and server 
+	  applications, other packages are designed to enhance the terminal
+	  side of first party only devices. e.g. the phone package for 
+	  dealing with physical devices such as ringer, buttons and
+	  hookswitches.
+	</P>
+	<P>
+	  The Mobile package adds to the first party view of the telephony 
+	  network the features needed to support the unique characteristics
+	  visible to the  wireless network device endpoint. This package was 
+	  initially designed with GSM networks in mind, but has been crafted to 
+	  work well in other wireless networks as well.
+	</P>
+
+	<H2>Mobile device characteristics</H2>
+	<P>
+	  Several characteristics of the mobile device are worth highlighting 
+	  here to understand some of the design decisions that were made in the
+	  Mobile package that may appear contrary to design patterns used in
+	  earlier releases of JTAPI :
+	</P>
+	<UL>
+	  <LI> small footprint - mobile devices are typically very cost sensitive 
+	  	and require drastic design choices in minimizing the overall footprint
+	   	of interface and implementation of the telephony applications.
+	  </LI>
+	  <UL>
+		<LI> No capabilities interfaces - optional static capabilities 
+		  are supported via interfaces and checks for instance of 
+		  interface.
+		</LI>
+		<LI> Listener events - Observer interfaces are typically bulky 
+		  in the use of the class name space to convey individual state 
+		  transitions.
+		</LI>
+		<LI>Return values - by defining meaningful return values for
+		  methods that were unused fewer methods are required, e.g.
+		  returning a null String for a get property operation for
+		  an not supported operation, or returning a boolean to 
+		  indicate the success or failure of an operation
+		</LI>
+		
+		<LI> Exceptions - in cases where a partial implementation of a
+		  feature are provided, exceptions can be used to provide
+		  finer granularity of optional implementation features. e.g.
+		  NetworkSelection scanning for networks may be provided
+		  in an implementation that throws method not supported exceptions
+		  if the scanning operation can not be canceled once started.
+		</LI>
+	  </UL>
+	  <LI>Emergency Provider State  - in addition to basic in and out of 
+		service states of the telephony network, the cellular network 
+	  	attempts to provide emergency service even if the device has 
+	    been compromised (SIM card removed), or the device is otherwise
+		restricted (onboard a plane).
+	  </LI>
+	  <LI> Radio Management - mobile devices are very power conscious
+	  	and the radio equipment very power intensive. Users typically 
+		have the ability to control whether the radio functions of the
+		devices are automatically enabled when the device is powered
+		on or whether these features are managed separately from other
+		Personal Information Management applications on the device.
+	  </LI>
+
+	  <LI> Network Selection - In many locations a mobile phone user
+	  	has a choice of cellular networks. The selection mechanism
+		might be automatic or intelligently chosen based on costs or
+		even manually with end user intervention.
+	  </LI>
+	</UL>
+	<H2>Network Types</H2>
+
+
+	<P>
+	  The term <STRONG>available network</STRONG> means a mobile cellular network that is in the
+	  general geographical area as the mobile device such that the device can
+	  detect and communicate with a cell of that network. And that the network can
+	  offer, at a minimum, restricted communication service to the mobile device.
+	</P>
+
+	<P>
+	  <STRONG>Current network</STRONG> refers to the mobile network service provider that the
+	  mobile device is currently registered with. That is, the network the mobile
+	  device is receiving communications through.
+	</P>
+
+
+	<P>
+	  <STRONG>Home network</STRONG> is the network the mobile device has a subscription of service
+	  with.
+	</P>
+
+  </BODY>
+</HTML>

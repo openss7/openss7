@@ -1,0 +1,1527 @@
+<HTML>
+<HEAD>
+<TITLE>
+<!--  JTAPI Media -->  S.410: ECTF Media Services
+package overview
+</TITLE>
+<!-- 
+/*
+ * ECTF S.410-R2 Source code distribution.
+ *
+ * Copyright (c) 2002, Enterprise Computer Telephony Forum (ECTF),
+ * All Rights Reserved.
+ *
+ * Use and redistribution of this file is subject to a License.
+ * For terms and conditions see: javax/telephony/media/LICENSE.HTML
+ * 
+ * In short, you can use this source code if you keep and display
+ * the ECTF Copyright and the License conditions. The code is supplied
+ * "AS IS" and ECTF disclaims all warranties and liability.
+ */
+ -->
+</HEAD>
+<BODY>
+<p>The
+<!--  JTAPI Media package --> ECTF S.410 API
+   defines the MediaService and Resource APIs for utilizing 
+   the media streams of calls. 
+
+<!--  JTAPI Media --> The ECTF S.410 API
+
+is suitable for applications doing <i>content</i> processing,
+independent of the call setup, signalling and routing.
+For example, this API is designed to simplify applications that implement
+interactive voice response (IVR) systems,
+auto-attendant or <i>robotic</i> agents (versus <i>live</i> operators),
+voice mail, speech recognition, text-to-speech, fax, integrated messaging, etc.
+</P>
+
+<H1>1. Introduction</H1>
+
+<P>
+<!--  JTAPI Media --> The ECTF S.410 API (also called 'JTAPI Media')
+
+is an optional package of the Java Telephony API (JTAPI).
+It is related to, and interoperates with, the core JTAPI package and other
+JTAPI extension packages.
+
+<!--  JTAPI Media --> The ECTF S.410 API
+
+is a Java language expression of the ECTF media services API
+and Architecture. It is related to the ECTF S.100 C language API that
+preceded the Java version historically.</P>
+
+<P>The ECTF architecture defines a framework for system services that may be
+used by media applications. The ECTF architecture includes services for
+managing media resources and calls as well as APIs for directly manipulating
+media resources and calls.</P>
+
+<P>The design of JTAPI Media permits applications that are providing a
+"media only" service to use high-level, framework-supplied services for call management.
+Such applications do not need to use any of the JTAPI core or call control methods.</p>
+
+<p>More complex applications <i>can</i> use the full range of JTAPI core and extension
+package APIs. Methods are provided to allow applications to integrate media
+services with other JTAPI packages in a smooth and natural manner.</P>
+
+<P>The following subsections explain the ECTF architecture and how it
+relates to JTAPI and the JTAPI Media package.</P>
+
+<P><b>Note:</b> This version of JTAPI Media API replaces the Media package
+defined in JTAPI-1.2. All classes in the JTAPI-1.2 release of the Media
+package were deprecated in the JTAPI-1.3 release. The new media package is
+defined to ensure there are no namespace overlaps allowing the coexistence
+of both packages for a transition period.</P>
+
+<h2>1.1 The ECTF media service architecture:</h2>
+
+<P>The ECTF architecture allows the separation of media applications and the
+services for media processing from the applications and services for call
+processing. The ECTF architecture includes many services: </P>
+
+<UL>
+<LI>a central broker for shared media processing resources (DSP or otherwise), </LI>
+<LI>management of the local switch fabric (to interconnect the media streams of calls and DSP resources), </LI>
+<LI>a file storage subsystem (for prompts and recordings), </LI>
+<LI>a service to manage call processing (making, answering, and dispatching calls), and </LI>
+<LI>other services to manage installation, configuration, registration and administration of hardware and software modules.</LI></UL>
+
+<P>JTAPI Media is compatible with the ECTF architecture, and incorporates
+the ECTF concepts of Groups, Resources and the System Call Router. However,
+JTAPI Media does not expose all the ECTF architectural components. The
+following diagram shows the relationship between the ECTF architecture and
+JTAPI/JTAPI Media.</P>
+
+<A NAME="Figure1">
+<P ALIGN="CENTER">
+<IMG SRC="doc-files/Figure1.gif" WIDTH=405 HEIGHT=332>
+</P>
+<B><P ALIGN="CENTER">Figure 1</P></B>
+</A>
+
+<P>The ECTF architecture defines additional components and interfaces which
+may be used when implementing the APIs. 
+The ECTF "Architecture Framework Whitepaper" contains additional information. 
+It can be downloaded from:
+<A HREF="http://www.ectf.org/pages/pubdocs/arch_fr.pdf">
+http://www.ectf.org/pages/pubdocs/arch_fr.pdf
+</A>
+</P>
+
+<h4> Simplifies applications </h4>
+<p>
+The key feature of this architecture is that detailed call control
+and network line signalling can be handled <i>outside</i> of the
+media service application.  Which has several benefits:
+<ul><li>
+Application are smaller, easier to write, media/content developer
+is not required to understand network signalling protocols
+<li></li>
+The choice of networks that are supported, and the effort
+to support them is managed in the server/platform.
+<li></li>
+Applications can run on any network device supported by the server.
+<li></li>
+Since applications do not write device management or resource sharing,
+applications do not create conflicting frameworks to control shared resources.
+</li></ul>
+</p>
+<P>From a media application's point of view, there is one module (an
+application or suite of applications) that manages call flow. Shown in the
+diagram as the SCR (System Call Router), that module is chartered with
+detecting inbound calls, doing call type discrimination, managing call
+progress signaling, routing the call to the appropriate destination, and
+generally managing the overall life-cycle of the call. That call management
+service is developed using the usual techniques for call processing; in
+particular, the service may be implemented using JTAPI call control. The
+implementation of the call management services may be large/complex or
+simple/basic, depending on the requirements of the deployment
+environment.</P>
+
+<h4> Applies to large or small systems </h4>
+<P>In an enterprise call center, the central call management functionality
+is part of the underlying ACD or call center management application;
+ultimately calls are directed to agents or queues. In such an environment,
+some of the "agents" may be "robotic agents". That is, the queue or terminal
+to which a call is directed may be handled by a media service application
+implemented using JTAPI Media (or ECTF-S.100). These robotic agents may
+query the caller for an account number, or query the caller for the type of
+service required, play or record a message, or attempt to entertain/annoy
+the caller in some other way.</P>
+
+<P>In a desktop, terminal, or appliance scenario, where multiple
+applications or functional modules cooperate to use a single
+line/connection, the "central call management functionality" is implemented
+by the platform service that manages the line protocol, does call type
+discrimination, and routes calls to various modules to process voice, fax or
+other types of calls. That is, for a single resource (the telephony device or modem)
+to be shared by multiple, independent applications, some platform service
+must be responsble for managing the shared resource.
+The manager is associated with the nature of the <i>device</i> and owns
+and controls its initiation and maintenance, but allows other applications
+to provide content or services for that device.
+<p>
+The manager is the "traffic cop" responsible for routing calls to the
+correct service application.
+For example, fax calls may be routed to a module that enables the fax modem
+and captures the incoming fax in a message store. Data calls may be routed
+to a module that configures IP/PPP/HDLC and implements the platform's IP
+subsystem. Voice calls may be routed to a module that alerts the user, waits
+for a "user gesture" that indicates "answer it, I want to talk", answers
+the call, attaches the local speaker and microphone, and waits for further
+input from the user. </P>
+
+<h4> Enable independent services to share resources </h4>
+
+<P>The intention of this architecture is to enable each media service (voice
+recording, fax transmission, etc.) to be composed independently and then
+integrated with the other services. Each service may rely on the fact that
+basic call control, call type discrimination, line and resource allocation,
+and the flow of calls between applications will be handled by some framework
+component outside the application. However, the application may take
+explicit control using the other capabilities such as the JTAPI core or
+extension packages. The JTAPI <I>MediaService</I> interface defines the
+interface between an application and the call and resource management
+components of the framework. </P>
+
+<P>Because applications delegate these responsibilities to the framework,
+they can easily be integrated into a variety of framework implementations
+and with each other. This is similar to the way graphic "component"
+applications delegate their size and placement to containing applications or
+display managers. If each application is allowed, encouraged or required to
+perform these services, conflicts will arise when multiple applications are
+integrated.
+</P>
+
+<h4> Simple view of "call control" </h4>
+<P>In this model, the media service object (either in a terminal or as a
+robotic service agent) sees a very narrow view of "call control".
+The basic loop is to: </P>
+
+<OL> 
+<LI> Signal readiness to handle a call.</LI>
+ <UL>
+ <LI> wait for a call to be directed to the application.</LI>
+ </UL>
+<LI> Attach the resources necessary to process the data stream.</LI>
+ <UL>
+ <LI> modem, voice coders, signal detectors, 
+ data communications protocol stacks, etc,</LI>
+ </UL>
+<LI> Process the call.</LI>
+ <UL>
+ <LI> send/receive voice, tones, data blocks, etc. </LI>
+ <LI> query/update databases  </LI>
+ <LI> store/retrieve messages </LI>
+ </UL>
+<LI> Transfer or release the call.  </LI>
+ <UL>
+ <LI> with appropriate annotations to indicate the results of the
+ interaction.  </LI>
+ </UL>
+</OL>
+
+<h2>1.2 The JTAPI interfaces and framework:</h2>
+
+<P>In JTAPI Media, the application interacts primarily with the
+BasicMediaService class. With reference to <A HREF="#Figure1">Figure&nbsp;1</A>,
+the methods of BasicMediaService can be divided into three categories,
+reflecting the target of the method:</P>
+
+<UL>
+<LI>Bind and Release methods, directed to the System Call Router </LI>
+<LI>Generic media group methods, directed to the MediaGroup object </LI>
+<LI>Resource specific methods, directed to the Resource object (via the MediaGroup)</LI>
+</UL>
+
+<P>The bind and release methods and the generic media group methods are
+defined and documented in the MediaService interface. BasicMediaService
+extends that to include the interfaces for the defined (<I>standard</I>)
+resources. The framework is designed to be extensible, and allows additional
+Resources to be added, in which case BasicMediaService can be specialized or
+extended to include the additional resource interfaces.</P>
+
+<P>BasicMediaService is defined as a class so that application developers
+can directly create or extend the class to define their own service
+implementations. As a class, BasicMediaService allows the supplier of a
+javax.telephony.media package to easily control access to and the
+implementation of any underlying components. For example, many
+implementations of the JTAPI Media interfaces want to ensure that resources
+are not susceptible to abuse from malicious, failing or merely misinformed
+applications. BasicMediaService provides a level of indirection between the
+application and the actual implementation classes. Presenting
+BasicMediaService as a class and using the <i>bind/release</i> concept to
+access media resources also avoids the problems of stale handles or
+"dangling references" to MediaGroups or Resources which the application can no
+longer use.
+</P><P>
+The bind and release methods warrant a few definitions and additional
+explanation:</P>
+
+<h4> Bind and Release overview</h4>
+
+<P>A <I>MediaTerminal</I> extends the JTAPI Terminal interface indicating
+that the Terminal is capable of providing media streams for computer/DSP
+processing. The media streams can be connected to various <I>Resources</I>
+that generate or consume the stream content. The collection of Resources
+attached to a MediaTerminal constitutes a <I>MediaGroup</I> object.</P>
+<P>
+When a call is directed to a MediaTerminal, the SCR that manages that
+Terminal determines which application will initially control that 
+MediaTerminal.  The MediaTerminal streams are connected to a MediaGroup
+(containing Resources as specified in the application's ConfigSpec),
+and that MediaGroup is <i>bound</i> to the application's MediaService object.
+<p>
+While it is <i>bound</i>, methods invoked on the MediaService are forwarded
+to the MediaGroup.
+<p>
+When the call is directed away from the MediaTerminal (by transfer or disconnect),
+the application retains the MediaService object, but it is
+<i>released</i> (or unbound) from the MediaGroup.
+The framework can immediately reuse the MediaTerminal, the MediaGroup and
+any Resources without interference from the previously bound application.
+</P>
+<P>The JTAPI Media API is mainly concerned with how an application handles
+the media processing once the call is connected to a MediaTerminal. The
+JTAPI Media API expects and relies on the other JTAPI packages to make
+connections to MediaTerminals and otherwise manage the routing of calls.</P>
+
+<h4> Modular components </h4>
+<P>The JTAPI Media API is designed to aid and enhance the development of
+simple, modular applications that provide media services for telephony
+users. This philosophy of modularization makes JTAPI Media well suited as
+the basis for creating JavaBeans that represent specific media treatments
+for calls. GUI/RAD/IDE developers may create drag-and-drop Beans
+representing services as simple as getting a caller's account number, to a
+full-scale auto-attendant and voice-mail system.</P>
+
+<A NAME="_Section1_3"><!--  --></A>
+<h2>1.3 Creating a new media service</h2>
+
+<P>An application developer can easily create a new service by extending the
+class <tt>BasicMediaService</tt> and writing simple, synchronous code to
+define the service. As explained above, the details of recognizing a call
+and delivering it to the application can be delegated to the framework.
+The new media service can then be developed into a JavaBean for easy inclusion
+in GUI or RAD application builders.</P>
+
+<A NAME="_Section1_3_1"><!--  --></A>
+<h3>1.3.1 <A HREF="doc-files/HelloWorld.java">HelloWorld</A> Example</h3>
+
+<P>For example, this media service receives a call
+and plays the contents of the file "Hello": </P>
+<PRE>import javax.telephony.media.*;
+public class HelloWorld extends BasicMediaService {
+    public static void main(String[] argv) {
+        new HelloWorld().run();
+    }
+    /** Wait for calls to be delivered to "HelloWorld",
+     *  and say "Hello" to the caller.
+     */
+    public void run() {
+        try {
+            bindToServiceName(ConfigSpec.basic, "HelloWorld");
+            play("Hello", 0, null, null);
+            release();
+        } catch (Exception ex) {
+            System.err.println(ex);
+        }
+    }
+}</PRE>
+
+<P>Note that since the application extends the BasicMediaService class, all
+the media methods are directly available to it. Its <tt>main()</tt> simply creates a
+HelloWorld object and calls the <tt>run()</tt> method on it. This method waits for an
+incoming call (using <tt>bindToServiceName</tt>), plays a phrase, releases the
+MediaGroup and associated Resources, and then returns.</P>
+
+<h1>2. Design Goals of JTAPI Media</h1>
+
+<P>This API and system architecture is designed for multi-vendor
+applications and shared resource scenarios in an enterprise
+environment. This necessitates certain assumptions, features and services
+that are not required for single-user, personal applications.</P>
+
+<P>However, JTAPI Media <I>can</I> be effectively deployed and used on
+single-user desktop systems. By moving commonly required features and
+services out of the application and into the platform framework, JTAPI Media
+allows application development and integration to be correspondingly easier
+and more robust. </P>
+
+<P>The major characteristics, assumptions, and design points of the API are
+as follows:</P>
+
+<h2>2.1 Managed Telephony Framework</h2>
+
+<P>This API is designed for applications that operate within a managed
+framework for call processing. For example, </P>
+
+<UL>
+<LI>an enterprise customer service/call center, </LI>
+<LI>a dial-up information service provider, </LI>
+<LI>a mobile telephony base station, </LI>
+<LI>a mobile telephony terminal, </LI>
+<LI>a public network "voice dialer", </LI>
+<LI>a LAN-Fax server, </LI></UL>
+
+<P>and many others.</P>
+
+<h2>2.2 Centralized Call Management</h2>
+
+<P>The ECTF architecture defines an environment in which call processing is
+managed and centralized. In such an environment, media service applications
+are written to assume that call processing is delegated to a system service
+(the diagram in section 1.1) that handles:</P>
+
+<UL>
+<LI>call progress, </LI>
+<LI>call-type discrimination, </LI>
+<LI>CLID, ANI and DID processing, </LI>
+<LI>routing of inbound calls to various applications or agents, </LI>
+<LI>making outbound calls, including least-cost routing,
+glare detection and resolution, predictive dialing, etc.</LI></UL>
+
+<P>
+Note that the "central control" can be as extensive as a million dollar call
+canter manager, or as small as a simple scheme to share access to the radio
+link of a cell phone.
+</P>
+
+<P>In a JTAPI environment, this system service is built on the JTAPI Core
+and extension packages.</P>
+
+<h2>2.3 Multi-Vendor Applications</h2>
+
+<P>The client applications may be written/developed by different software
+vendors, and integrated into the enterprise/server framework by some
+administrative agency. At issue is providing enough of the common framework
+components (for resource management and call control) so that all
+application vendors do not attempt to create their own (probably
+incompatible) frameworks.</P>
+
+<P>Currently, this means that the API encourages a view of application and
+system architecture where all applications follow common
+conventions/protocols for binding and releasing calls, requesting and
+releasing media/DSP resources.</P>
+
+<P>An example is a call routing application that provides the caller an
+option to jump to the voice mail application. The voice mail application
+might be provided by a different vendor than the site-specific routing
+application. Ultimately, the ECTF architecture will ensure (encourage) that
+applications look enough alike that they can be installed and managed
+homogeneously.</P>
+
+<h2>2.4 Distributed Architecture</h2>
+
+<P>This API is designed to allow distribution of the applications and
+implementation across processes and or networks. The implementation may
+contain servers that contain and manage the telephony and DSP equipment used
+by a plurality of client applications. Therefore, the API is designed to
+allow the delegation of transactions and services to the server to avoid
+lots of low level network traffic. Fine-grain operations are also possible
+and useful for non-distributed applications where network or processor
+latencies are not an issue. </P>
+
+<P>The transactions and services are defined to enhance the experience of
+the remote/telephonic user, primarily by reducing the latency that would be
+otherwise introduced if all events and reactions must transit from the
+resource provider/server to the application and back to the server. Such
+timing issues are typically <I>not</I> an issue for single user and single
+line (desktop) systems, but when scaling to hundreds of lines and multiple
+applications it becomes desirable or necessary to download the common user
+interaction logic to the server and potentially to the line interface board.</P>
+
+<P>Several examples are as follows:</P>
+<OL>
+<LI>Prompts for DTMF ("touch tone") input are normally terminated as soon as
+the caller presses the first DTMF digit of the input sequence. A delay of
+several hundred milliseconds in stopping the prompt playback is a known
+caller irritant and may cause the caller to question whether the input was
+received successfully. The responsibility to stop the prompt on input can
+therefore be delegated to the server to eliminate any network delays. </LI>
+
+<LI>Delivering a collection of phrases to the server to be played as a unit
+eliminates any potential delays between the phrases. </LI>
+
+<LI>Using DTMF to change the volume of an ongoing play may be delegated by
+the client to the server (and possibly handled by some on-board embedded
+processor), resulting in improved system responsiveness and simplified
+application code.</LI></OL>
+
+<P>All of this notwithstanding, the client application is empowered to get
+all events, and insert itself into the flow of control.</P>
+
+<h2>2.5 Multi-Language Environment</h2>
+
+<P>The client applications may be written/developed in different programming
+languages. In particular, a server for JTAPI Media applications may also be
+supporting ECTF S.100 C language applications. Furthermore, a Java
+application may need to invoke an application for a call that is written in
+another API and these applications may need to share data. This requires
+that certain data and control structures be represented in a form compatible
+with other applications in other languages.</P>
+
+<h2>2.6 Extensible Media Resources</h2>
+
+<P>The set of media Resource interfaces is extensible. Vendors of hardware
+or software for processing the media streams of calls may define new types
+of resource services. This means the API must be structured to allow server
+vendors or component vendors to extend the API. At this time, the Player,
+Recorder, SignalDetector, SignalGenerator and ASR are included. We expect the
+FAX Resource to be defined in a future release of JTAPI Media.</P> 
+
+<P>Other non-ECTF defined APIs such as the Java Speech and media APIs may be
+utilized in the creation of Media Resources and in future these APIs may
+become more closely related to JTAPI Media.</P>
+
+<h2>2.7 Asynchronous provider framework</h2>
+
+<P>The internal interactions between a client and its server (behind the
+MediaService) are designed to be asynchronous. This reflects the
+asynchronous nature of telephony signaling, the realities of network
+latencies, and a parsimonious use of state and threads on the client.</P>
+
+<h2>2.8 Synchronous (Blocking) API</h2>
+
+<P>Even though many media servers implement an asynchronous model in the
+low-level interfaces, and even in their API, the multithreaded nature of
+Java make a synchronous programming model the most natural for the majority
+of media applications. A synchronous API is simple, easy to understand, and
+easy to use for the majority of applications. In cases where simultaneous
+activity must be controlled by the application, threads allow a way to do
+this within the synchronous model. </P>
+
+<P>The use of a synchronous media model is generally consistent with the
+JTAPI model, where any method can potentially block waiting for activity to
+complete or waiting on communication over the network. In JTAPI non-media
+packages, only events that are of long and indeterminate delay because they
+correspond to user actions or network activity are represented by
+asynchronous events. JTAPI Media likewise provides asynchronous events for
+these types of events.</P>
+
+<P>The MediaService interface and the BasicMediaService class that
+implements that interface therefore present a synchronous interface to the
+application. That is, each method/request waits for completion before
+returning to the application thread. </P>
+
+<h2>2.9 Asynchronous API</h2>
+
+<P>Some applications and some developers work best with a non-blocking
+and/or event driven application model. This may in some cases provide a
+greater degree of efficiency and scalability. For those applications and
+developers, an asynchronous API is included in JTAPI Media Release-1.4
+(S.410 Revision-2). </P>
+
+<h2>2.10 Reference Implementation for Provider implementors</h2>
+
+<P>A significant amount of the API implementation can be common among many
+vendors, even though the lower levels of the implementation may vary
+radically. JTAPI Media Release-1.4 (ECTF S.410 Revision-2) includes the 
+<a href="provider/package-summary.html">
+<tt>javax.telephony.media.provider</tt></a> package which implements
+most of the JTAPI Media framework.  A Media Provider's Interface (MPI)
+is defined to allow platform developers to plug in their own
+implementation of the <tt>GroupProvider</tt> and <tt>MediaGroup</tt> objects.
+Using the provider package reference implementation ensures that the
+basic semantics of binding and event delivery are implemented consistantly
+by various MediaService provider impelemtations.
+</p><p>
+<b>Note:</b> the actual values for Symbols are not exposed to application
+developers and are not defined in this specification. However,
+for interoperability ECTF defines the complete set of Symbols
+for S.410 and S.100.  Provider implementors are advised to get
+the current Symbol definitions before deploying a Provider.
+</p>
+<p>
+For further information, potential implementors are advised to contact the
+JSR-043 Spec Lead or
+the JTAPI Media development community,
+at <a href="mailto:ectf-tgjmedia@ectf.org">
+<tt>ectf-tgjmedia@ectf.org</tt></a>. 
+</P>
+
+<A NAME="_Section3"><!--  --></A>
+<h1>3. JTAPI Media interfaces and classes</h1>
+
+<P>JTAPI Media defines classes for communicating information from
+application to the server/provider, interfaces for controlling media
+resources, an interface for controlling access to calls and their media
+streams and an implementation class that provides the basis for simple,
+synchronous control of the above interfaces.</P>
+
+<P>The JTAPI Media architecture separates the framework control and
+management interfaces from the extensible set of media resource
+interfaces. The following overview of the interfaces and classes will first
+describe the framework interfaces (how to get access to a call's media
+stream, and define the resources or protocols to be used on those streams)
+and then describe the particular set resource interfaces defined in this
+release of JTAPI Media.</P>
+
+<P>The basic model of operation in JTAPI Media is to:</P>
+<OL>
+<LI>Get access to a Terminal's data stream(s)</LI>
+<LI>Configure the resources necessary to operate on that stream
+    (the DSP operations or packet protocols to be used)</LI>
+<LI>Perform the media operations (read/write, listen/talk on the stream)</LI>
+<LI>[Re-configure as necessary, goto step 2]</LI>
+<LI>Release the stream and associated resource from this application
+(passing the call to another agent or application for further processing
+ or passing the call back to the framework for termination processing)</LI>
+</OL>
+
+<P>
+The interface and methods for steps 1, 2, 4, 5 are defined 
+in the MediaService interface.
+</P><P>
+The interfaces and methods for step 3 are defined by the Resource interfaces.
+</P><P>
+An application can also listen for various events, as described in the
+MediaServiceListener Interface. There are separate Listener interfaces for
+the different resources, which are defined in the Listener interface
+for each Resource.
+</P>
+
+<A NAME="_Section3_1"><!--  --></A>
+<h2>3.1 Framework Interfaces and classes</h2>
+
+<P>
+These <A HREF="package-tree.html">classes and interfaces</A> define the
+intrinsic framework of JTAPI Media applications.
+</P>
+<p>
+Section 3.1.1 describes the basic synchronous (or <i>blocking</i>) 
+methods for MediaService.
+
+The <a href="async/package-summary.html">async package</a>
+defines asynchronous (or <i>non-blocking</i>) versions for all these methods.
+The asynchronous programming interface is described in 
+<a href="#_Section3_4">Section 3.4</a>.
+</p>
+
+<A NAME="_Section3_1_1"><!--  --></A>
+<h3>3.1.1 Interface MediaService</h3>
+
+<P>The MediaService interface defines methods for getting access to a call's
+media stream. In JTAPI nomenclature, getting access to a media stream is
+defined as:<I> binding this MediaService object to a collection of media
+processing resources</I>. The resources are associated with a Terminal and
+the resources process the media streams of the Connection that is active at
+that Terminal. There are several "bind" methods that differ in how they
+select the Terminal:</P>
+
+<UL>
+<LI><tt>void bindToServiceName(ConfigSpec configSpec, String serviceName)</tt> <BR>
+Wait for a call to be directed to the specified serviceName and then bind this MediaService to a MediaTerminal connected to that Call. </LI>
+<LI><tt>void bindAndConnect(ConfigSpec configSpec, String origAddr, String dialDigits)</tt> <BR>
+create an out-bound Call to dialDigits, connect it to a MediaTerminal and bind this MediaService to that MediaTerminal. </LI>
+<LI><tt>Connection bindToCall(ConfigSpec configSpec, Call call)</tt> <BR>
+create a new Connection from an existing Call to some MediaTerminal and bind this MediaService to that MediaTerminal. </LI>
+<LI><tt>void bindToTerminal(ConfigSpec configSpec, Terminal terminal)</tt> <BR>
+bind this MediaService to the specified Terminal. This provides media access to any Call or Connection active on that Terminal. </LI>
+<LI><tt>void bindToTerminalName(ConfigSpec configSpec, String terminalName)</tt><BR>
+bind this MediaService to the terminal specified by an implementation-specific terminalName string. This differs from bindToTerminal() in that it may be used where the underlying framework does not support a JTAPI provider or provide access to JTAPI Terminal objects.</LI></UL>
+
+<P>Each of the <I>bind</I> methods includes a ConfigSpec that indicates the <I>initial</I> configuration of resources that the application requires. A call will not be delivered to a MediaService unless the required resources are available. The application can change the configuration using:</P>
+
+<UL>
+<LI><tt>void configure(ConfigSpec configSpec)</tt><BR>
+request a new configuration of resources on the stream.</LI></UL>
+
+<P>There are two basic methods for releasing ownership of a call:</P>
+
+<UL>
+<LI><tt>void release()</tt><BR>
+Release the binding between this MediaService and the MediaTerminal
+to which it is bound, indicating that this MediaService
+has no further interest in servicing the call.
+The expectation is that some other entity will determine the fate
+of the call. If no other MediaService is bound to this MediaTerminal
+then the provider implemetation typically disconnects the call
+and makes the MediaTerminal available for new calls.
+</LI>
+
+<LI><tt>void releaseToService(String disposition, int timeout)</tt><BR>
+
+Release the binding between this MediaService and the MediaTerminal
+to which it is bound, with the expectation that the Call and Connection on
+that MediaTerminal will be processed by some other MediaService,
+as determined by the specified <tt>disposition</tt>.
+If no application is available to handle the MediaTerminal
+within timeout milliseconds, an Exception is thrown and the current
+MediaService continues to own the call.  </LI></UL>
+<p>
+When <a href="#_Section3_5">Delegation</a> is being used,
+other forms of release may be useful:
+<ul>
+<li>
+<tt>void releaseToDestroy()</tt><br>
+Release with an indication that the call is or should be disconnected.
+</li>
+<li>
+<tt>void releaseToTag(String returnTag)</tt><br>
+The most general form of release, this MediaService is unbound
+from the MediaTerminal and control reverts to the previously
+bound MediaService that expressed interest in handling the 
+specified <tt>returnTag</tt>.
+</li>
+<li>
+<tt>void releaseDelegated()</tt><br>
+<b>See:</b>  <a href="Delegation.html#releaseDelegated()">Delegation</a>
+</li>
+</ul>
+
+<P>A ConfigSpec may allow several alternatives in the configuration of the
+MediaGroup: choices of resources and parameters or attributes associated
+with the MediaGroup or the various resources. To determine which resources
+are <I>actually</I> configured and their current parameter/attribute
+settings, one may use:</P>
+
+<UL>
+<LI><tt>ConfigSpec getConfiguration()</tt><BR>
+Return a description of the current MediaGroup configuration.</LI></UL>
+
+<P>To directly get or set the parameters of the resources use:</P>
+
+<UL>
+<LI><tt>Dictionary getParameters(Symbol[] parameterSymbols)</tt><BR>
+Get the values for the indicated parameters. </LI>
+<LI><tt>void setParameters(Dictionary parameterDictionary)</tt><BR>
+Set the values for the indicated parameters.</LI></UL>
+
+<P>Applications can access the currently bound Terminal, and thereby
+get access to the associated call control objects, such as the JTAPI
+TerminalConnection, Connection, and Call objects.</P>
+
+<UL>
+<LI><tt>String GetTerminalName()</tt><BR>
+Return an installation-specific String that identifies the Terminal to which
+the MediaService is bound.</LI>
+
+<LI><tt>Terminal getTerminal()</tt><BR>
+Return the JTAPI Terminal currently bound to the MediaService, 
+<i>if</i> the MediaService is associated with a JTAPI Provider. </LI>
+</UL>
+
+<h4>3.1.1.1 Miscellaneous and ancillary MediaService methods:</h4>
+
+<P>For the benefit of applications that cooperate on serial processing of a
+call, the MediaGroup object associated with a Terminal may be annotated with
+arbitrary information in a "UserDictionary". The framework may also populate
+the UserDictionary with various items of interest (CallingNumber,
+CalledNumber, etc.) before delivering the call to an application. Methods
+are supplied to get/set the values in the UserDictionary:</P>
+
+<UL>
+<LI><tt>Dictionary getUserValues(Symbol[] keys)</tt> </LI>
+<LI><tt>void setUserDictionary(Dictionay dictionary)</tt> </LI>
+<LI><tt>void setUserValues(Dictionary dictionary)</tt></LI></UL>
+
+<P>When handling Exceptions, it is sometimes useful to determine if the MediaService is still bound:</P>
+
+<UL>
+<LI><tt>boolean isBound()</tt><br>
+Returns <tt>true</tt> if this MediaService is bound</LI></UL>
+
+<P>Most MediaService methods are defined as synchronous or blocking methods,
+they return when the operation has completed (or throw an Exception if the
+operation fails). There are a few miscellaneous methods to allow another
+thread to interrupt the synchronous methods:</P>
+
+<UL>
+<LI><tt>void cancelBindRequest()</tt><BR>
+cause the outstanding bind or release request on this MediaService to fail, throwing BindCancelledException </LI>
+<LI><tt>void stop()</tt><BR>
+Stop any media resource methods on this MediaService. </LI>
+</UL>
+
+
+<h3>3.1.2 Interface MediaEvent and Its Descendants</h3>
+
+<P>Events are represented by objects of type MediaEvent which are
+implemented by a vendor-supplied class that extends
+java.util.EventObject. Each event contains an event ID that defines the
+particular event and a MediaService object that is the source of the
+event. Specializations of MediaEvent contain additional fields and
+associated access methods as defined by the Resource that generates that
+event.
+<b>Note:</b> the <i>provider</i> package contains reference implementations
+of all the events defined for JTAPI Media.</P>
+
+<P>MediaEvents are used in two ways: they indicate the outcome
+of a MediaService or Resource method invocation, in which case 
+they are referred to as a "transaction completion event"; 
+alternatively they indicate some asynchronous user action, 
+in which case they are referred to as a "non-transactional event".</P>
+
+<P>Non-transactional events are delivered via the MediaListener interfaces
+defined for the MediaService and Resource classes. There are only a few of
+these and many applications will find that they do not need these events. 
+In some cases, similar information is available from a synchronous completion
+event. They are available for those applications that find it necessary or
+convenient to use them.</P>
+
+<P>The basic JTAPI Media interface, as represented by BasicMediaService,
+presents all MediaService and Resource methods as synchronous/blocking
+methods. Therefore, transactional events are delivered as the return value
+of each resource method invocation. The completion event contains additional
+information about how, when or why the transaction completed. 
+If a transaction fails, then an Exception is thrown, and that Exception will
+contain information on how, when, why the transaction failed. </P>
+
+<A NAME="_Section3_1_3"><!--  --></A>
+<h3>3.1.3 Interface MediaListener and its Descendants</h3>
+
+<P>The JTAPI Media synchronous API defines Listener interfaces for
+non-transactional resource events such as Connection disconnected, signal
+detected, pattern detected, and RTC actions triggered by the user.</P>
+
+<P>There is one Listener interface for the MediaService events, and
+additional listener interfaces for events generated by each resource. 
+A listener may have multiple methods, each providing a callback for a
+particular event or group of events. 
+All of these listener interfaces extend from the MediaListener interface.</P>
+
+<P>The MediaService interface defines <tt>addMediaListener()</tt> and
+<tt>removeMediaListener()</tt> methods which add/remove a MediaListener.
+The Listener object that is added may implement any or all of the defined
+MediaListener interfaces. Each event generated by a BasicMediaService is
+dispatched to all the added MediaListeners which implement the Listener
+interface for that event. </P>
+
+<P>Listeners may be added to a MediaService before it is bound, and the
+listeners are not removed because of binds, releases, or
+reconfigurations. If a particular resource is not configured into a
+MediaService, then that MediaService does not generate or dispatch the
+associated events. Note: most resources include the <tt>p_EnabledEvents</tt>
+parameter that controls which events are generated by the resource.</P>
+
+<UL>
+<LI><tt>void addMediaListener(MediaListener listener)</tt>
+<BR>add a listener, which may implement one or more MediaListener interfaces, 
+to the MediaService.</LI>
+<LI><tt>void removeMediaListener(MediaListener listener)</tt>
+<BR>remove a listener from the MediaService</LI></UL>
+
+<P>
+
+
+
+Applications using the synchronous MediaService do not need Listeners
+to handle Transaction completion events.
+Transaction completion events are <I>not</I> sent to Listeners; 
+they are returned directly to the invoking method as the return value.
+</P>
+<P>The Listeners defined for JTAPI Media and the callbacks they define are:</P>
+<UL>
+
+<LI>MediaServiceListener
+<UL>
+<LI><tt>void onDisconnected(MediaEvent event)</tt><BR>
+    The Connection to this MediaTerminal is disconnected. </LI>
+<LI><tt>void onConnected(MediaEvent event)</tt><BR>
+    The Connection to this MediaTerminal is connected. </LI>
+</UL>
+</LI>
+
+<LI>PlayerListener
+<UL>
+<LI><tt>void onPause(PlayerEvent event)</tt> </LI>
+<LI><tt>void onResume(PlayerEvent event)</tt> </LI>
+<LI><tt>void onJump(PlayerEvent event)</tt> </LI>
+<LI><tt>void onSpeedChange(PlayerEvent event)</tt> </LI>
+<LI><tt>void onVolumeChange(PlayerEvent event)</tt> </LI>
+<LI><tt>void onMarker(PlayerEvent event)</tt> </LI>
+</UL>
+</LI>
+
+<LI>RecorderListener
+<UL>
+<LI><tt>void onPause(RecorderEvent event)</tt> </LI>
+<LI><tt>void onResume(RecorderEvent event)</tt> </LI>
+</UL>
+</LI>
+
+<LI>SignalDetectorListener
+<UL>
+<LI><tt>void onSignalDetected(SignalDetectorEvent event)</tt> </LI>
+<LI><tt>void onPatternMatched(SignalDetectorEvent event)</tt> </LI>
+<LI><tt>void onOverflow(SignalDetectorEvent event)</tt></LI>
+</UL>
+</LI>
+
+<LI>ASRListener
+
+<UL>
+<LI><tt>void onRecognitionStarted(ASREvent event)</tt> </LI>
+<LI><tt>void onValidUtterance(ASREvent event)</tt> </LI>
+<LI><tt>void onInvalidUtterance(ASREvent event)</tt> </LI>
+<LI><tt>void onIntermediateResultsReady(ASREvent event)</tt> </LI>
+</UL>
+</LI>
+
+</UL>
+
+<h3>3.1.4 Class MediaException and MediaRuntimeException</h3>
+
+<P>When a media operation fails, an Exception is generated. Applications may
+reliably assume that if a synchronous method returns, the operation
+completed normally; if there is an error then an Exception is thrown.</P>
+
+<P>Media Exceptions derive from two classes: MediaRuntimeException is the
+root for all RuntimeExceptions that are defined for the Media
+package. MediaException is the root for the remaining exceptions. Note that
+the Java compiler does not require that RuntimeExceptions be declared or
+caught within the lexical scope where they are thrown. </P>
+<P>MediaException has three subclasses:</P>
+
+<UL>
+<LI><tt>MediaServiceException</tt> represents those Exceptions that are
+thrown by methods in the MediaService interface. These are the methods that
+are not associated with a particular Resource. MediaServiceException has two
+subclasses: MediaBindException and MediaConfigException. </LI>
+
+<LI><tt>MediaResourceException</tt> is used for all exceptions thrown by
+resource methods. A MediaResourceException contains a ResourceEvent (for
+example, a PlayerEvent) that fully describes the failure. The application
+uses the ResourceEvent methods to extract the failure cause and other
+details. </LI>
+
+<LI><tt>MediaCallException</tt> represents call control exceptions that may
+be caught by any of the MediaService methods that do internal call
+control. For example, the bindAndConnect method could encounter failures in
+the createCall() and connect() methods. A MediaCallException contains a
+string description of the exception.</LI></UL>
+
+
+<h3>3.1.5 Class ConfigSpec and ResourceSpec</h3>
+
+<P>These ConfigSpec and ResourceSpec are "struct" classes that the
+application uses to define the resource configuration required. </P>
+
+<P>Each class contains final static members that contain useful pre-defined
+configurations. There are predefined ConfigSpecs and ResourceSpecs for
+commonly used configurations, and the application can define its own
+specifications as well.</P>
+
+<h3>3.1.6 Class RTC </h3>
+
+<P>RTC is a "struct" class for defining Run Time Controls
+(Condition-&gt;Action pairs). RTCs effect or control the processing or
+termination of a resource method. Several commonly used runtime controls are
+pre-defined as static final members of Class RTC. An example is
+<tt>RTC.SigDet_StopPlay</tt>, which allows the SignalDetector to stop the
+Player when a DTMF digit is detected.</P>
+
+<h3>3.1.7 Class BasicMediaService</h3>
+
+<P>This class implements the MediaService interface methods and all the
+standard Resource interfaces. This provides the application a convenient
+mechanism to invoke any of the resource methods. BasicMediaService
+implements the binding of a MediaGroup and the delegation of resource
+methods to the bound MediaGroup.</P>
+
+<P>BasicMediaService is primarily an aggregation of other interfaces, the
+only new or interesting methods it supplies are its constructors; the other
+methods of BasicMediaService are documented in the MediaService or Resource
+interfaces.</P>
+
+<P>This class may be used as a base class and specialized by application
+developers, which provides the convenience of referring to its methods
+without qualifying them with the BasicMediaService object name.</P>
+
+<A NAME="_Section3_2"><!--  --></a>
+<h2>3.2 ECTF Resource interfaces</h2>
+<h3>3.2.1 Player</h3>
+
+<P>Play a sequence of pre-recorded media data object (MDO) files.</P>
+<P>Numerous Coders are defined and a Player can switch coders for each MDO
+as necessary. The Player includes options for pause and resume, changing
+volume or speed, and jumping forward or backward within the stream.</P>
+<p>
+<ul>Basic method:
+<li>
+<tt>play(String streamID, int offset, RTC[] rtcs, Dictionary optargs);</tt>
+</li></ul>
+</p>
+
+<h3>3.2.2 Recorder</h3>
+
+<P>Records to an MDO file. </P>
+<P>Numerous Coders are defined. The Recorder includes options for pausing and resuming, playing an initial beep, and silence suppression.</P>
+<p>
+<ul>Basic method:
+<li><tt>record(String streamID, RTC[] rtcs, Dictionary optargs);</tt></li></ul>
+</p>
+
+<h3>3.2.3 SignalGenerator</h3>
+
+<P>Generates and sends DTMF (and possibly other) signals.</P>
+<p>
+<ul>Basic methods:
+<li><tt>sendSignals(String signals, RTC[] rtcs, Dictionary optargs);</tt></li>
+<li><tt>sendSignals(Symbol[] signals, RTC[] rtcs, Dictionary optargs);</tt></li>
+</ul>
+</p>
+
+<h3>3.2.4 SignalDetector</h3>
+
+<P>Detects DTMF signals and application defined patterns of
+signals. Detected signals and patterns can use used to control other
+(play and record) operations using RTCs (run time controls).</P>
+<p>
+<ul>Basic method:
+<li>
+<tt>retrieveSignals(int numSignals, Symbol[] patterns, RTC[] rtcs, Dictionary optargs);</tt>
+</li></ul>
+</p>
+
+<h3>3.2.5 ASR (Automatic Speech Recognition)</h3>
+<P>
+Recognizes spoken words in both discreet and continuous speech.
+</P>
+<p>
+<ul>Basic method:
+<li><tt>recognize(RTC[] rtcs, Dictionary optargs);</tt></li></ul>
+</p>
+
+<h3>3.2.6 TTS (Text To Speech)</h3>
+
+<P>The TTS interface is an extension of the Player resource, 
+because TTS is considered as a <i>coder</i> in which speech
+is encoded as text. The additional methods for TTS are used
+to load and activate particular pronounciation dictionaries.
+</P>
+<ul>Basic methods:
+<li><tt>loadTTSDictionary(String[] dictNames, Dictionary optargs)</tt></li>
+<li><tt>activateTTSDictionary(String[] dictNames, Dictionary optargs)</tt></li>
+<li><tt>deactivateTTSDictionary(String dictNames[], Dictionary optargs)</tt></li>
+<li><tt>unloadTTSDictionary(String dictNames[], Dictionary optargs)</tt></li>
+</ul>
+
+<h3>3.2.7 FAX</h3>
+
+<P>A resource to send and receive FAXes. 
+This is not included in the current JTAPI Media release (due to release timing), 
+but is defined by ECTF and is expected in the next release of JTAPI Media.
+Expect simple methods for <tt>faxSend(String MDO)</tt> and <tt>faxReceive(String MDO)</tt>.
+</P>
+
+<h3>3.2.8 Conference Resource</h3>
+<p>
+In most cases, conference creation can be managed by an associated
+call control API.  If the media package is used to <i>implement</i>
+the conferencing function inside the call control platform then
+the application needs to use a conference Resource directly.
+The MediaConnection interface can be used to connect between a
+MediaService with a CPR (Conference Port Resource) and other MediaServices.
+To configure a Conference Resource into a MediaService, the ConfigSpec
+should use <tt>ESymbol.CPR_ResourceClass</tt> and associated signals.</p>
+<p>
+In this version of the media package there is no API (no <i>methods</i>)
+for the conference resource, but some parameters and attributes are defined
+for CPR in the ECTF framework. 
+As with Fax, expect this to be more easily accessible in the next release.
+</p>
+
+<h3>3.2.9 Data modem</h3>
+
+<P>A data communications or modem resource has not been specified by ECTF.
+When a modem resource is configured to a stream, the data communications are
+managed by the platform's internal data communications framework, for
+example, the IP subsystem, or RAS subsystem. Therefore a "modem resource"
+interface may exist as way to associate a Terminal with the data
+communications framework, but would not have any interesting methods. </P>
+
+<h2>3.3 Naming Conventions for Symbols and Constants</h2>
+
+<P>JTAPI Media defines a large number of constants for events, parameters,
+attributes, and so on. 
+A naming convention for Symbol fields allows developers to easily
+recognize how a particular constant or Symbol is used.
+Each resource interface or other class that defines a significant
+number of constant Symbols inherits those definitions from its
+<I>Resource</I>Constants interface. This allows several interfaces to share
+the same constants, makes it easy to reference the constants, and ensures
+that the method definitions are not lost in the documentation of the
+constants.</P>
+
+<P>Constants have a prefix that identifies their usage as follows:</P>
+<table border="1" cellpadding="3">
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">Prefix:</TD>
+<TD VALIGN="TOP">
+<P>refers to:</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">a_</TD>
+<TD VALIGN="TOP">
+<P>Attributes (used in ConfigSpecs)</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">p_</TD>
+<TD VALIGN="TOP">
+<P>Parameters</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">v_</TD>
+<TD VALIGN="TOP">
+<P>Enumerated values for a parameter or attribute </TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">ev_</TD>
+<TD VALIGN="TOP">
+<P>Event IDs</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">q_</TD>
+<TD VALIGN="TOP">
+<P>Qualifier codes (providing additional information about a normal completion)</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">e_</TD>
+<TD VALIGN="TOP">
+<P>Error codes (additional information about failure to complete)</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">rtcc_</TD>
+<TD VALIGN="TOP">
+<P>RTC conditions (events that can trigger a Run Time Control)</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<P ALIGN="RIGHT">rtca_</TD>
+<TD VALIGN="TOP">
+<P>RTC actions (actions that can be triggered by a Run Time Control)</TD>
+</TR>
+</TABLE>
+
+<P>Because each Resource extends its <I>Resource</I>Constants interface, it
+is easy to reference a constant as a field of that interface, or any
+instance of that interface. This code snippet shows an example:</P>
+<P>
+<pre>
+    PlayerEvent pev = play("phrase", null, null, null);
+    if (pev.getQualifier() == pev.q_RTC) {
+        if (pev.getRTCTrigger() == SignalDetector.rtcc_SignalDetected)
+</pre>
+<P>Here the qualifier in a PlayerEvent (returned by the play method)
+is compared to the constant <tt>q_RTC</tt> 
+(a particular qualifier that indicates a method was terminated by a RTC). 
+The constant <tt>q_RTC</tt> is defined in the ResourceConstants interface, 
+which is extended by ResourceEvent, which is extended by PlayerEvent. 
+Thus it can be referenced as <tt>pev.q_RTC</tt>,
+<tt>PlayerEvent.q_RTC</tt>, <tt>ResourceEvent.q_RTC</tt>, 
+or <tt>ResourceConstants.q_RTC</tt>.
+</P>
+
+<A NAME="_Section3_4"><!--  --></a>
+<h2>3.4 Asynchronous Interface Package</h2>
+
+The <a href="async/package-summary.html">
+<tt>javax.telephony.media.async</tt></a> package defines interfaces with
+methods, events and listeners for asynchronous (non-blocking) operations.
+</p><p>
+The asynchronous method definitions are derived directly from
+the synchronous method definitions. 
+For each synchronous method, the asynchronous method is 
+prepended with "<tt>async_</tt>" 
+and has exactly the same argument list.
+That is:
+<ul><li>
+<tt>SomeReturnType methodName(arglist)</tt> becomes
+</li><li>
+<tt>Async.Event async_methodName(arglist)</tt>
+</li></ul>
+</p><p>
+The return type from an asynchronous method is some <tt>Async.Event</tt>, 
+specialized as necessary to contain any return values.
+<tt>Async.Event</tt> extends the basic MediaEvent, 
+adding a few methods for synchronization:
+<ul>
+<li><tt>boolean isDone();            // checks if this event is done</tt></li>
+<li><tt>void waitForEventDone();     // wait until this event is done</tt></li>
+</ul>
+</p><p>
+The synchronous MediaService methods described 
+(in Sections <a href="#_Section3_1_1">3.1</a> and <a href="#_Section3_2">3.2</a>)
+<i>block</i> waiting until the Async.Event is done.  
+An event <i>is done</i> when the transaction is complete and the 
+return values from the operation have been stored in the event.  
+When the event is done, the synchronous MediaService methods
+return the value of interest as extracted from the event 
+(or return <tt>void</tt>, if there is no interesting value).
+The synchronous Resource methods return the event itself;
+the event acts like a multiple-value return structure.
+</p><p>
+In contrast, asychronous methods immediately and directly 
+return the <tt>Async.Event</tt> object. The application has limited access 
+to the fields of the event until the event is done.  Two event 
+fields from MediaEvent are always (or immediately) accessible: 
+the EventID and the Event source (a MediaService). 
+The methods <tt>getEventID()</tt> and <tt>getSource()</tt> 
+(or the equivalent <tt>getMediaService()</tt>) return these values.
+The other fields of an event are not accessible until the event
+is done.   
+</p><p>
+An application can synchronize with an event (wait for it to be done)
+in four ways:
+<ol>
+<li>Invoke the <tt>waitForEventDone()</tt> method directly. 
+    The <tt>waitForEventDone()</tt> method blocks until the event is done, 
+    and then returns. <br>
+    [the invoking Thread is blocked using <tt>Thread.wait()</tt> and is
+     released by <tt>notifyAll()</tt> when the event is done.]</li>
+<li>Invoke an event accessor 
+    (other than <tt>getEventID</tt> or <tt>getMediaService</tt>).
+    All event accessors internally call <tt>waitForEventDone()</tt> before
+    extracting values from the event.</li>
+<li>Invoke the event method <tt>isDone()</tt> to effect a "polling" test.
+    <tt>isDone()</tt> returns <tt>false</tt> if <tt>waitForEventDone()</tt> 
+    would block. <br>
+    [internally <tt>waitForEventDone()</tt> blocks until <tt>isDone()</tt>
+     returns <tt>true</tt>.]</li>
+<li>Establish a Listener for the event of interest. 
+    The listener callback is invoked when the event is done.</li>
+</ol>
+Note that synchronous tranasction methods generate and use asynchronous
+events internally, and those events are <i>also</i> delivered to the listeners.
+Note also that the event objects returned from synchronous Resource
+methods are guaranteed to be <i>done</i> when the method returns.
+Furthermore, the synchronous API guarantees that all listeners
+have been notified before the method returns.
+Internally, the synchronous methods call <tt>waitForListenersDone()</tt>,
+which waits until the event is done, and the Listeners have run.
+<ul>
+<li><tt>void waitForListenersDone(); // wait until event and Listeners are done</tt></li>
+</ul>
+</p><p>
+As always, the order in which listeners are invoked is indeterminate.
+</p>
+<h3>3.4.1 Interface Async.MediaService</h3>
+<a href="#_Section3_1">Section 3.1</a> describes 
+the basic MediaService methods in the simple synchronous API.  
+The asynchronous MediaService method definitions are derived from
+the synchronous method definitions as described <a href="#_Section3_4">above</a>. 
+<p>
+Tranaction completion events are delivered 
+to an <tt>Async.BindAndReleaseListener</tt> (for Bind and Release methods) or 
+to an <tt>Async.MediaGroupListener</tt> (for the MediaGroup methods).
+</P>
+<h3>3.4.2 Asynchronous Resource Interfaces</h3>
+<p>
+Each Resource has an asynchronous interface, named Async_<i>Resource</i>.
+For example, the asynchronous interface for the <tt>Player</tt> resource
+is named <tt>Async_Player</tt>.
+</p><p>
+Asynchronous Resource methods are named as above.
+The method signatures are identical.
+The return types are <tt>Async_<i>Resource</i>Event</tt>.
+For example, 
+<ul><li>
+<tt>PlayerEvent play(...)</tt> becomes
+</li><li>
+<tt>Async_PlayerEvent async_play(...)</tt> 
+</li></ul>
+</p><p>
+If there is an error, then <tt>event.getError()</tt> is non-null.
+Transactional Exceptions are stored in the Async.Event, not thrown.
+The Exception points back to the ResourceEvent:
+<tt>resourceEvent.getException().getResourceEvent()</tt> 
+returns a <tt>resourceEvent</tt> that describes the cause of the
+error: <tt>getError()</tt>.
+</p><p>
+Completion events are delivered to Async_<i>Resource</i>Listener.
+The callback method in the asychronous Listener 
+for the completion of a resource <i>methodName</i>
+is typically are named <tt>on<i>MethodName</i>Done</tt>.
+For example, when <tt>Player.play(...)</tt> completes, the event 
+is delivered to <tt>onPlayDone(PlayerEvent event)</tt>
+</p>
+
+<a name="_Section3_5"><!--  --></a>
+<h2>3.5 Delegation Interface</h2>
+<p>
+The <a href="Delegation.html">
+Delegation</a> interface allows an application to pass control 
+of the media processing to another MediaService and then regain control.
+<p>
+The Delegation interface is <i>optional</i>.
+Application or development tools extend BasicMediaService 
+to include and implement the methods of the Delegation interface.
+</p><p>
+<ul>Basic methods: <li>
+<tt>delegateToService(String serviceName, int timeout, String catchTags);</tt>
+</li> <li>
+<tt>releaseToTag(String returnTag)</tt>
+</li></ul>
+
+<tt>delegateToService(...)</tt> gives control of
+a MediaGroup to another media service. 
+The original owner can simply wait for the MediaGroup to be returned
+(the normal completion of <tt>delegateToService()</tt>)
+or can unilaterally <tt>retrieve()</tt> the MediaGroup.
+</p><p>
+<tt>releaseToTag(String returnTag)</tt> returns the MediaGroup from the
+this media service to [one of] the previous owner.
+</p><p>
+The Delegation interface follows the conventions for the Bind and Release
+methods of the MediaService interface. Asynchronous methods, events,
+and listeners follow the same conventions.
+</p>
+
+<h1>4. Relationship to other APIs</h1>
+<h2>4.1 Relationship to JTAPI</h2>
+
+<p>JTAPI Media defines a MediaServices API that is largely independent
+of the Call objects and call control events defined in the core JTAPI.
+Indeed, JTAPI Media applications <i>can</i> be written without 
+using the rest of JTAPI. However, JTAPI Media is written to
+strongly integrate with JTAPI when both are available from a 
+platform provider. </p>
+<p>From the JTAPI point of view, the media package is an optional package 
+that extends the capabilities of the Provider, Call, and Terminal
+to enable applications to write portable and cooperative applications
+for handling the media content of JTAPI Calls and Connections.
+<p>
+The JTAPI landscape with the JTAPI Media pacakge:
+<table border="1" cellpadding="3">
+<TR>
+<TD VALIGN="TOP"><P ALIGN="CENTER">Package/Interface:</TD>
+<TD VALIGN="TOP"><P ALIGN="CENTER">Usage:</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<tt>Core,&nbsp;CallControl,&nbsp;CallCenter,<BR>
+Call,&nbsp;Address,&nbsp;Connection,&nbsp;etc.</tt></TD>
+<TD VALIGN="TOP">
+Application monitors and controls 
+the signalling (answer, make call, hang up)
+and routing (transfer, consult, retrieve, etc.)
+of Calls.
+</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<tt>phone/PhoneTerminal</tt></TD>
+<TD VALIGN="TOP">
+Application monitors and controls a 
+telephone Terminal device (light lamps, monitor buttons, etc.),
+from <I>outside</I> the Terminal
+.</TD>
+</TR>
+<TR><TD VALIGN="TOP">
+<tt>media/MediaService</tt></TD>
+<TD VALIGN="TOP">
+Application monitors and controls
+the media streams of a Terminal
+(play audio data, detect tones and voice input, etc.),
+from <I>within</I> the Terminal.</TD>
+</TR>
+</TABLE>
+<p>
+Developers who are intimately familiar with JTAPI core and call control 
+will find that some conventions are different within the Media package:
+</p>
+<h4>Model differences in the Media package</h4>
+The media package differs from other JTAPI and JTAPI extension packages:
+</P>
+
+<UL>
+<LI>JTAPI Media defines a set of interfaces that are orthogonal to the Call
+and call control objects in the JTAPI core. Previous JTAPI extensions
+focused on call control and naturally extended the core objects; JTAPI media
+breaks new ground, with new objects to address the needs of media
+applications. </LI>
+
+<LI>JTAPI Media uses the Listener interface for events rather than the
+Observer interface used by JTAPI-1.2. 
+In JTAPI-1.3 the JTAPI core also uses Event Listeners, 
+and JTAPI-1.4 extends that pattern to the other package.
+It is expected that the next major release of JTAPI
+(JTAPI-2.0) will support only the Listener pattern. 
+</LI>
+
+<LI>The capabilities mechanism is not used in JTAPI Media. 
+Instead, Resource interfaces are considered as solid contracts. If a
+component declares that it implements Player, then it is expected to
+implement Player. The resource interfaces are therefore defined to include
+the common, minimum functionality. Where there are standard extensions to
+that functionality, these are represented as "feature set" and identified
+and selected using attributes during the configuration process. For resource
+extensions that are not covered by the standards, as well as new types of
+resources, JTAPI Media is easily extended to include new Resource interfaces.
+</LI></UL>
+
+<h4> Style/Pattern differences in the Media package</h4>
+<P>There are also several stylistic differences from core JTAPI that are
+based on JTAPI Media's ties to S.100 and to that fact that it addresses a
+different domain than the call control portions of the API.</P>
+
+<UL>
+<LI>Constant names: The names of various constants contain a prefix (a_,
+ev_, p_, etc.) to identify their usage. The public fields of all JTAPI Media
+objects and interfaces are final static constants, the truly "variable"
+fields are accessed by get/set methods. All the field names listed in the
+Javadoc produced manual pages are constants. </LI>
+
+<LI>Event packages: Event interfaces are defined in the same package as the
+associated object or resource, rather than in a sub-package as done in the
+JTAPI packages that use the Observer model. The EventListener model requires
+only a few distinct event classes, so the motivation to create a package and
+directory for events is not relevant. </LI>
+
+<LI>Event Hierarchy: JTAPI Media uses an event hierarchy similar to Core
+JTAPI. The root of the JTAPI Media event hierarchy (<tt>MediaEvent</tt>) does not,
+however, extend the JTAPI <tt>event.Ev</tt> interface.  This is because the
+EventListener model (used by the Media package) expect Events to extend from
+<tt>java.util.EventObject</tt>. </LI>
+
+<LI>Interfaces vs. classes: The JTAPI core API defines most of the
+functionality in terms of pure interfaces that are implemented by the
+JtapiPeer vendor. The only classes defined are the JtapiPeerFactory and the
+Exception classes (Java requires that exceptions be concrete classes
+extended from <tt>java.lang.Exception</tt>). JTAPI Media follows the same
+basic approach, but supplies additional class implementations. Three such
+classes (<tt>ConfigSpec</tt>, <tt>ResourceSpec</tt>, <tt>RTC</tt>) define
+additional datatypes used to communicate between the application and the
+service provider. The classes provide structured objects, instead of relying
+solely on the Java primitive types or util classes. The other class defined
+in JTAPI Media is <tt>BasicMediaService</tt>, which provides a base class which
+applications may extend for creating and using the MediaService
+interface. This base class ensures that applications use a common internal
+interface to communicate with vendor supplied implementation objects, and
+allows the bind/release/handoff operations to work correctly. </LI>
+
+<LI>Class code, javax deployment, and reference implementations: 
+JTAPI Media, the API, is defined by the Javadoc generated specification. 
+The <tt>'provider'</tt> package is a reference implementation of JTAPI Media
+with an open interface (the MPI) to map to particular platforms.
+Given the realities of creating and 
+shipping a javax extension package, these files are obviously only 
+advisory in nature, but using the provider package implementation
+encourages consistency in the interpretation and implementation of the API.
+</LI>
+</UL>
+
+<P>JTAPI Media is defined to work with the JTAPI core package and is
+published as part of JTAPI. The JTAPI Media usage of the EventListener
+model is compatible with the Listener usage in JTAPI. </P>
+
+<P>JTAPI Media does not to duplicate the call control functionality of
+JTAPI, but there are a few cases where the functionality required for a
+media application necessitates providing a "higher level" interface to call
+control functionality. These cases are as follows:</P>
+
+<UL>
+<LI>It is generally desirable that the development of an application and the
+administration of it are handled separately. For example, the system
+administrator, not the application developer, makes the determination of
+what criteria (ANI, DNIS, port, etc.) are used to select the application to
+be run. This is done in the ECTF architecture by defining a system call
+routing service, driven by administrative data, that routes an incoming call
+to a particular application. To allow calls to be handled by one application
+and then <I>handed off</I> to another independent application, the system
+call router generally gives the call to an application already answered, and
+handles the disposition of an active call. It determines whether the call
+should be transferred to another application (or agent or queue or
+extension) or disconnected. Thus a typical IVR application does not need to
+listen for calls on particular ports, deal with DNIS and ANI, or answer or
+hang up the calls. Of course, an application can always use the full range
+of JTAPI functionality if it needs to supersede, extend or implement the
+call-processing framework. </LI>
+
+<LI>One of the challenges of originating outgoing calls in a
+multi-application environment is to properly handle the race condition that
+occurs when an application or system seizes a 2-way facility for an outgoing
+call just as an incoming call arrives. When the system recognizes this
+glare, it must back off and handle the incoming call, and retry another
+facility for the outgoing call. This is best done by a system-wide function
+that has a view of all the possible applications. To address this, JTAPI
+Media provides a "bindAndConnect" method that deals with these issues. This
+method is so named because it incorporates the functionality of
+Call.connect().</LI></UL>
+
+
+<h3>4.1.1 Using JTAPI Call Control capabilities with JTAPI Media</h3>
+
+<P>Many media service applications can define their functionality by using
+and extending the BasicMediaService class, and allowing the underlying
+implementation to manage the creation of Calls and Connections and the
+assignment of Terminals. However, the JTAPI Media <B><I>bind</I></B> methods
+(described in <A HREF="#_Section3_1_1">3.1.1 Interface MediaService</A>)
+allow an application to get a Call or Terminal instance using JTAPI directly
+and then bind to that Call or Terminal.</P> <P>No matter which bind method
+was used, the media service application can access the underlying JTAPI call
+objects using the MediaService getTerminal() method. From the Terminal, the
+application can access the other associated call control objects, and use
+the associated JTAPI methods to monitor or manipulate the call.</P>
+
+<h3>4.1.2 Example using JTAPI and JTAPI Media</h3>
+
+<P><A HREF="#_Section5_2">Section 5.2 FollowMe:</A> presents a JTAPI Media
+application that does detailed or complex call control. The application is a
+"find me" application; when an incoming call is delivered to it, the
+application tries to reach the desired party, and then if successful,
+connects the two parties. </P>
+
+<h2>4.2 Relationship to ECTF</h2>
+<h3>4.2.1 S.100</h3>
+
+<P>As a Java language expression of the ECTF architecture, JTAPI Media
+closely parallels the functionality provided by the C- language ECTF S.100
+API. Since it is imbedded in JTAPI, which provides mechanisms for
+conferencing, switching and configuration of network resources, JTAPI Media
+does not include some of the S.100 resources that provide this
+functionality. Support for some other S.100 resources (e.g. FAX) is not
+provided in the current release of JTAPI, but can be handled by vendor
+extensions and is expected to be added in a subsequent release.</P>
+
+<h3>4.2.2 Basis for ECTF Media Object Model (S.400).</h3>
+
+<P>The ECTF has a goal of defining a objected-oriented specification
+referred to as S.400, that is independent of the particular language and
+call control interface. JTAPI Media lays the groundwork for this
+effort. That specification, though separate from JTAPI Media, will draw
+heavily from the JTAPI Media work and the two specifications are expected to
+be compatible.</P>
+
+<h2>4.3 Relationship to CSTA</h2>
+
+<P>The JTAPI is generally modeled after and consistent with ECMA's CSTA
+specification for CTI services. The CSTA <i>AttachMedia</i> functionality,
+used to associate media resources with a call, is implemented in the JTAPI
+Media <tt>bindToCall()</tt> method.</P>
+
+<P>The Desktop CSTA example application (see: <A HREF="#_Section5_3">Section
+5.3 InCall:</A>) illustrates how the Incall sample from JTAPI Core is
+modified to automatically add a Recorder resource that will record both
+sides of the conversation when the call is answered.</P>
+
+<h1>5. Example Applications</h1>
+
+<A NAME="_Section5_1"><!--  --></a>
+<h2>5.1 <A HREF="doc-files/AnswerPhone.java">AnswerPhone</A>: An answering machine service</h2>
+
+
+<P>This an example of a media service that implements an answering machine,
+demonstrating using SignalDetector RTC to provide user controls for volume,
+speed, and other options. </P>
+
+<A NAME="_Section5_2"><!--  --></a>
+<h2>5.2 <A HREF="doc-files/FollowMe.java">FollowMe</A>: JTAPI call control
+with a JTAPI media service</h2>
+
+<P>This is an example that does extensive JTAPI call control, as well as
+using the JTAPI Media bind and release mechanisms for accepting incoming
+calls and handing them off to other applications, and of course playing,
+detecting digits, etc.</P>
+
+<A NAME="_Section5_3"><!--  --></a>
+<h2>5.3 <A HREF="doc-files/InCall.java">InCall</A>: Attach a media service
+to an existing Call</h2>
+
+<P>This is a simple extension of the JTAPI InCall example. This application
+demonstrates how to record a call that is not otherwise involved with IVR.</P>
+
+<!-- JTAPI Media insert this for mifdoclet:  -->
+<!--  <H1>6. API Reference</H1> -->
+
+</BODY>
+</HTML>

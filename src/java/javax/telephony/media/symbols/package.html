@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<title>
+JTAPI Media "Symbol" package (ECTF Symbols)
+</title>
+</head>
+<BODY LINK="#0000ff" VLINK="#800080">
+The <tt>symbol</tt> package contains the actual Symbol
+definitions for the ECTF Symbols. 
+Symbols are of Objects that wrap a controlled set <tt>int</tt> values.
+Symbols are similar to <tt>Integers</tt>, except they are not useful
+for arithmetic operations: Symbols are <i>nominal</i> but not <i>metric</i>.
+<p>
+The <tt>int</tt> value of a Symbol is structured to represent
+the canonical print name of that Symbol. That is, 
+a Symbol's value can be parsed into a Format, Vendor, Object and ItemName.
+The various Format classes determine how to parse the internal
+bit fields, as defined by ECTF.
+and the Stringifier class defines methods to compose printable
+names for particular Symbols.
+<p>
+This is a separate package from "javax.telephony.media" 
+because these definitions are not relevant 
+to the <i>application</i> programmer. 
+(and javadoc generates reams of useless information)
+<p>
+This is a separate package from "javax.telephony.media.provider"
+because these Symbol value definitions are invariant across 
+any an all provider implementations. Symbol values are defined and
+controlled by the ECTF and the ECTF Vendor ID registry.
+See also: 
+<a href="http://www.ectf.org/ectf/tech/vendrgty.htm">ECTF Vendor Registry</a>
+<p>
+The definitions of the symbol values and their
+canonical names are important for application portability.
+All media provider implementers must use compatible definitions.
+</p>
+</body>
+</html>
+</page>

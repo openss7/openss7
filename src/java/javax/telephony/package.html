@@ -1,0 +1,1246 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title> The Java Telephony API </title>
+<!-- Changed by: Jordan M. Slott, 18-Jan-1997 -->
+<!-- Changed by: Gary Adams - SMI Software Development,  4-May-1999 -->
+<!-- Changed by: Alexey Roytman, Marc Petit-Huguenin, Juan Bernabó, Bob Andreasen, Daniel Petrie, Rich Pennenga - JTAPI 1.4 team,  28-July-2001 -->
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<p>The Java Telephony API (JTAPI) is a portable, object-oriented
+application programming interface for Java-based
+computer-telephony applications. </p>
+
+<h1>The Java<font size="2"><sup><tt>TM</tt></sup></font>
+Telephony API </h1>
+
+<h2>Introduction </h2>
+
+<p>JTAPI serves a broad audience, from call center application
+developers to web page designers. JTAPI supports both first- and
+third-party telephony application domains. The API is designed to
+make programming simple applications easy, while providing those
+features necessary for advanced telephony applications. </p>
+
+<p>The Java Telephony API is, in fact, a set of API's. The
+&quot;core&quot; API provides the basic <em>call model</em> and
+rudimentary telephony features, such as placing telephone calls
+and answering telephone calls. The core API is surrounded by
+standard extension APIs providing functionality for specific
+telephony domains, such as call centers and media stream access.
+The JTAPI core and extension package architectures are described
+later in this document. </p>
+
+<p>Applications written using the Java Telephony API are portable
+across the various computer platforms and telephone systems.
+Implementations of JTAPI will be available for existing
+computer-telephony integration platforms such as Sun
+Microsystem's SunXTL<font size="1"><sup>TM</sup></font>,
+Microsoft and Intel's TAPI, Novell and Avaya's TSAPI, and IBM's
+CallPath. Additionally, independent hardware vendors may choose
+to provide implementations of the Java Telephony API on top of
+their own proprietary hardware. </p>
+
+<p><br>
+</p>
+
+<h3>Overview Document Organization </h3>
+
+<p>This document is organized into the following sections: </p>
+
+<table border="0" cellpadding="2" width="100%">
+    <tr>
+        <td width="20%"><a href="#FEATURES">Java Telephony API
+        Features</a> </td>
+        <td width="80%">Describes the features of JTAPI and the
+        principles on which it was designed. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#CONFIGURATIONS">Supported
+        Configurations</a> </td>
+        <td width="80%">Summarizes the environments in which
+        JTAPI may be used and the computer and software
+        configurations for which it was designed. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#ARCHITECTURE">Java Telephony
+        Package Architecture</a> </td>
+        <td width="80%">Summarizes how the Java Telephony API is
+        organized into various Java language packages. A brief
+        description accompanies each package along with links to
+        more detailed documentation. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#CALLMODEL">The Java Telephony
+        Call Model</a> </td>
+        <td width="80%">Describes how telephone calls and
+        different objects that make up telephone calls are
+        represented in this API. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#COREMETHODS">Core Package
+        Methods</a> </td>
+        <td width="80%">Provides a brief summary of the key
+        methods available in the core package which perform the
+        most basic telephony operations, such as placing a
+        telephone call, answering a telephone call, and
+        disconnecting a connection to a telephone call. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#CONNECTIONSTATES">Connection
+        Object States</a> </td>
+        <td width="80%">Describes the states in which the
+        Connection object can exist. It provides a description of
+        the allowable transitions from each state. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#TERMINALCONNECTIONSTATES">TerminalConnection
+        Object States</a> </td>
+        <td width="80%">Describes the states in which the
+        TerminalConnection object can exist. It provides a
+        description of the allowable transitions from each state.
+        </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#PLACINGCALL">Placing a
+        Telephone Call</a> </td>
+        <td width="80%">One of the most common features used in
+        any telephony API is placing a telephone call. This
+        section describes the JTAPI method invocations required
+        to place a telephone call, and examines state changes in
+        the call model. This analysis will explain how calls are
+        placed, answered, and terminated. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#EVENTDELIVERY">The Java Telephony
+        Event Delivery Model</a> </td>
+        <td width="80%">Describes the JTAPI event delivery model
+        - the Listener model (formerly the Observer model).
+        Applications use listeners for asynchronous notification
+        of changes in the state of the JTAPI call model.</td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#EXAMPLES">Application Code
+        Examples</a> </td>
+        <td width="80%">Provides two real-life code examples
+        using the Java Telephony API. One example places a
+        telephone call to a specified telephone number. The other
+        example shows a designated Terminal answering an incoming
+        telephone call. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#PROVIDER">Locating and
+        Obtaining Providers</a> </td>
+        <td width="80%">Describes the manner in which
+        applications create and obtain JTAPI Provider objects. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="#SECURITY">Security</a> </td>
+        <td width="80%">Summarizes the JTAPI security strategy. </td>
+    </tr>
+</table>
+
+<h3>History of the Java Telephony API </h3>
+
+<p>The Java Telephony API specification represents the combined
+efforts of design teams from Sun Microsystems, Avaya, Nortel,
+Novell, Intel, and IBM, operating under the direction of JavaSoft
+on versions 1.0 and 1.1, and teams from Sun Microsystems, Avaya,
+Nortel, IBM, Siemens, and Dialogic, working within the Enterprise
+Computer Telephony Forum on version 1.2.</p>
+
+<p>Major contributors to the ECTF experts group for release 1.3 were 
+Nortel, Dialogic, Nokia, Avaya and IBM;
+major contributors to release 1.4 effort were
+Avaya, Dialogic, IBM, Netergy Networks,
+Pingtel and OpenComm do Brasil Ltda.</p>
+
+<p>The Java Telephony API version 1.0 specification was released
+to the public on November 1, 1996. Version 1.1 was released to
+the public on February 1, 1997; version 1.2 was released to the
+public in December 1997; version 1.3 was released for early
+access on April 7, 1999., and its final public release was on
+July 23, 1999; version 1.4 was released for public review on June
+18, 2001, and the final release is expected in Sept of 2001.</p>
+
+<table border="1" align="center">
+<tr>
+<th>
+Release
+</th>
+<th>
+Early Release Date
+</th>
+<th>
+Final Public Release Date
+</th>
+</tr>
+
+<tr><td>
+1.0
+</td><td>
+</td><td>
+November 1 1996
+</td></tr>
+
+<tr><td>
+1.1
+</td><td>
+</td><td>
+February 1, 1997
+</td></tr>
+
+<tr><td>
+1.2
+</td><td>
+</td><td>
+December 1997
+</td></tr>
+
+<tr><td>
+1.3
+</td><td>
+April 7, 1999
+</td><td>
+July 23, 1999
+</td></tr>
+
+<tr><td>
+1.4
+</td><td>
+June 18, 2001
+</td><td>
+Sept 18, 2001
+</td></tr>
+
+</table>
+
+<h2><a name="FEATURES">Java Telephony Features</a> </h2>
+
+<p>The features and guiding design principles for the Java
+Telephony API are: </p>
+
+<ul>
+    <li>Brings simplicity to the most basic telephony
+        applications </li>
+    <li>Provides a scalable framework that spans desktop
+        applications to distributed call center telephony
+        applications </li>
+    <li>Interfaces applications directly to service providers or
+        acts as a Java interface to existing telephony APIs, such
+        as TSAPI and TAPI<font size="1"><sup>TM</sup></font> </li>
+    <li>Based on a simple core that is augmented with standard
+        extension packages </li>
+    <li>Runs on a wide range of hardware configurations, wherever
+        Java run-time can be used </li>
+</ul>
+
+<h2><a name="CONFIGURATIONS">Supported Configurations</a> </h2>
+
+<p>JTAPI runs on a variety of system configurations, including
+centralized servers with direct access to telephony resources,
+and remote network computers with access to telephony resources
+over a network. In the first configuration, a network computer is
+running the JTAPI application and is accessing telephony
+resources over a network, as illustrated in <a
+href="#NETWORKCOMPUTER">Figure 1.</a> In the second
+configuration, the application is running on a computer with its
+own telephony resources, as illustrated in <a
+href="#DESKTOPCOMPUTER">Figure 2.</a> </p>
+
+<h3><a name="NETWORKCOMPUTER">Network Computer (NC) Configuration
+</a></h3>
+
+<p>In a network configuration, the JTAPI application or Java
+applet runs on a remote workstation. This workstation can be a
+network computer with only a display, keyboard, processor, and
+some memory. It accesses network resources, making use of a
+centralized server that manages telephony resources. JTAPI
+communicates with this server via a remote communication
+mechanism, such as Java's Remote Method Invocation (RMI) or a
+telephony protocol. The following diagram shows this
+configuration. </p>
+
+<p align="center"><img src="doc-files/network.gif"
+alt="Network diagram" width="324" height="324"> </p>
+
+<p align="center"><strong>Figure 1: Network Configuration </strong></p>
+
+<h3><a name="DESKTOPCOMPUTER">Desktop Computer Configuration</a> </h3>
+
+<p>In a desktop configuration, the JTAPI application or Java
+applet runs on the same workstation that houses the telephony
+resources. The following diagram shows the desktop configuration.
+</p>
+
+<p align="center"><img src="doc-files/desktop.gif"
+alt="Desktop configuration" width="229" height="162"> </p>
+
+<p align="center"><strong>Figure 2: Desktop Configuration </strong></p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="ARCHITECTURE">Java Telephony Package Architecture </a></h2>
+
+<p>The Java Telephony API is composed of a set of Java language <em>packages.</em>
+Each package provides a specific piece of functionality for a
+certain aspect of computer-telephony applications.
+Implementations of telephony servers choose the packages they
+support, depending upon the capabilities of their underlying
+platform and hardware. Applications may query for the packages
+supported by the implementation they are currently using.
+Additionally, application developers may concern themselves with
+only the supported packages applications need to accomplish a
+task. The diagram below depicts the architecture of the JTAPI
+packages. </p>
+
+<p align="center"><img src="doc-files/packages.gif"
+alt="JTAPI package architecture" width="595" height="259"> </p>
+
+<p align="center">Figure 3: Core/Extension Package Relationship </p>
+
+<p>At the center of the Java Telephony API is the
+&quot;core&quot; package. The core package provides the basic
+framework to model telephone calls and rudimentary telephony
+features. These features include placing a telephone call,
+answering a telephone call, and disconnecting a connection to a
+telephone call. Simple telephony applications will only need to
+use the core to accomplish their tasks, and do not need to
+concern themselves with the details of other packages. For
+example, the core package permits applet designers to add
+telephone capabilities to a Web page with ease. </p>
+
+<p>A number of &quot;standard extension&quot; packages extend the
+JTAPI core package . These extension packages each bring
+additional telephony functionality to the API. Currently, the
+following extension packages exist for this API: call control,
+call center, media, phone, private data, and capabilities
+packages. Each package is summarized below in terms of the
+features it brings to JTAPI, and is linked to a separate overview
+document and specifications. </p>
+
+<p>The JTAPI package architecture is a two-way street for both
+implementations and applications. In other words, telephony
+server implementations choose which extension packages (in
+addition to the core package) they implement, based upon the
+capabilities of the underlying hardware. Applications choose the
+extension packages (in addition to the core package) they need to
+use to accomplish the desired tasks of the application.
+Applications may query the implementation for the extension
+packages the implementation supports, and the application
+developer does not need to concern himself/herself with the
+details of any packages not needed for the application. </p>
+
+<p><br>
+</p>
+
+<h3>Java Telephony Standard Extension Packages </h3>
+
+<p>Each JTAPI extension package has its own specification
+describing its extensions to the core API, and in most cases has
+its own separate overview document describing it. The chart below
+lists each extension package available, with a link to the
+individual overview document, if it exists. </p>
+
+<table border="0" cellpadding="2" width="100%">
+    <tr>
+        <td width="20%"><a
+        href="callcontrol/package-summary.html">Call Control
+        Package</a> </td>
+        <td width="80%">The <em><strong>javax.telephony.callcontrol</strong></em>
+        package extends the core package by providing more
+        advanced call-control features such as placing calls on
+        hold, transferring telephone calls, and conferencing
+        telephone calls. This package also provides a more
+        detailed state model of telephone calls. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="callcenter/package-summary.html">Call
+        Center Package</a> </td>
+        <td width="80%">The <em><strong>javax.telephony.callcenter</strong></em>
+        package provides applications the ability to perform
+        advanced features necessary for managing large call
+        centers. Examples of these advanced features include:
+        Routing, Automated Call Distribution (ACD), Predictive
+        Calling, and associating application data with telephony
+        objects. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="media/package-summary.html">Media
+        Package</a> </td>
+        <td width="80%">The <em><strong>javax.telephony.media</strong></em>
+        Package enables applications to manipulate the content of
+        the media streams associated with a telephone call.
+        Applications can easily generate and detect DTMF (and
+        other) tones, play and record prompts and messages, even
+        use Automatic Speech Recognition (ASR) and Text-to-Speech
+        technologies. </td>
+    </tr>
+    <tr>
+        <td width="20%"><a href="phone/package-summary.html">Phone
+        Package</a> </td>
+        <td width="80%">The <em><strong>javax.telephony.phone</strong></em>
+        package permits applications to control the physical
+        features of telephone hardware phone sets.
+        Implementations may describe Terminals as collections of
+        components, where each of these component-types has
+        interfaces in this package. </td>
+    </tr>
+    <tr>
+        <td width="20%">Capabilities Package </td>
+        <td width="80%">The <em><strong>javax.telephony.capabilities</strong></em>
+        package allows applications to query whether certain
+        actions may be performed. Capabilities take two forms: <em>static</em>
+        capabilities indicate whether an implementation supports
+        a feature; <em>dynamic</em> capabilities indicate whether
+        a certain action is allowable given the current state of
+        the call model. </td>
+    </tr>
+    <tr>
+        <td width="20%">Private Data Package </td>
+        <td width="80%">The <em><strong>javax.telephony.privatedata</strong></em>
+        package enables applications to communicate data directly
+        with the underlying hardware switch. This data may be
+        used to instruct the switch to perform a switch-specific
+        action. Applications may also use the package to
+        &quot;piggy-back&quot; a piece of data with a Java
+        Telephony API object. </td>
+    </tr>
+</table>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="CALLMODEL">The Java Telephony Call Model </a></h2>
+
+<p>The JTAPI <em>call model</em> consists of a half-dozen Java
+objects. These objects are defined using Java interfaces in the
+core package. Each call model object represents either a physical
+or logical entity in the telephone world. The primary purpose of
+these call model objects is to describe telephone calls and the
+endpoints involved in a telephone call. These call model objects
+are related to one another in specific ways, which are summarized
+below and described in more detail in the core package
+specification. </p>
+
+<p>The following diagram shows the JTAPI call model and the
+objects that compose the call model. A description of each object
+follow the diagram. </p>
+
+<p align="center"><img src="doc-files/cmodel.gif"
+alt="Call Model" width="468" height="504"> </p>
+
+<p align="center"><strong>Figure 4: JTAPI Call Model </strong></p>
+
+<h3>Provider Object </h3>
+
+<p>The Provider object is an abstraction of telephony
+service-provider software. The provider might manage a PBX
+connected to a server, a telephony/fax card in a desktop machine,
+or a computer networking technology, such as IP. A Provider hides
+the service-specific aspects of the telephony subsystem and
+enables Java applications and applets to interact with the
+telephony subsystem in a device-independent manner. </p>
+
+<h3>Call Object </h3>
+
+<p>The Call object represents a telephone call, the information
+flowing between the service provider and the call participants. A
+telephone call comprises a Call object and zero or more
+connections. In a two-party call scenario, a telephone call has
+one Call object and two connections. A conference call is three
+or more connections associated with one Call object. </p>
+
+<h3>Address Object </h3>
+
+<p>The Address object represents a telephone number. It is an
+abstraction for the logical endpoint of a telephone call. Note
+that this is quite distinct from a physical endpoint. In fact,
+one address may correspond to several physical endpoints (i.e.
+Terminals) </p>
+
+<h3>Connection Object </h3>
+
+<p>A Connection object models the communication link between a
+Call object and an Address object. This relationship is also
+referred to as a &quot;logical&quot; view, because it is
+concerned with the relationship between the Call and the Address
+(i.e. a logical endpoint). Connection objects may be in one of
+several states, indicating the current state of the relationship
+between the Call and the Address. These Connection states are
+summarized later. </p>
+
+<h3>Terminal Object </h3>
+
+<p>The Terminal object represents a physical device such as a
+telephone and its associated properties. Each Terminal object may
+have one or more Address Objects (telephone numbers) associated
+with it, as in the case of some office phones capable of managing
+multiple call appearances. The Terminal is also known as the
+&quot;physical&quot; endpoint of a call, because it corresponds
+to a physical piece of hardware. </p>
+
+<h3>TerminalConnection Object </h3>
+
+<p>TerminalConnection objects model the relationship between a
+Connection and the physical endpoint of a Call, which is
+represented by the Terminal object. This relationship is also
+known as the &quot;physical&quot; view of the Connection (in
+contrast to the Connection, which models the logical view). The
+TerminalConnection describes the current state of relationship
+between the Connection and a particular Terminal. The states
+associated with the TerminalConnection are described later in
+this document. </p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="COREMETHODS">Core Package Methods </a></h2>
+
+<p>The core package defines three methods to support its primary
+features: placing a telephone call, answering a telephone call,
+and disconnecting a connection to a telephone call. These methods
+are <strong>Call.connect()</strong>, <strong>TerminalConnection.answer()</strong>,
+and <strong>Connection.disconnect()</strong>, respectively. </p>
+
+<h3>Call.connect() </h3>
+
+<p>Once an application has an idle call object (obtained via <strong>Provider.createCall()</strong>),
+it may place a telephone call using the <strong>Call.connect()</strong>
+method. The application must specify the originating Terminal
+(physical endpoint) and the originating Address (logical
+endpoint) on that Terminal (in the case that a Terminal has
+multiple telephone numbers on it). It also provides the
+destination telephone number string. Two Connection objects are
+returned from the <strong>Call.connect()</strong> method,
+representing the originating and destination ends of the
+telephone call. </p>
+
+<h3>TerminalConnection.answer() </h3>
+
+<p>Applications monitor with listeners (discussed later) on
+Terminals for when incoming calls are presented. An incoming
+telephone call to a Terminal is indicated by a TerminalConnection
+to that Terminal in the RINGING state (see TerminalConnection
+states below). At that time, applications may invoke the <strong>TerminalConnection.answer()</strong>
+to answer that incoming telephone call. </p>
+
+<h3>Connection.disconnect() </h3>
+
+<p>The <strong>Connection.disconnect()</strong> method is used to
+remove an Address from the telephone call. The Connection object
+represents the relationship of that Address to the telephone
+call. Applications typically invoke this method when the
+Connection is in the CONNECTED state, resulting in the Connection
+moving to the DISCONNECTED state. In the core package,
+application may only remove entire Addresses from the Call, and
+all of the Terminals associated with that Address which are part
+of the call are removed as well. The call control extension
+package provides the ability for application to remove individual
+Terminals only from the Call. </p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="CONNECTIONSTATES">Connection Object States </a></h2>
+
+<p>A Connection object is always in a <em>state</em> that
+reflects the relationship between a Call and an Address. The
+state in which a Connection exists is not only important to the
+application for information purposes, it is always an indication
+of which methods and actions can be invoked on the Connection
+object. </p>
+
+<p>The state changes which Connection objects undergo are
+governed by rules shown below in a state transition diagram. This
+diagram guarantees to application developers the possible states
+in which the Connection object can transition given some current
+state. These state transition rules are invaluable to application
+developers. The diagram below shows the possible state
+transitions for the Connection object. Following this diagram is
+a brief summary of the meaning of each state. </p>
+
+<p align="center"><img src="doc-files/core-connectionstates.gif"
+alt="Summary of states" width="460" height="298"> </p>
+
+<p align="center">Figure 5: Connection State Transitions </p>
+
+<h3>IDLE state </h3>
+
+<p>The IDLE state is the initial state for all new Connection
+objects. Connections typically transition quickly out of the IDLE
+state into another state. A Connection in the IDLE state
+indicates that the party has just joined the telephone call in
+some form. No Core methods are valid on Connections in the IDLE
+state. </p>
+
+<h3>INPROGRESS state </h3>
+
+<p>The INPROGRESS state indicates that a telephone call is
+currently being placed to this destination endpoint. </p>
+
+<h3>ALERTING state </h3>
+
+<p>The ALERTING state indicates that the destination party of a
+telephone call is being alerted to an incoming telephone call. </p>
+
+<h3>CONNECTED state </h3>
+
+<p>The CONNECTED state indicates that a party is actively part of
+a telephone call. A Connection in the CONNECTED state implies
+that the associated party is talking to the other parties on the
+call or is connected to tone. </p>
+
+<h3>DISCONNECTED state </h3>
+
+<p>The DISCONNECTED state indicates that a party is no longer a
+part of a telephone call. No methods are valid for Connections in
+the DISCONNECTED state. </p>
+
+<h3>FAILED state </h3>
+
+<p>The FAILED state indicates that a telephone call placed to the
+endpoint has failed. For example, if an application uses
+Call.connect() to place a telephone call to a party who is busy,
+the Connection associated with the called party transitions into
+the FAILED state. </p>
+
+<h3>UNKNOWN state </h3>
+
+<p>The UNKNOWN state indicates that the Provider cannot determine
+the state of the Connection at the present time. A Connection may
+transition in and out of the UNKNOWN state at any time, unless it
+is in either the DISCONNECTED or FAILED state. The effects of the
+invocation of any method on a Connection in this state are
+unpredictable. </p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="TERMINALCONNECTIONSTATES">TerminalConnection Object
+States </a></h2>
+
+<p>The TerminalConnection object represents the relationship
+between a Terminal and a Connection. As mentioned previously,
+these objects represent a physical view of the Call, describing
+which physical Terminal endpoints are part of the telephone call.
+Similar to Connection objects, TerminalConnection objects have
+their own set of states and state transition diagram. This state
+transition diagram, with a brief description of each state
+follows. </p>
+
+<p align="center"><img
+src="doc-files/core-terminalconnectionstates.gif"
+alt="State transition diagram" width="398" height="288"> </p>
+
+<p align="center">Figure 6: TerminalConnection state transitions </p>
+
+<h3>IDLE state </h3>
+
+<p>The IDLE state is the initial state for all TerminalConnection
+objects. It has the same connotation for the Connection object's
+IDLE state. </p>
+
+<h3>ACTIVE state </h3>
+
+<p>The ACTIVE state indicates a Terminal is actively part of a
+telephone call. This often implies that the Terminal handset is
+off-hook. </p>
+
+<h3>RINGING state </h3>
+
+<p>The RINGING state indicates that a Terminal is signaling to a
+user that an incoming telephone call is present at the Terminal. </p>
+
+<h3>DROPPED state </h3>
+
+<p>The DROPPED state indicates that a Terminal was once part of a
+telephone call, but has since dropped off of that telephone call.
+The DROPPED state is the final state for all TerminalConnections.
+</p>
+
+<h3>PASSIVE state </h3>
+
+<p>The PASSIVE state indicates a Terminal is part of a telephone
+call, but not actively so. A TerminalConnection in the PASSIVE
+state indicates that a resource on the Terminal is being used by
+this telephone call. Packages providing advanced features permit
+Terminals to join calls from the PASSIVE state. </p>
+
+<h3>UNKNOWN state </h3>
+
+<p>The UNKNOWN state indicates that the Provider is unable to
+determine the current state of a TerminalConnection. It has a
+similar connotation to that of the Connection object's UNKNOWN
+state. </p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="PLACINGCALL">Placing a Telephone Call</a> </h2>
+
+<p>The past several sections have outlines the JTAPI call model,
+the essential methods in the core package, and the Connection and
+TerminalConnection states. This section ties all of this
+information together, presenting a common scenario found in most
+telephony applications. This section describes the state changes
+the entire call model typically undergoes when an application
+places a simple telephone call. Readers will come away with a
+coherent understanding of the call model changes for this simple
+example. </p>
+
+<p>The vehicle used to describe the state changes undergone by
+the call model is the diagram below. This diagram is a <em>call
+model timing diagram</em>, where changes in the various objects
+are depicted as times increases down the vertical axis. Such a
+diagram is given below describing the typical state changes after
+an application invokes the <strong>Call.connect()</strong>
+method. </p>
+
+<p align="center"><img src="doc-files/timeline.gif"
+alt="Typical state change" width="454" height="360"> </p>
+
+<p align="center">Figure 7: Call Model timing diagram </p>
+
+<p>In the diagram above, discrete time steps are denoted by
+integers down the vertical axis. Time increases down this
+axis,but the integers are not meant to indicate real (clock)
+time. </p>
+
+<p>This diagram, as a whole, represents a single telephone Call.
+In this case, the diagram represents a two-party telephone call
+(The <strong>Call.connect()</strong> method always results in a
+two-party call). The diagram may be broken into two parts: the
+left half and the right half. The left half represents the
+originating-end of the telephone call and the right half
+represents the destination-end of the telephone call. </p>
+
+<p>On the left-hand (originating) side of the diagram, the two
+vertical lines represent the originating Terminal and Address
+(which are arguments to the <strong>Call.connect()</strong>
+method) objects, as indicated on the diagram. The horizontal
+lines represent either Connection objects or TerminalConnection
+objects as marked. Note that the Connection objects are drawn in
+the inner- most regions, whereas the TerminalConnection objects
+are drawn in the outer- most regions. </p>
+
+<p>Similarly, on the right-hand (destination) side of the
+diagram, the two vertical lines represent the destination Address
+and Terminals. In this example, there are two destination
+Terminals associated with the destination Address. This
+configuration has been depicted previously in Figure 4. Note that
+since there are two Terminals, there are two TerminalConnection
+objects on the destination side. </p>
+
+<p>This diagram can be read as follows: as time passes the
+Connection and TerminalConnection objects change states. The
+appearance of a new Connection or TerminalConnection horizontal
+line corresponds to a new object of that type being created. </p>
+
+<p>In the example of placing a telephone call, we see that after
+the two Connections are created in the IDLE state, the
+originating Connection transitions to the CONNECTED state, while
+the destination Connection transitions to the INPROGRESS state.
+At that time, a TerminalConnection to the originating Terminal is
+created and transitions to the ACTIVE state. When the destination
+Connection transitions to the ALERTING state, two
+TerminalConnections are created in the RINGING state. </p>
+
+<p>At this point, a person at one of the destination Terminals
+answers the call. When this happens, that TerminalConnection
+moves to the ACTIVE state, and the other TerminalConnection moves
+to the PASSIVE state. At the same time, the destination
+Connection concurrently moves to the CONNECTED state. When the
+telephone call ends, all Connections move to the DISCONNECTED
+state, and all TerminalConnections move to the DROPPED state. </p>
+
+<p>As a final point, this document has used the terms
+&quot;logical&quot; and &quot;physical&quot; view of a telephone
+call. This diagram makes these concepts clear. An application can
+monitor the state changes of the Connection object (i.e. the
+logical view). By looking at the diagram, the reader can
+understand that these states provide a higher-level view of the
+progress of the telephone call. The TerminalConnection state
+changes represent the physical view. By monitoring the
+TerminalConnection state changes, applications can find out what
+is happening at each physical endpoint.</p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="EVENTDELIVERY">The Java Telephony Event Delivery Model </a></h2>
+
+<h3>Introduction</h3>
+
+<p>The Java Telephony API asynchronously notifies applications of
+various changes in the JTAPI call model.  These changes may include the
+state change of an object or the creation of an object.  </p>
+
+<h3>Listeners and Observers</h3>
+
+<p>Prior to JTAPI release 1.3, the Java observer/observable model was the pattern
+that JTAPI applications could follow to receive events from a JTAPI implementation
+using the JTAPI API.</p>
+
+<p>With JTAPI releases 1.3 (packages Core, Media, Mobile) and 1.4 (packages Callcontrol, Callcenter, Phone, Private),
+applications could transition to using an event delivery scheme based in spirit on
+<A HREF="http://java.sun.com/products/jdk/1.2/docs/guide/awt/designspec/events.html#919734">
+the Java 1.1 delegation-based event model</A>
+(or "Listener model").
+JTAPI releases 1.3 and 1.4 also include the Observer methods and events, but deprecate them.
+</p>
+
+<h3>Listener Interfaces and Events</h3>
+
+<p>
+An application defines an object which implements
+all the methods defined in a particular Listener interface;
+then the application may present that object
+as a Listener for that interface.
+</p>
+
+<p>The JTAPI Listener model defines <i>Listener interfaces</i>.
+It goes further to define <i>JTAPI events</i>, extended from 
+<A HREF="javax/telephony/Event.html">javax.telephony.Event</A>,
+representing a family of JTAPI call model changes.
+Finally each specific JTAPI call model change is indicated by
+a specific <i>event ID</i> (returned by the <CODE>Event.getID</CODE> method).
+</p>
+
+<p>
+For example,
+an object implementing the
+<A HREF="javax/telephony/CallListener.html">javax.telephony.CallListener</A>
+interface may expect a
+<A HREF="javax/telephony/CallEvent.html">javax.telephony.CallEvent</A>
+to carry one of the following
+<A HREF="javax/telephony/CallEvent.html#field_summary">event IDs</A>:
+<CODE>javax.telephony.CallEvent.CALL_VALID</CODE>
+(or just <CODE>CALL_VALID</CODE>),
+<CODE>CALL_INVALID</CODE> or
+<CODE>EVENT_TRANSMISSION_ENDED</CODE>.
+Each of these event IDs indicate the specific call model change which occurred.
+</p>
+
+<p>
+A Listener interface defines a set of methods which the application object must implement.
+One method is defined in the interface for each event plus event ID that may be reported
+to the application object.
+</p>
+
+<h3>Objects and Listeners</h3>
+
+<p>The Provider, Call, Terminal, and Address objects have
+Listeners. The interfaces corresponding to these listeners are
+ProviderListener, CallListener, TerminalListener, and
+AddressListener, respectively.</p>
+
+<p>The ProviderListener reports all state changes to the Provider
+object. For the core package, state changes are reported when the
+Provider changes state from OUT_OF_SERVICE, to IN_SERVICE, to
+SHUTDOWN.
+Note that an event ID, and a Listener method, is defined
+for each state change that may be reported by a JTAPI event.
+</p>
+
+<p>The Call listener reports state change information for all
+Connections and TerminalConnections that are part of the
+telephone call as well as state changes to the Call itself. These
+state changes are reported on neither the Address nor the
+Terminal listeners. </p>
+
+<p>At times, the application may want to monitor Address or
+Terminal objects for incoming telephone calls. In these
+instances, the application uses the <strong>Address.addCallListener()</strong>
+or the <strong>Terminal.addCallListener()</strong> methods. These
+methods instruct the implementation to automatically add a
+CallListener to any calls that come to an Address or Terminal.
+These CallListeners are removed once the call leaves the Address
+or Terminal. </p>
+
+<p>The Address and Terminal listeners report any state changes in
+these objects. In the core package there are no events for these
+objects. The AddressListener and TerminalListener interfaces
+still exist, however, so other packages may extend these
+interfaces. </p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="EXAMPLES">Application Code Examples </a></h2>
+
+<p>This section presents two application code examples. The first
+places a telephone call, and the second answers an incoming
+telephone call to a Terminal. </p>
+
+<p>Note that the outgoing application code example does not make
+any blocking JTAPI calls in listener code - it only examines the
+evlist it receives as a parameter - while the incoming call
+application code uses &quot;inner classes&quot;, defined in JDK<font
+size="1"><sup>TM</sup></font> 1.1, to avoid making blocking JTAPI
+calls in Listener code. </p>
+
+<p><br>
+<br>
+</p>
+
+<h3>Outgoing Telephone Call Example </h3>
+
+<p>The following code example places a telephone call using the
+core Call.connect() method. It, however, looks for the states
+provided by the Call Control package. </p>
+
+<pre>
+import javax.telephony.*;
+import javax.telephony.events.*;
+
+/*
+ * The MyOutCallObserver class implements the CallObserver
+ * interface and receives all events associated with the Call.
+ */
+ 
+public class MyOutCallObserver implements CallObserver {
+ 
+  public void callChangedEvent(CallEv[] evlist) {
+ 
+    for (int i = 0; i &lt; evlist.length; i++) {
+ 
+      if (evlist[i] instanceof ConnEv) {
+ 
+        String name = null;
+        try {
+          Connection connection = ((ConnEv)evlist[i]).getConnection();
+          Address addr = connection.getAddress();
+          name = addr.getName();
+        } catch (Exception excp) {
+          // Handle Exceptions
+        }
+        String msg = &quot;Connection to Address: &quot; + name + &quot; is &quot;;
+ 
+        if (evlist[i].getID() == ConnAlertingEv.ID) {
+          System.out.println(msg + &quot;ALERTING&quot;);
+        }
+        else if (evlist[i].getID() == ConnInProgressEv.ID) {
+          System.out.println(msg + &quot;INPROGRESS&quot;);
+        }
+        else if (evlist[i].getID() == ConnConnectedEv.ID) {
+          System.out.println(msg + &quot;CONNECTED&quot;);
+        }
+        else if (evlist[i].getID() == ConnDisconnectedEv.ID) {
+          System.out.println(msg + &quot;DISCONNECTED&quot;);
+        }
+      }  
+    }
+  }
+}
+
+
+         ------------------------------------------------------
+
+
+import javax.telephony.*;
+import javax.telephony.events.*;
+import MyOutCallObserver;
+
+
+/*
+ * Places a telephone call from 476111 to 5551212
+ */
+public class Outcall {
+ 
+  public static final void main(String args[]) {
+ 
+    /*
+     * Create a provider by first obtaining the default implementation of
+     * JTAPI and then the default provider of that implementation.
+     */
+    Provider myprovider = null;
+    try {
+      JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+      myprovider = peer.getProvider(null);
+    } catch (Exception excp) {
+      System.out.println(&quot;Can't get Provider: &quot; + excp.toString());
+      System.exit(0);
+    }
+ 
+   /*
+    * We need to get the appropriate objects associated with the
+    * originating side of the telephone call. We ask the Address for a list
+    * of Terminals on it and arbitrarily choose one.
+    */
+    Address origaddr = null;
+    Terminal origterm = null;
+    try {
+      origaddr = myprovider.getAddress(&quot;4761111&quot;);
+ 
+      /* Just get some Terminal on this Address */
+      Terminal[] terminals = origaddr.getTerminals();
+      if (terminals == null) {
+        System.out.println(&quot;No Terminals on Address.&quot;);
+        System.exit(0);
+      }  
+      origterm = terminals[0];
+    } catch (Exception excp) {
+      // Handle exceptions;
+    }
+ 
+ 
+    /*
+     * Create the telephone call object and add an observer.
+     */
+    Call mycall = null;
+    try {
+      mycall = myprovider.createCall();
+      mycall.addObserver(new MyOutCallObserver());
+    } catch (Exception excp) {
+      // Handle exceptions
+    }
+ 
+    /*
+     * Place the telephone call.
+     */
+    try {
+      Connection c[] = mycall.connect(origterm, origaddr, &quot;5551212&quot;);
+    } catch (Exception excp) {
+      // Handle all Exceptions
+    }
+  }
+}
+
+</pre>
+
+<p><br>
+<br>
+</p>
+
+<h3>Incoming Telephone Call Example </h3>
+
+<p>The following code example illustrates how an application
+answers a Call at a particular Terminal. It shows how
+applications accept calls when (and if) offered. This code
+example greatly resembles the core InCall code example. </p>
+
+<pre>
+import javax.telephony.*;
+import javax.telephony.events.*;
+
+import javax.telephony.*;
+import javax.telephony.events.*;
+
+/*
+ * The MyInCallObserver class implements the CallObserver and
+ * recieves all Call-related events.
+ */
+ 
+public class MyInCallObserver implements CallObserver {
+ 
+  public void callChangedEvent(CallEv[] evlist) {
+    TerminalConnection termconn;
+    String name;
+    for (int i = 0; i &lt; evlist.length; i++) {
+ 
+      if (evlist[i] instanceof TermConnEv) {
+        termconn = null;
+        name = null;
+ 
+        try {
+          TermConnEv tcev = (TermConnEv)evlist[i];
+          Terminal term = termconn.getTerminal();
+          termconn = tcev.getTerminalConnection();
+          name = term.getName();
+        } catch (Exception excp) {
+          // Handle exceptions.
+        }
+
+        String msg = &quot;TerminalConnection to Terminal: &quot; + name + &quot; is &quot;;
+ 
+        if (evlist[i].getID() == TermConnActiveEv.ID) {
+          System.out.println(msg + &quot;ACTIVE&quot;);
+        }
+        else if (evlist[i].getID() == TermConnRingingEv.ID) {
+          System.out.println(msg + &quot;RINGING&quot;);
+ 
+          /* Answer the telephone Call using &quot;inner class&quot; thread */
+          try {
+		final TerminalConnection _tc = termconn;
+	     	Runnable r = new Runnable() {
+		  public void run(){
+		    try{
+				_tc.answer();
+		    } catch (Exception excp){
+		      // handle answer exceptions
+		    }
+			};
+		
+		};
+		Thread T = new Thread(r);
+		T.start();
+          } catch (Exception excp) {
+            // Handle Exceptions;
+          }
+        } else if (evlist[i].getID() == TermConnDroppedEv.ID) {
+          System.out.println(msg + &quot;DROPPED&quot;);
+        }
+      }  
+    }
+  }
+}
+
+            ----------------------------------------------------
+
+import javax.telephony.*;
+import javax.telephony.events.*;
+import MyInCallObserver;
+
+/*
+ * Create a provider and monitor a particular terminal for an incoming call.
+ */
+public class Incall {
+ 
+  public static final void main(String args[]) {
+ 
+    /*
+     * Create a provider by first obtaining the default implementation of
+     * JTAPI and then the default provider of that implementation.
+     */
+    Provider myprovider = null;
+    try {
+      JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+      myprovider = peer.getProvider(null);
+    } catch (Exception excp) {
+      System.out.println(&quot;Can't get Provider: &quot; + excp.toString());
+      System.exit(0);
+    }
+ 
+    /*
+     * Get the terminal we wish to monitor and add a call observer to that
+     * Terminal. This will place a call observer on all call which come to
+     * that terminal. We are assuming that Terminals are named after some
+     * primary telephone number on them.
+     */
+    try {
+      Terminal terminal = myprovider.getTerminal(&quot;4761111&quot;);
+      terminal.addCallObserver(new MyInCallObserver());
+    } catch (Exception excp) {
+      System.out.println(&quot;Can't get Terminal: &quot; + excp.toString());
+      System.exit(0);
+  }
+  }
+}
+
+</pre>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="PROVIDER">Locating and Obtaining Providers </a></h2>
+
+<p>The Java Telephony API defines a convention by which telephony
+server implementations of JTAPI make their services available to
+applications. </p>
+
+<p>The two elements that link an application to a server are: </p>
+
+<h3>JtapiPeerFactory </h3>
+
+<p>The JtapiPeerFactory class is the first point of contact for
+an application that needs telephony services. It has the ability
+to return a named JtapiPeer object or a default JtapiPeer object.
+It is defined as a static class. </p>
+
+<h3>JtapiPeer </h3>
+
+<p>The JtapiPeer interface is the basis for a vendor's particular
+implementation of the Java Telephony API. Each vendor that
+provides an implementation of JTAPI must implement this interface
+in a class that can be loaded by the JtapiPeerFactory. </p>
+
+<p>It is through a class that implements the JtapiPeer object
+that an application gets a Provider object. </p>
+
+<h3>JtapiPeerFactory: Getting Started </h3>
+
+<p>The JtapiPeerFactory is a static class defined in JTAPI. Its
+sole public method, <em>getJtapiPeer() </em>gets the JtapiPeer
+implementation requested or it returns a default implementation. </p>
+
+<p><em>getJtapiPeer() </em>takes the name of the desired JTAPI
+server implementation class as a parameter to return an object
+instance of that class. If no name is provided, <em>getJtapiPeer()
+</em>returns the default JTAPI server implementation object. </p>
+
+<h3>JtapiPeer: Getting a Provider Object </h3>
+
+<p>JtapiPeer is an interface. It is used by the JTAPI server
+implementors. It defines the methods that applications use to get
+Provider objects, to query services available on those providers,
+and to get the name of the JtapiPeer object instance. By creating
+a class that implements the JtapiPeer interface, JTAPI
+implementations make the following methods available to
+applications. </p>
+
+<p>Applications use the <em>JtapiPeer.getProvider()</em> method
+to obtain new Provider objects. Each implementation may support
+one or more different &quot;services&quot; (e.g. for different
+types of underlying network substrate). A list of available
+services can be obtained via the <em>JtapiPeer.getServices()</em>
+method. </p>
+
+<p>Applications may also supply optional arguments to the
+Provider. These arguments are appended to the string argument
+passed to the <em>JtapiPeer.getProvider()</em> method. The string
+argument has the following format: </p>
+
+<p>&lt; service name &gt; ; arg1 = val1; arg2 = val2; ... </p>
+
+<p>Where &lt; service name &gt; is not optional, and each
+optional argument pair which follows is separated by a
+semi-colon. The keys for these arguments are implementation
+specific, except for two standard-defined keys: </p>
+
+<ol>
+    <li>login: provides the login user name to the Provider. </li>
+    <li>passwd: provides a password to the Provider. </li>
+</ol>
+
+<p>Applications use the <em>JtapiPeer.getName()</em> method to
+get the name of this JtapiPeer object instance. It has a <em>name
+</em>parameter, which is the same name used as an argument to the
+<em>JtapiPeerFactory.getJtapiPeer()</em> method. </p>
+
+<p><br>
+<br>
+</p>
+
+<h2><a name="SECURITY">Security in the Java Telephony API </a></h2>
+
+<p>JTAPI peer implementations use the Java &quot;sandbox&quot;
+model for controlling access to sensitive operations. Callers of
+JTAPI methods are categorized as &quot;trusted&quot; or
+&quot;untrusted&quot;, using criteria determined by the runtime
+system. Trusted callers are allowed full access to JTAPI
+functionality. Untrusted callers are limited to operations that
+cannot compromise the system's integrity. </p>
+
+<p>JTAPI may be used to access telephony servers or
+implementations that provide their own security mechanisms. These
+mechanisms remain in place; parameters such as user name and
+password are provided through parameters on the
+JtapiPeer.getProvider() method. </p>
+</body>
+</html>

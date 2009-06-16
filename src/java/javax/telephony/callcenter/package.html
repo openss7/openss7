@@ -1,0 +1,693 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>Call Center Overview</TITLE>
+   <!-- Changed by: Gary Adams - SMI Software Development,  4-May-1999 -->
+   <!-- Changed by: Alexey Roytman, Marc Petit-Huguenin, Juan Bernabó, Bob Andreasen, Daniel Petrie, Rich Pennenga - JTAPI 1.4 team,  28-July-2001 -->
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+The JTAPI Call Center package extends the core JTAPI package with additional 
+interfaces supporting call routing, automatic call distribution, predictive
+dialing and application data.
+
+
+<H1>
+Java Telephony API - 
+Call Center Extension Package
+</H1>
+
+<P>
+<H2>
+Introduction
+</H2>
+<HR>
+The Call Center Package extends the Core API by  supporting
+the following key Call Center features: 
+
+<A HREF="#Routing"> Routing </A>, 
+<A HREF="#ACD"> Automatic Call Distribution (ACD) </A>, 
+<A HREF="#PredCalling"> Predictive Calling </A>, 
+<A HREF="#AppData"> Application Data </A>.</P>
+
+
+<H2><A NAME="Routing">Routing</A></H2>
+<HR>
+
+<P>Routing is a call center feature that gives applications the
+ability to route calls to their final destinations. It gives 
+applications the power to apply routing heuristics unique to their domains.</P>
+
+<P>Before performing any routing functions, an application must first
+ register with the switching domain to route calls for
+a specific Address. The switching domain may perform security checks to
+verify that the application has permission to route calls for that Address.
+An application can indicate that it wants to route calls for all Addresses
+within the Provider's domain by invoking registration methods on a RouteAddress
+created with a special valid Address &quot;AllRouteAddress&quot;. The RouteAddress call center
+interface extends the core Address interface with methods for routing
+registration. </P>
+
+<P>When a call is made to an Address, the switching domain sends an event
+(or request) to the application, which then should respond with a 
+destination Address
+or with a &quot;no destination&quot;. Application can choose
+among alternate destinations based on, for
+example, origin of the call (calling number), number dialed to place
+the call (called number), hour of day or availability of agents to handle
+the call. This is the basic request/response scenario for routing. </P>
+
+<P>If the switching domain gets a response from the application, tries the Address 
+returned and fails, it could ask the application for another destination. The 
+application must know that this is not a new route request, but a request for a new
+destination from a previous request. Multiple calls may be placed to the
+same Address at the same time.  Thus, applications must track each request/response
+session. This tracking is facilitated by a route session. The first route
+request for a new call to the Address starts a new route session. All further
+communication between the application and the switching domain for this call (re-routes,
+route ended, etc) is done within this session. A new RouteSession object
+represents an outstanding route request. </P>
+
+<P>The RouteCallback interface provides an interface to handle routing
+events. An application implements the RouteCallback interface so that 
+the application
+will be
+"called back" when its provider wants the application to route a call.
+The getRouteableAddresss method on CallCenterProvider returns the
+list of Addresss that an application on this provider can register to route
+calls for.</P>
+
+<p>
+The RouteSession object is at the heart of all routing.  Below is a state
+diagram that illustrates the transitions possible on RouteSession.
+
+<HR>
+<H3>RouteSession Object States</H3>
+<CENTER>
+  <P>
+
+  <IMG SRC="doc-files/Rtestat.gif" HEIGHT=300 WIDTH=350
+	   ALT="RouteSession Object States">
+</P>
+</CENTER>
+
+<P>
+ROUTE: The RouteSession object enters the ROUTE state when the provider
+requests the application to route a call
+</p>
+
+<P>
+
+ROUTE_USED: The RouteSession object enters the ROUTE_USED state when the
+provider gives the application the destination for a successfully completed
+route request.
+</P>
+
+<p>
+
+ROUTE_END: The RouteSession object enters the ROUTE_END state when the 
+provider informs the application that a route session has ended or when 
+the application ends a route session.
+</p>
+
+<p>
+
+RE_ROUTE: The RouteSession object enters the REROUTE state when
+the provider requests the application to choose another call route.
+</p>
+
+<P>
+
+ROUTE_CALLBACK_ENDED: The RouteSession object enters the ROUTE_CALLBACK_ENDED
+state when the provider informs the application of the termination of a
+previously registered route callback.
+
+</P>
+<HR>
+<p>
+<CENTER>
+<H3>
+Routing Code Examples
+</H3>
+</CENTER>
+
+<BR><BR>
+</p>
+<H3>RouteTest Java Source</H3>
+
+<PRE>import java.applet.*;
+import java.lang.*;
+import java.util.*;
+import javax.telephony.*;
+import javax.telephony.callcenter.*;
+import javax.telephony.callcenter.events.*;
+
+public class RouteTest extends Applet {
+
+        Provider myProvider;
+        Address myAddress;
+        RouteAddress myRouteAddress;
+        MyRouteCallback myRouteCallback;
+
+        public void init() {
+
+          /*
+           * Create a provider by first obtaining the default implementation of
+           * JTAPI and then the default provider of that implementation.
+           */
+           Provider myprovider = null;
+           try {
+               JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+               myprovider = peer.getProvider(null);
+           } catch (Exception excp) {
+               System.out.println("Can't get Provider: " + excp.toString());
+               System.exit(0);
+           }
+       }
+
+        public void start() {
+
+            // if Device returned does not implement RouteDN return
+            if (!(myAddress instanceof RouteAddress))
+                return;
+
+        myRouteAddress = (RouteAddress)myAddress;
+        try {
+                // register callback to route calls for myRouteAddress
+                myRouteAddress.registerRouteCallback(myRouteCallback);
+        }
+        catch (Exception e) {
+                System.out.println(&quot;exception occurred&quot;);
+                return;
+        }
+
+        }
+
+        public void stop() {
+
+            if (myRouteAddress != null)
+            {
+                // cancel previous registration to route calls for
+                try {
+                        // myRouteAddress
+                        myRouteAddress.cancelRouteCallback(myRouteCallback);
+                }
+                catch (Exception e) {
+                        System.out.println(&quot;exception occurred&quot;);
+                        return;
+                }
+            }
+       }
+
+}
+
+class MyRouteCallback implements RouteCallback
+{
+    // for simplification this code is in the callback thread
+    // probably we should spawn off one thread per session
+
+        public void routeEvent(RouteEvent event)
+        {
+            // call function todetermine a destination
+            String[] routeSelected = new String[1];
+            routeSelected[0] = new String(getRoute((Terminal)event.getCallingTerminal(),
+                                        (Address)event.getCurrentRouteAddress()));
+            try {
+                event.getRouteSession().selectRoute(routeSelected);
+            }
+            catch (Exception e) {
+                 System.out.println(&quot;exception occurred&quot;);
+                 return;
+            }
+            return;
+        }
+
+        public void reRouteEvent(RouteSessionEvent event)
+        {
+            // previous routeSelected did not work, ok
+            // just pick some default route, audix &quot;77777&quot;
+            String[] routeSelected = new String[1];
+            routeSelected[0] = new String(&quot;77777&quot;);
+            try {
+                event.getRouteSession().selectRoute(routeSelected);
+            }
+            catch (Exception e) {
+                System.out.println(&quot;exception occurred&quot;);
+                return;
+            }
+        }
+
+        public void routeUsedEvent(RouteUsedEvent event)
+        {
+            // do something
+        }
+
+        public void routeEndEvent(RouteEndEvent event)
+        {
+            // session is over, clear up any objects, data, threads
+            // associated with this session
+        }
+
+        public void routeCallbackEndedEvent(RouteCallbackEndedEvent event)
+        {
+            // callback has been terminated, clear up any objects, data,
+            // threads associated with this callback
+        }
+
+        public String getRoute(Terminal callingTerminal, Address currentRouteAddress)
+        {
+            // look up some database to determine a destination
+            // based on callingTerminal and currentRouteAddress
+            // for now return a default &quot;12345&quot;
+            return (&quot;12345&quot;);
+        }
+}</PRE>
+
+<BR><BR>
+<HR>
+<CENTER>
+<H3>RouteTest Application Objects</H3>
+</CENTER>
+
+<P><IMG SRC="doc-files/Rtetest.gif" HEIGHT=370 WIDTH=500
+   ALT="RouteTest Application Objects"></P>
+
+<HR>
+
+<BR><BR><BR><BR>
+
+
+<H2><A NAME="ACD">ACD</A></H2>
+<HR>
+
+<H3>
+ACD Address
+</H3>
+
+<P>Automatic Call Distribution (ACD) is a Call Center feature that defines
+an ACD Group as zero or more Agent extensions that service calls coming to
+the Group. An incoming call can, for example, either sent to an available Agent or queued
+when no Agents are available. </P>
+
+<P>
+The primary interface for the ACD feature is the ACD Address, an extension of CallCenterAddress. 
+This is a specialization of Address that distributes calls to a dynamic set of Terminals. 
+ACD Address is not directly associated with a Terminal because it is a logical entity within 
+the Provider and as such does not have any physical attributes. 
+
+<HR>
+<p>
+<CENTER>
+<h3>ACD Address Model</h3>
+</CENTER>
+
+<center><img src="doc-files/ACDAddr.gif"
+		ALT="ACD Address Model"></center>
+<HR>
+<P>
+  Calls that are presented to an ACD Address may be processed in
+several different ways. For example, the call may be queued at the ACD
+Address before being distributed, the call may be delivered to one of
+the available Agent Terminals, or the call may be redirected to
+another ACD Address. The Connection interface which represents the
+relationship between the ACD Address and the Call is known as ACD
+Connection.
+
+</P>
+<p>
+  The dynamic association between the ACD Address and a given Terminal
+is represent by the Agent class. The Agent object represents an
+AgentTerminal's relationship to an
+ ACDAddress. You can think of the Agent object as representing a person acting as an agent in
+ the simplest case where the person is logged into only one ACD
+Address.
+ If the person were logged into several ACD Addresses these scenarios
+ would be represented as several Agent objects.
+ This Agent has a set of state transitions to represent its
+association. For example, when a Terminal creates an association with
+a given ACD Address (i.e.Agent Logged In), or when the Terminal is
+associated with a given ACD Address and is ready to process a call
+from the ACD Address (i.e. Agent Ready). For more details, on the
+states, see the Agent State Diagram below. A Terminal that can be
+associated with ACD Addresses is represented by the AgentTerminal
+which is an extension of the Terminal interface. </P>
+
+<HR>
+<CENTER>
+<H3>Agent Terminal States</H3>
+</CENTER>
+
+<P><IMG SRC="doc-files/Agnstat.gif" HEIGHT=400 WIDTH=540
+   ALT="Agent Terminal States"></P>
+
+<P>
+
+UNKNOWN: The AgentTerminal object enters the UNKNOWN state when the provider
+is unable to determine the state of the AgentTerminal.
+</P>
+
+<P>
+
+LOG_IN: The AgentTerminal object enters the LOG_IN state when the AgentTerminal
+is logged into an ACDAddress.
+</P>
+
+<p>
+
+LOG_OUT: The AgentTerminal object enters the LOG_OUT state when the 
+AgentTerminal has logged out of an ACDAddress.
+</P>
+
+<P>
+
+NOT_READY: The AgentTerminal object enters the NOT_READY state when it is
+busy with tasks other than servicing calls.
+</p>
+
+<P>
+
+READY: The AgentTerminal object enters the READY state when it is
+ready to service calls.
+</p>
+<P>
+
+WORK_NOT_READY: The AgentTerminal object enters the WORK_NOT_READY state when 
+it is disconnected from a call and is busy with tasks associated with
+a call.
+</p>
+<P>
+
+WORK_READY: The AgentTerminal object enters the WORK_READY state when 
+it is ready to resume the tasks associated with a call.
+</p>
+
+<p>
+
+BUSY: The AgentTerminal object enters the BUSY state when is is engaged in
+a call and cannot handle other ACD calls.
+</p>
+<HR>
+
+<p>
+<CENTER>
+<H3>
+ACD Sample Code
+</H3>
+</CENTER>
+
+
+
+<H3>AgentTest Java Source</H3>
+
+<PRE>import java.applet.*;
+import java.lang.*;
+import java.util.*;
+import javax.telephony.*;
+import javax.telephony.callcenter.*;
+
+public class AgentTest extends Applet {
+
+        Provider myProvider;
+        Terminal myTerminal;
+        Address myAddress;
+        AgentTerminal myAgentTerminal;
+        ACDAddress myACDAddress;
+        String agentID=&quot;&quot;;
+        String agent_passwd = &quot;&quot;;
+        Agent[] myAgents = new Agent[1];
+
+
+        public void init() {
+
+          /*
+           * Create a provider by first obtaining the default implementation of
+           * JTAPI and then the default provider of that implementation.
+           */
+           Provider myprovider = null;
+           try {
+               JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+               myprovider = peer.getProvider(null);
+           } catch (Exception excp) {
+               System.out.println("Can't get Provider: " + excp.toString());
+               System.exit(0);
+           }
+
+        }
+
+        public void start() {
+
+            // if Terminal returned does not implement AgentTerminal return
+            if (!(myTerminal instanceof AgentTerminal))
+                return;
+            // else cast it to AgentTerminal
+            myAgentTerminal = (AgentTerminal)myTerminal;
+
+            Address myAddress;
+            Address myAgentTerminalAddress;
+            try {
+                myAddress = myProvider.getAddress(&quot;74444&quot;);
+                // if Address is not an instance of ACDAddress return
+                if (!(myAddress instanceof ACDAddress))
+                   return;
+                // else cast it to ACDAddress
+                myACDAddress = (ACDAddress)myAddress;
+
+		// get address for agent terminal.
+		myAgentTerminalAddress = ( myAgentTerminal.getAddresses() )[0];
+
+                // prompt Agent for agent_passwd and agentID
+                // log in to ACD group
+		myAgents[0] = myAgentTerminal.addAgent(myAgentTerminalAddress, myACDAddress, Agent.LOG_IN, agentID, agent_passwd);
+             } catch (Exception e) {
+                System.out.println(&quot;exception occurred&quot;);
+                return;
+             }
+        }
+
+        public void stop() {
+
+            if ( (myAgentTerminal != null) && (myAgents != null) && (myAgents[0] != null) )
+            {
+            try {
+                // log out of ACD group
+                myAgentTerminal.removeAgent(myAgents[0]);
+            } catch (Exception e) {
+                System.out.println(&quot;exception occurred&quot;);
+                return;
+            }
+            }
+        }
+}
+</PRE>
+
+<HR>
+
+<CENTER>
+<H3><BR>
+AgentTest Application Objects</H3>
+</CENTER>
+<P>
+
+<IMG SRC="doc-files/Agntest.gif" HEIGHT=363 WIDTH=500
+	ALT="AgentTest Application Objects">
+</P>
+
+<HR>
+
+<H3>ACDTest Java Source</H3>
+
+<PRE>
+import java.applet.*;
+import java.lang.*;
+import java.util.*;
+import javax.telephony.*;
+import javax.telephony.callcenter.*;
+
+public class ACDTest extends Applet {
+	Provider myProvider;
+	Address myAddress;
+	ACDAddress myACDAddress;
+	MyACDListener myACDListener;
+
+	public void init() {
+
+		/*
+		 * Create a provider by first obtaining the default implementation of
+		 * JTAPI and then the default provider of that implementation.
+		 */
+		Provider myprovider = null;
+		try {
+			JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
+			myprovider = peer.getProvider(null);
+		} 
+		catch (Exception excp) {
+			System.out.println("Can't get Provider: " + excp.toString());
+			System.exit(0);
+		}
+	}
+
+	public void start() {
+		// if Address returned does not implement ACDAddress return
+		if (!(myAddress instanceof ACDAddress))
+			return;
+
+		myACDAddress = (ACDAddress)myAddress;
+		try {
+			// add listener on my ACD Address
+			myAddress.addAddressListener(myACDListener);
+		}
+		catch (Exception e) {
+			System.out.println("exception occured");
+			return;
+		}
+	}
+
+	public void stop() {
+		if (myACDAddress != null) {
+			// delete listener on my ACD Address
+			try {
+				myAddress.removeAddressListener(myACDListener);
+			}
+			catch (Exception e) {
+				System.out.println("exception occured");
+				return;
+			 }
+		}
+	}
+}
+
+class MyACDListener implements ACDAddressListener {
+	public void addressListenerEnded(AddressEvent event) {
+	}
+	
+	public void acdAddressBusy(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressLoggedOff(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressLoggedOn(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressNotReady(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressReady(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressUnknown(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressWorkNotReady(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+
+	public void acdAddressWorkReady(ACDAddressEvent event) {
+		trackACDAgents((ACDAddress)event.getAddress(),
+			event.getAgent().getAgentTerminal(),
+			event.getAgent().getAgentID());
+	}
+	public void trackACDAgents(ACDAddress acdGroup,
+		AgentTerminal agentTerminal,
+		String agentID) {
+		
+	// store information in global tables
+	// use in a routing app to figure out destination
+	return;
+	}
+}
+</PRE>
+
+<HR>
+<CENTER>
+<H3><BR>
+ACDTest Application Objects</H3>
+</CENTER>
+<P>
+
+<IMG SRC="doc-files/Acdtest.gif" HEIGHT=397 WIDTH=500
+	 ALT="ACDTest Application Objects">
+
+</P>
+<HR>
+<BR><BR><BR>
+
+<H3> ACD Manager </H3>
+
+<P>
+Some Provider implementations have a more complex ACD feature in
+which a group of ACD Address can be managed logically as one
+Address. In order to support this function, the Call Center model has
+included another Address interface to handle this ACD Address group
+management. This interface is known as an ACDManagerAddress. It is an
+extension of an Address. Calls that are presented to an ACD Manager
+Address may be processed in several different ways. For example, the
+call may be queued at several different ACD Addresses before being
+distributed to an Agent Terminal, the call may be delivered
+immediately to one of the available Terminals associated with a given
+ACD Address in the group, or the call may be redirected to another ACD
+Manager Address or individual ACD Address.The Connection interface
+which represents the relationship between the ACD Manager Address and
+the Call is known as ACDManagerConnection. 
+
+</P>
+
+<h3>ACD
+Manager Address Model</h3>
+ <HR>
+ <center>
+   <img src="doc-files/ACDMgrAd.gif" ALT="Manager Address Model"></center> <HR>
+
+
+
+<H2><A NAME="PredCalling">Predictive Call</A></H2>
+<HR>
+
+<P>Predictive Call is a key cornerstone of Call Center feature. An application
+uses it when it wants to launch a call where the destination is connected
+to the call first and the originator is connected only after the connection
+to the destination is successful.</P>
+
+<P>A typical application is one where an application wants to contact a
+list of potential customers, about for example a newspaper subscription
+promotion. The application has a list of telephone numbers that correspond
+to the customers. The application picks one number at a time from this
+list and makes a predictive call. If no one answers, the call is dropped.
+If a customer answers, an attempt is made to connect the originating device.
+The originating device may be an ACD group, in which case an ACD agent
+anwers for the originating device. After this call is established the application
+moves on to the next telephone number on the list and repeats its actions.</P>
+
+
+<H2><A NAME="AppData">Application Data</A></H2>
+<HR>
+
+<P>Application Data allows application to associate application specific
+data with a call. Methods on the CallCenterCall interface support setting
+and getting application data. In addition an event, ApplicationDataEvent,
+is sent when the set method is used or the provider associates data with
+the call from another source.</P>
+
+</BODY>
+</HTML>
+
