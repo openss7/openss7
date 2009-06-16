@@ -74,7 +74,7 @@ public class ProfileIdentifierChoice {
     /** ProfileIdentifierChoice: GROUP */
     public static final ProfileIdentifierChoice GROUP
         = new ProfileIdentifierChoice(M_GROUP);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getProfileIdentifierChoice() {

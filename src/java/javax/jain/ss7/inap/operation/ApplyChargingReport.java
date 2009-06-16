@@ -53,7 +53,7 @@ public  class ApplyChargingReport extends Operation implements java.io.Serializa
 {
  	  
 
-	  private String callResult;
+	  private java.lang.String callResult;
 
 /**
 Constructor For ApplyChargingReport
@@ -85,7 +85,7 @@ Gets Call Result
 /** 
 Sets Call Result 
 */
-    public void setCallResult(String callResult)
+    public void setCallResult(java.lang.String callResult)
     {
         this.callResult = callResult;
     }

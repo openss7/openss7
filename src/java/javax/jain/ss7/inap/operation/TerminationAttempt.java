@@ -55,13 +55,13 @@ public class TerminationAttempt  extends Operation  implements java.io.Serializa
 
     private DPSpecificCommonParameters dPSpecificCommonParameters;
     
-    private String calledPartyBusinessGroupID;
+    private java.lang.String calledPartyBusinessGroupID;
     private boolean isCalledPartyBusinessGroupID = false ;
     
     private CalledPartySubaddress calledPartySubaddress;
     private boolean isCalledPartySubaddress = false ;
     
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID =false ;
     
     private CallingPartySubaddress callingPartySubaddress;
@@ -135,7 +135,7 @@ Gets Operation Code
 /** Sets Called Party Business Group ID */
 
 
-    public void setCalledPartyBusinessGroupID( String  calledPartyBusinessGroupID)
+    public void setCalledPartyBusinessGroupID( java.lang.String  calledPartyBusinessGroupID)
     {
         this.calledPartyBusinessGroupID=calledPartyBusinessGroupID;
         isCalledPartyBusinessGroupID=true;
@@ -200,7 +200,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Sets Calling Party Business Group ID */
 
 
-    public void setCallingPartyBusinessGroupID( String  callingPartyBusinessGroupID)
+    public void setCallingPartyBusinessGroupID( java.lang.String  callingPartyBusinessGroupID)
     {
         this.callingPartyBusinessGroupID=callingPartyBusinessGroupID;
         isCallingPartyBusinessGroupID=true;

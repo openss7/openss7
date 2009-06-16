@@ -158,7 +158,7 @@ public class TriggerType  {
     /** TriggerType  :T_DISCONNECT */
     public static final TriggerType T_DISCONNECT
         = new TriggerType(M_T_DISCONNECT);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getTriggerType() {

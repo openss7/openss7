@@ -94,7 +94,7 @@ public class ActionPerformed {
     /** ActionPerformed : IS_INACTIVE */
     public static final ActionPerformed IS_INACTIVE
         = new ActionPerformed(M_IS_INACTIVE);
-    /** Gets the integer String representation of the constant class.
+    /** Gets the integer value representation of the constant class.
       * @return
       * The internal integer value of the constant class.  */
     public int getActionPerformed() {

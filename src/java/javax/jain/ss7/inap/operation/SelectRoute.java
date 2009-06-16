@@ -54,13 +54,13 @@ public class SelectRoute  extends Operation   implements java.io.Serializable
 
     private DestinationRoutingAddress destinationRoutingAddress; 
 
-    private String alertingPattern; 
+    private java.lang.String alertingPattern; 
     private boolean isAlertingPattern =false ; 
 
     private DigitsGenericDigits correlationID; 
     private boolean isCorrelationID = false ; 
 
-    private String iSDNAccessRelatedInformation; 
+    private java.lang.String iSDNAccessRelatedInformation; 
     private boolean isISDNAccessRelatedInformation = false ; 
 
     private OriginalCalledPartyID originalCalledPartyID; 
@@ -78,7 +78,7 @@ public class SelectRoute  extends Operation   implements java.io.Serializable
     private Carrier carrier; 
     private boolean isCarrier = false ; 
 
-    private String serviceInteractionIndicators; 
+    private java.lang.String serviceInteractionIndicators; 
     private boolean isServiceInteractionIndicators = false ; 
 
     private ServiceInteractionIndicatorsTwo serviceInteractionIndicatorsTwo;
@@ -216,7 +216,7 @@ Gets ISDN Access Related Information
 /**
 Sets ISDN Access Related Information
 */
-    public void setISDNAccessRelatedInformation(String iSDNAccessRelatedInformation)
+    public void setISDNAccessRelatedInformation(java.lang.String iSDNAccessRelatedInformation)
     {
         this.iSDNAccessRelatedInformation = iSDNAccessRelatedInformation;
         isISDNAccessRelatedInformation=true;
@@ -398,7 +398,7 @@ Gets Service Interaction Indicators
 /**
 Sets Service Interaction Indicators
 */
-    public void setServiceInteractionIndicators(String serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String serviceInteractionIndicators)
     {
         this.serviceInteractionIndicators = serviceInteractionIndicators;
         isServiceInteractionIndicators=true;

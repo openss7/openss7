@@ -78,7 +78,7 @@ public class Media {
     /** Media : FAX_GROUP_4 */
     public static final Media FAX_GROUP_4
         = new Media(M_FAX_GROUP_4);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Integer value of constant class.  */
     public int getMedia() {

@@ -57,9 +57,9 @@ public class EventNotificationCharging  extends Operation   implements java.io.S
 	private int monitorMode = 1;
     private boolean isMonitorMode = false ;
     
-    private String eventTypeCharging;
+    private java.lang.String eventTypeCharging;
 
-    private String eventSpecificInformationCharging;
+    private java.lang.String eventSpecificInformationCharging;
     private boolean isEventSpecificInformationCharging = false ;
 
     private LegID legID;

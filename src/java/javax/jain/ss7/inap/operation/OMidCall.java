@@ -54,13 +54,13 @@ public class OMidCall  extends Operation   implements java.io.Serializable
 
     private DPSpecificCommonParameters dPSpecificCommonParameters;
     
-    private String calledPartyBusinessGroupID;
+    private java.lang.String calledPartyBusinessGroupID;
     private boolean isCalledPartyBusinessGroupID = false ;
     
     private CalledPartySubaddress calledPartySubaddress;
     private boolean isCalledPartySubaddress = false ;
     
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID =false ;
     
     private CallingPartySubaddress callingPartySubaddress;

@@ -78,7 +78,7 @@ public class ResponseCondition {
     /** ResponseCondition  :LAST_RESPONSE */
     public static final  ResponseCondition  LAST_RESPONSE
         = new ResponseCondition(M_LAST_RESPONSE);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getResponseCondition() {

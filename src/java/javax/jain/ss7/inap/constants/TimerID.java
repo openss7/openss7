@@ -70,7 +70,7 @@ public class TimerID {
     public static final TimerID TSSF
         = new TimerID(M_TSSF);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class. */
     public int getTimerID() {

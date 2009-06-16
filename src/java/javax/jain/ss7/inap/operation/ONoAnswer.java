@@ -55,7 +55,7 @@ public class ONoAnswer  extends Operation   implements java.io.Serializable
 
     private DPSpecificCommonParameters dPSpecificCommonParameters;
     
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID = false ;
     
     private CallingPartySubaddress callingPartySubaddress;

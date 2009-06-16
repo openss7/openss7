@@ -1,211 +1,132 @@
 /*
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- *  Copyrights:
- *
- *  Copyright - 1999 Sun Microsystems, Inc. All rights reserved.
- *  901 San Antonio Road, Palo Alto, California 94043, U.S.A.
- *
- *  This product and related documentation are protected by copyright and
- *  distributed under licenses restricting its use, copying, distribution, and
- *  decompilation. No part of this product or related documentation may be
- *  reproduced in any form by any means without prior written authorization of
- *  Sun and its licensors, if any.
- *
- *  RESTRICTED RIGHTS LEGEND: Use, duplication, or disclosure by the United
- *  States Government is subject to the restrictions set forth in DFARS
- *  252.227-7013 (c)(1)(ii) and FAR 52.227-19.
- *
- *  The product described in this manual may be protected by one or more U.S.
- *  patents, foreign patents, or pending applications.
- *
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- *  Author:
- *
- *  Mahindra British Telecom
- *  155 , Bombay - Pune Road 
- *  Pimpri ,
- *  Pune - 411 018.
- *
- *  Module Name   : JAIN INAP API
- *  File Name     : VariablePart.java
- *  Approver      : Jain Inap Edit Group
- *  Version       : 1.0
- *
- *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
  */
+
 package javax.jain.ss7.inap.datatype;
 
-
-import java.io.*;
-import java.util.*;
 import javax.jain.ss7.inap.constants.*;
+import javax.jain.ss7.inap.*;
+import javax.jain.ss7.*;
+import javax.jain.*;
 
-/**
- This class represents the Variable Part DataType
- */
-
-public class VariablePart implements java.io.Serializable{
-
-	 private int integer;
-          
-	 
-	 private DigitsGenericDigits number;
-
-	 
-	 private String date;
-
-	 
-	 private String time;
-
-	 
-	 private String price;
-
-	 private VariablePartChoice variablePartChoice;
-	 
-	 
-
-/**
-Constructor For VariablePart
-*/
-	public VariablePart(int integer)
-	{
-		setInteger(integer);
-	}
-
-	public VariablePart(DigitsGenericDigits number)
-	{
-		setNumber(number);
-	}
-
-	public VariablePart(java.lang.String value, VariablePartID variablepartid)
-	{
-		if(variablepartid.getVariablePartID() == VariablePartID.DATE.getVariablePartID())
-			setDate(value);
-		else if(variablepartid.getVariablePartID() == VariablePartID.TIME.getVariablePartID())
-			setTime(value);
-		else if(variablepartid.getVariablePartID() == VariablePartID.PRICE.getVariablePartID())
-			setPrice(value);
-	}
-
-//-----------------------------------
-
-/**
-  Gets Integer
-*/
-
-    public int getInteger()
-    {
+/** This class represents the Variable Part DataType.
+  * @version 1.2.2
+  * @author Monavacon Limited
+  */
+public class VariablePart implements java.io.Serializable {
+    /** Constructor For VariablePart.  */
+    public VariablePart(int integer) {
+        setInteger(integer);
+    }
+    /** Constructor For VariablePart.  */
+    public VariablePart(DigitsGenericDigits number) {
+        setNumber(number);
+    }
+    /** Constructor For VariablePart.  */
+    public VariablePart(java.lang.String value, VariablePartID variablepartid) {
+        if (variablepartid == VariablePartID.DATE)
+            setDate(value);
+        else if (variablepartid == VariablePartID.TIME)
+            setTime(value);
+        else if (variablepartid == VariablePartID.PRICE)
+            setPrice(value);
+    }
+    /** Gets Integer.  */
+    public int getInteger() {
         return integer;
     }
-
-/**
-  Sets Integer 
-*/
-    public void setInteger(int integer)
-    {
+    /** Sets Integer.  */
+    public void setInteger(int integer) {
         this.integer = integer;
-        this.variablePartChoice=VariablePartChoice.INTEGER;
+        this.variablePartChoice = VariablePartChoice.INTEGER;
     }
-    
-    
-    
-//-----------------------
-
-/**
-  Gets Number
-*/
-
-    public DigitsGenericDigits getNumber()
-    {
+    /** Gets Number.  */
+    public DigitsGenericDigits getNumber() {
         return number;
     }
-
-/**
-  Sets Number
-*/
-    public void setNumber(DigitsGenericDigits number)
-    {
+    /** Sets Number.  */
+    public void setNumber(DigitsGenericDigits number) {
         this.number = number;
-        this.variablePartChoice=VariablePartChoice.NUMBER;
-
+        this.variablePartChoice = VariablePartChoice.NUMBER;
     }
-
-    
-//-----------------------
-
-/**
-  Gets Time
-*/
-
-    public java.lang.String getTime()
-    {
+    /** Gets Time.  */
+    public java.lang.String getTime() {
         return time;
     }
-
-/**
-  Sets Time
-*/
-    public void setTime(java.lang.String time)
-    {
+    /** Sets Time.  */
+    public void setTime(java.lang.String time) {
         this.time = time;
-        this.variablePartChoice=VariablePartChoice.TIME;
-
+        this.variablePartChoice = VariablePartChoice.TIME;
     }
-
-
-//-----------------------
-
-/**
-  Gets Date
-*/
-
-    public java.lang.String getDate()
-    {
+    /** Gets Date.  */
+    public java.lang.String getDate() {
         return date;
     }
-
-/**
-  Sets Date
-*/
-    public void setDate(java.lang.String date)
-    {
+    /** Sets Date.  */
+    public void setDate(java.lang.String date) {
         this.date = date;
-        this.variablePartChoice=VariablePartChoice.DATE;
-
+        this.variablePartChoice = VariablePartChoice.DATE;
     }
-
-//-----------------------
-/**
-  Gets Price
-*/
-
-    public java.lang.String getPrice()
-    {
+    /** Gets Price.  */
+    public java.lang.String getPrice() {
         return price;
     }
-
-/**
-  Sets Price
-*/
-    public void setPrice(java.lang.String price)
-    {
+    /** Sets Price.  */
+    public void setPrice(java.lang.String price) {
         this.price = price;
-        this.variablePartChoice=VariablePartChoice.PRICE;
+        this.variablePartChoice = VariablePartChoice.PRICE;
     }
-//-----------------------    
-
-/**
-  Gets VariableChoice
-*/
-    public VariablePartChoice getVariablePartChoice()
-    {
+    /** Gets VariableChoice.  */
+    public VariablePartChoice getVariablePartChoice() {
         return variablePartChoice;
     }
-
-
-//-----------------------   
-
-
+    private int integer;
+    private DigitsGenericDigits number;
+    private java.lang.String date;
+    private java.lang.String time;
+    private java.lang.String price;
+    private VariablePartChoice variablePartChoice;
 }
+
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

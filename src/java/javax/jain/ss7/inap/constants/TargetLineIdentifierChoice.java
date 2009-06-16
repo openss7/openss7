@@ -77,7 +77,7 @@ public class TargetLineIdentifierChoice {
     public static final TargetLineIdentifierChoice GROUP
         = new TargetLineIdentifierChoice(M_GROUP);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * The integer value of the constant class.
       */

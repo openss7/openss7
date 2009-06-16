@@ -78,7 +78,7 @@ public class InfoToSendChoice {
     /** InfoToSendChoice :  DISPLAY_INFORMATION */
     public static final InfoToSendChoice DISPLAY_INFORMATION
         = new InfoToSendChoice(M_DISPLAY_INFORMATION );
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getInfoToSendChoice() {

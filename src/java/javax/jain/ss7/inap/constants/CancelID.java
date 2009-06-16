@@ -76,7 +76,7 @@ public class CancelID {
     public static final CancelID ALL_REQUESTS
         = new CancelID(M_ALL_REQUESTS);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class. */
     public int getCancelID() {

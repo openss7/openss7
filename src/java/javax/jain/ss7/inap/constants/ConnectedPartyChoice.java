@@ -74,7 +74,7 @@ public class ConnectedPartyChoice {
     /** ConnectedPartyChoice :CALL_SEGMENT_ID */
     public static final ConnectedPartyChoice CALL_SEGMENT_ID
         = new ConnectedPartyChoice(M_CALL_SEGMENT_ID);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class. */
     public int getConnectedPartyChoice() {

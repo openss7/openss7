@@ -52,13 +52,13 @@ public class SelectFacility  extends Operation   implements java.io.Serializable
 {
 	
 
-	private String alertingPattern;
+	private java.lang.String alertingPattern;
 	private boolean isAlertingPattern = false ;
 	
     private CalledPartyNumber destinationNumberRoutingAddress ;
     private boolean isDestinationNumberRoutingAddress = false ;
 
-    private String iSDNAccessRelatedInformation;
+    private java.lang.String iSDNAccessRelatedInformation;
     private boolean isISDNAccessRelatedInformation = false ;
     
     private FacilityGroup calledFacilityGroup ;
@@ -70,10 +70,10 @@ public class SelectFacility  extends Operation   implements java.io.Serializable
     private OriginalCalledPartyID originalCalledPartyID;
     private boolean isOriginalCalledPartyID = false ;
     
-    private String displayInformation;
+    private java.lang.String displayInformation;
     private boolean isDisplayInformation = false ;
     
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
     
     private Entry iNServiceCompatibilityResponse;

@@ -93,9 +93,9 @@ public class BackwardServiceInteractionInd implements java.io.Serializable {
     public boolean isCallCompletionTreatmentIndicatorPresent() {
         return isCallCompletionTreatmentIndicator;
     }
-    private String conferenceTreatmentIndicator;
+    private java.lang.String conferenceTreatmentIndicator;
     private boolean isConferenceTreatmentIndicator = false ;
-    private String callCompletionTreatmentIndicator;
+    private java.lang.String callCompletionTreatmentIndicator;
     private boolean isCallCompletionTreatmentIndicator = false ;
 }
 

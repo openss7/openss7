@@ -55,7 +55,7 @@ public class ConnectToResource   extends Operation implements java.io.Serializab
 
     private ResourceAddress resourceAddress;
 
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
 
     private ServiceInteractionIndicatorsTwo serviceInteractionIndicatorsTwo;

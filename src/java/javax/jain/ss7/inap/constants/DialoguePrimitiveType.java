@@ -93,7 +93,7 @@ public class DialoguePrimitiveType {
     /** DialoguePrimitiveType : NOTICE */
     public static final DialoguePrimitiveType NOTICE
         = new DialoguePrimitiveType(M_NOTICE);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getDialoguePrimitiveType() {

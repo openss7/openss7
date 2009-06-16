@@ -83,7 +83,7 @@ public class ReceivedStatus {
     public static final ReceivedStatus MESSAGE_TIMEOUT
         = new ReceivedStatus(M_MESSAGE_TIMEOUT);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getReceivedStatus() {

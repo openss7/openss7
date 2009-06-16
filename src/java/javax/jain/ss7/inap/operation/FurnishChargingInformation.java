@@ -51,7 +51,7 @@ This class represents FurnishChargingInformation Operation.
 public class FurnishChargingInformation  extends Operation   implements java.io.Serializable
 {
     
-    private String fCIBillingChargingCharacteristics;
+    private java.lang.String fCIBillingChargingCharacteristics;
     
 /**
 Constructor For FurnishChargingInformation

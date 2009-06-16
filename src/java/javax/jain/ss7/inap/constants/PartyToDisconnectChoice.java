@@ -75,7 +75,7 @@ public class PartyToDisconnectChoice {
     public static final PartyToDisconnectChoice CALL_SEGMENT_ID
         = new PartyToDisconnectChoice(M_CALL_SEGMENT_ID);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class. */
     public int getPartyToDisconnectChoice() {

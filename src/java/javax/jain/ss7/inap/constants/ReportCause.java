@@ -138,7 +138,7 @@ public class ReportCause {
     /** TCNotice :SEGMENTATION_FAILED */
     public static final ReportCause SEGMENTATION_FAILED
         = new ReportCause(M_SEGMENTATION_FAILED);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getReportCause () {

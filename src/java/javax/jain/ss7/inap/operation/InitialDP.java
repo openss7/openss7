@@ -66,10 +66,10 @@ public class InitialDP  extends Operation   implements java.io.Serializable
     private CallingPartyNumber callingPartyNumber;
     private boolean isCallingPartyNumber = false ;
     
-    private String callingPartyBusinessGroupID;
+    private java.lang.String callingPartyBusinessGroupID;
     private boolean isCallingPartyBusinessGroupID = false ;
     
-    private String callingPartysCategory;
+    private java.lang.String callingPartysCategory;
     private boolean isCallingPartysCategory = false ;
     
     private CallingPartySubaddress callingPartySubaddress;
@@ -78,10 +78,10 @@ public class InitialDP  extends Operation   implements java.io.Serializable
     private CGEncountered cGEncountered;
     private boolean isCGEncountered = false ;
     
-    private String iPSSPCapabilities;
+    private java.lang.String iPSSPCapabilities;
     private boolean isIPSSPCapabilities = false ;
     
-    private String iPAvailable;
+    private java.lang.String iPAvailable;
     private boolean isIPAvailable = false ;
     
     private LocationNumber locationNumber;
@@ -93,7 +93,7 @@ public class InitialDP  extends Operation   implements java.io.Serializable
     private OriginalCalledPartyID originalCalledPartyID;
     private boolean isOriginalCalledPartyID = false ;
     
-    private String serviceProfileIdentifier;
+    private java.lang.String serviceProfileIdentifier;
     private boolean isServiceProfileIdentifier = false ;
     
     private TerminalType terminalType;
@@ -104,7 +104,7 @@ public class InitialDP  extends Operation   implements java.io.Serializable
     private HighLayerCompatibility highLayerCompatibility;
     private boolean isHighLayerCompatibility = false ;
     
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
     
     private DigitsGenericNumber additionalCallingPartyNumber;
@@ -134,7 +134,7 @@ public class InitialDP  extends Operation   implements java.io.Serializable
     private int componentCorrelationID;
     private boolean isComponentCorrelationID = false ;
     
-    private String iSDNAccessRelatedInformation;
+    private java.lang.String iSDNAccessRelatedInformation;
     private boolean isISDNAccessRelatedInformation = false ;
     
     private INServiceCompatibilityIndication iNServiceCompatibilityIndication;
@@ -152,10 +152,10 @@ public class InitialDP  extends Operation   implements java.io.Serializable
     private int createdCallSegmentAssociation;
     private boolean isCreatedCallSegmentAssociation = false ;
     
-    private String uSIServiceIndicator;
+    private java.lang.String uSIServiceIndicator;
     private boolean isUSIServiceIndicator = false ;
     
-    private String uSIInformation;
+    private java.lang.String uSIInformation;
     private boolean isUSIInformation = false ;
     
 	private ExtensionField extensions[];
@@ -651,7 +651,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Gets Service Profile Identifier*/
 
 
-    public  String  getServiceProfileIdentifier() throws ParameterNotSetException
+    public  java.lang.String  getServiceProfileIdentifier() throws ParameterNotSetException
 
     {
         if(isServiceProfileIdentifierPresent())
@@ -663,7 +663,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /** Sets Service Profile Identifier*/
 
-    public void setServiceProfileIdentifier( String  serviceProfileIdentifier)
+    public void setServiceProfileIdentifier( java.lang.String  serviceProfileIdentifier)
     {
        this.serviceProfileIdentifier=serviceProfileIdentifier;
        isServiceProfileIdentifier = true;
@@ -778,7 +778,7 @@ Returns:TRUE if present , FALSE otherwise.
 /**Gets Service Interaction Indicators*/
 
 
-    public  String   getServiceInteractionIndicators() throws ParameterNotSetException
+    public  java.lang.String   getServiceInteractionIndicators() throws ParameterNotSetException
 
     {
         if(isServiceInteractionIndicatorsPresent()) 
@@ -1160,7 +1160,7 @@ Returns:TRUE if present , FALSE otherwise.
 /** Gets ISDN Access Related Information */
 
 
-    public  String getISDNAccessRelatedInformation() throws ParameterNotSetException
+    public  java.lang.String getISDNAccessRelatedInformation() throws ParameterNotSetException
 
     {
         if(isISDNAccessRelatedInformationPresent()) 
@@ -1172,7 +1172,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /** Sets ISDN Access Related Information */
 
-    public void setISDNAccessRelatedInformation( String iSDNAccessRelatedInformation)
+    public void setISDNAccessRelatedInformation( java.lang.String iSDNAccessRelatedInformation)
     {
        this.iSDNAccessRelatedInformation=iSDNAccessRelatedInformation;
        isISDNAccessRelatedInformation = true;
@@ -1383,7 +1383,7 @@ Returns:TRUE if present , FALSE otherwise.
     
 /**Sets USI Service Indicator*/
 
-    public void setUSIServiceIndicator( String uSIServiceIndicator)
+    public void setUSIServiceIndicator( java.lang.String uSIServiceIndicator)
     {
        this.uSIServiceIndicator=uSIServiceIndicator;
        isUSIServiceIndicator=true;
@@ -1418,7 +1418,7 @@ Returns:TRUE if present , FALSE otherwise.
 
 /**Sets USI Information*/
 
-    public void setUSIInformation( String uSIInformation)
+    public void setUSIInformation( java.lang.String uSIInformation)
     {
        this.uSIInformation=uSIInformation;
        isUSIInformation=true;

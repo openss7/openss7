@@ -54,7 +54,7 @@ public class TDisconnect extends Operation  implements java.io.Serializable
     
     private DPSpecificCommonParameters dPSpecificCommonParameters;
 
-    private String calledPartyBusinessGroupID;
+    private java.lang.String calledPartyBusinessGroupID;
     private boolean isCalledPartyBusinessGroupID=  false ;
 
     private CalledPartySubaddress calledPartySubaddress;

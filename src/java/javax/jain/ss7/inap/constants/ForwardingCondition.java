@@ -79,7 +79,7 @@ public class ForwardingCondition {
     /** ForwardingCondition :ANY */
     public static final ForwardingCondition ANY
         = new ForwardingCondition(M_ANY);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getForwardingCondition() {

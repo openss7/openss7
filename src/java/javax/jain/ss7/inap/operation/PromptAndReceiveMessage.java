@@ -61,7 +61,7 @@ public class PromptAndReceiveMessage  extends Operation   implements java.io.Ser
 	 private DigitsGenericNumber subscriberID;
 	 private boolean isSubscriberIDRecord = false ;
 	 
-	 private String mailBoxID;
+	 private java.lang.String mailBoxID;
 	 private boolean isMailBoxID =false ;
 	 
     private InformationToRecord informationToRecord;

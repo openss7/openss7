@@ -79,7 +79,7 @@ public class ControlType {
     /** ControlType :DESTINATION_OVERLOAD */
     public static final ControlType DESTINATION_OVERLOAD
         = new ControlType(M_DESTINATION_OVERLOAD);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getControlType() {

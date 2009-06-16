@@ -193,7 +193,7 @@ public class EventTypeBCSM  {
     /** EventTypeBCSM :CALL_ACCPETED */
     public static final EventTypeBCSM CALL_ACCPETED
         = new EventTypeBCSM(M_CALL_ACCPETED);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getEventTypeBCSM() {

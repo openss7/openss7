@@ -80,7 +80,7 @@ public class DPAssignment {
     public static final DPAssignment OFFICE_BASED
         = new DPAssignment(M_OFFICE_BASED);
     /**
-      * Gets the integer String representation of the Constant class.
+      * Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getDPAssignment () {

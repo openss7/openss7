@@ -55,10 +55,10 @@ public class AnalyseInformation extends Operation implements java.io.Serializabl
 
     private DestinationRoutingAddress destinationRoutingAddress;
 
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern = false ;
 
-    private String iSDNAccessRelatedInformation;
+    private java.lang.String iSDNAccessRelatedInformation;
     private boolean isISDNAccessRelatedInformation = false ;
 
     private OriginalCalledPartyID originalCalledPartyID;
@@ -67,7 +67,7 @@ public class AnalyseInformation extends Operation implements java.io.Serializabl
     private CallingPartyNumber callingPartyNumber;
     private boolean isCallingPartyNumber = false ;
 
-    private String callingPartysCategory;
+    private java.lang.String callingPartysCategory;
     private boolean isCallingPartysCategory = false ;
 
     private CalledPartyNumber calledPartyNumber;
@@ -82,7 +82,7 @@ public class AnalyseInformation extends Operation implements java.io.Serializabl
     private Carrier carrier;
     private boolean isCarrier = false ;
 
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
 
     private Entry iNServiceCompatibilityResponse;

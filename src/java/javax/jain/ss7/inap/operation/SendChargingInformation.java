@@ -52,7 +52,7 @@ public class SendChargingInformation  extends Operation   implements java.io.Ser
 
 
 
-    private String sCIBillingChargingCharacteristics;
+    private java.lang.String sCIBillingChargingCharacteristics;
     
     private LegID partyToCharge;
     
@@ -92,7 +92,7 @@ Gets SCI Billing and Charging Characteristics
 /**
 Sets SCI Billing and Charging Characteristics
 */
-    public void setSCIBillingChargingCharacteristics (String sCIBillingChargingCharacteristics)
+    public void setSCIBillingChargingCharacteristics (java.lang.String sCIBillingChargingCharacteristics)
     {
         this.sCIBillingChargingCharacteristics = sCIBillingChargingCharacteristics;
     }

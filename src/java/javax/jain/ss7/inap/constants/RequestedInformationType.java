@@ -89,7 +89,7 @@ public class RequestedInformationType  {
     /** RequestedInformationType  : RELEASE_CAUSE */
     public static final RequestedInformationType RELEASE_CAUSE
         = new RequestedInformationType(M_RELEASE_CAUSE);
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getRequestedInformationType() {

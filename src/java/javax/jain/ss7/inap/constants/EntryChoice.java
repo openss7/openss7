@@ -73,7 +73,7 @@ public class EntryChoice {
     /** EntryChoice : NETWORK_SPECIFIC */
     public static final EntryChoice NETWORK_SPECIFIC
         = new EntryChoice(M_NETWORK_SPECIFIC );
-    /** Gets the integer String representation of the Constant class.
+    /** Gets the integer value representation of the Constant class.
       * @return
       * Internal integer value of constant class.  */
     public int getEntryChoice() {

@@ -55,7 +55,7 @@ public class Connect   extends Operation implements java.io.Serializable
 
     private DestinationRoutingAddress destinationRoutingAddress;
 
-    private String alertingPattern;
+    private java.lang.String alertingPattern;
     private boolean isAlertingPattern = false ;
 
     private DigitsGenericDigits correlationID;
@@ -66,7 +66,7 @@ public class Connect   extends Operation implements java.io.Serializable
     private ForwardingCondition forwardingCondition;
     private boolean isForwardingCondition = false ;
 
-    private String iSDNAccessRelatedInformation ;
+    private java.lang.String iSDNAccessRelatedInformation ;
     private boolean isISDNAccessRelatedInformation= false ;
 
     private OriginalCalledPartyID originalCalledPartyID;
@@ -84,13 +84,13 @@ public class Connect   extends Operation implements java.io.Serializable
     private Carrier carrier;
     private boolean isCarrier = false ;
 
-    private String serviceInteractionIndicators;
+    private java.lang.String serviceInteractionIndicators;
     private boolean isServiceInteractionIndicators = false ;
 
     private CallingPartyNumber callingPartyNumber;
     private boolean isCallingPartyNumber = false ;
 
-    private String callingPartyCategory;
+    private java.lang.String callingPartyCategory;
     private boolean isCallingPartyCategory = false ;
 
     private RedirectingPartyID redirectingPartyID;
@@ -99,7 +99,7 @@ public class Connect   extends Operation implements java.io.Serializable
     private RedirectionInformation redirectionInformation;
     private boolean isRedirectionInformation = false ;
 
-    private String displayInformation;
+    private java.lang.String displayInformation;
     private boolean isDisplayInformation = false ;
 
     private ForwardCallIndicators forwardCallIndicators;
@@ -318,7 +318,7 @@ Gets ISDN Access Related Information
 /**
 Sets ISDN Access Related Information
 */
-    public void setISDNAccessRelatedInformation(String iSDNAccessRelatedInformation)
+    public void setISDNAccessRelatedInformation(java.lang.String iSDNAccessRelatedInformation)
     {
         this.iSDNAccessRelatedInformation = iSDNAccessRelatedInformation;
         isISDNAccessRelatedInformation = true;
@@ -498,7 +498,7 @@ Gets Service Interaction Indicators
 /**
 Sets Service Interaction Indicators
 */
-    public void setServiceInteractionIndicators(String serviceInteractionIndicators)
+    public void setServiceInteractionIndicators(java.lang.String serviceInteractionIndicators)
     {
         this.serviceInteractionIndicators = serviceInteractionIndicators;
         isServiceInteractionIndicators = true; 
@@ -558,7 +558,7 @@ Gets Calling Party Category
 /**
 Sets Calling Party Category
 */
-    public void setCallingPartyCategory(String callingPartyCategory)
+    public void setCallingPartyCategory(java.lang.String callingPartyCategory)
     {
         this.callingPartyCategory = callingPartyCategory;
         isCallingPartyCategory = true;
@@ -648,7 +648,7 @@ Gets Display Information
 /**
 Sets Display Information
 */
-    public void setDisplayInformation(String displayInformation)
+    public void setDisplayInformation(java.lang.String displayInformation)
     {
         this.displayInformation = displayInformation;
         isDisplayInformation = true; 

@@ -97,7 +97,7 @@ public class BackwardGVNS implements java.io.Serializable {
     }
     private int terminatingAccessIndicator;
     private int extensionIndicator;
-    private String extension;
+    private java.lang.String extension;
     private boolean isExtension = false ;         
 }
 
