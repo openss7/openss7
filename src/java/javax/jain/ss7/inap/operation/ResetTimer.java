@@ -53,7 +53,7 @@ import javax.jain.*;
 
 /** This class represents the Reset Timer Operation.
   * @version 1.2.2
-  * @author Monvacon Limited
+  * @author Monavacon Limited
   */
 public class ResetTimer extends Operation implements java.io.Serializable {
     /** Constructors For ResetTimer.  */

@@ -53,7 +53,7 @@ import javax.jain.*;
 
 /** This class represents the OriginationAttempt Operation.
   * @version 1.2.2
-  * @author Monavcon Limited
+  * @author Monavacon Limited
   */
 public class OriginationAttempt extends Operation implements java.io.Serializable {
     /** Constructor For OriginationAttempt.  */

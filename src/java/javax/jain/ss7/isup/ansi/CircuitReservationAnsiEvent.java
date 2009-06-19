@@ -52,9 +52,8 @@ import javax.jain.*;
 /** An ISUP Event: The CircuitReservationAnsiEvent class is a subclass of the IsupEvent
   * class and is used for exchanging between an ISUP Provider and an ISUP Listener for
   * sending the ANSI ISUP Circuit Reservation message (CRM).
-  *
-  * @author Monavacon
   * @version 1.2.2
+  * @author Monavacon Limited
   */
 public class CircuitReservationAnsiEvent extends IsupEvent {
     /** Constructs a new EventCircuitReservation for ANSI variant, with only the JAIN ISUP

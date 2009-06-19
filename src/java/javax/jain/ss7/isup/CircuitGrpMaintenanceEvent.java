@@ -56,9 +56,8 @@ import javax.jain.*;
     Circuit Group Maintenance object to the listener on the reception of either a CGB or a
     CGU or a CGUA or a CGBA. The primitive field identifies the message that was received.
     This event is common to ITU and ANSI variants.
-
-    @author Monavacon
     @version 1.2.2
+    @author Monavacon Limited
   */
 public class CircuitGrpMaintenanceEvent extends CircuitGrpCommonEvent {
     /** Constructs a new CircuitGrpMaintenanceEvent, with the JAIN ISUP Mandatory

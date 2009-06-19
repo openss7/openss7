@@ -53,7 +53,7 @@ import jain.*;
   * encounters an Error that cannot be passed to all registered
   * JainTcapListeners through normal TCAP error handling mechanisms.
   * @version 1.2.2
-  * @author Monavacon
+  * @author Monavacon Limited
   */
 public class TcapErrorEvent extends java.util.EventObject implements java.io.Serializable, java.lang.Cloneable {
     /** Constructs a new TcapErrorEvent containing the user defined

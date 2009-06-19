@@ -53,7 +53,7 @@ import javax.jain.*;
 
 /** This class represents ONoAnswer Operation.
   * @version 1.2.2
-  * @author Monvacon Limited
+  * @author Monavacon Limited
   */
 public class ONoAnswer  extends Operation   implements java.io.Serializable
 {

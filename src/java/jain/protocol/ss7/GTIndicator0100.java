@@ -55,7 +55,7 @@ import jain.*;
   * <li>ITU SCCP Q711-716 (03/1993)
   * <li>ITU SCCP Q711-716 (07/1996) </ul>
   *
-  * @author Monavacon
+  * @author Monavacon Limited
   * @version 1.2.2
   */
 public final class GTIndicator0100 extends GlobalTitle {

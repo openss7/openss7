@@ -58,9 +58,8 @@ import javax.jain.*;
   * handled by that listener.  The mandatory parameters for generating an SGM ISUP message
   * are set using the constructor itself.  The optional parameters may be set using get
   * and set methods described below.
-  *
-  * @author Monavacon
   * @version 1.2.2
+  * @author Monavacon Limited
   */
 public class SegmentationItuEvent extends IsupEvent {
     /** Constructs a new SegmentationItuEvent, with only the JAIN ISUP Mandatory

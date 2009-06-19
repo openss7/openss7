@@ -58,9 +58,8 @@ import javax.jain.*;
     listener. The mandatory parameters are supplied to the constructor. Optional
     parameters may then be set using the set methods The primitive field is filled as
     ISUP_PRIMITIVE_CONNECT.
-
-    @author Monavacon
     @version 1.2.2
+    @author Monavacon Limited
   */
 public class ConnectItuEvent extends IsupEvent {
     /** Constructs a new ConnectItuEvent, with only the JAIN ISUP Mandatory parameters
