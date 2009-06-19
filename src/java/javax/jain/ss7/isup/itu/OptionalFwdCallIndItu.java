@@ -52,9 +52,8 @@ import javax.jain.*;
 /** A class representing the ITU ISUP Optional Forward Call Indicators.
   * This class provides the methods to access the ITU only sub-fields in the optional
   * forward call indicators parameter.
-  *
-  * @author Monavacon LImited
   * @version 1.2.2
+  * @author Monavacon Limited
   */
 public class OptionalFwdCallIndItu implements java.io.Serializable {
     public static final byte CUGCI_NON_CUG_CALL = 0;

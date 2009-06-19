@@ -52,7 +52,7 @@ import jain.*;
   * this version of a specification.
   * @serial
   *
-  * @author Monavacon Limted
+  * @author Monavacon Limited
   * @version 1.2.2
   */
 public class VersionNotSupportedException extends SS7Exception {

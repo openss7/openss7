@@ -58,7 +58,7 @@ import jain.*;
   * not use this class and an ANSI 1996 implementation may use all the
   * parameters within this class.
   * @version 1.2.2
-  * @author Monavacon
+  * @author Monavacon Limited
   */
 public final class DialoguePortion implements java.io.Serializable {
     /** Constructs a new DialoguePortion.  */

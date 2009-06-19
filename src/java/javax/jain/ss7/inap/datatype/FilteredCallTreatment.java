@@ -52,7 +52,7 @@ import javax.jain.*;
 
 /** This class represents the FilteredCallTreatment DataType.
   * @version 1.2.2
-  * @author Monavaon Limited
+  * @author Monavacon Limited
   */
 public class FilteredCallTreatment implements java.io.Serializable { 
     /** Constructor For FilteredCallTreatment.  */

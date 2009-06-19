@@ -52,9 +52,8 @@ import javax.jain.*;
 /** An ISUP Event: The CircuitValidationRespAnsiEvent class is a subclass of the IsupEvent
   * class and is used for exchanging between an ISUP Provider and an ISUP Listener for
   * sending the ANSI ISUP Circuit Validation Response message (CVR).
-  *
-  * @author Monavacon
   * @version 1.2.2
+  * @author Monavacon Limited
   */
 public class CircuitValidationRespAnsiEvent extends IsupEvent {
     /** Constructs a new EventCircuitValidationResp for ANSI variant, with only the JAIN

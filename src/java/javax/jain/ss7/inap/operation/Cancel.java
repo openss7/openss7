@@ -53,7 +53,7 @@ import javax.jain.*;
 
 /** This class represents the Cancel Operation.
   * @version 1.2.2
-  * @author Monvacon Limited
+  * @author Monavacon Limited
   */
 public class Cancel extends Operation implements java.io.Serializable {
     /** Constructors For Cancel.  */
