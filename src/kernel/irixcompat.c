@@ -129,7 +129,7 @@ irixcomp_exit(void)
 
 __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args);
 
-EXPORT_SYMBOL_GPL(icmn_err);	/* irix/ddi.h */
+EXPORT_SYMBOL(icmn_err);	/* irix/ddi.h */
 /* gcc 3.4.3 can't handle inlining with variable argument list */
 __IRIX_EXTERN void
 cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
@@ -142,7 +142,7 @@ cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
 	return;
 }
 
-EXPORT_SYMBOL_GPL(cmn_err_tag);	/* irix/ddi.h */
+EXPORT_SYMBOL(cmn_err_tag);	/* irix/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
 module_init(irixcomp_init);

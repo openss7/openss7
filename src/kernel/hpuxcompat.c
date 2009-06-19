@@ -123,12 +123,12 @@ streams_get_sleep_lock(caddr_t event)
 	return &sleep_lock;
 }
 
-EXPORT_SYMBOL_GPL(streams_get_sleep_lock);	/* hpux/ddi.h */
+EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
 
 __HPUX_EXTERN lock_t *get_sleep_lock(caddr_t event)
     __attribute__ ((alias(__stringify(streams_get_sleep_lock))));
 
-EXPORT_SYMBOL_GPL(get_sleep_lock);	/* hpux/ddi.h */
+EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
 /**
  *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
@@ -158,7 +158,7 @@ streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 	__strfunc(func, q, mp, priv);
 }
 
-EXPORT_SYMBOL_GPL(streams_put);	/* hpux/ddi.h */
+EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
 
 __HPUX_EXTERN int
 str_install_HPUX(struct stream_inst *inst)
@@ -287,7 +287,7 @@ str_install_HPUX(struct stream_inst *inst)
 	}
 }
 
-EXPORT_SYMBOL_GPL(str_install_HPUX);
+EXPORT_SYMBOL(str_install_HPUX);
 
 __HPUX_EXTERN int
 str_uninstall(struct stream_inst *inst)
@@ -320,7 +320,7 @@ str_uninstall(struct stream_inst *inst)
 	}
 }
 
-EXPORT_SYMBOL_GPL(str_uninstall);
+EXPORT_SYMBOL(str_uninstall);
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 static
