@@ -351,7 +351,7 @@ register_strsync(struct fmodsw *fmod)
 	return (0);
 }
 
-EXPORT_SYMBOL_GPL(register_strsync);
+EXPORT_SYMBOL(register_strsync);
 
 streams_fastcall void
 unregister_strsync(struct fmodsw *fmod)
@@ -362,7 +362,7 @@ unregister_strsync(struct fmodsw *fmod)
 #endif
 }
 
-EXPORT_SYMBOL_GPL(unregister_strsync);
+EXPORT_SYMBOL(unregister_strsync);
 
 /**
  *  register_strmod: - register STREAMS module
@@ -449,7 +449,7 @@ register_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strmod);
+EXPORT_SYMBOL(register_strmod);
 
 /**
  *  unregister_strmod:
@@ -485,7 +485,7 @@ unregister_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_strmod);
+EXPORT_SYMBOL(unregister_strmod);
 
 /**
  *  register_strdrv:	- register STREAMS driver to specfs
@@ -601,7 +601,7 @@ register_strdrv(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strdrv);
+EXPORT_SYMBOL(register_strdrv);
 
 /**
  *  unregister_strdrv:	- unregister STREAMS driver from specfs
@@ -669,7 +669,7 @@ unregister_strdrv(struct cdevsw *cdev)
 	goto unlock_exit;
 }
 
-EXPORT_SYMBOL_GPL(unregister_strdrv);
+EXPORT_SYMBOL(unregister_strdrv);
 
 #if !defined HAVE_KINC_LINUX_CDEV_H
 STATIC int
@@ -935,7 +935,7 @@ register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_cmajor);
+EXPORT_SYMBOL(register_cmajor);
 
 streams_fastcall int
 unregister_cmajor(struct cdevsw *cdev, major_t major)
@@ -962,7 +962,7 @@ unregister_cmajor(struct cdevsw *cdev, major_t major)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_cmajor);
+EXPORT_SYMBOL(unregister_cmajor);
 
 /**
  *  register_strnod:	- register a minor device node
@@ -1038,7 +1038,7 @@ register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strnod);
+EXPORT_SYMBOL(register_strnod);
 
 /**
  *  unregister_strnod: - unregister a minor device node
@@ -1089,4 +1089,4 @@ unregister_strnod(struct cdevsw *cdev, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_strnod);
+EXPORT_SYMBOL(unregister_strnod);

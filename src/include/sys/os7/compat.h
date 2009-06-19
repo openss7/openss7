@@ -113,7 +113,7 @@ typedef void irqreturn_t;
 #endif
 
 #ifndef EXPORT_SYMBOL_NOVERS
-#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL_GPL(__sym)
+#define EXPORT_SYMBOL_NOVERS(__sym) EXPORT_SYMBOL(__sym)
 #endif
 
 #define _RP streamscall

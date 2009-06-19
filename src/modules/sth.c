@@ -10081,7 +10081,7 @@ register_ioctl32(unsigned int cmd)
 	return ((void *) (long) (-1));
 }
 
-EXPORT_SYMBOL_GPL(register_ioctl32);
+EXPORT_SYMBOL(register_ioctl32);
 
 __unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
@@ -10091,7 +10091,7 @@ unregister_ioctl32(void *opaque)
 	return;
 }
 
-EXPORT_SYMBOL_GPL(unregister_ioctl32);
+EXPORT_SYMBOL(unregister_ioctl32);
 
 #else				/* defined HAVE_COMPAT_IOCTL */
 /*
@@ -10393,7 +10393,7 @@ register_ioctl32(unsigned int cmd)
 	return ((void *) t);
 }
 
-EXPORT_SYMBOL_GPL(register_ioctl32);
+EXPORT_SYMBOL(register_ioctl32);
 
 /**
  *  unregister_ioctl32: - register ioctl for 32bit compatibility
@@ -10410,7 +10410,7 @@ unregister_ioctl32(void *opaque)
 	}
 }
 
-EXPORT_SYMBOL_GPL(unregister_ioctl32);
+EXPORT_SYMBOL(unregister_ioctl32);
 
 #endif				/* defined HAVE_COMPAT_IOCTL */
 #else				/* defined WITH_32BIT_CONVERSION */
@@ -10423,7 +10423,7 @@ register_ioctl32(unsigned int cmd)
 	return ((void *) (long) (-1));
 }
 
-EXPORT_SYMBOL_GPL(register_ioctl32);
+EXPORT_SYMBOL(register_ioctl32);
 
 __unlikely streams_fastcall void
 unregister_ioctl32(void *opaque)
@@ -10433,7 +10433,7 @@ unregister_ioctl32(void *opaque)
 	return;
 }
 
-EXPORT_SYMBOL_GPL(unregister_ioctl32);
+EXPORT_SYMBOL(unregister_ioctl32);
 
 #endif				/* defined WITH_32BIT_CONVERSION */
 

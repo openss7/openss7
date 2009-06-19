@@ -797,127 +797,46 @@ lib-javax-jain-ss7-isup.jar.db: javax-jain-ss7-isup.jar
 #############################################################################
 
 my_javax_jain_ss7_inap_JAVAFILES = \
-	javax/jain/ss7/inap/operation/Operation.java \
-	javax/jain/ss7/inap/operation/ActivityTest.java \
-	javax/jain/ss7/inap/operation/AnalysedInformation.java \
-	javax/jain/ss7/inap/operation/ActivateServiceFiltering.java \
-	javax/jain/ss7/inap/operation/CallGap.java \
-	javax/jain/ss7/inap/operation/AnalyseInformation.java \
-	javax/jain/ss7/inap/operation/ApplyCharging.java \
-	javax/jain/ss7/inap/operation/ApplyChargingReport.java \
-	javax/jain/ss7/inap/operation/Cancel.java \
-	javax/jain/ss7/inap/operation/AssistRequestInstructions.java \
-	javax/jain/ss7/inap/operation/AuthorizeTermination.java \
-	javax/jain/ss7/inap/operation/Connect.java \
-	javax/jain/ss7/inap/operation/CallInformationReport.java \
-	javax/jain/ss7/inap/operation/CollectedInformation.java \
-	javax/jain/ss7/inap/operation/CollectInformation.java \
-	javax/jain/ss7/inap/operation/MoveLeg.java \
-	javax/jain/ss7/inap/operation/ConnectToResource.java \
-	javax/jain/ss7/inap/operation/Continue.java \
-	javax/jain/ss7/inap/operation/ContinueWithArgument.java \
-	javax/jain/ss7/inap/operation/CallInformationRequest.java \
-	javax/jain/ss7/inap/operation/CancelStatusReportRequest.java \
-	javax/jain/ss7/inap/operation/DFCWithArgument.java \
-	javax/jain/ss7/inap/operation/CreateCallSegmentAssociation.java \
-	javax/jain/ss7/inap/operation/DisconnectLeg.java \
-	javax/jain/ss7/inap/operation/EntityReleased.java \
-	javax/jain/ss7/inap/operation/DisconnectForwardConnection.java \
-	javax/jain/ss7/inap/operation/EstablishTemporaryConnection.java \
-	javax/jain/ss7/inap/operation/EventReportBCSM.java \
-	javax/jain/ss7/inap/operation/EventReportFacility.java \
-	javax/jain/ss7/inap/operation/EventNotificationCharging.java \
-	javax/jain/ss7/inap/operation/FacilitySelectedAndAvailable.java \
-	javax/jain/ss7/inap/operation/HoldCallInNetwork.java \
-	javax/jain/ss7/inap/operation/InitialDP.java \
-	javax/jain/ss7/inap/operation/InitiateCallAttempt.java \
-	javax/jain/ss7/inap/operation/ManageTriggerData.java \
-	javax/jain/ss7/inap/operation/FurnishChargingInformation.java \
-	javax/jain/ss7/inap/operation/MergeCallSegments.java \
-	javax/jain/ss7/inap/operation/MessageReceived.java \
-	javax/jain/ss7/inap/operation/MoveCallSegments.java \
-	javax/jain/ss7/inap/operation/OAnswer.java \
-	javax/jain/ss7/inap/operation/OAbandon.java \
-	javax/jain/ss7/inap/operation/TAnswer.java \
-	javax/jain/ss7/inap/operation/OCalledPartyBusy.java \
-	javax/jain/ss7/inap/operation/ODisconnect.java \
-	javax/jain/ss7/inap/operation/OMidCall.java \
-	javax/jain/ss7/inap/operation/ONoAnswer.java \
-	javax/jain/ss7/inap/operation/OriginationAttempt.java \
-	javax/jain/ss7/inap/operation/OSuspended.java \
-	javax/jain/ss7/inap/operation/ManageTriggerDataResult.java \
-	javax/jain/ss7/inap/operation/PlayAnnouncement.java \
-	javax/jain/ss7/inap/operation/ReceivedInformation.java \
-	javax/jain/ss7/inap/operation/OriginationAttemptAuthorized.java \
-	javax/jain/ss7/inap/operation/PromptAndCollectUserInformation.java \
-	javax/jain/ss7/inap/operation/Reconnect.java \
-	javax/jain/ss7/inap/operation/ReleaseCall.java \
-	javax/jain/ss7/inap/operation/ReportUTSI.java \
-	javax/jain/ss7/inap/operation/RequestReportUTSI.java \
-	javax/jain/ss7/inap/operation/PromptAndReceiveMessage.java \
-	javax/jain/ss7/inap/operation/RequestCurrentStatusReport.java \
-	javax/jain/ss7/inap/operation/RequestCurrentStatusReportResult.java \
-	javax/jain/ss7/inap/operation/RequestEveryStatusChangeReport.java \
-	javax/jain/ss7/inap/operation/RequestFirstStatusMatchReport.java \
-	javax/jain/ss7/inap/operation/RequestNotificationChargingEvent.java \
-	javax/jain/ss7/inap/operation/RequestReportBCSMEvent.java \
-	javax/jain/ss7/inap/operation/ResetTimer.java \
-	javax/jain/ss7/inap/operation/RouteSelectFailure.java \
-	javax/jain/ss7/inap/operation/SelectFacility.java \
-	javax/jain/ss7/inap/operation/SelectRoute.java \
-	javax/jain/ss7/inap/operation/SendSTUI.java \
-	javax/jain/ss7/inap/operation/RequestReportFacilityEvent.java \
-	javax/jain/ss7/inap/operation/SendChargingInformation.java \
-	javax/jain/ss7/inap/operation/SplitLeg.java \
-	javax/jain/ss7/inap/operation/SendFacilityInformation.java \
-	javax/jain/ss7/inap/operation/ServiceFilteringResponse.java \
-	javax/jain/ss7/inap/operation/StatusReport.java \
-	javax/jain/ss7/inap/operation/TBusy.java \
-	javax/jain/ss7/inap/operation/TDisconnect.java \
-	javax/jain/ss7/inap/operation/TerminationAttempt.java \
-	javax/jain/ss7/inap/operation/SpecializedResourceReport.java \
-	javax/jain/ss7/inap/operation/TMidCall.java \
-	javax/jain/ss7/inap/operation/TNoAnswer.java \
-	javax/jain/ss7/inap/operation/TSuspended.java \
-	javax/jain/ss7/inap/operation/CreateCallSegmentAssociationResult.java \
-	javax/jain/ss7/inap/operation/TerminationAttemptAuthorized.java \
 	javax/jain/ss7/inap/constants/ActionIndicator.java \
 	javax/jain/ss7/inap/constants/ActionPerformed.java \
-	javax/jain/ss7/inap/constants/DialoguePrimitiveType.java \
-	javax/jain/ss7/inap/constants/TransportAddressChoice.java \
+	javax/jain/ss7/inap/constants/BearerCapabilityChoice.java \
+	javax/jain/ss7/inap/constants/CallProcessingOperationCorrelationID.java \
 	javax/jain/ss7/inap/constants/CancelChoice.java \
 	javax/jain/ss7/inap/constants/CancelID.java \
 	javax/jain/ss7/inap/constants/CGEncountered.java \
 	javax/jain/ss7/inap/constants/CollectedInfoChoice.java \
 	javax/jain/ss7/inap/constants/ComponentChoice.java \
-	javax/jain/ss7/inap/constants/BearerCapabilityChoice.java \
 	javax/jain/ss7/inap/constants/ComponentID.java \
+	javax/jain/ss7/inap/constants/ComponentIndPrimitiveType.java \
+	javax/jain/ss7/inap/constants/ComponentPrimitiveType.java \
+	javax/jain/ss7/inap/constants/ComponentReqPrimitiveType.java \
 	javax/jain/ss7/inap/constants/ComponentType.java \
 	javax/jain/ss7/inap/constants/ConnectedPartyChoice.java \
 	javax/jain/ss7/inap/constants/ControlType.java \
-	javax/jain/ss7/inap/constants/ComponentIndPrimitiveType.java \
+	javax/jain/ss7/inap/constants/DialoguePrimitiveType.java \
 	javax/jain/ss7/inap/constants/DPAssignment.java \
-	javax/jain/ss7/inap/constants/ComponentReqPrimitiveType.java \
+	javax/jain/ss7/inap/constants/DpSpecificCriteriaChoice.java \
 	javax/jain/ss7/inap/constants/ElapsedTimeValueID.java \
 	javax/jain/ss7/inap/constants/EntryChoice.java \
 	javax/jain/ss7/inap/constants/ErrorCode.java \
 	javax/jain/ss7/inap/constants/ErrorTreatment.java \
-	javax/jain/ss7/inap/constants/CallProcessingOperationCorrelationID.java \
+	javax/jain/ss7/inap/constants/EventSpecificInformationBCSMChoice.java \
 	javax/jain/ss7/inap/constants/EventTypeBCSM.java \
 	javax/jain/ss7/inap/constants/ExtensionChoice.java \
 	javax/jain/ss7/inap/constants/ExtensionType.java \
 	javax/jain/ss7/inap/constants/FacilityGroupChoice.java \
-	javax/jain/ss7/inap/constants/DpSpecificCriteriaChoice.java \
 	javax/jain/ss7/inap/constants/FacilityGroupID.java \
 	javax/jain/ss7/inap/constants/FeatureRequestIndicator.java \
 	javax/jain/ss7/inap/constants/FilterCriteriaID.java \
 	javax/jain/ss7/inap/constants/FilteringCharacteristicsChoice.java \
+	javax/jain/ss7/inap/constants/FilteringCriteriaChoice.java \
+	javax/jain/ss7/inap/constants/FilteringTimeOutChoice.java \
 	javax/jain/ss7/inap/constants/ForwardingCondition.java \
 	javax/jain/ss7/inap/constants/GapCriteriaChoice.java \
 	javax/jain/ss7/inap/constants/GapTreatmentChoice.java \
 	javax/jain/ss7/inap/constants/GeneralProblem.java \
 	javax/jain/ss7/inap/constants/GroupID.java \
-	javax/jain/ss7/inap/constants/FilteringCriteriaChoice.java \
+	javax/jain/ss7/inap/constants/InformationToSendChoice.java \
 	javax/jain/ss7/inap/constants/InfoToSendChoice.java \
 	javax/jain/ss7/inap/constants/InvokeProblem.java \
 	javax/jain/ss7/inap/constants/LegIDChoice.java \
@@ -926,22 +845,22 @@ my_javax_jain_ss7_inap_JAVAFILES = \
 	javax/jain/ss7/inap/constants/MessageType.java \
 	javax/jain/ss7/inap/constants/MidCallReportType.java \
 	javax/jain/ss7/inap/constants/MonitorMode.java \
-	javax/jain/ss7/inap/constants/FilteringTimeOutChoice.java \
+	javax/jain/ss7/inap/constants/NotificationInformationChoice.java \
 	javax/jain/ss7/inap/constants/NumberMatchChoice.java \
-	javax/jain/ss7/inap/constants/OperationCode.java \
 	javax/jain/ss7/inap/constants/OperationCodeChoice.java \
+	javax/jain/ss7/inap/constants/OperationCode.java \
 	javax/jain/ss7/inap/constants/PAbortReason.java \
 	javax/jain/ss7/inap/constants/PartyToConnectChoice.java \
-	javax/jain/ss7/inap/constants/InformationToSendChoice.java \
-	javax/jain/ss7/inap/constants/NotificationInformationChoice.java \
 	javax/jain/ss7/inap/constants/PartyToDisconnectChoice.java \
+	javax/jain/ss7/inap/constants/ProfileIdentifierChoice.java \
+	javax/jain/ss7/inap/constants/ReceivedInformationChoice.java \
 	javax/jain/ss7/inap/constants/ReceivedStatus.java \
 	javax/jain/ss7/inap/constants/RejectType.java \
 	javax/jain/ss7/inap/constants/ReportCause.java \
 	javax/jain/ss7/inap/constants/ReportCondition.java \
-	javax/jain/ss7/inap/constants/ProfileIdentifierChoice.java \
-	javax/jain/ss7/inap/constants/ReceivedInformationChoice.java \
 	javax/jain/ss7/inap/constants/RequestedInformationType.java \
+	javax/jain/ss7/inap/constants/RequestedInformationValueChoice.java \
+	javax/jain/ss7/inap/constants/ResourceAddressChoice.java \
 	javax/jain/ss7/inap/constants/ResourceAddressID.java \
 	javax/jain/ss7/inap/constants/ResourceIDChoice.java \
 	javax/jain/ss7/inap/constants/ResourceStatus.java \
@@ -950,125 +869,126 @@ my_javax_jain_ss7_inap_JAVAFILES = \
 	javax/jain/ss7/inap/constants/ReturnResultProblem.java \
 	javax/jain/ss7/inap/constants/RoutingAddressChoice.java \
 	javax/jain/ss7/inap/constants/SideID.java \
-	javax/jain/ss7/inap/constants/RequestedInformationValueChoice.java \
+	javax/jain/ss7/inap/constants/TargetLineIdentifierChoice.java \
 	javax/jain/ss7/inap/constants/TerminalType.java \
 	javax/jain/ss7/inap/constants/TimeOutError.java \
 	javax/jain/ss7/inap/constants/TimerID.java \
 	javax/jain/ss7/inap/constants/ToneIDChoice.java \
-	javax/jain/ss7/inap/constants/ResourceAddressChoice.java \
+	javax/jain/ss7/inap/constants/TransportAddressChoice.java \
 	javax/jain/ss7/inap/constants/TriggerType.java \
 	javax/jain/ss7/inap/constants/UAbortReason.java \
 	javax/jain/ss7/inap/constants/USIMonitorMode.java \
 	javax/jain/ss7/inap/constants/VariablePartChoice.java \
 	javax/jain/ss7/inap/constants/VariablePartID.java \
-	javax/jain/ss7/inap/constants/EventSpecificInformationBCSMChoice.java \
-	javax/jain/ss7/inap/constants/TargetLineIdentifierChoice.java \
-	javax/jain/ss7/inap/datatype/TransportAddress.java \
 	javax/jain/ss7/inap/datatype/AddressAndService.java \
-	javax/jain/ss7/inap/datatype/DigitsGenericNumber.java \
-	javax/jain/ss7/inap/datatype/LocationNumber.java \
 	javax/jain/ss7/inap/datatype/AllCallSegments.java \
-	javax/jain/ss7/inap/datatype/Cause.java \
-	javax/jain/ss7/inap/datatype/BackwardGVNS.java \
-	javax/jain/ss7/inap/datatype/BCSMEvent.java \
-	javax/jain/ss7/inap/datatype/LegID.java \
 	javax/jain/ss7/inap/datatype/AssociatedCallSegment.java \
+	javax/jain/ss7/inap/datatype/BackwardGVNS.java \
 	javax/jain/ss7/inap/datatype/BackwardServiceInteractionInd.java \
-	javax/jain/ss7/inap/datatype/DPSpecificCriteria.java \
-	javax/jain/ss7/inap/datatype/MidCallControlInfo.java \
-	javax/jain/ss7/inap/datatype/MidCallControlInformation.java \
-	javax/jain/ss7/inap/datatype/MidCallInfoType.java \
-	javax/jain/ss7/inap/datatype/DigitsGenericDigits.java \
+	javax/jain/ss7/inap/datatype/BCSMEvent.java \
 	javax/jain/ss7/inap/datatype/BCSMFailure.java \
-	javax/jain/ss7/inap/datatype/BearerCap.java \
-	javax/jain/ss7/inap/datatype/Tone.java \
 	javax/jain/ss7/inap/datatype/BearerCapability.java \
-	javax/jain/ss7/inap/datatype/Text.java \
-	javax/jain/ss7/inap/datatype/InformationToSend.java \
-	javax/jain/ss7/inap/datatype/InbandInfo.java \
-	javax/jain/ss7/inap/datatype/MessageID.java \
-	javax/jain/ss7/inap/datatype/VariableMessage.java \
-	javax/jain/ss7/inap/datatype/VariablePart.java \
-	javax/jain/ss7/inap/datatype/CalledPartyNumber.java \
-	javax/jain/ss7/inap/datatype/CallingPartyNumber.java \
-	javax/jain/ss7/inap/datatype/CallSegment.java \
+	javax/jain/ss7/inap/datatype/BearerCap.java \
 	javax/jain/ss7/inap/datatype/BothGapTreatmentParameters.java \
-	javax/jain/ss7/inap/datatype/CallSegmentToCancel.java \
-	javax/jain/ss7/inap/datatype/Carrier.java \
 	javax/jain/ss7/inap/datatype/CalledAddressAndService.java \
+	javax/jain/ss7/inap/datatype/CalledPartyNumber.java \
 	javax/jain/ss7/inap/datatype/CalledPartySubaddress.java \
-	javax/jain/ss7/inap/datatype/CarrierID.java \
-	javax/jain/ss7/inap/datatype/Entry.java \
 	javax/jain/ss7/inap/datatype/CallingAddressAndService.java \
+	javax/jain/ss7/inap/datatype/CallingPartyNumber.java \
+	javax/jain/ss7/inap/datatype/CallingPartySubaddress.java \
+	javax/jain/ss7/inap/datatype/CallSegment.java \
+	javax/jain/ss7/inap/datatype/CallSegmentToCancel.java \
+	javax/jain/ss7/inap/datatype/CarrierID.java \
+	javax/jain/ss7/inap/datatype/Carrier.java \
+	javax/jain/ss7/inap/datatype/Cause.java \
 	javax/jain/ss7/inap/datatype/ChargingEvent.java \
 	javax/jain/ss7/inap/datatype/CollectedDigits.java \
 	javax/jain/ss7/inap/datatype/CollectedInfo.java \
-	javax/jain/ss7/inap/datatype/CallingPartySubaddress.java \
 	javax/jain/ss7/inap/datatype/Component.java \
 	javax/jain/ss7/inap/datatype/ConnectedParty.java \
 	javax/jain/ss7/inap/datatype/ControlDigits.java \
 	javax/jain/ss7/inap/datatype/CounterAndValue.java \
 	javax/jain/ss7/inap/datatype/CSFailure.java \
 	javax/jain/ss7/inap/datatype/DestinationRoutingAddress.java \
-	javax/jain/ss7/inap/datatype/ForwardGVNS.java \
+	javax/jain/ss7/inap/datatype/DigitsGenericDigits.java \
+	javax/jain/ss7/inap/datatype/DigitsGenericNumber.java \
+	javax/jain/ss7/inap/datatype/DisconnectSpecificInfo.java \
+	javax/jain/ss7/inap/datatype/DPSpecificCommonParameters.java \
+	javax/jain/ss7/inap/datatype/DPSpecificCriteria.java \
+	javax/jain/ss7/inap/datatype/Entry.java \
+	javax/jain/ss7/inap/datatype/EventSpecificInformationBCSM.java \
 	javax/jain/ss7/inap/datatype/ExtensionField.java \
-	javax/jain/ss7/inap/datatype/MiscCallInfo.java \
 	javax/jain/ss7/inap/datatype/Extension.java \
-	javax/jain/ss7/inap/datatype/MidCallSpecificInfo.java \
 	javax/jain/ss7/inap/datatype/FacilityGroup.java \
+	javax/jain/ss7/inap/datatype/FilteredCallTreatment.java \
+	javax/jain/ss7/inap/datatype/FilteringCharacteristics.java \
 	javax/jain/ss7/inap/datatype/FilteringCriteria.java \
 	javax/jain/ss7/inap/datatype/FilteringTimeOut.java \
+	javax/jain/ss7/inap/datatype/ForwardCallIndicators.java \
+	javax/jain/ss7/inap/datatype/ForwardGVNS.java \
+	javax/jain/ss7/inap/datatype/ForwardServiceInteractionInd.java \
 	javax/jain/ss7/inap/datatype/GapCriteria.java \
-	javax/jain/ss7/inap/datatype/GapOnService.java \
-	javax/jain/ss7/inap/datatype/DisconnectSpecificInfo.java \
 	javax/jain/ss7/inap/datatype/GapIndicators.java \
+	javax/jain/ss7/inap/datatype/GapOnService.java \
 	javax/jain/ss7/inap/datatype/GapTreatment.java \
 	javax/jain/ss7/inap/datatype/GenericNumbers.java \
-	javax/jain/ss7/inap/datatype/DPSpecificCommonParameters.java \
-	javax/jain/ss7/inap/datatype/ServiceAddressInformation.java \
-	javax/jain/ss7/inap/datatype/GlobalTitle.java \
-	javax/jain/ss7/inap/datatype/Leg.java \
-	javax/jain/ss7/inap/datatype/ScfID.java \
 	javax/jain/ss7/inap/datatype/GlobalTitle0001.java \
 	javax/jain/ss7/inap/datatype/GlobalTitle0010.java \
 	javax/jain/ss7/inap/datatype/GlobalTitle0011.java \
-	javax/jain/ss7/inap/datatype/INServiceCompatibilityIndication.java \
 	javax/jain/ss7/inap/datatype/GlobalTitle0100.java \
+	javax/jain/ss7/inap/datatype/GlobalTitle.java \
+	javax/jain/ss7/inap/datatype/HighLayerCompatibility.java \
+	javax/jain/ss7/inap/datatype/InbandInfo.java \
 	javax/jain/ss7/inap/datatype/InformationToRecord.java \
+	javax/jain/ss7/inap/datatype/InformationToSend.java \
+	javax/jain/ss7/inap/datatype/INServiceCompatibilityIndication.java \
+	javax/jain/ss7/inap/datatype/IPAddressAndCallSegmentID.java \
 	javax/jain/ss7/inap/datatype/IPAddressAndLegID.java \
-	javax/jain/ss7/inap/datatype/ServiceInteractionIndicatorsTwo.java \
+	javax/jain/ss7/inap/datatype/LegID.java \
+	javax/jain/ss7/inap/datatype/Leg.java \
+	javax/jain/ss7/inap/datatype/LocationNumber.java \
+	javax/jain/ss7/inap/datatype/MessageID.java \
+	javax/jain/ss7/inap/datatype/MidCallControlInfo.java \
+	javax/jain/ss7/inap/datatype/MidCallControlInformation.java \
+	javax/jain/ss7/inap/datatype/MidCallInfoType.java \
+	javax/jain/ss7/inap/datatype/MidCallSpecificInfo.java \
+	javax/jain/ss7/inap/datatype/MiscCallInfo.java \
+	javax/jain/ss7/inap/datatype/OriginalCalledPartyID.java \
 	javax/jain/ss7/inap/datatype/PartyToConnect.java \
 	javax/jain/ss7/inap/datatype/PartyToDisconnect.java \
 	javax/jain/ss7/inap/datatype/ProfileIdentifier.java \
 	javax/jain/ss7/inap/datatype/RedirectingPartyID.java \
-	javax/jain/ss7/inap/datatype/ForwardServiceInteractionInd.java \
+	javax/jain/ss7/inap/datatype/RedirectionInformation.java \
 	javax/jain/ss7/inap/datatype/RequestedInformation.java \
-	javax/jain/ss7/inap/datatype/EventSpecificInformationBCSM.java \
-	javax/jain/ss7/inap/datatype/FilteredCallTreatment.java \
-	javax/jain/ss7/inap/datatype/FilteringCharacteristics.java \
+	javax/jain/ss7/inap/datatype/RequestedInformationList.java \
+	javax/jain/ss7/inap/datatype/RequestedInformationTypeList.java \
+	javax/jain/ss7/inap/datatype/RequestedInformationValue.java \
 	javax/jain/ss7/inap/datatype/RequestedUTSI.java \
 	javax/jain/ss7/inap/datatype/ResourceAddress.java \
 	javax/jain/ss7/inap/datatype/ResourceID.java \
 	javax/jain/ss7/inap/datatype/RouteList.java \
-	javax/jain/ss7/inap/datatype/ForwardCallIndicators.java \
-	javax/jain/ss7/inap/datatype/HighLayerCompatibility.java \
-	javax/jain/ss7/inap/datatype/IPAddressAndCallSegmentID.java \
-	javax/jain/ss7/inap/datatype/OriginalCalledPartyID.java \
-	javax/jain/ss7/inap/datatype/RedirectionInformation.java \
-	javax/jain/ss7/inap/datatype/RequestedInformationValue.java \
-	javax/jain/ss7/inap/datatype/RequestedInformationList.java \
-	javax/jain/ss7/inap/datatype/RequestedInformationTypeList.java \
+	javax/jain/ss7/inap/datatype/ScfID.java \
+	javax/jain/ss7/inap/datatype/ServiceAddressInformation.java \
+	javax/jain/ss7/inap/datatype/ServiceInteractionIndicatorsTwo.java \
+	javax/jain/ss7/inap/datatype/Text.java \
+	javax/jain/ss7/inap/datatype/Tone.java \
+	javax/jain/ss7/inap/datatype/TransportAddress.java \
 	javax/jain/ss7/inap/datatype/TriggerDataIdentifier.java \
-	javax/jain/ss7/inap/event/DialogueIndEvent.java \
-	javax/jain/ss7/inap/event/DialogueReqEvent.java \
+	javax/jain/ss7/inap/datatype/VariableMessage.java \
+	javax/jain/ss7/inap/datatype/VariablePart.java \
 	javax/jain/ss7/inap/event/BeginIndEvent.java \
 	javax/jain/ss7/inap/event/BeginReqEvent.java \
+	javax/jain/ss7/inap/event/ComponentEvent.java \
 	javax/jain/ss7/inap/event/ComponentIndEvent.java \
 	javax/jain/ss7/inap/event/ComponentReqEvent.java \
 	javax/jain/ss7/inap/event/ContinueIndEvent.java \
 	javax/jain/ss7/inap/event/ContinueReqEvent.java \
+	javax/jain/ss7/inap/event/DialogueEvent.java \
+	javax/jain/ss7/inap/event/DialogueIndEvent.java \
+	javax/jain/ss7/inap/event/DialogueReqEvent.java \
 	javax/jain/ss7/inap/event/EndIndEvent.java \
 	javax/jain/ss7/inap/event/EndReqEvent.java \
+	javax/jain/ss7/inap/event/InapEvent.java \
 	javax/jain/ss7/inap/event/InvokeIndEvent.java \
 	javax/jain/ss7/inap/event/InvokeReqEvent.java \
 	javax/jain/ss7/inap/event/LCancelIndEvent.java \
@@ -1086,13 +1006,97 @@ my_javax_jain_ss7_inap_JAVAFILES = \
 	javax/jain/ss7/inap/event/UErrorReqEvent.java \
 	javax/jain/ss7/inap/event/URejectIndEvent.java \
 	javax/jain/ss7/inap/event/URejectReqEvent.java \
-	javax/jain/ss7/inap/exception/TooManyListenersRegisteredException.java \
+	javax/jain/ss7/inap/exception/InvalidApplicationContextException.java \
 	javax/jain/ss7/inap/exception/InvalidCallIDException.java \
 	javax/jain/ss7/inap/exception/ParameterOutOfRangeException.java \
-	javax/jain/ss7/inap/exception/InvalidApplicationContextException.java \
+	javax/jain/ss7/inap/exception/TooManyListenersRegisteredException.java \
 	javax/jain/ss7/inap/JainInapListener.java \
 	javax/jain/ss7/inap/JainInapProvider.java \
 	javax/jain/ss7/inap/JainInapStack.java \
+	javax/jain/ss7/inap/operation/ActivateServiceFiltering.java \
+	javax/jain/ss7/inap/operation/ActivityTest.java \
+	javax/jain/ss7/inap/operation/AnalysedInformation.java \
+	javax/jain/ss7/inap/operation/AnalyseInformation.java \
+	javax/jain/ss7/inap/operation/ApplyCharging.java \
+	javax/jain/ss7/inap/operation/ApplyChargingReport.java \
+	javax/jain/ss7/inap/operation/AssistRequestInstructions.java \
+	javax/jain/ss7/inap/operation/AuthorizeTermination.java \
+	javax/jain/ss7/inap/operation/CallGap.java \
+	javax/jain/ss7/inap/operation/CallInformationReport.java \
+	javax/jain/ss7/inap/operation/CallInformationRequest.java \
+	javax/jain/ss7/inap/operation/Cancel.java \
+	javax/jain/ss7/inap/operation/CancelStatusReportRequest.java \
+	javax/jain/ss7/inap/operation/CollectedInformation.java \
+	javax/jain/ss7/inap/operation/CollectInformation.java \
+	javax/jain/ss7/inap/operation/Connect.java \
+	javax/jain/ss7/inap/operation/ConnectToResource.java \
+	javax/jain/ss7/inap/operation/Continue.java \
+	javax/jain/ss7/inap/operation/ContinueWithArgument.java \
+	javax/jain/ss7/inap/operation/CreateCallSegmentAssociation.java \
+	javax/jain/ss7/inap/operation/CreateCallSegmentAssociationResult.java \
+	javax/jain/ss7/inap/operation/DFCWithArgument.java \
+	javax/jain/ss7/inap/operation/DisconnectForwardConnection.java \
+	javax/jain/ss7/inap/operation/DisconnectLeg.java \
+	javax/jain/ss7/inap/operation/EntityReleased.java \
+	javax/jain/ss7/inap/operation/EstablishTemporaryConnection.java \
+	javax/jain/ss7/inap/operation/EventNotificationCharging.java \
+	javax/jain/ss7/inap/operation/EventReportBCSM.java \
+	javax/jain/ss7/inap/operation/EventReportFacility.java \
+	javax/jain/ss7/inap/operation/FacilitySelectedAndAvailable.java \
+	javax/jain/ss7/inap/operation/FurnishChargingInformation.java \
+	javax/jain/ss7/inap/operation/HoldCallInNetwork.java \
+	javax/jain/ss7/inap/operation/InitialDP.java \
+	javax/jain/ss7/inap/operation/InitiateCallAttempt.java \
+	javax/jain/ss7/inap/operation/ManageTriggerData.java \
+	javax/jain/ss7/inap/operation/ManageTriggerDataResult.java \
+	javax/jain/ss7/inap/operation/MergeCallSegments.java \
+	javax/jain/ss7/inap/operation/MessageReceived.java \
+	javax/jain/ss7/inap/operation/MoveCallSegments.java \
+	javax/jain/ss7/inap/operation/MoveLeg.java \
+	javax/jain/ss7/inap/operation/OAbandon.java \
+	javax/jain/ss7/inap/operation/OAnswer.java \
+	javax/jain/ss7/inap/operation/OCalledPartyBusy.java \
+	javax/jain/ss7/inap/operation/ODisconnect.java \
+	javax/jain/ss7/inap/operation/OMidCall.java \
+	javax/jain/ss7/inap/operation/ONoAnswer.java \
+	javax/jain/ss7/inap/operation/Operation.java \
+	javax/jain/ss7/inap/operation/OriginationAttemptAuthorized.java \
+	javax/jain/ss7/inap/operation/OriginationAttempt.java \
+	javax/jain/ss7/inap/operation/OSuspended.java \
+	javax/jain/ss7/inap/operation/PlayAnnouncement.java \
+	javax/jain/ss7/inap/operation/PromptAndCollectUserInformation.java \
+	javax/jain/ss7/inap/operation/PromptAndReceiveMessage.java \
+	javax/jain/ss7/inap/operation/ReceivedInformation.java \
+	javax/jain/ss7/inap/operation/Reconnect.java \
+	javax/jain/ss7/inap/operation/ReleaseCall.java \
+	javax/jain/ss7/inap/operation/ReportUTSI.java \
+	javax/jain/ss7/inap/operation/RequestCurrentStatusReport.java \
+	javax/jain/ss7/inap/operation/RequestCurrentStatusReportResult.java \
+	javax/jain/ss7/inap/operation/RequestEveryStatusChangeReport.java \
+	javax/jain/ss7/inap/operation/RequestFirstStatusMatchReport.java \
+	javax/jain/ss7/inap/operation/RequestNotificationChargingEvent.java \
+	javax/jain/ss7/inap/operation/RequestReportBCSMEvent.java \
+	javax/jain/ss7/inap/operation/RequestReportFacilityEvent.java \
+	javax/jain/ss7/inap/operation/RequestReportUTSI.java \
+	javax/jain/ss7/inap/operation/ResetTimer.java \
+	javax/jain/ss7/inap/operation/RouteSelectFailure.java \
+	javax/jain/ss7/inap/operation/SelectFacility.java \
+	javax/jain/ss7/inap/operation/SelectRoute.java \
+	javax/jain/ss7/inap/operation/SendChargingInformation.java \
+	javax/jain/ss7/inap/operation/SendFacilityInformation.java \
+	javax/jain/ss7/inap/operation/SendSTUI.java \
+	javax/jain/ss7/inap/operation/ServiceFilteringResponse.java \
+	javax/jain/ss7/inap/operation/SpecializedResourceReport.java \
+	javax/jain/ss7/inap/operation/SplitLeg.java \
+	javax/jain/ss7/inap/operation/StatusReport.java \
+	javax/jain/ss7/inap/operation/TAnswer.java \
+	javax/jain/ss7/inap/operation/TBusy.java \
+	javax/jain/ss7/inap/operation/TDisconnect.java \
+	javax/jain/ss7/inap/operation/TerminationAttemptAuthorized.java \
+	javax/jain/ss7/inap/operation/TerminationAttempt.java \
+	javax/jain/ss7/inap/operation/TMidCall.java \
+	javax/jain/ss7/inap/operation/TNoAnswer.java \
+	javax/jain/ss7/inap/operation/TSuspended.java \
 	javax/jain/ss7/EncodingScheme.java \
 	javax/jain/ss7/GlobalTitle.java \
 	javax/jain/ss7/GTIndicator.java \
@@ -1124,127 +1128,46 @@ my_javax_jain_ss7_inap_JAVAFILES = \
 	javax/jain/ListenerAlreadyRegisteredException.java
 
 my_javax_jain_ss7_inap_CLASSFILES = \
-	javax/jain/ss7/inap/operation/Operation.class \
-	javax/jain/ss7/inap/operation/ActivityTest.class \
-	javax/jain/ss7/inap/operation/AnalysedInformation.class \
-	javax/jain/ss7/inap/operation/ActivateServiceFiltering.class \
-	javax/jain/ss7/inap/operation/CallGap.class \
-	javax/jain/ss7/inap/operation/AnalyseInformation.class \
-	javax/jain/ss7/inap/operation/ApplyCharging.class \
-	javax/jain/ss7/inap/operation/ApplyChargingReport.class \
-	javax/jain/ss7/inap/operation/Cancel.class \
-	javax/jain/ss7/inap/operation/AssistRequestInstructions.class \
-	javax/jain/ss7/inap/operation/AuthorizeTermination.class \
-	javax/jain/ss7/inap/operation/Connect.class \
-	javax/jain/ss7/inap/operation/CallInformationReport.class \
-	javax/jain/ss7/inap/operation/CollectedInformation.class \
-	javax/jain/ss7/inap/operation/CollectInformation.class \
-	javax/jain/ss7/inap/operation/MoveLeg.class \
-	javax/jain/ss7/inap/operation/ConnectToResource.class \
-	javax/jain/ss7/inap/operation/Continue.class \
-	javax/jain/ss7/inap/operation/ContinueWithArgument.class \
-	javax/jain/ss7/inap/operation/CallInformationRequest.class \
-	javax/jain/ss7/inap/operation/CancelStatusReportRequest.class \
-	javax/jain/ss7/inap/operation/DFCWithArgument.class \
-	javax/jain/ss7/inap/operation/CreateCallSegmentAssociation.class \
-	javax/jain/ss7/inap/operation/DisconnectLeg.class \
-	javax/jain/ss7/inap/operation/EntityReleased.class \
-	javax/jain/ss7/inap/operation/DisconnectForwardConnection.class \
-	javax/jain/ss7/inap/operation/EstablishTemporaryConnection.class \
-	javax/jain/ss7/inap/operation/EventReportBCSM.class \
-	javax/jain/ss7/inap/operation/EventReportFacility.class \
-	javax/jain/ss7/inap/operation/EventNotificationCharging.class \
-	javax/jain/ss7/inap/operation/FacilitySelectedAndAvailable.class \
-	javax/jain/ss7/inap/operation/HoldCallInNetwork.class \
-	javax/jain/ss7/inap/operation/InitialDP.class \
-	javax/jain/ss7/inap/operation/InitiateCallAttempt.class \
-	javax/jain/ss7/inap/operation/ManageTriggerData.class \
-	javax/jain/ss7/inap/operation/FurnishChargingInformation.class \
-	javax/jain/ss7/inap/operation/MergeCallSegments.class \
-	javax/jain/ss7/inap/operation/MessageReceived.class \
-	javax/jain/ss7/inap/operation/MoveCallSegments.class \
-	javax/jain/ss7/inap/operation/OAnswer.class \
-	javax/jain/ss7/inap/operation/OAbandon.class \
-	javax/jain/ss7/inap/operation/TAnswer.class \
-	javax/jain/ss7/inap/operation/OCalledPartyBusy.class \
-	javax/jain/ss7/inap/operation/ODisconnect.class \
-	javax/jain/ss7/inap/operation/OMidCall.class \
-	javax/jain/ss7/inap/operation/ONoAnswer.class \
-	javax/jain/ss7/inap/operation/OriginationAttempt.class \
-	javax/jain/ss7/inap/operation/OSuspended.class \
-	javax/jain/ss7/inap/operation/ManageTriggerDataResult.class \
-	javax/jain/ss7/inap/operation/PlayAnnouncement.class \
-	javax/jain/ss7/inap/operation/ReceivedInformation.class \
-	javax/jain/ss7/inap/operation/OriginationAttemptAuthorized.class \
-	javax/jain/ss7/inap/operation/PromptAndCollectUserInformation.class \
-	javax/jain/ss7/inap/operation/Reconnect.class \
-	javax/jain/ss7/inap/operation/ReleaseCall.class \
-	javax/jain/ss7/inap/operation/ReportUTSI.class \
-	javax/jain/ss7/inap/operation/RequestReportUTSI.class \
-	javax/jain/ss7/inap/operation/PromptAndReceiveMessage.class \
-	javax/jain/ss7/inap/operation/RequestCurrentStatusReport.class \
-	javax/jain/ss7/inap/operation/RequestCurrentStatusReportResult.class \
-	javax/jain/ss7/inap/operation/RequestEveryStatusChangeReport.class \
-	javax/jain/ss7/inap/operation/RequestFirstStatusMatchReport.class \
-	javax/jain/ss7/inap/operation/RequestNotificationChargingEvent.class \
-	javax/jain/ss7/inap/operation/RequestReportBCSMEvent.class \
-	javax/jain/ss7/inap/operation/ResetTimer.class \
-	javax/jain/ss7/inap/operation/RouteSelectFailure.class \
-	javax/jain/ss7/inap/operation/SelectFacility.class \
-	javax/jain/ss7/inap/operation/SelectRoute.class \
-	javax/jain/ss7/inap/operation/SendSTUI.class \
-	javax/jain/ss7/inap/operation/RequestReportFacilityEvent.class \
-	javax/jain/ss7/inap/operation/SendChargingInformation.class \
-	javax/jain/ss7/inap/operation/SplitLeg.class \
-	javax/jain/ss7/inap/operation/SendFacilityInformation.class \
-	javax/jain/ss7/inap/operation/ServiceFilteringResponse.class \
-	javax/jain/ss7/inap/operation/StatusReport.class \
-	javax/jain/ss7/inap/operation/TBusy.class \
-	javax/jain/ss7/inap/operation/TDisconnect.class \
-	javax/jain/ss7/inap/operation/TerminationAttempt.class \
-	javax/jain/ss7/inap/operation/SpecializedResourceReport.class \
-	javax/jain/ss7/inap/operation/TMidCall.class \
-	javax/jain/ss7/inap/operation/TNoAnswer.class \
-	javax/jain/ss7/inap/operation/TSuspended.class \
-	javax/jain/ss7/inap/operation/CreateCallSegmentAssociationResult.class \
-	javax/jain/ss7/inap/operation/TerminationAttemptAuthorized.class \
 	javax/jain/ss7/inap/constants/ActionIndicator.class \
 	javax/jain/ss7/inap/constants/ActionPerformed.class \
-	javax/jain/ss7/inap/constants/DialoguePrimitiveType.class \
-	javax/jain/ss7/inap/constants/TransportAddressChoice.class \
+	javax/jain/ss7/inap/constants/BearerCapabilityChoice.class \
+	javax/jain/ss7/inap/constants/CallProcessingOperationCorrelationID.class \
 	javax/jain/ss7/inap/constants/CancelChoice.class \
 	javax/jain/ss7/inap/constants/CancelID.class \
 	javax/jain/ss7/inap/constants/CGEncountered.class \
 	javax/jain/ss7/inap/constants/CollectedInfoChoice.class \
 	javax/jain/ss7/inap/constants/ComponentChoice.class \
-	javax/jain/ss7/inap/constants/BearerCapabilityChoice.class \
 	javax/jain/ss7/inap/constants/ComponentID.class \
+	javax/jain/ss7/inap/constants/ComponentIndPrimitiveType.class \
+	javax/jain/ss7/inap/constants/ComponentPrimitiveType.class \
+	javax/jain/ss7/inap/constants/ComponentReqPrimitiveType.class \
 	javax/jain/ss7/inap/constants/ComponentType.class \
 	javax/jain/ss7/inap/constants/ConnectedPartyChoice.class \
 	javax/jain/ss7/inap/constants/ControlType.class \
-	javax/jain/ss7/inap/constants/ComponentIndPrimitiveType.class \
+	javax/jain/ss7/inap/constants/DialoguePrimitiveType.class \
 	javax/jain/ss7/inap/constants/DPAssignment.class \
-	javax/jain/ss7/inap/constants/ComponentReqPrimitiveType.class \
+	javax/jain/ss7/inap/constants/DpSpecificCriteriaChoice.class \
 	javax/jain/ss7/inap/constants/ElapsedTimeValueID.class \
 	javax/jain/ss7/inap/constants/EntryChoice.class \
 	javax/jain/ss7/inap/constants/ErrorCode.class \
 	javax/jain/ss7/inap/constants/ErrorTreatment.class \
-	javax/jain/ss7/inap/constants/CallProcessingOperationCorrelationID.class \
+	javax/jain/ss7/inap/constants/EventSpecificInformationBCSMChoice.class \
 	javax/jain/ss7/inap/constants/EventTypeBCSM.class \
 	javax/jain/ss7/inap/constants/ExtensionChoice.class \
 	javax/jain/ss7/inap/constants/ExtensionType.class \
 	javax/jain/ss7/inap/constants/FacilityGroupChoice.class \
-	javax/jain/ss7/inap/constants/DpSpecificCriteriaChoice.class \
 	javax/jain/ss7/inap/constants/FacilityGroupID.class \
 	javax/jain/ss7/inap/constants/FeatureRequestIndicator.class \
 	javax/jain/ss7/inap/constants/FilterCriteriaID.class \
 	javax/jain/ss7/inap/constants/FilteringCharacteristicsChoice.class \
+	javax/jain/ss7/inap/constants/FilteringCriteriaChoice.class \
+	javax/jain/ss7/inap/constants/FilteringTimeOutChoice.class \
 	javax/jain/ss7/inap/constants/ForwardingCondition.class \
 	javax/jain/ss7/inap/constants/GapCriteriaChoice.class \
 	javax/jain/ss7/inap/constants/GapTreatmentChoice.class \
 	javax/jain/ss7/inap/constants/GeneralProblem.class \
 	javax/jain/ss7/inap/constants/GroupID.class \
-	javax/jain/ss7/inap/constants/FilteringCriteriaChoice.class \
+	javax/jain/ss7/inap/constants/InformationToSendChoice.class \
 	javax/jain/ss7/inap/constants/InfoToSendChoice.class \
 	javax/jain/ss7/inap/constants/InvokeProblem.class \
 	javax/jain/ss7/inap/constants/LegIDChoice.class \
@@ -1253,22 +1176,22 @@ my_javax_jain_ss7_inap_CLASSFILES = \
 	javax/jain/ss7/inap/constants/MessageType.class \
 	javax/jain/ss7/inap/constants/MidCallReportType.class \
 	javax/jain/ss7/inap/constants/MonitorMode.class \
-	javax/jain/ss7/inap/constants/FilteringTimeOutChoice.class \
+	javax/jain/ss7/inap/constants/NotificationInformationChoice.class \
 	javax/jain/ss7/inap/constants/NumberMatchChoice.class \
-	javax/jain/ss7/inap/constants/OperationCode.class \
 	javax/jain/ss7/inap/constants/OperationCodeChoice.class \
+	javax/jain/ss7/inap/constants/OperationCode.class \
 	javax/jain/ss7/inap/constants/PAbortReason.class \
 	javax/jain/ss7/inap/constants/PartyToConnectChoice.class \
-	javax/jain/ss7/inap/constants/InformationToSendChoice.class \
-	javax/jain/ss7/inap/constants/NotificationInformationChoice.class \
 	javax/jain/ss7/inap/constants/PartyToDisconnectChoice.class \
+	javax/jain/ss7/inap/constants/ProfileIdentifierChoice.class \
+	javax/jain/ss7/inap/constants/ReceivedInformationChoice.class \
 	javax/jain/ss7/inap/constants/ReceivedStatus.class \
 	javax/jain/ss7/inap/constants/RejectType.class \
 	javax/jain/ss7/inap/constants/ReportCause.class \
 	javax/jain/ss7/inap/constants/ReportCondition.class \
-	javax/jain/ss7/inap/constants/ProfileIdentifierChoice.class \
-	javax/jain/ss7/inap/constants/ReceivedInformationChoice.class \
 	javax/jain/ss7/inap/constants/RequestedInformationType.class \
+	javax/jain/ss7/inap/constants/RequestedInformationValueChoice.class \
+	javax/jain/ss7/inap/constants/ResourceAddressChoice.class \
 	javax/jain/ss7/inap/constants/ResourceAddressID.class \
 	javax/jain/ss7/inap/constants/ResourceIDChoice.class \
 	javax/jain/ss7/inap/constants/ResourceStatus.class \
@@ -1277,125 +1200,126 @@ my_javax_jain_ss7_inap_CLASSFILES = \
 	javax/jain/ss7/inap/constants/ReturnResultProblem.class \
 	javax/jain/ss7/inap/constants/RoutingAddressChoice.class \
 	javax/jain/ss7/inap/constants/SideID.class \
-	javax/jain/ss7/inap/constants/RequestedInformationValueChoice.class \
+	javax/jain/ss7/inap/constants/TargetLineIdentifierChoice.class \
 	javax/jain/ss7/inap/constants/TerminalType.class \
 	javax/jain/ss7/inap/constants/TimeOutError.class \
 	javax/jain/ss7/inap/constants/TimerID.class \
 	javax/jain/ss7/inap/constants/ToneIDChoice.class \
-	javax/jain/ss7/inap/constants/ResourceAddressChoice.class \
+	javax/jain/ss7/inap/constants/TransportAddressChoice.class \
 	javax/jain/ss7/inap/constants/TriggerType.class \
 	javax/jain/ss7/inap/constants/UAbortReason.class \
 	javax/jain/ss7/inap/constants/USIMonitorMode.class \
 	javax/jain/ss7/inap/constants/VariablePartChoice.class \
 	javax/jain/ss7/inap/constants/VariablePartID.class \
-	javax/jain/ss7/inap/constants/EventSpecificInformationBCSMChoice.class \
-	javax/jain/ss7/inap/constants/TargetLineIdentifierChoice.class \
-	javax/jain/ss7/inap/datatype/TransportAddress.class \
 	javax/jain/ss7/inap/datatype/AddressAndService.class \
-	javax/jain/ss7/inap/datatype/DigitsGenericNumber.class \
-	javax/jain/ss7/inap/datatype/LocationNumber.class \
 	javax/jain/ss7/inap/datatype/AllCallSegments.class \
-	javax/jain/ss7/inap/datatype/Cause.class \
-	javax/jain/ss7/inap/datatype/BackwardGVNS.class \
-	javax/jain/ss7/inap/datatype/BCSMEvent.class \
-	javax/jain/ss7/inap/datatype/LegID.class \
 	javax/jain/ss7/inap/datatype/AssociatedCallSegment.class \
+	javax/jain/ss7/inap/datatype/BackwardGVNS.class \
 	javax/jain/ss7/inap/datatype/BackwardServiceInteractionInd.class \
-	javax/jain/ss7/inap/datatype/DPSpecificCriteria.class \
-	javax/jain/ss7/inap/datatype/MidCallControlInfo.class \
-	javax/jain/ss7/inap/datatype/MidCallControlInformation.class \
-	javax/jain/ss7/inap/datatype/MidCallInfoType.class \
-	javax/jain/ss7/inap/datatype/DigitsGenericDigits.class \
+	javax/jain/ss7/inap/datatype/BCSMEvent.class \
 	javax/jain/ss7/inap/datatype/BCSMFailure.class \
-	javax/jain/ss7/inap/datatype/BearerCap.class \
-	javax/jain/ss7/inap/datatype/Tone.class \
 	javax/jain/ss7/inap/datatype/BearerCapability.class \
-	javax/jain/ss7/inap/datatype/Text.class \
-	javax/jain/ss7/inap/datatype/InformationToSend.class \
-	javax/jain/ss7/inap/datatype/InbandInfo.class \
-	javax/jain/ss7/inap/datatype/MessageID.class \
-	javax/jain/ss7/inap/datatype/VariableMessage.class \
-	javax/jain/ss7/inap/datatype/VariablePart.class \
-	javax/jain/ss7/inap/datatype/CalledPartyNumber.class \
-	javax/jain/ss7/inap/datatype/CallingPartyNumber.class \
-	javax/jain/ss7/inap/datatype/CallSegment.class \
+	javax/jain/ss7/inap/datatype/BearerCap.class \
 	javax/jain/ss7/inap/datatype/BothGapTreatmentParameters.class \
-	javax/jain/ss7/inap/datatype/CallSegmentToCancel.class \
-	javax/jain/ss7/inap/datatype/Carrier.class \
 	javax/jain/ss7/inap/datatype/CalledAddressAndService.class \
+	javax/jain/ss7/inap/datatype/CalledPartyNumber.class \
 	javax/jain/ss7/inap/datatype/CalledPartySubaddress.class \
-	javax/jain/ss7/inap/datatype/CarrierID.class \
-	javax/jain/ss7/inap/datatype/Entry.class \
 	javax/jain/ss7/inap/datatype/CallingAddressAndService.class \
+	javax/jain/ss7/inap/datatype/CallingPartyNumber.class \
+	javax/jain/ss7/inap/datatype/CallingPartySubaddress.class \
+	javax/jain/ss7/inap/datatype/CallSegment.class \
+	javax/jain/ss7/inap/datatype/CallSegmentToCancel.class \
+	javax/jain/ss7/inap/datatype/CarrierID.class \
+	javax/jain/ss7/inap/datatype/Carrier.class \
+	javax/jain/ss7/inap/datatype/Cause.class \
 	javax/jain/ss7/inap/datatype/ChargingEvent.class \
 	javax/jain/ss7/inap/datatype/CollectedDigits.class \
 	javax/jain/ss7/inap/datatype/CollectedInfo.class \
-	javax/jain/ss7/inap/datatype/CallingPartySubaddress.class \
 	javax/jain/ss7/inap/datatype/Component.class \
 	javax/jain/ss7/inap/datatype/ConnectedParty.class \
 	javax/jain/ss7/inap/datatype/ControlDigits.class \
 	javax/jain/ss7/inap/datatype/CounterAndValue.class \
 	javax/jain/ss7/inap/datatype/CSFailure.class \
 	javax/jain/ss7/inap/datatype/DestinationRoutingAddress.class \
-	javax/jain/ss7/inap/datatype/ForwardGVNS.class \
+	javax/jain/ss7/inap/datatype/DigitsGenericDigits.class \
+	javax/jain/ss7/inap/datatype/DigitsGenericNumber.class \
+	javax/jain/ss7/inap/datatype/DisconnectSpecificInfo.class \
+	javax/jain/ss7/inap/datatype/DPSpecificCommonParameters.class \
+	javax/jain/ss7/inap/datatype/DPSpecificCriteria.class \
+	javax/jain/ss7/inap/datatype/Entry.class \
+	javax/jain/ss7/inap/datatype/EventSpecificInformationBCSM.class \
 	javax/jain/ss7/inap/datatype/ExtensionField.class \
-	javax/jain/ss7/inap/datatype/MiscCallInfo.class \
 	javax/jain/ss7/inap/datatype/Extension.class \
-	javax/jain/ss7/inap/datatype/MidCallSpecificInfo.class \
 	javax/jain/ss7/inap/datatype/FacilityGroup.class \
+	javax/jain/ss7/inap/datatype/FilteredCallTreatment.class \
+	javax/jain/ss7/inap/datatype/FilteringCharacteristics.class \
 	javax/jain/ss7/inap/datatype/FilteringCriteria.class \
 	javax/jain/ss7/inap/datatype/FilteringTimeOut.class \
+	javax/jain/ss7/inap/datatype/ForwardCallIndicators.class \
+	javax/jain/ss7/inap/datatype/ForwardGVNS.class \
+	javax/jain/ss7/inap/datatype/ForwardServiceInteractionInd.class \
 	javax/jain/ss7/inap/datatype/GapCriteria.class \
-	javax/jain/ss7/inap/datatype/GapOnService.class \
-	javax/jain/ss7/inap/datatype/DisconnectSpecificInfo.class \
 	javax/jain/ss7/inap/datatype/GapIndicators.class \
+	javax/jain/ss7/inap/datatype/GapOnService.class \
 	javax/jain/ss7/inap/datatype/GapTreatment.class \
 	javax/jain/ss7/inap/datatype/GenericNumbers.class \
-	javax/jain/ss7/inap/datatype/DPSpecificCommonParameters.class \
-	javax/jain/ss7/inap/datatype/ServiceAddressInformation.class \
-	javax/jain/ss7/inap/datatype/GlobalTitle.class \
-	javax/jain/ss7/inap/datatype/Leg.class \
-	javax/jain/ss7/inap/datatype/ScfID.class \
 	javax/jain/ss7/inap/datatype/GlobalTitle0001.class \
 	javax/jain/ss7/inap/datatype/GlobalTitle0010.class \
 	javax/jain/ss7/inap/datatype/GlobalTitle0011.class \
-	javax/jain/ss7/inap/datatype/INServiceCompatibilityIndication.class \
 	javax/jain/ss7/inap/datatype/GlobalTitle0100.class \
+	javax/jain/ss7/inap/datatype/GlobalTitle.class \
+	javax/jain/ss7/inap/datatype/HighLayerCompatibility.class \
+	javax/jain/ss7/inap/datatype/InbandInfo.class \
 	javax/jain/ss7/inap/datatype/InformationToRecord.class \
+	javax/jain/ss7/inap/datatype/InformationToSend.class \
+	javax/jain/ss7/inap/datatype/INServiceCompatibilityIndication.class \
+	javax/jain/ss7/inap/datatype/IPAddressAndCallSegmentID.class \
 	javax/jain/ss7/inap/datatype/IPAddressAndLegID.class \
-	javax/jain/ss7/inap/datatype/ServiceInteractionIndicatorsTwo.class \
+	javax/jain/ss7/inap/datatype/LegID.class \
+	javax/jain/ss7/inap/datatype/Leg.class \
+	javax/jain/ss7/inap/datatype/LocationNumber.class \
+	javax/jain/ss7/inap/datatype/MessageID.class \
+	javax/jain/ss7/inap/datatype/MidCallControlInfo.class \
+	javax/jain/ss7/inap/datatype/MidCallControlInformation.class \
+	javax/jain/ss7/inap/datatype/MidCallInfoType.class \
+	javax/jain/ss7/inap/datatype/MidCallSpecificInfo.class \
+	javax/jain/ss7/inap/datatype/MiscCallInfo.class \
+	javax/jain/ss7/inap/datatype/OriginalCalledPartyID.class \
 	javax/jain/ss7/inap/datatype/PartyToConnect.class \
 	javax/jain/ss7/inap/datatype/PartyToDisconnect.class \
 	javax/jain/ss7/inap/datatype/ProfileIdentifier.class \
 	javax/jain/ss7/inap/datatype/RedirectingPartyID.class \
-	javax/jain/ss7/inap/datatype/ForwardServiceInteractionInd.class \
+	javax/jain/ss7/inap/datatype/RedirectionInformation.class \
 	javax/jain/ss7/inap/datatype/RequestedInformation.class \
-	javax/jain/ss7/inap/datatype/EventSpecificInformationBCSM.class \
-	javax/jain/ss7/inap/datatype/FilteredCallTreatment.class \
-	javax/jain/ss7/inap/datatype/FilteringCharacteristics.class \
+	javax/jain/ss7/inap/datatype/RequestedInformationList.class \
+	javax/jain/ss7/inap/datatype/RequestedInformationTypeList.class \
+	javax/jain/ss7/inap/datatype/RequestedInformationValue.class \
 	javax/jain/ss7/inap/datatype/RequestedUTSI.class \
 	javax/jain/ss7/inap/datatype/ResourceAddress.class \
 	javax/jain/ss7/inap/datatype/ResourceID.class \
 	javax/jain/ss7/inap/datatype/RouteList.class \
-	javax/jain/ss7/inap/datatype/ForwardCallIndicators.class \
-	javax/jain/ss7/inap/datatype/HighLayerCompatibility.class \
-	javax/jain/ss7/inap/datatype/IPAddressAndCallSegmentID.class \
-	javax/jain/ss7/inap/datatype/OriginalCalledPartyID.class \
-	javax/jain/ss7/inap/datatype/RedirectionInformation.class \
-	javax/jain/ss7/inap/datatype/RequestedInformationValue.class \
-	javax/jain/ss7/inap/datatype/RequestedInformationList.class \
-	javax/jain/ss7/inap/datatype/RequestedInformationTypeList.class \
+	javax/jain/ss7/inap/datatype/ScfID.class \
+	javax/jain/ss7/inap/datatype/ServiceAddressInformation.class \
+	javax/jain/ss7/inap/datatype/ServiceInteractionIndicatorsTwo.class \
+	javax/jain/ss7/inap/datatype/Text.class \
+	javax/jain/ss7/inap/datatype/Tone.class \
+	javax/jain/ss7/inap/datatype/TransportAddress.class \
 	javax/jain/ss7/inap/datatype/TriggerDataIdentifier.class \
-	javax/jain/ss7/inap/event/DialogueIndEvent.class \
-	javax/jain/ss7/inap/event/DialogueReqEvent.class \
+	javax/jain/ss7/inap/datatype/VariableMessage.class \
+	javax/jain/ss7/inap/datatype/VariablePart.class \
 	javax/jain/ss7/inap/event/BeginIndEvent.class \
 	javax/jain/ss7/inap/event/BeginReqEvent.class \
+	javax/jain/ss7/inap/event/ComponentEvent.class \
 	javax/jain/ss7/inap/event/ComponentIndEvent.class \
 	javax/jain/ss7/inap/event/ComponentReqEvent.class \
 	javax/jain/ss7/inap/event/ContinueIndEvent.class \
 	javax/jain/ss7/inap/event/ContinueReqEvent.class \
+	javax/jain/ss7/inap/event/DialogueEvent.class \
+	javax/jain/ss7/inap/event/DialogueIndEvent.class \
+	javax/jain/ss7/inap/event/DialogueReqEvent.class \
 	javax/jain/ss7/inap/event/EndIndEvent.class \
 	javax/jain/ss7/inap/event/EndReqEvent.class \
+	javax/jain/ss7/inap/event/InapEvent.class \
 	javax/jain/ss7/inap/event/InvokeIndEvent.class \
 	javax/jain/ss7/inap/event/InvokeReqEvent.class \
 	javax/jain/ss7/inap/event/LCancelIndEvent.class \
@@ -1413,13 +1337,97 @@ my_javax_jain_ss7_inap_CLASSFILES = \
 	javax/jain/ss7/inap/event/UErrorReqEvent.class \
 	javax/jain/ss7/inap/event/URejectIndEvent.class \
 	javax/jain/ss7/inap/event/URejectReqEvent.class \
-	javax/jain/ss7/inap/exception/TooManyListenersRegisteredException.class \
+	javax/jain/ss7/inap/exception/InvalidApplicationContextException.class \
 	javax/jain/ss7/inap/exception/InvalidCallIDException.class \
 	javax/jain/ss7/inap/exception/ParameterOutOfRangeException.class \
-	javax/jain/ss7/inap/exception/InvalidApplicationContextException.class \
+	javax/jain/ss7/inap/exception/TooManyListenersRegisteredException.class \
 	javax/jain/ss7/inap/JainInapListener.class \
 	javax/jain/ss7/inap/JainInapProvider.class \
 	javax/jain/ss7/inap/JainInapStack.class \
+	javax/jain/ss7/inap/operation/ActivateServiceFiltering.class \
+	javax/jain/ss7/inap/operation/ActivityTest.class \
+	javax/jain/ss7/inap/operation/AnalysedInformation.class \
+	javax/jain/ss7/inap/operation/AnalyseInformation.class \
+	javax/jain/ss7/inap/operation/ApplyCharging.class \
+	javax/jain/ss7/inap/operation/ApplyChargingReport.class \
+	javax/jain/ss7/inap/operation/AssistRequestInstructions.class \
+	javax/jain/ss7/inap/operation/AuthorizeTermination.class \
+	javax/jain/ss7/inap/operation/CallGap.class \
+	javax/jain/ss7/inap/operation/CallInformationReport.class \
+	javax/jain/ss7/inap/operation/CallInformationRequest.class \
+	javax/jain/ss7/inap/operation/Cancel.class \
+	javax/jain/ss7/inap/operation/CancelStatusReportRequest.class \
+	javax/jain/ss7/inap/operation/CollectedInformation.class \
+	javax/jain/ss7/inap/operation/CollectInformation.class \
+	javax/jain/ss7/inap/operation/Connect.class \
+	javax/jain/ss7/inap/operation/ConnectToResource.class \
+	javax/jain/ss7/inap/operation/Continue.class \
+	javax/jain/ss7/inap/operation/ContinueWithArgument.class \
+	javax/jain/ss7/inap/operation/CreateCallSegmentAssociation.class \
+	javax/jain/ss7/inap/operation/CreateCallSegmentAssociationResult.class \
+	javax/jain/ss7/inap/operation/DFCWithArgument.class \
+	javax/jain/ss7/inap/operation/DisconnectForwardConnection.class \
+	javax/jain/ss7/inap/operation/DisconnectLeg.class \
+	javax/jain/ss7/inap/operation/EntityReleased.class \
+	javax/jain/ss7/inap/operation/EstablishTemporaryConnection.class \
+	javax/jain/ss7/inap/operation/EventNotificationCharging.class \
+	javax/jain/ss7/inap/operation/EventReportBCSM.class \
+	javax/jain/ss7/inap/operation/EventReportFacility.class \
+	javax/jain/ss7/inap/operation/FacilitySelectedAndAvailable.class \
+	javax/jain/ss7/inap/operation/FurnishChargingInformation.class \
+	javax/jain/ss7/inap/operation/HoldCallInNetwork.class \
+	javax/jain/ss7/inap/operation/InitialDP.class \
+	javax/jain/ss7/inap/operation/InitiateCallAttempt.class \
+	javax/jain/ss7/inap/operation/ManageTriggerData.class \
+	javax/jain/ss7/inap/operation/ManageTriggerDataResult.class \
+	javax/jain/ss7/inap/operation/MergeCallSegments.class \
+	javax/jain/ss7/inap/operation/MessageReceived.class \
+	javax/jain/ss7/inap/operation/MoveCallSegments.class \
+	javax/jain/ss7/inap/operation/MoveLeg.class \
+	javax/jain/ss7/inap/operation/OAbandon.class \
+	javax/jain/ss7/inap/operation/OAnswer.class \
+	javax/jain/ss7/inap/operation/OCalledPartyBusy.class \
+	javax/jain/ss7/inap/operation/ODisconnect.class \
+	javax/jain/ss7/inap/operation/OMidCall.class \
+	javax/jain/ss7/inap/operation/ONoAnswer.class \
+	javax/jain/ss7/inap/operation/Operation.class \
+	javax/jain/ss7/inap/operation/OriginationAttemptAuthorized.class \
+	javax/jain/ss7/inap/operation/OriginationAttempt.class \
+	javax/jain/ss7/inap/operation/OSuspended.class \
+	javax/jain/ss7/inap/operation/PlayAnnouncement.class \
+	javax/jain/ss7/inap/operation/PromptAndCollectUserInformation.class \
+	javax/jain/ss7/inap/operation/PromptAndReceiveMessage.class \
+	javax/jain/ss7/inap/operation/ReceivedInformation.class \
+	javax/jain/ss7/inap/operation/Reconnect.class \
+	javax/jain/ss7/inap/operation/ReleaseCall.class \
+	javax/jain/ss7/inap/operation/ReportUTSI.class \
+	javax/jain/ss7/inap/operation/RequestCurrentStatusReport.class \
+	javax/jain/ss7/inap/operation/RequestCurrentStatusReportResult.class \
+	javax/jain/ss7/inap/operation/RequestEveryStatusChangeReport.class \
+	javax/jain/ss7/inap/operation/RequestFirstStatusMatchReport.class \
+	javax/jain/ss7/inap/operation/RequestNotificationChargingEvent.class \
+	javax/jain/ss7/inap/operation/RequestReportBCSMEvent.class \
+	javax/jain/ss7/inap/operation/RequestReportFacilityEvent.class \
+	javax/jain/ss7/inap/operation/RequestReportUTSI.class \
+	javax/jain/ss7/inap/operation/ResetTimer.class \
+	javax/jain/ss7/inap/operation/RouteSelectFailure.class \
+	javax/jain/ss7/inap/operation/SelectFacility.class \
+	javax/jain/ss7/inap/operation/SelectRoute.class \
+	javax/jain/ss7/inap/operation/SendChargingInformation.class \
+	javax/jain/ss7/inap/operation/SendFacilityInformation.class \
+	javax/jain/ss7/inap/operation/SendSTUI.class \
+	javax/jain/ss7/inap/operation/ServiceFilteringResponse.class \
+	javax/jain/ss7/inap/operation/SpecializedResourceReport.class \
+	javax/jain/ss7/inap/operation/SplitLeg.class \
+	javax/jain/ss7/inap/operation/StatusReport.class \
+	javax/jain/ss7/inap/operation/TAnswer.class \
+	javax/jain/ss7/inap/operation/TBusy.class \
+	javax/jain/ss7/inap/operation/TDisconnect.class \
+	javax/jain/ss7/inap/operation/TerminationAttemptAuthorized.class \
+	javax/jain/ss7/inap/operation/TerminationAttempt.class \
+	javax/jain/ss7/inap/operation/TMidCall.class \
+	javax/jain/ss7/inap/operation/TNoAnswer.class \
+	javax/jain/ss7/inap/operation/TSuspended.class \
 	javax/jain/ss7/EncodingScheme.class \
 	javax/jain/ss7/GlobalTitle.class \
 	javax/jain/ss7/GTIndicator.class \
@@ -1702,6 +1710,234 @@ lib-javax-jain-protocol-ss7-map.jar.db: javax-jain-protocol-ss7-map.jar
 
 #############################################################################
 
+my_javax_sip_JAVAFILES = \
+	javax/sip/address/AddressFactory.java \
+	javax/sip/address/Address.java \
+	javax/sip/address/Hop.java \
+	javax/sip/address/Router.java \
+	javax/sip/address/SipURI.java \
+	javax/sip/address/TelURL.java \
+	javax/sip/address/URI.java \
+	javax/sip/ClientTransaction.java \
+	javax/sip/DialogDoesNotExistException.java \
+	javax/sip/Dialog.java \
+	javax/sip/DialogState.java \
+	javax/sip/DialogTerminatedEvent.java \
+	javax/sip/header/AcceptEncodingHeader.java \
+	javax/sip/header/AcceptHeader.java \
+	javax/sip/header/AcceptLanguageHeader.java \
+	javax/sip/header/AlertInfoHeader.java \
+	javax/sip/header/AllowEventsHeader.java \
+	javax/sip/header/AllowHeader.java \
+	javax/sip/header/AuthenticationInfoHeader.java \
+	javax/sip/header/AuthorizationHeader.java \
+	javax/sip/header/CallIdHeader.java \
+	javax/sip/header/CallInfoHeader.java \
+	javax/sip/header/ContactHeader.java \
+	javax/sip/header/ContentDispositionHeader.java \
+	javax/sip/header/ContentEncodingHeader.java \
+	javax/sip/header/ContentLanguageHeader.java \
+	javax/sip/header/ContentLengthHeader.java \
+	javax/sip/header/ContentTypeHeader.java \
+	javax/sip/header/CSeqHeader.java \
+	javax/sip/header/DateHeader.java \
+	javax/sip/header/Encoding.java \
+	javax/sip/header/ErrorInfoHeader.java \
+	javax/sip/header/EventHeader.java \
+	javax/sip/header/ExpiresHeader.java \
+	javax/sip/header/ExtensionHeader.java \
+	javax/sip/header/FromHeader.java \
+	javax/sip/header/HeaderAddress.java \
+	javax/sip/header/HeaderFactory.java \
+	javax/sip/header/Header.java \
+	javax/sip/header/InReplyToHeader.java \
+	javax/sip/header/MaxForwardsHeader.java \
+	javax/sip/header/MediaType.java \
+	javax/sip/header/MimeVersionHeader.java \
+	javax/sip/header/MinExpiresHeader.java \
+	javax/sip/header/OptionTag.java \
+	javax/sip/header/OrganizationHeader.java \
+	javax/sip/header/Parameters.java \
+	javax/sip/header/PriorityHeader.java \
+	javax/sip/header/ProxyAuthenticateHeader.java \
+	javax/sip/header/ProxyAuthorizationHeader.java \
+	javax/sip/header/ProxyRequireHeader.java \
+	javax/sip/header/RAckHeader.java \
+	javax/sip/header/ReasonHeader.java \
+	javax/sip/header/RecordRouteHeader.java \
+	javax/sip/header/ReferToHeader.java \
+	javax/sip/header/ReplyToHeader.java \
+	javax/sip/header/RequireHeader.java \
+	javax/sip/header/RetryAfterHeader.java \
+	javax/sip/header/RouteHeader.java \
+	javax/sip/header/RSeqHeader.java \
+	javax/sip/header/ServerHeader.java \
+	javax/sip/header/SIPETagHeader.java \
+	javax/sip/header/SIPIfMatchHeader.java \
+	javax/sip/header/SubjectHeader.java \
+	javax/sip/header/SubscriptionStateHeader.java \
+	javax/sip/header/SupportedHeader.java \
+	javax/sip/header/TimeStampHeader.java \
+	javax/sip/header/ToHeader.java \
+	javax/sip/header/TooManyHopsException.java \
+	javax/sip/header/UnsupportedHeader.java \
+	javax/sip/header/UserAgentHeader.java \
+	javax/sip/header/ViaHeader.java \
+	javax/sip/header/WarningHeader.java \
+	javax/sip/header/WWWAuthenticateHeader.java \
+	javax/sip/InvalidArgumentException.java \
+	javax/sip/IOExceptionEvent.java \
+	javax/sip/ListeningPoint.java \
+	javax/sip/message/MessageFactory.java \
+	javax/sip/message/Message.java \
+	javax/sip/message/Request.java \
+	javax/sip/message/Response.java \
+	javax/sip/ObjectInUseException.java \
+	javax/sip/PeerUnavailableException.java \
+	javax/sip/ProviderDoesNotExistException.java \
+	javax/sip/RequestEvent.java \
+	javax/sip/ResponseEvent.java \
+	javax/sip/ServerTransaction.java \
+	javax/sip/SipException.java \
+	javax/sip/SipFactory.java \
+	javax/sip/SipListener.java \
+	javax/sip/SipProvider.java \
+	javax/sip/SipStack.java \
+	javax/sip/TimeoutEvent.java \
+	javax/sip/Timeout.java \
+	javax/sip/TransactionAlreadyExistsException.java \
+	javax/sip/TransactionDoesNotExistException.java \
+	javax/sip/Transaction.java \
+	javax/sip/TransactionState.java \
+	javax/sip/TransactionTerminatedEvent.java \
+	javax/sip/TransactionUnavailableException.java \
+	javax/sip/TransportAlreadySupportedException.java \
+	javax/sip/TransportNotSupportedException.java
+
+my_javax_sip_CLASSFILES = \
+	javax/sip/address/AddressFactory.class \
+	javax/sip/address/Address.class \
+	javax/sip/address/Hop.class \
+	javax/sip/address/Router.class \
+	javax/sip/address/SipURI.class \
+	javax/sip/address/TelURL.class \
+	javax/sip/address/URI.class \
+	javax/sip/ClientTransaction.class \
+	javax/sip/DialogDoesNotExistException.class \
+	javax/sip/Dialog.class \
+	javax/sip/DialogState.class \
+	javax/sip/DialogTerminatedEvent.class \
+	javax/sip/header/AcceptEncodingHeader.class \
+	javax/sip/header/AcceptHeader.class \
+	javax/sip/header/AcceptLanguageHeader.class \
+	javax/sip/header/AlertInfoHeader.class \
+	javax/sip/header/AllowEventsHeader.class \
+	javax/sip/header/AllowHeader.class \
+	javax/sip/header/AuthenticationInfoHeader.class \
+	javax/sip/header/AuthorizationHeader.class \
+	javax/sip/header/CallIdHeader.class \
+	javax/sip/header/CallInfoHeader.class \
+	javax/sip/header/ContactHeader.class \
+	javax/sip/header/ContentDispositionHeader.class \
+	javax/sip/header/ContentEncodingHeader.class \
+	javax/sip/header/ContentLanguageHeader.class \
+	javax/sip/header/ContentLengthHeader.class \
+	javax/sip/header/ContentTypeHeader.class \
+	javax/sip/header/CSeqHeader.class \
+	javax/sip/header/DateHeader.class \
+	javax/sip/header/Encoding.class \
+	javax/sip/header/ErrorInfoHeader.class \
+	javax/sip/header/EventHeader.class \
+	javax/sip/header/ExpiresHeader.class \
+	javax/sip/header/ExtensionHeader.class \
+	javax/sip/header/FromHeader.class \
+	javax/sip/header/HeaderAddress.class \
+	javax/sip/header/HeaderFactory.class \
+	javax/sip/header/Header.class \
+	javax/sip/header/InReplyToHeader.class \
+	javax/sip/header/MaxForwardsHeader.class \
+	javax/sip/header/MediaType.class \
+	javax/sip/header/MimeVersionHeader.class \
+	javax/sip/header/MinExpiresHeader.class \
+	javax/sip/header/OptionTag.class \
+	javax/sip/header/OrganizationHeader.class \
+	javax/sip/header/Parameters.class \
+	javax/sip/header/PriorityHeader.class \
+	javax/sip/header/ProxyAuthenticateHeader.class \
+	javax/sip/header/ProxyAuthorizationHeader.class \
+	javax/sip/header/ProxyRequireHeader.class \
+	javax/sip/header/RAckHeader.class \
+	javax/sip/header/ReasonHeader.class \
+	javax/sip/header/RecordRouteHeader.class \
+	javax/sip/header/ReferToHeader.class \
+	javax/sip/header/ReplyToHeader.class \
+	javax/sip/header/RequireHeader.class \
+	javax/sip/header/RetryAfterHeader.class \
+	javax/sip/header/RouteHeader.class \
+	javax/sip/header/RSeqHeader.class \
+	javax/sip/header/ServerHeader.class \
+	javax/sip/header/SIPETagHeader.class \
+	javax/sip/header/SIPIfMatchHeader.class \
+	javax/sip/header/SubjectHeader.class \
+	javax/sip/header/SubscriptionStateHeader.class \
+	javax/sip/header/SupportedHeader.class \
+	javax/sip/header/TimeStampHeader.class \
+	javax/sip/header/ToHeader.class \
+	javax/sip/header/TooManyHopsException.class \
+	javax/sip/header/UnsupportedHeader.class \
+	javax/sip/header/UserAgentHeader.class \
+	javax/sip/header/ViaHeader.class \
+	javax/sip/header/WarningHeader.class \
+	javax/sip/header/WWWAuthenticateHeader.class \
+	javax/sip/InvalidArgumentException.class \
+	javax/sip/IOExceptionEvent.class \
+	javax/sip/ListeningPoint.class \
+	javax/sip/message/MessageFactory.class \
+	javax/sip/message/Message.class \
+	javax/sip/message/Request.class \
+	javax/sip/message/Response.class \
+	javax/sip/ObjectInUseException.class \
+	javax/sip/PeerUnavailableException.class \
+	javax/sip/ProviderDoesNotExistException.class \
+	javax/sip/RequestEvent.class \
+	javax/sip/ResponseEvent.class \
+	javax/sip/ServerTransaction.class \
+	javax/sip/SipException.class \
+	javax/sip/SipFactory.class \
+	javax/sip/SipListener.class \
+	javax/sip/SipProvider.class \
+	javax/sip/SipStack.class \
+	javax/sip/TimeoutEvent.class \
+	javax/sip/Timeout.class \
+	javax/sip/TransactionAlreadyExistsException.class \
+	javax/sip/TransactionDoesNotExistException.class \
+	javax/sip/Transaction.class \
+	javax/sip/TransactionState.class \
+	javax/sip/TransactionTerminatedEvent.class \
+	javax/sip/TransactionUnavailableException.class \
+	javax/sip/TransportAlreadySupportedException.class \
+	javax/sip/TransportNotSupportedException.class
+
+MY_SECONDARY += $(my_javax_sip_CLASSFILES)
+my_jar_CLASSFILES += $(my_javax_sip_CLASSFILES)
+my_jar_LINKS += javax-sip.jar
+ALL_LOCAL += javax-sip.jar
+jar_DATA += javax-sip-$(VERSION).jar
+
+javax-sip-$(VERSION).jar: classdist_java.stamp $(my_javax_sip_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+my_JAVAFILES += $(my_javax_sip_JAVAFILES)
+#dist_java_JAVA += $(my_javax_sip_JAVAFILES)
+
+clean-javax_sip:
+	rm -f -- $(my_javax_sip_CLASSFILES)
+	rm -f -- javax-sip.jar javax-sip-$(VERSION).jar
+
+CLEAN_LOCAL += clean-javax_sip
+
+#############################################################################
+
 my_javax_csapi_cc_jcc_JAVAFILES = \
 	javax/csapi/cc/jcc/CallLoadControlEvent.java \
 	javax/csapi/cc/jcc/CallLoadControlListener.java \
@@ -1776,75 +2012,75 @@ CLEAN_LOCAL += clean-javax_csapi_cc_jcc
 
 #############################################################################
 
-#my_javax_jcat_JAVAFILES = \
-#	javax/jcat/JcatAddressEvent.java \
-#	javax/jcat/JcatAddress.java \
-#	javax/jcat/JcatAddressListener.java \
-#	javax/jcat/JcatCallEvent.java \
-#	javax/jcat/JcatCall.java \
-#	javax/jcat/JcatConnectionEvent.java \
-#	javax/jcat/JcatConnection.java \
-#	javax/jcat/JcatConnectionListener.java \
-#	javax/jcat/JcatProvider.java \
-#	javax/jcat/JcatTerminalCapabilities.java \
-#	javax/jcat/JcatTerminalConnectionEvent.java \
-#	javax/jcat/JcatTerminalConnection.java \
-#	javax/jcat/JcatTerminalConnectionListener.java \
-#	javax/jcat/JcatTerminalEvent.java \
-#	javax/jcat/JcatTerminal.java \
-#	javax/jcat/JcatTerminalListener.java
-#
-#my_javax_jcat_CLASSFILES = \
-#	javax/jcat/JcatAddressEvent.class \
-#	javax/jcat/JcatAddress.class \
-#	javax/jcat/JcatAddressListener.class \
-#	javax/jcat/JcatCallEvent.class \
-#	javax/jcat/JcatCall.class \
-#	javax/jcat/JcatConnectionEvent.class \
-#	javax/jcat/JcatConnection.class \
-#	javax/jcat/JcatConnectionListener.class \
-#	javax/jcat/JcatProvider.class \
-#	javax/jcat/JcatTerminalCapabilities.class \
-#	javax/jcat/JcatTerminalConnectionEvent.class \
-#	javax/jcat/JcatTerminalConnection.class \
-#	javax/jcat/JcatTerminalConnectionListener.class \
-#	javax/jcat/JcatTerminalEvent.class \
-#	javax/jcat/JcatTerminal.class \
-#	javax/jcat/JcatTerminalListener.class
-#
-#MY_SECONDARY += $(my_javax_jcat_CLASSFILES)
-#my_jar_CLASSFILES += $(my_javax_jcat_CLASSFILES)
-#my_jar_LINKS += javax-jcat.jar
-#ALL_LOCAL += javax-jcat.jar
-#jar_DATA += javax-jcat-$(VERSION).jar
-#
-#javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_javax_jcat_CLASSFILES)
-#	$(AM_V_GEN)$(JAR) cf $@ $^
-#
-#my_JAVAFILES += $(my_javax_jcat_JAVAFILES)
-##dist_java_JAVA += $(my_javax_jcat_JAVAFILES)
-#
-#clean-javax_jcat:
-#	rm -f -- $(my_javax_jcat_CLASSFILES)
-#	rm -f -- javax-jcat.jar javax-jcat-$(VERSION).jar
-#	rm -f -- lib-javax-jcat.jar.db
-#
-#CLEAN_LOCAL += clean-javax_jcat
-#
-### Build the whole jar into a library (older GCJ cannot handle this)
-##nodist_lib_javax_jcat_jar_la_SOURCES	= javax-jcat.jar
-#lib_javax_jcat_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jcat.jar
-#nodist_lib_javax_jcat_jar_la_SOURCES	= $(my_javax_jcat_CLASSFILES)
-#lib_javax_jcat_jar_la_LIBADD		=
-#lib_javax_jcat_jar_la_LDFLAGS		= -module -avoid-version -shared
-#lib_javax_jcat_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
-#
-#gcjlib_LTLIBRARIES 	+= lib-javax-jcat.jar.la
-#gcjlib_DATA		+= lib-javax-jcat.jar.db
-#ALL_LOCAL		+= lib-javax-jcat.jar.db
-#
-#lib-javax-jcat.jar.db: javax-jcat.jar
-#	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+my_javax_jcat_JAVAFILES = \
+	javax/jcat/JcatAddressEvent.java \
+	javax/jcat/JcatAddress.java \
+	javax/jcat/JcatAddressListener.java \
+	javax/jcat/JcatCallEvent.java \
+	javax/jcat/JcatCall.java \
+	javax/jcat/JcatConnectionEvent.java \
+	javax/jcat/JcatConnection.java \
+	javax/jcat/JcatConnectionListener.java \
+	javax/jcat/JcatProvider.java \
+	javax/jcat/JcatTerminalCapabilities.java \
+	javax/jcat/JcatTerminalConnectionEvent.java \
+	javax/jcat/JcatTerminalConnection.java \
+	javax/jcat/JcatTerminalConnectionListener.java \
+	javax/jcat/JcatTerminalEvent.java \
+	javax/jcat/JcatTerminal.java \
+	javax/jcat/JcatTerminalListener.java
+
+my_javax_jcat_CLASSFILES = \
+	javax/jcat/JcatAddressEvent.class \
+	javax/jcat/JcatAddress.class \
+	javax/jcat/JcatAddressListener.class \
+	javax/jcat/JcatCallEvent.class \
+	javax/jcat/JcatCall.class \
+	javax/jcat/JcatConnectionEvent.class \
+	javax/jcat/JcatConnection.class \
+	javax/jcat/JcatConnectionListener.class \
+	javax/jcat/JcatProvider.class \
+	javax/jcat/JcatTerminalCapabilities.class \
+	javax/jcat/JcatTerminalConnectionEvent.class \
+	javax/jcat/JcatTerminalConnection.class \
+	javax/jcat/JcatTerminalConnectionListener.class \
+	javax/jcat/JcatTerminalEvent.class \
+	javax/jcat/JcatTerminal.class \
+	javax/jcat/JcatTerminalListener.class
+
+MY_SECONDARY += $(my_javax_jcat_CLASSFILES)
+my_jar_CLASSFILES += $(my_javax_jcat_CLASSFILES)
+my_jar_LINKS += javax-jcat.jar
+ALL_LOCAL += javax-jcat.jar
+jar_DATA += javax-jcat-$(VERSION).jar
+
+javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_javax_jcat_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+my_JAVAFILES += $(my_javax_jcat_JAVAFILES)
+#dist_java_JAVA += $(my_javax_jcat_JAVAFILES)
+
+clean-javax_jcat:
+	rm -f -- $(my_javax_jcat_CLASSFILES)
+	rm -f -- javax-jcat.jar javax-jcat-$(VERSION).jar
+	rm -f -- lib-javax-jcat.jar.db
+
+CLEAN_LOCAL += clean-javax_jcat
+
+## Build the whole jar into a library (older GCJ cannot handle this)
+#nodist_lib_javax_jcat_jar_la_SOURCES	= javax-jcat.jar
+lib_javax_jcat_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jcat.jar
+nodist_lib_javax_jcat_jar_la_SOURCES	= $(my_javax_jcat_CLASSFILES)
+lib_javax_jcat_jar_la_LIBADD		=
+lib_javax_jcat_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jcat_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+
+gcjlib_LTLIBRARIES 	+= lib-javax-jcat.jar.la
+gcjlib_DATA		+= lib-javax-jcat.jar.db
+ALL_LOCAL		+= lib-javax-jcat.jar.db
+
+lib-javax-jcat.jar.db: javax-jcat.jar
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
 #############################################################################
 
@@ -2319,7 +2555,259 @@ clean-jain_protocol_ss7_oam:
 
 CLEAN_LOCAL += clean-jain_protocol_ss7_oam
 
-#############################################################################
+EXTRA_DIST += \
+	javax/management/NotificationBroadcasterSupport.class \
+	javax/management/MBeanServerDelegateMBean.class \
+	javax/management/QualifiedAttributeValueExp.class \
+	javax/management/Descriptor.class \
+	javax/management/BooleanValueExp.class \
+	javax/management/NotificationListener.class \
+	javax/management/StringValueExp.class \
+	javax/management/MBeanServerFactory$$1.class \
+	javax/management/RuntimeMBeanException.class \
+	javax/management/MBeanServerFactory.class \
+	javax/management/ServiceNotFoundException.class \
+	javax/management/remote/JMXProviderException.class \
+	javax/management/remote/JMXServiceURL.class \
+	javax/management/remote/JMXConnectorServerMBean.class \
+	javax/management/remote/JMXAuthenticator.class \
+	javax/management/remote/JMXConnectorServerFactory.class \
+	javax/management/remote/message/HandshakeEndMessage.class \
+	javax/management/remote/message/TLSMessage.class \
+	javax/management/remote/message/NotificationRequestMessage.class \
+	javax/management/remote/message/Message.class \
+	javax/management/remote/message/MBeanServerResponseMessage.class \
+	javax/management/remote/message/HandshakeErrorMessage.class \
+	javax/management/remote/message/SASLMessage.class \
+	javax/management/remote/message/MBeanServerRequestMessage.class \
+	javax/management/remote/message/CloseMessage.class \
+	javax/management/remote/message/HandshakeBeginMessage.class \
+	javax/management/remote/message/VersionMessage.class \
+	javax/management/remote/message/NotificationResponseMessage.class \
+	javax/management/remote/message/ProfileMessage.class \
+	javax/management/remote/JMXConnectorServer.class \
+	javax/management/remote/JMXConnectionNotification.class \
+	javax/management/remote/rmi/RMIConnector$$2.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$RMIServerCommunicatorAdmin.class \
+	javax/management/remote/rmi/RMIConnector$$RemoteMBeanServerConnection.class \
+	javax/management/remote/rmi/RMIConnector$$ObjectInputStreamWithLoader.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$PrivilegedOperation.class \
+	javax/management/remote/rmi/RMIConnector$$RMINotifClient.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$6.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$5.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$1.class \
+	javax/management/remote/rmi/RMIConnection.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$4.class \
+	javax/management/remote/rmi/RMIConnector$$4.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$7.class \
+	javax/management/remote/rmi/RMIIIOPServerImpl.class \
+	javax/management/remote/rmi/RMIJRMPServerImpl.class \
+	javax/management/remote/rmi/RMIServerImpl_Stub.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$2.class \
+	javax/management/remote/rmi/RMIConnectionImpl_Stub.class \
+	javax/management/remote/rmi/RMIServerImpl.class \
+	javax/management/remote/rmi/RMIServer.class \
+	javax/management/remote/rmi/RMIConnector$$3.class \
+	javax/management/remote/rmi/RMIConnector$$RMIClientCommunicatorAdmin.class \
+	javax/management/remote/rmi/RMIConnectorServer.class \
+	javax/management/remote/rmi/RMIConnectionImpl.class \
+	javax/management/remote/rmi/RMIConnector.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$3.class \
+	javax/management/remote/rmi/RMIConnector$$1.class \
+	javax/management/remote/rmi/RMIConnectionImpl$$8.class \
+	javax/management/remote/TargetedNotification.class \
+	javax/management/remote/jmxmp/JMXMPConnectorServer.class \
+	javax/management/remote/jmxmp/JMXMPConnector.class \
+	javax/management/remote/JMXConnectorFactory.class \
+	javax/management/remote/JMXConnectorFactory$$1.class \
+	javax/management/remote/JMXConnectorServerProvider.class \
+	javax/management/remote/SubjectDelegationPermission.class \
+	javax/management/remote/JMXServerErrorException.class \
+	javax/management/remote/MBeanServerForwarder.class \
+	javax/management/remote/JMXConnectorProvider.class \
+	javax/management/remote/JMXConnectorFactory$$3.class \
+	javax/management/remote/NotificationResult.class \
+	javax/management/remote/JMXPrincipal.class \
+	javax/management/remote/JMXConnector.class \
+	javax/management/remote/JMXConnectorFactory$$2.class \
+	javax/management/remote/generic/ServerIntermediary$$PrivilegedRequestJob.class \
+	javax/management/remote/generic/GenericConnector$$RequestHandler.class \
+	javax/management/remote/generic/ClientIntermediary$$GenericClientCommunicatorAdmin.class \
+	javax/management/remote/generic/ObjectWrapping.class \
+	javax/management/remote/generic/GenericConnector$$1.class \
+	javax/management/remote/generic/GenericConnectorServer.class \
+	javax/management/remote/generic/GenericConnectorServer$$Receiver.class \
+	javax/management/remote/generic/ServerIntermediary$$GenericServerCommunicatorAdmin.class \
+	javax/management/remote/generic/ClientIntermediary.class \
+	javax/management/remote/generic/ServerIntermediary$$RequestHandler.class \
+	javax/management/remote/generic/GenericConnectorServer$$1.class \
+	javax/management/remote/generic/ServerIntermediary$$5.class \
+	javax/management/remote/generic/ServerIntermediary$$4.class \
+	javax/management/remote/generic/MessageConnection.class \
+	javax/management/remote/generic/ClientIntermediary$$GenericClientNotifForwarder.class \
+	javax/management/remote/generic/ConnectionClosedException.class \
+	javax/management/remote/generic/GenericConnector$$RemoteMBeanServerConnection.class \
+	javax/management/remote/generic/MessageConnectionServer.class \
+	javax/management/remote/generic/GenericConnector.class \
+	javax/management/remote/generic/GenericConnector$$ResponseMsgWrapper.class \
+	javax/management/remote/generic/GenericConnectorServer$$ClientCreation.class \
+	javax/management/remote/generic/ServerIntermediary$$1.class \
+	javax/management/remote/generic/ServerIntermediary$$3.class \
+	javax/management/remote/generic/ServerIntermediary.class \
+	javax/management/remote/generic/ServerIntermediary$$2.class \
+	javax/management/remote/generic/ServerIntermediary$$6.class \
+	javax/management/OrQueryExp.class \
+	javax/management/NumericValueExp.class \
+	javax/management/InstanceNotFoundException.class \
+	javax/management/monitor/GaugeMonitorMBean.class \
+	javax/management/monitor/StringMonitor.class \
+	javax/management/monitor/CounterMonitor.class \
+	javax/management/monitor/GaugeMonitor.class \
+	javax/management/monitor/GaugeAlarmClock.class \
+	javax/management/monitor/MonitorNotification.class \
+	javax/management/monitor/MonitorMBean.class \
+	javax/management/monitor/StringAlarmClock.class \
+	javax/management/monitor/Monitor.class \
+	javax/management/monitor/CounterAlarmClock.class \
+	javax/management/monitor/StringMonitorMBean.class \
+	javax/management/monitor/MonitorSettingException.class \
+	javax/management/monitor/CounterMonitorMBean.class \
+	javax/management/AndQueryExp.class \
+	javax/management/ObjectName.class \
+	javax/management/MBeanNotificationInfo.class \
+	javax/management/InstanceAlreadyExistsException.class \
+	javax/management/MBeanAttributeInfo.class \
+	javax/management/MBeanFeatureInfo.class \
+	javax/management/ValueExp.class \
+	javax/management/MBeanParameterInfo.class \
+	javax/management/MBeanServerPermission.class \
+	javax/management/BadAttributeValueExpException.class \
+	javax/management/BetweenQueryExp.class \
+	javax/management/MBeanServer.class \
+	javax/management/JMException.class \
+	javax/management/InQueryExp.class \
+	javax/management/AttributeValueExp.class \
+	javax/management/BadBinaryOpValueExpException.class \
+	javax/management/NotificationBroadcaster.class \
+	javax/management/AttributeNotFoundException.class \
+	javax/management/MBeanServerDelegate.class \
+	javax/management/Query.class \
+	javax/management/loading/MLetObjectInputStream.class \
+	javax/management/loading/MLetParser.class \
+	javax/management/loading/MLetMBean.class \
+	javax/management/loading/MLetContent.class \
+	javax/management/loading/ClassLoaderRepository.class \
+	javax/management/loading/MLet.class \
+	javax/management/loading/DefaultLoaderRepository.class \
+	javax/management/BinaryOpValueExp.class \
+	javax/management/relation/RelationTypeNotFoundException.class \
+	javax/management/relation/InvalidRoleInfoException.class \
+	javax/management/relation/RoleStatus.class \
+	javax/management/relation/RelationSupport.class \
+	javax/management/relation/RoleNotFoundException.class \
+	javax/management/relation/RoleInfo.class \
+	javax/management/relation/RoleResult.class \
+	javax/management/relation/InvalidRelationServiceException.class \
+	javax/management/relation/RelationServiceNotRegisteredException.class \
+	javax/management/relation/MBeanServerNotificationFilter.class \
+	javax/management/relation/RelationNotification.class \
+	javax/management/relation/RoleUnresolvedList.class \
+	javax/management/relation/RelationSupportMBean.class \
+	javax/management/relation/RelationNotFoundException.class \
+	javax/management/relation/Relation.class \
+	javax/management/relation/InvalidRelationTypeException.class \
+	javax/management/relation/RelationException.class \
+	javax/management/relation/RoleInfoNotFoundException.class \
+	javax/management/relation/InvalidRelationIdException.class \
+	javax/management/relation/RoleUnresolved.class \
+	javax/management/relation/RoleList.class \
+	javax/management/relation/InvalidRoleValueException.class \
+	javax/management/relation/RelationTypeSupport.class \
+	javax/management/relation/RelationService.class \
+	javax/management/relation/Role.class \
+	javax/management/relation/RelationType.class \
+	javax/management/relation/RelationServiceMBean.class \
+	javax/management/MBeanRegistrationException.class \
+	javax/management/Notification.class \
+	javax/management/ReflectionException.class \
+	javax/management/MBeanServerNotification.class \
+	javax/management/QueryExp.class \
+	javax/management/DescriptorAccess.class \
+	javax/management/MBeanOperationInfo.class \
+	javax/management/MBeanException.class \
+	javax/management/InvalidAttributeValueException.class \
+	javax/management/AttributeList.class \
+	javax/management/DynamicMBean.class \
+	javax/management/InvalidApplicationException.class \
+	javax/management/IntrospectionException.class \
+	javax/management/MalformedObjectNameException.class \
+	javax/management/RuntimeOperationsException.class \
+	javax/management/ObjectInstance.class \
+	javax/management/ClassAttributeValueExp.class \
+	javax/management/NotificationFilter.class \
+	javax/management/NotificationFilterSupport.class \
+	javax/management/BinaryRelQueryExp.class \
+	javax/management/RuntimeErrorException.class \
+	javax/management/MBeanServerFactory$$PublicClassLoaderRepository.class \
+	javax/management/MatchQueryExp.class \
+	javax/management/MBeanInfo.class \
+	javax/management/OperationsException.class \
+	javax/management/NotCompliantMBeanException.class \
+	javax/management/timer/TimerAlarmClockNotification.class \
+	javax/management/timer/TimerNotification.class \
+	javax/management/timer/Timer.class \
+	javax/management/timer/TimerMBean.class \
+	javax/management/timer/TimerAlarmClock.class \
+	javax/management/DefaultLoaderRepository.class \
+	javax/management/AttributeChangeNotification.class \
+	javax/management/QueryEval.class \
+	javax/management/ListenerNotFoundException.class \
+	javax/management/openmbean/OpenMBeanAttributeInfoSupport.class \
+	javax/management/openmbean/OpenMBeanParameterInfo.class \
+	javax/management/openmbean/InvalidOpenTypeException.class \
+	javax/management/openmbean/TabularType.class \
+	javax/management/openmbean/CompositeData.class \
+	javax/management/openmbean/OpenMBeanConstructorInfoSupport.class \
+	javax/management/openmbean/OpenDataException.class \
+	javax/management/openmbean/OpenMBeanOperationInfo.class \
+	javax/management/openmbean/KeyAlreadyExistsException.class \
+	javax/management/openmbean/OpenType.class \
+	javax/management/openmbean/TabularData.class \
+	javax/management/openmbean/OpenMBeanInfoSupport.class \
+	javax/management/openmbean/OpenMBeanInfo.class \
+	javax/management/openmbean/InvalidKeyException.class \
+	javax/management/openmbean/ArrayType.class \
+	javax/management/openmbean/TabularDataSupport.class \
+	javax/management/openmbean/OpenMBeanAttributeInfo.class \
+	javax/management/openmbean/OpenMBeanParameterInfoSupport.class \
+	javax/management/openmbean/CompositeType.class \
+	javax/management/openmbean/SimpleType.class \
+	javax/management/openmbean/CompositeDataSupport.class \
+	javax/management/openmbean/OpenMBeanOperationInfoSupport.class \
+	javax/management/openmbean/OpenMBeanConstructorInfo.class \
+	javax/management/modelmbean/InvalidTargetObjectTypeException.class \
+	javax/management/modelmbean/ModelMBeanConstructorInfo.class \
+	javax/management/modelmbean/ModelMBeanInfoSupport.class \
+	javax/management/modelmbean/ModelMBeanInfo.class \
+	javax/management/modelmbean/XMLParseException.class \
+	javax/management/modelmbean/DescriptorSupport.class \
+	javax/management/modelmbean/RequiredModelMBean.class \
+	javax/management/modelmbean/ModelMBeanNotificationInfo.class \
+	javax/management/modelmbean/ModelMBean.class \
+	javax/management/modelmbean/ModelMBeanOperationInfo.class \
+	javax/management/modelmbean/ModelMBeanAttributeInfo.class \
+	javax/management/modelmbean/ModelMBeanNotificationBroadcaster.class \
+	javax/management/AttributeChangeNotificationFilter.class \
+	javax/management/MBeanConstructorInfo.class \
+	javax/management/PersistentMBean.class \
+	javax/management/MBeanRegistration.class \
+	javax/management/NotificationBroadcasterSupport$$ListenerInfo.class \
+	javax/management/NotQueryExp.class \
+	javax/management/Attribute.class \
+	javax/management/JMRuntimeException.class \
+	javax/management/BadStringOperationException.class
+
+############################################################################
 
 
 #############################################################################
