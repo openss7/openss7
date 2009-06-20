@@ -1,0 +1,143 @@
+/*
+ @(#) $RCSfile$ $Name$($Revision$) $Date$ <p>
+ 
+ Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
+ Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
+ 
+ All Rights Reserved. <p>
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license. <p>
+ 
+ This program is distributed in the hope that it will be useful, but <b>WITHOUT
+ ANY WARRANTY</b>; without even the implied warranty of <b>MERCHANTABILITY</b>
+ or <b>FITNESS FOR A PARTICULAR PURPOSE</b>.  See the GNU Affero General Public
+ License for more details. <p>
+ 
+ You should have received a copy of the GNU Affero General Public License along
+ with this program.  If not, see
+ <a href="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt</a>,
+ or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA. <p>
+ 
+ <em>U.S. GOVERNMENT RESTRICTED RIGHTS</em>.  If you are licensing this
+ Software on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department of
+ Defense ("DoD"), it is classified as "Commercial Computer Software" under
+ paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+ Regulations ("DFARS") (or any successor regulations) and the Government is
+ acquiring only the license rights granted herein (the license rights
+ customarily provided to non-Government users).  If the Software is supplied to
+ any unit or agency of the Government other than DoD, it is classified as
+ "Restricted Computer Software" and the Government's rights in the Software are
+ defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR")
+ (or any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations). <p>
+ 
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See
+ <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
+ 
+ Last Modified $Date$ by $Author$
+ */
+
+package javax.management;
+
+
+/**
+  * Interface implemented by an MBean that emits Notifications.
+  * It allows a listener to be registered with the MBean as a
+  * notification listener.
+  *
+  * <h4>Notification dispatch</h4> <p>
+  *
+  * When an MBean emits a notification, it considers each listener that
+  * has been added with addNotificationListener and not subsequently
+  * removed with removeNotificationListener. If a filter was provided
+  * with that listener, and if the filter's isNotificationEnabled method
+  * returns false, the listener is ignored. Otherwise, the listener's
+  * handleNotification method is called with the notification, as well
+  * as the handback object that was provided to addNotificationListener.
+  * <p>
+  *
+  * If the same listener is added more than once, it is considered as
+  * many times as it was added. It is often useful to add the same
+  * listener with different filters or handback objects. <p>
+  *
+  * Implementations of this interface can differ regarding the thread in
+  * which the methods of filters and listeners are called. <p>
+  *
+  * If the method call of a filter or listener throws an Exception, then
+  * that exception should not prevent other listeners from being
+  * invoked.  However, if the method call throws an Error, then it is
+  * recommended that processing of the notification stop at that point,
+  * and if it is possible to propagate the Error to the sender of the
+  * notification, this should be done. <p>
+  *
+  * New code should use the NotificationEmitter interface instead. <p>
+  *
+  * Implementations of this interface and of NotificationEmitter should
+  * be careful about synchronization. In particular, it is not a good
+  * idea for an implementation to hold any locks while it is calling a
+  * listener. To deal with the possibility that the list of listeners
+  * might change while a notification is being dispatched, a good
+  * strategy is to use a CopyOnWriteArrayList for this list.
+  *
+  * @since 1.5
+  *
+  * @author Monavacon Limited
+  * @version 1.2.2
+  */
+public interface NotificationBroadcaster {
+    /**
+      * Adds a listener to this MBean.
+      * @param listener
+      * The listener object which will handle the notifications emitted
+      * by the broadcaster.
+      * @param filter
+      * The filter object. If filter is null, no filtering will be
+      * performed before handling notifications.
+      * @param handback
+      * An opaque object to be sent back to the listener when a
+      * notification is emitted. This object cannot be used by the
+      * Notification broadcaster object. It should be resent unchanged
+      * with the notification to the listener.
+      * @exception IllegalArgumentException 
+      * Listener parameter is null.
+      * @see removeNotificationListener(javax.management.NotificationListener)
+      */
+    void addNotificationListener(NotificationListener listener,
+            NotificationFilter filter, Object handback)
+        throws IllegalArgumentException { }
+    /**
+      * Removes a listener from this MBean.
+      * If the listener has been registered with different handback
+      * objects or notification filters, all entries corresponding to
+      * the listener will be removed.
+      * @param listener
+      * A listener that was previously added to this MBean.
+      * @exception ListenerNotFoundException
+      * The listener is not registered with the MBean.
+      * @see addNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object),
+      * @see NotificationEmitter.removeNotificationListener(javax.mana gement.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
+      */
+    void removeNotificationListener(NotificationListener listener)
+        throws ListenerNotFoundException;
+    /**
+      * Returns an array indicating, for each notification this MBean
+      * may send, the name of the Java class of the notification and the
+      * notification type. <p>
+      *
+      * It is not illegal for the MBean to send notifications not
+      * described in this array. However, some clients of the MBean
+      * server may depend on the array being complete for their correct
+      * functioning.
+      * @return
+      * The array of possible notifications.
+      */
+    MBeanNotificationInfo[] getNotificationInfo();
+}
+
+// vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
