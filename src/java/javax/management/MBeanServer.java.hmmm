@@ -1,0 +1,128 @@
+/* ***************************************************************************
+
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
+
+ $Log$
+ *****************************************************************************/
+
+package javax.management;
+
+public interface MBeanServer extends MBeanServerConnection {
+    ObjectInstance createMBean(String className, ObjectName name)
+        throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException;
+    ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName)
+        throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException;
+    ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature)
+        throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException;
+    ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params, String[] signature)
+        throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException;
+    ObjectInstance registerMBean(Object object, ObjectName name)
+        throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException;
+    void unregisterMBean(ObjectName name)
+        throws InstanceNotFoundException, MBeanRegistrationException;
+    ObjectInstance getObjectInstance(ObjectName name)
+        throws InstanceNotFoundException;
+    Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query);
+    Set<ObjectName> queryNames(ObjectName name, QueryExp query);
+    boolean isRegistered(ObjectName name);
+    Integer getMBeanCount();
+    Object getAttribute(ObjectName name, String attribute)
+        throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException;
+    AttributeList getAttributes(ObjectName name, String[] attributes)
+        throws InstanceNotFoundException, ReflectionException;
+    void setAttribute(ObjectName name, Attribute attribute)
+        throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException;
+    AttributeList setAttributes(ObjectName name, AttributeList attributes)
+        throws InstanceNotFoundException, ReflectionException;
+    Object invoke(ObjectName name, String operationName, Object[] params, String[] signature)
+        throws InstanceNotFoundException, MBeanException, ReflectionException;
+    String getDefaultDomain();
+    String[] getDomains();
+    void addNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter, Object handback)
+        throws InstanceNotFoundException;
+    void addNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter, Object handback)
+        throws InstanceNotFoundException;
+    void removeNotificationListener(ObjectName name, ObjectName listener)
+        throws InstanceNotFoundException, ListenerNotFoundException;
+    void removeNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter, Object handback)
+        throws InstanceNotFoundException, ListenerNotFoundException;
+    void removeNotificationListener(ObjectName name, NotificationListener listener)
+        throws InstanceNotFoundException, ListenerNotFoundException;
+    void removeNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter, Object handback)
+        throws InstanceNotFoundException, ListenerNotFoundException;
+    MBeanInfo getMBeanInfo(ObjectName name)
+        throws InstanceNotFoundException, IntrospectionException, ReflectionException;
+    boolean isInstanceOf(ObjectName name, String className)
+        throws InstanceNotFoundException;
+    Object instantiate(String className)
+        throws ReflectionException, MBeanException;
+    Object instantiate(String className, ObjectName loaderName)
+        throws ReflectionException, MBeanException, InstanceNotFoundException;
+    Object instantiate(String className, Object[] params, String[] signature)
+        throws ReflectionException, MBeanException;
+    Object instantiate(String className, ObjectName loaderName, Object[] params, String[] signature)
+        throws ReflectionException, MBeanException, InstanceNotFoundException;
+    @Deprecated ObjectInputStream deserialize(ObjectName name, byte[] data)
+        throws InstanceNotFoundException, OperationsException;
+    @Deprecated ObjectInputStream deserialize(String className, byte[] data)
+        throws OperationsException, ReflectionException;
+    @Deprecated ObjectInputStream deserialize(String className, ObjectName loaderName, byte[] data)
+        throws InstanceNotFoundException, OperationsException, ReflectionException;
+    ClassLoader getClassLoaderFor(ObjectName mbeanName)
+        throws InstanceNotFoundException;
+    ClassLoader getClassLoader(ObjectName loaderName)
+        throws InstanceNotFoundException;
+    ClassLoaderRepository getClassLoaderRepository();
+}
+
+// vim: sw=4 et tw=90 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
+
