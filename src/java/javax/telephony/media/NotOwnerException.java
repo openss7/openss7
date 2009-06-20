@@ -34,9 +34,9 @@ class NotOwnerException extends MediaRuntimeException {
      * Constructs a <code>NotOwnerException</code> 
      * with the specified detail message. 
      *
-     * @param   s   the String supplied to retrieve()
+     * @param   s   the java.lang.String supplied to retrieve()
      */
-    public NotOwnerException(String s) {super(s);}
+    public NotOwnerException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>NotOwnerException</code>
@@ -45,7 +45,7 @@ class NotOwnerException extends MediaRuntimeException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public NotOwnerException(String s, MediaEvent event) {
+    public NotOwnerException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

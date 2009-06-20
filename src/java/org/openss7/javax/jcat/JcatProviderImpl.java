@@ -84,7 +84,7 @@ public class JcatProviderImpl extends JccProviderImpl implements java.rmi.Remote
       * specification, the platform will use the Perl5 regular
       * expressions).
       */
-    public native java.util.Set getTerminals(String nameRegex);
+    public native java.util.Set getTerminals(java.lang.String nameRegex);
     /**
       * This method returns a standard EventFilter which is implemented
       * by the JCAT platform.
@@ -120,7 +120,7 @@ public class JcatProviderImpl extends JccProviderImpl implements java.rmi.Remote
       * One or more of the provided argument is not valid
       * @since 1.0
       */
-    public native EventFilter createEventFilterRegistration(String terminalNameRegex, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterRegistration(java.lang.String terminalNameRegex, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
 }
 

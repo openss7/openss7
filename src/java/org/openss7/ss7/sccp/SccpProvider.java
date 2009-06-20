@@ -98,12 +98,12 @@ public interface SccpProvider extends java.util.EventListener {
       * asociated data.
       *
       * @param event The event to be transmitted.
-      * @exception MandatoryParameterNotSetException  Thrown if all of
+      * @exception javax.jain.MandatoryParameterNotSetException  Thrown if all of
       * the mandatory parameters required by this SccpProviderImpl to
       * send the SccpEvent are not set.
       */
     public void sendSccpEvent(SccpEvent event)
-        throws MandatoryParameterNotSetExcpetion;
+        throws javax.jain.MandatoryParameterNotSetException;
     /**
       * Adds a SccpListener to the list of registered Event Listeners of
       * this SccpProviderImpl.
@@ -112,27 +112,27 @@ public interface SccpProvider extends java.util.EventListener {
       * attribute
       * @param userAddress The feaeture to the added to the SccpListener
       * attribute.
-      * @exception TooManyListenersException  Thrown if a limit is
+      * @exception java.util.TooManyListenersException  Thrown if a limit is
       * placed on the allowable number of registered SccpListeners, and
       * this limit has been reached.
-      * @exception ListenerAlreadyRegisteredException  Thrown if the
+      * @exception javax.jain.ListenerAlreadyRegisteredException  Thrown if the
       * listener supplied is already registered for the specified
       * userAddress with this SccpProviderimpl.
-      * @exception InvalidUserAddressException  Thrown if the
+      * @exception javax.jain.InvalidUserAddressException  Thrown if the
       * userAddress supplied is not a valid address.
       */
     public void addSccpListener(SccpListener listener, SccpUserAddress userAddress)
-        throws TooManyListenersException, LIstenerAlreadyRegisteredException, InvalidUserAddressException;
+        throws java.util.TooManyListenersException, javax.jain.ListenerAlreadyRegisteredException, javax.jain.InvalidUserAddressException;
     /**
       * Removes a SccpListener from the list of registered SccpListeners
       * of thie SccpProviderImpl.
       *
       * @param listener  The listener to be removed from this provider.
-      * @exception ListenerNotRegisteredException  Thrown if there is no
+      * @exception javax.jain.ListenerNotRegisteredException  Thrown if there is no
       * such listener registered with this provider.
       */
     public void removeSccpListener(SccpListener listener)
-        throws ListenerNotRegisteredException;
+        throws javax.jain.ListenerNotRegisteredException;
     public SccpListeners[] getSccpListeners();
     /**
       * Returns the SccpStackImpl to which this SccpProviderImpl is

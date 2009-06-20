@@ -232,9 +232,9 @@ public class SignalingPointCode implements java.io.Serializable {
         return components;
     }
     /**
-      * String representation of class SignalingPointCode.
+      * java.lang.String representation of class SignalingPointCode.
       * @return
-      * String provides description of class SignalingPointCode.
+      * java.lang.String provides description of class SignalingPointCode.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

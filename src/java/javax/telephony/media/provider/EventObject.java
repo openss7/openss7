@@ -26,7 +26,7 @@ import java.lang.ref.WeakReference; 	// for diagnostics
  * the more complex Base.java).
  */
 class EventObject extends java.util.EventObject {
-    public EventObject(Object source) {
+    public EventObject(java.lang.Object source) {
 	super(source); 
 	/*
 	    synchronized (allEvents) { 		// 

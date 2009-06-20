@@ -124,7 +124,7 @@ public interface HeaderFactory {
     AuthorizationHeader createAuthorizationHeader(java.lang.String scheme)
         throws java.text.ParseException;
     /**
-        @deprecated Since 1.2. Use createCSeqHeader(long, String) method with type long. <p> Creates
+        @deprecated Since 1.2. Use createCSeqHeader(long, java.lang.String) method with type long. <p> Creates
         a new CSeqHeader based on the newly supplied sequence number and method values.
         @param sequenceNumber The new integer value of the sequence number.
         @param method The new string value of the method.

@@ -541,7 +541,7 @@ public class StatusReportMessage extends EtsiMessage {
     protected boolean m_pidIsSet = false;
     protected int m_dcs;
     protected boolean m_dcsIsSet = false;
-    protected String m_userText;
+    protected java.lang.String m_userText;
     protected boolean m_userTextIsSet = false;
 }
 

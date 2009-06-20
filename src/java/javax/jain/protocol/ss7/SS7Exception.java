@@ -63,7 +63,7 @@ public class SS7Exception extends JainException {
       * @param msg
       * The message detail of this Exception.
       */
-    public SS7Exception(String msg) {
+    public SS7Exception(java.lang.String msg) {
         super(msg);
     }
     /** Constructs a new Jain SS7 Exception.  */

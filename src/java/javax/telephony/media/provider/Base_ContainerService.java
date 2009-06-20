@@ -39,47 +39,47 @@ public class Base_ContainerService extends Base_Owner
     /************ implement Async_ContainerService *****/
 
     public abstract
-    Async_ContainerEvent async_setInfo(String fullName, 
+    Async_ContainerEvent async_setInfo(java.lang.String fullName, 
 				       Dictionary dict);
 
     public abstract
-    Async_ContainerEvent async_getInfo(String fullName, Symbol[] keys, Dictionary optargs);
+    Async_ContainerEvent async_getInfo(java.lang.String fullName, Symbol[] keys, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_setParameters(String fullName, 
+    Async_ContainerEvent async_setParameters(java.lang.String fullName, 
 					     Dictionary params);
 
     public abstract
-    Async_ContainerEvent async_getParameters(String fullName, Symbol[] params, Dictionary optargs);
+    Async_ContainerEvent async_getParameters(java.lang.String fullName, Symbol[] params, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_changeMode(String fullName, Symbol accessMode, Dictionary optargs);
+    Async_ContainerEvent async_changeMode(java.lang.String fullName, Symbol accessMode, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_copy(String fullName, String target,
+    Async_ContainerEvent async_copy(java.lang.String fullName, java.lang.String target,
 				    Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_rename(String fullName, String newName, Dictionary optargs);
+    Async_ContainerEvent async_rename(java.lang.String fullName, java.lang.String newName, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_destroy(String fullName, Dictionary optargs);
+    Async_ContainerEvent async_destroy(java.lang.String fullName, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_listObjects(String fullName, Dictionary optargs);
+    Async_ContainerEvent async_listObjects(java.lang.String fullName, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_createContainer(String fullName, Dictionary optargs);
+    Async_ContainerEvent async_createContainer(java.lang.String fullName, Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_openDataObject(String fullName, 
+    Async_ContainerEvent async_openDataObject(java.lang.String fullName, 
 					      Symbol accessMode, 
 					      boolean ifNoExist,
 					      boolean truncate,
 					      Dictionary optargs);
 
     public abstract
-    Async_ContainerEvent async_createDataObject(String fullName, 
+    Async_ContainerEvent async_createDataObject(java.lang.String fullName, 
 						Symbol accessMode, 
 						Dictionary optargs);
 
@@ -88,14 +88,14 @@ public class Base_ContainerService extends Base_Owner
 
 
     public
-    void setInfo(String fullName, Dictionary dict)
+    void setInfo(java.lang.String fullName, Dictionary dict)
 	throws ContainerException {
 	Async_ContainerEvent event = async_setInfo( fullName, dict );
 	event.throwIfContainerException();
     }
 
     public
-    Dictionary getInfo(String fullName, Symbol[] keys, Dictionary optargs)
+    Dictionary getInfo(java.lang.String fullName, Symbol[] keys, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_getInfo( fullName, keys, optargs );
 	event.throwIfContainerException();
@@ -103,14 +103,14 @@ public class Base_ContainerService extends Base_Owner
     }
 
     public
-    void setParameters(String fullName, Dictionary params)
+    void setParameters(java.lang.String fullName, Dictionary params)
 	throws ContainerException {
 	Async_ContainerEvent event = async_setParameters( fullName, params);
 	event.throwIfContainerException();
     }
 
     public
-    Dictionary getParameters(String fullName, Symbol[] params, Dictionary optargs)
+    Dictionary getParameters(java.lang.String fullName, Symbol[] params, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_getParameters( fullName, params, optargs);
 	event.throwIfContainerException();
@@ -118,35 +118,35 @@ public class Base_ContainerService extends Base_Owner
     }
 
     public
-    void changeMode(String fullName, Symbol accessMode, Dictionary optargs)
+    void changeMode(java.lang.String fullName, Symbol accessMode, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_changeMode(fullName, accessMode, optargs);
 	event.throwIfContainerException();
     }
 
     public
-    void copy(String fullName, String target, Dictionary optargs)
+    void copy(java.lang.String fullName, java.lang.String target, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_copy( fullName, target, optargs);
 	event.throwIfContainerException();
     }
 
     public
-    void rename(String fullName, String newName, Dictionary optargs)
+    void rename(java.lang.String fullName, java.lang.String newName, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_rename( fullName, newName, optargs );
 	event.throwIfContainerException();
     }
 
     public
-    void destroy(String fullName, Dictionary optargs)
+    void destroy(java.lang.String fullName, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_destroy( fullName, optargs );
 	event.throwIfContainerException();
     }
 
     public
-    String[] listObjects(String fullName, Dictionary optargs)
+    java.lang.String[] listObjects(java.lang.String fullName, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_listObjects( fullName, optargs );
 	event.throwIfContainerException();
@@ -155,14 +155,14 @@ public class Base_ContainerService extends Base_Owner
 
 
     public
-    void createContainer(String fullName, Dictionary optargs)
+    void createContainer(java.lang.String fullName, Dictionary optargs)
 	throws ContainerException {
 	Async_ContainerEvent event = async_createContainer( fullName, optargs );
 	event.throwIfContainerException();
     }
 
     public
-    DataObject createDataObject( String fullName, 
+    DataObject createDataObject( java.lang.String fullName, 
 				 Symbol accessMode, 
 				 Dictionary optargs )
 	throws ContainerException {
@@ -173,7 +173,7 @@ public class Base_ContainerService extends Base_Owner
     }
 
     public
-    DataObject openDataObject( String fullName, 
+    DataObject openDataObject( java.lang.String fullName, 
 			       Symbol accessMode, 
 			       boolean ifNoExist,
 			       boolean truncate,

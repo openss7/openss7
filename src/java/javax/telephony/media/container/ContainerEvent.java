@@ -72,9 +72,9 @@ interface ContainerEvent extends MediaEvent, ContainerConstants {
     public Dictionary getParamDict();
 
     /** for listObjects.
-     * @return a String[] of MDOs in the container
+     * @return a java.lang.String[] of MDOs in the container
      */
-    public String[] getObjectList();
+    public java.lang.String[] getObjectList();
 
     /** from openDataObject.
      * @return the DataObject that was opened.

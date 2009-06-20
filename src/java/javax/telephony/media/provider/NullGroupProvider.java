@@ -68,7 +68,7 @@ class NullGroupProvider extends Base_Owner implements MPI.GroupProvider
     /** implements MPI.GroupProvider */
     public Base.BindToCallEvent bindAndConnect(Base.BindToCallEvent event, 
 					       ConfigSpec cs,
-					       String s1, String s2)
+					       java.lang.String s1, java.lang.String s2)
     { 
 	bindMediaGroup(event, cs);
 	return event;
@@ -82,7 +82,7 @@ class NullGroupProvider extends Base_Owner implements MPI.GroupProvider
     }
     public Base.BindEvent bindToTerminalName(Base.BindEvent event, 
 					     ConfigSpec cs, 
-					     String s1)
+					     java.lang.String s1)
     { 
 	bindMediaGroup(event, cs);
 	return event;
@@ -96,16 +96,16 @@ class NullGroupProvider extends Base_Owner implements MPI.GroupProvider
     }
     public Base.BindEvent bindToServiceName(Base.BindEvent event,
 					    ConfigSpec cs,
-					    String serviceName)
+					    java.lang.String serviceName)
     { 
 	bindMediaGroup(event, cs);
 	return event;
     }
     public Base.DelegationEvent delegateToService(Base.DelegationEvent event,
 						  MPI.MediaGroup group, 
-						  String serviceName, 
+						  java.lang.String serviceName, 
 						  int timeout,
-						  String catchTags) 
+						  java.lang.String catchTags) 
     {
 	// newMS = find MediaService(serviceName), 
 	// stack current owner and tags, etc...
@@ -131,7 +131,7 @@ class NullGroupProvider extends Base_Owner implements MPI.GroupProvider
     }
     public Base.ReleaseEvent releaseToService(Base.ReleaseEvent event, 
 					      MPI.MediaGroup group,
-					      String serviceName, 
+					      java.lang.String serviceName, 
 					      int timeout)
     { 
 	// newMS = find MediaService(serviceName)
@@ -148,7 +148,7 @@ class NullGroupProvider extends Base_Owner implements MPI.GroupProvider
     }
     public Base.ReleaseEvent releaseToTag(Base.ReleaseEvent event,
 					  MPI.MediaGroup group,
-					  String returnTags)
+					  java.lang.String returnTags)
     { 
 	// newMS = previous owner (of tags)
 	// group.setOwner(newMS);

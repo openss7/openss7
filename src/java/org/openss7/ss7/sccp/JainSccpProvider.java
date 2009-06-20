@@ -195,7 +195,7 @@ public interface JainSccpProvider extends java.util.EventListener {
       * each <code>ConnectionOrientedEvent</code> . It is recommended that the
       * message detail returned in the
       * <code>MandatoryParameterNotSetException</code> should be a
-      * <code>String</code> of the form: <p>
+      * <code>java.lang.String</code> of the form: <p>
       * <center><B>"Parameter: <parameterName> not set"</B></center>
       */
     public void sendConnectOrientedEvent(ConnectionOrientedEvent event)
@@ -225,7 +225,7 @@ public interface JainSccpProvider extends java.util.EventListener {
       * parameters must be set for each <code>ConnectionlessEvent</code>.
       * It is recommended that the detail message returned in the
       * <code>MandatoryParameterNotSetException</code> should be a
-      * <code>String</code> of the form: <p>
+      * <code>java.lang.String</code> of the form: <p>
       * <center><B>"Parameter: <parameterName> not set"</B></center>
       */
     public void sendConnectionlessEvent(ConnectionlessEvent event)
@@ -244,7 +244,7 @@ public interface JainSccpProvider extends java.util.EventListener {
       * @param userAddress
       * The feature to be added to the JainSccpListener attribute.
       *
-      * @exception TooManyListenersException
+      * @exception java.util.TooManyListenersException
       * Thrown if a limit is placed on the allowable number of
       * registered JainSccpListeners, and this limit has been reached.
       *
@@ -252,11 +252,11 @@ public interface JainSccpProvider extends java.util.EventListener {
       * Thrown if the listener supplied is already registered for the
       * specified userAddress with this JainSccpProviderImpl.
       *
-      * @exception InvalidAddressException
+      * @exception jain.protocol.ss7.InvalidAddressException
       * Thrown if the userAddress supplied is not a valid address.
       */
     public void addJainSccpListener(JainSccpListener listener, SccpUserAddress userAddress)
-        throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException;
+        throws java.util.TooManyListenersException, ListenerAlreadyRegisteredException, jain.protocol.ss7.InvalidAddressException;
 
     /**
       * Removes a {@link JainSccpListener} from the list of registered

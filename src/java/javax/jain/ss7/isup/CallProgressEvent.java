@@ -73,7 +73,7 @@ public abstract class CallProgressEvent extends IsupEvent {
         @param eventInformation  Event Information parameter.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    protected CallProgressEvent(Object source, SignalingPointCode dpc,
+    protected CallProgressEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             EventInformation eventInformation)
         throws ParameterRangeInvalidException {

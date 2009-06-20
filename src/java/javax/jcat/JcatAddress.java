@@ -222,7 +222,7 @@ public interface JcatAddress extends JccAddress {
       * be displayed cannot be displayed due to its length or because of
       * invalid characters.
       */
-    public void setDisplayText(String text, boolean displayAllowed)
+    public void setDisplayText(java.lang.String text, boolean displayAllowed)
         throws InvalidArgumentException;
     /**
       * Gets the text that can be displayed on the terminal.
@@ -230,7 +230,7 @@ public interface JcatAddress extends JccAddress {
       * @return the string to be displayed if getDisplayAllowed()
       * returns true
       */
-    public String getDisplayText();
+    public java.lang.String getDisplayText();
     /**
       * Indication whether getDisplayText() is suppossed to be
       * displayed.

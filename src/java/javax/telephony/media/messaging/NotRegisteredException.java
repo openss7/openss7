@@ -36,7 +36,7 @@ public class NotRegisteredException extends ServiceException {
      *
      * @param   s   the detail message.
      */
-    public NotRegisteredException(String s) { super(s); }
+    public NotRegisteredException(java.lang.String s) { super(s); }
 
     /**
      * Construct a <code>NotRegisteredException</code>
@@ -49,7 +49,7 @@ public class NotRegisteredException extends ServiceException {
      * @param s  the detail message describing the error in the event.
      * @param event a ServiceRequestEvent 
      */
-    public NotRegisteredException(String s, ServiceEvent event) {
+    public NotRegisteredException(java.lang.String s, ServiceEvent event) {
 	super(s, event);
     }
 }

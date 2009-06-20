@@ -31,11 +31,11 @@ class Base_RecorderEvent extends Base.ResourceEvent
     /**
      * Create specific completion or non-tranaction event from Recorder.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_Record
      */
-    public Base_RecorderEvent(Object source, Symbol eventID) 
+    public Base_RecorderEvent(java.lang.Object source, Symbol eventID) 
     {super(source, eventID);}
 
     /** how much was recorded.

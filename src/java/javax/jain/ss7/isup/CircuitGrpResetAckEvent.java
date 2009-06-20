@@ -73,7 +73,7 @@ public class CircuitGrpResetAckEvent extends CircuitGrpCommonEvent {
       * IN THIS EVENT, THE STATUS FIELD IS NOT PRESENT ONLY WHEN THE RANGE IS 0. Refer
       * to RangeAndStatus class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public CircuitGrpResetAckEvent(Object source, SignalingPointCode dpc,
+    public CircuitGrpResetAckEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             RangeAndStatus in_rangeAndStatus)
         throws ParameterRangeInvalidException {

@@ -161,9 +161,9 @@ public abstract class DialogueIndEvent extends java.util.EventObject implements 
       * @return
       * The Primitive Type of the Event.  */
     public abstract int getPrimitiveType();
-    /** String representation of class DialogueIndEvent.
+    /** java.lang.String representation of class DialogueIndEvent.
       * @return
-      * String provides description of class DialogueIndEvent.  */
+      * java.lang.String provides description of class DialogueIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());

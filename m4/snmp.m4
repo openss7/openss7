@@ -212,16 +212,107 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 	LIBS="$perl_cv_ldadd"
 	LDFLAGS="$perl_cv_ldflags"
 
-	AC_CHECK_LIB([wrap], [main]) ###
-	AC_CHECK_LIB([sensors], [main])
-	AC_CHECK_LIB([m], [main])
-	AC_CHECK_LIB([crypto], [main])
-	AC_CHECK_LIB([z], [main]) ###
-	AC_CHECK_LIB([popt], [main]) ###
-	AC_CHECK_LIB([rpmio], [main])
-	AC_CHECK_LIB([rpmdb], [main], [], [], [-lrpm]) #xxx
-	AC_CHECK_LIB([rpm], [main])
-	AC_CHECK_LIB([dl], [main])
+	snmp_warned=no
+	AC_CHECK_LIB_BROKEN([wrap], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libwrap native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) ###
+	AC_CHECK_LIB([sensors], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libsensors native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB([m], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libm native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB([crypto], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libcrypto native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB([z], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libz native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) ###
+	AC_CHECK_LIB([popt], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libpopt native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) ###
+	AC_CHECK_LIB([rpmio], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting librpmio native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB([rpm], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting librpm native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB([rpmdb], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting librpmdb native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) #xxx
+	AC_CHECK_LIB([dl], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that native SNMP agents will compile without
+*** the supporting libdl native library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
 
 	snmp_cv_libs="$LIBS"
 	snmp_cv_ldflags="$LDFLAGS"
@@ -245,41 +336,46 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 ***
 *** Compiling native SNMP agents requires the native library
 *** libnetsnmphelpers.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
-*** --without-snmp-agent or --without-snmp to configure.
+*** net-snmp or ucd-snmp runtime package or a supporting
+*** native library.  Otherwise, pass --without-snmp-agent or
+*** --without-snmp to configure.
 *** ]) ], [-lnetsnmpagent -lnetsnmpmibs])
 	    AC_CHECK_LIB([netsnmpagent], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libnetsnmpagent.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
-*** --without-snmp-agent or --without-snmp to configure.
+*** net-snmp or ucd-snmp runtime package or a supporting
+*** native library.  Otherwise, pass --without-snmp-agent or
+*** --without-snmp to configure.
 *** ]) ], [-lnetsnmpmibs])
 	    AC_CHECK_LIB([netsnmpmibs], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libnetsnmpmibs.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
-*** --without-snmp-agent or --without-snmp to configure.
+*** net-snmp or ucd-snmp runtime package or a supporting
+*** native library.  Otherwise, pass --without-snmp-agent or
+*** --without-snmp to configure.
 *** ]) ])
 	else
 	    AC_CHECK_LIB([snmp], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
-*** libsnmp.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.  Otherwise, pass
-*** --without-snmp-agent or --without-snmp to configure.
+*** libsnmp.  Most likely you need to install the net-snmp or
+*** ucd-snmp runtime package or a supporting native library.
+*** Otherwise, pass --without-snmp-agent or --without-snmp to
+*** configure.
 *** ]) ])
 	    AC_CHECK_LIB([ucdagent], [main], [], [dnl
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
 *** libucdagent.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.  Otherwise, pass
-*** --without-snmp-agent or --without-snmp to configure.
+*** or ucd-snmp runtime package or a supporting native
+*** library.  Otherwise, pass --without-snmp-agent or
+*** --without-snmp to configure.
 *** ]) ], [-lucdmibs], [
 int allow_severity = 0;
 int deny_severity = 0;
@@ -288,9 +384,10 @@ int deny_severity = 0;
 		AC_MSG_ERROR([
 *** 
 *** Compiling native SNMP agents requires the native library
-*** libucdmibs.  Most likely you need to install the net-snmp or
-*** ucd-snmp runtime package.  Otherwise, pass
-*** --without-snmp-agent or --without-snmp to configure.
+*** libucdmibs.  Most likely you need to install the net-snmp
+*** or ucd-snmp runtime package or a supporting native
+*** library.  Otherwise, pass --without-snmp-agent or
+*** --without-snmp to configure.
 *** ]) ], [], [
 int allow_severity = 0;
 int deny_severity = 0;
@@ -323,16 +420,107 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 	LIBS="$perl_cv_ldadd32"
 	LDFLAGS="$perl_cv_ldflags32"
 
-	AC_CHECK_LIB32([wrap], [main]) ###
-	AC_CHECK_LIB32([sensors], [main])
-	AC_CHECK_LIB32([m], [main])
-	AC_CHECK_LIB32([crypto], [main])
-	AC_CHECK_LIB32([z], [main]) ###
-	AC_CHECK_LIB32([popt], [main]) ###
-	AC_CHECK_LIB32([rpmio], [main])
-	AC_CHECK_LIB32([rpmdb], [main], [], [], [-lrpm]) #xxx
-	AC_CHECK_LIB32([rpm], [main])
-	AC_CHECK_LIB32([dl], [main])
+	snmp_warned=no
+	AC_CHECK_LIB32_BROKEN([wrap], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libwrap 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) ###
+	AC_CHECK_LIB32_BROKEN([sensors], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libsensors 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB32_BROKEN([m], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libm 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB32_BROKEN([crypto], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libcrypto 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB32_BROKEN([z], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libz 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) ###
+	AC_CHECK_LIB32_BROKEN([popt], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libpopt 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) ###
+	AC_CHECK_LIB32_BROKEN([rpmio], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting librpmio 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB32_BROKEN([rpm], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting librpm 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
+	AC_CHECK_LIB32_BROKEN([rpmdb], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting librpmdb 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi]) #xxx
+	AC_CHECK_LIB32_BROKEN([dl], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
+		AC_MSG_WARN([
+***
+*** It is unlikey that 32-bit SNMP agents will compile without
+*** the supporting libdl 32-bit library.  Expect problems
+*** later.
+*** ])
+		snmp_warned=yes
+	    fi])
 
 	snmp_cv_libs32="$LIBS"
 	snmp_cv_ldflags32="$LDFLAGS"
@@ -347,65 +535,114 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 	LIBS="$snmp_cv_libs32"
 	LDFLAGS="$snmp_cv_ldflags32"
 
-	AC_CHECK_LIB32([netsnmp], [main])
+	AC_CHECK_LIB32_BROKEN([netsnmp], [main])
 
+	snmp_warned=no
 	if test ":${ac_cv_lib32_netsnmp_main:-no}" = :yes
 	then
-	    AC_CHECK_LIB32([netsnmphelpers], [main], [], [dnl
+	    AC_CHECK_LIB32_BROKEN([netsnmphelpers], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
 ***
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmphelpers.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** 32-bit net-snmp or ucd-snmp runtime package or a
+*** supporting 32-bit library.  Otherwise, 32-bit SNMP agents
+*** will simply not be built: not a big issue, as we do not
+*** currently build them anyway.  You can always pass
 *** --without-snmp-agent or --without-snmp to configure.
-*** ]) ], [-lnetsnmpagent -lnetsnmpmibs])
-	    AC_CHECK_LIB32([netsnmpagent], [main], [], [dnl
+*** ])
+		snmp_warned=yes
+	    fi
+	    LIBS="-lnetsnmphelpers $LIBS"
+	    ], [-lnetsnmpagent -lnetsnmpmibs])
+	    AC_CHECK_LIB32_BROKEN([netsnmpagent], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmpagent.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** 32-bit net-snmp or ucd-snmp runtime package or a
+*** supporting 32-bit library.  Otherwise, 32-bit SNMP agents
+*** will simply not be built: not a big issue, as we do not
+*** currently build them anyway.  You can always pass
 *** --without-snmp-agent or --without-snmp to configure.
-*** ]) ], [-lnetsnmpmibs])
-	    AC_CHECK_LIB32([netsnmpmibs], [main], [], [dnl
+*** ])
+		snmp_warned=yes
+	    fi
+	    LIBS="-lnetsnmpagent $LIBS"
+	    ], [-lnetsnmpmibs])
+	    AC_CHECK_LIB32_BROKEN([netsnmpmibs], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmpmibs.  Most likely you need to install the
-*** net-snmp or ucd-snmp runtime package.  Otherwise, pass
+*** 32-bit net-snmp or ucd-snmp runtime package or a
+*** supporting 32-bit library.  Otherwise, 32-bit SNMP agents
+*** will simply not be built: not a big issue, as we do not
+*** currently build them anyway.  You can always pass
 *** --without-snmp-agent or --without-snmp to configure.
-*** ]) ])
+*** ])
+		snmp_warned=yes
+	    fi
+	    LIBS="-lnetsnmpmibs $LIBS"
+	    ])
 	else
-	    AC_CHECK_LIB32([snmp], [main], [], [dnl
+	    AC_CHECK_LIB32_BROKEN([snmp], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
-*** libsnmp.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.  Otherwise, pass
+*** libsnmp.  Most likely you need to install the 32-bit
+*** net-snmp or ucd-snmp runtime package or a supporting
+*** 32-bit library.  Otherwise, 32-bit SNMP agents will simply
+*** not be built: not a big issue, as we do not currently
+*** build them anyway.  You can always pass
 *** --without-snmp-agent or --without-snmp to configure.
-*** ]) ])
-	    AC_CHECK_LIB32([ucdagent], [main], [], [dnl
+*** ])
+		snmp_warned=yes
+	    fi
+	    LIBS="-lsnmp $LIBS"
+	    ])
+	    AC_CHECK_LIB32_BROKEN([ucdagent], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
-*** libucdagent.  Most likely you need to install the net-snmp
-*** or ucd-snmp runtime package.  Otherwise, pass
+*** libucdagent.  Most likely you need to install the 32-bit
+*** net-snmp or ucd-snmp runtime package or a supporting
+*** 32-bit library.  Otherwise, 32-bit SNMP agents will simply
+*** not be built: not a big issue, as we do not currently
+*** build them anyway.  You can always pass
 *** --without-snmp-agent or --without-snmp to configure.
-*** ]) ], [-lucdmibs], [
+*** ])
+		snmp_warned=yes
+	    fi
+	    LIBS="-lucdagent $LIBS"
+	    ], [-lucdmibs], [
 int allow_severity = 0;
 int deny_severity = 0;
-])
-	    AC_CHECK_LIB32([ucdmibs], [main], [], [dnl
+	    ])
+	    AC_CHECK_LIB32_BROKEN([ucdmibs], [main], [], [dnl
+	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
-*** libucdmibs.  Most likely you need to install the net-snmp or
-*** ucd-snmp runtime package.  Otherwise, pass
+*** libucdmibs.  Most likely you need to install the 32-bit
+*** net-snmp or ucd-snmp runtime package or a supporting
+*** 32-bit library.  Otherwise, 32-bit SNMP agents will simply
+*** not be built: not a big issue, as we do not currently
+*** build them anyway.  You can always pass
 *** --without-snmp-agent or --without-snmp to configure.
-*** ]) ], [], [
+*** ])
+		snmp_warned=yes
+	    fi
+	    LIBS="-lucdmibs $LIBS"
+	    ], [], [
 int allow_severity = 0;
 int deny_severity = 0;
-])
+	    ])
 	fi
 
 	snmp_cv_ldadd32="$LIBS"

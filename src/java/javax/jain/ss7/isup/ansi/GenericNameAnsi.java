@@ -175,7 +175,7 @@ public class GenericNameAnsi implements java.io.Serializable {
     protected byte m_presentation;
     protected boolean m_availability;
     protected byte m_typeOfName;
-    protected String m_name;
+    protected java.lang.String m_name;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

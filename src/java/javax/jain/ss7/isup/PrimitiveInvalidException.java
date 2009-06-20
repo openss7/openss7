@@ -64,7 +64,7 @@ public class PrimitiveInvalidException extends IsupException {
     /** The toString method retrieves a string containing the value of the members of
       * the PrimitiveInvalid */
     public java.lang.String toString() {
-        String text = "PrimitiveInvalidException\n";
+        java.lang.String text = "PrimitiveInvalidException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";
         return text;
     }

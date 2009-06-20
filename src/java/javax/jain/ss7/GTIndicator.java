@@ -61,8 +61,8 @@ public class GTIndicator {
         m_value = value;
         m_valueIsSet = true;
     }
-    /** String representation of the Constant class.
-      * @return String provides description of Constant.  */
+    /** java.lang.String representation of the Constant class.
+      * @return java.lang.String provides description of Constant.  */
     public java.lang.String toString() {
         return m_value;
     }

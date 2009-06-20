@@ -88,7 +88,7 @@ import java.io.Serializable;
  * <p>
  * <b>Note:</b>
  * Pre-defined Symbol constants with the same internal value 
- * generally refer to the same Object, but this cannot be relied upon.
+ * generally refer to the same java.lang.Object, but this cannot be relied upon.
  * As with Integer, to compare two Symbols for numerical/logical equivalence, 
  * the {@link #equals equals} method <b>must</b> be used.
  * <p>
@@ -144,7 +144,7 @@ class Symbol extends javax.telephony.media.symbols.BaseSymbol implements java.io
      * @param other a Symbol to compare to this Symbol.
      * @return TRUE iff the Symbols have the same value.
      */
-    public boolean equals(Object other) {
+    public boolean equals(java.lang.Object other) {
 	return super.equals(other);
     }
 
@@ -158,13 +158,13 @@ class Symbol extends javax.telephony.media.symbols.BaseSymbol implements java.io
     }
 
     /** 
-     * Return a String representation of this Symbol.
+     * Return a java.lang.String representation of this Symbol.
      * <p>
      * Attempt to parse the symbol value to identify the 
-     * Vendor, Object and ItemName.
-     * @return a String representing this Symbol.
+     * Vendor, java.lang.Object and ItemName.
+     * @return a java.lang.String representing this Symbol.
      */
-    public String toString() {
+    public java.lang.String toString() {
 	return super.toString();
     }
 
@@ -188,10 +188,10 @@ class Symbol extends javax.telephony.media.symbols.BaseSymbol implements java.io
      * for example, to prepend other package names,
      * or use other techniques to map from name to Symbol.
      * 
-     * @param stringName a String that names a Symbol
+     * @param stringName a java.lang.String that names a Symbol
      * @return the named Symbol, or null if stringName is not registered.
      */
-    public static Symbol getSymbol(String stringName) {
+    public static Symbol getSymbol(java.lang.String stringName) {
 	return BaseSymbol.getSymbol(stringName);
     }
     
@@ -204,32 +204,32 @@ class Symbol extends javax.telephony.media.symbols.BaseSymbol implements java.io
      *
      * @param stringName the name to be given to that Symbol
      */
-    public void setName(String stringName) {
+    public void setName(java.lang.String stringName) {
 	super.setName(stringName);
     }
 
     /**
      * Store Symbol name information to someplace.
-     * @param pathName a String that indicates where to store the symbol table.
+     * @param pathName a java.lang.String that indicates where to store the symbol table.
      */
-    public static void saveSymbolNames(String pathName) {
+    public static void saveSymbolNames(java.lang.String pathName) {
 	BaseSymbol.saveSymbolNames(pathName);
     }
 
     /**
      * Load Symbol name information from somewhere.
      * 
-     * @param pathName a String that indicates which symbol table to load.
+     * @param pathName a java.lang.String that indicates which symbol table to load.
      *     if <tt>pathName</tt> is null, load standard/default symbol table.
      * <p>
      * <b>Note:</b>
-     * The format of the <tt>pathName</tt> String is not yet standardized.<br>
+     * The format of the <tt>pathName</tt> java.lang.String is not yet standardized.<br>
      * The implementation supplied in the reference code accepts strings
      * like: <tt>"class:javax.telephony.media.symbols.R2SymbolNames"</tt>.
      * The indicated class file is loaded, which runs its <tt>static</tt>
-     * block and invokes <tt>Symbol.setName(String)</tt> for each Symbol.
+     * block and invokes <tt>Symbol.setName(java.lang.String)</tt> for each Symbol.
      */ 
-    public static void loadSymbolNames(String pathName) {
+    public static void loadSymbolNames(java.lang.String pathName) {
 	BaseSymbol.loadSymbolNames(pathName);
     }
 }    

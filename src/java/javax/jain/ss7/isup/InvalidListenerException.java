@@ -67,7 +67,7 @@ public class InvalidListenerException extends IsupException{
       * the InvalidListenerException class.
       * @return A string representation of the member variables.  */
     public java.lang.String toString() {
-        String text = "InvalidListenerException\n";
+        java.lang.String text = "InvalidListenerException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";
         return text;
     }

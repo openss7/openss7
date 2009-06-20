@@ -127,13 +127,14 @@ public class ServiceAreaId extends LocationAreaId {
         return m_sac;
     }
     /**
-      * Get the whole Service Area Code (MCC+MNC+LAC+SAC) as a String.
+      * Get the whole Service Area Code (MCC+MNC+LAC+SAC) as a
+      * java.lang.String.
       *
       * @return
-      * String containing SAC.
+      * java.lang.String containing SAC.
       */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
     protected byte[] m_sac = null;
     protected boolean m_sacIsSet = false;

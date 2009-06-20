@@ -258,9 +258,9 @@ public final class UnidirectionalIndEvent extends DialogueIndEvent {
         m_qualityOfServicePresent = false;
         m_componentsPresent = false;
     }
-    /** String representation of class UnidirectionalIndEvent.
+    /** java.lang.String representation of class UnidirectionalIndEvent.
       * @return
-      * String provides description of class UnidirectionalIndEvent.  */
+      * java.lang.String provides description of class UnidirectionalIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nUnidirectionalIndEvent");

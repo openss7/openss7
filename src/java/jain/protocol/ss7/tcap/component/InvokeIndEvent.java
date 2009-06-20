@@ -270,10 +270,10 @@ public final class InvokeIndEvent extends ComponentIndEvent {
         m_lastComponentPresent = false;
         m_operationPresent = false;
     }
-    /** String representation of class
+    /** java.lang.String representation of class
       * jain.protocol.ss7.tcap.component.InvokeIndEvent.
       * @return
-      * String provides description of class
+      * java.lang.String provides description of class
       * jain.protocol.ss7.tcap.component.InvokeIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

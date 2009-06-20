@@ -75,7 +75,7 @@ public class ConnectItuEvent extends IsupEvent {
         @param bci  Backward call indicators.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public ConnectItuEvent(Object source, SignalingPointCode dpc,
+    public ConnectItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             BwdCallIndItu bci)
         throws ParameterRangeInvalidException {

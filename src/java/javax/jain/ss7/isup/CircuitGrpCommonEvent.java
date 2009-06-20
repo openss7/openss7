@@ -70,7 +70,7 @@ public abstract class CircuitGrpCommonEvent extends IsupEvent {
       * @param in_rangeAndStatus  Gives the range of the affected circuits. Refer to
       * RangeAndStatus class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    protected CircuitGrpCommonEvent(Object source, SignalingPointCode dpc,
+    protected CircuitGrpCommonEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             RangeAndStatus in_rangeAndStatus)
         throws ParameterRangeInvalidException {

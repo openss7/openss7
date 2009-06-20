@@ -48,5 +48,5 @@ public interface CallObservationEndedEv extends CallEv {
    * @since JTAPI v1.2
    * @return The object responsible for the observation ending for the Call.
    */
-  public Object getEndedObject();
+  public java.lang.Object getEndedObject();
 }

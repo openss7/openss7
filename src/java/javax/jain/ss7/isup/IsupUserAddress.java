@@ -140,7 +140,7 @@ public final class IsupUserAddress implements SS7Address, java.io.Serializable {
     /** Checks if two user addresses are the same or not.
       * @param obj ISUP User addres to be compared with.
       * @return True if the two User Addresses are the same, false otherwise.  */
-    public boolean equals(Object obj) {
+    public boolean equals(java.lang.Object obj) {
         if (obj instanceof IsupUserAddress) {
             IsupUserAddress isupUA = (IsupUserAddress) obj;
             if (!m_spc.equals(isupUA.m_spc))

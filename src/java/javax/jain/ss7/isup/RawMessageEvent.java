@@ -86,7 +86,7 @@ public class RawMessageEvent extends IsupEvent {
       * type field of ISUP Protocol messages. The range is 0-256.
       * @exception ParameterRangeInvalidException - Thrown when value is out of range.
       */
-    public RawMessageEvent(Object source, SignalingPointCode dpc,
+    public RawMessageEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int msgType)
         throws ParameterRangeInvalidException {

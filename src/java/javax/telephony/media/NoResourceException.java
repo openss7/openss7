@@ -41,7 +41,7 @@ class NoResourceException extends MediaRuntimeException {
      *
      * @param   s   the detail message.
      */
-    public NoResourceException(String s) {super(s);}
+    public NoResourceException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>NoResourceException</code>
@@ -50,7 +50,7 @@ class NoResourceException extends MediaRuntimeException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public NoResourceException(String s, MediaEvent event) {
+    public NoResourceException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

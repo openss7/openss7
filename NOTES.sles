@@ -1,0 +1,110 @@
+OpenSS7 -- notes for SLES 10 SP2.  2009-06-19
+$Id$
+Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+Steps for building from CVS on SLES 10 SP2:
+
+ 1. Install SLES 10 SP2 from CD/DVD images.
+
+ 2. Apply updates.
+
+ 3. Configure /etc/fstab and edit /etc/init.d/autofs to get the box to
+    work on the internal network.  Add self to sudoers with visudo.
+
+ 4. Install compilers (and everything that comes with it) with:
+    zypper install gcc gcc-c++ gcc-java gcc-info glibc-devel-32bit libgcj-devel-32bit
+    zypper install ctags rcs cvs fastjar indent perl-Tk tix gvim
+
+ 5. Install development tools:
+    zypper install m4 autoconf automake gettext libtool flex bison texinfo
+
+ 6. Install kernel symbols and sources:
+    zypper install kernel-syms kernel-source
+
+ 7. Install net-snmp stuff:
+    zypper install net-snmp net-snmp-32bit net-snmp-devel perl-Net-SNMP perl-SNMP
+    zypper install sensors
+
+ 8. Install documentation tools:
+    zypper install transfig groff gnuplot gv jpeg psutils
+
+ 9. Install more java stuff: (SLES does not have gjdoc!)
+    zypper install java-1_5_0-ibm java-1_5_0-ibm-32bit
+
+10. Make a tools directory and perform the following:
+    default m4 is version 1.4.4 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/m4/m4-1.4.13.tar.bz2
+    default autoconf version 2.59 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.63.tar.bz2
+    default automake version 1.9.6 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/automake/automake-1.11.tar.bz2
+    default gettext version 0.14.5 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/gettext/gettext-0.17.tar.gz
+    default libtool version 1.5.22 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.6a.tar.gz
+    default texinfo version 4.8 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/texinfo/texinfo-4.13a.tar.gz
+    default bison version 2.1 =>
+      wget --passive-ftp ftp://ftp.gnu.org/gnu/bison/bison-2.4.1.tar.bz2
+    default flex version 2.5.31 =>
+      wget http://prdownloads.sourceforge.net/flex/flex-2.5.35.tar.bz2
+    no swig package =>
+      wget http://www.openss7.org/tarballs/swig-1.3.39.tar.bz2
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2009  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

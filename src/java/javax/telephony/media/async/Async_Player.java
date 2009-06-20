@@ -36,35 +36,35 @@ public interface Async_Player extends PlayerConstants {
      * <p>
      * Completion event is sent to Async_PlayerListener.
      *
-     * @param streamIDs a String[] naming the MDO list to be played.
+     * @param streamIDs a java.lang.String[] naming the MDO list to be played.
      * @param offset number of milliseconds into the MDO list at 
      * which play is to start, offset may span several items in streamIDs.
      * @param rtc Array of RTC that effect this play.
      * @param optargs a Dictionary of optional arguments.
      * @return an Async_PlayerEvent
      * 
-     * @see Player#play(String[], int, RTC[], Dictionary)
+     * @see Player#play(java.lang.String[], int, RTC[], Dictionary)
      */
-    Async_PlayerEvent async_play(String[] streamIDs,
+    Async_PlayerEvent async_play(java.lang.String[] streamIDs,
 				 int offset, 
 				 RTC[] rtc,  
 				 Dictionary optargs);
 
     /**
      * Play a single MDO (Media Data Object) named by streamID.
-     * Equivalent to <code>async_play()</code> with a String[] 
+     * Equivalent to <code>async_play()</code> with a java.lang.String[] 
      * of length one, containing the given streamID.
      *
-     * @param streamID a String naming the MDO to be played.
+     * @param streamID a java.lang.String naming the MDO to be played.
      * @param offset int number milliseconds into the MDO 
      * at which play is to start.
      * @param rtc Array of RTC that effect this play.
      * @param optargs a Dictionary of optional arguments.
      * @return a Player.Event when the operation is complete (or queued).
      * 
-     * @see Player#play(String, int, RTC[], Dictionary)
+     * @see Player#play(java.lang.String, int, RTC[], Dictionary)
      */
-    Async_PlayerEvent async_play(String streamID,
+    Async_PlayerEvent async_play(java.lang.String streamID,
 				 int offset, 
 				 RTC[] rtc,  
 				 Dictionary optargs);

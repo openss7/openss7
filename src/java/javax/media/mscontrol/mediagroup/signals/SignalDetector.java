@@ -323,7 +323,7 @@ public interface SignalDetector
   How to define a Pattern
 
    Patterns can be defined in three ways:
-     * by a String of characters, among 0,1,2,3,4,5,6,7,8,9,*,#,A,B,C,D
+     * by a java.lang.String of characters, among 0,1,2,3,4,5,6,7,8,9,*,#,A,B,C,D
        For example: "2" will match a single DTMF key, and "04#" will
        match the sequence of 3 keys.
        patterns.put(p_Pattern[1], "2");

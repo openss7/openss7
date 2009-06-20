@@ -149,7 +149,7 @@ public interface JainTcapProvider extends java.util.EventListener {
       * interface will mandate that different parameters must be set for
       * each ComponentReqEvent  It is recommended that the message
       * detail returned in the MandatoryParameterNotSetException should
-      * be a String of the form: <br>
+      * be a java.lang.String of the form: <br>
       * <center> "Parameter: not set" </center><br> */
     public void sendComponentReqEvent(ComponentReqEvent event) throws MandatoryParameterNotSetException;
     /** Sends a Dialogue Request primitive into the TCAP layer of the
@@ -170,7 +170,7 @@ public interface JainTcapProvider extends java.util.EventListener {
       * JainTcapProvider interface will mandate that different
       * parameters must be set for each DialogueReqEvent . It is
       * recommended that the detail message returned in the
-      * MandatoryParameterNotSetException should be a String of the
+      * MandatoryParameterNotSetException should be a java.lang.String of the
       * form: <br>
       * <center> "Parameter: not set" </center><br> */
     public void sendDialogueReqEvent(DialogueReqEvent event) throws MandatoryParameterNotSetException;

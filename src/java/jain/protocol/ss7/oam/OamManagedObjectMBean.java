@@ -89,67 +89,67 @@ import jain.*;
 public abstract interface OamManagedObjectMBean extends javax.management.NotificationBroadcaster,javax.management.MBeanRegistration, java.lang.Cloneable, java.io.Serializable {
     /** The Object Type for a Mtp2SapMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP2_SAP".  */
-    public static final String OBJECT_TYPE_MTP2_SAP = "OBJECT_TYPE_MTP2_SAP";
+    public static final java.lang.String OBJECT_TYPE_MTP2_SAP = "OBJECT_TYPE_MTP2_SAP";
     /** The Object Type for a Mtp2TimerProfileMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_MTP2_TIMER_PROFILE".  */
-    public static final String OBJECT_TYPE_MTP2_TIMER_PROFILE = "OBJECT_TYPE_MTP2_TIMER_PROFILE";
+    public static final java.lang.String OBJECT_TYPE_MTP2_TIMER_PROFILE = "OBJECT_TYPE_MTP2_TIMER_PROFILE";
     /** The Object Type for a LinkMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_LINK".  */
-    public static final String OBJECT_TYPE_LINK = "OBJECT_TYPE_LINK";
+    public static final java.lang.String OBJECT_TYPE_LINK = "OBJECT_TYPE_LINK";
     /** The Object Type for a LinksetMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_LINKSET".  */
-    public static final String OBJECT_TYPE_LINKSET = "OBJECT_TYPE_LINKSET";
+    public static final java.lang.String OBJECT_TYPE_LINKSET = "OBJECT_TYPE_LINKSET";
     /** The Object Type for a RouteMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_ROUTE".  */
-    public static final String OBJECT_TYPE_ROUTE = "OBJECT_TYPE_ROUTE";
+    public static final java.lang.String OBJECT_TYPE_ROUTE = "OBJECT_TYPE_ROUTE";
     /** The Object Type for a RoutesetMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_ROUTESET".  */
-    public static final String OBJECT_TYPE_ROUTESET = "OBJECT_TYPE_ROUTESET";
+    public static final java.lang.String OBJECT_TYPE_ROUTESET = "OBJECT_TYPE_ROUTESET";
     /** The Object Type for a Mtp3SapMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP3_SAP".  */
-    public static final String OBJECT_TYPE_MTP3_SAP = "OBJECT_TYPE_MTP3_SAP";
+    public static final java.lang.String OBJECT_TYPE_MTP3_SAP = "OBJECT_TYPE_MTP3_SAP";
     /** The Object Type for an OwnSignallingPointMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_OWN_SIGNALLING_POINT".  */
-    public static final String OBJECT_TYPE_OWN_SIGNALLING_POINT = "OBJECT_TYPE_OWN_SIGNALLING_POINT";
+    public static final java.lang.String OBJECT_TYPE_OWN_SIGNALLING_POINT = "OBJECT_TYPE_OWN_SIGNALLING_POINT";
     /** The Object Type for a ScreeningTableMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_SCREENING_TABLE".  */
-    public static final String OBJECT_TYPE_SCREENING_TABLE = "OBJECT_TYPE_SCREENING_TABLE";
+    public static final java.lang.String OBJECT_TYPE_SCREENING_TABLE = "OBJECT_TYPE_SCREENING_TABLE";
     /** The Object Type for a Mtp3TimerProfileMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_MTP3_TIMER_PROFILE".  */
-    public static final String OBJECT_TYPE_MTP3_TIMER_PROFILE = "OBJECT_TYPE_MTP3_TIMER_PROFILE";
+    public static final java.lang.String OBJECT_TYPE_MTP3_TIMER_PROFILE = "OBJECT_TYPE_MTP3_TIMER_PROFILE";
     /** The Object Type for a ConcernedAreaMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_CONCERNED_AREA".  */
-    public static final String OBJECT_TYPE_CONCERNED_AREA = "OBJECT_TYPE_CONCERNED_AREA";
+    public static final java.lang.String OBJECT_TYPE_CONCERNED_AREA = "OBJECT_TYPE_CONCERNED_AREA";
     /** The Object Type for a GlobalTitleEntryMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_GLOBAL_TITLE_ENTRY".  */
-    public static final String OBJECT_TYPE_GLOBAL_TITLE_ENTRY = "OBJECT_TYPE_GLOBAL_TITLE_ENTRY";
+    public static final java.lang.String OBJECT_TYPE_GLOBAL_TITLE_ENTRY = "OBJECT_TYPE_GLOBAL_TITLE_ENTRY";
     /** The Object Type for a SccpEntitySetMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_SCCP_ENTITY_SET".  */
-    public static final String OBJECT_TYPE_SCCP_ENTITY_SET = "OBJECT_TYPE_SCCP_ENTITY_SET";
+    public static final java.lang.String OBJECT_TYPE_SCCP_ENTITY_SET = "OBJECT_TYPE_SCCP_ENTITY_SET";
     /** The Object Type for a SccpRoutingControlMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_SCCP_ROUTING_CONTROL".  */
-    public static final String OBJECT_TYPE_SCCP_ROUTING_CONTROL = "OBJECT_TYPE_SCCP_ROUTING_CONTROL";
+    public static final java.lang.String OBJECT_TYPE_SCCP_ROUTING_CONTROL = "OBJECT_TYPE_SCCP_ROUTING_CONTROL";
     /** The Object Type for a SccpTimerProfileMBean, getObjectType() for this MBean
       * returns "OBJECT_TYPE_SCCP_TIMER_PROFILE".  */
-    public static final String OBJECT_TYPE_SCCP_TIMER_PROFILE = "OBJECT_TYPE_SCCP_TIMER_PROFILE";
+    public static final java.lang.String OBJECT_TYPE_SCCP_TIMER_PROFILE = "OBJECT_TYPE_SCCP_TIMER_PROFILE";
     /** The Object Type for a TcapNodeMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_TCAP_NODE".  */
-    public static final String OBJECT_TYPE_TCAP_NODE = "OBJECT_TYPE_TCAP_NODE";
+    public static final java.lang.String OBJECT_TYPE_TCAP_NODE = "OBJECT_TYPE_TCAP_NODE";
     /** The Object Type for a OamTimerValMBean, getObjectType() for this MBean returns
       * "OBJECT_TYPE_OAM_TIMER_VAL".  */
-    public static final String OBJECT_TYPE_OAM_TIMER_VAL = "OBJECT_TYPE_OAM_TIMER_VAL";
+    public static final java.lang.String OBJECT_TYPE_OAM_TIMER_VAL = "OBJECT_TYPE_OAM_TIMER_VAL";
     /** The Object Type for a Mtp2LayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP2_LAYER_MANAGER".  */
-    public static final String OBJECT_TYPE_MTP2_LAYER_MANAGER = "OBJECT_TYPE_MTP2_LAYER_MANAGER";
+    public static final java.lang.String OBJECT_TYPE_MTP2_LAYER_MANAGER = "OBJECT_TYPE_MTP2_LAYER_MANAGER";
     /** The Object Type for a Mtp3LayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_MTP3_LAYER_MANAGER".  */
-    public static final String OBJECT_TYPE_MTP3_LAYER_MANAGER = "OBJECT_TYPE_MTP3_LAYER_MANAGER";
+    public static final java.lang.String OBJECT_TYPE_MTP3_LAYER_MANAGER = "OBJECT_TYPE_MTP3_LAYER_MANAGER";
     /** The Object Type for a SccpLayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_SCCP_LAYER_MANAGER".  */
-    public static final String OBJECT_TYPE_SCCP_LAYER_MANAGER = "OBJECT_TYPE_SCCP_LAYER_MANAGER";
+    public static final java.lang.String OBJECT_TYPE_SCCP_LAYER_MANAGER = "OBJECT_TYPE_SCCP_LAYER_MANAGER";
     /** The Object Type for a TcapLayerManager, getObjectType() for this MBean returns
       * "OBJECT_TYPE_TCAP_LAYER_MANAGER".  */
-    public static final String OBJECT_TYPE_TCAP_LAYER_MANAGER = "OBJECT_TYPE_TCAP_LAYER_MANAGER";
+    public static final java.lang.String OBJECT_TYPE_TCAP_LAYER_MANAGER = "OBJECT_TYPE_TCAP_LAYER_MANAGER";
     /**
       * Returns an OamStatisticNotification of the specified statistic type containing the
       * value of the statistic. For example, if the object implementing this interface is
@@ -289,7 +289,7 @@ public abstract interface OamManagedObjectMBean extends javax.management.Notific
       * order to unquely identify multiple instances of the same class. An implementation
       * should implicitly set this id when an object is created. The int equivalent will
       * be returned by getObjectId().  This property takes the form: id=uniqueId where
-      * 'uniqueId' is a String representation of an integer that is unique to all objects
+      * 'uniqueId' is a java.lang.String representation of an integer that is unique to all objects
       * of the same class. </ul>
       *
       * Therefore the complete objectName for an instance of
@@ -309,10 +309,10 @@ public abstract interface OamManagedObjectMBean extends javax.management.Notific
       * Returns an object id that is unique within all objects of the same class. This is
       * generated by the implementation layer manager in order to uniquely identify
       * multiple instances of the same class. An implementation should implicitly set this
-      * id when an object is created. The String equivalent of this method is used as the
+      * id when an object is created. The java.lang.String equivalent of this method is used as the
       * 'id' property in the objectName.
       */
-    public String getObjectId();
+    public java.lang.String getObjectId();
     /**
       * Returns an Object that may contain proprietary methods for this Managed Bean
       * (MBean).
@@ -323,14 +323,14 @@ public abstract interface OamManagedObjectMBean extends javax.management.Notific
       */
     public java.lang.Object getProprietaryInformation();
     /**
-      * Returns the Object Type of this Managed Bean (MBean) as a String. For example, if
+      * Returns the Object Type of this Managed Bean (MBean) as a java.lang.String. For example, if
       * an object 'mtpsSap_1' implements Mtp2SapMBean, then mtp2Sap_1.getObjectType()
       * should return "OBJECT_TYPE_MTP2_SAP".
       *
       * @return
       * the object type of this Managed Bean (MBean)
       */
-    public String getObjectType();
+    public java.lang.String getObjectType();
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

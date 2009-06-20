@@ -68,7 +68,7 @@ public class CallProgressAnsiEvent extends CallProgressEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @param eventInformation  Event Information parameter.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public CallProgressAnsiEvent(Object source, SignalingPointCode dpc,
+    public CallProgressAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             EventInformation eventInformation)
         throws ParameterRangeInvalidException {

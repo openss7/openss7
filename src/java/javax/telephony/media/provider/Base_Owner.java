@@ -88,7 +88,7 @@ public class Base_Owner implements MPI.Owner {
      * @param an object to qualify the eventQueue.Thread name
      * (typically: this.Base_Owner).
      */
-    protected void initEventQueue(Object nameObj) {
+    protected void initEventQueue(java.lang.Object nameObj) {
 	// subclass can supply their own specialized EventQueue:
 	if (eventQueue == null) eventQueue = new EventQueue();
 	eventQueue.setExceptionHandler(_dispatcherExceptionHandler);
@@ -104,7 +104,7 @@ public class Base_Owner implements MPI.Owner {
     protected void finalize() {
 	eventQueue.close();
 	_dispatcherExceptionHandler = null;
-	// super.finalize();		// Object.finalize() does nothing
+	// super.finalize();		// java.lang.Object.finalize() does nothing
     }
 
     /**

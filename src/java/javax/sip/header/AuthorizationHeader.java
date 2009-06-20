@@ -86,7 +86,7 @@ public interface AuthorizationHeader extends Parameters, Header {
         Sets the Realm of the AuthorizationHeader to the realm parameter value. Realm strings MUST
         be globally unique. It is RECOMMENDED that a realm string contain a hostname or domain name.
         Realm strings SHOULD present a human-readable identifier that can be rendered to a user.
-        @param realm The new Realm String of this AuthorizationHeader.
+        @param realm The new Realm java.lang.String of this AuthorizationHeader.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         realm.
       */
@@ -95,12 +95,12 @@ public interface AuthorizationHeader extends Parameters, Header {
     /**
         Returns the Realm value of this AuthorizationHeader. This convenience method returns only
         the realm of the complete Response.
-        @return The String representing the Realm information, null if value is not set.
+        @return The java.lang.String representing the Realm information, null if value is not set.
       */
     java.lang.String getRealm();
     /**
         Sets the Username of the AuthorizationHeader to the username parameter value.
-        @param username The new Username String of this AuthorizationHeader.
+        @param username The new Username java.lang.String of this AuthorizationHeader.
         @exception java.text.ParseException Thrown when an error is reached while parsing the
         username.
       */
@@ -109,12 +109,12 @@ public interface AuthorizationHeader extends Parameters, Header {
     /**
         Returns the Username value of this AuthorizationHeader. This convenience method returns only
         the username of the complete Response.
-        @return The String representing the Username information, null if value is not set.
+        @return The java.lang.String representing the Username information, null if value is not set.
       */
     java.lang.String getUsername();
     /**
         Sets the Nonce of the AuthorizationHeader to the nonce parameter value.
-        @param nonce The new nonce String of this AuthorizationHeader.
+        @param nonce The new nonce java.lang.String of this AuthorizationHeader.
         @exception java.text.ParseException Thrown when an error is reached while parsing the nonce
         value.
       */
@@ -122,7 +122,7 @@ public interface AuthorizationHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Nonce value of this AuthorizationHeader.
-        @return The String representing the nonce information, null if value is not set.
+        @return The java.lang.String representing the nonce information, null if value is not set.
       */
     java.lang.String getNonce();
     /**
@@ -137,7 +137,7 @@ public interface AuthorizationHeader extends Parameters, Header {
     URI getURI();
     /**
         Sets the Response of the AuthorizationHeader to the new response parameter value.
-        @param response The new response String of this AuthorizationHeader.
+        @param response The new response java.lang.String of this AuthorizationHeader.
         @exception java.text.ParseException Thrown when an error is reached while parsing the
         Response.
       */
@@ -145,12 +145,12 @@ public interface AuthorizationHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Response value of this AuthorizationHeader.
-        @return The String representing the Response information.
+        @return The java.lang.String representing the Response information.
       */
     java.lang.String getResponse();
     /**
         Sets the Algorithm of the AuthorizationHeader to the new algorithm parameter value.
-        @param algorithm The new algorithm String of this AuthorizationHeader.
+        @param algorithm The new algorithm java.lang.String of this AuthorizationHeader.
         @exception java.text.ParseException Thrown when an error was reached while parsing the
         algorithm value.
       */
@@ -158,12 +158,12 @@ public interface AuthorizationHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Algorithm value of this AuthorizationHeader.
-        @return The String representing the Algorithm information, null if the value is not set.
+        @return The java.lang.String representing the Algorithm information, null if the value is not set.
       */
     java.lang.String getAlgorithm();
     /**
         Sets the CNonce of the AuthorizationHeader to the cNonce parameter value.
-        @param cNonce The new cNonce String of this AuthorizationHeader.
+        @param cNonce The new cNonce java.lang.String of this AuthorizationHeader.
         @exception java.text.ParseException Thrown when an error was reached while parsing the
         cNonce value.
       */
@@ -171,7 +171,7 @@ public interface AuthorizationHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the CNonce value of this AuthorizationHeader.
-        @return The String representing the cNonce information, null if value is not set.
+        @return The java.lang.String representing the cNonce information, null if value is not set.
       */
     java.lang.String getCNonce();
     /**
@@ -184,7 +184,7 @@ public interface AuthorizationHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Opaque value of this AuthorizationHeader.
-        @return The String representing the Opaque information, null if the value is not set.
+        @return The java.lang.String representing the Opaque information, null if the value is not set.
       */
     java.lang.String getOpaque();
     /**

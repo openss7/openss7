@@ -80,7 +80,7 @@ import javax.sip.*;
   *
   * An application must create a SipStack by invoking the
   * SipFactory.createSipStack(Properties)method, ensuring the
-  * SipFactory.setPathName(String)is set. Following the naming
+  * SipFactory.setPathName(java.lang.String)is set. Following the naming
   * convention defined in SipFactory, the implementation of the SipStack
   * interface must be called SipStackImpl. This specification also
   * defines a stack configuration mechanism using java.util.Properties,
@@ -103,8 +103,8 @@ import javax.sip.*;
   * architecture, therefore this property is no longer mandatory. When
   * this parameter is specified as null, a singleton stack instance will
   * be created and returned by the SipFactory and the IP Address
-  * attributes can be managed via the createListeningPoint(String, int,
-  * String) method. For backwards compatability if this flag is set the
+  * attributes can be managed via the createListeningPoint(java.lang.String, int,
+  * java.lang.String) method. For backwards compatability if this flag is set the
   * SipFactory will return a new SipStack instance each time a SipStack
   * is created with a new IP Address. This configuration parameter will
   * become the default IP address of the SipStack. The SIP Factory will
@@ -294,8 +294,8 @@ public class SipStackImpl implements java.rmi.Remote, SipStack {
       */
     public native java.util.Iterator getSipProviders();
     /**
-      * This has been replaced by createListeningPoint(String, int,
-      * String) For backwards compatibility with v1.1 implementations
+      * This has been replaced by createListeningPoint(java.lang.String, int,
+      * java.lang.String) For backwards compatibility with v1.1 implementations
       * should support this method.
       * Implementations should throw TransportNotSupportedException if
       * the Properties specified during stack creation do not include an
@@ -323,7 +323,7 @@ public class SipStackImpl implements java.rmi.Remote, SipStack {
       * Thrown when the specified port is invalid.
       * @exception TransportNotSupportedException
       */
-    public native ListeningPoint createListeningPoint(int port, String transport)
+    public native ListeningPoint createListeningPoint(int port, java.lang.String transport)
         throws TransportNotSupportedException, InvalidArgumentException;
     /**
       * Creates a ListeningPoint a given IP address, port and transport.
@@ -342,7 +342,7 @@ public class SipStackImpl implements java.rmi.Remote, SipStack {
       * @exception TransportNotSupportedException
       * @since 1.2
       */
-    public native ListeningPoint createListeningPoint(String ipAddress, int port, String transport)
+    public native ListeningPoint createListeningPoint(java.lang.String ipAddress, int port, java.lang.String transport)
         throws TransportNotSupportedException, InvalidArgumentException;
     /**
       * Deletes the specified ListeningPoint attached to this SipStack.
@@ -377,7 +377,7 @@ public class SipStackImpl implements java.rmi.Remote, SipStack {
       * @return
       * A string identifing the stack instance
       */
-    public native String getStackName();
+    public native java.lang.String getStackName();
     /**
       * Gets the IP Address that identifies this SipStack instance.
       * Every SipStack object may have an IP Address. This specification
@@ -392,7 +392,7 @@ public class SipStackImpl implements java.rmi.Remote, SipStack {
       * A string identifing the IP Address. Null if there is no default
       * IP address associated with the stack instance.
       */
-    public native String getIPAddress();
+    public native java.lang.String getIPAddress();
     /**
       * Gets the Router object that identifies the default Router
       * information of this SipStack.

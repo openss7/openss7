@@ -80,7 +80,7 @@ public class SetupItuEvent extends SetupEvent {
       * @param callingCategory  Calling party category.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public SetupItuEvent(Object source, SignalingPointCode dpc,
+    public SetupItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             boolean glareControl, NatureConnInd nci, FwdCallIndItu fci,
             CalledPartyNumberItu cpn, byte cat, byte tmr)

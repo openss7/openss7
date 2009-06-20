@@ -58,34 +58,34 @@ public class MtpRouteType extends MtpParameter {
         setRouteType(routeType);
         setLocal(local);
     }
-    protected setRouteType(int routeType) {
+    protected void setRouteType(int routeType) {
         this.routeType = routeType;
     }
     public int getRouteType() {
         return routeType;
     }
-    protected setLocal(boolean local) {
+    protected void setLocal(boolean local) {
         this.local = local;
     }
     public boolean isLocal() {
         return local;
     }
     public final static MtpRouteType ROUTE_MEMBER_L
-        = MtpRouteType(M_ROUTE_MEMBER, true);
+        = new MtpRouteType(M_ROUTE_MEMBER, true);
     public final static MtpRouteType ROUTE_CLUSTER_L
-        = MtpRouteType(M_ROUTE_CLUSTER, true);
+        = new MtpRouteType(M_ROUTE_CLUSTER, true);
     public final static MtpRouteType ROUTE_NETWORK_L
-        = MtpRouteType(M_ROUTE_NETWORK, true);
+        = new MtpRouteType(M_ROUTE_NETWORK, true);
     public final static MtpRouteType ROUTE_WILDCARD_L
-        = MtpRouteType(M_ROUTE_WILDCARD, true);
+        = new MtpRouteType(M_ROUTE_WILDCARD, true);
     public final static MtpRouteType ROUTE_MEMBER
-        = MtpRouteType(M_ROUTE_MEMBER, false);
+        = new MtpRouteType(M_ROUTE_MEMBER, false);
     public final static MtpRouteType ROUTE_CLUSTER
-        = MtpRouteType(M_ROUTE_CLUSTER, false);
+        = new MtpRouteType(M_ROUTE_CLUSTER, false);
     public final static MtpRouteType ROUTE_NETWORK
-        = MtpRouteType(M_ROUTE_NETWORK, false);
+        = new MtpRouteType(M_ROUTE_NETWORK, false);
     public final static MtpRouteType ROUTE_WILDCARD
-        = MtpRouteType(M_ROUTE_WILDCARD, false);
+        = new MtpRouteType(M_ROUTE_WILDCARD, false);
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

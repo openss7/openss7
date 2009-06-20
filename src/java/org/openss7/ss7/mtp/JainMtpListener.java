@@ -53,7 +53,7 @@ package org.openss7.ss7.mtp;
   * It must be noted that any object than implements the JainMtpListener
   * interface is referred to as a MtpListenerImpl; the JainMtpProvider
   * interface, a JainMtpProviderImpl.  The events emitted by JainMtpProviderImpl
-  * may be {@linke org.openss7.ss7.mtp.MtpEvent} events.  These events
+  * may be {@link org.openss7.ss7.mtp.MtpEvent} events.  These events
   * correspond to MTP indication primitives emitted as events by the
   * JainMtpProviderImpl.  MTP indication events represent MTP service
   * primtives that are sent from MTP to the MTP User. <p>
@@ -99,7 +99,7 @@ public interface JainMtpListener extends java.util.EventListener {
       * attribute.
       */
     public void addUserAddress(MtpUserAddress userAddress)
-	throws UserAddressLimitException;
+	throws jain.protocol.ss7.UserAddressLimitException;
     /**
       * Removes the {@link org.openss7.ss7.mtp.MtpUserAddress} class
       * form the list of user addresses held by a MtpListenerImpl.
@@ -107,7 +107,7 @@ public interface JainMtpListener extends java.util.EventListener {
       * @param userAddress  The user address to be removed.
       */
     public void removeUserAddress(MtpUserAddress userAddress)
-	throws InvalidAddressException;
+	throws jain.protocol.ss7.InvalidAddressException;
     /**
       * Returns the list of {@link org.openss7.ss7.mtp.MtpUserAddress}
       * used by this MtpListenerImpl.
@@ -116,7 +116,7 @@ public interface JainMtpListener extends java.util.EventListener {
       * MtpListenerImpl.
       */
     public MtpUserAddress[] getUserAddressList()
-	throws UserAddressEmptyException;
+	throws jain.protocol.ss7.UserAddressEmptyException;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

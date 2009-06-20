@@ -183,9 +183,9 @@ public final class SubSystemAddress implements java.io.Serializable {
         return m_subSystemNumber;
     }
     /**
-      * String representation of class SubSystemAddress.
+      * java.lang.String representation of class SubSystemAddress.
       * @return
-      * String provides description of class SubSystemAddress.
+      * java.lang.String provides description of class SubSystemAddress.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

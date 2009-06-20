@@ -37,7 +37,7 @@ public class BindCancelledException extends MediaBindException {
      *
      * @param   s   the detail message.
      */
-    public BindCancelledException(String s) {super(s);}
+    public BindCancelledException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>BindCancelledException</code>
@@ -46,7 +46,7 @@ public class BindCancelledException extends MediaBindException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public BindCancelledException(String s, MediaEvent event) {
+    public BindCancelledException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

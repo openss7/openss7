@@ -222,9 +222,9 @@ public final class ResultIndEvent extends ComponentIndEvent {
         m_lastResultEvent = false;
         m_lastComponentPresent = false;
     }
-    /** String representation of class ResultIndEvent.
+    /** java.lang.String representation of class ResultIndEvent.
       * @return
-      * String provides description of class ResultIndEvent.  */
+      * java.lang.String provides description of class ResultIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nResultIndEvent");

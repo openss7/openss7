@@ -44,14 +44,14 @@ public interface Async_SignalGenerator extends SignalGeneratorConstants {
      * Non-blocking version of sendSignals;
      * Transmit a series of signals. 
      * <p>
-     * Each signal is defined by a char in the String.
+     * Each signal is defined by a char in the java.lang.String.
      *
      * @param signals an array of Symbols that defines a signal.
      * @param rtc an array of RTC objects that controls this transactions.
      * @param optargs a Dictionary of optional arguments 
      * @return an Async_SignalGeneratorEvent
      */
-    public Async_SignalGeneratorEvent async_sendSignals(String signals, 
+    public Async_SignalGeneratorEvent async_sendSignals(java.lang.String signals, 
 							RTC[] rtc,
 							Dictionary optargs);
 }

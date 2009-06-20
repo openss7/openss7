@@ -37,7 +37,7 @@ class ResourceNotAvailableException extends MediaConfigException {
      *
      * @param   s   the detail message.
      */
-    public ResourceNotAvailableException(String s) {super(s);}
+    public ResourceNotAvailableException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>ResourceNotAvailableException</code>
@@ -46,7 +46,7 @@ class ResourceNotAvailableException extends MediaConfigException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public ResourceNotAvailableException(String s, MediaEvent event) {
+    public ResourceNotAvailableException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

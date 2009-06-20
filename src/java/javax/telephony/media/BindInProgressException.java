@@ -37,7 +37,7 @@ class BindInProgressException extends MediaBindException {
      *
      * @param   s   the detail message.
      */
-    public BindInProgressException(String s) {super(s);}
+    public BindInProgressException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>BindInProgressException</code>
@@ -46,7 +46,7 @@ class BindInProgressException extends MediaBindException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public BindInProgressException(String s, MediaEvent event) {
+    public BindInProgressException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

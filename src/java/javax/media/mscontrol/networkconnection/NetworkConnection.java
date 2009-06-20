@@ -130,16 +130,16 @@ ig.c_Basic);
    for media streams.
     java.lang.String getRawLocalSessionDescription()
              Same as getLocalSessionDescription(), with a result as a
-   plain String.
+   plain java.lang.String.
     java.lang.String getRawRemoteSessionDescription()
              Same as getRemoteSessionDescription(), with a result as a
-   plain String.
+   plain java.lang.String.
     javax.sdp.SessionDescription getRemoteSessionDescription()
              This method gives access to the Remote Session Description
    for media streams .
     void modify(javax.sdp.SessionDescription aLocalSessionDescription,
    javax.sdp.SessionDescription aRemoteSessionDescription)
-             This method behaves exactly like modify(String, String).
+             This method behaves exactly like modify(java.lang.String, java.lang.String).
     void modify(java.lang.String aLocalSessionDescription,
    java.lang.String aRemoteSessionDescription)
              The modify method is used to drive the NetworkConnection.
@@ -190,7 +190,7 @@ void modify(javax.sdp.SessionDescription aLocalSessionDescription,
                    NetworkConnectionException,
                    ResourceNotAvailableException
 
-          This method behaves exactly like modify(String, String). Please
+          This method behaves exactly like modify(java.lang.String, java.lang.String). Please
           refer to it for documentation (including return type and
           exceptions ).
 
@@ -384,7 +384,7 @@ java.lang.String getRawLocalSessionDescription()
 n
 
           Same as getLocalSessionDescription(), with a result as a plain
-          String.
+          java.lang.String.
 
         Throws:
                 NetworkConnectionException
@@ -415,10 +415,10 @@ java.lang.String getRawRemoteSessionDescription()
 on
 
           Same as getRemoteSessionDescription(), with a result as a plain
-          String.
+          java.lang.String.
 
         Returns:
-                String
+                java.lang.String
 
         Throws:
                 NetworkConnectionException

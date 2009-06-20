@@ -69,7 +69,7 @@ public class ExitAnsiEvent extends IsupEvent {
         getCongestionPriority method in IsupEvent class for more details.
         @exception ParameterRangeInvalidException - Thrown when value is out of range.
       */
-    public ExitAnsiEvent(Object source, SignalingPointCode dpc,
+    public ExitAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority);
@@ -93,7 +93,7 @@ public class ExitAnsiEvent extends IsupEvent {
         throw new ParameterNotSetException("OutgoingTrunkGrpNumber is not set.");
     }
     /** Sets the Outgoing Trunk Group Number parameter of the message.
-        @param in_ogTgpNum - String value representing the Outgoing Trunk Group Number
+        @param in_ogTgpNum - java.lang.String value representing the Outgoing Trunk Group Number
         parameter of the event.
       */
     public void setOutgoingTrunkGrpNumber(java.lang.String in_ogTgpNum) {
@@ -116,7 +116,7 @@ public class ExitAnsiEvent extends IsupEvent {
         b.append("\n\tm_ogTgpNum: " + m_ogTgpNum);
         return b.toString();
     }
-    protected String m_ogTgpNum = null;
+    protected java.lang.String m_ogTgpNum = null;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

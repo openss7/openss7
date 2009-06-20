@@ -56,6 +56,6 @@ public interface PrivateCallEv extends CallEv {
    * <p>
    * @return The platform-specific data.
    */
-  public Object getPrivateData();
+  public java.lang.Object getPrivateData();
 }
 

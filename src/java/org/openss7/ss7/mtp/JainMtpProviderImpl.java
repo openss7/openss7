@@ -144,7 +144,7 @@ public class JainMtpProviderImpl implements java.lang.Runnable, java.rmi.Remote,
       * mandate that a different set of parameters be set for
       * each of the MtpEvents.  It is recommended that the
       * detail message returned in the
-      * MandatoryParameterNotSetException should be a String of
+      * MandatoryParameterNotSetException should be a java.lang.String of
       * the form, <p> <center><code>"Parameter: not
       * set"</code></center><p>
       * @exception javax.jain.ss7.isup.SendStackException
@@ -194,10 +194,10 @@ public class JainMtpProviderImpl implements java.lang.Runnable, java.rmi.Remote,
             try {
                 MtpEvent event = recvMtpEvent();
                 if (event != null) {
-                    Object source = event.getSource();
+                    java.lang.Object source = event.getSource();
                     if (source instanceof JainMtpListener) {
                         JainMtpListener listener = (JainMtpListener) source;
-                        event.setSource((Object) this);
+                        event.setSource((java.lang.Object) this);
                         listener.processMtpEvent(event);
                     }
                 }

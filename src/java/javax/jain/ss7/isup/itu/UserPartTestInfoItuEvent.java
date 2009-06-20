@@ -80,7 +80,7 @@ public class UserPartTestInfoItuEvent extends IsupEvent {
       * correctly.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public UserPartTestInfoItuEvent(Object source, SignalingPointCode dpc,
+    public UserPartTestInfoItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int primitive)
         throws PrimitiveInvalidException, ParameterRangeInvalidException {

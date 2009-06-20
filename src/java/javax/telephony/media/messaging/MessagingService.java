@@ -37,20 +37,20 @@ public interface MessagingService {
      * (by any of <tt>releaseService()</tt>, <tt>unregisterService()</tt>, 
      * or session death), 
      * the other end is notified via <tt>onServiceClosed()</tt>.
-     * @param serviceName the String name to be registered
+     * @param serviceName the java.lang.String name to be registered
      * @param listener for Events and Requests from the service.
      * @param attributes a Dictionary to restrict the choice of 
      * providers that supply <tt>serviceName</tt>
      * @throws NotRegisteredException if name is not registered
      */
-    public NamedService openNamedService(String serviceName, 
+    public NamedService openNamedService(java.lang.String serviceName, 
 					 NamedServiceListener listener,
 					 Dictionary attributes)
 	throws ServiceException;
 
     /**
      * Async form of openNamedService.
-     * @param serviceName the String name to be registered
+     * @param serviceName the java.lang.String name to be registered
      * @param listener for Events and Requests from the service.
      * @param attributes a Dictionary to restrict the choice of 
      * providers that supply <tt>serviceName</tt>
@@ -58,7 +58,7 @@ public interface MessagingService {
      * @return an Async_ServiceEvent object
      * @throws ServiceException if serviceName cannot be opened.
      */
-    public Async_ServiceEvent async_openNamedService(String serviceName, 
+    public Async_ServiceEvent async_openNamedService(java.lang.String serviceName, 
 						     NamedServiceListener listener,
 						     Dictionary attributes)
 	throws ServiceException; 
@@ -91,59 +91,59 @@ public interface MessagingService {
      * <b>Note:</b> other listeners can be added to the <tt>NamedService</tt>
      * and this initial listener can be removed. 
      * 
-     * @param serviceName the String by which this NamedService can be opened.
+     * @param serviceName the java.lang.String by which this NamedService can be opened.
      * @param listener a NamedServiceListener for new message connections.
      * @param attributes a Dictionary of selection attributes
      * @throws NotRegisteredException if could not register
      * @see NamedServiceListener
      */
-    public void registerService(String serviceName, 
+    public void registerService(java.lang.String serviceName, 
 				NamedServiceListener listener,
 				Dictionary attributes)
 	throws ServiceException;
 
     /**
      * Async form of registerService.
-     * @param serviceName the String by which this NamedService can be opened.
+     * @param serviceName the java.lang.String by which this NamedService can be opened.
      * @param listener a NamedServiceListener for new message connections.
      * @param attributes a Dictionary of selection attributes
      * @return an Async_ServiceEvent object
      * @throws ServiceException if serviceName cannot be registered.
      */
-    public Async_ServiceEvent async_registerService(String serviceName, 
+    public Async_ServiceEvent async_registerService(java.lang.String serviceName, 
 					     NamedServiceListener listener,
 					     Dictionary attributes)
 	throws ServiceException;
     
     /** 
      * Unregister the serviceName, preventing further openings.
-     * @param serviceName the String by which this NamedService was registered.
+     * @param serviceName the java.lang.String by which this NamedService was registered.
      * @throws ServiceException if serviceName cannot be unregistered.
      */
-    public void unregisterService(String serviceName)
+    public void unregisterService(java.lang.String serviceName)
 	throws ServiceException;
 
     /**
      * Async form of unregisterService. 
-     * @param serviceName the String by which this NamedService was registered.
+     * @param serviceName the java.lang.String by which this NamedService was registered.
      */
-    public Async_ServiceEvent async_unregisterService(String serviceName)
+    public Async_ServiceEvent async_unregisterService(java.lang.String serviceName)
 	throws ServiceException;
     
     /**
      * Unregister the given serviceName and close all 
      * NamedService connections to that serviceName.
-     * @param serviceName the String by which this NamedService can be opened.
+     * @param serviceName the java.lang.String by which this NamedService can be opened.
      * @throws ServiceException if serviceName cannot be closed.
      */
-    public void close(String serviceName) throws ServiceException;
+    public void close(java.lang.String serviceName) throws ServiceException;
     /**
      * Async form of close. 
-     * @param serviceName the String by which this NamedService can be opened.
+     * @param serviceName the java.lang.String by which this NamedService can be opened.
      * @return an Async_ServiceEvent object
      * @throws ServiceException if serviceName cannot be closed.
      */
-    public Async_ServiceEvent async_close(String serviceName) 
+    public Async_ServiceEvent async_close(java.lang.String serviceName) 
 	throws ServiceException;
 
     

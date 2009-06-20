@@ -354,7 +354,7 @@ public interface CallControlTerminal extends Terminal {
    * @exception ResourceUnavailableException An internal resource necessary
    * for the successful invocation of this method is not available.
    */
-  public TerminalConnection pickupFromGroup(String pickupGroup,
+  public TerminalConnection pickupFromGroup(java.lang.String pickupGroup,
 					    Address terminalAddress)
     throws InvalidArgumentException, InvalidStateException,
       MethodNotSupportedException, PrivilegeViolationException,

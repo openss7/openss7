@@ -56,6 +56,6 @@ public interface PrivateAddrEv extends AddrEv {
    * <p>
    * @return The platform-specific data.
    */
-  public Object getPrivateData();
+  public java.lang.Object getPrivateData();
 }
 

@@ -158,7 +158,7 @@ interface ASRConstants extends ResourceConstants {
     Symbol a_SpeakerType	= ESymbol.ASR_SpeakerType;
 
     /**
-     * Value is A vendor-defined String identifying a set of words and/or
+     * Value is A vendor-defined java.lang.String identifying a set of words and/or
      * phrases.
      */
     Symbol a_Label	= ESymbol.ASR_Label;
@@ -253,28 +253,28 @@ interface ASRConstants extends ResourceConstants {
      * Attribute containing a list of public rule names that become
      * active when the Grammar Context becomes active.
      * <p>
-     * Value is a String[] containing the rule names.
+     * Value is a java.lang.String[] containing the rule names.
      */
     Symbol a_DefaultRules	= ESymbol.ASR_DefaultRules;
 
     /**
      * Attribute containing a list of all rules in the grammar.
      * <p>
-     * Value is a String[] containing the rule names.
+     * Value is a java.lang.String[] containing the rule names.
      */
     Symbol a_Rules	= ESymbol.ASR_Rules;
 
     /**
      * Attribute containing a list of all private rules in the grammar.
      * <p>
-     * Value is a String[] containing the rule names.
+     * Value is a java.lang.String[] containing the rule names.
      */
     Symbol a_PrivateRules	= ESymbol.ASR_PrivateRules;
 
     /**
      * Attribute containing a list of all public rules in the grammar.
      * <p>
-     * Value is a String[] containing the rule names.
+     * Value is a java.lang.String[] containing the rule names.
      */
     Symbol a_PublicRules	= ESymbol.ASR_PublicRules;
 
@@ -404,27 +404,27 @@ interface ASRConstants extends ResourceConstants {
     /* Table 32: Grammar Context Parameters */
 
     /**
-     * Value is a String[] of names for all of the rules in the grammar.
+     * Value is a java.lang.String[] of names for all of the rules in the grammar.
      * <br> Read-Only
      */
     Symbol p_Rules	= ESymbol.ASR_Rules;
 
     /**
-     * Value is a String[] of names for all of the private rules in the
+     * Value is a java.lang.String[] of names for all of the private rules in the
      * grammar.
      * <br> Read-Only
      */
     Symbol p_PrivateRules	= ESymbol.ASR_PrivateRules;
 
     /**
-     * Value is a String[] of names for all of the public rules in the
+     * Value is a java.lang.String[] of names for all of the public rules in the
      * grammar.
      * <br> Read-Only
      */
     Symbol p_PublicRules	= ESymbol.ASR_PublicRules;
 
     /**
-     * Value is a String[] of names of the active rules in the grammar.
+     * Value is a java.lang.String[] of names of the active rules in the grammar.
      * <br> Default value is {@link #a_DefaultRules}
      * <br> Set when Idle.
      */
@@ -433,24 +433,24 @@ interface ASRConstants extends ResourceConstants {
     /* Table 5-5: Context Control Parameters */
 
     /**
-     * Value is a String[] of the active words.
+     * Value is a java.lang.String[] of the active words.
      * <br> Defualt Value is all loaded words.
      * <br> May be set in the Idle state.
      */
     Symbol p_ActiveWords		= ESymbol.ASR_ActiveWords;
     /**
-     * Value is a String[] of the loaded words.
+     * Value is a java.lang.String[] of the loaded words.
      * <br> Read-Only.
      */
     Symbol p_LoadedWords		= ESymbol.ASR_LoadedWords;
     /**
-     * Value is a String[] of the active contexts.
+     * Value is a java.lang.String[] of the active contexts.
      * <br> Defualt Value is all loaded contexts.
      * <br> May be set in the Idle state.
      */
     Symbol p_ActiveContexts		= ESymbol.ASR_ActiveContexts;
     /**
-     * Value is a String[] of the loaded contexts.
+     * Value is a java.lang.String[] of the loaded contexts.
      * <br> Read-Only.
      */
     Symbol p_LoadedContexts		= ESymbol.ASR_LoadedContexts;
@@ -469,18 +469,18 @@ interface ASRConstants extends ResourceConstants {
      */
     Symbol p_SpeakerType		= ESymbol.ASR_SpeakerType;
     /**
-     * Value is an abstract String identifying a set of words and/or
+     * Value is an abstract java.lang.String identifying a set of words and/or
      * phrases.
      * <br> May be set in the WordTrained state.
      */
     Symbol p_Label			= ESymbol.ASR_Label;
     /**
-     * Value is a String[] containing the languages recognised.
+     * Value is a java.lang.String[] containing the languages recognised.
      * <br> Read-Only.
      */
     Symbol p_Language			= ESymbol.Language_Language;
     /**
-     * Value is a String[] containing the variants recognised.
+     * Value is a java.lang.String[] containing the variants recognised.
      * <br> Read-Only.
      */
     Symbol p_Variant			= ESymbol.Language_Variant;
@@ -652,7 +652,7 @@ interface ASRConstants extends ResourceConstants {
     Symbol p_StartPaused	= ESymbol.ASR_StartPaused;
     /**
      * Utterances which triggers rtcc_SpecficUtterance.
-     * <p>Value is a String[], each String represents an utterance.
+     * <p>Value is a java.lang.String[], each java.lang.String represents an utterance.
      * When any of these utterances are recognized,
      * {@link #rtcc_SpecificUtterance} is triggered.
      */

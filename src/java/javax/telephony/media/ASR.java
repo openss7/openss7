@@ -606,15 +606,15 @@ import java.util.Dictionary;
  * <table border="1" cellpadding="3">
  * <tr><td>Name</td><td>Data Type</td><td>State when settable</td>
        <td>Default Value</td><td>Possible Values</td><td>Definition</td></tr>
- * <tr><td><tt>p_ActiveWords</tt></td><td>String[]</td><td><tt>v_Idle</tt></td>
+ * <tr><td><tt>p_ActiveWords</tt></td><td>java.lang.String[]</td><td><tt>v_Idle</tt></td>
  *     <td>All Loaded Words</td><td>&nbsp;</td>
  *     <td>List of Active Words</td></tr>
- * <tr><td><tt>p_LoadedWords</tt></td><td>String[]</td><td>Read-Only</td><td>&nbsp;</td>
+ * <tr><td><tt>p_LoadedWords</tt></td><td>java.lang.String[]</td><td>Read-Only</td><td>&nbsp;</td>
  *     <td>&nbsp;</td><td>List of Loaded Words</td></tr>
- * <tr><td><tt>p_ActiveContexts</tt></td><td>String[]</td><td><tt>v_Idle</tt></td>
+ * <tr><td><tt>p_ActiveContexts</tt></td><td>java.lang.String[]</td><td><tt>v_Idle</tt></td>
  *     <td>All Loaded Contexts</td><td>&nbsp;</td>
  *     <td>List of active Contexts</td></tr>
- * <tr><td><tt>p_LoadedContexts</tt></td><td>String[]</td><td>Read-Only</td>
+ * <tr><td><tt>p_LoadedContexts</tt></td><td>java.lang.String[]</td><td>Read-Only</td>
  *     <td>&nbsp;</td><td>&nbsp;</td><td>List of loaded Contexts</td></tr>
  * <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
  * </table>
@@ -652,7 +652,7 @@ import java.util.Dictionary;
  *         <tt>v_Verification</tt>, <tt>v_Identification</tt></TD>
  *     <td>The type of recognition possible</TD></TR>
  * <TR><td><tt>{@link ASRConstants#p_Label p_Label}</tt></TD>
- *     <td>String</TD>
+ *     <td>java.lang.String</TD>
  *     <td>WordTrained</TD>
  *     <td>&nbsp</td>
  *     <td>An abstract string identifying a set of words and/or phrases.
@@ -907,7 +907,7 @@ import java.util.Dictionary;
  *         (or function). This parameter is valid for the recognize()
  * 	   and wordTrain() functions only.</TD></TR>
  * <tr><td><tt>p_SpecificUtterance</tt></TD>
- *     <td>String[]</TD>
+ *     <td>java.lang.String[]</TD>
  *     <td><tt>v_Idle</tt></TD>
  *     <td>&nbsp</TD>
  *     <td>&nbsp</TD>
@@ -1100,14 +1100,14 @@ import java.util.Dictionary;
  * TokenSequence[i] contains:
  * <pre>
  * int SequenceLength;
- * String[]           Token[i][j] j=0..SequenceLength
+ * java.lang.String[]           Token[i][j] j=0..SequenceLength
  * Symbol[]  TokenQualifier[i][j] j=0..SequenceLength
  * int[]         TokenScore[i][j] j=0..SequenceLength
- * String[]      GrammarTag[i][j] j=0..SequenceLength
- * String       ContextName[i]
+ * java.lang.String[]      GrammarTag[i][j] j=0..SequenceLength
+ * java.lang.String       ContextName[i]
  * Symbol          Language[i]
  * Symbol   LanguageVariant[i]
- * String SequenceQualifier[i]
+ * java.lang.String SequenceQualifier[i]
  * int        SequenceScore[i]
  * </pre>
  * <p>
@@ -1212,7 +1212,7 @@ import java.util.Dictionary;
  *
  * <h4>TokenSequence.getToken(int o)</h4>
  *
- * <tt>getTokenSequence(r).getToken(o)</tt> returns the String that identifies 
+ * <tt>getTokenSequence(r).getToken(o)</tt> returns the java.lang.String that identifies 
  * the <i>token</i> that corresponds to the matrix element t[r][o].
  *
  * <h4>TokenSequence.getTokenQualifier(int o)</h4>
@@ -1231,7 +1231,7 @@ import java.util.Dictionary;
  * <a name="5733"><!-- --></a>
  * <h4>getGrammarTag(int o)</h4>
  *
- * <tt>getTokenSequence(r).getGrammarTag(o)</tt> returns the <tt>String</tt>
+ * <tt>getTokenSequence(r).getGrammarTag(o)</tt> returns the <tt>java.lang.String</tt>
  * that corresponds to the matrix element q[r][o].
  * If <tt>getTokenSequence(r).getTokenQualifier(o)</tt> is <tt>v_GrammarTag</tt>,
  * then g[r][o] provides the grammar tag for the token t[r][o]. 
@@ -1408,7 +1408,7 @@ public interface ASR extends Resource, ASRConstants
 	 *
 	 * @param   s   the detail message.
 	 */
-	public NoContextException(String s) {super(s);}
+	public NoContextException(java.lang.String s) {super(s);}
     }
 
     /** Initiate speech recognition on the ASR resource.
@@ -1537,12 +1537,12 @@ public interface ASR extends Resource, ASRConstants
      * {@link ASREvent#getRuleExpansion ASREvent.getRuleExpansion()}.
      *
      * @param grammarContext the name of a loaded grammar Context.
-     * @param ruleName a String that names the rule to be expanded.
-     * @return a String containing the rule expansion.
+     * @param ruleName a java.lang.String that names the rule to be expanded.
+     * @return a java.lang.String containing the rule expansion.
      * @throws MediaResourceException if requested operation fails.
      * @see #setRuleExpansion
      */
-    String getRuleExpansion(String grammarContext, String ruleName)
+    java.lang.String getRuleExpansion(java.lang.String grammarContext, java.lang.String ruleName)
 	throws MediaResourceException;
 
     /**
@@ -1555,15 +1555,15 @@ public interface ASR extends Resource, ASRConstants
      * specification language.
      * 
      * @param grammarContext a loaded Context.
-     * @param ruleName a String that names the rule being defined.
-     * @param ruleExpansion a String containing the rule expansion.
+     * @param ruleName a java.lang.String that names the rule being defined.
+     * @param ruleExpansion a java.lang.String containing the rule expansion.
      * @return an ASREvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      * @see #getRuleExpansion
      */
-    ASREvent setRuleExpansion(String grammarContext, 
-			      String ruleName,
-			      String ruleExpansion)
+    ASREvent setRuleExpansion(java.lang.String grammarContext, 
+			      java.lang.String ruleName,
+			      java.lang.String ruleExpansion)
 	throws MediaResourceException;
  
     /** Context methods */
@@ -1612,7 +1612,7 @@ public interface ASR extends Resource, ASRConstants
      * <p>
      *
      * @param resourceContext a Context within the ASR Resource.
-     * @param containerContext a String containing the name of the container
+     * @param containerContext a java.lang.String containing the name of the container
      * context.
      * @param direction a Symbol indicating the direction and type of copy.
      * Must be one of {@link ASRConstants#v_ToResource},
@@ -1620,8 +1620,8 @@ public interface ASR extends Resource, ASRConstants
      *     {@link ASRConstants#v_ToResourceTraining}.
      * @throws MediaResourceException if requested operation fails.  
      */
-    void contextCopy(String resourceContext,
-		     String containerContext, 
+    void contextCopy(java.lang.String resourceContext,
+		     java.lang.String containerContext, 
 		     Symbol direction)
 	throws MediaResourceException;
 
@@ -1650,7 +1650,7 @@ public interface ASR extends Resource, ASRConstants
      *
      * @throws MediaResourceException if requested operation fails.
      */
-    void contextCreate(String resourceContext,
+    void contextCreate(java.lang.String resourceContext,
 		       Symbol trainingType,
 		       Dictionary contextParams)
 	throws MediaResourceException;
@@ -1677,7 +1677,7 @@ public interface ASR extends Resource, ASRConstants
      *
      * @throws MediaResourceException if requested operation fails.
      */
-    Dictionary contextGetParameters(String resourceContext, Symbol[] keys)
+    Dictionary contextGetParameters(java.lang.String resourceContext, Symbol[] keys)
 	throws MediaResourceException;
 
     /**
@@ -1690,7 +1690,7 @@ public interface ASR extends Resource, ASRConstants
      * @param resourceContext the Context to be removed.
      * @throws MediaResourceException if requested operation fails.
      */
-    void contextRemove(String resourceContext)
+    void contextRemove(java.lang.String resourceContext)
 	throws MediaResourceException;
 
     /**
@@ -1702,7 +1702,7 @@ public interface ASR extends Resource, ASRConstants
      *
      * @throws MediaResourceException if requested operation fails.
      */
-    void contextSetParameters(String resourceContext, Dictionary contextParams)
+    void contextSetParameters(java.lang.String resourceContext, Dictionary contextParams)
 	throws MediaResourceException;
     
     /** Training methods */
@@ -1723,7 +1723,7 @@ public interface ASR extends Resource, ASRConstants
      * the association between the <b>Word</b> and <tt>wordString</tt>
      * cannot be changed.
      * <tt>wordString</tt> is not necessarily an exact transcription 
-     * of the utterance; in most cases, an arbitrary String is used.
+     * of the utterance; in most cases, an arbitrary java.lang.String is used.
      * <p>
      * For example, in a scenario where arbitrary voice
      * labels are associated with a telephone number, the actual
@@ -1737,11 +1737,11 @@ public interface ASR extends Resource, ASRConstants
      * in that case, the value of <tt>wordString</tt> is ignored.
      * 
      * @param wordContext the Context to which this word is committed.
-     * @param wordTemp a String that identifes the word to commit.
-     * @param wordString the permanent String to identify this word.
+     * @param wordTemp a java.lang.String that identifes the word to commit.
+     * @param wordString the permanent java.lang.String to identify this word.
      * @return an ASREvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.  */
-    ASREvent wordCommit(String wordContext, String wordTemp, String wordString)
+    ASREvent wordCommit(java.lang.String wordContext, java.lang.String wordTemp, java.lang.String wordString)
 	throws MediaResourceException;
 
     /**
@@ -1752,11 +1752,11 @@ public interface ASR extends Resource, ASRConstants
      * <b>Word</b> adds it to the Context's <tt>p_WordList</tt> parameter.
      * 
      * @param wordContext the Context in which Word is created.
-     * @param wordTemp a String containing the temporary name of the word.
+     * @param wordTemp a java.lang.String containing the temporary name of the word.
      * @return an ASREvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    ASREvent wordCreate(String wordContext, String wordTemp)
+    ASREvent wordCreate(java.lang.String wordContext, java.lang.String wordTemp)
 	throws MediaResourceException;
 
     /**
@@ -1771,12 +1771,12 @@ public interface ASR extends Resource, ASRConstants
      * part of the permanent training of the <b>Word</b>.
      * 
      * @param wordContext the Context in which the work is being trained.
-     * @param wordTemp the String that identifies the word being trained.
+     * @param wordTemp the java.lang.String that identifies the word being trained.
      *
      * @return an ASREvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    ASREvent wordDeleteLastUtterance(String wordContext, String wordTemp)
+    ASREvent wordDeleteLastUtterance(java.lang.String wordContext, java.lang.String wordTemp)
 	throws MediaResourceException;
 
     /**
@@ -1789,11 +1789,11 @@ public interface ASR extends Resource, ASRConstants
      * must be the temporary name.
      *
      * @param wordContext the Context from which the training is deleted.
-     * @param wordString the String that idenifies word to be deleted.
+     * @param wordString the java.lang.String that idenifies word to be deleted.
      * @return an ASREvent when then operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    ASREvent wordDeleteTraining(String wordContext, String wordString)
+    ASREvent wordDeleteTraining(java.lang.String wordContext, java.lang.String wordString)
 	throws MediaResourceException;
 
     /**
@@ -1808,11 +1808,11 @@ public interface ASR extends Resource, ASRConstants
      * must be the temporary name.
      *
      * @param wordContext the Context from which the Word is removed.
-     * @param wordString the String that identifies the word.
+     * @param wordString the java.lang.String that identifies the word.
      * @return an ASREvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    ASREvent wordDestroy(String wordContext, String wordString)
+    ASREvent wordDestroy(java.lang.String wordContext, java.lang.String wordString)
 	throws MediaResourceException;
 
     /**
@@ -1873,15 +1873,15 @@ public interface ASR extends Resource, ASRConstants
      * IPA as their text input for training. If <tt>p_TrainingType</tt>
      * is set to <tt>v_Text</tt> or <tt>v_Phonetic</tt>, the dictionary
      * entry <tt>p_TrainingInfo</tt> must also be present. This array of
-     * String will contain either the text or phonetic representation of
+     * java.lang.String will contain either the text or phonetic representation of
      * the training material, as appropriate.
      * 
      * @param wordContext the Context in which the word is trained.
-     * @param wordString a String that identifies the word to be trained.
+     * @param wordString a java.lang.String that identifies the word to be trained.
      * @return an ASREvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.  
      */
-    ASREvent wordTrain(String wordContext, String wordString)
+    ASREvent wordTrain(java.lang.String wordContext, java.lang.String wordString)
 	throws MediaResourceException;
 }
 

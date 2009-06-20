@@ -40,7 +40,7 @@ public interface ButtonInfoEv extends PhoneTermEv {
    * <p>
    * @return The string button information.
    */
-  public String getInfo();
+  public java.lang.String getInfo();
 
 
   /**
@@ -48,5 +48,5 @@ public interface ButtonInfoEv extends PhoneTermEv {
    * <p>
    * @return The old button information.
    */
-  public String getOldInfo();
+  public java.lang.String getOldInfo();
 }

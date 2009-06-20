@@ -88,7 +88,7 @@ public interface PhoneTerminalEvent extends Event, TerminalEvent
      * Applications may obtain the new contents of the display component via
      * the {@link PhoneDisplay#getDisplay(int x, int y)} method.
      *
-     * @see PhoneDisplay#setDisplay(String string, int x, int y)
+     * @see PhoneDisplay#setDisplay(java.lang.String string, int x, int y)
      */
     public static final int PHONE_TERMINAL_DISPLAY_UPDATE_EVENT   = 502;
     
@@ -207,7 +207,7 @@ public interface PhoneTerminalEvent extends Event, TerminalEvent
    * <p>
    * @return The string button information.
    */
-  public String getInfo();
+  public java.lang.String getInfo();
 
 
 // ButtonInfoEv
@@ -217,7 +217,7 @@ public interface PhoneTerminalEvent extends Event, TerminalEvent
    * <p>
    * @return The old button information.
    */
-  public String getOldInfo();
+  public java.lang.String getOldInfo();
   
 
 // DisplayUpdateEv
@@ -229,7 +229,7 @@ public interface PhoneTerminalEvent extends Event, TerminalEvent
    * @param y The y-coordinate.
    * @return The string displayed starting at coordinates (x, y).
    */
-  public String getDisplay(int x, int y);
+  public java.lang.String getDisplay(int x, int y);
   
   
   // HookswitchStateEv

@@ -100,6 +100,6 @@ public class NullMediaGroup implements MPI.MediaGroup, MediaServiceConstants {
 	return event;
     }
     /** assume that this Group implements the media methods. */
-    public Object getTargetForMethod(java.lang.reflect.Method method) 
+    public java.lang.Object getTargetForMethod(java.lang.reflect.Method method) 
     { return this; }
 }

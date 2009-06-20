@@ -163,7 +163,7 @@ public class TcapErrorNotification extends OamErrorNotification {
     /** Returns a string representation (with details) of classes which extend this class.
       * Over rides standard JAVA toString method.  */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
 }
 

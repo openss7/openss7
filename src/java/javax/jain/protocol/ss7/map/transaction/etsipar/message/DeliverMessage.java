@@ -401,7 +401,7 @@ public class DeliverMessage extends EtsiMessage {
     protected boolean m_dcsIsSet = false;
     protected Date m_scts;
     protected boolean m_sctsIsSet = false;
-    protected String m_userText;
+    protected java.lang.String m_userText;
     protected boolean m_userTextIsSet = false;
 }
 

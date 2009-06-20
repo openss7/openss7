@@ -238,7 +238,7 @@ public interface CallCenterCall extends Call {
    */
   public Connection[] connectPredictive(Terminal originatorTerminal,
 					Address originatorAddress,
-					String destination,
+					java.lang.String destination,
 					int connectionState,
 					int maxRings,
 					int treatment,
@@ -273,7 +273,7 @@ public interface CallCenterCall extends Call {
    * </OL>
    * @param data The data to be associated with the call.
    * @exception ResourceUnavailableException An internal resource necessary
-   * for adding the data was unavailable. For example, the size of the Object
+   * for adding the data was unavailable. For example, the size of the java.lang.Object
    * was not supported by the implementation.
    * @exception InvalidArgumentException The argument provided is not valid.
    * For example, the implementation does not support the specific object type.
@@ -283,7 +283,7 @@ public interface CallCenterCall extends Call {
    * this method.
    * @see javax.telephony.callcenter.events.CallCentCallAppDataEv
    */
-  public void setApplicationData(Object data)
+  public void setApplicationData(java.lang.Object data)
       throws ResourceUnavailableException, InvalidArgumentException,
         InvalidStateException, MethodNotSupportedException;
 
@@ -296,7 +296,7 @@ public interface CallCenterCall extends Call {
    * @exception MethodNotSupportedException The implementation does not
    * support this method.
    */
-  public Object getApplicationData()
+  public java.lang.Object getApplicationData()
     throws MethodNotSupportedException;
 
 

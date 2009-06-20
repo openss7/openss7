@@ -170,10 +170,10 @@ interface R2Symbol {
     Symbol Error_InvalidFile		= Format0.f0symbol(Error_     , 0x043);
     Symbol Error_InvalidHandle		= Format0.f0symbol(Error_     , 0x044);
     Symbol Error_InvalidParameter	= Format0.f0symbol(Error_     , 0x045);
-    /** @deprecate spell out Error_InvalidPosition */
+    /** @deprecated spell out Error_InvalidPosition */
     Symbol Error_InvPosition		= Format0.f0symbol(Error_     , 0x046);
     Symbol Error_InvalidPosition	= Format0.f0symbol(Error_     , 0x046);
-    /** @deprecate spell out Error_InvalidTDD */
+    /** @deprecated spell out Error_InvalidTDD */
     Symbol Error_INVTDD			= Format0.f0symbol(Error_     , 0x047);
     Symbol Error_InvalidTDD		= Format0.f0symbol(Error_     , 0x047);
     Symbol Error_KeyNotFound		= Format0.f0symbol(Error_     , 0x048);

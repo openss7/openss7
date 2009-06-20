@@ -231,9 +231,9 @@ public final class SccpUserAddress
         return m_nationalUse;
     }
     /**
-      * String representation of class SccpUserAddress.
+      * java.lang.String representation of class SccpUserAddress.
       * @return
-      * String provides description of class SccpUserAddress.
+      * java.lang.String provides description of class SccpUserAddress.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

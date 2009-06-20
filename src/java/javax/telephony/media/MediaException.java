@@ -85,7 +85,7 @@ public abstract class MediaException extends Exception {
      *
      * @param   s   the detail message.
      */
-    public MediaException(String s) {super(s);}
+    public MediaException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>MediaException</code>
@@ -98,7 +98,7 @@ public abstract class MediaException extends Exception {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public MediaException(String s, MediaEvent event) {
+    public MediaException(java.lang.String s, MediaEvent event) {
 	super(s);
 	this.event = event;
     }

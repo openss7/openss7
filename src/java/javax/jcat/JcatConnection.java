@@ -214,7 +214,7 @@ public interface JcatConnection extends JccConnection {
       * An internal resource necessary for the successful invocation of this method is not
       * available.
       */
-    public JcatConnection park(String destinationAddress)
+    public JcatConnection park(java.lang.String destinationAddress)
         throws InvalidPartyException, InvalidStateException, MethodNotSupportedException,
                           PrivilegeViolationException, ResourceUnavailableException;
     /**

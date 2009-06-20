@@ -34,11 +34,11 @@ public interface Async_TTSPlayer extends Async_Player {
      * The dictionary is placed at the top of the dictionary stack,
      * and is deactivated.
      *
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a Async_PlayerEvent
      */
-    Async_PlayerEvent async_loadTTSDictionary(String[] dictNames, Dictionary optargs);
+    Async_PlayerEvent async_loadTTSDictionary(java.lang.String[] dictNames, Dictionary optargs);
 
     /**
      * Non-blocking version of activateTTSDictionary(); 
@@ -46,30 +46,30 @@ public interface Async_TTSPlayer extends Async_Player {
      * Activates a collection of TTS dictionaries.
      * The dictionaries must already be loaded.
      *
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a Async_PlayerEvent
      */
-    Async_PlayerEvent async_activateTTSDictionary(String[] dictNames, Dictionary optargs);
+    Async_PlayerEvent async_activateTTSDictionary(java.lang.String[] dictNames, Dictionary optargs);
 
     /**
      * Non-blocking version of deactivateTTSDictionary(); 
      * <p>
      * Deactivates a collection of loaded TTS dictionaries.
      * 
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a Async_PlayerEvent
      */
-    Async_PlayerEvent async_deactivateTTSDictionary(String dictNames[], Dictionary optargs);
+    Async_PlayerEvent async_deactivateTTSDictionary(java.lang.String dictNames[], Dictionary optargs);
 
     /**
      * Non-blocking version of unloadTTSDictionary(); 
      * <p>
      * Unloads a collection of TTS dictionaries from a Player.
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a Async_PlayerEvent
      */
-    Async_PlayerEvent async_unloadTTSDictionary(String dictNames[], Dictionary optargs);
+    Async_PlayerEvent async_unloadTTSDictionary(java.lang.String dictNames[], Dictionary optargs);
 }

@@ -49,7 +49,7 @@ import javax.jain.*;
 
 /**
   * This class contains the following utilities: <ul>
-  * <li>bytesToHex - Convert an array of bytes to String with hex values;
+  * <li>bytesToHex - Convert an array of bytes to java.lang.String with hex values;
   * <li>isArraysEqual - Check if two byte arrays are equal.
   * </ul>
   *
@@ -57,7 +57,7 @@ import javax.jain.*;
   * @version 1.2.2
   */
 public class JainSS7Utility {
-    /** Convert an array of bytes to String with hex values.
+    /** Convert an array of bytes to java.lang.String with hex values.
       * @param data
       * A byte array.
       * @param start
@@ -65,8 +65,8 @@ public class JainSS7Utility {
       * @param end
       * The end in data.
       * @return
-      * A byte sequence ready to convert to a String, i.e: <br>
-      * <code>new String(bytesToHex(data, 0, len))</code> */
+      * A byte sequence ready to convert to a java.lang.String, i.e: <br>
+      * <code>new java.lang.String(bytesToHex(data, 0, len))</code> */
     public static byte[] bytesToHex(byte[] data, int start, int end) {
         byte[] result;
         byte nibble;

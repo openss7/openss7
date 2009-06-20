@@ -63,7 +63,7 @@ public interface AllowHeader extends Header {
     /**
         Sets the Allow header value. The argument may be a single method name (eg "ACK") or a comma
         delimited list of method names (eg "ACK, CANCEL, INVITE").
-        @param method The String defining the method supported in this AllowHeader.
+        @param method The java.lang.String defining the method supported in this AllowHeader.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         method supported.
       */

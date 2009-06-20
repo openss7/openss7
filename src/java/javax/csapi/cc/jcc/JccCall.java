@@ -206,7 +206,7 @@ public interface JccCall {
 
     /** The application calls this method to supervise a call. The application can set a granted connection time for
       * this call. If an application calls this function before it calls a {@link
-      * #routeCall(String,String,String,String)}, the timer measurement will start as soon as the call is answered by
+      * #routeCall(java.lang.String,java.lang.String,java.lang.String,java.lang.String)}, the timer measurement will start as soon as the call is answered by
       * the called party.  A call supervision event is also sent if the call is terminated before the supervision event
       * occurs.  <p>
       *
@@ -286,7 +286,7 @@ public interface JccCall {
       * @throws MethodNotSupportedException
       * The implementation does not support this method.
       * @since 1.0a */
-    public JccConnection[] connect(JccAddress origaddr, String dialedDigits)
+    public JccConnection[] connect(JccAddress origaddr, java.lang.String dialedDigits)
         throws ResourceUnavailableException, PrivilegeViolationException, InvalidPartyException, InvalidStateException,
                           MethodNotSupportedException;
     /** Creates a new JccConnection and attaches it to this JccCall. The JccConnection object is associated with an
@@ -350,7 +350,7 @@ public interface JccCall {
       * The implementation does not support this method
       * @throws InvalidPartyException
       * In case one of the parties given is invalid.  */
-    public JccConnection createConnection(String targetAddress, String originatingAddress, String originalCalledAddress, String redirectingAddress)
+    public JccConnection createConnection(java.lang.String targetAddress, java.lang.String originatingAddress, java.lang.String originalCalledAddress, java.lang.String redirectingAddress)
         throws InvalidStateException, ResourceUnavailableException, PrivilegeViolationException, MethodNotSupportedException, InvalidArgumentException, InvalidPartyException;
     /** This method requests routing of a call to the targetAddress given as an input parameter.  Creates a new
       * JccConnection and attaches it to this JccCall. The JccConnection object is associated with an JccAddress object
@@ -358,10 +358,10 @@ public interface JccCall {
       * implementation is expected to find the JccAddress object corresponding to the string assuming that the
       * JccAddress is local to the JccProvider.  The given string may not correspond to any JccAddress object in the
       * JccProvider's domain which would be the case for a call to a remote Address.  This method is equivalent to the
-      * {@link #createConnection(String,String,String,String)},
+      * {@link #createConnection(java.lang.String,java.lang.String,java.lang.String,java.lang.String)},
       * {@link JccConnection#routeConnection(boolean) JccConnection.routeConnection(FALSE)} and
       * {@link JccConnection#attachMedia()} or is also equivalent to
-      * {@link #createConnection(String,String,String,String)} and
+      * {@link #createConnection(java.lang.String,java.lang.String,java.lang.String,java.lang.String)} and
       * {@link JccConnection#routeConnection(boolean) JccConnection.routeConnection(TRUE)}.
       * <h5><a name="routeCallSemantics">Examples</a></h5> <ul>
       *
@@ -419,7 +419,7 @@ public interface JccCall {
       * In case one of the parties given is invalid. 
       * @return
       * The created JccConnection object */
-    public JccConnection routeCall(String targetAddress, String originatingAddress, String originalDestinationAddress, String redirectingAddress)
+    public JccConnection routeCall(java.lang.String targetAddress, java.lang.String originatingAddress, java.lang.String originalDestinationAddress, java.lang.String redirectingAddress)
         throws InvalidStateException, ResourceUnavailableException, PrivilegeViolationException,
                           MethodNotSupportedException, InvalidPartyException, InvalidArgumentException;  
 	

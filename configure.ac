@@ -80,12 +80,18 @@ dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid
 dnl typing, but allow user to override with --disable-dependency-tracking.
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
-	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
+    enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 dnl
-dnl force default from older autoconf/automake when not specified by caller
+dnl default to dependency tracking to avoid automake bug in silent rules
 dnl
-enable_dependency_tracking="${enable_dependency_tracking:-no}"
+enable_dependency_tracking="${enable_dependency_tracking:-yes}"
+dnl
+dnl enable silent rules by default: good for maintainer mode too
+dnl
+if test :${enable_silent_rules:-yes} = :yes ; then
+    AM_DEFAULT_VERBOSITY=0
+fi
 
 AC_USE_SYSTEM_EXTENSIONS
 

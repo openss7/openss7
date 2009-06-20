@@ -86,9 +86,9 @@ class Stringifier {
      * are registered.
      * Unregistered segments are printed in hex.
      */
-    public static String toString(BaseSymbol symbol) {
+    public static java.lang.String toString(BaseSymbol symbol) {
 	// see if whole name is registered for this value
-	String symstr = (String)symbolName.get(symbol);
+	java.lang.String symstr = (java.lang.String)symbolName.get(symbol);
 	if (symstr != null) return symstr;
 	// whole value is not registered, try parsing it:
 	
@@ -101,7 +101,7 @@ class Stringifier {
 	
 
 	// This Symbol not registered, item will have to be in hex.
- 	String itemstr = "0x" + Integer.toString(parser.getItem(value), 16);
+ 	java.lang.String itemstr = "0x" + Integer.toString(parser.getItem(value), 16);
 
 	// if Obj_VENDOR is registered use that:
 	int objectValue = parser.getObject(value);
@@ -109,11 +109,11 @@ class Stringifier {
 	if (symstr != null) return symstr + "_" + itemstr;
 
 	// Object name not registered, use hex for Object segment.
-	String objstr = "0x"+Integer.toString(parser.getObjectOnly(value),16);
+	java.lang.String objstr = "0x"+Integer.toString(parser.getObjectOnly(value),16);
 
 	// Check for known vendor:
 	int vendorValue = parser.getVendorOnly(value);
-	String vendor = getVendorName(vendorValue);
+	java.lang.String vendor = getVendorName(vendorValue);
 	if (vendor != null) return objstr+"_"+vendor+"_"+itemstr;
 	
 	// everything in hex, but parsed into fields:
@@ -123,7 +123,7 @@ class Stringifier {
     }
     /** Hashtable maps Symbol to its Name */
     static Hashtable symbolName = new Hashtable();
-    public static void setSymbolName(BaseSymbol symbol, String name) {
+    public static void setSymbolName(BaseSymbol symbol, java.lang.String name) {
 	if (name != null)
 	    symbolName.put(symbol, name);
 	else
@@ -134,45 +134,45 @@ class Stringifier {
     protected static Hashtable venobjName = new Hashtable();
 
     /** allow vendors to label their ObjectVendorFormat combination */
-    public static void setObjectName(int obj, String name) {
+    public static void setObjectName(int obj, java.lang.String name) {
 	if (name != null)
 	    venobjName.put(new Integer(obj), name);
 	else 
 	    venobjName.remove(new Integer(obj));
     }
-    /** @return the String associated with a given ObjectVendorFormat */
-    protected static String getObjectName(int objectValue) {
-	return (String)venobjName.get(new Integer(objectValue));
+    /** @return the java.lang.String associated with a given ObjectVendorFormat */
+    protected static java.lang.String getObjectName(int objectValue) {
+	return (java.lang.String)venobjName.get(new Integer(objectValue));
     }
 
-    /* There should also be a "Symbol.parseName(String)"
+    /* There should also be a "Symbol.parseName(java.lang.String)"
      * which tries to reconstitute a Symbol based on a toString() result.
      * That is, recode from hex if necessary.
      */
 
-    /** Register a print String associated with the given vendor ID. 
+    /** Register a print java.lang.String associated with the given vendor ID. 
      * Vendor IDs and the associated names are assigned by ECTF.
      * @see "http://www.ectf.org/ectf/tech/vendint.htm"
      */
-    public static void registerVendor(int vendor, String name) {
+    public static void registerVendor(int vendor, java.lang.String name) {
 	if (name != null)
 	    vendorString.put(new Integer(vendor), name);
 	else
 	    vendorString.remove(new Integer(vendor));
     }
-    /** Return Vendor's name String, if it is registered. 
+    /** Return Vendor's name java.lang.String, if it is registered. 
      * @see registerVendor
      */
-    protected static String getVendorName(int vendorValue) {
-	return (String)vendorString.get(new Integer(vendorValue));
+    protected static java.lang.String getVendorName(int vendorValue) {
+	return (java.lang.String)vendorString.get(new Integer(vendorValue));
     }
-    /** Contains String names for each vendorID. 
+    /** Contains java.lang.String names for each vendorID. 
      * Could be an Array, since the VendorID is compact small int
      */
     private static Hashtable vendorString = new Hashtable();
 
     /**
-     * We put these into a table with the String versions, 
+     * We put these into a table with the java.lang.String versions, 
      * so one can translate Symbol values back to reasonable names.
      * <p>
      * This table downloaded 7/10/2000 from

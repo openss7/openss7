@@ -218,9 +218,9 @@ public abstract class ComponentIndEvent extends java.util.EventObject implements
       * @return
       * The PrimitiveType value.  */
     public abstract int getPrimitiveType();
-    /** String representation of class ComponentIndEvent.
+    /** java.lang.String representation of class ComponentIndEvent.
       * @return
-      * String provides description of class ComponentIndEvent.  */
+      * java.lang.String provides description of class ComponentIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());

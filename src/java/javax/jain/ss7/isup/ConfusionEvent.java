@@ -75,7 +75,7 @@ public class ConfusionEvent extends IsupEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @param causeIndicator  Cause indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public ConfusionEvent(Object source, SignalingPointCode dpc,
+    public ConfusionEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             CauseInd causeIndicator)
         throws ParameterRangeInvalidException {

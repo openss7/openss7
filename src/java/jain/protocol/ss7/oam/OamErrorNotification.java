@@ -105,7 +105,7 @@ public abstract class OamErrorNotification extends javax.management.Notification
         return m_errorType;
     }
     /**
-      * Sets a non-OAM related error message. This String is set when a non-OAM related
+      * Sets a non-OAM related error message. This java.lang.String is set when a non-OAM related
       * (eg. Java, JNI, etc.) error is encountered and should contain the details of the
       * error. <p>
       *
@@ -123,7 +123,7 @@ public abstract class OamErrorNotification extends javax.management.Notification
         m_errorMsg = errorMsg;
     }
     /**
-      * Returns a non-OAM related error message. This String is set when a non-OAM related
+      * Returns a non-OAM related error message. This java.lang.String is set when a non-OAM related
       * (eg. Java, JNI, etc.) error is encountered and should contain the details of the
       * error. <p>
       *
@@ -138,7 +138,7 @@ public abstract class OamErrorNotification extends javax.management.Notification
     }
 
     protected int m_errorType = NON_OAM_RELATED_ERROR;
-    private String m_errorMsg = "";
+    private java.lang.String m_errorMsg = "";
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

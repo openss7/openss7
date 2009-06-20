@@ -98,7 +98,7 @@ public class InvalidStateException extends Exception {
       * Current state at time of fault.
       * @param s
       * Desciption of the fault.  */
-    public InvalidStateException(java.lang.Object object, int type, int state, String s) {
+    public InvalidStateException(java.lang.Object object, int type, int state, java.lang.String s) {
         super(s);
         setObject(object);
         setType(type);

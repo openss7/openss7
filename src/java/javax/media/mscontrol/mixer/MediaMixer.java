@@ -173,7 +173,7 @@ fig)
 
         See Also:
                 createMixerAdapter(Parameters),
-                createMixerAdapter(MixerAdapterConfig, String)
+                createMixerAdapter(MixerAdapterConfig, java.lang.String)
      _________________________________________________________________
 
   createMixerAdapter
@@ -201,7 +201,7 @@ MixerAdapter createMixerAdapter(Parameters params)
 
         See Also:
                 createMixerAdapter(ConfigSymbol),
-                createMixerAdapter(MixerAdapterConfig, String)
+                createMixerAdapter(MixerAdapterConfig, java.lang.String)
      _________________________________________________________________
 
   createMixerAdapter

@@ -103,7 +103,7 @@ public class TooManyInstancesException extends SS7Exception {
     public java.lang.String getObjectType() {
         return m_objectType;
     }
-    protected String m_objectType;
+    protected java.lang.String m_objectType;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

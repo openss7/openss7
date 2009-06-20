@@ -95,7 +95,7 @@ public interface AgentTerminal extends Terminal {
    * the ACDAddress.
    */
   public Agent addAgent(Address agentAddress, ACDAddress acdAddress,
-			int initialState, String agentID, String password)
+			int initialState, java.lang.String agentID, java.lang.String password)
     throws InvalidArgumentException, InvalidStateException,
       ResourceUnavailableException;
 

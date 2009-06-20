@@ -120,7 +120,6 @@ public class JainMtpStackImpl implements Runnable, JainMtpStack {
     /** Constructs a new JainMtpStackImpl instance.  */
     public JainMtpStackImpl() {
     }
-    public native SignalingPointCode getSignalingPointCode();
     /** Creates a new Peer (vendor specific) JainMtpProvider whose
       * reference is exposed by this JainMtpStackImpl.
       * @return
@@ -270,18 +269,18 @@ public class JainMtpStackImpl implements Runnable, JainMtpStack {
       * exception if not possible.
       * @param signalingPointCode
       * The signalling point code to set.
-      * @exception javax.jain.ParameterInvalidException
+      * @exception javax.jain.protocol.ss7.SS7InvalidParamException
       * Thrown when the supplied signalling point code is invalid, or if
       * the stack cannot change the signalling point code because it is
       * not in the idle state. */
     public void setSignalingPointCode(javax.jain.ss7.SignalingPointCode signalingPointCode)
-        throws javax.jain.ParameterInvalidException {
+        throws javax.jain.protocol.ss7.SS7InvalidParamException {
         if (providerList.size() == 0) {
             this.signalingPointCode = signalingPointCode;
             this.signalingPointCodeIsSet = (signalingPointCode != null);
             return;
         }
-        throw new javax.jain.ParameterInvalidException("Provider already created.");
+        throw new javax.jain.protocol.ss7.SS7InvalidParamException("Provider already created.");
     }
     /** Gets the signaling point code associated with the stack.
       * @return
@@ -304,18 +303,18 @@ public class JainMtpStackImpl implements Runnable, JainMtpStack {
       * possible.
       * @param networkIndicator
       * The network indicator to set.
-      * @exception javax.jain.ParameterInvalidException
+      * @exception javax.jain.protocol.ss7.SS7InvalidParamException
       * Thrown when the supplied network indicator is invalid, or if the
       * stack cannot change the network indicator because it is not in
       * the idle state.  */
     public void setNetworkIndicator(javax.jain.ss7.NetworkIndicator networkIndicator)
-        throws javax.jain.ParameterInvalidException {
+        throws javax.jain.protocol.ss7.SS7InvalidParamException {
         if (provderList.size() == 0) {
             this.networkIndicator = networkIndicator;
             this.networkIndicatorIsSet = (networkIndicator != null);
             return;
         }
-        throw new javax.jain.ParameterInvalidException("Provider already created.");
+        throw new javax.jain.protocol.ss7.SS7InvalidParamException("Provider already created.");
     }
     /** Gets the network indicator associated with the stack.
       * @return

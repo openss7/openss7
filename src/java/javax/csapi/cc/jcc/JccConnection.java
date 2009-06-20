@@ -382,7 +382,7 @@ public interface JccConnection {
       * <li>this.getCall().getState() == ACTIVE </ol>
       *
       * @param address
-      * Indicates the String representation of the translated addresses.
+      * Indicates the java.lang.String representation of the translated addresses.
       * @exception MethodNotSupportedException
       * The implementation does not support this method.
       * @exception InvalidStateException

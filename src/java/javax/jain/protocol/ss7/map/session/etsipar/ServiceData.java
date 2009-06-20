@@ -119,7 +119,7 @@ public class ServiceData extends MapParameter {
     public java.lang.String getData() {
         return m_data;
     }
-    protected String m_data = "";
+    protected java.lang.String m_data = "";
     protected boolean m_dataIsSet = false;
 }
 

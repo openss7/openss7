@@ -60,7 +60,7 @@ public abstract class MtpEvent extends SS7Event {
         super(source);
         setPrimitiveType(primitiveType);
     }
-    private setPrimitveType(MtpPrimitiveType primitiveType) {
+    private void setPrimitveType(MtpPrimitiveType primitiveType) {
         this.primitiveType = primitiveType;
     }
     public MtpPrimitiveType getPrimitiveType() {

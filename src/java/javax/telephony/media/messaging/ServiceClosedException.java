@@ -35,7 +35,7 @@ public class ServiceClosedException extends ServiceException {
      *
      * @param   s   the detail message.
      */
-    public ServiceClosedException(String s) { super(s); }
+    public ServiceClosedException(java.lang.String s) { super(s); }
 
     /**
      * Construct a <code>ServiceClosedException</code>
@@ -48,7 +48,7 @@ public class ServiceClosedException extends ServiceException {
      * @param s  the detail message describing the error in the event.
      * @param event a ServiceEvent 
      */
-    public ServiceClosedException(String s, ServiceEvent event) {
+    public ServiceClosedException(java.lang.String s, ServiceEvent event) {
 	super(s, event);
     }
 }

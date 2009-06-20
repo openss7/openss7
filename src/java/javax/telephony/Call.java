@@ -464,7 +464,7 @@ public interface Call {
    * @return array of Connections
    */
   public Connection[] connect(Terminal origterm, Address origaddr,
-			      String dialedDigits)
+			      java.lang.String dialedDigits)
     throws ResourceUnavailableException, PrivilegeViolationException,
       InvalidPartyException, InvalidArgumentException, InvalidStateException,
       MethodNotSupportedException;

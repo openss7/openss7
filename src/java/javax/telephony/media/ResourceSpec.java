@@ -94,11 +94,11 @@ public class ResourceSpec {
      */
 
     /**
-     * String to identify this particular ResourceSpec.
+     * java.lang.String to identify this particular ResourceSpec.
      * Useful when processing alternative choices.
      * May help app recognize which choice was taken.
      */
-    private String resSpecName = "";
+    private java.lang.String resSpecName = "";
 
     /** Private field to store the ResourceClass Symbol. */
     private Symbol resourceSymbol;
@@ -111,17 +111,17 @@ public class ResourceSpec {
 
     /**
      * Elide package name, include getName(). 
-     * @return a String that identifies this ResourceSpec instance.
+     * @return a java.lang.String that identifies this ResourceSpec instance.
      */
-    public String toString() {
-	String fullName = this.getClass().getName();
-	String shortName = fullName.substring( fullName.lastIndexOf('.') + 1 );
-	String cname = getName();
+    public java.lang.String toString() {
+	java.lang.String fullName = this.getClass().getName();
+	java.lang.String shortName = fullName.substring( fullName.lastIndexOf('.') + 1 );
+	java.lang.String cname = getName();
 	return shortName+"@"+hashCode()+"("+((cname==null)?"null":cname)+")";
     }
    
     /**
-     * Constructor with a name String, the resource Symbol, 
+     * Constructor with a name java.lang.String, the resource Symbol, 
      * selection attributes and initial parameters.
      * <p>
      * The <tt>resSpecName</tt> is useful when processing alternative choices;
@@ -134,14 +134,14 @@ public class ResourceSpec {
      * If the other arguments are <code>null</code>, 
      * they are treated the same as empty collections.
      *
-     * @param resSpecName a String to identify this ResourceSpec.
+     * @param resSpecName a java.lang.String to identify this ResourceSpec.
      * @param resourceSymbol the Symbol for the requested Resource interface. 
      * @param selectionAttributes a Dictionary containing required values
      * for Attributes of the Resource implementation.
      * @param initialParameters a Dictionary of initial parameter settings
      * for this resource.
      */
-    public ResourceSpec(String resSpecName,
+    public ResourceSpec(java.lang.String resSpecName,
 			Symbol resourceSymbol,
 			Dictionary selectionAttributes, 
 			Dictionary initialParameters) {
@@ -171,7 +171,7 @@ public class ResourceSpec {
      * for this resource.
      * 
      * @deprecated as of 1.4 use the
-     * {@link #ResourceSpec(String,Symbol,Dictionary,Dictionary) <tt>resourceSymbol</tt> }
+     * {@link #ResourceSpec(java.lang.String,Symbol,Dictionary,Dictionary) <tt>resourceSymbol</tt> }
      * constructor
      */
     public ResourceSpec(Class resourceClass, // deprecated
@@ -208,10 +208,10 @@ public class ResourceSpec {
      *
      * @throws ClassNotFoundException if class is not found
      * @deprecated as of 1.4 use the
-     * {@link #ResourceSpec(String,Symbol,Dictionary,Dictionary) <tt>resourceSymbol</tt> }
+     * {@link #ResourceSpec(java.lang.String,Symbol,Dictionary,Dictionary) <tt>resourceSymbol</tt> }
      * constructor
      */
-    public ResourceSpec(String resourceClassName, // deprecated
+    public ResourceSpec(java.lang.String resourceClassName, // deprecated
 			Dictionary selectionAttributes, 
 			Dictionary initialParameters)
 	throws ClassNotFoundException {
@@ -221,10 +221,10 @@ public class ResourceSpec {
 	}
     
     /**
-     * Returns the String name assigned to this ResourceSpec.
-     * @return the String name assigned to this ResourceSpec.
+     * Returns the java.lang.String name assigned to this ResourceSpec.
+     * @return the java.lang.String name assigned to this ResourceSpec.
      */
-    public String getName() {
+    public java.lang.String getName() {
 	return resSpecName;
     }
     

@@ -37,7 +37,7 @@ class AlreadyBoundException extends MediaBindException {
      *
      * @param   s   the detail message.
      */
-    public AlreadyBoundException(String s) {super(s);}
+    public AlreadyBoundException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>AlreadyBoundException</code>
@@ -46,7 +46,7 @@ class AlreadyBoundException extends MediaBindException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public AlreadyBoundException(String s, MediaEvent event) {
+    public AlreadyBoundException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

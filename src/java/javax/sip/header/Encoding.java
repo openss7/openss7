@@ -58,7 +58,7 @@ public interface Encoding {
     /**
         Sets the encoding of an EncodingHeader.
         @param encoding The new string value defining the encoding.
-        @exceptino java.text.ParseException Thrown when an error was found while parsing the
+        @exception java.text.ParseException Thrown when an error was found while parsing the
         encoding value.
       */
     void setEncoding(java.lang.String encoding)

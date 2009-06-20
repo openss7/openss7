@@ -43,10 +43,14 @@
  Last Modified $Date$ by $Author$
  */
 
+package org.openss7.ss7.sccp;
+
 /**
   * @author Monavacon Limited
   * @version 1.2.2
   */
+public class SccpUserAddress {
+}
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
 

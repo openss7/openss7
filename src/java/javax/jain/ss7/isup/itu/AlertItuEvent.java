@@ -72,7 +72,7 @@ public class AlertItuEvent extends AlertEvent {
         @param bci  Backward call indicators..
         @exception ParameterRangeInvalidException  Thrown when value is out of range
       */
-    public AlertItuEvent(Object source, SignalingPointCode dpc,
+    public AlertItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             BwdCallIndItu bci)
         throws ParameterRangeInvalidException {

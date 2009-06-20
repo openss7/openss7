@@ -35,7 +35,7 @@ class MediaConfigException extends MediaServiceException {
      *
      * @param   s   the detail message.
      */
-    public MediaConfigException(String s) {super(s);}
+    public MediaConfigException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>MediaConfigException</code>
@@ -44,7 +44,7 @@ class MediaConfigException extends MediaServiceException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public MediaConfigException(String s, MediaEvent event) {
+    public MediaConfigException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 

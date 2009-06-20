@@ -76,7 +76,7 @@ public class CallFailureIndEvent extends IsupEvent {
       * @param callFailureReason - Call failure reason refer to getCallFailureReason
       * method for values of callFailureReason.
       * @exception ParameterRangeInvalidException - Thrown when value is out of range.  */
-    public CallFailureIndEvent(Object source, SignalingPointCode dpc,
+    public CallFailureIndEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int callFailureReason)
         throws ParameterRangeInvalidException {

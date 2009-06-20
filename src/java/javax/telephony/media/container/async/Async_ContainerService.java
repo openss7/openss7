@@ -31,22 +31,22 @@ public interface Async_ContainerService extends ContainerService {
     /** Store arbitrary user infomation with a Container or DataObject.
      * @see ContainerService#setInfo setInfo
      */
-    Async_ContainerEvent async_setInfo(String fullName, Dictionary dict);
+    Async_ContainerEvent async_setInfo(java.lang.String fullName, Dictionary dict);
 
     /** Return arbitrary user infomation stored with a Container or DataObject. 
      * @see ContainerService#getInfo getInfo
      */
-    Async_ContainerEvent async_getInfo(String fullName, Symbol[] keys, Dictionary optargs);
+    Async_ContainerEvent async_getInfo(java.lang.String fullName, Symbol[] keys, Dictionary optargs);
 
     /** set system parameters on a Container or DataObject.
      * @see ContainerService#setParameters setParameters
      */
-    Async_ContainerEvent async_setParameters(String fullName, Dictionary params) ;
+    Async_ContainerEvent async_setParameters(java.lang.String fullName, Dictionary params) ;
 
     /** get system parameters on a Container or DataObject.
      * @see ContainerService#getParameters getParameters
      */
-    Async_ContainerEvent async_getParameters(String fullName, Symbol[] keys, Dictionary optargs) ;
+    Async_ContainerEvent async_getParameters(java.lang.String fullName, Symbol[] keys, Dictionary optargs) ;
 
     /** change the access rights of a container. 
      * @param the name of the DataObject to open.
@@ -55,13 +55,13 @@ public interface Async_ContainerService extends ContainerService {
     
      * @see ContainerService#changeMode changeMode
      */
-    Async_ContainerEvent async_changeMode(String fullName, Symbol accessMode, Dictionary optargs);
+    Async_ContainerEvent async_changeMode(java.lang.String fullName, Symbol accessMode, Dictionary optargs);
 
     /** Copy one DataObject to new DataObject name.
      * @see ContainerService#copy copy
      */
-    Async_ContainerEvent async_copy(String fullName, 
-				    String target, 
+    Async_ContainerEvent async_copy(java.lang.String fullName, 
+				    java.lang.String target, 
 				    Dictionary optargs);
 
     /** Rename a Container or DataObject within its current Container.
@@ -72,7 +72,7 @@ public interface Async_ContainerService extends ContainerService {
      * @param newName the new name for the Container/DataObject.
      * @see ContainerService#rename rename
      */
-    Async_ContainerEvent async_rename(String fullName, String newName, Dictionary optargs);
+    Async_ContainerEvent async_rename(java.lang.String fullName, java.lang.String newName, Dictionary optargs);
 
     /** remove this container and all data objects.
      * <P>
@@ -80,35 +80,35 @@ public interface Async_ContainerService extends ContainerService {
      * Destroy can succeed even if this container is open in read-only mode.
      * @see ContainerService#destroy destroy
      */
-    Async_ContainerEvent async_destroy(String fullName, Dictionary optargs);
+    Async_ContainerEvent async_destroy(java.lang.String fullName, Dictionary optargs);
 
     /** list inner objects and containers. 
      * @see ContainerService#listObjects listObjects
      */
-    Async_ContainerEvent async_listObjects(String fullName, Dictionary optargs);
+    Async_ContainerEvent async_listObjects(java.lang.String fullName, Dictionary optargs);
 
     /** Create a new Container.
      * <p>
-     * <b>Note:</b>to create a new Data Object, use async_openObject().
+     * <b>Note:</b>to create a new Data java.lang.Object, use async_openObject().
      *
      * @param the name of the new Container.
      * @see ContainerService#createContainer createContainer
      */
-    Async_ContainerEvent async_createContainer(String fullName, Dictionary optargs);
+    Async_ContainerEvent async_createContainer(java.lang.String fullName, Dictionary optargs);
 
     /**
-     * Create a new Data Object and open it.
+     * Create a new Data java.lang.Object and open it.
      * @see ContainerService#createDataObject createDataObject
      */
-    Async_ContainerEvent async_createDataObject(String fullName, 
+    Async_ContainerEvent async_createDataObject(java.lang.String fullName, 
 						Symbol accessMode, 
 						Dictionary optargs);
 
     /**
-     * Open a Data Object.
+     * Open a Data java.lang.Object.
      * @see ContainerService#openDataObject openDataObject
      */
-    Async_ContainerEvent async_openDataObject(String fullName, 
+    Async_ContainerEvent async_openDataObject(java.lang.String fullName, 
 					      Symbol accessMode, 
 					      boolean ifNoExist,
 					      boolean truncate,

@@ -76,7 +76,7 @@ public class SS7PeerUnavailableException extends SS7Exception {
       * @param msg
       * The message detail of this Exception.
       */
-    public SS7PeerUnavailableException(String msg) {
+    public SS7PeerUnavailableException(java.lang.String msg) {
         super(msg);
     }
     /**

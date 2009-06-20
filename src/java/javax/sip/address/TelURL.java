@@ -139,7 +139,7 @@ public interface TelURL extends URI, Parameters {
     public java.lang.String getPhoneContext();
     /**
         This method returns the URI as a string.
-        @return String The stringified version of the URI.
+        @return java.lang.String The stringified version of the URI.
       */
     public java.lang.String toString();
 }

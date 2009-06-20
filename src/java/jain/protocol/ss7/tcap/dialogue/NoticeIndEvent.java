@@ -198,9 +198,9 @@ public final class NoticeIndEvent extends DialogueIndEvent {
         m_originatingAddressPresent = false;
         m_reportCausePresent = false;
     }
-    /** String representation of class NoticeIndEvent.
+    /** java.lang.String representation of class NoticeIndEvent.
       * @return
-      * String provides description of class NoticeIndEvent.  */
+      * java.lang.String provides description of class NoticeIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nNoticeIndEvent");

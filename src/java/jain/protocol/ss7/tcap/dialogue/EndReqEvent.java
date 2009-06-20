@@ -128,9 +128,9 @@ public final class EndReqEvent extends DialogueReqEvent {
         m_qualityOfServicePresent = false;
         m_terminationPresent = false;
     }
-    /** String representation of class EndReqEvent.
+    /** java.lang.String representation of class EndReqEvent.
       * @return
-      * String provides description of class EndReqEvent.  */
+      * java.lang.String provides description of class EndReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nEndReqEvent");

@@ -77,7 +77,7 @@ public class SignalingLinkSelection extends MtpParameter {
       * value.  The default is to increment the value last used: this
       * ensures an equal distribution of values over signaling links in
       * a signalling link set. */
-    public synchronized SignalingLinkSelection() {
+    public SignalingLinkSelection() {
         super();
         setSignallingLinkSelection(current++);
     }

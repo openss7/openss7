@@ -75,7 +75,7 @@ public class FacilityRequestItuEvent extends IsupEvent {
       * @param facilityInd  Facility indicator.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public FacilityRequestItuEvent(Object source, SignalingPointCode dpc,
+    public FacilityRequestItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             short facilityInd)
         throws ParameterRangeInvalidException {

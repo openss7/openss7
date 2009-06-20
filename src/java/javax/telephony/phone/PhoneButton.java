@@ -30,7 +30,7 @@ public interface PhoneButton extends Component {
    * <p>
    * @return The string button information.
    */
-  public String getInfo();
+  public java.lang.String getInfo();
 
 
   /**
@@ -38,7 +38,7 @@ public interface PhoneButton extends Component {
    * <p>
    * @param buttonInfo The button information.
    */
-  public void setInfo(String buttonInfo);
+  public void setInfo(java.lang.String buttonInfo);
 
 
   /**

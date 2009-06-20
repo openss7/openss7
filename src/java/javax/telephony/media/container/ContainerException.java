@@ -43,7 +43,7 @@ class ContainerException extends MediaException {
      *
      * @param   s   the detail message.
      */
-    public ContainerException(String s) {super(s);}
+    public ContainerException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>ContainerException</code>
@@ -56,7 +56,7 @@ class ContainerException extends MediaException {
      * @param s  the detail message
      * @param event a ContainerEvent 
      */
-    public ContainerException(String s, ContainerEvent event) {
+    public ContainerException(java.lang.String s, ContainerEvent event) {
 	super(s, event);
     }
 

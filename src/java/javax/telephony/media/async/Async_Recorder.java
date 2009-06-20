@@ -36,7 +36,7 @@ public interface Async_Recorder extends RecorderConstants {
      * the Media Stream Container identified by 
      * the given <code>streamID</code>.
      * <p>
-     * @param streamID the String name of a MDO where recording is to be stored
+     * @param streamID the java.lang.String name of a MDO where recording is to be stored
      * @param rtc an Array of RTC (Run-Time-Control) objects
      * @param optargs, a Dictionary of optional arguments 
      *
@@ -44,7 +44,7 @@ public interface Async_Recorder extends RecorderConstants {
      *
      * @see Recorder#record
      */
-    Async_RecorderEvent async_record(String streamID, RTC[] rtc, Dictionary optargs); 
+    Async_RecorderEvent async_record(java.lang.String streamID, RTC[] rtc, Dictionary optargs); 
     
 	
     /** Non-blocking version of Recorder.pauseRecorder.

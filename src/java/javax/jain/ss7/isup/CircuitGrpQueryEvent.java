@@ -79,7 +79,7 @@ public class CircuitGrpQueryEvent extends CircuitGrpCommonEvent {
       * @exception PrimitiveInvalidException  Thrown when the primitive value is not
       * as specified.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public CircuitGrpQueryEvent(Object source, SignalingPointCode dpc,
+    public CircuitGrpQueryEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority, int
             primitive, RangeAndStatus in_rangeAndStatus)
         throws PrimitiveInvalidException, ParameterRangeInvalidException {

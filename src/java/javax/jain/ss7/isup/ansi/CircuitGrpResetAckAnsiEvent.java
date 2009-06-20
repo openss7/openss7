@@ -72,7 +72,7 @@ public class CircuitGrpResetAckAnsiEvent extends CircuitGrpResetAckEvent {
       * THIS EVENT, THE STATUS FIELD IS NOT PRESENT.</em>  Refer to RangeAndStatus
       * class for more details.
       * @exception ParameterRangeInvalidException - Thrown when value is out of range.  */
-    public CircuitGrpResetAckAnsiEvent(Object source, SignalingPointCode dpc, SignalingPointCode opc,
+    public CircuitGrpResetAckAnsiEvent(java.lang.Object source, SignalingPointCode dpc, SignalingPointCode opc,
             byte sls, int cic, byte congestionPriority, RangeAndStatus in_rangeAndStatus)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority, in_rangeAndStatus);

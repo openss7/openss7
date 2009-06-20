@@ -70,7 +70,7 @@ public class StopMaintReqEvent extends IsupEvent {
       * the network, filled as 0. Refer to getCongestionPriority method in IsupEvent
       * class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public StopMaintReqEvent(Object source, SignalingPointCode dpc,
+    public StopMaintReqEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority);

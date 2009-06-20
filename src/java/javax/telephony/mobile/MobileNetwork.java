@@ -65,11 +65,11 @@ public interface MobileNetwork {
      * @return All available names of a network, 
      * null, if none available.
      */
-    public String[] getNames();
+    public java.lang.String[] getNames();
 	
 	
     /**
-     * Returns the network code in a String format.
+     * Returns the network code in a java.lang.String format.
 	* <br> 
      * Example: MCC-MNC, SID-NID
 	* <br> 
@@ -79,7 +79,7 @@ public interface MobileNetwork {
      * <p>
      * @return The network code.
      */
-    public String getCode();
+    public java.lang.String getCode();
 
 	
 

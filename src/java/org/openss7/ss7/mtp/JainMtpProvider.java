@@ -164,7 +164,7 @@ public interface JainMtpProvider extends java.util.EventListener {
       * mandate that a different set of parameters be set for
       * each of the MtpEvents.  It is recommended that the
       * detail message returned in the
-      * MandatoryParameterNotSetException should be a String of
+      * MandatoryParameterNotSetException should be a java.lang.String of
       * the form, <p> <center><code>"Parameter: not
       * set"</code></center><p>
       * @exception javax.jain.ss7.isup.SendStackException

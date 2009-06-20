@@ -41,12 +41,12 @@ class Base_SignalDetectorEvent extends Base.ResourceEvent
     /**
      * Create specific completion or non-tranaction event from Recorder.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_RetrieveSignals, ev_FlushBuffer, 
      * ev_Pattern[i], ev_SignalDetected.
      */
-    public Base_SignalDetectorEvent(Object source, Symbol eventID) {
+    public Base_SignalDetectorEvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
     }
 
@@ -80,13 +80,13 @@ class Base_SignalDetectorEvent extends Base.ResourceEvent
     
 
     /** 
-     * Return SignalBuffer as a String.
+     * Return SignalBuffer as a java.lang.String.
      * Non-standard signals that have not been defined 
-     * by setSignalChar() appear in the String as '?'.
+     * by setSignalChar() appear in the java.lang.String as '?'.
      * 
-     * @return a String representing SignalBuffer.
+     * @return a java.lang.String representing SignalBuffer.
      */
-    abstract public String getSignalString();
+    abstract public java.lang.String getSignalString();
 
     /** dispatch this event to Async_SignalDetectorListener */
     public void dispatch(EventListener listener) {

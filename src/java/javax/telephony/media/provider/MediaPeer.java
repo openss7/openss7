@@ -25,8 +25,8 @@ import javax.telephony.media.*;
 public interface MediaPeer {
     /** Create a service connection to the indicated service provider.
      *
-     * @param providerString a MediaPeer specific String that identifies
+     * @param providerString a MediaPeer specific java.lang.String that identifies
      * the MediaProvider
      */
-    public MediaProvider getMediaProvider(String providerString);
+    public MediaProvider getMediaProvider(java.lang.String providerString);
 }

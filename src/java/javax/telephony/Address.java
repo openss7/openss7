@@ -138,7 +138,7 @@ public interface Address {
    * <p>
    * @return The name of this Address.
    */
-  public String getName();
+  public java.lang.String getName();
 
 
   /**

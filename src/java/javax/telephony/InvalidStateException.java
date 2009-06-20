@@ -47,7 +47,7 @@ public class InvalidStateException extends Exception {
    * The current object.
    * @serial
    */
-  private Object _object;
+  private java.lang.Object _object;
 
   /**
    * The invalid object in question is the Provider
@@ -88,7 +88,7 @@ public class InvalidStateException extends Exception {
    * @param type type of failure
    * @param state current state at time of fault
    */
-  public InvalidStateException(Object object, int type, int state) {
+  public InvalidStateException(java.lang.Object object, int type, int state) {
     super();
     _type   = type;
     _object = object;
@@ -104,7 +104,7 @@ public class InvalidStateException extends Exception {
    * @param state current state at time of fault
    * @param s desciption of the fault
    */
-  public InvalidStateException(Object object, int type, int state, String s) {
+  public InvalidStateException(java.lang.Object object, int type, int state, java.lang.String s) {
     super(s);
     _type   = type;
     _object = object;
@@ -126,7 +126,7 @@ public class InvalidStateException extends Exception {
    * 
    * @return The object which is in the wrong state.
    */
-  public Object getObject() {
+  public java.lang.Object getObject() {
     return _object;
   }
 

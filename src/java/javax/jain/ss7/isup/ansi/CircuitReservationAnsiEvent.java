@@ -69,7 +69,7 @@ public class CircuitReservationAnsiEvent extends IsupEvent {
       * @param in_natureConnInd  Nature of Connection Indicators. Refer to for more
       * details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public CircuitReservationAnsiEvent(Object source, SignalingPointCode dpc,
+    public CircuitReservationAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             NatureConnInd in_natureConnInd)
         throws ParameterRangeInvalidException {

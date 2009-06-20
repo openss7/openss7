@@ -37,11 +37,11 @@ public interface NetworkSelection extends MobileProvider {
      * null if the current mode is manual i.e., the network was 
      * selected by using the setNetwork-method.
      * <p>
-     * @return The current selection mode String object.
+     * @return The current selection mode java.lang.String object.
      * @exception MethodNotSupportedException Indicates network selection
      * is not supported.
      */
-    public String getCurrentSelectionMode()
+    public java.lang.String getCurrentSelectionMode()
         throws MethodNotSupportedException;
 
 
@@ -58,7 +58,7 @@ public interface NetworkSelection extends MobileProvider {
      * @exception MethodNotSupportedException Indicates network selection
      * is not supported.
      */
-    public String[] getSelectionModes()
+    public java.lang.String[] getSelectionModes()
         throws MethodNotSupportedException;
 
 	/**
@@ -76,7 +76,7 @@ public interface NetworkSelection extends MobileProvider {
 	 *         is in a state in which setting the network selection mode is not possible 
 	 *         (call ongoing, for example).
 	 */
-    public void setSelectionMode(String mode)
+    public void setSelectionMode(java.lang.String mode)
         throws InvalidArgumentException,MethodNotSupportedException,
 		   InvalidStateException;
 

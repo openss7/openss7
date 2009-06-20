@@ -83,7 +83,7 @@ public class SetupAnsiEvent extends SetupEvent {
         @param usi  User service information.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public SetupAnsiEvent(Object source, SignalingPointCode dpc, SignalingPointCode
+    public SetupAnsiEvent(java.lang.Object source, SignalingPointCode dpc, SignalingPointCode
             opc, byte sls, int cic, byte congestionPriority, boolean glareControl,
             NatureConnInd nci, FwdCallIndAnsi fci, CalledPartyNumber cpn, byte cat,
             UserServiceInfo usi)

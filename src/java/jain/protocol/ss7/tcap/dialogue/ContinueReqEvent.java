@@ -182,9 +182,9 @@ public final class ContinueReqEvent extends DialogueReqEvent {
         m_qualityOfServicePresent = false;
         m_allowedPermissionPresent = false;
     }
-    /** String representation of class ContinueReqEvent.
+    /** java.lang.String representation of class ContinueReqEvent.
       * @return
-      * String provides description of class ContinueReqEvent.  */
+      * java.lang.String provides description of class ContinueReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nContinueReqEvent");

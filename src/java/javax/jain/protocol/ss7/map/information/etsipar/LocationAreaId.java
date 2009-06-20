@@ -87,7 +87,7 @@ public class LocationAreaId extends MapParameter {
         throws SS7InvalidParamException {
     }
     /** Change the value of the Mobile Country Code (MCC).
-      * @param mcc - String with 3 digit MCC.
+      * @param mcc - java.lang.String with 3 digit MCC.
       * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
       * range.
       */
@@ -100,13 +100,13 @@ public class LocationAreaId extends MapParameter {
         throw new SS7InvalidParamException("Mobile Country Code length " + mcc.length() + " invalid.");
     }
     /** Get the value of the Mobile Country Code (MCC).
-      * @return String with 3 digit MCC.
+      * @return java.lang.String with 3 digit MCC.
       */
     public java.lang.String getMobileCountryCode() {
         return m_mcc;
     }
     /** Change the value of the Mobile Network Code (MNC).
-      * @param mnc  String with 2-3 digit MNC.
+      * @param mnc  java.lang.String with 2-3 digit MNC.
       * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
       * range.
       */
@@ -119,7 +119,7 @@ public class LocationAreaId extends MapParameter {
         throw new SS7InvalidParamException("Mobile Network Code length " + mnc.length() + " is invalid.");
     }
     /** Get the value of the Mobile Network Code (MNC).
-      * @return String with 2-3 digit MNC.
+      * @return java.lang.String with 2-3 digit MNC.
       */
     public java.lang.String getMobileNetworkCode() {
         return m_mnc;
@@ -143,8 +143,8 @@ public class LocationAreaId extends MapParameter {
     public byte[] getLocationAreaCode() {
         return m_lac;
     }
-    /** Get the whole Location Area Id (MCC+MNC+LAC) as a String.
-      * @return String containing LAI.
+    /** Get the whole Location Area Id (MCC+MNC+LAC) as a java.lang.String.
+      * @return java.lang.String containing LAI.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
@@ -167,8 +167,8 @@ public class LocationAreaId extends MapParameter {
         }
         return false;
     }
-    protected String m_mcc = "";
-    protected String m_mnc = "";
+    protected java.lang.String m_mcc = "";
+    protected java.lang.String m_mnc = "";
     protected byte[] m_lac;
 }
 

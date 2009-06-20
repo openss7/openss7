@@ -189,9 +189,9 @@ public final class SubSystemAddress implements java.io.Serializable {
         throw new MandatoryParameterNotSetException("SubSystem Number: not set.");
     }
     /**
-      * String representation of class SubSystemAddress.
+      * java.lang.String representation of class SubSystemAddress.
       * @return
-      * String provides description of class SubSystemAddress.
+      * java.lang.String provides description of class SubSystemAddress.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

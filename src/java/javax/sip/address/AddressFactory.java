@@ -71,7 +71,7 @@ public interface AddressFactory {
         character ('sip:') is appended to the result.  <li>The user and host are then appended. Any
         character that is not a legal URI character is quoted. </ul> The resulting URI string is
         then parsed in order to create the new SipURI instance as if by invoking the
-        createURI(String) constructor; this may cause a URISyntaxException to be thrown.  <p> An
+        createURI(java.lang.String) constructor; this may cause a URISyntaxException to be thrown.  <p> An
         application that wishes to create a 'sips' URI should call the SipURI.setSecure(boolean)
         with an argument of 'true' on the returned SipURI.
         @param user The new string value of the user, this value may be null.
@@ -94,7 +94,7 @@ public interface AddressFactory {
         RFC3261, for example "Bob ". It is recommended to use the to use the name-addr form
         containing '<' '>' to avoid confusion of URI parameters. As a special case, the string
         argument "*" creates a wildcard Address object with the property that
-        ((SipURI)Address.getURI()).getUser() returns a String contain one character "*".
+        ((SipURI)Address.getURI()).getUser() returns a java.lang.String contain one character "*".
         @param address The new string value of the address.
         @exception java.text.ParseException Thrown to signal that an error has occurred unexpectedly
         while parsing the address value.

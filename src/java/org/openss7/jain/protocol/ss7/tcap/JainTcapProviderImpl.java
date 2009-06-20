@@ -77,9 +77,9 @@ public class JainTcapProviderImpl implements java.rmi.Remote, Runnable, JainTcap
     public native void sendDialogueReqEvent(DialogueReqEvent event)
         throws MandatoryParameterNotSetException;
     public native void addJainTcapListener(JainTcapListener listener, TcapUserAddress userAddress)
-        throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidUserAddressException; 
+        throws java.util.TooManyListenersException, ListenerAlreadyRegisteredException, InvalidUserAddressException; 
     public native void addJainTcapListener(JainTcapListener listener, SccpUserAddress userAddress)
-        throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException;
+        throws java.util.TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException;
     public native void removeJainTcapListener(JainTcapListener listener)
         throws ListenerNotRegisteredException;
     public JainTcapStack getAttachedStack() {
@@ -96,7 +96,7 @@ public class JainTcapProviderImpl implements java.rmi.Remote, Runnable, JainTcap
                 EventObject rawevent;
                 rawevent = recvTcapEvent();
                 if (rawevent != null) {
-                    Object source;
+                    java.lang.Object source;
 
                     /* The source of the event is really the destination
                      * JainTcapListener object registered for this event.
@@ -112,11 +112,11 @@ public class JainTcapProviderImpl implements java.rmi.Remote, Runnable, JainTcap
                          * thread pool to process the event. */
                         if (rawevent instanceof DialogueIndEvent) {
                             DialogueIndEvent event = (DialogueIndEvent) rawevent;
-                            event.setSource((Object) this);
+                            event.setSource((java.lang.Object) this);
                             listener.processDialogueIndEvent(event);
                         } else if (rawevent instanceof ComponentIndEvent) {
                             ComponentIndEvent event = (ComponentIndEvent) rawevent;
-                            event.setSource((Object) this);
+                            event.setSource((java.lang.Object) this);
                             listener.processComponentIndEvent(event);
                         } else if (rawevent instanceof TcapErrorEvent) {
                             TcapErrorEvent event = new TcapErrorEvent(this, ((TcapErrorEvent)rawevent).getError());

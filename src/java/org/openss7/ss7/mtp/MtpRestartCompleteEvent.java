@@ -77,9 +77,9 @@ import org.openss7.ss7.*;
   */
 public class MtpRestartCompleteEvent extends MtpRestartEvent {
     /** Private array of paused signalling pint codes.  */
-    private javax.jain.ss7.SignalingPointCode[] pausedPointCodes = new javax.jain.ss7.SignalingPointCode[];
+    private javax.jain.ss7.SignalingPointCode[] pausedPointCodes = new javax.jain.ss7.SignalingPointCode[0];
     /** Private array of restricted signalling pint codes.  */
-    private javax.jain.ss7.SignalingPointCode[] restrictedPointCodes = new javax.jain.ss7.SignalingPointCode[];
+    private javax.jain.ss7.SignalingPointCode[] restrictedPointCodes = new javax.jain.ss7.SignalingPointCode[0];
     /** Constructs a new MtpRestartCompleteEVent object with object
       * source, affected point code, paused point code array and
       * restricted point code array.  Note that signalling points that

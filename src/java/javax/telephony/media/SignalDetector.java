@@ -349,7 +349,7 @@ import java.util.Dictionary;
  * <p>
  * The Pattern parameters can be set with <code>setParameters</code>
  * or in the <code>optargs</code> argument of retrieveSignals.
- * Each pattern String is set as the value of one of the pattern
+ * Each pattern java.lang.String is set as the value of one of the pattern
  * parameter symbols (<code>p_Pattern[<b>i</b>]</code>). 
  * <p>
  * <b>Example:</b> define some patterns
@@ -420,12 +420,12 @@ interface SignalDetector extends Resource, SignalDetectorConstants {
      * so <code>retrieveSignals(...).getSignalBuffer()</code> is safe.
      * The Signals are accessed as elements of the <tt>Symbol[]</tt> returned by
      * {@link SignalDetectorEvent#getSignalBuffer getSignalBuffer}
-     * or char elements of the String returned by 
+     * or char elements of the java.lang.String returned by 
      * {@link SignalDetectorEvent#getSignalString getSignalString}.
      * <p>
      * <b>Example:</b>
      * <br><code>
-     * 	String nextDTMF = retrieveSignals(1,null,null,null).getSignalBuffer();
+     * 	java.lang.String nextDTMF = retrieveSignals(1,null,null,null).getSignalBuffer();
      * </code>
      * <p>
      * <b>Note:</b>

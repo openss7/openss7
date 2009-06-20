@@ -183,9 +183,9 @@ public final class UserAbortIndEvent extends DialogueIndEvent {
         m_userAbortInformationPresent = false;
         m_abortReasonPresent = false;
     }
-    /** String representation of class UserAbortIndEvent.
+    /** java.lang.String representation of class UserAbortIndEvent.
       * @return
-      * String provides description of class UserAbortIndEvent.  */
+      * java.lang.String provides description of class UserAbortIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(500);
         b.append("\n\nUserAbortIndEvent");

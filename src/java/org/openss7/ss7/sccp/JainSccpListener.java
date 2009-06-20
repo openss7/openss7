@@ -95,12 +95,12 @@ public interface JainSccpListener extends java.util.EventListener {
       * JainSccpProviderImpl.
       */
     public void addUserAddress(SccpUserAddress userAddress)
-        throws UserAddressLimitException;
+        throws jain.protocol.ss7.UserAddressLimitException;
     /** 
       * Removes the {@link org.openss7.ss7.sccp.SccpUserAddress} from the
       * list of user addresses held by a JainSccpListenerImpl. */
     public void removeUserAddress(SccpUserAddress userAddress)
-        throws InvalidAddressException;
+        throws jain.protocol.ss7.InvalidAddressException;
     /** 
       * Returns the list of {@link org.openss7.ss7.sccp.SccpUserAddress}
       * used by this JainSccpListenerImpl.
@@ -108,7 +108,7 @@ public interface JainSccpListener extends java.util.EventListener {
       * JainSccpListenerImpl.
       */
     public SccpUserAddress[] getUserAddressList()
-        throws UserAddressEmptyException;
+        throws jain.protocol.ss7.UserAddressEmptyException;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

@@ -20,8 +20,8 @@ package javax.telephony.media;
  * Delegation allows an application to pass control of the media processing
  * to another MediaService and then regain control.
  * <P>
- * {@link #delegateToService(String, int, String)} is similar to 
- * {@link MediaService#releaseToService(String, int) releaseToService(String, int)}:
+ * {@link #delegateToService(java.lang.String, int, java.lang.String)} is similar to 
+ * {@link MediaService#releaseToService(java.lang.String, int) releaseToService(java.lang.String, int)}:
  * the MediaGroup of this MediaService is bound to a new MediaService.
  * However, the MediaGroup is <i>not</i> released from
  * the invoking MediaService; instead,
@@ -35,9 +35,9 @@ package javax.telephony.media;
  * is not bound then <tt>isOwner</tt> returns <tt>false</tt>.
  * <p>
  * <tt>delegateToService</tt>
- * also associates a String of <i>catchTags</i>
+ * also associates a java.lang.String of <i>catchTags</i>
  * with this MediaService on the ownerstack of the MediaGroup.
- * These tags are used when processing {@link MediaService#releaseToTag(String)}.
+ * These tags are used when processing {@link MediaService#releaseToTag(java.lang.String)}.
  * <p>
  * <h4> Returning from delegateToService </h4>
  *
@@ -65,7 +65,7 @@ package javax.telephony.media;
  * <p>
  * <h4> Catch and Return tag usage </h4>
  * When the current owner <i>releases</i> the MediaGroup 
- * (using {@link MediaService#releaseToTag(String)} or one of its variants),
+ * (using {@link MediaService#releaseToTag(java.lang.String)} or one of its variants),
  * the stack is popped and ownership returns to a previous owner.
  * The particular owner to regain ownership is determined by
  * the <i>returnTag</i> supplied in the release method,
@@ -74,14 +74,14 @@ package javax.telephony.media;
  * <p>
  * Each previous owner on the stack (that is, each MediaService that
  * has an open call to <tt>delegateToService</tt>),
- * supplies a String of <i>catchTags</i> which is associated with
+ * supplies a java.lang.String of <i>catchTags</i> which is associated with
  * that MediaService on the owner stack.  When the current
- * owner releases the MediaGroup using <tt>releaseToTag(String)</tt>,
+ * owner releases the MediaGroup using <tt>releaseToTag(java.lang.String)</tt>,
  * the stack of previous owners is searched from the most recent owner
  * to the least recent owner:
  * <ul><li>
  * If the <tt>catchTags</tt> of a previous owner match
- * the <tt>returnTags</tt> supplied in <tt>releaseToTag(String)</tt>,
+ * the <tt>returnTags</tt> supplied in <tt>releaseToTag(java.lang.String)</tt>,
  * then that MediaService becomes the new owner;
  * its call to <tt>delegateToService()</tt> returns, 
  * <tt>onDelegationDone()</tt> is invoked on the <tt>Async_DelegationListener</tt>,
@@ -89,7 +89,7 @@ package javax.telephony.media;
  * It is <i>still</i> bound to the 
  * </li><li>
  * If the <tt>catchTags</tt> of the previous owner do <b>not</b> match
- * the <tt>returnTags</tt> supplied in <tt>releaseToTag(String)</tt>,
+ * the <tt>returnTags</tt> supplied in <tt>releaseToTag(java.lang.String)</tt>,
  * then that MediaService is removed from the stack of previous owners;
  * its call to <tt>delegateToService()</tt> returns,
  * <tt>onDelegationDone()</tt> is invoked on the Async_DelegationListener,
@@ -161,12 +161,12 @@ package javax.telephony.media;
  * <p>
  * To regain ownership, one must either wait for delegation to complete, 
  * or use <tt>retrieve()</tt>.
- * {@link #retrieve(Symbol)} is like <tt>releaseToTag(String)</tt> in that
+ * {@link #retrieve(Symbol)} is like <tt>releaseToTag(java.lang.String)</tt> in that
  * it causes a non-local (that is, it may skip levels on the ownership stack) 
  * transfer of ownership. 
  * However, <tt>retrieve(Symbol)</tt> is initiated by a previous owner
  * (which MediaService becomes the new, current owner). In contrast,
- * <tt>releaseToTag(String)</tt> is initiated by the current owner.
+ * <tt>releaseToTag(java.lang.String)</tt> is initiated by the current owner.
  *
  * <p>
  * <h4>Delegation is Optional</h4>
@@ -175,7 +175,7 @@ package javax.telephony.media;
  * If the MediaService does <b>not</b> otherwise implement this interface, then
  * <table border="1" cellpadding="3">
 
- * <tr><td><tt>delegateToService(String,int,String)</tt></td>
+ * <tr><td><tt>delegateToService(java.lang.String,int,java.lang.String)</tt></td>
  * <td>throws <tt>NoServiceAssignedException</tt></td></tr>
 
  * <tr><td><tt>retrieve()</tt></td>
@@ -184,7 +184,7 @@ package javax.telephony.media;
  * <tr><td><tt>releaseDelegated()</tt></td>
  * <td>throws <tt>NotDelegatedException</tt></td></tr>
 
- * <tr><td><tt>releaseToTag(String)</tt></td><td>same as <tt>release()</tt>, 
+ * <tr><td><tt>releaseToTag(java.lang.String)</tt></td><td>same as <tt>release()</tt>, 
  * because there are no previous owners</td></tr>
 
  * <tr><td><tt>releaseToDestroy()</tt></td><td>same as <tt>release()</tt>, 
@@ -222,7 +222,7 @@ public interface Delegation extends DelegationConstants {
      * to be returned.
      * <p>
      * A new owner is identified by the given <tt>serviceName</tt>. 
-     * see {@link MediaService#releaseToService(String, int)} for details.
+     * see {@link MediaService#releaseToService(java.lang.String, int)} for details.
      * <p>
      * Unlike <tt>releaseToService()</tt>, <tt>delegateToService()</tt>
      * does not release the current MediaService. 
@@ -277,7 +277,7 @@ public interface Delegation extends DelegationConstants {
      * <p>
      * @param serviceName the service name of the recipient.
      * @param timeout the time to wait for a service to become ready.
-     * @param catchTags a String of tags to control <tt>releaseToTag(String)</tt>;
+     * @param catchTags a java.lang.String of tags to control <tt>releaseToTag(java.lang.String)</tt>;
      * <br><tt>catchTags = null</tt> is equivalent to <tt>tag_NormalReturn</tt>.
      * @return a DelegationEvent that indicates how the delegation terminated.
      *
@@ -301,10 +301,10 @@ public interface Delegation extends DelegationConstants {
      * @throws MediaConfigException 
      * if the MediaGroup could not be configured for the recipient service.
      *
-     * @see MediaService#releaseToService(String, int)
+     * @see MediaService#releaseToService(java.lang.String, int)
      * @see javax.telephony.media.async.Async.DelegationListener#onDelegateToServiceDone(MediaServiceEvent)
      */
-    DelegationEvent delegateToService(String serviceName, int timeout, String catchTags)
+    DelegationEvent delegateToService(java.lang.String serviceName, int timeout, java.lang.String catchTags)
 	throws MediaBindException,
 	       MediaConfigException; 
 

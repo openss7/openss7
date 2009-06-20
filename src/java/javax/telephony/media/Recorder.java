@@ -71,12 +71,12 @@ import java.util.Dictionary;
  * is sent to onResumed().
  * <p>
  * <b>Note:</b>
- * The format of the String that identifies 
+ * The format of the java.lang.String that identifies 
  * an MDO is not defined by this release of specification.  
  * [although it will be compatible with that used in the ContainerService].
  * The vendor-specific implementation of the MediaService 
  * (for example, the vendor of the server or resource)
- * shall define the supported String formats.
+ * shall define the supported java.lang.String formats.
  * <p>
  * For example, an implementation may support URLs or File pathnames;
  * in which case an application could use Strings of the form: 
@@ -138,7 +138,7 @@ interface Recorder extends Resource, RecorderConstants {
      * <li><code>rtca_Stop</code> triggered</li>
      * </ol>
      * <p>
-     * @param streamID the String name of the MDO where data is to be stored.
+     * @param streamID the java.lang.String name of the MDO where data is to be stored.
      * @param rtc an Array of RTC (Run-Time-Control) objects
      * @param optargs a Dictionary of optional arguments 
      *
@@ -146,7 +146,7 @@ interface Recorder extends Resource, RecorderConstants {
      * @throws MediaResourceException if requested operation fails. 
      * @throws DisconnectedException if Terminal is disconnected.
      */
-    RecorderEvent record(String streamID, RTC[] rtc, Dictionary optargs)
+    RecorderEvent record(java.lang.String streamID, RTC[] rtc, Dictionary optargs)
 	throws MediaResourceException;
 
     /**

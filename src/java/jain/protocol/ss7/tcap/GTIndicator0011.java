@@ -209,9 +209,9 @@ public final class GTIndicator0011 extends GlobalTitle {
         m_encodingSchemePresent = false;
     }
     /** @deprecated
-      * String representation of class GTIndicator0011
+      * java.lang.String representation of class GTIndicator0011
       * @return
-      * String provides description of class GTIndicator0011.  */
+      * java.lang.String provides description of class GTIndicator0011.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nGlobal Title Indicator = GTINDICATOR_0011");

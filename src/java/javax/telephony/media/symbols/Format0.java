@@ -66,11 +66,11 @@ class Format0 implements Stringifier.Parser {
 
 
     /** Setup print string translations for "Object" of ECTF 
-     * String is assigned to the combination of ObjectVendorFormat
+     * java.lang.String is assigned to the combination of ObjectVendorFormat
      * as returned by Stringifier.getObject();
      * [value is computed with vendor and format = 0]
      */
-    private static void setObjName(int obj, String name) {
+    private static void setObjName(int obj, java.lang.String name) {
 	Stringifier.setObjectName(obj<<objShift, name+"_ECTF");
     }
 

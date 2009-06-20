@@ -51,12 +51,12 @@ package javax.csapi.cc.jcc;
   * @author Monavacon Limited
   * @since 1.0b */
 public class InvalidArgumentException extends Exception {
-    /** Constructor with no String.  */
+    /** Constructor with no java.lang.String.  */
     public InvalidArgumentException() { } 
     /** Constructor which takes a string description.
       * @param s
       * Description of the faulty argument.  */
-    public InvalidArgumentException(String s) {
+    public InvalidArgumentException(java.lang.String s) {
         super(s);
     }
 }

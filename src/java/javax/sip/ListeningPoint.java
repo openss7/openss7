@@ -104,7 +104,7 @@ public interface ListeningPoint extends java.lang.Cloneable, java.io.Serializabl
       */
     java.lang.String getIPAddress();
     /**
-        Sets the sentBy string for this ListeningPoint. The sentBy String is placed in the top most
+        Sets the sentBy string for this ListeningPoint. The sentBy java.lang.String is placed in the top most
         Via header of outgoing requests. This parameter is optional and if it is not set, the top
         most Via header will use the IP address and port assigned to the listening point for the
         sentBy field.

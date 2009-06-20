@@ -63,7 +63,7 @@ import javax.sip.message.*;
     messages. </ul> <h4>Architecture:</h4> This specification mandates a one-to-many relationship
     between a SipStack and a SipProvider. There is a one-to-many relationship between a SipStack and
     a ListeningPoint.  <h5>SipStack Creation</h5> An application must create a SipStack by invoking
-    the SipFactory.createSipStack(Properties) method, ensuring the SipFactory.setPathName(String) is
+    the SipFactory.createSipStack(Properties) method, ensuring the SipFactory.setPathName(java.lang.String) is
     set. Following the naming convention defined in SipFactory, the implementation of the SipStack
     interface must be called SipStackImpl. This specification also defines a stack configuration
     mechanism using java.util.Properties, therefore this constructor must also accept a properties
@@ -80,7 +80,7 @@ import javax.sip.message.*;
     Address should be set using the enhanced ListeningPoint architecture, therefore this property is
     no longer mandatory. When this parameter is specified as null, a singleton stack instance will
     be created and returned by the SipFactory and the IP Address attributes can be managed via the
-    createListeningPoint(String, int, String) method. For backwards compatability if this flag is
+    createListeningPoint(java.lang.String, int, java.lang.String) method. For backwards compatability if this flag is
     set the SipFactory will return a new SipStack instance each time a SipStack is created with a
     new IP Address. This configuration parameter will become the default IP address of the SipStack.
     The SIP Factory will return any any existing instance of SipStack that already exist for this IP
@@ -200,7 +200,7 @@ public interface SipStack {
       */
     java.util.Iterator getSipProviders();
     /**
-        @deprecated Since v1.2. This has been replaced by createListeningPoint(String, int, String)
+        @deprecated Since v1.2. This has been replaced by createListeningPoint(java.lang.String, int, java.lang.String)
         For backwards compatibility with v1.1 implementations should support this method.
         Implementations should throw TransportNotSupportedException if the Properties specified
         during stack creation do not include an IP Address. <p> Creates a new ListeningPoint on this

@@ -374,5 +374,5 @@ public interface Ev {
    * information and may return null.
    * @return The object that is being observed.
    */
-   public Object getObserved();
+   public java.lang.Object getObserved();
 }

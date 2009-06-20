@@ -75,7 +75,7 @@ public class SubsequentAddressItuEvent extends IsupEvent {
       * @param subsequentNumber  SubsequentNumber the address digits.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public SubsequentAddressItuEvent(Object source, SignalingPointCode dpc,
+    public SubsequentAddressItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             byte[] subsequentNumber)
         throws ParameterRangeInvalidException {

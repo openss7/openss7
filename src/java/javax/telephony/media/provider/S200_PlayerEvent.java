@@ -31,11 +31,11 @@ class S200_PlayerEvent extends Base_PlayerEvent
     /**
      * Create specific completion or non-transaction event from Player.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_Play
      */
-    public S200_PlayerEvent(Object source, Symbol eventID) {
+    public S200_PlayerEvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
 	// set flag values:
 	index = -2;
@@ -43,7 +43,7 @@ class S200_PlayerEvent extends Base_PlayerEvent
     }
 
     /** Constructor for non-trans vesion */
-    public S200_PlayerEvent(Object source, Symbol eventID, boolean isNonTrans)
+    public S200_PlayerEvent(java.lang.Object source, Symbol eventID, boolean isNonTrans)
     {
 	this(source, eventID);
 	this.isNonTrans = isNonTrans;

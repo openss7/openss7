@@ -103,7 +103,7 @@ public interface SipURI extends URI, Parameters {
     /**
         Sets the user of SipURI. The identifier of a particular resource at the host being
         addressed. The user and the user password including the '@' sign make up the user-info.
-        @param user The new String value of the user.
+        @param user The new java.lang.String value of the user.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         user value.
       */
@@ -120,7 +120,7 @@ public interface SipURI extends URI, Parameters {
         authentication information in clear text (such as URIs) has proven to be a security risk in
         almost every case where it has been used. The user password and the user including the @
         sign make up the user-info.
-        @param userPassword The new String value of the user password.
+        @param userPassword The new java.lang.String value of the user password.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         user value.
       */
@@ -182,15 +182,15 @@ public interface SipURI extends URI, Parameters {
     /**
         Sets the value of the specified header fields to be included in a request constructed from
         the URI. If the header already had a value it will be overwritten.
-        @param name A String specifying the header name.
-        @param value A String specifying the header value.
+        @param name A java.lang.String specifying the header name.
+        @param value A java.lang.String specifying the header value.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         user value.
       */
     public void setHeader(java.lang.String name, java.lang.String value)
         throws java.text.ParseException;
     /**
-        Returns an Iterator over the String names of all headers present in this SipURI.
+        Returns an Iterator over the java.lang.String names of all headers present in this SipURI.
         @return An Iterator over all the header names.
       */
     public java.util.Iterator getHeaderNames();
@@ -236,7 +236,7 @@ public interface SipURI extends URI, Parameters {
     /**
         Sets the value of the method parameter. This specifies which SIP method to use in requests
         directed at this URI. This is equivalent to setParameter("method", method).
-        @param method New value String value of the method parameter
+        @param method New value java.lang.String value of the method parameter
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         user value.
       */
@@ -246,7 +246,7 @@ public interface SipURI extends URI, Parameters {
         Sets the value of the user parameter. The user URI parameter exists to distinguish telephone
         numbers from user names that happen to look like telephone numbers. This is equivalent to
         setParameter("user", user).
-        @param userParam New value String value of the method parameter
+        @param userParam New value java.lang.String value of the method parameter
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         user value.
       */

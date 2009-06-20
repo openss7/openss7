@@ -28,14 +28,14 @@ public
 class Signals implements SignalConstants {
 
     /**
-     * Define the String representation for Signal Symbols.
+     * Define the java.lang.String representation for Signal Symbols.
      * Used to generate getSignalString();
      * <p>
-     * Generally, we expect the String name to be a single character;
+     * Generally, we expect the java.lang.String name to be a single character;
      * but this routine normalizes them all to Strings.
      * <p>
      * It is possible that a Symbol could be assigned
-     * a multi-char String. That could confuse someone who 
+     * a multi-char java.lang.String. That could confuse someone who 
      * expected <tt>getSignalString.charAt(n)</tt> to correspond
      * to <tt>getSignalBuffer()[n]</tt>.
      * <p>
@@ -43,15 +43,15 @@ class Signals implements SignalConstants {
      * suggests that Character constants should be used; 
      * so apps should not easily trip on this.
      * <p>
-     * @param sc is array of Objects of the form: {Symbol, String, ...}
+     * @param sc is array of Objects of the form: {Symbol, java.lang.String, ...}
      * @see SignalConstants#p_SymbolChar 
      */
-    public static void setSignalNames(Object[] sc) {
+    public static void setSignalNames(java.lang.Object[] sc) {
 	for (int i = 0; i<sc.length; i+=2) {
-	    // Object[] is {Symbol, String, ... }
-	    // symToSignalName is {Symbol -> String}
+	    // java.lang.Object[] is {Symbol, java.lang.String, ... }
+	    // symToSignalName is {Symbol -> java.lang.String}
 	    Symbol symbol = (Symbol)sc[i];
-	    String string = ""+sc[i+1];	// invoke .toString() as necessary.
+	    java.lang.String string = ""+sc[i+1];	// invoke .toString() as necessary.
 	    symToSignalName.put( symbol, string );
 	    signalNameToSym.put( string, symbol );
 	}
@@ -64,21 +64,21 @@ class Signals implements SignalConstants {
      * Retrieve the name for a signal Symbol.
      * These Strings are concatenated by getSignalString().
      * 
-     * @return a String, generally a single character.
+     * @return a java.lang.String, generally a single character.
      * @see SignalDetectorEvent#getSignalString()
      */
-    public static String getSignalName(Symbol sym) {
-	return (String)symToSignalName.get(sym);
+    public static java.lang.String getSignalName(Symbol sym) {
+	return (java.lang.String)symToSignalName.get(sym);
     }
     
     /**
-     * Convert from String form to Symbol form. 
+     * Convert from java.lang.String form to Symbol form. 
      */
-    static Symbol getSymbolFromName(String str) {
+    static Symbol getSymbolFromName(java.lang.String str) {
 	return (Symbol)signalNameToSym.get(str);
     }
 
-    private static Object[] standardSignals = {
+    private static java.lang.Object[] standardSignals = {
 	v_DTMF0, "0",
 	v_DTMF1, "1",
 	v_DTMF2, "2",

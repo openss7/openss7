@@ -299,9 +299,9 @@ public final class DialoguePortion implements java.io.Serializable {
         m_confidentialityInformationPresent = false;
         m_securityContextInfoPresent = false;
     }
-    /** String representation of class DialoguePortion.
+    /** java.lang.String representation of class DialoguePortion.
       * @return
-      * String provides description of class DialoguePortion.  */
+      * java.lang.String provides description of class DialoguePortion.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nDialoguePortion");

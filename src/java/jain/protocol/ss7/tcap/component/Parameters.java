@@ -139,9 +139,9 @@ public final class Parameters implements java.io.Serializable {
         m_parameterIdentifierPresent = false;
         m_parameterPresent = false;
     }
-    /** String representation of class Parameters.
+    /** java.lang.String representation of class Parameters.
       * @return
-      * String provides description of class Parameters.  */
+      * java.lang.String provides description of class Parameters.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(500);
         b.append("\n\nParameter");

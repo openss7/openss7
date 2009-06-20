@@ -117,7 +117,7 @@ public class Mtp2ErrorNotification extends OamErrorNotification {
       * Over rides standard JAVA toString method.
       */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
 }
 

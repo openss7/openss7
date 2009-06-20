@@ -78,7 +78,7 @@ public class MandatoryParameterNotSetException extends ParameterNotSetException 
       * @param msg
       * The detail message. It is recommended that the detail message
       * returned in the MandatoryParameterNotSetException should be a
-      * String of the form: "Parameter: not set".
+      * java.lang.String of the form: "Parameter: not set".
       */
     public MandatoryParameterNotSetException(java.lang.String msg) {
         super(msg);

@@ -77,7 +77,7 @@ public interface URI extends java.lang.Cloneable, java.io.Serializable {
     public boolean isSipURI();
     /**
         This method returns the URI as a string.
-        @return String The stringified version of the URI.
+        @return java.lang.String The stringified version of the URI.
       */
     public java.lang.String toString();
 }

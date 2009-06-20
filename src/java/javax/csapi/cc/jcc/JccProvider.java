@@ -108,7 +108,7 @@ package javax.csapi.cc.jcc;
   * <h5>Obtaining a JccProvider</h5>
   *
   * A JccProvider is created and returned by the
-  * JccPeer.getProvider(String) method which is given a string to
+  * JccPeer.getProvider(java.lang.String) method which is given a string to
   * describe the desired JccProvider. This method sets up any needed
   * communication paths between the application and the JccProvider. The
   * string given is one of the services listed in the
@@ -145,7 +145,7 @@ package javax.csapi.cc.jcc;
   * A JccAddress object represents what we commonly think of as a
   * "telephone number." Unlike JccCall objects, applications may not
   * create JccAddress objects. An address is obtained through
-  * getAddress(String). Note that a JccProvider might have only a
+  * getAddress(java.lang.String). Note that a JccProvider might have only a
   * limited number of addresses in its domain. Hence, if the given
   * address string does not correspond to an address within the domain
   * of the provider, then the provider throws an exception.
@@ -940,10 +940,10 @@ public interface JccProvider {
     /** Returns the unique string name of this JccProvider instance.
       * Each different JccProvider must have a unique string associated
       * with it. This is the same string which the application passed to
-      * the JccPeer.getProvider(String) method to create this
+      * the JccPeer.getProvider(java.lang.String) method to create this
       * JccProvider instance.
       * @return
-      * The unique String name of this Provider.
+      * The unique java.lang.String name of this Provider.
       * @since 1.0b */
     public java.lang.String getName();
     /** Returns an JccAddress object which corresponds to the

@@ -21,7 +21,7 @@ import javax.telephony.media.*;
  * as derived and extended from the S.100-R2 specification.
  * <p>
  * This class is loaded just for its static{} initializer,
- * which sets a String name for each Symbol in R2Symbol.
+ * which sets a java.lang.String name for each Symbol in R2Symbol.
  *
  * @author  Jeff Peck
  * @since   JTAPI-1.3
@@ -121,10 +121,10 @@ public abstract class R2SymbolNames {
     R2Symbol.Error_InvalidFile		  .setName("Error_InvalidFile");
     R2Symbol.Error_InvalidHandle	  .setName("Error_InvalidHandle");
     R2Symbol.Error_InvalidParameter	  .setName("Error_InvalidParameter");
-    /** @deprecate spell out Error_InvalidPosition */
+    /** @deprecated spell out Error_InvalidPosition */
     R2Symbol.Error_InvPosition		  .setName("Error_InvPosition");
     R2Symbol.Error_InvalidPosition	  .setName("Error_InvalidPosition");
-    /** @deprecate spell out Error_InvalidTDD */
+    /** @deprecated spell out Error_InvalidTDD */
     R2Symbol.Error_INVTDD		  .setName("Error_INVTDD");
     R2Symbol.Error_InvalidTDD		  .setName("Error_InvalidTDD");
     R2Symbol.Error_KeyNotFound		  .setName("Error_KeyNotFound");

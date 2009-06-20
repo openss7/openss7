@@ -131,7 +131,7 @@ public class JainInapStackImpl implements java.rmi.Remote, JainInapStack {
       * @return
       * A string describing the Stack Name.
       */
-    public String getStackName() {
+    public java.lang.String getStackName() {
         return m_stackName;
     }
     /**
@@ -140,7 +140,7 @@ public class JainInapStackImpl implements java.rmi.Remote, JainInapStack {
       * @param stackName
       * The new Stack Name value.
       */
-    public void setStackName(String stackName) {
+    public void setStackName(java.lang.String stackName) {
         m_stackName = stackName;
         m_stackNameIsSet = true;
     }
@@ -150,14 +150,14 @@ public class JainInapStackImpl implements java.rmi.Remote, JainInapStack {
       * @return
       * A string describing the Vendor's name.
       */
-    public String getVendorName() {
+    public java.lang.String getVendorName() {
         return m_vendorName;
     }
     /**
       * Sets the Vendors name for this stack, this name may be the
       * Vendor's domain name i.e, "com.sun".
       */
-    public void setVendorName(String vendorName) {
+    public void setVendorName(java.lang.String vendorName) {
         m_vendorName = vendorName;
         m_vendorNameIsSet = true;
     }
@@ -180,9 +180,9 @@ public class JainInapStackImpl implements java.rmi.Remote, JainInapStack {
         return m_subsystemNumber;
     }
 
-    private String m_stackName = "inap";
+    private java.lang.String m_stackName = "inap";
     private boolean m_stackNameIsSet = false;
-    private String m_vendorName = "org.openss7";
+    private java.lang.String m_vendorName = "org.openss7";
     private boolean m_vendorNameIsSet = false;
     private SignalingPointCode m_spc = new SignalingPointCode(0,0,0);
     private boolean m_spcIsSet = false;

@@ -19,7 +19,7 @@ import java.util.Hashtable;
 
 /**
  * Vendor modifiable base for Symbols.
- * This abstract class supplies getSymbol(String) and loadSymbols(String).
+ * This abstract class supplies getSymbol(java.lang.String) and loadSymbols(java.lang.String).
  *
  * @author  Jeff Peck
  * @since   JTAPI-1.4
@@ -100,7 +100,7 @@ class BaseSymbol {
      * @param other a Symbol to compare to this Symbol.
      * @return TRUE iff the Symbols have the same value.
      */
-    public boolean equals(Object other) {
+    public boolean equals(java.lang.Object other) {
  	return ((other instanceof BaseSymbol)
 	&& (this.value == ((BaseSymbol)other).value));
     }
@@ -116,13 +116,13 @@ class BaseSymbol {
 
 
     /** 
-     * Return a String representation of this Symbol.
+     * Return a java.lang.String representation of this Symbol.
      * <p>
      * Attempt to parse the symbol value to identify the 
      * Vendor, Object and ItemName.
-     * @return a String representing this Symbol.
+     * @return a java.lang.String representing this Symbol.
      */
-    public String toString() {
+    public java.lang.String toString() {
 	return Stringifier.toString(this);
     }
 
@@ -145,13 +145,13 @@ class BaseSymbol {
      * A JTAPI Media vendor may extend this implementation; 
      * for example, to prepend other package names.
      * 
-     * @param stringName a String that names a Symbol
+     * @param stringName a java.lang.String that names a Symbol
      * @return the named Symbol, or null if stringName is not registered.
      */
-    public static Symbol getSymbol(String stringName) {
+    public static Symbol getSymbol(java.lang.String stringName) {
 	int dot = stringName.lastIndexOf('.');
-	String clsName;
-	String itmName;
+	java.lang.String clsName;
+	java.lang.String itmName;
 	if (dot < 1) {
 	    // first default: stringName = "Player_Play"
 	    clsName = "javax.telephony.media.ESymbol";
@@ -182,15 +182,15 @@ class BaseSymbol {
      * @param symbol the Symbol to be named 
      * @param stringName the name to be given to that Symbol
      */
-    public void setName(String stringName) {
+    public void setName(java.lang.String stringName) {
 	Stringifier.setSymbolName(this, stringName);
     }
 
     /**
      * Store Symbol name information to someplace.
-     * @param pathName a String that indicates where to store the symbol table.
+     * @param pathName a java.lang.String that indicates where to store the symbol table.
      */
-    public static void saveSymbolNames(String pathName) {
+    public static void saveSymbolNames(java.lang.String pathName) {
 	// dump nameSymbol = Symbol.value
 	//
 	// There should be a standard for this in the next release.
@@ -205,17 +205,17 @@ class BaseSymbol {
     /**
      * Load Symbol name information from somewhere.
      * 
-     * @param pathName a String that indicates which symbol table to load.
+     * @param pathName a java.lang.String that indicates which symbol table to load.
      *     if <tt>pathName</tt> is null, load standard/default symbol table.
      * <p>
      * <b>Note:</b>
-     * The format of the <tt>pathName</tt> String is not yet standardized.<br>
+     * The format of the <tt>pathName</tt> java.lang.String is not yet standardized.<br>
      * The implementation supplied in the reference code accepts strings
      * like: <tt>"class:javax.telephony.media.symbols.R2SymbolNames"</tt>.
      * The indicated class file is loaded, which runs its <tt>static</tt>
-     * block and invokes <tt>Symbol.setName(String)</tt> for each Symbol.
+     * block and invokes <tt>Symbol.setName(java.lang.String)</tt> for each Symbol.
      */ 
-    public static void loadSymbolNames(String pathName) {
+    public static void loadSymbolNames(java.lang.String pathName) {
 	// load into nameSymbol (and symbolName)
 	//
 	// There should be a standard for this in the next release.
@@ -226,7 +226,7 @@ class BaseSymbol {
 	// There may be better formats later, but for now one can use:
 	// loadSymbolNames("class:javax.telephony.media.symbols.R2SymbolNames");
 	// Which loads that class file, and runs its static{} block,
-	// which includes a Symbol.setName(String) for each R2Symbol.
+	// which includes a Symbol.setName(java.lang.String) for each R2Symbol.
 	if (pathName == null) 
 	    pathName = "class:javax.telephony.media.symbols.R2SymbolNames";
 	if (pathName.startsWith("class:")) {

@@ -107,7 +107,7 @@ public class JtapiPeerFactory {
    * @exception JtapiPeerUnavailableException Indicates that the JtapiPeer
    * specified by the classname is not available.
    */
-  public synchronized static JtapiPeer getJtapiPeer(String jtapiPeerName)
+  public synchronized static JtapiPeer getJtapiPeer(java.lang.String jtapiPeerName)
     throws JtapiPeerUnavailableException {
       
       // If jtapiPeerName is null set it to a default jtapiPeer name
@@ -130,7 +130,7 @@ public class JtapiPeerFactory {
 	  return (JtapiPeer)jtapiPeerClass.newInstance();
       }
       catch (Exception e) {
-	String errmsg = "JtapiPeer: " + jtapiPeerName +
+	java.lang.String errmsg = "JtapiPeer: " + jtapiPeerName +
 	  " could not be instantiated.";
 	throw new JtapiPeerUnavailableException(errmsg);
       }
@@ -147,8 +147,8 @@ public class JtapiPeerFactory {
    * 
    * @return the default JTAPI peer name
    */
-  private static String getDefaultJtapiPeerName() {
-    String JtapiPeerName = "DefaultJtapiPeer";
+  private static java.lang.String getDefaultJtapiPeerName() {
+    java.lang.String JtapiPeerName = "DefaultJtapiPeer";
     return JtapiPeerName;
   }
 }

@@ -160,7 +160,7 @@ void emitSignals(java.lang.String signals,
 
           Transmit a series of signals out the Terminal to the network.
 
-          Each signal is defined by a char in the String.
+          Each signal is defined by a char in the java.lang.String.
 
         Throws:
                 MscontrolException

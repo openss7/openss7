@@ -88,5 +88,5 @@ public interface CallCenterCallEvent extends CallCenterEvent, CallEvent
     * <p>
     * @return The data object, null if it has been cleared.
     */
-   public Object getApplicationData();
+   public java.lang.Object getApplicationData();
 }

@@ -67,7 +67,7 @@ public class SendStackException extends IsupException {
     /** The toString method retrieves a string containing the value of the members of
       * the PrimitiveInvalid */
     public java.lang.String toString() {
-        String text = "SendStackException\n";
+        java.lang.String text = "SendStackException\n";
         text += "\t\t\tMessage: " + getMessage() + "\n";
         return text;
     }

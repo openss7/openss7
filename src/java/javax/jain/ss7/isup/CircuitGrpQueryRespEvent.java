@@ -86,7 +86,7 @@ public class CircuitGrpQueryRespEvent extends CircuitGrpCommonEvent {
         specified.
         @exception ParameterRangeInvalidException - Thrown when value is out of range.
       */
-    public CircuitGrpQueryRespEvent(Object source, SignalingPointCode dpc,
+    public CircuitGrpQueryRespEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int primitive, RangeAndStatus in_rangeAndStatus, byte[] in_circuitStateInd)
         throws PrimitiveInvalidException, ParameterRangeInvalidException {

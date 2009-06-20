@@ -35,7 +35,7 @@ public class MediaBindException extends MediaServiceException {
      *
      * @param   s   the detail message.
      */
-    public MediaBindException(String s) {super(s);}
+    public MediaBindException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>MediaBindException</code>
@@ -44,7 +44,7 @@ public class MediaBindException extends MediaServiceException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public MediaBindException(String s, MediaEvent event) {
+    public MediaBindException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

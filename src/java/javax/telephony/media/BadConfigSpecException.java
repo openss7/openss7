@@ -35,7 +35,7 @@ class BadConfigSpecException extends MediaConfigException {
      *
      * @param   s   the detail message.
      */
-    public BadConfigSpecException(String s) {super(s);}
+    public BadConfigSpecException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>BadConfigSpecException</code>
@@ -44,7 +44,7 @@ class BadConfigSpecException extends MediaConfigException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public BadConfigSpecException(String s, MediaEvent event) {
+    public BadConfigSpecException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

@@ -142,9 +142,9 @@ public final class EndIndEvent extends DialogueIndEvent {
         m_qualityOfServicePresent = false;
         m_componentsPresent = false;
     }
-    /** String representation of class EndIndEvent.
+    /** java.lang.String representation of class EndIndEvent.
       * @return
-      * String provides description of class EndIndEvent.  */
+      * java.lang.String provides description of class EndIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nEndIndEvent");

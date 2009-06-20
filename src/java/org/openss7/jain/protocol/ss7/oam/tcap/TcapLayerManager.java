@@ -62,7 +62,7 @@ public class TcapLayerManager implements TcapLayerManagerMBean {
         m_objectName = new ObjectName("org.openss7.jain.protocol.ss7.oam.tcap:type=" + getObjectType() + ",id=" + getObjectId());
     }
     /* javax.management.NotificationBroadcaster interface */
-    public native void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback);
+    public native void addNotificationListener(NotificationListener listener, NotificationFilter filter, java.lang.Object handback);
     public native MBeanNotificationInfo[] getNotificationInfo();
     public native void removeNotificationListener(NotificationListener listener);
     /* javax.management.MBeanRegistration interface */
@@ -77,7 +77,7 @@ public class TcapLayerManager implements TcapLayerManagerMBean {
         throws StatisticNotSupportedException, IllegalOperationException;
     public native void stopPollingStatistic(Integer statisticType)
         throws IllegalOperationException;
-    public void setName(String name)
+    public void setName(java.lang.String name)
         throws NullPointerException {
         if (name != null) {
             m_name = name;
@@ -85,23 +85,23 @@ public class TcapLayerManager implements TcapLayerManagerMBean {
         }
         throw new NullPointerException();
     }
-    public String getName() {
+    public java.lang.String getName() {
         return m_name;
     }
     public ObjectName getObjectName() {
         return m_objectName;
     }
-    public String getObjectId() {
-        return new String("" + getId() + "");
+    public java.lang.String getObjectId() {
+        return new java.lang.String("" + getId() + "");
     }
-    public Object getProprietaryInformation() {
+    public java.lang.Object getProprietaryInformation() {
         return null;
     }
-    public String getObjectType() {
-        return new String("OBJECT_TYPE_TCAP_LAYER_MANAGER");
+    public java.lang.String getObjectType() {
+        return new java.lang.String("OBJECT_TYPE_TCAP_LAYER_MANAGER");
     }
     /* OamLayerManagementMBean interface */
-    public native void addNotificationListenerToAllMBeans(NotificationListener listener, NotificationFilter filter, Object handback)
+    public native void addNotificationListenerToAllMBeans(NotificationListener listener, NotificationFilter filter, java.lang.Object handback)
         throws NullPointerException;
     public native void removeNotificationListenerFromAllMBeans(NotificationListener listener)
         throws NullPointerException;
@@ -111,12 +111,12 @@ public class TcapLayerManager implements TcapLayerManagerMBean {
         throws CommitException;
     public native void readCurrentConfiguration()
         throws ReadConfigurationException;
-    public native String getVendorDetails();
+    public native java.lang.String getVendorDetails();
     public native void setProtocolVariantAndYear(Integer variantAndYear)
         throws UnsupportedOperationException, IllegalArgumentException;
     public native Integer getProtocolVariantAndYear();
-    public native void setStackName(String stackName);
-    public native String getStackName();
+    public native void setStackName(java.lang.String stackName);
+    public native java.lang.String getStackName();
     public native OamLookupTable getLookupTable();
     /* TcapLayerManagerMBean interface extensions */
     public native void setActiveTcapNode(Integer index, ObjectName tcapLayer)
@@ -131,7 +131,7 @@ public class TcapLayerManager implements TcapLayerManagerMBean {
     public native ObjectName getTcapNode(Integer index);
     public native ObjectName[] getTcapNodes();
     protected native int getId();
-    protected String m_name = "";
+    protected java.lang.String m_name = "";
     protected ObjectName m_objectName;
 }
 

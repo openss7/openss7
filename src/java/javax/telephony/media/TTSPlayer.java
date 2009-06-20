@@ -70,7 +70,7 @@ import java.util.Dictionary;
  * dictionaries are to be used to play the object. 
 
  * <p>
- * The Media Data Object containing a TTS text
+ * The Media Data java.lang.Object containing a TTS text
  * has additional information in its ContainerInfo parameter.
  * The value of ContainerInfo is a Dictionary 
  * with the following elements:
@@ -90,7 +90,7 @@ import java.util.Dictionary;
  * Container_Duration	</td><td>Integer</td><td>time to play at normal speed in milliseconds
  * </td></tr></table>
  * <p>
- * The Media Data Object containing a TTS dictionary
+ * The Media Data java.lang.Object containing a TTS dictionary
  * has additional information available via getParameters().
  * The container parameters include
  * the following elements:
@@ -98,12 +98,12 @@ import java.util.Dictionary;
  * <tr><td>
  * Key			</td><td>Value Type</td><td>Description
  * </td></tr><tr><td>
- * Player_Name		</td><td>String[]</td><td>A string
+ * Player_Name		</td><td>java.lang.String[]</td><td>A string
  * identifying the words/phrases that the dictionary contains.
  * These names are yet to be standardized, but are expected
  * to be formatted as scoped names, like ECTF Symbol names.
  * </td></tr><tr><td>
- * Player_WordList	</td><td>String[]</td><td>The actual words/phrases in the dictionary.
+ * Player_WordList	</td><td>java.lang.String[]</td><td>The actual words/phrases in the dictionary.
  * This is used for administrative and documentation.
  * The value of Player_Name is a shorthand way to identify this list.
  * </td></tr><tr><td>
@@ -151,44 +151,44 @@ public interface TTSPlayer extends Player {
      * The dictionary is placed at the top of the dictionary stack,
      * and is deactivated.
      *
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a PlayerEvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    PlayerEvent loadTTSDictionary(String[] dictNames, Dictionary optargs)
+    PlayerEvent loadTTSDictionary(java.lang.String[] dictNames, Dictionary optargs)
 	throws MediaResourceException;
 
     /**
      * Activates a collection of TTS dictionaries.
      * The dictionaries must already be loaded.
      *
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a PlayerEvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
     
-    PlayerEvent activateTTSDictionary(String[] dictNames, Dictionary optargs)
+    PlayerEvent activateTTSDictionary(java.lang.String[] dictNames, Dictionary optargs)
 	throws MediaResourceException;
 
     /**
      * Deactivates a collection of loaded TTS dictionaries.
      * 
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a PlayerEvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    PlayerEvent deactivateTTSDictionary(String dictNames[], Dictionary optargs)
+    PlayerEvent deactivateTTSDictionary(java.lang.String dictNames[], Dictionary optargs)
 	throws MediaResourceException;
     /**
      * Unloads a collection of TTS dictionaries from a Player.
-     * @param dictNames a String[] of DataObject fullNames.
+     * @param dictNames a java.lang.String[] of DataObject fullNames.
      * @param optargs a Dictionary of optional args.
      * @return a PlayerEvent when the operation is complete.
      * @throws MediaResourceException if requested operation fails.
      */
-    PlayerEvent unloadTTSDictionary(String dictNames[], Dictionary optargs)
+    PlayerEvent unloadTTSDictionary(java.lang.String dictNames[], Dictionary optargs)
 	throws MediaResourceException;
 }

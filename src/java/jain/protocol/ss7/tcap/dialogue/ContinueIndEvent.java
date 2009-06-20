@@ -194,9 +194,9 @@ public final class ContinueIndEvent extends DialogueIndEvent {
         m_allowedPermissionPresent = false;
         m_componentsPresent = false;
     }
-    /** String representation of class ContinueIndEvent.
+    /** java.lang.String representation of class ContinueIndEvent.
       * @return
-      * String provides description of class ContinueIndEvent.  */
+      * java.lang.String provides description of class ContinueIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nContinueIndEvent");

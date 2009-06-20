@@ -156,13 +156,14 @@ public class CellGlobalId extends LocationAreaId {
         return m_racIsSet;
     }
     /**
-      * Get the whole Cell Global Id (MCC+MNC+LAC+RAC+CI) as a String.
+      * Get the whole Cell Global Id (MCC+MNC+LAC+RAC+CI) as a
+      * java.lang.String.
       *
       * @return
-      * String containing CGI.
+      * java.lang.String containing CGI.
       */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
     protected byte[] m_ci = null;
     protected boolean m_ciIsSet = false;

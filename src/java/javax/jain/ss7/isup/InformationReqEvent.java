@@ -73,7 +73,7 @@ public abstract class InformationReqEvent extends IsupEvent {
         @param in_infoReqInd  Information Request Indicators.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    protected InformationReqEvent(Object source, SignalingPointCode dpc,
+    protected InformationReqEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             InfoReqInd in_infoReqInd)
         throws ParameterRangeInvalidException {

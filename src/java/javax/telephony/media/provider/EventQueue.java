@@ -42,7 +42,7 @@ class EventQueue extends Dispatcher {
     /** Events done for this MediaService */
     private Vector doneEvents = new Vector();	// Async.Event
 
-    public String toString() {
+    public java.lang.String toString() {
 	return super.toString() + " {" +
 	    "\n\t"+"doneEvents.size() = " + doneEvents.size() +
 	    "}";
@@ -94,7 +94,7 @@ class EventQueue extends Dispatcher {
     }
 
     /** restart EventQueue. */
-    public void start(String name) {
+    public void start(java.lang.String name) {
 	// re-open the EventQueue
 	if (doneEvents == null) doneEvents = new Vector();
 	super.start(name);	// rename and restart

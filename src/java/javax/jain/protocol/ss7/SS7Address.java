@@ -211,17 +211,17 @@ public class SS7Address extends SS7Parameter implements java.lang.Cloneable, jav
     }
 
     /**
-      * Get the whole SS7Address (SPC+SSN+GT) as a String.
+      * Get the whole SS7Address (SPC+SSN+GT) as a java.lang.String.
       *
-      * @return String.
+      * @return java.lang.String.
       */
-    public String toString() {
-        String text = "SS7Address\n";
+    public java.lang.String toString() {
+        java.lang.String text = "SS7Address\n";
 
         try {
             byte[] pointCode = getSignalingPointCode();
             text += "\t\t\tSignaling Point Code: " +
-                new String(JainSS7Utility.bytesToHex(pointCode, 0, pointCode.length)) + "\n";
+                new java.lang.String(JainSS7Utility.bytesToHex(pointCode, 0, pointCode.length)) + "\n";
         } catch (SS7ParameterNotSetException e ) { }
         try {
             text += "\t\t\tSub-System Number: " + getSubSystemNumber() + "\n";
@@ -239,7 +239,7 @@ public class SS7Address extends SS7Parameter implements java.lang.Cloneable, jav
       *
       * @return True if equal, otherwise false.
       */
-    public boolean equals(Object sa) {
+    public boolean equals(java.lang.Object sa) {
         if (sa instanceof SS7Address) {
             SS7Address other = (SS7Address) sa;
             if (m_spc_is_set != other.m_spc_is_set)

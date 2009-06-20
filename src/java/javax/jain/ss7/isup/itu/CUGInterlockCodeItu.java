@@ -113,7 +113,7 @@ public class CUGInterlockCodeItu implements java.io.Serializable {
         return b.toString();
     }
     protected int m_binaryCode;
-    protected String m_networkIdentity;
+    protected java.lang.String m_networkIdentity;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

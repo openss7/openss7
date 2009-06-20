@@ -61,7 +61,7 @@ public class SS7ListenerAlreadyRegisteredException extends SS7Exception {
       *
       * @param msg The detail message.
       */
-    public SS7ListenerAlreadyRegisteredException(String msg) {
+    public SS7ListenerAlreadyRegisteredException(java.lang.String msg) {
         super(msg);
     }
     /**

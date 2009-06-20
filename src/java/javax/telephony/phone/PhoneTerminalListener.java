@@ -48,7 +48,7 @@ public interface PhoneTerminalListener extends TerminalListener {
      *
      * @see PhoneTerminalEvent#PHONE_TERMINAL_DISPLAY_UPDATE_EVENT
      * @see PhoneDisplay#getDisplay(int x, int y)
-     * @see PhoneDisplay#setDisplay(String string, int x, int y)
+     * @see PhoneDisplay#setDisplay(java.lang.String string, int x, int y)
      */
     public void terminalDisplayUpdated( PhoneTerminalEvent event);
     

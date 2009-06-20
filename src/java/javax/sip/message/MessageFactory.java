@@ -211,7 +211,7 @@ public interface MessageFactory {
       */
     Response createResponse(int statusCode, Request request) throws java.text.ParseException;
     /**
-        Creates a Response from a String. This method parses the supplied string into a SIP
+        Creates a Response from a java.lang.String. This method parses the supplied string into a SIP
         Response. The response string should only consist of the SIP portion of the Response and not
         the content.
         @param response Is a string representing the response. The argument should only contain the

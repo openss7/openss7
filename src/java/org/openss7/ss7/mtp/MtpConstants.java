@@ -53,7 +53,7 @@ import org.openss7.ss7.*;
   * @version 1.2.2
   */
 public class MtpConstants {
-    publicMtpConstants() { }
+    public MtpConstants() { }
     /** Stack specification: ANSI 1992.  */
     public static final int STACK_SPECIFICATION_ANSI_92 = 1;
     /** Stack specification: ANSI 1996.  */

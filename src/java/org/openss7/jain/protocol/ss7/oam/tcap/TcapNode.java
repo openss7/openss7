@@ -63,7 +63,7 @@ public class TcapNode implements TcapNodeMBean {
         m_objectName = new ObjectName("org.openss7.jain.protocol.ss7.oam.tcap:type=" + getObjectType() + ",id=" + getObjectId());
     }
     /* javax.management.NotificationBroadcaster interface */
-    public native void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback);
+    public native void addNotificationListener(NotificationListener listener, NotificationFilter filter, java.lang.Object handback);
     public native MBeanNotificationInfo[] getNotificationInfo();
     public native void removeNotificationListener(NotificationListener listener);
     /* javax.management.MBeanRegistration interface */
@@ -78,7 +78,7 @@ public class TcapNode implements TcapNodeMBean {
         throws StatisticNotSupportedException, IllegalOperationException;
     public native void stopPollingStatistic(Integer statisticType)
         throws IllegalOperationException;
-    public void setName(String name)
+    public void setName(java.lang.String name)
         throws NullPointerException {
         if (name != null) {
             m_name = name;
@@ -86,20 +86,20 @@ public class TcapNode implements TcapNodeMBean {
         }
         throw new NullPointerException();
     }
-    public String getName() {
+    public java.lang.String getName() {
         return m_name;
     }
     public ObjectName getObjectName() {
         return m_objectName;
     }
-    public String getObjectId() {
-        return new String("" + getId() + "");
+    public java.lang.String getObjectId() {
+        return new java.lang.String("" + getId() + "");
     }
-    public Object getProprietaryInformation() {
+    public java.lang.Object getProprietaryInformation() {
         return null;
     }
-    public String getObjectType() {
-        return new String("OBJECT_TYPE_TCAP_NODE");
+    public java.lang.String getObjectType() {
+        return new java.lang.String("OBJECT_TYPE_TCAP_NODE");
     }
     /* TcapNodeMBean interface */
     public native void setOwnSignallingPoint(ObjectName ownSignallingPoint);
@@ -111,7 +111,7 @@ public class TcapNode implements TcapNodeMBean {
     public native ObjectName getSubsystem(Integer index);
     public native ObjectName[] getSubsystems();
     protected native int getId();
-    protected String m_name = "";
+    protected java.lang.String m_name = "";
     protected ObjectName m_objectName;
 }
 

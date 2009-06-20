@@ -52,7 +52,7 @@ public interface PhoneDisplay extends Component {
    * @exception InvalidArgumentException Either the coordinates provided
    * were invalid.
    */
-  public String getDisplay(int x, int y)
+  public java.lang.String getDisplay(int x, int y)
     throws InvalidArgumentException;
 
 
@@ -65,6 +65,6 @@ public interface PhoneDisplay extends Component {
    * @exception InvalidArgumentException Either the coordinates provided
    * were invalid.
    */
-  public void setDisplay(String string, int x, int y)
+  public void setDisplay(java.lang.String string, int x, int y)
     throws InvalidArgumentException;
 }

@@ -37,10 +37,10 @@ public interface ServiceEvent extends MediaEvent, MessageConstants {
     public NamedService getNamedService(); // like a 'Socket'
 
     /** Get the name of the NamedService.
-     * @return the <tt>serviceName</tt> String
+     * @return the <tt>serviceName</tt> java.lang.String
      * from <tt>openNamedService</tt> or <tt>registerService</tt>
      */
-    public String getServiceName();
+    public java.lang.String getServiceName();
 
     /**
      * Send an Event to the NamedService of this event. 

@@ -267,9 +267,9 @@ public interface Provider {
    * method to create this Provider instance.
    * <p>
    * @see javax.telephony.JtapiPeer
-   * @return The unique String name of this Provider.
+   * @return The unique java.lang.String name of this Provider.
    */
-  public String getName();
+  public java.lang.String getName();
  
 
   /**
@@ -319,7 +319,7 @@ public interface Provider {
    * correspond to the name of any Address object known to the Provider or
    * within the Provider's domain.
    */
-  public Address getAddress(String number)
+  public Address getAddress(java.lang.String number)
     throws InvalidArgumentException;
 
 
@@ -385,7 +385,7 @@ public interface Provider {
    * to a name of any Terminal known to the Provider or within the Provider's
    * domain.
    */
-  public Terminal getTerminal(String name)
+  public Terminal getTerminal(java.lang.String name)
     throws InvalidArgumentException;
 
 

@@ -84,9 +84,9 @@ public final class UserCancelReqEvent extends ComponentReqEvent {
         m_dialogueIdPresent = false;
 	m_invokeIdPresent = false;
     }
-    /** String representation of class UserCancelReqEvent.
+    /** java.lang.String representation of class UserCancelReqEvent.
       * @return
-      * String provides description of class UserCancelReqEvent.  */
+      * java.lang.String provides description of class UserCancelReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
 	b.append("\n\nUserCancelReqEvent");

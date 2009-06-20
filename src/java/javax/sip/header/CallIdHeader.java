@@ -84,7 +84,7 @@ public interface CallIdHeader extends Header {
     /**
         Returns the Call-Id of CallIdHeader. The CallId parameter uniquely identifies a series of
         messages within a dialogue.
-        @return The String value of the Call-Id of this CallIdHeader.
+        @return The java.lang.String value of the Call-Id of this CallIdHeader.
       */
     java.lang.String getCallId();
     /**

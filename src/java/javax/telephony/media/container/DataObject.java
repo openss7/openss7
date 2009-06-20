@@ -23,7 +23,7 @@ import javax.telephony.media.*;
  * An open DataObject can be used to read/write data.
  * These are <b>not</b> used directly for play() and record().
  * Data written using <tt>DataObject.write()</tt> can be played
- * by passing the String <b>name</b> of the MDO to <tt>play()</tt>.
+ * by passing the java.lang.String <b>name</b> of the MDO to <tt>play()</tt>.
  *
  * @author  Jeff Peck
  * @since   JTAPI-1.4

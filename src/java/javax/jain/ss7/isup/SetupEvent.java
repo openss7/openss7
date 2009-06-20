@@ -84,7 +84,7 @@ public abstract class SetupEvent extends IsupEvent {
       * @param callingCategory  Calling party category.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    protected SetupEvent(Object source, SignalingPointCode dpc,
+    protected SetupEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             boolean glareControl, NatureConnInd natureConInd, FwdCallInd forwardCallInd,
             CalledPartyNumber calledPartyNum, byte callingCategory)

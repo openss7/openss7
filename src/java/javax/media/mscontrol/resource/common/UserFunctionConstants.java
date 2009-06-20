@@ -71,9 +71,9 @@ public interface UserFunctionConstants
              Attribute indicating what function is actually run by the
    resource.
    static Symbol p_ParameterNames
-             Value is a String with the format "key1;key2;..."
+             Value is a java.lang.String with the format "key1;key2;..."
    static Symbol p_Parameters
-             Value is a String with the format
+             Value is a java.lang.String with the format
    "key1=value1;key2=value2;..."
 
 
@@ -94,7 +94,7 @@ static final Symbol a_FunctionName
 
 static final Symbol p_ParameterNames
 
-          Value is a String with the format "key1;key2;..."
+          Value is a java.lang.String with the format "key1;key2;..."
           This item sets the set of keys returned by the getParameters
           method.
      _________________________________________________________________
@@ -103,12 +103,12 @@ static final Symbol p_ParameterNames
 
 static final Symbol p_Parameters
 
-          Value is a String with the format "key1=value1;key2=value2;..."
+          Value is a java.lang.String with the format "key1=value1;key2=value2;..."
           When p_Parameters is used in a Parameters class, any key and
           value is allowed, as long as the underlying DSP function
           supports them.
           When p_Parameters is used in the getParameters method, the
-          returned String is based on p_ParameterNames, completed with
+          returned java.lang.String is based on p_ParameterNames, completed with
           the associated values.
      _________________________________________________________________
 

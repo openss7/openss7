@@ -69,7 +69,7 @@ public class ReleaseItuEvent extends ReleaseEvent {
       * @param causeIndicator  Cause indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public ReleaseItuEvent(Object source, SignalingPointCode dpc,
+    public ReleaseItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             CauseInd cai)
         throws ParameterRangeInvalidException {

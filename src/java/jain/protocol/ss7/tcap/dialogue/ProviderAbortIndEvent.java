@@ -165,9 +165,9 @@ public final class ProviderAbortIndEvent extends DialogueIndEvent {
         m_qualityOfServicePresent = false;
         m_pAbortPresent = false;
     }
-    /** String representation of class ProviderAbortIndEvent.
+    /** java.lang.String representation of class ProviderAbortIndEvent.
       * @return
-      * String provides description of class ProviderAbortIndEvent.  */
+      * java.lang.String provides description of class ProviderAbortIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nProviderAbortIndEvent");

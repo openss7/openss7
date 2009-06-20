@@ -255,9 +255,9 @@ public final class GTIndicator0001 extends GlobalTitle {
     /** @deprecated
       * Returns a description of this class.  */
     public java.lang.String toString() {
-        String text = "GlobalTitle0001\n";
+        java.lang.String text = "GlobalTitle0001\n";
         try {
-            String schemeName = null;
+            java.lang.String schemeName = null;
             switch (getEncodingScheme()) {
                 case TcapConstants.ES_EVEN:
                     schemeName = "ES_EVEN";
@@ -277,7 +277,7 @@ public final class GTIndicator0001 extends GlobalTitle {
         }
         text += "\t\t\tGlobal Title Indicator: GTINDICATOR_0001\n";
         try {
-            String nai = null;
+            java.lang.String nai = null;
             switch (getNatureOfAddrInd()) {
                 case TcapConstants.NA_INTERNATIONAL:
                     nai = "NA_INTERNATIONAL";
@@ -300,7 +300,7 @@ public final class GTIndicator0001 extends GlobalTitle {
         } catch (ParameterNotSetException e) {
         }
         try {
-            String np = null;
+            java.lang.String np = null;
             switch (getNumberingPlan()) {
                 case TcapConstants.NP_DATA:
                     np = "NP_DATA";

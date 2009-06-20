@@ -100,10 +100,10 @@ interface ErrSym {
     Symbol e_InvalidFile		= ESymbol.Error_InvalidFile;
     Symbol e_InvalidHandle		= ESymbol.Error_InvalidHandle;
     Symbol e_InvalidParameter		= ESymbol.Error_InvalidParameter;
-    /** @deprecate spell out e_InvalidPosition */
+    /** @deprecated spell out e_InvalidPosition */
     Symbol e_InvPosition		= ESymbol.Error_InvalidPosition;
     Symbol e_InvalidPosition		= ESymbol.Error_InvalidPosition;
-    /** @deprecate spell out e_InvalidTDD */
+    /** @deprecated spell out e_InvalidTDD */
     Symbol e_INVTDD			= ESymbol.Error_InvalidTDD;
     Symbol e_InvalidTDD			= ESymbol.Error_InvalidTDD;
     Symbol e_KeyNotFound		= ESymbol.Error_KeyNotFound;

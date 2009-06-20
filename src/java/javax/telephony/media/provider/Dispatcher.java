@@ -136,7 +136,7 @@ class Dispatcher implements Runnable {
     }
 
     /** Print the Exception and other information */
-    public static void printDispatcherException(String label, 
+    public static void printDispatcherException(java.lang.String label, 
 						Dispatcher disp,
 						Exception ex, 
 						EventListener listener,
@@ -150,12 +150,12 @@ class Dispatcher implements Runnable {
     }
 
     private static final class VectorX extends Vector {
-	/** Extract Vector to an Object[].
+	/** Extract Vector to an java.lang.Object[].
 	 * like JDK-1.2 Vector.toArray(), but works in Java-1
 	 */
-	public Object[] toArray(Object[] a) {
+	public java.lang.Object[] toArray(java.lang.Object[] a) {
 	    if (a.length < elementCount)
-		a = new Object[elementCount];
+		a = new java.lang.Object[elementCount];
 	    System.arraycopy(elementData, 0, a, 0, elementCount);
 	    return a;
 	}
@@ -230,9 +230,9 @@ class Dispatcher implements Runnable {
      * [which is not restricted by locking 'theListeners']
      * <br><b>Note:</b>this is reallocated only if it gets bigger.
      */
-    private Object[] notifyArray = new Object[2];
+    private java.lang.Object[] notifyArray = new java.lang.Object[2];
 
-    public String toString() {
+    public java.lang.String toString() {
 	return super.toString() + " {"+
 	    "\n\t"+"state = "+state+" stopNow = "+stopNow +
 	    "\n\t"+"thread = " + dispatcherThread +
@@ -273,17 +273,17 @@ class Dispatcher implements Runnable {
 
     /** if true, stop Dispatch Thread ASAP. */
     protected boolean stopNow = false;
-    protected String state = stateNew;
-    final static String stateNew 	= "New"; 	// stopNow=F
-    final static String stateStart 	= "Start"; 	// stopNow=F
-    final static String stateRunning	= "Running";	// stopNow=F/stopNow=T
-    final static String stateStop	= "Stop";	// Running + stopNow=T
-    final static String stateDone	= "Done";	// run done, stopNow=T
-    final static String stateClosed 	= "Closed";	// close done,stopNow=T
+    protected java.lang.String state = stateNew;
+    final static java.lang.String stateNew 	= "New"; 	// stopNow=F
+    final static java.lang.String stateStart 	= "Start"; 	// stopNow=F
+    final static java.lang.String stateRunning	= "Running";	// stopNow=F/stopNow=T
+    final static java.lang.String stateStop	= "Stop";	// Running + stopNow=T
+    final static java.lang.String stateDone	= "Done";	// run done, stopNow=T
+    final static java.lang.String stateClosed 	= "Closed";	// close done,stopNow=T
     
-    private static final String threadNamePrefix = "DT-";
+    private static final java.lang.String threadNamePrefix = "DT-";
     private static int dispatcherNumber = 1;
-    private static synchronized String newName() {
+    private static synchronized java.lang.String newName() {
 	// if (dispatcherNumber <= 0) {dispatcherNumber=1; threadNamePrefix+="x";}
 	return threadNamePrefix+(dispatcherNumber++)+"-";
     }
@@ -296,7 +296,7 @@ class Dispatcher implements Runnable {
     }
 
     /** a diagnostic routine */
-    static void stacktrace(java.io.PrintStream strm, String str) {
+    static void stacktrace(java.io.PrintStream strm, java.lang.String str) {
 	strm.println(str);
 	new Exception("stacktrace").printStackTrace(strm);
 	strm.println("currentThread()="+Thread.currentThread());
@@ -305,8 +305,8 @@ class Dispatcher implements Runnable {
     /** A utility routine to get short name for an object.
      * Used to set default name of Dispatcher Thread.
      */
-    static public String objName(Object obj) {
-	String name = obj.getClass().getName();
+    static public java.lang.String objName(java.lang.Object obj) {
+	java.lang.String name = obj.getClass().getName();
 	name = name.substring(name.lastIndexOf(".")+1);
 	name += "@"+Integer.toString(System.identityHashCode(obj),16);
 	return name;
@@ -315,13 +315,13 @@ class Dispatcher implements Runnable {
     public void start() {
 	start(objName(this));
     }
-    public void start(Object obj) {
+    public void start(java.lang.Object obj) {
 	start(objName(this)+((obj == null) ? "" : "-"+objName(obj)));
     }
     /** start a Thread for this Dispatcher. */
     synchronized
-    public void start(String name) {
-	String newname = newName()+name;
+    public void start(java.lang.String name) {
+	java.lang.String newname = newName()+name;
 	if (isRunning()) {
 	    dispatcherThread.setName(newname);
 	    return;

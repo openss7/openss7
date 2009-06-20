@@ -51,7 +51,7 @@ package javax.media.mscontrol;
   */
 public interface MediaObject {
     /** A non-mutable ID string, replacing the system-provided ID.  The
-      * value must be a String starting with a letter or a number.  This
+      * value must be a java.lang.String starting with a letter or a number.  This
       * attribute can be used in the Parameters argument of the
       * createContainer method, or the createVxmlDialog method.  */
     static final Symbol a_MediaObjectId;

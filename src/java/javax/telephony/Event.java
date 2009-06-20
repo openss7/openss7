@@ -284,7 +284,7 @@ public interface Event {
    * <p>
    * @return The object sending the event.
    */
-  public Object getSource();
+  public java.lang.Object getSource();
 
 
   /**

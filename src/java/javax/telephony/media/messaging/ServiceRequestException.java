@@ -36,7 +36,7 @@ public class ServiceRequestException extends ServiceException {
      *
      * @param   s   the detail message.
      */
-    public ServiceRequestException(String s) { super(s); }
+    public ServiceRequestException(java.lang.String s) { super(s); }
 
     /**
      * Construct a <code>ServiceRequestException</code>
@@ -49,7 +49,7 @@ public class ServiceRequestException extends ServiceException {
      * @param s  the detail message describing the error in the event.
      * @param event a ServiceEvent
      */
-    public ServiceRequestException(String s, ServiceEvent event) {
+    public ServiceRequestException(java.lang.String s, ServiceEvent event) {
 	super(s, event);
     }
 }

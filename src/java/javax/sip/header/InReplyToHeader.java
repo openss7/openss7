@@ -74,7 +74,7 @@ public interface InReplyToHeader extends Header {
     /**
         Returns the Call-Id of InReplyToHeader. The CallId parameter uniquely identifies a series of
         messages within a dialogue.
-        @return The String value of the Call-Id of this InReplyToHeader.
+        @return The java.lang.String value of the Call-Id of this InReplyToHeader.
       */
     java.lang.String getCallId();
 }

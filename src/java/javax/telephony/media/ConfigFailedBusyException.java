@@ -44,7 +44,7 @@ class ConfigFailedBusyException extends MediaConfigException {
      *
      * @param   s   the detail message.
      */
-    public ConfigFailedBusyException(String s) {super(s);}
+    public ConfigFailedBusyException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>ConfigFailedBusyException</code>
@@ -53,7 +53,7 @@ class ConfigFailedBusyException extends MediaConfigException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public ConfigFailedBusyException(String s, MediaEvent event) {
+    public ConfigFailedBusyException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

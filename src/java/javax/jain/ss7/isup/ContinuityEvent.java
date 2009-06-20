@@ -76,7 +76,7 @@ public class ContinuityEvent extends IsupEvent {
         0 otherwise.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public ContinuityEvent(Object source, SignalingPointCode dpc,
+    public ContinuityEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             byte in_continuityInd)
         throws ParameterRangeInvalidException {

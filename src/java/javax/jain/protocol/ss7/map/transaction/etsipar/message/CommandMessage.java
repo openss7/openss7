@@ -380,7 +380,7 @@ public class CommandMessage extends EtsiMessage {
     protected boolean m_tMIdIsSet = false;
     protected SS7Number m_da = null;
     protected boolean m_daIsSet = false;
-    protected String m_cd = null;
+    protected java.lang.String m_cd = null;
     protected boolean m_cdIsSet = false;
 }
 
