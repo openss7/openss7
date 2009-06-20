@@ -144,7 +144,7 @@ public class JainIsupProviderImpl implements Runnable, JainIsupProvider {
       * implementations of this JainIsupProvider interface will mandate that a different
       * set of parameters be set for each of the IsupEvents.  It is recommended that the
       * detail message returned in the MandatoryParameterNotSetException should be a
-      * String of the form, <p> <center><code>"Parameter: not set"</code></center><p>
+      * java.lang.String of the form, <p> <center><code>"Parameter: not set"</code></center><p>
       * @exception SendStackException
       * Thrown if the event could not be sent to the underlying stack.
       * @exception ParameterRangeInvalidException
@@ -178,7 +178,7 @@ public class JainIsupProviderImpl implements Runnable, JainIsupProvider {
                 IsupEvent event;
                 event = recvIsupEvent();
                 if (event != null) {
-                    Object source;
+                    java.lang.Object source;
 
                     /* The source of the event is really the destination
                      * JainIsupListener object registered for this event.
@@ -188,7 +188,7 @@ public class JainIsupProviderImpl implements Runnable, JainIsupProvider {
                     if (source instanceof JainIsupListener) {
                         JainIsupListener listener;
                         listener = (JainIsupListener) source;
-                        event.setSource((Object) this);
+                        event.setSource((java.lang.Object) this);
                         /* TODO: we might want to spawn a thread from a
                          * thread pool to process the event. */
                         listener.processIsupEvent(event);

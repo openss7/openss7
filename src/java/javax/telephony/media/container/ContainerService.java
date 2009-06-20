@@ -77,7 +77,7 @@ import java.util.Dictionary;
  * the ASR interface.
  * <P>
  * Containers are manipulated by reference to their full name,
- * which is a String in the usual heirarchical format as 
+ * which is a java.lang.String in the usual heirarchical format as 
  * commonly seen in file pathnames or URLs.
  * That is, strings of the form:
  * <br><tt>//servername/container1/.../containerN/dataobject</tt>
@@ -103,16 +103,16 @@ import java.util.Dictionary;
 public 
 interface ContainerService extends ContainerConstants {
     /** Store arbitrary user infomation with a Container or DataObject. 
-     * @param fullName the full Container or DataObject path String.
+     * @param fullName the full Container or DataObject path java.lang.String.
      * @param dict a Dictionary of infomation to be stored on the container.
      * @throws ContainerException if anything goes wrong.
      * @see #getInfo
      */
-    void setInfo(String fullName, Dictionary dict)
+    void setInfo(java.lang.String fullName, Dictionary dict)
 	throws ContainerException;
 
     /** Return arbitrary user infomation stored with a Container or DataObject. 
-     * @param fullName the full Container or DataObject path String.
+     * @param fullName the full Container or DataObject path java.lang.String.
      * @param keys a Symbol[] selecting the items to retrieve. 
      * <br>If <tt>keys</tt> is <tt>null</tt>, then retrieve all parameters.
      * @param optargs a Dictionary of implementation-specific information.
@@ -120,21 +120,21 @@ interface ContainerService extends ContainerConstants {
      * @throws ContainerException if anything goes wrong.
      * @see #setInfo
      */
-    Dictionary getInfo(String fullName, Symbol[] keys, Dictionary optargs)
+    Dictionary getInfo(java.lang.String fullName, Symbol[] keys, Dictionary optargs)
 	throws ContainerException;
 
     /** Set system parameters on a Container or DataObject. 
-     * @param fullName the full Container or DataObject path String.
+     * @param fullName the full Container or DataObject path java.lang.String.
      * @param params a Dictionary of parameters to be set.
      * @throws ContainerException if anything goes wrong.
      * @see #getParameters
      */
-    void setParameters(String fullName, Dictionary params)
+    void setParameters(java.lang.String fullName, Dictionary params)
 	throws ContainerException;
 
     /** Get system parameters on a Container or DataObject. 
      * 
-     * @param fullName the full Container or DataObject path String.
+     * @param fullName the full Container or DataObject path java.lang.String.
      * @param keys a Symbol[] selecting the items to retrieve.
      * <br>If <tt>keys</tt> is <tt>null</tt>, then retrieve all parameters.
      * @param optargs a Dictionary of implementation-specific information.
@@ -142,7 +142,7 @@ interface ContainerService extends ContainerConstants {
      * @throws ContainerException if anything goes wrong.
      * @see #setParameters
      */
-    Dictionary getParameters(String fullName, Symbol[] keys, Dictionary optargs)
+    Dictionary getParameters(java.lang.String fullName, Symbol[] keys, Dictionary optargs)
 	throws ContainerException;
 
     /** Change the <b>static</b> access rights of the named DataObject. 
@@ -157,7 +157,7 @@ interface ContainerService extends ContainerConstants {
      * @param optargs a Dictionary of implementation-specific information.
      * @throws ContainerException if anything goes wrong.
      */
-    void changeMode(String fullName, Symbol accessMode, Dictionary optargs)
+    void changeMode(java.lang.String fullName, Symbol accessMode, Dictionary optargs)
 	throws ContainerException;
 
     /** Copy a DataObject to a new DataObject name.
@@ -181,7 +181,7 @@ interface ContainerService extends ContainerConstants {
      * @param optargs a Dictionary of implementation-specific information.
      * @throws ContainerException if anything goes wrong.
      */
-    void copy(String fullName, String target, Dictionary optargs)
+    void copy(java.lang.String fullName, java.lang.String target, Dictionary optargs)
 	throws ContainerException;
 
     /** Rename a Container or DataObject within its current Container.
@@ -195,7 +195,7 @@ interface ContainerService extends ContainerConstants {
      * @throws ContainerException if <tt>fullName</tt> does not exist, 
      * or if <tt>newName</tt> already exists.
      */
-    void rename(String fullName, String newName, Dictionary optargs)
+    void rename(java.lang.String fullName, java.lang.String newName, Dictionary optargs)
 	throws ContainerException;
 
     /** Remove the named Container or DataObject.
@@ -205,23 +205,23 @@ interface ContainerService extends ContainerConstants {
      * <b>Note:</b>
      * Destroy can succeed even if the Container is in read-only mode.
      * 
-     * @param fullName the full Container or DataObject path String.
+     * @param fullName the full Container or DataObject path java.lang.String.
      * @param optargs a Dictionary of implementation-specific information.
      * @throws ContainerException if container does not exist.
      */
-    void destroy(String fullName, Dictionary optargs)
+    void destroy(java.lang.String fullName, Dictionary optargs)
 	throws ContainerException;
 
     /** List Containers and DataObjects contained in the named Container.
      * <p>
      * The order of objects in the list is not specified. 
      * 
-     * @param fullName the full Container path String.
+     * @param fullName the full Container path java.lang.String.
      * @param optargs a Dictionary of implementation-specific information.
-     * @return a String[] with an element for each object in the container.
+     * @return a java.lang.String[] with an element for each object in the container.
      * @throws ContainerException if container does not exist.
      */
-    String[] listObjects(String fullName, Dictionary optargs)
+    java.lang.String[] listObjects(java.lang.String fullName, Dictionary optargs)
 	throws ContainerException;
 
     /** Create a new Container.
@@ -232,7 +232,7 @@ interface ContainerService extends ContainerConstants {
      * @param optargs a Dictionary of implementation-specific information.
      * @throws ContainerException container cannot be created.
      */
-    void createContainer(String fullName, Dictionary optargs)
+    void createContainer(java.lang.String fullName, Dictionary optargs)
 	throws ContainerException;
 
     /** Create a new Media Data Object and open it.
@@ -247,7 +247,7 @@ interface ContainerService extends ContainerConstants {
      * @throws ContainerException if the Data Object is not opened.
      */
 
-    DataObject createDataObject(String fullName, 
+    DataObject createDataObject(java.lang.String fullName, 
 				Symbol accessMode, 
 				Dictionary optargs) 
 	throws ContainerException;
@@ -306,7 +306,7 @@ interface ContainerService extends ContainerConstants {
      * @return an open DataObject.
      * @throws ContainerException if the Data Object is not opened.
      */
-    DataObject openDataObject(String fullName, 
+    DataObject openDataObject(java.lang.String fullName, 
 			      Symbol accessMode, 
 			      boolean ifNoExist,
 			      boolean truncate,

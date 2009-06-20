@@ -71,7 +71,7 @@ public class CircuitValidationRespAnsiEvent extends IsupEvent {
       * @param in_circuitGrpCharacteristicsInd  Circuit Group Characteristics Indicators.
       * Refer to CircuitGrpCharacteristicsInd class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public CircuitValidationRespAnsiEvent(Object source, SignalingPointCode dpc,
+    public CircuitValidationRespAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             short in_circuitValResp,
             CircuitGrpCharacteristicsIndAnsi in_circuitGrpCharacteristicsIndAnsi)

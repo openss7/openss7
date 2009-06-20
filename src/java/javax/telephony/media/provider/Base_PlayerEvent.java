@@ -31,11 +31,11 @@ class Base_PlayerEvent extends Base.ResourceEvent
     /**
      * Create specific completion or non-transaction event from Player.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_Play
      */
-    public Base_PlayerEvent(Object source, Symbol eventID) {
+    public Base_PlayerEvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
     }
 

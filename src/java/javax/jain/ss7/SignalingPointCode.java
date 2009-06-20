@@ -257,12 +257,12 @@ public class SignalingPointCode implements java.io.Serializable {
         return result;
     }
     /**
-      * String representation of class SignalingPointCode.
+      * java.lang.String representation of class SignalingPointCode.
       * @return
-      * String provides description of class SignalingPointCode.
+      * java.lang.String provides description of class SignalingPointCode.
       */
     public java.lang.String toString() {
-        return new String(m_network + "." + m_cluster + "." + m_member);
+        return new java.lang.String(m_network + "." + m_cluster + "." + m_member);
     }
     protected int m_member = 0;
     protected boolean m_memberIsSet = false;

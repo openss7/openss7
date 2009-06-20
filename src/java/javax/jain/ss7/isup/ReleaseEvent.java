@@ -76,7 +76,7 @@ public abstract class ReleaseEvent extends IsupEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @param causeIndicator  Cause indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    protected ReleaseEvent(Object source, SignalingPointCode dpc,
+    protected ReleaseEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             CauseInd causeIndicator)
         throws ParameterRangeInvalidException {

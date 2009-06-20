@@ -173,7 +173,7 @@ public interface MessageSessionProvider {
       * The listener to be registered for "incoming sessions".
       * @param userAddress
       * The SS7Address that the listener is listening to.
-      * @exception TooManyListenersException
+      * @exception java.util.TooManyListenersException
       * Thrown if the provider cannot handle any more listeners.  This
       * exception normally is used to indicate that only one listener
       * can be registered!

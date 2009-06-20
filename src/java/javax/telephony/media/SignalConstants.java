@@ -74,14 +74,14 @@ interface SignalConstants {
 
     /**
      * Specifies the chars to use when non standard Signals
-     * are converted to a String or vice versa.
-     * The associated value is a Object[]. 
+     * are converted to a java.lang.String or vice versa.
+     * The associated value is a java.lang.Object[]. 
      * Even numbered elements are a Symbol, 
      * odd numbered elements are the associated Character.
      * <p>
      * For example, The standard values could be represented like:
      * <pre>
-     * Object[] v_StandardDTMFChars = { 
+     * java.lang.Object[] v_StandardDTMFChars = { 
      *     v_DTMF0, new Character('0'),
      *     v_DTMF1, new Character('1'),
      *     v_DTMF2, new Character('2'),

@@ -96,7 +96,7 @@ public class ResourceUnavailableException extends Exception {
   /**
    * Constructor, takes a type and a string.
    */
-  public ResourceUnavailableException(int type, String s) {
+  public ResourceUnavailableException(int type, java.lang.String s) {
     super(s);
     _type = type;
   }

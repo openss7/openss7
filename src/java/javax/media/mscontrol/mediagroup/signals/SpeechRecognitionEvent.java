@@ -112,7 +112,7 @@ public interface SpeechRecognitionEvent
 vent> {
       public void onEvent(SignalDetectorEvent anEvent) {
           if (anEvent instanceof SpeechRecognitionEvent) {
-             String tag = ((SpeechRecognitionEvent)anEvent).getTag();
+             java.lang.String tag = ((SpeechRecognitionEvent)anEvent).getTag();
              if (tag != null) {
                  if (tag.equals("yes")) {
                     log.debug("customer agrees");
@@ -163,7 +163,7 @@ vent> {
              Return the tag associated to the user input, as defined by
    SISR.
     java.lang.String getUserInput()
-             Return the recognized utterance, as a String.
+             Return the recognized utterance, as a java.lang.String.
 
 
 
@@ -241,7 +241,7 @@ java.lang.String getTag()
 
 java.lang.String getUserInput()
 
-          Return the recognized utterance, as a String.
+          Return the recognized utterance, as a java.lang.String.
           Return null if no utterance was recognized, or if multiple
           utterances were recognized with various confidence levels. In
           those cases, the semantic result returned by

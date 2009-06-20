@@ -45,23 +45,19 @@
 
 package org.openss7.ss7.sccp;
 
-import java.io.IOException;
-import org.mobicents.ss7.sccp.*;
-
 /**
   * @author Monavacon Limited
   * @version 1.2.2
   */
 public class SccpProviderImpl implements SccpProvider {
-    /**
-      * This method is used to add an object that implements the SccpListener
-      * interface to the provider.
-      */
-    public native void addSccpListener(SccpListener listener);
-    public native SccpListener getListener();
-    public native void send(SccpAddress calledParty, SccpAddress callingParty, byte[] data)
-        throws IOException;
-    public native void shutdown();
+    public native void sendSccpEvent(SccpEvent event)
+        throws javax.jain.MandatoryParameterNotSetException;
+    public native void addSccpListener(SccpListener listener, SccpUserAddress userAddress)
+        throws java.util.TooManyListenersException, javax.jain.ListenerAlreadyRegisteredException, javax.jain.InvalidUserAddressException;
+    public native void removeSccpListener(SccpListener listener)
+        throws javax.jain.ListenerNotRegisteredException;
+    public native SccpListeners[] getSccpListeners();
+    public native SccpStack getSccpStack();
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

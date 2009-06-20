@@ -41,11 +41,11 @@ public interface MediaGroupEvent extends MediaServiceEvent {
      */
     Terminal getTerminal();
     /**
-     * Return a terminal name String from getTerminalName().
+     * Return a terminal name java.lang.String from getTerminalName().
      * Valid when <tt>(getEventID.equals(ev_GetTerminalName))</tt>.
-     * @return a terminal name String from <tt>getTerminalName()</tt>
+     * @return a terminal name java.lang.String from <tt>getTerminalName()</tt>
      */
-    String getTerminalName();
+    java.lang.String getTerminalName();
     /**
      * Return a ConfigSpec from getConfigSpec().
      * Valid when <tt>(getEventID().equals(ev_GetConfigSpec))</tt>.

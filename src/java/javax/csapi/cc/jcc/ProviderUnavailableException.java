@@ -47,7 +47,7 @@ package javax.csapi.cc.jcc;
 
 /** This exception indicates that the JccProvider is currently not
   * available to the application. This exception is typically thrown in
-  * two cases: when JccPeer.getProvider(String) is called or on any
+  * two cases: when JccPeer.getProvider(java.lang.String) is called or on any
   * method when the JccProvider is in a JccProvider.SHUTDOWN state. <p>
   *
   * The exception stores the reason for the failure which may be
@@ -63,10 +63,10 @@ public class ProviderUnavailableException extends java.lang.RuntimeException {
       * JccProvider.IN_SERVICE state.  */
     public static final int CAUSE_NOT_IN_SERVICE = 161;
     /** Constant definition for an invalid service string given to
-      * JccPeer.getProvider(String).  */
+      * JccPeer.getProvider(java.lang.String).  */
     public static final int CAUSE_INVALID_SERVICE = 162;
     /** Constant definition for an invalid optional argument given to
-      * JccPeer.getProvider(String).  */
+      * JccPeer.getProvider(java.lang.String).  */
     public static final int CAUSE_INVALID_ARGUMENT = 163;
     /** Constructor with no cause and string.  */
     public ProviderUnavailableException() {

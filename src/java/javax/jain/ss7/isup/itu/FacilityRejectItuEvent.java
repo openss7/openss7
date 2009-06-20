@@ -77,7 +77,7 @@ public class FacilityRejectItuEvent extends IsupEvent {
         @param causeIndicator  Cause indicators.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public FacilityRejectItuEvent(Object source, SignalingPointCode dpc,
+    public FacilityRejectItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             short facilityInd, CauseInd causeIndicator)
         throws ParameterRangeInvalidException {

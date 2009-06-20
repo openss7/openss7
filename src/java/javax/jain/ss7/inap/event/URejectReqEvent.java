@@ -84,21 +84,21 @@ public class URejectReqEvent extends ComponentReqEvent implements java.io.Serial
         throws java.lang.IllegalArgumentException {
         if (rejectType == RejectType.INVOKE_PROBLEM) {
             InvokeProblem y = new InvokeProblem();
-            if (y.contains((Object)(new Integer(rejectCode)))) {
+            if (y.contains((java.lang.Object)(new Integer(rejectCode)))) {
                 this.rejectCode = rejectCode;
             } else {
                 throw new IllegalArgumentException("ParameterOutOfRange");
             }
         } else if (rejectType == RejectType.RETURN_RESULT_PROBLEM) {
             ReturnResultProblem y = new ReturnResultProblem();
-            if (y.contains((Object)(new Integer(rejectCode)))) {
+            if (y.contains((java.lang.Object)(new Integer(rejectCode)))) {
                 this.rejectCode = rejectCode;
             } else {
                 throw new IllegalArgumentException("ParameterOutOfRange");
             }
         } else if (rejectType == RejectType.RETURN_ERROR_PROBLEM) {
             ReturnErrorProblem y = new ReturnErrorProblem();
-            if (y.contains((Object)(new Integer(rejectCode)))) {
+            if (y.contains((java.lang.Object)(new Integer(rejectCode)))) {
                 this.rejectCode = rejectCode;
             } else {
                 throw new IllegalArgumentException("ParameterOutOfRange");

@@ -58,7 +58,7 @@ interface DelegationEvent extends MediaServiceEvent, DelegationConstants {
      * was released to some older owner using <tt>releaseToTag</tt>,
      * then <tt>getRetrieveCause()</tt> returns the <tt>v_Released</tt>
      * <tt>getQualifier()</tt> returns <tt>q_Released</tt>, and
-     * <tt>getReturnTags()</tt> returns the tag String
+     * <tt>getReturnTags()</tt> returns the tag java.lang.String
      * used in <tt>releaseToTag()</tt>.
      * [that is, a tag which was <i>not</i> caught by this MediaService]
      * <p>
@@ -89,8 +89,8 @@ interface DelegationEvent extends MediaServiceEvent, DelegationConstants {
      * <br>or<br>
      * <tt>event.getQualifier().equals(q_Returned)</tt>
      * <p>
-     * @return the <tt>returnTag</tt> String used in <tt>releaseToTag()</tt>.
+     * @return the <tt>returnTag</tt> java.lang.String used in <tt>releaseToTag()</tt>.
      */
-    String getReturnTag();
+    java.lang.String getReturnTag();
 };
 

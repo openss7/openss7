@@ -35,19 +35,19 @@ public class Base_ASREvent extends Base.ResourceEvent
     /**
      * Create specific completion or non-transaction event from ASR.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ASR.ev_Recognize
      */
-    public Base_ASREvent(Object source, Symbol eventID) {
+    public Base_ASREvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
     }
 
     abstract public Symbol getResultPresentation();
     abstract public Dictionary getContextDictionary();
-    abstract public String getRuleExpansion();
-    abstract public String getWordName();
-    abstract public String getContextName();
+    abstract public java.lang.String getRuleExpansion();
+    abstract public java.lang.String getWordName();
+    abstract public java.lang.String getContextName();
     abstract public Symbol getReadiness();
     abstract public Symbol getTrainingResult();
     abstract public int getNumberOfSequences();

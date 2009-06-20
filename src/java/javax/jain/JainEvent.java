@@ -56,7 +56,7 @@ public abstract class JainEvent extends java.util.EventObject implements java.io
     /** The constructor.
       * @param source
       * The source of this Event.  */
-    public JainEvent(Object source) {
+    public JainEvent(java.lang.Object source) {
         super(source);
     }
     /** Empty constructor needed for serializable objects and beans.  */
@@ -69,7 +69,7 @@ public abstract class JainEvent extends java.util.EventObject implements java.io
       * clone the vent and change the event source at any time.
       * @param source
       * The object source of the event.  */
-    public void setSource(Object source) {
+    public void setSource(java.lang.Object source) {
         this.source = source;
     }
 }

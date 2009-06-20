@@ -78,9 +78,9 @@ public class TcapErrorEvent extends java.util.EventObject implements java.io.Ser
     public java.lang.Object getError() {
         return m_error;
     }
-    /** String representation of class TcapErrorEvent.
+    /** java.lang.String representation of class TcapErrorEvent.
       * @return
-      * String provides description of class TcapErrorEvent.  */
+      * java.lang.String provides description of class TcapErrorEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());

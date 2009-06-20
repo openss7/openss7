@@ -222,9 +222,9 @@ public final class ErrorIndEvent extends ComponentIndEvent {
         m_errorTypePresent = false;
         m_errorCodePresent = false;
     }
-    /** String representation of class ErrorIndEvent.
+    /** java.lang.String representation of class ErrorIndEvent.
       * @return
-      * String provides description of class ErrorIndEvent.  */
+      * java.lang.String provides description of class ErrorIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(500);
         b.append("\n\nErrorIndEvent");

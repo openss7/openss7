@@ -82,7 +82,7 @@ public class LocationNumber extends E164Number {
     /** Change the value of the Locally Significant Part (LSP). (This method is identical
       * to setSubscriberNumber, just with a more appropriate name in the context of
       * LocationNumber.)
-      * @param lsp  String with LSP.
+      * @param lsp  java.lang.String with LSP.
       */
     public void setLocallySignificantPart(java.lang.String lsp)
         throws SS7InvalidParamException {
@@ -91,13 +91,13 @@ public class LocationNumber extends E164Number {
     /** Get the value of the Locally Significant Part (LSP). (This method is identical to
       * getSubscriberNumber, just with a more appropriate name in the context of
       * LocationNumber.)
-      * @return String with LSP.
+      * @return java.lang.String with LSP.
       */
     public java.lang.String getLocallySignificantPart() {
         return m_lsp;
     }
-    protected String m_cc;
-    protected String m_lsp;
+    protected java.lang.String m_cc;
+    protected java.lang.String m_lsp;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

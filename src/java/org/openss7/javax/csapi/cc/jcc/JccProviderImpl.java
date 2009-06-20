@@ -54,27 +54,27 @@ import javax.csapi.cc.jcc.*;
 public class JccProviderImpl implements java.rmi.Remote, JccProvider {
     public native EventFilter createEventFilterEventSet(int blockEvents[], int notifyEvents[])
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterMidCallEvent(int midCallType, String midCallValue, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterMidCallEvent(int midCallType, java.lang.String midCallValue, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
     public native EventFilter createEventFilterMinimunCollectedAddressLength(int minimumAddressLength, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
     public native EventFilter createEventFilterCauseCode(int causeCode, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterAddressRange(String lowAddress, String highAddress, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterAddressRange(java.lang.String lowAddress, java.lang.String highAddress, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterAddressRegEx(String addressRegex, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterAddressRegEx(java.lang.String addressRegex, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException,InvalidArgumentException ;
     public native EventFilter createEventFilterOr(EventFilter filters[], int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
     public native EventFilter createEventFilterAnd(EventFilter filters[],int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterDestAddressRange(String lowDestAddress, String highDestAddress, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterDestAddressRange(java.lang.String lowDestAddress, java.lang.String highDestAddress, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterDestAddressRegEx(String destAddressRegex, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterDestAddressRegEx(java.lang.String destAddressRegex, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterOrigAddressRange(String lowOrigAddress, String highOrigAddress, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterOrigAddressRange(java.lang.String lowOrigAddress, java.lang.String highOrigAddress, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
-    public native EventFilter createEventFilterOrigAddressRegEx(String origAddressRegex, int matchDisposition, int nomatchDisposition)
+    public native EventFilter createEventFilterOrigAddressRegEx(java.lang.String origAddressRegex, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
     public native void addCallListener( JccCallListener calllistener )
         throws MethodNotSupportedException, ResourceUnavailableException;
@@ -93,8 +93,8 @@ public class JccProviderImpl implements java.rmi.Remote, JccProvider {
     public native void addProviderListener( JccProviderListener providerlistener )
         throws ResourceUnavailableException, MethodNotSupportedException;
     public native void removeProviderListener( JccProviderListener providerlistener );
-    public native String getName();
-    public native JccAddress getAddress(String address)
+    public native java.lang.String getName();
+    public native JccAddress getAddress(java.lang.String address)
         throws InvalidPartyException;
     public native void shutdown();
 }

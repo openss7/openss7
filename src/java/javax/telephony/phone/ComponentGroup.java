@@ -74,7 +74,7 @@ public interface ComponentGroup {
    * <p>
    * @return A string description of the component group.
    */
-  public String getDescription();
+  public java.lang.String getDescription();
 
 
   /**

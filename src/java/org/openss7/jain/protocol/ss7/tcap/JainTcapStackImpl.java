@@ -327,7 +327,7 @@ public class JainTcapStackImpl implements java.rmi.Remote, JainTcapStack {
       * @return
       * a string describing the Stack Name
       */
-    public String getStackName() {
+    public java.lang.String getStackName() {
         return m_stackName;
     }
     /**
@@ -336,7 +336,7 @@ public class JainTcapStackImpl implements java.rmi.Remote, JainTcapStack {
       * @param stackProtocol
       * The new Stack Name value
       */
-    public void setStackName(String stackName) {
+    public void setStackName(java.lang.String stackName) {
         m_stackName = stackName;
         m_stackNameIsSet = true;
     }
@@ -348,7 +348,7 @@ public class JainTcapStackImpl implements java.rmi.Remote, JainTcapStack {
       *
       * @since JAIN TCAP v1.1
       */
-    public String getVendorName() {
+    public java.lang.String getVendorName() {
         return m_vendorName;
     }
     /**
@@ -361,7 +361,7 @@ public class JainTcapStackImpl implements java.rmi.Remote, JainTcapStack {
       *
       * @since JAIN TCAP v1.1
       */
-    public void setVendorName(String vendorName) {
+    public void setVendorName(java.lang.String vendorName) {
         m_vendorName = vendorName;
         m_vendorNameIsSet = true;
     }
@@ -469,11 +469,11 @@ public class JainTcapStackImpl implements java.rmi.Remote, JainTcapStack {
     /** Whether the signalling point code is user-set. */
     private boolean m_spcIsSet = false;
     /** The set stack name. */
-    private String m_stackName = "tcap";
+    private java.lang.String m_stackName = "tcap";
     /** Whether the stack name is user-set. */
     private boolean m_stackNameIsSet = false;
     /** The set vendor name. */
-    private String m_vendorName = "org.openss7";
+    private java.lang.String m_vendorName = "org.openss7";
     /** Whether the vendor name is user-set. */
     private boolean m_vendorNameIsSet = false;
     /** The set stack specification. */

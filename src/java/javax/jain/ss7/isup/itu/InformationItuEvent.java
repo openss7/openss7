@@ -70,7 +70,7 @@ public class InformationItuEvent extends InformationEvent {
       * @param in_infoInd  Information indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public InformationItuEvent(Object source, SignalingPointCode dpc,
+    public InformationItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             InfoInd in_infoInd)
         throws ParameterRangeInvalidException {

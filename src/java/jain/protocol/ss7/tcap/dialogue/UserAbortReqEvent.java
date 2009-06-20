@@ -156,9 +156,9 @@ public final class UserAbortReqEvent extends DialogueReqEvent {
         m_userAbortInformationPresent = false;
         m_abortReasonPresent = false;
     }
-    /** String representation of class UserAbortReqEvent.
+    /** java.lang.String representation of class UserAbortReqEvent.
       * @return
-      * String provides description of class UserAbortReqEvent.  */
+      * java.lang.String provides description of class UserAbortReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nUserAbortReqEvent");

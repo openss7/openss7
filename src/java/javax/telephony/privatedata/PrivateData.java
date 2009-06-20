@@ -72,7 +72,7 @@ public interface PrivateData {
   * <p>
   * @param data The platform-dependent data.
   */
-  public void setPrivateData(Object data);
+  public void setPrivateData(java.lang.Object data);
 
 
   /**
@@ -82,9 +82,9 @@ public interface PrivateData {
    * method invocation ONLY.
    * <p>
    * @since JTAPI v1.2 
-   * @return Object The platform-dependent data.
+   * @return java.lang.Object The platform-dependent data.
    */
-  public Object getPrivateData();
+  public java.lang.Object getPrivateData();
 
 
   /**
@@ -97,5 +97,5 @@ public interface PrivateData {
    * @param data The platform-dependent data.
    * @return The platform-dependent data sent.
    */
-  public Object sendPrivateData(Object data);
+  public java.lang.Object sendPrivateData(java.lang.Object data);
 }

@@ -41,11 +41,11 @@ public class IntRange implements java.io.Serializable {
 	this.lower=lower;
 	this.upper=upper;
     }
-    public String toString() {
+    public java.lang.String toString() {
 	return "IntRange["+lower+","+upper+"]";
     }
     
-    public boolean equals( Object other ) {
+    public boolean equals( java.lang.Object other ) {
         return ((other instanceof IntRange) &&
                 (this.lower == ((IntRange)other).lower) &&
 		(this.upper == ((IntRange)other).upper));

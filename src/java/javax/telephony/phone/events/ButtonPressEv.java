@@ -38,5 +38,5 @@ public interface ButtonPressEv extends PhoneTermEv {
    * <p>
    * @return The string button information.
    */
-  public String getInfo();
+  public java.lang.String getInfo();
 }

@@ -275,7 +275,7 @@ public interface RouteSession {
    * @exception MethodNotSupportedException Routing is not supported by the
    * implementation.
    */
-  public void selectRoute(String[] routeSelected)
+  public void selectRoute(java.lang.String[] routeSelected)
     throws MethodNotSupportedException;
 
 

@@ -39,7 +39,7 @@ public class JtapiPeerUnavailableException extends Exception {
    * 
    * @param s description of the fault
    */
-  public JtapiPeerUnavailableException(String s) {
+  public JtapiPeerUnavailableException(java.lang.String s) {
     super(s);
   }
 }

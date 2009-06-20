@@ -93,16 +93,16 @@ public class E164Number extends SS7Parameter {
       * @throws SS7InvalidParamException Thrown if parameter(s) are
       *	    invalid / out of range.
       */
-    public E164Number(String cc, String sn) throws SS7InvalidParamException {
+    public E164Number(java.lang.String cc, java.lang.String sn) throws SS7InvalidParamException {
         this.setCountryCode(cc);
         this.setSubscriberNumber(sn);
     }
     /**
       * Change the value of the Country Code (CC).
       *
-      * @param cc String with 1-3 digits CC.
+      * @param cc java.lang.String with 1-3 digits CC.
       */
-    public void setCountryCode(String cc) throws SS7InvalidParamException {
+    public void setCountryCode(java.lang.String cc) throws SS7InvalidParamException {
         if (cc.length() > 3)
             throw new SS7InvalidParamException("Country Code \"" + cc + "\" is too long.");
         for (int i = 0; i < cc.length(); i++) {
@@ -119,10 +119,10 @@ public class E164Number extends SS7Parameter {
     /**
       * Get the value of the Country Code (CC).
       *
-      * @return String with 1-3 digits CC.
+      * @return java.lang.String with 1-3 digits CC.
       */
-    public String getCountryCode() {
-        String cc = "";
+    public java.lang.String getCountryCode() {
+        java.lang.String cc = "";
         if (m_cc_is_set)
             cc = m_cc;
         return cc;
@@ -133,10 +133,10 @@ public class E164Number extends SS7Parameter {
       * Get the value of the National Destination Code (NDC). It shall
       * be checked if this parameter is present before getting it.
       *
-      * @return String with NDC.
+      * @return java.lang.String with NDC.
       */
-    public String getNatDestCode() {
-        String ndc = "";
+    public java.lang.String getNatDestCode() {
+        java.lang.String ndc = "";
         if (m_ndc_is_set)
             ndc = m_ndc;
         return ndc;
@@ -152,9 +152,9 @@ public class E164Number extends SS7Parameter {
     /**
       * Change the value of the Subscriber Number (SN).
       *
-      * @param sn String with SN.
+      * @param sn java.lang.String with SN.
       */
-    public void setSubscriberNumber(String sn) throws SS7InvalidParamException {
+    public void setSubscriberNumber(java.lang.String sn) throws SS7InvalidParamException {
         if (sn == null)
             throw new SS7InvalidParamException("Subscriber Number must be specified.");
         int len = sn.length();
@@ -175,10 +175,10 @@ public class E164Number extends SS7Parameter {
     /**
       * Get the value of the Subscriber Number (SN).
       *
-      * @return String with SN.
+      * @return java.lang.String with SN.
       */
-    public String getSubscriberNumber() {
-        String sn = "";
+    public java.lang.String getSubscriberNumber() {
+        java.lang.String sn = "";
         if (m_sn_is_set)
             sn = m_sn;
         return sn;
@@ -191,9 +191,9 @@ public class E164Number extends SS7Parameter {
       * fact that the total length of an E.164 Number can be maximum 15
       * digits.
       *
-      * @param ndc String with NDC.
+      * @param ndc java.lang.String with NDC.
       */
-    public void setNatDestCode(String ndc) throws SS7InvalidParamException {
+    public void setNatDestCode(java.lang.String ndc) throws SS7InvalidParamException {
         int len = ndc.length();
         int max = 15 - getCountryCode().length() - getSubscriberNumber().length();
         if (len > max)
@@ -210,14 +210,14 @@ public class E164Number extends SS7Parameter {
         m_ndc_is_set = true;
     }
     /**
-      * Get the whole E.164 Number (CC+NDC+SN) as a String.
+      * Get the whole E.164 Number (CC+NDC+SN) as a java.lang.String.
       *
       * @overrides toString in class Object
       *
-      * @return String containing the E.164 Number.
+      * @return java.lang.String containing the E.164 Number.
       */
-    public String toString() {
-        String text = "E164Number\n";
+    public java.lang.String toString() {
+        java.lang.String text = "E164Number\n";
         text += "\t\t\tCountry Code: " + getCountryCode() + "\n";
         text += "\t\t\tNational Destination Code: " + getNatDestCode() + "\n";
         text += "\t\t\tSubscriber Number: " + getSubscriberNumber() + "\n";
@@ -231,7 +231,7 @@ public class E164Number extends SS7Parameter {
       *	    Number.
       * @return True if equal, otherwise false.
       */
-    public boolean equals(Object object) {
+    public boolean equals(java.lang.Object object) {
         try {
             if (object instanceof E164Number) {
                 E164Number e164 = (E164Number) object;
@@ -267,11 +267,11 @@ public class E164Number extends SS7Parameter {
         return len;
     }
 
-    private String m_cc;
+    private java.lang.String m_cc;
     private boolean m_cc_is_set = false;
-    private String m_ndc;
+    private java.lang.String m_ndc;
     private boolean m_ndc_is_set = false;
-    private String m_sn;
+    private java.lang.String m_sn;
     private boolean m_sn_is_set = false;
 }
 

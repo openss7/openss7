@@ -144,7 +144,7 @@ class ConfigSpec implements ConfigSpecConstants, java.io.Serializable {
      * <p>
      * <b>Note:</b> the value for key <tt>Group_ECTF_Config</tt>.
      */
-    protected String configName = "S410"; // 
+    protected java.lang.String configName = "S410"; // 
 
     /**
      * This protected variable stores the array of resource specs.
@@ -173,22 +173,22 @@ class ConfigSpec implements ConfigSpecConstants, java.io.Serializable {
 
     /**
      * Elide package name, include getConfigName(). 
-     * @return a String that identifies this ConfigSpec instance.
+     * @return a java.lang.String that identifies this ConfigSpec instance.
      */
-    public String toString() {
-	String fullName = this.getClass().getName();
-	String shortName = fullName.substring( fullName.lastIndexOf('.') + 1 );
-	String cname = getConfigName();
+    public java.lang.String toString() {
+	java.lang.String fullName = this.getClass().getName();
+	java.lang.String shortName = fullName.substring( fullName.lastIndexOf('.') + 1 );
+	java.lang.String cname = getConfigName();
 	return shortName+"@"+hashCode()+"{"+((cname==null)?"null":cname)+"}";
     }
     
     /**
      * Construct a ConfigSpec and set the configName.
      * <p>
-     * The <tt>configName</tt> is a String name that identifies
+     * The <tt>configName</tt> is a java.lang.String name that identifies
      * this configuration.  
      *
-     * @param configName a String to name this configSpec
+     * @param configName a java.lang.String to name this configSpec
      * @param timeout int number of milliseconds to wait for resources.
      * <code>configure()</code> should complete or abort in this time.
      * @param specs an array of ResourceSpec
@@ -196,7 +196,7 @@ class ConfigSpec implements ConfigSpecConstants, java.io.Serializable {
      * @param parameters Dictionary of initial configuration parameters.
      * @param rtcs Array of persistant RTCs.
      */
-    public ConfigSpec(String configName,
+    public ConfigSpec(java.lang.String configName,
 		      int timeout, 		// 
 		      ResourceSpec[] specs, 	// resource specs
 		      Dictionary attributes,	// selection attributes
@@ -210,15 +210,15 @@ class ConfigSpec implements ConfigSpecConstants, java.io.Serializable {
     /**
      * Copy a ConfigSpec and set the configName and timeout.
      * <p>
-     * The <tt>configName</tt> is a String name that identifies
+     * The <tt>configName</tt> is a java.lang.String name that identifies
      * this configuration.  
      *
-     * @param configName a String to name this configSpec
+     * @param configName a java.lang.String to name this configSpec
      * @param timeout int number of milliseconds to wait for resources.
      * <code>configure()</code> should complete or abort in this time.
      * @param configSpec use RessourceSpec[], Attributes, Parameters and RTC[] from here.
      */
-    public ConfigSpec(String configName,
+    public ConfigSpec(java.lang.String configName,
 		      int timeout,
 		      ConfigSpec configSpec // template
 		      ) {
@@ -257,12 +257,12 @@ class ConfigSpec implements ConfigSpecConstants, java.io.Serializable {
     }
 
     /** 
-     * Return the String name of this ConfigSpec.
+     * Return the java.lang.String name of this ConfigSpec.
      * May return <tt>null</tt> if no name is assigned.
      * 
-     * @return the String name of this ConfigSpec.
+     * @return the java.lang.String name of this ConfigSpec.
      */
-    public String getConfigName() {
+    public java.lang.String getConfigName() {
 	return configName;
     }
 

@@ -84,9 +84,9 @@ public final class TimerResetReqEvent extends ComponentReqEvent {
         m_dialogueIdPresent = false;
         m_invokeIdPresent = false;
     }
-    /** String representation of class TimerResetReqEvent.
+    /** java.lang.String representation of class TimerResetReqEvent.
       * @return
-      * String provides description of class TimerResetReqEvent.  */
+      * java.lang.String provides description of class TimerResetReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nTimerResetReqEvent");

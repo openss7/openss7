@@ -107,7 +107,7 @@ public class CommitException extends SS7Exception {
       * </code>
       */
     public java.lang.String getLog() {
-        return new String("");
+        return new java.lang.String("");
     }
 }
 

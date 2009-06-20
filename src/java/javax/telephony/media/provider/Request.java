@@ -40,7 +40,7 @@ import java.util.EventListener;
  * static initializers to find the required Method. 
  * <P>
  * The constructor comes in various flavors with different numbers
- * of Object arguments, and a couple with strategically placed <tt>int</tt>
+ * of java.lang.Object arguments, and a couple with strategically placed <tt>int</tt>
  * args. These are sufficient to handle the S.410 media resource methods.
  * <p>
  * This bit of <i>reflection</i> allows the MediaGroup object and
@@ -52,7 +52,7 @@ import java.util.EventListener;
 public
 class Request {
     private Method method;
-    private Object[] arglist;
+    private java.lang.Object[] arglist;
 
     /** return the internal, cached Method, 
      * so one can look up the declaring class. 
@@ -60,58 +60,58 @@ class Request {
      */
     public Method getMethod() { return method; }
 
-    public Request(Method method, Object[] arglist) {
+    public Request(Method method, java.lang.Object[] arglist) {
 	this.method = method;
 	this.arglist = arglist;
     }
 
     public Request(Method method) {
-	this(method, new Object[0]);
+	this(method, new java.lang.Object[0]);
     }
 
-    public Request(Method method, Object arg0) {
-	this(method, new Object[1]);
+    public Request(Method method, java.lang.Object arg0) {
+	this(method, new java.lang.Object[1]);
 	arglist[0] = arg0;
     }
 
-    public Request(Method method, Object arg0, Object arg1) {
-	this(method, new Object[2]);
+    public Request(Method method, java.lang.Object arg0, java.lang.Object arg1) {
+	this(method, new java.lang.Object[2]);
 	arglist[0] = arg0;
 	arglist[1] = arg1;
     }
-    public Request(Method method, Object arg0, Object arg1, Object arg2) {
-	this(method, new Object[3]);
+    public Request(Method method, java.lang.Object arg0, java.lang.Object arg1, java.lang.Object arg2) {
+	this(method, new java.lang.Object[3]);
 	arglist[0] = arg0;
 	arglist[1] = arg1;
 	arglist[2] = arg2;
     }
-    public Request(Method method, Object arg0, Object arg1, Object arg2, 
-		   Object arg3) {
-	this(method, new Object[4]);
+    public Request(Method method, java.lang.Object arg0, java.lang.Object arg1, java.lang.Object arg2, 
+		   java.lang.Object arg3) {
+	this(method, new java.lang.Object[4]);
 	arglist[0] = arg0;
 	arglist[1] = arg1;
 	arglist[2] = arg2;
 	arglist[3] = arg3;
     }
-    public Request(Method method, Object arg0, Object arg1, Object arg2, 
-		   Object arg3, 
-		   Object arg4) {
-	this(method, new Object[5]);
+    public Request(Method method, java.lang.Object arg0, java.lang.Object arg1, java.lang.Object arg2, 
+		   java.lang.Object arg3, 
+		   java.lang.Object arg4) {
+	this(method, new java.lang.Object[5]);
 	arglist[0] = arg0;
 	arglist[1] = arg1;
 	arglist[2] = arg2;
 	arglist[3] = arg3;
 	arglist[4] = arg4;
     }
-    public Request(Method method, int arg0, Object arg1, 
-		   Object arg2,
-		   Object arg3) {
+    public Request(Method method, int arg0, java.lang.Object arg1, 
+		   java.lang.Object arg2,
+		   java.lang.Object arg3) {
 	this(method, new Integer(arg0), arg1, arg2, arg3);
     }
 
-    public Request(Method method, Object arg0, int arg1, 
-		   Object arg2, 
-		   Object arg3) {
+    public Request(Method method, java.lang.Object arg0, int arg1, 
+		   java.lang.Object arg2, 
+		   java.lang.Object arg3) {
 	this(method, arg0, new Integer(arg1), arg2, arg3);
     }
     
@@ -135,11 +135,11 @@ class Request {
      * bundled into the return value.
      * 
      * @param group the MPI.MediaGroup on which this request is invoked.
-     * @return the Object that is the return value of the method.
+     * @return the java.lang.Object that is the return value of the method.
      * @throws RuntimeException if any Throwable/Exception is generated.
      */
-    public Object invoke(MPI.MediaGroup group) {
-	Object target = group.getTargetForMethod(method);
+    public java.lang.Object invoke(MPI.MediaGroup group) {
+	java.lang.Object target = group.getTargetForMethod(method);
 	// System.err.println("invoke: method = "+method);
 	// System.err.println("invoke: target = "+target);
 	// System.err.println("invoke: arglist = "+arglist+" "+arglist.length);
@@ -162,7 +162,7 @@ class Request {
     /** Find the indicated Method.
      * Catch any Exceptions so this can be used in static initializers 
      */
-    static public Method theMethod(Class clas, String name, Class[] argtypes) {
+    static public Method theMethod(Class clas, java.lang.String name, Class[] argtypes) {
 	try {return clas.getMethod(name, argtypes);}
 	catch (Exception ex) {return null;}
     }

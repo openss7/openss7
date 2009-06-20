@@ -228,7 +228,7 @@ public interface MobileProvider extends javax.telephony.Provider {
      * <p>
      * @return A string representing the air interface type.
      */
-    public String getType();
+    public java.lang.String getType();
 
     /**
      * Get the network time. 

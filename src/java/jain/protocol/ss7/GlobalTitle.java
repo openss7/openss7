@@ -124,9 +124,9 @@ public class GlobalTitle implements java.io.Serializable {
         throw new ParameterNotSetException("Address Information: not set.");
     }
     /**
-      * String representation of class GlobalTitle
+      * java.lang.String representation of class GlobalTitle
       * @return
-      * String provides description of class GlobalTitle.
+      * java.lang.String provides description of class GlobalTitle.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

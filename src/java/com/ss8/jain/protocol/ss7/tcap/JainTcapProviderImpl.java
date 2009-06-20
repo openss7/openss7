@@ -62,7 +62,7 @@ public class JainTcapProviderImpl implements JainTcapProvider {
     // addJainTcapListener( SccpUserAddress )
     ////////////////////////////////////////////////////////////////////////////////
     public void addJainTcapListener(JainTcapListener listener, SccpUserAddress userAddress)
-	throws TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException {
+	throws java.util.TooManyListenersException, ListenerAlreadyRegisteredException, InvalidAddressException {
 
 
 	int spNo = ((JainTcapStackImpl) getStack()).getSPNo();
@@ -70,7 +70,7 @@ public class JainTcapProviderImpl implements JainTcapProvider {
 	if (this.listener != null) {
 
 		// We support one listener per provider
-		throw new TooManyListenersException("Only one listener per provider");
+		throw new java.util.TooManyListenersException("Only one listener per provider");
 	}
 
 	try {
@@ -1831,7 +1831,7 @@ public class JainTcapProviderImpl implements JainTcapProvider {
     // addJainTcapListener( TcapUserAddress ) DEPRECATED
     ////////////////////////////////////////////////////////////////////////////////
     public void addJainTcapListener(JainTcapListener listener, TcapUserAddress userAddress)
-        throws TooManyListenersException, ListenerAlreadyRegisteredException,
+        throws java.util.TooManyListenersException, ListenerAlreadyRegisteredException,
                 InvalidUserAddressException {
 
         throw new InvalidUserAddressException("use class SccpUserAddress not TcapUserAddress\n");

@@ -388,7 +388,7 @@ public class SipProviderImpl implements java.rmi.Remote, SipProvider {
       * The transport for the listening point
       * @since 1.2
       */
-    public native ListeningPoint getListeningPoint(String transport);
+    public native ListeningPoint getListeningPoint(java.lang.String transport);
     /**
       * Removes the specified ListeningPoint from this SipProvider.
       * This method returns silently if the ListeningPoint is not

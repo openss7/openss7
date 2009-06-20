@@ -153,6 +153,136 @@ AS_VAR_POPDEF([ac_Lib])dnl
 # =============================================================================
 
 # =============================================================================
+# AC_CHECK_LIB_BROKEN(LIBRARY, FUNCTION,
+#                     [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#                     [OTHER-LIBRARIES], [PROLOGUE])
+# -----------------------------------------------------------------------------
+# SLES 10 has some broken native libraries.  These libraries do not include the
+# base SONAME in the library and do not install the proper symbolic links in
+# /lib or /usr/lib, therefore, when the check fails, it is necessary to go
+# looking for the library and include it directly.
+# =============================================================================
+AC_DEFUN([AC_CHECK_LIB_BROKEN],
+[m4_ifval([$3], , [AH_CHECK_LIB([$1])])dnl
+AS_LITERAL_IF([$1],
+	      [AS_VAR_PUSHDEF([ac_Lib], [ac_cv_lib_$1_$2])
+	       AS_VAR_PUSHDEF([ac_Flg], [ac_cv_flg_$1_$2])],
+	      [AS_VAR_PUSHDEF([ac_Lib], [ac_cv_lib_$1''_$2]),
+	       AS_VAR_PUSHDEF([ac_Flg], [ac_cv_flg_$1''_$2])])dnl
+AC_CACHE_CHECK([for $2 in native -l$1], ac_Lib,
+[ac_check_lib_save_LIBS=$LIBS
+LIBS="-l$1 $5 $LIBS"
+AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
+	       [AS_VAR_SET(ac_Flg, "-l$1")
+		AS_VAR_SET(ac_Lib, yes)],
+[AS_VAR_SET(ac_Flg, no)
+ AS_VAR_SET(ac_Lib, no)
+ AC_MSG_RESULT([searching])
+ eval "syslibdir=\"$libdir\""
+ syslibdir=`echo $syslibdir | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g;s,/usr/,/,g'`
+ eval "ac_search_path=\"
+    ${DESTDIR}${rootdir}${syslibdir}
+    ${DESTDIR}${syslibdir}
+    ${DESTDIR}${rootdir}${libdir}
+    ${DESTDIR}${libdir}\""
+ ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+ for ac_dir in $ac_search_path ; do
+     for ac_lib in $ac_dir/lib$1.so.* ; do
+	 if test -r $ac_lib ; then
+	     AC_MSG_CHECKING([for broken native lib$1 $ac_lib])
+	     LIBS=$ac_check_lib_save_LIBS
+	     LIBS="$ac_lib $5 $LIBS"
+	     AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
+			    [AS_VAR_SET(ac_Flg, $ac_lib)
+			     AS_VAR_SET(ac_Lib, yes)],
+			    [AS_VAR_SET(ac_Flg, no)
+			     AS_VAR_SET(ac_Lib, no)])
+	     AC_MSG_RESULT([AS_VAR_GET(ac_Flg)])
+	     AS_IF([test AS_VAR_GET(ac_Lib) = yes], [break])
+	 fi
+     done
+ done
+ AC_MSG_CHECKING([for $2 in native lib$1])
+])
+LIBS=$ac_check_lib_save_LIBS])
+AS_IF([test AS_VAR_GET(ac_Lib) = yes],
+      [m4_default([$3], [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_LIB$1))
+    LIBS=AS_VAR_GET(ac_Flg)" $LIBS"
+])],
+      [$4])dnl
+AS_VAR_POPDEF([ac_Lib])dnl
+AS_VAR_POPDEF([ac_Flg])dnl
+])
+# -----------------------------------------------------------------------------
+# AC_CHECK_LIB_BROKEN
+# =============================================================================
+
+# =============================================================================
+# AC_CHECK_LIB32_BROKEN(LIBRARY, FUNCTION,
+#                       [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#                       [OTHER-LIBRARIES], [PROLOGUE])
+# -----------------------------------------------------------------------------
+# SLES 10 has broken 32-bit libraries on 64-bit architectures.  These libraries
+# do not include the base SONAME in the library and do not install the proper
+# symbolic links in /lib or /usr/lib, therefore, when the check fails, it is
+# necessary to go looking for the library and include it directly.
+# =============================================================================
+AC_DEFUN([AC_CHECK_LIB32_BROKEN],
+[m4_ifval([$3], , [AH_CHECK_LIB32([$1])])dnl
+AS_LITERAL_IF([$1],
+	      [AS_VAR_PUSHDEF([ac_Lib], [ac_cv_lib32_$1_$2])
+	       AS_VAR_PUSHDEF([ac_Flg], [ac_cv_flg32_$1_$2])],
+	      [AS_VAR_PUSHDEF([ac_Lib], [ac_cv_lib32_$1''_$2])
+	       AS_VAR_PUSHDEF([ac_Flg], [ac_cv_flg32_$1''_$2])])dnl
+AC_CACHE_CHECK([for $2 in 32-bit -l$1], ac_Lib,
+[ac_check_lib_save_LIBS=$LIBS
+LIBS="-l$1 $5 $LIBS"
+AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
+	       [AS_VAR_SET(ac_Flg, "-l$1")
+	        AS_VAR_SET(ac_Lib, yes)],
+[AS_VAR_SET(ac_Flg, no)
+ AS_VAR_SET(ac_Lib, no)
+ AC_MSG_RESULT([searching])
+ eval "syslib32dir=\"$lib32dir\""
+ syslib32dir=`echo $syslib32dir | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g;s,/usr/,/,g'`
+ eval "ac_search_path=\"
+    ${DESTDIR}${rootdir}${syslib32dir}
+    ${DESTDIR}${syslib32dir}
+    ${DESTDIR}${rootdir}${lib32dir}
+    ${DESTDIR}${lib32dir}\""
+ ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+ for ac_dir in $ac_search_path ; do
+     for ac_lib in $ac_dir/lib$1.so.* ; do
+	 if test -r $ac_lib ; then
+	     AC_MSG_CHECKING([for broken 32-bit lib$1 $ac_lib])
+	     LIBS=$ac_check_lib_save_LIBS
+	     LIBS="$ac_lib $5 $LIBS"
+	     AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
+			    [AS_VAR_SET(ac_Flg, $ac_lib)
+			     AS_VAR_SET(ac_Lib, yes)],
+			    [AS_VAR_SET(ac_Flg, no)
+			     AS_VAR_SET(ac_Lib, no)])
+	     AC_MSG_RESULT([AS_VAR_GET(ac_Flg)])
+	     AS_IF([test AS_VAR_GET(ac_Lib) = yes], [break])
+	 fi
+     done
+ done
+ AC_MSG_CHECKING([for $2 in 32-bit lib$1])
+])
+LIBS=$ac_check_lib_save_LIBS])
+AS_IF([test AS_VAR_GET(ac_Lib) = yes],
+      [m4_default([$3], [AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_LIB32$1))
+    LIBS=AS_VAR_GET(ac_Flg)" $LIBS"
+])],
+      [$4])dnl
+AS_VAR_POPDEF([ac_Lib])dnl
+AS_VAR_POPDEF([ac_Flg])dnl
+])
+# -----------------------------------------------------------------------------
+# AC_CHECK_LIB32_BROKEN
+# =============================================================================
+
+# =============================================================================
 # AH_CHECK_LIB32(LIBNAME)
 # -----------------------------------------------------------------------------
 m4_define([AH_CHECK_LIB32],

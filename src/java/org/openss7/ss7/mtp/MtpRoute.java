@@ -55,7 +55,7 @@ public class MtpRoute extends MtpParameter {
         setSignalingPointCode(signalingPointCode);
         setRouteType(routeType);
     }
-    public void setSignalingPointCode(signalingPointCode) {
+    public void setSignalingPointCode(SignalingPointCode signalingPointCode) {
         this.signalingPointCode = signalingPointCode;
     }
     public void setRouteType(MtpRouteType routeType) {

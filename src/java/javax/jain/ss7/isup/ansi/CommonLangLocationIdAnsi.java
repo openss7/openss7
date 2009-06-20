@@ -68,7 +68,7 @@ public class CommonLangLocationIdAnsi implements java.io.Serializable {
         @exception ParameterRangeInvalidException - Thrown when value is out of range.
       */
     public CommonLangLocationIdAnsi(java.lang.String in_town, java.lang.String in_state,
-            String in_building, java.lang.String in_buildingSubDivision)
+            java.lang.String in_building, java.lang.String in_buildingSubDivision)
         throws ParameterRangeInvalidException {
         this.setTown(in_town);
         this.setState(in_state);
@@ -84,7 +84,7 @@ public class CommonLangLocationIdAnsi implements java.io.Serializable {
     /** Sets the Town field of CommonLangLocationId parameter.
         @param in_town - The Town value, range 1-4 IA5 coded characters.
       */
-    public void setTown(String in_town)
+    public void setTown(java.lang.String in_town)
         throws ParameterRangeInvalidException {
         if (1 <= in_town.length() && in_town.length() <= 4) {
             m_town = in_town;
@@ -101,7 +101,7 @@ public class CommonLangLocationIdAnsi implements java.io.Serializable {
     /** Sets the State field of CommonLangLocationId parameter.
         @param in_state - The State value, range 1-2 IA5 coded characters.
       */
-    public void setState(String in_state)
+    public void setState(java.lang.String in_state)
         throws ParameterRangeInvalidException {
         if (1 <= in_state.length() && in_state.length() <= 2) {
             m_state = in_state;
@@ -118,7 +118,7 @@ public class CommonLangLocationIdAnsi implements java.io.Serializable {
     /** Sets the Building field of CommonLangLocationId parameter.
         @param in_building - The Building value, range 1-2 IA5 coded characters.
       */
-    public void setBuilding(String in_building)
+    public void setBuilding(java.lang.String in_building)
         throws ParameterRangeInvalidException {
         if (1 <= in_building.length() && in_building.length() <= 2) {
             m_building = in_building;
@@ -136,7 +136,7 @@ public class CommonLangLocationIdAnsi implements java.io.Serializable {
         @param in_buildingSubDivision - The BuildingSubDivision value, range 1-3 IA5 coded
         characters.
       */
-    public void setBuildingSubDivision(String in_buildingSubDivision)
+    public void setBuildingSubDivision(java.lang.String in_buildingSubDivision)
         throws ParameterRangeInvalidException {
         if (1 <= in_buildingSubDivision.length() && in_buildingSubDivision.length() <= 3) {
             m_buildingSubDivision = in_buildingSubDivision;
@@ -158,10 +158,10 @@ public class CommonLangLocationIdAnsi implements java.io.Serializable {
         b.append("\n\tm_buildingSubDivision: " + m_buildingSubDivision);
         return b.toString();
     }
-    protected String  m_town;
-    protected String  m_state;
-    protected String  m_building;
-    protected String  m_buildingSubDivision;
+    protected java.lang.String  m_town;
+    protected java.lang.String  m_state;
+    protected java.lang.String  m_building;
+    protected java.lang.String  m_buildingSubDivision;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

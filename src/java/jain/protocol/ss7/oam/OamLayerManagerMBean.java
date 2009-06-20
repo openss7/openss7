@@ -181,7 +181,7 @@ public abstract interface OamLayerManagerMBean {
     public void readCurrentConfiguration()
         throws ReadConfigurationException;
     /**
-      * Returns a String that identifies the Vendor that supplied this implementation.
+      * Returns a java.lang.String that identifies the Vendor that supplied this implementation.
       * @return
       * a string identifying the Vendor implementation
       */
@@ -234,7 +234,7 @@ public abstract interface OamLayerManagerMBean {
       * @return
       * the stack name that was set by the setStackName method.
       */
-    public String getStackName();
+    public java.lang.String getStackName();
     /** Returns a reference to the OamLookupTable.  */
     public OamLookupTable getLookupTable();
 }

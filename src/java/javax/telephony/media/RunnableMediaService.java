@@ -58,7 +58,7 @@ package javax.telephony.media;
  *
  * <pre> // when framework wants <i>appClassName</i> to handle a Call
  * // and that Call will be given to this <i>serviceName</i>
- * runService(String appClassName, String serviceName) {
+ * runService(java.lang.String appClassName, java.lang.String serviceName) {
  *     RunnableMediaService rms;
  *     Class appClass = classForName(appClassName); // the application Class
  *     rms = (RunnableMediaService)(appClass.newInstance());
@@ -98,9 +98,9 @@ interface RunnableMediaService extends Runnable {
       * 	bindToServiceName(ConfigSpec, serviceName);
       * </pre>
       * <p>
-      * @param serviceName the String to be used
+      * @param serviceName the java.lang.String to be used
       * in this application's subsequent bindToServiceName()
       * @see MediaService#bindToServiceName bindToServiceName
       */
-     void setServiceName(String serviceName);
+     void setServiceName(java.lang.String serviceName);
  }

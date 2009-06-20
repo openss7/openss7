@@ -37,7 +37,7 @@ class NoServiceReadyException extends MediaBindException {
      *
      * @param   s   the detail message.
      */
-    public NoServiceReadyException(String s) {super(s);}
+    public NoServiceReadyException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>NoServiceReadyException</code>
@@ -46,7 +46,7 @@ class NoServiceReadyException extends MediaBindException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public NoServiceReadyException(String s, MediaEvent event) {
+    public NoServiceReadyException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

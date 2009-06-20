@@ -231,11 +231,11 @@ public interface JainMtpStack {
     public void setStackSpecification(int stackSpecification)
         throws javax.jain.VersionNotSupportedException;
     public void setSignalingPointCode(javax.jain.ss7.SignalingPointCode signalingPointCode)
-        throws javax.jain.ParameterInvalidException;
+        throws javax.jain.protocol.ss7.SS7InvalidParamException;
     public javax.jain.ss7.SignalingPointCode getSignalingPointCode()
         throws javax.jain.ParameterNotSetException;
     public void setNetworkIndicator(javax.jain.ss7.NetworkIndicator networkIndicator)
-        throws javax.jain.ParameterInvalidException;
+        throws javax.jain.protocol.ss7.SS7InvalidParamException;
     public javax.jain.ss7.NetworkIndicator getNetworkIndicator()
         throws javax.jain.ParameterNotSetException;
 }

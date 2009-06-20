@@ -33,17 +33,17 @@ class S200_SignalGeneratorEvent extends Base_SignalGeneratorEvent {
     /**
      * Create specific completion or non-tranaction event from SignalGenerator.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_SendSignals
      */
-    public S200_SignalGeneratorEvent(Object source, Symbol eventID) 
+    public S200_SignalGeneratorEvent(java.lang.Object source, Symbol eventID) 
     {super(source, eventID);}
 
     /** Constructor for non-trans vesion.
      * Not used.
      */
-    public S200_SignalGeneratorEvent(Object source, Symbol eventID, boolean isNonTrans) {
+    public S200_SignalGeneratorEvent(java.lang.Object source, Symbol eventID, boolean isNonTrans) {
 	this(source, eventID);
 	this.isNonTrans = isNonTrans;
     }

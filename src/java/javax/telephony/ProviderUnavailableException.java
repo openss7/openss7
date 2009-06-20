@@ -118,7 +118,7 @@ public class ProviderUnavailableException extends RuntimeException {
    * 
    * @param s description of the fault
    */
-  public ProviderUnavailableException(String s) {
+  public ProviderUnavailableException(java.lang.String s) {
     super(s);
 
     _cause = ProviderUnavailableException.CAUSE_UNKNOWN;
@@ -131,7 +131,7 @@ public class ProviderUnavailableException extends RuntimeException {
    * @param cause reason code for the fault
    * @param s description of the fault
    */
-  public ProviderUnavailableException(int cause, String s) {
+  public ProviderUnavailableException(int cause, java.lang.String s) {
     super(s);
 
     _cause = cause;

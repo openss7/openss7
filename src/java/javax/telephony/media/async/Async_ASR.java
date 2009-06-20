@@ -154,11 +154,11 @@ public interface Async_ASR extends ASRConstants
      * {@link ASREvent#getRuleExpansion ASREvent.getRuleExpansion()}.
      *
      * @param grammarContext the name of a loaded grammar Context.
-     * @param ruleName a String that names the rule to be expanded.
+     * @param ruleName a java.lang.String that names the rule to be expanded.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_getRuleExpansion(String grammarContext, String ruleName);
+    Async_ASREvent async_getRuleExpansion(java.lang.String grammarContext, java.lang.String ruleName);
 
     /**
      * Non-blocking version of setRuleExpansion().
@@ -171,14 +171,14 @@ public interface Async_ASR extends ASRConstants
      * specification language.
      * 
      * @param grammarContext a loaded Context.
-     * @param ruleName a String that names the rule being defined.
-     * @param ruleExpansion a String containing the rule expansion.
+     * @param ruleName a java.lang.String that names the rule being defined.
+     * @param ruleExpansion a java.lang.String containing the rule expansion.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_setRuleExpansion(String grammarContext, 
-					  String ruleName,
-					  String ruleExpansion);
+    Async_ASREvent async_setRuleExpansion(java.lang.String grammarContext, 
+					  java.lang.String ruleName,
+					  java.lang.String ruleExpansion);
  
     /** Training methods */
     /**
@@ -198,7 +198,7 @@ public interface Async_ASR extends ASRConstants
      * the association between the <b>Word</b> and <tt>wordString</tt>
      * cannot be changed.
      * <tt>wordString</tt> is not necessarily an exact transcription 
-     * of the utterance; in most cases, an arbitrary String is used.
+     * of the utterance; in most cases, an arbitrary java.lang.String is used.
      * <p>
      * For example, in a scenario where arbitrary voice
      * labels are associated with a telephone number, the actual
@@ -212,14 +212,14 @@ public interface Async_ASR extends ASRConstants
      * in that case, the value of <tt>wordString</tt> is ignored.
      * 
      * @param wordContext the Context to which this word is committed.
-     * @param wordTemp a String that identifes the word to commit.
-     * @param wordString the permanent String to identify this word.
+     * @param wordTemp a java.lang.String that identifes the word to commit.
+     * @param wordString the permanent java.lang.String to identify this word.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_wordCommit(String wordContext, 
-				    String wordTemp, 
-				    String wordString);
+    Async_ASREvent async_wordCommit(java.lang.String wordContext, 
+				    java.lang.String wordTemp, 
+				    java.lang.String wordString);
 
     /**
      * Create a new <b>Word</b> within a loaded Context.
@@ -229,10 +229,10 @@ public interface Async_ASR extends ASRConstants
      * <b>Word</b> adds it to the Context's <tt>p_WordList</tt> parameter.
      * 
      * @param wordContext the Context in which Word is created.
-     * @param wordTemp a String containing the temporary name of the word.
+     * @param wordTemp a java.lang.String containing the temporary name of the word.
      * @return an async_ASREvent
      */
-    Async_ASREvent async_wordCreate(String wordContext, String wordTemp);
+    Async_ASREvent async_wordCreate(java.lang.String wordContext, java.lang.String wordTemp);
 
     /**
      * Prevent the previous utterance from contributing to training.
@@ -246,11 +246,11 @@ public interface Async_ASR extends ASRConstants
      * part of the permanent training of the <b>Word</b>.
      * 
      * @param wordContext the Context in which the work is being trained.
-     * @param wordTemp the String that identifies the word being trained.
+     * @param wordTemp the java.lang.String that identifies the word being trained.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_wordDeleteLastUtterance(String wordContext, String wordTemp);
+    Async_ASREvent async_wordDeleteLastUtterance(java.lang.String wordContext, java.lang.String wordTemp);
 
     /**
      * Delete all training associated with a Word in the
@@ -262,11 +262,11 @@ public interface Async_ASR extends ASRConstants
      * must be the temporary name.
      *
      * @param wordContext the Context from which the training is deleted.
-     * @param wordString the String that idenifies word to be deleted.
+     * @param wordString the java.lang.String that idenifies word to be deleted.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_wordDeleteTraining(String wordContext, String wordString);
+    Async_ASREvent async_wordDeleteTraining(java.lang.String wordContext, java.lang.String wordString);
 
     /**
      * Remove a word from a loaded Context.
@@ -280,11 +280,11 @@ public interface Async_ASR extends ASRConstants
      * must be the temporary name.
      *
      * @param wordContext the Context from which the Word is removed.
-     * @param wordString the String that identifies the word.
+     * @param wordString the java.lang.String that identifies the word.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_wordDestroy(String wordContext, String wordString);
+    Async_ASREvent async_wordDestroy(java.lang.String wordContext, java.lang.String wordString);
 
     /**
      * Train a Word in a Context. The Recognizer
@@ -344,15 +344,15 @@ public interface Async_ASR extends ASRConstants
      * IPA as their text input for training. If <tt>p_TrainingType</tt>
      * is set to <tt>v_Text</tt> or <tt>v_Phonetic</tt>, the dictionary
      * entry <tt>p_TrainingInfo</tt> must also be present. This array of
-     * String will contain either the text or phonetic representation of
+     * java.lang.String will contain either the text or phonetic representation of
      * the training material, as appropriate.
      * 
      * @param wordContext the Context in which the word is trained.
-     * @param wordString a String that identifies the word to be trained.
+     * @param wordString a java.lang.String that identifies the word to be trained.
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_wordTrain(String wordContext, String wordString);
+    Async_ASREvent async_wordTrain(java.lang.String wordContext, java.lang.String wordString);
 
     /** Context methods */
     /**
@@ -400,7 +400,7 @@ public interface Async_ASR extends ASRConstants
      * <p>
      *
      * @param contextResource a Context within the ASR Resource.
-     * @param containerContext a String containing the name of the container
+     * @param containerContext a java.lang.String containing the name of the container
      * context.
      * @param direction a Symbol indicating the direction and type of copy.
      * Must be one of {@link ASRConstants#v_ToResource},
@@ -409,8 +409,8 @@ public interface Async_ASR extends ASRConstants
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_contextCopy(String contextResource,
-				     String containerContext, 
+    Async_ASREvent async_contextCopy(java.lang.String contextResource,
+				     java.lang.String containerContext, 
 				     Symbol direction);
 
     /**
@@ -438,7 +438,7 @@ public interface Async_ASR extends ASRConstants
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_contextCreate(String resourceContext,
+    Async_ASREvent async_contextCreate(java.lang.String resourceContext,
 				       Symbol trainingType,
 				       Dictionary contextParams);
 
@@ -463,7 +463,7 @@ public interface Async_ASR extends ASRConstants
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_contextGetParameters(String resourceContext, Symbol[] keys);
+    Async_ASREvent async_contextGetParameters(java.lang.String resourceContext, Symbol[] keys);
 
     /**
      * Remove an existing Context from an ASR Resource.
@@ -476,7 +476,7 @@ public interface Async_ASR extends ASRConstants
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_contextRemove(String resourceContext);
+    Async_ASREvent async_contextRemove(java.lang.String resourceContext);
 
     /**
      * This function sets the parameters associated with a particular
@@ -487,7 +487,7 @@ public interface Async_ASR extends ASRConstants
      *
      * @return an async_ASREvent
      */
-    Async_ASREvent async_contextSetParameters(String resourceContext, 
+    Async_ASREvent async_contextSetParameters(java.lang.String resourceContext, 
 					      Dictionary contextParams);
 
 }

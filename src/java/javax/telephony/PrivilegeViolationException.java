@@ -70,7 +70,7 @@ public class PrivilegeViolationException extends Exception {
    * @param type kind of violation
    * @param s description of the violation
    */
-  public PrivilegeViolationException(int type, String s) {
+  public PrivilegeViolationException(int type, java.lang.String s) {
     super(s);
     _type = type;
   }

@@ -124,7 +124,7 @@ static final Symbol p_SIPHeaders
           This parameter allows the application to pass to the
           NetworkConnection some SIP Headers that may be of interest for
           media transport, like user-agent identification.
-          The expected value is a Map<String, String>, where each entry
+          The expected value is a Map<java.lang.String, java.lang.String>, where each entry
           is a (header-name, header-value).
      _________________________________________________________________
 

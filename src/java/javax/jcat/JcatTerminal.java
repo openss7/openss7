@@ -259,7 +259,7 @@ public interface JcatTerminal {
       *
       * @return the name of the JcatTerminal.
       */
-    public String getName();
+    public java.lang.String getName();
     /**
       * Returns the JcatProvider associated with this JcatTerminal.
       * This JcatProvider object is valid throughout the lifetime of the

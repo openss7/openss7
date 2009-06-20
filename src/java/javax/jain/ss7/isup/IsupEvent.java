@@ -59,7 +59,7 @@ import javax.jain.*;
   * and the Circuit Identification Code associated with an ISUP Event.  This class
   * implements the <i>Cloneable</i> interface, therefore all message that
   * extend to this Event can be cloned using the clone() method inherited from
-  * <i>Object</i>.
+  * <i>java.lang.Object</i>.
   * @serial
   *
   * @author Monavacon Limited
@@ -70,7 +70,7 @@ public abstract class IsupEvent extends JainEvent {
     protected IsupEvent() { }
     /** Constructs a new IsupEvent and sets the source of the event.
       * @param source The source of this event.  */
-    protected IsupEvent(Object source) {
+    protected IsupEvent(java.lang.Object source) {
         super(source);
     }
     /** Constructs a new IsupEvent and sets the source, dpc, opc, sls and cic.
@@ -82,7 +82,7 @@ public abstract class IsupEvent extends JainEvent {
       * @param cic The circuit identification code in the event.
       * @param congestionPriority The congestion priority of the event.
       * @exception ParameterRangeInvalidException Thrown when a value is out of range.  */
-    protected IsupEvent(Object source, SignalingPointCode dpc, SignalingPointCode opc, byte sls, int cic, byte congestionPriority) throws ParameterRangeInvalidException {
+    protected IsupEvent(java.lang.Object source, SignalingPointCode dpc, SignalingPointCode opc, byte sls, int cic, byte congestionPriority) throws ParameterRangeInvalidException {
         this(source);
         this.setDpc(dpc);
         this.setOpc(opc);
@@ -262,7 +262,7 @@ public abstract class IsupEvent extends JainEvent {
             return true;
         return false;
     }
-    public void setSource(Object in_source) {
+    public void setSource(java.lang.Object in_source) {
         source = in_source;
     }
     /** The toString method retrieves a string containing the values of the members of

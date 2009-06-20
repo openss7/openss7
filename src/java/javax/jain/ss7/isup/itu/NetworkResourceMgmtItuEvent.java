@@ -76,7 +76,7 @@ public class NetworkResourceMgmtItuEvent extends IsupEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public NetworkResourceMgmtItuEvent(Object source, SignalingPointCode dpc,
+    public NetworkResourceMgmtItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority);

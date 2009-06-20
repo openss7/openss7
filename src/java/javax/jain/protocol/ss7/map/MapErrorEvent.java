@@ -83,20 +83,20 @@ public class MapErrorEvent extends java.util.EventObject implements java.io.Seri
       * @return The Object containing the error.
       */
     public java.lang.Object getError() {
-        Object error = null;
+        java.lang.Object error = null;
         if (m_error_is_set)
             error = m_error;
         return error;
     }
     public java.lang.Object getSource() {
-        Object source = null;
+        java.lang.Object source = null;
         if (m_source_is_set)
             source = m_source;
         return source;
     }
-    private Object m_source = null;
+    private java.lang.Object m_source = null;
     private boolean m_source_is_set = false;
-    private Object m_error = null;
+    private java.lang.Object m_error = null;
     private boolean m_error_is_set = false;
 }
 

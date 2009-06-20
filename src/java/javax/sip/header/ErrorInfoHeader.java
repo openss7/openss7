@@ -75,7 +75,7 @@ public interface ErrorInfoHeader extends Parameters, Header {
     void setErrorInfo(URI errorInfo);
     /**
         Returns the ErrorInfo value of this ErrorInfoHeader. This message may return null if a
-        String message identifies the ErrorInfo.
+        java.lang.String message identifies the ErrorInfo.
         @return The URI representing the ErrorInfo.
       */
     URI getErrorInfo();

@@ -19,7 +19,7 @@ import javax.telephony.media.Symbol;
 
 /**
  * Thrown by {@link MediaService#releaseToService releaseToService}
- * if there is no mapping from the disposition String to a serviceName.
+ * if there is no mapping from the disposition java.lang.String to a serviceName.
  * <p>
  * Conceptually, this is like getting a <i>reorder</i> tone when dialing
  * a number for which there is no assigned Address or Terminal.
@@ -40,7 +40,7 @@ public class NoServiceAssignedException extends MediaBindException {
      *
      * @param   s   the detail message.
      */
-    public NoServiceAssignedException(String s) {super(s);}
+    public NoServiceAssignedException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>NoServiceAssignedException</code>
@@ -49,7 +49,7 @@ public class NoServiceAssignedException extends MediaBindException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public NoServiceAssignedException(String s, MediaEvent event) {
+    public NoServiceAssignedException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

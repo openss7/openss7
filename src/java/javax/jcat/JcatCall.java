@@ -158,7 +158,7 @@ public interface JcatCall extends JccCall {
       * An internal resource necessary for the successful invocation of
       * this method is not available.
       */
-    public JcatConnection blindTransfer(String dialledDigits)
+    public JcatConnection blindTransfer(java.lang.String dialledDigits)
         throws InvalidArgumentException, InvalidStateException,
                           InvalidPartyException,
                           MethodNotSupportedException,
@@ -322,7 +322,7 @@ public interface JcatCall extends JccCall {
       * @exception MethodNotSupportedException
       * The implementation does not support this method.
       */
-    public JcatConnection[] connect(JcatTerminal term, JcatAddress addr, String dialedDigits)
+    public JcatConnection[] connect(JcatTerminal term, JcatAddress addr, java.lang.String dialedDigits)
         throws ResourceUnavailableException,
                           PrivilegeViolationException,
                           InvalidPartyException, InvalidStateException,
@@ -373,7 +373,7 @@ public interface JcatCall extends JccCall {
       * JcatConnections are returned representing the originating and
       * destination participants of the JcatCall. The JcatCall
       * progresses in the same way as if the JcatCall was placed using
-      * the connect(JcatTerminal,JcatAddress,String) method.
+      * the connect(JcatTerminal,JcatAddress,java.lang.String) method.
       *
       * @param termconn
       * Originating terminal for the telephone call.
@@ -404,7 +404,7 @@ public interface JcatCall extends JccCall {
       * An internal resource necessary for the successful invocation of
       * this method is not available.
       */
-    public JcatConnection[] consult(JcatTerminalConnection termconn, String dialedDigits)
+    public JcatConnection[] consult(JcatTerminalConnection termconn, java.lang.String dialedDigits)
     throws InvalidArgumentException, InvalidPartyException,
                       InvalidStateException,
                       MethodNotSupportedException,

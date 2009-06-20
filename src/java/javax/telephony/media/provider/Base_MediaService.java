@@ -70,7 +70,7 @@ public class Base_MediaService extends Base_Owner
      implements MPI.Owner,
 		MediaService, Async.MediaService, Delegation, Async_Delegation
 {
-    public String toString() {
+    public java.lang.String toString() {
 	return super.toString()
 	    + ":" + ((_group==null) ? "unBound" : _group.toString());
     }
@@ -446,7 +446,7 @@ public class Base_MediaService extends Base_Owner
      * <tt>MediaProvider mp = BasicMediaService.findMediaProvider(...);</tt>
      * 
      * @param peerName name of the MediaPeer Class
-     * @param providerString a String that identifies
+     * @param providerString a java.lang.String that identifies
      * the (MediaPeer-specific) MediaProvider and other information.
      * 
      * @throws ClassNotFoundException if MediaPeer class is not found
@@ -456,7 +456,7 @@ public class Base_MediaService extends Base_Owner
      * @throws ClassCastException if Provider instance is not a MediaProvider
      */ 
     public static
-    MediaProvider findMediaProvider(String peerName, String providerString) 
+    MediaProvider findMediaProvider(java.lang.String peerName, java.lang.String providerString) 
     throws ClassNotFoundException, 
         InstantiationException,
         IllegalAccessException,
@@ -536,7 +536,7 @@ public class Base_MediaService extends Base_Owner
 
     /**
      * Create an unbound MediaService, using services identified
-     * by the two String arguments.
+     * by the two java.lang.String arguments.
      *
      * @param peerName the name of a Class that implements MediaPeer.
      * @param providerString a "login" string for that MediaPeer.
@@ -547,7 +547,7 @@ public class Base_MediaService extends Base_Owner
      * @throws ProviderUnavailableException if Provider is not available
      * @throws ClassCastException if Provider instance is not a MediaProvider
      */
-    public Base_MediaService(String peerName, String providerString) 
+    public Base_MediaService(java.lang.String peerName, java.lang.String providerString) 
 	throws ClassNotFoundException, 
 	       InstantiationException, // hope to remove in Jtapi-2.0
 	       IllegalAccessException,	// hope to remove in Jtapi-2.0
@@ -596,7 +596,7 @@ public class Base_MediaService extends Base_Owner
     /*********** Delegation methods ************/
     // Directly implemented methods, not generated:
 
-    public DelegationEvent delegateToService(String serviceName, int timeout, String catchTags)
+    public DelegationEvent delegateToService(java.lang.String serviceName, int timeout, java.lang.String catchTags)
 	throws MediaBindException,
 	       MediaConfigException 
     {
@@ -608,9 +608,9 @@ public class Base_MediaService extends Base_Owner
     }
 
     synchronized
-    public Async.DelegationEvent async_delegateToService(String serviceName, 
+    public Async.DelegationEvent async_delegateToService(java.lang.String serviceName, 
 							 int timeout, 
-							 String catchTags)
+							 java.lang.String catchTags)
 	throws MediaBindException 
     {
 	checkReleaseable();	// throw NotBoundException, BindInProgress, NotOwnerException;
@@ -698,7 +698,7 @@ public class Base_MediaService extends Base_Owner
 %>%;// %?gen% 
      */
 
-    public void bindAndConnect(ConfigSpec configspec0, String string1, String string2)
+    public void bindAndConnect(ConfigSpec configspec0, java.lang.String string1, java.lang.String string2)
 	throws MediaBindException,
 	       MediaConfigException,
 	       MediaCallException 
@@ -712,7 +712,7 @@ public class Base_MediaService extends Base_Owner
     }
 
     synchronized
-    public Async.BindToCallEvent async_bindAndConnect(ConfigSpec configspec0, String string1, String string2)
+    public Async.BindToCallEvent async_bindAndConnect(ConfigSpec configspec0, java.lang.String string1, java.lang.String string2)
 	throws MediaBindException 
     {
 	checkBindable();  // throw AlreadyBoundException
@@ -748,7 +748,7 @@ public class Base_MediaService extends Base_Owner
 	return event;
     }
 
-    public void bindToServiceName(ConfigSpec configspec0, String string1)
+    public void bindToServiceName(ConfigSpec configspec0, java.lang.String string1)
 	throws MediaBindException,
 	       MediaConfigException 
     {
@@ -760,7 +760,7 @@ public class Base_MediaService extends Base_Owner
     }
 
     synchronized
-    public Async.BindEvent async_bindToServiceName(ConfigSpec configspec0, String string1)
+    public Async.BindEvent async_bindToServiceName(ConfigSpec configspec0, java.lang.String string1)
 	throws MediaBindException 
     {
 	checkBindable();  // throw AlreadyBoundException
@@ -771,7 +771,7 @@ public class Base_MediaService extends Base_Owner
 	return event;
     }
 
-    public void bindToTerminalName(ConfigSpec configspec0, String string1)
+    public void bindToTerminalName(ConfigSpec configspec0, java.lang.String string1)
 	throws MediaBindException,
 	       MediaConfigException 
     {
@@ -783,7 +783,7 @@ public class Base_MediaService extends Base_Owner
     }
 
     synchronized
-    public Async.BindEvent async_bindToTerminalName(ConfigSpec configspec0, String string1)
+    public Async.BindEvent async_bindToTerminalName(ConfigSpec configspec0, java.lang.String string1)
 	throws MediaBindException 
     {
 	checkBindable();  // throw AlreadyBoundException
@@ -839,7 +839,7 @@ public class Base_MediaService extends Base_Owner
 	return event;
     }
 
-    public void releaseToService(String string0, int int1)
+    public void releaseToService(java.lang.String string0, int int1)
 	throws NotBoundException,
 	       MediaBindException,
 	       MediaConfigException 
@@ -852,7 +852,7 @@ public class Base_MediaService extends Base_Owner
     }
 
     synchronized
-    public Async.ReleaseEvent async_releaseToService(String string0, int int1)
+    public Async.ReleaseEvent async_releaseToService(java.lang.String string0, int int1)
 	throws MediaBindException 
     {
 	checkReleaseable(); // throw NotBoundException
@@ -863,7 +863,7 @@ public class Base_MediaService extends Base_Owner
 	return event;
     }
 
-    public void releaseToTag(String string0)
+    public void releaseToTag(java.lang.String string0)
 	throws MediaBindException 
     {
 	Async.ReleaseEvent event;
@@ -873,7 +873,7 @@ public class Base_MediaService extends Base_Owner
     }
 
     synchronized
-    public Async.ReleaseEvent async_releaseToTag(String string0)
+    public Async.ReleaseEvent async_releaseToTag(java.lang.String string0)
 	throws NotBoundException,
 	       MediaBindException 
     {
@@ -960,7 +960,7 @@ public class Base_MediaService extends Base_Owner
     }
 
 
-    public String getTerminalName()
+    public java.lang.String getTerminalName()
 	throws NotBoundException 
     {
 	Async.MediaGroupEvent event = async_getTerminalName();
@@ -1116,12 +1116,12 @@ public class Base_MediaService extends Base_Owner
      * This corresponds to the S.100 function: CTgrp_execute(traninfo);
      * <p>
      * @param request a Request for a method invocation on this MediaGroup.
-     * @return the Object returned from the method invocation,
+     * @return the java.lang.Object returned from the method invocation,
      * typically a Base.Event: MediaEvent, ResourceEvent or other variant.
      *
      * @see Request.invoke(MPI.MediaGroup)
      */
-    protected Object invokeGroupMethod(Request request)
+    protected java.lang.Object invokeGroupMethod(Request request)
 	throws RuntimeException {
 	return request.invoke(checkGroup());
     }

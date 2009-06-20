@@ -29,7 +29,7 @@ public class NullMediaPeer implements MediaPeer {
     static MPI.GroupProvider groupProvider = new NullGroupProvider();
 
     /** implements MediaPeer interface */
-    public MediaProvider getMediaProvider(String providerString) {
+    public MediaProvider getMediaProvider(java.lang.String providerString) {
 	return groupProvider;
     }
 }

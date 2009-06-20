@@ -35,7 +35,7 @@ class NotDelegatedException extends MediaException {
      *
      * @param   s   the detail message.
      */
-    public NotDelegatedException(String s) {super(s);}
+    public NotDelegatedException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>NotDelegatedException</code>
@@ -44,7 +44,7 @@ class NotDelegatedException extends MediaException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public NotDelegatedException(String s, MediaEvent event) {
+    public NotDelegatedException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

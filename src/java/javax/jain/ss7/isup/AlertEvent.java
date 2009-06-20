@@ -74,7 +74,7 @@ public abstract class AlertEvent extends IsupEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @param bwdCallInd  Backward call indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    protected AlertEvent(Object source, SignalingPointCode dpc,
+    protected AlertEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             BwdCallInd bci)
         throws ParameterRangeInvalidException {

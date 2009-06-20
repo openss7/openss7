@@ -75,7 +75,7 @@ import javax.sip.*;
     Properties object passed to the SipFactory.createSipStack(Properties) method upon creation of
     the SIP Stack object. The Router object must accept a SipStack as an argument to the constructor
     in order for the Router to access attributes of the SipStack The constructor of an object
-    implementing the Router interface must be RouterImpl(SipStack sipStack, String outboundProxy) {}
+    implementing the Router interface must be RouterImpl(SipStack sipStack, java.lang.String outboundProxy) {}
     <p> The routing policy can not be changed dynamically, i.e. the SipStack needs to be deleted and
     re-created. Outbound proxy should be passed to the SipFactory.createSipStack(Properties) method
     upon creation of the SIP Stack object. <p> <h5>Application Notes</h5> A UAC application which

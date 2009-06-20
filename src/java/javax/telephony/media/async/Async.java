@@ -306,10 +306,10 @@ interface Async {
 	 * for this method, the event is named "<tt>ev_GroupStop</tt>"
 	 * to avoid conflict with the Resource events' "<tt>ev_Stop</tt>"
 	 * <p>
-	 * For example, to get the terminal name String when
+	 * For example, to get the terminal name java.lang.String when
 	 * <tt>getTerminalName()</tt> completes, use: <pre>
 	 *     if (event.getEventID().equals(ev_GetTerminalName)) 
-	 *        String name = event.getTerminalName();</pre>
+	 *        java.lang.String name = event.getTerminalName();</pre>
 	 * <p>
 	 * <b>Note:</b> at this time there is no justification
 	 * to define additional callback methods specialized for
@@ -394,8 +394,8 @@ interface Async {
 	 * Async version of bindAndConnect.
 
 	 * @param cs  a ConfigSpec object
-	 * @param s1  a String specifing the origAddr
-	 * @param s2  a String specifing the dialDigits
+	 * @param s1  a java.lang.String specifing the origAddr
+	 * @param s2  a java.lang.String specifing the dialDigits
 
 	 * @return an Async.BindToCallEvent for onBindDone();
 	 * @throws MediaBindException for preconditions; 
@@ -403,7 +403,7 @@ interface Async {
 	 * <tt>BindInProgressException</tt>
 	 * @see MediaService#bindAndConnect
 	 */
-	BindToCallEvent async_bindAndConnect(ConfigSpec cs, String s1, String s2)
+	BindToCallEvent async_bindAndConnect(ConfigSpec cs, java.lang.String s1, java.lang.String s2)
 	    throws MediaBindException;
 	/**
 	 * Async version of bindToCall.
@@ -421,26 +421,26 @@ interface Async {
 	/**
 	 * Async version of bindToServiceName.
 	 * @param cs    a ConfigSpec object
-	 * @param serviceName a String
+	 * @param serviceName a java.lang.String
 	 * @throws MediaBindException for preconditions; 
 	 * <tt>AlreadyBoundException</tt> or
 	 * <tt>BindInProgressException</tt>
 	 * @return an Async.BindEvent for onBindDone();
 	 * @see MediaService#bindToServiceName
 	 */
-	BindEvent async_bindToServiceName(ConfigSpec cs, String serviceName)
+	BindEvent async_bindToServiceName(ConfigSpec cs, java.lang.String serviceName)
 	    throws MediaBindException;
 	/**
 	 * Async version of bindToTerminalName.
 	 * @param cs    a ConfigSpec object
-	 * @param s1	a terminal name String
+	 * @param s1	a terminal name java.lang.String
 	 * @throws MediaBindException for preconditions; 
 	 * <tt>AlreadyBoundException</tt> or
 	 * <tt>BindInProgressException</tt>
 	 * @return an Async.BindEvent for onBindDone();
 	 * @see MediaService#bindToTerminalName
 	 */
-	BindEvent async_bindToTerminalName(ConfigSpec cs, String s1)
+	BindEvent async_bindToTerminalName(ConfigSpec cs, java.lang.String s1)
 	    throws MediaBindException;
 	/**
 	 * Async version of bindToTerminal.
@@ -466,24 +466,24 @@ interface Async {
 	/**
 	 * Async version of releaseToService().
 	 *
-	 * @param serviceName  a String
+	 * @param serviceName  a java.lang.String
 	 * @param timeout      an int specifying timeout in milliseconds
 	 * @throws MediaBindException a <tt>BindInProgressException</tt>
 	 * @return an Async.ReleaseEvent for onReleaseDone();
 	 * @see MediaService#releaseToService
 	 */
-	ReleaseEvent async_releaseToService(String serviceName, int timeout)
+	ReleaseEvent async_releaseToService(java.lang.String serviceName, int timeout)
 	    throws MediaBindException;
 	
 	/**
 	 * Async version of releaseToTag().
-	 * @param returnTag a String of tags to match delegated <tt>catchTags</tt>
+	 * @param returnTag a java.lang.String of tags to match delegated <tt>catchTags</tt>
 	 * @throws NotBoundException if not currently bound to a MediaGroup.
 	 * @throws MediaBindException a BindInProgressException
 	 * @return an Async.ReleaseEvent for onReleaseDone();
 	 * @see MediaService#releaseToTag
 	 */
-	ReleaseEvent async_releaseToTag(String returnTag) 
+	ReleaseEvent async_releaseToTag(java.lang.String returnTag) 
 	    throws NotBoundException, MediaBindException;
 	
 	/** 

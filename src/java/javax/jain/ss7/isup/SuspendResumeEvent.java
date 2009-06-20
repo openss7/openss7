@@ -82,7 +82,7 @@ public class SuspendResumeEvent extends IsupEvent {
       * subscriber initiated.
       * @exception PrimitiveInvalidException  Thrown when the primitive value is not
       * set correctly.  */
-    public SuspendResumeEvent(Object source, SignalingPointCode dpc,
+    public SuspendResumeEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int primitive, byte suspendResumeInd)
         throws PrimitiveInvalidException, ParameterRangeInvalidException {

@@ -89,7 +89,7 @@ public class BasicMediaService extends Base_MediaService
      * <tt>MediaProvider mp = BasicMediaService.findMediaProvider(...);</tt>
      * 
      * @param peerName name of the MediaPeer Class
-     * @param providerString a String that identifies
+     * @param providerString a java.lang.String that identifies
      * the (MediaPeer-specific) MediaProvider and other information.
      * 
      * @throws ClassNotFoundException if MediaPeer class is not found
@@ -100,7 +100,7 @@ public class BasicMediaService extends Base_MediaService
      * @return a MediaProvider
      */ 
     public static 
-	MediaProvider findMediaProvider(String peerName, String providerString)
+	MediaProvider findMediaProvider(java.lang.String peerName, java.lang.String providerString)
 	throws ClassNotFoundException, 
 	       InstantiationException,
 	       IllegalAccessException,
@@ -117,7 +117,7 @@ public class BasicMediaService extends Base_MediaService
     /**
      * Create an unbound MediaService, using the given MediaProvider object.
      * The MediaProvider object may be obtained from:
-     * <ul><li>{@link #findMediaProvider(String,String) 
+     * <ul><li>{@link #findMediaProvider(java.lang.String,java.lang.String) 
 		       findMediaProvider(peerName, providerString)};</li>
      * <li>a JTAPI core Provider, by casting, 
      *     if that Provider implements MediaProvider</li>
@@ -131,7 +131,7 @@ public class BasicMediaService extends Base_MediaService
     
     /**
      * Create an unbound MediaService, using a MediaProvider
-     * identified by the two String arguments.
+     * identified by the two java.lang.String arguments.
      * <p>
      * <tt>peerName</tt> names a Class that implements <tt>MediaPeer</tt>.
      * If <tt>peerName</tt> is <tt>null</tt>, several 
@@ -156,7 +156,7 @@ public class BasicMediaService extends Base_MediaService
      * The format of a <code>providerString</code> 
      * as used to obtain a Jtapi [core/Call] Provider 
      * is documented in 
-     * {@link JtapiPeer#getProvider(String) JtapiPeer.getProvider(String)}.
+     * {@link JtapiPeer#getProvider(java.lang.String) JtapiPeer.getProvider(java.lang.String)}.
      *
      * @param peerName the name of a Class that implements MediaPeer.
      * @param providerString a "login" string for that MediaPeer.
@@ -167,7 +167,7 @@ public class BasicMediaService extends Base_MediaService
      * @throws ProviderUnavailableException if Provider is not available
      * @throws ClassCastException if Provider instance is not a MediaProvider
      */
-    public BasicMediaService(String peerName, String providerString) 
+    public BasicMediaService(java.lang.String peerName, java.lang.String providerString) 
 	throws ClassNotFoundException, 
     	       InstantiationException, 
     	       IllegalAccessException, 
@@ -185,11 +185,11 @@ public class BasicMediaService extends Base_MediaService
 %(javagen "codegen4.scm")%
 %-(big-time hack: should slice up the methName, but this works [for now])%
 %(defun retfunc (m) 
- (if (String.equals m "void") "return"
- (if (String.endsWith m "Event") "return event"
+ (if (java.lang.String.equals m "void") "return"
+ (if (java.lang.String.endsWith m "Event") "return event"
  "return %"
  )))%
-%(define return (maparray String retfunc retnType))%
+%(define return (maparray java.lang.String retfunc retnType))%
 %$methods<
     // @see %$declClass#%$methName(%, %$parmType)
     public %$retnType %$methName(%, %<%$parmType %$localvar%>)%<%Z<
@@ -203,8 +203,8 @@ public class BasicMediaService extends Base_MediaService
 %>%;// %?gen%
      */
 
-    // @see Player#play(String, int, RTC[], Dictionary)
-    public PlayerEvent play(String string0, int int1, RTC[] rtc2, Dictionary dictionary3)
+    // @see Player#play(java.lang.String, int, RTC[], Dictionary)
+    public PlayerEvent play(java.lang.String string0, int int1, RTC[] rtc2, Dictionary dictionary3)
 	throws MediaResourceException 
     {
 	Async_PlayerEvent event = async_play(string0, int1, rtc2, dictionary3);
@@ -212,8 +212,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see Player#play(String[], int, RTC[], Dictionary)
-    public PlayerEvent play(String[] string0, int int1, RTC[] rtc2, Dictionary dictionary3)
+    // @see Player#play(java.lang.String[], int, RTC[], Dictionary)
+    public PlayerEvent play(java.lang.String[] string0, int int1, RTC[] rtc2, Dictionary dictionary3)
 	throws MediaResourceException 
     {
 	Async_PlayerEvent event = async_play(string0, int1, rtc2, dictionary3);
@@ -275,8 +275,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see TTSPlayer#loadTTSDictionary(String[], Dictionary)
-    public PlayerEvent loadTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see TTSPlayer#loadTTSDictionary(java.lang.String[], Dictionary)
+    public PlayerEvent loadTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
 	throws MediaResourceException 
     {
 	Async_PlayerEvent event = async_loadTTSDictionary(string0, dictionary1);
@@ -284,8 +284,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see TTSPlayer#activateTTSDictionary(String[], Dictionary)
-    public PlayerEvent activateTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see TTSPlayer#activateTTSDictionary(java.lang.String[], Dictionary)
+    public PlayerEvent activateTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
 	throws MediaResourceException 
     {
 	Async_PlayerEvent event = async_activateTTSDictionary(string0, dictionary1);
@@ -293,8 +293,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see TTSPlayer#deactivateTTSDictionary(String[], Dictionary)
-    public PlayerEvent deactivateTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see TTSPlayer#deactivateTTSDictionary(java.lang.String[], Dictionary)
+    public PlayerEvent deactivateTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
 	throws MediaResourceException 
     {
 	Async_PlayerEvent event = async_deactivateTTSDictionary(string0, dictionary1);
@@ -302,8 +302,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see TTSPlayer#unloadTTSDictionary(String[], Dictionary)
-    public PlayerEvent unloadTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see TTSPlayer#unloadTTSDictionary(java.lang.String[], Dictionary)
+    public PlayerEvent unloadTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
 	throws MediaResourceException 
     {
 	Async_PlayerEvent event = async_unloadTTSDictionary(string0, dictionary1);
@@ -311,8 +311,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see Recorder#record(String, RTC[], Dictionary)
-    public RecorderEvent record(String string0, RTC[] rtc1, Dictionary dictionary2)
+    // @see Recorder#record(java.lang.String, RTC[], Dictionary)
+    public RecorderEvent record(java.lang.String string0, RTC[] rtc1, Dictionary dictionary2)
 	throws MediaResourceException 
     {
 	Async_RecorderEvent event = async_record(string0, rtc1, dictionary2);
@@ -374,8 +374,8 @@ public class BasicMediaService extends Base_MediaService
 	return event;
     }
 
-    // @see SignalGenerator#sendSignals(String, RTC[], Dictionary)
-    public SignalGeneratorEvent sendSignals(String string0, RTC[] rtc1, Dictionary dictionary2)
+    // @see SignalGenerator#sendSignals(java.lang.String, RTC[], Dictionary)
+    public SignalGeneratorEvent sendSignals(java.lang.String string0, RTC[] rtc1, Dictionary dictionary2)
 	throws MediaResourceException 
     {
 	Async_SignalGeneratorEvent event = async_sendSignals(string0, rtc1, dictionary2);
@@ -407,21 +407,21 @@ public class BasicMediaService extends Base_MediaService
 %>%;// %?gen%
  */	 
 
-    static final Class[] argTypes0 = {String.class, int.class, RTC[].class, Dictionary.class};
+    static final Class[] argTypes0 = {java.lang.String.class, int.class, RTC[].class, Dictionary.class};
     static final Method method0 = Request.theMethod((Async_Player.class), "async_play", argTypes0);
 
-    // @see Async_Player#async_play(String, int, RTC[], Dictionary)
-    public Async_PlayerEvent async_play(String string0, int int1, RTC[] rtc2, Dictionary dictionary3)
+    // @see Async_Player#async_play(java.lang.String, int, RTC[], Dictionary)
+    public Async_PlayerEvent async_play(java.lang.String string0, int int1, RTC[] rtc2, Dictionary dictionary3)
     {
 	Request request = new Request(method0, string0, int1, rtc2, dictionary3);
 	return (Async_PlayerEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes1 = {String[].class, int.class, RTC[].class, Dictionary.class};
+    static final Class[] argTypes1 = {java.lang.String[].class, int.class, RTC[].class, Dictionary.class};
     static final Method method1 = Request.theMethod((Async_Player.class), "async_play", argTypes1);
 
-    // @see Async_Player#async_play(String[], int, RTC[], Dictionary)
-    public Async_PlayerEvent async_play(String[] string0, int int1, RTC[] rtc2, Dictionary dictionary3)
+    // @see Async_Player#async_play(java.lang.String[], int, RTC[], Dictionary)
+    public Async_PlayerEvent async_play(java.lang.String[] string0, int int1, RTC[] rtc2, Dictionary dictionary3)
     {
 	Request request = new Request(method1, string0, int1, rtc2, dictionary3);
 	return (Async_PlayerEvent)invokeGroupMethod(request);
@@ -487,51 +487,51 @@ public class BasicMediaService extends Base_MediaService
 	return (Async_PlayerEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes8 = {String[].class, Dictionary.class};
+    static final Class[] argTypes8 = {java.lang.String[].class, Dictionary.class};
     static final Method method8 = Request.theMethod((Async_TTSPlayer.class), "async_loadTTSDictionary", argTypes8);
 
-    // @see Async_TTSPlayer#async_loadTTSDictionary(String[], Dictionary)
-    public Async_PlayerEvent async_loadTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see Async_TTSPlayer#async_loadTTSDictionary(java.lang.String[], Dictionary)
+    public Async_PlayerEvent async_loadTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
     {
 	Request request = new Request(method8, string0, dictionary1);
 	return (Async_PlayerEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes9 = {String[].class, Dictionary.class};
+    static final Class[] argTypes9 = {java.lang.String[].class, Dictionary.class};
     static final Method method9 = Request.theMethod((Async_TTSPlayer.class), "async_activateTTSDictionary", argTypes9);
 
-    // @see Async_TTSPlayer#async_activateTTSDictionary(String[], Dictionary)
-    public Async_PlayerEvent async_activateTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see Async_TTSPlayer#async_activateTTSDictionary(java.lang.String[], Dictionary)
+    public Async_PlayerEvent async_activateTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
     {
 	Request request = new Request(method9, string0, dictionary1);
 	return (Async_PlayerEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes10 = {String[].class, Dictionary.class};
+    static final Class[] argTypes10 = {java.lang.String[].class, Dictionary.class};
     static final Method method10 = Request.theMethod((Async_TTSPlayer.class), "async_deactivateTTSDictionary", argTypes10);
 
-    // @see Async_TTSPlayer#async_deactivateTTSDictionary(String[], Dictionary)
-    public Async_PlayerEvent async_deactivateTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see Async_TTSPlayer#async_deactivateTTSDictionary(java.lang.String[], Dictionary)
+    public Async_PlayerEvent async_deactivateTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
     {
 	Request request = new Request(method10, string0, dictionary1);
 	return (Async_PlayerEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes11 = {String[].class, Dictionary.class};
+    static final Class[] argTypes11 = {java.lang.String[].class, Dictionary.class};
     static final Method method11 = Request.theMethod((Async_TTSPlayer.class), "async_unloadTTSDictionary", argTypes11);
 
-    // @see Async_TTSPlayer#async_unloadTTSDictionary(String[], Dictionary)
-    public Async_PlayerEvent async_unloadTTSDictionary(String[] string0, Dictionary dictionary1)
+    // @see Async_TTSPlayer#async_unloadTTSDictionary(java.lang.String[], Dictionary)
+    public Async_PlayerEvent async_unloadTTSDictionary(java.lang.String[] string0, Dictionary dictionary1)
     {
 	Request request = new Request(method11, string0, dictionary1);
 	return (Async_PlayerEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes12 = {String.class, RTC[].class, Dictionary.class};
+    static final Class[] argTypes12 = {java.lang.String.class, RTC[].class, Dictionary.class};
     static final Method method12 = Request.theMethod((Async_Recorder.class), "async_record", argTypes12);
 
-    // @see Async_Recorder#async_record(String, RTC[], Dictionary)
-    public Async_RecorderEvent async_record(String string0, RTC[] rtc1, Dictionary dictionary2)
+    // @see Async_Recorder#async_record(java.lang.String, RTC[], Dictionary)
+    public Async_RecorderEvent async_record(java.lang.String string0, RTC[] rtc1, Dictionary dictionary2)
     {
 	Request request = new Request(method12, string0, rtc1, dictionary2);
 	return (Async_RecorderEvent)invokeGroupMethod(request);
@@ -587,11 +587,11 @@ public class BasicMediaService extends Base_MediaService
 	return (Async_SignalDetectorEvent)invokeGroupMethod(request);
     }
 
-    static final Class[] argTypes18 = {String.class, RTC[].class, Dictionary.class};
+    static final Class[] argTypes18 = {java.lang.String.class, RTC[].class, Dictionary.class};
     static final Method method18 = Request.theMethod((Async_SignalGenerator.class), "async_sendSignals", argTypes18);
 
-    // @see Async_SignalGenerator#async_sendSignals(String, RTC[], Dictionary)
-    public Async_SignalGeneratorEvent async_sendSignals(String string0, RTC[] rtc1, Dictionary dictionary2)
+    // @see Async_SignalGenerator#async_sendSignals(java.lang.String, RTC[], Dictionary)
+    public Async_SignalGeneratorEvent async_sendSignals(java.lang.String string0, RTC[] rtc1, Dictionary dictionary2)
     {
 	Request request = new Request(method18, string0, rtc1, dictionary2);
 	return (Async_SignalGeneratorEvent)invokeGroupMethod(request);

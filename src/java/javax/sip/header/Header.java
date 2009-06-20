@@ -132,7 +132,7 @@ public interface Header extends java.lang.Cloneable, java.io.Serializable {
     /**
         Gets a string representation of the Header. This method overrides the toString method in
         java.lang.Object.
-        @return String representation of Header.
+        @return java.lang.String representation of Header.
       */
     java.lang.String toString();
 }

@@ -69,7 +69,7 @@ public class ReleaseResponseItuEvent extends ReleaseResponseEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public ReleaseResponseItuEvent(Object source, SignalingPointCode dpc,
+    public ReleaseResponseItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority);

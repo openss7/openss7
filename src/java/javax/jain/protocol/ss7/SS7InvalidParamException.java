@@ -53,9 +53,9 @@ package javax.jain.protocol.ss7;
   */
 public class SS7InvalidParamException extends SS7Exception {
     /**
-      * SS7InvalidParamException with just a String message parameter.
+      * SS7InvalidParamException with just a java.lang.String message parameter.
       */
-    public SS7InvalidParamException(String msg) {
+    public SS7InvalidParamException(java.lang.String msg) {
         super(msg);
     }
     /**

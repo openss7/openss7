@@ -86,7 +86,7 @@ public class CircuitGrpMaintenanceEvent extends CircuitGrpCommonEvent {
         correctly.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public CircuitGrpMaintenanceEvent(Object source, SignalingPointCode dpc,
+    public CircuitGrpMaintenanceEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int primitive, RangeAndStatus in_rangeAndStatus,
             byte in_circuitGrpSupervisionMsgTypeInd)

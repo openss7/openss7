@@ -35,7 +35,7 @@ public class ServiceException extends MediaException {
      *
      * @param   s   the detail message.
      */
-    public ServiceException(String s) { super(s); }
+    public ServiceException(java.lang.String s) { super(s); }
 
     /**
      * Construct a <code>ServiceException</code>
@@ -48,7 +48,7 @@ public class ServiceException extends MediaException {
      * @param s  the detail message describing the error in the event.
      * @param event a ServiceEvent 
      */
-    public ServiceException(String s, ServiceEvent event) {
+    public ServiceException(java.lang.String s, ServiceEvent event) {
 	super(s, event);
     }
 

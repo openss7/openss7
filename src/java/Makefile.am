@@ -112,6 +112,25 @@ javadoc.stamp: $(my_JAVAFILES) $(srcdir)/overview
 		-group "Jain TAPI API (JSR 43) Packages" javax.telephony* \
 		-quiet \
 		jain \
+		jain.protocol.ip \
+		javax.megaco \
+		javax.megaco.association \
+		javax.megaco.pkg \
+		javax.megaco.pkg.ToneGenPkg \
+		javax.megaco.pkg.AnalogLineSPkg \
+		javax.megaco.pkg.RTPPkg \
+		javax.megaco.pkg.ContinuityPkg \
+		javax.megaco.pkg.BaseRootPkg \
+		javax.megaco.pkg.DTMFGenPkg \
+		javax.megaco.pkg.NetworkPkg \
+		javax.megaco.pkg.DTMFDetPkg \
+		javax.megaco.pkg.TDMCktPkg \
+		javax.megaco.pkg.CPToneDetPkg \
+		javax.megaco.pkg.ToneDetPkg \
+		javax.megaco.pkg.CPToneGenPkg \
+		javax.megaco.pkg.GenericPkg \
+		javax.megaco.message \
+		javax.megaco.message.descriptor \
 		jain.protocol.ss7 \
 		jain.protocol.ss7.oam \
 		jain.protocol.ss7.oam.mtp2 \
@@ -269,6 +288,10 @@ javadoc.stamp: $(my_JAVAFILES) $(srcdir)/overview
 #		javax.media.mscontrol.resource.symbols
 #		javax.media.mscontrol.resource.video
 #		javax.media.mscontrol.vxml
+#		jain.protocol.ip.mgcp
+#		jain.protocol.ip.mgcp.pkg
+#		jain.protocol.ip.mgcp.message
+#		jain.protocol.ip.mgcp.message.parms
 
 javadoc: javadoc.stamp
 
@@ -283,6 +306,8 @@ clean-javadoc:
 	rm -f -- javadoc.stamp
 
 CLEAN_LOCAL += clean-javadoc
+
+EXTRA_DIST += overview
 
 
 #############################################################################
@@ -343,9 +368,13 @@ AM_GCJHFLAGS = -I$(builddir) -I$(srcdir)
 
 MY_SUFFIXES += .class
 
+my_SOURCEFILES =
+
+my_INCLUDES =
+
 # This is how we build CNI headers and stub files
 
-.class.h: %.class
+.class.h:
 	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
 	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
 	$(GCJH) $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed -e 's,\.class$$,,'`
@@ -2927,12 +2956,15 @@ ALL_LOCAL		+= lib-org-openss7-jain-protocol-ss7-oam.jar.db
 lib-org-openss7-jain-protocol-ss7-oam.jar.db: org-openss7-jain-protocol-ss7-oam.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_oam_INCLUDES)
+my_SOURCEFILES += $(my_oam_SOURCEFILES)
+
 $(my_oam_INCLUDES): %.h : %.class
 $(my_oam_SOURCEFILES): $(my_oam_INCLUDES)
 
 #MY_PRECIOUS += $(my_oam_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_oam_INCLUDES) $(my_oam_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_oam_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-jain-protocol-ss7-oam.jar
 ALL_LOCAL += org-openss7-jain-protocol-ss7-oam.jar
@@ -2993,12 +3025,15 @@ ALL_LOCAL		+= lib-org-openss7-jain-protocol-ss7-tcap.jar.db
 lib-org-openss7-jain-protocol-ss7-tcap.jar.db: org-openss7-jain-protocol-ss7-tcap.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jtcap_INCLUDES)
+my_SOURCEFILES += $(my_jtcap_SOURCEFILES)
+
 $(my_jtcap_INCLUDES): %.h : %.class
 $(my_jtcap_SOURCEFILES): $(my_jtcap_INCLUDES)
 
 #MY_PRECIOUS += $(my_jtcap_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jtcap_INCLUDES) $(my_jtcap_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jtcap_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-jain-protocol-ss7-tcap.jar
 ALL_LOCAL += org-openss7-jain-protocol-ss7-tcap.jar
@@ -3059,12 +3094,15 @@ ALL_LOCAL		+= lib-org-openss7-javax-sip.jar.db
 lib-org-openss7-javax-sip.jar.db: org-openss7-javax-sip.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jsip_INCLUDES)
+my_SOURCEFILES += $(my_jsip_SOURCEFILES)
+
 $(my_jsip_INCLUDES): %.h : %.class
 $(my_jsip_SOURCEFILES): $(my_jsip_INCLUDES)
 
 #MY_PRECIOUS += $(my_jsip_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jsip_INCLUDES) $(my_jsip_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jsip_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-javax-sip.jar
 ALL_LOCAL += org-openss7-javax-sip.jar
@@ -3124,12 +3162,15 @@ ALL_LOCAL		+= lib-org-openss7-javax-jcat.jar.db
 lib-org-openss7-javax-jcat.jar.db: org-openss7-javax-jcat.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jcat_INCLUDES)
+my_SOURCEFILES += $(my_jcap_SOURCEFILES)
+
 $(my_jcat_INCLUDES): %.h : %.class
 $(my_jcat_SOURCEFILES): $(my_jcat_INCLUDES)
 
 #MY_PRECIOUS += $(my_jcat_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jcat_INCLUDES) $(my_jcat_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jcat_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-javax-jcat.jar
 ALL_LOCAL += org-openss7-javax-jcat.jar
@@ -3187,12 +3228,15 @@ ALL_LOCAL		+= lib-org-openss7-javax-jain-ss7-isup.jar.db
 lib-org-openss7-javax-jain-ss7-isup.jar.db: org-openss7-javax-jain-ss7-isup.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jisup_INCLUDES)
+my_SOURCEFILES += $(my_jisup_SOURCEFILES)
+
 $(my_jisup_INCLUDES): %.h : %.class
 $(my_jisup_SOURCEFILES): $(my_jisup_INCLUDES)
 
 #MY_PRECIOUS += $(my_jisup_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jisup_INCLUDES) $(my_jisup_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jisup_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-javax-jain-ss7-isup.jar
 ALL_LOCAL += org-openss7-javax-jain-ss7-isup.jar
@@ -3253,12 +3297,15 @@ ALL_LOCAL		+= lib-org-openss7-javax-jain-ss7-inap.jar.db
 lib-org-openss7-javax-jain-ss7-inap.jar.db: org-openss7-javax-jain-ss7-inap.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jinap_INCLUDES)
+my_SOURCEFILES += $(my_jinap_SOURCEFILES)
+
 $(my_jinap_INCLUDES): %.h : %.class
 $(my_jinap_SOURCEFILES): $(my_jinap_INCLUDES)
 
 #MY_PRECIOUS += $(my_jinap_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jinap_INCLUDES) $(my_jinap_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jinap_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-javax-jain-ss7-inap.jar
 ALL_LOCAL += org-openss7-javax-jain-ss7-inap.jar
@@ -3354,12 +3401,15 @@ ALL_LOCAL		+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.db
 lib-org-openss7-javax-jain-protocol-ss7-map.jar.db: org-openss7-javax-jain-protocol-ss7-map.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jmap_INCLUDES)
+my_SOURCEFILES += $(my_jmap_SOURCEFILES)
+
 $(my_jmap_INCLUDES): %.h : %.class
 $(my_jmap_SOURCEFILES): $(my_jmap_INCLUDES)
 
 #MY_PRECIOUS += $(my_jmap_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jmap_INCLUDES) $(my_jmap_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jmap_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-javax-jain-protocol-ss7-map.jar
 ALL_LOCAL += org-openss7-javax-jain-protocol-ss7-map.jar
@@ -3420,12 +3470,15 @@ ALL_LOCAL		+= lib-org-openss7-javax-csapi-cc-jcc.jar.db
 lib-org-openss7-javax-csapi-cc-jcc.jar.db: org-openss7-javax-csapi-cc-jcc.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
+my_INCLUDES += $(my_jcc_INCLUDES)
+my_SOURCEFILES += $(my_jcc_SOURCEFILES)
+
 $(my_jcc_INCLUDES): %.h : %.class
 $(my_jcc_SOURCEFILES): $(my_jcc_INCLUDES)
 
 #MY_PRECIOUS += $(my_jcc_SOURCEFILES)
 
-MY_INTERMEDIATE += $(my_jcc_INCLUDES) $(my_jcc_HEADERCLASSES)
+MY_INTERMEDIATE += $(my_jcc_HEADERCLASSES)
 
 my_jar_LINKS += org-openss7-javax-csapi-cc-jcc.jar
 ALL_LOCAL += org-openss7-javax-csapi-cc-jcc.jar
@@ -3459,6 +3512,9 @@ jnilib_LTLIBRARIES =
 
 SWIG = swig
 
+my_SWIGFILES =
+my_swig_JAVAFILES =
+
 my_c_WRAPPERS =
 
 # this is how we use SWIG to generate headers and wrapper files for C
@@ -3472,7 +3528,7 @@ $(my_c_WRAPPERS): %_wrap.c: %.i
 
 my_cxx_WRAPPERS =
 
-$(my_cxx_WRAPPERS): %_wrap.cxx : %.i %.hh
+$(my_cxx_WRAPPERS): %_wrap.cxx : %.i
 	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
 	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
 	$(SWIG) -java -c++ -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
@@ -3550,11 +3606,13 @@ libopenss7StreamsJNI_la_LDFLAGS	 = -module -avoid-version -shared
 #jnilib_LTLIBRARIES += libopenss7StreamsJNI.la
 EXTRA_LTLIBRARIES += libopenss7StreamsJNI.la
 
+my_SWIGFILES += org/openss7/streams/streams.i
 my_c_WRAPPERS += org/openss7/streams/streams_wrap.c
-my_cxx_WRAPPERS += org/openss7/streams/streams_wrap.cxx
-MY_INTERMEDIATE += org/openss7/streams/streams_wrap.c
-MY_INTERMEDIATE += org/openss7/streams/streams_wrap.cxx
-MY_INTERMEDIATE += $(my_streams_JAVAFILES)
+#my_cxx_WRAPPERS += org/openss7/streams/streams_wrap.cxx
+my_swig_JAVAFILES += $(my_streams_JAVAFILES)
+#MY_INTERMEDIATE += org/openss7/streams/streams_wrap.c
+#MY_INTERMEDIATE += org/openss7/streams/streams_wrap.cxx
+#MY_INTERMEDIATE += $(my_streams_JAVAFILES)
 MY_SECONDARY += $(my_streams_CLASSFILES)
 $(my_streams_JAVAFILES): $(my_streams_SOURCEFILES)
 
@@ -3662,11 +3720,13 @@ libopenss7XtiJNI_la_LDFLAGS  = -module -avoid-version -shared
 
 jnilib_LTLIBRARIES += libopenss7XtiJNI.la
 
+my_SWIGFILES += org/openss7/xti/xti.i
 my_c_WRAPPERS += org/openss7/xti/xti_wrap.c
-my_cxx_WRAPPERS += org/openss7/xti/xti_wrap.cxx
-MY_INTERMEDIATE += org/openss7/xti/xti_wrap.c
-MY_INTERMEDIATE += org/openss7/xti/xti_wrap.cxx
-MY_INTERMEDIATE += $(my_xti_JAVAFILES)
+#my_cxx_WRAPPERS += org/openss7/xti/xti_wrap.cxx
+my_swig_JAVAFILES += $(my_xti_JAVAFILES)
+#MY_INTERMEDIATE += org/openss7/xti/xti_wrap.c
+#MY_INTERMEDIATE += org/openss7/xti/xti_wrap.cxx
+#MY_INTERMEDIATE += $(my_xti_JAVAFILES)
 MY_SECONDARY += $(my_xti_CLASSFILES)
 $(my_xti_JAVAFILES): $(my_xti_SOURCEFILES)
 
@@ -3795,11 +3855,13 @@ libopenss7TcapJNI_la_LDFLAGS	= -module -avoid-version -shared
 #jnilib_LTLIBRARIES += libopenss7TcapJNI.la
 EXTRA_LTLIBRARIES += libopenss7TcapJNI.la
 
-my_c_WRAPPERS += org/openss7/tcap/tcap_wrap.c
+my_SWIGFILES += org/openss7/tcap/tcap.i
+#my_c_WRAPPERS += org/openss7/tcap/tcap_wrap.c
 my_cxx_WRAPPERS += org/openss7/tcap/tcap_wrap.cxx
-MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.c
-MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.cxx
-MY_INTERMEDIATE += $(my_tcap_JAVAFILES)
+my_swig_JAVAFILES += $(my_tcap_JAVAFILES)
+#MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.c
+#MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.cxx
+#MY_INTERMEDIATE += $(my_tcap_JAVAFILES)
 MY_SECONDARY += $(my_tcap_CLASSFILES)
 $(my_tcap_JAVAFILES): $(my_tcap_SOURCEFILES)
 
@@ -3894,11 +3956,13 @@ libopenss7XtcapJNI_la_LDFLAGS	= -module -avoid-version -shared
 #jnilib_LTLIBRARIES += libopenss7XtcapJNI.la
 EXTRA_LTLIBRARIES += libopenss7XtcapJNI.la
 
+my_SWIGFILES += org/openss7/xtcap/xtcap.i
 my_c_WRAPPERS += org/openss7/xtcap/xtcap_wrap.c
-my_cxx_WRAPPERS += org/openss7/xtcap/xtcap_wrap.cxx
-MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.c
-MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.cxx
-MY_INTERMEDIATE += $(my_xtcap_JAVAFILES)
+#my_cxx_WRAPPERS += org/openss7/xtcap/xtcap_wrap.cxx
+my_swig_JAVAFILES += $(my_xtcap_JAVAFILES)
+#MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.c
+#MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.cxx
+#MY_INTERMEDIATE += $(my_xtcap_JAVAFILES)
 MY_SECONDARY += $(my_xtcap_CLASSFILES)
 $(my_xtcap_JAVAFILES): $(my_xtcap_SOURCEFILES)
 
@@ -3915,10 +3979,316 @@ CLEAN_LOCAL += clean-org_openss7_xtcap
 my_JAVAFILES += $(my_xtcap_JAVAFILES)
 #dist_java_JAVA += $(my_xtcap_JAVAFILES)
 
+# =============================================================================
+
+## Distribute everything generated by SwiG so that the casual builder does
+## not need to have swig installed.
+
+EXTRA_DIST += $(my_SWIGFILES)
+EXTRA_DIST += $(my_c_WRAPPERS)
+EXTRA_DIST += $(my_cxx_WRAPPERS)
+EXTRA_DIST += $(my_swig_JAVAFILES)
+
 EXTRA_DIST += $(my_JAVAFILES)
 
-#.INTERMEDIATE: $(MY_INTERMEDIATE)
-.SECONDARY: $(MY_SECONDARY) $(MY_INTERMEDIATE)
+EXTRA_DIST += \
+	jain/package.html \
+	jain/protocol/ip/mgcp/message/package.html \
+	jain/protocol/ip/mgcp/message/parms/package.html \
+	jain/protocol/ip/mgcp/package.html \
+	jain/protocol/ip/mgcp/pkg/package.html \
+	jain/protocol/ip/package.html \
+	jain/protocol/package.html \
+	jain/protocol/ss7/oam/mtp2/package.html \
+	jain/protocol/ss7/oam/mtp3/package.html \
+	jain/protocol/ss7/oam/package.html \
+	jain/protocol/ss7/oam/sccp/package.html \
+	jain/protocol/ss7/oam/tcap/package.html \
+	jain/protocol/ss7/package.html \
+	jain/protocol/ss7/tcap/component/package.html \
+	jain/protocol/ss7/tcap/dialogue/package.html \
+	jain/protocol/ss7/tcap/package.html \
+	javax/csapi/cc/jcc/package.html \
+	javax/csapi/cc/package.html \
+	javax/csapi/package.html \
+	javax/jain/package.html \
+	javax/jain/protocol/package.html \
+	javax/jain/protocol/ss7/map/information/etsipar/package.html \
+	javax/jain/protocol/ss7/map/information/package.html \
+	javax/jain/protocol/ss7/map/package.html \
+	javax/jain/protocol/ss7/map/position/etsipar/package.html \
+	javax/jain/protocol/ss7/map/position/package.html \
+	javax/jain/protocol/ss7/map/session/etsipar/package.html \
+	javax/jain/protocol/ss7/map/session/package.html \
+	javax/jain/protocol/ss7/map/transaction/etsipar/message/package.html \
+	javax/jain/protocol/ss7/map/transaction/etsipar/package.html \
+	javax/jain/protocol/ss7/map/transaction/etsipar/pdu/package.html \
+	javax/jain/protocol/ss7/map/transaction/package.html \
+	javax/jain/protocol/ss7/package.html \
+	javax/jain/ss7/inap/constants/package.html \
+	javax/jain/ss7/inap/datatype/package.html \
+	javax/jain/ss7/inap/event/package.html \
+	javax/jain/ss7/inap/exception/package.html \
+	javax/jain/ss7/inap/operation/package.html \
+	javax/jain/ss7/inap/package.html \
+	javax/jain/ss7/isup/ansi/package.html \
+	javax/jain/ss7/isup/itu/package.html \
+	javax/jain/ss7/isup/package.html \
+	javax/jain/ss7/package.html \
+	javax/jcat/package.html \
+	javax/management/event/package.html \
+	javax/management/loading/package.html \
+	javax/management/modelmbean/package.html \
+	javax/management/monitor/package.html \
+	javax/management/namespaces/package.html \
+	javax/management/openmbean/package.html \
+	javax/management/package.html \
+	javax/management/relation/package.html \
+	javax/management/remote/generic/package.html \
+	javax/management/remote/jmxmp/package.html \
+	javax/management/remote/message/package.html \
+	javax/management/remote/package.html \
+	javax/management/remote/rmi/package.html \
+	javax/management/timer/package.html \
+	javax/media/mscontrol/mediagroup/asrtts/package.html \
+	javax/media/mscontrol/mediagroup/fax/package.html \
+	javax/media/mscontrol/mediagroup/http/package.html \
+	javax/media/mscontrol/mediagroup/package.html \
+	javax/media/mscontrol/mediagroup/rtsp/package.html \
+	javax/media/mscontrol/mediagroup/signals/package.html \
+	javax/media/mscontrol/mediagroup/sms/package.html \
+	javax/media/mscontrol/mixer/package.html \
+	javax/media/mscontrol/networkconnection/package.html \
+	javax/media/mscontrol/package.html \
+	javax/media/mscontrol/resource/common/package.html \
+	javax/media/mscontrol/resource/package.html \
+	javax/media/mscontrol/resource/symbols/package.html \
+	javax/media/mscontrol/resource/video/package.html \
+	javax/media/mscontrol/vxml/package.html \
+	javax/media/package.html \
+	javax/megaco/association/package.html \
+	javax/megaco/message/descriptor/package.html \
+	javax/megaco/message/package.html \
+	javax/megaco/package.html \
+	javax/megaco/pkg/AnalogLineSPkg/package.html \
+	javax/megaco/pkg/BaseRootPkg/package.html \
+	javax/megaco/pkg/ContinuityPkg/package.html \
+	javax/megaco/pkg/CPToneDetPkg/package.html \
+	javax/megaco/pkg/CPToneGenPkg/package.html \
+	javax/megaco/pkg/DTMFDetPkg/package.html \
+	javax/megaco/pkg/DTMFGenPkg/package.html \
+	javax/megaco/pkg/GenericPkg/package.html \
+	javax/megaco/pkg/NetworkPkg/package.html \
+	javax/megaco/pkg/package.html \
+	javax/megaco/pkg/RTPPkg/package.html \
+	javax/megaco/pkg/TDMCktPkg/package.html \
+	javax/megaco/pkg/ToneDetPkg/package.html \
+	javax/megaco/pkg/ToneGenPkg/package.html \
+	javax/oss/fault/package.html \
+	javax/oss/package.html \
+	javax/sip/address/package.html \
+	javax/sip/header/package.html \
+	javax/sip/message/package.html \
+	javax/sip/package.html \
+	javax/slee/connection/package.html \
+	javax/slee/facilities/package.html \
+	javax/slee/management/package.html \
+	javax/slee/nullactivity/package.html \
+	javax/slee/package.html \
+	javax/slee/profile/package.html \
+	javax/slee/profile/query/package.html \
+	javax/slee/resource/package.html \
+	javax/slee/serviceactivity/package.html \
+	javax/slee/transaction/package.html \
+	javax/slee/usage/package.html \
+	javax/telephony/callcenter/capabilities/package.html \
+	javax/telephony/callcenter/events/package.html \
+	javax/telephony/callcenter/package.html \
+	javax/telephony/callcontrol/capabilities/package.html \
+	javax/telephony/callcontrol/events/package.html \
+	javax/telephony/callcontrol/package.html \
+	javax/telephony/capabilities/package.html \
+	javax/telephony/events/package.html \
+	javax/telephony/media/async/package.html \
+	javax/telephony/media/capabilities/package.html \
+	javax/telephony/media/connection/async/package.html \
+	javax/telephony/media/connection/package.html \
+	javax/telephony/media/container/async/package.html \
+	javax/telephony/media/container/package.html \
+	javax/telephony/media/events/package.html \
+	javax/telephony/media/messaging/package.html \
+	javax/telephony/media/package.html \
+	javax/telephony/media/provider/package.html \
+	javax/telephony/media/symbols/package.html \
+	javax/telephony/mobile/package.html \
+	javax/telephony/package.html \
+	javax/telephony/phone/capabilities/package.html \
+	javax/telephony/phone/events/package.html \
+	javax/telephony/phone/package.html \
+	javax/telephony/privatedata/capabilities/package.html \
+	javax/telephony/privatedata/events/package.html \
+	javax/telephony/privatedata/package.html \
+	org/omg/package.html \
+	org/omg/stub/javax/management/package.html \
+	org/omg/stub/javax/management/remote/package.html \
+	org/omg/stub/javax/management/remote/rmi/package.html \
+	org/omg/stub/javax/package.html \
+	org/omg/stub/package.html \
+	org/openss7/jain/package.html \
+	org/openss7/jain/protocol/package.html \
+	org/openss7/jain/protocol/ss7/oam/mtp2/package.html \
+	org/openss7/jain/protocol/ss7/oam/mtp3/package.html \
+	org/openss7/jain/protocol/ss7/oam/package.html \
+	org/openss7/jain/protocol/ss7/oam/sccp/package.html \
+	org/openss7/jain/protocol/ss7/oam/tcap/package.html \
+	org/openss7/jain/protocol/ss7/package.html \
+	org/openss7/jain/protocol/ss7/tcap/package.html \
+	org/openss7/javax/csapi/cc/jcc/package.html \
+	org/openss7/javax/csapi/cc/package.html \
+	org/openss7/javax/csapi/package.html \
+	org/openss7/javax/jain/package.html \
+	org/openss7/javax/jain/protocol/package.html \
+	org/openss7/javax/jain/protocol/ss7/map/information/package.html \
+	org/openss7/javax/jain/protocol/ss7/map/package.html \
+	org/openss7/javax/jain/protocol/ss7/map/position/package.html \
+	org/openss7/javax/jain/protocol/ss7/map/session/package.html \
+	org/openss7/javax/jain/protocol/ss7/map/transaction/package.html \
+	org/openss7/javax/jain/protocol/ss7/package.html \
+	org/openss7/javax/jain/ss7/inap/package.html \
+	org/openss7/javax/jain/ss7/isup/package.html \
+	org/openss7/javax/jain/ss7/package.html \
+	org/openss7/javax/jcat/package.html \
+	org/openss7/javax/package.html \
+	org/openss7/javax/sip/package.html \
+	org/openss7/jcat/package.html \
+	org/openss7/package.html \
+	org/openss7/ss7/mtp/package.html \
+	org/openss7/ss7/package.html \
+	org/openss7/ss7/sccp/package.html \
+	org/openss7/streams/package.html \
+	org/openss7/tcapi/package.html \
+	org/openss7/tcap/package.html \
+	org/openss7/xtcap/package.html \
+	org/openss7/xti/package.html
+
+EXTRA_DIST += \
+	jain/doc-files/figure1.gif \
+	jain/doc-files/figure2.gif \
+	jain/doc-files/figure3.gif \
+	jain/doc-files/figure4.gif \
+	jain/doc-files/gt0001.jpg \
+	jain/doc-files/javalogo.gif \
+	javax/csapi/cc/jcc/doc-files/callstates.gif \
+	javax/csapi/cc/jcc/doc-files/connection.gif \
+	javax/csapi/cc/jcc/doc-files/providerstates.gif \
+	javax/jain/doc-files/javalogo.gif \
+	javax/jain/doc-files/rs \
+	javax/jain/doc-files/rs/images \
+	javax/jain/doc-files/rs/images/aepona.gif \
+	javax/jain/doc-files/rs/images/arrowleft.gif \
+	javax/jain/doc-files/rs/images/arrowright.gif \
+	javax/jain/doc-files/rs/images/datakinetics.gif \
+	javax/jain/doc-files/rs/images/ericsson.gif \
+	javax/jain/doc-files/rs/images/figure1_1.gif \
+	javax/jain/doc-files/rs/images/figure1_2.gif \
+	javax/jain/doc-files/rs/images/figure1_3.gif \
+	javax/jain/doc-files/rs/images/figure1_4.gif \
+	javax/jain/doc-files/rs/images/figure2_1.gif \
+	javax/jain/doc-files/rs/images/figure2_2.gif \
+	javax/jain/doc-files/rs/images/figure2_3.gif \
+	javax/jain/doc-files/rs/images/figure2_4.gif \
+	javax/jain/doc-files/rs/images/figure2_5.gif \
+	javax/jain/doc-files/rs/images/figure2_6.gif \
+	javax/jain/doc-files/rs/images/figure2_7.gif \
+	javax/jain/doc-files/rs/images/figure2_8.gif \
+	javax/jain/doc-files/rs/images/figure2_9.gif \
+	javax/jain/doc-files/rs/images/figure3_1.gif \
+	javax/jain/doc-files/rs/images/figure3_2.gif \
+	javax/jain/doc-files/rs/images/figure3_3.gif \
+	javax/jain/doc-files/rs/images/figure3_4.gif \
+	javax/jain/doc-files/rs/images/figure3_5.gif \
+	javax/jain/doc-files/rs/images/figure3_6.gif \
+	javax/jain/doc-files/rs/images/figure3_7.gif \
+	javax/jain/doc-files/rs/images/figure3_8.gif \
+	javax/jain/doc-files/rs/images/figure3_9.gif \
+	javax/jain/doc-files/rs/images/figure4_1.gif \
+	javax/jain/doc-files/rs/images/figure5_1.gif \
+	javax/jain/doc-files/rs/images/figure5_2.gif \
+	javax/jain/doc-files/rs/images/figure6_1.gif \
+	javax/jain/doc-files/rs/images/figure6_2.gif \
+	javax/jain/doc-files/rs/images/figure6_3.gif \
+	javax/jain/doc-files/rs/images/figure6_4.gif \
+	javax/jain/doc-files/rs/images/figure6_5.gif \
+	javax/jain/doc-files/rs/images/figure6_6.gif \
+	javax/jain/doc-files/rs/images/figure7_1.gif \
+	javax/jain/doc-files/rs/images/figure7_2.gif \
+	javax/jain/doc-files/rs/images/figure7_3.gif \
+	javax/jain/doc-files/rs/images/figure7_4.gif \
+	javax/jain/doc-files/rs/images/figure7_5.gif \
+	javax/jain/doc-files/rs/images/javalogo.gif \
+	javax/jain/doc-files/rs/images/mahindra.jpg \
+	javax/jain/doc-files/rs/images/motorola.gif \
+	javax/jain/doc-files/rs/images/sun.gif \
+	javax/jain/doc-files/rs/images/telcordia.gif \
+	javax/jain/doc-files/rs/images/ulticom.jpg \
+	javax/jcat/doc-files/jcat_connection.gif \
+	javax/jcat/doc-files/jcat_termconnection.gif \
+	javax/telephony/callcenter/doc-files/ACDAddr.gif \
+	javax/telephony/callcenter/doc-files/acdcon-direct.gif \
+	javax/telephony/callcenter/doc-files/acdcon-indirect.gif \
+	javax/telephony/callcenter/doc-files/acdconnection-states.gif \
+	javax/telephony/callcenter/doc-files/ACDMgrAd.gif \
+	javax/telephony/callcenter/doc-files/Acdtest.gif \
+	javax/telephony/callcenter/doc-files/Agnstat.gif \
+	javax/telephony/callcenter/doc-files/Agntest.gif \
+	javax/telephony/callcenter/doc-files/callcent-agentstate.gif \
+	javax/telephony/callcenter/doc-files/callcent-routestate.gif \
+	javax/telephony/callcenter/doc-files/CallCtlConnect.gif \
+	javax/telephony/callcenter/doc-files/CallCtlConnRelation.gif \
+	javax/telephony/callcenter/doc-files/CallCtlConnStates.gif \
+	javax/telephony/callcenter/doc-files/CallCtlTermConnStates.gif \
+	javax/telephony/callcenter/doc-files/Rtestat.gif \
+	javax/telephony/callcenter/doc-files/Rtetest.gif \
+	javax/telephony/callcontrol/doc-files/ACDAddr.gif \
+	javax/telephony/callcontrol/doc-files/ACDMgrAd.gif \
+	javax/telephony/callcontrol/doc-files/Acdtest.gif \
+	javax/telephony/callcontrol/doc-files/Agnstat.gif \
+	javax/telephony/callcontrol/doc-files/Agntest.gif \
+	javax/telephony/callcontrol/doc-files/CallCtlConnect.gif \
+	javax/telephony/callcontrol/doc-files/callctl-connectionstates.gif \
+	javax/telephony/callcontrol/doc-files/CallCtlConnRelation.gif \
+	javax/telephony/callcontrol/doc-files/CallCtlConnStates.gif \
+	javax/telephony/callcontrol/doc-files/CallCtlTermConnRelation.gif \
+	javax/telephony/callcontrol/doc-files/CallCtlTermConnStates.gif \
+	javax/telephony/callcontrol/doc-files/callctl-terminalconnectionstates.gif \
+	javax/telephony/callcontrol/doc-files/cyan-ball.gif \
+	javax/telephony/callcontrol/doc-files/Rtestat.gif \
+	javax/telephony/callcontrol/doc-files/Rtetest.gif \
+	javax/telephony/doc-files/cmodel.gif \
+	javax/telephony/doc-files/core-callstates.gif \
+	javax/telephony/doc-files/core-connectionstates.gif \
+	javax/telephony/doc-files/core-events.gif \
+	javax/telephony/doc-files/core-terminalconnectionstates.gif \
+	javax/telephony/doc-files/desktop.gif \
+	javax/telephony/doc-files/network.gif \
+	javax/telephony/doc-files/packages.gif \
+	javax/telephony/doc-files/providerstates.gif \
+	javax/telephony/doc-files/timeline.gif \
+	javax/telephony/events/doc-files/core-events.gif \
+	javax/telephony/media/doc-files/AnswerPhone.java \
+	javax/telephony/media/doc-files/AsrStates.gif \
+	javax/telephony/media/doc-files/AsrTrainStates.gif \
+	javax/telephony/media/doc-files/Figure1.gif \
+	javax/telephony/media/doc-files/FollowMe.java \
+	javax/telephony/media/doc-files/GroupAnatomy.gif \
+	javax/telephony/media/doc-files/HelloWorld.java \
+	javax/telephony/media/doc-files/InCall.java \
+	javax/telephony/media/doc-files/PlayerStates.gif
+
+# =============================================================================
+
+.INTERMEDIATE: $(MY_INTERMEDIATE)
+.SECONDARY: $(MY_SECONDARY)
 
 # =============================================================================
 #

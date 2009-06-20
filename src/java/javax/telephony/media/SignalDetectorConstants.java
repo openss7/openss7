@@ -294,11 +294,11 @@ interface SignalDetectorConstants extends ResourceConstants, SignalConstants {
     /**
      * Each p_Pattern[<b>i</b>] defines a pattern to be matched.
      * An array of Pattern Symbols to be used as keys in a Dictionary.
-     * The associated value in the Dictionary should be a String
+     * The associated value in the Dictionary should be a java.lang.String
      * that defines the series of Signals that matches the pattern.
      * <p>
      * For each p_Pattern[<b>i</b>], the valid value is a 
-     * <a href="SignalDetector.html#pattern_Strings">pattern String</a>
+     * <a href="SignalDetector.html#pattern_Strings">pattern java.lang.String</a>
      * <p>
      * These parameters may be set in setParameters, 
      * or the optargs argument of 

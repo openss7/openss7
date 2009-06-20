@@ -168,10 +168,10 @@ public abstract class ComponentReqEvent extends java.util.EventObject implements
       * @return
       * The Primitive Type of the Event.  */
     public abstract int getPrimitiveType();
-    /** String representation of class
+    /** java.lang.String representation of class
       * jain.protocol.ss7.tcap.ComponentReqEvent.
       * @return
-      * String provides description of class ComponentReqEvent.  */
+      * java.lang.String provides description of class ComponentReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append(super.toString());

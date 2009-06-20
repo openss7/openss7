@@ -139,7 +139,7 @@ static final java.lang.String mixerAdapterURIBase
           For example, the URI of a MixerAdapter, whose ID is
           "chairmanAdapter", can be computed with:
 
- String chairURI = VideoLayout.mixerAdapterURIBase+"chairmanAdapter";
+ java.lang.String chairURI = VideoLayout.mixerAdapterURIBase+"chairmanAdapter";
 
 
           This string can then be inserted in a VideoLayout document:
@@ -208,7 +208,7 @@ java.lang.String getType()
 java.lang.String marshall()
 
         Returns:
-                A readable String typically representing the xml
+                A readable java.lang.String typically representing the xml
                 definition of the VideoLayout.
      _________________________________________________________________
 

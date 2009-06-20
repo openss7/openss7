@@ -42,8 +42,8 @@ import  javax.telephony.*;
 
 public class CallControlForwarding {
  
-  private String destAddress;
-  private String caller;
+  private java.lang.String destAddress;
+  private java.lang.String caller;
   private int    type;
   private int    whichCalls;
   
@@ -98,7 +98,7 @@ public class CallControlForwarding {
    *
    * @param destAddress destination address for the call forwarding operation
    */
-  public CallControlForwarding(String destAddress) {
+  public CallControlForwarding(java.lang.String destAddress) {
     this.destAddress = destAddress;
     type             = FORWARD_UNCONDITIONALLY;
     caller           = null;
@@ -113,7 +113,7 @@ public class CallControlForwarding {
    * @param destAddress destination address for the call forwarding operation
    * @param type the type of the forwarding operation
    */
-  public CallControlForwarding(String destAddress, int type) {
+  public CallControlForwarding(java.lang.String destAddress, int type) {
     this.destAddress = destAddress;
     this.type        = type;
     caller           = null;
@@ -131,7 +131,7 @@ public class CallControlForwarding {
    * @param type the type of the forwarding operation
    * @param internalCalls flag for internal call forwarding
    */
-  public CallControlForwarding(String destAddress, int type, boolean
+  public CallControlForwarding(java.lang.String destAddress, int type, boolean
 	  		       internalCalls) {
     this.destAddress = destAddress;
     this.type        = type;
@@ -154,7 +154,7 @@ public class CallControlForwarding {
    * @param type the type of the forwarding operation
    * @param caller the address of the incoming caller
    */
-  public CallControlForwarding(String destAddress, int type, String caller) {
+  public CallControlForwarding(java.lang.String destAddress, int type, java.lang.String caller) {
     this.destAddress = destAddress;
     this.type        = type;
     this.caller      = caller;
@@ -167,7 +167,7 @@ public class CallControlForwarding {
    * <p>
    * @return The destination address of this forwarding instruction.
    */
-  public String getDestinationAddress() {
+  public java.lang.String getDestinationAddress() {
     return this.destAddress;
   }
 
@@ -204,7 +204,7 @@ public class CallControlForwarding {
    * <p>
    * @return The specific address for this forwarding instruction.
    */
-  public String getSpecificCaller() {
+  public java.lang.String getSpecificCaller() {
     return this.caller;
   }
 }

@@ -236,7 +236,7 @@ public interface Agent {
    * <p>
    * @return the Agent's ID.
    */
-  public String getAgentID();
+  public java.lang.String getAgentID();
 
 
   /**

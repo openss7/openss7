@@ -78,7 +78,7 @@ public interface SignalDetectorEvent
     Symbol[] getSignalBuffer()
              Get array of matched signal names.
     java.lang.String getSignalString()
-             Get matched signals as a single String.
+             Get matched signals as a single java.lang.String.
 
 
 
@@ -100,7 +100,7 @@ public interface SignalDetectorEvent
 
 java.lang.String getSignalString()
 
-          Get matched signals as a single String. The return value is
+          Get matched signals as a single java.lang.String. The return value is
           constructed by concatenating a single-character for each signal
           Symbol.
 
@@ -110,7 +110,7 @@ java.lang.String getSignalString()
           '>' and '<' respectively.
 
         Returns:
-                a String of DTMF Signal chars.
+                a java.lang.String of DTMF Signal chars.
      _________________________________________________________________
 
   getSignalBuffer

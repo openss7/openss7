@@ -216,14 +216,14 @@ public interface JainSccpStack {
       *
       * @return  A string describing the Stack Name.
       */
-    public String getStackName();
+    public java.lang.String getStackName();
 
     /**
       * Sets the name of the stack as a string.
       *
       * @param  stackName  The new Stack Name value.
       */
-    public void setStackName(String stackName);
+    public void setStackName(java.lang.String stackName);
 
     /**
       * Returns the Vendor's name for this stack.
@@ -231,7 +231,7 @@ public interface JainSccpStack {
       * @return  A string describing the Vendor's name.
       * @since  JAIN TCAP v1.1
       */
-    public String getVendorName();
+    public java.lang.String getVendorName();
 
     /**
       * Sets the Vendors name for this stack, this name will be the
@@ -241,7 +241,7 @@ public interface JainSccpStack {
       * @param vendorName The new Vendor's Name.
       * @since JAIN TCAP v1.1
       */
-    public void setVendorName(String vendorName);
+    public void setVendorName(java.lang.String vendorName);
 
     /**
       * Gets the stack Specification that this Stack is currently

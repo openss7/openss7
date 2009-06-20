@@ -59,32 +59,32 @@ public interface MidCallData {
     /** getServiceCodeType() return constant: the type of service code
       * is unknown, the corresponding value (returned by
       * getServiceCodeValue()) is operator specific.  */
-    public static final int SERVICE_CODE_UNDEFINED;
+    public static final int SERVICE_CODE_UNDEFINED = 0;
     /** getServiceCodeType() return constant: the user entered a digit
       * sequence during the call, the corresponding value (returned by
       * getServiceCodeValue()) is an ascii representation of the
       * received digits.  */
-    public static final int SERVICE_CODE_DIGITS;
+    public static final int SERVICE_CODE_DIGITS = 1;
     /** getServiceCodeType() return constant: a facility information
       * element is received, the corresponding value (returned by
       * getServiceCodeValue()) contains the facility information element
       * as defined in ITU Q.932.  */
-    public static final int SERVICE_CODE_FACILITY;
+    public static final int SERVICE_CODE_FACILITY = 2;
     /** getServiceCodeType() return constant: a user-to-user message was
       * received. The associated value (returned by
       * getServiceCodeValue()) contains the content of the user-to-user
       * information element. value (returned by getServiceCodeValue()) */
-    public static final int SERVICE_CODE_U2U;
+    public static final int SERVICE_CODE_U2U = 3;
     /** getServiceCodeType() return constant: the user performed a
       * hookflash, optionally followed by some digits. The corresponding
       * value (returned by getServiceCodeValue()) is an ascii
       * representation of the entered digits.  */
-    public static final int SERVICE_CODE_HOOKFLASH;
+    public static final int SERVICE_CODE_HOOKFLASH = 4;
     /** getServiceCodeType() return constant: the user pressed the
       * register recall button, optionally followed by some digits. The
       * corresponding value (returned by getServiceCodeValue()) is an
       * ascii representation of the entered digits.  */
-    public static final int SERVICE_CODE_RECALL;
+    public static final int SERVICE_CODE_RECALL = 5;
     /** Returns the type of the mid call event.
       * @return
       * An int representing the type of the mid call event. Only

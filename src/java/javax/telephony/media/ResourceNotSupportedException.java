@@ -38,7 +38,7 @@ class ResourceNotSupportedException extends MediaConfigException {
      *
      * @param   s   the detail message.
      */
-    public ResourceNotSupportedException(String s) {super(s);}
+    public ResourceNotSupportedException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>ResourceNotSupportedException</code>
@@ -47,7 +47,7 @@ class ResourceNotSupportedException extends MediaConfigException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public ResourceNotSupportedException(String s, MediaEvent event) {
+    public ResourceNotSupportedException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

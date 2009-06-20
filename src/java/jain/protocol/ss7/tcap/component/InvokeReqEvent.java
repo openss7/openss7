@@ -296,9 +296,9 @@ public final class InvokeReqEvent extends ComponentReqEvent {
         m_operationPresent = false;
         m_lastInvokeEvent = false;
     }
-    /** String representation of class InvokeReqEvent.
+    /** java.lang.String representation of class InvokeReqEvent.
       * @return
-      * String provides description of class InvokeReqEvent.  */
+      * java.lang.String provides description of class InvokeReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nInvokeReqEvent");

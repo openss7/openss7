@@ -50,7 +50,7 @@ public class PlatformException extends RuntimeException {
    *
    * @param s description of the fault.
    */
-  public PlatformException(String s) {
+  public PlatformException(java.lang.String s) {
     super(s);
   }
 }

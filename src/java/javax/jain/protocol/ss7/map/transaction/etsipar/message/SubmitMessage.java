@@ -484,7 +484,7 @@ public class SubmitMessage extends EtsiMessage {
         protected boolean m_dscIsSet = false;
         protected Date m_vp = null;
         protected boolean m_vpIsSet = false;
-        protected String m_userText;
+        protected java.lang.String m_userText;
         protected boolean m_userTextIsSet = false;
 }
 

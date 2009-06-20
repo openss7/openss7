@@ -59,7 +59,7 @@ public class SS7ParameterNotSetException extends SS7Exception {
       *
       * @param msg The detail message.
       */
-    public SS7ParameterNotSetException(String msg) {
+    public SS7ParameterNotSetException(java.lang.String msg) {
         super(msg);
     }
     /**

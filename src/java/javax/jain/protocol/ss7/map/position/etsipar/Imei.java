@@ -105,7 +105,7 @@ public class Imei extends EquipmentId {
       * Change the value of the Type Approval Code (TAC).
       *
       * @param tac
-      * String with 6 digits TAC.
+      * java.lang.String with 6 digits TAC.
       */
     public void setTypeApprovalCode(java.lang.String tac)
         throws SS7InvalidParamException {
@@ -116,7 +116,7 @@ public class Imei extends EquipmentId {
       * Get the value of the Type Approval Code (TAC).
       *
       * @return
-      * String with 6 digits TAC.
+      * java.lang.String with 6 digits TAC.
       */
     public java.lang.String getTypeApprovalCode() {
         return m_tac;
@@ -125,7 +125,7 @@ public class Imei extends EquipmentId {
       * Change the value of the Final Assembly Code( FAC).
       *
       * @param fac
-      * String with 2 digits FAC.
+      * java.lang.String with 2 digits FAC.
       */
     public void setFinalAssemblyCode(java.lang.String fac)
         throws SS7InvalidParamException {
@@ -136,7 +136,7 @@ public class Imei extends EquipmentId {
       * Get the value of the Final Assembly Code( FAC).
       *
       * @return
-      * String with 2 digits FAC.
+      * java.lang.String with 2 digits FAC.
       */
     public java.lang.String getFinalAssemblyCode() {
         return m_fac;
@@ -145,7 +145,7 @@ public class Imei extends EquipmentId {
       * Change the value of the Serial Number (SNR).
       *
       * @param snr
-      * String with 6 digits SNR.
+      * java.lang.String with 6 digits SNR.
       */
     public void setSerialNumber(java.lang.String snr)
         throws SS7InvalidParamException {
@@ -156,7 +156,7 @@ public class Imei extends EquipmentId {
       * Get the value of the Serial Number (SNR).
       *
       * @return
-      * String with 6 digits SNR.
+      * java.lang.String with 6 digits SNR.
       */
     public java.lang.String getSerialNumber() {
         return m_snr;
@@ -165,7 +165,7 @@ public class Imei extends EquipmentId {
       * Set the value of the Software Version Number (SVN).
       *
       * @param svn
-      * String with 1 digit SVN.
+      * java.lang.String with 1 digit SVN.
       */
     public void setSoftwareVersionNumber(java.lang.String svn)
         throws SS7InvalidParamException {
@@ -178,7 +178,7 @@ public class Imei extends EquipmentId {
       * it.
       *
       * @return
-      * String with 1 digit SVN.
+      * java.lang.String with 1 digit SVN.
       */
     public java.lang.String getSoftwareVersionNumber() {
         return m_svn;
@@ -193,13 +193,13 @@ public class Imei extends EquipmentId {
         return m_svnIsSet;
     }
     /**
-      * Get the whole IMEI (TAC+FAC+SNR+SVN) as a String.
+      * Get the whole IMEI (TAC+FAC+SNR+SVN) as a java.lang.String.
       *
       * @return
-      * String containing the IMEI.
+      * java.lang.String containing the IMEI.
       */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
     /**
       * Compares this IMEI with another.
@@ -232,13 +232,13 @@ public class Imei extends EquipmentId {
         }
         return false;
     }
-    protected String m_tac;
+    protected java.lang.String m_tac;
     protected boolean m_tacIsSet = false;
-    protected String m_fac;
+    protected java.lang.String m_fac;
     protected boolean m_facIsSet = false;
-    protected String m_snr;
+    protected java.lang.String m_snr;
     protected boolean m_snrIsSet = false;
-    protected String m_svn;
+    protected java.lang.String m_svn;
     protected boolean m_svnIsSet = false;
 }
 

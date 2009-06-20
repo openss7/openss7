@@ -112,7 +112,7 @@ public java.lang.String getPathName()
           vendor's implementation of this specification.
 
         Returns:
-                String
+                java.lang.String
      _________________________________________________________________
 
   getInstance

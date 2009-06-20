@@ -102,22 +102,22 @@ interface MPI
      */
     public interface GroupProvider extends MediaProvider {
 	Base.BindToCallEvent bindAndConnect(Base.BindToCallEvent event, ConfigSpec cs, 
-					    String s1, String s2);
+					    java.lang.String s1, java.lang.String s2);
 	Base.BindToCallEvent bindToCall(Base.BindToCallEvent event, ConfigSpec cs, 
 					Call call);
 	Base.BindEvent bindToTerminalName(Base.BindEvent event, ConfigSpec cs, 
-					  String s1);
+					  java.lang.String s1);
 	Base.BindEvent bindToTerminal(Base.BindEvent event, ConfigSpec cs, 
 				      Terminal t1);
 
 	Base.BindEvent bindToServiceName(Base.BindEvent event, ConfigSpec cs, 
-					 String serviceName);
+					 java.lang.String serviceName);
 
 	Base.DelegationEvent delegateToService(Base.DelegationEvent event,
 					       MPI.MediaGroup group, 
-					       String serviceName, 
+					       java.lang.String serviceName, 
 					       int timeout,
-					       String catchTags);
+					       java.lang.String catchTags);
 
 	Base.DelegationEvent retrieve(Base.DelegationEvent event, MPI.MediaGroup group, 
 				      Symbol cause);
@@ -127,13 +127,13 @@ interface MPI
 	Base.ReleaseEvent release(Base.ReleaseEvent event, MPI.MediaGroup group);
 
 	Base.ReleaseEvent releaseToTag(Base.ReleaseEvent event, MPI.MediaGroup group, 
-					String returnTag);
+					java.lang.String returnTag);
 
 	Base.ReleaseEvent releaseToDestroy(Base.ReleaseEvent event, MPI.MediaGroup group);
 
 	Base.ReleaseEvent releaseToService(Base.ReleaseEvent event,
 					   MPI.MediaGroup group,
-					   String serviceName, 
+					   java.lang.String serviceName, 
 					   int timeout);
 	/**
 	 * Cancel any ongoing Bind or Release.
@@ -238,8 +238,8 @@ interface MPI
 	 * This allows a level of indirection for those MediaGroup
 	 * implementations that delegate Resource methods to aggregated objects.
 	 * 
-	 * @return an Object [Resource] that implements the given Method. 
+	 * @return an java.lang.Object [Resource] that implements the given Method. 
 	 */
-	Object getTargetForMethod(java.lang.reflect.Method method);
+	java.lang.Object getTargetForMethod(java.lang.reflect.Method method);
     }
 }

@@ -196,7 +196,7 @@ public interface CallControlConnectionEvent extends CallControlCallEvent,
    * <p>
    * @return The digits that have already been dialed.
    */
-  public String getDigits();
+  public java.lang.String getDigits();
     
 
   /**

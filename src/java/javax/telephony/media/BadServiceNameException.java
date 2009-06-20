@@ -18,8 +18,8 @@ package javax.telephony.media;
 import javax.telephony.media.Symbol;
 
 /**
- * Thrown when the disposition or serviceName String is ill-formed.
- * This Exception indicates the String cannot be (or be mapped to) 
+ * Thrown when the disposition or serviceName java.lang.String is ill-formed.
+ * This Exception indicates the java.lang.String cannot be (or be mapped to) 
  * a legal service name.
  * <p>
  * Conceptually, this is like getting a <i>reorder</i> tone when dialing
@@ -42,7 +42,7 @@ class BadServiceNameException extends NoServiceAssignedException {
      *
      * @param   s   the detail message.
      */
-    public BadServiceNameException(String s) {super(s);}
+    public BadServiceNameException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>BadServiceNameException</code>
@@ -51,7 +51,7 @@ class BadServiceNameException extends NoServiceAssignedException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public BadServiceNameException(String s, MediaEvent event) {
+    public BadServiceNameException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

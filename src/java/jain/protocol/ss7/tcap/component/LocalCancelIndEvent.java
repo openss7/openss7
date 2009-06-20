@@ -110,9 +110,9 @@ public final class LocalCancelIndEvent extends ComponentIndEvent {
         m_dialogueIdPresent = false;
         m_invokeIdPresent = false;
     }
-    /** String representation of class LocalCancelIndEvent.
+    /** java.lang.String representation of class LocalCancelIndEvent.
       * @return
-      * String provides description of class LocalCancelIndEvent.  */
+      * java.lang.String provides description of class LocalCancelIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nLocalCancelIndEvent");

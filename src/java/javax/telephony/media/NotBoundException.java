@@ -46,7 +46,7 @@ class NotBoundException extends MediaRuntimeException {
      *
      * @param   s   the detail message.
      */
-    public NotBoundException(String s) {super(s);}
+    public NotBoundException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>NotBoundException</code>
@@ -55,7 +55,7 @@ class NotBoundException extends MediaRuntimeException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public NotBoundException(String s, MediaEvent event) {
+    public NotBoundException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

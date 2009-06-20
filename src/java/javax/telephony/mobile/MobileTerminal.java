@@ -55,38 +55,38 @@ import  javax.telephony.*;
 public interface MobileTerminal extends Terminal{
 	
 	/**
-	 * Returns the Terminal Identification String.
+	 * Returns the Terminal Identification java.lang.String.
 	 * This methods returns an equipment ID string such as IMEI or ESN.
 	 * (International Mobile Equipment Identification) or
 	 * (Electronic Serial Number)
 	 * <p>
-	 * @return an equipment ID String, NULL if no such ID is implemented.
+	 * @return an equipment ID java.lang.String, NULL if no such ID is implemented.
 	 */
-	public String getTerminalId();
+	public java.lang.String getTerminalId();
 
 	/**
 	 * Returns the Mobile's Manufacturer Name.
 	 * <p>
-	 * @return an manufacturer name String, NULL if not implemented.
+	 * @return an manufacturer name java.lang.String, NULL if not implemented.
 	 */
-	public String getManufacturerName();
+	public java.lang.String getManufacturerName();
 
 
 	/**
-	 * Returns the Software Version String.
+	 * Returns the Software Version java.lang.String.
 	 * This methods returns a software version string.
 	 * <p>
-	 * @return a software version String, NULL if not implemented.
+	 * @return a software version java.lang.String, NULL if not implemented.
 	 */
-	public String getSoftwareVersion();
+	public java.lang.String getSoftwareVersion();
 
 	/**
-	 * Returns the type approval String.
+	 * Returns the type approval java.lang.String.
 	 * This methods returns a type approval string.
 	 * <p>
-	 * @return a type approval String, NULL if not implemented.
+	 * @return a type approval java.lang.String, NULL if not implemented.
 	 */
-	public String getTypeApproval();
+	public java.lang.String getTypeApproval();
 
 
 	/**
@@ -123,7 +123,7 @@ public interface MobileTerminal extends Terminal{
 	 * @return true if a tone was successfully delivered.
 	 */
 
-	public boolean generateDTMF(String digits)	
+	public boolean generateDTMF(java.lang.String digits)	
 		throws MethodNotSupportedException;
 }
 

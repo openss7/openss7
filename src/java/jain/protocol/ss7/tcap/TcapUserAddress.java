@@ -228,10 +228,10 @@ public final class TcapUserAddress implements java.io.Serializable {
     /** @deprecated
       * Returns a string representation of an instance of this class.  */
     public java.lang.String toString() {
-        String text = "TcapUserAddress\n";
+        java.lang.String text = "TcapUserAddress\n";
         try {
             byte[] pointCode = getSignalingPointCode();
-            text += "\t\t\tSignalling Point Code: " + new String(JainSS7Utility.bytesToHex(pointCode, 0, pointCode.length)) + "\n";
+            text += "\t\t\tSignalling Point Code: " + new java.lang.String(JainSS7Utility.bytesToHex(pointCode, 0, pointCode.length)) + "\n";
         } catch (ParameterNotSetException e) {
         }
         try {

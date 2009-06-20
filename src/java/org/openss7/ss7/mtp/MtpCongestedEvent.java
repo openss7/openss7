@@ -54,7 +54,7 @@ import org.openss7.ss7.*;
   * M3UA (RFC 4666).
   *
   * <h4>Parameter Components:</h4>
-  * The parameter components of the MtpCongestionEvent are: <ul>
+  * The parameter components of the MtpCongestedEvent are: <ul>
   * <li><em>Affected Route:</em> mandatory, no default;
   * <li><em>Congestion Status:</em> mandatory, no default; and,
   * <li><em>Concerned Signaling Point:</em> optional, defaults to the
@@ -63,10 +63,10 @@ import org.openss7.ss7.*;
   * @author Monavacon Limited
   * @version 1.2.2
   */
-public class MtpCongestionEvent extends MtpRouteManagementEvent {
+public class MtpCongestedEvent extends MtpRouteManagementEvent {
     /** Private congestion status parameter. */
     private CongestionStatus congestionStatus;
-    /** Constructs a new MtpCongestionEvent from the object source,
+    /** Constructs a new MtpCongestedEvent from the object source,
       * affected route and congestion status.
       * @param source
       * The object source generating the event.
@@ -75,7 +75,7 @@ public class MtpCongestionEvent extends MtpRouteManagementEvent {
       * @param congestionStatus
       * The congestion status of the affected route.
       */
-    public MtpCongestionEvent(java.lang.Object source, MtpRoute affectedRoute, CongestionStatus congestionStatus) {
+    public MtpCongestedEvent(java.lang.Object source, MtpRoute affectedRoute, CongestionStatus congestionStatus) {
         super(source, MtpPrimitiveType.STATUS_CONG, affectedRoute, RouteStatus.CONGESTED);
         setCongestionStatus(congestionStatus);
     }

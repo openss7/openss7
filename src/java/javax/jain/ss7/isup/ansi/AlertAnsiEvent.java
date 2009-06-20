@@ -69,7 +69,7 @@ public class AlertAnsiEvent extends AlertEvent {
       * getCongestionPriority method in IsupEvent calss for details.
       * @param bci Backward call indicators.
       * @exception ParameterRangeInvalidException  Thrown when a value is out of range.  */
-    public AlertAnsiEvent(Object source, SignalingPointCode dpc, SignalingPointCode opc, byte sls, int cic, byte congestionPriority, BwdCallIndAnsi bci)
+    public AlertAnsiEvent(java.lang.Object source, SignalingPointCode dpc, SignalingPointCode opc, byte sls, int cic, byte congestionPriority, BwdCallIndAnsi bci)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority, bci);
     }

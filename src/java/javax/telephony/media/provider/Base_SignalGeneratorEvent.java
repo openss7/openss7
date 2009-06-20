@@ -31,11 +31,11 @@ class Base_SignalGeneratorEvent extends Base.ResourceEvent
     /**
      * Create specific completion or non-tranaction event from SignalGenerator.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_SendSignals
      */
-    public Base_SignalGeneratorEvent(Object source, Symbol eventID) 
+    public Base_SignalGeneratorEvent(java.lang.Object source, Symbol eventID) 
     {super(source, eventID);}
 
     /** Dispatch this event to Async_SignalGeneratorListener */

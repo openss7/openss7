@@ -74,7 +74,7 @@ public final class SccpUserAddress implements java.io.Serializable, SS7Address {
       * Constructs a SccpUserAddress with the specified SubSystemAddress
       * (Signalling Point Code and Sub-System Number).
       * This constructor automatically sets the Routing indicator to
-      * {@linke RoutingIndicator#ROUTING_SUBSYSTEM ROUTING_SUBSYSTEM}.
+      * {@link RoutingIndicator#ROUTING_SUBSYSTEM ROUTING_SUBSYSTEM}.
       * @param subSystemAddress
       * The new SubSystem Address supplied to the constructor.
       */
@@ -84,7 +84,7 @@ public final class SccpUserAddress implements java.io.Serializable, SS7Address {
     /**
       * Constructs a SccpUserAddress with the specified Global Title.
       * This constructor automatically sets the Routing indicator to
-      * {@linke RoutingIndicator#ROUTING_GLOBALTITLE ROUTING_GLOBALTITLE}.
+      * {@link RoutingIndicator#ROUTING_GLOBALTITLE ROUTING_GLOBALTITLE}.
       * @param globalTitle
       * The new GlobalTitle supplied to the method.
       */
@@ -98,8 +98,8 @@ public final class SccpUserAddress implements java.io.Serializable, SS7Address {
       * @param
       * routingIndicator
       * The new Routing Indicator value is one of the following:- <ul>
-      * <li>{@linke RoutingIndicator#ROUTING_SUBSYSTEM ROUTING_SUBSYSTEM}
-      * <li>{@linke RoutingIndicator#ROUTING_GLOBALTITLE ROUTING_GLOBALTITLE} </ul>
+      * <li>{@link RoutingIndicator#ROUTING_SUBSYSTEM ROUTING_SUBSYSTEM}
+      * <li>{@link RoutingIndicator#ROUTING_GLOBALTITLE ROUTING_GLOBALTITLE} </ul>
       * @exception java.lang.IllegalArgumentException
       * Thrown when the supplied RoutingIndicator in invalid.
       * @exception MandatoryParameterNotSetException
@@ -117,11 +117,11 @@ public final class SccpUserAddress implements java.io.Serializable, SS7Address {
       * Sets the Global Title of this User Address.
       * The Global Title is an object which can be identified to be one
       * of the following five different types: <ul>
-      * <li>{@linke GlobalTitle GTIndicator0000}
-      * <li>{@linke GTIndicator0001}
-      * <li>{@linke GTIndicator0010}
-      * <li>{@linke GTIndicator0011}
-      * <li>{@linke GTIndicator0100} </ul>
+      * <li>{@link GlobalTitle GTIndicator0000}
+      * <li>{@link GTIndicator0001}
+      * <li>{@link GTIndicator0010}
+      * <li>{@link GTIndicator0011}
+      * <li>{@link GTIndicator0100} </ul>
       * @param globalTitle
       * The GlobalTitle of this SccpUserAddress.
       * @see GlobalTitle
@@ -251,9 +251,9 @@ public final class SccpUserAddress implements java.io.Serializable, SS7Address {
         return m_nationalUse;
     }
     /**
-      * String representation of class SccpUserAddress.
+      * java.lang.String representation of class SccpUserAddress.
       * @return
-      * String provides description of class SccpUserAddress.
+      * java.lang.String provides description of class SccpUserAddress.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

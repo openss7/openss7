@@ -64,7 +64,7 @@ public interface JtapiPeer {
    * <p>
    * @return The name of this JtapiPeer object instance.
    */
-  public String getName();
+  public java.lang.String getName();
 
 
   /**
@@ -73,7 +73,7 @@ public interface JtapiPeer {
    * <p>
    * @return The services that this implementation supports.
    */
-  public String[] getServices();
+  public java.lang.String[] getServices();
 
 
   /**
@@ -107,6 +107,6 @@ public interface JtapiPeer {
    * @exception ProviderUnavailableException Indicates a Provider corresponding
    * to the given string is unavailable.
    */
-  public Provider getProvider(String providerString)
+  public Provider getProvider(java.lang.String providerString)
     throws ProviderUnavailableException;
 }

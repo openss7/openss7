@@ -49,7 +49,7 @@ public class MediaResourceException extends MediaException {
      *
      * @param   s   the detail message.
      */
-    public MediaResourceException(String s) {super(s);}
+    public MediaResourceException(java.lang.String s) {super(s);}
     
     /**
      * Construct a <code>MediaResourceException</code>
@@ -73,7 +73,7 @@ public class MediaResourceException extends MediaException {
      * @param s  the detail message describing the error in the event.
      * @param event a ResourceEvent 
      */
-    public MediaResourceException(String s, ResourceEvent event) {
+    public MediaResourceException(java.lang.String s, ResourceEvent event) {
 	super(s, event);
     }
 

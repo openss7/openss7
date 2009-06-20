@@ -83,7 +83,7 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
         Sets the Realm of the WWWAuthenicateHeader to the realm parameter value. Realm strings MUST
         be globally unique. It is RECOMMENDED that a realm string contain a hostname or domain name.
         Realm strings SHOULD present a human-readable identifier that can be rendered to a user.
-        @param realm The new Realm String of this WWWAuthenicateHeader.
+        @param realm The new Realm java.lang.String of this WWWAuthenicateHeader.
         @exception java.text.ParseException Thrown when an error was found while parsing the realm.
       */
     void setRealm(java.lang.String realm)
@@ -91,12 +91,12 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
     /**
         Returns the Realm value of this WWWAuthenicateHeader. This convenience method returns only
         the realm of the complete Challenge.
-        @return The String representing the Realm information, null if value is not set.
+        @return The java.lang.String representing the Realm information, null if value is not set.
       */
     java.lang.String getRealm();
     /**
         Sets the Nonce of the WWWAuthenicateHeader to the nonce parameter value.
-        @param nonce The new nonce String of this WWWAuthenicateHeader.
+        @param nonce The new nonce java.lang.String of this WWWAuthenicateHeader.
         @exception java.text.ParseException Thrown when an error was found while parsing the nonce
         value.
       */
@@ -104,7 +104,7 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Nonce value of this WWWAuthenicateHeader.
-        @return The String representing the nonce information, null if value is not set.
+        @return The java.lang.String representing the nonce information, null if value is not set.
       */
     java.lang.String getNonce();
     /**
@@ -121,7 +121,7 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
     URI getURI();
     /**
         Sets the Algorithm of the WWWAuthenicateHeader to the new algorithm parameter value.
-        @param algorithm The new algorithm String of this WWWAuthenicateHeader.
+        @param algorithm The new algorithm java.lang.String of this WWWAuthenicateHeader.
         @exception java.text.ParseException Thrown when an error was found while parsing the
         algorithm value.
       */
@@ -129,7 +129,7 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Algorithm value of this WWWAuthenicateHeader.
-        @return The String representing the Algorithm information, null if the value is not set.
+        @return The java.lang.String representing the Algorithm information, null if the value is not set.
       */
     java.lang.String getAlgorithm();
     /**
@@ -155,7 +155,7 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Opaque value of this WWWAuthenicateHeader.
-        @return The String representing the Opaque information, null if the value is not set.
+        @return The java.lang.String representing the Opaque information, null if the value is not set.
       */
     java.lang.String getOpaque();
     /**
@@ -167,7 +167,7 @@ public interface WWWAuthenticateHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Domain value of this WWWAuthenicateHeader.
-        @return The String representing the Domain information, null if value is not set.
+        @return The java.lang.String representing the Domain information, null if value is not set.
       */
     java.lang.String getDomain();
     /**

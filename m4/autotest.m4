@@ -68,15 +68,9 @@ AC_DEFUN([_AUTOTEST], [dnl
 AC_DEFUN([_AUTOTEST_OPTIONS], [dnl
     AC_MSG_CHECKING([for autotest on installcheck])
     AC_ARG_ENABLE([autotest],
-	AS_HELP_STRING([--enable-autotest],
-	    [enable pre- and post-install testing.  @<:@default=auto@:>@]),
-	[enable_autotest="$enableval"], [dnl
-	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	    then
-		enable_autotest='yes'
-	    else
-		enable_autotest='no'
-	    fi])
+	AS_HELP_STRING([--disable-autotest],
+	    [disable pre- and post-install testing.  @<:@default=enabled@:>@]),
+	[enable_autotest="$enableval"], [enable_autotest=yes])
     AC_MSG_RESULT([${enable_autotest}])
     AM_CONDITIONAL([PERFORM_TESTING], [test :"${enable_autotest:-yes}" = :yes])dnl
 ])# _AUTOTEST_OPTIONS

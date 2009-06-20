@@ -134,7 +134,7 @@ public interface MsPosProvider {
       * processMsPosOperation method when the MsPosReqEvent is sent.
       * @param listener  The listener to be registered for "incoming transactions".
       * @param userAddress  The SS7Address that the listener is listening to.
-      * @exception TooManyListenersException  Thrown if the provider cannot handle any
+      * @exception java.util.TooManyListenersException  Thrown if the provider cannot handle any
       * more listeners.  This exception normally is used to indicate that only one
       * listener can be registered!
       */

@@ -42,7 +42,7 @@ class ResourceBusyException extends MediaResourceException {
      *
      * @param   s   the detail message.
      */
-    public ResourceBusyException(String s) {super(s);}
+    public ResourceBusyException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>ResourceBusyException</code>
@@ -51,7 +51,7 @@ class ResourceBusyException extends MediaResourceException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public ResourceBusyException(String s, ResourceEvent event) {
+    public ResourceBusyException(java.lang.String s, ResourceEvent event) {
 	super(s, event);
     }
 }

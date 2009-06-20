@@ -112,7 +112,7 @@ public class JainSS7Factory {
       * @param pathName
       * A string with the path name, e.g. "com.sun".
       */
-    public void setPathName(String pathName) {
+    public void setPathName(java.lang.String pathName) {
         m_pathName = pathName;
     }
     /**
@@ -125,7 +125,7 @@ public class JainSS7Factory {
       * @return
       * A string containgin the path name, e.g. "com.sun".
       */
-    public String getPathName() {
+    public java.lang.String getPathName() {
         return m_pathName;
     }
     /**
@@ -182,12 +182,12 @@ public class JainSS7Factory {
       * Indicates that the Peer JAIN SS7 Object specified by the
       * classname and the current pathname cannot be located.
       */
-    public synchronized Object createSS7Object(String objectClassName)
+    public synchronized java.lang.Object createSS7Object(java.lang.String objectClassName)
         throws SS7PeerUnavailableException {
         if (objectClassName != null) {
             try {
                 Class peerObjectClass = Class.forName(getPathName() + "." + objectClassName);
-                Object newPeerObject = peerObjectClass.newInstance();
+                java.lang.Object newPeerObject = peerObjectClass.newInstance();
                 m_jainObjectList.addElement(newPeerObject);
                 return (newPeerObject);
             } catch (Exception e) {
@@ -209,7 +209,7 @@ public class JainSS7Factory {
     }
 
     protected static JainSS7Factory m_jainSS7Factory;
-    protected String m_pathName = "com.sun";
+    protected java.lang.String m_pathName = "com.sun";
     protected java.util.Vector m_jainObjectList = new java.util.Vector();
 }
 

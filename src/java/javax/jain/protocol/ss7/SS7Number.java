@@ -55,7 +55,7 @@ import javax.jain.*;
   * is the responsibility of the user of this class to ensure that TON, NPI and
   * the type of the number value are consistent with each other. <p>
   *
-  * The number value can be just a String or an array of bytes, the encoding of
+  * The number value can be just a java.lang.String or an array of bytes, the encoding of
   * which should be possible to determine based on TON and NPI.  The number
   * value can alos be represented by a specific class, e.g. the class
   * E164Number, that preserves the internal structure of the number value.
@@ -155,7 +155,7 @@ public class SS7Number extends SS7Parameter {
       * @exception SS7InvalidParamException Thrown if paraemeter(s) are invalid
       * or out of range.
       */
-    public SS7Number(int ton, int npi, Object number) throws SS7InvalidParamException {
+    public SS7Number(int ton, int npi, java.lang.Object number) throws SS7InvalidParamException {
         m_ton = ton;
         m_ton_is_set = true;
         m_npi = npi;
@@ -222,7 +222,7 @@ public class SS7Number extends SS7Parameter {
       * @exception SS7InvalidParamException Thrown if parameters are invalid or
       * out of range.
       */
-    public void setNumber(Object number) throws SS7InvalidParamException {
+    public void setNumber(java.lang.Object number) throws SS7InvalidParamException {
         m_number = number;
         m_number_is_set = true;
     }
@@ -230,20 +230,20 @@ public class SS7Number extends SS7Parameter {
       * Get the number value.
       * @return Number value.
       */
-    public Object getNumber() {
-        Object r_number = null;
+    public java.lang.Object getNumber() {
+        java.lang.Object r_number = null;
 
         if (m_number_is_set)
             r_number = m_number;
         return r_number;
     }
     /**
-      * Get the whole SS7 Number (TON+NPI+Number) as a String.
+      * Get the whole SS7 Number (TON+NPI+Number) as a java.lang.String.
       *
-      * @return String containing the Number.
+      * @return java.lang.String containing the Number.
       */
-    public String toString() {
-        String text = "SS7Number\n";
+    public java.lang.String toString() {
+        java.lang.String text = "SS7Number\n";
         text += "\t\t\tType Of Number: " + getTypeOfNumber() + "\n";
         text += "\t\t\tNumbering Plan Indicator: " + getNumPlanId() + "\n";
         try {
@@ -257,7 +257,7 @@ public class SS7Number extends SS7Parameter {
       * @param e164 E.164 Number to be compared with this E.164 Number.
       * @return True if equal, otherwise false.
       */
-    public boolean equals(Object object) {
+    public boolean equals(java.lang.Object object) {
         if (object != null && object instanceof SS7Number) {
             SS7Number nr = (SS7Number) object;
             if (m_ton_is_set != nr.m_ton_is_set)
@@ -281,7 +281,7 @@ public class SS7Number extends SS7Parameter {
     private boolean m_ton_is_set = false;
     private int m_npi = NPI_UNKNOWN;
     private boolean m_npi_is_set = false;
-    private Object m_number;
+    private java.lang.Object m_number;
     private boolean m_number_is_set = false;
 }
 

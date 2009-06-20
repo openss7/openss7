@@ -82,9 +82,9 @@ public class NumberingPlan {
         m_valueIsSet = true;
     }
     /**
-      * String representation of the Constant class.
+      * java.lang.String representation of the Constant class.
       * @return
-      * String provides description of Constant.
+      * java.lang.String provides description of Constant.
       */
     public java.lang.String toString() {
         if (m_valueIsSet) {

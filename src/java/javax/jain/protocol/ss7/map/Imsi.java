@@ -91,7 +91,7 @@ public class Imsi extends SS7Parameter {
     }
     /**
       * Change the value of the Mobile Country Code (MCC).
-      * @param mcc String with 3 digits MCC.
+      * @param mcc java.lang.String with 3 digits MCC.
       */
     public void setMobileCountryCode(java.lang.String mcc) throws SS7InvalidParamException {
         int len = mcc.length();
@@ -113,17 +113,17 @@ public class Imsi extends SS7Parameter {
     }
     /**
       * Get the value of thie Mobile Country Code (MCC).
-      * @return String with 3 digit MCC.
+      * @return java.lang.String with 3 digit MCC.
       */
     public java.lang.String getMobileCountryCode() {
-        String mcc = "";
+        java.lang.String mcc = "";
         if (m_mcc_is_set)
             mcc = m_mcc;
         return mcc;
     }
     /**
       * Change the value of the Mobile Network Code (MNC).
-      * @param String with 2 or 3 digits MNC.
+      * @param java.lang.String with 2 or 3 digits MNC.
       */
     public void setMobileNetworkCode(java.lang.String mnc) throws SS7InvalidParamException {
         int len = mnc.length();
@@ -145,17 +145,17 @@ public class Imsi extends SS7Parameter {
     }
     /**
       * Get the value of the Mobile Network Code (MNC).
-      * @return String with 2 or 3 digits MNC.
+      * @return java.lang.String with 2 or 3 digits MNC.
       */
     public java.lang.String getMobileNetworkCode() {
-        String mnc = "";
+        java.lang.String mnc = "";
         if (m_mnc_is_set)
             mnc = m_mnc;
         return mnc;
     }
     /**
       * Change the value of the Mobile Subscriber Identification Number (MSIN).
-      * @param msin String with MSIN.
+      * @param msin java.lang.String with MSIN.
       */
     public void setMobileSubscriberNr(java.lang.String msin) throws SS7InvalidParamException {
         int len = msin.length();
@@ -175,20 +175,20 @@ public class Imsi extends SS7Parameter {
     }
     /**
       * Get the value fo the Mobile Subscriber Identification Number (MSIN).
-      * @return String with MSIN.
+      * @return java.lang.String with MSIN.
       */
     public java.lang.String getMobileSubscriberNr() {
-        String msin = "";
+        java.lang.String msin = "";
         if (m_msin_is_set)
             msin = m_msin;
         return msin;
     }
     /**
-      * Get the whole IMSI (MCC+MNC+MSIN) as a String.
-      * @return String cntaining the E.164 number.
+      * Get the whole IMSI (MCC+MNC+MSIN) as a java.lang.String.
+      * @return java.lang.String cntaining the E.164 number.
       */
     public java.lang.String toString() {
-        String text = "Imsi\n";
+        java.lang.String text = "Imsi\n";
         text += "\t\t\tMobile Country Code: " + getMobileCountryCode() + "\n";
         text += "\t\t\tMobile Network Code: " + getMobileNetworkCode() + "\n";
         text += "\t\t\tMobile Subscriber Nr: " + getMobileSubscriberNr() + "\n";
@@ -233,11 +233,11 @@ public class Imsi extends SS7Parameter {
         len += getMobileSubscriberNr().length();
         return len;
     }
-    private String m_mcc = "";
+    private java.lang.String m_mcc = "";
     private boolean m_mcc_is_set = false;
-    private String m_mnc = "";
+    private java.lang.String m_mnc = "";
     private boolean m_mnc_is_set = false;
-    private String m_msin = "";
+    private java.lang.String m_msin = "";
     private boolean m_msin_is_set = false;
 }
 

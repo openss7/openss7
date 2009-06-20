@@ -34,14 +34,14 @@ public class S200_ASREvent extends Base_ASREvent {
 	RecognitionResults (results) = Dictionary: {
 	    ResultPresentation = TypeII/TypeI
 	    RecognitionSequences = Dictionary[n] {
-		Context = String
-		GrammarTags = String[]
+		Context = java.lang.String
+		GrammarTags = java.lang.String[]
 		Language_Language = Symbol   Note: Language_ECTF_Language
 		Language_Variant = Symbol    Note: Language_ECTF_Variant
-		SequenceSpeaker = String
+		SequenceSpeaker = java.lang.String
 		SequenceQualifier = Symbol {Normal, Garbage, Silence}
 		SequenceScore = int
-		TokenRow = String[]
+		TokenRow = java.lang.String[]
 		TokenQualifiers = Symbol[]
 		TokenScores = int[]
 	    } // "n" of these Dictionary, one for each result row.
@@ -52,16 +52,16 @@ public class S200_ASREvent extends Base_ASREvent {
     /**
      * Create specific completion or non-transaction event from ASR.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ASR.ev_Recognize
      */
-    public S200_ASREvent(Object source, Symbol eventID) {
+    public S200_ASREvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
     }
 
     /** Constructor for non-trans vesion */
-    public S200_ASREvent(Object source, Symbol eventID, boolean isNonTrans)
+    public S200_ASREvent(java.lang.Object source, Symbol eventID, boolean isNonTrans)
     {
 	this(source, eventID);
 	this.isNonTrans = isNonTrans;
@@ -81,8 +81,8 @@ public class S200_ASREvent extends Base_ASREvent {
 	resultPresentation = (Symbol)results.get(ESymbol.ASR_ResultPresentation);
 	// extract RecognitionSequences,
 	// convert to TokenSequence[]
-	Object[] seqs = null;	     // a Dictionary[]
-	seqs = (Object[])results.get(ESymbol.ASR_RecognitionSequences);
+	java.lang.Object[] seqs = null;	     // a Dictionary[]
+	seqs = (java.lang.Object[])results.get(ESymbol.ASR_RecognitionSequences);
 	if (seqs == null) return;    // unlikely... there should be at least 1
 	// create array of TokenSequence objects:
 	tokenSequences = new TokenSequence[seqs.length];
@@ -121,17 +121,17 @@ public class S200_ASREvent extends Base_ASREvent {
 	waitForEventDone(); 
 	return (Dictionary)payload.get(ESymbol.ASR_ContextParms);
     }
-    public String getRuleExpansion() {
+    public java.lang.String getRuleExpansion() {
 	waitForEventDone(); 
-	return (String)payload.get(ESymbol.ASR_RuleExpansion);
+	return (java.lang.String)payload.get(ESymbol.ASR_RuleExpansion);
     }
-    public String getWordName() {
+    public java.lang.String getWordName() {
 	waitForEventDone(); 
-	return (String)payload.get(ESymbol.ASR_WordName);
+	return (java.lang.String)payload.get(ESymbol.ASR_WordName);
     }
-    public String getContextName() {
+    public java.lang.String getContextName() {
 	waitForEventDone(); 
-	return (String)payload.get(ESymbol.ASR_ContextName);
+	return (java.lang.String)payload.get(ESymbol.ASR_ContextName);
     }
     public Symbol getReadiness() {
 	waitForEventDone(); 
@@ -150,19 +150,19 @@ public class S200_ASREvent extends Base_ASREvent {
 	TokenSequence(int row, Dictionary sequence) {
 	    this.row = row;
 	    this.sequence = sequence;
-	    tokenRow = (String[])sequence.get(ESymbol.ASR_TokenRow);
+	    tokenRow = (java.lang.String[])sequence.get(ESymbol.ASR_TokenRow);
 	    sequence_length = tokenRow.length;
 	}
-	public String toString() {
+	public java.lang.String toString() {
 	    return "TokenSequence["+row+"] " + sequence;
 	}
 
 	/**
 	 * Get the context from which the sequence is taken.
-	 * @return String containing the name of the context.
+	 * @return java.lang.String containing the name of the context.
 	 */
-	public String getContextName() {
-	    return (String)sequence.get(ESymbol.ASR_Context);
+	public java.lang.String getContextName() {
+	    return (java.lang.String)sequence.get(ESymbol.ASR_Context);
 	}	    
 
 	/**
@@ -183,10 +183,10 @@ public class S200_ASREvent extends Base_ASREvent {
 
 	/**
 	 * Get the name of the speaker of the sequence.
-	 * @return String containing the name of the speaker.
+	 * @return java.lang.String containing the name of the speaker.
 	 */
-	public String getSequenceSpeaker() {
-	    return (String)sequence.get(ESymbol.ASR_SequenceSpeaker);
+	public java.lang.String getSequenceSpeaker() {
+	    return (java.lang.String)sequence.get(ESymbol.ASR_SequenceSpeaker);
 	}
 
 	/**
@@ -220,13 +220,13 @@ public class S200_ASREvent extends Base_ASREvent {
 	}
 	
 	/** set in constructor */
-	protected String[] tokenRow = null;
+	protected java.lang.String[] tokenRow = null;
 	/**
 	 * Get the name of the <tt>jth</tt> token in this sequence.
-	 * @return the name String that identifies the <tt>jth</tt> token.
+	 * @return the name java.lang.String that identifies the <tt>jth</tt> token.
 	 * @see ASR#wordCommit
 	 */
-	public String getToken(int j) {
+	public java.lang.String getToken(int j) {
 	    return (tokenRow == null) ? null : tokenRow[j];
 	}
 
@@ -272,9 +272,9 @@ public class S200_ASREvent extends Base_ASREvent {
 	    return (tokenScores == null) ? -1 : tokenScores[j].intValue();
 	}
 
-	private static final String[] noStrings = new String[0];
+	private static final java.lang.String[] noStrings = new java.lang.String[0];
 	/** set when requested. */
-	String[] grammarTags = noStrings;
+	java.lang.String[] grammarTags = noStrings;
 	/**
 	 * Get the GrammarTag for the <tt>jth</tt> token in this sequence.
 	 * <p>
@@ -283,14 +283,14 @@ public class S200_ASREvent extends Base_ASREvent {
 	 * because the TokenQualifier indicates whether the <tt>jth</tt>
 	 * element is a GrammarTag
 	 * </I>.
-	 * @return the GrammarTag String for the <tt>jth</tt> token.
+	 * @return the GrammarTag java.lang.String for the <tt>jth</tt> token.
 	 *
-	 * @deprecate use getToken() to get the jth token, 
+	 * @deprecated use getToken() to get the jth token, 
 	 * getTokenQualifier() indicates it is a GrammarTag.
 	 */
-	public String getGrammarTag(int j) {
+	public java.lang.String getGrammarTag(int j) {
 	    if (grammarTags == noStrings)
-		grammarTags = ((String[])sequence.get(ESymbol.ASR_GrammarTags));
+		grammarTags = ((java.lang.String[])sequence.get(ESymbol.ASR_GrammarTags));
 	    return (grammarTags == null) ? null : grammarTags[j];
 	}
     }

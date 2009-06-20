@@ -189,9 +189,9 @@ public final class ErrorReqEvent extends ComponentReqEvent {
         m_errorTypePresent = false;
         m_errorCodePresent = false;
     }
-    /** String representation of class ErrorReqEvent.
+    /** java.lang.String representation of class ErrorReqEvent.
       * @return
-      * String provides description of class ErrorReqEvent.  */
+      * java.lang.String provides description of class ErrorReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(500);
         b.append("\n\nErrorReqEvent");

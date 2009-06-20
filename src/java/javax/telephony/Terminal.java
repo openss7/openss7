@@ -148,7 +148,7 @@ public interface Terminal {
    * <p>
    * @return The name of the Terminal.
    */
-  public String getName();
+  public java.lang.String getName();
 
 
   /**

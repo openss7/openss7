@@ -297,7 +297,7 @@ public class SccpStatisticNotification extends OamStatisticNotification {
       * Over rides standard JAVA toString method.
       */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
 }
 

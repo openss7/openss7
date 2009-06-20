@@ -49,7 +49,7 @@ public interface RouteAddress extends Address {
    * applications to register a callback for all routeable Addresses in the
    * Provider's domain.
    */
-  public static final String ALL_ROUTE_ADDRESS = "AllRouteAddress";
+  public static final java.lang.String ALL_ROUTE_ADDRESS = "AllRouteAddress";
 
 
   /**

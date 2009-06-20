@@ -291,7 +291,7 @@ public interface MediaTerminalConnection extends TerminalConnection {
    * @exception InvalidStateException Indicates the TerminalConnection is not
    * in the media channel available state.
    */
-  public void generateDtmf(String digits)
+  public void generateDtmf(java.lang.String digits)
     throws MethodNotSupportedException, ResourceUnavailableException,
       InvalidStateException;
 }

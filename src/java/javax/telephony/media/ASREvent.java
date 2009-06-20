@@ -116,10 +116,10 @@ interface ASREvent extends ResourceEvent, ASRConstants {
 	/**
 	 * Get the name of the <tt>jth</tt> token in this sequence.
 	 * @param j index of the token to be returned. 
-	 * @return the name String that identifies the <tt>jth</tt> token.
+	 * @return the name java.lang.String that identifies the <tt>jth</tt> token.
 	 * @see ASR#wordCommit
 	 */
-	String getToken(int j);
+	java.lang.String getToken(int j);
 
 	/**
 	 * Get the qualifier for the <tt>jth</tt> token in this sequence.
@@ -153,9 +153,9 @@ interface ASREvent extends ResourceEvent, ASRConstants {
 	 * </I>.
 	 * <p>
 	 * @param j index of the token for which the GrammarTag is returned. 
-	 * @return the GrammarTag String for the <tt>jth</tt> token.
+	 * @return the GrammarTag java.lang.String for the <tt>jth</tt> token.
 	 */
-	String getGrammarTag(int j);
+	java.lang.String getGrammarTag(int j);
 
 	/**
 	 * Get the the recognizer's confidence for the <tt>jth</tt> token.
@@ -174,9 +174,9 @@ interface ASREvent extends ResourceEvent, ASRConstants {
 
 	/**
 	 * Get the context from which the sequence is taken.
-	 * @return String containing the name of the context.
+	 * @return java.lang.String containing the name of the context.
 	 */
-	String getContextName();
+	java.lang.String getContextName();
 
 	/**
 	 * Get the language of the sequence.
@@ -194,9 +194,9 @@ interface ASREvent extends ResourceEvent, ASRConstants {
 
 	/**
 	 * Get the name of the speaker of the sequence.
-	 * @return String containing the name of the speaker.
+	 * @return java.lang.String containing the name of the speaker.
 	 */
-	String getSequenceSpeaker();
+	java.lang.String getSequenceSpeaker();
 
 	/**
 	 * Get an overall qualifier of the sequence.
@@ -224,34 +224,34 @@ interface ASREvent extends ResourceEvent, ASRConstants {
      * <p>
      *
      * @return context parameter Dictionary.
-     * @see ASR#contextGetParameters(String, Symbol[]) ASR.contextGetParameters
+     * @see ASR#contextGetParameters(java.lang.String, Symbol[]) ASR.contextGetParameters
      */
     Dictionary getContextDictionary();
 
     /**
      * Return the rule expansion from getRuleExpansion.
      * <p>
-     * @return a String which is the rule expansion.
+     * @return a java.lang.String which is the rule expansion.
      * @see ASR#getRuleExpansion ASR.getRuleExpansion()
      */
-    String getRuleExpansion();
+    java.lang.String getRuleExpansion();
 
     /**
      * Return the name of the affected word.
      * <p>
      *
-     * @return a String which is the name of the word.
+     * @return a java.lang.String which is the name of the word.
      * @see ASR#wordCommit ASR.wordCommit()
      * @see ASR#wordCreate ASR.wordCreate()
      * @see ASR#wordDeleteTraining ASR.wordDeleteTraining()
      * @see ASR#wordDestroy ASR.wordDestroy()
      * @see ASR#wordTrain ASR.wordTrain()
      */
-    String getWordName();
+    java.lang.String getWordName();
 
     /**
      * Return the name of the affected context.
-     * @return a String which is the context name.
+     * @return a java.lang.String which is the context name.
      * @see ASR#contextRemove ASR.contextRemove()
      * @see ASR#wordCommit ASR.wordCommit()
      * @see ASR#wordCreate ASR.wordCreate()
@@ -260,7 +260,7 @@ interface ASREvent extends ResourceEvent, ASRConstants {
      * @see ASR#wordDestroy ASR.wordDestroy()
      * @see ASR#wordTrain ASR.wordTrain()
      */
-    String getContextName();
+    java.lang.String getContextName();
 
     /**
      * Return a Symbol telling if the word has been sufficiently trained.

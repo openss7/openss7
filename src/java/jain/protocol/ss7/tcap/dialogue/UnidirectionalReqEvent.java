@@ -175,9 +175,9 @@ public final class UnidirectionalReqEvent extends DialogueReqEvent {
         m_originatingAddressPresent = false;
         m_qualityOfServicePresent = false;
     }
-    /** String representation of class UnidirectionalReqEvent.
+    /** java.lang.String representation of class UnidirectionalReqEvent.
       * @return
-      * String provides description of class UnidirectionalReqEvent.  */
+      * java.lang.String provides description of class UnidirectionalReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nUnidirectionalReqEvent");

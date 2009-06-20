@@ -82,7 +82,7 @@ public interface MediaConnection extends MediaConnectionConstants {
 	 * Note: the token from ms1.bridge(ms2) is not equal to
 	 * the Token from ms2.bridge(ms1)
 	 */
-	public boolean equals(Object other);
+	public boolean equals(java.lang.Object other);
     }
     // API:
     /**

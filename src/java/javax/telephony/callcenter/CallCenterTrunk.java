@@ -130,7 +130,7 @@ public interface CallCenterTrunk {
    * <p>
    * @return The name of the trunk.
    */
- public String getName();
+ public java.lang.String getName();
 
 
   /**

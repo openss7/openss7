@@ -58,13 +58,13 @@ public abstract class SS7Event extends java.util.EventObject implements java.io.
     /** Construct an SS7Event object.
       * @param source
       * The source object reference. */
-    public SS7Event(Object source) {
+    public SS7Event(java.lang.Object source) {
 	super(source);
     }
     /** Set the source of an SS7Event object.
       * @param source
       * The source object reference to set. */
-    public void setSource(Object source) {
+    public void setSource(java.lang.Object source) {
 	this.source = source;
     }
     /** Gets the primitive type of the event.

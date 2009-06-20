@@ -64,7 +64,7 @@ package javax.csapi.cc.jcc;
   * interface.
   *
   * <h5>Obtaining a JccPeer Object</h5>
-  * Applications use the getJccPeer(String) method to obtain a JccPeer
+  * Applications use the getJccPeer(java.lang.String) method to obtain a JccPeer
   * object. The argument to this method is a classname which represents
   * an object which implements the JccPeer interface. This object and
   * the classname under which it can be found must be supplied by the
@@ -86,7 +86,7 @@ package javax.csapi.cc.jcc;
   * DefaultJccPeer.class class file. When placed in the classpath of
   * applications, this class (which must implement the JccPeer
   * interface) becomes the default JccPeer object returned by the
-  * getJccPeer(String) method. By convention the default class name must
+  * getJccPeer(java.lang.String) method. By convention the default class name must
   * be DefaultJccPeer. <p>
   *
   * In basic environments, applications and users do not want the burden
@@ -94,7 +94,7 @@ package javax.csapi.cc.jcc;
   * implementation. Therefore, the JccPeerFactory class supports a
   * mechanism for applications to obtain the default implementation for
   * their system. If applications use a null argument to the
-  * getJccPeer(String) method, they will be returned the default
+  * getJccPeer(java.lang.String) method, they will be returned the default
   * installed implementation on their system if it exists. <p>
   *
   * Note: It is the responsibility of implementation vendors to supply a
@@ -138,7 +138,7 @@ public class JccPeerFactory {
             Class JccPeerClass = Class.forName(JccPeerName);
             return (JccPeer)JccPeerClass.newInstance();
         } catch (Exception e) {
-            String errmsg = "JccPeer: " + JccPeerName + " could not be instantiated.";
+            java.lang.String errmsg = "JccPeer: " + JccPeerName + " could not be instantiated.";
             throw new ClassNotFoundException(errmsg);
         }
     }
@@ -150,8 +150,8 @@ public class JccPeerFactory {
       * general discouraged.
       * @return
       * The default Jcc peer name.  */
-    private static String getDefaultJccPeerName() {
-        String JccPeerName = "DefaultJccPeer";
+    private static java.lang.String getDefaultJccPeerName() {
+        java.lang.String JccPeerName = "DefaultJccPeer";
         return JccPeerName;
     }
 }

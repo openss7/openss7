@@ -332,9 +332,9 @@ public final class RejectIndEvent extends ComponentIndEvent {
         m_lastComponentPresent = false;
         m_rejectTypePresent = false;
     }
-    /** String representation of class RejectIndEvent.
+    /** java.lang.String representation of class RejectIndEvent.
       * @return
-      * String provides description of class RejectIndEvent.  */
+      * java.lang.String provides description of class RejectIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nRejectIndEvent");

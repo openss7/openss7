@@ -100,7 +100,7 @@ public interface MediaConfig {
       * </code> */
     java.util.Set<Symbol> getSupportedSymbols();
     /** @return
-      * A readable String representing the xml definition of the
+      * A readable java.lang.String representing the xml definition of the
       * MediaConfig.  */
     java.lang.String marshall();
 }

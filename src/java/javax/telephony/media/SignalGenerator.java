@@ -32,19 +32,19 @@ interface SignalGenerator extends Resource, SignalGeneratorConstants {
     /**
      * Transmit a series of signals out the Terminal to the network. 
      * <p>
-     * Each signal is defined by a single char in the String.
+     * Each signal is defined by a single char in the java.lang.String.
      * <p>
      * <b>Note:</b> The AIA inserts spaces for presentation at the 
      * S.200/S.300 layers
      *
-     * @param signals an String containing chars representing each signal.
+     * @param signals an java.lang.String containing chars representing each signal.
      * @param rtc an array of RTC objects that controls this transactions.
      * @param optargs a Dictionary of optional arguments 
      * @return a SignalGeneratorEvent.
      * @exception MediaResourceException if this request fails. 
      * @throws DisconnectedException if Terminal is disconnected.
      */
-    SignalGeneratorEvent sendSignals(String signals, RTC[] rtc,
+    SignalGeneratorEvent sendSignals(java.lang.String signals, RTC[] rtc,
 				     Dictionary optargs)
 	throws MediaResourceException;
 
@@ -54,7 +54,7 @@ interface SignalGenerator extends Resource, SignalGeneratorConstants {
      * Each signal is defined by a Symbol in the Symbol[].
      * <p>
      * <b>Note:</b> This method may be less efficient than using 
-     * the String form of sendSignals.
+     * the java.lang.String form of sendSignals.
      *
      * @param signals an array of Symbols that defines a signal.
      * @param rtc an array of RTC objects that controls this transactions.

@@ -36,17 +36,17 @@ class Base_MediaConnectionEvent extends Base.MediaGroupEvent
      * Surely, we could use a subclass, but for now,
      * we just set a flag.
      */
-    public Base_MediaConnectionEvent(Object source, Symbol eventID, 
+    public Base_MediaConnectionEvent(java.lang.Object source, Symbol eventID, 
 				     boolean isNonTrans) {
 	super(source, eventID);
 	this.isNonTrans = isNonTrans;
     }
 
-    public Base_MediaConnectionEvent(Object source, Symbol eventID) {
+    public Base_MediaConnectionEvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
     }
     /** Do not use, specify the real eventID; from the Token.type. */
-    public Base_MediaConnectionEvent(Object source) {
+    public Base_MediaConnectionEvent(java.lang.Object source) {
 	super(source, ev_Disconnect);
     }
     // originally dispatched to Async.MediaGroupListener.onMediaGroupDone().
@@ -127,13 +127,13 @@ class Base_MediaConnectionEvent extends Base.MediaGroupEvent
      * <b>Note:</b>
      * A provider implementer can extend this with fields 
      * that indicate which objects are actually connected.
-     * Also provide a suitable .equals(Object) method.
+     * Also provide a suitable .equals(java.lang.Object) method.
      * two Tokens are equal if the refer to the same media
      * path connection: same source and sink of media.
      */
     public static
     class Token implements MediaConnection.Token {
-	public String toString() {
+	public java.lang.String toString() {
 	    return getClass().getName()+"{type="+ type+" dataFlow="+dataFlow+"}";
 	}
 	

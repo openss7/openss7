@@ -224,9 +224,9 @@ public final class BeginReqEvent extends DialogueReqEvent {
         m_qualityOfServicePresent = false;
         m_allowedPermissionPresent = false;
     }
-    /** String representation of class BeginReqEvent.
+    /** java.lang.String representation of class BeginReqEvent.
       * @return
-      * String provides description of class BeginReqEvent.  */
+      * java.lang.String provides description of class BeginReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nBeginReqEvent");

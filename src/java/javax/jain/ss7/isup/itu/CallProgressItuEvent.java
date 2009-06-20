@@ -72,7 +72,7 @@ public class CallProgressItuEvent extends CallProgressEvent {
         @param eventInformation  Event Information.
         @exception ParameterRangeInvalidException  Thrown when value is out of range
       */
-    public CallProgressItuEvent(Object source, SignalingPointCode dpc,
+    public CallProgressItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             EventInformation eventInformation)
         throws ParameterRangeInvalidException {

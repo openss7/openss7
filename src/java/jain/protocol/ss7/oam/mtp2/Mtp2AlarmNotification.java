@@ -197,24 +197,24 @@ public class Mtp2AlarmNotification extends OamAlarmNotification {
       * The priority of this Mtp2AlarmNotification.  This may be either
       * (in increasing order of priority): <ol>
       *
-      * <li>{@linke OamAlarmNotification#PRIORITY_INFORMATIONAL PRIORITY_INFORMATIONAL}
+      * <li>{@link OamAlarmNotification#PRIORITY_INFORMATIONAL PRIORITY_INFORMATIONAL}
       *     - The cause of this Notification does not affect the
       *     functional state of the system and may be ignored.  This
       *     Mtp2AlarmNotification is for purely informational purposes
       *     only.
       *
-      * <li>{@linke OamAlarmNotification#PRIORITY_LOW PRIORITY_LOW}
+      * <li>{@link OamAlarmNotification#PRIORITY_LOW PRIORITY_LOW}
       *     - Indicates that the state of the MBean that emitted this
       *     Mtp2AlarmNotification has changed as a result of an
       *     operation explicitly invoked by an application.
       *
-      * <li>{@linke OamAlarmNotification#PRIORITY_HIGH PRIORITY_HIGH}
+      * <li>{@link OamAlarmNotification#PRIORITY_HIGH PRIORITY_HIGH}
       *     - Indicates that the physical network element associated
       *     with the MBean that emitted this Mtp2AlarmNotification has
       *     gone out of service.  Without corrective action, service
       *     reliability can be severely affected.
       *
-      * <li>{@linke OamAlarmNotification#PRIORITY_CRITICAL PRIORITY_CRITICAL}
+      * <li>{@link OamAlarmNotification#PRIORITY_CRITICAL PRIORITY_CRITICAL}
       *     - Indicates the complete failure of the physical network
       *     element associated with the MBean that emitted this
       *     Mtp2AlarmNotification.  Immediate recovery action is
@@ -236,7 +236,7 @@ public class Mtp2AlarmNotification extends OamAlarmNotification {
       * extend this class.  Over rides standard JAVA toString method.
       */
     public java.lang.String toString() {
-        return new String("");
+        return new java.lang.String("");
     }
 }
 

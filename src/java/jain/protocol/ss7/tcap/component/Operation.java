@@ -330,10 +330,10 @@ public final class Operation implements java.io.Serializable {
         m_operationSpecifierPresent = false;
         m_privateOperationDataPresent = false;
     }
-    /** String representation of class
+    /** java.lang.String representation of class
       * jain.protocol.ss7.tcap.component.Operation.
       * @return
-      * String provides description of class
+      * java.lang.String provides description of class
       * jain.protocol.ss7.tcap.component.Operation.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

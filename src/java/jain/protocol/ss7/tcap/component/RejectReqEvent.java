@@ -283,9 +283,9 @@ public final class RejectReqEvent extends ComponentReqEvent {
         m_problemTypePresent = false;
         m_rejectTypePresent = false;
     }
-    /** String representation of class RejectReqEvent.
+    /** java.lang.String representation of class RejectReqEvent.
       * @return
-      * String provides description of class RejectReqEvent.  */
+      * java.lang.String provides description of class RejectReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nRejectreqEvent");

@@ -62,7 +62,7 @@ public interface AuthenticationInfoHeader extends Parameters, Header {
     static final java.lang.String NAME = "Authentication-Info";
     /**
         Sets the NextNonce of the AuthenticationInfoHeader to the nextNonce parameter value.
-        @param nextNonce The new nextNonce String of this AuthenticationInfoHeader.
+        @param nextNonce The new nextNonce java.lang.String of this AuthenticationInfoHeader.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         nextNonce value.
       */
@@ -70,7 +70,7 @@ public interface AuthenticationInfoHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the nextNonce value of this AuthenticationInfoHeader.
-        @return The String representing the nextNonce information, null if value is not set.
+        @return The java.lang.String representing the nextNonce information, null if value is not set.
       */
     java.lang.String getNextNonce();
     /**
@@ -88,7 +88,7 @@ public interface AuthenticationInfoHeader extends Parameters, Header {
     java.lang.String getQop();
     /**
         Sets the CNonce of the AuthenticationInfoHeader to the cNonce parameter value.
-        @param cNonce The new cNonce String of this AuthenticationInfoHeader.
+        @param cNonce The new cNonce java.lang.String of this AuthenticationInfoHeader.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         cNonce value.
       */
@@ -96,7 +96,7 @@ public interface AuthenticationInfoHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the CNonce value of this AuthenticationInfoHeader.
-        @return The String representing the cNonce information, null if value is not set.
+        @return The java.lang.String representing the cNonce information, null if value is not set.
       */
     java.lang.String getCNonce();
     /**
@@ -114,7 +114,7 @@ public interface AuthenticationInfoHeader extends Parameters, Header {
     int getNonceCount();
     /**
         Sets the Response of the AuthenticationInfoHeader to the new response parameter value.
-        @param response The new response String of this AuthenticationInfoHeader.
+        @param response The new response java.lang.String of this AuthenticationInfoHeader.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         Response.
       */
@@ -122,7 +122,7 @@ public interface AuthenticationInfoHeader extends Parameters, Header {
         throws java.text.ParseException;
     /**
         Returns the Response value of this AuthenticationInfoHeader.
-        @return The String representing the Response information.
+        @return The java.lang.String representing the Response information.
       */
     java.lang.String getResponse();
 }

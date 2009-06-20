@@ -62,7 +62,7 @@ public class SS7ListenerNotRegisteredException extends SS7Exception {
       * detail message.
       * @param msg The detail message.
       */
-    public SS7ListenerNotRegisteredException(String msg) {
+    public SS7ListenerNotRegisteredException(java.lang.String msg) {
         super(msg);
     }
     /**

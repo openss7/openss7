@@ -82,10 +82,10 @@ public class RTC implements java.io.Serializable {
 	this.trigger = trigger;
 	this.action = action;
     }
-    public String toString() {
-	String fullName = super.toString();
-	String shortName = fullName.substring( fullName.lastIndexOf('.') + 1 );
-	String x = "(" + trigger + "->" + action + ")";
+    public java.lang.String toString() {
+	java.lang.String fullName = super.toString();
+	java.lang.String shortName = fullName.substring( fullName.lastIndexOf('.') + 1 );
+	java.lang.String x = "(" + trigger + "->" + action + ")";
 	return shortName+x;
     }
 
@@ -95,10 +95,10 @@ public class RTC implements java.io.Serializable {
 
     /** Two RTCs are equal if both the trigger and action Symbols
      * (respectively) are equal.
-     * @param other the Object to be compared to this RTC Object
+     * @param other the java.lang.Object to be compared to this RTC java.lang.Object
      * @return true iff both RTCs have the same trigger and action Symbols.
      */
-    public boolean equals(Object other) {
+    public boolean equals(java.lang.Object other) {
 	return ((other instanceof RTC) && 
 		((trigger == ((RTC)other).trigger) ||
 		 ((trigger != null) && trigger.equals(((RTC)other).trigger))) &&

@@ -54,5 +54,5 @@ public interface CallCtlConnDialingEv extends CallCtlConnEv {
    * <p>
    * @return The digits that have already been dialed.
    */
-  public String getDigits();
+  public java.lang.String getDigits();
 }

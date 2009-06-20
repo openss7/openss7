@@ -10,6 +10,13 @@
 #include <java/lang/UnsupportedOperationException.h>
 
 void
+org::openss7::javax::jain::ss7::inap::JainInapProviderImpl::finalize ()
+{
+  throw new ::java::lang::UnsupportedOperationException (JvNewStringLatin1 ("org::openss7::javax::jain::ss7::inap::JainInapProviderImpl::finalize () not implemented"));
+}
+
+
+void
 org::openss7::javax::jain::ss7::inap::JainInapProviderImpl::addJainInapListener (::javax::jain::ss7::inap::JainInapListener *, jbyteArray)
 {
   throw new ::java::lang::UnsupportedOperationException (JvNewStringLatin1 ("org::openss7::javax::jain::ss7::inap::JainInapProviderImpl::addJainInapListener (::javax::jain::ss7::inap::JainInapListener *, jbyteArray) not implemented"));

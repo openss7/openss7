@@ -37,7 +37,7 @@ public class InvalidArgumentException extends Exception {
    * Constructor which takes a string description.
    * @param s description of the faulty argument
    */
-  public InvalidArgumentException(String s) {
+  public InvalidArgumentException(java.lang.String s) {
     super(s);
   }
 }

@@ -266,9 +266,9 @@ public final class BeginIndEvent extends DialogueIndEvent {
         m_allowedPermissionPresent = false;
         m_componentsPresent = false;
     }
-    /** String representation of class BeginIndEvent.
+    /** java.lang.String representation of class BeginIndEvent.
       * @return
-      * String provides description of class BeginIndEvent.  */
+      * java.lang.String provides description of class BeginIndEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nBeginIndEvent");

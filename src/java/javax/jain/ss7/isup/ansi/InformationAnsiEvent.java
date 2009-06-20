@@ -71,7 +71,7 @@ public class InformationAnsiEvent extends InformationEvent {
         @param in_infoInd  Information Indicator parameter.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public InformationAnsiEvent(Object source, SignalingPointCode dpc,
+    public InformationAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             InfoIndAnsi in_infoInd)
         throws ParameterRangeInvalidException {

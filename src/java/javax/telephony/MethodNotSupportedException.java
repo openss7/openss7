@@ -38,7 +38,7 @@ public class MethodNotSupportedException extends Exception {
    *
    * @param s description of the fault
    */
-  public MethodNotSupportedException(String s) {
+  public MethodNotSupportedException(java.lang.String s) {
     super(s);
   }
 }

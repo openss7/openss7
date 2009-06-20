@@ -159,7 +159,7 @@ public interface CallControlCallCapabilities extends CallCapabilities {
    * @return True if the application can invoke the transfer feature which
    * takes a destination string as an argument, false otherwise.
    */
-  public boolean canTransfer(String destination);
+  public boolean canTransfer(java.lang.String destination);
 
 
   /**
@@ -193,7 +193,7 @@ public interface CallControlCallCapabilities extends CallCapabilities {
    * <p>
    * @deprecated Since JTAPI v1.2. The default behavior of this method in
    * JTAPI v1.2 and later should invoke the canConsult(TerminalConnection,
-   * String) method.
+   * java.lang.String) method.
    * @return True if the application can invoke the consult feature, false
    * otherwise.
    */
@@ -216,7 +216,7 @@ public interface CallControlCallCapabilities extends CallCapabilities {
    * @return True if the application can invoke the consult feature which
    * takes a TerminalConnection and a string as arguments.
    */
-  public boolean canConsult(TerminalConnection tc, String destination);
+  public boolean canConsult(TerminalConnection tc, java.lang.String destination);
 
 
   /**

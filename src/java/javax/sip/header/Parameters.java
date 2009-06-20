@@ -55,7 +55,7 @@ import javax.sip.*;
   */
 public interface Parameters {
     /**
-        Returns the value of the named parameter, or null if it is not set. A zero-length String
+        Returns the value of the named parameter, or null if it is not set. A zero-length java.lang.String
         indicates flag parameter.
         @param name Name of parameter to retrieve.
         @return The value of specified parameter.
@@ -63,9 +63,9 @@ public interface Parameters {
     java.lang.String getParameter(java.lang.String name);
     /**
         Sets the value of the specified parameter. If the parameter already had a value it will be
-        overwritten. A zero-length String indicates flag parameter.
-        @param name A String specifying the parameter name.
-        @param value A String specifying the parameter value.
+        overwritten. A zero-length java.lang.String indicates flag parameter.
+        @param name A java.lang.String specifying the parameter name.
+        @param value A java.lang.String specifying the parameter value.
         @exception java.text.ParseException Thrown when an error was found while parsing the
         parameter name or value.
       */
@@ -80,7 +80,7 @@ public interface Parameters {
     /**
         Removes the specified parameter from Parameters of this ParametersHeader. This method
         returns silently if the parameter is not part of the ParametersHeader.
-        @param name A String specifying the parameter name.
+        @param name A java.lang.String specifying the parameter name.
       */
     void removeParameter(java.lang.String name);
 }

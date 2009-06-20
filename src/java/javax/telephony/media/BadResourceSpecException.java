@@ -35,7 +35,7 @@ class BadResourceSpecException extends BadConfigSpecException {
      *
      * @param   s   the detail message.
      */
-    public BadResourceSpecException(String s) {super(s);}
+    public BadResourceSpecException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>BadResourceSpecException</code>
@@ -44,7 +44,7 @@ class BadResourceSpecException extends BadConfigSpecException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public BadResourceSpecException(String s, MediaEvent event) {
+    public BadResourceSpecException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

@@ -46,7 +46,7 @@
 package javax.jain.ss7.inap.datatype;
 
 import javax.jain.ss7.inap.constants.*;
-import javax.jain.ss7.inap.exceptions.*;
+import javax.jain.ss7.inap.exception.*;
 import javax.jain.ss7.inap.*;
 import javax.jain.ss7.*;
 import javax.jain.*;

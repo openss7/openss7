@@ -73,7 +73,7 @@ DisconnectedException extends MediaRuntimeException {
      * @param str the detail message.
      * @param event a ResourceEvent that indicates <code>DISCONNECTED</code>.
      */
-    public DisconnectedException(String str, ResourceEvent event) {
+    public DisconnectedException(java.lang.String str, ResourceEvent event) {
 	super(str, event);
     }
 

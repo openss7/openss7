@@ -178,7 +178,7 @@ public interface JccAddress {
       * each JccAddress possesses a unique string representation within
       * a given JccProvider.  @return The "unique" string representation
       * of this JccAddress.  @since 1.0b */
-    public String getName();
+    public java.lang.String getName();
     /** Retrieves the Jccprovider handling this address object. This
       * JccProvider object is valid throughout the lifetime of the
       * JccAddress and does not change once the JccAddress is created.

@@ -87,7 +87,7 @@ public class UserStatus extends MtpParameter {
       * <li>{@link #M_UNAVAILABLE} and
       * <li>{@link #M_INACCESSIBLE}. </ul>
       */
-    private setValue(int value) {
+    private void setValue(int value) {
         this.value = value;
     }
     /** Gets the integer value of the constant class.

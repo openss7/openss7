@@ -52,17 +52,17 @@ import java.util.Dictionary;
  * <p>
  * Coding types for data objects are defined in {@link CoderConstants}.
  * <p>
- * The MDO to be played is identified by its String name. 
- * The String name is an identifier that may be interpreted 
+ * The MDO to be played is identified by its java.lang.String name. 
+ * The java.lang.String name is an identifier that may be interpreted 
  * as a path or URL (URI) for the MDO.
  * <p>
  * <b>Note:</b>
- * The format of the String that identifies 
+ * The format of the java.lang.String that identifies 
  * an MDO is not defined by this release of specification
  * [although it will be compatible with that used in the ContainerService].
  * The vendor-specific implementation of the MediaService 
  * (for example, the vendor of the server or resource)
- * shall define the supported String formats.
+ * shall define the supported java.lang.String formats.
  * <p>
  * For example, an implementation may support URLs or File pathnames;
  * in which case an application could use Strings of the form: 
@@ -300,7 +300,7 @@ interface Player extends Resource, PlayerConstants {
      * </ol>
      * <p>
      *
-     * @param streamIDs a String[] naming the MDO list to be played.
+     * @param streamIDs a java.lang.String[] naming the MDO list to be played.
      * @param offset number of milliseconds into the MDO list at 
      * which play is to start, offset may span several items in streamIDs.
      * @param rtc Array of RTC that effect this play.
@@ -309,7 +309,7 @@ interface Player extends Resource, PlayerConstants {
      * @throws MediaResourceException if requested operation fails.
      * @throws DisconnectedException if Terminal is disconnected.
      */
-    PlayerEvent play(String[] streamIDs,
+    PlayerEvent play(java.lang.String[] streamIDs,
 		     int offset, 
 		     RTC[] rtc , 
 		     Dictionary optargs)
@@ -317,10 +317,10 @@ interface Player extends Resource, PlayerConstants {
 
     /**
      * Play a single MDO (Media Data Object) named by streamID.
-     * Equivalent to <tt>play()</tt> with a String[] of length one,
+     * Equivalent to <tt>play()</tt> with a java.lang.String[] of length one,
      * containing the given streamID.
      *
-     * @param streamID a String naming the MDO to be played.
+     * @param streamID a java.lang.String naming the MDO to be played.
      * @param offset int number milliseconds into the MDO 
      * at which play is to start.
      * @param rtc Array of RTC that effect this play.
@@ -329,7 +329,7 @@ interface Player extends Resource, PlayerConstants {
      * @throws MediaResourceException if requested operation fails.
      * @throws DisconnectedException if Terminal is disconnected.
      */
-    PlayerEvent play(String streamID,
+    PlayerEvent play(java.lang.String streamID,
 		     int offset, 
 		     RTC[] rtc , 
 		     Dictionary optargs) 

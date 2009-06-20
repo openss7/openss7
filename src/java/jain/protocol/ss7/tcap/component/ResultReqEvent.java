@@ -186,9 +186,9 @@ public final class ResultReqEvent extends ComponentReqEvent {
         m_parametersPresent = false;
         m_lastResultEvent = false;
     }
-    /** String representation of class ResultReqEvent.
+    /** java.lang.String representation of class ResultReqEvent.
       * @return
-      * String provides description of class ResultReqEvent.  */
+      * java.lang.String provides description of class ResultReqEvent.  */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);
         b.append("\n\nResultReqEvent");

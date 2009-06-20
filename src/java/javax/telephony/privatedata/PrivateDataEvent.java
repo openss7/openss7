@@ -61,5 +61,5 @@ public interface PrivateDataEvent extends Event {
    * @return The platform-specific data.
    * @see PrivateData
    */
-  public Object getPrivateData();
+  public java.lang.Object getPrivateData();
 }

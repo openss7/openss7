@@ -71,7 +71,7 @@ interface PlayerConstants extends ResourceConstants, CoderConstants {
     /**
      * Attribute to indicate which TTS dictionaries are supported.
      * <p>
-     * Value is an Symbol[] of TTS Dictionary; or String[] ??
+     * Value is an Symbol[] of TTS Dictionary; or java.lang.String[] ??
      * <p>
      * Used for TTS Player.
      */

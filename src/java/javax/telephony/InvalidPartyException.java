@@ -67,7 +67,7 @@ public class InvalidPartyException extends Exception {
    * @param type type of exception
    * @param s description of the fault
    */
-  public InvalidPartyException(int type, String s) {
+  public InvalidPartyException(int type, java.lang.String s) {
     super(s);
     _type = type;
   }

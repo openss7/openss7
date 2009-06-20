@@ -72,7 +72,7 @@ public interface SignalConstants
    Field Summary
    static Symbol p_SymbolChar
              Specifies the chars to use when non standard Signals are
-   converted to a String or vice versa.
+   converted to a java.lang.String or vice versa.
    static Symbol v_CED
              Symbol for CED. 2100Hz tone answer to v_CNG.
    static Symbol v_CNG
@@ -281,13 +281,13 @@ static final Symbol v_VFURequest
 static final Symbol p_SymbolChar
 
           Specifies the chars to use when non standard Signals are
-          converted to a String or vice versa. The associated value is a
-          Object[] even numbered elements are a Symbol, odd numbered
+          converted to a java.lang.String or vice versa. The associated value is a
+          java.lang.Object[] even numbered elements are a Symbol, odd numbered
           elements are the associated Character.
 
           For example, The standard values could be represented like:
 
- Object[] v_StandardDTMFChars = {
+ java.lang.Object[] v_StandardDTMFChars = {
      v_DTMF0, new Character('0'),
      v_DTMF1, new Character('1'),
      v_DTMF2, new Character('2'),

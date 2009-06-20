@@ -85,11 +85,11 @@ public class Extension implements java.io.Serializable {
         this.booleanType = booleanType;
         this.extensionChoice = ExtensionChoice.BOOLEAN_TYPE;
     }
-    /** Gets String Type data.  */
+    /** Gets java.lang.String Type data.  */
     public java.lang.String getStringType() {
         return stringType;
     }
-    /** Sets String Type data.  */
+    /** Sets java.lang.String Type data.  */
     public void setStringType(java.lang.String stringType) {
         this.stringType = stringType;
         this.extensionChoice = ExtensionChoice.STRING_TYPE;

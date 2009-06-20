@@ -69,7 +69,7 @@ public class MtpPrimitiveType extends java.lang.Object {
     private MtpPrimitiveType(int primitiveType) {
         setValue(primitiveType);
     }
-    private setValue(int value) {
+    private void setValue(int value) {
         primitiveType = value;
     }
     /** Get the integer value of the constant class.

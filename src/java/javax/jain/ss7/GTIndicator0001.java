@@ -326,9 +326,9 @@ public final class GTIndicator0001 extends GlobalTitle {
         return GTIndicator.GTINDICATOR_0001;
     }
     /**
-      * String representation of class GTIndicator0001.
+      * java.lang.String representation of class GTIndicator0001.
       * @return
-      * String provides description of class GTIndicator0001.
+      * java.lang.String provides description of class GTIndicator0001.
       */
     public java.lang.String toString() {
         StringBuffer b = new StringBuffer(512);

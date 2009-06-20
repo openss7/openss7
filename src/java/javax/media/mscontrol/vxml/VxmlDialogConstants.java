@@ -168,7 +168,7 @@ static final Symbol p_ConnectionData
           message, or any other signalling data pertaining to the remote
           connection.
           In a SIP context, this would be the (raw) SIP message.
-          Value is a String
+          Value is a java.lang.String
      _________________________________________________________________
 
   ev_Prepared

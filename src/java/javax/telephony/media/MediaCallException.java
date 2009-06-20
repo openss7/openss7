@@ -38,7 +38,7 @@ class MediaCallException extends MediaException {
      *
      * @param   s   the detail message.
      */
-    public MediaCallException(String s) {super(s);}
+    public MediaCallException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>MediaCallException</code>
@@ -47,7 +47,7 @@ class MediaCallException extends MediaException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public MediaCallException(String s, MediaEvent event) {
+    public MediaCallException(java.lang.String s, MediaEvent event) {
 	super(s, event);
     }
 }

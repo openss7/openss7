@@ -149,7 +149,7 @@ public interface CallControlTerminalCapabilities extends TerminalCapabilities {
    * of the <CODE>CallControlTerminal.pickupFromGroup()</CODE> method.
    * <p>
    * @deprecated Since JTAPI v1.2. The default behavior of this method in
-   * JTAPI v1.2 and later should invoke the canPickupFromGroup(String,
+   * JTAPI v1.2 and later should invoke the canPickupFromGroup(java.lang.String,
    * Address) method.
     * @return True if the application can invoke the pickup from group feature,
    * false otherwise.
@@ -175,7 +175,7 @@ public interface CallControlTerminalCapabilities extends TerminalCapabilities {
    * which takes a string pickup group code and an Address as arguments, false
    * otherwise.
    */
-  public boolean canPickupFromGroup(String group, Address address);
+  public boolean canPickupFromGroup(java.lang.String group, Address address);
 
 
   /**

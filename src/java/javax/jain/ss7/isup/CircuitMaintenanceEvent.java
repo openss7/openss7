@@ -91,7 +91,7 @@ public class CircuitMaintenanceEvent extends IsupEvent {
       * @exception PrimitiveInvalidException  Thrown when the primitive value is not
       * set correctly.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-public CircuitMaintenanceEvent(Object source, SignalingPointCode dpc,
+public CircuitMaintenanceEvent(java.lang.Object source, SignalingPointCode dpc,
         SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
         int primitive)
     throws PrimitiveInvalidException, ParameterRangeInvalidException {

@@ -43,7 +43,7 @@ class MediaRuntimeException extends RuntimeException {
      *
      * @param   s   the detail message.
      */
-    public MediaRuntimeException(String s) {super(s);}
+    public MediaRuntimeException(java.lang.String s) {super(s);}
 
     /**
      * Construct a <code>MediaRuntimeException</code>
@@ -52,7 +52,7 @@ class MediaRuntimeException extends RuntimeException {
      * @param s  the detail message describing the error in the event.
      * @param event a MediaEvent 
      */
-    public MediaRuntimeException(String s, MediaEvent event) {
+    public MediaRuntimeException(java.lang.String s, MediaEvent event) {
 	super(s);
 	this.event = event;
     }

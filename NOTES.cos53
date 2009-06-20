@@ -10,7 +10,7 @@ Steps for building from CVS on CentOS 5.3:
 1. Install CentOS 5.3 from network install disk.
 
 2. Configure /etc/fstab and /etc/hosts to get the box to work
-   on the internal network.
+   on the internal network.  Add self to sudoers with visudo.
 
 3. Perform `yum update' to get recent copies of all packages and then reboot
    on the new kernel.
@@ -36,7 +36,7 @@ Steps for building from CVS on CentOS 5.3:
    default autoconf version 2.59 =>
      wget --passive-ftp ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.63.tar.bz2
    default automake version 1.9.6 =>
-     wget --passive-ftp ftp://ftp.gnu.org/gnu/automake/automake-1.10.2.tar.bz2
+     wget --passive-ftp ftp://ftp.gnu.org/gnu/automake/automake-1.11.tar.bz2
    default gettext version 0.14.6 =>
      wget --passive-ftp ftp://ftp.gnu.org/gnu/gettext/gettext-0.17.tar.gz
    default libtool version 1.5.22 =>

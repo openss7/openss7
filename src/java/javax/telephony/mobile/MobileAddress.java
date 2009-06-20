@@ -75,15 +75,15 @@ public interface MobileAddress extends Address {
 		throws MethodNotSupportedException;
 
 	/**
-	 * Returns the Subscription Identification String associated with
+	 * Returns the Subscription Identification java.lang.String associated with
 	 * this address.
 	 *
 	 * This methods returns the subscription ID string such as IMSI.
 	 * (International Mobile Subscriber Identification)
 	 * 
-	 * @return the subscriber ID String, NULL if no such ID is implemented.
+	 * @return the subscriber ID java.lang.String, NULL if no such ID is implemented.
 	 */
-	public String getSubscriptionId();
+	public java.lang.String getSubscriptionId();
 
 }
 

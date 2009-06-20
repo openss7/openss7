@@ -103,5 +103,5 @@ public interface RouteEvent extends RouteSessionEvent {
    * <p>
    * @return The ISDN call setup message.
    */
-  public String getSetupInformation();  
+  public java.lang.String getSetupInformation();  
 }

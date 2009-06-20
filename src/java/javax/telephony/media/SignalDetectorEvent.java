@@ -28,9 +28,9 @@ package javax.telephony.media;
 public
 interface SignalDetectorEvent extends ResourceEvent, SignalDetectorConstants {
     /**
-     * Get signals as a single String.
+     * Get signals as a single java.lang.String.
      * The return value is constructed by concatenating 
-     * the single-character String equivalents for each signal Symbol.
+     * the single-character java.lang.String equivalents for each signal Symbol.
      * <p>
      * Each DTMF signal has a single character equivalent, 
      * one of: <code> 0,1,2,3,4,5,6,7,8,9,*,#,A,B,C,D</code>.
@@ -58,12 +58,12 @@ interface SignalDetectorEvent extends ResourceEvent, SignalDetectorConstants {
      * some implementations may not return the flushed signals.
      * In that case, this method returns <code>null</code>.
      *
-     * @return a String of DTMF signal characters.
+     * @return a java.lang.String of DTMF signal characters.
      */
-    String getSignalString();
+    java.lang.String getSignalString();
 
     /**
-     * Get signals as a single String with a space character
+     * Get signals as a single java.lang.String with a space character
      * between each signal.
      * Signals with multi-character names appear with their full name.
      * <p>
@@ -72,13 +72,13 @@ interface SignalDetectorEvent extends ResourceEvent, SignalDetectorConstants {
      * <b>Note:</b>
      * Returns <tt>null</tt> if there are no signals in the event.
      *
-     * @return a String of DTMF Signal chars.
+     * @return a java.lang.String of DTMF Signal chars.
      */
-    String getSpacedString();
+    java.lang.String getSpacedString();
 
     /**
      * Get signals as an array of Strings.
-     * Each signal appears as its associated String name.
+     * Each signal appears as its associated java.lang.String name.
      * Signals with multi-character names appear with their full name.
      * <P>
      * This method is useful for examining Signals that are not
@@ -96,10 +96,10 @@ interface SignalDetectorEvent extends ResourceEvent, SignalDetectorConstants {
      * some implementations may not return the flushed signals.
      * In that case, this method returns <code>null</code>.
      *
-     * @return a String[], one String for each Signal in the event.
+     * @return a java.lang.String[], one java.lang.String for each Signal in the event.
      * @see #getSpacedString
      */
-    String[] getStringArray();
+    java.lang.String[] getStringArray();
 
     /**
      * Get signals as an array of Symbols.

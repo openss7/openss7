@@ -73,7 +73,7 @@ public class ReattemptIndEvent extends IsupEvent {
       * method for values of callReattemptReason.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public ReattemptIndEvent(Object source, SignalingPointCode dpc,
+    public ReattemptIndEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int callReattemptReason)
         throws ParameterRangeInvalidException {

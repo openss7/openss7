@@ -283,7 +283,7 @@ public interface CallControlCall extends Call {
    * @exception ResourceUnavailableException An internal resource necessary
    * for the successful invocation of this method is not available.
    */
-  public Connection addParty(String newParty)
+  public Connection addParty(java.lang.String newParty)
     throws InvalidStateException, InvalidPartyException,
            MethodNotSupportedException, PrivilegeViolationException,
            ResourceUnavailableException;
@@ -723,7 +723,7 @@ public interface CallControlCall extends Call {
    * @exception ResourceUnavailableException An internal resource necessary
    * for the successful invocation of this method is not available.
    */
-  public Connection transfer(String address)
+  public Connection transfer(java.lang.String address)
     throws InvalidArgumentException, InvalidStateException,
       InvalidPartyException, MethodNotSupportedException,
       PrivilegeViolationException, ResourceUnavailableException;
@@ -1083,7 +1083,7 @@ public interface CallControlCall extends Call {
    * @exception MethodNotSupportedException The implementation does not
    * support this method.
    */
-  public Connection[] consult(TerminalConnection tc, String dialedDigits)
+  public Connection[] consult(TerminalConnection tc, java.lang.String dialedDigits)
     throws InvalidStateException, InvalidArgumentException,
       MethodNotSupportedException, ResourceUnavailableException,
       PrivilegeViolationException, InvalidPartyException;

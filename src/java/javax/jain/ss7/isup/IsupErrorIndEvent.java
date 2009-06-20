@@ -78,7 +78,7 @@ public class IsupErrorIndEvent extends IsupEvent {
       * @param eCause  Error cause.
       * @param eString  Error string.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public IsupErrorIndEvent(Object source, SignalingPointCode dpc,
+    public IsupErrorIndEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority, int
             eCause, java.lang.String eString)
         throws ParameterRangeInvalidException {
@@ -116,7 +116,7 @@ public class IsupErrorIndEvent extends IsupEvent {
     }
     /** getErrorString method returns the string corresponding to the error cause.
       * The value of the string is implementation dependent.
-      * @return String describing the error cause.
+      * @return java.lang.String describing the error cause.
       * @exception MandatoryParameterException  Thrown if the Mandatory Parameter is
       * not set. */
     public java.lang.String getErrorString()
@@ -145,7 +145,7 @@ public class IsupErrorIndEvent extends IsupEvent {
     }
     protected int m_eCause;
     protected boolean m_eCauseIsSet = false;
-    protected String m_eString = null;
+    protected java.lang.String m_eString = null;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

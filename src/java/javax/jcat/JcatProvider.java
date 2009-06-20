@@ -78,7 +78,7 @@ public interface JcatProvider extends JccProvider {
       * @param nameRegex  denotes the regular expression (for the purpose of this
       * specification, the platform will use the Perl5 regular expressions).
       */
-    public java.util.Set getTerminals(String nameRegex);
+    public java.util.Set getTerminals(java.lang.String nameRegex);
     /**
       * This method returns a standard EventFilter which is implemented by the JCAT
       * platform. For all events that require filtering by this EventFilter, apply the
@@ -113,7 +113,7 @@ public interface JcatProvider extends JccProvider {
       *
       * @since 1.0
       */
-    public EventFilter createEventFilterRegistration(String terminalNameRegex, int matchDisposition, int nomatchDisposition)
+    public EventFilter createEventFilterRegistration(java.lang.String terminalNameRegex, int matchDisposition, int nomatchDisposition)
         throws ResourceUnavailableException, InvalidArgumentException;
 }
 

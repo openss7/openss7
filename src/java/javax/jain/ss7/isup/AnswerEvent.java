@@ -73,7 +73,7 @@ public abstract class AnswerEvent extends IsupEvent {
       * the optional national congestion control procedures at MTP3. Refer to
       * getCongestionPriority method in IsupEvent class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    protected AnswerEvent(Object source, SignalingPointCode dpc,
+    protected AnswerEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority)
         throws ParameterRangeInvalidException {
         super(source, dpc, opc, sls, cic, congestionPriority);

@@ -231,7 +231,7 @@ public class LcsClientId extends MapParameter {
     /** Set the Client Name parameter that names the client requesting position. Only
       * characters from the "7 bit default alphabet" specified in 3G TS 23.038 V4.0.0
       * should be used.
-      * @param lcsClientName  A String with the client name; maximum 63 characters.
+      * @param lcsClientName  A java.lang.String with the client name; maximum 63 characters.
       * @exception SS7InvalidParamException  Thrown if parameter(s) are invalid / out of
       * range.
       */
@@ -241,7 +241,7 @@ public class LcsClientId extends MapParameter {
     }
     /** Get the Client Name parameter that names the client requesting position. It shall
       * be checked if this parameter is present before getting it.
-      * @return A String with the client name.
+      * @return A java.lang.String with the client name.
       */
     public java.lang.String getLcsClientName() {
         return m_lcsClientName;
@@ -257,7 +257,7 @@ public class LcsClientId extends MapParameter {
     protected SS7Number m_lcsClientDialedByMS = null;
     protected int m_lcsClientInternalId;
     protected boolean m_lcsClientInternalIdPresent = false;
-    protected String m_lcsClientName = null;
+    protected java.lang.String m_lcsClientName = null;
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

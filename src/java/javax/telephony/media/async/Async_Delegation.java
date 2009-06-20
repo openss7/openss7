@@ -34,9 +34,9 @@ public interface Async_Delegation extends DelegationConstants {
      * Invokes {@link Async.DelegationListener#onDelegateToServiceDone onDelegateToServiceDone}
      * when complete.
      *
-     * @param serviceName  a String naming the service
+     * @param serviceName  a java.lang.String naming the service
      * @param timeout      an int specifying the timeout in milliseconds
-     * @param catchTags    a String of tags to match a possible releaseTag
+     * @param catchTags    a java.lang.String of tags to match a possible releaseTag
      *
      * @throws NotBoundException if not currently bound to a MediaGroup.
      * @throws MediaBindException a BindInProgressException
@@ -47,9 +47,9 @@ public interface Async_Delegation extends DelegationConstants {
      *
      * @see Delegation#delegateToService
      */
-    public Async.DelegationEvent async_delegateToService (String serviceName, 
+    public Async.DelegationEvent async_delegateToService (java.lang.String serviceName, 
 							  int timeout, 
-							  String catchTags)
+							  java.lang.String catchTags)
 	throws NotBoundException, MediaBindException, NotOwnerException;
     
     /**

@@ -91,7 +91,7 @@ public interface AgentTermEv extends CallCentEv, TermEv {
    * method.
    * @return The Agent ID.
    */
-  public String getAgentID();
+  public java.lang.String getAgentID();
 
 
   /**

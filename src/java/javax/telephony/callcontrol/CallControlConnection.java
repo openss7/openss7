@@ -581,7 +581,7 @@ public interface CallControlConnection extends Connection {
    * @exception ResourceUnavailableException An internal resource necessary
    * for the successful invocation of this method is not available.
    */
-  public Connection redirect(String destinationAddress)
+  public Connection redirect(java.lang.String destinationAddress)
     throws InvalidStateException, InvalidPartyException,
       MethodNotSupportedException, PrivilegeViolationException,
       ResourceUnavailableException;
@@ -637,7 +637,7 @@ public interface CallControlConnection extends Connection {
    * @exception ResourceUnavailableException An internal resource necessary
    * for the successful invocation of this method is not available.
    */
-  public void addToAddress(String additionalAddress)
+  public void addToAddress(java.lang.String additionalAddress)
     throws InvalidStateException, MethodNotSupportedException,
       PrivilegeViolationException, ResourceUnavailableException;
 
@@ -705,7 +705,7 @@ public interface CallControlConnection extends Connection {
    * @exception ResourceUnavailableException An internal resource necessary
    * for the successful invocation of this method is not available.
    */
-  public Connection park(String destinationAddress)
+  public Connection park(java.lang.String destinationAddress)
     throws InvalidStateException, MethodNotSupportedException,
       PrivilegeViolationException, InvalidPartyException,
       ResourceUnavailableException;

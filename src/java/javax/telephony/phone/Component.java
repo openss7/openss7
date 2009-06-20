@@ -38,7 +38,7 @@ public interface Component {
    * <p>
    * @return The name of this component.
    */
-  public String getName();
+  public java.lang.String getName();
 
 
   /**

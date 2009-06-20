@@ -50,24 +50,24 @@ package javax.csapi.cc.jcc;
   *
   * Other interfaces derived from JCC are expected to implement this
   * interface. The JccPeer object, returned by the
-  * JccPeerFactory.getJccPeer(String) method, determines which
+  * JccPeerFactory.getJccPeer(java.lang.String) method, determines which
   * JccProviders are made available to the application. <p>
   *
-  * Applications use the getProvider(String) method on this interface to
+  * Applications use the getProvider(java.lang.String) method on this interface to
   * obtain new JccProvider objects. Each implementation may support one
   * or more different "services". A list of available services can be
   * obtained via the getServices() method. <p>
   *
   * <h5>Obtaining a JccProvider</h5>
-  * Applications use the getProvider(String) method on this interface to
+  * Applications use the getProvider(java.lang.String) method on this interface to
   * obtain new JccProvider objects. Each implementation may support one
   * or more different "services" (e.g. for different types of underlying
   * network substrate). A list of available services can be obtained via
   * the getServices() method. <p>
   *
   * Applications may also supply optional arguments to the JccProvider
-  * through the getProvider(String) method. These arguments are appended
-  * to the providerString argument passed to the getProvider(String)
+  * through the getProvider(java.lang.String) method. These arguments are appended
+  * to the providerString argument passed to the getProvider(java.lang.String)
   * method. The providerString argument has the following format: <p>
   *
   * <code>&lt; service name &gt; ; arg1 = val1; arg2 = val2; ...</code>
@@ -86,7 +86,7 @@ package javax.csapi.cc.jcc;
 public interface JccPeer {
     /** Returns the name of this JccPeer object instance. The name is
       * the same name used as an argument to
-      * JccPeerFactory.getJccPeer(String) method.
+      * JccPeerFactory.getJccPeer(java.lang.String) method.
       * @return
       * The name of this JccPeer object instance.  */
     public java.lang.String getName();

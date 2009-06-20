@@ -60,7 +60,7 @@ public interface MediaSession extends MediaObject {
     /** Allows the application to pass to the implementation a hint
       * regarding the best suited Media Server based on capabilities,
       * resource brokering or any other mechanism.  The associated value
-      * is a String.  This parameter should be added to the Parameters
+      * is a java.lang.String.  This parameter should be added to the Parameters
       * argument of MediaSessionFactory.createMediaSession(Parameters).
       */
     static final Symbol p_MediaServerHint;
@@ -89,7 +89,7 @@ public interface MediaSession extends MediaObject {
       * MixerAdapter.
       * @exception MscontrolException
       * @see createContainer(Class, Parameters)
-      * @see createContainer(MediaConfig, String) */
+      * @see createContainer(MediaConfig, java.lang.String) */
     <C extends MediaConfig,T extends ResourceContainer<? extends C>> T createContainer(ConfigSymbol<C> aPredefinedConfig)
         throws MscontrolException;
     /** Create a ResourceContainer, providing a set of discrete attributes. <p>
@@ -115,7 +115,7 @@ public interface MediaSession extends MediaObject {
       * A MediaGroup, a NetworkConnection, a MediaMixer or a
       * MixerAdapter.
       * @exception MscontrolException
-      * @see createContainer(MediaConfig, String)
+      * @see createContainer(MediaConfig, java.lang.String)
       * @see createContainer(ConfigSymbol) */
     <T extends ResourceContainer<? extends MediaConfig>> T createContainer(java.lang.Class<T> aClass, Parameters params)
         throws MscontrolException;

@@ -192,7 +192,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
     /**
         Set the ContentLengthHeader of this Message. The actual content length for the outgoing
         message will be computed from the content assigned. If the content is speficied as an object
-        it will be converted to a String before the message is sent out and the content length
+        it will be converted to a java.lang.String before the message is sent out and the content length
         computed from the length of the string.  If the message content is specified in bytes, the
         length of the byte array specified will be used to determine the content length header, that
         is in both cases, the length of the content overrides any value specified in the
@@ -291,7 +291,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
     ExpiresHeader getExpires();
     /**
         Sets the protocol version of SIP being used by this Message.
-        @param version The new String object containing the version of the SIP Protocol of this
+        @param version The new java.lang.String object containing the version of the SIP Protocol of this
         Message.
         @exception java.text.ParseException Thrown when error was found while parsing the version
         argument.
@@ -311,7 +311,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         Proxy the message using the send methods on the SipProvider. </ul> The message contents are
         cloned as follows: <ul> <li> If the content is of type byte[] a new byte[] array is
         allocated and the original contents are copied over to the cloned Message.  <li> If the
-        content is of type String then a new String equal to the old String is allocated and
+        content is of type java.lang.String then a new java.lang.String equal to the old java.lang.String is allocated and
         assigned to the cloned Message.  <li> If the content is of type Object and it has a public
         clone method then it is invoked and the resultant Object is used in the new cloned Message.
         </ul>
@@ -343,7 +343,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
                 toString in class java.lang.Object
 
         @return
-                String representation of Message.
+                java.lang.String representation of Message.
       */
     java.lang.String toString();
 }

@@ -76,7 +76,7 @@ public interface MediaSessionFactory {
     <C extends MediaConfig> C getMediaConfig(ConfigSymbol<C> aConfigSymbol)
         throws MediaConfigException;
     /** Create an instance of MediaConfig, from an xml byte stream (for
-      * example a file, or a String). <p>
+      * example a file, or a java.lang.String). <p>
       * Example: <br>
       * <blockquote><code>
       * Reader xmlDoc = new StringReader("&lt;?xml .... &gt;");

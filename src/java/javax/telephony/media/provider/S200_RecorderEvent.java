@@ -31,17 +31,17 @@ class S200_RecorderEvent extends Base_RecorderEvent {
     /**
      * Create specific completion or non-tranaction event from Recorder.
      *
-     * @param source the Object that created this EventObject.
+     * @param source the java.lang.Object that created this EventObject.
      * @param eventID a Symbol that identifies this event: 
      * ev_Record
      */
-    public S200_RecorderEvent(Object source, Symbol eventID) {
+    public S200_RecorderEvent(java.lang.Object source, Symbol eventID) {
 	super(source, eventID);
 	duration = -2;		// mark as unset
     }
 
     /** Constructor for non-trans vesion */
-    public S200_RecorderEvent(Object source, Symbol eventID, boolean isNonTrans)
+    public S200_RecorderEvent(java.lang.Object source, Symbol eventID, boolean isNonTrans)
     {
 	this(source, eventID);
 	this.isNonTrans = isNonTrans;

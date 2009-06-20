@@ -58,10 +58,10 @@ public interface SccpStack {
     public void deleteProvider(SccpProvider providerToBeDeleted)
 	throws DeletedProviderException;
     public SccpProvider[] getProviderList();
-    public String getStackName();
-    public void setStackName(String stackname);
-    public String getVendorName();
-    public void setVendorName(String vendorname);
+    public java.lang.String getStackName();
+    public void setStackName(java.lang.String stackname);
+    public java.lang.String getVendorName();
+    public void setVendorName(java.lang.String vendorname);
     public int getStackSpecification();
     public void setStackSpecificaiton(int stackSpecification)
 	throws VersionNotSupportedException;

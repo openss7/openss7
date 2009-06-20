@@ -52,9 +52,9 @@ import javax.csapi.cc.jcc.*;
   * @version 1.2.2
   */
 public class JccPeerImpl implements java.rmi.Remote, JccPeer {
-    public native String getName();
-    public native String[] getServices();
-    public native JccProvider getProvider(String providerString)
+    public native java.lang.String getName();
+    public native java.lang.String[] getServices();
+    public native JccProvider getProvider(java.lang.String providerString)
         throws ProviderUnavailableException;
 }
 

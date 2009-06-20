@@ -65,7 +65,7 @@ public class Base
     {
 	/** Note: EventObject.source is a MPI.Owner! */
 	/** could be a MediaService or  a ContainerService object */
-	// Object source;	// inherited from EventObject
+	// java.lang.Object source;	// inherited from EventObject
 
 	/** true if this is dispatched as a nonTrans event. 
 	 * Some eventIDs dispatch differently if they are non-trans.
@@ -110,7 +110,7 @@ public class Base
 	private boolean listenerdone = false;
 
 	/** an easier to parse/splice subset of toString(). */
-	protected String toString1() {
+	protected java.lang.String toString1() {
 	    return "\n\t" +
 		"source = " + source + ";\n\t" +
 		"eventID = " + eventID + ";\n\t" +
@@ -123,7 +123,7 @@ public class Base
 		"listenerdone = " + listenerdone +  ";\n\t" +
 		"";
 	}
-	public String toString() {
+	public java.lang.String toString() {
 	    return getClass().getName() + "{" + this.toString1() + "}";
 	}
 
@@ -131,7 +131,7 @@ public class Base
 	 * @param source the MPI$Owner which dispatches this Dispather.DispatchableEvent.
 	 * @param eventID a Symbol that identifies this event.
 	 */
-	public Event(Object source, Symbol eventID) { 
+	public Event(java.lang.Object source, Symbol eventID) { 
 	    super(source);
 	    this.eventID = eventID;
 	}
@@ -142,7 +142,7 @@ public class Base
 	 * @param eventID a Symbol that identifies the event. 
 	 * @param exception an Exception to be thrown in invoking thread.
 	 */
-	public Event(Object source, Symbol eventID, Exception exception) { 
+	public Event(java.lang.Object source, Symbol eventID, Exception exception) { 
 	    this(source, eventID);
 	    done(exception);
 	}
@@ -539,7 +539,7 @@ public class Base
 	public void dispatch(EventListener listener) {
 	    // no listener defined for this event
 	}
-	// arg is declared as Object because we get it directly from a Vector.
+	// arg is declared as java.lang.Object because we get it directly from a Vector.
 	// and implementions test and cast anyway.
     }
 
@@ -555,12 +555,12 @@ public class Base
 	 * @param source a MediaService and MPI$Owner
 	 * @param eventID a Symbol that identifies this event.
 	 */
-	public MediaServiceEvent(Object source, Symbol eventID) {
+	public MediaServiceEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
 
 	// Create a done MediaServiceEvent
-	public MediaServiceEvent(Object source, Symbol eventID, Exception exception) { 
+	public MediaServiceEvent(java.lang.Object source, Symbol eventID, Exception exception) { 
 	    super(source, eventID, exception);
 	}
 
@@ -580,7 +580,7 @@ public class Base
     public static
     class BindAndReleaseEvent extends MediaServiceEvent
 	implements Async.BindAndReleaseEvent {
-	public BindAndReleaseEvent(Object source, Symbol eventID) {
+	public BindAndReleaseEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
 	/** The group to which an Owner is bound. */
@@ -624,7 +624,7 @@ public class Base
     public static
     class ReleaseEvent extends BindAndReleaseEvent 
 	implements Async.ReleaseEvent {
-	public ReleaseEvent(Object source, Symbol eventID) {
+	public ReleaseEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
 	public void dispatch(EventListener listener) {
@@ -639,7 +639,7 @@ public class Base
     public static
     class DelegationEvent extends BindAndReleaseEvent 
 	implements Async.DelegationEvent {
-	public DelegationEvent(Object source, Symbol eventID) {
+	public DelegationEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
 	/** sometimes delegation returns bound, sometimes not. */
@@ -669,9 +669,9 @@ public class Base
 	/** the Tags used in the releaseToTags command.
 	 * delivered to the recieving MediaService.
 	 */
-	public String getReturnTag() {
+	public java.lang.String getReturnTag() {
 	    waitForEventDone(); 
-	    return (String)payload.get(ESymbol.Group_Tag);
+	    return (java.lang.String)payload.get(ESymbol.Group_Tag);
 	}
 	
 	public Symbol getRetrieveCause() {
@@ -683,10 +683,10 @@ public class Base
     /** Completion Event for the bind methods. */
     public static
     class BindEvent extends BindAndReleaseEvent implements Async.BindEvent {
-	public BindEvent(Object source, Symbol eventID) {
+	public BindEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
-	public BindEvent(Object source) {
+	public BindEvent(java.lang.Object source) {
 	    super(source, ev_BindToServiceName);
 	}
 
@@ -715,10 +715,10 @@ public class Base
     class BindToCallEvent extends BindEvent 
 	implements Async.BindToCallEvent {
 	protected Connection connection = null; // read-only attribute
-	public BindToCallEvent(Object source, Symbol eventID) {
+	public BindToCallEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
-	public BindToCallEvent(Object source) {
+	public BindToCallEvent(java.lang.Object source) {
 	    super(source, ev_BindToCall);
 	}
 	public Connection getConnection() {waitForEventDone(); return connection;}
@@ -745,8 +745,8 @@ public class Base
      */
     public static class MediaGroupEvent extends MediaServiceEvent
 	implements Async.MediaGroupEvent {
-	Object retVal = null;
-	public MediaGroupEvent(Object source, Symbol eventID) {
+	java.lang.Object retVal = null;
+	public MediaGroupEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
 
@@ -754,7 +754,7 @@ public class Base
 	    if(listener instanceof Async.MediaGroupListener)
 		((Async.MediaGroupListener)listener).onMediaGroupDone(this);
 	}
-	public void done(Exception exception, Object retVal){
+	public void done(Exception exception, java.lang.Object retVal){
 	    this.retVal = retVal;
 	    super.done(exception);
 	}
@@ -763,9 +763,9 @@ public class Base
 	    waitForEventDone();
 	    return (Terminal) ((retVal instanceof Terminal) ? retVal : null);
 	}
-	public String getTerminalName() {
+	public java.lang.String getTerminalName() {
 	    waitForEventDone();
-	    return (String) ((retVal instanceof String) ? retVal : null);
+	    return (java.lang.String) ((retVal instanceof java.lang.String) ? retVal : null);
 	}
 	public ConfigSpec getConfigSpec() {
 	    waitForEventDone();
@@ -800,7 +800,7 @@ public class Base
 	 */
 	protected Symbol rtcc = null; 		// RTCTrigger
 
-	protected String toString1() {
+	protected java.lang.String toString1() {
 	    return "\n\t" +
 		"source = " + source + ";\n\t" +
 		"eventID = " + eventID + ";\n\t" +
@@ -814,7 +814,7 @@ public class Base
 		"";
 	}
 	
-	public ResourceEvent(Object source, Symbol eventID) {
+	public ResourceEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
 	
@@ -825,7 +825,7 @@ public class Base
 	 * <br>done(exception);
 	 * </tt>
 	 *
-	 * @param source the Object that created this EventObject.
+	 * @param source the java.lang.Object that created this EventObject.
 	 * @param eventID a Symbol that identifies the event 
 	 * @param exception the Exception to throw if completion failed
 	 * @param qual a Symbol that identifies the cause of completion
@@ -833,7 +833,7 @@ public class Base
 	 * @param suberror an int with more info about the error
 	 * @param payload a Dictionary of additional information.
 	 */
-	public ResourceEvent( Object source, Symbol eventID, 
+	public ResourceEvent( java.lang.Object source, Symbol eventID, 
 			      Exception exception,
 			      Symbol qual, 
 			      Symbol error,
@@ -902,13 +902,13 @@ public class Base
 	 * @param ex is generally null. 
 	 * (this event is not returned to sync methods).
 	 */
-	public DisconnectedEvent(Object source, Symbol eventID, Exception ex) {
+	public DisconnectedEvent(java.lang.Object source, Symbol eventID, Exception ex) {
 	    super(source, eventID, ex);
 	}
-	public DisconnectedEvent(Object source, Symbol eventID) {
+	public DisconnectedEvent(java.lang.Object source, Symbol eventID) {
 	    super(source, eventID);
 	}
-	public DisconnectedEvent(Object source) {
+	public DisconnectedEvent(java.lang.Object source) {
 	    this(source, ev_Disconnected);
 	}
 	public void dispatch(EventListener listener) {
@@ -945,7 +945,7 @@ public class Base
 	 * @param ex an Exception; should be <tt>null</tt> 
 	 * (this event is not returned to sync methods).
 	 */
-	public DelegatedEvent(Object source, Symbol eventID, Exception ex) {
+	public DelegatedEvent(java.lang.Object source, Symbol eventID, Exception ex) {
 	    super(source, eventID, ex);
 	}
 	/** Create this [non-transactional] Event already done. 
@@ -957,7 +957,7 @@ public class Base
 	 * @param source the Owner MediaService to which event is delivered.
 	 * (this event is not returned to sync methods).
 	 */
-	public DelegatedEvent(Object source) {
+	public DelegatedEvent(java.lang.Object source) {
 	    super(source, ev_Delegated, null);
 	}
 

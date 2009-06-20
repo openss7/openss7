@@ -96,7 +96,7 @@ public class MaintenanceTimeoutIndEvent extends IsupEvent {
       * @param maintTimeoutReason  The timer which has expired Refer to
       * getMaintTmoReason method for more information.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
-    public MaintenanceTimeoutIndEvent(Object source, SignalingPointCode dpc,
+    public MaintenanceTimeoutIndEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             int maintTimeoutReason)
         throws ParameterRangeInvalidException {

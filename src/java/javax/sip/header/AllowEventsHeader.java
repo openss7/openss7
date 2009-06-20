@@ -67,14 +67,14 @@ public interface AllowEventsHeader extends Header {
     public static final java.lang.String NAME = "Allow-Events";
     /**
         Sets the eventType defined in this AllowEventsHeader.
-        @param eventType The String defining the method supported in this AllowEventsHeader.
+        @param eventType The java.lang.String defining the method supported in this AllowEventsHeader.
         @exception java.text.ParseException Thrown when an error was encountered while parsing the
         Strings defining the eventType supported
       */
     public void setEventType(java.lang.String eventType) throws java.text.ParseException;
     /**
         Gets the eventType of the AllowEventsHeader.
-        @return The String object identifing the eventTypes of AllowEventsHeader.
+        @return The java.lang.String object identifing the eventTypes of AllowEventsHeader.
       */
     public java.lang.String getEventType();
 }

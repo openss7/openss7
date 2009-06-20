@@ -107,18 +107,18 @@ import java.util.EventListener;
  * <table border="1" cellpadding="3">
  * <tr><td align=top>Method</td><td>binds to:</td></tr>
  * <tr><td align=top>
- * {@link #bindAndConnect(ConfigSpec,String,String)}</td>
+ * {@link #bindAndConnect(ConfigSpec,java.lang.String,java.lang.String)}</td>
  * 	<td>a Terminal connected to a new (outbound) Call</td></tr>
  * <tr><td align=top>
- * {@link #bindToServiceName(ConfigSpec,String)}</td>
+ * {@link #bindToServiceName(ConfigSpec,java.lang.String)}</td>
  * 	<td>a Terminal connected to a Call 
  *		that is routed to the named service</td></tr>
  * <tr><td align=top>
  * {@link #bindToCall(ConfigSpec,Call)}</td>
  * 	<td>a Terminal added to a specified Call</td></tr>
  * <tr><td align=top>
- * {@link #bindToTerminalName(ConfigSpec,String)}</td>
- * 	<td>a Terminal named by the specified String</td></tr>
+ * {@link #bindToTerminalName(ConfigSpec,java.lang.String)}</td>
+ * 	<td>a Terminal named by the specified java.lang.String</td></tr>
  * <tr><td align=top>
  * {@link #bindToTerminal(ConfigSpec,Terminal)}</td>
  * 	<td>the specified Terminal object</td></tr>
@@ -180,7 +180,7 @@ import java.util.EventListener;
  * <a href=#framework>framework</a> which is empowered and directed 
  * to disconnect the Connection and recycle any resources.
  * <p>
- * In contrast, {@link #releaseToService(String, int)} indicates that
+ * In contrast, {@link #releaseToService(java.lang.String, int)} indicates that
  * further processing is expected, and the supplied disposition string
  * determines which service (or Address) should continue the processing.
  * The disposition strings are application specific, and are mapped to
@@ -189,13 +189,13 @@ import java.util.EventListener;
  * <p>
  * If {@link Delegation <i>delegation</i>} is being used, 
  * then there are other alternatives.
- * An application can use {@link #releaseToTag(String) releaseToTag(returnTag)}
+ * An application can use {@link #releaseToTag(java.lang.String) releaseToTag(returnTag)}
  * to return control to a previous owner.  The <tt>returnTag</tt> is
  * primarily designed to select which previous owner, but may also
  * encode the status or cause for the return.
  * <p>
  * The method {@link #releaseToDestroy()} is a simplified form 
- * of <tt>releaseToTag(String)</tt>
+ * of <tt>releaseToTag(java.lang.String)</tt>
  * which directs the call to the system framework with an indication
  * that the call should be disconnected.
  * <p>
@@ -307,7 +307,7 @@ interface MediaService extends MediaServiceConstants {
      * <p>
      * A MediaService object is associated with a MediaProvider
      * when it is constructed. 
-     * See: {@link BasicMediaService#BasicMediaService(String, String)}
+     * See: {@link BasicMediaService#BasicMediaService(java.lang.String, java.lang.String)}
      * This method returns the MediaProvider instance 
      * used by this MediaService object.
      * @return the MediaProvider used by this MediaService.
@@ -331,12 +331,12 @@ interface MediaService extends MediaServiceConstants {
      * if the MediaGroup cannot be configured as requested.
      * <p>
      * @param configSpec a ConfigSpec describing the requested configuration
-     * @param terminalName a String that names a media capable Terminal
+     * @param terminalName a java.lang.String that names a media capable Terminal
      * @throws MediaBindException one of 
      * AlreadyBoundException, BindInProgressException, BindCancelledException.
      * @throws MediaConfigException if a MediaGroup can not be configured as requested
      */
-    public void bindToTerminalName(ConfigSpec configSpec, String terminalName)
+    public void bindToTerminalName(ConfigSpec configSpec, java.lang.String terminalName)
 	throws MediaBindException, MediaConfigException;
      
     /** 
@@ -367,7 +367,7 @@ interface MediaService extends MediaServiceConstants {
      * A call is directed to this <code>serviceName</code> when:<ul>
      * <li>the characteristics of an new (inbound) call are 
      * mapped to <code>serviceName</code>.</li>
-     * <li>the <code>disposition</code> String of 
+     * <li>the <code>disposition</code> java.lang.String of 
      * {@link #releaseToService releaseToService}
      * maps to <code>serviceName</code></li>
      * </ul>
@@ -419,7 +419,7 @@ interface MediaService extends MediaServiceConstants {
      * @see ConfigSpecConstants#a_LocalState a_LocalState
      * @see RunnableMediaService
      */
-    public void bindToServiceName(ConfigSpec configSpec, String serviceName)
+    public void bindToServiceName(ConfigSpec configSpec, java.lang.String serviceName)
 	throws MediaBindException, MediaConfigException;
      
     /** 
@@ -482,19 +482,19 @@ interface MediaService extends MediaServiceConstants {
      * at any available Address.
      * <p>
      * @param configSpec a ConfigSpec describing the requested configuration
-     * @param origAddr a String identifying the origination Address
-     * @param dialDigits a String identifying the destination Address
+     * @param origAddr a java.lang.String identifying the origination Address
+     * @param dialDigits a java.lang.String identifying the destination Address
      * 
      * @throws MediaBindException one of 
      * AlreadyBoundException, BindInProgressException, BindCancelledException.
      * @throws MediaConfigException if a MediaGroup can not be configured as requested.
      * @throws MediaCallException if the Call or Connections cannot be established.
      *
-     * @see Call#connect(Terminal, Address, String)
+     * @see Call#connect(Terminal, Address, java.lang.String)
      */
     public void bindAndConnect(ConfigSpec configSpec, 
-			       String origAddr, 
-			       String dialDigits)
+			       java.lang.String origAddr, 
+			       java.lang.String dialDigits)
 	throws MediaBindException, 
 	       MediaConfigException, 
 	       MediaCallException;
@@ -504,20 +504,20 @@ interface MediaService extends MediaServiceConstants {
      * with optargs for provider specific extensions.
      * <p>
      * @param configSpec a ConfigSpec describing the requested configuration
-     * @param origAddr a String identifying the origination Address
-     * @param dialDigits a String identifying the destination Address
+     * @param origAddr a java.lang.String identifying the origination Address
+     * @param dialDigits a java.lang.String identifying the destination Address
      * 
      * @throws MediaBindException one of 
      * AlreadyBoundException, BindInProgressException, BindCancelledException.
      * @throws MediaConfigException if a MediaGroup can not be configured as requested.
      * @throws MediaCallException if the Call or Connections cannot be established.
      *
-     * @see #bindAndConect(ConfigSpec, String, String)
+     * @see #bindAndConect(ConfigSpec, java.lang.String, java.lang.String)
      */
     /*
     public void bindAndConnect(ConfigSpec configSpec, 
-			       String origAddr, 
-			       String dialDigits
+			       java.lang.String origAddr, 
+			       java.lang.String dialDigits
 			       Dictionary optargs)
 	throws MediaBindException, 
 	       MediaConfigException, 
@@ -596,13 +596,13 @@ interface MediaService extends MediaServiceConstants {
      * <b>Note:</b>To release this MediaService, but direct the further
      * processing of the call to a specific new owner, 
      * an application may use:
-     * {@link #releaseToService(String, int)}.
+     * {@link #releaseToService(java.lang.String, int)}.
      * <p>
      * <b>Note:</b>To release this MediaService, but direct the further
      * processing of the call to a specific previous owner
      * (which used delegateToService()), 
      * an application may use:
-     * {@link #releaseToTag(String)}.
+     * {@link #releaseToTag(java.lang.String)}.
      * <p>
      * @throws NotBoundException if not currently bound to a MediaGroup
      * @throws MediaBindException one of:
@@ -665,7 +665,7 @@ interface MediaService extends MediaServiceConstants {
      * Additional information may be passed to the special service
      * implementation using standard URL construction conventions.
      * <p>
-     * @param disposition a String that identifies the next MediaService. 
+     * @param disposition a java.lang.String that identifies the next MediaService. 
      * @param timeout milliseconds to wait for service to become ready.
      *
      * @throws NotBoundException if not currently bound to a MediaGroup
@@ -683,7 +683,7 @@ interface MediaService extends MediaServiceConstants {
      * @throws MediaConfigException 
      * if the MediaGroup could not be configured for the recipient service.
      */
-    public void releaseToService(String disposition, int timeout)
+    public void releaseToService(java.lang.String disposition, int timeout)
 	throws NotBoundException, MediaBindException, MediaConfigException;
 
     /**
@@ -723,15 +723,15 @@ interface MediaService extends MediaServiceConstants {
      * matches any one of the given <tt>returnTag</tt> tags.
      * 
      * <p>
-     * @param returnTag a String of tags to match a previous <tt>catchTags</tt>
+     * @param returnTag a java.lang.String of tags to match a previous <tt>catchTags</tt>
      *
      * @throws MediaBindException a <tt>BindInProgressException</tt> 
      * if a bind or release is already in process.
      *
      * @see MediaService#release()
-     * @see MediaService#releaseToService(String, int)
+     * @see MediaService#releaseToService(java.lang.String, int)
      */
-    void releaseToTag(String returnTag) throws MediaBindException;
+    void releaseToTag(java.lang.String returnTag) throws MediaBindException;
 
     /**
      * Release with an indication that 
@@ -742,7 +742,7 @@ interface MediaService extends MediaServiceConstants {
      * @throws MediaBindException a <tt>BindInProgressException</tt>
      * if a bind or release is already in process.
      * 
-     * @see #releaseToTag(String)
+     * @see #releaseToTag(java.lang.String)
      */
     void releaseToDestroy() throws MediaBindException;
 
@@ -793,14 +793,14 @@ interface MediaService extends MediaServiceConstants {
     public ConfigSpec getConfiguration() throws NotBoundException;
       
     /**
-     * Return the installation-specific String that identifies
+     * Return the installation-specific java.lang.String that identifies
      * the Terminal to which this MediaService is bound.
      * <p>
-     * @return a String that uniquely identifies the bound Terminal.
+     * @return a java.lang.String that uniquely identifies the bound Terminal.
      * @throws NotBoundException if not currently bound to a MediaGroup
      * @see Terminal#getName Terminal.getName()
      */
-    public String getTerminalName() throws NotBoundException;
+    public java.lang.String getTerminalName() throws NotBoundException;
      
     /**
      * Return the Terminal associated with the MediaService.

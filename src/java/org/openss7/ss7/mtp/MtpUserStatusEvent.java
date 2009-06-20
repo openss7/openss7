@@ -60,7 +60,7 @@ import org.openss7.ss7.*;
   */
 public class MtpUserStatusEvent extends MtpUserManagementEvent {
     private UserStatus userStatus;
-    public MtpUserStatus(java.lang.Object source,
+    public MtpUserStatusEvent(java.lang.Object source,
             MtpUserAddress userAddress, UserStatus userStatus) {
         super(source, userAddress);
         setUserStatus(userStatus);

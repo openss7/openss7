@@ -40,5 +40,5 @@ public interface DisplayUpdateEv extends PhoneTermEv {
    * @param y The y-coordinate.
    * @return The string displayed starting at coordinates (x, y).
    */
-  public String getDisplay(int x, int y);
+  public java.lang.String getDisplay(int x, int y);
 }

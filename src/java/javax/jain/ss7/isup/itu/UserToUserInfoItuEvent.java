@@ -76,7 +76,7 @@ public class UserToUserInfoItuEvent extends IsupEvent {
       * @param userToUserInfo  User to User information.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
-    public UserToUserInfoItuEvent(Object source, SignalingPointCode dpc,
+    public UserToUserInfoItuEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
             byte[] in_userToUserInfo)
         throws ParameterRangeInvalidException {
