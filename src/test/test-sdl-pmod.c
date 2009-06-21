@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-sdl-pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $
 
  -----------------------------------------------------------------------------
 
@@ -60,16 +60,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-sdl-pmod.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:19  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-sdl-pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-sdl-pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -3110,7 +3113,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.1 $ $Date: 2009-06-21 11:44:19 $");
 }
 
 void

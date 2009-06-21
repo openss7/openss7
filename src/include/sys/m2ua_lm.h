@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: m2ua_lm.h,v 1.1.2.1 2009-06-21 11:25:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m2ua_lm.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:36  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_M2UA_H__
 #define __SYS_M2UA_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: m2ua_lm.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef M2UA_AS_IOC_MAGIC
 #define M2UA_AS_IOC_MAGIC			('2' + 30)

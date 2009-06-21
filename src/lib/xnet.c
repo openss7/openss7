@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xnet.c,v $
+ Revision 1.1.2.1  2009-06-21 11:37:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -6179,10 +6182,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name$(\$Revision$).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.1 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name$(\$Revision$)
-  * @date \$Date$
+  * @version \$Name:  $(\$Revision: 1.1.2.1 $)
+  * @date \$Date: 2009-06-21 11:37:47 $
   */
 
 /** @} */

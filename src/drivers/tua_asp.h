@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tua_asp.h,v 1.1.2.1 2009-06-21 11:20:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tua_asp.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:57  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __TUA_ASP_H__
 #define __TUA_ASP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: tua_asp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include "../ua/ua_asp.h"	/* UA --> UA Common Messages */
 #include "tua_msg.h"		/* TUA specific messages */

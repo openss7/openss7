@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xdsbdcp.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xdsbdcp.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __XDSBDCP_H__
 #define __XDSBDCP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xdsbdcp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * The <xdsbdcp.h> header defines the object identifiers of directory attribute types and object

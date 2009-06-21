@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:16:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:16:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -365,7 +365,7 @@ if test -n "$prev" ; then
 fi
 
 if test X"$show_version" = Xyes ; then
-    $echo "$progname:"' Version $Name$($Revision$) $Date$'
+    $echo "$progname:"' Version $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:16:41 $'
 fi
 
 if test X"$show_help" = Xyes ; then
@@ -2816,6 +2816,9 @@ fi
 
 # =============================================================================
 #
-# $Log$
+# $Log: strconf-sh,v $
+# Revision 1.1.2.1  2009-06-21 11:16:41  brian
+# - added files to new distro
+#
 # =============================================================================
 # vim: ft=sh sw=4 et nocin nosi

@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: sgp.texi,v 1.1.2.1 2009-06-21 10:48:44 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:48:44 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -449,7 +449,10 @@ Project} website for a current version.
 
 @smallexample
 @verbatim
-$Log$
+$Log: sgp.texi,v $
+Revision 1.1.2.1  2009-06-21 10:48:44  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

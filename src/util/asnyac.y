@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,20 +47,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: asnyac.y,v $
+ Revision 1.1.2.1  2009-06-21 11:47:53  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 /* C DECLARATIONS */
 
 %{
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:53 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:53 $";
 
 #include <stdlib.h>
 #include <unistd.h>

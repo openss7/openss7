@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id$
+.\" @(#) $Id: mtp.7.man,v 1.1.2.1 2009-06-21 10:36:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date$ by $Author$
+.\" Last Modified $Date: 2009-06-21 10:36:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log$
+.\" $Log: mtp.7.man,v $
+.\" Revision 1.1.2.1  2009-06-21 10:36:22  brian
+.\" - added files to new distro
+.\"
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -213,7 +216,7 @@ $LIST$
 .]
 .Sh IDENTIFICATION
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 for Linux Fast-STREAMS: $Name$($Revision$); $Date$.
+.\"OpenSS7 for Linux Fast-STREAMS: $Name:  $($Revision: 1.1.2.1 $); $Date: 2009-06-21 10:36:22 $.
 .Pp
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 All Rights Reserved.

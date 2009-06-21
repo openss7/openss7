@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: log.h,v 1.1.2.1 2009-06-21 11:20:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: log.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_STRLOG_H__
 #define __LOCAL_STRLOG_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define LOG_EMERG	0
 #define LOG_ALERT	1

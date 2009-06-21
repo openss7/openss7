@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: pty.h,v 1.1.2.1 2009-06-21 11:25:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: pty.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:38  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_PTY_H__
 #define __SYS_PTY_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: pty.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define ISPTM	    (('P'<<8)|1)	/* query for master */
 #define UNLKPT	    (('P'<<8)|2)	/* unlock master/slave pair */

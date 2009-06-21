@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: v401pfw.h,v 1.1.2.1 2009-06-21 11:20:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: v401pfw.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:58  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_V401PFW_H__
 #define __LOCAL_V401PFW_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: v401pfw.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 static unsigned char v401pfw[] = {
 	0xff, 0xff, 0xff, 0xff, 0x55, 0x99, 0xaa, 0x66, 0x0c, 0x00, 0x01, 0x80, 0x00,

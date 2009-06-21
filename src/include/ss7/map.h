@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: map.h,v 1.1.2.1 2009-06-21 11:25:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: map.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:33  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SS7_MAP_H__
 #define __SS7_MAP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define MAP_INFO_REQ		 0	/* Information request */
 #define MAP_BIND_REQ		 1	/* Bind to network address */

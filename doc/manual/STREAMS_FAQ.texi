@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: STREAMS_FAQ.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -459,7 +459,10 @@ package.
 
 @smallexample
 @verbatim
-$Log$
+$Log: STREAMS_FAQ.texi,v $
+Revision 1.1.2.1  2009-06-21 10:40:08  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

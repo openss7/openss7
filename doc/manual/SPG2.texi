@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: SPG2.texi,v 1.1.2.1 2009-06-21 10:40:06 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:40:06 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -646,7 +646,10 @@ package.
 
 @smallexample
 @verbatim
-$Log$
+$Log: SPG2.texi,v $
+Revision 1.1.2.1  2009-06-21 10:40:06  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

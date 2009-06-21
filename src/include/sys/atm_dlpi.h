@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: atm_dlpi.h,v 1.1.2.1 2009-06-21 11:25:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: atm_dlpi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_ATM_DLPI_H__
 #define __SYS_ATM_DLPI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: atm_dlpi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #endif				/* __SYS_ATM_DLPI_H__ */
 

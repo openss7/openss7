@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: np.h,v 1.1.2.1 2009-06-21 11:25:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: np.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:37  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_NP_H__
 #define __SYS_NP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: np.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 struct np_mgmt {
 	np_ulong cm_user;		/* User index and class. */

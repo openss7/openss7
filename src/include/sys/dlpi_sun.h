@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: dlpi_sun.h,v 1.1.2.1 2009-06-21 11:25:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dlpi_sun.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:36  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_DLPI_SUN_H__
 #define __SYS_DLPI_SUN_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: dlpi_sun.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define DL_NOTIFY_REQ			0x100	/* Enable notifications */
 #define DL_NOTIFY_ACK			0x101	/* Supported notifications */

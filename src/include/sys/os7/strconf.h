@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strconf.h,v 1.1.2.1 2009-06-21 11:26:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strconf.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:49  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_OS7_STRCONF_H__
 #define __SYS_OS7_STRCONF_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/os7/strconf.h directly, include sys/strconf.h instead."

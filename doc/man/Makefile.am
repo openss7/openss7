@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:32:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date$ by $Author$
+## Last Modified $Date: 2009-06-21 10:32:53 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -770,6 +770,7 @@ openss7_man_MANS = \
 	man4/inet.4 \
 	man4/ip2xinet.4 \
 	man4/ip.4 \
+	man4/ip2.4 \
 	man4/ipcl.4 \
 	man4/ipco.4 \
 	man4/ipip.4 \
@@ -4699,6 +4700,7 @@ openss7_dist_noinst_MANS = \
 	man4/inet.4.man \
 	man4/ip2xinet.4.man \
 	man4/ip.4.man \
+	man4/ip2.4.man \
 	man4/ipcl.4.man \
 	man4/ipco.4.man \
 	man4/ipip.4.man \
@@ -8685,6 +8687,9 @@ include ../../am/man.am
 
 ## =============================================================================
 ##
-## $Log$
+## $Log: Makefile.am,v $
+## Revision 1.1.2.1  2009-06-21 10:32:53  brian
+## - added files to distro
+##
 ## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

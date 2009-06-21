@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tabold.h,v 1.1.2.1 2009-06-21 11:40:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tabold.h,v $
+ Revision 1.1.2.1  2009-06-21 11:40:36  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_TABOLD_H__
 #define __LOCAL_TABOLD_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: tabold.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * This file contains 4 tables, one for transmit bit-stuffing and bit-reversal: tx_table; one for

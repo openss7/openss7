@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sccop_user.h,v 1.1.2.1 2009-06-21 11:20:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sccop_user.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:51  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SSCOP_USER_H__
 #define __SSCOP_USER_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sccop_user.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #endif				/* __SSCOP_USER_H__ */

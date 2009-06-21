@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: omp_dmi.h,v 1.1.2.1 2009-06-21 11:23:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: omp_dmi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:45  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __OMP_DMI_H__
 #define __OMP_DMI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: omp_dmi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * This secton sets out the symbols which are defined in the <omp_dmi.h>

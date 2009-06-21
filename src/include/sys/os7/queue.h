@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: queue.h,v 1.1.2.1 2009-06-21 11:26:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: queue.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:49  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __OS7_QUEUE_H__
 #define __OS7_QUEUE_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define QR_DONE		0
 #define QR_ABSORBED	1

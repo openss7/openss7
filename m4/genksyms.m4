@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -265,13 +265,18 @@ dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     AC_CACHE_CHECK([for modpost options], [ksyms_cv_modpost_options], [dnl
 	ksyms_cv_modpost_options=
 	if test :${linux_cv_CONFIG_MODVERSIONS:-no} = :yes ; then
-	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options}${ksyms_cv_modpost_options:+ }-m"
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-m"
 	fi
 	if test :${linux_cv_CONFIG_MODULE_UNLOAD:-no} = :yes ; then
-	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options}${ksyms_cv_modpost_options:+ }-u"
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-u"
 	fi
 	if test :${linux_cv_CONFIG_SRCVERSION_ALL:-no} = :yes ; then
-	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options}${ksyms_cv_modpost_options:+ }-a"
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-a"
+	fi
+	if test -r $kmodver ; then
+	    if (grep EXPORT_SYMBOL $kmodver>/dev/null) ; then
+		ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-x"
+	    fi
 	fi
     ])
     MODPOST_OPTIONS="$ksyms_cv_modpost_options"
@@ -341,7 +346,10 @@ AC_DEFUN([_KSYMS_], [dnl
 
 # =============================================================================
 #
-# $Log$
+# $Log: genksyms.m4,v $
+# Revision 1.1.2.1  2009-06-21 11:06:04  brian
+# - added files to new distro
+#
 # Revision 0.9.2.28  2008-09-21 07:40:45  brian
 # - add defaults to environment variables
 #

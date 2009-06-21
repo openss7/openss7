@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sl_dl.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $";
 
 
 /*
@@ -70,7 +73,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/os7/compat.h>
 
 #define SL_DL_DESCRIP		"SIGNALLING LINK (SL) DATA LINK (DL) STREAMS MODULE"
-#define SL_DL_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
 
 #define SL_DL_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SL_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"

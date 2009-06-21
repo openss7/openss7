@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ua_msg.h,v 1.1.2.1 2009-06-21 11:20:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ua_msg.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:57  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_UA_MSG_H__
 #define __LOCAL_UA_MSG_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ua_msg.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  *  This file is usable both by kernel modules and user space programs.  The

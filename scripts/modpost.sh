@@ -128,7 +128,7 @@ modpost_fpathize="$SED -r -e s%(\.mod)?\.(k)?o(\.gz)?$%%"
 
 # defaults
 
-defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion modules command cachefile pkgdirectory"
+defaults="sysmap moddir infile outfile sysfile unload modversions allsrcversion modules command cachefile pkgdirectory exportsyms"
 
 #default_sysmap=/boot/System.map-`uname -r`
 #default_moddir=/lib/modules/`uname -r`
@@ -153,6 +153,7 @@ default_modules=
 default_command=process
 default_cachefile=$MODPOST_CACHE
 default_pkgdirectory=openss7
+default_exportsyms=n
 
 debug=0
 verbose=1
@@ -216,6 +217,8 @@ Options:
         module versions are supported ['$modversions']
     -a, --allsrcversion
         source version all modules ['$allsrcversion']
+    -x, --exportsyms
+        place export symbols in versions files
     -p, --pkgdirectory SUBDIRECTORY
         subdirectory for modules ['$pkgdirectory']
     -n, --dryrun
@@ -469,6 +472,9 @@ do
 	    ;;
 	(--allsrcversion|--allsrcversio|--allsrcversi|--allsrcvers|--allsrcver|--allsrcve|--allsrcv|--allsrc|--allsr|--alls|--all|--al|--a|-a)
 	    allsrcversion=y
+	    ;;
+	(--exportsyms|--exportsym|--exportsy|--exports|--export|--xport|--exp|--ex|--x|-x)
+	    exportsyms=y
 	    ;;
 	(--pkgdirectory|--pkgdirect|--pkgdir|--pkgdi|--pkgd|--pkg|--pk|--p|-p)
 	    prevopt="$arg"
@@ -802,7 +808,7 @@ write_dump_ours() {
 	    eval "exp=\"\$mod_${token}_sym_${sym}_exp\""
 	    if test :"$crc" != : ; then
 		((count++))
-		if test :"$exp" != : ; then
+		if test :"$exp" != : -a ${exportsyms:-n} != :n ; then
 		    printf "0x%08x\t%s\t%s\t%s\n" $crc $sym $path $exp
 		else
 		    printf "0x%08x\t%s\t%s\n" $crc $sym $path
@@ -844,7 +850,7 @@ write_dump_others() {
 	    eval "exp=\"\$mod_${token}_sym_${sym}_exp\""
 	    if test :"$crc" != : ; then
 		((count++))
-		if test :"$exp" != : ; then
+		if test :"$exp" != : -a ${exportsyms:-n} != :n ; then
 		    printf "0x%08x\t%s\t%s\t%s\n" $crc $sym $name $exp
 		else
 		    printf "0x%08x\t%s\t%s\n" $crc $sym $name

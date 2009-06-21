@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: xftam.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,15 +47,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xftam.c,v $
+ Revision 1.1.2.1  2009-06-21 11:37:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: xftam.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: xftam.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $";
 
 

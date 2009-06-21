@@ -1,6 +1,6 @@
 -- ===========================================================================
 --
--- @(#) $Id$
+-- @(#) $Id: ANSI_TCAP.asn,v 1.1.2.1 2009-06-21 11:20:44 brian Exp $
 --
 -- ===========================================================================
 --
@@ -28,11 +28,14 @@
 -- techniques, or procedures embodied, described, or referred to herein.
 -- The author is under no obligation to provide any feature listed herein.
 --
--- Modified $Date$ by <bidulock@openss7.org>
+-- Modified $Date: 2009-06-21 11:20:44 $ by <bidulock@openss7.org>
 --
 -- ===========================================================================
 --
--- $Log$
+-- $Log: ANSI_TCAP.asn,v $
+-- Revision 1.1.2.1  2009-06-21 11:20:44  brian
+-- - added files to new distro
+--
 -- Revision 0.9.2.2  2007/08/03 13:35:43  brian
 -- - manual updates, put ss7 modules in public release
 --

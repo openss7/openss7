@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:27:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:27:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3166,8 +3166,8 @@ lib-org-openss7-javax-jcat.jar.db: org-openss7-javax-jcat.jar
 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
 
 my_INCLUDES += $(my_jcat_INCLUDES)
-my_SOURCEFILES += $(my_jcap_SOURCEFILES)
-DISTCLEANFILES += $(my_jcap_SOURCEFILES)
+my_SOURCEFILES += $(my_jcat_SOURCEFILES)
+DISTCLEANFILES += $(my_jcat_SOURCEFILES)
 
 $(my_jcat_INCLUDES): %.h : %.class
 $(my_jcat_SOURCEFILES): $(my_jcat_INCLUDES)
@@ -4300,6 +4300,9 @@ EXTRA_DIST += \
 
 # =============================================================================
 #
-# $Log$
+# $Log: Makefile.am,v $
+# Revision 1.1.2.1  2009-06-21 11:27:54  brian
+# - added files to new distro
+#
 # =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

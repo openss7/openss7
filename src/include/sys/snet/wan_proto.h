@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: wan_proto.h,v 1.1.2.1 2009-06-21 11:26:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: wan_proto.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:50  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_SNET_WAN_PROTO_H__
 #define __SYS_SNET_WAN_PROTO_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: wan_proto.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define WAN_SID		1	/* Set subnetwork identifier */
 #define WAN_REG		2	/* Register subnetwork identifier */

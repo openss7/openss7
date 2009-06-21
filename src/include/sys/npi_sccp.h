@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: npi_sccp.h,v 1.1.2.1 2009-06-21 11:25:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: npi_sccp.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:37  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef _SYS_NPI_SCCP_H
 #define _SYS_NPI_SCCP_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: npi_sccp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed with doxygen(1). */
 

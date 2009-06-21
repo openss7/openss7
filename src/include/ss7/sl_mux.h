@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sl_mux.h,v 1.1.2.1 2009-06-21 11:25:34 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sl_mux.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:34  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SS7_SL_MUX_H__
 #define __SS7_SL_MUX_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define SLMUX_CLEI_MAX	    32
 

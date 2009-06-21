@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -175,7 +175,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -221,10 +221,13 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:47:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
-# $Log$
+# $Log: strerr.sh,v $
+# Revision 1.1.2.1  2009-06-21 11:47:58  brian
+# - added files to new distro
+#
 # =============================================================================
 # vim: ft=sh sw=4 tw=80

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -223,7 +223,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -268,11 +268,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:47:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
-# $Log$
+# $Log: streams.sh,v $
+# Revision 1.1.2.1  2009-06-21 11:47:57  brian
+# - added files to new distro
+#
 # Revision 0.9.2.21  2008-10-21 22:42:16  brian
 # - handle verbose better in debian initscripts
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: cmn_err.h,v 1.1.2.1 2009-06-21 11:26:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: cmn_err.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_OPENSS7_CMN_ERR_H__
 #define __SYS_OPENSS7_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do not include sys/openss7/cmn_err.h directly, include sys/cmn_err.h instead."

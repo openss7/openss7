@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ddi.h,v 1.1.2.1 2009-06-21 11:26:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ddi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_OPENSS7_DDI_H__
 #define __SYS_OPENSS7_DDI_H__ 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_DDI_H__
 #warning "Do not include sys/openss7/ddi.h directly, include sys/ddi.h instead."
