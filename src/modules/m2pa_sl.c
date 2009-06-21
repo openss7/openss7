@@ -7767,7 +7767,7 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		rtn = sl_power_on_req(sl, q, mp);
 		break;
 	default:
-		m2palogrx(sl, "-> (?????)");
+		m2palogrx(sl, "-> (unknown)");
 		rtn = -EOPNOTSUPP;
 		break;
 	}
@@ -7834,7 +7834,7 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 		rtn = ne_reset_con(sl, q, mp);
 		break;
 	default:
-		m2palogrx(sl, "(????) <-");
+		m2palogrx(sl, "(unknown) <-");
 		rtn = -EOPNOTSUPP;
 		break;
 	}

@@ -193,19 +193,20 @@ CLEAN_LOCAL		+= clean-verfiles
 
 stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS)
 	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
+	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
 	list="$?" ; for obj in $$list ; do \
 		test :$$obj != :stamp-verfiles || continue ; \
 		if $(OBJDUMP) -h $$obj | grep -q __ksymtab; then \
 			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
 			v=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,,;s,\.o$$,,'` ; \
 			$(ECHO_Q) "  LD    " $$a ; \
-			$(ECHO_V) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
-			$(LD) -r -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
+			$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
 		else \
 			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
 			$(ECHO_Q) "  LD    " $$a ; \
-			$(ECHO_V) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
-			$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
+			$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 		fi ; \
 	done ; \
 	touch stamp-verobjs
@@ -366,11 +367,12 @@ endif
 
 stamp-verobjs: $(KERNEL_OBJECTS)
 	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
+	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
 	list="$?" ; for obj in $$list ; do \
 		a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
 		$(ECHO_Q) "  LD    " $$a ; \
-		$(ECHO_V) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
-		$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
+		$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
+		$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 	done ; \
 	touch stamp-verobjs
 

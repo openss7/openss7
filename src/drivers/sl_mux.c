@@ -3464,7 +3464,7 @@ slm_ioctl(struct sl *lm, queue_t *q, mblk_t *mp)
 		size = sizeof(struct slmux_ppa);
 		break;
 	default:
-		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(SLM_IOC????)");
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(SLM_IOC-unknown)");
 		err = EINVAL;
 		break;
 	}
@@ -3599,7 +3599,7 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 			err = ENOBUFS;
 		break;
 	default:
-		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOC????)");
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOC-unknown)");
 		err = EINVAL;
 		break;
 	}
@@ -4364,7 +4364,7 @@ sl_r_iocack(queue_t *q, mblk_t *mp)
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- M_COPYOUT");
 		break;
 	default:
-		mi_strlog(q, STRLOGRX, SL_TRACE, "<- M_????(%d)", (int) DB_TYPE(mp));
+		mi_strlog(q, STRLOGRX, SL_TRACE, "<- M_unknown(%d)", (int) DB_TYPE(mp));
 		break;
 	}
 

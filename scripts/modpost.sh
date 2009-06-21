@@ -534,6 +534,7 @@ command_info() {
 
 #
 # This function is the same for 2.6.3 through 2.6.10
+# Could put ifdef CONFIG_SUSE_KERNEL around the supported thing.
 #
 add_header() {
 	cat<<_ACEOF
@@ -542,6 +543,9 @@ add_header() {
 #include <linux/compiler.h>
 
 MODULE_INFO(vermagic, VERMAGIC_STRING);
+#ifdef CONFIG_SUSE_KERNEL
+MODULE_INFO(supported, "yes");
+#endif
 _ACEOF
 }
 
@@ -687,23 +691,68 @@ add_srcversion() {
     name="$1"
     token=`echo "$name" | $modpost_tokenize`
     shift
-    # also set with -a flag to modpost
-    test :${allsrcversion:-n} = :y || return 0
-    case " $(eval '$ECHO "$mod_'${token}'_syms"') " in
-	    ( __mod_version[0-9][0-9]* | __mod_version[0-9][0-9]* ) ;;
-	    (*) return 0 ;;
+    eval "syms=\"\$mod_${token}_syms\""
+    case " $syms " in
+	(*" __mod_version[0-9][0-9] "*|*" ___mod_version[0-9][0-9] "*)
+	    reason=version
+	    ;;
+	# also set with -a flag to modpost
+	(*) 
+	    if (nm -s ${name}.o | grep '\<__mod_version' >/dev/null) ; then
+		reason=version
+	    else
+		test :${allsrcversion:-n} = :y || return 0
+		reason=all
+	    fi
+	    ;;
     esac
+    gotone=no
     cat /dev/null >.mytmp$$.sources
-    for file in ${1+@} ; do
-	    cat $file >> .mytmp$$.sources
+    for s in ${1+@} ; do
+	test -r $s || continue
+	cat $s >> .mytmp$$.sources
+	gotone=yes
     done
-    srcversion=`openssl -md4 .my4mp$$.sources`
+    # The way to find the sources is to use the .deps files if they exist.
+    for f in .deps/lib*${name}_a-*.Po ; do
+	if test -r $f ; then
+	    files=`cat $f | grep ':$' | egrep -v '^(/lib/modules|/usr)' | sed -e 's,:$,,'`
+	    for s in $files ; do
+		test -r $s || continue
+		cat $s >> .mytmp$$.sources
+		gotone=yes
+	    done
+	fi
+    done
+    if test :$gotone = :no ; then
+	nam=`echo $name | sed -r -e 's,streams(_|-),,'`
+	for f in .deps/*${nam}.Po ; do
+	    if test -r $f ; then
+		files=`cat $f | grep ':$' | egrep -v '^(/lib/modules|/usr)' | sed -e 's,:$,,'`
+		for s in $files ; do
+		    test -r $s || continue
+		    cat $s >> .mytmp$$.sources
+		    gotone=yes
+		done
+	    fi
+	done
+    fi
+    if test :$gotone = :yes ; then
+	srcversion=`openssl md4 .mytmp$$.sources | cut -f2 '-d '`
+    fi
     rm -f -- .mytmp$$.sources
-    cat<<_ACEOF
+    test :$gotone = :yes || { command_warn "could not find sources for $name" ; return 0 ; }
+    if test :$reason = :all ; then
+	cat<<_ACEOF
 #ifdef CONFIG_MODULE_SRCVERSION_ALL
-	MODULE_INFO(srcversion, "$srcversion");
+MODULE_INFO(srcversion, "$srcversion");
 #endif
 _ACEOF
+    else
+	cat<<_ACEOF
+MODULE_INFO(srcversion, "$srcversion");
+_ACEOF
+    fi
 }
 
 write_modsrc() {
@@ -876,6 +925,59 @@ read_infiles() {
 }
 
 #
+# Read in an objdump -t listing.  This must be from object -t run on a kernel object.  This will add
+# the EXPORT_SYMBOL or EXPORT_SYMBOL_GPL for use in the Module.symvers file.
+#
+read_obj() {
+    name=$1
+    token=`echo "$name" | $modpost_tokenize`
+    test :"$name" != : || { command_error "no module name" ; return 1 ; }
+    count=0
+    progress=0
+    while read addr flag type table num expsym junk ; do
+	case $flag in
+	    (l) ;;
+	    (*) continue ;;
+	esac
+	case $type in
+	    (O) ;;
+	    (*) continue ;;
+	esac
+	case $table in
+	    (__ksymtab|___ksymtab|__ksymtab_gpl|___ksymtab_gpl) ;;
+	    (*) continue ;;
+	esac
+	case $expsym in
+	    (__ksymtab_*|___ksymtab_*) ;;
+	    (*) continue ;;
+	esac
+	((count++))
+	((progress++))
+	if test $progress -ge 100 ; then
+	    progress=0
+	    command_info "processed $count export symbols"
+	fi
+	test -z "$junk" || { command_error "got junk $junk" ; continue ; }
+	sym=`$ECHO "$expsym" | sed -r -e 's|^(_)?__ksymtab_||'`
+	nam="$name"
+	tok="$token"
+	case $table in
+	    (__ksymtab|___ksymtab)
+		eval "mod_${tok}_sym_${sym}_exp=\"EXPORT_SYMBOL\""
+		eval "sym_${sym}_exp=\"EXPORT_SYMBOL\""
+		cache_dirty=yes
+		;;
+	    (__ksymtab_gpl|___ksymtab_gpl)
+		eval "mod_${tok}_sym_${sym}_exp=\"EXPORT_SYMBOL_GPL\""
+		eval "sym_${sym}_exp=\"EXPORT_SYMBOL_GPL\""
+		cache_dirty=yes
+		;;
+	esac
+    done
+    command_info "processed $count export symbols"
+}
+
+#
 # Read in any nm -Bs listing.  This can be a System.map file, a Modules.map file, or the result of
 # nm -Bs run on a kernel object.
 #
@@ -913,7 +1015,7 @@ read_map() {
 	    eval "sym_${sym}_name=\"$nam\""
 	    eval "sym_${sym}_crc=\"0x$crc\""
 	    cache_dirty=yes
-	elif test :$crc = :U ; then
+	elif test :$crc = :U -o :$crc = :w; then
 	    undef="$flag"
 	    case "$undef" in
 		(__this_module|___this_module)
@@ -1011,8 +1113,10 @@ read_module() {
 	    ;;
     esac
     command_info "processing module $name in file $filename"
-    nm -s $file | egrep '(\<A\>|\<U\>|\<(_)?init_module\>|\<(_)?cleanup_module\>|\<(_)?__this_module\>)' >.tmp.$$.map
+    nm -s $file | egrep '(\<A\>|\<U\>|\<w\>|\<(_)?init_module\>|\<(_)?cleanup_module\>|\<(_)?__this_module\>)' >.tmp.$$.map
     read_map "$name" <.tmp.$$.map
+    objdump -t $file | grep '\<l\>' | grep '\<O\>' | grep ksymtab | grep -v kstrtab >.tmp.$$.map
+    read_obj "$name" <.tmp.$$.map
     rm -f -- .tmp.$$.map
     test :"$remv" != : && rm -f -- "$remv"
 }
@@ -1065,6 +1169,8 @@ read_kobject() {
     command_info "processing module $name in file $base"
     nm -s $file | egrep '\<(_)?__crc_' >.tmp.$$.map
     read_map "$name" <.tmp.$$.map
+    objdump -t $file | grep '\<l\>' | grep '\<O\>' | grep ksymtab | grep -v kstrtab >.tmp.$$.map
+    read_obj "$name" <.tmp.$$.map
     rm -f -- .tmp.$$.map
     test -n "$remv" && rm -f -- $remv
 }
