@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ip_to_dlpi.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $";
 
 #include <sys/os7/compat.h>
 
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile$ $Name$ ($Revision$) $Date$"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"

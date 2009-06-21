@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mtp3b.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mtp3b.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:32  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mtp3b.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mtp3b.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $";
 
 /*
  * This is an MTP3b module for use by MTP3b.  It can be pushed over an SSCOPE SSCF module to provide
@@ -67,7 +70,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  */
 
 #define MTP3B_DESCRIP	"MTP3B-MTP3B STREAMS MODULE."
-#define MTP3B_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define MTP3B_REVISION	"OpenSS7 $RCSfile: mtp3b.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $"
 #define MTP3B_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MTP3B_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-MTP3B module."
 #define MTP3B_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

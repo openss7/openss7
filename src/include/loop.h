@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: loop.h,v 1.1.2.1 2009-06-21 11:23:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: loop.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:45  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef _LOOP_H
 #define _LOOP_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: loop.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/loop.h>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ip_strm_mod.h,v 1.1.2.1 2009-06-21 11:40:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ip_strm_mod.h,v $
+ Revision 1.1.2.1  2009-06-21 11:40:30  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_IP_STRM_MOD_H__
 #define __LOCAL_IP_STRM_MOD_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ip_strm_mod.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #if defined(__KERNEL__)
 

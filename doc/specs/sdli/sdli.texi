@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: sdli.texi,v 1.1.2.1 2009-06-21 10:56:20 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:56:20 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,7 +403,10 @@ changes in the design of any techniques, or procedures embodied, described, or r
 
 @smallexample
 @verbatim
-$Log$
+$Log: sdli.texi,v $
+Revision 1.1.2.1  2009-06-21 10:56:20  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

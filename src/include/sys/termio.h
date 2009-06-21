@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: termio.h,v 1.1.2.1 2009-06-21 11:25:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: termio.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:38  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_TERMIO_H__
 #define __SYS_TERMIO_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: termio.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/termios.h>
 

@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id$
+.\" @(#) $Id: ss7capd.8.man,v 1.1.2.1 2009-06-21 10:37:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date$ by $Author$
+.\" Last Modified $Date: 2009-06-21 10:37:48 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log$
+.\" $Log: ss7capd.8.man,v $
+.\" Revision 1.1.2.1  2009-06-21 10:37:48  brian
+.\" - added files to new distro
+.\"
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -531,7 +534,7 @@ Sample output file format:
 .sp
 .nf
 \fC\s-3\
-001067476343.682774 # SS7CAPD $Id$ Output File Header
+001067476343.682774 # SS7CAPD $Id: ss7capd.8.man,v 1.1.2.1 2009-06-21 10:37:48 brian Exp $ Output File Header
 001067476343.682774 # machine: Linux daisy 2.4.18 #3 Tue Oct 28 05:22:20 MST 2003 i686
 001067476343.682774 # device: /dev/x400p-sl (0:1:14) myalink
 001067476343.682774 # original file name: /var/log/ss7capd/myalink.out

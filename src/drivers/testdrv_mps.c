@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: testdrv_mps.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:56  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $";
 
 /*
  * This is a test module for MPS compatability.  Its purpose is to test MPS compatability functions
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TD_MPS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TD_MPS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TD_MPS_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define TD_MPS_REVISION		"OpenSS7 $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $"
 #define TD_MPS_DEVICE		"MPS Compatability TEST Driver (TEST-DRV-MPS)"
 #define TD_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TD_MPS_LICENSE		"GPL"

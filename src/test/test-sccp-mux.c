@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-sccp-mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:18 $
 
  -----------------------------------------------------------------------------
 
@@ -60,15 +60,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-sccp-mux.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:18  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-sccp-mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:18 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-sccp-mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:18 $";
 
 

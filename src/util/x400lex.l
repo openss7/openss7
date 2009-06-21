@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,20 +47,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: x400lex.l,v $
+ Revision 1.1.2.1  2009-06-21 11:47:56  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 /* C DECLARATIONS */
 
 %{
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:56 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: x400lex.l,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:56 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 

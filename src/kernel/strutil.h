@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strutil.h,v 1.1.2.1 2009-06-21 11:37:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strutil.h,v $
+ Revision 1.1.2.1  2009-06-21 11:37:25  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>

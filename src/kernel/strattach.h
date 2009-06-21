@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strattach.h,v 1.1.2.1 2009-06-21 11:37:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strattach.h,v $
+ Revision 1.1.2.1  2009-06-21 11:37:25  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_STRATTACH_H__
 #define __LOCAL_STRATTACH_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
 streams_fastcall long do_fattach(const struct file *file, const char *file_name);

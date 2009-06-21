@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: wan.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: wan.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:58  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: wan.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: wan.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $";
 
 /*
  * This file is the WAN (Wide Area Network, Raw HDLC) driver.  It does not link

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: sbc.texi,v 1.1.2.1 2009-06-21 10:47:35 brian Exp $
 %
 % =========================================================================
 %
@@ -81,7 +81,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:47:35 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -433,7 +433,10 @@ Project} website for a current version.
 
 @smallexample
 @verbatim
-$Log$
+$Log: sbc.texi,v $
+Revision 1.1.2.1  2009-06-21 10:47:35  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: isua_as.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $";
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -120,7 +123,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

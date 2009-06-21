@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xmap_gsm.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xmap_gsm.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __XMAP_GSM_H__
 #define __XMAP_GSM_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsm.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * The <xmap.h> and <xmap_gsm.h> headers declare the interface functions, the

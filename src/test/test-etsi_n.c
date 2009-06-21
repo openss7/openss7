@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:15 $
 
  -----------------------------------------------------------------------------
 
@@ -60,16 +60,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-etsi_n.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:15  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:15 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:15 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: lki_ioctl.h,v 1.1.2.1 2009-06-21 11:25:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: lki_ioctl.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:33  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SS7_LKI_IOCTL_H__
 #define __SS7_LKI_IOCTL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: lki_ioctl.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed by doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mfe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mfe.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:49  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mfe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mfe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $";
 
 /*
  * This file is the MFE (Multiprotocol over Frame Relay Encapsulation) driver.

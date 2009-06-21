@@ -1,3 +1,7 @@
 Makefile.in
 npi.info
 npi.info-*
+npi_mtp.info
+npi_mtp.info-*
+npi_sccp.info
+npi_sccp.info-*

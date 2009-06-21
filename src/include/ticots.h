@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ticots.h,v 1.1.2.1 2009-06-21 11:23:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ticots.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:45  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef _TICOTS_H
 #define _TICOTS_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/ticots.h>
 

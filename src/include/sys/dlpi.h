@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: dlpi.h,v 1.1.2.1 2009-06-21 11:25:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dlpi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed by doxygen(1). */
 

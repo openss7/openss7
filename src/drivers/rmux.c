@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: rmux.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:50  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $";
 
 /*
  *  RMUX is a remote multiplexing driver using SCTP.  Its purpose is to make remote STREAMS devices

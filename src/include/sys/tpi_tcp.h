@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tpi_tcp.h,v 1.1.2.1 2009-06-21 11:25:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tpi_tcp.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:38  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __TPI_TCP_H__
 #define __TPI_TCP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: tpi_tcp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed with doxygen(1). */
 

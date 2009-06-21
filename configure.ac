@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:25:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 10:25:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,8 +57,8 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
-AC_INIT([OpenSS7],[1.2],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name$($Revision$) $Date$])
+AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
+AC_REVISION([$Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:25:07 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -261,7 +261,10 @@ AC_OUTPUT
 
 # =============================================================================
 #
-# $Log$
+# $Log: configure.ac,v $
+# Revision 1.1.2.1  2009-06-21 10:25:07  brian
+# - added base files to new distro
+#
 # =============================================================================
 # 
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>

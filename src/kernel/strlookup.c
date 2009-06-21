@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strlookup.c,v $
+ Revision 1.1.2.1  2009-06-21 11:37:16  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>

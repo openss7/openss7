@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xmap_gsm_err.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xmap_gsm_err.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __XMAP_GSM_ERR_H__
 #define __XMAP_GSM_ERR_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsm_err.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* Error classes: */
 #define OMP_O_MAP_C_ABSENT_SUBSCRIBER_PARAM			mapP_gsm(\x87\x69)	/* 1001 */	/* GSM ERR */

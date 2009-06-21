@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sctp_msg.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:52  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $";
 
 #define __NO_VERSION__
 

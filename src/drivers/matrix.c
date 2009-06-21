@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: matrix.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:49  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $";
 
 /*
  * This is the MATRIX multiplexing driver.  Its purpose is to allow a single
@@ -151,7 +154,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/mxi_ioctl.h>
 
 #define MATRIX_DESCRIP		"MATRIX (MX) STREAMS MULTIPLEXING DRIVER."
-#define MATRIX_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define MATRIX_REVISION		"OpenSS7 $RCSfile: matrix.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $"
 #define MATRIX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

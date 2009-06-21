@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: dlpiapi.h,v 1.1.2.1 2009-06-21 11:23:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dlpiapi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:45  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __DLPIAPI_H__
 #define __DLPIAPI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define dlpi_open(h)		dlpi_open_GCOM(h)
 #define dlpi_close(fd)		dlpi_close_GCOM(fd)

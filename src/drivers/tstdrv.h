@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tstdrv.h,v 1.1.2.1 2009-06-21 11:20:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tstdrv.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:56  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_TESTDRV_H__
 #define __LOCAL_TESTDRV_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: tstdrv.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #endif				/* __LOCAL_TESTDRV_H__ */

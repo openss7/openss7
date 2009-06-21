@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: slmon.c,v $
+ Revision 1.1.2.1  2009-06-21 11:47:55  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $";
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is
@@ -289,7 +292,7 @@ output_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SS7MON $Id$ Output File Header\n");
+	fprintf(stdout, " # SS7MON $Id: slmon.c,v 1.1.2.1 2009-06-21 11:47:55 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -2239,7 +2242,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.1 $ $Date: 2009-06-21 11:47:55 $");
 }
 
 static void

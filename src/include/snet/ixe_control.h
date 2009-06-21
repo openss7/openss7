@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ixe_control.h,v 1.1.2.1 2009-06-21 11:25:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ixe_control.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:32  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_SNET_IXE_CONTROL_H__
 #define __SYS_SNET_IXE_CONTROL_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ixe_control.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #endif				/* __SYS_SNET_IXE_CONTROL_H__ */
 

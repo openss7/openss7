@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xmap_gsmi.h,v 1.1.2.1 2009-06-21 11:37:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xmap_gsmi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:37:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_XMAP_GSMI_H__
 #define __LOCAL_XMAP_GSMI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmap_gsmi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* Operation codes: */
 /* location registration operations */

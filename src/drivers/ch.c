@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ch.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:44  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CHMUX_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

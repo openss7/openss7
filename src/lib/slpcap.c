@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: slpcap.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: slpcap.c,v $
+ Revision 1.1.2.1  2009-06-21 11:37:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: slpcap.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: slpcap.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $";
 
 /*
  *  This is a replacement libpcap to permit live capture of SS7 SDUs using ethereal or wireshark.

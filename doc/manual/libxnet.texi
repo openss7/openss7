@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: libxnet.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -678,7 +678,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name$($Revision$); $Date$.
+OpenSS7 XTI Library: $Name:  $($Revision: 1.1.2.1 $); $Date: 2009-06-21 10:40:08 $.
 
 @subsubheading AUTHOR
 @format
@@ -841,7 +841,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name$($Revision$); $Date$.
+Linux Fast-STREAMS: $Name:  $($Revision: 1.1.2.1 $); $Date: 2009-06-21 10:40:08 $.
 @end flushleft
 @end format
 

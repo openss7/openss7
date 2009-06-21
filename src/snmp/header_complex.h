@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: header_complex.h,v 1.1.2.1 2009-06-21 11:42:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:42:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: header_complex.h,v $
+ Revision 1.1.2.1  2009-06-21 11:42:32  brian
+ - added files to new distro
+
  Revision 0.9.2.4  2008-04-28 09:47:28  brian
  - updated headers for release
 
@@ -68,7 +71,7 @@
 #ifndef __LOCAL_HEADER_COMPLEX_H__
 #define __LOCAL_HEADER_COMPLEX_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: header_complex.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  *  header_complex.h:  More complex storage and data sorting for mib modules

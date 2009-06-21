@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: isup.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

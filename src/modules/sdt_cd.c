@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sdt_cd.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:34  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $";
 
 
 /*
@@ -93,7 +96,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $"
 #define SDT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Provides OpenSS7 SDT-CD module."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

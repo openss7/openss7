@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tc_mod.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:36  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
 
 
 /*
@@ -118,7 +121,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/xti_tcap.h>
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
-#define TC_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 #define TC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xmp_cmis.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xmp_cmis.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __XMP_CMIS_H__
 #define __XMP_CMIS_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xmp_cmis.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * The <xmp_cmis.h> header declares the interface functions, the structures passed to and from those

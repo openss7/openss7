@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sctp_input.h,v 1.1.2.1 2009-06-21 11:20:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sctp_input.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:52  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SCTP_INPUT_H__
 #define __SCTP_INPUT_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sctp_input.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 extern void sctp_init_proto(void);
 extern void sctp_term_proto(void);

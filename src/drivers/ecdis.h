@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ecdis.h,v 1.1.2.1 2009-06-21 11:20:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ecdis.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:45  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_ECDIS_H__
 #define __LOCAL_ECDIS_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ecdis.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 /*
  * SpanDSP - a series of DSP components for telephony
  *

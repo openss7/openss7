@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strsun.h,v 1.1.2.1 2009-06-21 11:26:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strsun.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:50  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."

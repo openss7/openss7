@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: zaptel.h,v 1.1.2.1 2009-06-21 11:20:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: zaptel.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:59  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 /*
@@ -66,13 +69,13 @@
  *
  * All rights reserved.
  *
- * $Id$
+ * $Id: zaptel.h,v 1.1.2.1 2009-06-21 11:20:59 brian Exp $
  */
 
 #ifndef _LINUX_ZAPTEL_H
 #define _LINUX_ZAPTEL_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: zaptel.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifdef __KERNEL__
 #include "zconfig.h"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sccp_npi.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:33  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $";
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control
@@ -94,7 +97,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define SCCP_NPI_DESCRIP	"SCCPI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define SCCP_NPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_NPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SCCP_NPI_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SCCP_NPI_REVISION	"OpenSS7 $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
 #define SCCP_NPI_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define SCCP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_NPI_LICENSE	"GPL"

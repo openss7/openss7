@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: x25-plp.other.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:59  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $";
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -76,7 +79,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $"
 #define PLP_DEVICE	"SVR 4.2 STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"

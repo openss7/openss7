@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ss7d.c,v $
+ Revision 1.1.2.1  2009-06-21 11:47:55  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $";
 
 /*
  * This is ss7d(8).  The purpose of the daemon is to configure the SS7 stack from configuration

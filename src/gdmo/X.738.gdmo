@@ -1,1 +1,1635 @@
-X.738.2000.gdmo
+--@@ GDMOCHECK $Revision: 1.1.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Nov 21 11:10:36 MST 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995"
+--  { joint-iso-ccitt ms(9) function(2) part13(13) } >--
+--< GDMO.Namespace itut_x738 >--
+--< GDMO.Alias "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995" "Rec. X.738 (1993)",
+--  "Recommendation X.738:1993",
+--  "Recommendation X.738 : 1992",
+--  "Rec. X.738|ISO/IEC 10164-13:1992",
+--  "ITU-T Rec. X.738 (1993)/Cor.1 (1998): | ISO/IEC 10164-13 : 1995/Cor.1 : 1999",
+--  "ITU-T Rec. X.738 (1993)/Cor.2 (2000): | ISO/IEC 10164-13 : 1995/Cor.2 : 2002" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile: X.738.gdmo,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:22:55 $
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date: 2009-06-21 11:22:55 $ by $Author: brian $
+--  
+--  =============================================================================
+--  >--
+MODULE "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995" { joint-iso-ccitt ms(9) function(2) part13(13) }
+-- Annex A
+-- Summarization management support objects
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.1 Managed object class definitions
+
+bufferedScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner;
+	CHARACTERIZED BY
+		bufferedScannerPackage PACKAGE
+			BEHAVIOUR
+				bufferedScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.9.3.";;
+			ATTRIBUTES
+				bufferedObservationIdList GET-REPLACE ADD-REMOVE,
+				reportPeriod GET-REPLACE,
+				suppressObjectInstance GET-REPLACE;
+			ACTIONS
+				reportBuffer
+					scanActionError;
+			NOTIFICATIONS
+				bufferedScanReport;;;
+	CONDITIONAL PACKAGES
+		timeStampReportPackage
+			PRESENT IF
+				"time stamping supported";
+REGISTERED AS { summarizationManagedObjectClass 1 };
+
+
+bufferedScanReportRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+	CHARACTERIZED BY
+		bufferedScanReportPackage PACKAGE
+			BEHAVIOUR
+				bufferedScanReportRecordBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from 
+						buffered scan report notifications or event reports.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":granularityPeriod GET,
+				bufferedObservationList GET;;;
+	CONDITIONAL PACKAGES
+		firstScanInitiationTimePackage
+			PRESENT IF
+				"the firstScanInitiationTime parameter is present in report",
+		suspectIntervalsPackage
+			PRESENT IF
+				"the number of suspect intervals is non-zero and therefore present in the report.",
+		incompleteScanPackage
+			PRESENT IF
+				"the scan could not be completed.";
+REGISTERED AS { summarizationManagedObjectClass 2 };
+
+
+dynamicScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		dynamicScannerPackage PACKAGE
+			BEHAVIOUR
+				dynamicScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.10.3.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId GET,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":administrativeState GET-REPLACE;;;
+REGISTERED AS { summarizationManagedObjectClass 3 };
+
+
+dynamicSimpleScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		dynamicScanner;
+	CHARACTERIZED BY
+		dynamicSimpleScannerPackage PACKAGE
+			BEHAVIOUR
+				dynamicSimpleScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.11.3.";;
+			ACTIONS
+				activateDynamicSimpleScanReport
+					scanActionError;;;
+REGISTERED AS { summarizationManagedObjectClass 4 };
+
+
+ensembleStatisticScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		homogeneousScanner;
+	CHARACTERIZED BY
+		ensembleStatisticScannerPackage PACKAGE
+			BEHAVIOUR
+				ensembleBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.3.3.";;
+			ATTRIBUTES
+				numericAttributeIdList GET-REPLACE ADD-REMOVE,
+				suppressObjectInstance GET-REPLACE;
+			ACTIONS
+				activateStatisticalReport
+					scanActionError;
+			NOTIFICATIONS
+				statisticalReport;;;
+REGISTERED AS { summarizationManagedObjectClass 5 };
+
+
+heterogeneousScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner;
+	CHARACTERIZED BY
+		heterogeneousScannerPackage PACKAGE
+			BEHAVIOUR
+				heterogeneousScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.8.3.";;
+			ATTRIBUTES
+				observationIdList GET-REPLACE ADD-REMOVE,
+				suppressObjectInstance GET-REPLACE;
+			ACTIONS
+				activateScanReport
+					scanActionError;
+			NOTIFICATIONS
+				scanReport;;;
+	CONDITIONAL PACKAGES
+		timeStampReportPackage
+			PRESENT IF
+				"time stamping supported",
+		onceReportAttributeIdListPackage
+			PRESENT IF
+				"the once report attribute Id list mechanism is supported";
+REGISTERED AS { summarizationManagedObjectClass 6 };
+
+
+homogeneousScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner;
+	CHARACTERIZED BY
+		homogeneousScannerPackage PACKAGE
+			BEHAVIOUR
+				homogeneousScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.1.3.";;
+			ATTRIBUTES
+				scanAttributeIdList GET-REPLACE ADD-REMOVE;;;-- this may be empty
+	CONDITIONAL PACKAGES
+		timeStampReportPackage
+			PRESENT IF
+				"time stamping supported",
+		scopedSelectionPackage
+			PRESENT IF
+				"the managedObjectInstanceSelectionPackage is not present in an instance",
+		timingSelectionPackage
+			PRESENT IF
+				"timing attributes present",
+		managedObjectInstanceSelectionPackage
+			PRESENT IF
+				"the scopedSelectionPackage is not present in an instance";
+REGISTERED AS { summarizationManagedObjectClass 7 };
+
+
+meanScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		ensembleStatisticScanner;
+	CHARACTERIZED BY
+		meanScannerPackage PACKAGE
+			BEHAVIOUR
+				meanScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.4. 2and 8.1.4.3.";;;;
+REGISTERED AS { summarizationManagedObjectClass 8 };
+
+
+meanVarianceScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		meanScanner;
+	CHARACTERIZED BY
+		meanVarianceScannerPackage PACKAGE
+			BEHAVIOUR
+				meanVarianceScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.5.2 and 8.1.5.3.";;;;
+REGISTERED AS { summarizationManagedObjectClass 9 };
+
+
+minMaxScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		ensembleStatisticScanner;
+	CHARACTERIZED BY
+		minMaxScannerPackage PACKAGE
+			BEHAVIOUR
+				minMaxScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.7.2 and 8.1.7.3.";;;;
+	CONDITIONAL PACKAGES
+		meanCalculationPackage
+			PRESENT IF
+				"mean calculation is supported";
+REGISTERED AS { summarizationManagedObjectClass 10 };
+
+
+percentileScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		ensembleStatisticScanner;
+	CHARACTERIZED BY
+		percentileScannerPackage PACKAGE
+			BEHAVIOUR
+				percentileScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.6.2 and 8.1.6.3.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":configurablePCT GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		meanCalculationPackage
+			PRESENT IF
+				"mean calculation is supported";
+REGISTERED AS { summarizationManagedObjectClass 11 };
+
+
+scanReportRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+	CHARACTERIZED BY
+		scanReportRecordPackage PACKAGE
+			BEHAVIOUR
+				scanReportRecordBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from 
+						scan report notifications or event reports.";;
+			ATTRIBUTES
+				observationScanList GET;;;
+	CONDITIONAL PACKAGES
+		scanInitiationTimePackage
+			PRESENT IF
+				"the scanInitiationTime parameter is present in report",
+		onceReportAttributeListPackage
+			PRESENT IF
+				"the onceReportAttributeList parameter is present in report",
+		incompleteScanPackage
+			PRESENT IF
+				"the scan could not be completed.";
+REGISTERED AS { summarizationManagedObjectClass 13 };
+
+
+simpleScanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		homogeneousScanner;
+	CHARACTERIZED BY
+		simpleScannerPackage PACKAGE
+			BEHAVIOUR
+				simpleScannerBehaviour BEHAVIOUR
+					DEFINED AS
+						"See 8.1.2.3.";;
+			ATTRIBUTES
+				numericAttributeIdArray GET-REPLACE,--This list may be empty.
+				suppressObjectInstance GET-REPLACE;
+			ACTIONS
+				activateScanReport
+					scanActionError;
+			NOTIFICATIONS
+				scanReport;;;
+	CONDITIONAL PACKAGES
+		onceReportAttributeIdListPackage
+			PRESENT IF
+				"once report is supported";
+REGISTERED AS { summarizationManagedObjectClass 14 };
+
+
+statisticalReportRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+	CHARACTERIZED BY
+		statisticalReportPackage PACKAGE
+			BEHAVIOUR
+				statisticalReportRecordBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from 
+						statistical report notifications or event reports.";;
+			ATTRIBUTES
+				algorithmOutputs GET;;;
+	CONDITIONAL PACKAGES
+		scanInitiationTimePackage
+			PRESENT IF
+				"the scanInitiationTime parameter is present in the report",
+		observationReportListPackage
+			PRESENT IF
+				"the observationReportList parameter is present in the report",
+		algorithmParametersPackage
+			PRESENT IF
+				"the algorithmParameters parameter is present in the behaviour",
+		incompleteScanPackage
+			PRESENT IF
+				"the scan could not be completed.";
+REGISTERED AS { summarizationManagedObjectClass 15 };
+-- A.2 Calculation package definition
+-- The following calculation package defines behaviour associated with calculation of statistics
+-- for each numeric attribute type across all selected managed objects.
+
+
+meanCalculationPackage PACKAGE
+	BEHAVIOUR
+		meanCalculationBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.1.4.3.";;
+REGISTERED AS { summarizationPackage 1 };
+-- A.3 Package definitions
+
+
+algorithmParametersPackage PACKAGE
+	ATTRIBUTES
+		algorithmParameters GET;
+REGISTERED AS { summarizationPackage 2 };
+
+
+firstScanInitiationTimePackage PACKAGE
+	ATTRIBUTES
+		firstScanInitiationTime GET;
+REGISTERED AS { summarizationPackage 3 };
+
+
+incompleteScanPackage PACKAGE
+	ATTRIBUTES
+		incompleteScan GET;
+REGISTERED AS { summarizationPackage 14 };
+
+
+managedObjectInstanceSelectionPackage PACKAGE
+	ATTRIBUTES
+		objectList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { summarizationPackage 4 };
+
+
+observationReportListPackage PACKAGE
+	ATTRIBUTES
+		observationReportList GET;
+REGISTERED AS { summarizationPackage 5 };
+
+
+onceReportAttributeIdListPackage PACKAGE
+	ATTRIBUTES
+		onceReportAttributeIdList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { summarizationPackage 6 };
+
+
+onceReportAttributeListPackage PACKAGE
+	ATTRIBUTES
+		onceReportAttributeList GET;
+REGISTERED AS { summarizationPackage 7 };
+
+
+scanInitiationTimePackage PACKAGE
+	ATTRIBUTES
+		scanInitiationTime GET;
+REGISTERED AS { summarizationPackage 9 };
+
+
+scopedSelectionPackage PACKAGE
+	BEHAVIOUR
+		scopedSelectionBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.1.1.3.";;
+	ATTRIBUTES
+		baseManagedObject GET-REPLACE,
+		scope GET-REPLACE,
+		scanningFilter
+			DEFAULT VALUE SummarizationASN1Productions.scanningFilterDefault
+			GET-REPLACE;
+REGISTERED AS { summarizationPackage 10 };
+
+
+suspectIntervalsPackage PACKAGE
+	ATTRIBUTES
+		suspectIntervals GET;
+REGISTERED AS { summarizationPackage 11 };
+
+
+timeStampReportPackage PACKAGE
+	ATTRIBUTES
+		timeStampReportMode
+			DEFAULT VALUE SummarizationASN1Productions.timeStampingDefault
+			GET-REPLACE;
+REGISTERED AS { summarizationPackage 12 };
+
+
+timingSelectionPackage PACKAGE
+	BEHAVIOUR
+		timingSelectionBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.1.1.3.";;
+	ATTRIBUTES
+		beginTimeOffset GET-REPLACE,
+		endTimeOffset GET-REPLACE,
+		timeAttributeIdentifier GET-REPLACE;
+REGISTERED AS { summarizationPackage 13 };
+-- A.4 Attribute definitions
+
+
+algorithmOutputs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.AlgorithmOutputBuffer;
+	BEHAVIOUR
+		algorithmOutputsBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute includes the outputs of a statistical algorithm that was applied 
+				to scanned attribute values. See 8.2.2.2.3.";;
+REGISTERED AS { summarizationAttribute 1 };
+
+
+algorithmParameters ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.AlgorithmParameters;
+	BEHAVIOUR
+		algorithmParametersBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute includes one or more parameters of a statistical algorithm that 
+				was applied to scanned attribute values. See 8.2.2.2.4.";;
+REGISTERED AS { summarizationAttribute 2 };
+
+
+baseManagedObject ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		baseManagedObjectBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies an existing managed object which is the base of the 
+				scoping process for selecting managed objects. See 8.1.12.3";;
+REGISTERED AS { summarizationAttribute 3 };
+
+
+beginTimeOffset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimePeriod;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		beginTimeOffsetBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute, subtracted from the current time, indicates the 
+				beginning of a time window. See 8.1.12.5.";;
+REGISTERED AS { summarizationAttribute 4 };
+
+
+bufferedObservationIdList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.BufferedObservationIdList;
+	BEHAVIOUR
+		bufferedObservationIdListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies observed objects, and observed attributes within those 
+				managed objects, to be scanned. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 5 };
+
+
+bufferedObservationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.BufferedObservationList;
+	BEHAVIOUR
+		bufferedObservationListBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.2.2.3.4, A.4.";;
+REGISTERED AS { summarizationAttribute 6 };
+
+
+endTimeOffset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimePeriod;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		endTimeOffsetBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute, subtracted from the current time, indicates the end 
+				of a time window. See 8.1.12.5.";;
+REGISTERED AS { summarizationAttribute 7 };
+
+
+firstScanInitiationTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.FirstScanInitiationTime;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		firstScanInitiationTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the start time of the first scan in buffer. See 
+				8.2.2.3.2.";;
+REGISTERED AS { summarizationAttribute 8 };
+
+
+incompleteScan ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.IncompleteScan;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		incompleteScanBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute indicates the reason a scan could not be completed. 
+				See 8.2.2.1.4.";;
+REGISTERED AS { summarizationAttribute 30 };
+
+
+numericAttributeIdArray ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NumericAttributeIdArray;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		numericAttributeIdArrayBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an ordered list of identifiers of attributes whose values are 
+				to be scanned. The identified attributes must be of either the integer or the 
+				real type. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 10 };
+
+
+numericAttributeIdList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NumericAttributeIdList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		numericAttributeIdListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is a list of identifiers of attributes whose values are to be 
+				scanned. The identified attributes must be of either the integer or the real 
+				type. See 8.1.3.2.";;
+REGISTERED AS { summarizationAttribute 11 };
+
+
+objectList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObjectList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		objectListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the managed objects whose attributes are to be 
+				scanned.";;
+REGISTERED AS { summarizationAttribute 12 };
+
+
+observationIdList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObservationIdList;
+	BEHAVIOUR
+		observationIdListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies observed objects, and observed attributes within those 
+				managed objects, to be scanned.";;
+REGISTERED AS { summarizationAttribute 13 };
+
+
+observationReportList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NonStatisticalReportInformation;
+	BEHAVIOUR
+		observationReportListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the set of managed objects and their attributes values 
+				that were scanned. See 8.2.2.2.2.";;
+REGISTERED AS { summarizationAttribute 14 };
+
+
+observationScanList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObservationScanList;
+	BEHAVIOUR
+		observationScanListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the set of managed objects and their attributes values 
+				that were scanned. See 8.2.2.1.3.";;
+REGISTERED AS { summarizationAttribute 15 };
+
+
+onceReportAttributeIdList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.OnceReportAttributeIdList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		onceReportAttributeIdListBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.1.12.2.";;
+REGISTERED AS { summarizationAttribute 16 };
+
+
+onceReportAttributeList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.OnceReportAttributeList;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		onceReportAttributeListBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.2.2.1.2.";;
+REGISTERED AS { summarizationAttribute 17 };
+
+
+reportPeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ReportPeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		reportPeriodBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the number of granularity periods in a report period. 
+				See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 19 };
+
+
+scanAttributeIdList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ScanAttributeIdList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		scanAttributeIdListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies attributes of any ASN.1 type whose attribute 
+				identifiers are to be included in summary reports along with the attribute 
+				values. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 21 };
+
+
+scanInitiationTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ScanInitiationTime;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		scanInitiationTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.2.2.1.1.";;
+REGISTERED AS { summarizationAttribute 22 };
+
+
+scanningFilter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.CMISFilter;
+	BEHAVIOUR
+		scanningFilterBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a set of criteria for selecting managed objects, used 
+				in the filtering process. See 8.1.12.3";;
+REGISTERED AS { summarizationAttribute 24 };
+
+
+scope ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.Scope;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scopeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a set of managed objects, used in the scoping process 
+				for selecting managed objects. See 8.1.12.3.";;
+REGISTERED AS { summarizationAttribute 25 };
+
+
+suppressObjectInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.SuppressObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		suppressObjectInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a boolean value which, if true, causes the observed 
+				object instance parameter to be suppressed from all summary reports. See 
+				8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 26 };
+
+
+suspectIntervals ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.SuspectIntervals;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		suspectIntervalsBehaviour BEHAVIOUR
+			DEFINED AS
+				"See 8.2.2.3.3.";;
+REGISTERED AS { summarizationAttribute 27 };
+
+
+timeAttributeIdentifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimeAttributeIdentifier;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		timeAttributeIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies which attribute within an observed managed object is 
+				used for time-based selection. See 8.1.12.5.";;
+REGISTERED AS { summarizationAttribute 28 };
+
+
+timeStampReportMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimeStampReportMode;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		timeStampReportModeBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute identifies which method of time stamping reports 
+				should be used: timeStampingOff (0), globalTimeStampOnly (1), or 
+				individualTimeStamping (2). See 8.1.12.4.";;
+REGISTERED AS { summarizationAttribute 29 };
+-- A.5 Notification definitions
+
+
+bufferedScanReport NOTIFICATION
+	BEHAVIOUR
+		bufferedScanReportBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted upon completion of the last scan in the report 
+				period, and includes attribute values scanned within the report period which has 
+				just completed.";;
+	WITH INFORMATION SYNTAX SummarizationASN1Productions.BufferedScanReportInformation
+		AND ATTRIBUTE IDS
+			granularityPeriod
+				"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":granularityPeriod,
+			firstScanInitiationTime
+				firstScanInitiationTime,
+			suspectIntervals
+				suspectIntervals,
+			bufferedObservationList
+				bufferedObservationList,
+			incompleteScan
+				incompleteScan,
+			additionalText
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+			additionalInformation
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { summarizationNotification 1 };
+
+
+scanReport NOTIFICATION
+	BEHAVIOUR
+		scanReportBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted upon completion of a scan, and includes attribute 
+				values observed during the scan.";;
+	WITH INFORMATION SYNTAX SummarizationASN1Productions.ScanReportInformation
+		AND ATTRIBUTE IDS
+			scanInitiationTime
+				scanInitiationTime,
+			onceReportAttributeList
+				onceReportAttributeList,
+			observationScanList
+				observationScanList,
+			incompleteScan
+				incompleteScan,
+			additionalText
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+			additionalInformation
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { summarizationNotification 2 };
+
+
+statisticalReport NOTIFICATION
+	BEHAVIOUR
+		statisticalReportBehaviour BEHAVIOUR
+			DEFINED AS
+				"This notification is emitted upon completion of a scan, and includes statistical 
+				summary information.";;
+	WITH INFORMATION SYNTAX SummarizationASN1Productions.StatisticalScanReportInformation
+		AND ATTRIBUTE IDS
+			scanInitiationTime
+				scanInitiationTime,
+			observationReportList
+				observationReportList,
+			algorithmOutputs
+				algorithmOutputs,
+			algorithmParameters
+				algorithmParameters,
+			incompleteScan
+				incompleteScan,
+			additionalText
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+			additionalInformation
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { summarizationNotification 3 };
+-- A.6 Action definitions
+
+
+activateDynamicSimpleScanReport ACTION
+	BEHAVIOUR
+		activateDynamicSimpleScanReportBehaviour BEHAVIOUR
+			DEFINED AS
+				"The contents of SummarizationASN1Productions.ScanReportInformation may be sent 
+				in multiple replies. See 8.3";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX SummarizationASN1Productions.DynamicSimpleScanArgument;
+	WITH REPLY SYNTAX SummarizationASN1Productions.ScanReportInformation;
+REGISTERED AS { summarizationAction 1 };
+
+
+activateScanReport ACTION
+	BEHAVIOUR
+		activateScanReportBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action initiates a scan according to the current object and attribute 
+				selection attributes of the scanner. The reply includes all scanned attribute 
+				values. The contents of SummarizationASN1Productions.ScanReportInformation may 
+				be sent in multiple replies.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX SummarizationASN1Productions.ScanReportInformation;
+REGISTERED AS { summarizationAction 2 };
+
+
+activateStatisticalReport ACTION
+	BEHAVIOUR
+		activateStatisticalReportBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action initiates a scan according to the current object and attribute 
+				selection attributes of the scanner. The reply includes scanned attribute values 
+				and/or statistical summary information calculated from those values. The 
+				contents of SummarizationASN1Productions.StatisticalScanReportInformation may be 
+				sent in multiple replies.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX SummarizationASN1Productions.StatisticalScanReportInformation;
+REGISTERED AS { summarizationAction 3 };
+
+
+reportBuffer ACTION
+	BEHAVIOUR
+		reportBufferBehaviour BEHAVIOUR
+			DEFINED AS
+				"The report buffer action initiates a scan of the attributes specified in the 
+				report time attribute Id list. The retained values of the previously scanned 
+				attributes together with the results of this scan are returned in the action 
+				result. The contents of 
+				SummarizationASN1Productions.BufferedScanReportInformation may be sent in 
+				multiple replies. See 8.1.9.3.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX SummarizationASN1Productions.BufferedScanReportInformation;
+REGISTERED AS { summarizationAction 4 };
+-- A.7 Name binding definitions
+
+
+dynamicSimpleScanner-system NAME BINDING
+	SUBORDINATE OBJECT CLASS dynamicSimpleScanner AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
+	conflictingPackagesRequestedError;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { summarizationNameBinding 2 };
+
+
+conflictingPackagesScanner-system NAME BINDING
+	SUBORDINATE OBJECT CLASS "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
+	conflictingPackagesRequestedError;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { summarizationNameBinding 9 };
+-- A.8 Parameter Templates
+
+
+conflictingPackagesRequestedError PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX SummarizationASN1Productions.PackageConflict;
+	BEHAVIOUR
+		conflictingPackagesRequestedErrorBehaviour BEHAVIOUR
+			DEFINED AS
+				"This error is returned when an object creation is requested either with 
+				attributes defined for conditional packages all of which shall not be present 
+				together or attributes of packages that have to be present together but are not 
+				specified in the request.";;
+REGISTERED AS { summarizationParameter 2 };
+
+
+scanActionError PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX SummarizationASN1Productions.ScannerActionError;
+	BEHAVIOUR
+		scannerActionErrorBehaviour BEHAVIOUR
+			DEFINED AS
+				"The scan action request to a summarization managed object was not performed 
+				because of one of the following reasons: administrative state is locked, 
+				administrative state is shutting down, scan is terminated because administrative 
+				state was set to locked when performing the scan action or an unspecified error 
+				occurred.";;
+REGISTERED AS { summarizationParameter 1 };
+
+END
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log: X.738.gdmo,v $
+--  Revision 1.1.2.1  2009-06-21 11:22:55  brian
+--  - added files to new distro
+--
+--  Revision 1.1.2.1  2009-06-21 11:22:55  brian
+--  - added files to new distro
+--
+--  Revision 0.9.2.4  2007/12/15 20:20:40  brian
+--  - updates
+--
+--  Revision 0.9.2.3  2007/09/29 14:28:11  brian
+--  - update gdmos and asns
+--  
+--  Revision 0.9.2.2  2007/09/09 22:58:50  brian
+--  - updates for namespace
+--  
+--  Revision 0.9.2.1  2007/09/06 10:59:03  brian
+--  - added new gdmo files
+--  
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995"
+--  { joint-iso-ccitt ms(9) function(2) part13(13) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ +- itut_x723::coProtocolMachine
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ +- itut_x723::subsystem
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

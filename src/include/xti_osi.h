@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xti_osi.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xti_osi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:23:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef _XTI_INET_H
 #define _XTI_INET_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include <sys/xti_osi.h>
 

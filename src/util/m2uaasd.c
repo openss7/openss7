@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m2uaasd.c,v $
+ Revision 1.1.2.1  2009-06-21 11:47:54  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $";
 
 /*
  *  This is a configuration daemon for the M2UA-AS multiplexing driver.  Its purpose is to open a

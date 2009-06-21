@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id$
+.\" @(#) $Id: kmem_zalloc_node.9.man,v 1.1.2.1 2009-06-21 10:38:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date$ by $Author$
+.\" Last Modified $Date: 2009-06-21 10:38:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log$
+.\" $Log: kmem_zalloc_node.9.man,v $
+.\" Revision 1.1.2.1  2009-06-21 10:38:45  brian
+.\" - added files to new distro
+.\"
 .\" Revision 0.9.2.15  2008-12-16 08:31:08  brian
 .\" - do not truncate keys to 6 chars
 .\"

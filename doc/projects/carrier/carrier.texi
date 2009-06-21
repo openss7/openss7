@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: carrier.texi,v 1.1.2.1 2009-06-21 10:45:23 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:45:23 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -433,7 +433,10 @@ Project} website for a current version.
 
 @smallexample
 @verbatim
-$Log$
+$Log: carrier.texi,v $
+Revision 1.1.2.1  2009-06-21 10:45:23  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

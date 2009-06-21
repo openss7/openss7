@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: dlpi_dua.h,v 1.1.2.1 2009-06-21 11:25:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dlpi_dua.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __DLPI_DUA_H__
 #define __DLPI_DUA_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: dlpi_dua.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #endif				/* __DLPI_DUA_H__ */

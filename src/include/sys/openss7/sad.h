@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sad.h,v 1.1.2.1 2009-06-21 11:26:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sad.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:48  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_OPENSS7_SAD_H__
 #define __SYS_OPENSS7_SAD_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_SAD_H__
 #warning "Do not include sys/openss7/sad.h directly, include sys/sad.h instead."

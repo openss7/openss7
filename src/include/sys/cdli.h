@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: cdli.h,v 1.1.2.1 2009-06-21 11:25:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: cdli.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_CDLI_H__
 #define __SYS_CDLI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: cdli.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * This is a replacement for the AIX Common Data Link Interface (CDLI) header

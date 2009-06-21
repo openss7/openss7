@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: socket.c,v $
+ Revision 1.1.2.1  2009-06-21 11:37:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: socket.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -1308,10 +1311,10 @@ __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 Sockets Library version \$Name$(\$Revision$).
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 1.1.2.1 $).
  * @author Brian F. G. Bidulock
- * @version \$Name$(\$Revision$)
- * @date \$Date$
+ * @version \$Name:  $(\$Revision: 1.1.2.1 $)
+ * @date \$Date: 2009-06-21 11:37:46 $
  *
  * @}
  */

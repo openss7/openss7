@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: m3ua_msg.h,v 1.1.2.1 2009-06-21 11:20:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m3ua_msg.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:49  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __M3UA_MSG_H__
 #define __M3UA_MSG_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: m3ua_msg.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #include "../ua/ua_msg.h"
 /*

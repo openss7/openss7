@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: xti_sctp.h,v 1.1.2.1 2009-06-21 11:25:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xti_sctp.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:39  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed with doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: lapb.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: lapb.other.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:31  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lapb.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: lapb.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $";
 
 
 /*
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.other.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"

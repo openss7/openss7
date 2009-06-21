@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ddi.h,v 1.1.2.1 2009-06-21 11:26:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:26:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ddi.h,v $
+ Revision 1.1.2.1  2009-06-21 11:26:51  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_UW7_DDI_H__
 #define __SYS_UW7_DDI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

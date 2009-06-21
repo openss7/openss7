@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: s_cdi.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:33  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $";
 
 /*
  * S_CDI is a simple conversion module that converts between a CDI Stream

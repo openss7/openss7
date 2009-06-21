@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tcpns.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:36  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
 
 
 /*
@@ -90,7 +93,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"

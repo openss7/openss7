@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: slm.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:54  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It
@@ -96,7 +99,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $"
 #define SLM_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

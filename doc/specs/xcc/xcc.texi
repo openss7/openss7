@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id$
+% @(#) $Id: xcc.texi,v 1.1.2.1 2009-06-21 10:57:56 brian Exp $
 %
 % =========================================================================
 %
@@ -81,7 +81,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date$ by $Author$
+% Last Modified $Date: 2009-06-21 10:57:56 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -383,7 +383,10 @@ changes in the design of any techniques, or procedures embodied, described, or r
 
 @smallexample
 @verbatim
-$Log$
+$Log: xcc.texi,v $
+Revision 1.1.2.1  2009-06-21 10:57:56  brian
+- added files to new distro
+
 @end verbatim
 @end smallexample
 

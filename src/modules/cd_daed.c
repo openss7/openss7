@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: cd_daed.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:30  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $";
 
 #include <sys/os7/compat.h>
 
@@ -72,7 +75,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sth.h,v 1.1.2.1 2009-06-21 11:40:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sth.h,v $
+ Revision 1.1.2.1  2009-06-21 11:40:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_STH_H__
 #define __LOCAL_STH_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 extern struct smodule_info str_minfo;	/* for strsysctl.c */
 

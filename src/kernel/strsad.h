@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strsad.h,v 1.1.2.1 2009-06-21 11:37:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strsad.h,v $
+ Revision 1.1.2.1  2009-06-21 11:37:25  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_STRSAD_H__
 #define __LOCAL_STRSAD_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strsad.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 // defined in sys/strconf.h
 //extern int autopush_add(struct strapush *sap);

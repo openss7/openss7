@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: streams.h,v 1.1.2.1 2009-06-21 11:37:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: streams.h,v $
+ Revision 1.1.2.1  2009-06-21 11:37:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_STREAMS_H__
 #define __LOCAL_STREAMS_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: streams.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1

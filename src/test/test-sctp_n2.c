@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $
 
  -----------------------------------------------------------------------------
 
@@ -60,16 +60,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-sctp_n2.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:19  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the

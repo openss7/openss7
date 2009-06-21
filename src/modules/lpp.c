@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: lpp.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:31  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $";
 
 
 /*

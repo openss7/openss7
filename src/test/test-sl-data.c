@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-sl-data.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $
 
  -----------------------------------------------------------------------------
 
@@ -60,16 +60,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-sl-data.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:19  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-sl-data.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-sl-data.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $";
 
 #include <stropts.h>
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: slconfd.c,v $
+ Revision 1.1.2.1  2009-06-21 11:47:55  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: slconfd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $";
 
 /*
  *  This is a configuration daemon for the SL-MUX multiplexing driver.  Its purpose is to open
@@ -187,7 +190,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.1 $ $Date: 2009-06-21 11:47:55 $");
 }
 
 static void

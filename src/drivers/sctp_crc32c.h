@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sctp_crc32c.h,v 1.1.2.1 2009-06-21 11:20:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sctp_crc32c.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:52  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SCTP_CRC32C_H__
 #define __SCTP_CRC32C_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sctp_crc32c.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 extern uint32_t crc_table[];
 extern uint32_t crc32c(register uint32_t crc, void *buf, register int len);

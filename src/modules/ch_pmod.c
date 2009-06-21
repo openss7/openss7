@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ch_pmod.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:30  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $";
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 //#undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
 #define CH_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

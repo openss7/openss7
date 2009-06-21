@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: linkstate.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:47:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: linkstate.c,v $
+ Revision 1.1.2.1  2009-06-21 11:47:54  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: linkstate.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: linkstate.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -145,7 +148,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.1 $ $Date: 2009-06-21 11:47:54 $");
 }
 
 static void

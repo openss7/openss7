@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: cddev.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:44  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
 
 /*
  * This is a multiplexing driver used for providing access to devices that
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define CDDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CDDEV_EXTRA	"Part of the OpenSS7 X/Open Networking Serivces for Linux Fast-STREAMS"
 #define CDDEV_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define CDDEV_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 #define CDDEV_DEVICE	"SVR 4.2 STREAMS CDI Communication Device Interface Provider"
 #define CDDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDDEV_LICENSE	"GPL"

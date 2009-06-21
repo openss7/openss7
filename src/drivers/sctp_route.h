@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sctp_route.h,v 1.1.2.1 2009-06-21 11:20:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sctp_route.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:52  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SCTP_ROUTE_H__
 #define __SCTP_ROUTE_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sctp_route.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 extern int sctp_update_routes(sctp_t *, int);
 

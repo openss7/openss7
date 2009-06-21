@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ifr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ifr.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ifr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ifr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $";
 
 /*
  * This file is the IFR (Frame Relay) driver.  It accepts WAN Streams linked

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sua_as.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:35  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $";
 
 
 /*
@@ -131,7 +134,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

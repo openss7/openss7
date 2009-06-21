@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 #
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:41:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,9 +70,9 @@ use SNMP;
 $\ = "\n";
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile$ $Name$($Revision$) $Date$';
-my $version = '$Revision$';
-my $date = '$Date$';
+my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:59 $';
+my $version = '$Revision: 1.1.2.1 $';
+my $date = '$Date: 2009-06-21 11:41:59 $';
 my $title = 'STREAMS SNMP Manager';
 
 my $Title = <<EOF;
@@ -3556,6 +3556,9 @@ Tk::MainLoop;
 
 # =============================================================================
 #
-# $Log$
+# $Log: streams-manager,v $
+# Revision 1.1.2.1  2009-06-21 11:41:59  brian
+# - added files to new distro
+#
 # =============================================================================
 # vim: ft=perl sw=4 fo=tcqlorn

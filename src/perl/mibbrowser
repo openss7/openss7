@@ -1,7 +1,7 @@
 #!/usr/bin/perl -W
 # =============================================================================
 #
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:41:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,9 +99,9 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile$ $Name$($Revision$) $Date$';
-my $version = '$Revision$';
-my $date = '$Date$';
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:58 $';
+my $version = '$Revision: 1.1.2.1 $';
+my $date = '$Date: 2009-06-21 11:41:58 $';
 my $title = 'OpenSS7 Network Manager';
 
 use SNMP;
@@ -14804,6 +14804,9 @@ exit;
 
 # =============================================================================
 #
-# $Log$
+# $Log: mibbrowser,v $
+# Revision 1.1.2.1  2009-06-21 11:41:58  brian
+# - added files to new distro
+#
 # =============================================================================
 # vim: ft=perl sw=4

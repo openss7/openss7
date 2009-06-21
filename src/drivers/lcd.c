@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: lcd.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $";
 
 /*
  * This is a Linux Communications Device (LCD) driver.  This driver provides
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define	LCD_DESCRIP	"SVR 4.2 COMMUNICATIONS DEVICE DRIVER FOR LINUX FAST-STREAMS"
 #define	LCD_EXTRA	"Part of X/Open Network Services for Linux Fast-STREAMS"
 #define	LCD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define	LCD_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define	LCD_REVISION	"OpenSS7 $RCSfile: lcd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $"
 #define	LCD_DEVICE	"SVR 4.2MP Communications Device (CD) for Linux Fast-STREAMS"
 #define	LCD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define	LCD_LICENSE	"GPL"

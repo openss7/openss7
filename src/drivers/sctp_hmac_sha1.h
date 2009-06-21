@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sctp_hmac_sha1.h,v 1.1.2.1 2009-06-21 11:20:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sctp_hmac_sha1.h,v $
+ Revision 1.1.2.1  2009-06-21 11:20:52  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SCTP_HMAC_SHA1_H__
 #define __SCTP_HMAC_SHA1_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: sctp_hmac_sha1.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 extern void hmac_sha1(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest);
 

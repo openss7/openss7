@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dlp.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:45  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: dlp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $";
 
 /*
  *  This module is a master device driver for Data Link Provider Streams presenting a Data Link

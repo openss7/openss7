@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: xos.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:37  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $";
 
 /*
  * This is a XOS [draft-bidulock-tsvwg-xos-00] module.  It pushes over a TCP
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define XOS_DESCRIPT	"X.25 OVER SCTP MODULE FOR LINUX FAST-STREAMS"
 #define XOS_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define XOS_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define XOS_REVISION	"OpenSS7 $RCSfile: xos.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
 #define XOS_DEVICE	"SVR 4.2MP X.25 over SCTP Module (XOS) for X.25 CONS"
 #define XOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOS_LICENSE	"GPL"

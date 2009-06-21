@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mx_pmod.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:32  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $";
 
 
 /*
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 //#undef unfreezestr
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
-#define MX_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $"
 #define MX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: otk6.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:50  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $";
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The
@@ -116,7 +119,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
 #define OTK6_DEVICE	"SVR 4.2 STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"

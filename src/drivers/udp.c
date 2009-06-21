@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: udp.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:57  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -137,7 +140,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"

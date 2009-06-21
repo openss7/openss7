@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m2ua.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:47  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -71,7 +74,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile$ $Name$($Revision$) $Date$"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

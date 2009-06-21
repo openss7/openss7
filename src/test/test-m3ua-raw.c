@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:17 $
 
  -----------------------------------------------------------------------------
 
@@ -60,16 +60,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: test-m3ua-raw.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:17  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:17 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:17 $";
 
 /*
  *  This file is for testing raw M3UA in conjunction with the sctp_t driver.  It provides test cases

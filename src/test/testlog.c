@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:22 $
 
  -----------------------------------------------------------------------------
 
@@ -60,16 +60,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:44:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: testlog.c,v $
+ Revision 1.1.2.1  2009-06-21 11:44:22  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:22 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:22 $";
 
 /*
  *  This is a little user space program to test the correctness of the formatting of the data blocks

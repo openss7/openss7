@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mx_x400p.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:33  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $";
 
 
 #include <sys/os7/compat.h>
@@ -70,7 +73,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile$ $Name$ ($Revision$) $Date$"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: chmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: chmux.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:44  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: chmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: chmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
 
 /*
  * This is a CH multiplexing driver.  Its purpose is to allow a single device,
@@ -116,7 +119,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <ss7/chi_ioctl.h>
 
 #define CH_MUX_DESCRIP		"CH MULTIPLEX (CH-MUX) STREAMS MULTIPLEXING DRIVER"
-#define CH_MUX_REVISION		"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define CH_MUX_REVISION		"OpenSS7 $RCSfile: chmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 #define CH_MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define CH_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CH_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

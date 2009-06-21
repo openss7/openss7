@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: slmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:20:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: slmux.c,v $
+ Revision 1.1.2.1  2009-06-21 11:20:54  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: slmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: slmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $";
 
 #define SL_SL_MINOR	0	/* /dev/streams/sl/sl */
 #define SL_ADM_MINOR	1	/* /dev/streams/sl/sl-admin */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tp.h,v 1.1.2.1 2009-06-21 11:25:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:25:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tp.h,v $
+ Revision 1.1.2.1  2009-06-21 11:25:38  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __SYS_TP_H__
 #define __SYS_TP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: tp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 struct tp_mgmt {
 	t_uscalar_t cm_user;		/* User index and class. */

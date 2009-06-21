@@ -17,7 +17,7 @@ STREAMS_MOUNTPOINT="/dev/streams"
 
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:48:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,11 +62,14 @@ STREAMS_MOUNTPOINT="/dev/streams"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:48:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
-# $Log$
+# $Log: streams,v $
+# Revision 1.1.2.1  2009-06-21 11:48:00  brian
+# - added files to new distro
+#
 # Revision 0.9.2.9  2008-04-28 12:54:12  brian
 # - update file headers for release
 #

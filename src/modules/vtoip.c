@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:40:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: vtoip.c,v $
+ Revision 1.1.2.1  2009-06-21 11:40:37  brian
+ - added files to new distro
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $";
 
 /*
  * This is a Y.1452 VToIP (Voice Trunking over IP) module.  It pushes over a UDP

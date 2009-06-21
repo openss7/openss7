@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: osilib.h,v 1.1.2.1 2009-06-21 11:37:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 11:37:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: osilib.h,v $
+ Revision 1.1.2.1  2009-06-21 11:37:46  brian
+ - added files to new distro
+
  *****************************************************************************/
 
 #ifndef __LOCAL_OSILIB_H__
 #define __LOCAL_OSILIB_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: osilib.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  *  Local definitions for the OSI Address Translation Library (libosi).

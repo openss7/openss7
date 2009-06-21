@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -140,7 +140,10 @@ dnl	ac_configure_args="$ac_configure_args --enable-devfs"
 
 # =============================================================================
 #
-# $Log$
+# $Log: devfs.m4,v $
+# Revision 1.1.2.1  2009-06-21 11:06:04  brian
+# - added files to new distro
+#
 # Revision 0.9.2.10  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
