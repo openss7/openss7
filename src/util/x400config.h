@@ -1,9 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: x400config.h,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -46,11 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: x400config.h,v $
+ Revision 1.1.2.2  2009-06-21 12:41:53  brian
+ - updated headers
+
+ Revision 1.1.2.1  2009-06-21 11:47:56  brian
+ - added files to new distro
+
  Revision 0.9.2.2  2008-04-29 07:11:33  brian
  - updating headers for release
 
@@ -62,7 +69,7 @@
 #ifndef __LOCAL_X400CONFIG_H__
 #define __LOCAL_X400CONFIG_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: x400config.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef YYSTYPE
 #define YYSTYPE int
