@@ -60,18 +60,36 @@ KERNELRELEASE = $(shell uname -r)
 .DEFAULT: cflag-check
 
 cflag-check:
-	@if test -n '$(KBUILD_CFLAGS)' ; then \
-		echo '$(KBUILD_CFLAGS)' | sed -e 's|^$(KBUILD_CPPFLAGS) ||' ; \
-	else \
-		echo '$(CFLAGS)' | sed -e 's|^$(CPPFLAGS) ||' ; \
-	fi
+	@kflags='$(KBUILD_CFLAGS)' ; if test -n "$$kflags" -a -n '$(KBUILD_CPPFLAGS)' ; then \
+		kflags=`echo "$$kflags" | sed -e 's,^$(KBUILD_CPPFLAGS) ,,'` ; \
+	 fi ; \
+	 cflags='$(CFLAGS)' ; if test -n "$$cflags" -a -n '$(CPPFLAGS)' ; then  \
+		 cflags=`echo "$$cflags" | sed -e 's,^$(CPPFLAGS) ,,'` ; \
+	 fi ; \
+	 if test -n "$$kflags" -a -n "$$cflags" ; then \
+		 kflags=`echo $$kflags | sed -e "s,$$cflags ,,"` ; \
+	 fi ; \
+	 echo "$${cflags:+$$cflags }$$kflags"
+
+#	@if test -n '$(KBUILD_CFLAGS)' ; then \
+#		echo '$(KBUILD_CFLAGS)' | sed -e 's|^$(KBUILD_CPPFLAGS) ||' ; \
+#	else \
+#		echo '$(CFLAGS)' | sed -e 's|^$(CPPFLAGS) ||' ; \
+#	fi
 
 cppflag-check:
-	@if test -n '$(KBUILD_CPPFLAGS)' ; then \
-		echo '$(KBUILD_CPPFLAGS)' ; \
-	else \
-		echo "$(CPPFLAGS)" ; \
-	fi
+	@kflags='$(KBUILD_CPPFLAGS)' ; \
+	 cflags='$(CPPFLAGS)' ; \
+	 if test -n "$$kflags" -a -n "$$cflags" ; then \
+		 kflags=`echo $$kflags | sed -e "s,$$cflags ,,"` ; \
+	 fi ; \
+	 echo "$${cflags:+$$cflags }$$kflags"
+
+#	@if test -n '$(KBUILD_CPPFLAGS)' ; then \
+#		echo '$(KBUILD_CPPFLAGS)' ; \
+#	else \
+#		echo "$(CPPFLAGS)" ; \
+#	fi
 
 modflag-check:
 	@echo "$(MODFLAGS)"

@@ -151,6 +151,13 @@ dnl
 	PKG_LDS=''
     fi
     AC_SUBST([PKG_LDS])
+    if test -f $ac_aux_dir/abi.VERSION
+    then
+	PKG_ABI="$ac_aux_dir/abi.VERSION"
+    else
+	PKG_ABI=''
+    fi
+    AC_SUBST([PKG_ABI])
 ])# _KSYMS_SETUP
 # =============================================================================
 

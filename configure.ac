@@ -73,25 +73,20 @@ AC_CANONICAL_TARGET
 _DISTRO
 
 AM_INIT_AUTOMAKE([silent-rules tar-ustar])
-AM_SILENT_RULES
 AM_MAINTAINER_MODE
 dnl
-dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid
-dnl typing, but allow user to override with --disable-dependency-tracking.
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking and
+dnl --enable-silent-rules to avoid typing, but allow user to override with
+dnl --disable-dependency-tracking and --disable-silent-rules.  Default to
+dnl previous dependency tracking mode.
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
     enable_dependency_tracking="${enable_dependency_tracking:-yes}"
+    enable_silent_rules="${enable_silent_rules:-yes}"
+else
+    enable_dependency_tracking="${enable_dependency_tracking:-no}"
 fi
-dnl
-dnl default to dependency tracking to avoid automake bug in silent rules
-dnl
-enable_dependency_tracking="${enable_dependency_tracking:-yes}"
-dnl
-dnl enable silent rules by default: good for maintainer mode too
-dnl
-if test :${enable_silent_rules:-yes} = :yes ; then
-    AM_DEFAULT_VERBOSITY=0
-fi
+AM_SILENT_RULES
 
 AC_USE_SYSTEM_EXTENSIONS
 

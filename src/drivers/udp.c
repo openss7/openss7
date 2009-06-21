@@ -597,7 +597,7 @@ tp_alloc(void)
  * different names to avoid conflict with generic definitions.  */
 
 //#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
-#if 0
+#if 1
 
 #define spin_lock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

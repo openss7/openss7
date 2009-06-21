@@ -2958,6 +2958,7 @@ lib-org-openss7-jain-protocol-ss7-oam.jar.db: org-openss7-jain-protocol-ss7-oam.
 
 my_INCLUDES += $(my_oam_INCLUDES)
 my_SOURCEFILES += $(my_oam_SOURCEFILES)
+DISTCLEANFILES += $(my_oam_SOURCEFILES)
 
 $(my_oam_INCLUDES): %.h : %.class
 $(my_oam_SOURCEFILES): $(my_oam_INCLUDES)
@@ -3027,6 +3028,7 @@ lib-org-openss7-jain-protocol-ss7-tcap.jar.db: org-openss7-jain-protocol-ss7-tca
 
 my_INCLUDES += $(my_jtcap_INCLUDES)
 my_SOURCEFILES += $(my_jtcap_SOURCEFILES)
+DISTCLEANFILES += $(my_jtcap_SOURCEFILES)
 
 $(my_jtcap_INCLUDES): %.h : %.class
 $(my_jtcap_SOURCEFILES): $(my_jtcap_INCLUDES)
@@ -3096,6 +3098,7 @@ lib-org-openss7-javax-sip.jar.db: org-openss7-javax-sip.jar
 
 my_INCLUDES += $(my_jsip_INCLUDES)
 my_SOURCEFILES += $(my_jsip_SOURCEFILES)
+DISTCLEANFILES += $(my_jsip_SOURCEFILES)
 
 $(my_jsip_INCLUDES): %.h : %.class
 $(my_jsip_SOURCEFILES): $(my_jsip_INCLUDES)
@@ -3164,6 +3167,7 @@ lib-org-openss7-javax-jcat.jar.db: org-openss7-javax-jcat.jar
 
 my_INCLUDES += $(my_jcat_INCLUDES)
 my_SOURCEFILES += $(my_jcap_SOURCEFILES)
+DISTCLEANFILES += $(my_jcap_SOURCEFILES)
 
 $(my_jcat_INCLUDES): %.h : %.class
 $(my_jcat_SOURCEFILES): $(my_jcat_INCLUDES)
@@ -3230,6 +3234,7 @@ lib-org-openss7-javax-jain-ss7-isup.jar.db: org-openss7-javax-jain-ss7-isup.jar
 
 my_INCLUDES += $(my_jisup_INCLUDES)
 my_SOURCEFILES += $(my_jisup_SOURCEFILES)
+DISTCLEANFILES += $(my_jisup_SOURCEFILES)
 
 $(my_jisup_INCLUDES): %.h : %.class
 $(my_jisup_SOURCEFILES): $(my_jisup_INCLUDES)
@@ -3299,6 +3304,7 @@ lib-org-openss7-javax-jain-ss7-inap.jar.db: org-openss7-javax-jain-ss7-inap.jar
 
 my_INCLUDES += $(my_jinap_INCLUDES)
 my_SOURCEFILES += $(my_jinap_SOURCEFILES)
+DISTCLEANFILES += $(my_jinap_SOURCEFILES)
 
 $(my_jinap_INCLUDES): %.h : %.class
 $(my_jinap_SOURCEFILES): $(my_jinap_INCLUDES)
@@ -3403,6 +3409,7 @@ lib-org-openss7-javax-jain-protocol-ss7-map.jar.db: org-openss7-javax-jain-proto
 
 my_INCLUDES += $(my_jmap_INCLUDES)
 my_SOURCEFILES += $(my_jmap_SOURCEFILES)
+DISTCLEANFILES += $(my_jmap_SOURCEFILES)
 
 $(my_jmap_INCLUDES): %.h : %.class
 $(my_jmap_SOURCEFILES): $(my_jmap_INCLUDES)
@@ -3472,6 +3479,7 @@ lib-org-openss7-javax-csapi-cc-jcc.jar.db: org-openss7-javax-csapi-cc-jcc.jar
 
 my_INCLUDES += $(my_jcc_INCLUDES)
 my_SOURCEFILES += $(my_jcc_SOURCEFILES)
+DISTCLEANFILES += $(my_jcc_SOURCEFILES)
 
 $(my_jcc_INCLUDES): %.h : %.class
 $(my_jcc_SOURCEFILES): $(my_jcc_INCLUDES)
