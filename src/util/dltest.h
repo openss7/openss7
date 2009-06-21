@@ -1,9 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: dltest.h,v 1.1.2.2 2009-06-21 12:41:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -46,11 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dltest.h,v $
+ Revision 1.1.2.2  2009-06-21 12:41:53  brian
+ - updated headers
+
+ Revision 1.1.2.1  2009-06-21 11:47:54  brian
+ - added files to new distro
+
  Revision 0.9.2.1  2008-05-25 12:46:57  brian
  - added manual pages, libraries, utilities and drivers
 
@@ -59,7 +66,7 @@
 #ifndef __LOCAL_DLTEST_H__
 #define __LOCAL_DLTEST_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dltest.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  * Common DLPI Test Suite header file

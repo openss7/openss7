@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 # =============================================================================
-# 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# @(#) $RCSfile: modpost.pl,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -46,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +81,7 @@ $default{'cachefile'} = $ENV{MODPOST_CACHE};
 $debug = 0;
 $verbose = 1;
 
-$ident = '$RCSfile$ $Name$($Revision$) $Date$';
+$ident = '$RCSfile: modpost.pl,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $';
 $version = '3.0.0';
 
 $show = 'yes';
@@ -91,8 +92,8 @@ sub version()
 	print<<EOF;
 Version $version
 $ident
-Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
-Distributed under GPL Version 3, included here by reference.
+Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.
+Distributed under AGPL Version 3, included here by reference.
 See `$program --copying' for copying permissions.
 EOF
 }
@@ -168,22 +169,23 @@ sub copying()
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
 All Rights Reserved.
 --------------------------------------------------------------------------------
 This program is free software; you can  redistribute  it and/or modify  it under
-the terms  of the GNU General Public License  as  published by the Free Software
-Foundation; version 3 of the License.
+the terms of the  GNU  Affero  General  Public  License as published by the Free
+Software Foundation; version 3 of the License.
 
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should  have received a copy of the GNU  General  Public License  along with
-this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the  GNU  Affero General Public License along
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 --------------------------------------------------------------------------------
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
 of the U.S. Government ("Government"), the following provisions apply to you. If
@@ -811,7 +813,13 @@ exit $retval;
 
 # =============================================================================
 #
-# $Log$
+# $Log: modpost.pl,v $
+# Revision 1.1.2.2  2009-06-21 12:41:53  brian
+# - updated headers
+#
+# Revision 1.1.2.1  2009-06-21 11:16:41  brian
+# - added files to new distro
+#
 # Revision 0.9.2.1  2008-10-29 18:14:57  brian
 # - commit working files for release
 #
