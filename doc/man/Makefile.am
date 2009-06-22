@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-22 03:34:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-22 05:43:05 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-22 03:34:24 $ by $Author: brian $
+## Last Modified $Date: 2009-06-22 05:43:05 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -3919,6 +3919,10 @@ openss7_man_MANS = \
 	man9/SV_SIGNAL.9 \
 	man9/SV_WAIT.9 \
 	man9/SV_WAIT_SIG.9 \
+	man9/sysctl_str_hiwat.9 \
+	man9/sysctl_str_lowat.9 \
+	man9/sysctl_str_maxpsz.9 \
+	man9/sysctl_str_minpsz.9 \
 	man9/sysctl_str_nstrpush.9 \
 	man9/sysctl_str_strctlsz.9 \
 	man9/sysctl_str_strmsgsz.9 \
@@ -7849,6 +7853,10 @@ openss7_dist_noinst_MANS = \
 	man9/SV_SIGNAL.9.man \
 	man9/SV_WAIT.9.man \
 	man9/SV_WAIT_SIG.9.man \
+	man9/sysctl_str_hiwat.9.man \
+	man9/sysctl_str_lowat.9.man \
+	man9/sysctl_str_maxpsz.9.man \
+	man9/sysctl_str_minpsz.9.man \
 	man9/sysctl_str_nstrpush.9.man \
 	man9/sysctl_str_strctlsz.9.man \
 	man9/sysctl_str_strmsgsz.9.man \
@@ -8688,6 +8696,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.3  2009-06-22 05:43:05  brian
+## - needed to pass check target
+##
 ## Revision 1.1.2.2  2009-06-22 03:34:24  brian
 ## - updates for release
 ##
