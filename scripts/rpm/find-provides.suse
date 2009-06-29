@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# This script reads filenames from STDIN and outputs any relevant provides
+# information that needs to be included in the package.
+IFS=$'\n'
+filelist=($(cat))
+
+solist=($(printf "%s\n" "${filelist[@]}" | grep "\\.so" | grep -v "^/lib/ld.so" | \
+	  tr '\n' '\0' | xargs -0 -r file -L | grep "ELF.*shared object" | \
+	  cut -d: -f1))
+pythonlist=
+tcllist=
+monolist=($(printf "%s\n" "${filelist[@]}" | egrep "\\.(exe|dll)\$"))
+
+#
+# --- Alpha does not mark 64bit dependencies
+case `uname -m` in
+  alpha*)	mark64=false ;;
+  *)		mark64=true ;;
+esac
+
+#
+# --- Library sonames and weak symbol versions (from glibc).
+for f in "${solist[@]}"; do
+    soname=$(objdump -p "$f" | awk '/SONAME/ {print $2}')
+    [ -n "$soname" -a -L "$f" ] && continue
+    [ -z "$soname" ] && soname="${f##*/}"
+
+    if $mark64 && file -L "$f" 2>/dev/null | grep "ELF 64-bit" >/dev/null; then
+	lib64="()(64bit)" slib64="(64bit)"
+    else
+	lib64= slib64=
+    fi
+    echo "$soname$lib64"
+    objdump -p "$f" | awk '
+	BEGIN { START=0 ; }
+	/Version definitions:/ { START=1; }
+	/^[0-9]/ && (START==1) { print $4; }
+	/^$/ { START=0; }
+    ' | \
+	while read symbol ; do
+	    echo "$soname($symbol)$slib64"
+	done
+done | sort -u
+
+#
+# --- Perl modules.
+[ -x /usr/lib/rpm/perl.prov ] &&
+    printf "%s\n" "${filelist[@]}" | grep '\.pm$' | /usr/lib/rpm/perl.prov | sort -u
+
+#
+# --- Python modules.
+[ -x /usr/lib/rpm/python.prov -a -n "$pythonlist" ] &&
+    printf "%s\n" "${pythonlist[@]}" | /usr/lib/rpm/python.prov | sort -u
+
+#
+# --- Tcl modules.
+[ -x /usr/lib/rpm/tcl.prov -a -n "$tcllist" ] &&
+    printf "%s\n" "${tcllist[@]}" | /usr/lib/rpm/tcl.prov | sort -u
+
+#
+# --- Mono exes/dlls
+: ${MONO_PREFIX=/usr}
+[ -x $MONO_PREFIX/bin/mono -a -f $MONO_PREFIX/bin/mono-find-provides -a -n "$monolist" ] &&
+    printf "%s\n" "${monolist[@]}" | MONO_PATH=$MONO_PREFIX/lib${MONO_PATH:+:$MONO_PATH} prefix=$MONO_PREFIX $MONO_PREFIX/bin/mono-find-provides
+
+#
+# --- Kernel module exported symbols
+[ -x /usr/lib/rpm/find-provides.ksyms ] &&
+    printf "%s\n" "${filelist[@]}" | /usr/lib/rpm/find-provides.ksyms "$@"
+
+exit 0
