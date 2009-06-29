@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $
+ @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:31 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldterm.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:46  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:40:31  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
+#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 
-static char const ident[] = "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $";
+static char const ident[] = "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 
 /*
@@ -155,8 +158,8 @@ static char const ident[] = "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.1
 
 #define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
-#define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
+#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define LDTERM_DEVICE		"SVR 4.2 MP STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LDTERM_LICENSE		"GPL"
 #define LDTERM_BANNER		LDTERM_DESCRIP		"\n" \

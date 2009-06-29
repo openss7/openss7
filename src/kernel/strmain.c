@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strmain.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:45  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:37:16  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
 
-static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
+static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,8 +76,8 @@ static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
-#define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
+#define STREAMS_DEVICE		"SVR 4.2 MP STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
 #define STREAMS_BANNER		STREAMS_DESCRIP		"\n" \

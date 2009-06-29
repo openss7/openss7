@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:53 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sfx.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:44  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:53  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
 
-static char const ident[] = "$RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $";
+static char const ident[] = "$RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -79,8 +82,8 @@ static char const ident[] = "$RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.1 $)
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
-#define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define SFX_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
 #define SFX_BANNER	SFX_DESCRIP	"\n" \

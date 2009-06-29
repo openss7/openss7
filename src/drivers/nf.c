@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:50 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:43  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:50  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
+#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
 
-static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $";
+static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -102,8 +105,8 @@ static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.1 $) 
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
-#define NF_DEVICE	"SVR 4.2 STREAMS NETFILTER Driver"
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define NF_DEVICE	"SVR 4.2 MP STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NF_LICENSE	"GPL"
 #define NF_BANNER	NF_DESCRIP	"\n" \

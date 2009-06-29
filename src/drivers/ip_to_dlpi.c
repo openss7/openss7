@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:46 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_to_dlpi.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:43  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:46  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
 
-static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $";
+static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
 
 #include <sys/os7/compat.h>
 
@@ -81,8 +84,8 @@ static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
-#define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define IP2XINET_DEVICE		"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
 #define IP2XINET_BANNER		IP2XINET_DESCRIP	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:45 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: echo.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:43  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:45  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
 
-static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $";
+static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -76,8 +79,8 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
-#define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define ECHO_DEVICE	"SVR 4.2 MP STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
 #define ECHO_BANNER	ECHO_DESCRIP	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:30 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:45  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:40:30  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
+#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
 
-static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $";
+static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $";
 
 
 /*
@@ -87,8 +90,8 @@ static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define ISOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ISOT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
-#define ISOT_DEVICE	"SVR 4.2 STREAMS ISOT Module for RFC 1006 and RFC 2126"
+#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
+#define ISOT_DEVICE	"SVR 4.2 MP STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOT_LICENSE	"GPL"
 #define ISOT_BANNER	ISOT_DESCRIP	"\n" \

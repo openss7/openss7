@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $
+ @(#) $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:56 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: trmux.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:44  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:56  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $"
+#ident "@(#) $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
 
-static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $";
+static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
 
 /*
  * This is TRMUX, a TCAP Translaction Sublayer (TR) driver implementing the TRI
@@ -81,8 +84,8 @@ static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.1 
 #define TRMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TRMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TRMUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TRMUX_REVISION	"Monavacon $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $"
-#define TRMUX_DEVICE	"SVR 4.2 STREAMS Q.771 Transaction Sublayer (TR) Driver"
+#define TRMUX_REVISION	"Monavacon $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define TRMUX_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Driver"
 #define TRMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMUX_LICENSE	"GPL"
 #define TRMUX_BANNER	TRMUX_DESCRIP	"\n" \

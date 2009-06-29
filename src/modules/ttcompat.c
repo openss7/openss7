@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $
+ @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:37 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ttcompat.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:46  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:40:37  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
+#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 
-static char const ident[] = "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $";
+static char const ident[] = "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 
 /*
@@ -487,8 +490,8 @@ struct ltchars {
 
 #define TTCOMPAT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
-#define TTCOMPAT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (TTCOMPAT)"
+#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define TTCOMPAT_DEVICE		"SVR 4.2 MP STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TTCOMPAT_LICENSE	"GPL"
 #define TTCOMPAT_BANNER		TTCOMPAT_DESCRIP	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
 
  -----------------------------------------------------------------------------
 
@@ -47,22 +47,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:47 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:43  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:47  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
 
-static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $";
+static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
 
 /*
- *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
+ *  This file contains a classic loop driver for SVR 4.2 MP STREAMS.  The loop driver is a general
  *  purpose STREAMS-based pipe-like driver that can be used for connecting two upper-level STREAMS
  *  together to form a structure similar to a STREAMS-based Pipe, but which has an additional driver
  *  module beneath each STREAM head.  Upper level STREAMS are linked together using ioctl()
@@ -86,8 +89,8 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $"
-#define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
 #define LOOP_BANNER	LOOP_DESCRIP	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 1.1.2.1 2009-06-21 11:26:48 brian Exp $
+ @(#) $Id: strsubr.h,v 1.1.2.2 2009-06-29 07:35:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:26:48 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 1.1.2.2  2009-06-29 07:35:42  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:26:48  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_OPENSS7_STRSUBR_H__
 #define __SYS_OPENSS7_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do not include sys/openss7/strsubr.h directly, include sys/strsubr.h instead."
@@ -736,6 +739,11 @@ __STREAMS_EXTERN struct strevent *sealloc(void);
 __STREAMS_EXTERN int sefree(struct strevent *se);
 
 #ifndef BIG_COMPILE
+extern ulong sysctl_str_maxpsz;
+extern ulong sysctl_str_minpsz;
+extern ulong sysctl_str_hiwat;
+extern ulong sysctl_str_lowat;
+
 extern ulong sysctl_str_nstrpush;
 extern ulong sysctl_str_strctlsz;
 #endif

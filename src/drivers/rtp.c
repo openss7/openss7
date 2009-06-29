@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $
+ @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:51 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:44  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:51  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $"
+#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
 
-static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $";
+static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
 
 /*
  *  This driver provides the functionality of an RTP (Realtime Transport
@@ -103,8 +106,8 @@ static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $)
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $"
-#define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
+#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define RTP_DEVICE	"SVR 4.2 MP STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"
 #define RTP_BANNER	RTP_DESCRIP	"\n" \

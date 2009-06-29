@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:50 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipe.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:44  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:50  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
 
-static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $";
+static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -80,8 +83,8 @@ static char const ident[] = "$RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $"
-#define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define PIPE_DEVICE	"SVR 4.2 MP STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
 #define PIPE_BANNER	PIPE_DESCRIP	"\n" \
