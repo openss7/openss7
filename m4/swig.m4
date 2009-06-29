@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: swig.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: swig.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,11 +82,12 @@ AC_DEFUN([_SWIG_OPTIONS], [dnl
 AC_DEFUN([_SWIG_SETUP], [dnl
     AC_ARG_VAR([SWIG],
 	[Swig command. @<@default=swig@:>@])
-    AC_PATH_PROG([SWIG], [swig], [${am_missing4_run}swig],
+    AC_PATH_PROG([SWIG], [swig], [],
 	[$PATH:/usr/local/bin:/usr/bin:/bin])
     if test :"${SWIG:-no}" = :no ; then
+	ac_cv_path_SWIG="${am_missing4_run}swig"
+	SWIG="${am_missing4_run}swig"
 	AC_MSG_WARN([Could not find swig program in PATH.])
-	SWIG='${am_missing4_run}swig'
     fi
 ])# _SWIG_SETUP
 # =============================================================================
@@ -108,6 +109,9 @@ AC_DEFUN([_SWIG_XXX], [dnl
 # =============================================================================
 #
 # $Log: swig.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:38  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

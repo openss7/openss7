@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -97,8 +97,12 @@ AC_DEFUN([_AUTOTEST_SETUP], [dnl
 AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
     AC_ARG_VAR([AUTOM4TE],
 	       [Autom4te command. @<:@default=autom4te@:>@])
-    AC_PATH_PROG([AUTOM4TE], [autom4te], [${am_missing_run}autom4te],
+    AC_PATH_PROG([AUTOM4TE], [autom4te], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${AUTOM4TE:-no}" = :no ; then
+	ac_cv_path_AUTOM4TE="${am_missing_run}autom4te"
+	AUTOM4TE="${am_missing_run}autom4te"
+    fi
 ])# _AUTOTEST_SETUP_AUTOM4TE
 # ===========================================================================
 
@@ -208,6 +212,9 @@ AC_DEFUN([_AUTOTEST_], [dnl
 # =============================================================================
 #
 # $Log: autotest.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:38  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

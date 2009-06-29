@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -114,8 +114,8 @@ post-netconfig:
 		if test -f $$f -a "$$f" = "$$d/strnsl" ; then \
 			case $$f in \
 				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
-				(*) $(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
-				    sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
+				(*) $(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
+				    sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
 				    found='yes' ;; \
 			esac ; \
 		fi ; \
@@ -124,8 +124,8 @@ post-netconfig:
 		if test -f $$f -a "$$f" != "$$d/strnsl" ; then \
 			case $$f in \
 				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
-				(*) $(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
-				    sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
+				(*) $(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
+				    sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
 				    found='yes' ;; \
 			esac ; \
 		fi ; \
@@ -145,7 +145,7 @@ post-netconfig:
 uninstall-netconfig:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	rm -f $(DESTDIR)/$(sysconfdir)/netconfig.d/@PACKAGE_LCNAME@
+	rm -f $(DESTDIR)$(sysconfdir)/netconfig.d/@PACKAGE_LCNAME@
 
 
 if INSTALL_INITSCRIPTS
@@ -172,6 +172,9 @@ EXTRA_DIST		+= src/util/sysconfig/netconfig
 ## =============================================================================
 ##
 ## $Log: netconfig.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

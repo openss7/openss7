@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -63,7 +63,7 @@ install-initscripts: $(dist_initrd_SCRIPTS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	@list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
-		f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+		f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
 		$(ECHO) "$(SHELL) $(top_srcdir)/scripts/install_initd -v $(DESTDIR)$(initrddir)/$$f" ; \
 		$(SHELL) $(top_srcdir)/scripts/install_initd -v $(DESTDIR)$(initrddir)/$$f || :; \
 	done
@@ -73,11 +73,11 @@ post-initscripts:
 	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
 		if runlevel >/dev/null 2>&1 ; then \
 			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
-				f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+				f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
 				flist="$$flist $$f" ; \
 				rlist="$$f $$rlist" ; \
 			done ; \
-			r=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
+			r=`runlevel | sed 's|.*[[:space:]]||'` ; \
 			for d in $$r S ; do \
 				for i in $$rlist ; do \
 					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$i \
@@ -106,10 +106,10 @@ preun-initscripts:
 			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 				rlist="$$p $$rlist" ; \
 			done ; \
-			r=`runlevel | sed -e 's|.*[[:space:]]||'` ; \
+			r=`runlevel | sed 's|.*[[:space:]]||'` ; \
 			for d in $$r S ; do \
 				for p in $$rlist ; do \
-					f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+					f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
 					if test -L $(initrddir)/../rc$${d}.d/S[0-9][0-9]$$f \
 					        -o -L $(initrddir)/rc$${d}.d/S[0-9][0-9]$$f ; then \
 						$(ECHO) "$(SHELL) $(srcdir)/$$p stop" ; \
@@ -124,7 +124,7 @@ uninstall-initscripts:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
-		f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
+		f=`$(ECHO) $$p | sed 's|^.*/||'` ; \
 		$(ECHO) "$(SHELL) $(top_srcdir)/scripts/remove_initd -v $(DESTDIR)$(initrddir)/$$f" ; \
 		$(SHELL) $(top_srcdir)/scripts/remove_initd -v $(DESTDIR)$(initrddir)/$$f || :; \
 	done
@@ -147,6 +147,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: init.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

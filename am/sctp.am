@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -101,7 +101,7 @@ install-modules: $(KERNEL_MODULES)
 	fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
 		if test -f $$p; then \
-			f="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
+			f="`$(ECHO) $$p | sed 's|^.*/||;s|lib.*_a-||'`" ; \
 			$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $$d/$$f ; \
 			if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
@@ -136,7 +136,7 @@ INSTALL_EXEC_LOCAL	+= install-modules
 # target with install-exec-hook that runs after install-exec has completed.
 ##
 # The post-modules target checks for a fully configured install directory by checking for
-# modules.dep in the kernel modules directory $(DESTDIR)$(rootdir)$(kmoduledir).
+# modules.dep in the kernel modules directory $(DESTDIR)$(kmoduledir).
 ##
 # If modules.dep does not exist, we simply exit.
 ##
@@ -173,7 +173,7 @@ post-modules:
 			cp -f $$prel_fil $$prel_new ; \
 			list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 				f=`basename $$p .o` ; \
-				sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
+				sed "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
 				$(am__mv) $$prel_tmp $$prel_new ; \
 				$(ECHO) "$$f" >> $$prel_new ; \
 			done ; \
@@ -215,7 +215,7 @@ uninstall-modules:
 	@r='$(DESTDIR)$(rootdir)' ; k="$$r$(kmoduledir)" ; d="$$k/$(KERNEL_SUBDIR)" ; \
 	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then kext='.gz' ; else kext='' ; fi ; \
 	list='$(KERNEL_MODULES)'; for p in $$list; do \
-		p="`$(ECHO) $$p | sed -e 's|^.*/||;s|lib.*_a-||'`" ; \
+		p="`$(ECHO) $$p | sed 's|^.*/||;s|lib.*_a-||'`" ; \
 		p="$$p$$kext" ; \
 		$(ECHO) "$(LIBTOOL) --mode=uninstall rm -f -- $$d/$$p" ; \
 		$(LIBTOOL) --mode=uninstall rm -f -- "$$d/$$p" ; \
@@ -270,7 +270,7 @@ postun-modules:
 				cp -f $$prel_fil $$prel_new ; \
 				list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
 					f=`basename $$p .o` ; \
-					sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
+					sed "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
 					$(am__mv) $$prel_tmp $$prel_new ; \
 				done ; \
 				chmod --reference=$$prel_fil $$prel_new ; \
@@ -322,6 +322,9 @@ EXTRA_SCRIPTS		+= scripts/cflagcheck
 ## =============================================================================
 ##
 ## $Log: sctp.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 #
-# @(#) $RCSfile: missing2,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+# @(#) $RCSfile: missing2,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-29 07:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,22 +47,35 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
 # missing2 for more commands ala missing
+#
+# This particular missing script is used for missing documentation tools.
+# Some commands can be replaced by scripts themselves and can be simplified
+# here to do just the things needed by our makefiles.
 
-scriptversion=2008-09-04.01
+scriptversion=2009-06-24.01
 
 if test $# -eq 0; then
-    echo 1>&2 "Try \'$0 --help' for more information"
+    cat 1>&2 <<-EOF
+	Try \'$0 --help' for more information
+	EOF
     exit 1
 fi
 
+script="$0"
+scriptname=$(basename $0)
+scriptdir=`(cd $(dirname $0); pwd)`
+srcdir=`(cd $scriptdir/../src/java; pwd)`
 run=:
 sed_output='s/.* --output[ =]\([^ ]*\).*/\1/p'
 sed_minuso='s/.* -o \([^ ]*\).*/\1/p'
+sed_minusd='s/.* -d \([^ ]*\).*/\1/p'
+sed_lastop='s/.* \([^ ]*\) *$/\1/p'
+
 
 msg="missing on your system"
 
@@ -84,32 +97,33 @@ case $1 in
 	;;
 
     (-h|--h|--he|--hel|--help)
-	cat <<EOF
-$0 [OPTION]... PROGRAM [ARGUMENT]...
+	cat <<-EOF
+	$0 [OPTION]... PROGRAM [ARGUMENT]...
 
-Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
-an error status if there is no known handling for PROGRAM.
+	Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
+	an error status if there is no known handling for PROGRAM.
 
-Options:
-  -h, --help	    display this help and exit
-  -v, --version	    output version information and exit
-  -c, --copying	    output copying information and exit
-  --run		    try to run PROGRAM, and emulate if it fails
+	Options:
+	  -h, --help	    display this help and exit
+	  -v, --version	    output version information and exit
+	  -c, --copying	    output copying information and exit
+	  --run		    try to run PROGRAM, and emulate if it fails
 
-Supported PROGRAM values:
-  latex		    touch the output file
-  pslatex	    touch the output file
-  pdflatex	    touch the output file
-  bibtex	    touch the output file
-  latex2html	    touch the output file
-  dvips		    touch the output file
-  dvipdf	    touch the output file
-  gnuplot	    touch the output file
-  fig2dev	    touch the output file
-  convert	    touch the output file
+	Supported PROGRAM values:
+	  latex		    touch the output file
+	  pslatex	    touch the output file
+	  pdflatex	    touch the output file
+	  bibtex	    touch the output file
+	  latex2html	    touch the output file
+	  dvips		    touch the output file
+	  dvipdf	    touch the output file
+	  gnuplot	    touch the output file
+	  fig2dev	    touch the output file
+	  convert	    touch the output file
+	  ps2pdf	    touch the output file
 
-Send problem reports to <bugs@openss7.org>.
-EOF
+	Send problem reports to <bugs@openss7.org>.
+	EOF
 	exit $?
 	;;
 
@@ -117,64 +131,81 @@ EOF
 	;;
 
     (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
-	cat <<EOF
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+	cat <<-EOF
+	Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+	Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+	Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
-All Rights Reserved.
+	All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation; version 3 of the License.
+	This program is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Affero General Public License as published by
+	the Free Software Foundation; version 3 of the License.
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
-General Public License for more details.
+	This program is distributed in the hope that it will be useful, but
+	WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
+	General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-02139, USA.
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+	write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+	02139, USA.
 
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-on behalf of the U.S. Government ("Government"), the following
-provisions apply to you.  If the Software is supplied by the Department
-of Defense ("DoD"), it is classified as "Commercial Computer Software"
-under paragraph 252.227-7014 of the DoD Supplement to the Federal
-Acquisition Regulations ("DFARS") (or any successor regulations) and the
-Government is acquiring only the license rights granted herein (the
-license rights customarily provided to non-Government users).  If the
-Software is supplied to any unit or agency of the Government other than
-DoD, it is classified as "Restricted Computer Software" and the
-Government's rights in the Software are defined in paragraph 52.227-19
-of the Federal Acquisition Regulations ("FAR") (or any successor
-regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-NASA Supplement to the FAR (or any successor regulations).
+	U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+	on behalf of the U.S. Government ("Government"), the following
+	provisions apply to you.  If the Software is supplied by the Department
+	of Defense ("DoD"), it is classified as "Commercial Computer Software"
+	under paragraph 252.227-7014 of the DoD Supplement to the Federal
+	Acquisition Regulations ("DFARS") (or any successor regulations) and the
+	Government is acquiring only the license rights granted herein (the
+	license rights customarily provided to non-Government users).  If the
+	Software is supplied to any unit or agency of the Government other than
+	DoD, it is classified as "Restricted Computer Software" and the
+	Government's rights in the Software are defined in paragraph 52.227-19
+	of the Federal Acquisition Regulations ("FAR") (or any successor
+	regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+	NASA Supplement to the FAR (or any successor regulations).
 
-Commercial licensing and support of this software is available from
-OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-EOF
+	Commercial licensing and support of this software is available from
+	OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+	EOF
 	;;
     (-*)
-	echo 1>&2 "$0: Unknown \`$1' option"
-	echo 1>&2 "Try \`$0 --help' for more information"
+	cat 1>&2 <<-EOF
+		$0: Unknown \`$1' option
+		Try \`$0 --help' for more information
+		EOF
 	exit 1
 	;;
 
 esac
 
+program="$1" ; shift
+
+zeroarg=`which $program 2>/dev/null` ; test -n $zeroarg || zeroarg="$program"
+
 # Now exit if we have PROGRAM, but it failed.  Also exit now if we do not have
-# PROGRAM and --version, --help or --copyring was passed to PROGRAM (most likely
+# PROGRAM and --version, --help or --copying was passed to PROGRAM (most likely
 # to detect the program).
-case $1 in
-    (dvipdf|gnuplot|fig2dev|convert)
+
+if test -z "$run" -a -x "$zeroarg" ; then
+    # it exists and is executable, but it failed
+    exit 1
+elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
+    # Could not run --version or --help.  This is prbably someone running `$TOOL
+    # --version' to check whether $TOOL exists without knowing that $TOOL uses
+    # missing4.
+    exit 1
+fi
+
+case $program in
+    (dvipdf|gnuplot|fig2dev|convert|ps2pdf*)
 	# do not handle --version or --help
 	;;
     (latex2html)
 	# handles --version but not --help (well)
-	if test -z "$run" && ($1 --version) >/dev/null 2>&1 ; then
+	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
 	    # it exists, but it failed.
 	    exit 1
 	elif test ":$2" = ":--version" ; then
@@ -185,10 +216,10 @@ case $1 in
 	fi
 	;;
     (latex|pslatex|pdflatex|bibtex|dvips|*)
-	if test -z "$run" && ($1 --version) >/dev/null 2>&1 ; then
+	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
 	    # it exists, but it failed.
 	    exit 1
-	elif test ":$2" = ":--version" || test ":$2" = ":--help" ; then
+	elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
 	    # Could not run --version or --help.  This is probably someone
 	    # running `$TOOL --version' or `$TOOL --help' to check whether $TOOL
 	    # exists and not knowing $TOOL uses missing2.
@@ -197,33 +228,259 @@ case $1 in
 	;;
 esac
 
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), or
+# warning is requested, generate a warning.
+
+cat 1>&2 <<-EOF
+	*** WARNING: \`$program' is needed, and is $msg.
+	***
+	EOF
+
+case $program in
+    (latex)
+	cat 1>&2 <<-EOF
+	*** You may have altered some LaTeX files that need to be converted to
+	*** DVI files.  You may need the \`Latex' package to convert those LaTeX
+	*** files to DVI files.  You can normally get \`Latex' as part of many
+	*** popular Linux Distributions.  On RPM systems, try \`yum install
+	*** tetex-latex'.  On DEB systems, try \`apt-get install tetex-base
+	*** tetex-bin'.  On SuSE, try \`zypper install texlive-bin-latex
+	*** texlive-latex'.  \`Latex' has been available for many years: you can
+	*** get \`Latex' from any CTAN site.
+	***
+	*** Debian 4.0:  \`apt-get install tetex-bin'
+	*** Ubuntu 8.04: \`apt-get install texlive-latex-base'
+	*** Fedora 7:    \`yum install tetex-latex'
+	*** Fedora 9:    \`yum install texlive-latex'
+	*** CentOS 5.x:  \`yum install texex-latex'
+	*** openSUSE 11: \`zypper install texlive-latex'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (pslatex)
+	cat 1>&2 <<-EOF
+	*** You may have altered some LaTeX files that need to be converted to
+	*** DVI format files with postscript fonts.  You may need the \`Latex'
+	*** package to convert those LaTeX files to DVI files.  You can normally
+	*** get \`Latex' as part of many popular Linux Distributions.  On RPM
+	*** systems, try \`yum install tetex-latex'.  On DEB systems, try
+	*** \`apt-get install tetex-base tetex-bin'.  On SuSE, \`zypper install
+	*** texlive-bin-latex texlive-latex'.  \`Latex' has been available for
+	*** many years: you can get \`Latex' from any CTAN site.
+	***
+	*** Debian 4.0:  \`apt-get install tetex-bin'
+	*** Ubuntu 8.04: \`apt-get install texlive-base-bin'
+	*** Fedora 7:    \`yum install tetex-latex'
+	*** Fedora 9:    \`yum install texlive-latex'
+	*** CentOS 5.x:  \`yum install texex-latex'
+	*** openSUSE 11: \`zypper install texlive-latex'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (pdflatex)
+	cat 1>&2 <<-EOF
+	*** You may have altered some LaTeX files that need to be converted to
+	*** portable document format files.  You may need the \`tetex-latex'
+	*** package to convert those LaTeX files to PDF files.  You can normally
+	*** get \`tetex-latex' as part of many popular Linux Distributions.  On
+	*** recent RPM based systems, try \`yum install tetex-latex'.  On recent
+	*** DEB based systems, try \`apt-get install tetex-base tetex-bin'.  On
+	*** SuSE, \`zypper install texlive-bin-latex texlive-latex'.  \`Latex'
+	*** has been available for many years: you can get \`Latex' from any
+	*** CTAN site.
+	***
+	*** Debian 4.0:  \`apt-get install tetex-bin'
+	*** Ubuntu 8.04: \`apt-get install texlive-latex-base'
+	*** Fedora 7:    \`yum install tetex-latex'
+	*** Fedora 9:    \`yum install texlive-latex'
+	*** CentOS 5.x:  \`yum install tetex-latex'
+	*** openSUSE 11: \`zypper install texlive-latex'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (bibtex)
+	cat 1>&2 <<-EOF
+	*** You may have altered some LaTeX files that need to be converted to
+	*** bibliography files.  You may need the \`tetex' package to convert
+	*** those LaTeX files to BIB files.  You can normally get \`tetex' as
+	*** part of many popular Linux Distributions.  On recent RPM based
+	*** systems, try \`yum install tetex'.  On recent DEB based systems, try
+	*** \`apt-get install tetex-base tetex-bin'.  On SuSE, \`zypper install
+	*** texlive-bin texlive'.  \`Bibtex' has been available for many years:
+	*** you can get \`Bibtex' from any CTAN site.
+	***
+	*** Debian 4.0:  \`apt-get install tetex-bin'
+	*** Ubuntu 8.04: \`apt-get install texlive-base-bin'
+	*** Fedora 7:    \`yum install tetex'
+	*** Fedora 9:    \`yum install texlive'
+	*** CentOS 5.x:  \`yum install tetex'
+	*** openSUSE 11: \`zypper install texlive-latex'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (latex2html)
+	cat 1>&2 <<-EOF
+	*** You may have altered some LaTeX files that need to be converted to
+	*** HTML files.  You may need the \`latex2html' package to convert those
+	*** LaTeX files to HTML files.  You can normally get \`latex2html' as
+	*** part of many popular Linux Distributions.  On recent RPM based
+	*** systems, try \`yum install latex2html'.  On recent DEB based
+	*** systems, try \`apt-get install latex2html'.  On SuSE, try \`zypper
+	*** install latex2html'.  \`Latex2html' has been available for many
+	*** years: you can get \`Latex2html' from any CTAN site.
+	***
+	*** Debian 4.0:  \`apt-get install latex2html'
+	*** Ubuntu 8.04: \`apt-get install latex2html'
+	*** Fedora 7:    \`yum install latex2html'
+	*** Fedora 9:    \`yum install latex2html'
+	*** CentOS 5.x:  \`yum install latex2html'
+	*** openSUSE 11: \`zypper install latex2html'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (dvips)
+	cat 1>&2 <<-EOF
+	*** You may have altered some DVI files that need to be converted to
+	*** postscript files.  You may need the \`tetex-dvips' package to
+	*** convert those DVI files to postscript files.  You can normally get
+	*** \`tetex-dvips' as part of many popular Linux distributions.  On
+	*** recent RPM based systems, try \`yum install tetex-dvips'.  On recent
+	*** DEB based systems, try \`apt-get install tetex-base tetex-bin'.  On
+	*** SuSE, \`zypper install texlive-bin texlive'.  \`Dvips' has been
+	*** available for many years: you can get \`Dvips' and \`Tetex' from any
+	*** CTAN site.
+	***
+	*** Debian 4.0:  \`apt-get install tetex-bin'
+	*** Ubuntu 8.04: \`apt-get install texlive-base-bin'
+	*** Fedora 7:    \`yum install tetex'
+	*** Fedora 9:    \`yum install texlive-dvips'
+	*** CentOS 5.x:  \`yum install tetex-dvips'
+	*** openSUSE 11: \`zypper install texlive'
+	*** SLES 10:     \`configure --disable-docs'
+	***
+	EOF
+	;;
+    (dvipdf)
+	cat 1>&2 <<-EOF
+	*** You may have altered some DVI files that need to be converted to
+	*** portable document format files.  You may need the \`Ghostscript' and
+	*** \`Dvips' packages to convert those DVI files to PDF file.  You can
+	*** normally get \`Ghostscript' and \`Dvips' as part of many popular
+	*** Linux distributions.  On recent RPM based systems, try \`yum install
+	*** ghostscript tetex-dvips'.  On recent DEB based systems, try
+	*** \`apt-get install gs tetex-base tetex-bin'.  On SuSE, \`zypper
+	*** install ghostscript-library'.
+	***
+	*** Debian 4.0:  \`apt-get install gs-common'
+	*** Ubuntu 8.04: \`apt-get install ghostscript'
+	*** Fedora 7:    \`yum install ghostscript'
+	*** Fedora 9:    \`yum install ghostscript'
+	*** CentOS 5.x:  \`yum install ghostscript'
+	*** openSUSE 11: \`zypper install ghostscript-library'
+	*** SLES 10:     \`zypper install ghostscript-library'
+	EOF
+	;;
+    (gnuplot)
+	cat 1>&2 <<-EOF
+	*** You may have altered some plot files that need to be converted to
+	*** another format (typically fig format).  You may need the \`gnuplot'
+	*** package to convert those files to another format.  You can normally
+	*** get \`gnuplot' as part of many popular Linux distributions.  On
+	*** recent RPM based systems, try \`yum install gnuplot'.  On recent DEB
+	*** based systems, try \`apt-get install gnuplot'.   On SuSE, \`zypper
+	*** install gnuplot'.  \`Gnuplot' has been available for many years: you
+	*** can get \`Gnuplot' from any GNU archive site.
+	***
+	*** Debian 4.0:  \`apt-get install gnuplot-nox'
+	*** Ubuntu 8.04: \`apt-get install gnuplot-nox'
+	*** Fedora 7:    \`yum install gnuplot'
+	*** Fedora 9:    \`yum install gnuplot'
+	*** CentOS 5.x:  \`yum install gnuplot'
+	*** openSUSE 11: \`zypper install gnuplot'
+	*** SLES 10:     \`zypper install gnuplot'
+	***
+	EOF
+	;;
+    (fig2dev)
+	cat 1>&2 <<-EOF
+	*** You may have modified some Fig files that need to be converted to
+	*** another format.  You may need the \`transfig' package to convert
+	*** those files to another format.  You can normally get \`transfig' as
+	*** part of many popular Linux distributions.  On recent RPM based
+	*** systems, try \`yum install transfig'.  On DEB based systems, try
+	*** \`apt-get install transfig'.  On SuSE, \`zypper install transfig'.
+	*** Versions ranging from 3.2.3 through 3.2.4 are acceptable.  The
+	*** \`transfig' package derives from xfig and has been available for
+	*** many years and is availble on the web from many sources.
+	***
+	*** Debian 4.0:  \`apt-get install transfig'
+	*** Ubuntu 8.04: \`apt-get install transfig'
+	*** Fedora 7:    \`yum install transfig'
+	*** Fedora 9:    \`yum install transfig'
+	*** CentOS 5.x:  \`yum install transfig'
+	*** openSUSE 11: \`zypper install transfig'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (convert)
+	cat 1>&2 <<-EOF
+	*** You may have modified some graphics files that need to be converted
+	*** to another format.  You may need the \`ImageMagick' package to
+	*** convert those files to another format.  You can normally get
+	*** \`ImageMagick' as part of many popular Linux distributions.  On
+	*** recent RPM based systems, try \`yum install ImageMagick'.  On recent
+	*** DEB based systems, try \`'apt-get install imagemagick'.  On SuSE,
+	*** \`zypper install ImageMagick'.  Versions ranging from 5.4.3 through
+	*** 6.2.8 are acceptable.  The \`ImageMagick' package has been available
+	*** for many years and is available on the web from many sources.
+	***
+	*** Debian 4.0:  \`apt-get install imagemagick'
+	*** Ubuntu 8.04: \`apt-get install imagemagick'
+	*** Fedora 7:    \`yum install ImageMagick'
+	*** Fedora 9:    \`yum install ImageMagick'
+	*** CentOS 5.x:  \`yum install ImageMagick'
+	*** openSUSE 11: \`zypper install ImageMagick'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
+    (ps2pdf*)
+	cat 1>&2 <<-EOF
+	*** You may have modified some draft sources that need to be converted
+	*** from postscript to PDF format.  You may need the \`ghostscript'
+	*** package to convert those files to another format.  You can normally
+	*** get \`ghostscript' as part of many popular Linux distributions.  On
+	*** recent RPM based systems, try \`yum install ghostscript'.  On recent
+	*** DEB based system, try \`apt-get install ghostscript'.  On SuSE,
+	*** \`zypper install ghostscript'.  Most current versions are
+	*** acceptable.  The \`ghostscript' package has been available for many
+	*** years and is available on the web from a number of sources.
+	***
+	*** Debian 4.0:  \`apt-get install gs-common'
+	*** Ubuntu 8.04: \`apt-get install gs-common'
+	*** RedHat 7.2:  \`rpm -i ghostscript-6.52-9.5'
+	*** CentOS 5.x:  \`yum install ghostscipt'
+	*** SLES 10:     \`zypper install ghostscript-library'
+	EOF
+	;;
+    (*)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	EOF
+	;;
+esac
+
 # If PROGRAM does not exist, or fails to run (possibly an outdated version), try
 # to emulate PROGRAM.
-case $1 in
+case $program in
     (latex)
 	# Calling latex on a file  with format %[.tex] should result in
 	# a file named %.dvi.  Therefore if the file %.dvi exists in the
 	# source directory then simply touch it.  Otherwise, create a
 	# default file in the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some LaTeX files that need to be converted to
-*** DVI files.  You may need the \`Latex' package to convert those LaTeX
-*** files to DVI files.  You can normally get \`Latex' as part of many
-*** popular Linux Distributions.  On recent RPM based systems, try \`yum
-*** install tetex-latex'.  On recent DEB based systems, try \`apt-get
-*** install tetex-base tetex-bin'.  On SuSE, \`zypper install
-*** texlive-bin-latex texlive-latex'.  \`Latex' has been available for
-*** many years: you can get \`Latex' from any CTAN site.
-***
-*** Debian 4.0:  \`apt-get install tetex-bin'
-*** Ubuntu 8.04: \`apt-get install texlive-latex-base'
-*** Fedora 7:    \`yum install tetex-latex'
-*** Fedora 9:    \`yum install texlive-latex'
-*** openSUSE 11: \`zypper install texlive-latex'
-***
-EOF
 	# Note that missing2 is being executed in the build directory.
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
@@ -251,26 +508,6 @@ EOF
 	# named %.dvi.  Therefore, if the file %.dvi exists in the source or
 	# build directory, then simply touch it.  Otherwise, create a default
 	# file in the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some LaTeX files that need to be converted to
-*** DVI format files with postscript fonts.  You may need the \`Latex'
-*** package to convert those LaTeX files to DVI files.  You can normally
-*** get \`Latex' as part of many popular Linux Distributions.  On recent
-*** RPM based systems, try \`yum install tetex-latex'.  On recent DEB
-*** based systems, try \`apt-get install tetex-base tetex-bin'. On SuSE,
-*** \`zypper install texlive-bin-latex texlive-latex'.  \`Latex' has
-*** been available for many years: you can get \`Latex' from any CTAN
-*** site.
-***
-*** Debian 4.0:  \`apt-get install tetex-bin'
-*** Ubuntu 8.04: \`apt-get install texlive-base-bin'
-*** Fedora 7:    \`yum install tetex-latex'
-*** Fedora 9:    \`yum install texlive-latex'
-*** openSUSE 11: \`zypper install texlive-latex'
-***
-EOF
 	# Note that missing2 is being executed in the build directory.
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
@@ -298,26 +535,6 @@ EOF
 	# named %.pdf.  Therefore, if the file %.pdf exists in the source
 	# director, then simply touch it.  Otherwise, create a default file in
 	# the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some LaTeX files that need to be converted to
-*** portable document format files.  You may need the \`tetex-latex'
-*** package to convert those LaTeX files to PDF files.  You can normally
-*** get \`tetex-latex' as part of many popular Linux Distributions.  On
-*** recent RPM based systems, try \`yum install tetex-latex'.  On recent
-*** DEB based systems, try \`apt-get install tetex-base tetex-bin'.  On
-*** SuSE, \`zypper install texlive-bin-latex texlive-latex'.  \`Latex'
-*** has been available for many years: you can get \`Latex' from any
-*** CTAN site.
-***
-*** Debian 4.0:  \`apt-get install tetex-bin'
-*** Ubuntu 8.04: \`apt-get install texlive-latex-base'
-*** Fedora 7:    \`yum install tetex-latex'
-*** Fedora 9:    \`yum install texlive-latex'
-*** openSUSE 11: \`zypper install texlive-latex'
-***
-EOF
 	# Note that missing2 is being executed in the build directory.
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
@@ -344,25 +561,6 @@ EOF
 	# named %.bib.  Therefore, if the file %.bib exists in the source
 	# directory, then simply touch it.  Otherwise, create a default file in
 	# the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some LaTeX files that need to be converted to
-*** bibliography files.  You may need the \`tetex' package to convert those
-*** LaTeX files to BIB files.  You can normally get \`tetex' as part of many
-*** popular Linux Distributions.  On recent RPM based systems, try \`yum install
-*** tetex'.  On recent DEB based systems, try \`apt-get install tetex-base
-*** tetex-bin'.  On SuSE, \`zypper install texlive-bin texlive'.  \`Bibtex'
-*** has been available for many years: you can get \`Bibtex' from any
-*** CTAN site.
-***
-*** Debian 4.0:  \`apt-get install tetex-bin'
-*** Ubuntu 8.04: \`apt-get install texlive-base-bin'
-*** Fedora 7:    \`yum install tetex'
-*** Fedora 9:    \`yum install texlive'
-*** openSUSE 11: \`zypper install texlive-latex'
-***
-EOF
 	# Note that missing2 is being executed in the build directory.
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
@@ -390,25 +588,6 @@ EOF
 	# %.html exists in the source directory, then simply touch it.
 	# Otherwise, create a default file in the build directory and
 	# complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some LaTeX files that need to be converted to HTML
-*** files.  You may need the \`latex2html' package to convert those LaTeX
-*** files to HTML files.  You can normally get \`latex2html' as part of many
-*** popular Linux Distributions.  On recent RPM based systems, try \`yum
-*** install latex2html'.  On recent DEB based systems, try \`apt-get install
-*** latex2html'.  On SuSE, try \`zypper install latex2html'.  \`Latex2html'
-*** has been available for many years: you can get \`Latex2html' from
-*** any CTAN site.
-***
-*** Debian 4.0:  \`apt-get install latex2html'
-*** Ubuntu 8.04: \`apt-get install latex2html'
-*** Fedora 7:    \`yum install latex2html'
-*** Fedora 9:    \`yum install latex2html'
-*** openSUSE 11: \`zypper install latex2html'
-***
-EOF
 	# Note that missing2 is being executed in the build directory.
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
@@ -436,26 +615,6 @@ EOF
 	# name.  Therefore, if the output file (%.ps or that specified by -o)
 	# exists in the source or build directory, then simply touch it.
 	# Otherwise, create a default file in the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some DVI files that need to be converted to
-*** postscript files.  You may need the \`tetex-dvips' package to
-*** convert those DVI files to postscript files.  You can normally get
-*** \`tetex-dvips' as part of many popular Linux distributions.  On
-*** recent RPM based systems, try \`yum install tetex-dvips'.  On recent
-*** DEB based systems, try \`apt-get install tetex-base tetex-bin'.  On
-*** SuSE, \`zypper install texlive-bin texlive'.  \`Dvips' has been
-*** available for many years: you can get \`Dvips' and \`Tetex' from any
-*** CTAN site.
-***
-*** Debian 4.0:  \`apt-get install tetex-bin'
-*** Ubuntu 8.04: \`apt-get install texlive-base-bin'
-*** Fedora 7:    \`yum install tetex'
-*** Fedora 9:    \`yum install texlive-dvips'
-*** openSUSE 11: \`zypper install texlive'
-***
-EOF
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
 	    SRCFILE=`echo "$LASTARG" | sed 's,\.dvi$,,;s,$,.dvi,'`
@@ -489,25 +648,6 @@ EOF
 	# that specified by the command line) exists in the source or build
 	# directory, then simply touch it.  Otherwise, create a default file in
 	# the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some DVI files that need to be converted to
-*** portable document format files.  You may need the \`Ghostscript' and
-*** \`Dvips' packages to convert those DVI files to PDF file.  You can
-*** normally get \`Ghostscript' and \`Dvips' as part of many popular
-*** Linux distributions.  On recent RPM based systems, try \`yum install
-*** ghostscript tetex-dvips'.  On recent DEB based systems, try
-*** \`apt-get install gs tetex-base tetex-bin'.  On SuSE, \`zypper
-*** install ghostscript-library'.
-***
-*** Debian 4.0:  \`apt-get install gs-common'
-*** Ubuntu 8.04: \`apt-get install ghostscript'
-*** Fedora 7:    \`yum install ghostscript'
-*** Fedora 9:    \`yum install ghostscript'
-*** openSUSE 11: \`zypper install ghostscript-library'
-***
-EOF
 	# do not handle yet
 	exit 1
 	;;
@@ -517,25 +657,6 @@ EOF
 	# (as specified in the 'set output' command wtihin the file) exists in
 	# the source or build directory, then simply touch it.  Otherwise,
 	# create a default file in the build directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have altered some plot files that need to be converted to
-*** another format (typically fig format).  You may need the \`gnuplot'
-*** package to convert those files to another format.  You can normally
-*** get \`gnuplot' as part of many popular Linux distributions.  On
-*** recent RPM based systems, try \`yum install gnuplot'.  On recent DEB
-*** based systems, try \`apt-get install gnuplot'.   On SuSE, \`zypper
-*** install gnuplot'.  \`Gnuplot' has been available for many years: you
-*** can get \`Gnuplot' from any GNU archive site.
-***
-*** Debian 4.0:  \`apt-get install gnuplot-nox'
-*** Ubuntu 8.04: \`apt-get install gnuplot-nox'
-*** Fedora 7:    \`yum install gnuplot'
-*** Fedora 9:    \`yum install gnuplot'
-*** openSUSE 11: \`zypper install gnuplot'
-***
-EOF
 	if test $# -gt 1 ; then
 	    eval LASTARG="\${$#}"
 	    SRCFILE="$LASTARG"
@@ -567,26 +688,6 @@ EOF
 	# directory and complain.  If the second argument is not present, the
 	# output file name could be guessed from the -L language and the root of
 	# the input file.  If the input file is not present, simply exit 0.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-***
-*** You may have modified some Fig files that need to be converted to
-*** another format.  You may need the \`transfig' package to convert
-*** those files to another format.  You can normally get \`transfig' as
-*** part of many popular Linux distributions.  On recent RPM based
-*** systems, try \`yum install transfig'.  On DEB based systems, try
-*** \`apt-get install transfig'.  On SuSE, \`zypper install transfig'.
-*** Versions ranging from 3.2.3 through 3.2.4 are acceptable.  The
-*** \`transfig' package derives from xfig and has been available for
-*** many years and is availble on the web from many sources.
-***
-*** Debian 4.0:  \`apt-get install transfig'
-*** Ubuntu 8.04: \`apt-get install transfig'
-*** Fedora 7:    \`yum install transfig'
-*** Fedora 9:    \`yum install transfig'
-*** openSUSE 11: \`zypper install transfig'
-***
-EOF
 	# only handle case where two args are provided (srcfile outfile)
 	if test $# -gt 2 ; then
 	    last=$#
@@ -613,26 +714,6 @@ EOF
 	# specified on the command line exists in the source directory, then
 	# simply touch it.  Otherwise, create a default file in the build
 	# directory and complain.
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-*** 
-*** You may have modified some graphics files that need to be converted
-*** to another format.  You may need the \`ImageMagick' package to
-*** convert those files to another format.  You can normally get
-*** \`ImageMagick' as part of many popular Linux distributions.  On
-*** recent RPM based systems, try \`yum install ImageMagick'.  On recent
-*** DEB based systems, try \`'apt-get install imagemagick'.  On SuSE,
-*** \`zypper install ImageMagick'.  Versions ranging from 5.4.3 through
-*** 6.2.8 are acceptable.  The \`ImageMagick' package has been available
-*** for many years and is available on the web from many sources.
-***
-*** Debian 4.0:  \`apt-get install imagemagick'
-*** Ubuntu 8.04: \`apt-get install imagemagick'
-*** Fedora 7:    \`yum install ImageMagick'
-*** Fedora 9:    \`yum install ImageMagick'
-*** openSUSE 11: \`zypper install ImageMagick'
-***
-EOF
 	# only handle case where two args are provided (srcfile outfile)
 	if test $# -gt 2 ; then
 	    last=$#
@@ -653,27 +734,43 @@ EOF
 	fi
 	exit 1
 	;;
+    (ps2pdf*)
+	# 
+	# ps2pdfwr [options...] (input.[e]ps|-) [output.pdf|-]
+	# Handle the simple case input.ps to output.pdf where both are
+	# specified skip the others.
+	input=`echo "$*" | sed -n 's/.* \([^- ][^ ]*\.ps\).*/\1/p'`
+	test -n "$input" || input=`echo "$*" | sed -n 's/.* \([^- ][^ ]*\.eps\).*/\1/p'`
+	test -n "$input" || exit 1
+	output=`echo "$*" | sed -n 's/.* \([^- ][^ ]*\.pdf\).*/\1/p'`
+	test -n "$output" || output=`echo "$input" | sed -e 's,\.ps$,.pdf,;s,\.eps,.pdf,'`
+	test -n "$output" || exit 1
+	if test -f $output -o -f $(basename $output) ; then
+	    if test -f $output ; then
+		touch $output
+		exit 0
+	    fi
+	    output=$(basename $output)
+	    if test -f $output ; then
+		touch $output
+		exit 0
+	    fi
+	fi
+	exit 1
+	;;
     (*)
-	cat 1>&2 <<EOF
-*** WARNING: \`$1' is needed, and is $msg.
-*** 
-*** You might have modified some files without having the proper tools
-*** for further handling them.  Check the \`README' file, it often tells
-*** you about the needed prerequisites for installing this package.  You
-*** may also peek at any GNU archive site, in case some other package
-*** would contain this missing \`$1' program.
-***
-EOF
 	exit 1
 	;;
 esac
 
 exit 0
 
-
 # =============================================================================
 #
 # $Log: missing2,v $
+# Revision 1.1.2.3  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
 # Revision 1.1.2.2  2009-06-21 12:41:53  brian
 # - updated headers
 #

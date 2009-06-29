@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -64,7 +64,7 @@ if RPM_BUILD_KERNEL
 
 if AMDEP
 ## AMDEP
-@am__include@ $(DEPDIR)/modversions.Ph
+sinclude $(DEPDIR)/modversions.Ph
 ## AMDEP
 endif
 
@@ -75,19 +75,20 @@ if WITH_KO_MODULES
 if AMDEP
 ## AMDEP
 $(DEPDIR)/modversions.Ph:
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "Creating $@ dependencies..." ; \
 	( \
 		list="$(EXPORT_SRCFILES)" ; for s in $$list ; do \
 			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi ; \
-			r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+			r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 			$(ECHO) "sinclude ./$(DEPDIR)/$$r.Pver" ; $(ECHO) "" ; \
 			$(ECHO) "$$r.ver: $$d$$s" ; $(ECHO) "" ; \
 		done ; \
 		objs= ; \
 		list="$(KERNEL_OBJECTS)" ; for obj in $$list ; do \
-			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
-			v=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,,;s,\.o$$,,'` ; \
+			a=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+			v=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,,;s,\.o$$,,'` ; \
 			case " $(EXPORT_VERFILES) " in \
 				(*" $(PKGINCL)/versions/$$v.ver "*) \
 					$(ECHO) "$$a: $$obj $$v.ver" ; $(ECHO) "" ; \
@@ -124,25 +125,25 @@ if KERNEL_VERSIONS
 ## KERNEL_VERSIONS
 
 if am__fastdepCC
-## am_fastdepCC
+## am__fastdepCC
 stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	touch stamp-verfiles
-## am_fastdepCC
+## am__fastdepCC
 else
-## !am_fastdepCC
+## !am__fastdepCC
 if AMDEP
 ## AMDEP
 stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
@@ -156,7 +157,7 @@ else
 stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
@@ -164,7 +165,7 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	touch stamp-verfiles
 ## !AMDEP
 endif
-## !am_fastdepCC
+## !am__fastdepCC
 endif
 
 ## KERNEL_VERSIONS
@@ -174,7 +175,7 @@ else
 stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "$(ECHO) '/* dummy load script */' > \"$$r.ver\"" ; \
 		$(ECHO) '/* dummy load script */' > "$$r.ver" ; \
@@ -185,9 +186,8 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 endif
 
 clean-verfiles:
-	@vers=`$(ECHO) " $(EXPORT_SRCFILES) " | sed -e 's, *  , ,g;s, [^[:space:]]*/, ,g;s,\.c ,.ver ,g'` ; \
-	$(ECHO) "rm -f -- stamp-verfiles $$vers" ; \
-	rm -f -- stamp-verfiles $$vers
+	@vers=`$(ECHO) " $(EXPORT_SRCFILES) " | sed 's, *  , ,g;s, [^[:space:]]*/, ,g;s,\.c ,.ver ,g'` ; \
+	list="stamp-verfiles $$vers" ; $(am__list_remove)
 
 CLEAN_LOCAL		+= clean-verfiles
 
@@ -197,13 +197,13 @@ stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS)
 	list="$?" ; for obj in $$list ; do \
 		test :$$obj != :stamp-verfiles || continue ; \
 		if $(OBJDUMP) -h $$obj | grep -q __ksymtab; then \
-			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
-			v=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,,;s,\.o$$,,'` ; \
+			a=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
+			v=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,,;s,\.o$$,,'` ; \
 			$(ECHO_Q) "  LD    " $$a ; \
 			$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a" ; \
 			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj $$v.ver && $(am__mv) -- a.$$$$.out $$a ; \
 		else \
-			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
+			a=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 			$(ECHO_Q) "  LD    " $$a ; \
 			$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
 			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
@@ -214,9 +214,8 @@ stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS)
 ALL_LOCAL		+= stamp-verobjs
 
 clean-verobjs:
-	@objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed -e 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
-	$(ECHO) "rm -f -- stamp-verobjs $$objs" ; \
-	rm -f -- stamp-verobjs $$objs
+	@objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
+	list="stamp-verobjs $$objs" ; $(am__list_remove)
 
 CLEAN_LOCAL		+= clean-verobjs
 
@@ -229,9 +228,10 @@ else
 if AMDEP
 ## AMDEP
 $(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "Creating $@ dependencies..." ; \
-	v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e s',/[^/]*$$,,'`/versions ; \
+	v=`$(ECHO) "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
 	$(ECHO) "$(mkdir_p) $$v" ; \
 	$(mkdir_p) $$v ; \
 	( \
@@ -239,8 +239,8 @@ $(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
 		list='$(EXPORT_SRCFILES)'; \
 		for s in $$list ; do \
 			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-			r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-			p=`$(ECHO) "$$v" | sed -e 's,^[^/]*/,,'` ; \
+			r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			p=`$(ECHO) "$$v" | sed 's,^[^/]*/,,'` ; \
 			$(ECHO) "sinclude ./$(DEPDIR)/$$r.Pver" ; $(ECHO) "" ; \
 			$(ECHO) "$$v/$$r.ver: $$d$$s" ; $(ECHO) "" ; \
 			vers="$${vers}$${vers:+ }$$v/$$r.ver" ; \
@@ -248,7 +248,7 @@ $(DEPDIR)/modversions.Ph: $(EXPORT_SRCFILES)
 		$(ECHO) "" ; $(ECHO) "$(MODVERSIONS_H): $$vers" ; \
 		objs= ; \
 		list="$(KERNEL_OBJECTS)" ; for obj in $$list ; do \
-			a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
+			a=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 			$(ECHO) "$$a: $$obj" ; $(ECHO) "" ; \
 			objs="$${objs}$${objs:+ }$$obj" ; \
 		done ; \
@@ -283,7 +283,7 @@ if KERNEL_VERSIONS
 $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "Creating $@ header file..." ; \
-	v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e 's,/[^/]*$$,,'`/versions ; \
+	v=`$(ECHO) "$(MODVERSIONS_H)" | sed 's,/[^/]*$$,,'`/versions ; \
 	$(mkdir_p) $$v ; \
 	( \
 		$(ECHO) "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
@@ -292,8 +292,8 @@ $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 		list='$(EXPORT_SRCFILES)'; \
 		for s in $$list ; do \
 			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-			r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
-			p=`$(ECHO) "$$v" | sed -e 's,^.*/include/,,'` ; \
+			r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			p=`$(ECHO) "$$v" | sed 's,^.*/include/,,'` ; \
 			$(ECHO) "#include \"$$p/$$r.ver\"" ; \
 			vers="$${vers}$${vers:+ }$$v/$$r.ver" ; \
 		done ; \
@@ -304,11 +304,11 @@ $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 if am__fastdepCC
 ## am__fastdepCC
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
-	@v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e 's,/[^/]*$$,,'`/versions ; \
+	@v=`$(ECHO) "$(MODVERSIONS_H)" | sed 's,/[^/]*$$,,'`/versions ; \
 	$(mkdir_p) $$v ; \
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
@@ -319,11 +319,11 @@ else
 if AMDEP
 ## AMDEP
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
-	@v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e s',/[^/]*$$,,'`/versions ; \
+	@v=`$(ECHO) "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
 	$(mkdir_p) $$v ; \
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
@@ -334,11 +334,11 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 else
 ## !AMDEP
 $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
-	@v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e s',/[^/]*$$,,'`/versions ; \
+	@v=`$(ECHO) "$(MODVERSIONS_H)" | sed s',/[^/]*$$,,'`/versions ; \
 	$(mkdir_p) $$v ; \
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(ECHO_Q) "  CPP   " $$r.ver ; \
 		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
@@ -369,7 +369,7 @@ stamp-verobjs: $(KERNEL_OBJECTS)
 	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
 	 test -z '$(PKG_ABI)' || pkg_abi='--version-script $(PKG_ABI)' ; \
 	list="$?" ; for obj in $$list ; do \
-		a=`$(ECHO) "$$obj" | sed -e 's,^lib.*_a-,$(kpre),'` ; \
+		a=`$(ECHO) "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 		$(ECHO_Q) "  LD    " $$a ; \
 		$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
 		$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
@@ -380,9 +380,8 @@ ALL_LOCAL		+= stamp-verobjs
 
 clean-verobjs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed -e 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
-	$(ECHO) "rm -f -- stamp-verobjs $$objs" ; \
-	rm -f -- stamp-verobjs $$objs
+	@objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed 's, *  , ,g;s, lib[^[:space:]]*_a-, $(kpre),g'` ; \
+	list="stamp-verobjs $$objs" ; $(am__list_remove)
 
 CLEAN_LOCAL		+= clean-verobjs
 
@@ -395,12 +394,12 @@ clean-ksyms:
 distclean-ksyms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test -n "$(AUTOCONFIG_H)" ; then \
-		p=`$(ECHO) "$(AUTOCONFIG_H)" | sed -e 's,[^/]*$$,,'` ; \
+		p=`$(ECHO) "$(AUTOCONFIG_H)" | sed 's,[^/]*$$,,'` ; \
 		if test -d "$$p" ; then \
 			rm -f -- $(AUTOCONFIG_H) $${p}stamp-h2 ; \
 		fi \
 	fi
-	rm -f -- $(BUILD_SPECIFIC_FILES)
+	@list="$(BUILD_SPECIFIC_FILES)" ; $(am__list_remove)
 
 maintainer-clean-ksyms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -437,9 +436,8 @@ uninstall-ksyms:
 			$(PKGINCL)/*) f=`$(ECHO) "$$p" | sed "s,^$$incstrip,,"`;; \
 			*) f=$$p;; \
 		esac; \
-		$(ECHO) "rm -f -- '$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)/$$f'"; \
-		rm -f -- "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)/$$f"; \
-	done
+		echo "$(DESTDIR)$(pkgincludedir)/$(kversion)/$(target_cpu)/$$f"; \
+	done | $(am__base_remove)
 
 postun-ksyms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -474,6 +472,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: genksyms.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -151,7 +151,7 @@ $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 
 $(debtop_dsc_file) $(debtop_tar_file)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) "$@" | sed -e 's|^$(debdir)/|$(debbuilddir)/|'`; \
+	@f=`$(ECHO) "$@" | sed 's|^$(debdir)/|$(debbuilddir)/|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f; }; \
@@ -168,10 +168,10 @@ $(debtop_sig_file): $(debtop_dsc_file)
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
 	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 	pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-	$(ECHO) "rm -f $@"; \
-	rm -f $@; \
+	$(ECHO) "rm -f -- $@"; \
+	rm -f -- $@; \
 	$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@"; \
-	eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" || { rm -f $< $@; exit 1; }
+	eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@" || { rm -f -- $< $@; exit 1; }
 	cp -fp $@ $<
 	touch $@
 
@@ -213,7 +213,7 @@ chg-deb:
 	@if test "$(debdir)" != "$(debbuilddir)"; then \
 		list="$(debian_binary_files) $(debian_change_files)"; for f in $$list; do \
 			test -f $$f || continue; \
-			t=`echo $$f | sed -e 's|^$(debbuilddir)/|$(debdir)/|'`; \
+			t=`echo $$f | sed 's|^$(debbuilddir)/|$(debdir)/|'`; \
 			if test ":$(FORCE)" = :force -o ! -f "$$t"; then \
 				$(ECHO) "cp -f -- $$f $$t"; \
 				cp -f -- $$f $$t; \
@@ -253,10 +253,10 @@ csig:
 			home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
 			pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 			pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-			$(ECHO) "rm -f $$t"; \
-			rm -f $$t; \
+			$(ECHO) "rm -f -- $$t"; \
+			rm -f -- $$t; \
 			$(ECHO) "$(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t"; \
-			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t" || { rm -f $$f $$t; exit 1; }; \
+			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -o- -- $$f > $$t" || { rm -f -- $$f $$t; exit 1; }; \
 			cp -fp $$t $$f; \
 			touch $$t; \
 		fi; \
@@ -281,18 +281,18 @@ reupload:
 		$(ECHO) "D: $@: skipped noarch"; \
 	fi; \
 	targets="$(ARCH) $(AM_DEBTARGETS)"; for t in $$targets;  do \
-		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -f $(DESTDIR)/lib/modules/$$k/build || continue; \
+			test -f $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
 			if test -z '$(DESTDIR)'; then \
 				if ! $(DPKG) -S /lib/modules/$$k/build >/dev/null 2>&1; then \
 					continue; \
 				fi; \
 			fi; \
-			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
 			debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$a.*deb' 2>/dev/null`"; \
 			if test -z "$$debs" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
@@ -350,10 +350,9 @@ update-clean-deb:
 	@list="$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files)"; \
 	for f in $$list; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
-			$(ECHO) "rm -f -- \"$$f\""; \
-			rm -f -- "$$f"; \
+			echo "$$f"; \
 		fi; \
-	done
+	done | $(am__base_remove)
 
 UPDATE			+= all-update-dscs all-update-debs all-update-chgs
 UPDATE_SIGN		+= all-update-csig all-update-sigs
@@ -374,7 +373,7 @@ update-dscs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(debtop_dsc_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
-			g=`echo "$$f" | sed -e 's,^$(debdir),$(debian_dir),'`; \
+			g=`$(ECHO) "$$f" | sed 's,^$(debdir),$(debian_dir),'`; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
@@ -409,18 +408,18 @@ update-debs:
 	fi; \
 	targets="$(ARCH) $(AM_DEBTARGETS)"; \
 	for t in $$targets; do \
-		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; \
+			test -f $(DESTDIR)$(rootdir)/lib/modules/$$k/build/Makefile || continue; \
 			if test -z '$(DESTDIR)'; then \
 				if ! $(DPKG) -S /lib/modules/$$k/build >/dev/null 2>&1; then \
 					continue; \
 				fi; \
 			fi; \
-			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
 			rebuild=yes; \
 			debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$(krelease)_$$a\..*deb') 2>/dev/null`; \
 			for f in $$debs; do \
@@ -540,15 +539,15 @@ apt_files		= $(apt_nonrel_files) \
 #!
 $(aptdir)/Packages:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) packages $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) packages $(aptdir) | sed 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Sources:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) sources $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) sources $(aptdir) | sed 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Contents:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) contents $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) contents $(aptdir) | sed 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Packages.gz $(aptdir)/Sources.gz $(aptdir)/Contents.gz $(aptdir)/Release.gz: %.gz : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -560,11 +559,11 @@ $(aptdir)/Packages.bz2 $(aptdir)/Sources.bz2 $(aptdir)/Contents.bz2 $(aptdir)/Re
 
 $(aptdir)/md5sum.txt:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	find $(aptdir) -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed -e 's, $(aptdir)/, ,' > $@
+	find $(aptdir) -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Release: $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) release $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) release $(aptdir) | sed 's, $(aptdir)/, ,' > $@
 
 #! repo-apt:
 #!     Create (or recreate) the meta data files for an APT repository in the
@@ -616,6 +615,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

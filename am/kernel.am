@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -75,14 +75,15 @@ if AMDEP
 sinclude $(DEPDIR)/modules.Pk
 
 $(DEPDIR)/modules.Pk: Makefile
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "Creating $@ dependencies..." ; \
 	( \
-		srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
+		srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
 		$(ECHO) "stamp-mobjects: $$srcs" ; $(ECHO) "" ; \
-		objs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.o |g'` ; \
+		objs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.o |g'` ; \
 		$(ECHO) "stamp-kobjects: $$objs" ; $(ECHO) "" ; \
-		mods=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g'` ; \
+		mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g'` ; \
 		for m in $$mods ; do b=`basename $$m` ; \
 			$(ECHO) "sinclude $(DEPDIR)/$$b.mod.Po" ; \
 			$(ECHO) "sinclude $(DEPDIR)/$$b.Pko" ; \
@@ -93,7 +94,7 @@ $(DEPDIR)/modules.Pk: Makefile
 endif
 
 stamp-modpost: stamp-verobjs $(KERNEL_MODULES)
-	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO_Q) "  GEN   " $(MODPOST_MODVER) ; \
 	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list" ; \
 	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list ; \
@@ -104,7 +105,7 @@ CLEANFILES		+= System.symvers Module.symvers
 if am__fastdepCC
 ## am__fastdepCC
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
 		test :$$m != :stamp-modpost || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
@@ -120,7 +121,7 @@ else
 if AMDEP
 ## AMDEP
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
@@ -134,7 +135,7 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 else
 ## !AMDEP
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
 		test :$$m != :stamp-modpost || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
@@ -191,11 +192,10 @@ endif
 
 clean-kernel:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
-	objs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
-	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.ko |g'` ; \
-	$(ECHO) "rm -f -- stamp-modpost stamp-mobjects stamp-kobjects $$srcs $$objs $$mods" ; \
-	rm -f -- stamp-modpost stamp-mobjects stamp-kobjects $$srcs $$objs $$mods
+	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
+	objs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
+	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.ko |g'` ; \
+	list="stamp-modpost stamp-mobjects stamp-kobjects $$srcs $$objs $$mods" ; $(am__list_remove)
 
 all-kernel: stamp-kobjects Modules.map
 
@@ -346,13 +346,13 @@ pre-modules:
 	if test -n "$$modl_mods" -a -f $(DESTDIR)$(kmoduledir)/modules.dep ; then \
 		dep= ; while read line ; do \
 			case $$line in \
-				(*\\)	line="`echo $$line | sed -e 's|\\$$||'`" ; \
+				(*\\)	line="`echo $$line | sed 's|\\$$||'`" ; \
 					dep="$${dep:+$$dep }$$line" ; continue ;; \
 				(*)	dep="$${dep:+$$dep }$$line" ;; \
 			esac ; \
 			set dummy $$dep ; \
 			if test "$${3+set}" = "set" ; then \
-				t=`echo $$2 | sed -e 's|:$$||'` ; \
+				t=`echo $$2 | sed 's|:$$||'` ; \
 				$(ECHO) "Reading dependencies for target $$t" ; \
 				target=target_`echo $$t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
 				shift 2 ; \
@@ -373,9 +373,8 @@ pre-modules:
 			prereq=prereq_`echo $$m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$$||;s|[^a-zA-Z0-9_]|_|g'` ; \
 			eval "modl_deps=\"\`remove_depmods \$$$$prereq\`\"" ; \
 			test -n "$$modl_deps" || continue ; \
-			$(ECHO) "rm -f -- $$modl_deps" ; \
-			rm -f -- $$modl_deps ; \
-		done ; \
+			echo "$$modl_deps" ; \
+		done | $(am__base_remove) ; \
 	fi
 
 pre-modconf:
@@ -425,15 +424,14 @@ post-modconf:
 	if ( grep -q 'BEGIN LiS' $$conf_fil ) ; then \
 		list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; for m in $$list ; do \
 			p="$$m$(kext)$(kzip)" ; \
-			sed -e "/$$m/d" $$conf_new > $$conf_tmp ; \
+			sed "/$$m/d" $$conf_new > $$conf_tmp ; \
 			$(am__mv) $$conf_tmp $$conf_new ; \
 			for d in $$streams_dirs ; do \
 				for s in $$streams_subs ; do \
-					$(ECHO) "rm -f -- $$d/$$s/$$p $$d/$$s/boot/$$p" ; \
-					rm -f -- $$d/$$s/$$p $$d/$$s/boot/$$p ; \
+					echo "$$d/$$s/$$p $$d/$$s/boot/$$p" ; \
 				done ; \
 			done ; \
-		done ; \
+		done | $(am__base_remove) ; \
 		for d in $$streams_dirs ; do \
 			for s in $$streams_subs ; do \
 				$(ECHO) "rmdir --ignore-fail-on-non-empty $$d/$$s/boot $$d/$$s $$d" ; \
@@ -451,15 +449,14 @@ post-modconf:
 					cp -f $$streams_fil $$streams_new ; \
 					list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? | |g'` ; for m in $$list ; do \
 						p="$$m$(kext)$(kzip)" ; \
-						sed -e "/$$m/d" $$streams_new > $$streams_tmp ; \
+						sed "/$$m/d" $$streams_new > $$streams_tmp ; \
 						$(am__mv) $$streams_tmp $$streams_new ; \
 						for d in $$streams_dirs ; do \
 							for s in $$streams_subs ; do \
-								$(ECHO) "rm -f -- $$d/$$s/$$p $$d/$$s/boot/$$p" ; \
-								rm -f -- $$d/$$s/$$p $$d/$$s/boot/$$p ; \
+								echo "$$d/$$s/$$p $$d/$$s/boot/$$p" ; \
 							done ; \
 						done ; \
-					done ; \
+					done | $(am__base_remove) ; \
 					for d in $$streams_dirs ; do \
 						for s in $$streams_subs ; do \
 							$(ECHO) "rmdir --ignore-fail-on-non-empty $$d/$$s/boot $$d/$$s $$d" ; \
@@ -498,8 +495,8 @@ post-preload:
 	prel_tmp="$${TMPDIR-/var/tmp}/`basename $$prel_fil`.tmp.$$$$" ; \
 	cp -f $$prel_fil $$prel_new ; \
 	list='$(KERNEL_PRELOADS)' ; for p in $$list ; do \
-		f=`$(ECHO) "$$p" | sed -e 's|\.o$$||'` ; \
-		sed -e "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
+		f=`$(ECHO) "$$p" | sed 's|\.o$$||'` ; \
+		sed "/^$$f\>/d" $$prel_new > $$prel_tmp ; \
 		$(am__mv) $$prel_tmp $$prel_new ; \
 		$(ECHO) "$$f" >> $$prel_new ; \
 	done ; \
@@ -579,20 +576,20 @@ uninstall-preload:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list=` $(ECHO) " $(KERNEL_PRELOADS) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
-		$(ECHO_C)rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot/$$p ; \
-	done
+		echo "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot/$$p" ; \
+	done | $(am__base_remove)
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/boot" || :
 
 uninstall-modules:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
-		$(ECHO_C)$(LIBTOOL) --mode=uninstall rm -f -- "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+		$(ECHO_V) "$(LIBTOOL) --mode=uninstall rm -f -- \"$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p\"" ; \
+		$(LIBTOOL) --mode=uninstall rm -f -- "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 	done
 	@list='$(KERNEL_AUX_FILES)' ; for f in $$list ; do \
-		$(ECHO) "rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
-		rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
-	done
+		echo "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
+	done | $(am__base_remove)
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)" || :
 
 uninstall-modconf:
@@ -630,7 +627,7 @@ postun-modconf:
 	conf_tmp="$${TMPDIR-/var/tmp}/`basename $$conf_fil`.tmp.$$$$" ; \
 	conf_new="$${TMPDIR-/var/tmp}/`basename $$conf_fil`.new.$$$$" ; \
 	cp -f -- $$conf_fil $$conf_new ; \
-	sed -e '\|^include[[:space:]].*$(modutildir)/$(KMODCONF_EXT)|d' $$conf_new > $$conf_tmp ; \
+	sed '\|^include[[:space:]].*$(modutildir)/$(KMODCONF_EXT)|d' $$conf_new > $$conf_tmp ; \
 	$(am__mv) -- $$conf_tmp $$conf_new ; \
 	chmod --reference=$$conf_fil $$conf_new ; \
 	cp -fb --suffix=.$(KMODCONF_EXT).bak -- $$conf_new $$conf_fil ; \
@@ -657,8 +654,8 @@ postun-preload:
 	prel_new="${TMPDIR-/var/tmp}/`basename $$prel_fil`.new.$$$$" ; \
 	cp -f -- $$prel_fil $$prel_new ; \
 	mods='$(KERNEL_PRELOADS)' ; for p in $$mods ; do \
-		m=`$(ECHO) $$p | sed -e 's|\.o$$||'` ; \
-		sed -e '\|^[[:space:]]*'"$$m"'[[:space:]]*$$|d' $$prel_new > $$prel_tmp ; \
+		m=`$(ECHO) $$p | sed 's|\.o$$||'` ; \
+		sed '\|^[[:space:]]*'"$$m"'[[:space:]]*$$|d' $$prel_new > $$prel_tmp ; \
 		$(am__mv) -- $$prel_tmp $$prel_new ; \
 	done ; \
 	chmod --reference=$$prel_fil -- $$prel_new ; \
@@ -753,6 +750,9 @@ EXTRA_SCRIPTS		+= scripts/cflagcheck
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

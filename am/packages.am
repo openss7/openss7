@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,8 +77,8 @@ $(DEPDIR)/packages.Ph: Makefile
 	( \
 		objs= ; \
 		list="$(PACKAGE_OBJECTS)" ; for obj in $$list ; do \
-			a=`$(ECHO) "$$obj" | sed -e 's,\<lib.*_a-,$(kpre),'` ; \
-			s=`$(ECHO) "$$obj" | sed -e 's,\<lib.*_a-,,;s,\<$(kpre),,;s,\.o$$,,'` ; \
+			a=`$(ECHO) "$$obj" | sed 's,\<lib.*_a-,$(kpre),'` ; \
+			s=`$(ECHO) "$$obj" | sed 's,\<lib.*_a-,,;s,\<$(kpre),,;s,\.o$$,,'` ; \
 			if test -f "$$s" ; then d= ; else d="$(srcdir)/" ; fi ; \
 			if test -f "$$d$$s" ; then s="$$s.c" ; else s= ; fi ; \
 			if test "$$a" = "$$obj" ; then \
@@ -89,7 +89,7 @@ $(DEPDIR)/packages.Ph: Makefile
 			objs="$${objs:+$${objs} }$$obj" ; \
 		done ; \
 		$(ECHO) "stamp-pkgobjs: $$objs" ; $(ECHO) "" ; \
-	) >$(DEPDIR)/packages.Tph || { rm -f $(DEPDIR)/packages.Tph ; exit 1 ; } ; \
+	) >$(DEPDIR)/packages.Tph || { rm -f -- $(DEPDIR)/packages.Tph ; exit 1 ; } ; \
 	$(am__mv) $(DEPDIR)/packages.Tph $@
 ## AMDEP
 endif
@@ -105,9 +105,9 @@ if am__fastdepCC
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list="$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -MT libBCMpkgs_a-$$r.o -MD -MP -MF "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
-		then $(am__mv) "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
+		then $(am__mv) "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f -- "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
 	done ; \
 	touch stamp-pkgobjs
 ## am__fastdepCC
@@ -118,7 +118,7 @@ if AMDEP
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		source="$$s" object="libBCMpkgs_a-$$r.o" libtool=no \
 		DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
@@ -130,7 +130,7 @@ else
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
 	done ; \
 	touch stamps-pkgobjs
@@ -140,9 +140,8 @@ endif
 endif
 
 clean-pkgobjs:
-	@objs=`$(ECHO) " $(PACKAGE_SRCFILES) " | sed -e 's, *  , ,g;s, [^[:space:]]*/, libBCMpkgs_a-,g;s,\.c ,.o ,g'` ; \
-	$(ECHO) "rm -f -- stamp-pkgobjs $$objs" ; \
-	rm -f -- stamp-pkgobjs $$objs
+	@objs=`$(ECHO) " $(PACKAGE_SRCFILES) " | sed 's, *  , ,g;s, [^[:space:]]*/, libBCMpkgs_a-,g;s,\.c ,.o ,g'` ; \
+	list="stamp-pkgobjs $$objs" ; $(am__list_remove)
 
 CLEAN_LOCAL		+= clean-pkgobjs
 
@@ -154,6 +153,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: packages.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

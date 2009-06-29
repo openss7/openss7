@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:25:07 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:25:07 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:25:07 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -72,19 +72,17 @@ AC_CANONICAL_TARGET
 
 _DISTRO
 
-AM_INIT_AUTOMAKE([silent-rules tar-ustar])
+AM_INIT_AUTOMAKE([gnits 1.11 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-ustar])
 AM_MAINTAINER_MODE
 dnl
-dnl make --enable-maintainer-mode imply --enable-dependency-tracking and
-dnl --enable-silent-rules to avoid typing, but allow user to override with
-dnl --disable-dependency-tracking and --disable-silent-rules.  Default to
-dnl previous dependency tracking mode.
+dnl Default to --enable-silent-rules.  Let the user specify
+dnl --disable-silent-rules or specify V=1 to make if they want verbose
+dnl output.  Note that if dependency tracking is disabled, enabling silent
+dnl rules is pointless on automake-1.11 as it has a bug in that regard and
+dnl will spew both silent CC lines and verbose lines at once.
 dnl
-if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
-    enable_dependency_tracking="${enable_dependency_tracking:-yes}"
+if test :$enable_dependency_tracking != :no ; then
     enable_silent_rules="${enable_silent_rules:-yes}"
-else
-    enable_dependency_tracking="${enable_dependency_tracking:-no}"
 fi
 AM_SILENT_RULES
 
@@ -262,6 +260,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.2  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:25:07  brian
 # - added base files to new distro
 #

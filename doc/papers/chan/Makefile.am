@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:41:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:41:31 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +80,6 @@ include ../../../am/papers.am
 EXTRA_DIST += \
 	voipt.tex \
 	voipt.bib \
-	voipt.css \
 	voipt_fig01.fig \
 	voipt_fig02.fig \
 	voipt_fig03.fig \
@@ -94,6 +93,9 @@ EXTRA_DIST += \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:36  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:41:31  brian
 # - added files to new distro
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:25:07 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,21 +48,29 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:25:07 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
 m4_include([m4/pr.m4])
+m4_include([m4/public.m4])
+
+m4_include([m4/archive.m4])
+m4_include([m4/rpm.m4])
+m4_include([m4/deb.m4])
+
+m4_include([m4/man.m4])
+m4_include([m4/info.m4])
+m4_include([m4/papers.m4])
+m4_include([m4/drafts.m4])
+
 m4_include([m4/init.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/devfs.m4])
 m4_include([m4/genksyms.m4])
-m4_include([m4/man.m4])
-m4_include([m4/public.m4])
-m4_include([m4/rpm.m4])
-m4_include([m4/deb.m4])
+
 m4_include([m4/libraries.m4])
 m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
@@ -72,9 +80,9 @@ m4_include([m4/lib32.m4])
 m4_include([m4/perl.m4])
 m4_include([m4/snmp.m4])
 m4_include([m4/agent.m4])
-m4_include([m4/jar.m4])
 m4_include([m4/gcj.m4])
-
+m4_include([m4/java.m4])
+m4_include([m4/swig.m4])
 
 # =============================================================================
 # AC_OPENSS7
@@ -82,15 +90,17 @@ m4_include([m4/gcj.m4])
 AC_DEFUN([AC_OPENSS7], [dnl
     _OPENSS7_PACKAGE([OpenSS7], [OpenSS7])
     PKGINCL="src/include/sys/${PACKAGE_LCNAME}"
-    _GCJ_CONFIG
-    _OS7_OPTIONS
     _AUTOPR
-    _MAN_CONVERSION
-    _JAR
     _PUBLIC_RELEASE
-    _INIT_SCRIPTS
+    _ARCHIVE
     _RPM_SPEC
     _DEB_DPKG
+    _MAN_CONVERSION
+    _INFO
+    _PAPERS
+    _DRAFTS
+    _OS7_OPTIONS
+    _INIT_SCRIPTS
     AC_CONFIG_FILES([debian/openss7-core.postinst
 		     debian/openss7-core.postrm
 		     debian/openss7-core.preinst
@@ -152,6 +162,8 @@ dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/inclu
     _AGENT
     _AUTOTEST
     _DOXY
+    _JAVA
+    _SWIG
 ])# AC_OPENSS7
 # =============================================================================
 
@@ -3642,6 +3654,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:25:07  brian
 # - added base files to new distro
 #

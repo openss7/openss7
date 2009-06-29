@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:42:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:42:56 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -164,12 +164,14 @@ EXTRA_DIST += \
 	sctp.fig \
 	sctpresults.tex \
 	sctpresults.bib \
-	sctpresults.css \
 	org.css
 
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:36  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:42:56  brian
 # - added files to new distro
 #

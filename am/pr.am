@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: pr.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: pr.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -96,7 +96,7 @@ clean-send-pr:
 distclean-send-pr:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list='$(LOGGING_TARGETS)' ; for t in $$list ; do \
-		p=`echo $$t | sed -e 's|\.log$$|.pr|'` ; \
+		p=`echo $$t | sed 's|\.log$$|.pr|'` ; \
 		$(ECHO) "rm -f -- $$p" ; \
 		rm -f -- $$p ; \
 	done ; \
@@ -126,6 +126,9 @@ MY_PHONY		+= bug pr send-pr finish-pr
 ## =============================================================================
 ##
 ## $Log: pr.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

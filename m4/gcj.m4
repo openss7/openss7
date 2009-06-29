@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -178,14 +178,14 @@ if test -z "$GCJ"; then
     dnl Until the check is removed from there, copy the code:
     if test -n "$ac_tool_prefix"; then
 	AC_CHECK_PROG(GCJ, [${ac_tool_prefix}gcj], [${ac_tool_prefix}gcj])
-    fi
-fi
+    fi # gcj.m4 181
+fi # gcj.m4 182
 if test -z "$GCJ" ; then
     AC_CHECK_PROG(GCJ, gcj, gcj, , , /usr/ucb/gcj)
-fi
+fi # gcj.m4 185
 if test -z "$GCJ"; then
     AC_CHECK_TOOLS(GCJ, cl.exe)
-fi
+fi # gcj.m4 188
 ])
 
 test -z "$GCJ" && AC_MSG_FAILURE([no acceptable GCJ compiler found in \$PATH])
@@ -225,7 +225,7 @@ if test -z "$JAVAC"; then
     AC_CHECK_TOOLS(JAVAC,
 	[m4_default([$1], [gcj javac])],
 	gcj)
-fi
+fi # gcj.m4 228
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javac compiler version])
 ac_compiler=$JAVAC
@@ -252,7 +252,7 @@ if test -z "$GCJH"; then
     AC_CHECK_TOOLS(GCJH,
 	[m4_default([$1], [gcjh])],
 	gcjh)
-fi
+fi # gcj.m4 255
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javah compiler version])
 ac_compiler=$GCJH
@@ -283,7 +283,7 @@ if test -z "$JAVAH"; then
     AC_CHECK_TOOLS(JAVAH,
 	[m4_default([$1], [gcjh gcjnih javah])],
 	gcjh)
-fi
+fi # gcj.m4 286
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javah compiler version])
 ac_compiler=$JAVAH
@@ -303,7 +303,7 @@ AC_LANG_POP(Java)dnl
 m4_define([_AC_PROG_GCJ_G],
 [ac_test_GCJFLAGS=${GCJFLAGS+set}
 ac_save_GCJFLAGS=$GCJFLAGS
-AC_CACHE_CHECK(whether $GCJ accepts -g, ac_cv_prog_gcj_g,
+AC_CACHE_CHECK([whether $GCJ accepts -g], [ac_cv_prog_gcj_g],
     [ac_save_gcj_werror_flag=$ac_gcj_werror_flag
      ac_gcj_werror_flag=yes
      ac_cv_prog_gcj_g=no
@@ -324,7 +324,7 @@ elif test $ac_cv_prog_gcj_g = yes; then
     GCJFLAGS="-g -O2"
 else
     GCJFLAGS="-O2"
-fi[]dnl
+fi # gcj.m4 327
 ])
 
 # AC_LANG_FLAG(Java)(FLAG, [IF-WORKS], [IF-DOES-NOT-WORK])
@@ -335,7 +335,7 @@ m4_define([AC_LANG_FLAG(Java)],
 [ac_test_GCJFLAGS=${GCJFLAGS+set}
 ac_save_GCJFLAGS=$GCJFLAGS
 AS_VAR_PUSHDEF([CacheVar], [AS_TR_SH(ac_cv_prog_gcj[]$1)])dnl
-AC_CACHE_CHECK(whether $GCJ accepts $1, CacheVar,
+AC_CACHE_CHECK([whether $GCJ accepts $1], CacheVar,
     [ac_save_gcj_werror_flag=$ac_gcj_werror_flag
      ac_gcj_werror_flag=yes
      AS_VAR_SET([CacheVar], [no])
@@ -352,13 +352,13 @@ AC_CACHE_CHECK(whether $GCJ accepts $1, CacheVar,
      ac_gcj_werror_flag=$ac_save_gcj_werror_flag])
 if test "$ac_test_GCJFLAGS" = set; then
     GCJFLAGS=$ac_save_GCJFLAGS
-fi
+fi # gcj.m4 355
 if test :AS_VAR_GET([CacheVar]) = :yes
 then :;
 $2
 else :;
 $3
-fi[]dnl
+fi # gcj.m4 361
 AS_VAR_POPDEF([CacheVar])dnl
 ])
 
@@ -370,7 +370,7 @@ m4_define([AC_LANG_FLAG(Javah)],
 [ac_test_JAVAHFLAGS=${JAVAHFLAGS+set}
 ac_save_JAVAHFLAGS=$JAVAHFLAGS
 AS_VAR_PUSHDEF([CacheVar], [AS_TR_SH(ac_cv_prog_javah[]$1)])dnl
-AC_CACHE_CHECK(whether $JAVAH accepts $1, CacheVar,
+AC_CACHE_CHECK([whether $JAVAH accepts $1], CacheVar,
     [ac_save_javah_werror_flag=$ac_javah_werror_flag
      ac_javah_werror_flag=yes
      AS_VAR_SET([CacheVar], [no])
@@ -393,7 +393,7 @@ then :;
 $2
 else :;
 $3
-fi[]dnl
+fi # gcj.m4 396
 AS_VAR_POPDEF([CacheVar])dnl
 ])
 
@@ -445,57 +445,18 @@ AC_DEFUN([_GCJ_CONFIG], [dnl
 # _GCJ_TOOLS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_GCJ_TOOLS], [dnl
-    AC_ARG_VAR([GCJH],
-	[Java CNI header command. @<:@default=gcjh@:>@])
-    AC_ARG_VAR([GCJHFLAGS],
-	[Java CNI header command flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([GCJH], [gcjh], [],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
-    if test -z "$GCJH"; then
-	AC_MSG_ERROR([
-***
-*** Configure could not find the GNU Java Compiler CNI header
-*** generation command, 'gcjh'.  This program is part of the GNU
-*** Compiler Collection, but is not always loaded on recent
-*** distributions.
-***
-*** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
-***
-*** Alternatively, you can specify an equivalent command with
-*** the GCJH environment variable when rerunning configure.
-***])
-    fi
-
-    AC_ARG_VAR([JAVAH],
-	[Java JNI header command. @<:@default=gcjh@:>@])
-    AC_ARG_VAR([JAVAHFLAGS],
-	[Java JNI header command flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([JAVAH], [gcjh javah], [],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
-    if test -z "$JAVAH"; then
-	AC_MSG_ERROR([
-***
-*** Configure could not find the Java JNI header generation
-*** program 'javah' (nor 'gcjh').  This program is part of the
-*** GNU Compiler Collection, but is not always loaded on recent
-*** distributions.  It is also part of most Java SDKs.
-***
-*** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
-***
-*** Alternatively, you can specify an equivalent command with
-*** the JAVAH environment variable when rerunning configure.
-***])
-    fi
-
+    AC_REQUIRE([_OPENSS7_MISSING4])
+    gcj_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+dnl
+dnl We need a javac compiler or we cannot compile any classes.
+dnl
     AC_ARG_VAR([JAVAC],
 	[Java class compiler. @<:@default=gcj@:>@])
     AC_ARG_VAR([JAVACFLAGS],
 	[Java class compiler flags. @<:@default=auto@:>@])
     AC_PATH_PROGS([JAVAC], [gcj javac], [],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
-    if test -z "$GCJH"; then
+	[$gcj_tmp])
+    if test -z "$JAVAC"; then
 	AC_MSG_ERROR([
 ***
 *** Configure could not find the Java class compiler program
@@ -511,14 +472,121 @@ AC_DEFUN([_GCJ_TOOLS], [dnl
 ***])
     fi
 
+dnl
+dnl We need the gcj-dbtool so that we can create classmap databses and add
+dnl native compile java modules to the global classmap database when
+dnl installing.
+dnl
+    AC_ARG_VAR([GCJDBTOOL],
+	[GCJ database tool. @<:@default=gcj-dbtool@:>@])
+    AC_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [],
+	[$gcj_tmp])
+    if test -z "$GCJDBTOOL"; then
+	AC_MSG_ERROR([
+***
+*** Configure could not find the GCJ database tool program
+*** 'gcj-dbtool'.  This program is part of the GNU Compiler
+*** Collection, but is not always loaded on recent
+*** distributions.
+***
+*** On RPM based distributions, try 'yum install gcc-java'.
+*** On DEB based distributions, try 'apt-get install gcj'.
+*** On SUSE distributions, try 'zypper install gcc-java'.
+***
+*** Alternatively, you can specify an equivalent command with
+*** the GCJDBTOOL environment variable when running configure.
+***])
+    fi
+
+dnl
+dnl Note that we distribute the CNI header files.  Therefore, this tool should
+dnl only get invoked should the CNI header files need to be updated.  A
+dnl workaround for a missing tool is to simply touch the header files that
+dnl were distributed if they exist.  If the header files do not exist, then an
+dnl error will result.  See the missing4 script.
+dnl
+    AC_ARG_VAR([GCJH],
+	[Java CNI header command. @<:@default=gcjh@:>@])
+    AC_ARG_VAR([GCJHFLAGS],
+	[Java CNI header command flags. @<:@default=auto@:>@])
+    AC_PATH_PROGS([GCJH], [gcjh], [],
+	[$gcj_tmp])
+    if test :"${GCJH:-no}" = :no ; then
+	ac_cv_path_GCJH="${am_missing4_run}gcjh"
+	GCJH="${am_missing4_run}gcjh"
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	then
+	    AC_MSG_WARN([
+***
+*** Configure could not find the GNU Java Compiler CNI header
+*** generation command, 'gcjh'.  This program is part of the GNU
+*** Compiler Collection, but is not always loaded on recent
+*** distributions.
+***
+*** On RPM based distributions, try 'yum install gcc-java'.
+*** On DEB based distributions, try 'apt-get install gcj'.
+*** On SUSE distributions, try 'zypper install gcc-java'.
+***
+*** Alternatively, you can specify an equivalent command with
+*** the GCJH environment variable when running configure.
+***])
+	fi
+    fi
+
+dnl
+dnl Note that we distribute the JNI header files.  Therefore, this tool should
+dnl only get invoked should the JNI header files need to be updated.  A
+dnl workaround for a missing tool is to simply touch the header files that
+dnl were distributed if they exist.  If the header files do not exist, then an
+dnl error will result.  See the missing4 script.
+dnl
+    AC_ARG_VAR([JAVAH],
+	[Java JNI header command. @<:@default=gcjh@:>@])
+    AC_ARG_VAR([JAVAHFLAGS],
+	[Java JNI header command flags. @<:@default=auto@:>@])
+    AC_PATH_PROGS([JAVAH], [gcjh javah], [],
+	[$gcj_tmp])
+    if test :"${JAVAH:-no}" = :no ; then
+	ac_cv_path_JAVAH="${am_missing4_run}gcjh"
+	JAVAH="${am_missing4_run}gcjh"
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	then
+	    AC_MSG_WARN([
+***
+*** Configure could not find the Java JNI header generation
+*** program 'javah' (nor 'gcjh').  This program is part of the
+*** GNU Compiler Collection, but is not always loaded on recent
+*** distributions.  It is also part of most Java SDKs.
+***
+*** On RPM based distributions, try 'yum install gcc-java'.
+*** On DEB based distributions, try 'apt-get install gcj'.
+*** On SUSE distributions, try 'zypper install gcc-java'.
+***
+*** Alternatively, you can specify an equivalent command with
+*** the JAVAH environment variable when running configure.
+***])
+	fi
+    fi
+
+dnl
+dnl Note that we now distribute the prebuilt javadoc documentation.  This is
+dnl due to SLES 10 that is completely missing the gjdoc tool and has no
+dnl package for it.  A workaround for a missing tool is to simply touch the
+dnl index file if it exists.  If the index file does not exist (e.g., it was
+dnl removed with a distclean), an error will result.  See the missing4 script.
+dnl
     AC_ARG_VAR([JAVADOC],
 	[Java documentation doclet. @<:@default=gjdoc@:>@])
     AC_ARG_VAR([JAVADOCFLAGS],
 	[Java documentation flags. @<:@default=auto@:>@])
     AC_PATH_PROGS([JAVADOC], [gjdoc javadoc], [],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
-    if test -z "$JAVADOC"; then
-	AC_MSG_ERROR([
+	[$gcj_tmp])
+    if test :"${JAVADOC:-no}" = :no ; then
+	ac_cv_path_JAVADOC="${am_missing4_run}gjdoc"
+	JAVADOC="${am_missing4_run}gjdoc"
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	then
+	    AC_MSG_WARN([
 ***
 *** Configure could not find the Java documentation program
 *** 'javadoc' (nor 'gjdoc').  This program is part of the
@@ -527,19 +595,17 @@ AC_DEFUN([_GCJ_TOOLS], [dnl
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
+*** On SUSE, try 'zypper install jdk-1_5_0-ibm-devel'.
 ***
 *** Alternatively, you can specify an equivalent command with
-*** the JAVADOC environment variable when rerunning configure.
+*** the JAVADOC environment variable when running configure.
 ***])
+	fi
     fi
+    JAVADOCFLAGS=
     if test $(basename "$JAVADOC") = 'gjdoc'; then
-	JAVADOCFLAGS=
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-validhtml"
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-licensetext"
-    else
-	if test $(basename "$JAVADOC") = 'javadoc'; then
-	    JAVADOCFLAGS=
-	fi
     fi
 ])# _GCJ_TOOLS
 # =============================================================================
@@ -564,7 +630,7 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
 	GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wall"
 	GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Werror"
-    fi
+    fi # gcj.m4 630
     AC_LANG_PUSH([Java])
     JNIFLAGS=`echo " $JNIFLAGS" | sed -r -e 's, -f(no-)?jni,,g'`
     AC_LANG_FLAG([-fjni],
@@ -622,6 +688,9 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 #
 # $Log: gcj.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:38  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

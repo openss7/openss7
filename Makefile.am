@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:25:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:25:07 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,7 +73,7 @@ include am/help.am
 ##
 include am/pr.am
 
-AUTOMAKE_OPTIONS += nostdinc
+AUTOMAKE_OPTIONS = nostdinc
 AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir)
 
 if PKG_BUILD_ARCH
@@ -813,8 +813,8 @@ EXTRA_TEX			+= scripts/texinfo.cnf \
 				   scripts/texi/versions.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3
-EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
+dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3 scripts/missing4
+EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3 scripts/missing4
 
 ##
 ## Rules for building kernel objects
@@ -2595,14 +2595,14 @@ if WITH_32BIT_LIBS
 SUBDIRS += lib32
 endif
 
-SUBDIRS += src/java
-
 SUBDIRS += tests
 
-if DEVELOPMENT
-if DOCUMENTATION
-SUBDIRS += doc
+if WITH_JAVA
+SUBDIRS += src/java
 endif
+
+if DEVELOPMENT
+SUBDIRS += doc
 endif
 
 if PKG_BUILD_INDEP
@@ -2856,6 +2856,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:25:07  brian
 # - added base files to new distro
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -136,9 +136,9 @@ AC_DEFUN([_DOXY_SETUP], [dnl
     AC_PATH_PROG([DOXYGEN], [doxygen], [],
 		 [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DOXYGEN:-no}" = :no ; then
-	AC_MSG_WARN([Could not find doxygen program in PATH.])
 	ac_cv_path_DOXYGEN="${am_missing2_run}doxygen"
 	DOXYGEN="${am_missing2_run}doxygen"
+	AC_MSG_WARN([Could not find doxygen program in PATH.])
     fi
     AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${ac_cv_path_DOXYGEN:-no}" != :no])dnl
 ])# _DOXY_SETUP
@@ -192,6 +192,9 @@ AC_DEFUN([_DOXY_], [dnl
 # =============================================================================
 #
 # $Log: doxy.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:38  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

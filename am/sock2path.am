@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -82,8 +82,8 @@ post-sock2path:
 		cat /dev/null > $$t ; \
 		files="$$d/*" ; for f in $$files ; do \
 			if test -f $$f ; then \
-				$(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t" ; \
-				sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t ; \
+				$(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t" ; \
+				sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t ; \
 			fi ; \
 		done ; \
 	fi
@@ -91,7 +91,7 @@ post-sock2path:
 uninstall-sock2path:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	rm -f $(DESTDIR)/$(sysconfdir)/sock2path.d/@PACKAGE_LCNAME@
+	rm -f $(DESTDIR)$(sysconfdir)/sock2path.d/@PACKAGE_LCNAME@
 
 INSTALL_DATA_HOOK	+= install-sock2path
 
@@ -111,6 +111,9 @@ EXTRA_DIST		+= src/util/sysconfig/sock2path
 ## =============================================================================
 ##
 ## $Log: sock2path.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

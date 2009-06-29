@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:31:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:31:38 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,11 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . drafts man manual papers projects specs suites
+SUBDIRS = . man manual
+
+if DOCUMENTATION
+SUBDIRS += drafts papers projects specs suites
+endif
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -77,6 +81,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:35  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:31:38  brian
 # - added files to distro
 #
