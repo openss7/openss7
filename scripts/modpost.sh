@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-22 03:34:25 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-06-29 07:35:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-22 03:34:25 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-22 03:34:25 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-06-29 07:35:26 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -808,7 +808,7 @@ write_dump_ours() {
 	    eval "exp=\"\$mod_${token}_sym_${sym}_exp\""
 	    if test :"$crc" != : ; then
 		((count++))
-		if test :"$exp" != : -a ${exportsyms:-n} != :n ; then
+		if test :"$exp" != : -a :${exportsyms:-n} != :n ; then
 		    printf "0x%08x\t%s\t%s\t%s\n" $crc $sym $path $exp
 		else
 		    printf "0x%08x\t%s\t%s\n" $crc $sym $path
@@ -850,7 +850,7 @@ write_dump_others() {
 	    eval "exp=\"\$mod_${token}_sym_${sym}_exp\""
 	    if test :"$crc" != : ; then
 		((count++))
-		if test :"$exp" != : -a ${exportsyms:-n} != :n ; then
+		if test :"$exp" != : -a :${exportsyms:-n} != :n ; then
 		    printf "0x%08x\t%s\t%s\t%s\n" $crc $sym $name $exp
 		else
 		    printf "0x%08x\t%s\t%s\n" $crc $sym $name
@@ -1264,6 +1264,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: modpost.sh,v $
+# Revision 1.1.2.4  2009-06-29 07:35:26  brian
+# - updated rpm spec and symvers
+#
 # Revision 1.1.2.3  2009-06-22 03:34:25  brian
 # - updates for release
 #
