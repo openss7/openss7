@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: ap_open.3.man,v 1.1.2.1 2009-06-21 10:34:08 brian Exp $
+.\" @(#) $Id: ap_open.3.man,v 1.1.2.2 2009-06-29 07:35:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:08 $ by $Author: brian $
+.\" Last Modified $Date: 2009-06-29 07:35:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ap_open.3.man,v $
+.\" Revision 1.1.2.2  2009-06-29 07:35:31  brian
+.\" - pass check target
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:08  brian
 .\" - added files to new distro
 .\"
@@ -349,7 +352,7 @@ user.
 .PP
 On success,
 .BR ap_open ()
-returns an XAP instance identifier, an integer (³ 0), that is used to
+returns an XAP instance identifier, an integer (0), that is used to
 identify
 the XAP instance in subsequent calls to XAP functions. Otherwise, a value of -1 is returned and
 the location pointed to by
