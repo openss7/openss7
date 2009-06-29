@@ -1,0 +1,173 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
+# =============================================================================
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+# =============================================================================
+# _JAVA
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA], [dnl
+    AC_REQUIRE([_DISTRO])
+    _JAVA_OPTIONS
+    _JAVA_SETUP
+    _JAVA_USER
+    _JAVA_OUTPUT
+])# _JAVA
+# =============================================================================
+
+# =============================================================================
+# _JAVA_OPTIONS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_OPTIONS], [dnl
+    AC_ARG_ENABLE([java],
+	AS_HELP_STRING([--disable-java],
+	    [disable JAVA modules.  @<:@default=enabled@:>@]),
+	    [], [enable_java=yes])
+])# _JAVA_OPTIONS
+# =============================================================================
+
+# =============================================================================
+# _JAVA_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_SETUP], [dnl
+    AC_ARG_VAR([CLASSPATH],
+	       [Java CLASSPATH variable. @<:@default=auto@:>@])
+    if test :${enable_java:-yes} = :yes ; then
+	if test :${javaclasspath+set} != :set ; then
+	    if test :${CLASSPATH+set} != :set ; then
+		CLASSPATH='${builddir}:${srcdir}'
+	    fi # java.m4 91
+	    javaclasspath="$CLASSPATH"
+	else
+	    CLASSPATH='${javaclasspath}'
+	fi # java.m4 95
+	_JAVA_SETUP_GCJ
+	_JAVA_SETUP_JAR
+    fi # java.m4 98
+    AC_SUBST([javaclasspath])dnl
+])# _JAVA_SETUP
+# =============================================================================
+
+# =============================================================================
+# _JAVA_SETUP_JAR
+# -----------------------------------------------------------------------------
+# Checks for the jar or fastjar command.  This command is used to generate
+# Java archives.  In general it is possible to generate simple java archives
+# using a script and the zip command.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_SETUP_JAR], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING4])
+    jar_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    AC_ARG_VAR([JAR],
+	[Java archive command. @<:@default=fastjar,jar@:>@])
+    AC_PATH_PROGS([JAR], [fastjar jar jar3], [],
+	[$jar_tmp])
+    if test :"${JAR:-no}" = :no ; then
+	ac_cv_path_JAR="${am_missing4_run}jar"
+	JAR="${am_missing4_run}jar"
+    fi
+    AC_ARG_VAR([ZIP],
+	[Zip archive command. @<:@default=zip@:>@])
+    AC_PATH_PROGS([ZIP], [zip], [],
+	[$jar_tmp])
+    if test :"${ZIP:-no}" = :no ; then
+	ac_cv_path_ZIP="${am_missing4_run}zip"
+	ZIP="${am_missing4_run}zip"
+    fi
+])# _JAVA_SETUP_JAR
+# =============================================================================
+
+# =============================================================================
+# _JAVA_SETUP_GCJ
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_SETUP_GCJ], [dnl
+    _GCJ_CONFIG
+])# _JAVA_SETUP_GCJ
+# =============================================================================
+
+# =============================================================================
+# _JAVA_USER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_USER], [dnl
+])# _JAVA_USER
+# =============================================================================
+
+# =============================================================================
+# _JAVA_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_OUTPUT], [dnl
+    AM_CONDITIONAL([WITH_JAVA], [test :${enable_java:-yes} = :yes])dnl
+])# _JAVA_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _JAVA_XXX
+# -----------------------------------------------------------------------------
+AC_DEFUN([_JAVA_XXX], [dnl
+])# _JAVA_XXX
+# =============================================================================
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# 
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+# 
+# =============================================================================
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
+# =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
+
