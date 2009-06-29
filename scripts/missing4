@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 # 
-# @(#) $RCSfile: missing4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:16:41 $
+# @(#) $RCSfile: missing4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:16:41 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@
 # Some commands can be replaced by scripts themselves and can be simplified
 # here to do just the things needed by our makefiles.
 
-scriptversion=2009-06-04.01
+scriptversion=2009-06-24.01
 
 if test $# -eq 0; then
     cat 1>&2 <<-EOF
@@ -68,9 +68,14 @@ fi
 
 script="$0"
 scriptname=$(basename $0)
+scriptdir=`(cd $(dirname $0); pwd)`
+srcdir=`(cd $scriptdir/../src/java; pwd)`
 run=:
 sed_output='s/.* --output[ =]\([^ ]*\).*/\1/p'
 sed_minuso='s/.* -o \([^ ]*\).*/\1/p'
+sed_minusd='s/.* -d \([^ ]*\).*/\1/p'
+sed_lastop='s/.* \([^ ]*\) *$/\1/p'
+
 
 msg="missing on your system"
 
@@ -83,7 +88,7 @@ case $1 in
 	# Exit code 63 means version mismatch.  This often happens when the
 	# user tries to use an ancient version of a tool on a file that
 	# requires a minimum version.  In this case we should proceed as
-	# thorugh the program has been absent, or as though --run has not been
+	# though the program has been absent, or as though --run had not been
 	# passed.
 	if test $? = 63 ; then
 	    run=:
@@ -93,28 +98,31 @@ case $1 in
 
     (-h|--h|--he|--hel|--help)
 	cat <<-EOF
-		$0 [OPTION]... PROGRAM [ARGUMENT]...
-		
-		Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
-		an error status if there is no known handling for PROGRAM.
-		
-		Options:
-		  -h, --help	    display this help and exit
-		  -v, --version	    output version information and exit
-		  -c, --copying	    output copying information and exit
-		  --run		    try to run PROGRAM, and emulate if it fails
-		
-		Supported PROGRAM values:
-		  Scripting Interface commands:
-		      swig			    touch the output files
-		
-		  Java commands:
-		      jar			    create an archive using zip
-		
-		
-		
-		Send problem reports to <bugs@openss7.org>.
-		EOF
+	$0 [OPTION]... PROGRAM [ARGUMENT]...
+	
+	Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
+	an error status if there is no known handling for PROGRAM.
+	
+	Options:
+	  -h, --help	    display this help and exit
+	  -v, --version	    output version information and exit
+	  -c, --copying	    output copying information and exit
+	  --run		    try to run PROGRAM, and emulate if it fails
+	
+	Supported PROGRAM values:
+	  Scripting Interface commands:
+	      swig	    touch the output files
+	
+	  Java commands:
+	      jar	    create an archive using zip
+	      fastjar	    create an archive using zip
+	      gcjh	    touch output file if exists
+	      javah	    touch output file if exists
+	      gjdoc	    touch output directory index.html
+	      javadoc	    touch output directory index.html
+	
+	Send problem reports to <bugs@openss7.org>.
+	EOF
 	exit $?
 	;;
 
@@ -123,45 +131,45 @@ case $1 in
 
     (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
 	cat <<-EOF
-		Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-		Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-		
-		All Rights Reserved.
-		
-		This program is free software; you can redistribute it and/or modify it
-		under the terms of the GNU Affero General Public License as published by
-		the Free Software Foundation; version 3 of the License.
-		
-		This program is distributed in the hope that it will be useful, but
-		WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
-		General Public License for more details.
-		
-		You should have received a copy of the GNU Affero General Public License
-		along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-		write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-		02139, USA.
-		
-		U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-		on behalf of the U.S. Government ("Government"), the following
-		provisions apply to you.  If the Software is supplied by the Department
-		of Defense ("DoD"), it is classified as "Commercial Computer Software"
-		under paragraph 252.227-7014 of the DoD Supplement to the Federal
-		Acquisition Regulations ("DFARS") (or any successor regulations) and the
-		Government is acquiring only the license rights granted herein (the
-		license rights customarily provided to non-Government users).  If the
-		Software is supplied to any unit or agency of the Government other than
-		DoD, it is classified as "Restricted Computer Software" and the
-		Government's rights in the Software are defined in paragraph 52.227-19
-		of the Federal Acquisition Regulations ("FAR") (or any successor
-		regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-		NASA Supplement to the FAR (or any successor regulations).
-		
-		Commercial licensing and support of this software is available from
-		OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-		EOF
+	Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+	Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+	Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+	
+	All Rights Reserved.
+	
+	This program is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Affero General Public License as published by
+	the Free Software Foundation; version 3 of the License.
+	
+	This program is distributed in the hope that it will be useful, but
+	WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
+	General Public License for more details.
+	
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+	write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+	02139, USA.
+	
+	U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+	on behalf of the U.S. Government ("Government"), the following
+	provisions apply to you.  If the Software is supplied by the Department
+	of Defense ("DoD"), it is classified as "Commercial Computer Software"
+	under paragraph 252.227-7014 of the DoD Supplement to the Federal
+	Acquisition Regulations ("DFARS") (or any successor regulations) and the
+	Government is acquiring only the license rights granted herein (the
+	license rights customarily provided to non-Government users).  If the
+	Software is supplied to any unit or agency of the Government other than
+	DoD, it is classified as "Restricted Computer Software" and the
+	Government's rights in the Software are defined in paragraph 52.227-19
+	of the Federal Acquisition Regulations ("FAR") (or any successor
+	regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+	NASA Supplement to the FAR (or any successor regulations).
+	
+	Commercial licensing and support of this software is available from
+	OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+	EOF
 	;;
-
     (-*)
 	cat 1>&2 <<-EOF
 		$0: Unknown \`$1' option
@@ -180,48 +188,182 @@ zeroarg=`which $program 2>/dev/null` ; test -n $zeroarg || zeroarg="$program"
 # PROGRAM and --version, --help or --copying was passed to PROGRAM (most likely
 # to detect the program).
 
+if test -z "$run" -a -x "$zeroarg" ; then
+    # it exists and is executable, but it failed
+    exit 1
+elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
+    # Could not run --version or --help.  This is prbably someone running `$TOOL
+    # --version' to check whether $TOOL exists without knowing that $TOOL uses
+    # missing4.
+    exit 1
+fi
+
 case $program in
-    (swig)
+    (swig*) # could be swig-1.3
 	# does not handle --version or --help, but handles -version or -help
 	if test -z "$run" && ($program -version) >/dev/null 2>&1 ; then
-	elif test ":$2" = ":-version" || test ":$2" = ":-help" ; then
+	    # it exists, but it failed.
+	    exit 1
+	elif test ":$2" = ":-version" -o ":$2" = ":-help" ; then
 	    # Could not run -version or -help.  This is probably someone
 	    # running `$TOOL -version' or `$TOOL -help' to check whether $TOOL
 	    # exists and not knowing $TOOL uses missing4.
 	    exit 1
 	fi
 	;;
+    (jar3)
+	# does not handle --version or --help but handles -V
+	if test -z "$run" && ($program -V) >/dev/null 2>&1 ; then
+	    # it exists, but it failed.
+	    exit 1
+	elif test ":$2" = ":--version" -o ":$2" = ":--help" -o ":$2" =  ":-V" ; then
+	    # Could not run --version or --help or -V.  This is probably someone
+	    # running `$TOOL --version' to check whether $TOOL exists without
+	    # known $TOOL uses missing4.
+	    exit 1
+	fi
+	;;
     (*)
 	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
-	elif test ":$2" = ":--version" || test ":$2" = ":--help" ; then
+	    # it exists, but it failed.
+	    exit 1
+	elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
 	    # Could not run --version or --help.  This is probably someone
-	    # running `$TOOL --version' or `$TOOL --help' to check whether
-	    # $TOOL exists and not knowing $TOOL uses missing4.
+	    # running `$TOOL --version' or `$TOOL --help' to check whether $TOOL
+	    # exists and not knowing $TOOL uses missing4.
 	    exit 1
 	fi
 	;;
 esac
 
-# If PROGRAM does not exist, or fails to run (possibly an outdated version),
-# try to emulate PROGRAM.
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), or
+# warning is requested, generate a warning.
+
+cat 1>&2 <<-EOF
+	*** WARNING: \`$program' is needed, and is $msg.
+	***
+	EOF
+
 case $program in
-    (swig)
+    (swig*) # could be swig-1.3
 	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING: \`$program' is needed, and is $msg.
-		*** 
-		*** You may have altered some SWIG module files that need to create
-		*** corresponding wrapper files.  You may need an appropriate version of
-		*** the \`swig' program to convert those module files to wrapper files.
-		*** You can normally get \'swig' as part of many popular Linux
-		*** distributions.  On recent RPM based systems, try \`yum install
-		*** swig'.  On recent DEB based systems, try \`apt-get install swig'.
-		*** On SuSE, \`zypper install swig'.  \`Swig' has been available for
-		*** many years: you can get \`Swig' from sourceforge.  A recent version
-		*** of swig is also available from the OpenSS7 project site at
-		*** http://www.openss7.org/repo/tarballs/swig-1.3.39.tar.gz
-		***
-		EOF
+	*** You may have altered some SWIG module files that need to create
+	*** corresponding wrapper files.  You may need an appropriate version of
+	*** the \`swig' program to convert those module files to wrapper files.
+	*** You can normally get \'swig' as part of many popular GNU/Linux
+	*** distributions.  On recent RPM based systems, try \`yum install
+	*** swig'.  On recent DEB based systems, try \`apt-get install swig'.
+	*** On SuSE, \`zypper install swig'.  \`Swig' has been available for
+	*** many years: you can get \`Swig' from sourceforge.  A recent version
+	*** of swig is also available from the OpenSS7 project site at
+	*** http://www.openss7.org/repo/tarballs/swig-1.3.39.tar.gz
+	***
+	*** Debian 4.0:	\`apt-get install swig'
+	*** CentOS 5.x:	\`yum install swig'
+	*** SLES 10:	(install swig from sources)
+	*** RH 7.3:	\`rpm -i swig'
+	EOF
+	;;
+    (jar|jar*|fastjar*)
+	cat 1>&2 <<-EOF
+	*** You may have altered some Java files that need to create
+	*** corresponding Java archive.  You may need an appropriate version of
+	*** the \`jar' program to convert those module files to wrapper files.
+	*** You can normally get \'jar' as part of many popular GNU/Linux
+	*** distributions.  On recent RPM based systems, try \`yum install
+	*** fastjar'.  On recent DEB based systems, try \`apt-get install
+	*** fastjar'.  On SuSE, \`zypper install fastjar'.  \`Jar' has been
+	*** available for many years: you can get \`Jar' as part of any JDK.
+	***
+	*** Debian 4.0:	\`apt-get install fastjar'
+	*** CentOS 5.x:	\`yum install libgcj'
+	*** SLES 10:	\`zypper install fastjar'
+	*** RH 7.3:	\`rpm -i libgcj3'
+	EOF
+	;;
+    (gcjh)
+	cat 1>&2 <<-EOF
+	*** You may have altered some Java files that need to create
+	*** corresponding CNI or JNI headers, or you may have removed the
+	*** distributed CNI or JNI header files.  You need an appropriate
+	*** version of the \`gcjh' program to regenerate the CNI or JNI header
+	*** files.  You can normally get \`gcjh' as part of the GNU Compiler
+	*** Collection on many popular GNU/Linux distributions.
+	***
+	*** On RPM based distributions, try 'yum install gcc-java'.
+	*** On DEB based distributions, try 'apt-get install gcj'.
+	*** On SUSE distributions, try 'zypper install gcc-java'.
+	***
+	*** Alternatively, you can specify an equivalent command with the GCJH
+	*** environment variable when running \`configure'.
+	***
+	*** Debian 4.0:	\`apt-get install gcj'
+	*** CentOS 5.x:	\`yum install gcc-java'
+	*** SLES 10:	\`zypper install gcc-java'
+	*** RH 7.3:	\`rpm -i gcc-java'
+	EOF
+	;;
+    (javah|gcjh)
+	cat 1>&2 <<-EOF
+	*** You may have altered some Java files that need to create
+	*** corresponding JNI headers, or you may have removed the distributed
+	*** JNI header files.  You need an appropriate version of the \`gcjh' or
+	*** \`javah' program to regenerate the JNI headers from the class files.
+	*** You can normally get \`gcjh' as part of the GNU Compiler Collection
+	*** on many popular GNU/Linux distributions.  You can normally get
+	*** \`javah' as part of most Java SDKs.
+	***
+	*** On RPM based distributions, try 'yum install gcc-java'.
+	*** On DEB based distributions, try 'apt-get install gcj'.
+	*** On SUSE distributions, try 'zypper install gcc-java'.
+	***
+	*** Alternatively, you can specify an equivalent command with the JAVAH
+	*** environment variable when running \`configure'.
+	***
+	*** Debian 4.0:	\`apt-get install gcj'
+	*** CentOS 5.x:	\`yum install gcc-java'
+	*** SLES 10:	\`zypper install gcc-java'
+	*** RH 7.3:	\`rpm -i gcc-java'
+	EOF
+	;;
+    (javadoc|gjdoc)
+	cat 1>&2 <<-EOF
+	*** You may have altered some Java files that need to create
+	*** corresponding Javadoc documentation, or you may have removed the
+	*** distributed Javadoc documentation.  You need an appropriate version
+	*** of the \`gjdoc' or \`javadoc' program to regenerate the Java
+	*** documentation from the java files.  You can normally get \'gjdoc' as
+	*** part of many popular GNU/Linux distributions.  A notable exception
+	*** is SUSE SLES 10 for which \`gjdoc' is not available.
+	***
+	*** On RPM based distributions, try 'yum install gcc-java'.
+	*** On DEB based distributions, try 'apt-get install gcj'.
+	*** On SUSE distributions, try 'zypper install jdk-1_5_0-ibm-devel'.
+	***
+	*** Alternatively, you can specify an equivalent command with the
+	*** JAVADOC environment variable when running \`configure'.
+	***
+	*** Debian 4.0:	\`apt-get install gjdoc'
+	*** CentOS 5.x:	\`yum install gjdoc'
+	*** SLES 10:	\`zypper install java-1_5_0-ibm-devel'
+	*** RH 7.3:	\`rpm -i kaffe'
+	EOF
+	;;
+    (*)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	EOF
+	;;
+esac
+
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), try
+# to emulate PROGRAM.
+case $program in
+    (swig*) # could be swig-1.3
 	file=`echo "$*" | sed -n "$sed_output"`
 	test -z "$file" && file=`echo "$*" | sed -n "$sed_minuso"`
 	if test -z "$file" ; then
@@ -232,7 +374,7 @@ case $program in
 		module=`grep '^%module' $input | sed -n 's/%module.* \([^ ]*\)/\1/p'`
 		if test -n "$module" ; then
 		    case "$*" in
-			(* -c++ *)
+			(*" -c++ "*)
 			    # c++ wrapper file
 			    file="${module}_wrap.cxx"
 			    ;;
@@ -248,42 +390,70 @@ case $program in
 		exit 1
 	    fi
 	fi
-	if test -n "$file" -a -f "$file" ; then
+	test -n "$file" -a -f "$file" || exit 1
+	touch $file
+	;;
+    (jar|jar*|fastjar*)
+	# should be able to use zip, but what the hey...
+	exit 1
+	;;
+    (gcjh)
+	# It should be possible to determine the name of the file for which CNI
+	# or JNI headers or stubs were to be created.  If the files exist, then
+	# we can just touch them.  Otherwise, we need to error out.  Assume that
+	# we are building one header at time, so the last argument is the path
+	# to the class file, $file,  with .class removed.  If no -stubs option
+	# was specified, the file is $file.h.  If -stubs was specified, with no
+	# -jni then the file is $file.cc.  If -stubs was specified with -jni,
+	# then the file is $file.c.
+	file=`echo "$*" | sed -n $sed_lastop`
+	test -n "$file" -a -r $file.class || exit 1
+	if (echo "$*" | grep ' -stubs ' >/dev/null)
+	then
+	    if (echo "$*" | grep ' -jni ' >/dev/null)
+	    then
+		# -stubs and -jni
+		file="$file.c"
+	    else
+		# -stubs and no -jni
+		file="$file.cc"
+	    fi
+	else
+	    # no -stubs
+	    file="$file.h"
+	fi
+	if test -r $file ; then
 	    touch $file
+	elif test -r $srcdir/$file ; then
+	    touch $srcdir/$file
 	else
 	    exit 1
 	fi
 	;;
-    (jar)
-	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING: \`$program' is needed, and is $msg.
-		*** 
-		*** You may have altered some Java files that need to create
-		*** corresponding Java archive.  You may need an appropriate version of
-		*** the \`jar' program to convert those module files to wrapper files.
-		*** You can normally get \'jar' as part of many popular Linux
-		*** distributions.  On recent RPM based systems, try \`yum install
-		*** fastjar'.  On recent DEB based systems, try \`apt-get install
-		*** fastjar'.  On SuSE, \`zypper install fastjar'.  \`Jar' has been
-		*** available for many years: you can get \`Jar' as part of any JDK.
-		***
-		EOF
-	    # should be able to use zip, but what the hey...
+    (javah|gcjh)
+	file=`echo "$*" | sed -n $sed_lastop`
+	test -n "$file" -a -r $file.class || exit 1
+	file="$file.h"
+	if test -r $file ; then
+	    touch $file
+	elif test -r $srcdir/$file ; then
+	    touch $srcdir/$file
+	else
 	    exit 1
+	fi
+	;;
+    (javadoc|gjdoc)
+	# It should be possible to determine from the argument which output
+	# directory is being written to and touch the index.html file.  If the
+	# index file does not exist, it was likely removed with distclean:
+	# error out in that case.
+	dir=`echo "$*" | sed -n "$sed_minusd"`
+	test -n "$dir" || dir='./api-docs'
+	file="$dir/index.html"
+	test -n "$file" -a -f "$file" || exit 1
+	touch $file
 	;;
     (*)
-	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING: \`$program' is needed, and is $msg.
-		*** 
-		*** You might have modified some files without having the proper tools
-		*** for further handling them.  Check the \`README' file, it often tells
-		*** you about the needed prerequisites for installing this package.  You
-		*** may also peek at any GNU archive site, in case some other package
-		*** would contain this missing \`$program' program.
-		*** 
-		EOF
 	exit 1
 	;;
 esac
@@ -293,6 +463,9 @@ exit 0
 # =============================================================================
 #
 # $Log: missing4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:16:41  brian
 # - added files to new distro
 #

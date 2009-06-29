@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -59,7 +59,7 @@ LSM $(PACKAGE)-$(VERSION).lsm: $(PACKAGE_TARNAME).lsm
 	$(AM_V_GEN)cat $< > $@
 
 $(tardir)/$(PACKAGE)-$(VERSION).lsm:
-	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
+	@f=`$(ECHO) "$@" | sed 's|^.*/||'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO_Q) "  GEN   " $$f ; \
 		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
@@ -134,6 +134,9 @@ EXTRA_DIST		+= LSM $(PACKAGE)-$(VERSION).lsm
 ## =============================================================================
 ##
 ## $Log: lsm.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

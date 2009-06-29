@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:43:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:43:32 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -193,12 +193,14 @@ EXTRA_DIST += \
 	socketpipe.fig \
 	piperesults.tex \
 	piperesults.bib \
-	piperesults.css \
 	org.css
 
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:37  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 10:43:32  brian
 # - added files to new distro
 #

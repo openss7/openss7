@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -228,7 +228,7 @@ help: ./README-make
 MY_PHONY += help
 
 README-make: Makefile
-	$(AM_V_GEN)grep '^#!' Makefile | sed -e 's|^#!||' > $@
+	$(AM_V_GEN)grep '^#!' Makefile | sed 's|^#!||' > $@
 
 EXTRA_DIST  += README-make
 CLEANFILES  += README-make
@@ -247,6 +247,9 @@ ALL_LOCAL   += INSTALL-$(PACKAGE)
 ## =============================================================================
 ##
 ## $Log: help.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:40:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:40:26 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -56,21 +56,11 @@ include ../../am/openss7.am
 
 info_TEXINFOS		=
 
-if DEVELOPMENT
-## DEVELOPMENT
+if DOCUMENTATION
+## DOCUMENTATION
 
 info_TEXINFOS		+= \
-			openss7.texi \
-			STREAMS.texi \
-			STREAMS_FAQ.texi \
-			SPG2.texi \
-			SPG.texi \
-			porting.texi \
-			dlpi_porting.texi \
-			libxnet.texi \
-			libxnsl.texi \
-			x25_porting.texi \
-			x400p.texi
+			openss7.texi
 
 openss7_TEXINFOS	= \
 			bugs.texi \
@@ -110,6 +100,21 @@ openss7_TEXINFOS	= \
 			$(top_srcdir)/scripts/texi/macros.texi \
 			$(top_srcdir)/scripts/texi/mail.texi \
 			$(top_srcdir)/scripts/texi/versions.texi
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= \
+			STREAMS.texi \
+			STREAMS_FAQ.texi \
+			SPG2.texi \
+			SPG.texi \
+			porting.texi \
+			dlpi_porting.texi \
+			libxnet.texi \
+			libxnsl.texi \
+			x25_porting.texi \
+			x400p.texi
 
 STREAMS_TEXINFOS	= \
 			install.texi \
@@ -291,11 +296,17 @@ endif
 ## DEVELOPMENT
 endif
 
+## DOCUMENTATION
+endif
+
 include ../../am/info.am
 
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:40:26  brian
 ## - added files to new distro
 ##

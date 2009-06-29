@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -209,7 +209,7 @@ RPMTARGET		= $(target)
 #!
 $(rpm_tar_file)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
+	@f=`$(ECHO) "$@" | sed 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; };  \
@@ -221,7 +221,7 @@ $(rpm_tar_file)::
 
 $(rpm_spec_file) $(rpm_img_files)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'`; \
+	@f=`$(ECHO) "$@" | sed 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; };  \
@@ -257,7 +257,7 @@ $(rpm_src_file):: $(rpm_source_files)
 ##
 $(rpm_link_file)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
+	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; }; \
@@ -363,18 +363,18 @@ rebuild:
 	fi; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
 	for t in $$targets; do \
-		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -e $(DESTDIR)/lib/modules/$$k/build || continue; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
 			if test -z '$(DESTDIR)'; then \
 				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
 					continue; \
 				fi; \
 			fi; \
-			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
 			rpms="`find $(rpmdir)/$$a -name '*$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$a'.rpm' 2>/dev/null`"; \
 			if test -z "$$rpms" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
@@ -576,15 +576,15 @@ update-n-rpm:
 
 update-k-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
-	a=`echo '$(RPMTARGET)' | sed -e 's,-.*$$,,'`; \
+	a=`echo '$(RPMTARGET)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
-	test -e $(DESTDIR)/lib/modules/$(kversion)/build || exit 0; \
+	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || exit 0; \
 	if test -z '$(DESTDIR)'; then \
 		if ! $(RPM) -q --whatprovides /lib/modules/$(kversion)/build >/dev/null 2>&1; then \
 			exit 0; \
 		fi; \
 	fi; \
-	ks=`echo $(kversion) | sed -e 's,-,.,g;s,_,.,g'`; \
+	ks=`echo $(kversion) | sed 's,-,.,g;s,_,.,g'`; \
 	rebuild=yes; \
 	rpms="`find $(rpmdir)/$$a -name '*$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$a'.rpm' 2>/dev/null`"; \
 	for f in $$rpms; do \
@@ -602,7 +602,7 @@ update-k-rpm:
 
 update-t-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
-	a=`echo '$(RPMTARGET)' | sed -e 's,-.*$$,,'`; \
+	a=`echo '$(RPMTARGET)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
 	rebuild=yes; \
 	rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
@@ -625,12 +625,12 @@ update-all-rpms:
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" all-update-n-rpm || :; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
 	for t in $$targets; do \
-		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -e $(DESTDIR)/lib/modules/$$k/build || continue; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
 			if test -z '$(DESTDIR)'; then \
 				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
 					continue; \
@@ -672,18 +672,18 @@ update-rpms:
 	fi; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
 	for t in $$targets; do \
-		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -e $(DESTDIR)/lib/modules/$$k/build || continue; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
 			if test -z '$(DESTDIR)'; then \
 				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
 					continue; \
 				fi; \
 			fi; \
-			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
 			rebuild=yes; \
 			rpms="`find $(rpmdir)/$$a -name '*$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$a'.rpm' 2>/dev/null`"; \
 			for f in $$rpms; do \
@@ -827,7 +827,7 @@ repomd_group		= $(repodir)/comps.xml
 #!
 $(repomd_group)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
+	@f=`$(ECHO) "$@" | sed 's|^.*/||'`; \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test -f "$$d$$f" || { \
 		touch $$f; exit 0; }; \
@@ -862,7 +862,7 @@ $(repodir)/openss7.repo: $(repodir)
 #!
 repo-yum: $(repodir) $(repodir)/openss7.repo
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) $(repomd_group) | sed -e 's|^.*/||'`; \
+	@f=`$(ECHO) $(repomd_group) | sed 's|^.*/||'`; \
 	d=`pwd`/scripts/; test -f $$d$$f || d=`(cd $(srcdir); pwd)`/scripts/; \
 	g=; test ! -f $$d$$f || g="-g $$d$$f"; \
 	$(ECHO) "$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir)"; \
@@ -910,26 +910,26 @@ if BUILD_REPO_YAST
 #!
 $(yastdir)/media.1/media:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@p=`$(RPM) --showrc | grep '\<packager\>' | sed -e 's,.*\<packager\>[[:space:]]*,,;s[[:space:]]*$$,,' 2>/dev/null`; \
+	@p=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s[[:space:]]*$$,,' 2>/dev/null`; \
 	if test -z "$$p"; then p='Unknown'; fi; \
 	$(ECHO) "( echo \"$$p\"; date +%Y%m%d%H%M%S; echo '1') >>$@"; \
-	( echo "$$p"; date +%Y%m%d%H%M%S; echo '1') >>$@
+	( $(ECHO) "$$p"; date +%Y%m%d%H%M%S; echo '1') >>$@
 
 $(yastdir)/content:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@v=`$(RPM) --showrc | grep '\<vendor\>' | sed -e 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	@v=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
 	if test -z "$$v"; then v='Unknown'; fi; \
 	( \
-		echo "PRODUCT $(PACKAGE_TITLE)"; \
-		echo "VERSION $(PACAKGE_VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
-		echo "VENDOR $$v"; \
-		echo "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_STITLE))"; \
-		echo "ARCH.i686 i686 i586 i486 i386 noarch"; \
-		echo "ARCH.i586 i586 i486 i386 noarch"; \
-		echo "ARCH.x86_64 x86_64 noarch"; \
-		echo "DEFAULTBASE i586"; \
-		echo "DESCRDIR setup/descr"; \
-		echo "DATADIR RPMS"; \
+		$(ECHO) "PRODUCT $(PACKAGE_TITLE)"; \
+		$(ECHO) "VERSION $(PACAKGE_VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
+		$(ECHO) "VENDOR $$v"; \
+		$(ECHO) "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_STITLE))"; \
+		$(ECHO) "ARCH.i686 i686 i586 i486 i386 noarch"; \
+		$(ECHO) "ARCH.i586 i586 i486 i386 noarch"; \
+		$(ECHO) "ARCH.x86_64 x86_64 noarch"; \
+		$(ECHO) "DEFAULTBASE i586"; \
+		$(ECHO) "DESCRDIR setup/descr"; \
+		$(ECHO) "DATADIR RPMS"; \
 	) >>$@
 
 $(yastdir)/content.asc:: \
@@ -967,8 +967,8 @@ am__yast_skipfiles = (^|/)(\.[^/]*|directory.yast|INDEX.gz|ARCHIVE.gz|ls-lR.gz|M
 
 repo-yast-listings:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	( echo "$(yastdir)"; find . -follow -type d ) | while read d; do \
-		p=`echo "$$d" | sed -e 's,.*/,,'`; \
+	( $(ECHO) "$(yastdir)"; find . -follow -type d ) | while read d; do \
+		p=`$(ECHO) "$$d" | sed 's,.*/,,'`; \
 		case "$$p" in (RCS|CVS|.*) continue;; esac; \
 		( cd -- "$$d"; \
 			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' > directory.yast; \
@@ -980,11 +980,7 @@ repo-yast-listings:
 repo-yast-listings-clean:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n '$(yastdir)' || exit 1; \
-	find $(yastdir) -follow -name 'directory.yast' | while read f; do \
-		$(ECHO) "rm -f -- $$f"; \
-		rm -f -- $$f; \
-	done
-
+	find $(yastdir) -follow -name 'directory.yast' | $(am__list_remove)
 
 #! repo-yast:
 #! 	Create (or recreate) the meta data files for a YaST2 repository in the
@@ -1038,6 +1034,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

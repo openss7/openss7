@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: jar.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: jar.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,18 +78,24 @@ AC_DEFUN([_JAR_OPTIONS], [dnl
 # using a script and the zip command.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAR_SETUP], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING4])
+    jar_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([JAR],
 	[Java archive command. @<:@default=fastjar,jar@:>@])
-    AC_PATH_PROGS([JAR], [fastjar jar], [${am_missing4_run}jar],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_PATH_PROGS([JAR], [fastjar jar], [],
+	[$jar_tmp])
+    if test :"${JAR:-no}" = :no ; then
+	ac_cv_path_JAR="${am_missing4_run}jar"
+	JAR="${am_missing4_run}jar"
+    fi
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    AC_PATH_PROGS([ZIP], [zip], [${am_missing4_run}zip],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([GCJDBTOOL],
-	[GCJ database tool. @<:@default=gcj-dbtool@:>@])
-    AC_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [${am_missing4_run}gcj-dbtool],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_PATH_PROGS([ZIP], [zip], [],
+	[$jar_tmp])
+    if test :"${ZIP:-no}" = :no ; then
+	ac_cv_path_ZIP="${am_missing4_run}zip"
+	ZIP="${am_missing4_run}zip"
+    fi
 ])# _JAR_SETUP
 # =============================================================================
 
@@ -111,6 +117,9 @@ AC_DEFUN([_JAR_XXX], [dnl
 # =============================================================================
 #
 # $Log: jar.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:38  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

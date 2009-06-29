@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:03:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:03:05 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,7 @@
 ##
 include ../am/openss7.am
 
-AUTOMAKE_OPTIONS += nostdinc
+AUTOMAKE_OPTIONS = nostdinc
 AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir)
 
 lib_LTLIBRARIES			=
@@ -850,6 +850,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:37  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:03:05  brian
 # - added files to new distro
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -221,8 +221,8 @@ Corporation at a fee.  See http://www.openss7.com/
     _OPENSS7_OPTIONS_CFLAGS
     _OPENSS7_MISSING2
     _OPENSS7_MISSING3
+    _OPENSS7_MISSING4
     _OPENSS7_UPDATE
-    _OPENSS7_BESTZIP
     AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
 # =============================================================================
@@ -278,6 +278,15 @@ dnl
     if test :"${psdir+set}" != :set ; then psdir='${docdir}' ; fi
     AC_SUBST([psdir])
     AC_SUBST([rootdir])
+dnl
+dnl Some more directories...
+dnl
+    if test :"${javadir+set}" != :set ; then javadir="${datarootdir}/java" ; fi
+    AC_SUBST([javadir])
+    if test :"${javadocdir+set}" != :set ; then javadocdir="${datarootdir}/javadoc" ; fi
+    AC_SUBST([javadocdir])
+    if test :"${jnidir+set}" != :set ; then jnidir="${libdir}/java" ; fi
+    AC_SUBST([jnidir])
 dnl
 dnl Need to check this before libtool gets done
 dnl
@@ -579,6 +588,13 @@ AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
 	], [enable_docs='yes'])
     AC_MSG_RESULT([$enable_docs])
     AM_CONDITIONAL([DOCUMENTATION], [test :"${enable_docs:-yes}" = :yes])dnl
+    AC_MSG_CHECKING([for documentation distributed])
+    AC_ARG_ENABLE([distribute-docs],
+	AS_HELP_STRING([--enable-distribute-docs],
+	    [enable distribution of pre-built documentation. @<:@default=disabled@:>@]),
+	[enable_distribute_docs="$enableval"], [enable_distribute_docs='no'])
+    AC_MSG_RESULT([$enable_distribute_docs])
+    AM_CONDITIONAL([DISTRIBUTE_DOCS], [test :"${enable_distribute_docs:-no}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_DOCS
 # =============================================================================
 
@@ -587,18 +603,15 @@ AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
     os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    AC_ARG_VAR([GPG],
-	       [GPG signature command. @<:@default=gpg@:>@])
-    AC_PATH_PROG([GPG], [gpg pgp], [],
-		 [$os7_tmp])
+    AC_ARG_VAR([GPG], [GPG signature command. @<:@default=gpg@:>@])
+    AC_PATH_PROG([GPG], [gpg pgp], [], [$os7_tmp])
     if test :"${GPG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find gpg program in PATH.])
 	GPG=/usr/bin/gpg
     fi
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg user])
-    AC_ARG_VAR([GNUPGUSER],
-	       [GPG user name. @<:@default=auto@:>@])
+    AC_ARG_VAR([GNUPGUSER], [GPG user name. @<:@default=auto@:>@])
     AC_ARG_WITH([gpg-user],
 	AS_HELP_STRING([--with-gpg-user=USERNAME],
 	    [specify the USER for signing DEBs, RPMs and tarballs.
@@ -619,8 +632,7 @@ dnl          fi
     AC_MSG_RESULT([${GNUPGUSER:-no}])
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg home])
-    AC_ARG_VAR([GNUPGHOME],
-	       [GPG home directory. @<:@default=auto@:>@])
+    AC_ARG_VAR([GNUPGHOME], [GPG home directory. @<:@default=auto@:>@])
     AC_ARG_WITH([gpg-home],
 	AS_HELP_STRING([--with-gpg-home=HOMEDIR],
 	    [specify the HOME for signing DEBs, RPMs and tarballs.
@@ -757,7 +769,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
 # subdirectory name (tarballs).
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
-    if test :$PACKAGE_DISTDIR = :`pwd` ; then
+    if test :"$PACKAGE_DISTDIR" = :`pwd` ; then
 	pkg_tmp='$(PACKAGE_DISTDIR)'
     else
 	pkg_tmp='$(PACKAGE_DISTDIR)/tarballs'
@@ -934,55 +946,33 @@ AC_DEFUN([_OPENSS7_MISSING2], [dnl
 	am_missing2_run=
 	AC_MSG_WARN(['missing2' script is too old or missing])
     fi
-    os7_tmp="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin";
-    AC_ARG_VAR([LATEX],
-	       [Latex command. @<:@default=latex@:>@])
-    AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex],
-		 [$os7_tmp])
-    AC_ARG_VAR([PSLATEX],
-	       [PS Latex command. @<:@default=pslatex@:>@])
-    AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex],
-		 [$os7_tmp])
-    AC_ARG_VAR([PDFLATEX],
-	       [PDF Latex command. @<:@default=pdflatex@:>@])
-    AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex],
-		 [$os7_tmp])
-    AC_ARG_VAR([BIBTEX],
-	       [BibTeX command. @<:@default=bibtex@:>@])
-    AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex],
-		 [$os7_tmp])
-    AC_ARG_VAR([LATEX2HTML],
-	       [LaTeX to HTML command. @<:@default=latex2html@:>@])
-    AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html],
-		 [$os7_tmp])
-    AC_ARG_VAR([DVI2PS],
-	       [DVI to PS command. @<:@default=dvips@:>@])
-    AC_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips],
-		 [$os7_tmp])
-    AC_ARG_VAR([DVIPDF],
-	       [DVI to PDF command. @<:@default=dvipdf@:>@])
-    AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
-		 [$os7_tmp])
-    AC_ARG_VAR([GNUPLOT],
-	       [GNU plot command. @<:@default=gnuplot@:>@])
-    AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot],
-		 [$os7_tmp])
-    AC_ARG_VAR([FIG2DEV],
-	       [Fig to graphics format command. @<:@default=fig2dev@:>@])
-    AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev],
-		 [$os7_tmp])
-    AC_ARG_VAR([CONVERT],
-	       [Graphics format conversion command. @<:@default=convert@:>@])
-    AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert],
-		 [$os7_tmp])
-    AC_ARG_VAR([PS2EPSI],
-	       [PS to EPSI conversion command. @<:@default=ps2epsi@:>@])
-    AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi],
-		 [$os7_tmp])
-    AC_ARG_VAR([EPSTOPDF],
-	       [EPS to PDF conversion command. @<:@default=epstopdf@:>@])
-    AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf],
-		 [$os7_tmp])
+dnl    os7_tmp="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin";
+dnl    AC_ARG_VAR([LATEX], [Latex command. @<:@default=latex@:>@])
+dnl    AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex], [$os7_tmp])
+dnl    AC_ARG_VAR([PSLATEX], [PS Latex command. @<:@default=pslatex@:>@])
+dnl    AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex], [$os7_tmp])
+dnl    AC_ARG_VAR([PDFLATEX], [PDF Latex command. @<:@default=pdflatex@:>@])
+dnl    AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex], [$os7_tmp])
+dnl    AC_ARG_VAR([BIBTEX], [BibTeX command. @<:@default=bibtex@:>@])
+dnl    AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex], [$os7_tmp])
+dnl    AC_ARG_VAR([LATEX2HTML], [LaTeX to HTML command. @<:@default=latex2html@:>@])
+dnl    AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html], [$os7_tmp])
+dnl    AC_ARG_VAR([DVI2PS], [DVI to PS command. @<:@default=dvips@:>@])
+dnl    AC_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$os7_tmp])
+dnl    AC_ARG_VAR([DVIPDF], [DVI to PDF command. @<:@default=dvipdf@:>@])
+dnl    AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf], [$os7_tmp])
+dnl    AC_ARG_VAR([GNUPLOT], [GNU plot command. @<:@default=gnuplot@:>@])
+dnl    AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot], [$os7_tmp])
+dnl    AC_ARG_VAR([FIG2DEV], [Fig to graphics format command. @<:@default=fig2dev@:>@])
+dnl    AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$os7_tmp])
+dnl    AC_ARG_VAR([CONVERT], [Graphics format conversion command. @<:@default=convert@:>@])
+dnl    AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$os7_tmp])
+dnl    AC_ARG_VAR([PS2EPSI], [PS to EPSI conversion command. @<:@default=ps2epsi@:>@])
+dnl    AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$os7_tmp])
+dnl    AC_ARG_VAR([EPSTOPDF], [EPS to PDF conversion command. @<:@default=epstopdf@:>@])
+dnl    AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$os7_tmp])
+dnl    AC_ARG_VAR([PS2PDF], [PS to PDF conversion command @<:@default=ps2pdf12@:>@])
+dnl    AC_PATH_PROGS([PS2PDF], [ps2pdf12 ps2pdf13 ps2pdf14 ps2pdf ps2pdfwr], [${am_missing2_run}ps2pdf], [$os7_tmp])
 ])# _OPENSS7_MISSING2
 # =============================================================================
 
@@ -997,26 +987,34 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 	am_missing3_run=
 	AC_MSG_WARN(['missing3' script is too old or missing])
     fi
-    AC_ARG_ENABLE([repo-tar],
-	AS_HELP_STRING([--disable-repo-tar],
-	    [disable tar repo construction.  @<:@default=auto@:>@]),
-	[enable_repo_tar="$enableval"],
-	[enable_repo_tar=yes])
-    os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    AC_ARG_VAR([MD5SUM],
-	       [MD5 sum command. @<:@default=md5sum@:>@])
-    AC_PATH_PROG([MD5SUM], [md5sum], [${am_missing3_run}md5sum],
-		 [$os7_tmp])
-    AC_ARG_VAR([SHA1SUM],
-	       [SHA1 sum command. @<:@default=sha1sum@:>@])
-    AC_PATH_PROG([SHA1SUM], [sha1sum], [${am_missing3_run}sha1sum],
-		 [$os7_tmp])
-    AC_ARG_VAR([SHA256SUM],
-	       [SHA256 sum command. @<:@default=sha256sum@:>@])
-    AC_PATH_PROG([SHA256SUM], [sha256sum], [${am_missing3_run}sha256sum],
-		 [$os7_tmp])
-    AM_CONDITIONAL([BUILD_REPO_TAR], [test ":$enable_repo_tar" = :yes])dnl
+dnl    AC_ARG_ENABLE([repo-tar],
+dnl	AS_HELP_STRING([--disable-repo-tar],
+dnl	    [disable tar repo construction.  @<:@default=auto@:>@]),
+dnl	[enable_repo_tar="$enableval"],
+dnl	[enable_repo_tar=yes])
+dnl    os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+dnl    AC_ARG_VAR([MD5SUM], [MD5 sum command. @<:@default=md5sum@:>@])
+dnl    AC_PATH_PROG([MD5SUM], [md5sum], [${am_missing3_run}md5sum], [$os7_tmp])
+dnl    AC_ARG_VAR([SHA1SUM], [SHA1 sum command. @<:@default=sha1sum@:>@])
+dnl    AC_PATH_PROG([SHA1SUM], [sha1sum], [${am_missing3_run}sha1sum], [$os7_tmp])
+dnl    AC_ARG_VAR([SHA256SUM], [SHA256 sum command. @<:@default=sha256sum@:>@])
+dnl    AC_PATH_PROG([SHA256SUM], [sha256sum], [${am_missing3_run}sha256sum], [$os7_tmp])
+dnl    AM_CONDITIONAL([BUILD_REPO_TAR], [test ":$enable_repo_tar" = :yes])dnl
 ])# _OPENSS7_MISSING3
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_MISSING4
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_MISSING4], [dnl
+    test x"${MISSING4+set}" = xset || MISSING4="\${SHELL} $am_aux_dir/missing4"
+    if eval "$MISSING4 --run true" ; then
+	am_missing4_run="$MISSING4 --run "
+    else
+	am_missing4_run=
+	AC_MSG_WARN(['missing4' script is too old or missing])
+    fi
+])# _OPENSS7_MISSING4
 # =============================================================================
 
 # =============================================================================
@@ -1032,33 +1030,6 @@ AC_DEFUN([_OPENSS7_UPDATE], [dnl
 # =============================================================================
 
 # =============================================================================
-# _OPENSS7_BESTZIP
-# -----------------------------------------------------------------------------
-# Building lzma archives is very, very, very slow.  Use this option to suppress
-# the building of lzma archives, even on systems that support lzma, unless
-# explicitly requested.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_OPENSS7_BESTZIP], [dnl
-    AC_CHECK_PROG([BESTZIP], [lzma], [lzma], [bzip2])
-    AC_MSG_CHECKING([for pkg lzma archive creation])
-    AC_ARG_ENABLE([lmza],
-	AS_HELP_STRING([--enable-lzma],
-	    [create lzma archives @<:@default=no@:>@]),
-	[case "${enableval:-yes}" in
-	    (no|NO|false|FALSE|default|DEFAULT)
-		enable_lzma='no' ;;
-	    (yes|YES|true|TRUE)
-		enable_lzma=$BESTZIP ;;
-	    (*)
-		enable_lzma="${enableval:-no}" ;;
-	 esac],
-	[enable_lzma='no'])
-    AC_MSG_RESULT([${enable_lzma:-no}])
-    AM_CONDITIONAL([WITH_LZMA], [test ":$enable_lzma" = :lzma])dnl
-])# _OPENSS7_BESTZIP
-# =============================================================================
-
-# =============================================================================
 # _OPENSS7
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7], [dnl
@@ -1068,6 +1039,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.2  2009-06-29 07:35:38  brian
+# - improvements to build process
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

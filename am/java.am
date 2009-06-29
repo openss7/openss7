@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,13 +48,359 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
+
+## -----------------------------------------------------------------------------
+## General rule variables
+## -----------------------------------------------------------------------------
+
+## Configure figures out where javadir should be.
+##javadir		= $(datadir)/java
+dist_java_JAVA		=
+JAVAROOT		= $(builddir)
+## Configure figures out what the java class path should be.
+##CLASSPATH		= $(builddir):$(srcdir)
+AM_JAVACFLAGS		= -nowarn # -target 1.2 -nowarn # -warn:none # -target 1.2 -warn:none
+
+EXTRA_LTLIBRARIES	=
+EXTRA_DATA		=
+my_JAVAFILES		=
+
+## -----------------------------------------------------------------------------
+## This is for generating Java documentation
+## -----------------------------------------------------------------------------
+
+pkgjavadocdir = $(javadocdir)/$(PACKAGE_LCNAME)
+
+javadoc_DEPFILES	=
+javadocsubdir		= api-docs
+javadoc_GROUPS		=
+javadoc_PACKAGES	=
+
+##
+# This rule is for generating Javadoc documentation.  Note that for debian we
+# do not really want to use this rule: we should use dh_javadoc debhelper
+# instead.
+##
+$(javadocsubdir)/index.html: $(javadoc_DEPFILES)
+	$(AM_V_GEN)$(JAVADOC) $(JAVADOCFLAGS) \
+		-d $(javadocsubdir) \
+		-sourcepath $(builddir):$(srcdir) \
+		-linkoffline http://developer.classpath.org/doc/ /usr/share/doc/gcj-4.1/html/ \
+		-protected -splitindex -linksource -use -author -version -docfilessubdirs -quiet \
+		-doctitle "OpenSS7 Jain APIs" \
+		-header "<a href=\"http://www.openss7.org/\">OpenSS7</a> Jain ($(VERSION))" \
+		-footer "<a href=\"http://www.openss7.org/\">OpenSS7</a> Jain ($(VERSION))" \
+		-bottom "Copyright &copy; `date +%Y` Monavacon Limited.  All Rights Reserved." \
+		-overview $(srcdir)/overview \
+		$(javadoc_GROUPS) \
+		$(javadoc_PACKAGES)
+
+if MAINTAINER_MODE
+if AMDEP
+javadoc_DEPFILES	+= $(my_JAVAFILES) $(srcdir)/overview
+endif
+endif
+
+EXTRA_DIST += overview
+
+##
+# Rule for building javadoc.  Note that for debian we do not really want to
+# use this rule: we should use dh_javadoc debhelper instead.
+##
+javadoc: $(javadocsubdir)/index.html
+
+##
+# Rule for cleaning javadoc documentation.
+##
+clean-javadoc:
+	rm -rf -- $(javadocsubdir)
+
+CLEAN_LOCAL += clean-javadoc
+
+##
+# Rule for installing javadoc documentation.  Note that for debian we do not
+# really want to use this rule: we should use dh_javadoc debhelper instead.
+##
+install-javadoc: $(javadocsubdir)/index.html
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	test -z "$(javadocdir)" || $(MKDIR_P) "$(DESTDIR)$(javadocdir)"
+	test -z "$(pkgjavadocdir)" || $(MKDIR_P) "$(DESTDIR)$(pkgjavadocdir)"
+	@if test -f $(javadocsubdir)/index.html ; then d=; else d=$(srcdir)/; fi ; \
+	 $(am__vpath_adj_setup) \
+	 list=`find $${d}$(javadocsubdir) -type f | sort` ; for p in $$list ; do \
+	 	$(am__vpath_adj) \
+		$(ECHO) "$(INSTALL_DATA) -D \"$$p\" \"$(DESTDIR)$(pkgjavadocdir)/$$f\""; \
+		$(INSTALL_DATA) -D "$$p" "$(DESTDIR)$(pkgjavadocdir)/$$f"; \
+	 done
+
+##
+# Rule for uninstalling javadoc documentation.  Note that for debian we do not
+# really want ot use this rule: we should use dh_javadoc debhelper instead.
+##
+uninstall-javadoc:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@if test -f $(javadocsubdir)/index.html ; then d=; else d=$(srcdir)/; fi ; \
+	 $(am__vpath_adj_setup) \
+	 list=`find $${d}$(javadocsubdir) -type f | sort` ; for p in $$list ; do \
+	 	$(am__vpath_adj) \
+		echo "$(DESTDIR)$(pkgjavadocdir)/$$f" ; \
+	 done | $(am__base_remove)
+
+##
+# Rule for distributing javadoc.  Note that for some distributions,
+# particularly SLES 10, there are insufficient documentation tools to build
+# the documentation.  SLES 10 cannot load gjdoc which is what we really need
+# to build documentation so we distribute the pre-built documentation for use
+# by broken distros such as SLES 10.
+##
+dist-javadoc: $(javadocsubdir)/index.html
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -f $(javadocsubdir)/index.html ; then d=; else d=$(srcdir)/; fi ; \
+	 echo "cp -a $${d}$(javadocsubdir) $(distdir)" ; \
+	 cp -a $${d}$(javadocsubdir) $(distdir)
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+if DEVELOPMENT
+## DEVELOPMENT
+if DOCUMENTATION
+## DOCUMENTATION
+
+ALL_LOCAL		+= javadoc
+INSTALL_DATA_LOCAL	+= install-javadoc
+UNINSTALL_LOCAL		+= uninstall-javadoc
+
+## DOCUMENTATION
+endif
+## DEVELOPMENT
+endif
+## PKG_BUILD_INDEP
+endif
+
+##
+## Should really have a DISTRIBUTE_JAVADOC flag instead.
+##
+if DISTRIBUTE_DOCS
+DIST_HOOK		+= dist-javadoc
+endif
+
+## -----------------------------------------------------------------------------
+## This is for generating Jars from Java source.
+## -----------------------------------------------------------------------------
+
+jardir			= $(javadir)
+jar_DATA		=
+my_jar_LINKS		=
+my_jar_CLASSFILES	=
+
+##
+# A rule to link a basename .jar to the versioned .jar file.  This is not
+# really necessary.  This is being done in the build directory when it should
+# be done as part of the installation process.  What we really need is an
+# install-data-hook to perform the linking.
+##
+$(my_jar_LINKS): %.jar : %-$(VERSION).jar
+	$(AM_V_GEN)ln -sf $< $@
+
+##
+# A rule to make the package jar file.
+##
+$(PACKAGE)-$(VERSION).jar: classdist_java.stamp $(my_jar_CLASSFILES)
+	$(AM_V_GEN)$(JAR) cf $@ $^
+
+##
+# A rule to make unversioned symbolic links to the versioned jar file in the
+# installation directory.  This needs to be done as part of the
+# install-data-hook so that it runs after the versioned jar files have been
+# installed.
+##
+install-jar:
+	list="$(my_jar_LINKS)"; for f in $$list ; do \
+		v=`echo $$f | sed 's,\.jar$$,$(VERSION).jar,'` ; \
+		$(ECHO) "(cd $(DESTDIR)$(jardir) ; ln -sf $$v $$f)" ; \
+		(cd $(DESTDIR)$(jardir) ; ln -sf $$v $$f) ; \
+	done
+
+##
+# A rule to uninstall versioned symbolic links to versioned jar files.
+##
+uninstall-jar:
+	list="$(my_jar_LINKS)"; $(am__echo_list) | sed 's,^,$(DESTDIR)$(jardir)/,' | $(am__base_remove)
+
+##EXTRA_DATA		+= $(PACKAGE)-$(VERSION).jar
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+my_jar_LINKS		+= $(PACKAGE).jar
+ALL_LOCAL		+= $(PACKAGE).jar
+jar_DATA		+= $(PACKAGE)-$(VERSION).jar
+INSTALL_DATA_HOOK	+= install-jar
+UNINSTALL_LOCAL		+= uninstall-jar
+
+## PKG_BUILD_ARCH
+endif
+
+CLEANFILES += $(PACKAGE).jar $(PACKAGE)-$(VERSION).jar
+
+## -----------------------------------------------------------------------------
+## This is for generating GCJ CNI or JNI header files and stubs.
+## -----------------------------------------------------------------------------
+
+my_SOURCEFILES		=
+my_INCLUDES		=
+AM_GCJHFLAGS		= -I$(builddir) -I$(srcdir)
+
+##
+# This rule is for building CNI headers from .class files.
+##
+.class.h:
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$@ ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	$(GCJH) $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed 's,\.h$$,,'`
+
+##
+# This rule is for building CNI stubs from .class files.
+##
+.class.cc:
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$@ ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	$(GCJH) -stubs $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed 's,\.cc$$,,'`
+
+MY_SUFFIXES 		+= .class
+
+## -----------------------------------------------------------------------------
+## This is for generating GCJ compiled Java modules.
+## -----------------------------------------------------------------------------
+## Note that we really do not want to use these rules on debian.  Instead,
+## what we would like to do is to use the dh_nativejava dephelper to compile
+## and install these modules.  All that we need do is pass it a jar file.
+## -----------------------------------------------------------------------------
+
+# The GCJ library install directory.  This is distro-specific and should be
+# set by configure instead of specified here.
+gcjlibdir		= $(libdir)/gcj/$(PACKAGE_LCNAME)
+AM_GCJFLAGS		= -I$(builddir) -I$(srcdir) -prefer-pic -shared -fPIC
+GCJLIB_INCLUDES		= -I$(builddir) -I$(srcdir) $(PKG_INCLUDES) $(USER_CPPFLAGS)
+GCJCLASSCOMPILE		= $(GCJ) -I$(builddir) -I$(srcdir) $(GCJFLAGS)
+
+## These are already set by configure as testing is required.
+##JNIFLAGS		= -fjni
+##CNIFLAGS		= -findirect-dispatch
+
+gcjlib_LTLIBRARIES 	=
+gcjlib_DATA		=
+
+##
+# This rule specifies how to generate a .class file from a .java source file
+# with dependency tracking.
+##
+.java.class:
+@am__fastdepGCJ_TRUE@	$(AM_V_GCJ)$(GCJCLASSCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$$(basename $@ .class).Tpo -C -d $(abs_builddir) $<
+@am__fastdepGCJ_TRUE@	$(AM_V_at)touch $(DEPDIR)/$$(basename $@ .class).Tpo
+@am__fastdepGCJ_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$$(basename $@ .class).Tpo $(DEPDIR)/$$(basename $@ .class).Po
+@am__fastdepGCJ_FALSE@	$(AM_V_GCJ) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCLASSCOMPILE) -C -d $(abs_builddir) $<
+
+MY_SUFFIXES 		+= .java
+
+## -----------------------------------------------------------------------------
+## This is for generating GCJ classmap databases.
+## -----------------------------------------------------------------------------
+
+# The GCJ classmap database install directory.  This is distro-specific and
+# should be set by configure instead of specified here.  This default is for
+# RedHat.
+gcjdbdir		= $(gcjlibdir)
+gcjdb_DATA		=
+
+##
+# This rule is for generating GCJ class map database files from jar files.
+##
+$(gcjdb_DATA): lib-%.db: %
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/lib-%.so
+
+##
+# The post-classmap target checks for a fully configured install directory by
+# checking for existence of the default classmap file in the target install
+# directory $(DESTDIR).  When it exists, then we are doing a non-rpm
+# (autoconf) install and need to rebuild the classmap database in the target
+# directory.  Otherwise, we skip this step.  Note that RedHat has a tool
+# called rebuild-gcj-db that would work; however, it is not adjusted for
+# cross-compiles and non-root installations.
+##
+post-classmap:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	db=`$(GCJDBTOOL) -p $(libdir)` ; \
+	test -n "$$db" -a -f $(DESTDIR)$$db || exit 0 ; \
+	$(GCJDBTOOL) -n $(DESTDIR)$$db 64 ; \
+	find $(gcdbdir) -follow -name '*.db' -print0 | \
+	xargs -0 $(GCJDBTOOL) -m $(DESTDIR)$$db $(DESTDIR)$$db
+
+if PKG_BUILD_ARCH
+POST_INSTALL_AM		+= post-classmap
+POST_UNINSTALL_AM	+= post-classmap
+endif
+
+## -----------------------------------------------------------------------------
+## This is for generating SWIG JNI modules
+## -----------------------------------------------------------------------------
+
+## This is where the JNI libraries go.  This is distro-specific and should be set
+## by configure instead of specified here.  The default is for RedHat.
+## jnidir = $(libdir)/java
+
+jni_LTLIBRARIES =
+
+## The swig command is established by configure.
+##SWIG = swig
+
+my_SWIGFILES =
+my_swig_JAVAFILES =
+
+# C wrapper files generated by SWIG.
+my_c_WRAPPERS =
+
+##
+# This rule is for using SWIG to generate headers and wrapper files for C.  Note
+# that this is only for Java.  These files are distributed similar to flex and
+# bison files and a proper version of SWIG is likely not required.  Note that we
+# need version 1.3.39 or better.  SWIG will not even compile on my old RedHat
+# 7.2 system.
+##
+$(my_c_WRAPPERS): %_wrap.c: %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	$(SWIG) -java -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
+
+# C++ wrapper files generated by SWIG.
+my_cxx_WRAPPERS =
+
+##
+# This rule is for using SWIG to generate headers and wrapper files for C++.
+# Note that this is only for Java.  These files are distributed similar to flex
+# and bison files and a proper version of SWIG is likely not required.  Note
+# that we need version 1.3.39 or better.  SWIG will not even compile on my old
+# RedHat 7.2 system.
+##
+$(my_cxx_WRAPPERS): %_wrap.cxx : %.i
+	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	$(SWIG) -java -c++ -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
 
 ## =============================================================================
 ##
 ## $Log: java.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

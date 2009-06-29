@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: drafts.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: drafts.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,232 +48,215 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
-TXTS  = $(ME_MES:.me=.txt)
-DVIS  = $(ME_MES:.me=.dvi)
-PDFS  = $(ME_MES:.me=.pdf)
-PSS   = $(ME_MES:.me=.ps)
-HTMLS = $(ME_MES:.me=.html)
+sinclude $(DEPDIR)/drafts.Pd
+
+$(DEPDIR)/drafts.Pd: Makefile $(ME_MES)
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	$(AM_V_GEN)list="$(ME_MES)" ; for f in $$list ; do \
+		if test -r $$f; then d=; else d=$(srcdir)/; fi; \
+		echo -n "$$f" | sed -r 's,(.*)\.me,\1.txt \1.dvi \1.ps \1.html: \\\n,' ; \
+		( echo "$$f" ; cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*),\1,p' ; \
+		  echo "idrefs" ) | \
+		sed '$$!N;$$!N;$$!N;$$!N;s,\n, ,g;s,^,\t,;$$!s,$$, \\,;$$s,$$,\n,' ; \
+		echo -n "$$f" | sed -r 's,(.*)\.me,\1.pdf: \1.ps\n\n,' ; \
+		cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*)\.pic,\1.pic: \1.fig\n\n\1.gif: \1.fig\n\n\1.eps: \1.fig\n\n,p' ; \
+	done > $(DEPDIR)/drafts.Td || { rm -f -- drafts.Td ; exit 1 ; } ; \
+	mv -f $(DEPDIR)/drafts.Td $@
+
+DISTCLEANFILES += $(DEPDIR)/drafts.Td $(DEPDIR)/drafts.Pd
+
+##
+# Little trick.  Although we cannot change the rules that automake places in the
+# makefiles, we can change what is in the variables.  So, when we cannot build a
+# thing, we null out the variable.
+##
+TXTS  = @WITH_DRAFTS_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(ME_MES:.me=.txt)
+HTMLS = @WITH_DRAFTS_TRUE@@WITH_DRAFTS_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(ME_MES:.me=.html)
+DVIS  = @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(ME_MES:.me=.dvi)
+PSS   = @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(ME_MES:.me=.ps)
+PDFS  = @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(ME_MES:.me=.pdf)
 
 PICS  = $(FIG_FIGS:.fig=.pic)
 GIFS  = $(FIG_FIGS:.fig=.gif)
 EPSS  = $(FIG_FIGS:.fig=.eps)
 
-ME_DEPS = fixup idrefs draft.me draft2.me draft3.me draft4.me
+ME_DEPS 	= fixup idrefs draft.me draft2.me draft3.me draft4.me
 
 .me.txt:  ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | nroff -s -p -e -t -me -Tascii | $(srcdir)/fixup > $@
 .me.dvi:  ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | groff -s -p -e -t -me -Tdvi  > $@ 2>/dev/null
 .me.ps:   ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | groff -s -p -e -t -me -Tps   > $@ 2>/dev/null
 .me.html: ; $(AM_V_GEN)cat $< | $(SOELIM) -I$(srcdir) | (cd $(srcdir) ; $(REFER)) | groff -s -p -e -t -me -Thtml > $@ 2>/dev/null
 
-##.me.txt:  ; $(AM_V_GEN)groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
-##.me.dvi:  ; $(AM_V_GEN)groff -R -s -p -t -e -Tdvi   -me $< > $@
-##.me.ps:   ; $(AM_V_GEN)groff -R -s -p -t -e -Tps    -me $< > $@
-##.me.html: ; $(AM_V_GEN)groff -R -s -p -t -e -Thtml  -me $< > $@
+.ps.pdf:  ; $(AM_V_GEN)$(PS2PDF) $< $@
+## We don't want to make PDFS with dvidpdf, but with ps2pdf instead.
+##.dvi.pdf: ; $(AM_V_GEN)$(DVIPDF) $< $@
 
-.ps.pdf:  ; $(AM_V_GEN)ps2pdf $< $@
-#.dvi.pdf: ; $(AM_V_GEN)dvipdf $< $@
+MY_SUFFIXES	+= .me .txt .dvi .ps .pdf .html
 
 .fig.pic: ; $(AM_V_GEN)$(FIG2DEV) -L pic -s 10 -p allps $< $@
 .fig.gif: ; $(AM_V_GEN)$(FIG2DEV) -L gif $< $@
 .fig.eps: ; $(AM_V_GEN)$(FIG2DEV) -L ps -p dummy $< $@
 
-#$(TXTS) : %.txt : %.me $(ME_DEPS) ; $(AM_V_GEN)groff -R -s -p -t -e -Tascii -me $< | ./fixup > $@
-#$(DVIS) : %.dvi : %.me $(ME_DEPS) ; $(AM_V_GEN)groff -R -s -p -t -e -Tdvi   -me $< > $@
-#$(PSS)  : %.ps  : %.me $(ME_DEPS) ; $(AM_V_GEN)groff -R -s -p -t -e -Tps    -me $< > $@
-#$(PDFS) : %.pdf : %.ps $(ME_DEPS) ; $(AM_V_GEN)ps2pdf $< $@
+## $(PICS): %.pic: %.fig
+## $(GIFS): %.gif: %.fig
+## $(EPSS): %.eps: %.fig
 
-#$(PICS) : %.pic : %.fig ; $(AM_V_GEN)$(FIG2DEV) -L pic -p allps $< $@
-#$(GIFS) : %.gif : %.fig ; $(AM_V_GEN)$(FIG2DEV) -L gif $< $@
-#$(EPSS) : %.eps : %.fig ; $(AM_V_GEN)$(FIG2DEV) -L ps  $< $@
-
-if MAINTAINER_MODE
-## MAINTAINER_MODE
-##
-# Only build docs in maintainer mode, don't build what we don't distribute.
-##
-dvi-local: $(PICS) $(DVIS)
-txt-local: $(PICS) $(TXTS)
-ps-local: $(PICS) $(PSS)
-pdf-local: $(PICS) $(PDFS)
-html-local: $(PICS) $(HTMLS)
-## MAINTAINER_MODE
-else
-## !MAINTAINER_MODE
-dvi-local:
-txt-local:
-ps-local:
-pdf-local:
-html-local:
-## !MAINTAINER_MODE
-endif
+MY_SUFFIXES	+= .fig .pic .gif .eps
 
 txt-am: txt-local
 
-if DEVELOPMENT
-## DEVELOPMENT
+MY_PHONY	+= txt-local
+
+txt-local:  @WITH_DRAFTS_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(TXTS)
+html-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(HTMLS)
+dvi-local:  @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(DVIS)
+ps-local:   @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(PSS)
+pdf-local:  @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(PDFS)
 
 ##
 # Because we do not distribute dvis, pss, or htmls, we need to know how to
 # make them: especially dvis as they are required for the distcheck target.
 ##
-$(DVIS)		: %.dvi	 : %.me $(ME_DEPS) $(PICS)
-$(PSS)		: %.ps   : %.me $(ME_DEPS) $(PICS)
-$(HTMLS)	: %.html : %.me $(ME_DEPS)
-
-if MAINTAINER_MODE
-## MAINTAINER_MODE
-if AMDEP
-## AMDEP
-$(TXTS)		: %.txt  : %.me $(ME_DEPS) $(PICS)
-$(PDFS)		: %.pdf  : %.me $(ME_DEPS) $(PICS)
-## AMDEP
-else
-## !AMDEP
-#$(TXTS)	: %.txt  : %.me $(ME_DEPS) $(PICS)
-#$(PDFS)	: %.pdf  : %.me $(ME_DEPS) $(PICS)
-## !AMDEP
-endif
-## MAINTAINER_MODE
-endif
+## $(TXTS)	: %.txt  : %.me $(ME_DEPS)
+## $(DVIS)	: %.dvi	 : %.me $(ME_DEPS)
+## $(PSS)	: %.ps   : %.me $(ME_DEPS)
+## $(PDFS)	: %.pdf  : %.me $(ME_DEPS)
+## $(HTMLS)	: %.html : %.me $(ME_DEPS)
 
 EXTRA_DIST	+= $(ME_MES) $(FIG_FIGS) $(ME_DEPS)
+if DISTRIBUTE_DOCS
+## Don't attempt to distribute what we can't build.
+if WITH_DRAFTS
 EXTRA_DIST	+= $(TXTS)
+if WITH_DRAFTS_PRINT
+EXTRA_DIST	+= $(DVIS)
+EXTRA_DIST	+= $(PSS)
 EXTRA_DIST	+= $(PDFS)
+endif
+if WITH_DRAFTS_HTML
+EXTRA_DIST	+= $(HTMLS)
+endif
+endif
+endif
 
 clean-txt:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(TXTS)
+	@list='$(TXTS)' ; $(am__list_remove)
+
+CLEAN_LOCAL	+= clean-txt
 
 clean-dvi:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(DVIS)
+	@list='$(DVIS)' ; $(am__list_remove)
+
+CLEAN_LOCAL	+= clean-dvi
 
 clean-ps:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(PSS)
+	@list='$(PSS)' ; $(am__list_remove)
+
+CLEAN_LOCAL	+= clean-ps
 
 clean-pdf:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(PDFS)
+	@list='$(PDFS)' ; $(am__list_remove)
+
+CLEAN_LOCAL	+= clean-pdf
 
 clean-pic:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(PICS)
+	@list='$(PICS)' ; $(am__list_remove)
+
+CLEAN_LOCAL	+= clean-pic
 
 clean-gif:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(GIFS)
+	@list='$(GIFS)' ; $(am__list_remove)
+
+CLEAN_LOCAL	+= clean-gif
 
 clean-eps:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(EPSS)
+	@list='$(EPSS)' ; $(am__list_remove)
 
-install-dvi: install-dvi-am
+CLEAN_LOCAL	+= clean-eps
 
-install-dvi-am: $(DVIS)
+install-dvi-drafts: $(DVIS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	test -z "$(dvidir)" || $(MKDIR_P) "$(DESTDIR)$(dvidir)"
 	@list='$(DVIS)'; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed -e 's,.*/,,'`; \
-		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(dvidir)/$$f'"; \
+		f=`echo $$p | sed 's,.*/,,'`; \
+		$(ECHO) " $(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(dvidir)/$$f\""; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(dvidir)/$$f"; \
 	done
 
-install-ps: install-ps-am
+MY_PHONY	+= install-dvi-drafts
 
-install-ps-am: $(PSS)
+install-dvi-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ install-dvi-drafts
+
+install-ps-drafts: $(PSS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	test -z "$(psdir)" || $(MKDIR_P) "$(DESTDIR)$(psdir)"
 	@list='$(PSS)'; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed -e 's,.*/,,'`; \
-		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(psdir)/$$f"; \
+		f=`echo $$p | sed 's,.*/,,'`; \
+		$(ECHO) " $(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(psdir)/$$f\""; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(psdir)/$$f"; \
 	done
 
-install-pdf: install-pdf-am
+MY_PHONY	+= install-ps-drafts
 
-install-pdf-am: $(PDFS)
+install-ps-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ install-ps-drafts
+
+install-pdf-drafts: $(PDFS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	test -z "$(pdfdir)" || $(MKDIR_P) "$(DESTDIR)$(pdfdir)"
 	@list='$(PDFS)' ; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed -e 's,.*/,,'`; \
-		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(pdfdir)/$$f'"; \
+		f=`echo $$p | sed 's,.*/,,'`; \
+		$(ECHO) " $(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(pdfdir)/$$f\""; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(pdfdir)/$$f"; \
 	done
 
-uninstall-dvi: uninstall-dvi-am
+MY_PHONY	+= install-pdf-drafts
+
+install-pdf-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ install-pdf-drafts
+
+uninstall-dvi: uninstall-dvi-drafts
 
 uninstall-dvi-am:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	@list='$(DVIS)'; for p in $$list; do \
-		f=`echo $$p | sed -e 's,.*/,,'`; \
-		echo " rm -f '$(DESTDIR)$(dvidir)/$$f'"; \
-		rm -f "$(DESTDIR)$(dvidir)/$$f"; \
-	done
+	@list='$(DVIS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(dvidir)/,' | $(am__base_remove)
 
 uninstall-ps: uninstall-ps-am
 
 uninstall-ps-am:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	@list='$(PSS)'; for p in $$list; do \
-		f=`echo $$p | sed -e 's,.*/,,'`; \
-		echo " rm -f '$(DESTDIR)$(psdir)/$$f'"; \
-		rm -f "$(DESTDIR)$(psdir)/$$f"; \
-	done
+	@list='$(PSS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(psdir)/,' | $(am__base_remove)
 
 uninstall-pdf: uninstall-pdf-am
 
 uninstall-pdf-am:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	@list='$(PDFS)'; for p in $$list; do \
-		f=`echo $$p | sed -e 's,.*/,,'`; \
-		echo " rm -f '$(DESTDIR)$(pdfdir)/$$f'"; \
-		rm -f "$(DESTDIR)$(pdfdir)/$$f"; \
-	done
-
-
-CLEAN_LOCAL		+= clean-txt \
-			   clean-dvi \
-			   clean-ps \
-			   clean-pdf \
-			   clean-pic \
-			   clean-gif \
-			   clean-eps
-
-if PKG_BUILD_INDEP
-## PKG_BUILD_INDEP
-
-if MAINTAINER_MODE
-## MAINTAINER_MODE
-##
-# Only build docs in maintianer mode, don't build what we don't distribute.
-##
-ALL_LOCAL		+= dvi ps pdf txt
-## MAINTAINER_MODE
-endif
-
-## PKG_BUILD_INDEP
-endif
-
-## DEVELOPMENT
-endif
+	@list='$(PDFS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(pdfdir)/,' | $(am__base_remove)
 
 ## =============================================================================
 ##
 ## $Log: drafts.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

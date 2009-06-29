@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:00 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,16 +48,33 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:26:00 $ by $Author: brian $
+## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
 ##
 ## =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.11 dist-bzip2 std-options -Wall color-tests
+##TOMAKE_OPTIONS = gnits 1.11 dist-bzip2 std-options -Wall color-tests
 
 ECHO = echo
 
 ECHO_V = test -n '$(AM_V_at)' || $(ECHO)
 ECHO_Q = test -z '$(AM_V_at)' || $(ECHO)
+
+am__short_list = \
+	sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+	sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+
+am__base_remove = \
+	$(am__short_list) | \
+	while read line ; do \
+		$(ECHO) "rm -f -- $$line" ; \
+		rm -f -- $$line ; \
+	done
+
+am__echo_list = \
+	for f in $$list ; do echo "$$f" ; done
+
+am__list_remove = \
+	$(am__echo_list) | $(am__base_remove)
 
 ##
 # Accumulate these 'till the end
@@ -67,6 +84,9 @@ INSTALL_DATA_LOCAL	=
 INSTALL_DATA_HOOK	=
 INSTALL_EXEC_LOCAL	=
 INSTALL_EXEC_HOOK	=
+INSTALL_DVI_LOCAL	=
+INSTALL_PS_LOCAL	=
+INSTALL_PDF_LOCAL	=
 INSTALL_HTML_LOCAL	=
 UNINSTALL_LOCAL		=
 UNINSTALL_HOOK		=
@@ -234,7 +254,7 @@ $(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(D
 $(ALL_RECURSIVE_TARGETS):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
-	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
+	target=`$(ECHO) $@ | sed 's|^all-||'`; \
 	list='$(subdirs) .'; \
 	for subdir in $$list; do \
 		$(ECHO_V) "D: Making $$target in $$subdir"; \
@@ -256,7 +276,7 @@ $(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(D
 $(ALL_REVERSIVE_TARGETS):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
-	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
+	target=`$(ECHO) $@ | sed 's|^all-||'`; \
 	list=''; rev='$(subdirs) .'; for subdir in $$rev; do \
 		list="$$subdir $$list"; \
 	done; \
@@ -653,7 +673,21 @@ install-data-local: $(INSTALL_DATA_LOCAL)
 
 install-data-hook: $(INSTALL_DATA_HOOK) post-install-am
 
+install-dvi-local: $(INSTALL_DVI_LOCAL)
+
+MY_PHONY		+= install-dvi-local $(INSTALL_DVI_LOCAL)
+
+install-ps-local: $(INSTALL_PS_LOCAL)
+
+MY_PHONY		+= install-ps-local $(INSTALL_PS_LOCAL)
+
+install-pdf-local: $(INSTALL_PDF_LOCAL)
+
+MY_PHONY		+= install-pdf-local $(INSTALL_PDF_LOCAL)
+
 install-html-local: $(INSTALL_HTML_LOCAL)
+
+MY_PHONY		+= install-html-local $(INSTALL_HTML_LOCAL)
 
 post-install: post-install-recursive
 
@@ -752,7 +786,7 @@ MY_PHONY		+= repo-sign $(REPO_SIGN)
 #!     `release-clean' target at the end of removal of distribution packages.
 #!
 repo-clean: $(REPO_CLEAN)
-	rm -f -- $(REPOCLEANFILES)
+	list="$(REPOCLEANFILES)" ; $(am__list_remove)
 
 MY_PHONY		+= repo-clean $(REPO_CLEAN)
 
@@ -816,10 +850,10 @@ release-clean: release-clean-recursive release-clean-local
 
 release-clean-am:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@targets="$(RELEASE_CLEAN_LOCAL)"; revers=; for t in $$targets; do \
-		revers="$$t$${reverse:+ $$reverse}"; \
+	@reverse="$(RELEASE_CLEAN_LOCAL)"; targets=; for t in $$reverse; do \
+		targets="$$t$${targets:+ $$targets}"; \
 	done; \
-	for target in $$reverse; do \
+	for target in $$targets; do \
 		$(ECHO_V) "D: Making $$target in `pwd`"; \
 		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
@@ -827,13 +861,9 @@ release-clean-am:
 
 release-clean-local:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@list="$(RELEASECLEANFILES)"; reverse=; for f in $$list; do \
-		reverse="$$f$${reverse:+ $$reverse}"; \
-	done; \
-	if test -n "$$reverse"; then \
-		$(ECHO) "rm -f -- $$reverse"; \
-		rm -f -- $$reverse; \
-	fi
+	@reverse="$(RELEASECLEANFILES)"; list=; for f in $$reverse; do \
+		list="$$f$${list:+ $$list}"; \
+	done ; $(am__list_remove)
 
 MY_REVERSIVE_TARGETS	+= release-clean-recursive
 MY_PHONY		+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
@@ -900,10 +930,10 @@ update-clean: update-clean-recursive update-clean-local
 
 update-clean-am:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@targets="$(UPDATE_CLEAN_LOCAL)"; reverse=; for t in $$targets; do \
-		reverse="$$t$${reverse:+ $$reverse}"; \
+	@reverse="$(UPDATE_CLEAN_LOCAL)"; targets=; for t in $$reverse; do \
+		targets="$$t$${targets:+ $$targets}"; \
 	done; \
-	for target in $$reverse; do \
+	for target in $$targets; do \
 		$(ECHO_V) "D: Making $$target in `pwd`"; \
 		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
@@ -911,15 +941,11 @@ update-clean-am:
 
 update-clean-local:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@list="$(UPDATECLEANFILES)"; reverse=; for f in $$list; do \
+	@reverse="$(UPDATECLEANFILES)"; list=; for f in $$reverse; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
-			reverse="$$f$${reverse:+ $$reverse}"; \
+			list="$$f$${list:+ $$list}"; \
 		fi; \
-	done; \
-	if test -n "$$reverse"; then \
-		$(ECHO) "rm -f -- $$reverse"; \
-		rm -f -- $$reverse; \
-	fi
+	done ; $(am__list_remove)
 
 MY_REVERSIVE_TARGETS 	+= update-clean-recursive
 MY_PHONY		+= update-clean-am update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
@@ -961,7 +987,7 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 #!
 $(LOGGING_TARGETS): FORCE
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'`; \
+	@target=`$(ECHO) "$@" | sed 's|\.log$$||;s|compile||'`; \
 	if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
 	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target || \
 	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \
@@ -1004,6 +1030,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.2  2009-06-29 07:35:35  brian
+## - improvements to build process
+##
 ## Revision 1.1.2.1  2009-06-21 10:26:00  brian
 ## - added files to new distro
 ##

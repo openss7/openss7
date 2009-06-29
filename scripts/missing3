@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 #
-# @(#) $RCSfile: missing3,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+# @(#) $RCSfile: missing3,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-29 07:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@
 # repository commands are scripts themselves and can be simplified here to do
 # just the things needed by our makefiles.
 
-scriptversion=2008-09-19.01
+scriptversion=2009-06-24.01
 
 if test $# -eq 0; then
     cat 1>&2 <<-EOF
@@ -68,9 +68,14 @@ fi
 
 script="$0"
 scriptname=$(basename $0)
+scriptdir=`(cd $(dirname $0); pwd)`
+srcdir=`(cd $scriptdir/../src/java; pwd)`
 run=:
 sed_output='s/.* --output[ =]\([^ ]*\).*/\1/p'
 sed_minuso='s/.* -o \([^ ]*\).*/\1/p'
+sed_minusd='s/.* -d \([^ ]*\).*/\1/p'
+sed_lastop='s/.* \([^ ]*\) *$/\1/p'
+
 
 msg="missing on your system"
 
@@ -93,37 +98,37 @@ case $1 in
 
     (-h|--h|--he|--hel|--help)
 	cat <<-EOF
-		$0 [OPTION]... PROGRAM [ARGUMENT]...
-		
-		Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
-		an error status if there is no known handling for PROGRAM.
-		
-		Options:
-		  -h, --help	    display this help and exit
-		  -v, --version	    output version information and exit
-		  -c, --copying	    output copying information and exit
-		  --run		    try to run PROGRAM, and emulate if it fails
-		
-		Supported PROGRAM values:
-		  RedHat/Fedora repository commands:
-		      createrepo		    touch the output file
-		
-		  Novell/YaST repository commands:
-		      create_directory.yast	    create directory.yast as specified
-		      create_md5sums		    create MD5SUMS and MD5SUMS.meta files
-		      create_package_desc	    create the packages file
-		      create_repo_for_patch.sh	    create patch repository
-		      create_update_source.sh	    create update repository
-		      createpatch		    create patch RPMs
-		      mk_listings		    create archive listings
-		
-		  Debian/Apt repository commands:
-		      apt-ftparchive		    create appropriate output
-		      dpkg-scanpackages		    create appropriate output
-		      dpkg-scansources		    create appropriate output
-		
-		Send problem reports to <bugs@openss7.org>.
-		EOF
+	$0 [OPTION]... PROGRAM [ARGUMENT]...
+	
+	Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
+	an error status if there is no known handling for PROGRAM.
+	
+	Options:
+	  -h, --help	    display this help and exit
+	  -v, --version	    output version information and exit
+	  -c, --copying	    output copying information and exit
+	  --run		    try to run PROGRAM, and emulate if it fails
+	
+	Supported PROGRAM values:
+	  RedHat/Fedora repository commands:
+	      createrepo		    touch the output file
+	
+	  Novell/YaST repository commands:
+	      create_directory.yast	    create directory.yast as specified
+	      create_md5sums		    create MD5SUMS and MD5SUMS.meta files
+	      create_package_desc	    create the packages file
+	      create_repo_for_patch.sh	    create patch repository
+	      create_update_source.sh	    create update repository
+	      createpatch		    create patch RPMs
+	      mk_listings		    create archive listings
+	
+	  Debian/Apt repository commands:
+	      apt-ftparchive		    create appropriate output
+	      dpkg-scanpackages		    create appropriate output
+	      dpkg-scansources		    create appropriate output
+	
+	Send problem reports to <bugs@openss7.org>.
+	EOF
 	exit $?
 	;;
 
@@ -132,44 +137,44 @@ case $1 in
 
     (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
 	cat <<-EOF
-		Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-		Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-		Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-		
-		All Rights Reserved.
-		
-		This program is free software; you can redistribute it and/or modify it
-		under the terms of the GNU Affero General Public License as published by
-		the Free Software Foundation; version 3 of the License.
-		
-		This program is distributed in the hope that it will be useful, but
-		WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
-		General Public License for more details.
-		
-		You should have received a copy of the GNU Affero General Public License
-		along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-		write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-		02139, USA.
-		
-		U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-		on behalf of the U.S. Government ("Government"), the following
-		provisions apply to you.  If the Software is supplied by the Department
-		of Defense ("DoD"), it is classified as "Commercial Computer Software"
-		under paragraph 252.227-7014 of the DoD Supplement to the Federal
-		Acquisition Regulations ("DFARS") (or any successor regulations) and the
-		Government is acquiring only the license rights granted herein (the
-		license rights customarily provided to non-Government users).  If the
-		Software is supplied to any unit or agency of the Government other than
-		DoD, it is classified as "Restricted Computer Software" and the
-		Government's rights in the Software are defined in paragraph 52.227-19
-		of the Federal Acquisition Regulations ("FAR") (or any successor
-		regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-		NASA Supplement to the FAR (or any successor regulations).
-		
-		Commercial licensing and support of this software is available from
-		OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-		EOF
+	Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+	Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+	Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+	
+	All Rights Reserved.
+	
+	This program is free software; you can redistribute it and/or modify it
+	under the terms of the GNU Affero General Public License as published by
+	the Free Software Foundation; version 3 of the License.
+	
+	This program is distributed in the hope that it will be useful, but
+	WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero
+	General Public License for more details.
+	
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+	write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+	02139, USA.
+	
+	U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+	on behalf of the U.S. Government ("Government"), the following
+	provisions apply to you.  If the Software is supplied by the Department
+	of Defense ("DoD"), it is classified as "Commercial Computer Software"
+	under paragraph 252.227-7014 of the DoD Supplement to the Federal
+	Acquisition Regulations ("DFARS") (or any successor regulations) and the
+	Government is acquiring only the license rights granted herein (the
+	license rights customarily provided to non-Government users).  If the
+	Software is supplied to any unit or agency of the Government other than
+	DoD, it is classified as "Restricted Computer Software" and the
+	Government's rights in the Software are defined in paragraph 52.227-19
+	of the Federal Acquisition Regulations ("FAR") (or any successor
+	regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+	NASA Supplement to the FAR (or any successor regulations).
+	
+	Commercial licensing and support of this software is available from
+	OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+	EOF
 	;;
     (-*)
 	cat 1>&2 <<-EOF
@@ -186,8 +191,19 @@ program="$1" ; shift
 zeroarg=`which $program 2>/dev/null` ; test -n $zeroarg || zeroarg="$program"
 
 # Now exit if we have PROGRAM, but it failed.  Also exit now if we do not have
-# PROGRAM and --version, --help or --copyring was passed to PROGRAM (most likely
+# PROGRAM and --version, --help or --copying was passed to PROGRAM (most likely
 # to detect the program).
+
+if test -z "$run" -a -x "$zeroarg" ; then
+    # it exists and is executable, but it failed
+    exit 1
+elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
+    # Could not run --version or --help.  This is prbably someone running `$TOOL
+    # --version' to check whether $TOOL exists without knowing that $TOOL uses
+    # missing4.
+    exit 1
+fi
+
 case $program in
     (create_directory.yast|create_md5sums|create_package_desc|create_repo_for_patch.sh|create_update_source.sh|creatpatch|mk_listings)
 	# do not handle --version or --help
@@ -196,12 +212,99 @@ case $program in
 	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
 	    # it exists, but it failed.
 	    exit 1
-	elif test ":$2" = ":--version" || test ":$2" = ":--help" ; then
+	elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
 	    # Could not run --version or --help.  This is probably someone
 	    # running `$TOOL --version' or `$TOOL --help' to check whether $TOOL
-	    # exists and not knowing $TOOL uses missing2.
+	    # exists and not knowing $TOOL uses missing3.
 	    exit 1
 	fi
+	;;
+esac
+
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), or
+# warning is requested, generate a warning.
+
+cat 1>&2 <<-EOF
+	*** WARNING: \`$program' is needed, and is $msg.
+	***
+	EOF
+
+case $program in
+    (apt-ftparchive)
+	if test $# -lt 2; then
+		cat 1>&1 <<-EOF
+			Error: $program: too few arguments
+			Usage: $program [options] command {path|config}
+			EOF
+		exit 1
+	fi
+	arg=$1
+	case $arg in
+	    (packages|sources)
+		;;
+	    (contents|release)
+		cat 1>&2 <<-EOF
+	*** Most arguments can be emulated, but the \`$arg' argument is not
+	*** currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive sites, in case some other package
+	*** would contain the missing \`$program' program.
+	EOF
+		;;
+	    (generate|clean)
+		cat 1>&2 <<-EOF
+	*** Most arguments can be emulated, but the \`$arg' argument is not
+	*** currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive sites, in case some other package
+	*** would contain the missing \`$program' program.
+	EOF
+		;;
+	    (*)
+		cat 1>&2 <<-EOF
+			Error: $program: unrecognized command \`$arg'
+			Usage: $program [options] command {path|config}
+			EOF
+		exit 1
+		;;
+	esac
+	;;
+    (dpkg-scanpackages|dpkg-scansources)
+	cat 1>&2 <<-EOF
+	*** It is straightforward to emulate \`$program'; however, emulation is
+	*** not currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	EOF
+	;;
+    (dpkg|dpkg-deb)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	*** 
+	EOF
+	;;
+    (*)
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	EOF
 	;;
 esac
 
@@ -216,12 +319,6 @@ case $program in
 	# dpkg-scanpackages, dpkg-scansources, dpkg-deb and brute force.  Note
 	# that dpkg-scanpackages and dpkg-scansources might also be missing, so
 	# invoke them using this script again.
-	if test $# -lt 2; then
-		cat 1>&1 <<-EOF
-			Error: $program: too few arguments
-			Usage: $program [options] command {path|config}
-			EOF
-	fi
 	arg=$1; shift
 	case $arg in
 	    (packages)
@@ -230,113 +327,28 @@ case $program in
 	    (sources)
 		$script --run dpkg-scansources "$@"; exit $?
 		;;
-	    (contents|release)
-		cat 1>&2 <<-EOF
-			*** 
-			*** WARNING: \`$program' is needed, and is $msg.
-			*** 
-			*** Most arguments can be emulated, but the \`$arg' argument
-			*** is not currently supported by \`$scriptname'.
-			*** 
-			*** You might have modified some files without having the proper tools
-			*** for further handling them.  Check the \`README' file, it often tells
-			*** you about the needed prerequisites for installing this package.  You
-			*** may also peek at any GNU archive sites, in case some other package
-			*** would contain the missing \`$program' program.
-			*** 
-			EOF
-		exit 1;
-		;;
-	    (generate|clean)
-		cat 1>&2 <<-EOF
-			*** 
-			*** WARNING: \`$program' is needed, and is $msg.
-			*** 
-			*** Most arguments can be emulated, but the \`$arg' argument
-			*** is not currently supported by \`$scriptname'.
-			*** 
-			*** You might have modified some files without having the proper tools
-			*** for further handling them.  Check the \`README' file, it often tells
-			*** you about the needed prerequisites for installing this package.  You
-			*** may also peek at any GNU archive sites, in case some other package
-			*** would contain the missing \`$program' program.
-			*** 
-			EOF
-		exit 1;
-		;;
-	    (*)
-		cat 1>&2 <<-EOF
-			Error: $program: unrecognized command \`$arg'
-			Usage: $program [options] command {path|config}
-			EOF
-		;;
 	esac
-	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING: \`$program' is needed, and is $msg.
-		*** 
-		*** You might have modified some files without having the proper tools
-		*** for further handling them.  Check the \`README' file, it often tells
-		*** you about the needed prerequisites for installing this package.  You
-		*** may also peek at any GNU archive site, in case some other package
-		*** would contain this missing \`$program' program.
-		*** 
-		EOF
 	exit 1
 	;;
     (dpkg-scanpackages|dpkg-scansources)
-	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING: \`$program' is needed, and is $msg.
-		*** 
-		*** It is straightforward to emulate \`$program'; however,
-		*** emulation is not currently supported by \`$scriptname'.
-		*** 
-		*** You might have modified some files without having the proper tools
-		*** for further handling them.  Check the \`README' file, it often tells
-		*** you about the needed prerequisites for installing this package.  You
-		*** may also peek at any GNU archive site, in case some other package
-		*** would contain this missing \`$program' program.
-		*** 
-		EOF
 	exit 1
 	;;
     (dpkg|dpkg-deb)
-	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING \`$program' is needed, and is $msg.
-		*** 
-		*** You might have modified some files without having the proper tools
-		*** for further handling them.  Check the \`README' file, it often tells
-		*** you about the needed prerequisites for installing this package.  You
-		*** may also peek at any GNU archive site, in case some other package
-		*** would contain this missing \`$program' program.
-		*** 
-		EOF
 	exit 1
 	;;
     (*)
-	cat 1>&2 <<-EOF
-		*** 
-		*** WARNING: \`$program' is needed, and is $msg.
-		*** 
-		*** You might have modified some files without having the proper tools
-		*** for further handling them.  Check the \`README' file, it often tells
-		*** you about the needed prerequisites for installing this package.  You
-		*** may also peek at any GNU archive site, in case some other package
-		*** would contain this missing \`$program' program.
-		*** 
-		EOF
 	exit 1
 	;;
 esac
 
 exit 0
 
-
 # =============================================================================
 #
 # $Log: missing3,v $
+# Revision 1.1.2.3  2009-06-29 07:35:34  brian
+# - improvements to build process
+#
 # Revision 1.1.2.2  2009-06-21 12:41:53  brian
 # - updated headers
 #
