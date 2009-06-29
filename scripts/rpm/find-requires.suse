@@ -1,0 +1,149 @@
+#!/bin/bash
+
+#
+# Auto-generate requirements for executables (both ELF and a.out) and library
+# sonames, script interpreters, and perl modules.
+#
+
+ulimit -c 0
+
+#
+# --- Set needed to 0 for traditional find-requires behavior.
+needed=1
+if [ X"$1" = Xldd ]; then
+    needed=0
+elif [ X"$1" = Xobjdump ]; then
+    needed=1
+fi
+
+#
+# --- Grab the file manifest and classify files.
+#filelist=`sed "s/['\"]/\\\&/g"`
+#filelist=`sed "s/[]['\"*?{}]/\\\\\&/g"`
+IFS=$'\n'
+filelist=($(grep -Ev '/usr/doc/|/usr/share/doc/'))
+exelist=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file | \
+	egrep -v ":.* (commands|script) " | \
+	grep ":.*executable" | cut -d: -f1))
+scriptlist=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file | \
+	egrep ":.* (commands|script) " | cut -d: -f1))
+liblist=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file | \
+	grep ":.*shared object" | cut -d : -f1))
+
+interplist=()
+perllist=()
+pythonlist=()
+tcllist=()
+monolist=($(printf "%s\n" "${filelist[@]}" | egrep "\\.(exe|dll)\$"))
+
+#
+# --- Alpha does not mark 64bit dependencies
+case `uname -m` in
+  alpha*)	mark64="" ;;
+  *)		mark64="()(64bit)" ;;
+esac
+
+if [ "$needed" -eq 0 ]; then
+#
+# --- Executable dependency sonames.
+  for f in "${exelist[@]}"; do
+    [ -r "$f" -a -x "$f" ] || continue
+    lib64=`if file -L "$f" 2>/dev/null | \
+	grep "ELF 64-bit" >/dev/null; then echo "$mark64"; fi`
+    ldd "$f" | awk '/=>/ {
+	if ($1 !~ /libNoVersion.so/ && $1 !~ /4[um]lib.so/ && $1 !~ /linux-gate.so/) {
+	    gsub(/'\''"/,"\\&",$1);
+	    printf "%s'$lib64'\n", $1
+	}
+    }'
+  done | xargs -r -n 1 basename | sort -u
+
+#
+# --- Library dependency sonames.
+  for f in "${liblist[@]}"; do
+    [ -r "$f" ] || continue
+    lib64=`if file -L "$f" 2>/dev/null | \
+	grep "ELF 64-bit" >/dev/null; then echo "$mark64"; fi`
+    ldd "$f" | awk '/=>/ {
+	if ($1 !~ /libNoVersion.so/ && $1 !~ /4[um]lib.so/ && $1 !~ /linux-gate.so/) {
+	    gsub(/'\''"/,"\\&",$1);
+	    printf "%s'$lib64'\n", $1
+	}
+    }'
+  done | xargs -r -n 1 basename | sort -u
+fi
+
+#
+# --- Script interpreters.
+for f in "${scriptlist[@]}"; do
+    [ -r "$f" -a -x "$f" ] || continue
+    interp=`head -n 1 "$f" | sed -ne 's/^\#\![ 	]*//p' | cut -d" " -f1`
+    interplist=("${interplist[@]}" "$interp")
+    case $interp in
+    */perl)	perllist=("${perllist[@]}" "$f") ;;
+    esac
+done
+[ -n "$interplist" ] && { printf "%s\n" "${interplist[@]}" | sort -u ; }
+
+#
+# --- Add perl module files to perllist.
+for f in "${filelist[@]}"; do
+    [ -r "$f" -a "${f%.pm}" != "${f}" ] && perllist=("${perllist[@]}" "$f")
+done
+
+#
+# --- Weak symbol versions (from glibc).
+[ -n "$mark64" ] && mark64="(64bit)"
+for f in "${liblist[@]}" "${exelist[@]}" ; do
+    [ -r "$f" ] || continue
+    lib64=`if file -L "$f" 2>/dev/null | \
+	grep "ELF 64-bit" >/dev/null; then echo "$mark64"; fi`
+    objdump -p "$f" | awk 'BEGIN { START=0; LIBNAME=""; needed='$needed'; }
+	/^$/ { START=0; }
+	/^Dynamic Section:$/ { START=1; }
+	(START==1) && /NEEDED/ {
+	    if (needed) {
+		if ("'$lib64'" != "") {
+		    sub(/$/, "()'$lib64'", $2) ;
+		}
+		print $2 ;
+	    }
+	}
+	/^Version References:$/ { START=2; }
+	(START==2) && /required from/ {
+	    sub(/:/, "", $3);
+	    LIBNAME=$3;
+	}
+	(START==2) && (LIBNAME!="") && ($4!="") {
+	    print LIBNAME "(" $4 ")'$lib64'";
+	}
+    '
+done | sort -u
+
+#
+# --- Perl modules.
+#[ -x /usr/lib/rpm/perl.req -a -n "$perllist" ] && \
+#    printf "%s\n" "${perllist[@]}" | /usr/lib/rpm/perl.req | sort -u
+
+#
+# --- Python modules.
+[ -x /usr/lib/rpm/python.req -a -n "$pythonlist" ] && \
+    printf "%s\n" "${pythonlist[@]}" | /usr/lib/rpm/python.req | sort -u
+
+#
+# --- Tcl modules.
+[ -x /usr/lib/rpm/tcl.req -a -n "$tcllist" ] && \
+    printf "%s\n" "${tcllist[@]}" | /usr/lib/rpm/tcl.req | sort -u
+
+#
+# --- Mono exes/dlls
+: ${MONO_PREFIX=/usr}
+[ -x $MONO_PREFIX/bin/mono -a -f $MONO_PREFIX/bin/mono-find-requires -a -n "$monolist" ] &&
+    printf "%s\n" "${monolist[@]}" | MONO_PATH=$MONO_PREFIX/lib${MONO_PATH:+:$MONO_PATH} prefix=$MONO_PREFIX $MONO_PREFIX/bin/mono-find-requires
+
+#
+# --- Kernel module imported symbols
+[ -x ${0%/*}/find-requires.ksyms ] &&
+    printf "%s\n" "${filelist[@]}" | ${0%/*}/find-requires.ksyms "$@"
+
+exit 0
