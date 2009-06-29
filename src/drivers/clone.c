@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:44 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:42  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:20:44  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $"
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
+static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -76,8 +79,8 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.1 
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
-#define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $"
+#define CLONE_DEVICE	"SVR 4.2 MP STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
 #define CLONE_BANNER	CLONE_DESCRIP	"\n" \

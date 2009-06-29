@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $
+ @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:36 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp0.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:46  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:40:36  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
+#ident "@(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 
-static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
+static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 /*
  *  ISO Transport Class 0 over TCP/IP (TP0)
@@ -84,8 +87,8 @@ static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.1 $)
 
 #define TP0_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP0_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
-#define TP0_DEVICE	"SVR 4.2 STREAMS TP0 Module for RFC 1006 and RFC 2126"
+#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define TP0_DEVICE	"SVR 4.2 MP STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"
 #define TP0_BANNER	TP0_DESCRIP	"\n" \

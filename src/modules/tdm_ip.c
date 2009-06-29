@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $
+ @(#) $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:36 $ by $Author: brian $
+ Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tdm_ip.c,v $
+ Revision 1.1.2.2  2009-06-29 07:35:46  brian
+ - SVR 4.2 => SVR 4.2 MP
+
  Revision 1.1.2.1  2009-06-21 11:40:36  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
+#ident "@(#) $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 
-static char const ident[] = "$RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
+static char const ident[] = "$RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 /*
  *  This is a Y.1453 TDM-IP module.  It pushes over a UDP Stream that provides connectivity to the
@@ -88,8 +91,8 @@ static char const ident[] = "$RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.1
 #define TDM_IP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TDM_IP_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TDM_IP_REVISION		"OpenSS7 $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
-#define TDM_IP_DEVICE		"SVR 4.2 STREAMS TDM-IP MODULE"
+#define TDM_IP_REVISION		"OpenSS7 $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define TDM_IP_DEVICE		"SVR 4.2 MP STREAMS TDM-IP MODULE"
 #define TDM_IP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TDM_IP_LICENSE		"GPL"
 #define TDM_IP_BANNER		TDM_IP_DESCRIP		"\n" \
