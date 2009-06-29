@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: XAP.3.man,v 1.1.2.1 2009-06-21 10:34:07 brian Exp $
+.\" @(#) $Id: XAP.3.man,v 1.1.2.2 2009-06-29 07:35:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:07 $ by $Author: brian $
+.\" Last Modified $Date: 2009-06-29 07:35:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: XAP.3.man,v $
+.\" Revision 1.1.2.2  2009-06-29 07:35:31  brian
+.\" - pass check target
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:07  brian
 .\" - added files to new distro
 .\"
@@ -637,7 +640,7 @@ If the user has not set the AP_BUFFERS_ONLY flag on
 then, when data
 structures are to be returned to the user by
 .BR ap_get_env "(3) or " ap_rcv (3),
-when cdata®env is returned or cdata®old_conn_id is returned, the allocation
+when cdata->env is returned or cdata->old_conn_id is returned, the allocation
 function will be called with the type argument set to AP_MEMORY.
 .IP \(bu
 When user data is to be returned from
