@@ -1,56 +1,62 @@
-#!/bin/bash
+#!/usr/bin/awk -f
 
-cat | xargs -r awk '
-    BEGIN { START = 0; }
-    (FNR == 1) {
-	START = 1; LIBTOOL = 0;
-	if (/# .*\.la - a libtool library file/) {
-	    BASENAME = $2; START = 0; LIBTOOL = 1;
-	    REQUIRED = 0; PROVIDED = 0;
-	    next
-	}
-	nextfile
-    }
-    (LIBTOOL) && /^dependency_libs=/ {
-	sub("^dependency_libs='"'"'[[:space:]]*", "")
-	sub("[[:space:]]*'"'"'[[:space:]]*$", "")
-	gsub("[[:space:]]+", " ")
-	split($0, LIBS, " ")
-	for (LIB in LIBS) {
-	    if (LIBS[LIB] ~ /\.la$/) {
-		REQUIRES["libtool(" LIBS[LIB] ")"] = 1
-	    }
-	}
-	REQUIRED = 1
-	if (PROVIDED) {
-	    nextfile
-	}
-	next
-    }
-    (LIBTOOL) && /^libdir=/ {
-	split($1, array, "'"'"'")
-	PROVIDES["libtool(" array[2] "/" BASENAME ")"] = 1
-	PROVIDED = 1
-	if (REQUIRED) {
-	    nextfile
-	}
-	next
-    }
-    END {
-	for (N in REQUIRES) {
-	    if (N in PROVIDES) {
+/\.la$/ {
+    file = $1
+    first = 1
+    while ((getline <file) > 0) {
+	if (first) {
+	    if (/# .*\.la - a libtool library file/) {
+		basename = $2
+		first = 0
+		provided = 0
+		required = 0
 		continue
 	    }
-	    print N
+	    break
+	}
+	if (/^libdir=/) {
+	    split($0, array, "'")
+	    provides["libtool(" array[2] "/" basename ")"] = 1
+	    if (required)
+		break
+	    provided = 1
+	    continue
+	}
+	if (/^dependency_libs=/) {
+	    sub("^dependency_libs='[[:space:]]*", "")
+	    sub("[[:space:]]*'[[:space:]]*$", "")
+	    gsub("[[:space:]]+", " ")
+	    split($0, libs, " ")
+	    for (lib in libs) {
+		if (libs[lib] ~ /\.la$/) {
+		    requires["libtool(" libs[lib] ")"] = 1
+		}
+	    }
+	    if (provided)
+		break
+	    required = 1
+	    continue
 	}
     }
-' | sort -b -u
-
-exit 0
+    close(file)
+}
+END {
+    j = 1
+    for (la in requires) {
+	if (la in provides)
+	    continue
+	indices[j] = la
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.libtool,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:51:40 $
+# @(#) $RCSfile: find-requires.libtool,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -96,13 +102,16 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:40 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.libtool,v $
+# Revision 1.1.2.2  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
 # Revision 1.1.2.1  2009-07-04 03:51:40  brian
 # - updates for release
 #
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

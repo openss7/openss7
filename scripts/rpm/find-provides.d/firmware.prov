@@ -1,40 +1,58 @@
-#!/bin/sh
-#
-# firmware.prov - Automatically extract any and all firmware dependencies from
-#                 kernel object (.ko) files and add to RPM deps.
+#!/usr/bin/awk -f
 
-grep '\.ko$' | xargs -r strings -n 7 | awk '
-    /^firmware=/ {
-	sub("^firmware=", "")
-	FIRMWARE[$0] = 1
-	next
-    }
-    /^version=/ {
-	sub("^version=", "")
-	gsub(" ", "_")
-	VERSION = $0
-	next
-    }
-    /^vermagic=/ {
-	sub("^vermagic=", "")
-	sub(" .*", "")
-	sub("-.*", "")
-	KREL = $0
-	for (F in FIRMWARE) {
-	    if (VERSION) {
-		print "firmware(" F ") = " VERSION
-	    } else {
-		print "firmward(" F ")"
-	    }
+/\.ko$/ {
+    command = "strings -n 7 " $1
+    version = ""
+    release = ""
+    delete myfirmware
+    while ((command | getline)) {
+	if (/^firmware=/) {
+	    sub(/^firmware=/, "")
+	    myfirmware[$0] = 1
+	    continue
+	}
+	if (/^version=/) {
+	    sub(/^version=/, "")
+	    gsub(/ /, "_")
+	    version = $0
+	    continue
+	}
+	if (/^vermagic=/) {
+	    sub(/^vermagic=/, "")
+	    sub(/ .*/, "")
+	    sub(/-.*/, "")
+	    release = $0
+	    continue
 	}
     }
-'
-
-exit 0
+    close(command)
+    for (fw in myfirmware) {
+	provides = "firmware(" fw ")"
+	if (version) {
+	    firmware[provides " = " version] = 1
+	    firmware[provides] = 0
+	} else {
+	    if (!(provides in firmware))
+		firmware[provides] = 1
+	}
+    }
+}
+END {
+    j = 1
+    for (fw in firmware) {
+	if (firmware[fw]) {
+	    indices[j] = fw
+	    j++
+	}
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++)
+	print indices[i]
+}
 
 # =============================================================================
 #
-# @(#) $RCSfile: firmware.prov,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:53:06 $
+# @(#) $RCSfile: firmware.prov,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -80,13 +98,14 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:53:06 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: firmware.prov,v $
-# Revision 1.1.2.1  2009-07-04 03:53:06  brian
-# - updates for release
+# Revision 1.1.2.2  2009-07-04 13:28:10  brian
+# - conversion to pure awk
 #
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi fo+=tcqlorn
+# vim: ft=awk tw=80 sw=4 fo+=tcqlorn
+

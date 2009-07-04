@@ -1,19 +1,34 @@
-#! /bin/sh
+#!/usr/bin/awk -f
 
-grep '\.ko$' | xargs -r objdump -t 2>/dev/null \
-| awk '
-    ($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/) {
-	sub("^0*", "", $1)
-	sub("^_?__crc_", "", $5)
-	print "ksym(" $5 ") = " $1
+# feed kernel module filenames in on standard input,
+# provided kernel symbols output on standard output
+
+/\.ko$/ {
+    command = "objdump -t " $1 " 2>/dev/null"
+    while ((command | getline) > 0) {
+	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
+	    sub("^0*", "", $1)
+	    sub("^_?__crc_", "", $5)
+	    ksyms["ksym(" $5 ") = " $1] = 1
+	}
     }
-' | sort -bu
-
-exit 0
+    close(command)
+}
+END {
+    j = 1
+    for (ksym in ksyms) {
+	indices[j] = ksym
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-provides.ksyms,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: find-provides.ksyms,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -59,13 +74,16 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-provides.ksyms,v $
+# Revision 1.1.2.3  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi fo+=tcqlorn
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

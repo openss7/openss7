@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,54 +70,80 @@ which_tool() {
 }
 
 remove_unprovided() {
-    required=($(cat | sort -b -u))
-    provided=($(for r in "${required[@]}" ; do
-	t=$(echo "$r" | awk '{ print $1 }')
-	(echo "$r" ; rpm -q --whatprovides "$t" | grep -v 'no package' \
-	| xargs -n 1 -r rpm -q --provides ) | awk '
-	    BEGIN { first = 1; gotone = 0; }
-	    (first == 1) {
-		capability = $1 ;
-		version = $3 ;
-		first = 0;
-		if (capability~/^\//) {
-		    if (version) {
-			CAPABILITIES[capability " = " version] = 1
-		    } else {
-			CAPABILITIES[capability] = 1
+    awk '
+	(NF == 1) {
+	    if (!($1 in requiredcaps))
+		requiredcaps[$1] = 1
+	    next
+	}
+	(NF == 3) {
+	    requiredcaps[$1] = 0
+	    requiredvers[$0] = 1
+	    next
+	}
+	END {
+	    for (cap in requiredcaps) {
+		whatprovides = "rpm -q --qf '"'"'%{NAME}\\n'"'"' --whatprovides '"'"'" cap "'"'"' 2>/dev/null"
+		while ((whatprovides | getline)) {
+		    if (/no package/)
+			break;
+		    providedpkgs[$1] = 1
+		    providedcaps[$1] = pkg
+		}
+		close(whatprovides)
+	    }
+	    for (pkg in providedpkgs) {
+		provides = "rpm -q --provides " pkg " 2>/dev/null"
+		while ((provides | getline)) {
+		    if (NF == 1) {
+			if (!($1 in providedcaps))
+			    providedcaps[$1] = pkg
+			continue
 		    }
-		    nextfile
+		    if (NF == 3) {
+			providedcaps[$1] = ""
+			providedvers[$0] = pkg
+			continue
+		    }
 		}
-		next
+		close(provides)
 	    }
-	    (capability == $1) && (version == $3) {
-		if (version) {
-		    CAPABILITIES[$1 " = " $3] = 1
-		} else {
-		    CAPABILITIES[$1] = 1
+	    j = 1
+	    k = 1
+	    for (cap in requiredcaps) {
+		if (!requiredcaps[cap])
+		    continue
+		if (cap in providedcaps) {
+		    if (!providedcaps[cap])
+			continue
+		    result[j] = cap
+		    j++
+		    continue
 		}
-		next
+		unprovided[k] = cap
+		k++
 	    }
-	    (capability == $1) {
-		CAPABILITIES[$1]
-	    }
-	    END {
-		for (cap in CAPABILITIES) {
-		    print cap
+	    for (ver in requiredvers) {
+		if (ver in providedvers) {
+		    result[j] = ver
+		    j++
+		    continue
 		}
+		unprovided[k] = ver
+		k++
 	    }
-	'
-    done | sort -b -u))
-    warnings=($(join '-t#' -v 1 <(printf "%s\n" "${required[@]}") <(printf "%s\n" "${provided[@]}")))
-    if [ -n "$warnings" ] ; then
-	echo "" >&2
-	echo "Warning: unprovided requirements:" >&2
-	printf "\t%s\n" "${warnings[@]}" >&2
-	echo "" >&2
-    fi
-    if [ -n "$provided" ] ; then
-	printf "%s\n" "${provided[@]}"
-    fi
+	    n = asort(result)
+	    for (i = 1; i <= n; i++)
+		print result[i]
+	    n = asort(unprovided)
+	    if (n) {
+		cat = "cat >&2"
+		print "Warning: unprovided capabilities:" | cat
+		for (i = 1; i <= n; i++)
+		    print "   " unprovided[i] | cat
+	    }
+	}
+    '
 }
 
 searchlist=($where /usr/lib/rpm /usr/lib/rpm/redhat)
@@ -162,7 +188,7 @@ jarlist=($(printf "%s\n" "${filelist[@]}" | egrep '\.(jar|war|zip)$' | xargs -r 
 #     if [ -n "$tool" -a -x "$tool" ] ; then
 # 	  printf "%s\n" "${solist[@]}" "${exelist[@]}" | \
 # 	  $tool "${args[@]}" | sort -u
-#     fi | sort -bu
+#     fi
 # fi
 
 # --- Shared objects.
@@ -171,7 +197,7 @@ if [ -n "$solist" -o -n "$exelist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	printf "%s\n" "${solist[@]}" "${exelist[@]}" | \
 	$tool "${args[@]}"
-    fi | sort -bu
+    fi
 fi
 
 # --- libtool
@@ -180,7 +206,7 @@ if [ -n "$libtoollist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	printf "%s\n" "${libtoollist[@]}" | \
 	$tool "${args[@]}"
-    fi | sort -bu
+    fi
 fi
 
 # --- Scripts.
@@ -223,7 +249,7 @@ if [ -n "$scriptlist" ] ; then
 		esac
 	    fi
 	fi
-    done | sort -bu
+    done
 fi
 
 # --- Perl modules.
@@ -232,7 +258,7 @@ if [ -n "$perllist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	printf "%s\n" "${perllist[@]}" | \
 	$tool "${args[@]}"
-    fi | sort -bu
+    fi
 fi
 
 # --- Python modules.
@@ -241,7 +267,7 @@ if [ -n "$pythonlist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	printf "%s\n" "${pythonlist[@]}" | \
 	$tool "${args[@]}"
-    fi | sort -bu
+    fi
 fi
 
 # --- Tcl modules.
@@ -250,7 +276,7 @@ if [ -n "$tcllist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	printf "%s\n" "${tcllist[@]}" | \
 	$tool "${args[@]}"
-    fi | sort -bu
+    fi
 fi
 
 # --- Kernel module imported symbols.
@@ -281,6 +307,9 @@ exit 0
 # =============================================================================
 #
 # $Log: find-requires,v $
+# Revision 1.1.2.3  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #
