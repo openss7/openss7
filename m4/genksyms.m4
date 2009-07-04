@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -151,7 +151,7 @@ dnl
 	PKG_LDS=''
     fi
     AC_SUBST([PKG_LDS])
-    if test -f $ac_aux_dir/abi.VERSION
+    if test -f $ac_aux_dir/abi.VERSION -a :${linux_cv_k_ko_modules:-no} = :yes
     then
 	PKG_ABI="$ac_aux_dir/abi.VERSION"
     else
@@ -347,6 +347,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 1.1.2.4  2009-07-04 03:51:33  brian
+# - updates for release
+#
 # Revision 1.1.2.3  2009-06-29 07:35:38  brian
 # - improvements to build process
 #

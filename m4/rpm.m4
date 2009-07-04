@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -567,7 +567,6 @@ dnl
 		(*) enable_rpms=no ;;
 	    esac
 	fi
-	ac_cv_path_RPM="${am_missing3_run}rpm"
 	RPM="${am_missing3_run}rpm"
     fi
     AC_ARG_VAR([RPMBUILD],
@@ -576,10 +575,8 @@ dnl
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${RPMBUILD:-no}" = :no; then
 	if test ":$enable_rpms" = :yes; then
-	    ac_cv_path_RPMBUILD="$RPM"
 	    RPMBUILD="$RPM"
 	else
-	    ac_cv_path_RPMBUILD="${am_missing3_run}rpmbuild";
 	    RPMBUILD="${am_missing3_run}rpmbuild";
 	    enable_srpms=no;
 	fi
@@ -616,7 +613,6 @@ dnl
 	    AC_MSG_WARN([Could not find createrepo program in PATH.])
 	fi
 	enable_repo_yum=no
-	ac_cv_path_CREATEREPO="${am_missing3_run}createrepo"
 	CREATEREPO="${am_missing3_run}createrepo"
     fi
     AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
@@ -644,7 +640,6 @@ dnl
 	    fi
 	fi
 	enable_repo_yast=no
-	ac_cv_path_CREATE_PACKAGE_DESCR="${am_missing3_run}create_package_descr"
 	CREATE_PACKAGE_DESCR="${am_missing3_run}create_package_descr"
     fi
     AC_CACHE_CHECK([for rpm yast repo construction], [rpm_cv_repo_yast], [dnl
@@ -685,6 +680,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.3  2009-07-04 03:51:33  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:38  brian
 # - improvements to build process
 #

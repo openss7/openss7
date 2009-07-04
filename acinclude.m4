@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,7 +80,7 @@ m4_include([m4/lib32.m4])
 m4_include([m4/perl.m4])
 m4_include([m4/snmp.m4])
 m4_include([m4/agent.m4])
-m4_include([m4/gcj.m4])
+dnl m4_include([m4/gcj.m4])
 m4_include([m4/java.m4])
 m4_include([m4/swig.m4])
 
@@ -3654,6 +3654,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.3  2009-07-04 03:51:32  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:34  brian
 # - improvements to build process
 #

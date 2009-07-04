@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: SetupAnsiEvent.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:35:07 $ <p>
+ @(#) $RCSfile: SetupAnsiEvent.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:34 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:35:07 $ by $Author: brian $
+ Last Modified $Date: 2009-07-04 03:51:34 $ by $Author: brian $
  */
 
 package javax.jain.ss7.isup.ansi;
@@ -553,7 +553,7 @@ public class SetupAnsiEvent extends SetupEvent {
         if (m_es!= null)
             b.append(JainSS7Utility.bytesToHex(m_es, 0, m_es.length));
         b.append("\n\tm_genNameAnsi: " + m_genNameAnsi);
-        if (m_hcIsSet);
+        if (m_hcIsSet)
             b.append("\n\tm_hc: " + m_hc);
         b.append("\n\tm_informationReqIndAnsi: " + m_informationReqIndAnsi);
         b.append("\n\tm_jurisdic: ");

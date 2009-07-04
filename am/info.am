@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -58,40 +58,40 @@ $(DEPDIR)/info.Pd: Makefile $(info_TEXINFOS)
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	$(AM_V_GEN)list="$(info_TEXINFOS)" ; for f in $$list ; do \
 		if test -r $$f; then d=; else d=$(srcdir)/; fi; \
-		echo -n "$$f" | sed -r 's,(.*)\.texi,\1.ps: \1.dvi\n\n,' ; \
-		\
-		echo -n "$$f" | sed -r 's,(.*)\.texi,\1.info \1.txt: \1.texi \\\n,' ; \
-		( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*),\2,p' ; \
-		  cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*,\2.txt,p' ) | \
-		while read p ; do \
+		echo "$$f" | sed -r 's,(.*)\.texi,\1.ps: \1.dvi,' ; \
+		( echo "$$f" | sed -r 's,(.*)\.texi,$(srcdir)/\1.info \1.txt: \1.texi,' ; \
+		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
+		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.txt,p' ) | \
+		  while read p ; do \
 			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo "$$v$$p" ; fi ; \
-		done | sed '$$!N;$$!N;$$!N;$$!N;s,\n, ,g;s,^,\t,;$$!s,$$, \\,;$$s,$$,\n,' ; \
-		\
-		echo -n "$$f" | sed -r 's,(.*)\.texi,\1.dvi: \1.texi \\\n,' ; \
-		( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*),\2,p' ; \
-		  cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*,\2.eps,p' ) | \
-		while read p ; do \
+			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
+		  done ) | \
+		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
+		( echo "$$f" | sed -r 's,(.*)\.texi,\1.dvi: \1.texi,' ; \
+		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
+		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.eps,p' ) | \
+		  while read p ; do \
 			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo "$$v$$p" ; fi ; \
-		done | sed '$$!N;$$!N;$$!N;$$!N;s,\n, ,g;s,^,\t,;$$!s,$$, \\,;$$s,$$,\n,' ; \
-		\
-		echo -n "$$f" | sed -r 's,(.*)\.texi,\1.pdf: \1.texi \\\n,' ; \
-		( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*),\2,p' ; \
-		  cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*,\2.pdf,p' ) | \
-		while read p ; do \
+			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
+		  done ) | \
+		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
+		( echo "$$f" | sed -r 's,(.*)\.texi,\1.pdf: \1.texi,' ; \
+		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
+		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.pdf,p' ) | \
+		  while read p ; do \
 			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo "$$v$$p" ; fi ; \
-		done | sed '$$!N;$$!N;$$!N;$$!N;s,\n, ,g;s,^,\t,;$$!s,$$, \\,;$$s,$$,\n,' ; \
-		\
-		echo -n "$$f" | sed -r 's,(.*)\.texi,\1.html: \1.texi \\\n,' ; \
-		( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*),\2,p' ; \
-		  cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*,\2.png,p' ) | \
-		while read p ; do \
+			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
+		  done ) | \
+		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
+		( echo "$$f" | sed -r 's,(.*)\.texi,\1.html: \1.texi,' ; \
+		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
+		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.png,p' ) | \
+		  while read p ; do \
 			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo "$$v$$p" ; fi ; \
-		done | sed '$$!N;$$!N;$$!N;$$!N;s,\n, ,g;s,^,\t,;$$!s,$$, \\,;$$s,$$,\n,' ; \
-	done > $(DEPDIR)/info.Td || { rm -f -- info.Td ; exit 1 ; } ; \
+			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
+		  done ) | \
+		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
+	done > $(DEPDIR)/info.Td || { rm -f -- $(DEPDIR)/info.Td ; exit 1 ; } ; \
 	mv -f $(DEPDIR)/info.Td $@
 
 DISTCLEANFILES += $(DEPDIR)/info.Td $(DEPDIR)/info.Pd
@@ -115,12 +115,16 @@ AM_MAKEINFOSGMLFLAGS	= $(AM_INFOINCLUDES) --commands-in-node-names
 ##
 INFOS	= @WITH_TEXINFO_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=$(srcdir)/%.info)
 TXTS	= @WITH_TEXINFO_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.txt)
-HTMLS	= @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.html)
+htmls	= @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.html)
 SGMLS	= @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.sgml)
 DVIS	= @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.dvi)
 PSS	= @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.ps)
 PDFS	= @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@$(info_TEXINFOS:%.texi=%.pdf)
 
+##
+# The following override the .texi.dvi, etc, definitions from automake to quiet them down.
+# Otherwise they are identical.
+##
 $(DVIS): %.dvi : %.texi
 	$(AM_V_GEN)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir)' \
@@ -142,7 +146,6 @@ $(SGMLS): %.sgml : %.texi
 	$(AM_V_GEN)$(MAKEINFO) --docbook $(AM_MAKEINFOSGMLFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) -o $@ $<
 
 $(INFOS): %.info : %.texi
-	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -- img-txts
 	@restore=: && backupdir="$(am__leading_dot)am$$$$" && \
 	am__cwd=`pwd` && $(am__cd) $(srcdir) && \
 	rm -rf $$backupdir && mkdir $$backupdir && \
@@ -160,11 +163,11 @@ $(INFOS): %.info : %.texi
 	else \
 		rc=$$?; \
 		$(am__cd) $(srcdir) && \
-		$$restore $$backupdir/* `$(ECHO) "./$@" | sed 's|[^/]*$$||'`; \
+		$$restore $$backupdir/* `echo "./$@" | sed 's|[^/]*$$||'`; \
 	fi; \
 	rm -rf $$backupdir; exit $$rc
 
-$(HTMLS): %.html : %.texi
+$(htmls): %.html : %.texi
 	@rm -rf $(@:.html=.htp) ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "$(MAKEINFOHTML) $(AM_MAKEINFOHTMLFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) -o $(@:.html=.htp) $<" ; \
@@ -207,14 +210,17 @@ FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
 
 MY_SECONDARY	+= $(FIG_PSS) $(FIG_EPSS) $(FIG_PDFS) $(FIG_PNGS) $(FIG_JPGS) $(FIG_TXTS)
 
-MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
+#.fig.eps:; $(AM_V_GEN)$(FIG2DEV) -L eps -p dummy $< $@ || $(CONVERT) $< $@
+#.fig.ps :; $(AM_V_GEN)$(FIG2DEV) -L  ps -p dummy $< $@ || $(CONVERT) $< $@
+#.fig.pdf:; $(AM_V_GEN)$(FIG2DEV) -L pdf -p dummy $< $@ || $(CONVERT) $< $@
 
 $(FIG_PSS) : %.ps  : %.fig ; $(AM_V_GEN)$(FIG2DEV) -L  ps -p dummy $< $@ || $(CONVERT) $< $@
 $(FIG_EPSS): %.eps : %.fig ; $(AM_V_GEN)$(FIG2DEV) -L eps -p dummy $< $@ || $(CONVERT) $< $@
 $(FIG_PDFS): %.pdf : %.fig ; $(AM_V_GEN)$(FIG2DEV) -L pdf -p dummy $< $@ || $(CONVERT) $< $@
 $(FIG_JPGS): %.jpg : %.eps ; $(AM_V_GEN)$(CONVERT) -antialias $< $@
-$(FIG_TXTS): txts-am
 $(FIG_PNGS): %.png : %.eps ; $(AM_V_GEN)$(CONVERT) -antialias $< $@
+
+$(FIG_TXTS): txts-am
 
 txts-am:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -240,7 +246,9 @@ TBL_TXTS = $(TBL_TBLS:%.tbl=%.txt)
 
 MY_SECONDARY	+= $(TBL_PSS) $(TBL_EPSS) $(TBL_PDFS) $(TBL_PNGS) $(TBL_JPGS) $(TBL_TXTS)
 
-.tbl.dvi: ; $(GROFF) -t -Tdvi -ms $< > $@ || :
+#.tbl.txt:; $(AM_V_GEN)( $(ECHO) ""; ( $(GROFF) -t -Tascii -ms -P-b -P-c -P-u -P-o $< 2>/dev/null || $(GROFF) -t -Tascii -ms -P-b -P-u -P-o $< ) | sed '/^[[:space:]]*$$/d'; $(ECHO) "" ) > $@
+#.tbl.dvi:; $(GROFF) -t -Tdvi -ms $< > $@ || :
+#.tbl.ps :; $(AM_V_GEN)$(GROFF) -t -Tps -ms $< > $@ 2>/dev/null || :
 
 $(TBL_PSS)  : %.ps  : %.tbl ; $(AM_V_GEN)$(GROFF) -t -Tps -ms $< > $@ 2>/dev/null || :
 $(TBL_EPSS) : %.eps : %.ps  ; $(AM_V_GEN)$(PS2EPSI) $< $@ || $(CONVERT) $< $@
@@ -272,6 +280,9 @@ PNG_TXTS = $(PNG_PNGS:%.png=%.txt)
 
 MY_SECONDARY	+= $(PNG_PSS) $(PNG_EPSS) $(PNG_PDFS) $(PNG_JPGS) $(PNG_TXTS)
 
+#.png.ps :; $(AM_V_GEN)$(CONVERT) -density 144 $< $@
+#.png.jpg:; $(AM_V_GEN)$(CONVERT) -density 144 $< $@
+
 $(PNG_PSS)  : %.ps  : %.png ; $(AM_V_GEN)$(CONVERT) -density 144 $< $@
 $(PNG_EPSS) : %.eps : %.ps  ; $(AM_V_GEN)$(PS2EPSI) $< $@ || $(CONVERT) $< $@
 $(PNG_PDFS) : %.pdf : %.eps ; $(AM_V_GEN)$(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
@@ -288,69 +299,48 @@ PS_TXTS = $(PS_PSS:%.ps=%.txt)
 
 MY_SECONDARY	+= $(PS_EPSS) $(PS_PDFS) $(PS_PNGS) $(PS_JPGS) $(PS_TXTS)
 
+#.ps.eps :; $(AM_V_GEN)$(PS2EPSI) $< $@ || $(CONVERT) $< $@
+
+#.eps.pdf:; $(AM_V_GEN)$(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
+#.eps.jpg:; $(AM_V_GEN)$(CONVERT) -antialias $< $@
+#.eps.png:; $(AM_V_GEN)$(CONVERT) -antialias $< $@
+
 $(PS_EPSS): %.eps : %.ps  ; $(AM_V_GEN)$(PS2EPSI) $< $@ || $(CONVERT) $< $@
 $(PS_PDFS): %.pdf : %.eps ; $(AM_V_GEN)$(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
 $(PS_JPGS): %.jpg : %.eps ; $(AM_V_GEN)$(CONVERT) -antialias $< $@
-$(PS_TXTS): txts-am
 $(PS_PNGS): %.png : %.eps ; $(AM_V_GEN)$(CONVERT) -antialias $< $@
 
-IMG_EPSS = $(FIG_EPSS) $(TBL_EPSS) $(PNG_EPSS) $(PS_EPSS)
-IMG_PDFS = $(FIG_PDFS) $(TBL_PDFS) $(PNG_PDFS) $(PS_PDFS)
-IMG_PNGS = $(FIG_PNGS) $(TBL_PNGS) $(PNG_PNGS) $(PS_PNGS)
-IMG_TXTS = $(FIG_TXTS) $(TBL_TXTS) $(PNG_TXTS) $(PS_TXTS)
-IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
+$(PS_TXTS): txts-am
 
-img-epss: $(IMG_EPSS)
-img-pdfs: $(IMG_PDFS)
-img-txts: $(IMG_TXTS)
-img-jpgs: $(IMG_JPGS)
-img-pngs: $(IMG_PNGS)
+IMG_TXTS = @WITH_TEXINFO_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ \
+	   $(FIG_TXTS) $(TBL_TXTS) $(PNG_TXTS) $(PS_TXTS)
+IMG_EPSS = @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ \
+	   $(FIG_EPSS) $(TBL_EPSS) $(PNG_EPSS) $(PS_EPSS)
+IMG_PDFS = @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ \
+	   $(FIG_PDFS) $(TBL_PDFS) $(PNG_PDFS) $(PS_PDFS)
+IMG_PNGS = @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ \
+	   $(FIG_PNGS) $(TBL_PNGS) $(PNG_PNGS) $(PS_PNGS)
+IMG_JPGS = @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ \
+	   $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
 
-MY_PHONY += img-epss img-pdfs img-txts img-jpgs img-pngs
+HTMLS = $(htmls) $(IMG_PNGS)
 
-##
-# I know this is ugly and GNU make specified, but...  If you are using autoconf we
-# pretty much assume you have some GNU tools around...
-# also, automake misses dependencies for ps files
-##
-MY_SECONDARY	+= $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS) $(IMG_JPGS)
+MY_SECONDARY	+=  $(IMG_TXTS) $(IMG_EPSS) $(IMG_PDFS)
 
-##
-## If we are not tracking dependencies skip the extra info texinfos because
-## some are usually regenerated by configure causing all of the documentation
-## to be rebuilt  we really only want to rebuild documentation that was not
-## distributed.
-##
-## $(DVIS)	: %.dvi  : %.texi @MAINTAINER_MODE_TRUE@@AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
-## $(PSS)	: %.ps   : %.dvi  @MAINTAINER_MODE_TRUE@@AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
-## $(PDFS)	: %.pdf  : %.texi @MAINTAINER_MODE_TRUE@@AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
-## $(HTMLS)	: %.html : %.texi @MAINTAINER_MODE_TRUE@@AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
-## $(SGMLS)	: %.sgml : %.texi @MAINTAINER_MODE_TRUE@@AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
-##
-## distcheck is not run in maintainer mode, and we need this, otherwise distcheck
-## breaks because it otherwise attempts to place the info files into the source
-## directory for some arcane reason.
-##
-## $(INFO_DEPS)	: @MAINTAINER_MODE_TRUE@%.info : %.texi @AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
-## $(TXTS)	: %.txt  : %.texi @MAINTAINER_MODE_TRUE@@AMDEP_TRUE@ $(EXTRA_info_TEXINFOS)
+MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
 
-##
-# Don't distribute .ps manuals, they are way too big, no dvis or sgmls either
-##
+#info-local: @WITH_TEXINFO_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(INFOS)
+txt-local:   @WITH_TEXINFO_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(TXTS)
+#dvi-local:  @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(DVIS)
+#ps-local:   @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(PSS)
+#pdf-local:  @WITH_TEXINFO_TRUE@@WITH_TEXINFO_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(PDFS)
+#html-local: @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(HTMLS)
+
 EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(TBL_TBLS) $(FIG_FIGS) $(PNG_PNGS) $(PS_PSS)
+EXTRA_DIST	+= $(FIG_TXTS) $(PNG_TXTS) $(PS_TXTS)
+
 if DISTRIBUTE_DOCS
-## Don't distribute what we can't build.
-if WITH_TEXINFO
-EXTRA_DIST	+= $(TXTS)
-if WITH_TEXINFO_PRINT
-EXTRA_DIST	+= $(DVIS)
-EXTRA_DIST	+= $(PSS)
-EXTRA_DIST	+= $(PDFS)
-endif
-if WITH_TEXINFO_HTML
-EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
-endif
-endif
+EXTRA_DIST	+= $(TXTS) $(DVIS) $(PSS) $(PDFS) $(HTMLS)
 endif
 
 texi/args.texi:
@@ -362,44 +352,36 @@ texi/args.texi:
 
 clean-figs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@figs="$(FIG_FIGS)" ; for i in $$figs ; do \
-		d=`$(ECHO) $$i | sed 's|\.fig||'` ; \
-		echo "$$d.ps $$d.eps" ; \
-		echo "$$d.png $$d.jpg" ; \
-		echo "$$d.txt $$d.pdf" ; \
+	@list="$(FIG_FIGS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.fig||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-figs
 
 clean-tbls:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
-		d=`$(ECHO) $$i | sed 's|\.tbl||'` ; \
-		echo "$$d.ps $$d.eps" ; \
-		echo "$$d.png $$d.jpg" ; \
-		echo "$$d.txt $$d.pdf" ; \
+	@list="$(TBL_TBLS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.tbl||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-tbls
 
 clean-pngs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
-		d=`$(ECHO) $$i | sed 's|\.png||'` ; \
-		echo "$$d.ps $$d.eps" ; \
-		echo "$$d.png $$d.jpg" ; \
-		echo "$$d.txt $$d.pdf" ; \
+	@list="$(PNG_PNGS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.png||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-pngs
 
 clean-pss:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@pss="$(PS_PSS)" ; for i in $$pss ; do \
-		d=`$(ECHO) $$i | sed 's|\.ps||'` ; \
-		echo "$$d.ps $$d.eps" ; \
-		echo "$$d.png $$d.jpg" ; \
-		echo "$$d.txt $$d.pdf" ; \
+	@list="$(PS_PSS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.ps||'` ; \
+		echo -e "$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-pss
@@ -415,34 +397,52 @@ CLEAN_LOCAL	+= clean-texi
 
 distclean-figs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(FIG_FIGS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.fig||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-figs
 
 distclean-tbls:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(TBL_TBLS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.tbl||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-tbls
 
 distclean-pngs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(PNG_PNGS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.png||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-pngs
 
 distclean-pss:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@list="$(PS_PSS)" ; for i in $$list ; do \
+		d=`echo $$i | sed 's|\.ps||'` ; \
+		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-pss
 
 distclean-texi:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test -L texi ; then \
+		$(ECHO) "rm -f -- texi" ; \
+		rm -f -- texi ; \
+	fi
 
 maintainer-clean-figs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@figs="$(FIG_FIGS)" ; for i in $$figs ; do \
-		f=`$(ECHO) "$(srcdir)/$$i" | sed 's|\.fig$$||'` ; \
-		echo "$$f.ps $$f.eps" ; \
-		echo "$$f.png $$f.jpg" ; \
-		echo "$$f.txt $$f.pdf" ; \
+	@list="$(FIG_FIGS)" ; for i in $$list ; do \
+		f=`echo "$(srcdir)/$$i" | sed 's|\.fig$$||'` ; \
+		echo -e "$$f.ps\n$$f.eps\n$$f.png\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-texi
@@ -451,33 +451,27 @@ MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-figs
 
 maintainer-clean-tbls:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
-		f=`$(ECHO) "$(srcdir)/$$i" | sed 's|\.tbl$$||'` ; \
-		echo "$$f.ps $$f.eps" ; \
-		echo "$$f.png $$f.jpg" ; \
-		echo "$$f.txt $$f.pdf" ; \
+	@list="$(TBL_TBLS)" ; for i in $$list ; do \
+		f=`echo "$(srcdir)/$$i" | sed 's|\.tbl$$||'` ; \
+		echo -e "$$f.ps\n$$f.eps\n$$f.png\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-tbls
 
 maintainer-clean-pngs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
-		f=`$(ECHO) "$(srcdir)$$i" | sed 's|\.png$$||'` ; \
-		echo "$$f.ps $$f.eps" ; \
-		echo "$$f.png $$f.jpg" ; \
-		echo "$$f.txt $$f.pdf" ; \
+	@list="$(PNG_PNGS)" ; for i in $$list ; do \
+		f=`echo "$(srcdir)$$i" | sed 's|\.png$$||'` ; \
+		echo -e "$$f.ps\n$$f.eps\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 MAINTAINER_CLEAN_LOCAL	+= distclean-pngs
 
 maintainer-clean-pss:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@pss="$(PS_PSS)" ; for i in $$pss ; do \
-		f=`$(ECHO) "$(srcdir)/$$i" | sed 's|\.ps$$||'` ; \
-		echo "$$f.ps $$f.eps" ; \
-		echo "$$f.png $$f.jpg" ; \
-		echo "$$f.txt $$f.pdf" ; \
+	@list="$(PS_PSS)" ; for i in $$list ; do \
+		f=`echo "$(srcdir)/$$i" | sed 's|\.ps$$||'` ; \
+		echo -e "$$f.eps\n$$f.png\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 MAINTAINER_CLEAN_LOCAL	+= distclean-pss
@@ -487,35 +481,61 @@ maintainer-clean-texi:
 
 MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-texi
 
-install-pngs: $(IMG_PNGS)
+install-txt-local: $(TXTS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	test -z "$(htmldir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)"
-	@list='$(IMG_PNGS)'; for p in $$list ; do \
-		if test -f "$$p" ; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed 's,.*/,,'`; \
-		$(ECHO) "$(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(htmldir)/$$f\""; \
-		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(htmldir)/$$f"; \
-	done
+	@list='$(TXTS)'; dir='$(docdir)'; $(am__list_install)
 
-INSTALL_HTML_LOCAL	+= install-pngs
+## install-dvi-am defined by automake, no local necessary
 
-uninstall-pngs:
+## install-ps-am defined by automake, no local necessary
+
+## install-pdf-am defined by automake, no local necessary
+
+## install-html-am defined by automake, no local necessary
+
+uninstall-info-ma: uninstall-info-am
+
+uninstall-txt-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	@list='$(IMG_PNGS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(htmldir)/,' | $(am__base_remove)
+	@list='$(TXTS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(docdir)/,' | $(am__base_remove)
 
-UNINSTALL_LOCAL		+= uninstall-pngs
+uninstall-dvi-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@list='$(DVIS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(dvidir)/,' | $(am__base_remove)
+
+uninstall-ps-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@list='$(PSS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(psdir)/,' | $(am__base_remove)
+
+uninstall-pdf-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@list='$(PDFS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(pdfdir)/,' | $(am__base_remove)
+
+uninstall-html-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@list='$(HTMLS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(htmldir)/,' | $(am__base_remove)
 
 ##
 # Note that maintainer-clean-aminfo generated by automake will clean the info
 # files out of the source directory.
 ##
 
-MY_PHONY		+= txts-am pngs-am
-MY_PHONY		+= install-pngs uninstall-pngs
+MY_PHONY		+= pngs-am
+
+.SECONDARY: $(MY_SECONDARY)
 
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

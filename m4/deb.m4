@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -294,7 +294,6 @@ dnl
 		AC_MSG_WARN([Could not find dpkg program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac
-	ac_cv_path_DPKG="${am_missing3_run}dpkg"
 	DPKG="${am_missing3_run}dpkg"
     fi
     AC_ARG_VAR([DPKG_SOURCE],
@@ -307,7 +306,6 @@ dnl
 		AC_MSG_WARN([Could not find dpkg-source program in PATH.]) ;;
 	    (*) enable_dscs=no ;;
 	esac
-	ac_cv_path_DPKG_SOURCE="${am_missing3_run}dpkg-source"
 	DPKG_SOURCE="${am_missing3_run}dpkg-source"
     fi
     AC_ARG_VAR([DPKG_BUILDPACKAGE],
@@ -320,7 +318,6 @@ dnl
 		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.]) ;;
 	    (*) enable_debs=no ;;
 	esac
-	ac_cv_path_DPKG_BUILDPACKAGE="${am_missing3_run}dpkg-buildpackage"
 	DPKG_BUILDPACKAGE="${am_missing3_run}dpkg-buildpackage"
     fi
     AC_CACHE_CHECK([for deb building of debs], [deb_cv_debs], [dnl
@@ -345,7 +342,6 @@ dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find apt-ftparchive program in PATH.])
 	else enable_repo_apt=no; fi
-	ac_cv_path_APT_FTPARCHIVE="${am_missing3_run}apt-ftparchive"
 	APT_FTPARCHIVE="${am_missing3_run}apt-ftparchive"
     fi
     AC_ARG_VAR([DPKG_SCANSOURCES],
@@ -356,7 +352,6 @@ dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find dpkg-scansources program in PATH.])
 	else enable_repo_apt=no; fi
-	ac_cv_path_DPKG_SCANSOURCES="${am_missing3_run}dpkg-scansources"
 	DPKG_SCANSOURCES="${am_missing3_run}dpkg-scansources"
     fi
     AC_ARG_VAR([DPKG_SCANPACKAGES],
@@ -367,7 +362,6 @@ dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find dpkg-scanpackages program in PATH.])
 	else enable_repo_apt=no; fi
-	ac_cv_path_DPKG_SCANPACKAGES="${am_missing3_run}dpkg-scanpackages"
 	DPKG_SCANPACKAGES="${am_missing3_run}dpkg-scanpackages"
     fi
     AC_ARG_VAR([DPKG_DEB],
@@ -378,7 +372,6 @@ dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find dpkg-deb program in PATH.])
 	else enable_repo_apt=no; fi
-	ac_cv_path_DPK_DEB="${am_missing3_run}dpkg-deb"
 	DPK_DEB="${am_missing3_run}dpkg-deb"
     fi
     AC_CACHE_CHECK([for deb apt repo constructtion], [deb_cv_repo_apt], [dnl
@@ -439,6 +432,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 1.1.2.3  2009-07-04 03:51:32  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:38  brian
 # - improvements to build process
 #

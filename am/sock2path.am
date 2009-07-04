@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -99,7 +99,7 @@ POST_INSTALL_AM		+= post-sock2path
 
 UNINSTALL_LOCAL		+= uninstall-sock2path
 
-POST_UNINSTALL_AM	+= post-sock2path
+POST_UNINSTALL_MA	+= post-sock2path
 
 ## RPM_BUILD_USER
 endif
@@ -111,6 +111,9 @@ EXTRA_DIST		+= src/util/sysconfig/sock2path
 ## =============================================================================
 ##
 ## $Log: sock2path.am,v $
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

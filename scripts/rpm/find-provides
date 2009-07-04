@@ -1,0 +1,203 @@
+#!/bin/bash
+# =============================================================================
+#
+# @(#) $RCSfile: find-provides,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+#
+# =============================================================================
+
+# This script reads from stdin and outputs any relevant information that need to
+# be included in the package.
+
+ulimit -c 0
+
+# First, find out where we are so that we can include other scripts.
+
+args=("$@")
+script=$(basename $0)
+where=`(cd $(dirname $0); pwd)`
+
+which_tool() {
+    old_PATH="$PATH"
+    PATH="$PATH:$where:/usr/lib/rpm:/usr/lib/rpm/redhat"
+    which $1
+    PATH="$old_PATH"
+}
+
+searchlist=($where /usr/lib/rpm /usr/lib/rpm/redhat)
+
+# swallow the entire list, escaping quotes
+IFS=$'\n'
+filelist=($(grep -v '\.debug$'))
+
+#classify files
+filetypes=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file))
+
+exelist=($(printf "%s\n" "${filetypes[@]}" | \
+	egrep -v ':.* (commands|script) ' | grep ':.*executable' | \
+	cut -d: -f1))
+
+scriptlist=($(printf "%s\n" "${filetypes[@]}" | \
+	egrep ':.* (commands|script) ' | \
+	cut -d: -f1))
+
+solist=($(printf "%s\n" "${filetypes[@]}" | \
+	grep ':.*shared object' | \
+	cut -d: -f1))
+solist=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file -L | \
+	grep ':.*shared object' | cut -d: -f1))
+
+libtoollist=($(printf "%s\n" "${filelist[@]}" | grep '\.la$'))
+
+perllist=($(printf "%s\n" "${filelist[@]}" | egrep '\.(pm|pl|ph)$'))
+
+pythonlist=()
+
+tcllist=()
+
+ksymslist=($(printf "%s\n" "${filelist[@]}" | grep '\.ko$'))
+
+jarlist=($(printf "%s\n" "${filelist[@]}" | egrep '\.(jar|war|zip)$' | xargs -r file -L \
+	| grep ':.*Zip archive data' | cut -d: -f1))
+
+# --- Shared objects.
+if [ -n "$solist" ] ; then
+    tool=$(which_tool "find-provides.so")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	printf "%s\n" "${solist[@]}" | \
+	$tool "${args[@]}" | sort -u
+    fi
+fi
+
+# --- libtool
+if [ -n "$libtoollist" ] ; then
+    tool=$(which_tool "find-provides.libtool")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	printf "%s\n" "${libtoollist[@]}" | \
+	$tool "${args[@]}" | sort -u
+    fi
+fi
+
+# --- Perl modules.
+if [ -n "$perllist" ] ; then
+    tool=$(which_tool "perl.prov")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	printf "%s\n" "${perllist[@]}" | \
+	$tool "${args[@]}" | sort -u
+    fi
+fi
+
+# --- Python modules.
+if [ -n "$pythonlist" ] ; then
+    tool=$(which_tool "python.prov")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	printf "%s\n" "${pythonlist[@]}" | \
+	$tool "${args[@]}" | sort -u
+    fi
+fi
+
+# --- Tcl modules.
+if [ -n "$tcllist" ] ; then
+    tool=$(which_tool "tcl.prov")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	printf "%s\n" "${tcllist[@]}" | \
+	$tool "${args[@]}" | sort -u
+    fi
+fi
+
+# --- extra scripts
+for dir in "${searchlist[@]}" ; do
+    if [ -d $dir/find-provides.d ] ; then
+	for s in $dir/find-provides.d/*.prov ; do
+	    if [ -x "$s" ] ; then
+		var=$(echo "$s" | awk '{ gsub("[^a-zA-Z0-9]", "_"); print "extra_" $0; }')
+		eval "tmp=\$$var"
+		if [ :$tmp != :done ] ; then
+		    printf "%s\n" "${filelist[@]}" | \
+		    $s "${args[@]}" | sort -u
+		    eval "$var=done"
+		fi
+	    fi
+	done
+    fi
+done
+
+# --- pkgconfig
+tool=$(which_tool "find-provides.pkgconfig")
+if [ -n "$tool" -a -x "$tool" ] ; then
+    printf "%s\n" "${filelist[@]}" | \
+    $tool "${args[@]}" | sort -u
+fi
+
+# -- kernel module exported symbols
+if [ -n "$ksymslist" ] ; then
+    tool=$(which_tool "find-provides.ksyms")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	printf "%s\n" "${ksymslist[@]}" | \
+	$tool "${args[@]}"
+    fi
+fi
+
+# -- Java jar files
+tool=$(which_tool "javadeps")
+if [ -n "$tool" -a -x "$tool" ] ; then
+    for jar in "${jarlist[@]}" ; do
+	unzip -p "$jar" | $tool --provides --rpmformat --keywords --starprov -- -
+    done
+fi
+
+exit 0
+
+# =============================================================================
+#
+# $Log: find-provides,v $
+# Revision 1.1.2.2  2009-07-04 03:51:33  brian
+# - updates for release
+#
+# =============================================================================
+# vim: tw=80 sw=4 nocin nosi

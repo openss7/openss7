@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -140,7 +140,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
     AC_PATH_PROGS([GNUPLOT], [gnuplot plot], [], [$tmp_path])
     if test :"${GNUPLOT:-no}" = :no ; then
-	ac_cv_path_GNUPLOT="${am_missing2_run}gnuplot"
 	GNUPLOT="${am_missing2_run}gnuplot"
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
@@ -169,7 +168,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([FIG2DEV], [fig2dev], [], [$tmp_path])
     if test :"${FIG2DEV:-no}" = :no ; then
-	ac_cv_path_FIG2DEV="${am_missing2_run}fig2dev"
 	FIG2DEV="${am_missing2_run}fig2dev"
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
@@ -198,7 +196,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([BIBTEX], [bibtex], [], [$tmp_path])
     if test :"${BIBTEX:-no}" = :no ; then
-	ac_cv_path_BIBTEX="${am_missing2_run}bibtex"
 	BIBTEX="${am_missing2_run}bibtex"
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
@@ -212,7 +209,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([LATEX], [latex], [], [$tmp_path])
     if test :"${LATEX:-no}" = :no ; then
-	ac_cv_path_LATEX="${am_missing2_run}latex"
 	LATEX="${am_missing2_run}latex"
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
@@ -241,7 +237,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([PSLATEX], [pslatex], [], [$tmp_path])
     if test :"${PSLATEX:-no}" = :no ; then
-	ac_cv_path_PSLATEX="${am_missing2_run}pslatex"
 	PSLATEX="${am_missing2_run}pslatex"
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
@@ -270,7 +265,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([PDFLATEX], [pdflatex], [], [$tmp_path])
     if test :"${PDFLATEX:-no}" = :no ; then
-	ac_cv_path_PDFLATEX="${am_missing2_run}pdflatex"
 	PDFLATEX="${am_missing2_run}pdflatex"
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
@@ -299,7 +293,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([LATEX2HTML], [latex2html], [], [$tmp_path])
     if test :"${LATEX2HTML:-no}" = :no ; then
-	ac_cv_path_LATEX2HTML="${am_missing2_run}latex2html"
 	LATEX2HTML="${am_missing2_run}latex2html"
 	if test :$enable_papers_html != :no ; then
 	    disable_papers_html=yes
@@ -328,7 +321,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([CONVERT], [convert], [], [$tmp_path])
     if test :"${CONVERT:-no}" = :no ; then
-	ac_cv_path_CONVERT="${am_missing2_run}convert"
 	CONVERT="${am_missing2_run}convert"
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
@@ -357,7 +349,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([PS2EPSI], [ps2epsi], [], [$tmp_path])
     if test :"${PS2EPSI:-no}" = :no ; then
-	ac_cv_path_PS2EPSI="${am_missing2_run}ps2epsi"
 	PS2EPSI="${am_missing2_run}ps2epsi"
 	if test :$enable_papers_print != :no ; then
 	    # disable_papers_print=yes
@@ -366,7 +357,6 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     fi
     AC_PATH_PROG([EPSTOPDF], [epstopdf], [], [$tmp_path])
     if test :"${EPSTOPDF:-no}" = :no ; then
-	ac_cv_path_EPSTOPDF="${am_missing2_run}epstopdf"
 	EPSTOPDF="${am_missing2_run}epstopdf"
 	if test :$enable_papers_print != :no ; then
 	    # disable_papers_print=yes
@@ -379,7 +369,6 @@ dnl DVIPS make variable and complains if we try to redefine it.
 dnl
     AC_PATH_PROG([DVI2PS], [dvips], [], [$tmp_path])
     if test :"${DVI2PS:-no}" = :no ; then
-	ac_cv_path_DVI2PS="${am_missing2_run}dvips"
 	DVI2PS="${am_missing2_run}dvips"
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
@@ -466,7 +455,13 @@ AC_DEFUN([_PAPERS_XXX], [dnl
 
 # =============================================================================
 #
-# $Log$
+# $Log: papers.m4,v $
+# Revision 1.1.2.2  2009-07-04 03:51:33  brian
+# - updates for release
+#
+# Revision 1.1.2.1  2009-06-29 07:35:54  brian
+# - added new macros for docs and java
+#
 # =============================================================================
 # 
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>

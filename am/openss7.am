@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -76,6 +76,22 @@ am__echo_list = \
 am__list_remove = \
 	$(am__echo_list) | $(am__base_remove)
 
+am__base_install = \
+	$(am__short_list) | \
+	while read files ; do \
+		$(ECHO) " $(INSTALL_DATA) $$files '$(DESTDIR)$$dir'"; \
+		$(INSTALL_DATA) $$files "$(DESTDIR)$$dir" || exit $$?; \
+	done
+
+am__list_install = \
+	$(ECHO_V) "test -z '$$dir' || $(MKDIR_P) '$(DESTDIR)$$dir'"; \
+	test -z "$$dir" || $(MKDIR_P) "$(DESTDIR)$$dir"; \
+	test -n "$$dir" || list=; \
+	for p in $$list ; do \
+		if test -f "$$p"; then d=; else d=$(srcdir)/ ; fi ; \
+		echo "$$d$$p"; \
+	done | $(am__base_install)
+
 ##
 # Accumulate these 'till the end
 ##
@@ -84,10 +100,6 @@ INSTALL_DATA_LOCAL	=
 INSTALL_DATA_HOOK	=
 INSTALL_EXEC_LOCAL	=
 INSTALL_EXEC_HOOK	=
-INSTALL_DVI_LOCAL	=
-INSTALL_PS_LOCAL	=
-INSTALL_PDF_LOCAL	=
-INSTALL_HTML_LOCAL	=
 UNINSTALL_LOCAL		=
 UNINSTALL_HOOK		=
 MOSTLYCLEAN_LOCAL	=
@@ -103,22 +115,22 @@ UPDATE_CLEAN_LOCAL	=
 
 PRE_INSTALL_AM		=
 POST_INSTALL_AM		=
-PRE_UNINSTALL_AM	=
-POST_UNINSTALL_AM	=
+PRE_UNINSTALL_MA	=
+POST_UNINSTALL_MA	=
 
 RETEST_AM		=
 
 MANS_AM			=
 INSTALL_MANS_AM		=
-UNINSTALL_MANS_AM	=
+UNINSTALL_MANS_MA	=
 
 MIBS_AM			=
 INSTALL_MIBS_AM		=
-UNINSTALL_MIBS_AM	=
+UNINSTALL_MIBS_MA	=
 
 SNMP_AM			=
 INSTALL_SNMP_AM		=
-UNINSTALL_SNMP_AM	=
+UNINSTALL_SNMP_MA	=
 
 ##
 # Accumulate until the end
@@ -222,7 +234,7 @@ MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
 $(MY_REVERSIVE_TARGETS):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
-	target=`$(ECHO) $@ | sed s/-recursive//`; \
+	target=`$(ECHO) $@ | sed s/-reversive//`; \
 	list=''; rev='$(SUBDIRS)'; for subdir in $$rev; do \
 	     	if test "$$subdir" = "."; then dot_seen=yes; fi; \
 		list="$$subdir $$list"; \
@@ -233,7 +245,7 @@ $(MY_REVERSIVE_TARGETS):
 			if test "$$target" = "remove"; then target='uninstall'; else continue; fi ;; \
 		esac; \
 		$(ECHO_V) "D: Making $$target in $$subdir"; \
-		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
+		if test "$$subdir" = "."; then local="$$target-ma"; else local="$$target"; fi; \
 		$(ECHO_V) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
 			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
@@ -330,19 +342,119 @@ check-clean-am:
 
 MY_PHONY	+= check-clean check-clean-am
 
-MY_RECURSIVE_TARGETS	+= txt-recursive sgml-recursive
-
+#!
+#! Text Documentation Targets
+#! --------------------------
+#!
+#! The following targets are used to build, install and uninstall just the text
+#! documentation from the distribution.  These targets are good for creating a
+#! distribution of just the text documentation.  When building atop multiple
+#! packages, these targets recurse down through each package.  It is optional to
+#! build and install text documentation.  It will always be removed by the
+#! 'uninstall' target.
+#!
+#! txt:
+#!     Build all of the text documentation.  This involves creating text
+#!     documents from texinfo manuals and internet drafts.
+#!
+#! install-txt:
+#!     Installs the text documentation under DESTDIR.  Specify DESTDIR to place
+#!     the text documentation wherever you see fit.  If DESTDIR is not specified
+#!     on the command line, the text documentation will be installed in the
+#!     normal installation directory (@docdir@).
+#!
+#! uninstall-txt:
+#!     Uninstalls the text documentation from DESTDIR.  Specify DESTDIR to
+#!     indicate from where to remove the text documentation.  If DESTDIR is not
+#!     specified on the command line, the text documentation will be removed
+#!     from the normal installation directory (@docdir@).
+#!
 txt: txt-recursive
 
 txt-am:
+
+install-txt: install-txt-recursive
+
+install-txt-am: install-txt-local
+
+install-txt-local:
+
+uninstall-txt: uninstall-txt-reversive
+
+uninstall-txt-ma:
+
+UNINSTALL_LOCAL		+= uninstall-txt-ma
+
+MY_PHONY		+= txt txt-am install-txt install-txt-am install-txt-local uninstall-txt uninstall-txt-ma
+MY_RECURSIVE_TARGETS	+= txt-recursive install-txt-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-txt-reversive
+
+## -----------------------------------------------------
+
+uninstall-dvi: uninstall-dvi-reversive
+uninstall-dvi-ma:
+
+MY_PHONY		+= uninstall-dvi-ma
+MY_REVERSIVE_TARGETS	+= uninstall-dvi-reversive
+
+## -----------------------------------------------------
+
+uninstall-ps: uninstall-ps-reversive
+uninstall-ps-ma:
+
+MY_PHONY		+= uninstall-ps-ma
+MY_REVERSIVE_TARGETS	+= uninstall-ps-reversive
+
+## -----------------------------------------------------
+
+uninstall-pdf: uninstall-pdf-reversive
+uninstall-pdf-ma:
+
+MY_PHONY		+= uninstall-pdf-ma
+MY_REVERSIVE_TARGETS	+= uninstall-pdf-reversive
+
+## -----------------------------------------------------
+
+uninstall-html: uninstall-html-reversive
+uninstall-html-ma:
+
+MY_PHONY		+= uninstall-html-ma
+MY_REVERSIVE_TARGETS	+= uninstall-html-reversive
+
+## -----------------------------------------------------
+
+uninstall-info: uninstall-info-reversive
+uninstall-info-ma:
+
+MY_PHONY		+= uninstall-info-ma
+MY_REVERSIVE_TARGETS	+= uninstall-info-reversive
+
+## -----------------------------------------------------
 
 sgml: sgml-recursive
 
 sgml-am:
 
+install-sgml: install-sgml-recursive
+
+install-sgml-am:
+
+uninstall-sgml: uninstall-sgml-reversive
+
+uninstall-sgml-ma:
+
+UNINSTALL_LOCAL		+= uninstall-sgml-ma
+
+MY_PHONY		+= sgml sgml-am install-sgml install-sgml-am
+
+MY_RECURSIVE_TARGETS	+= sgml-recursive install-sgml-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-sgml-reversive
+
+## -----------------------------------------------------
+
 doxy:
 
-MY_PHONY	+= txt txt-am sgml sgml-am doxy
+MY_PHONY		+=  doxy
 
 #!
 #! Manual Page Targets
@@ -362,13 +474,13 @@ MY_PHONY	+= txt txt-am sgml sgml-am doxy
 #!     Installs the manual pages under DESTDIR.  Specify DESTDIR to place the
 #!     manual pages wherever you see fit.  If DESTDIR is not specified on the
 #!     command line, the manual pages will be installed in the normal
-#!     installation directory.
+#!     installation directory (@mandir@).
 #!
 #! uninstall-mans:
 #!     Uninstalls the manual pages from DESTDIR.  Specify DESTDIR to indicate
-#!     where to remove the manual pages from.  If DESTDIR is not specified on
+#!     from where to remove the manual pages.  If DESTDIR is not specified on
 #!     the command line, the manual pages will be removed from the normal
-#!     installation directory.
+#!     installation directory (@mandir@).
 #!
 mans: mans-recursive
 
@@ -378,13 +490,14 @@ install-mans: install-mans-recursive
 
 install-mans-am: $(INSTALL_MANS_AM)
 
-uninstall-mans: uninstall-mans-recursive
+uninstall-mans: uninstall-mans-reversive
 
-uninstall-mans-am: $(UNINSTALL_MANS_AM)
+uninstall-mans-ma: $(UNINSTALL_MANS_MA)
 
-MY_PHONY	+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-am
+MY_PHONY		+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-ma
 
-MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive uninstall-mans-recursive
+MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-mans-reversive
 
 #!
 #! SNMP Agent Targets:
@@ -419,13 +532,14 @@ install-mibs: install-mibs-recursive
 
 install-mibs-am: $(INSTALL_MIBS_AM)
 
-uninstall-mibs: uninstall-mibs-recursive
+uninstall-mibs: uninstall-mibs-reversive
 
-uninstall-mibs-am: $(UNINSTALL_MIBS_AM)
+uninstall-mibs-ma: $(UNINSTALL_MIBS_MA)
 
-MY_PHONY	+= mibs mibs-am install-mibs install-mibs-am uninstall-mibs uninstall-mibs-am
+MY_PHONY	+= mibs mibs-am install-mibs install-mibs-am uninstall-mibs uninstall-mibs-ma
 
-MY_RECURSIVE_TARGETS	+= mibs-recursive install-mibs-recursive uninstall-mibs-recursive
+MY_RECURSIVE_TARGETS	+= mibs-recursive install-mibs-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-mibs-reversive
 
 #!
 #! snmp:
@@ -453,13 +567,14 @@ install-snmp: install-snmp-recursive
 
 install-snmp-am: $(INSTALL_SNMP_AM)
 
-uninstall-snmp: uninstall-snmp-recursive
+uninstall-snmp: uninstall-snmp-reversive
 
-uninstall-snmp-am: $(UNINSTALL_SNMP_AM)
+uninstall-snmp-ma: $(UNINSTALL_SNMP_MA)
 
-MY_PHONY	+= snmp snmp-am install-snmp install-snmp-am uninstall-snmp uninstall-snmp-am
+MY_PHONY	+= snmp snmp-am install-snmp install-snmp-am uninstall-snmp uninstall-snmp-ma
 
-MY_RECURSIVE_TARGETS	+= snmp-recursive install-snmp-recursive uninstall-snmp-recursive
+MY_RECURSIVE_TARGETS	+= snmp-recursive install-snmp-recursive
+MY_REVERSIVE_TARGETS	+= uninstall-snmp-reversive
 
 #!
 #! Development Targets:
@@ -673,22 +788,6 @@ install-data-local: $(INSTALL_DATA_LOCAL)
 
 install-data-hook: $(INSTALL_DATA_HOOK) post-install-am
 
-install-dvi-local: $(INSTALL_DVI_LOCAL)
-
-MY_PHONY		+= install-dvi-local $(INSTALL_DVI_LOCAL)
-
-install-ps-local: $(INSTALL_PS_LOCAL)
-
-MY_PHONY		+= install-ps-local $(INSTALL_PS_LOCAL)
-
-install-pdf-local: $(INSTALL_PDF_LOCAL)
-
-MY_PHONY		+= install-pdf-local $(INSTALL_PDF_LOCAL)
-
-install-html-local: $(INSTALL_HTML_LOCAL)
-
-MY_PHONY		+= install-html-local $(INSTALL_HTML_LOCAL)
-
 post-install: post-install-recursive
 
 post-install-am: $(POST_INSTALL_AM)
@@ -696,23 +795,23 @@ post-install-am: $(POST_INSTALL_AM)
 MY_RECURSIVE_TARGETS	+= post-install-recursive
 MY_PHONY		+= post-install post-install-am
 
-pre-uninstall: pre-uninstall-recursive
+pre-uninstall: pre-uninstall-reversive
 
-pre-uninstall-am: $(PRE_UNINSTALL_AM)
+pre-uninstall-ma: $(PRE_UNINSTALL_MA)
 
-MY_REVERSIVE_TARGETS	+= pre-uninstall-recursive
-MY_PHONY		+= pre-uninstall pre-uninstall-am
+MY_REVERSIVE_TARGETS	+= pre-uninstall-reversive
+MY_PHONY		+= pre-uninstall pre-uninstall-ma
 
-uninstall-local: pre-uninstall-am $(UNINSTALL_LOCAL)
+uninstall-local: pre-uninstall-ma $(UNINSTALL_LOCAL)
 
-uninstall-hook: $(UNINSTALL_HOOK) post-uninstall-am
+uninstall-hook: $(UNINSTALL_HOOK) post-uninstall-ma
 
-post-uninstall: post-uninstall-am
+post-uninstall: post-uninstall-ma
 
-post-uninstall-am: $(POST_UNINSTALL_AM)
+post-uninstall-ma: $(POST_UNINSTALL_MA)
 
-MY_REVERSIVE_TARGETS	+= post-uninstall-recursive
-MY_PHONY		+= post-uninstall post-uninstall-am
+MY_REVERSIVE_TARGETS	+= post-uninstall-reversive
+MY_PHONY		+= post-uninstall post-uninstall-ma
 
 mostlyclean-local: $(MOSTLYCLEAN_LOCAL)
 
@@ -737,12 +836,12 @@ retest-am: $(RETEST_AM)
 MY_RECURSIVE_TARGETS	+= retest-recursive
 MY_PHONY		+= retest retest-am
 
-remove-am: uninstall-am
+remove-ma: uninstall-am
 
 remove: remove-recursive
 
-MY_REVERSIVE_TARGETS	+= remove-recursive
-MY_PHONY		+= remove remove-am
+MY_REVERSIVE_TARGETS	+= remove-reversive
+MY_PHONY		+= remove remove-ma
 
 $(REPO_DIRECTORIES)::
 	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
@@ -846,9 +945,9 @@ FORCED_TARGETS		+= forced-release-sign
 #!     This target will remove all distribution files for the current package
 #!     from the package distribution directory.
 #!
-release-clean: release-clean-recursive release-clean-local
+release-clean: release-clean-reversive release-clean-local
 
-release-clean-am:
+release-clean-ma:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@reverse="$(RELEASE_CLEAN_LOCAL)"; targets=; for t in $$reverse; do \
 		targets="$$t$${targets:+ $$targets}"; \
@@ -865,8 +964,8 @@ release-clean-local:
 		list="$$f$${list:+ $$list}"; \
 	done ; $(am__list_remove)
 
-MY_REVERSIVE_TARGETS	+= release-clean-recursive
-MY_PHONY		+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
+MY_REVERSIVE_TARGETS	+= release-clean-reversive
+MY_PHONY		+= release-clean-ma release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
 
 $(UPDATE_DIRECTORIES)::
 	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
@@ -926,9 +1025,9 @@ MY_PHONY		+= update-sign $(UPDATE_SIGN)
 #!     This target will remove all update files for the current package from the
 #!     package distribution directories.
 #!
-update-clean: update-clean-recursive update-clean-local
+update-clean: update-clean-reversive update-clean-local
 
-update-clean-am:
+update-clean-ma:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@reverse="$(UPDATE_CLEAN_LOCAL)"; targets=; for t in $$reverse; do \
 		targets="$$t$${targets:+ $$targets}"; \
@@ -947,8 +1046,8 @@ update-clean-local:
 		fi; \
 	done ; $(am__list_remove)
 
-MY_REVERSIVE_TARGETS 	+= update-clean-recursive
-MY_PHONY		+= update-clean-am update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
+MY_REVERSIVE_TARGETS 	+= update-clean-reversive
+MY_PHONY		+= update-clean-ma update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
 
 ##
 ## Some logging targets for the head makefile targets.
@@ -1030,6 +1129,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##
