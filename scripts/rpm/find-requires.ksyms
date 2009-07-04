@@ -1,98 +1,101 @@
-#!/bin/bash
+#!/usr/bin/awk -f
 
-IFS=$'\n'
+# feed kernel module filenames in on standard input,
+# required kernel sets and symbols on standard output
 
-case "$1" in
-kernel-module-*)    ;; # Fedora kernel module package names start with
-		       # kernel-module.
-kernel*)	    is_kernel_package=1 ;;
-esac
-
-symset_table() {
-    (
-	if [ -d /boot ] ; then
-	    find /boot -type f -name 'symsets-*.tar.gz' 2>/dev/null
-	fi
-	if [ -d /usr/src/kernels ] ; then
-	    find /usr/src/kernels -type f -name 'symsets-*.tar.gz' 2>/dev/null
-	fi
-    ) | while read t ; do
-	test -r "$t" || continue
-	tar -tzf "$t" | awk '/\/$/ { next; } { print; }' | \
-	while read f ; do
-	    k=${f#symsets-}
-	    k=${k%/*}
-	    c=${f##*/}
-	    c=${c%.*}
-	    h=${f##*.}
-	    tar -xzOf $t $f | awk '{ sub("0x0*", "", $1); print k "/" $2 "/" $1 " " c " " h; }' k="$k" c="$c" h="$h"
-	done
-    done | awk ' { if (($1) in seen)  { next; } seen[$1] = 1; print; }'
-    # needed for suse which has multiple symbols in the file
+BEGIN {
+    find = "find /boot /usr/src/kernels -type f -name 'symsets-*.tar.gz' 2>/dev/null"
+    while ((find | getline file)) {
+	tar = "tar -tzf " file
+	while ((tar | getline set)) {
+	    if (set~/\/$/)
+		continue
+	    kernel = set
+	    sub("^symsets-", "", kernel)
+	    sub(/\/.*/, "", kernel)
+	    class = set
+	    sub(/^.*\//, "", class)
+	    sub(/\..*/, "", class)
+	    hash = set
+	    sub(/^.*\./, "", hash)
+	    list = "tar -xzOf " file " " set
+	    while ((list | getline)) {
+		sub(/0x0*/, "", $1)
+		ksym = "ksym(" kernel ":" $2 ") = " $1
+		if (ksym in symsets)
+		    continue
+		symsets[ksym] = "kernel(" class ") = " hash
+	    }
+	    close(list)
+	}
+	close(tar)
+    }
+    close(find)
 }
-
-all_provides() {
-    for module in "$@"; do
-	nm "$module"
-    done | awk '
-	/^0*.*[[:space:]]+A[[:space:]]+_?__crc_[^[:space:]]+/ {
-	    sub("^0*", "", $1)
-	    sub("^_?__crc_", "", $3)
-	    print $3 ":" $1
-	}'
-}
-
-all_requires() {
-    for module in "$@"; do
-	kver=$(/sbin/modinfo -F vermagic "$module" | awk '{ print $1; }')
-#	if [ -e "/boot/symsets-$1.tar.gz" ]; then
-	    /sbin/modprobe --dump-modversions "$module" 2>/dev/null \
-	    | awk '{ sub("0x0*", "", $1); print $2 ":" $1 " " kver; }' kver="$kver"
-#	fi
-    done | sort -b -u | tee req.log
-}
-
-if ! [ -z "$is_kernel_package" -a -x /sbin/modinfo -a -x /sbin/modprobe ]; then
-    cat > /dev/null
-    exit 0
-fi
-
-#
-# Debian 4.0 has a broken modprobe that reports --dump-modversions in the usage
-# as an option, but then reports 'unrecognized option'.
-#
-if /sbin/modprobe --dump-modversions 2>&1 | grep -iq 'unrecognized option' >/dev/null 2>&1 ; then
-    cat > /dev/null
-    exit 0
-fi
-
-modules=($(grep -E '/lib/modules/.+\.ko$'))
-if [ ${#modules[@]} -gt 0 ]; then
-    (join -a 2 \
-    <(symset_table "$@" | sort -b -u '-t ' -k1 | tee prov2.log ) \
-    <(join -v 1 \
-            <(all_requires "${modules[@]}" | sort -b -u) \
-            <(all_provides "${modules[@]}" | sort -b -u) \
-	| awk '{ sub(":", "/", $1); print $2 "/" $1; }' | sort -b -u | tee req2.log \
-    ) ) \
-    | sort -u \
-    | awk '
-	(NF > 2) {
-	    print "kernel(" $2 ") = " $3
+/\.ko$/ {
+    module = $1
+    modinfo = "/sbin/modinfo -F vermagic " module " 2>/dev/null"
+    if ((modinfo | getline)) {
+	if ($0) {
+	    vermagic = $1
+	    close(modinfo)
+	} else {
+	    close(modinfo)
 	    next
 	}
-	{
-	    split($1, array, "/")
-	    print "ksym(" array[3] ") = " array[2]
+    } else {
+	close(modinfo)
+	next
+    }
+    modprobe = "/sbin/modprobe --dump-modversions " module " 2>/dev/null"
+    while ((modprobe | getline)) {
+	if ($0) {
+	    sub(/0x0*/, "", $1)
+	    ksym = "ksym(" vermagic ":" $2 ") = " $1
+	    requires[ksym] = 1
 	}
-    '
-fi
-
-exit 0
+    }
+    close(modprobe)
+    command = "objdump -t " module " 2>/dev/null"
+    while ((command | getline) > 0) {
+	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
+	    sub(/^0*/, "", $1)
+	    sub(/^_?__crc_/, "", $5)
+	    ksym = "ksym(" vermagic ":" $5 ") = " $1
+	    provides[ksym] = 1
+	}
+    }
+    close(command)
+}
+END {
+    j = 1
+    for (ksym in requires) {
+	if (ksym in provides)
+	    continue
+	if (ksym in symsets) {
+	    requiredsets[symsets[ksym]] = 1
+	} else {
+	    sub(/^ksym\(.*:/, "ksym(", ksym)
+	    requiredsyms[ksym] = 1
+	}
+    }
+    for (kset in requiredsets) {
+	indices[j] = kset
+	j++
+    }
+    for (ksym in requiredsyms) {
+	indices[j] = ksym
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.ksyms,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: find-requires.ksyms,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -138,13 +141,16 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.ksyms,v $
+# Revision 1.1.2.3  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi fo+=tcqlorn
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

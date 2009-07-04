@@ -1,7 +1,39 @@
-#!/bin/bash
+#!/usr/bin/awk -f
+
+/\.la$/ {
+    file = $1
+    first = 1
+    while ((getline <file) > 0) {
+	if (first) {
+	    if (/# .*\.la - a libtool library file/) {
+		basename = $2
+		first = 0
+		continue
+	    }
+	    break
+	}
+	if (/^libdir=/) {
+	    split($0, array, "'")
+	    provides["libtool(" array[2] "/" basename ")"] = 1
+	}
+    }
+    close(file)
+}
+END {
+    j = 1
+    for (provide in provides) {
+	indices[j] = provide
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
+
 # =============================================================================
 #
-# @(#) $RCSfile: find-provides.libtool,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:51:40 $
+# @(#) $RCSfile: find-provides.libtool,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,34 +79,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:40 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
-# =============================================================================
-
-cat | xargs -r awk '
-    BEGIN { START = 0; }
-    (FNR == 1) {
-	START = 1; LIBTOOL = 0;
-	if (/# .*\.la - a libtool library file/) {
-	    BASENAME = $2
-	    START = 0
-	    LIBTOOL = 1
-	    next
-	}
-	nextfile
-    }
-    (LIBTOOL) && /^libdir=/ {
-	split($1, array, "'"'"'")
-	print "libtool(" array[2] "/" BASENAME ")"
-	nextfile
-    }
-' | sort -b -u
-
-# =============================================================================
+# -----------------------------------------------------------------------------
 #
 # $Log: find-provides.libtool,v $
+# Revision 1.1.2.2  2009-07-04 13:28:10  brian
+# - conversion to pure awk
+#
 # Revision 1.1.2.1  2009-07-04 03:51:40  brian
 # - updates for release
 #
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

@@ -1,113 +1,108 @@
-#!/bin/bash
+#!/usr/bin/awk -f
 
-# heavily based upon find-suggests.ksyms by Andreas Gruenbacher <agruen@suse.de>.
-# with modifications by Michael Brown <Michael_E_Brown@dell.com>
-#
-# -- added module versioning info to modalias() symbols
-# -- removed code which inspects spec files.
-
-IFS=$'\n'
-
-# 
-# Initially, dont generate modalias() lines for kernel package. This needs
-# additional discussion. Would like to eventually add them for 
-# completeness, so that we can determine when drivers are folded into 
-# mainline kernel.
-# 
-case "$1" in
-kernel-module-*)    ;; # Fedora kernel module package names start with
-		       # kernel-module.
-kernel*)	   is_kernel_package=1 ;;
-esac
-
-if ! [ -z "$is_kernel_package" ]; then
-    cat > /dev/null
-    exit 0
-fi
-
-print_modaliases() {
-    declare class=$1 variants=$2 pos=$3
-    if [ -n "$variants" ]; then
-	echo "${class:0:pos}[$variants]${class:pos+1}"
-    else
-	[ -z "$class" ] || echo "$class"
-    fi
-}
-
-combine_modaliases() {
-    declare tag class variants pos n
-    read class
-    while read tag; do
-	for ((n=0; n<${#class}; n++)); do
-	    if [ "*" != "${class:n:1}" -a \
-		 "${class:0:n}" = "${tag:0:n}" -a \
-		 "${class:n+1}" = "${tag:n+1}" ] &&
-	       ( [ -z "$pos" ] || [ $n = $pos ] ); then
-		variants="${variants:-${class:n:1}}${tag:n:1}"
-		pos=$n
-		break
-	    fi
-	done
-	if [ $n -eq ${#class} ]; then
-	    print_modaliases "$class" "$variants" "$pos"
-	    variants=
-	    pos=
-	    class=$tag
-	fi
-    done
-    print_modaliases "$class" "$variants" "$pos"
-}
-
-grep '\.ko$' | xargs -r strings -n 7 | awk '
-    BEGIN { VERSION = ""; KREL = ""; }
-    /^alias=/ {
-	sub("^alias=", "")
-	MYALIASES[$0] = 1
-	next
-    }
-    /^version=/ {
-	sub("^version=", "")
-	gsub(" ", "_")
-	VERSION = $0
-	next
-    }
-    /^vermagic=/ {
-	sub("^vermagic=", "")
-	sub(" .*", "")
-	sub("-.*", "")
-	KREL = $0
-	for (ALIAS in MYALIASES) {
-	    ALIASES["modalias(kernel-" KREL ":" ALIAS ")"] = 1
-	    if (VERSION) {
-		ALIASES["modalias(" ALIAS ") = " VERSION] = 1
-	    } else {
-		ALIASES["modalias(" ALIAS ")"] = 1
-	    }
+/\.ko$/ {
+    command = "strings -n 7 " $1
+    version = ""
+    release = ""
+    delete myaliases
+    while ((command | getline) > 0) {
+	if (/^alias=/) {
+	    sub(/^alias=/, "")
+	    myaliases[$0] = 1
+	    continue
 	}
-	VERSION = ""
-	KREL = ""
-	delete MYALIASES
-	next
+	if (/^version=/) {
+	    sub(/^version=/, "")
+	    gsub(/ /, "_")
+	    version = $0
+	    continue
+	}
+	if (/^vermagic=/) {
+	    sub(/^vermagic=/, "")
+	    sub(/ .*/, "")
+	    sub(/-.*/, "")
+	    release = $0
+	    continue
+	}
     }
-    END {
-	j = 1
-	for (ALIAS in ALIASES) {
-	    INDICES[j] = ALIAS
+    close(command)
+    for (alias in myaliases) {
+	aliases["modalias(kernel-" release ":" alias ")"] = 1
+	modalias = "modalias(" alias ")"
+	if (version) {
+	    aliases[modalias " = " version] = 1
+	    aliases[modalias] = 0
+	} else {
+	    if (!(modalias in aliases))
+		aliases[modalias] = 1
+	}
+    }
+}
+END {
+    j = 1
+    for (alias in aliases) {
+	if (aliases[alias]) {
+	    indices[j] = alias
 	    j++
 	}
-	n = asort(INDICES)
-	for (i = 1; i <= n; i++) {
-	    print INDICES[i]
-	}
     }
-' \
-| combine_modaliases
-
-exit 0
+    n = asort(indices)
+    save = indices[1]
+    position = 0
+    variations = ""
+    for (i = 2; i <= n; i++) {
+	this = indices[i]
+	if (!/^modalias\((kernel-.+:)?.+:.+/ || (length(save) != length(this)) || (position && ((substr(save, 1, position-1) != substr(this, 1, position-1)) || (substr(save, position+1) != substr(this, position+1)) || substr(this, 1, position) == "*"))) {
+	    if (position) {
+		print substr(save, 1, position-1) "[" variations "]" substr(save, position+1)
+	    } else {
+		print save
+	    }
+	    position = 0
+	    variations = ""
+	    save = this
+	    continue
+	}
+	if (position) {
+	    variations = variations substr(this, position, 1)
+	    save = this
+	    continue
+	}
+	# we only handle one character difference at one position, and it must
+	# be to the right of all colons
+	if (match(this, "^.+:") == 0) {
+	    print save
+	    save = this
+	    continue
+	}
+	prefixlen = RLENGTH
+	for (c = 1; c <= length(this); c++) {
+	    if (substr(this, c, 1) != substr(save, c, 1)) {
+		if (c <= prefixlen || position) {
+		    position = 0
+		    break
+		}
+		position = c
+	    }
+	}
+	if (position) {
+	    variations = substr(save, position, 1) substr(this, position, 1)
+	    save = this
+	    continue
+	}
+	print save
+	save = this
+    }
+    if (position) {
+	print substr(save, 1, position-1) "[" variations "]" substr(save, position+1)
+    } else {
+	print save
+    }
+}
 
 # =============================================================================
 #
-# @(#) $RCSfile: modalias.prov,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:53:06 $
+# @(#) $RCSfile: modalias.prov,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 13:28:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -153,13 +148,13 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:53:06 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: modalias.prov,v $
-# Revision 1.1.2.1  2009-07-04 03:53:06  brian
-# - updates for release
+# Revision 1.1.2.2  2009-07-04 13:28:10  brian
+# - conversion to pure awk
 #
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi fo+=tcqlorn
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn
