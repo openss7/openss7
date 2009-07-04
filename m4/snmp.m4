@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,6 +283,14 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 *** ])
 		snmp_warned=yes
 	    fi])
+dnl
+dnl Note that for old versions of RedHat (7.2), librpm depends on librpmdb which
+dnl in turn depends upon librpm.  You can only load these libraries together or
+dnl not at all.  That is why [-lrpmdb] is specified as the fifth argument to
+dnl AC_CHECK_LIB_BROKEN.  For target systems that do not have this dependency,
+dnl librpmdb is the next in the dependency order anyway.  This will only cause a
+dnl problem when librpmdb is broken too.
+dnl
 	AC_CHECK_LIB([rpm], [main], [], [dnl
 	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
@@ -292,7 +300,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS], [dnl
 *** later.
 *** ])
 		snmp_warned=yes
-	    fi])
+	    fi], [-lrpmdb])
 	AC_CHECK_LIB([rpmdb], [main], [], [dnl
 	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
@@ -491,6 +499,14 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** ])
 		snmp_warned=yes
 	    fi])
+dnl
+dnl Note that for old versions of RedHat (7.2), librpm depends on librpmdb which
+dnl in turn depends upon librpm.  You can only load these libraries together or
+dnl not at all.  That is why [-lrpmdb] is specified as the fifth argument to
+dnl AC_CHECK_LIB32_BROKEN.  For target systems that do not have this dependency,
+dnl librpmdb is the next in the dependency order anyway.  This will only cause a
+dnl problem if librpmdb is broken too.
+dnl
 	AC_CHECK_LIB32_BROKEN([rpm], [main], [], [dnl
 	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
@@ -500,7 +516,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** later.
 *** ])
 		snmp_warned=yes
-	    fi])
+	    fi], [-lrpmdb])
 	AC_CHECK_LIB32_BROKEN([rpmdb], [main], [], [dnl
 	    if test :$snmp_warned != :yes ; then
 		AC_MSG_WARN([
@@ -710,6 +726,9 @@ AC_DEFUN([_SNMP_], [dnl
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 1.1.2.2  2009-07-04 03:51:33  brian
+# - updates for release
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

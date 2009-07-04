@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -110,12 +110,16 @@ if WITH_BZIP2
 archive_files		+= $(tardir)/$(PACKAGE)-$(VERSION).tar.gz
 archive_signs		+= $(tardir)/$(PACKAGE)-$(VERSION).tar.gz.asc
 archive_suffixes	+= gz
+$(distdir).tar.gz:: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
+	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist-best
 ## WITH_BZIP2
 endif
 
 archive_files		+= $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 archive_signs		+= $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2.asc
 archive_suffixes	+= bz2
+$(distdir).tar.bz2:: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
+	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist-best
 
 if WITH_LZMA
 ## WITH_LZMA
@@ -437,48 +441,48 @@ $(tardir)/ARCHIVE.gz:
 	find $(tardir) -follow -maxdepth 1 -type f | LANG= sort | sed 's,^$(tardir)/,,' | while read f ; do \
 		case "$$f" in \
 			(*.tar) \
-				$(ECHO) "$(AMTAR) tvvf $(tardir)/$$f | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				$(AMTAR) tvvf $(tardir)/$$f | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "$(AMTAR) tvvf $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				$(AMTAR) tvvf $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.tgz|*.tar.gz|*.tar.[zZ]) \
-				$(ECHO) "gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.tbz2|*.tar.bz2) \
-				$(ECHO) "bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.tlzma|*.tar.lzma) \
-				$(ECHO) "lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.txz|*.tar.xz) \
-				$(ECHO) "xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.t[zZ]|*.tar.[zZ]) \
-				$(ECHO) "uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.rpm) \
-				$(ECHO) "$(RPM) -qvlp $(tardir)/$$f | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				$(RPM) -qvlp $(tardir)/$$f | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "$(RPM) -qvlp $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				$(RPM) -qvlp $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.deb|*.udeb|*.ddeb) \
-				$(ECHO) "$(DPKG) --contents $(tardir)/$$f | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				$(DPKG) --contents $(tardir)/$$f | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "$(DPKG) --contents $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				$(DPKG) --contents $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.cpi|*.cpio) \
-				$(ECHO) "cpio -itv < $(tardir)/$$f | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				cpio -itv < $(tardir)/$$f | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "cpio -itv < $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				cpio -itv < $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.shar.gz) \
-				$(ECHO) "gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*.zip) \
-				$(ECHO) "zipinfo $(tardir)/$$f | sed \"s,^,$$f:\t,\" | gzip -c >> $@" ; \
-				zipinfo $(tardir)/$$f | sed "s,^,$$f:\t," | gzip -c >> $@ || : \
+				$(ECHO) "zipinfo $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
+				zipinfo $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
 				;; \
 			(*) \
 				;; \
@@ -540,6 +544,9 @@ EXTRA_DIST		+= scripts/OPENSS7-GPG-KEY \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

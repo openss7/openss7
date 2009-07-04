@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: drafts.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: drafts.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -58,13 +58,13 @@ $(DEPDIR)/drafts.Pd: Makefile $(ME_MES)
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	$(AM_V_GEN)list="$(ME_MES)" ; for f in $$list ; do \
 		if test -r $$f; then d=; else d=$(srcdir)/; fi; \
-		echo -n "$$f" | sed -r 's,(.*)\.me,\1.txt \1.dvi \1.ps \1.html: \\\n,' ; \
-		( echo "$$f" ; cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*),\1,p' ; \
-		  echo "idrefs" ) | \
-		sed '$$!N;$$!N;$$!N;$$!N;s,\n, ,g;s,^,\t,;$$!s,$$, \\,;$$s,$$,\n,' ; \
-		echo -n "$$f" | sed -r 's,(.*)\.me,\1.pdf: \1.ps\n\n,' ; \
-		cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*)\.pic,\1.pic: \1.fig\n\n\1.gif: \1.fig\n\n\1.eps: \1.fig\n\n,p' ; \
-	done > $(DEPDIR)/drafts.Td || { rm -f -- drafts.Td ; exit 1 ; } ; \
+		( echo "$$f" | sed -r 's,(.*)\.me,\1.txt \1.dvi \1.ps \1.html:,' ; \
+		  echo " $$f" ; cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*), \1,p' ; \
+		  echo " idrefs" ) | \
+		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
+		echo "$$f" | sed -r 's,(.*)\.me,\1.pdf: \1.ps,' ; \
+		cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*)\.pic,\1.pic: \1.fig#\1.gif: \1.fig#\1.eps: \1.fig,p' | tr '#' '\n' ; \
+	done > $(DEPDIR)/drafts.Td || { rm -f -- $(DEPDIR)/drafts.Td ; exit 1 ; } ; \
 	mv -f $(DEPDIR)/drafts.Td $@
 
 DISTCLEANFILES += $(DEPDIR)/drafts.Td $(DEPDIR)/drafts.Pd
@@ -101,10 +101,6 @@ MY_SUFFIXES	+= .me .txt .dvi .ps .pdf .html
 .fig.gif: ; $(AM_V_GEN)$(FIG2DEV) -L gif $< $@
 .fig.eps: ; $(AM_V_GEN)$(FIG2DEV) -L ps -p dummy $< $@
 
-## $(PICS): %.pic: %.fig
-## $(GIFS): %.gif: %.fig
-## $(EPSS): %.eps: %.fig
-
 MY_SUFFIXES	+= .fig .pic .gif .eps
 
 txt-am: txt-local
@@ -112,35 +108,15 @@ txt-am: txt-local
 MY_PHONY	+= txt-local
 
 txt-local:  @WITH_DRAFTS_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(TXTS)
-html-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(HTMLS)
 dvi-local:  @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(DVIS)
 ps-local:   @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(PSS)
 pdf-local:  @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(PDFS)
-
-##
-# Because we do not distribute dvis, pss, or htmls, we need to know how to
-# make them: especially dvis as they are required for the distcheck target.
-##
-## $(TXTS)	: %.txt  : %.me $(ME_DEPS)
-## $(DVIS)	: %.dvi	 : %.me $(ME_DEPS)
-## $(PSS)	: %.ps   : %.me $(ME_DEPS)
-## $(PDFS)	: %.pdf  : %.me $(ME_DEPS)
-## $(HTMLS)	: %.html : %.me $(ME_DEPS)
+html-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ $(HTMLS)
 
 EXTRA_DIST	+= $(ME_MES) $(FIG_FIGS) $(ME_DEPS)
+
 if DISTRIBUTE_DOCS
-## Don't attempt to distribute what we can't build.
-if WITH_DRAFTS
-EXTRA_DIST	+= $(TXTS)
-if WITH_DRAFTS_PRINT
-EXTRA_DIST	+= $(DVIS)
-EXTRA_DIST	+= $(PSS)
-EXTRA_DIST	+= $(PDFS)
-endif
-if WITH_DRAFTS_HTML
-EXTRA_DIST	+= $(HTMLS)
-endif
-endif
+EXTRA_DIST	+= $(TXTS) $(DVIS) $(PSS) $(PDFS) $(HTMLS)
 endif
 
 clean-txt:
@@ -185,75 +161,62 @@ clean-eps:
 
 CLEAN_LOCAL	+= clean-eps
 
-install-dvi-drafts: $(DVIS)
+install-txt-local: $(TXTS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	test -z "$(dvidir)" || $(MKDIR_P) "$(DESTDIR)$(dvidir)"
-	@list='$(DVIS)'; for p in $$list; do \
-		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed 's,.*/,,'`; \
-		$(ECHO) " $(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(dvidir)/$$f\""; \
-		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(dvidir)/$$f"; \
-	done
+	@list='$(TXTS)'; dir='$(docdir)'; $(am__list_install)
 
-MY_PHONY	+= install-dvi-drafts
-
-install-dvi-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ install-dvi-drafts
-
-install-ps-drafts: $(PSS)
+install-dvi-local: $(DVIS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	test -z "$(psdir)" || $(MKDIR_P) "$(DESTDIR)$(psdir)"
-	@list='$(PSS)'; for p in $$list; do \
-		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed 's,.*/,,'`; \
-		$(ECHO) " $(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(psdir)/$$f\""; \
-		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(psdir)/$$f"; \
-	done
+	@list='$(DVIS)'; dir='$(dvidir)'; $(am__list_install)
 
-MY_PHONY	+= install-ps-drafts
-
-install-ps-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ install-ps-drafts
-
-install-pdf-drafts: $(PDFS)
+install-ps-local: $(PSS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	test -z "$(pdfdir)" || $(MKDIR_P) "$(DESTDIR)$(pdfdir)"
-	@list='$(PDFS)' ; for p in $$list; do \
-		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=`echo $$p | sed 's,.*/,,'`; \
-		$(ECHO) " $(INSTALL_DATA) \"$$d$$p\" \"$(DESTDIR)$(pdfdir)/$$f\""; \
-		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(pdfdir)/$$f"; \
-	done
+	@list='$(PSS)'; dir='$(psdir)'; $(am__list_install)
 
-MY_PHONY	+= install-pdf-drafts
+install-pdf-local: $(PDFS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@list='$(PDFS)'; dir='$(pdfdir)'; $(am__list_install)
 
-install-pdf-local: @WITH_DRAFTS_TRUE@@WITH_DRAFTS_PRINT_TRUE@@DEVELOPMENT_TRUE@@DOCUMENTATION_TRUE@ install-pdf-drafts
+install-html-local: $(HTMLS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@list='$(HTMLS)'; dir='$(htmldir)'; $(am__list_install)
 
-uninstall-dvi: uninstall-dvi-drafts
+uninstall-txt-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@list='$(TXTS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(docdir)/,' | $(am__base_remove)
 
-uninstall-dvi-am:
+uninstall-dvi-ma:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(DVIS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(dvidir)/,' | $(am__base_remove)
 
-uninstall-ps: uninstall-ps-am
-
-uninstall-ps-am:
+uninstall-ps-ma:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(PSS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(psdir)/,' | $(am__base_remove)
 
-uninstall-pdf: uninstall-pdf-am
-
-uninstall-pdf-am:
+uninstall-pdf-ma:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(PDFS)'; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(pdfdir)/,' | $(am__base_remove)
 
+uninstall-html-ma:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	@list='$(HTMLS)' ; $(am__echo_list) | sed 's,.*/,,;s,^,$(DESTDIR)$(htmldir)/,' | $(am__base_remove)
+
 ## =============================================================================
 ##
 ## $Log: drafts.am,v $
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

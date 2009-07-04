@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -170,14 +170,14 @@ _AC_ARG_VAR_LIBS()dnl
 _AC_ARG_VAR_CPPFLAGS()dnl
 m4_ifval([$1],
       [AC_CHECK_TOOLS(GCJ, [$1])],
-[AC_CHECK_TOOL(GCJ, gcj)
+[AC_CHECK_TOOLS(GCJ, [gcj3 gcj])
 if test -z "$GCJ"; then
     dnl Here we want:
     dnl   AC_CHECK_TOOL(GCJ, gcj)
     dnl but without the check for a tool without the prefix.
     dnl Until the check is removed from there, copy the code:
     if test -n "$ac_tool_prefix"; then
-	AC_CHECK_PROG(GCJ, [${ac_tool_prefix}gcj], [${ac_tool_prefix}gcj])
+	AC_CHECK_PROGS(GCJ, [${ac_tool_prefix}gcj3 ${ac_tool_prefix}gcj], [${ac_tool_prefix}gcj])
     fi # gcj.m4 181
 fi # gcj.m4 182
 if test -z "$GCJ" ; then
@@ -218,7 +218,8 @@ AN_MAKEVAR([JAVAC], [AC_PROG_JAVAC])
 AN_PROGRAM([gcj], [AC_PROG_JAVAC])
 AN_PROGRAM([javac], [AC_PROG_JAVAC])
 AC_DEFUN([AC_PROG_JAVAC],
-[AC_LANG_PUSH(Java)dnl
+[AC_REQUIRE([AC_PROG_GCJ])
+AC_LANG_PUSH(Java)dnl
 AC_ARG_VAR([JAVAC], [Java class compiler])dnl
 AC_ARG_VAR([JAVACFLAGS], [Java class compiler flags])dnl
 if test -z "$JAVAC"; then
@@ -243,6 +244,7 @@ AC_LANG_POP(Java)dnl
 # to specify an alternative search list for the CNI header
 # compiler.
 AN_MAKEVAR([GCJH], [AC_PROG_GCJH])
+AN_PROGRAM([gcjh3], [AC_PROG_GCJH])
 AN_PROGRAM([gcjh], [AC_PROG_GCJH])
 AC_DEFUN([AC_PROG_GCJH],
 [AC_LANG_PUSH(Java)dnl
@@ -250,7 +252,7 @@ AC_ARG_VAR([GCJH], [Java CNI header command])dnl
 AC_ARG_VAR([GCJHFLAGS], [Java CNI header flags])dnl
 if test -z "$GCJH"; then
     AC_CHECK_TOOLS(GCJH,
-	[m4_default([$1], [gcjh])],
+	[m4_default([$1], [gcjh3 gcjh])],
 	gcjh)
 fi # gcj.m4 255
 # Provide some information about the compiler
@@ -276,12 +278,13 @@ AN_PROGRAM([gcjh], [AC_PROG_JAVAH])
 AN_PROGRAM([gcjnih], [AC_PROG_JAVAH])
 AN_PROGRAM([javah], [AC_PROG_JAVAH])
 AC_DEFUN([AC_PROG_JAVAH],
-[AC_LANG_PUSH(Java)dnl
+[AC_REQUIRE([AC_PROG_GCJH])
+AC_LANG_PUSH(Java)dnl
 AC_ARG_VAR([JAVAH], [Java JNI header command])dnl
 AC_ARG_VAR([JAVAHFLAGS], [Java JNI header flags])dnl
 if test -z "$JAVAH"; then
     AC_CHECK_TOOLS(JAVAH,
-	[m4_default([$1], [gcjh gcjnih javah])],
+	[m4_default([$1], [$GCJH gcjh3 gcjh gcjnih javah])],
 	gcjh)
 fi # gcj.m4 286
 # Provide some information about the compiler
@@ -450,11 +453,12 @@ AC_DEFUN([_GCJ_TOOLS], [dnl
 dnl
 dnl We need a javac compiler or we cannot compile any classes.
 dnl
+    AC_REQUIRE([AC_PROG_JAVAC])
     AC_ARG_VAR([JAVAC],
-	[Java class compiler. @<:@default=gcj@:>@])
+	[Java class compiler. @<:@default=[$]GCJ@:>@])
     AC_ARG_VAR([JAVACFLAGS],
 	[Java class compiler flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([JAVAC], [gcj javac], [],
+    AC_PATH_PROGS([JAVAC], [$GCJ javac], [],
 	[$gcj_tmp])
     if test -z "$JAVAC"; then
 	AC_MSG_ERROR([
@@ -482,12 +486,18 @@ dnl
     AC_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [],
 	[$gcj_tmp])
     if test -z "$GCJDBTOOL"; then
-	AC_MSG_ERROR([
+	GCJDBTOOL="${am_missing4_run}gcj-dbtool"
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no
+	then
+	    AC_MSG_WARN([
 ***
 *** Configure could not find the GCJ database tool program
 *** 'gcj-dbtool'.  This program is part of the GNU Compiler
 *** Collection, but is not always loaded on recent
-*** distributions.
+*** distributions.  Also, older versions of libgcj, such as that
+*** distributed with GCC version 2 and early version 3, do not
+*** have this tool.  The first clue to this is that GCJ does not
+*** support the -indirect-dispatch flag.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
@@ -496,6 +506,7 @@ dnl
 *** Alternatively, you can specify an equivalent command with
 *** the GCJDBTOOL environment variable when running configure.
 ***])
+	fi
     fi
 
 dnl
@@ -505,14 +516,14 @@ dnl workaround for a missing tool is to simply touch the header files that
 dnl were distributed if they exist.  If the header files do not exist, then an
 dnl error will result.  See the missing4 script.
 dnl
+    AC_REQUIRE([AC_PROG_GCJH])
     AC_ARG_VAR([GCJH],
 	[Java CNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([GCJHFLAGS],
 	[Java CNI header command flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([GCJH], [gcjh], [],
+    AC_PATH_PROGS([GCJH], [gcjh3 gcjh], [],
 	[$gcj_tmp])
     if test :"${GCJH:-no}" = :no ; then
-	ac_cv_path_GCJH="${am_missing4_run}gcjh"
 	GCJH="${am_missing4_run}gcjh"
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
@@ -540,14 +551,14 @@ dnl workaround for a missing tool is to simply touch the header files that
 dnl were distributed if they exist.  If the header files do not exist, then an
 dnl error will result.  See the missing4 script.
 dnl
+    AC_REQUIRE([AC_PROG_JAVAH])
     AC_ARG_VAR([JAVAH],
 	[Java JNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([JAVAHFLAGS],
 	[Java JNI header command flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([JAVAH], [gcjh javah], [],
+    AC_PATH_PROGS([JAVAH], [gcjh3 gcjh javah], [],
 	[$gcj_tmp])
     if test :"${JAVAH:-no}" = :no ; then
-	ac_cv_path_JAVAH="${am_missing4_run}gcjh"
 	JAVAH="${am_missing4_run}gcjh"
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
@@ -582,7 +593,6 @@ dnl
     AC_PATH_PROGS([JAVADOC], [gjdoc javadoc], [],
 	[$gcj_tmp])
     if test :"${JAVADOC:-no}" = :no ; then
-	ac_cv_path_JAVADOC="${am_missing4_run}gjdoc"
 	JAVADOC="${am_missing4_run}gjdoc"
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
@@ -688,6 +698,9 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 #
 # $Log: gcj.m4,v $
+# Revision 1.1.2.3  2009-07-04 03:51:33  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:38  brian
 # - improvements to build process
 #

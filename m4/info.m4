@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: info.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -139,7 +139,6 @@ AC_DEFUN([_INFO_SETUP], [dnl
     disable_texinfo_print=
     AC_PATH_PROGS([TEX], [etex tex], [], [$tmp_path])
     if test :"${TEX:-no}" = :no ; then
-	ac_cv_path_TEX="${am_missing2_run}tex"
 	TEX="${am_missing2_run}tex"
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
@@ -168,7 +167,6 @@ AC_DEFUN([_INFO_SETUP], [dnl
     fi
     AC_PATH_PROGS([PDFTEX], [pdfetex pdftex], [], [$tmp_path])
     if test :"${PDFTEX:-no}" = :no ; then
-	ac_cv_path_PDFTEX="${am_missing2_run}pdftex"
 	PDFTEX="${am_missing2_run}pdftex"
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
@@ -221,7 +219,6 @@ AC_DEFUN([_INFO_SETUP], [dnl
     fi
 dnl    AC_PATH_PROG([NROFF], [nroff], [], [$tmp_path])
 dnl    if test :"${NROFF:-no}" = :no ; then
-dnl	ac_cv_path_NROFF="${am_missing5_run}nroff"
 dnl	NROFF="${am_missing5_run}nroff"
 dnl	if test :$enable_texinfo != :no ; then
 dnl	    : # will attempt to emulate with groff
@@ -229,7 +226,6 @@ dnl	fi
 dnl    fi
     AC_PATH_PROG([GROFF], [groff], [], [$tmp_path])
     if test :"${GROFF:-no}" = :no ; then
-	ac_cv_path_GROFF="${am_missing5_run}groff"
 	GROFF="${am_missing5_run}groff"
 	if test :$enable_texinfo != :no ; then
 	    disable_texinfo=yes
@@ -256,7 +252,6 @@ dnl    fi
     fi
     AC_PATH_PROG([FIG2DEV], [fig2dev], [], [$tmp_path])
     if test :"${FIG2DEV:-no}" = :no ; then
-	ac_cv_path_FIG2DEV="${am_missing2_run}fig2dev"
 	FIG2DEV="${am_missing2_run}fig2dev"
 	if test :$enable_texinfo_html != :no -o :$enable_texinfo_print != :no ; then
 	    if test :$enable_texinfo_html != :no ; then
@@ -291,7 +286,6 @@ dnl    fi
     fi
     AC_PATH_PROG([CONVERT], [convert], [], [$tmp_path])
     if test :"${CONVERT:-no}" = :no ; then
-	ac_cv_path_CONVERT="${am_missing2_run}convert"
 	CONVERT="${am_missing2_run}convert"
 	if test :$enable_texinfo_html != :no -o :$enable_texinfo_print != :no ; then
 	    if test :$enable_texinfo_html != :no ; then
@@ -326,7 +320,6 @@ dnl    fi
     fi
     AC_PATH_PROG([PS2EPSI], [ps2epsi], [], [$tmp_path])
     if test :"${PS2EPSI:-no}" = :no ; then
-	ac_cv_path_PS2EPSI="${am_missing2_run}ps2epsi"
 	PS2EPSI="${am_missing2_run}ps2epsi"
 	if test :$enable_texinfo_print != :no ; then
 	    # disable_texinfo_print=yes
@@ -335,7 +328,6 @@ dnl    fi
     fi
     AC_PATH_PROG([EPSTOPDF], [epstopdf], [], [$tmp_path])
     if test :"${EPSTOPDF:-no}" = :no ; then
-	ac_cv_path_EPSTOPDF="${am_missing2_run}epstopdf"
 	EPSTOPDF="${am_missing2_run}epstopdf"
 	if test :$enable_texinfo_print != :no ; then
 	    # disable_texinfo_print=yes
@@ -348,7 +340,6 @@ dnl DVIPS make variable and complains if we try to redefine it.
 dnl
     AC_PATH_PROG([DVI2PS], [dvips], [], [$tmp_path])
     if test :"${DVI2PS:-no}" = :no ; then
-	ac_cv_path_DVI2PS="${am_missing2_run}dvips"
 	DVI2PS="${am_missing2_run}dvips"
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
@@ -433,7 +424,13 @@ AC_DEFUN([_INFO_XXX], [dnl
 
 # =============================================================================
 #
-# $Log$
+# $Log: info.m4,v $
+# Revision 1.1.2.2  2009-07-04 03:51:33  brian
+# - updates for release
+#
+# Revision 1.1.2.1  2009-06-29 07:35:53  brian
+# - added new macros for docs and java
+#
 # =============================================================================
 # 
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>

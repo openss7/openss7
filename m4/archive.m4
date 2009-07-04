@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -216,7 +216,6 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     disable_repo_tar=
     AC_PATH_PROG([MD5SUM], [md5sum], [], [$tmp_path])
     if test :"${MD5SUM:-no}" = :no ; then
-	ac_cv_path_MD5SUM="${am_missing3_run}md5sum"
 	MD5SUM="${am_missing3_run}md5sum"
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
@@ -244,7 +243,6 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     fi
     AC_PATH_PROG([SHA1SUM], [sha1sum], [], [$tmp_path])
     if test :"${SHA1SUM:-no}" = :no ; then
-	ac_cv_path_SHA1SUM="${am_missing3_run}sha1sum"
 	SHA1SUM="${am_missing3_run}sha1sum"
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
@@ -272,7 +270,6 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     fi
     AC_PATH_PROG([SHA256SUM], [sha256sum], [], [$tmp_path])
     if test :"${SHA256SUM:-no}" = :no ; then
-	ac_cv_path_SHA256SUM="${am_missing3_run}sha256sum"
 	SHA256SUM="${am_missing3_run}sha256sum"
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
@@ -340,7 +337,13 @@ AC_DEFUN([_ARCHIVE_XXX], [dnl
 
 # =============================================================================
 #
-# $Log$
+# $Log: archive.m4,v $
+# Revision 1.1.2.2  2009-07-04 03:51:32  brian
+# - updates for release
+#
+# Revision 1.1.2.1  2009-06-29 07:35:53  brian
+# - added new macros for docs and java
+#
 # =============================================================================
 # 
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>

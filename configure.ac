@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -93,7 +93,7 @@ dnl Checks for programs.
 dnl
 AM_PROG_AS
 AC_PROG_AWK
-AC_PROG_CXX
+AC_PROG_CXX([g++3 g++])
 AC_PROG_CC
 AC_PROG_CPP
 AM_PROG_CC_C_O
@@ -106,8 +106,16 @@ AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 AC_PROG_LEX
 AC_PROG_YACC
+
+m4_include([m4/gcj.m4])
+dnl
+dnl older systems that have gcj3 and gcj should use the newer version
+dnl
 AC_PROG_GCJ
 AM_PROG_GCJ
+AC_PROG_GCJH
+AC_PROG_JAVAC
+AC_PROG_JAVAH
 
 LT_INIT([dlopen])
 LT_LANG([C++])
@@ -260,6 +268,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.3  2009-07-04 03:51:32  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:34  brian
 # - improvements to build process
 #

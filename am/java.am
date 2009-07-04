@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -127,11 +127,12 @@ CLEAN_LOCAL += clean-javadoc
 install-javadoc: $(javadocsubdir)/index.html
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	test -z "$(javadocdir)" || $(MKDIR_P) "$(DESTDIR)$(javadocdir)"
 	test -z "$(pkgjavadocdir)" || $(MKDIR_P) "$(DESTDIR)$(pkgjavadocdir)"
 	@if test -f $(javadocsubdir)/index.html ; then d=; else d=$(srcdir)/; fi ; \
 	 $(am__vpath_adj_setup) \
-	 list=`find $${d}$(javadocsubdir) -type f | sort` ; for p in $$list ; do \
+	 list=`find $${d}$(javadocsubdir) -type f | sort` ; \
+	 test -n '$(pkgjavadocdir)' || list=; \
+	 for p in $$list ; do \
 	 	$(am__vpath_adj) \
 		$(ECHO) "$(INSTALL_DATA) -D \"$$p\" \"$(DESTDIR)$(pkgjavadocdir)/$$f\""; \
 		$(INSTALL_DATA) -D "$$p" "$(DESTDIR)$(pkgjavadocdir)/$$f"; \
@@ -146,7 +147,8 @@ uninstall-javadoc:
 	@$(NORMAL_UNINSTALL)
 	@if test -f $(javadocsubdir)/index.html ; then d=; else d=$(srcdir)/; fi ; \
 	 $(am__vpath_adj_setup) \
-	 list=`find $${d}$(javadocsubdir) -type f | sort` ; for p in $$list ; do \
+	 list=`find $${d}$(javadocsubdir) -type f | sort` ; \
+	 for p in $$list ; do \
 	 	$(am__vpath_adj) \
 		echo "$(DESTDIR)$(pkgjavadocdir)/$$f" ; \
 	 done | $(am__base_remove)
@@ -346,7 +348,7 @@ post-classmap:
 
 if PKG_BUILD_ARCH
 POST_INSTALL_AM		+= post-classmap
-POST_UNINSTALL_AM	+= post-classmap
+POST_UNINSTALL_MA	+= post-classmap
 endif
 
 ## -----------------------------------------------------------------------------
@@ -398,6 +400,9 @@ $(my_cxx_WRAPPERS): %_wrap.cxx : %.i
 ## =============================================================================
 ##
 ## $Log: java.am,v $
+## Revision 1.1.2.3  2009-07-04 03:51:32  brian
+## - updates for release
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

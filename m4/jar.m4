@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: jar.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: jar.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,7 +85,6 @@ AC_DEFUN([_JAR_SETUP], [dnl
     AC_PATH_PROGS([JAR], [fastjar jar], [],
 	[$jar_tmp])
     if test :"${JAR:-no}" = :no ; then
-	ac_cv_path_JAR="${am_missing4_run}jar"
 	JAR="${am_missing4_run}jar"
     fi
     AC_ARG_VAR([ZIP],
@@ -93,7 +92,6 @@ AC_DEFUN([_JAR_SETUP], [dnl
     AC_PATH_PROGS([ZIP], [zip], [],
 	[$jar_tmp])
     if test :"${ZIP:-no}" = :no ; then
-	ac_cv_path_ZIP="${am_missing4_run}zip"
 	ZIP="${am_missing4_run}zip"
     fi
 ])# _JAR_SETUP
@@ -117,6 +115,9 @@ AC_DEFUN([_JAR_XXX], [dnl
 # =============================================================================
 #
 # $Log: jar.m4,v $
+# Revision 1.1.2.3  2009-07-04 03:51:33  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:38  brian
 # - improvements to build process
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:26 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:26 $ by $Author: brian $
+# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -157,6 +157,14 @@
 %global HAVE_docfiles       1
 %global HAVE_includes       %{?includes:    1}%{!?includes:    0}
 %global HAVE_mkvars         1
+
+%global HAVE_infofiles      1
+%global HAVE_txtfiles       1
+%global HAVE_dvifiles       1
+%global HAVE_psfiles        1
+%global HAVE_pdffiles       1
+%global HAVE_htmlfiles      1
+%global HAVE_pngfiles       1
 
 %if %{without_ko_modules}
 %global HAVE_oldmods        %{HAVE_modules}
@@ -273,7 +281,7 @@
 %global WITH_papers_html    1
 %global WITH_papers_print   1
 %global WITH_drafts         1
-%global WITH_drafts_html    1
+%global WITH_drafts_html    0
 %global WITH_drafts_print   1
 
 # Because we only need to build the tools binaries once for each
@@ -327,13 +335,32 @@
 %global FILES_infofiles 0
 %endif
 
-%if %{WITH_texinfo}%{WITH_papers}%{WITH_drafts}
+%global WITH_txtfiles   0
+%if %{WITH_texinfo}
+%global WITH_txtfiles   1
+%endif
+%if %{WITH_drafts}
+%global WITH_txtfiles   1
+%endif
+
+%if %{WITH_txtfiles}
 %else
 %global HAVE_txtfiles   0
 %global FILES_txtfiles  0
 %endif
 
-%if %{WITH_texinfo_html}%{WITH_papers_html}%{WITH_drafts_html}
+%global WITH_htmlfiles  0
+%if %{WITH_texinfo_html}
+%global WITH_htmlfiles  1
+%endif
+%if %{WITH_papers_html}
+%global WITH_htmlfiles  1
+%endif
+%if %{WITH_drafts_html}
+%global WITH_htmlfiles  1
+%endif
+
+%if %{WITH_htmlfiles}
 %else
 %global HAVE_htmlfiles  0
 %global HAVE_pngfiles   0
@@ -341,7 +368,18 @@
 %global FILES_pngfiles  0
 %endif
 
-%if %{WITH_texinfo_print}%{WITH_papers_print}%{WITH_drafts_print}
+%global WITH_printfiles 0
+%if %{WITH_texinfo_print}
+%global WITH_printfiles 1
+%endif
+%if %{WITH_papers_print}
+%global WITH_printfiles 1
+%endif
+%if %{WITH_drafts_print}
+%global WITH_printfiles 1
+%endif
+
+%if %{WITH_printfiles}
 %else
 %global HAVE_dvifiles   0
 %global HAVE_psfiles    0
@@ -1680,11 +1718,11 @@ make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
     %{!?_enable_debug_packages: install-strip} \
     %{?_enable_debug_packages: install}
 
-%{?files_txtfiles:make install-txt}
-%{?files_dvifiles:make install-dvi}
-%{?files_psfiles:make install-ps}
-%{?files_pdffiles:make install-pdf}
-%{?files_htmlfiles:make install-html}
+%{?files_txtfiles:make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" install-txt}
+%{?files_dvifiles:make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" install-dvi}
+%{?files_psfiles:make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" install-ps}
+%{?files_pdffiles:make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" install-pdf}
+%{?files_htmlfiles:make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" install-html}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -3329,7 +3367,7 @@ Group:          Development/Kernel
 %{?_xpm:Icon:   %_xpm}
 %{?_gif:Icon:   %_gif}
 Autoreq:        true
-Autoprov:       true
+Autoprov:       no
 
 %if %{FILES_sourcefiles}
 Prefix:         %{_usrsrc}/%{name}
@@ -3364,7 +3402,7 @@ build that are not present in the %{name}-devel-%{_kversion}
 package.
 %{descriptail}
 
-%if {PACKAGE_ksrc}
+%if %{PACKAGE_ksrc}
 %files -n %{name}-source-%{_kversion}
 # -----------------------------------------------------------------------------
 %{?files_sourcefiles:%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}}
@@ -3498,6 +3536,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.3  2009-07-04 03:51:32  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-06-29 07:35:26  brian
 # - updated rpm spec and symvers
 #
