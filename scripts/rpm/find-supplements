@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# This script reads filenames from STDIN and outputs any relevant provides
+# information that needs to be included in the package.
+IFS=$'\n'
+filelist=($(cat))
+
+#
+# --- Kernel module hardware identifiers
+# (e.g., modalias(pci:v0000109Ed00000878sv00000070sd0000FF01bc*sc*i*)
+[ -x /usr/lib/rpm/find-supplements.ksyms ] &&
+    printf "%s\n" "${filelist[@]}" | /usr/lib/rpm/find-supplements.ksyms "$@"
+
+exit 0
