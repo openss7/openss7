@@ -1,0 +1,165 @@
+#!/bin/bash
+
+# heavily based upon find-suggests.ksyms by Andreas Gruenbacher <agruen@suse.de>.
+# with modifications by Michael Brown <Michael_E_Brown@dell.com>
+#
+# -- added module versioning info to modalias() symbols
+# -- removed code which inspects spec files.
+
+IFS=$'\n'
+
+# 
+# Initially, dont generate modalias() lines for kernel package. This needs
+# additional discussion. Would like to eventually add them for 
+# completeness, so that we can determine when drivers are folded into 
+# mainline kernel.
+# 
+case "$1" in
+kernel-module-*)    ;; # Fedora kernel module package names start with
+		       # kernel-module.
+kernel*)	   is_kernel_package=1 ;;
+esac
+
+if ! [ -z "$is_kernel_package" ]; then
+    cat > /dev/null
+    exit 0
+fi
+
+print_modaliases() {
+    declare class=$1 variants=$2 pos=$3
+    if [ -n "$variants" ]; then
+	echo "${class:0:pos}[$variants]${class:pos+1}"
+    else
+	[ -z "$class" ] || echo "$class"
+    fi
+}
+
+combine_modaliases() {
+    declare tag class variants pos n
+    read class
+    while read tag; do
+	for ((n=0; n<${#class}; n++)); do
+	    if [ "*" != "${class:n:1}" -a \
+		 "${class:0:n}" = "${tag:0:n}" -a \
+		 "${class:n+1}" = "${tag:n+1}" ] &&
+	       ( [ -z "$pos" ] || [ $n = $pos ] ); then
+		variants="${variants:-${class:n:1}}${tag:n:1}"
+		pos=$n
+		break
+	    fi
+	done
+	if [ $n -eq ${#class} ]; then
+	    print_modaliases "$class" "$variants" "$pos"
+	    variants=
+	    pos=
+	    class=$tag
+	fi
+    done
+    print_modaliases "$class" "$variants" "$pos"
+}
+
+grep '\.ko$' | xargs -r strings -n 7 | awk '
+    BEGIN { VERSION = ""; KREL = ""; }
+    /^alias=/ {
+	sub("^alias=", "")
+	MYALIASES[$0] = 1
+	next
+    }
+    /^version=/ {
+	sub("^version=", "")
+	gsub(" ", "_")
+	VERSION = $0
+	next
+    }
+    /^vermagic=/ {
+	sub("^vermagic=", "")
+	sub(" .*", "")
+	sub("-.*", "")
+	KREL = $0
+	for (ALIAS in MYALIASES) {
+	    ALIASES["modalias(kernel-" KREL ":" ALIAS ")"] = 1
+	    if (VERSION) {
+		ALIASES["modalias(" ALIAS ") = " VERSION] = 1
+	    } else {
+		ALIASES["modalias(" ALIAS ")"] = 1
+	    }
+	}
+	VERSION = ""
+	KREL = ""
+	delete MYALIASES
+	next
+    }
+    END {
+	j = 1
+	for (ALIAS in ALIASES) {
+	    INDICES[j] = ALIAS
+	    j++
+	}
+	n = asort(INDICES)
+	for (i = 1; i <= n; i++) {
+	    print INDICES[i]
+	}
+    }
+' \
+| combine_modaliases
+
+exit 0
+
+# =============================================================================
+#
+# @(#) $RCSfile: modalias.prov,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:53:06 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2009-07-04 03:53:06 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: modalias.prov,v $
+# Revision 1.1.2.1  2009-07-04 03:53:06  brian
+# - updates for release
+#
+# =============================================================================
+# vim: tw=80 sw=4 nocin nosi fo+=tcqlorn
