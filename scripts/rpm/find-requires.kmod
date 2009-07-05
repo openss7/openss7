@@ -1,0 +1,279 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-requires.kmod" >"/dev/stderr"
+    find = "find /boot /usr/src/kernels -type f -name 'symsets-*.tar.gz' 2>/dev/null"
+    while ((find | getline file)) {
+	tar = "tar -tzf " file
+	while ((tar | getline set)) {
+	    if (set~/\/$/)
+		continue
+	    kernel = set
+	    sub("^symsets-", "", kernel)
+	    sub(/\/.*/, "", kernel)
+	    class = set
+	    sub(/^.*\//, "", class)
+	    sub(/\..*/, "", class)
+	    hash = set
+	    sub(/^.*\./, "", hash)
+	    list = "tar -xzOf " file " " set
+	    while ((list | getline)) {
+		sub(/0x0*/, "", $1)
+		ksym = "ksym(" $2 ") = " $1
+		#if ((kernel, ksym) in symsets)
+		#    continue
+		symsets[kernel, ksym] = "kernel(" class ") = " hash
+	    }
+	    close(list)
+	}
+	close(tar)
+    }
+    close(find)
+}
+/\.ko$/ {
+    section = 0
+    delete lines
+    string = ""
+    file = $1
+    module = $1
+    sub(/\.ko$/, "", module)
+    sub(/.*\//, "", module)
+    modinfo = "objdump -j .modinfo -s " file
+    while ((modinfo | getline line)) {
+	if (section) {
+	    sub(/^ .... /, "", line)
+	    sub(/  .*$/, "", line)
+	    gsub(/ /, "", line)
+	    string = string line
+	} else {
+	    if (line~/^Contents of section/)
+		section = 1
+	}
+    }
+    close(modinfo)
+    j = 1
+    for (i = 1; i <= length(string); i += 2) {
+	char = "0x" substr(string, i, 1) substr(string, i+1, 1)
+	char = strtonum(char)
+	if (char) {
+	    if (32 <= char && char <= 126)
+		lines[j] = lines[j] sprintf("%c", char)
+	} else {
+	    if (lines[j])
+		j++
+	}
+    }
+    version = ""
+    srcversion = ""
+    vermagic = ""
+    for (i = 1; i <= j; i++) {
+	if (lines[i]) {
+	    if (lines[i]~/^version=/) {
+		version = lines[i]
+		sub(/^version=/, "", version)
+		continue
+	    }
+	    if (lines[i]~/^srcversion=/) {
+		srcversion = lines[i]
+		sub(/^srcversion=/, "", srcversion)
+		continue
+	    }
+	    if (lines[i]~/^vermagic/) {
+		vermagic = lines[i]
+		sub(/^vermagic=/, "", vermagic)
+		sub(/ .*/, "", vermagic)
+		continue
+	    }
+	}
+    }
+    if (!version)
+	version = srcversion
+    if (!version)
+	version = vermagic
+    for (i = 1; i <= j; i++) {
+	if (lines[i]) {
+	    if (lines[i]~/^alias=/) {
+		sub(/^alias=/, "", lines[i])
+		modalias = "modalias(" lines[i] ")"
+		if (version) {
+		    provides[vermagic, modalias " = " version] = 1
+		    provides[vermagic, modalias] = 0
+		} else {
+		    provides[vermagic, modalias] = 1
+		}
+		modalias = "modalias(kernel-" vermagic ":" lines[i] ")"
+		if (version && version != vermagic) {
+		    provides[vermagic, modalias " = " version] = 1
+		    provides[vermagic, modalias] = 0
+		} else {
+		    provides[vermagic, modalias] = 1
+		}
+		continue
+	    }
+	    if (lines[i]~/^firmware=/) {
+		sub(/^firmware=/, "", lines[i])
+		firmware = "firmware(" lines[i] ")"
+		if (version) {
+		    provides[vermagic, firmware " = " version] = 1
+		    provides[vermagic, firmware] = 0
+		} else {
+		    provides[vermagic, firmware] = 1
+		}
+		continue
+	    }
+	    if (lines[i]~/^depends=/) {
+		sub(/^depends=/, "", lines[i])
+		n = split(lines[i], deps, /,/)
+		for (i = 1; i <= n; i++) {
+		    modalias ="modalias(" deps[i] ")" 
+		    requires[vermagic, modalias] = 1
+		}
+		continue
+	    }
+	}
+    }
+    modalias = "modalias(" module ")"
+    if (version) {
+	provides[vermagic, modalias " = " version] = 1
+	provides[vermagic, modalias] = 0
+    } else {
+	provides[vermagic, modalias] = 1
+    }
+    section = 0
+    delete lines
+    delete strings
+    k = 1
+    modprobe = "objdump -j __versions -s " $1
+    while ((modprobe | getline line)) {
+	if (section) {
+	    sub(/^ .... /, "", line)
+	    sub(/  .*$/, "", line)
+	    gsub(/ /, "", line)
+	    strings[k] = strings[k] line
+	    if (length(strings[k]) == 128) {
+		sub(/(00)+$/, "", strings[k])
+		k++
+	    }
+	} else {
+	    if (line~/^Contents of section/)
+		section = 1
+	}
+    }
+    close(modprobe)
+    for (j = 1; j <= k; j++) {
+	if (!strings[j])
+	    continue
+	# FIXME: check endianness
+	lines[j] = substr(strings[j], 7, 2) substr(strings[j], 5, 2) substr(strings[j], 3, 2) substr(strings[j], 1, 2) " "
+	for (i = 9; i <= length(strings[j]); i += 2) {
+	    char = "0x" substr(strings[j], i, 1) substr(strings[j], i+1, 1)
+	    char = strtonum(char)
+	    if (32 <= char && char <= 126)
+		lines[j] = lines[j] sprintf("%c", char)
+	}
+    }
+    for (i = 1; i <= k; i++) {
+	if (lines[i]) {
+	    sub(/^0+/, "", lines[i])
+	    split(lines[i], fields, / /)
+	    ksym = "ksym(" fields[2] ") = " fields[1]
+	    requires[vermagic, ksym] = 1
+	}
+    }
+    nm = "objdump -t " $1 " 2>/dev/null"
+    while ((nm | getline)) {
+	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
+	    sub("^0*", "", $1)
+	    sub("^_?__crc_", "", $5)
+	    ksym = "ksym(" $5 ") = " $1
+	    provides[vermagic, ksym] = 1
+	}
+    }
+    close(nm)
+}
+END {
+    havesymsets = 0
+    j = 1
+    for (r in requires) {
+	if (!requires[r])
+	    continue
+	if (r in provides)
+	    continue
+	split(r, ind, SUBSEP)
+	if (r in symsets) {
+	    requiredsets[ind[1], symsets[r]] = 1
+	    havesymsets = 1
+	    continue
+	}
+	indices[j] = ind[2]
+	j++
+    }
+    for (s in requiredsets) {
+	split(s, ind, SUBSEP)
+	indices[j] = ind[2]
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++)
+	if (!havesymsets || indices[i]!~/ksym\(/)
+	    print indices[i]
+}
+
+# =============================================================================
+#
+# @(#) $RCSfile: find-requires.kmod,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-05 12:02:28 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2009-07-05 12:02:28 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: find-requires.kmod,v $
+# Revision 1.1.2.1  2009-07-05 12:02:28  brian
+# - new awk scripts for kernel modules
+#
+# =============================================================================
+# vim: ft=awk sw=4 fo+=tcqlorn
