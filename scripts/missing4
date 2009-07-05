@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 # 
-# @(#) $RCSfile: missing4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:34 $
+# @(#) $RCSfile: missing4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -120,6 +120,7 @@ case $1 in
 	      javah	    touch output file if exists
 	      gjdoc	    touch output directory index.html
 	      javadoc	    touch output directory index.html
+	      gcj-dbtool    touch output file if exists
 	
 	Send problem reports to <bugs@openss7.org>.
 	EOF
@@ -258,10 +259,11 @@ case $program in
 	*** of swig is also available from the OpenSS7 project site at
 	*** http://www.openss7.org/repo/tarballs/swig-1.3.39.tar.gz
 	***
-	*** Debian 4.0:	\`apt-get install swig'
-	*** CentOS 5.x:	\`yum install swig'
-	*** SLES 10:	(install swig from sources)
-	*** RH 7.3:	\`rpm -i swig'
+	*** Debian 4.0:	 \`apt-get install swig'
+	*** Ubuntu 8.04: \`apt-get install swig'
+	*** CentOS 5.x:	 \`yum install swig'
+	*** SLES 10:	 (install swig from sources)
+	*** RH 7.3:	 \`rpm -i swig'
 	EOF
 	;;
     (jar|jar*|fastjar*)
@@ -275,10 +277,11 @@ case $program in
 	*** fastjar'.  On SuSE, \`zypper install fastjar'.  \`Jar' has been
 	*** available for many years: you can get \`Jar' as part of any JDK.
 	***
-	*** Debian 4.0:	\`apt-get install fastjar'
-	*** CentOS 5.x:	\`yum install libgcj'
-	*** SLES 10:	\`zypper install fastjar'
-	*** RH 7.3:	\`rpm -i libgcj3'
+	*** Debian 4.0:	 \`apt-get install fastjar'
+	*** Ubuntu 8.04: \`apt-get install fastjar'
+	*** CentOS 5.x:	 \`yum install libgcj'
+	*** SLES 10:	 \`zypper install fastjar'
+	*** RH 7.3:	 \`rpm -i libgcj3'
 	EOF
 	;;
     (gcjh)
@@ -297,10 +300,11 @@ case $program in
 	*** Alternatively, you can specify an equivalent command with the GCJH
 	*** environment variable when running \`configure'.
 	***
-	*** Debian 4.0:	\`apt-get install gcj'
-	*** CentOS 5.x:	\`yum install gcc-java'
-	*** SLES 10:	\`zypper install gcc-java'
-	*** RH 7.3:	\`rpm -i gcc-java'
+	*** Debian 4.0:	 \`apt-get install gcj'
+	*** Ubuntu 8.04: \`apt-get install gcj'
+	*** CentOS 5.x:	 \`yum install gcc-java'
+	*** SLES 10:	 \`zypper install gcc-java'
+	*** RH 7.3:	 \`rpm -i gcc-java'
 	EOF
 	;;
     (javah|gcjh)
@@ -320,10 +324,11 @@ case $program in
 	*** Alternatively, you can specify an equivalent command with the JAVAH
 	*** environment variable when running \`configure'.
 	***
-	*** Debian 4.0:	\`apt-get install gcj'
-	*** CentOS 5.x:	\`yum install gcc-java'
-	*** SLES 10:	\`zypper install gcc-java'
-	*** RH 7.3:	\`rpm -i gcc-java'
+	*** Debian 4.0:	 \`apt-get install gcj'
+	*** Ubuntu 8.04: \`apt-get install gcj'
+	*** CentOS 5.x:	 \`yum install gcc-java'
+	*** SLES 10:	 \`zypper install gcc-java'
+	*** RH 7.3:	 \`rpm -i gcc-java'
 	EOF
 	;;
     (javadoc|gjdoc)
@@ -343,10 +348,32 @@ case $program in
 	*** Alternatively, you can specify an equivalent command with the
 	*** JAVADOC environment variable when running \`configure'.
 	***
-	*** Debian 4.0:	\`apt-get install gjdoc'
-	*** CentOS 5.x:	\`yum install gjdoc'
-	*** SLES 10:	\`zypper install java-1_5_0-ibm-devel'
-	*** RH 7.3:	\`rpm -i kaffe'
+	*** Debian 4.0:	 \`apt-get install gjdoc'
+	*** Ubuntu 8.04: \`apt-get install gjdoc'
+	*** CentOS 5.x:	 \`yum install gjdoc'
+	*** SLES 10:	 \`zypper install java-1_5_0-ibm-devel'
+	*** RH 7.3:	 \`rpm -i kaffe'
+	EOF
+	;;
+    (gcj-dbtool)
+	cat 1>&2 <<-EOF
+	*** You may have altered some Java files that need to create a classmap
+	*** corresponding database.  You need an appropriate version of the
+	*** \`gcj-dbtool' program to regenerate the classmap database.  You can
+	*** normally get \`gcj-dbtool' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On RPM based distributions, try 'yum install libgcj'
+	*** On DEB based distributions, try 'apt-get install gij'
+	*** On SuSE distributions, try 'zypper install libgcj'
+	***
+	*** Alternatively, you can specify an equivalent command with the
+	*** GCJDBTOOL environment variable when running \`configure'.
+	***
+	*** Debian 4.0:  \`apt-get install gij'
+	*** Ubuntu 8.04: \`apt-get install gij'
+	*** CentOS 5.x:  \`yum install libgcj'
+	*** SLES 10:     \`zypper install libgcj'
 	EOF
 	;;
     (*)
@@ -463,6 +490,9 @@ exit 0
 # =============================================================================
 #
 # $Log: missing4,v $
+# Revision 1.1.2.3  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.2  2009-06-29 07:35:34  brian
 # - improvements to build process
 #

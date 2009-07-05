@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:58 $ by $Author: brian $
+ Last Modified $Date: 2009-07-05 12:04:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 1.1.2.2  2009-07-05 12:04:28  brian
+ - updates for release builds
+
  Revision 1.1.2.1  2009-06-21 11:20:58  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $"
 
-static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $";
+static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -70,6 +73,10 @@ static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
+
+#ifndef KBUILD_MODNAME
+#define KBUILD_MODNAME KBUILD_BASENAME
+#endif
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -91,7 +98,7 @@ static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $"
 #define X100P_COPYRIGHT		"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

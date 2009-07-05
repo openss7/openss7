@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:53 $ by $Author: brian $
+ Last Modified $Date: 2009-07-05 12:04:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 1.1.2.2  2009-07-05 12:04:28  brian
+ - updates for release builds
+
  Revision 1.1.2.1  2009-06-21 11:20:53  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $"
 
-static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $";
+static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -77,6 +80,10 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2
 #define X400P_DOWNLOAD_FIRMWARE 1
 
 #include <sys/os7/compat.h>
+
+#ifndef KBUILD_MODNAME
+#define KBUILD_MODNAME KBUILD_BASENAME
+#endif
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -112,7 +119,7 @@ static char const ident[] = "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

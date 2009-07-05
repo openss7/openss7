@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: drafts.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: drafts.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -275,10 +275,13 @@ dnl    fi
 *** commands to obtain 'ghostscript':
 ***
 *** Debian 4.0:  'apt-get install gs-common'
-*** Ubuntu 8.04: 'apt-get install gs-common'
-*** RedHat 7.2:  'rpm -i ghostscript-6.52-9.5'
-*** CentOS 5.x:  'yum install ghostscipt'
+*** Ubuntu 8.04: 'apt-get install ghostscript'
+*** Fedora 7:    'yum install ghostscript'
+*** Fedora 9:    'yum install ghostscript'
+*** CentOS 5.x:  'yum install ghostscript'
+*** openSUSE 11: 'zypper install ghostscript-library'
 *** SLES 10:     'zypper install ghostscript-library'
+*** RedHat 7.2:  'rpm -i ghostscript-6.52-9.5'
 ***
 *** To get rid of this warning, load the 'ghostscript' package, specify the
 *** appropriate program with the PS2PDF environment variable to 'configure', or
@@ -374,6 +377,9 @@ AC_DEFUN([_DRAFTS_XXX], [dnl
 # =============================================================================
 #
 # $Log: drafts.m4,v $
+# Revision 1.1.2.3  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #

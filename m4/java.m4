@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: java.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: java.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -118,6 +118,24 @@ dnl
 	[$jar_tmp])
     if test :"${JAR:-no}" = :no ; then
 	JAR="${am_missing4_run}jar"
+	AC_MSG_WARN([
+***
+*** Configure cannot find a suitable 'jar' program.  Generating Java archives
+*** requires the 'jar' program.  You can normally get 'jar' as part of most
+*** popular GNU/Linux distributions and all current versions are acceptable.
+*** The 'jar' program has been available for many years.  'fastjar' is part of
+*** the GNU Compiler Collection.  You can also get 'jar' as part of any JDK.
+*** Use the following command to obtain 'fastjar':
+***
+*** Debian 4.0:	 'apt-get install fastjar'
+*** Ubuntu 8.04: 'apt-get install fastjar'
+*** CentOS 5.x:	 'yum install libgcj'
+*** SLES 10:	 'zypper install fastjar'
+*** RH 7.3:	 'rpm -i libgcj3'
+***
+*** To get rid of this warning, load the 'fastjar' package or specify the
+*** appropriate program with the JAR environment variable to 'configure'.
+*** ])
     fi
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
@@ -125,6 +143,13 @@ dnl
 	[$jar_tmp])
     if test :"${ZIP:-no}" = :no ; then
 	ZIP="${am_missing4_run}zip"
+	AC_MSG_WARN([
+***
+*** Configure cannot find a suitable 'zip' program.
+***
+*** To get rid of this warning, load the 'zip' program or specify the
+*** appropriate program with the ZIP enviornment variable to 'configure'.
+*** ])
     fi
     AC_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner], [${am_missing4_run}jarsigner], [$jar_tmp])
     AC_PATH_PROGS([KEYTOOL], [gkeytool keytool], [${am_missing4_run}keytool], [$jar_tmp])
@@ -164,6 +189,9 @@ AC_DEFUN([_JAVA_XXX], [dnl
 # =============================================================================
 #
 # $Log: java.m4,v $
+# Revision 1.1.2.3  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #

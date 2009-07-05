@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: info.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: info.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -152,7 +152,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** CTAN site.  Use the following to obtain 'tex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
+*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
@@ -180,7 +180,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** site.  Use the following to obtain 'tex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
+*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
@@ -207,7 +207,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** any GNU archive site.  Use the following commands to obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
-*** Ubuntu 8.04: 'apt-get install groff'
+*** Ubuntu 8.04: 'apt-get install groff-base'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
 ***
@@ -219,14 +219,14 @@ AC_DEFUN([_INFO_SETUP], [dnl
     fi
 dnl    AC_PATH_PROG([NROFF], [nroff], [], [$tmp_path])
 dnl    if test :"${NROFF:-no}" = :no ; then
-dnl	NROFF="${am_missing5_run}nroff"
+dnl	NROFF="${am_missing4_run}nroff"
 dnl	if test :$enable_texinfo != :no ; then
 dnl	    : # will attempt to emulate with groff
 dnl	fi
 dnl    fi
     AC_PATH_PROG([GROFF], [groff], [], [$tmp_path])
     if test :"${GROFF:-no}" = :no ; then
-	GROFF="${am_missing5_run}groff"
+	GROFF="${am_missing4_run}groff"
 	if test :$enable_texinfo != :no ; then
 	    disable_texinfo=yes
 	    AC_MSG_WARN([
@@ -240,7 +240,7 @@ dnl    fi
 *** 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
-*** Ubuntu 8.04: 'apt-get install groff'
+*** Ubuntu 8.04: 'apt-get install groff-base'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
 ***
@@ -353,7 +353,7 @@ dnl
 *** obtain 'tex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
+*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
@@ -425,6 +425,9 @@ AC_DEFUN([_INFO_XXX], [dnl
 # =============================================================================
 #
 # $Log: info.m4,v $
+# Revision 1.1.2.3  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #

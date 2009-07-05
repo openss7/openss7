@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-05 12:04:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -1045,24 +1045,24 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 			   scripts/rpm/find-provides \
 			   scripts/rpm/find-provides.d/firmware.prov \
 			   scripts/rpm/find-provides.d/modalias.prov \
+			   scripts/rpm/find-provides.java \
+			   scripts/rpm/find-provides.kmod \
 			   scripts/rpm/find-provides.ksyms \
 			   scripts/rpm/find-provides.libtool \
 			   scripts/rpm/find-provides.perl \
 			   scripts/rpm/find-provides.pkgconfig \
-			   scripts/rpm/find-provides.redhat \
 			   scripts/rpm/find-provides.so \
-			   scripts/rpm/find-provides.suse \
 			   scripts/rpm/find-prov.pl \
 			   scripts/rpm/find-req.pl \
 			   scripts/rpm/find-requires \
 			   scripts/rpm/find-requires.exe \
+			   scripts/rpm/find-requires.java \
+			   scripts/rpm/find-requires.kmod \
 			   scripts/rpm/find-requires.ksyms \
 			   scripts/rpm/find-requires.libtool \
 			   scripts/rpm/find-requires.perl \
 			   scripts/rpm/find-requires.pkgconfig \
-			   scripts/rpm/find-requires.redhat \
 			   scripts/rpm/find-requires.so \
-			   scripts/rpm/find-requires.suse \
 			   scripts/rpm/find-supplements \
 			   scripts/rpm/find-supplements.ksyms \
 			   scripts/rpm/get_magic.pl \
@@ -1073,12 +1073,15 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 			   scripts/rpm/perl.prov \
 			   scripts/rpm/perl.req \
 			   scripts/rpm/pythondeps.sh \
-			   scripts/rpm/symset-table \
 			   scripts/rpm/tcl.req
+
 
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.4  2009-07-05 12:04:26  brian
+## - updates for release builds
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

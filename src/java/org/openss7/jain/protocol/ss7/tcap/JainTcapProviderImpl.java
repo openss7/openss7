@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: JainTcapProviderImpl.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:36:37 $ <p>
+ @(#) $RCSfile: JainTcapProviderImpl.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:36:37 $ by $Author: brian $
+ Last Modified $Date: 2009-07-05 12:04:28 $ by $Author: brian $
  */
 
 package org.openss7.jain.protocol.ss7.tcap;
@@ -57,7 +57,7 @@ import jain.*;
   * @author Monavacon Limited
   * @version 1.2.2
   */
-public class JainTcapProviderImpl implements java.rmi.Remote, Runnable, JainTcapProvider {
+public class JainTcapProviderImpl implements Runnable, JainTcapProvider {
     protected JainTcapProviderImpl() {
     }
     public JainTcapProviderImpl(JainTcapStackImpl stack) {

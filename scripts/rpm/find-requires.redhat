@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "D: Executing: $0" >&2
+
 #
 # Auto-generate requirements for executables (both ELF and a.out) and library
 # sonames, script interpreters, and perl modules.
