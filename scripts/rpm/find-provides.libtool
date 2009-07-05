@@ -1,5 +1,8 @@
 #!/usr/bin/awk -f
 
+BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-provides.libtool" >"/dev/stderr"
+}
 /\.la$/ {
     file = $1
     first = 1
@@ -33,7 +36,7 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-provides.libtool,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 13:28:10 $
+# @(#) $RCSfile: find-provides.libtool,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:02:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -79,11 +82,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:02:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-provides.libtool,v $
+# Revision 1.1.2.3  2009-07-05 12:02:24  brian
+# - updated scripts
+#
 # Revision 1.1.2.2  2009-07-04 13:28:10  brian
 # - conversion to pure awk
 #

@@ -1,46 +1,55 @@
 #!/bin/bash
 
+echo "D: Executing: $0" >&2
+
 args=("$@")
 script=$(basename $0)
 where=`(cd $(dirname $0); pwd)`
 
 which_tool() {
     old_PATH="$PATH"
-    PATH="$PATH:$where:/usr/lib/rpm:/usr/lib/rpm/redhat"
+    PATH="$PATH:$where:/usr/lib/rpm/redhat:/usr/lib/rpm"
     which $1
     PATH="$old_PATH"
 }
-
-save_IFS="$IFS"
-IFS='
-'
-jarlist=($(cat))
-IFS="$save_IFS"
 
 tool=$(which_tool "javadeps")
 
 [ -n "$tool" -a -x "$tool" ] || { cat >/dev/null ; exit 0; }
 
-all_provides() {
-    for jar in "$@" ; do
-	unzip -p "$jar" | $tool --provides --rpmformat --keywords --starprov -- - | sort -b -u
-    done | sort -b -u
-}
+awk '
+    /\.(jar|war|zip)$/ {
+	file = $1
+	prov = "unzip -p " file " | " tool " --provides --rpmformat --keywords --starprov -- - 2>/dev/null"
+	while ((prov | getline line)) {
+	    provides[line] = 1
+	}
+	close(prov)
+	reqd = "unzip -p " file " | " tool " --requires --rpmformat --keywords -- - 2>/dev/null"
+	while ((reqd | getline line)) {
+	    requires[line] = 1
+	}
+	close(reqd)
+    }
+    END {
+	j = 1
+	for (r in requires) {
+	    if (provides[r])
+		continue
+	    indices[j] = r
+	    j++
+	}
+	n = asort(indices)
+	for (i = 1; i <= n; i++)
+	    print indices[i]
+    }
+' tool="$tool"
 
-all_requires() {
-    for jar in "$@" ; do
-	unzip -p "$jar" | $tool --requires --rpmformat --keywords -- - | sort -b -u
-    done | sort -b -u
-}
-
-# filter what we provide from what we require
-(join -v 2 \
-    <(all_provides "${jarlist[@]}") \
-    <(all_requires "${jarlist[@]}"))
+exit 0
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:51:40 $
+# @(#) $RCSfile: find-requires.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:02:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -86,11 +95,14 @@ all_requires() {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:40 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:02:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.java,v $
+# Revision 1.1.2.2  2009-07-05 12:02:24  brian
+# - updated scripts
+#
 # Revision 1.1.2.1  2009-07-04 03:51:40  brian
 # - updates for release
 #

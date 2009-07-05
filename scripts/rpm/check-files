@@ -1,92 +1,37 @@
-#!/bin/bash
+#!/usr/bin/awk -f
 
-# argument or environment variable, either is fine
-
-test $# -lt 1 -o :"$RPM_BUILD_ROOT" != : || RPM_BUILD_ROOT="$1"
-
-# in case somthing goes astray
-
-test -d "$RPM_BUILD_ROOT" || { cat >/dev/null; exit 1; }
-
-awk '
-    BEGIN { 
-	sub("/+$", "", RPM_BUILD_ROOT)
-	PACKAGE = 0; INSTALL = 0;
+BEGIN {
+    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    if (ARGC > 1 && ARGV[1]) {
+	RPM_BUILD_ROOT = ARGV[1]
+	delete ARGV[1]
     }
-    (FNR == 1) {
-	if (PACKAGE) { PACKAGE = 0; INSTALL = 1; }
-	else         { PACKAGE = 1; INSTALL = 0; }
+    sub(/\/+$/, "", RPM_BUILD_ROOT)
+    if (!RPM_BUILD_ROOT)
+	exit 1
+}
+{
+    packaged[substr($0, length(RPM_BUILD_ROOT) + 1)] = 1
+}
+END {
+    find = "find " RPM_BUILD_ROOT " -type f -o -type l 2>/dev/null"
+    j = 1
+    while ((find | getline line)) {
+	path = substr(line, length(RPM_BUILD_ROOT) + 1)
+	if (path in packaged)
+	    continue
+	unpackaged[j] = path
+	j++
     }
-    (PACKAGE) {
-	PACKAGED[substr($0, length(RPM_BUILD_ROOT) + 1)] = 1
-    }
-    (INSTALL) {
-	INSTALLED[substr($0, length(RPM_BUILD_ROOT) + 1)] = 1
-    }
-    END {
-	for (F in INSTALLED) {
-	    if (F in PACKAGED) {
-		continue
-	    }
-	    print F
-	}
-    }
-' RPM_BUILD_ROOT="$RPM_BUILD_ROOT" \
-<(cat) <(find "$RPM_BUILD_ROOT" -type f -o -type l)
-
-#
-# RPM calls this script and provides a list of packaged files on standard input.
-# The script checks the files in the build directory to see whether they have
-# all been packaged or not.  The script that ships with RPM is not so efficient.
-# It uses temporary files where none are needed.
-#
-# The output is indented 3 spaces to be compatible with previous versions of the
-# check-files script contained with rpm.
-#
-# This file is invoked from rpm by invoking from an rpm spec file (or
-# ~/.rpmmacros file) the following:
-#
-# %__check_files \
-# %{_builddir}/%{name}-%{version}/scripts/rpm/check-files %{buildroot}
-#
-# Setting the following to 1 will cause unpackaged files to terminate the
-# build.  When set to 0, warnings are still generated.
-#
-# %_unpackaged_files_terminate_build 1
-#
-
-# Following is a listing of the script that comes with RPM for reference:
-
-## #
-## # Gets file list on standard input and RPM_BUILD_ROOT as first parameter
-## # and searches for omitted files and symlinks (not counting directories).
-## # Returns it's output on standard output.
-## #
-## # filon@pld.org.pl
-## 
-## RPM_BUILD_ROOT=$1
-## 
-## if [ ! -d "$RPM_BUILD_ROOT" ] ; then
-## 	cat > /dev/null
-## 	exit 1
-## fi
-## 
-## [ "$TMPDIR" ] || TMPDIR=/tmp
-## FILES_DISK=`mktemp $TMPDIR/rpmXXXXXX`
-## FILES_RPM=`mktemp $TMPDIR/rpmXXXXXX`
-## 
-## find $RPM_BUILD_ROOT -type f -o -type l | LC_ALL=C sort > $FILES_DISK
-## LC_ALL=C sort > $FILES_RPM
-## 
-## for f in `diff -d "$FILES_DISK" "$FILES_RPM" | grep "^< " | cut -c3-`; do
-## 	echo $f | sed -e "s#^$RPM_BUILD_ROOT#   #g"
-## done
-## 
-## rm -f $FILES_DISK
+    close(find)
+    n = asort(unpackaged)
+    for (i = 1; i <= n; i++)
+	print unpackaged[i]
+}
 
 # =============================================================================
 #
-# @(#) $RCSfile: check-files,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-04 03:51:39 $
+# @(#) $RCSfile: check-files,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:02:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -132,13 +77,13 @@ awk '
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:39 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:02:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: check-files,v $
-# Revision 1.1.2.1  2009-07-04 03:51:39  brian
-# - updates for release
+# Revision 1.1.2.2  2009-07-05 12:02:24  brian
+# - updated scripts
 #
 # =============================================================================
-# vim: tw=0 sw=4 noet nocin nosi fo+=tcqlorn
+# vim: ft=awk tw=80 sw=4 fo+=tcqlorn

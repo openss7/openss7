@@ -1,55 +1,4 @@
 #!/bin/bash
-# =============================================================================
-#
-# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 13:28:10 $
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation; version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
-#
-# =============================================================================
 
 # This script reads from stdin and outputs any relevant information that need to
 # be included in the package.
@@ -64,7 +13,7 @@ where=`(cd $(dirname $0); pwd)`
 
 which_tool() {
     old_PATH="$PATH"
-    PATH="$PATH:$where:/usr/lib/rpm:/usr/lib/rpm/redhat"
+    PATH="$PATH:$where:/usr/lib/rpm/redhat:/usr/lib/rpm"
     which $1
     PATH="$old_PATH"
 }
@@ -137,10 +86,9 @@ remove_unprovided() {
 		print result[i]
 	    n = asort(unprovided)
 	    if (n) {
-		cat = "cat >&2"
-		print "Warning: unprovided capabilities:" | cat
+		print "W: Warning: unprovided requirements:" > "/dev/stderr"
 		for (i = 1; i <= n; i++)
-		    print "   " unprovided[i] | cat
+		    print "W:    " unprovided[i] > "/dev/stderr"
 	    }
 	}
     '
@@ -148,46 +96,85 @@ remove_unprovided() {
 
 searchlist=($where /usr/lib/rpm /usr/lib/rpm/redhat)
 
-# swallow the entire list, escaping quotes
-IFS=$'\n'
-filelist=($(grep -v '\.debug$'))
+exelist=()
+scriptlist=()
+solist=()
+libtoolist=()
+perllist=()
+pythonlist=()
+tcllist=()
+kmodlist=()
+jarlist=()
+pkgconfiglist=()
+executables=()
+others=()
 
-#classify files
-filetypes=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file))
+while read f ; do
+    case "$f" in
+	(*.la)
+	    libtoollist=("${libtoollist[@]}" "$f")
+	    continue
+	    ;;
+	(*.pm|*.pl|*.ph)
+	    perllist=("${perllist[@]}" "$f")
+	    continue
+	    ;;
+	(*.ko)
+	    kmodlist=("${kmodlist[@]}" "$f")
+	    continue
+	    ;;
+	(*.jar|*.zip|*.war)
+	    jarlist=("${jarlist[@]}" "$f")
+	    continue
+	    ;;
+	(*.pc)
+	    pkgconfiglist=("${pkgconfiglist[@]}" "$f")
+	    continue
+	    ;;
+	(*.py)
+	    pythonlist=("${pythonlist[@]}" "$f")
+	    continue
+	    ;;
+	(*.tcl)
+	    tcllist=("${tcllist[@]}" "$f")
+	    continue
+	    ;;
+	(*.so|*.so.*)
+	    solist=("${solist[@]}" "$f")
+	    continue
+	    ;;
+    esac
+    if [ -x "$f" ] ; then
+	executables=("${executables[@]}" "$f")
+    fi
+done
 
-exelist=($(printf "%s\n" "${filetypes[@]}" | \
+#classify executables
+echo "D: Building: exelist" >&2
+exelist=("${exelist[@]}" \
+	$(printf "%s\0" "${executables[@]}" | xargs -0 -r file | \
 	egrep -v ':.* (commands|script) ' | grep ':.*executable' | \
 	cut -d: -f1))
 
-scriptlist=($(printf "%s\n" "${filetypes[@]}" | \
+echo "D: Building: scriptlist" >&2
+scriptlist=("${scriptlist[@]}" \
+	$(printf "%s\0" "${executables[@]}" | xargs -0 -r file | \
 	egrep ':.* (commands|script) ' | \
 	cut -d: -f1))
 
-solist=($(printf "%s\n" "${filetypes[@]}" | \
+echo "D: Building: solist" >&2
+solist=("${solist[@]}" \
+	$(printf "%s\0" "${executables[@]}" | xargs -0 -r file | \
 	grep ':.*shared object' | \
 	cut -d: -f1))
-solist=($(printf "%s\0" "${filelist[@]}" | xargs -0 -r file -L | \
-	grep ':.*shared object' | cut -d: -f1))
 
-libtoollist=($(printf "%s\n" "${filelist[@]}" | grep '\.la$'))
-
-perllist=($(printf "%s\n" "${filelist[@]}" | egrep '\.(pm|pl|ph)$'))
-
-pythonlist=()
-
-tcllist=()
-
-ksymslist=($(printf "%s\n" "${filelist[@]}" | grep '\.ko$'))
-
-jarlist=($(printf "%s\n" "${filelist[@]}" | egrep '\.(jar|war|zip)$' | xargs -r file -L \
-	| grep ':.*Zip archive data' | cut -d: -f1))
 
 # # --- Executables.
 # if [ -n "$exelist" ] ; then
 #     tool=$(which_tool "find-requires.exe")
 #     if [ -n "$tool" -a -x "$tool" ] ; then
 # 	  printf "%s\n" "${solist[@]}" "${exelist[@]}" | \
-# 	  $tool "${args[@]}" | sort -u
+# 	  $tool "${args[@]}" | sort -bu
 #     fi
 # fi
 
@@ -195,8 +182,9 @@ jarlist=($(printf "%s\n" "${filelist[@]}" | egrep '\.(jar|war|zip)$' | xargs -r 
 if [ -n "$solist" -o -n "$exelist" ] ; then
     tool=$(which_tool "find-requires.so")
     if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${solist[@]}" "${exelist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | sort -bu
     fi
 fi
 
@@ -204,8 +192,9 @@ fi
 if [ -n "$libtoollist" ] ; then
     tool=$(which_tool "find-requires.libtool")
     if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${libtoollist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | remove_unprovided
     fi
 fi
 
@@ -249,15 +238,16 @@ if [ -n "$scriptlist" ] ; then
 		esac
 	    fi
 	fi
-    done
+    done | sort -bu
 fi
 
 # --- Perl modules.
 if [ -n "$perllist" ] ; then
     tool=$(which_tool "perl.req")
     if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${perllist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | sort -bu
     fi
 fi
 
@@ -265,8 +255,9 @@ fi
 if [ -n "$pythonlist" ] ; then
     tool=$(which_tool "python.req")
     if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${pythonlist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | sort -bu
     fi
 fi
 
@@ -274,31 +265,47 @@ fi
 if [ -n "$tcllist" ] ; then
     tool=$(which_tool "tcl.req")
     if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${tcllist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | sort -bu
+    fi
+fi
+
+# --- pkgconfig
+if [ -n "$pkgconfiglist" ] ; then
+    tool=$(which_tool "find-requires.pkgconfig")
+    if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${pkgconfiglist[@]}" | \
+	$tool "${args[@]}" | sort -u
     fi
 fi
 
 # --- Kernel module imported symbols.
-if [ -n "$ksymslist" ] ; then
-    tool=$(which_tool "find-requires.ksyms")
+if [ -n "$kmodlist" ] ; then
+    tool=$(which_tool "find-requires.kmod")
     if [ -n "$tool" -a -x "$tool" ] ; then
-	printf "%s\n" "${ksymslist[@]}" | \
+	echo "D: Executing: $tool" >&2
+	printf "%s\n" "${kmodlist[@]}" | \
 	$tool "${args[@]}"
-    fi | remove_unprovided
-    # we built them, so anything unprovided is a false positive
-    # this is necessary primarily for CentOS that messes up the
-    # kernel symbol sets
+    else
+	tool=$(which_tool "find-requires.ksyms")
+	if [ -n "$tool" -a -x "$tool" ] ; then
+	    echo "D: Executing: $tool" >&2
+	    printf "%s\n" "${kmodlist[@]}" | \
+	    $tool "${args[@]}" | remove_unprovided
+	fi
+    fi
 fi
 
 # -- Java jar files
-tool=$(which_tool "javadeps")
 if [ -n "$jarlist" ] ; then
     tool=$(which_tool "find-requires.java")
     if [ -n "$tool" -a -x "$tool" ] ; then
+	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${jarlist[@]}" | \
-	$tool "${args[@]}"
-    fi | remove_unprovided
+	$tool "${args[@]}" | remove_unprovided
+    fi
     # we built them, so anything unprovided is a false positive 
 fi
 
@@ -306,7 +313,60 @@ exit 0
 
 # =============================================================================
 #
+# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:02:24 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2009-07-05 12:02:24 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
 # $Log: find-requires,v $
+# Revision 1.1.2.4  2009-07-05 12:02:24  brian
+# - updated scripts
+#
 # Revision 1.1.2.3  2009-07-04 13:28:10  brian
 # - conversion to pure awk
 #

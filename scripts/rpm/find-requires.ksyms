@@ -4,6 +4,7 @@
 # required kernel sets and symbols on standard output
 
 BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-requires.ksyms" >"/dev/stderr"
     find = "find /boot /usr/src/kernels -type f -name 'symsets-*.tar.gz' 2>/dev/null"
     while ((find | getline file)) {
 	tar = "tar -tzf " file
@@ -95,7 +96,7 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.ksyms,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 13:28:10 $
+# @(#) $RCSfile: find-requires.ksyms,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:02:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -141,11 +142,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:02:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.ksyms,v $
+# Revision 1.1.2.4  2009-07-05 12:02:24  brian
+# - updated scripts
+#
 # Revision 1.1.2.3  2009-07-04 13:28:10  brian
 # - conversion to pure awk
 #
