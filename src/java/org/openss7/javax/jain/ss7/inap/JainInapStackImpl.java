@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: JainInapStackImpl.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:36:42 $ <p>
+ @(#) $RCSfile: JainInapStackImpl.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:31 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:36:42 $ by $Author: brian $
+ Last Modified $Date: 2009-07-05 12:04:31 $ by $Author: brian $
  */
 
 package org.openss7.javax.jain.ss7.inap;
@@ -72,7 +72,7 @@ import javax.jain.*;
   * {@link javax.jain.ss7.JainSS7Factory#setPathName()} method before
   * calling the createSS7Object method.
   */
-public class JainInapStackImpl implements java.rmi.Remote, JainInapStack {
+public class JainInapStackImpl implements JainInapStack {
     /**
       * Creates a new Peer (vendor specific) instance of the class
       * JainInapProviderImpl that is attached to this instance of

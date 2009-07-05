@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 #
-# @(#) $RCSfile: missing2,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-29 07:35:34 $
+# @(#) $RCSfile: missing2,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:34 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -215,7 +215,7 @@ case $program in
 	    exit 1
 	fi
 	;;
-    (latex|pslatex|pdflatex|bibtex|dvips|*)
+    (doxygen|latex|pslatex|pdflatex|bibtex|dvips|*)
 	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
 	    # it exists, but it failed.
 	    exit 1
@@ -237,12 +237,32 @@ cat 1>&2 <<-EOF
 	EOF
 
 case $program in
+    (doxygen)
+	cat 1>&2 <<-EOF
+	*** You may have altered some Doxygen source files that need to be
+	*** converted to documentation file.  You may need the \`Doxygen'
+	*** package to convert those source files to documentation files.  You
+	*** can normally get \`doxygen' as part of many popular Linux
+	*** distributions.  On RPM systems, try \`yum install doxygen'.  On DEB
+	*** systems, try \`apt-get install doxygen'.  On SuSE, try \`zypper
+	*** install doxygen'.  \`Doxygen' has been available for a number of
+	*** years: you can get \`Doxygen' from sourceforge.
+	***
+	*** Debian 4.0:  \`apt-get install doxygen'
+	*** Ubuntu 8.04: \`apt-get install doxygen'
+	*** Fedora 7:    \`yum install doxygen'
+	*** Fedora 9:    \`yum install doxygen'
+	*** CentOS 5.x:  \`yum install doxygen'
+	*** openSUSE 11: \`zypper install doxygen'
+	*** SLES 10:     \`configure --disable-docs'
+	EOF
+	;;
     (latex)
 	cat 1>&2 <<-EOF
 	*** You may have altered some LaTeX files that need to be converted to
 	*** DVI files.  You may need the \`Latex' package to convert those LaTeX
 	*** files to DVI files.  You can normally get \`Latex' as part of many
-	*** popular Linux Distributions.  On RPM systems, try \`yum install
+	*** popular Linux distributions.  On RPM systems, try \`yum install
 	*** tetex-latex'.  On DEB systems, try \`apt-get install tetex-base
 	*** tetex-bin'.  On SuSE, try \`zypper install texlive-bin-latex
 	*** texlive-latex'.  \`Latex' has been available for many years: you can
@@ -456,10 +476,13 @@ case $program in
 	*** years and is available on the web from a number of sources.
 	***
 	*** Debian 4.0:  \`apt-get install gs-common'
-	*** Ubuntu 8.04: \`apt-get install gs-common'
-	*** RedHat 7.2:  \`rpm -i ghostscript-6.52-9.5'
-	*** CentOS 5.x:  \`yum install ghostscipt'
+	*** Ubuntu 8.04: \`apt-get install ghostscript'
+	*** Fedora 7:    \`yum install ghostscript'
+	*** Fedora 9:    \`yum install ghostscript'
+	*** CentOS 5.x:  \`yum install ghostscript'
+	*** openSUSE 11: \`zypper install ghostscript-library'
 	*** SLES 10:     \`zypper install ghostscript-library'
+	*** RedHat 7.2:  \`rpm -i ghostscript-6.52-9.5'
 	EOF
 	;;
     (*)
@@ -476,6 +499,10 @@ esac
 # If PROGRAM does not exist, or fails to run (possibly an outdated version), try
 # to emulate PROGRAM.
 case $program in
+    (doxygen)
+	# way to complex to figure out which files to touch
+	exit 1
+	;;
     (latex)
 	# Calling latex on a file  with format %[.tex] should result in
 	# a file named %.dvi.  Therefore if the file %.dvi exists in the
@@ -768,6 +795,9 @@ exit 0
 # =============================================================================
 #
 # $Log: missing2,v $
+# Revision 1.1.2.4  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.3  2009-06-29 07:35:34  brian
 # - improvements to build process
 #

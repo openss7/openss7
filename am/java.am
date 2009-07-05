@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-05 12:04:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -223,7 +223,7 @@ $(PACKAGE)-$(VERSION).jar: classdist_java.stamp $(my_jar_CLASSFILES)
 ##
 install-jar:
 	list="$(my_jar_LINKS)"; for f in $$list ; do \
-		v=`echo $$f | sed 's,\.jar$$,$(VERSION).jar,'` ; \
+		v=`echo $$f | sed 's,\.jar$$,-$(VERSION).jar,'` ; \
 		$(ECHO) "(cd $(DESTDIR)$(jardir) ; ln -sf $$v $$f)" ; \
 		(cd $(DESTDIR)$(jardir) ; ln -sf $$v $$f) ; \
 	done
@@ -400,6 +400,9 @@ $(my_cxx_WRAPPERS): %_wrap.cxx : %.i
 ## =============================================================================
 ##
 ## $Log: java.am,v $
+## Revision 1.1.2.4  2009-07-05 12:04:26  brian
+## - updates for release builds
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -201,6 +201,18 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers_print=yes
 	    AC_MSG_WARN([
 *** 
+*** Configure cannot find a suitable 'bibtex' program.  Generating papers
+*** requires the 'bibtex' program from the 'tex' package.  You can normally get
+*** 'bibtex' as part of many popular GNU/Linux distributions and all current
+*** version are acceptable.  The 'tex' package has been available for many years
+*** and is available from any CTAN site.  Use the following command to obtain
+*** 'bibtex':
+***
+*** Debian 4.0:  'apt-get install tetex-bin'
+*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
+*** CentOS 5.x:  'yum install tetex'
+*** SLES 10:     'configure --disable-papers-print'
+***
 *** To get rid of this warning, load the 'tetex' package, specify the
 *** appropriate program with the BIBTEX environment variable to 'configure',
 *** or specify the --disable-papers-print option to 'configure'.
@@ -382,10 +394,10 @@ dnl
 *** obtain 'tex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
+*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
+*** CentOS 5.x:  'yum install texex-dvips'
 *** openSUSE 11: 'zypper install texlive-latex'
 *** SLES 10:     'configure --disable-papers-print'
 ***
@@ -456,6 +468,9 @@ AC_DEFUN([_PAPERS_XXX], [dnl
 # =============================================================================
 #
 # $Log: papers.m4,v $
+# Revision 1.1.2.3  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.2  2009-07-04 03:51:33  brian
 # - updates for release
 #

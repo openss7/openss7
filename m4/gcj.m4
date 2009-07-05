@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -463,16 +463,16 @@ dnl
     if test -z "$JAVAC"; then
 	AC_MSG_ERROR([
 ***
-*** Configure could not find the Java class compiler program
-*** 'javac' (nor 'gcj').  This program is part of the GNU
-*** Compiler Collection, but is not always loaded on recent
-*** distributions.  It is also part of most Java SDKs.
+*** Configure could not find the Java class compiler program 'javac'
+*** (nor 'gcj').  This program is part of the GNU Compiler Collection,
+*** but is not always loaded on recent distributions.  It is also part
+*** of most Java SDKs.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 ***
-*** Alternatively, you can specify an equivalent command with
-*** the JAVAC environment variable when rerunning configure.
+*** Alternatively, you can specify an equivalent command with the JAVAC
+*** environment variable when rerunning configure.
 ***])
     fi
 
@@ -491,20 +491,24 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find the GCJ database tool program
-*** 'gcj-dbtool'.  This program is part of the GNU Compiler
-*** Collection, but is not always loaded on recent
-*** distributions.  Also, older versions of libgcj, such as that
-*** distributed with GCC version 2 and early version 3, do not
-*** have this tool.  The first clue to this is that GCJ does not
-*** support the -indirect-dispatch flag.
+*** Configure could not find a suitable GCJ database tool program, 'gcj-dbtool'.
+*** This program is part of the GNU Compiler Collection, but is not always
+*** loaded on recent distributions.  Also, older versions of libgcj, such as
+*** that distributed with GCC version 2 and early version 3, do not have this
+*** tool.  The first clue to this is that GCJ does not support the
+*** -indirect-dispatch flag.
 ***
-*** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
-*** On SUSE distributions, try 'zypper install gcc-java'.
+*** On RPM based distributions, try 'yum install libgcj'.
+*** On DEB based distributions, try 'apt-get install gij'.
+*** On SuSE distributions, try 'zypper install libgcj'.
 ***
-*** Alternatively, you can specify an equivalent command with
-*** the GCJDBTOOL environment variable when running configure.
+*** Alternatively, you can specify an equivalent command with the GCJDBTOOL
+*** environment variable when running configure.
+***
+*** Debian 4.0:  'apt-get install gij'
+*** Ubuntu 8.04: 'apt-get install gij'
+*** CentOS 5.x:  'yum install libgcj'
+*** SLES 10:     'zypper install libgcj'
 ***])
 	fi
     fi
@@ -529,17 +533,22 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find the GNU Java Compiler CNI header
-*** generation command, 'gcjh'.  This program is part of the GNU
-*** Compiler Collection, but is not always loaded on recent
-*** distributions.
+*** Configure could not find the GNU Java Compiler CNI header generation
+*** command, 'gcjh'.  This program is part of the GNU Compiler Collection, but
+*** is not always loaded on recent distributions.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE distributions, try 'zypper install gcc-java'.
 ***
-*** Alternatively, you can specify an equivalent command with
-*** the GCJH environment variable when running configure.
+*** Alternatively, you can specify an equivalent command with the GCJH
+*** environment variable when running configure.
+***
+*** Debian 4.0:	 'apt-get install gcj'
+*** Ubuntu 8.04: 'apt-get install gcj'
+*** CentOS 5.x:	 'yum install gcc-java'
+*** SLES 10:	 'zypper install gcc-java'
+*** RH 7.3:	 'rpm -i gcc-java'
 ***])
 	fi
     fi
@@ -564,17 +573,22 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find the Java JNI header generation
-*** program 'javah' (nor 'gcjh').  This program is part of the
-*** GNU Compiler Collection, but is not always loaded on recent
-*** distributions.  It is also part of most Java SDKs.
+*** Configure could not find the Java JNI header generation program 'javah' (nor
+*** 'gcjh').  This program is part of the GNU Compiler Collection, but is not
+*** always loaded on recent distributions.  It is also part of most Java SDKs.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE distributions, try 'zypper install gcc-java'.
 ***
-*** Alternatively, you can specify an equivalent command with
-*** the JAVAH environment variable when running configure.
+*** Alternatively, you can specify an equivalent command with the JAVAH
+*** environment variable when running configure.
+***
+*** Debian 4.0:	 'apt-get install gcj'
+*** Ubuntu 8.04: 'apt-get install gcj'
+*** CentOS 5.x:	 'yum install gcc-java'
+*** SLES 10:	 'zypper install gcc-java'
+*** RH 7.3:	 'rpm -i gcc-java'
 ***])
 	fi
     fi
@@ -598,17 +612,22 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find the Java documentation program
-*** 'javadoc' (nor 'gjdoc').  This program is part of the
-*** GNU Compiler Colleciton, but is not always loaded on
-*** recent distributions.  It is also part of most Java SDKs.
+*** Configure could not find the Java documentation program 'javadoc' (nor
+*** 'gjdoc').  This program is part of the GNU Compiler Colleciton, but is not
+*** always loaded on recent distributions.  It is also part of most Java SDKs.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE, try 'zypper install jdk-1_5_0-ibm-devel'.
 ***
-*** Alternatively, you can specify an equivalent command with
-*** the JAVADOC environment variable when running configure.
+*** Alternatively, you can specify an equivalent command with the JAVADOC
+*** environment variable when running configure.
+***
+*** Debian 4.0:	 'apt-get install gjdoc'
+*** Ubuntu 8.04: 'apt-get install gjdoc'
+*** CentOS 5.x:	 'yum install gjdoc'
+*** SLES 10:	 'zypper install java-1_5_0-ibm-devel'
+*** RH 7.3:	 'rpm -i kaffe'
 ***])
 	fi
     fi
@@ -698,6 +717,9 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 #
 # $Log: gcj.m4,v $
+# Revision 1.1.2.4  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.3  2009-07-04 03:51:33  brian
 # - updates for release
 #

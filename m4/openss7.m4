@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -946,33 +946,6 @@ AC_DEFUN([_OPENSS7_MISSING2], [dnl
 	am_missing2_run=
 	AC_MSG_WARN(['missing2' script is too old or missing])
     fi
-dnl    os7_tmp="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin";
-dnl    AC_ARG_VAR([LATEX], [Latex command. @<:@default=latex@:>@])
-dnl    AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex], [$os7_tmp])
-dnl    AC_ARG_VAR([PSLATEX], [PS Latex command. @<:@default=pslatex@:>@])
-dnl    AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex], [$os7_tmp])
-dnl    AC_ARG_VAR([PDFLATEX], [PDF Latex command. @<:@default=pdflatex@:>@])
-dnl    AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex], [$os7_tmp])
-dnl    AC_ARG_VAR([BIBTEX], [BibTeX command. @<:@default=bibtex@:>@])
-dnl    AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex], [$os7_tmp])
-dnl    AC_ARG_VAR([LATEX2HTML], [LaTeX to HTML command. @<:@default=latex2html@:>@])
-dnl    AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html], [$os7_tmp])
-dnl    AC_ARG_VAR([DVI2PS], [DVI to PS command. @<:@default=dvips@:>@])
-dnl    AC_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$os7_tmp])
-dnl    AC_ARG_VAR([DVIPDF], [DVI to PDF command. @<:@default=dvipdf@:>@])
-dnl    AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf], [$os7_tmp])
-dnl    AC_ARG_VAR([GNUPLOT], [GNU plot command. @<:@default=gnuplot@:>@])
-dnl    AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot], [$os7_tmp])
-dnl    AC_ARG_VAR([FIG2DEV], [Fig to graphics format command. @<:@default=fig2dev@:>@])
-dnl    AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$os7_tmp])
-dnl    AC_ARG_VAR([CONVERT], [Graphics format conversion command. @<:@default=convert@:>@])
-dnl    AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$os7_tmp])
-dnl    AC_ARG_VAR([PS2EPSI], [PS to EPSI conversion command. @<:@default=ps2epsi@:>@])
-dnl    AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$os7_tmp])
-dnl    AC_ARG_VAR([EPSTOPDF], [EPS to PDF conversion command. @<:@default=epstopdf@:>@])
-dnl    AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$os7_tmp])
-dnl    AC_ARG_VAR([PS2PDF], [PS to PDF conversion command @<:@default=ps2pdf12@:>@])
-dnl    AC_PATH_PROGS([PS2PDF], [ps2pdf12 ps2pdf13 ps2pdf14 ps2pdf ps2pdfwr], [${am_missing2_run}ps2pdf], [$os7_tmp])
 ])# _OPENSS7_MISSING2
 # =============================================================================
 
@@ -987,19 +960,6 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 	am_missing3_run=
 	AC_MSG_WARN(['missing3' script is too old or missing])
     fi
-dnl    AC_ARG_ENABLE([repo-tar],
-dnl	AS_HELP_STRING([--disable-repo-tar],
-dnl	    [disable tar repo construction.  @<:@default=auto@:>@]),
-dnl	[enable_repo_tar="$enableval"],
-dnl	[enable_repo_tar=yes])
-dnl    os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-dnl    AC_ARG_VAR([MD5SUM], [MD5 sum command. @<:@default=md5sum@:>@])
-dnl    AC_PATH_PROG([MD5SUM], [md5sum], [${am_missing3_run}md5sum], [$os7_tmp])
-dnl    AC_ARG_VAR([SHA1SUM], [SHA1 sum command. @<:@default=sha1sum@:>@])
-dnl    AC_PATH_PROG([SHA1SUM], [sha1sum], [${am_missing3_run}sha1sum], [$os7_tmp])
-dnl    AC_ARG_VAR([SHA256SUM], [SHA256 sum command. @<:@default=sha256sum@:>@])
-dnl    AC_PATH_PROG([SHA256SUM], [sha256sum], [${am_missing3_run}sha256sum], [$os7_tmp])
-dnl    AM_CONDITIONAL([BUILD_REPO_TAR], [test ":$enable_repo_tar" = :yes])dnl
 ])# _OPENSS7_MISSING3
 # =============================================================================
 
@@ -1039,6 +999,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.3  2009-07-05 12:04:27  brian
+# - updates for release builds
+#
 # Revision 1.1.2.2  2009-06-29 07:35:38  brian
 # - improvements to build process
 #
