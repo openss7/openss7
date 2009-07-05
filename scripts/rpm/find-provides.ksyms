@@ -3,6 +3,9 @@
 # feed kernel module filenames in on standard input,
 # provided kernel symbols output on standard output
 
+BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-provides.ksyms" >"/dev/stderr"
+}
 /\.ko$/ {
     command = "objdump -t " $1 " 2>/dev/null"
     while ((command | getline) > 0) {
@@ -28,7 +31,7 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-provides.ksyms,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 13:28:10 $
+# @(#) $RCSfile: find-provides.ksyms,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:02:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -74,11 +77,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 13:28:10 $ by $Author: brian $
+# Last Modified $Date: 2009-07-05 12:02:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-provides.ksyms,v $
+# Revision 1.1.2.4  2009-07-05 12:02:24  brian
+# - updated scripts
+#
 # Revision 1.1.2.3  2009-07-04 13:28:10  brian
 # - conversion to pure awk
 #
