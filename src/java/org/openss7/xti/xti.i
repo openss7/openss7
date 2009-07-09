@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:36:50 $
+ @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-09 12:05:16 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:36:50 $ by $Author: brian $
+ Last Modified $Date: 2009-07-09 12:05:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti.i,v $
+ Revision 1.1.2.2  2009-07-09 12:05:16  brian
+ - updated implementation
+
  Revision 1.1.2.1  2009-06-21 11:36:50  brian
  - added files to new distro
 
@@ -80,7 +83,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef HAV_SYS_IOCTL_H
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
 #include <sys/stropts.h>
