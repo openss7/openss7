@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+all: streams
+
+streams: streams_wrap.c
+
+.PRECIOUS: makeswig
+
+streams_wrap.cxx: streams.i makeswig
+	swig -c++ -java -I../../../../include/ -package org.openss7.streams streams.i
+
+
+streams_wrap.c: streams.i makeswig
+	swig -java -I../../../../include/ -package org.openss7.streams streams.i
+
+clean:
+	rm -f *.java
+	rm -f streams_wrap.c
+	rm -f streams_wrap.cxx
+
+.PHONY: clean all streams
+
