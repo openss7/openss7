@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-09 12:05:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-09 12:05:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,10 @@ include ../../am/openss7.am
 ## Java rules
 ##
 include ../../am/java.am
+
+## accumulate for swig.am
+java_c_MODULES		=
+java_cxx_MODULES	=
 
 javadoc_GROUPS += \
 	-group "Base Jain API Packages" jain:javax.jain \
@@ -268,7 +272,7 @@ EXTRA_javadoc_PACKAGES = \
 # These are simple jars and their compiled equivalents.
 #############################################################################
 
-my_jain_isup_JAVAFILES = \
+my_javax_jain_JAVAFILES = \
 	javax/jain/CreateProviderException.java \
 	javax/jain/DeleteProviderException.java \
 	javax/jain/IDNotAvailableException.java \
@@ -276,6 +280,7 @@ my_jain_isup_JAVAFILES = \
 	javax/jain/InvalidArgumentException.java \
 	javax/jain/InvalidPathNameException.java \
 	javax/jain/InvalidStateException.java \
+	javax/jain/JainEvent.java \
 	javax/jain/JainException.java \
 	javax/jain/ListenerAlreadyRegisteredException.java \
 	javax/jain/ListenerNotRegisteredException.java \
@@ -284,6 +289,251 @@ my_jain_isup_JAVAFILES = \
 	javax/jain/ParameterNotSetException.java \
 	javax/jain/PeerUnavailableException.java \
 	javax/jain/PlatformException.java \
+	javax/jain/VersionNotSupportedException.java
+my_javax_jain_CLASSFILES = \
+	$(my_javax_jain_JAVAFILES:%.java=%.class)
+
+MY_SECONDARY	+= $(my_javax_jain_CLASSFILES)
+if PKG_BUILD_ARCH
+my_jar_LINKS	+= javax-jain.jar
+ALL_LOCAL	+= javax-jain.jar
+jar_DATA	+= javax-jain-$(VERSION).jar
+endif
+
+javax-jain-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_CLASSFILES)
+	$(AM_V_GEN)d='javax/jain -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
+
+clean-javax_jain:
+	@d='javax/jain -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-jain.jar
+	rm -f -- javax-jain-$(VERSION).jar
+	rm -f -- lib-javax-jain.jar.db
+
+CLEAN_LOCAL += clean-javax_jain
+
+nodist_lib_javax_jain_jar_la_SOURCES	= javax-jain.jar
+lib_javax_jain_jar_la_LIBADD		=
+lib_javax_jain_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jain_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+
+if PKG_BUILD_ARCH
+gcjlib_LTLIBRARIES	+= lib-javax-jain.jar.la
+gcjlib_DATA		+= lib-javax-jain.jar.db
+ALL_LOCAL		+= lib-javax-jain.jar.db
+endif
+
+my_javax_jain_ss7_JAVAFILES = \
+	javax/jain/ss7/EncodingScheme.java \
+	javax/jain/ss7/GlobalTitle.java \
+	javax/jain/ss7/GTIndicator0001.java \
+	javax/jain/ss7/GTIndicator0010.java \
+	javax/jain/ss7/GTIndicator0011.java \
+	javax/jain/ss7/GTIndicator0100.java \
+	javax/jain/ss7/GTIndicator.java \
+	javax/jain/ss7/JainSS7Factory.java \
+	javax/jain/ss7/JainSS7Utility.java \
+	javax/jain/ss7/NAddressIndicator.java \
+	javax/jain/ss7/NetworkIndicator.java \
+	javax/jain/ss7/NumberingPlan.java \
+	javax/jain/ss7/RoutingIndicator.java \
+	javax/jain/ss7/SccpUserAddress.java \
+	javax/jain/ss7/SignalingPointCode.java \
+	javax/jain/ss7/SPCFormat.java \
+	javax/jain/ss7/SS7Address.java \
+	javax/jain/ss7/SubSystemAddress.java
+my_javax_jain_ss7_CLASSFILES = \
+	$(my_javax_jain_ss7_JAVAFILES:%.java=%.class)
+
+MY_SECONDARY += $(my_javax_jain_ss7_CLASSFILES)
+if PKG_BUILD_ARCH
+my_jar_LINKS += javax-jain-ss7.jar
+ALL_LOCAL += javax-jain-ss7.jar
+jar_DATA += javax-jain-ss7-$(VERSION).jar
+endif
+
+javax-jain-ss7-$(VERSION).jar: classdist_java.stamp javax-jain.jar $(my_javax_jain_ss7_CLASSFILES)
+	$(AM_V_GEN)d='javax/jain/ss7 -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
+
+clean-javax_jain_ss7:
+	@d='javax/jain/ss7 -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-jain-ss7.jar javax-jain-ss7-$(VERSION).jar
+	rm -f -- lib-javax-jain-ss7.jar.db
+
+CLEAN_LOCAL += clean-javax_jain_ss7
+
+nodist_lib_javax_jain_ss7_jar_la_SOURCES	= javax-jain-ss7.jar
+lib_javax_jain_ss7_jar_la_LIBADD		=
+lib_javax_jain_ss7_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jain_ss7_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+
+if PKG_BUILD_ARCH
+gcjlib_LTLIBRARIES	+= lib-javax-jain-ss7.jar.la
+gcjlib_DATA		+= lib-javax-jain-ss7.jar.db
+ALL_LOCAL		+= lib-javax-jain-ss7.jar.db
+endif
+
+my_javax_jain_protocol_ss7_JAVAFILES = \
+	javax/jain/protocol/ss7/E164Number.java \
+	javax/jain/protocol/ss7/JainSS7Factory.java \
+	javax/jain/protocol/ss7/JainSS7Utility.java \
+	javax/jain/protocol/ss7/SS7Address.java \
+	javax/jain/protocol/ss7/SS7Exception.java \
+	javax/jain/protocol/ss7/SS7InvalidParamException.java \
+	javax/jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.java \
+	javax/jain/protocol/ss7/SS7ListenerNotRegisteredException.java \
+	javax/jain/protocol/ss7/SS7MandatoryParameterNotSetException.java \
+	javax/jain/protocol/ss7/SS7Number.java \
+	javax/jain/protocol/ss7/SS7Parameter.java \
+	javax/jain/protocol/ss7/SS7ParameterNotSetException.java \
+	javax/jain/protocol/ss7/SS7PeerUnavailableException.java
+my_javax_jain_protocol_ss7_CLASSFILES = \
+	$(my_javax_jain_protocol_ss7_JAVAFILES:%.java=%.class)
+
+MY_SECONDARY	+= $(my_javax_jain_protocol_ss7_CLASSFILES)
+if PKG_BUILD_ARCH
+my_jar_LINKS	+= javax-jain-protocol-ss7.jar
+ALL_LOCAL	+= javax-jain-protocol-ss7.jar
+jar_DATA	+= javax-jain-protocol-ss7-$(VERSION).jar
+endif
+
+javax-jain-protocol-ss7-$(VERSION).jar: classdist_java.stamp javax-jain.jar $(my_javax_jain_protocol_ss7_CLASSFILES)
+	$(AM_V_GEN)d='javax/jain/protocol/ss7 -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
+
+clean-javax_jain_protocol_ss7:
+	@d='javax/jain/protocol/ss7 -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-jain-protocol-ss7.jar
+	rm -f -- javax-jain-protocol-ss7-$(VERSION).jar
+	rm -f -- lib-javax-jain-protocol-ss7.jar.db
+
+CLEAN_LOCAL	+= clean-javax_jain_protocol_ss7
+
+nodist_lib_javax_jain_protocol_ss7_jar_la_SOURCES	= javax-jain-protocol-ss7.jar
+lib_javax_jain_protocol_ss7_jar_la_LIBADD		=
+lib_javax_jain_protocol_ss7_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_javax_jain_protocol_ss7_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+
+if PKG_BUILD_ARCH
+gcjlib_LTLIBRARIES	+= lib-javax-jain-protocol-ss7.jar.la
+gcjlib_DATA		+= lib-javax-jain-protocol-ss7.jar.db
+ALL_LOCAL		+= lib-javax-jain-protocol-ss7.jar.db
+endif
+
+## -----------------------------------------------------------------------------
+
+my_jain_JAVAFILES = \
+	jain/CreateProviderException.java \
+	jain/DeleteProviderException.java \
+	jain/InvalidAddressException.java \
+	jain/InvalidArgumentException.java \
+	jain/InvalidPathNameException.java \
+	jain/JainException.java \
+	jain/ListenerAlreadyRegisteredException.java \
+	jain/ListenerNotRegisteredException.java \
+	jain/MandatoryParameterNotSetException.java \
+	jain/MethodNotSupportedException.java \
+	jain/ParameterNotSetException.java \
+	jain/PeerUnavailableException.java \
+	jain/PlatformException.java
+my_jain_CLASSFILES = \
+	$(my_jain_JAVAFILES:%.java=%.class)
+
+MY_SECONDARY	+= $(my_jain_CLASSFILES)
+if PKG_BUILD_ARCH
+my_jar_LINKS	+= jain.jar
+ALL_LOCAL	+= jain.jar
+jar_DATA	+= jain-$(VERSION).jar
+endif
+
+jain-$(VERSION).jar: classdist_java.stamp $(my_jain_CLASSFILES)
+	$(AM_V_GEN)d='jain -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
+
+clean-jain:
+	@d='jain -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- jain.jar
+	rm -f -- jain-$(VERSION).jar
+	rm -f -- lib-jain.jar.db
+
+CLEAN_LOCAL	+= clean-jain
+
+nodist_lib_jain_jar_la_SOURCES	= jain.jar
+lib_jain_jar_la_LIBADD		=
+lib_jain_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_jain_jar_la_GCJFLAGS	= $(AM_GCJFLAGS) $(CNIFLAGS)
+
+if PKG_BUILD_ARCH
+gcjlib_LTLIBRARIES	+= lib-jain.jar.la
+gcjlib_DATA		+= lib-jain.jar.db
+ALL_LOCAL		+= lib-jain.jar.db
+endif
+
+## -----------------------------------------------------------------------------
+
+my_jain_protocol_ss7_JAVAFILES = \
+	jain/protocol/ss7/AddressConstants.java \
+	jain/protocol/ss7/GlobalTitle.java \
+	jain/protocol/ss7/GTIndicator0001.java \
+	jain/protocol/ss7/GTIndicator0010.java \
+	jain/protocol/ss7/GTIndicator0011.java \
+	jain/protocol/ss7/GTIndicator0100.java \
+	jain/protocol/ss7/IdNotAvailableException.java \
+	jain/protocol/ss7/JainSS7Factory.java \
+	jain/protocol/ss7/JainSS7Utility.java \
+	jain/protocol/ss7/SccpUserAddress.java \
+	jain/protocol/ss7/SignalingPointCode.java \
+	jain/protocol/ss7/SS7Address.java \
+	jain/protocol/ss7/SS7Exception.java \
+	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.java \
+	jain/protocol/ss7/SS7ListenerNotRegisteredException.java \
+	jain/protocol/ss7/SS7PeerUnavailableException.java \
+	jain/protocol/ss7/SubSystemAddress.java \
+	jain/protocol/ss7/UserAddressEmptyException.java \
+	jain/protocol/ss7/UserAddressLimitException.java \
+	jain/protocol/ss7/VersionNotSupportedException.java
+my_jain_protocol_ss7_CLASSFILES = \
+	$(my_jain_protocol_ss7_JAVAFILES:%.java=%.class)
+
+MY_SECONDARY	+= $(my_jain_protocol_ss7_CLASSFILES)
+if PKG_BUILD_ARCH
+my_jar_LINKS	+= jain-protocol-ss7.jar
+ALL_LOCAL	+= jain-protocol-ss7.jar
+jar_DATA	+= jain-protocol-ss7-$(VERSION).jar
+endif
+
+jain-protocol-ss7-$(VERSION).jar: classdist_java.stamp jain.jar $(my_jain_protocol_ss7_CLASSFILES)
+	$(AM_V_GEN)d='jain/protocol/ss7 -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
+
+clean-jain_protocol_ss7:
+	@d='jain/protocol/ss7 -maxdepth 1' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- jain-protocol-ss7.jar
+	rm -f -- jain-protocol-ss7-$(VERSION).jar
+	rm -f -- lib-jain-protocol-ss7.jar.db
+
+CLEAN_LOCAL += clean-jain_protocol_ss7
+
+nodist_lib_jain_protocol_ss7_jar_la_SOURCES	= jain-protocol-ss7.jar
+lib_jain_protocol_ss7_jar_la_LIBADD		=
+lib_jain_protocol_ss7_jar_la_LDFLAGS		= -module -avoid-version -shared
+lib_jain_protocol_ss7_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
+
+if PKG_BUILD_ARCH
+gcjlib_LTLIBRARIES	+= lib-jain-protocol-ss7.jar.la
+gcjlib_DATA		+= lib-jain-protocol-ss7.jar.db
+ALL_LOCAL		+= lib-jain-protocol-ss7.jar.db
+endif
+
+## -----------------------------------------------------------------------------
+
+my_javax_jain_ss7_isup_JAVAFILES = \
 	javax/jain/ss7/isup/AlertEvent.java \
 	javax/jain/ss7/isup/ansi/AlertAnsiEvent.java \
 	javax/jain/ss7/isup/ansi/AnswerAnsiEvent.java \
@@ -421,208 +671,38 @@ my_jain_isup_JAVAFILES = \
 	javax/jain/ss7/isup/UserServiceInfoCommon.java \
 	javax/jain/ss7/isup/UserServiceInfo.java \
 	javax/jain/ss7/isup/UserServiceInfoPrime.java \
-	javax/jain/ss7/isup/UserToUserIndicators.java \
-	javax/jain/ss7/JainSS7Factory.java \
-	javax/jain/ss7/JainSS7Utility.java \
-	javax/jain/ss7/NetworkIndicator.java \
-	javax/jain/ss7/SignalingPointCode.java \
-	javax/jain/ss7/SPCFormat.java \
-	javax/jain/ss7/SS7Address.java \
-	javax/jain/VersionNotSupportedException.java
-
+	javax/jain/ss7/isup/UserToUserIndicators.java
 my_javax_jain_ss7_isup_CLASSFILES = \
-	javax/jain/CreateProviderException.class \
-	javax/jain/DeleteProviderException.class \
-	javax/jain/IDNotAvailableException.class \
-	javax/jain/InvalidAddressException.class \
-	javax/jain/InvalidArgumentException.class \
-	javax/jain/InvalidPathNameException.class \
-	javax/jain/InvalidStateException.class \
-	javax/jain/JainException.class \
-	javax/jain/ListenerAlreadyRegisteredException.class \
-	javax/jain/ListenerNotRegisteredException.class \
-	javax/jain/MandatoryParameterNotSetException.class \
-	javax/jain/MethodNotSupportedException.class \
-	javax/jain/ParameterNotSetException.class \
-	javax/jain/PeerUnavailableException.class \
-	javax/jain/PlatformException.class \
-	javax/jain/ss7/isup/AlertEvent.class \
-	javax/jain/ss7/isup/ansi/AlertAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/AnswerAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/BusinessGroupAnsi.class \
-	javax/jain/ss7/isup/ansi/BwdCallIndAnsi.class \
-	javax/jain/ss7/isup/ansi/CallProgressAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/CarrierIdAnsi.class \
-	javax/jain/ss7/isup/ansi/ChargeNumberAnsi.class \
-	javax/jain/ss7/isup/ansi/CircuitAssignMapAnsi.class \
-	javax/jain/ss7/isup/ansi/CircuitGrpCharacteristicsIndAnsi.class \
-	javax/jain/ss7/isup/ansi/CircuitGrpResetAckAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/CircuitGrpResetAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/CircuitIdNameAnsi.class \
-	javax/jain/ss7/isup/ansi/CircuitReservationAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/CircuitValidationRespAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/CircuitValidationRespIndAnsi.class \
-	javax/jain/ss7/isup/ansi/CommonLangLocationIdAnsi.class \
-	javax/jain/ss7/isup/ansi/ExitAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/FwdCallIndAnsi.class \
-	javax/jain/ss7/isup/ansi/GenericNameAnsi.class \
-	javax/jain/ss7/isup/ansi/InfoIndAnsi.class \
-	javax/jain/ss7/isup/ansi/InfoReqIndAnsi.class \
-	javax/jain/ss7/isup/ansi/InformationAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/InformationReqAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/OperatorServicesInfoAnsi.class \
-	javax/jain/ss7/isup/ansi/OptionalBwdCallIndAnsi.class \
-	javax/jain/ss7/isup/ansi/ReleaseAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/SetupAnsiEvent.class \
-	javax/jain/ss7/isup/ansi/TransactionReqAnsi.class \
-	javax/jain/ss7/isup/ansi/TransitNwSelAnsi.class \
-	javax/jain/ss7/isup/AnswerEvent.class \
-	javax/jain/ss7/isup/BwdCallInd.class \
-	javax/jain/ss7/isup/CalledPartyNumber.class \
-	javax/jain/ss7/isup/CallFailureIndEvent.class \
-	javax/jain/ss7/isup/CallingPartyNumber.class \
-	javax/jain/ss7/isup/CallProgressEvent.class \
-	javax/jain/ss7/isup/CallReference.class \
-	javax/jain/ss7/isup/CauseInd.class \
-	javax/jain/ss7/isup/CircuitGrpCommonEvent.class \
-	javax/jain/ss7/isup/CircuitGrpMaintenanceEvent.class \
-	javax/jain/ss7/isup/CircuitGrpQueryEvent.class \
-	javax/jain/ss7/isup/CircuitGrpQueryRespEvent.class \
-	javax/jain/ss7/isup/CircuitGrpResetAckEvent.class \
-	javax/jain/ss7/isup/CircuitGrpResetEvent.class \
-	javax/jain/ss7/isup/CircuitMaintenanceEvent.class \
-	javax/jain/ss7/isup/ConfusionEvent.class \
-	javax/jain/ss7/isup/ConReq.class \
-	javax/jain/ss7/isup/ContinuityEvent.class \
-	javax/jain/ss7/isup/EventInformation.class \
-	javax/jain/ss7/isup/FacilityEvent.class \
-	javax/jain/ss7/isup/ForwardTransferEvent.class \
-	javax/jain/ss7/isup/FwdCallInd.class \
-	javax/jain/ss7/isup/GenericDigits.class \
-	javax/jain/ss7/isup/GenericNumber.class \
-	javax/jain/ss7/isup/InfoInd.class \
-	javax/jain/ss7/isup/InfoReqInd.class \
-	javax/jain/ss7/isup/InformationEvent.class \
-	javax/jain/ss7/isup/InformationReqEvent.class \
-	javax/jain/ss7/isup/InvalidListenerException.class \
-	javax/jain/ss7/isup/IsupConstants.class \
-	javax/jain/ss7/isup/IsupErrorIndEvent.class \
-	javax/jain/ss7/isup/IsupEvent.class \
-	javax/jain/ss7/isup/IsupException.class \
-	javax/jain/ss7/isup/IsupParameter.class \
-	javax/jain/ss7/isup/IsupUserAddress.class \
-	javax/jain/ss7/isup/itu/AlertItuEvent.class \
-	javax/jain/ss7/isup/itu/AnswerItuEvent.class \
-	javax/jain/ss7/isup/itu/BwdCallIndItu.class \
-	javax/jain/ss7/isup/itu/CallDiversionInfoItu.class \
-	javax/jain/ss7/isup/itu/CalledPartyNumberItu.class \
-	javax/jain/ss7/isup/itu/CallingPartyNumberItu.class \
-	javax/jain/ss7/isup/itu/CallProgressItuEvent.class \
-	javax/jain/ss7/isup/itu/ConnectedNumberItu.class \
-	javax/jain/ss7/isup/itu/ConnectItuEvent.class \
-	javax/jain/ss7/isup/itu/CUGInterlockCodeItu.class \
-	javax/jain/ss7/isup/itu/EchoControlInfoItu.class \
-	javax/jain/ss7/isup/itu/FacilityAcceptItuEvent.class \
-	javax/jain/ss7/isup/itu/FacilityItuEvent.class \
-	javax/jain/ss7/isup/itu/FacilityRejectItuEvent.class \
-	javax/jain/ss7/isup/itu/FacilityRequestItuEvent.class \
-	javax/jain/ss7/isup/itu/FwdCallIndItu.class \
-	javax/jain/ss7/isup/itu/GenericNumberItu.class \
-	javax/jain/ss7/isup/itu/IdentificationReqItuEvent.class \
-	javax/jain/ss7/isup/itu/IdentificationRespItuEvent.class \
-	javax/jain/ss7/isup/itu/InformationItuEvent.class \
-	javax/jain/ss7/isup/itu/InformationReqItuEvent.class \
-	javax/jain/ss7/isup/itu/LocationNumberItu.class \
-	javax/jain/ss7/isup/itu/MCIDReqIndItu.class \
-	javax/jain/ss7/isup/itu/MCIDRespIndItu.class \
-	javax/jain/ss7/isup/itu/MessageCompatibilityInfoItu.class \
-	javax/jain/ss7/isup/itu/NetworkResourceMgmtItuEvent.class \
-	javax/jain/ss7/isup/itu/NwSpecificFacItu.class \
-	javax/jain/ss7/isup/itu/OptionalBwdCallIndItu.class \
-	javax/jain/ss7/isup/itu/OptionalFwdCallIndItu.class \
-	javax/jain/ss7/isup/itu/ParamCompatibilityInfoItu.class \
-	javax/jain/ss7/isup/itu/RedirectionNumberItu.class \
-	javax/jain/ss7/isup/itu/ReleaseItuEvent.class \
-	javax/jain/ss7/isup/itu/ReleaseResponseItuEvent.class \
-	javax/jain/ss7/isup/itu/SegmentationItuEvent.class \
-	javax/jain/ss7/isup/itu/SetupItuEvent.class \
-	javax/jain/ss7/isup/itu/SubsequentAddressItuEvent.class \
-	javax/jain/ss7/isup/itu/UserPartTestInfoItuEvent.class \
-	javax/jain/ss7/isup/itu/UserTeleserviceInfoItu.class \
-	javax/jain/ss7/isup/itu/UserToUserIndicatorsItu.class \
-	javax/jain/ss7/isup/itu/UserToUserInfoItuEvent.class \
-	javax/jain/ss7/isup/JainIsupListener.class \
-	javax/jain/ss7/isup/JainIsupProvider.class \
-	javax/jain/ss7/isup/JainIsupStack.class \
-	javax/jain/ss7/isup/MaintenanceTimeoutIndEvent.class \
-	javax/jain/ss7/isup/NatureConnInd.class \
-	javax/jain/ss7/isup/NotificationInd.class \
-	javax/jain/ss7/isup/NumberParameter.class \
-	javax/jain/ss7/isup/NwStatusIndEvent.class \
-	javax/jain/ss7/isup/OptionalBwdCallInd.class \
-	javax/jain/ss7/isup/OrigCalledNumber.class \
-	javax/jain/ss7/isup/ParameterAlreadySetException.class \
-	javax/jain/ss7/isup/ParameterRangeInvalidException.class \
-	javax/jain/ss7/isup/PassAlongEvent.class \
-	javax/jain/ss7/isup/Precedence.class \
-	javax/jain/ss7/isup/PrimitiveInvalidException.class \
-	javax/jain/ss7/isup/RangeAndStatus.class \
-	javax/jain/ss7/isup/RawMessageEvent.class \
-	javax/jain/ss7/isup/ReattemptIndEvent.class \
-	javax/jain/ss7/isup/RedirectingNumber.class \
-	javax/jain/ss7/isup/RedirectionInfo.class \
-	javax/jain/ss7/isup/ReleaseEvent.class \
-	javax/jain/ss7/isup/ReleaseResponseEvent.class \
-	javax/jain/ss7/isup/RemoteOperations.class \
-	javax/jain/ss7/isup/SendStackException.class \
-	javax/jain/ss7/isup/SetupEvent.class \
-	javax/jain/ss7/isup/StartResetIndEvent.class \
-	javax/jain/ss7/isup/StopMaintReqEvent.class \
-	javax/jain/ss7/isup/SuspendResumeEvent.class \
-	javax/jain/ss7/isup/TransitNwSel.class \
-	javax/jain/ss7/isup/UserServiceInfoCommon.class \
-	javax/jain/ss7/isup/UserServiceInfo.class \
-	javax/jain/ss7/isup/UserServiceInfoPrime.class \
-	javax/jain/ss7/isup/UserToUserIndicators.class \
-	javax/jain/ss7/JainSS7Factory.class \
-	javax/jain/ss7/JainSS7Utility.class \
-	javax/jain/ss7/NetworkIndicator.class \
-	javax/jain/ss7/SignalingPointCode.class \
-	javax/jain/ss7/SPCFormat.class \
-	javax/jain/ss7/SS7Address.class \
-	javax/jain/VersionNotSupportedException.class
+	$(my_javax_jain_ss7_isup_JAVAFILES:%.java=%.class)
 
 MY_SECONDARY += $(my_javax_jain_ss7_isup_CLASSFILES)
 my_jar_CLASSFILES += $(my_javax_jain_ss7_isup_CLASSFILES)
-##EXTRA_DATA += javax-jain-ss7-isup-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += javax-jain-ss7-isup.jar
 ALL_LOCAL += javax-jain-ss7-isup.jar
 jar_DATA += javax-jain-ss7-isup-$(VERSION).jar
 endif
 
-javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_ss7_isup_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp javax-jain-ss7.jar $(my_javax_jain_ss7_isup_CLASSFILES)
+	$(AM_V_GEN)d='javax/jain/ss7/isup' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_jain_isup_JAVAFILES)
-#dist_java_JAVA += $(my_jain_isup_JAVAFILES)
+java_JAVAFILES += $(my_javax_jain_ss7_isup_JAVAFILES)
+#dist_java_JAVA += $(my_javax_jain_ss7_isup_JAVAFILES)
 
 clean-javax_jain_ss7_isup:
-	rm -f -- $(my_javax_jain_ss7_isup_CLASSFILES)
+	@d='javax/jain/ss7/isup' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
 	rm -f -- javax-jain-ss7-isup.jar javax-jain-ss7-isup-$(VERSION).jar
 	rm -f -- lib-javax-jain-ss7-isup.jar.db
 
 CLEAN_LOCAL += clean-javax_jain_ss7_isup
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_javax_jain_ss7_isup_jar_la_SOURCES	= javax-jain-ss7-isup.jar
-lib_javax_jain_ss7_isup_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-ss7-isup.jar
-nodist_lib_javax_jain_ss7_isup_jar_la_SOURCES	= $(my_javax_jain_ss7_isup_CLASSFILES)
+nodist_lib_javax_jain_ss7_isup_jar_la_SOURCES	= javax-jain-ss7-isup.jar
 lib_javax_jain_ss7_isup_jar_la_LIBADD		=
 lib_javax_jain_ss7_isup_jar_la_LDFLAGS		= -module -avoid-version -shared
 lib_javax_jain_ss7_isup_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-javax-jain-ss7-isup.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-javax-jain-ss7-isup.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-javax-jain-ss7-isup.jar.la
@@ -631,7 +711,7 @@ ALL_LOCAL		+= lib-javax-jain-ss7-isup.jar.db
 endif
 
 lib-javax-jain-ss7-isup.jar.db: javax-jain-ss7-isup.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
 #############################################################################
 
@@ -935,399 +1015,40 @@ my_javax_jain_ss7_inap_JAVAFILES = \
 	javax/jain/ss7/inap/operation/TerminationAttempt.java \
 	javax/jain/ss7/inap/operation/TMidCall.java \
 	javax/jain/ss7/inap/operation/TNoAnswer.java \
-	javax/jain/ss7/inap/operation/TSuspended.java \
-	javax/jain/ss7/EncodingScheme.java \
-	javax/jain/ss7/GlobalTitle.java \
-	javax/jain/ss7/GTIndicator.java \
-	javax/jain/ss7/GTIndicator0001.java \
-	javax/jain/ss7/NAddressIndicator.java \
-	javax/jain/ss7/NumberingPlan.java \
-	javax/jain/ss7/GTIndicator0010.java \
-	javax/jain/ss7/GTIndicator0011.java \
-	javax/jain/ss7/GTIndicator0100.java \
-	javax/jain/ss7/JainSS7Factory.java \
-	javax/jain/ss7/JainSS7Utility.java \
-	javax/jain/ss7/NetworkIndicator.java \
-	javax/jain/ss7/RoutingIndicator.java \
-	javax/jain/ss7/SccpUserAddress.java \
-	javax/jain/ss7/SS7Address.java \
-	javax/jain/ss7/SubSystemAddress.java \
-	javax/jain/ss7/SignalingPointCode.java \
-	javax/jain/ss7/SPCFormat.java \
-	javax/jain/DeleteProviderException.java \
-	javax/jain/JainException.java \
-	javax/jain/IDNotAvailableException.java \
-	javax/jain/InvalidAddressException.java \
-	javax/jain/InvalidArgumentException.java \
-	javax/jain/InvalidPathNameException.java \
-	javax/jain/ListenerNotRegisteredException.java \
-	javax/jain/MandatoryParameterNotSetException.java \
-	javax/jain/ParameterNotSetException.java \
-	javax/jain/PeerUnavailableException.java \
-	javax/jain/ListenerAlreadyRegisteredException.java
+	javax/jain/ss7/inap/operation/TSuspended.java
 
 my_javax_jain_ss7_inap_CLASSFILES = \
-	javax/jain/ss7/inap/constants/ActionIndicator.class \
-	javax/jain/ss7/inap/constants/ActionPerformed.class \
-	javax/jain/ss7/inap/constants/BearerCapabilityChoice.class \
-	javax/jain/ss7/inap/constants/CallProcessingOperationCorrelationID.class \
-	javax/jain/ss7/inap/constants/CancelChoice.class \
-	javax/jain/ss7/inap/constants/CancelID.class \
-	javax/jain/ss7/inap/constants/CGEncountered.class \
-	javax/jain/ss7/inap/constants/CollectedInfoChoice.class \
-	javax/jain/ss7/inap/constants/ComponentChoice.class \
-	javax/jain/ss7/inap/constants/ComponentID.class \
-	javax/jain/ss7/inap/constants/ComponentIndPrimitiveType.class \
-	javax/jain/ss7/inap/constants/ComponentPrimitiveType.class \
-	javax/jain/ss7/inap/constants/ComponentReqPrimitiveType.class \
-	javax/jain/ss7/inap/constants/ComponentType.class \
-	javax/jain/ss7/inap/constants/ConnectedPartyChoice.class \
-	javax/jain/ss7/inap/constants/ControlType.class \
-	javax/jain/ss7/inap/constants/DialoguePrimitiveType.class \
-	javax/jain/ss7/inap/constants/DPAssignment.class \
-	javax/jain/ss7/inap/constants/DpSpecificCriteriaChoice.class \
-	javax/jain/ss7/inap/constants/ElapsedTimeValueID.class \
-	javax/jain/ss7/inap/constants/EntryChoice.class \
-	javax/jain/ss7/inap/constants/ErrorCode.class \
-	javax/jain/ss7/inap/constants/ErrorTreatment.class \
-	javax/jain/ss7/inap/constants/EventSpecificInformationBCSMChoice.class \
-	javax/jain/ss7/inap/constants/EventTypeBCSM.class \
-	javax/jain/ss7/inap/constants/ExtensionChoice.class \
-	javax/jain/ss7/inap/constants/ExtensionType.class \
-	javax/jain/ss7/inap/constants/FacilityGroupChoice.class \
-	javax/jain/ss7/inap/constants/FacilityGroupID.class \
-	javax/jain/ss7/inap/constants/FeatureRequestIndicator.class \
-	javax/jain/ss7/inap/constants/FilterCriteriaID.class \
-	javax/jain/ss7/inap/constants/FilteringCharacteristicsChoice.class \
-	javax/jain/ss7/inap/constants/FilteringCriteriaChoice.class \
-	javax/jain/ss7/inap/constants/FilteringTimeOutChoice.class \
-	javax/jain/ss7/inap/constants/ForwardingCondition.class \
-	javax/jain/ss7/inap/constants/GapCriteriaChoice.class \
-	javax/jain/ss7/inap/constants/GapTreatmentChoice.class \
-	javax/jain/ss7/inap/constants/GeneralProblem.class \
-	javax/jain/ss7/inap/constants/GroupID.class \
-	javax/jain/ss7/inap/constants/InformationToSendChoice.class \
-	javax/jain/ss7/inap/constants/InfoToSendChoice.class \
-	javax/jain/ss7/inap/constants/InvokeProblem.class \
-	javax/jain/ss7/inap/constants/LegIDChoice.class \
-	javax/jain/ss7/inap/constants/Media.class \
-	javax/jain/ss7/inap/constants/MessageIDChoice.class \
-	javax/jain/ss7/inap/constants/MessageType.class \
-	javax/jain/ss7/inap/constants/MidCallReportType.class \
-	javax/jain/ss7/inap/constants/MonitorMode.class \
-	javax/jain/ss7/inap/constants/NotificationInformationChoice.class \
-	javax/jain/ss7/inap/constants/NumberMatchChoice.class \
-	javax/jain/ss7/inap/constants/OperationCodeChoice.class \
-	javax/jain/ss7/inap/constants/OperationCode.class \
-	javax/jain/ss7/inap/constants/PAbortReason.class \
-	javax/jain/ss7/inap/constants/PartyToConnectChoice.class \
-	javax/jain/ss7/inap/constants/PartyToDisconnectChoice.class \
-	javax/jain/ss7/inap/constants/ProfileIdentifierChoice.class \
-	javax/jain/ss7/inap/constants/ReceivedInformationChoice.class \
-	javax/jain/ss7/inap/constants/ReceivedStatus.class \
-	javax/jain/ss7/inap/constants/RejectType.class \
-	javax/jain/ss7/inap/constants/ReportCause.class \
-	javax/jain/ss7/inap/constants/ReportCondition.class \
-	javax/jain/ss7/inap/constants/RequestedInformationType.class \
-	javax/jain/ss7/inap/constants/RequestedInformationValueChoice.class \
-	javax/jain/ss7/inap/constants/ResourceAddressChoice.class \
-	javax/jain/ss7/inap/constants/ResourceAddressID.class \
-	javax/jain/ss7/inap/constants/ResourceIDChoice.class \
-	javax/jain/ss7/inap/constants/ResourceStatus.class \
-	javax/jain/ss7/inap/constants/ResponseCondition.class \
-	javax/jain/ss7/inap/constants/ReturnErrorProblem.class \
-	javax/jain/ss7/inap/constants/ReturnResultProblem.class \
-	javax/jain/ss7/inap/constants/RoutingAddressChoice.class \
-	javax/jain/ss7/inap/constants/SideID.class \
-	javax/jain/ss7/inap/constants/TargetLineIdentifierChoice.class \
-	javax/jain/ss7/inap/constants/TerminalType.class \
-	javax/jain/ss7/inap/constants/TimeOutError.class \
-	javax/jain/ss7/inap/constants/TimerID.class \
-	javax/jain/ss7/inap/constants/ToneIDChoice.class \
-	javax/jain/ss7/inap/constants/TransportAddressChoice.class \
-	javax/jain/ss7/inap/constants/TriggerType.class \
-	javax/jain/ss7/inap/constants/UAbortReason.class \
-	javax/jain/ss7/inap/constants/USIMonitorMode.class \
-	javax/jain/ss7/inap/constants/VariablePartChoice.class \
-	javax/jain/ss7/inap/constants/VariablePartID.class \
-	javax/jain/ss7/inap/datatype/AddressAndService.class \
-	javax/jain/ss7/inap/datatype/AllCallSegments.class \
-	javax/jain/ss7/inap/datatype/AssociatedCallSegment.class \
-	javax/jain/ss7/inap/datatype/BackwardGVNS.class \
-	javax/jain/ss7/inap/datatype/BackwardServiceInteractionInd.class \
-	javax/jain/ss7/inap/datatype/BCSMEvent.class \
-	javax/jain/ss7/inap/datatype/BCSMFailure.class \
-	javax/jain/ss7/inap/datatype/BearerCapability.class \
-	javax/jain/ss7/inap/datatype/BearerCap.class \
-	javax/jain/ss7/inap/datatype/BothGapTreatmentParameters.class \
-	javax/jain/ss7/inap/datatype/CalledAddressAndService.class \
-	javax/jain/ss7/inap/datatype/CalledPartyNumber.class \
-	javax/jain/ss7/inap/datatype/CalledPartySubaddress.class \
-	javax/jain/ss7/inap/datatype/CallingAddressAndService.class \
-	javax/jain/ss7/inap/datatype/CallingPartyNumber.class \
-	javax/jain/ss7/inap/datatype/CallingPartySubaddress.class \
-	javax/jain/ss7/inap/datatype/CallSegment.class \
-	javax/jain/ss7/inap/datatype/CallSegmentToCancel.class \
-	javax/jain/ss7/inap/datatype/CarrierID.class \
-	javax/jain/ss7/inap/datatype/Carrier.class \
-	javax/jain/ss7/inap/datatype/Cause.class \
-	javax/jain/ss7/inap/datatype/ChargingEvent.class \
-	javax/jain/ss7/inap/datatype/CollectedDigits.class \
-	javax/jain/ss7/inap/datatype/CollectedInfo.class \
-	javax/jain/ss7/inap/datatype/Component.class \
-	javax/jain/ss7/inap/datatype/ConnectedParty.class \
-	javax/jain/ss7/inap/datatype/ControlDigits.class \
-	javax/jain/ss7/inap/datatype/CounterAndValue.class \
-	javax/jain/ss7/inap/datatype/CSFailure.class \
-	javax/jain/ss7/inap/datatype/DestinationRoutingAddress.class \
-	javax/jain/ss7/inap/datatype/DigitsGenericDigits.class \
-	javax/jain/ss7/inap/datatype/DigitsGenericNumber.class \
-	javax/jain/ss7/inap/datatype/DisconnectSpecificInfo.class \
-	javax/jain/ss7/inap/datatype/DPSpecificCommonParameters.class \
-	javax/jain/ss7/inap/datatype/DPSpecificCriteria.class \
-	javax/jain/ss7/inap/datatype/Entry.class \
-	javax/jain/ss7/inap/datatype/EventSpecificInformationBCSM.class \
-	javax/jain/ss7/inap/datatype/ExtensionField.class \
-	javax/jain/ss7/inap/datatype/Extension.class \
-	javax/jain/ss7/inap/datatype/FacilityGroup.class \
-	javax/jain/ss7/inap/datatype/FilteredCallTreatment.class \
-	javax/jain/ss7/inap/datatype/FilteringCharacteristics.class \
-	javax/jain/ss7/inap/datatype/FilteringCriteria.class \
-	javax/jain/ss7/inap/datatype/FilteringTimeOut.class \
-	javax/jain/ss7/inap/datatype/ForwardCallIndicators.class \
-	javax/jain/ss7/inap/datatype/ForwardGVNS.class \
-	javax/jain/ss7/inap/datatype/ForwardServiceInteractionInd.class \
-	javax/jain/ss7/inap/datatype/GapCriteria.class \
-	javax/jain/ss7/inap/datatype/GapIndicators.class \
-	javax/jain/ss7/inap/datatype/GapOnService.class \
-	javax/jain/ss7/inap/datatype/GapTreatment.class \
-	javax/jain/ss7/inap/datatype/GenericNumbers.class \
-	javax/jain/ss7/inap/datatype/GlobalTitle0001.class \
-	javax/jain/ss7/inap/datatype/GlobalTitle0010.class \
-	javax/jain/ss7/inap/datatype/GlobalTitle0011.class \
-	javax/jain/ss7/inap/datatype/GlobalTitle0100.class \
-	javax/jain/ss7/inap/datatype/GlobalTitle.class \
-	javax/jain/ss7/inap/datatype/HighLayerCompatibility.class \
-	javax/jain/ss7/inap/datatype/InbandInfo.class \
-	javax/jain/ss7/inap/datatype/InformationToRecord.class \
-	javax/jain/ss7/inap/datatype/InformationToSend.class \
-	javax/jain/ss7/inap/datatype/INServiceCompatibilityIndication.class \
-	javax/jain/ss7/inap/datatype/IPAddressAndCallSegmentID.class \
-	javax/jain/ss7/inap/datatype/IPAddressAndLegID.class \
-	javax/jain/ss7/inap/datatype/LegID.class \
-	javax/jain/ss7/inap/datatype/Leg.class \
-	javax/jain/ss7/inap/datatype/LocationNumber.class \
-	javax/jain/ss7/inap/datatype/MessageID.class \
-	javax/jain/ss7/inap/datatype/MidCallControlInfo.class \
-	javax/jain/ss7/inap/datatype/MidCallControlInformation.class \
-	javax/jain/ss7/inap/datatype/MidCallInfoType.class \
-	javax/jain/ss7/inap/datatype/MidCallSpecificInfo.class \
-	javax/jain/ss7/inap/datatype/MiscCallInfo.class \
-	javax/jain/ss7/inap/datatype/OriginalCalledPartyID.class \
-	javax/jain/ss7/inap/datatype/PartyToConnect.class \
-	javax/jain/ss7/inap/datatype/PartyToDisconnect.class \
-	javax/jain/ss7/inap/datatype/ProfileIdentifier.class \
-	javax/jain/ss7/inap/datatype/RedirectingPartyID.class \
-	javax/jain/ss7/inap/datatype/RedirectionInformation.class \
-	javax/jain/ss7/inap/datatype/RequestedInformation.class \
-	javax/jain/ss7/inap/datatype/RequestedInformationList.class \
-	javax/jain/ss7/inap/datatype/RequestedInformationTypeList.class \
-	javax/jain/ss7/inap/datatype/RequestedInformationValue.class \
-	javax/jain/ss7/inap/datatype/RequestedUTSI.class \
-	javax/jain/ss7/inap/datatype/ResourceAddress.class \
-	javax/jain/ss7/inap/datatype/ResourceID.class \
-	javax/jain/ss7/inap/datatype/RouteList.class \
-	javax/jain/ss7/inap/datatype/ScfID.class \
-	javax/jain/ss7/inap/datatype/ServiceAddressInformation.class \
-	javax/jain/ss7/inap/datatype/ServiceInteractionIndicatorsTwo.class \
-	javax/jain/ss7/inap/datatype/Text.class \
-	javax/jain/ss7/inap/datatype/Tone.class \
-	javax/jain/ss7/inap/datatype/TransportAddress.class \
-	javax/jain/ss7/inap/datatype/TriggerDataIdentifier.class \
-	javax/jain/ss7/inap/datatype/VariableMessage.class \
-	javax/jain/ss7/inap/datatype/VariablePart.class \
-	javax/jain/ss7/inap/event/BeginIndEvent.class \
-	javax/jain/ss7/inap/event/BeginReqEvent.class \
-	javax/jain/ss7/inap/event/ComponentEvent.class \
-	javax/jain/ss7/inap/event/ComponentIndEvent.class \
-	javax/jain/ss7/inap/event/ComponentReqEvent.class \
-	javax/jain/ss7/inap/event/ContinueIndEvent.class \
-	javax/jain/ss7/inap/event/ContinueReqEvent.class \
-	javax/jain/ss7/inap/event/DialogueEvent.class \
-	javax/jain/ss7/inap/event/DialogueIndEvent.class \
-	javax/jain/ss7/inap/event/DialogueReqEvent.class \
-	javax/jain/ss7/inap/event/EndIndEvent.class \
-	javax/jain/ss7/inap/event/EndReqEvent.class \
-	javax/jain/ss7/inap/event/InapEvent.class \
-	javax/jain/ss7/inap/event/InvokeIndEvent.class \
-	javax/jain/ss7/inap/event/InvokeReqEvent.class \
-	javax/jain/ss7/inap/event/LCancelIndEvent.class \
-	javax/jain/ss7/inap/event/LRejectIndEvent.class \
-	javax/jain/ss7/inap/event/NoticeIndEvent.class \
-	javax/jain/ss7/inap/event/PAbortIndEvent.class \
-	javax/jain/ss7/inap/event/ResultIndEvent.class \
-	javax/jain/ss7/inap/event/ResultReqEvent.class \
-	javax/jain/ss7/inap/event/RRejectIndEvent.class \
-	javax/jain/ss7/inap/event/TimerResetReqEvent.class \
-	javax/jain/ss7/inap/event/UAbortIndEvent.class \
-	javax/jain/ss7/inap/event/UAbortReqEvent.class \
-	javax/jain/ss7/inap/event/UCancelReqEvent.class \
-	javax/jain/ss7/inap/event/UErrorIndEvent.class \
-	javax/jain/ss7/inap/event/UErrorReqEvent.class \
-	javax/jain/ss7/inap/event/URejectIndEvent.class \
-	javax/jain/ss7/inap/event/URejectReqEvent.class \
-	javax/jain/ss7/inap/exception/InvalidApplicationContextException.class \
-	javax/jain/ss7/inap/exception/InvalidCallIDException.class \
-	javax/jain/ss7/inap/exception/ParameterOutOfRangeException.class \
-	javax/jain/ss7/inap/exception/TooManyListenersRegisteredException.class \
-	javax/jain/ss7/inap/JainInapListener.class \
-	javax/jain/ss7/inap/JainInapProvider.class \
-	javax/jain/ss7/inap/JainInapStack.class \
-	javax/jain/ss7/inap/operation/ActivateServiceFiltering.class \
-	javax/jain/ss7/inap/operation/ActivityTest.class \
-	javax/jain/ss7/inap/operation/AnalysedInformation.class \
-	javax/jain/ss7/inap/operation/AnalyseInformation.class \
-	javax/jain/ss7/inap/operation/ApplyCharging.class \
-	javax/jain/ss7/inap/operation/ApplyChargingReport.class \
-	javax/jain/ss7/inap/operation/AssistRequestInstructions.class \
-	javax/jain/ss7/inap/operation/AuthorizeTermination.class \
-	javax/jain/ss7/inap/operation/CallGap.class \
-	javax/jain/ss7/inap/operation/CallInformationReport.class \
-	javax/jain/ss7/inap/operation/CallInformationRequest.class \
-	javax/jain/ss7/inap/operation/Cancel.class \
-	javax/jain/ss7/inap/operation/CancelStatusReportRequest.class \
-	javax/jain/ss7/inap/operation/CollectedInformation.class \
-	javax/jain/ss7/inap/operation/CollectInformation.class \
-	javax/jain/ss7/inap/operation/Connect.class \
-	javax/jain/ss7/inap/operation/ConnectToResource.class \
-	javax/jain/ss7/inap/operation/Continue.class \
-	javax/jain/ss7/inap/operation/ContinueWithArgument.class \
-	javax/jain/ss7/inap/operation/CreateCallSegmentAssociation.class \
-	javax/jain/ss7/inap/operation/CreateCallSegmentAssociationResult.class \
-	javax/jain/ss7/inap/operation/DFCWithArgument.class \
-	javax/jain/ss7/inap/operation/DisconnectForwardConnection.class \
-	javax/jain/ss7/inap/operation/DisconnectLeg.class \
-	javax/jain/ss7/inap/operation/EntityReleased.class \
-	javax/jain/ss7/inap/operation/EstablishTemporaryConnection.class \
-	javax/jain/ss7/inap/operation/EventNotificationCharging.class \
-	javax/jain/ss7/inap/operation/EventReportBCSM.class \
-	javax/jain/ss7/inap/operation/EventReportFacility.class \
-	javax/jain/ss7/inap/operation/FacilitySelectedAndAvailable.class \
-	javax/jain/ss7/inap/operation/FurnishChargingInformation.class \
-	javax/jain/ss7/inap/operation/HoldCallInNetwork.class \
-	javax/jain/ss7/inap/operation/InitialDP.class \
-	javax/jain/ss7/inap/operation/InitiateCallAttempt.class \
-	javax/jain/ss7/inap/operation/ManageTriggerData.class \
-	javax/jain/ss7/inap/operation/ManageTriggerDataResult.class \
-	javax/jain/ss7/inap/operation/MergeCallSegments.class \
-	javax/jain/ss7/inap/operation/MessageReceived.class \
-	javax/jain/ss7/inap/operation/MoveCallSegments.class \
-	javax/jain/ss7/inap/operation/MoveLeg.class \
-	javax/jain/ss7/inap/operation/OAbandon.class \
-	javax/jain/ss7/inap/operation/OAnswer.class \
-	javax/jain/ss7/inap/operation/OCalledPartyBusy.class \
-	javax/jain/ss7/inap/operation/ODisconnect.class \
-	javax/jain/ss7/inap/operation/OMidCall.class \
-	javax/jain/ss7/inap/operation/ONoAnswer.class \
-	javax/jain/ss7/inap/operation/Operation.class \
-	javax/jain/ss7/inap/operation/OriginationAttemptAuthorized.class \
-	javax/jain/ss7/inap/operation/OriginationAttempt.class \
-	javax/jain/ss7/inap/operation/OSuspended.class \
-	javax/jain/ss7/inap/operation/PlayAnnouncement.class \
-	javax/jain/ss7/inap/operation/PromptAndCollectUserInformation.class \
-	javax/jain/ss7/inap/operation/PromptAndReceiveMessage.class \
-	javax/jain/ss7/inap/operation/ReceivedInformation.class \
-	javax/jain/ss7/inap/operation/Reconnect.class \
-	javax/jain/ss7/inap/operation/ReleaseCall.class \
-	javax/jain/ss7/inap/operation/ReportUTSI.class \
-	javax/jain/ss7/inap/operation/RequestCurrentStatusReport.class \
-	javax/jain/ss7/inap/operation/RequestCurrentStatusReportResult.class \
-	javax/jain/ss7/inap/operation/RequestEveryStatusChangeReport.class \
-	javax/jain/ss7/inap/operation/RequestFirstStatusMatchReport.class \
-	javax/jain/ss7/inap/operation/RequestNotificationChargingEvent.class \
-	javax/jain/ss7/inap/operation/RequestReportBCSMEvent.class \
-	javax/jain/ss7/inap/operation/RequestReportFacilityEvent.class \
-	javax/jain/ss7/inap/operation/RequestReportUTSI.class \
-	javax/jain/ss7/inap/operation/ResetTimer.class \
-	javax/jain/ss7/inap/operation/RouteSelectFailure.class \
-	javax/jain/ss7/inap/operation/SelectFacility.class \
-	javax/jain/ss7/inap/operation/SelectRoute.class \
-	javax/jain/ss7/inap/operation/SendChargingInformation.class \
-	javax/jain/ss7/inap/operation/SendFacilityInformation.class \
-	javax/jain/ss7/inap/operation/SendSTUI.class \
-	javax/jain/ss7/inap/operation/ServiceFilteringResponse.class \
-	javax/jain/ss7/inap/operation/SpecializedResourceReport.class \
-	javax/jain/ss7/inap/operation/SplitLeg.class \
-	javax/jain/ss7/inap/operation/StatusReport.class \
-	javax/jain/ss7/inap/operation/TAnswer.class \
-	javax/jain/ss7/inap/operation/TBusy.class \
-	javax/jain/ss7/inap/operation/TDisconnect.class \
-	javax/jain/ss7/inap/operation/TerminationAttemptAuthorized.class \
-	javax/jain/ss7/inap/operation/TerminationAttempt.class \
-	javax/jain/ss7/inap/operation/TMidCall.class \
-	javax/jain/ss7/inap/operation/TNoAnswer.class \
-	javax/jain/ss7/inap/operation/TSuspended.class \
-	javax/jain/ss7/EncodingScheme.class \
-	javax/jain/ss7/GlobalTitle.class \
-	javax/jain/ss7/GTIndicator.class \
-	javax/jain/ss7/GTIndicator0001.class \
-	javax/jain/ss7/NAddressIndicator.class \
-	javax/jain/ss7/NumberingPlan.class \
-	javax/jain/ss7/GTIndicator0010.class \
-	javax/jain/ss7/GTIndicator0011.class \
-	javax/jain/ss7/GTIndicator0100.class \
-	javax/jain/ss7/JainSS7Factory.class \
-	javax/jain/ss7/JainSS7Utility.class \
-	javax/jain/ss7/NetworkIndicator.class \
-	javax/jain/ss7/RoutingIndicator.class \
-	javax/jain/ss7/SccpUserAddress.class \
-	javax/jain/ss7/SS7Address.class \
-	javax/jain/ss7/SubSystemAddress.class \
-	javax/jain/ss7/SignalingPointCode.class \
-	javax/jain/ss7/SPCFormat.class \
-	javax/jain/DeleteProviderException.class \
-	javax/jain/JainException.class \
-	javax/jain/IDNotAvailableException.class \
-	javax/jain/InvalidAddressException.class \
-	javax/jain/InvalidArgumentException.class \
-	javax/jain/InvalidPathNameException.class \
-	javax/jain/ListenerNotRegisteredException.class \
-	javax/jain/MandatoryParameterNotSetException.class \
-	javax/jain/ParameterNotSetException.class \
-	javax/jain/PeerUnavailableException.class \
-	javax/jain/ListenerAlreadyRegisteredException.class
+	$(my_javax_jain_ss7_inap_JAVAFILES:%.java=%.class)
 
-MY_SECONDARY += $(my_javax_jain_ss7_inap_CLASSFILES)
+MY_SECONDARY	+= $(my_javax_jain_ss7_inap_CLASSFILES)
 my_jar_CLASSFILES += $(my_javax_jain_ss7_inap_CLASSFILES)
-##EXTRA_DATA += javax-jain-ss7-inap-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += javax-jain-ss7-inap.jar
-ALL_LOCAL += javax-jain-ss7-inap.jar
-jar_DATA += javax-jain-ss7-inap-$(VERSION).jar
+my_jar_LINKS	+= javax-jain-ss7-inap.jar
+ALL_LOCAL	+= javax-jain-ss7-inap.jar
+jar_DATA	+= javax-jain-ss7-inap-$(VERSION).jar
 endif
 
-javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_ss7_inap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp javax-jain-ss7.jar $(my_javax_jain_ss7_inap_CLASSFILES)
+	$(AM_V_GEN)d='javax/jain/ss7/inap' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_javax_jain_ss7_inap_JAVAFILES)
+java_JAVAFILES += $(my_javax_jain_ss7_inap_JAVAFILES)
 #dist_java_JAVA += $(my_javax_jain_ss7_inap_JAVAFILES)
 
 clean-javax_jain_ss7_inap:
+	@d='javax/jain/ss7/inap' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
 	rm -f -- $(my_javax_jain_ss7_inap_CLASSFILES)
 	rm -f -- javax-jain-ss7-inap.jar javax-jain-ss7-inap-$(VERSION).jar
 	rm -f -- lib-javax-jain-ss7-inap.jar.db
 
 CLEAN_LOCAL += clean-javax_jain_ss7_inap
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_javax_jain_ss7_inap_jar_la_SOURCES	= javax-jain-ss7-inap.jar
-lib_javax_jain_ss7_inap_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-ss7-inap.jar
-nodist_lib_javax_jain_ss7_inap_jar_la_SOURCES	= $(my_javax_jain_ss7_inap_CLASSFILES)
+nodist_lib_javax_jain_ss7_inap_jar_la_SOURCES	= javax-jain-ss7-inap.jar
 lib_javax_jain_ss7_inap_jar_la_LIBADD		=
 lib_javax_jain_ss7_inap_jar_la_LDFLAGS		= -module -avoid-version -shared
 lib_javax_jain_ss7_inap_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-javax-jain-ss7-inap.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-javax-jain-ss7-inap.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-javax-jain-ss7-inap.jar.la
@@ -1336,23 +1057,11 @@ ALL_LOCAL		+= lib-javax-jain-ss7-inap.jar.db
 endif
 
 lib-javax-jain-ss7-inap.jar.db: javax-jain-ss7-inap.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
 #############################################################################
 
 my_javax_jain_protocol_ss7_map_JAVAFILES = \
-	javax/jain/JainEvent.java \
-	javax/jain/JainException.java \
-	javax/jain/protocol/ss7/E164Number.java \
-	javax/jain/protocol/ss7/SS7ListenerNotRegisteredException.java \
-	javax/jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.java \
-	javax/jain/protocol/ss7/SS7PeerUnavailableException.java \
-	javax/jain/protocol/ss7/SS7MandatoryParameterNotSetException.java \
-	javax/jain/protocol/ss7/SS7ParameterNotSetException.java \
-	javax/jain/protocol/ss7/JainSS7Factory.java \
-	javax/jain/protocol/ss7/SS7Number.java \
-	javax/jain/protocol/ss7/SS7Exception.java \
-	javax/jain/protocol/ss7/SS7Parameter.java \
 	javax/jain/protocol/ss7/map/Imsi.java \
 	javax/jain/protocol/ss7/map/Position.java \
 	javax/jain/protocol/ss7/map/session/SessionDataIndEvent.java \
@@ -1425,132 +1134,40 @@ my_javax_jain_protocol_ss7_map_JAVAFILES = \
 	javax/jain/protocol/ss7/map/Result.java \
 	javax/jain/protocol/ss7/map/PositionPointUncertEllipse.java \
 	javax/jain/protocol/ss7/map/PositionPointUncertCircle.java \
-	javax/jain/protocol/ss7/map/MapErrorEvent.java \
-	javax/jain/protocol/ss7/JainSS7Utility.java \
-	javax/jain/protocol/ss7/SS7InvalidParamException.java \
-	javax/jain/protocol/ss7/SS7Address.java
+	javax/jain/protocol/ss7/map/MapErrorEvent.java
 
 my_javax_jain_protocol_ss7_map_CLASSFILES = \
-	javax/jain/JainEvent.class \
-	javax/jain/JainException.class \
-	javax/jain/protocol/ss7/E164Number.class \
-	javax/jain/protocol/ss7/SS7ListenerNotRegisteredException.class \
-	javax/jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.class \
-	javax/jain/protocol/ss7/SS7PeerUnavailableException.class \
-	javax/jain/protocol/ss7/SS7MandatoryParameterNotSetException.class \
-	javax/jain/protocol/ss7/SS7ParameterNotSetException.class \
-	javax/jain/protocol/ss7/JainSS7Factory.class \
-	javax/jain/protocol/ss7/SS7Number.class \
-	javax/jain/protocol/ss7/SS7Exception.class \
-	javax/jain/protocol/ss7/SS7Parameter.class \
-	javax/jain/protocol/ss7/map/Imsi.class \
-	javax/jain/protocol/ss7/map/Position.class \
-	javax/jain/protocol/ss7/map/session/SessionDataIndEvent.class \
-	javax/jain/protocol/ss7/map/session/MessageSessionListener.class \
-	javax/jain/protocol/ss7/map/session/SessionEvent.class \
-	javax/jain/protocol/ss7/map/session/SessionDataReqEvent.class \
-	javax/jain/protocol/ss7/map/session/etsipar/ServiceData.class \
-	javax/jain/protocol/ss7/map/session/JainMapMessageSessionStack.class \
-	javax/jain/protocol/ss7/map/session/SessionOpenReqEvent.class \
-	javax/jain/protocol/ss7/map/session/MessageSessionProvider.class \
-	javax/jain/protocol/ss7/map/session/SessionCloseReqEvent.class \
-	javax/jain/protocol/ss7/map/session/SessionOpenIndEvent.class \
-	javax/jain/protocol/ss7/map/MsNumber.class \
-	javax/jain/protocol/ss7/map/MsIsdn.class \
-	javax/jain/protocol/ss7/map/PositionPointAltitudeUncertEllipsoid.class \
-	javax/jain/protocol/ss7/map/transaction/MtMessageConfEvent.class \
-	javax/jain/protocol/ss7/map/transaction/MtMessageRecAvailRespEvent.class \
-	javax/jain/protocol/ss7/map/transaction/Message.class \
-	javax/jain/protocol/ss7/map/transaction/MessageTransactionProvider.class \
-	javax/jain/protocol/ss7/map/transaction/MessageTransactionListener.class \
-	javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStack.class \
-	javax/jain/protocol/ss7/map/transaction/MoMessageIndEvent.class \
-	javax/jain/protocol/ss7/map/transaction/MoMessageRespEvent.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/pdu/SmsPdu.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/SubmitReportMessage.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/DeliverMessage.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/DeliverReportMessage.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/StatusReportMessage.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/EtsiMessage.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/SubmitMessage.class \
-	javax/jain/protocol/ss7/map/transaction/etsipar/message/CommandMessage.class \
-	javax/jain/protocol/ss7/map/transaction/MtMessageRecAvailIndEvent.class \
-	javax/jain/protocol/ss7/map/transaction/MtMessageReqEvent.class \
-	javax/jain/protocol/ss7/map/transaction/TransactionEvent.class \
-	javax/jain/protocol/ss7/map/JainMapStack.class \
-	javax/jain/protocol/ss7/map/information/MsInfoReqEvent.class \
-	javax/jain/protocol/ss7/map/information/InformationEvent.class \
-	javax/jain/protocol/ss7/map/information/MsInfoProvider.class \
-	javax/jain/protocol/ss7/map/information/JainMapMsInfoStack.class \
-	javax/jain/protocol/ss7/map/information/etsipar/LsaId.class \
-	javax/jain/protocol/ss7/map/information/etsipar/InfoRequestSpecifier.class \
-	javax/jain/protocol/ss7/map/information/etsipar/LocationAreaId.class \
-	javax/jain/protocol/ss7/map/information/etsipar/Location.class \
-	javax/jain/protocol/ss7/map/information/etsipar/CellGlobalId.class \
-	javax/jain/protocol/ss7/map/information/etsipar/LocationNumber.class \
-	javax/jain/protocol/ss7/map/information/etsipar/ServiceAreaId.class \
-	javax/jain/protocol/ss7/map/information/etsipar/VlrNumber.class \
-	javax/jain/protocol/ss7/map/information/MsInfoConfEvent.class \
-	javax/jain/protocol/ss7/map/information/MsInfoListener.class \
-	javax/jain/protocol/ss7/map/PositionPoint.class \
-	javax/jain/protocol/ss7/map/MapParameter.class \
-	javax/jain/protocol/ss7/map/PositionArc.class \
-	javax/jain/protocol/ss7/map/position/MsPosReqEvent.class \
-	javax/jain/protocol/ss7/map/position/MsPosProvider.class \
-	javax/jain/protocol/ss7/map/position/PositionEvent.class \
-	javax/jain/protocol/ss7/map/position/MsPosIndEvent.class \
-	javax/jain/protocol/ss7/map/position/JainMapMsPosStack.class \
-	javax/jain/protocol/ss7/map/position/MsPosRespEvent.class \
-	javax/jain/protocol/ss7/map/position/MsPosReportIndEvent.class \
-	javax/jain/protocol/ss7/map/position/etsipar/LcsQos.class \
-	javax/jain/protocol/ss7/map/position/etsipar/EquipmentId.class \
-	javax/jain/protocol/ss7/map/position/etsipar/LcsClientId.class \
-	javax/jain/protocol/ss7/map/position/etsipar/Imei.class \
-	javax/jain/protocol/ss7/map/position/etsipar/PosRequestSpecifier.class \
-	javax/jain/protocol/ss7/map/position/MsPosConfEvent.class \
-	javax/jain/protocol/ss7/map/position/MsPosReportRespEvent.class \
-	javax/jain/protocol/ss7/map/position/MsPosListener.class \
-	javax/jain/protocol/ss7/map/position/PositionTargetId.class \
-	javax/jain/protocol/ss7/map/PositionPointAltitude.class \
-	javax/jain/protocol/ss7/map/Result.class \
-	javax/jain/protocol/ss7/map/PositionPointUncertEllipse.class \
-	javax/jain/protocol/ss7/map/PositionPointUncertCircle.class \
-	javax/jain/protocol/ss7/map/MapErrorEvent.class \
-	javax/jain/protocol/ss7/JainSS7Utility.class \
-	javax/jain/protocol/ss7/SS7InvalidParamException.class \
-	javax/jain/protocol/ss7/SS7Address.class
+	$(my_javax_jain_protocol_ss7_map_JAVAFILES:%.java=%.class)
 
-MY_SECONDARY += $(my_javax_jain_protocol_ss7_map_CLASSFILES)
+MY_SECONDARY	+= $(my_javax_jain_protocol_ss7_map_CLASSFILES)
 my_jar_CLASSFILES += $(my_javax_jain_protocol_ss7_map_CLASSFILES)
-##EXTRA_DATA += javax-jain-protocol-ss7-map-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += javax-jain-protocol-ss7-map.jar
-ALL_LOCAL += javax-jain-protocol-ss7-map.jar
-jar_DATA += javax-jain-protocol-ss7-map-$(VERSION).jar
+my_jar_LINKS	+= javax-jain-protocol-ss7-map.jar
+ALL_LOCAL	+= javax-jain-protocol-ss7-map.jar
+jar_DATA	+= javax-jain-protocol-ss7-map-$(VERSION).jar
 endif
 
-javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp $(my_javax_jain_protocol_ss7_map_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp javax-jain-protocol-ss7.jar $(my_javax_jain_protocol_ss7_map_CLASSFILES)
+	$(AM_V_GEN)d='javax/jain/protocol/ss7/map' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_javax_jain_protocol_ss7_map_JAVAFILES)
+java_JAVAFILES += $(my_javax_jain_protocol_ss7_map_JAVAFILES)
 #dist_java_JAVA += $(my_javax_jain_protocol_ss7_map_JAVAFILES)
 
 clean-javax_jain_protocol_ss7_map:
-	rm -f -- $(my_javax_jain_protocol_ss7_map_CLASSFILES)
-	rm -f -- javax-jain-protocol-ss7-map.jar javax-jain-protocol-ss7-map-$(VERSION).jar
+	@d='javax/jain/protocol/ss7/map' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-jain-protocol-ss7-map.jar
+	rm -f -- javax-jain-protocol-ss7-map-$(VERSION).jar
 	rm -f -- lib-javax-jain-protocol-ss7-map.jar.db
 
 CLEAN_LOCAL += clean-javax_jain_protocol_ss7_map
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_javax_jain_protocol_ss7_map_jar_la_SOURCES	= javax-jain-protocol-ss7-map.jar
-lib_javax_jain_protocol_ss7_map_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jain-protocol-ss7-map.jar
-nodist_lib_javax_jain_protocol_ss7_map_jar_la_SOURCES	= $(my_javax_jain_protocol_ss7_map_CLASSFILES)
+nodist_lib_javax_jain_protocol_ss7_map_jar_la_SOURCES	= javax-jain-protocol-ss7-map.jar
 lib_javax_jain_protocol_ss7_map_jar_la_LIBADD		=
 lib_javax_jain_protocol_ss7_map_jar_la_LDFLAGS		= -module -avoid-version -shared
 lib_javax_jain_protocol_ss7_map_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-javax-jain-protocol-ss7-map.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-javax-jain-protocol-ss7-map.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-javax-jain-protocol-ss7-map.jar.la
@@ -1559,7 +1176,7 @@ ALL_LOCAL		+= lib-javax-jain-protocol-ss7-map.jar.db
 endif
 
 lib-javax-jain-protocol-ss7-map.jar.db: javax-jain-protocol-ss7-map.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
 #############################################################################
 
@@ -1668,127 +1285,29 @@ my_javax_sip_JAVAFILES = \
 	javax/sip/TransportNotSupportedException.java
 
 my_javax_sip_CLASSFILES = \
-	javax/sip/address/AddressFactory.class \
-	javax/sip/address/Address.class \
-	javax/sip/address/Hop.class \
-	javax/sip/address/Router.class \
-	javax/sip/address/SipURI.class \
-	javax/sip/address/TelURL.class \
-	javax/sip/address/URI.class \
-	javax/sip/ClientTransaction.class \
-	javax/sip/DialogDoesNotExistException.class \
-	javax/sip/Dialog.class \
-	javax/sip/DialogState.class \
-	javax/sip/DialogTerminatedEvent.class \
-	javax/sip/header/AcceptEncodingHeader.class \
-	javax/sip/header/AcceptHeader.class \
-	javax/sip/header/AcceptLanguageHeader.class \
-	javax/sip/header/AlertInfoHeader.class \
-	javax/sip/header/AllowEventsHeader.class \
-	javax/sip/header/AllowHeader.class \
-	javax/sip/header/AuthenticationInfoHeader.class \
-	javax/sip/header/AuthorizationHeader.class \
-	javax/sip/header/CallIdHeader.class \
-	javax/sip/header/CallInfoHeader.class \
-	javax/sip/header/ContactHeader.class \
-	javax/sip/header/ContentDispositionHeader.class \
-	javax/sip/header/ContentEncodingHeader.class \
-	javax/sip/header/ContentLanguageHeader.class \
-	javax/sip/header/ContentLengthHeader.class \
-	javax/sip/header/ContentTypeHeader.class \
-	javax/sip/header/CSeqHeader.class \
-	javax/sip/header/DateHeader.class \
-	javax/sip/header/Encoding.class \
-	javax/sip/header/ErrorInfoHeader.class \
-	javax/sip/header/EventHeader.class \
-	javax/sip/header/ExpiresHeader.class \
-	javax/sip/header/ExtensionHeader.class \
-	javax/sip/header/FromHeader.class \
-	javax/sip/header/HeaderAddress.class \
-	javax/sip/header/HeaderFactory.class \
-	javax/sip/header/Header.class \
-	javax/sip/header/InReplyToHeader.class \
-	javax/sip/header/MaxForwardsHeader.class \
-	javax/sip/header/MediaType.class \
-	javax/sip/header/MimeVersionHeader.class \
-	javax/sip/header/MinExpiresHeader.class \
-	javax/sip/header/OptionTag.class \
-	javax/sip/header/OrganizationHeader.class \
-	javax/sip/header/Parameters.class \
-	javax/sip/header/PriorityHeader.class \
-	javax/sip/header/ProxyAuthenticateHeader.class \
-	javax/sip/header/ProxyAuthorizationHeader.class \
-	javax/sip/header/ProxyRequireHeader.class \
-	javax/sip/header/RAckHeader.class \
-	javax/sip/header/ReasonHeader.class \
-	javax/sip/header/RecordRouteHeader.class \
-	javax/sip/header/ReferToHeader.class \
-	javax/sip/header/ReplyToHeader.class \
-	javax/sip/header/RequireHeader.class \
-	javax/sip/header/RetryAfterHeader.class \
-	javax/sip/header/RouteHeader.class \
-	javax/sip/header/RSeqHeader.class \
-	javax/sip/header/ServerHeader.class \
-	javax/sip/header/SIPETagHeader.class \
-	javax/sip/header/SIPIfMatchHeader.class \
-	javax/sip/header/SubjectHeader.class \
-	javax/sip/header/SubscriptionStateHeader.class \
-	javax/sip/header/SupportedHeader.class \
-	javax/sip/header/TimeStampHeader.class \
-	javax/sip/header/ToHeader.class \
-	javax/sip/header/TooManyHopsException.class \
-	javax/sip/header/UnsupportedHeader.class \
-	javax/sip/header/UserAgentHeader.class \
-	javax/sip/header/ViaHeader.class \
-	javax/sip/header/WarningHeader.class \
-	javax/sip/header/WWWAuthenticateHeader.class \
-	javax/sip/InvalidArgumentException.class \
-	javax/sip/IOExceptionEvent.class \
-	javax/sip/ListeningPoint.class \
-	javax/sip/message/MessageFactory.class \
-	javax/sip/message/Message.class \
-	javax/sip/message/Request.class \
-	javax/sip/message/Response.class \
-	javax/sip/ObjectInUseException.class \
-	javax/sip/PeerUnavailableException.class \
-	javax/sip/ProviderDoesNotExistException.class \
-	javax/sip/RequestEvent.class \
-	javax/sip/ResponseEvent.class \
-	javax/sip/ServerTransaction.class \
-	javax/sip/SipException.class \
-	javax/sip/SipFactory.class \
-	javax/sip/SipListener.class \
-	javax/sip/SipProvider.class \
-	javax/sip/SipStack.class \
-	javax/sip/TimeoutEvent.class \
-	javax/sip/Timeout.class \
-	javax/sip/TransactionAlreadyExistsException.class \
-	javax/sip/TransactionDoesNotExistException.class \
-	javax/sip/Transaction.class \
-	javax/sip/TransactionState.class \
-	javax/sip/TransactionTerminatedEvent.class \
-	javax/sip/TransactionUnavailableException.class \
-	javax/sip/TransportAlreadySupportedException.class \
-	javax/sip/TransportNotSupportedException.class
+	$(my_javax_sip_JAVAFILES:%.java=%.class)
 
-MY_SECONDARY += $(my_javax_sip_CLASSFILES)
+MY_SECONDARY	+= $(my_javax_sip_CLASSFILES)
 my_jar_CLASSFILES += $(my_javax_sip_CLASSFILES)
-##EXTRA_DATA += javax-sip-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += javax-sip.jar
-ALL_LOCAL += javax-sip.jar
-jar_DATA += javax-sip-$(VERSION).jar
+my_jar_LINKS	+= javax-sip.jar
+ALL_LOCAL	+= javax-sip.jar
+jar_DATA	+= javax-sip-$(VERSION).jar
 endif
 
 javax-sip-$(VERSION).jar: classdist_java.stamp $(my_javax_sip_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)d='javax/sip' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_javax_sip_JAVAFILES)
+java_JAVAFILES += $(my_javax_sip_JAVAFILES)
 #dist_java_JAVA += $(my_javax_sip_JAVAFILES)
 
 clean-javax_sip:
-	rm -f -- $(my_javax_sip_CLASSFILES)
-	rm -f -- javax-sip.jar javax-sip-$(VERSION).jar
+	@d='javax/sip' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-sip.jar
+	rm -f -- javax-sip-$(VERSION).jar
+	rm -f -- lib-javax-sip.jar.db
 
 CLEAN_LOCAL += clean-javax_sip
 
@@ -1820,52 +1339,30 @@ my_javax_csapi_cc_jcc_JAVAFILES = \
 	javax/csapi/cc/jcc/PrivilegeViolationException.java \
 	javax/csapi/cc/jcc/ProviderUnavailableException.java \
 	javax/csapi/cc/jcc/ResourceUnavailableException.java
-
 my_javax_csapi_cc_jcc_CLASSFILES = \
-	javax/csapi/cc/jcc/CallLoadControlEvent.class \
-	javax/csapi/cc/jcc/CallLoadControlListener.class \
-	javax/csapi/cc/jcc/EventFilter.class \
-	javax/csapi/cc/jcc/InvalidArgumentException.class \
-	javax/csapi/cc/jcc/InvalidPartyException.class \
-	javax/csapi/cc/jcc/InvalidStateException.class \
-	javax/csapi/cc/jcc/JccAddress.class \
-	javax/csapi/cc/jcc/JccCallEvent.class \
-	javax/csapi/cc/jcc/JccCall.class \
-	javax/csapi/cc/jcc/JccCallListener.class \
-	javax/csapi/cc/jcc/JccConnectionEvent.class \
-	javax/csapi/cc/jcc/JccConnection.class \
-	javax/csapi/cc/jcc/JccConnectionListener.class \
-	javax/csapi/cc/jcc/JccEvent.class \
-	javax/csapi/cc/jcc/JccPeerFactory.class \
-	javax/csapi/cc/jcc/JccPeer.class \
-	javax/csapi/cc/jcc/JccProviderEvent.class \
-	javax/csapi/cc/jcc/JccProvider.class \
-	javax/csapi/cc/jcc/JccProviderListener.class \
-	javax/csapi/cc/jcc/MethodNotSupportedException.class \
-	javax/csapi/cc/jcc/MidCallData.class \
-	javax/csapi/cc/jcc/PlatformException.class \
-	javax/csapi/cc/jcc/PrivilegeViolationException.class \
-	javax/csapi/cc/jcc/ProviderUnavailableException.class \
-	javax/csapi/cc/jcc/ResourceUnavailableException.class
+	$(my_javax_csapi_cc_jcc_JAVAFILES:%.java=%.class)
 
-MY_SECONDARY += $(my_javax_csapi_cc_jcc_CLASSFILES)
+MY_SECONDARY	+= $(my_javax_csapi_cc_jcc_CLASSFILES)
 my_jar_CLASSFILES += $(my_javax_csapi_cc_jcc_CLASSFILES)
-##EXTRA_DATA += javax-csapi-cc-jcc-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += javax-csapi-cc-jcc.jar
-ALL_LOCAL += javax-csapi-cc-jcc.jar
-jar_DATA += javax-csapi-cc-jcc-$(VERSION).jar
+my_jar_LINKS	+= javax-csapi-cc-jcc.jar
+ALL_LOCAL	+= javax-csapi-cc-jcc.jar
+jar_DATA	+= javax-csapi-cc-jcc-$(VERSION).jar
 endif
 
 javax-csapi-cc-jcc-$(VERSION).jar: classdist_java.stamp $(my_javax_csapi_cc_jcc_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)d='javax/csapi/cc/jcc' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_javax_csapi_cc_jcc_JAVAFILES)
+java_JAVAFILES += $(my_javax_csapi_cc_jcc_JAVAFILES)
 #dist_java_JAVA += $(my_javax_csapi_cc_jcc_JAVAFILES)
 
 clean-javax_csapi_cc_jcc:
-	rm -f -- $(my_javax_csapi_cc_jcc_CLASSFILES)
-	rm -f -- javax-csapi-cc-jcc.jar javax-csapi-cc-jcc-$(VERSION).jar
+	@d='javax/csapi/cc/jcc' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-csapi-cc-jcc.jar
+	rm -f -- javax-csapi-cc-jcc-$(VERSION).jar
+	rm -f -- lib-javax-csapi-cc-jcc.jar.db
 
 CLEAN_LOCAL += clean-javax_csapi_cc_jcc
 
@@ -1890,54 +1387,37 @@ my_javax_jcat_JAVAFILES = \
 	javax/jcat/JcatTerminalListener.java
 
 my_javax_jcat_CLASSFILES = \
-	javax/jcat/JcatAddressEvent.class \
-	javax/jcat/JcatAddress.class \
-	javax/jcat/JcatAddressListener.class \
-	javax/jcat/JcatCallEvent.class \
-	javax/jcat/JcatCall.class \
-	javax/jcat/JcatConnectionEvent.class \
-	javax/jcat/JcatConnection.class \
-	javax/jcat/JcatConnectionListener.class \
-	javax/jcat/JcatProvider.class \
-	javax/jcat/JcatTerminalCapabilities.class \
-	javax/jcat/JcatTerminalConnectionEvent.class \
-	javax/jcat/JcatTerminalConnection.class \
-	javax/jcat/JcatTerminalConnectionListener.class \
-	javax/jcat/JcatTerminalEvent.class \
-	javax/jcat/JcatTerminal.class \
-	javax/jcat/JcatTerminalListener.class
+	$(my_javax_jcat_JAVAFILES:%.java=%.class)
 
-MY_SECONDARY += $(my_javax_jcat_CLASSFILES)
+MY_SECONDARY	+= $(my_javax_jcat_CLASSFILES)
 my_jar_CLASSFILES += $(my_javax_jcat_CLASSFILES)
-##EXTRA_DATA += javax-jcat-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += javax-jcat.jar
-ALL_LOCAL += javax-jcat.jar
-jar_DATA += javax-jcat-$(VERSION).jar
+my_jar_LINKS	+= javax-jcat.jar
+ALL_LOCAL	+= javax-jcat.jar
+jar_DATA	+= javax-jcat-$(VERSION).jar
 endif
 
 javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_javax_jcat_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)d='javax/jcat' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_javax_jcat_JAVAFILES)
+java_JAVAFILES += $(my_javax_jcat_JAVAFILES)
 #dist_java_JAVA += $(my_javax_jcat_JAVAFILES)
 
 clean-javax_jcat:
-	rm -f -- $(my_javax_jcat_CLASSFILES)
-	rm -f -- javax-jcat.jar javax-jcat-$(VERSION).jar
+	@d='javax/jcat' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- javax-jcat.jar
+	rm -f -- javax-jcat-$(VERSION).jar
 	rm -f -- lib-javax-jcat.jar.db
 
 CLEAN_LOCAL += clean-javax_jcat
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_javax_jcat_jar_la_SOURCES	= javax-jcat.jar
-lib_javax_jcat_jar_la_DEPENDENCIES	= classdist_java.stamp javax-jcat.jar
-nodist_lib_javax_jcat_jar_la_SOURCES	= $(my_javax_jcat_CLASSFILES)
+nodist_lib_javax_jcat_jar_la_SOURCES	= javax-jcat.jar
 lib_javax_jcat_jar_la_LIBADD		=
 lib_javax_jcat_jar_la_LDFLAGS		= -module -avoid-version -shared
 lib_javax_jcat_jar_la_GCJFLAGS		= $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-javax-jcat.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-javax-jcat.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-javax-jcat.jar.la
@@ -1946,44 +1426,11 @@ ALL_LOCAL		+= lib-javax-jcat.jar.db
 endif
 
 lib-javax-jcat.jar.db: javax-jcat.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
 #############################################################################
 
 my_jain_protocol_ss7_tcap_JAVAFILES = \
-	jain/CreateProviderException.java \
-	jain/DeleteProviderException.java \
-	jain/InvalidAddressException.java \
-	jain/InvalidArgumentException.java \
-	jain/InvalidPathNameException.java \
-	jain/JainException.java \
-	jain/ListenerAlreadyRegisteredException.java \
-	jain/ListenerNotRegisteredException.java \
-	jain/MandatoryParameterNotSetException.java \
-	jain/MethodNotSupportedException.java \
-	jain/ParameterNotSetException.java \
-	jain/PeerUnavailableException.java \
-	jain/PlatformException.java \
-	jain/protocol/ss7/AddressConstants.java \
-	jain/protocol/ss7/GTIndicator0001.java \
-	jain/protocol/ss7/GTIndicator0010.java \
-	jain/protocol/ss7/GTIndicator0011.java \
-	jain/protocol/ss7/GTIndicator0100.java \
-	jain/protocol/ss7/GlobalTitle.java \
-	jain/protocol/ss7/IdNotAvailableException.java \
-	jain/protocol/ss7/JainSS7Factory.java \
-	jain/protocol/ss7/JainSS7Utility.java \
-	jain/protocol/ss7/SS7Address.java \
-	jain/protocol/ss7/SS7Exception.java \
-	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.java \
-	jain/protocol/ss7/SS7ListenerNotRegisteredException.java \
-	jain/protocol/ss7/SS7PeerUnavailableException.java \
-	jain/protocol/ss7/SccpUserAddress.java \
-	jain/protocol/ss7/SignalingPointCode.java \
-	jain/protocol/ss7/SubSystemAddress.java \
-	jain/protocol/ss7/UserAddressEmptyException.java \
-	jain/protocol/ss7/UserAddressLimitException.java \
-	jain/protocol/ss7/VersionNotSupportedException.java \
 	jain/protocol/ss7/tcap/ComponentIndEvent.java \
 	jain/protocol/ss7/tcap/ComponentReqEvent.java \
 	jain/protocol/ss7/tcap/DialogueIndEvent.java \
@@ -2033,119 +1480,37 @@ my_jain_protocol_ss7_tcap_JAVAFILES = \
 	jain/protocol/ss7/tcap/dialogue/UserAbortReqEvent.java
 
 my_jain_protocol_ss7_tcap_CLASSFILES = \
-	jain/CreateProviderException.class \
-	jain/DeleteProviderException.class \
-	jain/InvalidAddressException.class \
-	jain/InvalidArgumentException.class \
-	jain/InvalidPathNameException.class \
-	jain/JainException.class \
-	jain/ListenerAlreadyRegisteredException.class \
-	jain/ListenerNotRegisteredException.class \
-	jain/MandatoryParameterNotSetException.class \
-	jain/MethodNotSupportedException.class \
-	jain/ParameterNotSetException.class \
-	jain/PeerUnavailableException.class \
-	jain/PlatformException.class \
-	jain/protocol/ss7/AddressConstants.class \
-	jain/protocol/ss7/GTIndicator0001.class \
-	jain/protocol/ss7/GTIndicator0010.class \
-	jain/protocol/ss7/GTIndicator0011.class \
-	jain/protocol/ss7/GTIndicator0100.class \
-	jain/protocol/ss7/GlobalTitle.class \
-	jain/protocol/ss7/IdNotAvailableException.class \
-	jain/protocol/ss7/JainSS7Factory.class \
-	jain/protocol/ss7/JainSS7Utility.class \
-	jain/protocol/ss7/SS7Address.class \
-	jain/protocol/ss7/SS7Exception.class \
-	jain/protocol/ss7/SS7ListenerAlreadyRegisteredException.class \
-	jain/protocol/ss7/SS7ListenerNotRegisteredException.class \
-	jain/protocol/ss7/SS7PeerUnavailableException.class \
-	jain/protocol/ss7/SccpUserAddress.class \
-	jain/protocol/ss7/SignalingPointCode.class \
-	jain/protocol/ss7/SubSystemAddress.class \
-	jain/protocol/ss7/UserAddressEmptyException.class \
-	jain/protocol/ss7/UserAddressLimitException.class \
-	jain/protocol/ss7/VersionNotSupportedException.class \
-	jain/protocol/ss7/tcap/ComponentIndEvent.class \
-	jain/protocol/ss7/tcap/ComponentReqEvent.class \
-	jain/protocol/ss7/tcap/DialogueIndEvent.class \
-	jain/protocol/ss7/tcap/DialogueReqEvent.class \
-	jain/protocol/ss7/tcap/GTIndicator0001.class \
-	jain/protocol/ss7/tcap/GTIndicator0010.class \
-	jain/protocol/ss7/tcap/GTIndicator0011.class \
-	jain/protocol/ss7/tcap/GTIndicator0100.class \
-	jain/protocol/ss7/tcap/GlobalTitle.class \
-	jain/protocol/ss7/tcap/InvalidUserAddressException.class \
-	jain/protocol/ss7/tcap/JainTcapListener.class \
-	jain/protocol/ss7/tcap/JainTcapProvider.class \
-	jain/protocol/ss7/tcap/JainTcapStack.class \
-	jain/protocol/ss7/tcap/ProviderNotAttachedException.class \
-	jain/protocol/ss7/tcap/TcapConstants.class \
-	jain/protocol/ss7/tcap/TcapErrorEvent.class \
-	jain/protocol/ss7/tcap/TcapException.class \
-	jain/protocol/ss7/tcap/TcapUserAddress.class \
-	jain/protocol/ss7/tcap/UnableToDeleteProviderException.class \
-	jain/protocol/ss7/tcap/component/ComponentConstants.class \
-	jain/protocol/ss7/tcap/component/ErrorIndEvent.class \
-	jain/protocol/ss7/tcap/component/ErrorReqEvent.class \
-	jain/protocol/ss7/tcap/component/InvokeIndEvent.class \
-	jain/protocol/ss7/tcap/component/InvokeReqEvent.class \
-	jain/protocol/ss7/tcap/component/LocalCancelIndEvent.class \
-	jain/protocol/ss7/tcap/component/Operation.class \
-	jain/protocol/ss7/tcap/component/Parameters.class \
-	jain/protocol/ss7/tcap/component/RejectIndEvent.class \
-	jain/protocol/ss7/tcap/component/RejectReqEvent.class \
-	jain/protocol/ss7/tcap/component/ResultIndEvent.class \
-	jain/protocol/ss7/tcap/component/ResultReqEvent.class \
-	jain/protocol/ss7/tcap/component/TimerResetReqEvent.class \
-	jain/protocol/ss7/tcap/component/UserCancelReqEvent.class \
-	jain/protocol/ss7/tcap/dialogue/BeginIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/BeginReqEvent.class \
-	jain/protocol/ss7/tcap/dialogue/ContinueIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/ContinueReqEvent.class \
-	jain/protocol/ss7/tcap/dialogue/DialogueConstants.class \
-	jain/protocol/ss7/tcap/dialogue/DialoguePortion.class \
-	jain/protocol/ss7/tcap/dialogue/EndIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/EndReqEvent.class \
-	jain/protocol/ss7/tcap/dialogue/NoticeIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/ProviderAbortIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/UnidirectionalIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/UnidirectionalReqEvent.class \
-	jain/protocol/ss7/tcap/dialogue/UserAbortIndEvent.class \
-	jain/protocol/ss7/tcap/dialogue/UserAbortReqEvent.class
+	$(my_jain_protocol_ss7_tcap_JAVAFILES:%.java=%.class)
 
-
-MY_SECONDARY += $(my_jain_protocol_ss7_tcap_CLASSFILES)
+MY_SECONDARY	+= $(my_jain_protocol_ss7_tcap_CLASSFILES)
 my_jar_CLASSFILES += $(my_jain_protocol_ss7_tcap_CLASSFILES)
-##EXTRA_DATA += jain-protocol-ss7-tcap-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += jain-protocol-ss7-tcap.jar
-ALL_LOCAL += jain-protocol-ss7-tcap.jar
-jar_DATA += jain-protocol-ss7-tcap-$(VERSION).jar
+my_jar_LINKS	+= jain-protocol-ss7-tcap.jar
+ALL_LOCAL	+= jain-protocol-ss7-tcap.jar
+jar_DATA	+= jain-protocol-ss7-tcap-$(VERSION).jar
 endif
 
-jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_jain_protocol_ss7_tcap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp jain-protocol-ss7.jar $(my_jain_protocol_ss7_tcap_CLASSFILES)
+	$(AM_V_GEN)d='jain/protocol/ss7/tcap' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_jain_protocol_ss7_tcap_JAVAFILES)
+java_JAVAFILES += $(my_jain_protocol_ss7_tcap_JAVAFILES)
 #dist_java_JAVA += $(my_jain_protocol_ss7_tcap_JAVAFILES)
 
 clean-jain_protocol_ss7_tcap:
-	rm -f -- $(my_jain_protocol_ss7_tcap_CLASSFILES)
-	rm -f -- jain-protocol-ss7-tcap.jar jain-protocol-ss7-tcap-$(VERSION).jar
+	@d='jain/protocol/ss7/tcap' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- jain-protocol-ss7-tcap.jar
+	rm -f -- jain-protocol-ss7-tcap-$(VERSION).jar
 	rm -f -- lib-jain-protocol-ss7-tcap.jar.db
 
 CLEAN_LOCAL += clean-jain_protocol_ss7_tcap
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_jain_protocol_ss7_tcap_jar_la_SOURCES = jain-protocol-ss7-tcap.jar
-lib_jain_protocol_ss7_tcap_jar_la_DEPENDENCIES	  = classdist_java.stamp jain-protocol-ss7-tcap.jar
-nodist_lib_jain_protocol_ss7_tcap_jar_la_SOURCES  = $(my_jain_protocol_ss7_tcap_CLASSFILES)
+nodist_lib_jain_protocol_ss7_tcap_jar_la_SOURCES = jain-protocol-ss7-tcap.jar
 lib_jain_protocol_ss7_tcap_jar_la_LIBADD	  =
 lib_jain_protocol_ss7_tcap_jar_la_LDFLAGS	  = -module -avoid-version -shared
 lib_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-jain-protocol-ss7-tcap.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-jain-protocol-ss7-tcap.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-jain-protocol-ss7-tcap.jar.la
@@ -2154,7 +1519,7 @@ ALL_LOCAL		+= lib-jain-protocol-ss7-tcap.jar.db
 endif
 
 lib-jain-protocol-ss7-tcap.jar.db: jain-protocol-ss7-tcap.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
 #############################################################################
 
@@ -2212,76 +1577,29 @@ my_jain_protocol_ss7_oam_JAVAFILES = \
 	jain/protocol/ss7/oam/TooManyInstancesException.java
 
 my_jain_protocol_ss7_oam_CLASSFILES = \
-	jain/protocol/ss7/oam/CommitException.class \
-	jain/protocol/ss7/oam/IllegalOperationException.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2AlarmNotification.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2ErrorNotification.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2LayerManagerMBean.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2ManagedObjectMBean.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2SapMBean.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2StatisticNotification.class \
-	jain/protocol/ss7/oam/mtp2/Mtp2TimerProfileMBean.class \
-	jain/protocol/ss7/oam/mtp3/LinkMBean.class \
-	jain/protocol/ss7/oam/mtp3/LinkSetMBean.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3AlarmNotification.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3ErrorNotification.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3LayerManagerMBean.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3ManagedObjectMBean.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3SapMBean.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3StatisticNotification.class \
-	jain/protocol/ss7/oam/mtp3/Mtp3TimerProfileMBean.class \
-	jain/protocol/ss7/oam/mtp3/OwnSignallingPointMBean.class \
-	jain/protocol/ss7/oam/mtp3/RouteMBean.class \
-	jain/protocol/ss7/oam/mtp3/RouteSetMBean.class \
-	jain/protocol/ss7/oam/mtp3/ScreeningTableMBean.class \
-	jain/protocol/ss7/oam/mtp3/SignallingPointMBean.class \
-	jain/protocol/ss7/oam/OamAlarmNotification.class \
-	jain/protocol/ss7/oam/OamErrorNotification.class \
-	jain/protocol/ss7/oam/OamLayerManagerMBean.class \
-	jain/protocol/ss7/oam/OamLookupTable.class \
-	jain/protocol/ss7/oam/OamManagedObjectMBean.class \
-	jain/protocol/ss7/oam/OamStatisticNotification.class \
-	jain/protocol/ss7/oam/OamTimerProfileMBean.class \
-	jain/protocol/ss7/oam/OamTimerValMBean.class \
-	jain/protocol/ss7/oam/ReadConfigurationException.class \
-	jain/protocol/ss7/oam/sccp/ConcernedAreaMBean.class \
-	jain/protocol/ss7/oam/sccp/GlobalTitleEntryMBean.class \
-	jain/protocol/ss7/oam/sccp/SccpAlarmNotification.class \
-	jain/protocol/ss7/oam/sccp/SccpEntitySetMBean.class \
-	jain/protocol/ss7/oam/sccp/SccpErrorNotification.class \
-	jain/protocol/ss7/oam/sccp/SccpLayerManagerMBean.class \
-	jain/protocol/ss7/oam/sccp/SccpManagedObjectMBean.class \
-	jain/protocol/ss7/oam/sccp/SccpRoutingControlMBean.class \
-	jain/protocol/ss7/oam/sccp/SccpSapMBean.class \
-	jain/protocol/ss7/oam/sccp/SccpStatisticNotification.class \
-	jain/protocol/ss7/oam/sccp/SccpTimerProfileMBean.class \
-	jain/protocol/ss7/oam/StatisticNotSupportedException.class \
-	jain/protocol/ss7/oam/tcap/TcapAlarmNotification.class \
-	jain/protocol/ss7/oam/tcap/TcapErrorNotification.class \
-	jain/protocol/ss7/oam/tcap/TcapLayerManagerMBean.class \
-	jain/protocol/ss7/oam/tcap/TcapManagedObjectMBean.class \
-	jain/protocol/ss7/oam/tcap/TcapNodeMBean.class \
-	jain/protocol/ss7/oam/tcap/TcapStatisticNotification.class \
-	jain/protocol/ss7/oam/TooManyInstancesException.class
+	$(my_jain_protocol_ss7_oam_JAVAFILES:%.java=%.class)
 
-MY_SECONDARY += $(my_jain_protocol_ss7_oam_CLASSFILES)
+MY_SECONDARY	+= $(my_jain_protocol_ss7_oam_CLASSFILES)
 my_jar_CLASSFILES += $(my_jain_protocol_ss7_oam_CLASSFILES)
-##EXTRA_DATA += jain-protocol-ss7-oam-$(VERSION).jar
 if PKG_BUILD_ARCH
-my_jar_LINKS += jain-protocol-ss7-oam.jar
-ALL_LOCAL += jain-protocol-ss7-oam.jar
-jar_DATA += jain-protocol-ss7-oam-$(VERSION).jar
+my_jar_LINKS	+= jain-protocol-ss7-oam.jar
+ALL_LOCAL	+= jain-protocol-ss7-oam.jar
+jar_DATA	+= jain-protocol-ss7-oam-$(VERSION).jar
 endif
 
 jain-protocol-ss7-oam-$(VERSION).jar: classdist_java.stamp $(my_jain_protocol_ss7_oam_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)d='jain/protocol/ss7/oam' ; \
+	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-my_JAVAFILES += $(my_jain_protocol_ss7_oam_JAVAFILES)
+java_JAVAFILES += $(my_jain_protocol_ss7_oam_JAVAFILES)
 #dist_java_JAVA += $(my_jain_protocol_ss7_oam_JAVAFILES)
 
 clean-jain_protocol_ss7_oam:
-	rm -f -- $(my_jain_protocol_ss7_oam_CLASSFILES)
-	rm -f -- jain-protocol-ss7-oam.jar jain-protocol-ss7-oam-$(VERSION).jar
+	@d='jain/protocol/ss7/oam' ; \
+	find $$d -name '*.class' -type f | $(am__base_remove)
+	rm -f -- jain-protocol-ss7-oam.jar
+	rm -f -- jain-protocol-ss7-oam-$(VERSION).jar
+	rm -f -- lib-jain-protocol-ss7-oam.jar.db
 
 CLEAN_LOCAL += clean-jain_protocol_ss7_oam
 
@@ -2568,111 +1886,22 @@ my_oam_JAVAFILES = \
 	org/openss7/jain/protocol/ss7/oam/tcap/TcapLayerManager.java \
 	org/openss7/jain/protocol/ss7/oam/tcap/TcapNode.java
 my_oam_CLASSFILES = \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2LayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2Sap.class \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2TimerProfile.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Link.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/LinkSet.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3LayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3Sap.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3TimerProfile.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/OwnSignallingPoint.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Route.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/RouteSet.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/ScreeningTable.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/SignallingPoint.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/ConcernedArea.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/GlobalTitleEntry.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpEntitySet.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpLayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpRoutingControl.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpSap.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpTimerProfile.class \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapLayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapNode.class
+	$(my_oam_JAVAFILES:%.java=%.class)
 my_oam_SOURCEFILES = \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2LayerManager.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2Sap.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2TimerProfile.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Link.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/LinkSet.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3LayerManager.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3Sap.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3TimerProfile.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/OwnSignallingPoint.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Route.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/RouteSet.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/ScreeningTable.cc \
-	org/openss7/jain/protocol/ss7/oam/mtp3/SignallingPoint.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/ConcernedArea.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/GlobalTitleEntry.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpEntitySet.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpLayerManager.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpRoutingControl.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpSap.cc \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpTimerProfile.cc \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapLayerManager.cc \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapNode.cc
+	$(my_oam_JAVAFILES:%.java=%.cc)
 my_oam_INCLUDES = \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2LayerManager.h \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2Sap.h \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2TimerProfile.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Link.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/LinkSet.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3LayerManager.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3Sap.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3TimerProfile.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/OwnSignallingPoint.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Route.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/RouteSet.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/ScreeningTable.h \
-	org/openss7/jain/protocol/ss7/oam/mtp3/SignallingPoint.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/ConcernedArea.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/GlobalTitleEntry.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpEntitySet.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpLayerManager.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpRoutingControl.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpSap.h \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpTimerProfile.h \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapLayerManager.h \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapNode.h
+	$(my_oam_JAVAFILES:%.java=%.h)
 my_oam_HEADERCLASSES = \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2LayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2Sap.class \
-	org/openss7/jain/protocol/ss7/oam/mtp2/Mtp2TimerProfile.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Link.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/LinkSet.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3LayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3Sap.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Mtp3TimerProfile.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/OwnSignallingPoint.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/Route.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/RouteSet.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/ScreeningTable.class \
-	org/openss7/jain/protocol/ss7/oam/mtp3/SignallingPoint.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/ConcernedArea.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/GlobalTitleEntry.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpEntitySet.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpLayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpRoutingControl.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpSap.class \
-	org/openss7/jain/protocol/ss7/oam/sccp/SccpTimerProfile.class \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapLayerManager.class \
-	org/openss7/jain/protocol/ss7/oam/tcap/TcapNode.class
+	$(my_oam_JAVAFILES:%.java=%.class)
 
-## ## Build the whole jar into a library (older GCJ cannot handle this)
-## #nodist_lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES = org-openss7-jain-protocol-ss7-oam.jar
-## #lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES	     = $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
-## lib_org_openss7_jain_protocol_ss7_oam_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-jain-protocol-ss7-oam.jar $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
-## nodist_lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES  = $(my_oam_CLASSFILES)
+## nodist_lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES = org-openss7-jain-protocol-ss7-oam.jar
 ## lib_org_openss7_jain_protocol_ss7_oam_jar_la_SOURCES	     = $(my_oam_INCLUDES) $(my_oam_SOURCEFILES)
 ## lib_org_openss7_jain_protocol_ss7_oam_jar_la_CPPFLAGS	     = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-## lib_org_openss7_jain_protocol_ss7_oam_jar_la_CFLAGS	     = $(USER_CFLAGS)
+## lib_org_openss7_jain_protocol_ss7_oam_jar_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS)
 ## lib_org_openss7_jain_protocol_ss7_oam_jar_la_LIBADD	     = $(top_builddir)/libstreams.la
 ## lib_org_openss7_jain_protocol_ss7_oam_jar_la_LDFLAGS	     = -module -avoid-version -shared
 ## lib_org_openss7_jain_protocol_ss7_oam_jar_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(CNIFLAGS)
 ## 
-## ##EXTRA_DATA		+= lib-org-openss7-jain-protocol-ss7-oam.jar.db
 ## ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-jain-protocol-ss7-oam.jar.la
 ## if PKG_BUILD_ARCH
 ## gcjlib_LTLIBRARIES 	+= lib-org-openss7-jain-protocol-ss7-oam.jar.la
@@ -2681,20 +1910,12 @@ my_oam_HEADERCLASSES = \
 ## endif
 ## 
 ## lib-org-openss7-jain-protocol-ss7-oam.jar.db: org-openss7-jain-protocol-ss7-oam.jar
-## 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+## 	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 ## 
-## my_INCLUDES += $(my_oam_INCLUDES)
-## my_SOURCEFILES += $(my_oam_SOURCEFILES)
-## DISTCLEANFILES += $(my_oam_SOURCEFILES)
-## 
-## $(my_oam_INCLUDES): %.h : %.class
-## $(my_oam_SOURCEFILES): $(my_oam_INCLUDES)
-## 
-## #MY_PRECIOUS += $(my_oam_SOURCEFILES)
+## java_cni_CLASSES	+= $(my_oam_CLASSFILES)
 ## 
 ## MY_INTERMEDIATE += $(my_oam_HEADERCLASSES)
 ## 
-## ##EXTRA_DATA += org-openss7-jain-protocol-ss7-oam-$(VERSION).jar
 ## if PKG_BUILD_ARCH
 ## my_jar_LINKS += org-openss7-jain-protocol-ss7-oam.jar
 ## ALL_LOCAL += org-openss7-jain-protocol-ss7-oam.jar
@@ -2702,12 +1923,14 @@ my_oam_HEADERCLASSES = \
 ## endif
 ## 
 ## org-openss7-jain-protocol-ss7-oam-$(VERSION).jar: classdist_java.stamp $(my_oam_CLASSFILES)
-## 	$(AM_V_GEN)$(JAR) cf $@ $^
+##	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+##	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+##	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 ## 
 ## MY_SECONDARY += $(my_oam_CLASSFILES)
 ## my_jar_CLASSFILES += $(my_oam_CLASSFILES)
 ## 
-## my_JAVAFILES += $(my_oam_JAVAFILES)
+## java_JAVAFILES += $(my_oam_JAVAFILES)
 ## #dist_java_JAVA += $(my_oam_JAVAFILES)
 ## 
 ## clean-org_openss7_jain_protocol_ss7_oam:
@@ -2725,31 +1948,22 @@ my_jtcap_JAVAFILES = \
 	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.java \
 	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.java
 my_jtcap_CLASSFILES = \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.class \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.class
+	$(my_jtcap_JAVAFILES:%.java=%.class)
 my_jtcap_SOURCEFILES = \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.cc \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.cc
+	$(my_jtcap_JAVAFILES:%.java=%.cc)
 my_jtcap_INCLUDES = \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.h \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.h
+	$(my_jtcap_JAVAFILES:%.java=%.h)
 my_jtcap_HEADERCLASSES = \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.class \
-	org/openss7/jain/protocol/ss7/tcap/JainTcapProviderImpl.class
+	$(my_jtcap_JAVAFILES:%.java=%.class)
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES = org-openss7-jain-protocol-ss7-tcap.jar
-#lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES	      = $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-jain-protocol-ss7-tcap.jar $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
-nodist_lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES  = $(my_jtcap_CLASSFILES)
+nodist_lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES = org-openss7-jain-protocol-ss7-tcap.jar
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_SOURCES	      = $(my_jtcap_INCLUDES) $(my_jtcap_SOURCEFILES)
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CPPFLAGS	      = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CFLAGS	      = $(USER_CFLAGS)
+lib_org_openss7_jain_protocol_ss7_tcap_jar_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LIBADD	      = $(top_builddir)/libstreams.la
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_LDFLAGS	      = -module -avoid-version -shared
 lib_org_openss7_jain_protocol_ss7_tcap_jar_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-jain-protocol-ss7-tcap.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-jain-protocol-ss7-tcap.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-jain-protocol-ss7-tcap.jar.la
@@ -2758,20 +1972,12 @@ ALL_LOCAL		+= lib-org-openss7-jain-protocol-ss7-tcap.jar.db
 endif
 
 lib-org-openss7-jain-protocol-ss7-tcap.jar.db: org-openss7-jain-protocol-ss7-tcap.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jtcap_INCLUDES)
-my_SOURCEFILES += $(my_jtcap_SOURCEFILES)
-DISTCLEANFILES += $(my_jtcap_SOURCEFILES)
-
-$(my_jtcap_INCLUDES): %.h : %.class
-$(my_jtcap_SOURCEFILES): $(my_jtcap_INCLUDES)
-
-#MY_PRECIOUS += $(my_jtcap_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jtcap_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jtcap_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar
 
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-jain-protocol-ss7-tcap.jar
@@ -2780,13 +1986,14 @@ jar_DATA += org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar
 endif
 
 org-openss7-jain-protocol-ss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_jtcap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jtcap_CLASSFILES)
-my_jar_CLASSFILES += $(my_jtcap_CLASSFILES)
-
-my_JAVAFILES += $(my_jtcap_JAVAFILES)
-#dist_java_JAVA += $(my_jtcap_JAVAFILES)
+MY_SECONDARY		+= $(my_jtcap_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jtcap_CLASSFILES)
+java_JAVAFILES		+= $(my_jtcap_JAVAFILES)
+#dist_java_JAVA		+= $(my_jtcap_JAVAFILES)
 
 clean-org_openss7_jain_protocol_ss7_tcap:
 	rm -f -- $(my_jtcap_CLASSFILES)
@@ -2803,31 +2010,22 @@ my_jsip_JAVAFILES = \
 	org/openss7/javax/sip/SipProviderImpl.java \
 	org/openss7/javax/sip/SipStackImpl.java
 my_jsip_CLASSFILES = \
-	org/openss7/javax/sip/SipProviderImpl.class \
-	org/openss7/javax/sip/SipStackImpl.class
+	$(my_jsip_JAVAFILES:%.java=%.class)
 my_jsip_SOURCEFILES = \
-	org/openss7/javax/sip/SipProviderImpl.cc \
-	org/openss7/javax/sip/SipStackImpl.cc
+	$(my_jsip_JAVAFILES:%.java=%.cc)
 my_jsip_INCLUDES = \
-	org/openss7/javax/sip/SipProviderImpl.h \
-	org/openss7/javax/sip/SipStackImpl.h
+	$(my_jsip_JAVAFILES:%.java=%.h)
 my_jsip_HEADERCLASSES = \
-	org/openss7/javax/sip/SipProviderImpl.class \
-	org/openss7/javax/sip/SipStackImpl.class
+	$(my_jsip_JAVAFILES:%.java=%.class)
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_javax_sip_jar_la_SOURCES = org-openss7-javax-sip.jar
-#lib_org_openss7_javax_sip_jar_la_SOURCES	 = $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
-lib_org_openss7_javax_sip_jar_la_DEPENDENCIES	 = classdist_java.stamp org-openss7-javax-sip.jar $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
-nodist_lib_org_openss7_javax_sip_jar_la_SOURCES	 = $(my_jsip_CLASSFILES)
+nodist_lib_org_openss7_javax_sip_jar_la_SOURCES = org-openss7-javax-sip.jar
 lib_org_openss7_javax_sip_jar_la_SOURCES	 = $(my_jsip_INCLUDES) $(my_jsip_SOURCEFILES)
 lib_org_openss7_javax_sip_jar_la_CPPFLAGS	 = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_sip_jar_la_CFLAGS		 = $(USER_CFLAGS)
+lib_org_openss7_javax_sip_jar_la_CFLAGS		 = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_sip_jar_la_LIBADD		 = $(top_builddir)/libstreams.la
 lib_org_openss7_javax_sip_jar_la_LDFLAGS	 = -module -avoid-version -shared
 lib_org_openss7_javax_sip_jar_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-javax-sip.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-javax-sip.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-sip.jar.la
@@ -2836,20 +2034,12 @@ ALL_LOCAL		+= lib-org-openss7-javax-sip.jar.db
 endif
 
 lib-org-openss7-javax-sip.jar.db: org-openss7-javax-sip.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jsip_INCLUDES)
-my_SOURCEFILES += $(my_jsip_SOURCEFILES)
-DISTCLEANFILES += $(my_jsip_SOURCEFILES)
-
-$(my_jsip_INCLUDES): %.h : %.class
-$(my_jsip_SOURCEFILES): $(my_jsip_INCLUDES)
-
-#MY_PRECIOUS += $(my_jsip_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jsip_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jsip_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-javax-sip-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-javax-sip.jar
 ALL_LOCAL += org-openss7-javax-sip.jar
@@ -2857,13 +2047,15 @@ jar_DATA += org-openss7-javax-sip-$(VERSION).jar
 endif
 
 org-openss7-javax-sip-$(VERSION).jar: classdist_java.stamp $(my_jsip_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jsip_CLASSFILES)
-my_jar_CLASSFILES += $(my_jsip_CLASSFILES)
+MY_SECONDARY		+= $(my_jsip_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jsip_CLASSFILES)
 
-my_JAVAFILES += $(my_jsip_JAVAFILES)
-#dist_java_JAVA += $(my_jsip_JAVAFILES)
+java_JAVAFILES		+= $(my_jsip_JAVAFILES)
+#dist_java_JAVA		+= $(my_jsip_JAVAFILES)
 
 clean-org_openss7_javax_sip:
 	rm -f -- $(my_jsip_CLASSFILES)
@@ -2879,31 +2071,26 @@ CLEAN_LOCAL += clean-org_openss7_javax_sip
 my_jcat_JAVAFILES = \
 	org/openss7/javax/jcat/JcatProviderImpl.java
 my_jcat_CLASSFILES = \
-	org/openss7/javax/jcat/JcatProviderImpl.class
+	$(my_jcat_JAVAFILES:%.java=%.class)
 my_jcat_SOURCEFILES = \
-	org/openss7/javax/jcat/JcatProviderImpl.cc
+	$(my_jcat_JAVAFILES:%.java=%.cc)
 my_jcat_INCLUDES = \
-	org/openss7/javax/jcat/JcatProviderImpl.h \
+	$(my_jcat_JAVAFILES:%.java=%.h) \
 	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.h \
 	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.h
 my_jcat_HEADERCLASSES = \
-	org/openss7/javax/jcat/JcatProviderImpl.class \
+	$(my_jcat_JAVAFILES:%.java=%.class) \
 	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.class \
 	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.class
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_javax_jcat_jar_la_SOURCES	= org-openss7-javax-jcat.jar
-#lib_org_openss7_javax_jcat_jar_la_SOURCES	 = $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
-lib_org_openss7_javax_jcat_jar_la_DEPENDENCIES	 = classdist_java.stamp org-openss7-javax-jcat.jar $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
-nodist_lib_org_openss7_javax_jcat_jar_la_SOURCES = $(my_jcat_CLASSFILES)
+nodist_lib_org_openss7_javax_jcat_jar_la_SOURCES	= org-openss7-javax-jcat.jar
 lib_org_openss7_javax_jcat_jar_la_SOURCES	 = $(my_jcat_INCLUDES) $(my_jcat_SOURCEFILES)
 lib_org_openss7_javax_jcat_jar_la_CPPFLAGS	 = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jcat_jar_la_CFLAGS	 = $(USER_CFLAGS)
+lib_org_openss7_javax_jcat_jar_la_CFLAGS	 = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_jcat_jar_la_LIBADD	 = $(top_builddir)/libstreams.la
 lib_org_openss7_javax_jcat_jar_la_LDFLAGS	 = -module -avoid-version -shared
 lib_org_openss7_javax_jcat_jar_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-javax-jcat.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-javax-jcat.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jcat.jar.la
@@ -2912,20 +2099,12 @@ ALL_LOCAL		+= lib-org-openss7-javax-jcat.jar.db
 endif
 
 lib-org-openss7-javax-jcat.jar.db: org-openss7-javax-jcat.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jcat_INCLUDES)
-my_SOURCEFILES += $(my_jcat_SOURCEFILES)
-DISTCLEANFILES += $(my_jcat_SOURCEFILES)
-
-$(my_jcat_INCLUDES): %.h : %.class
-$(my_jcat_SOURCEFILES): $(my_jcat_INCLUDES)
-
-#MY_PRECIOUS += $(my_jcat_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jcat_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jcat_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-javax-jcat-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-javax-jcat.jar
 ALL_LOCAL += org-openss7-javax-jcat.jar
@@ -2933,13 +2112,15 @@ jar_DATA += org-openss7-javax-jcat-$(VERSION).jar
 endif
 
 org-openss7-javax-jcat-$(VERSION).jar: classdist_java.stamp $(my_jcat_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jcat_CLASSFILES)
-my_jar_CLASSFILES += $(my_jcat_CLASSFILES)
+MY_SECONDARY		+= $(my_jcat_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jcat_CLASSFILES)
 
-my_JAVAFILES += $(my_jcat_JAVAFILES)
-#dist_java_JAVA += $(my_jcat_JAVAFILES)
+java_JAVAFILES		+= $(my_jcat_JAVAFILES)
+#dist_java_JAVA		+= $(my_jcat_JAVAFILES)
 
 clean-org_openss7_javax_jcat:
 	rm -f -- $(my_jcat_CLASSFILES)
@@ -2956,28 +2137,20 @@ my_jisup_JAVAFILES = \
 	org/openss7/javax/jain/ss7/isup/JainIsupProviderImpl.java \
 	org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.java
 my_jisup_CLASSFILES = \
-	org/openss7/javax/jain/ss7/isup/JainIsupProviderImpl.class \
-	org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.class
+	$(my_jisup_JAVAFILES:%.java=%.class)
 my_jisup_SOURCEFILES = \
-	org/openss7/javax/jain/ss7/isup/JainIsupProviderImpl.cc \
-	org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.cc
+	$(my_jisup_JAVAFILES:%.java=%.cc)
 my_jisup_INCLUDES = \
-	org/openss7/javax/jain/ss7/isup/JainIsupProviderImpl.h \
-	org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.h
+	$(my_jisup_JAVAFILES:%.java=%.h)
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES = org-openss7-javax-jain-ss7-isup.jar
-#lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES	   = $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
-lib_org_openss7_javax_jain_ss7_isup_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-javax-jain-ss7-isup.jar $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
-nodist_lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES  = $(my_jisup_CLASSFILES)
+nodist_lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES = org-openss7-javax-jain-ss7-isup.jar
 lib_org_openss7_javax_jain_ss7_isup_jar_la_SOURCES	   = $(my_jisup_INCLUDES) $(my_jisup_SOURCEFILES)
 lib_org_openss7_javax_jain_ss7_isup_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jain_ss7_isup_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_javax_jain_ss7_isup_jar_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_jain_ss7_isup_jar_la_LIBADD	   = $(top_builddir)/libstreams.la
 lib_org_openss7_javax_jain_ss7_isup_jar_la_LDFLAGS	   = -module -avoid-version -shared
 lib_org_openss7_javax_jain_ss7_isup_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-javax-jain-ss7-isup.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-javax-jain-ss7-isup.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jain-ss7-isup.jar.la
@@ -2986,20 +2159,12 @@ ALL_LOCAL		+= lib-org-openss7-javax-jain-ss7-isup.jar.db
 endif
 
 lib-org-openss7-javax-jain-ss7-isup.jar.db: org-openss7-javax-jain-ss7-isup.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jisup_INCLUDES)
-my_SOURCEFILES += $(my_jisup_SOURCEFILES)
-DISTCLEANFILES += $(my_jisup_SOURCEFILES)
-
-$(my_jisup_INCLUDES): %.h : %.class
-$(my_jisup_SOURCEFILES): $(my_jisup_INCLUDES)
-
-#MY_PRECIOUS += $(my_jisup_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jisup_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jisup_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-javax-jain-ss7-isup-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-javax-jain-ss7-isup.jar
 ALL_LOCAL += org-openss7-javax-jain-ss7-isup.jar
@@ -3007,13 +2172,15 @@ jar_DATA += org-openss7-javax-jain-ss7-isup-$(VERSION).jar
 endif
 
 org-openss7-javax-jain-ss7-isup-$(VERSION).jar: classdist_java.stamp $(my_jisup_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jisup_CLASSFILES)
-my_jar_CLASSFILES += $(my_jisup_CLASSFILES)
+MY_SECONDARY		+= $(my_jisup_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jisup_CLASSFILES)
 
-my_JAVAFILES += $(my_jisup_JAVAFILES)
-#dist_java_JAVA += $(my_jisup_JAVAFILES)
+java_JAVAFILES		+= $(my_jisup_JAVAFILES)
+#dist_java_JAVA		+= $(my_jisup_JAVAFILES)
 
 clean-org_openss7_javax_jain_ss7_isup:
 	rm -f -- $(my_jisup_CLASSFILES)
@@ -3030,31 +2197,22 @@ my_jinap_JAVAFILES = \
 	org/openss7/javax/jain/ss7/inap/JainInapProviderImpl.java \
 	org/openss7/javax/jain/ss7/inap/JainInapStackImpl.java
 my_jinap_CLASSFILES = \
-	org/openss7/javax/jain/ss7/inap/JainInapProviderImpl.class \
-	org/openss7/javax/jain/ss7/inap/JainInapStackImpl.class
+	$(my_jinap_JAVAFILES:%.java=%.class)
 my_jinap_SOURCEFILES = \
-	org/openss7/javax/jain/ss7/inap/JainInapProviderImpl.cc \
-	org/openss7/javax/jain/ss7/inap/JainInapStackImpl.cc
+	$(my_jinap_JAVAFILES:%.java=%.cc)
 my_jinap_INCLUDES = \
-	org/openss7/javax/jain/ss7/inap/JainInapProviderImpl.h \
-	org/openss7/javax/jain/ss7/inap/JainInapStackImpl.h
+	$(my_jinap_JAVAFILES:%.java=%.h)
 my_jinap_HEADERCLASSES = \
-	org/openss7/javax/jain/ss7/inap/JainInapProviderImpl.class \
-	org/openss7/javax/jain/ss7/inap/JainInapStackImpl.class
+	$(my_jinap_JAVAFILES:%.java=%.class)
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES = org-openss7-javax-jain-ss7-inap.jar
-#lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES	   = $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
-lib_org_openss7_javax_jain_ss7_inap_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-javax-jain-ss7-inap.jar $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
-nodist_lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES  = $(my_jinap_CLASSFILES)
+nodist_lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES = org-openss7-javax-jain-ss7-inap.jar
 lib_org_openss7_javax_jain_ss7_inap_jar_la_SOURCES	   = $(my_jinap_INCLUDES) $(my_jinap_SOURCEFILES)
 lib_org_openss7_javax_jain_ss7_inap_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jain_ss7_inap_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_javax_jain_ss7_inap_jar_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_jain_ss7_inap_jar_la_LIBADD	   = $(top_builddir)/libstreams.la
 lib_org_openss7_javax_jain_ss7_inap_jar_la_LDFLAGS	   = -module -avoid-version -shared
 lib_org_openss7_javax_jain_ss7_inap_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-javax-jain-ss7-inap.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-javax-jain-ss7-inap.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jain-ss7-inap.jar.la
@@ -3063,20 +2221,12 @@ ALL_LOCAL		+= lib-org-openss7-javax-jain-ss7-inap.jar.db
 endif
 
 lib-org-openss7-javax-jain-ss7-inap.jar.db: org-openss7-javax-jain-ss7-inap.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jinap_INCLUDES)
-my_SOURCEFILES += $(my_jinap_SOURCEFILES)
-DISTCLEANFILES += $(my_jinap_SOURCEFILES)
-
-$(my_jinap_INCLUDES): %.h : %.class
-$(my_jinap_SOURCEFILES): $(my_jinap_INCLUDES)
-
-#MY_PRECIOUS += $(my_jinap_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jinap_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jinap_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-javax-jain-ss7-inap-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-javax-jain-ss7-inap.jar
 ALL_LOCAL += org-openss7-javax-jain-ss7-inap.jar
@@ -3084,13 +2234,15 @@ jar_DATA += org-openss7-javax-jain-ss7-inap-$(VERSION).jar
 endif
 
 org-openss7-javax-jain-ss7-inap-$(VERSION).jar: classdist_java.stamp $(my_jinap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jinap_CLASSFILES)
-my_jar_CLASSFILES += $(my_jinap_CLASSFILES)
+MY_SECONDARY		+= $(my_jinap_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jinap_CLASSFILES)
 
-my_JAVAFILES += $(my_jinap_JAVAFILES)
-#dist_java_JAVA += $(my_jinap_JAVAFILES)
+java_JAVAFILES		+= $(my_jinap_JAVAFILES)
+#dist_java_JAVA		+= $(my_jinap_JAVAFILES)
 
 clean-org_openss7_javax_jain_ss7_inap:
 	rm -f -- $(my_jinap_CLASSFILES)
@@ -3114,59 +2266,22 @@ my_jmap_JAVAFILES = \
 	org/openss7/javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStackImpl.java \
 	org/openss7/javax/jain/protocol/ss7/map/transaction/MessageTransactionProviderImpl.java
 my_jmap_CLASSFILES = \
-	org/openss7/javax/jain/protocol/ss7/map/JainMapStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/information/JainMapMsInfoStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/information/MsInfoProviderImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/position/JainMapMsPosStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/position/MsPosProviderImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/session/JainMapMessageSessionStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/session/MessageSessionProviderImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/MessageTransactionProviderImpl.class
+	$(my_jmap_JAVAFILES:%.java=%.class)
 my_jmap_SOURCEFILES = \
-	org/openss7/javax/jain/protocol/ss7/map/JainMapStackImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/information/JainMapMsInfoStackImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/information/MsInfoProviderImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/position/JainMapMsPosStackImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/position/MsPosProviderImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/session/JainMapMessageSessionStackImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/session/MessageSessionProviderImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStackImpl.cc \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/MessageTransactionProviderImpl.cc
+	$(my_jmap_JAVAFILES:%.java=%.cc)
 my_jmap_INCLUDES = \
-	org/openss7/javax/jain/protocol/ss7/map/JainMapStackImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/information/JainMapMsInfoStackImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/information/MsInfoProviderImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/position/JainMapMsPosStackImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/position/MsPosProviderImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/session/JainMapMessageSessionStackImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/session/MessageSessionProviderImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStackImpl.h \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/MessageTransactionProviderImpl.h
+	$(my_jmap_JAVAFILES:%.java=%.h)
 my_jmap_HEADERCLASSES = \
-	org/openss7/javax/jain/protocol/ss7/map/JainMapStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/information/JainMapMsInfoStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/information/MsInfoProviderImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/position/JainMapMsPosStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/position/MsPosProviderImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/session/JainMapMessageSessionStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/session/MessageSessionProviderImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/JainMapMessageTransactionStackImpl.class \
-	org/openss7/javax/jain/protocol/ss7/map/transaction/MessageTransactionProviderImpl.class
+	$(my_jmap_JAVAFILES:%.java=%.class)
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES = org-openss7-javax-jain-protocol-ss7-map.jar
-#lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES 	   = $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-javax-jain-protocol-ss7-map.jar $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
-nodist_lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES  = $(my_jmap_CLASSFILES)
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES	   = $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
+nodist_lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES = org-openss7-javax-jain-protocol-ss7-map.jar
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_SOURCES 	   = $(my_jmap_INCLUDES) $(my_jmap_SOURCEFILES)
 lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_LIBADD	   = $(top_builddir)/libstreams.la
 lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_LDFLAGS	   = -module -avoid-version -shared
 lib_org_openss7_javax_jain_protocol_ss7_map_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.la
@@ -3175,20 +2290,12 @@ ALL_LOCAL		+= lib-org-openss7-javax-jain-protocol-ss7-map.jar.db
 endif
 
 lib-org-openss7-javax-jain-protocol-ss7-map.jar.db: org-openss7-javax-jain-protocol-ss7-map.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jmap_INCLUDES)
-my_SOURCEFILES += $(my_jmap_SOURCEFILES)
-DISTCLEANFILES += $(my_jmap_SOURCEFILES)
-
-$(my_jmap_INCLUDES): %.h : %.class
-$(my_jmap_SOURCEFILES): $(my_jmap_INCLUDES)
-
-#MY_PRECIOUS += $(my_jmap_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jmap_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jmap_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-javax-jain-protocol-ss7-map.jar
 ALL_LOCAL += org-openss7-javax-jain-protocol-ss7-map.jar
@@ -3196,13 +2303,15 @@ jar_DATA += org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar
 endif
 
 org-openss7-javax-jain-protocol-ss7-map-$(VERSION).jar: classdist_java.stamp $(my_jmap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jmap_CLASSFILES)
-my_jar_CLASSFILES += $(my_jmap_CLASSFILES)
+MY_SECONDARY		+= $(my_jmap_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jmap_CLASSFILES)
 
-my_JAVAFILES += $(my_jmap_JAVAFILES)
-#dist_java_JAVA += $(my_jmap_JAVAFILES)
+java_JAVAFILES		+= $(my_jmap_JAVAFILES)
+#dist_java_JAVA		+= $(my_jmap_JAVAFILES)
 
 clean-org_openss7_javax_jain_protocol_ss7_map:
 	rm -f -- $(my_jmap_CLASSFILES)
@@ -3219,31 +2328,22 @@ my_jcc_JAVAFILES = \
 	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.java \
 	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.java
 my_jcc_CLASSFILES = \
-	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.class \
-	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.class
+	$(my_jcc_JAVAFILES:%.java=%.class)
 my_jcc_SOURCEFILES = \
-	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.cc \
-	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.cc
+	$(my_jcc_JAVAFILES:%.java=%.cc)
 my_jcc_INCLUDES = \
-	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.h \
-	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.h
+	$(my_jcc_JAVAFILES:%.java=%.h)
 my_jcc_HEADERCLASSES = \
-	org/openss7/javax/csapi/cc/jcc/JccPeerImpl.class \
-	org/openss7/javax/csapi/cc/jcc/JccProviderImpl.class
+	$(my_jcc_JAVAFILES:%.java=%.class)
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES = org-openss7-javax-csapi-cc-jcc.jar
-#lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES	  = $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_DEPENDENCIES	  = classdist_java.stamp org-openss7-javax-csapi-cc-jcc.jar $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
-nodist_lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES  = $(my_jcc_CLASSFILES)
+nodist_lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES = org-openss7-javax-csapi-cc-jcc.jar
 lib_org_openss7_javax_csapi_cc_jcc_jar_la_SOURCES	  = $(my_jcc_INCLUDES) $(my_jcc_SOURCEFILES)
 lib_org_openss7_javax_csapi_cc_jcc_jar_la_CPPFLAGS	  = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_javax_csapi_cc_jcc_jar_la_CFLAGS	  = $(USER_CFLAGS)
+lib_org_openss7_javax_csapi_cc_jcc_jar_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_csapi_cc_jcc_jar_la_LIBADD	  = $(top_builddir)/libstreams.la
 lib_org_openss7_javax_csapi_cc_jcc_jar_la_LDFLAGS	  = -module -avoid-version -shared
 lib_org_openss7_javax_csapi_cc_jcc_jar_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
-##EXTRA_DATA		+= lib-org-openss7-javax-csapi-cc-jcc.jar.db
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-javax-csapi-cc-jcc.jar.la
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-javax-csapi-cc-jcc.jar.la
@@ -3252,20 +2352,12 @@ ALL_LOCAL		+= lib-org-openss7-javax-csapi-cc-jcc.jar.db
 endif
 
 lib-org-openss7-javax-csapi-cc-jcc.jar.db: org-openss7-javax-csapi-cc-jcc.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-my_INCLUDES += $(my_jcc_INCLUDES)
-my_SOURCEFILES += $(my_jcc_SOURCEFILES)
-DISTCLEANFILES += $(my_jcc_SOURCEFILES)
-
-$(my_jcc_INCLUDES): %.h : %.class
-$(my_jcc_SOURCEFILES): $(my_jcc_INCLUDES)
-
-#MY_PRECIOUS += $(my_jcc_SOURCEFILES)
+java_cni_CLASSES	+= $(my_jcc_CLASSFILES)
 
 MY_INTERMEDIATE += $(my_jcc_HEADERCLASSES)
 
-##EXTRA_DATA += org-openss7-javax-csapi-cc-jcc-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-javax-csapi-cc-jcc.jar
 ALL_LOCAL += org-openss7-javax-csapi-cc-jcc.jar
@@ -3273,13 +2365,15 @@ jar_DATA += org-openss7-javax-csapi-cc-jcc-$(VERSION).jar
 endif
 
 org-openss7-javax-csapi-cc-jcc-$(VERSION).jar: classdist_java.stamp $(my_jcc_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_jcc_CLASSFILES)
-my_jar_CLASSFILES += $(my_jcc_CLASSFILES)
+MY_SECONDARY		+= $(my_jcc_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_jcc_CLASSFILES)
 
-my_JAVAFILES += $(my_jcc_JAVAFILES)
-#dist_java_JAVA += $(my_jcc_JAVAFILES)
+java_JAVAFILES		+= $(my_jcc_JAVAFILES)
+#dist_java_JAVA		+= $(my_jcc_JAVAFILES)
 
 clean-org_openss7_javax_csapi_cc_jcc:
 	rm -f -- $(my_jcc_CLASSFILES)
@@ -3289,36 +2383,6 @@ clean-org_openss7_javax_csapi_cc_jcc:
 	rm -f -- lib-org-openss7-javax-csapi-cc-jcc.jar.db
 
 CLEAN_LOCAL += clean-org_openss7_javax_csapi_cc_jcc
-
-#############################################################################
-# These are the SWIG JNI modules
-#############################################################################
-
-##### this is where the JNI libraries go
-####jnidir = $(libdir)/java
-####jni_LTLIBRARIES =
-####
-####SWIG = swig
-####
-####my_SWIGFILES =
-####my_swig_JAVAFILES =
-####my_c_WRAPPERS =
-####
-##### this is how we use SWIG to generate headers and wrapper files for C
-####
-####$(my_c_WRAPPERS): %_wrap.c: %.i
-####	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
-####	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-####	$(SWIG) -java -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
-####
-##### this is how we use SWIG to generate headers and wrapper files for C++
-####
-####my_cxx_WRAPPERS =
-####
-####$(my_cxx_WRAPPERS): %_wrap.cxx : %.i
-####	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
-####	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-####	$(SWIG) -java -c++ -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed -e 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
 
 #############################################################################
 # This is how we build STREAMS JNI classes for Java.
@@ -3336,46 +2400,29 @@ my_streams_JAVAFILES = \
 	org/openss7/streams/str_mlist.java \
 	org/openss7/streams/strpeek.java \
 	org/openss7/streams/strpmsg.java
-
 my_streams_CLASSFILES = \
-	org/openss7/streams/bandinfo.class \
-	org/openss7/streams/strbuf.class \
-	org/openss7/streams/StreamsConstants.class \
-	org/openss7/streams/Streams.class \
-	org/openss7/streams/StreamsJNI.class \
-	org/openss7/streams/strfdinsert.class \
-	org/openss7/streams/strioctl.class \
-	org/openss7/streams/str_list.class \
-	org/openss7/streams/str_mlist.class \
-	org/openss7/streams/strpeek.class \
-	org/openss7/streams/strpmsg.class
+	$(my_streams_JAVAFILES:%.java=%.class)
 my_streams_SOURCEFILES = \
 	org/openss7/streams/streams_wrap.c
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_streams_jar_la_SOURCES	= org-openss7-streams.jar
-#lib_org_openss7_streams_jar_la_SOURCES	= $(my_streams_SOURCEFILES)
-lib_org_openss7_streams_jar_la_DEPENDENCIES   = classdist_java.stamp org-openss7-streams.jar $(my_streams_SOURCEFILES)
-nodist_lib_org_openss7_streams_jar_la_SOURCES = $(my_streams_CLASSFILES)
-lib_org_openss7_streams_jar_la_SOURCES	      = $(my_streams_SOURCEFILES)
-lib_org_openss7_streams_jar_la_CPPFLAGS       = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_streams_jar_la_CFLAGS	      = $(USER_CFLAGS)
+nodist_lib_org_openss7_streams_jar_la_SOURCES	= org-openss7-streams.jar
+lib_org_openss7_streams_jar_la_SOURCES	= $(my_streams_SOURCEFILES)
+lib_org_openss7_streams_jar_la_CPPFLAGS       = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+lib_org_openss7_streams_jar_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_streams_jar_la_LIBADD	      = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 lib_org_openss7_streams_jar_la_LDFLAGS	      = -module -avoid-version -shared
 lib_org_openss7_streams_jar_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(JNIFLAGS)
 
-EXTRA_LTLIBRARIES 	+= lib-org-openss7-streams.jar.la
-EXTRA_DATA		+= lib-org-openss7-streams.jar.db
-#if PKG_BUILD_ARCH
-#gcjlib_LTLIBRARIES 	+= lib-org-openss7-streams.jar.la
-#gcjlib_DATA		+= lib-org-openss7-streams.jar.db
-#ALL_LOCAL		+= lib-org-openss7-streams.jar.db
-#endif
+#EXTRA_LTLIBRARIES 	+= lib-org-openss7-streams.jar.la
+if PKG_BUILD_ARCH
+gcjlib_LTLIBRARIES 	+= lib-org-openss7-streams.jar.la
+gcjlib_DATA		+= lib-org-openss7-streams.jar.db
+ALL_LOCAL		+= lib-org-openss7-streams.jar.db
+endif
 
 lib-org-openss7-streams.jar.db: org-openss7-streams.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-##EXTRA_DATA += org-openss7-streams-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-streams.jar
 ALL_LOCAL += org-openss7-streams.jar
@@ -3383,15 +2430,17 @@ jar_DATA += org-openss7-streams-$(VERSION).jar
 endif
 
 org-openss7-streams-$(VERSION).jar: classdist_java.stamp $(my_streams_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_streams_CLASSFILES)
-my_jar_CLASSFILES += $(my_streams_CLASSFILES)
+MY_SECONDARY		+= $(my_streams_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_streams_CLASSFILES)
 
 libopenss7StreamsJNI_la_SOURCES	 = $(my_streams_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7StreamsJNI_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7StreamsJNI_la_CFLAGS	 = $(USER_CFLAGS)
+libopenss7StreamsJNI_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+libopenss7StreamsJNI_la_CFLAGS	 = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7StreamsJNI_la_LIBADD	 = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7StreamsJNI_la_LDFLAGS	 = -module -avoid-version -shared
 
@@ -3400,18 +2449,14 @@ EXTRA_LTLIBRARIES += libopenss7StreamsJNI.la
 #jni_LTLIBRARIES += libopenss7StreamsJNI.la
 #endif
 
-my_SWIGFILES += org/openss7/streams/streams.i
-my_c_WRAPPERS += org/openss7/streams/streams_wrap.c
-#my_cxx_WRAPPERS += org/openss7/streams/streams_wrap.cxx
-my_swig_JAVAFILES += $(my_streams_JAVAFILES)
-#MY_INTERMEDIATE += org/openss7/streams/streams_wrap.c
-#MY_INTERMEDIATE += org/openss7/streams/streams_wrap.cxx
-#MY_INTERMEDIATE += $(my_streams_JAVAFILES)
-MY_SECONDARY += $(my_streams_CLASSFILES)
+java_c_MODULES		+= org/openss7/streams/streams.i
+swig_JAVAFILES		+= $(my_streams_JAVAFILES)
+MY_SECONDARY		+= $(my_streams_CLASSFILES)
+
 $(my_streams_JAVAFILES): $(my_streams_SOURCEFILES)
 
-my_JAVAFILES += $(my_streams_JAVAFILES)
-#dist_java_JAVA += $(my_streams_JAVAFILES)
+java_JAVAFILES		+= $(my_streams_JAVAFILES)
+#dist_java_JAVA		+= $(my_streams_JAVAFILES)
 
 clean-org_openss7_streams:
 	rm -f -- $(my_streams_JAVAFILES)
@@ -3449,47 +2494,20 @@ my_xti_JAVAFILES = \
 	org/openss7/xti/XtiConstants.java \
 	org/openss7/xti/Xti.java \
 	org/openss7/xti/XtiJNI.java
-
 my_xti_CLASSFILES = \
-	org/openss7/xti/netbuf.class \
-	org/openss7/xti/rate.class \
-	org/openss7/xti/reqvalue.class \
-	org/openss7/xti/t_ap_pc_item.class \
-	org/openss7/xti/t_ap_pco_el.class \
-	org/openss7/xti/t_ap_syn_off.class \
-	org/openss7/xti/t_bind.class \
-	org/openss7/xti/t_call.class \
-	org/openss7/xti/t_discon.class \
-	org/openss7/xti/thrpt.class \
-	org/openss7/xti/t_info.class \
-	org/openss7/xti/t_iovec.class \
-	org/openss7/xti/t_leaf_status.class \
-	org/openss7/xti/t_mosiaddr.class \
-	org/openss7/xti/t_optmgmt.class \
-	org/openss7/xti/transdel.class \
-	org/openss7/xti/t_uderr.class \
-	org/openss7/xti/t_unitdata.class \
-	org/openss7/xti/XtiConstants.class \
-	org/openss7/xti/Xti.class \
-	org/openss7/xti/XtiJNI.class
-
+	$(my_xti_JAVAFILES:%.java=%.class)
 my_xti_SOURCEFILES = \
 	org/openss7/xti/xti_wrap.c
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_xti_jar_la_SOURCES = org-openss7-xti.jar
-#lib_org_openss7_xti_jar_la_SOURCES	   = $(my_xti_SOURCEFILES)
-lib_org_openss7_xti_jar_la_DEPENDENCIES	   = classdist_java.stamp org-openss7-xti.jar $(my_xti_SOURCEFILES)
-nodist_lib_org_openss7_xti_jar_la_SOURCES  = $(my_xti_CLASSFILES)
+nodist_lib_org_openss7_xti_jar_la_SOURCES = org-openss7-xti.jar
 lib_org_openss7_xti_jar_la_SOURCES	   = $(my_xti_SOURCEFILES)
-lib_org_openss7_xti_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_xti_jar_la_CFLAGS	   = $(USER_CFLAGS)
+lib_org_openss7_xti_jar_la_CPPFLAGS	   = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+lib_org_openss7_xti_jar_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_xti_jar_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 lib_org_openss7_xti_jar_la_LDFLAGS	   = -module -avoid-version -shared
 lib_org_openss7_xti_jar_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 ##EXTRA_LTLIBRARIES 	+= lib-org-openss7-xti.jar.la
-##EXTRA_DATA		+= lib-org-openss7-xti.jar.db
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-xti.jar.la
 gcjlib_DATA		+= lib-org-openss7-xti.jar.db
@@ -3497,9 +2515,8 @@ ALL_LOCAL		+= lib-org-openss7-xti.jar.db
 endif
 
 lib-org-openss7-xti.jar.db: org-openss7-xti.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-##EXTRA_DATA += org-openss7-xti-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-xti.jar
 ALL_LOCAL += org-openss7-xti.jar
@@ -3507,15 +2524,17 @@ jar_DATA += org-openss7-xti-$(VERSION).jar
 endif
 
 org-openss7-xti-$(VERSION).jar: classdist_java.stamp $(my_tcap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_tcap_CLASSFILES)
-my_jar_CLASSFILES += $(my_tcap_CLASSFILES)
+MY_SECONDARY		+= $(my_tcap_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_tcap_CLASSFILES)
 
 libopenss7XtiJNI_la_SOURCES  = $(my_xti_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7XtiJNI_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7XtiJNI_la_CFLAGS   = $(USER_CFLAGS)
+libopenss7XtiJNI_la_CPPFLAGS = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+libopenss7XtiJNI_la_CFLAGS   = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7XtiJNI_la_LIBADD   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7XtiJNI_la_LDFLAGS  = -module -avoid-version -shared
 
@@ -3524,18 +2543,14 @@ if PKG_BUILD_ARCH
 jni_LTLIBRARIES += libopenss7XtiJNI.la
 endif
 
-my_SWIGFILES += org/openss7/xti/xti.i
-my_c_WRAPPERS += org/openss7/xti/xti_wrap.c
-#my_cxx_WRAPPERS += org/openss7/xti/xti_wrap.cxx
-my_swig_JAVAFILES += $(my_xti_JAVAFILES)
-#MY_INTERMEDIATE += org/openss7/xti/xti_wrap.c
-#MY_INTERMEDIATE += org/openss7/xti/xti_wrap.cxx
-#MY_INTERMEDIATE += $(my_xti_JAVAFILES)
-MY_SECONDARY += $(my_xti_CLASSFILES)
+java_c_MODULES		+= org/openss7/xti/xti.i
+swig_JAVAFILES		+= $(my_xti_JAVAFILES)
+MY_SECONDARY		+= $(my_xti_CLASSFILES)
+
 $(my_xti_JAVAFILES): $(my_xti_SOURCEFILES)
 
-my_JAVAFILES += $(my_xti_JAVAFILES)
-#dist_java_JAVA += $(my_xti_JAVAFILES)
+java_JAVAFILES		+= $(my_xti_JAVAFILES)
+#dist_java_JAVA		+= $(my_xti_JAVAFILES)
 
 clean-org_openss7_xti:
 	rm -f -- $(my_xti_JAVAFILES)
@@ -3582,56 +2597,20 @@ my_tcap_JAVAFILES = \
 	org/openss7/tcap/TcapStream.java \
 	org/openss7/tcap/TcapUni.java \
 	org/openss7/tcap/TciError.java
-
 my_tcap_CLASSFILES = \
-	org/openss7/tcap/SccpAddress.class \
-	org/openss7/tcap/sccp_addr_t.class \
-	org/openss7/tcap/SWIGTYPE_p_listT_TcapOptions_R_t.class \
-	org/openss7/tcap/SWIGTYPE_p_listT_tci__TcapOption_R_t.class \
-	org/openss7/tcap/TcapAbort.class \
-	org/openss7/tcap/TcapAccept.class \
-	org/openss7/tcap/TcapAllow.class \
-	org/openss7/tcap/TcapBegin.class \
-	org/openss7/tcap/TcapCancel.class \
-	org/openss7/tcap/TcapComponentEvent.class \
-	org/openss7/tcap/TcapCont.class \
-	org/openss7/tcap/TcapCoord.class \
-	org/openss7/tcap/TcapData.class \
-	org/openss7/tcap/TcapDialogueEvent.class \
-	org/openss7/tcap/TcapEnd.class \
-	org/openss7/tcap/TcapEndPoint.class \
-	org/openss7/tcap/TcapError.class \
-	org/openss7/tcap/TcapEvent.class \
-	org/openss7/tcap/TcapInvoke.class \
-	org/openss7/tcap/Tcap.class \
-	org/openss7/tcap/TcapJNI.class \
-	org/openss7/tcap/TcapManagement.class \
-	org/openss7/tcap/TcapOptionBuffer.class \
-	org/openss7/tcap/TcapOption.class \
-	org/openss7/tcap/TcapReject.class \
-	org/openss7/tcap/TcapResult.class \
-	org/openss7/tcap/TcapState.class \
-	org/openss7/tcap/TcapStream.class \
-	org/openss7/tcap/TcapUni.class \
-	org/openss7/tcap/TciError.class
-
+	$(my_tcap_JAVAFILES:%.java=%.class)
 my_tcap_SOURCEFILES = \
 	org/openss7/tcap/tcap_wrap.cxx
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_tcap_jar_la_SOURCES = org-openss7-tcap.jar
-#lib_org_openss7_tcap_jar_la_SOURCES	    = $(my_tcap_SOURCEFILES)
-lib_org_openss7_tcap_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-tcap.jar $(my_tcap_SOURCEFILES)
-nodist_lib_org_openss7_tcap_jar_la_SOURCES  = $(my_tcap_CLASSFILES)
+nodist_lib_org_openss7_tcap_jar_la_SOURCES = org-openss7-tcap.jar
 lib_org_openss7_tcap_jar_la_SOURCES	    = $(my_tcap_SOURCEFILES)
-lib_org_openss7_tcap_jar_la_CPPFLAGS	    = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_tcap_jar_la_CFLAGS	    = $(USER_CFLAGS)
+lib_org_openss7_tcap_jar_la_CPPFLAGS	    = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+lib_org_openss7_tcap_jar_la_CFLAGS	    = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_tcap_jar_la_LIBADD	    = $(top_builddir)/libstreams.la
 lib_org_openss7_tcap_jar_la_LDFLAGS	    = -module -avoid-version -shared
 lib_org_openss7_tcap_jar_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 EXTRA_LTLIBRARIES 	+= lib-org-openss7-tcap.jar.la
-EXTRA_DATA		+= lib-org-openss7-tcap.jar.db
 #if PKG_BUILD_ARCH
 #gcjlib_LTLIBRARIES 	+= lib-org-openss7-tcap.jar.la
 #gcjlib_DATA		+= lib-org-openss7-tcap.jar.db
@@ -3639,9 +2618,8 @@ EXTRA_DATA		+= lib-org-openss7-tcap.jar.db
 #endif
 
 lib-org-openss7-tcap.jar.db: org-openss7-tcap.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-##EXTRA_DATA += org-openss7-tcap-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-tcap.jar
 ALL_LOCAL += org-openss7-tcap.jar
@@ -3649,15 +2627,17 @@ jar_DATA += org-openss7-tcap-$(VERSION).jar
 endif
 
 org-openss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_xti_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_xti_CLASSFILES)
-my_jar_CLASSFILES += $(my_xti_CLASSFILES)
+MY_SECONDARY		+= $(my_xti_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_xti_CLASSFILES)
 
 libopenss7TcapJNI_la_SOURCES	= $(my_tcap_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7TcapJNI_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7TcapJNI_la_CFLAGS	= $(USER_CFLAGS)
+libopenss7TcapJNI_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+libopenss7TcapJNI_la_CFLAGS	= $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7TcapJNI_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7TcapJNI_la_LDFLAGS	= -module -avoid-version -shared
 
@@ -3666,18 +2646,14 @@ EXTRA_LTLIBRARIES += libopenss7TcapJNI.la
 #jni_LTLIBRARIES += libopenss7TcapJNI.la
 #endif
 
-my_SWIGFILES += org/openss7/tcap/tcap.i
-#my_c_WRAPPERS += org/openss7/tcap/tcap_wrap.c
-my_cxx_WRAPPERS += org/openss7/tcap/tcap_wrap.cxx
-my_swig_JAVAFILES += $(my_tcap_JAVAFILES)
-#MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.c
-#MY_INTERMEDIATE += org/openss7/tcap/tcap_wrap.cxx
-#MY_INTERMEDIATE += $(my_tcap_JAVAFILES)
-MY_SECONDARY += $(my_tcap_CLASSFILES)
+java_cxx_MODULES	+= org/openss7/tcap/tcap.i
+swig_JAVAFILES		+= $(my_tcap_JAVAFILES)
+MY_SECONDARY		+= $(my_tcap_CLASSFILES)
+
 $(my_tcap_JAVAFILES): $(my_tcap_SOURCEFILES)
 
-my_JAVAFILES += $(my_tcap_JAVAFILES)
-#dist_java_JAVA += $(my_tcap_JAVAFILES)
+java_JAVAFILES		+= $(my_tcap_JAVAFILES)
+#dist_java_JAVA		+= $(my_tcap_JAVAFILES)
 
 clean-org_openss7_tcap:
 	rm -f -- $(my_tcap_JAVAFILES)
@@ -3709,37 +2685,19 @@ my_xtcap_JAVAFILES = \
 	org/openss7/xtcap/Xtcap.java \
 	org/openss7/xtcap/XtcapJNI.java
 my_xtcap_CLASSFILES = \
-	org/openss7/xtcap/OM_descriptor.class \
-	org/openss7/xtcap/OM_padded_object.class \
-	org/openss7/xtcap/OMP_return_code.class \
-	org/openss7/xtcap/OM_string.class \
-	org/openss7/xtcap/OM_value.class \
-	org/openss7/xtcap/SWIGTYPE_p_OM_value.class \
-	org/openss7/xtcap/SWIGTYPE_p_p_char.class \
-	org/openss7/xtcap/SWIGTYPE_p_p_OM_descriptor_struct.class \
-	org/openss7/xtcap/SWIGTYPE_p_void.class \
-	org/openss7/xtcap/TCAP_feature.class \
-	org/openss7/xtcap/TCAP_waiting_sessions.class \
-	org/openss7/xtcap/XtcapConstants.class \
-	org/openss7/xtcap/Xtcap.class \
-	org/openss7/xtcap/XtcapJNI.class
+	$(my_xtcap_JAVAFILES:%.java=%.class)
 my_xtcap_SOURCEFILES = \
 	org/openss7/xtcap/xtcap_wrap.c
 
-## Build the whole jar into a library (older GCJ cannot handle this)
-#nodist_lib_org_openss7_xtcap_jar_la_SOURCES = org-openss7-xtcap.jar
-#lib_org_openss7_xtcap_jar_la_SOURCES	     = $(my_xtcap_SOURCEFILES)
-lib_org_openss7_xtcap_jar_la_DEPENDENCIES    = classdist_java.stamp org-openss7-xtcap.jar $(my_xtcap_SOURCEFILES)
-nodist_lib_org_openss7_xtcap_jar_la_SOURCES  = $(my_xtcap_CLASSFILES)
+nodist_lib_org_openss7_xtcap_jar_la_SOURCES = org-openss7-xtcap.jar
 lib_org_openss7_xtcap_jar_la_SOURCES	     = $(my_xtcap_SOURCEFILES)
-lib_org_openss7_xtcap_jar_la_CPPFLAGS	     = $(GCJLIB_INCLUDES) -fno-strict-aliasing
-lib_org_openss7_xtcap_jar_la_CFLAGS	     = $(USER_CFLAGS)
+lib_org_openss7_xtcap_jar_la_CPPFLAGS	     = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+lib_org_openss7_xtcap_jar_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_xtcap_jar_la_LIBADD	     = $(top_builddir)/libstreams.la
 lib_org_openss7_xtcap_jar_la_LDFLAGS	     = -module -avoid-version -shared
 lib_org_openss7_xtcap_jar_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(JNIFLAGS)
 
 EXTRA_LTLIBRARIES 	+= lib-org-openss7-xtcap.jar.la
-EXTRA_DATA		+= lib-org-openss7-xtcap.jar.db
 #if PKG_BUILD_ARCH
 #gcjlib_LTLIBRARIES 	+= lib-org-openss7-xtcap.jar.la
 #gcjlib_DATA		+= lib-org-openss7-xtcap.jar.db
@@ -3747,9 +2705,8 @@ EXTRA_DATA		+= lib-org-openss7-xtcap.jar.db
 #endif
 
 lib-org-openss7-xtcap.jar.db: org-openss7-xtcap.jar
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/$$(basename $@ .db).so
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/`basename $@ .db`.so
 
-##EXTRA_DATA += org-openss7-xtcap-$(VERSION).jar
 if PKG_BUILD_ARCH
 my_jar_LINKS += org-openss7-xtcap.jar
 ALL_LOCAL += org-openss7-xtcap.jar
@@ -3757,15 +2714,17 @@ jar_DATA += org-openss7-xtcap-$(VERSION).jar
 endif
 
 org-openss7-xtcap-$(VERSION).jar: classdist_java.stamp $(my_xtcap_CLASSFILES)
-	$(AM_V_GEN)$(JAR) cf $@ $^
+	$(AM_V_GEN)strip=`echo '-$(VERSION).jar' | sed 's,.,.,g'` ; \
+	d=`echo '$@' | sed "s,$$strip$$,,;s,-,/,g"` ; \
+	find "$$d" -name '*.class' -type f | sort -u | $(JAR) c@f $@
 
-MY_SECONDARY += $(my_xtcap_CLASSFILES)
-my_jar_CLASSFILES += $(my_xtcap_CLASSFILES)
+MY_SECONDARY		+= $(my_xtcap_CLASSFILES)
+my_jar_CLASSFILES	+= $(my_xtcap_CLASSFILES)
 
 libopenss7XtcapJNI_la_SOURCES	= $(my_xtcap_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7XtcapJNI_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing
-libopenss7XtcapJNI_la_CFLAGS	= $(USER_CFLAGS)
+libopenss7XtcapJNI_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
+libopenss7XtcapJNI_la_CFLAGS	= $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7XtcapJNI_la_LIBADD	= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7XtcapJNI_la_LDFLAGS	= -module -avoid-version -shared
 
@@ -3774,14 +2733,10 @@ EXTRA_LTLIBRARIES += libopenss7XtcapJNI.la
 #jni_LTLIBRARIES += libopenss7XtcapJNI.la
 #endif
 
-my_SWIGFILES += org/openss7/xtcap/xtcap.i
-my_c_WRAPPERS += org/openss7/xtcap/xtcap_wrap.c
-#my_cxx_WRAPPERS += org/openss7/xtcap/xtcap_wrap.cxx
-my_swig_JAVAFILES += $(my_xtcap_JAVAFILES)
-#MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.c
-#MY_INTERMEDIATE += org/openss7/xtcap/xtcap_wrap.cxx
-#MY_INTERMEDIATE += $(my_xtcap_JAVAFILES)
-MY_SECONDARY += $(my_xtcap_CLASSFILES)
+java_c_MODULES		+= org/openss7/xtcap/xtcap.i
+swig_JAVAFILES		+= $(my_xtcap_JAVAFILES)
+MY_SECONDARY		+= $(my_xtcap_CLASSFILES)
+
 $(my_xtcap_JAVAFILES): $(my_xtcap_SOURCEFILES)
 
 clean-org_openss7_xtcap:
@@ -3794,20 +2749,19 @@ clean-org_openss7_xtcap:
 
 CLEAN_LOCAL += clean-org_openss7_xtcap
 
-my_JAVAFILES += $(my_xtcap_JAVAFILES)
-#dist_java_JAVA += $(my_xtcap_JAVAFILES)
+java_JAVAFILES		+= $(my_xtcap_JAVAFILES)
+#dist_java_JAVA		+= $(my_xtcap_JAVAFILES)
 
 # =============================================================================
+
+#MY_INTERMEDIATE	+= $(swig_JAVAFILES)
 
 ## Distribute everything generated by SwiG so that the casual builder does
 ## not need to have swig installed.
 
-EXTRA_DIST += $(my_SWIGFILES)
-EXTRA_DIST += $(my_c_WRAPPERS)
-EXTRA_DIST += $(my_cxx_WRAPPERS)
-EXTRA_DIST += $(my_swig_JAVAFILES)
+EXTRA_DIST += $(swig_JAVAFILES)
 
-EXTRA_DIST += $(my_JAVAFILES)
+EXTRA_DIST += $(java_JAVAFILES)
 
 EXTRA_DIST += \
 	jain/package.html \
@@ -4103,12 +3057,17 @@ EXTRA_DIST += \
 	javax/telephony/media/doc-files/InCall.java \
 	javax/telephony/media/doc-files/PlayerStates.gif
 
-.SECONDARY: $(MY_SECONDARY)
-.INTERMEDIATE: $(MY_INTERMEDIATE)
+include ../../am/swig.am
+
+#SECONDARY: $(MY_SECONDARY)
+#INTERMEDIATE: $(MY_INTERMEDIATE)
 
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.5  2009-07-09 12:05:15  brian
+# - updated implementation
+#
 # Revision 1.1.2.4  2009-07-04 03:51:33  brian
 # - updates for release
 #

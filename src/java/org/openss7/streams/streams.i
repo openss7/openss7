@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.i,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:36:48 $
+ @(#) $RCSfile: streams.i,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-09 12:05:15 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,53 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:36:48 $ by $Author: brian $
+ Last Modified $Date: 2009-07-09 12:05:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.i,v $
+ Revision 1.1.2.2  2009-07-09 12:05:15  brian
+ - updated implementation
+
  Revision 1.1.2.1  2009-06-21 11:36:48  brian
  - added files to new distro
 
  *****************************************************************************/
 
 %module Streams
+%{
+#define _XOPEN_SOURCE 600
+#define _REENTRANT
+#define _THREAD_SAFE
+
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
+#include <sys/stropts.h>
+#include <sys/poll.h>
+#include <fcntl.h>
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+
+#ifndef __EXCEPTIONS
+#define __EXCEPTIONS 1
+#endif
+
+#include <unistd.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <stropts.h>
+%}
 
 %include "typemaps.i"
 %include "arrays_java.i"
