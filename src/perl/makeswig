@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+SUBDIRS = xti
+
+all:
+	subdirs='$(SUBDIRS)'; for d in $$subdirs ; do \
+		(cd $$d ; ./makeswig) ; \
+	done
+
+clean:
+	subdirs='$(SUBDIRS)'; for d in $$subdirs ; do \
+		(cd $$d ; ./makeswig clean) ; \
+	done
+
+.PRECIOUS: makeswig
+
+.PHONY: clean all
+
