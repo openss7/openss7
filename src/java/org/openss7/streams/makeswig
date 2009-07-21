@@ -2,7 +2,7 @@
 
 all: streams
 
-streams: streams_wrap.c
+streams: streams_wrap.cxx
 
 .PRECIOUS: makeswig
 

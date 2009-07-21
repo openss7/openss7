@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: drafts.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
+# @(#) $RCSfile: drafts.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,18 +78,16 @@ AC_DEFUN([_DRAFTS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DRAFTS_ARGS], [dnl
     AC_ARG_ENABLE([drafts],
-	AS_HELP_STRING([--disable-drafts],
-	    [disable build and install of internet drafts
-	     @<:@default=enabled@:>@]),
+	[AS_HELP_STRING([--disable-drafts],
+	    [text formatted internet drafts @<:@default=auto@:>@])],
 	[], [enable_drafts=yes])
     AC_ARG_ENABLE([drafts-html],
-	AS_HELP_STRING([--enable-drafts-html],
-	    [enabled build and install of html formatted internet drafts @<:@default=disabled@:>@]),
+	[AS_HELP_STRING([--enable-drafts-html],
+	    [html formatted internet drafts @<:@default=auto@:>@])],
 	[], [enable_drafts_html=no])
     AC_ARG_ENABLE([drafts-print],
-	AS_HELP_STRING([--disable-drafts-print],
-	    [disable build and install of print formatted internet drafts
-	     @<:@default=enabled@:>@]),
+	[AS_HELP_STRING([--disable-drafts-print],
+	    [print formatted internet drafts @<:@default=auto@:>@])],
 	[], [enable_drafts_print=yes])
     AC_ARG_VAR([SOELIM],  [Roff source elimination command. @<:@default=gsoelim,soelim@:>@])
     AC_ARG_VAR([REFER],   [Roff references command. @<:@default=grefer,refer@:>@])
@@ -137,12 +135,13 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 	    disable_drafts=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'soelim' program.  Generating TXT, PS and
-*** DVI formatted drafts requires the 'soelim' program from the 'groff' package.
-*** You can normally get 'groff' as part of most poplular Linux distributions
-*** and all current versions are acceptable.  The 'groff' package has been
-*** available for many years and is available on the web from any GNU archive
-*** site.  Use the following commands to obtain 'groff':
+*** Configure cannot find a suitable 'soelim' program.  Generating TXT,
+*** PS and DVI formatted drafts requires the 'soelim' program from the
+*** 'groff' package.  You can normally get 'groff' as part of most
+*** poplular Linux distributions and all current versions are
+*** acceptable.  The 'groff' package has been available for many years
+*** and is available on the web from any GNU archive site.  Use the
+*** following commands to obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
@@ -150,8 +149,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** SLES 10:     'zypper install groff'
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
-*** appropriate program with the SOELIM environment variable to 'configure', or
-*** specify the --disable-drafts option to 'configure'.
+*** appropriate program with the SOELIM environment variable to
+*** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi
     fi
@@ -161,12 +160,13 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 	    disable_drafts=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'refer' program.  Generating TXT, PS and
-*** DVI formatted drafts requires the 'refer' program from the 'groff' package.
-*** You can normally get 'groff' as part of most poplular Linux distributions
-*** and all current versions are acceptable.  The 'groff' package has been
-*** available for many years and is available on the web from any GNU archive
-*** site.  Use the following commands to obtain 'groff':
+*** Configure cannot find a suitable 'refer' program.  Generating TXT,
+*** PS and DVI formatted drafts requires the 'refer' program from the
+*** 'groff' package.  You can normally get 'groff' as part of most
+*** poplular Linux distributions and all current versions are
+*** acceptable.  The 'groff' package has been available for many years
+*** and is available on the web from any GNU archive site.  Use the
+*** following commands to obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
@@ -174,8 +174,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** SLES 10:     'zypper install groff'
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
-*** appropriate program with the REFER environment variable to 'configure', or
-*** specify the --disable-drafts option to 'configure'.
+*** appropriate program with the REFER environment variable to
+*** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi
     fi
@@ -185,12 +185,13 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 	    disable_drafts=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'pic' program.  Generating TXT, PS and DVI
-*** formatted drafts requires the 'pic' program from the 'groff' package.  You
-*** can normally get 'groff' as part of most poplular Linux distributions and
-*** all current versions are acceptable.  The 'groff' package has been available
-*** for many years and is available on the web from any GNU archive site.  Use
-*** the following commands to obtain 'groff':
+*** Configure cannot find a suitable 'pic' program.  Generating TXT, PS
+*** and DVI formatted drafts requires the 'pic' program from the 'groff'
+*** package.  You can normally get 'groff' as part of most poplular
+*** Linux distributions and all current versions are acceptable.  The
+*** 'groff' package has been available for many years and is available
+*** on the web from any GNU archive site.  Use the following commands to
+*** obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
@@ -198,8 +199,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** SLES 10:     'zypper install groff'
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
-*** appropriate program with the PIC environment variable to 'configure', or
-*** specify the --disable-drafts option to 'configure'.
+*** appropriate program with the PIC environment variable to
+*** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi
     fi
@@ -209,12 +210,13 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 	    disable_drafts=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'tbl' program.  Generating TXT, PS and DVI
-*** formatted drafts requires the 'tbl' program from the 'groff' package.  You
-*** can normally get 'groff' as part of most poplular Linux distributions and
-*** all current versions are acceptable.  The 'groff' package has been available
-*** for many years and is available on the web from any GNU archive site.  Use
-*** the following commands to obtain 'groff':
+*** Configure cannot find a suitable 'tbl' program.  Generating TXT, PS
+*** and DVI formatted drafts requires the 'tbl' program from the 'groff'
+*** package.  You can normally get 'groff' as part of most poplular
+*** Linux distributions and all current versions are acceptable.  The
+*** 'groff' package has been available for many years and is available
+*** on the web from any GNU archive site.  Use the following commands to
+*** obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
@@ -222,8 +224,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** SLES 10:     'zypper install groff'
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
-*** appropriate program with the TBL environment variable to 'configure', or
-*** specify the --disable-drafts option to 'configure'.
+*** appropriate program with the TBL environment variable to
+*** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi
     fi
@@ -241,12 +243,13 @@ dnl    fi
 	    disable_drafts=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'groff' program.  Generating TXT, PS and
-*** DVI formatted drafts requires the 'groff' program from the 'groff' package.
-*** You can normally get 'groff' as part of most poplular Linux distributions
-*** and all current versions are acceptable.  The 'groff' package has been
-*** available for many years and is available on the web from any GNU archive
-*** site.  Use the following commands to obtain 'groff':
+*** Configure cannot find a suitable 'groff' program.  Generating TXT,
+*** PS and DVI formatted drafts requires the 'groff' program from the
+*** 'groff' package.  You can normally get 'groff' as part of most
+*** poplular Linux distributions and all current versions are
+*** acceptable.  The 'groff' package has been available for many years
+*** and is available on the web from any GNU archive site.  Use the
+*** following commands to obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
@@ -254,8 +257,8 @@ dnl    fi
 *** SLES 10:     'zypper install groff'
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
-*** appropriate program with the GROFF environment variable to 'configure', or
-*** specify the --disable-drafts option to 'configure'.
+*** appropriate program with the GROFF environment variable to
+*** 'configure', or specify the --disable-drafts option to 'configure'.
 *** ])
 	fi
     fi
@@ -266,12 +269,13 @@ dnl    fi
 	    disable_drafts_print=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'ps2pdf' program.  Generating PDF formatted
-*** drafts requires the 'ps2pdf' program from the 'ghostscript' package to
-*** convert from PS to PDF formatted drafts.  You can normally get 'ghostscript'
-*** as part of most popular Linux distributions and all current versions are
-*** acceptable.  The 'ghostscript' package has been available for many years and
-*** is available on the web from a number of sources.  Use the following
+*** Configure cannot find a suitable 'ps2pdf' program.  Generating PDF
+*** formatted drafts requires the 'ps2pdf' program from the
+*** 'ghostscript' package to convert from PS to PDF formatted drafts.
+*** You can normally get 'ghostscript' as part of most popular Linux
+*** distributions and all current versions are acceptable.  The
+*** 'ghostscript' package has been available for many years and is
+*** available on the web from a number of sources.  Use the following
 *** commands to obtain 'ghostscript':
 ***
 *** Debian 4.0:  'apt-get install gs-common'
@@ -283,9 +287,10 @@ dnl    fi
 *** SLES 10:     'zypper install ghostscript-library'
 *** RedHat 7.2:  'rpm -i ghostscript-6.52-9.5'
 ***
-*** To get rid of this warning, load the 'ghostscript' package, specify the
-*** appropriate program with the PS2PDF environment variable to 'configure', or
-*** specify the --disable-drafts-print option to configure.
+*** To get rid of this warning, load the 'ghostscript' package, specify
+*** the appropriate program with the PS2PDF environment variable to
+*** 'configure', or specify the --disable-drafts-print option to
+*** configure.
 *** ])
 	fi
     fi
@@ -296,12 +301,13 @@ dnl    fi
 	    disable_drafts_print=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'fig2dev' program.  Generating figures for
-*** drafts requires the 'fig2dev' program from the 'transfig' package.  You can
-*** normally get 'transfig' as part of most popular Linux distributions and all
-*** current versions are acceptable.  The 'transfig' package has been available
-*** for many years and is available from many web sources.  Use the following
-*** commands to obtain 'fig2dev':
+*** Configure cannot find a suitable 'fig2dev' program.  Generating
+*** figures for drafts requires the 'fig2dev' program from the
+*** 'transfig' package.  You can normally get 'transfig' as part of most
+*** popular Linux distributions and all current versions are acceptable.
+*** The 'transfig' package has been available for many years and is
+*** available from many web sources.  Use the following commands to
+*** obtain 'fig2dev':
 ***
 *** Debian 4.0:  'apt-get install transfig'
 *** Ubuntu 8.04: 'apt-get install transfig'
@@ -312,8 +318,9 @@ dnl    fi
 *** SLES 10:     'configure --disable-drafts-print'
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
-*** appropriate program with the FIG2DEV environment variable to 'configure',
-*** or specify the --disable-drafts-print option to 'configure'.
+*** appropriate program with the FIG2DEV environment variable to
+*** 'configure', or specify the --disable-drafts-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -377,6 +384,9 @@ AC_DEFUN([_DRAFTS_XXX], [dnl
 # =============================================================================
 #
 # $Log: drafts.m4,v $
+# Revision 1.1.2.4  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.3  2009-07-05 12:04:27  brian
 # - updates for release builds
 #

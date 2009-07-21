@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: sctp.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -301,7 +301,7 @@ postun-source:
 POST_UNINSTALL_MA	+= postun-modules postun-source
 
 if PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
 TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
 			   ksysmap='$(ksysmap)' \
 			   KERNEL_MODULES='$(KERNEL_MODULES)' \
@@ -322,6 +322,9 @@ EXTRA_SCRIPTS		+= scripts/cflagcheck
 ## =============================================================================
 ##
 ## $Log: sctp.am,v $
+## Revision 1.1.2.4  2009-07-21 11:06:11  brian
+## - changes from release build
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

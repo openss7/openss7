@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: atm.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: atm.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ATM_OPTIONS], [dnl
     AC_ARG_WITH([atm],
-	AS_HELP_STRING([--with-atm=HEADERS],
-	    [specify the ATM header file directory.  @<:@default=INCLUDEDIR/stratm@:>@]),
-	[with_atm="$withval" ; for s in ${!atm_cv_*} ; do eval "unset $s" ; done],
-	[with_atm=''])
+	[AS_HELP_STRING([--with-atm=HEADERS],
+	    [ATM header directory @<:@default=INCLUDEDIR/stratm@:>@])],
+	[for s in ${!atm_cv_*} ; do eval "unset $s" ; done])
 ])# _ATM_OPTIONS
 # =============================================================================
 
@@ -628,6 +627,9 @@ AC_DEFUN([_ATM_], [dnl
 # =============================================================================
 #
 # $Log: atm.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

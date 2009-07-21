@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -72,7 +72,7 @@ if WITH_KO_MODULES
 
 if AMDEP
 ## AMDEP
-sinclude $(DEPDIR)/modules.Pk
+-include $(DEPDIR)/modules.Pk
 
 $(DEPDIR)/modules.Pk: Makefile
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
@@ -90,6 +90,21 @@ $(DEPDIR)/modules.Pk: Makefile
 		done \
 	) >$(DEPDIR)/modules.Tpk || { rm -f $(DEPDIR)/modules.Tpk ; exit 1 ; } ; \
 	$(am__mv) $(DEPDIR)/modules.Tpk $@
+
+DISTCLEANFILES += $(DEPDIR)/modules.Tpk $(DEPDIR)/modules.Pk
+
+distclean-modules_Pk:
+	@( \
+		echo "$(DEPDIR)/modules.Tpk" ; \
+		echo "$(DEPDIR)/modules.Pk" ; \
+		mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g'` ; \
+		for m in $$mods ; do b=`basename $$m` ; \
+			echo "$(DEPDIR)/$$b.mod.Tpo" ; echo "$(DEPDIR)/$$b.mod.Po" ; \
+			echo "$(DEPDIR)/$$b.Tpko" ; echo "$(DEPDIR)/$$b.Pko" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-modules_Pk
 ## AMDEP
 endif
 
@@ -727,7 +742,7 @@ endif
 ##
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
 TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
 			   ksysmap='$(ksysmap)' \
 			   KERNEL_MODULES='$(KERNEL_MODULES)' \
@@ -744,12 +759,22 @@ endif
 ## RPM_BUILD_KERNEL
 endif
 
-dist_noinst_SCRIPTS	+= scripts/cflagcheck $(top_srcdir)/scripts/modpost.sh
+DISTCLEANFILES		+= $(target)-$(kversion)-config.cache
+
+dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/modpost.awk
+dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/modpost.sh
+dist_noinst_SCRIPTS	+= scripts/cflagcheck
 EXTRA_SCRIPTS		+= scripts/cflagcheck
 
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.5  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.4  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

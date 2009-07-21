@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,12 +77,11 @@ m4_include([m4/strconf.m4])
 m4_include([m4/xopen.m4])
 m4_include([m4/doxy.m4])
 m4_include([m4/lib32.m4])
+m4_include([m4/tcl.m4])
 m4_include([m4/perl.m4])
 m4_include([m4/snmp.m4])
 m4_include([m4/agent.m4])
 dnl m4_include([m4/gcj.m4])
-m4_include([m4/java.m4])
-m4_include([m4/swig.m4])
 
 # =============================================================================
 # AC_OPENSS7
@@ -126,9 +125,19 @@ AC_DEFUN([AC_OPENSS7], [dnl
 		       src/drivers/sctp_hooks.h
 		       src/drivers/udp_hooks.h])
     _LDCONFIG
+    _TCL_EXTENSIONS
+    _PERL_EXTENSIONS
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CPPFLAGS="${USER_CPPFLAGS}${USER_CPPFLAGS:+ }-DNAME=\\\"\`echo [\$][@] | sed -e 's,^[[^-]]*-,,;s,\.o,,'\`\\\""
-    USER_CFLAGS="$CFLAGS"
+    USER_DFLAGS=`echo "$CFLAGS" | sed -n 's,.*-Werror,-Werror,p'`
+    CFLAGS=`echo "$CFLAGS" | sed 's, -Werror,,'`
+    USER_CFLAGS=
+    USER_DXXFLAGS=`echo "$CXXFLAGS" | sed -n 's,.*-Werror,-Werror,p'`
+    CXXFLAGS=`echo "$CXXFLAGS" | sed 's, -Werror,,'`
+    USER_CXXFLAGS=
+    USER_GCDFLAGS=`echo "$GCJFLAGS" | sed -n 's,.*-Werror,-Werror,p'`
+    USER_GCJFLAGS=`echo "$GCJFLAGS" | sed 's, -Werror,,'`
+    GCJFLAGS=
     USER_LDFLAGS="$LDFLAGS"
     _LINUX_KERNEL
     _LINUX_DEVFS
@@ -150,6 +159,11 @@ dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/inclu
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
+    AC_SUBST([USER_DFLAGS])dnl
+    AC_SUBST([USER_CXXFLAGS])dnl
+    AC_SUBST([USER_DXXFLAGS])dnl
+    AC_SUBST([USER_GCJFLAGS])dnl
+    AC_SUBST([USER_GCDFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([PKG_INCLUDES])dnl
     AC_SUBST([PKG_MODFLAGS])dnl
@@ -162,8 +176,6 @@ dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/inclu
     _AGENT
     _AUTOTEST
     _DOXY
-    _JAVA
-    _SWIG
 ])# AC_OPENSS7
 # =============================================================================
 
@@ -173,68 +185,50 @@ dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/inclu
 AC_DEFUN([_OS7_OPTIONS], [dnl
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-irq],
-	AS_HELP_STRING([--disable-streams-irq],
-	    [disable STREAMS irq suppression.
-	     @<:@default=enabled@:>@]),
-	    [enable_streams_irq="$enableval"],
-	    [enable_streams_irq='yes'])
+	[AS_HELP_STRING([--disable-streams-irq],
+	    [STREAMS irq suppression @<:@default=yes@:>@])])
     AC_MSG_CHECKING([for STREAMS irq suppression])
-    case ${enable_streams_irq:-yes} in
-	(no)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
-		AC_PACKAGE_TITLE [will not suppress interrupts for stream or
-		queue lock protection.  When defined a driver's put() procedure
-		must not be called from an ISR and must only be called from
-		bottom half or tasklets.  Bottom half locking is more expensive:
-		don't enable this except for interrupt based profiling.])
-	    ;;
-    esac
+    if test :"${enable_streams_irq:-yes}" = :no ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
+	    AC_PACKAGE_TITLE [will not suppress interrupts for stream or queue
+	    lock protection.  When defined a driver's put() procedure must not
+	    be called from an ISR and must only be called from bottom half or
+	    tasklets.  Bottom half locking is more expensive: don't enable this
+	    except for interrupt based profiling.])
+    fi
     AC_MSG_RESULT([${enable_streams_irq:-yes}])
-    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${enable_streams_irq:-yes} = :no])
+    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :"${enable_streams_irq:-yes}" = :no])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-stats],
-	AS_HELP_STRING([--disable-streams-stats],
-	    [disable STREAMS stats counting.
-	     @<:@default=enabled@:>@]),
-	    [enable_streams_stats="$enableval"],
-	    [enable_streams_stats='yes'])
+	[AS_HELP_STRING([--disable-streams-stats],
+	    [STREAMS stats counting @<:@default=yes@:>@])])
     AC_MSG_CHECKING([for STREAMS stats counting])
-    case ${enable_streams_stats:-yes} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DO_STATS], [1], [When defined]
-		AC_PACKAGE_TITLE [will perform STREAMS entry point counting in
-		the module_stat structure if a pointer is provided by the module
-		or driver.  This is a low cost item and is enabled by default.])
-	    ;;
-    esac
+    if test :"${enable_streams_stats:-yes}" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DO_STATS], [1], [When defined]
+	    AC_PACKAGE_TITLE [will perform STREAMS entry point counting in the
+	    module_stat structure if a pointer is provided by the module or
+	    driver.  This is a low cost item and is enabled by default.])
+    fi
     AC_MSG_RESULT([${enable_streams_stats:-yes}])
-    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :${enable_streams_stats:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :"${enable_streams_stats:-yes}" = :yes])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-syncqs],
-	AS_HELP_STRING([--disable-streams-syncqs],
-	    [disable STREAMS synchronization queues.
-	    @<:@default=enabled@:>@]),
-	    [enable_streams_syncqs="$enableval"],
-	    [enable_streams_syncqs='yes'])
+	[AS_HELP_STRING([--disable-streams-syncqs],
+	    [STREAMS synchronization queues @<:@default=yes@:>@])])
     AC_MSG_CHECKING([for STREAMS synchronization])
-    case ${enable_streams_syncqs:-yes} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SYNCQS], [1], [When defined]
-		AC_PACKAGE_TITLE [will include support for synchronization
-		queues and levels.])
-	    ;;
-    esac
+    if test :"${enable_streams_syncqs:-yes}" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SYNCQS], [1], [When defined]
+	    AC_PACKAGE_TITLE [will include support for synchronization queues
+	    and levels.])
+    fi
     AC_MSG_RESULT([${enable_streams_syncqs:-yes}])
-    AM_CONDITIONAL([CONFIG_STREAMS_SYNCQS], [test :${enable_streams_syncqs:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SYNCQS], [test :"${enable_streams_syncqs:-yes}" = :yes])
 dnl--------------------------------------------------------------------------
     AC_ARG_WITH([streams-kthreads],
-	AS_HELP_STRING([--with-streams-kthreads],
-	    [set STREAMS kernel thread operation to 'nice', 'normal', 'rt' or
-	     'no'. @<:@default=nice@:>@]),
-	    [with_streams_kthreads="$withval"],
-	    [with_streams_kthreads='nice'])
+	[AS_HELP_STRING([--with-streams-kthreads],
+	    [STREAMS kernel thread operation: nice, normal, rt or no @<:@default=nice@:>@])])
     AC_MSG_CHECKING([for STREAMS kernel threads])
-    case ${with_streams_kthreads:-nice} in
+    case "${with_streams_kthreads:-nice}" in
 	(no|rt|normal) ;;
 	(*) with_streams_kthreads=nice ;;
     esac
@@ -248,7 +242,7 @@ dnl--------------------------------------------------------------------------
     AH_TEMPLATE([CONFIG_STREAMS_NN_KTHREADS], [When defined] AC_PACKAGE_TITLE
 	[will run kernel threads under normal scheduling priority when
 	CONFIG_STREAMS_RT_KTHREADS is not defined instead of at nice level 19.])
-    case ${with_streams_kthreads:-nice} in
+    case "${with_streams_kthreads:-nice}" in
 	(no) ;;
 	(rt)	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1])
 		    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_RT_KTHREADS], [1]) ;;
@@ -257,51 +251,38 @@ dnl--------------------------------------------------------------------------
 	(nice)	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1]) ;;
     esac
     AC_MSG_RESULT([${with_streams_kthreads:-nice}])
-    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${with_streams_kthreads:-nice} != :no])
+    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :"${with_streams_kthreads:-nice}" != :no])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-utils],
-	AS_HELP_STRING([--disable-streams-utils],
-	    [disable additional STREAMS utilities.
-	    @<:@default=enabled@:>@]),
-	    [enable_streams_utils="$enableval"],
-	    [enable_streams_utils='yes'])
+	[AS_HELP_STRING([--disable-streams-utils],
+	    [additional STREAMS utilities @<:@default=yes@:>@])])
     AC_MSG_CHECKING([for STREAMS utilities])
-    case ${enable_streams_utils:-yes} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTILS], [1], [When defined,]
+    if test :"${enable_streams_utils:-yes}" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTILS], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include additional STREAMS utilities.])
-	    ;;
-    esac
+    fi
     AC_MSG_RESULT([${enable_streams_utils:-yes}])
-    AM_CONDITIONAL([CONFIG_STREAMS_UTILS], [test :${enable_streams_utils:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_UTILS], [test :"${enable_streams_utils:-yes}" = :yes])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([big-compile],
-	AS_HELP_STRING([--disable-big-compile],
-	    [disable compiling as one big computational unit,
-	    @<:@default=enabled@:>@]),
-	    [enable_big_compile="$enableval"],
-	    [enable_big_comiple='yes'])
+	[AS_HELP_STRING([--disable-big-compile],
+	    [compile as one big computational unit @<:@default=yes@:>@])])
     AC_MSG_CHECKING([for STREAMS big compile])
-    case ${enable_big_compile:-yes} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SEPARATE_COMPILE], [1], [When defined,]
+    if test :"${enable_big_compile:-yes}" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SEPARATE_COMPILE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will compile streams objects separately.])
-	    ;;
-    esac
+    fi
     AC_MSG_RESULT([${enable_big_compile:-yes}])
-    AM_CONDITIONAL([CONFIG_STREAMS_SEPARATE_COMPILE], [test :${enable_big_compile:-yes} != :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SEPARATE_COMPILE], [test :"${enable_big_compile:-yes}" != :yes])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-fifos],
-	AS_HELP_STRING([--enable-streams-fifos],
-	    [enable override of system fifos with STREAMS-based fifos.
-	    @<:@default=no@:>@]),
-	[enable_streams_fifos="$enableval"],
-	[enable_streams_fifos='no'])
-    if test :"$enable_streams_fifos" = :yes ; then
+	[AS_HELP_STRING([--enable-streams-fifos],
+	    [override system fifos with STREAMS-based fifos @<:@default=no@:>@])])
+    if test :"${enable_streams_fifos:-no}" = :yes ; then
 	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_OVERRIDE_FIFOS], [1], [When defined,]
-		AC_PACKAGE_TITLE [will override the Linux system defined
-		FIFOs at startup.  This should be used with care for a while,
-		until streams FIFOs are proven.])
+	    AC_PACKAGE_TITLE [will override the Linux system defined FIFOs at
+	    startup.  This should be used with care for a while, until streams
+	    FIFOs are proven.])
     fi
 dnl--------------------------------------------------------------------------
     AH_VERBATIM([streamscall], m4_text_wrap([Use this macro like fastcall.  It
@@ -330,318 +311,250 @@ dnl--------------------------------------------------------------------------
     AC_DEFINE_UNQUOTED([STREAMSCALL(__x)], [__x streamscall])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-sth],
-	AS_HELP_STRING([--enable-module-sth],
-	    [enable module sth for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_sth="$enableval"],
-	    [enable_module_sth='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_STH], [test :${enable_module_sth:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE], [test :${enable_module_sth:-module} = :module])
+	[AS_HELP_STRING([--enable-module-sth],
+	    [sth linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_sth:-module}" in (yes|no) ;; (*) enable_module_sth=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_STH], [test :"${enable_module_sth:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE], [test :"${enable_module_sth:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-bufmod],
-	AS_HELP_STRING([--enable-module-bufmod],
-	    [enable bufmod module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_bufmod="$enableval"],
-	    [enable_module_bufmod='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD], [test :${enable_module_bufmod:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD_MODULE], [test :${enable_module_bufmod:-module} = :module])
+	[AS_HELP_STRING([--enable-module-bufmod],
+	    [bufmod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_bufmod:-module}" in (yes|no) ;; (*) enable_module_bufmod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD], [test :"${enable_module_bufmod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD_MODULE], [test :"${enable_module_bufmod:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-nullmod],
-	AS_HELP_STRING([--enable-module-nullmod],
-	    [enable nullmod module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_nullmod="$enableval"],
-	    [enable_module_nullmod='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD], [test :${enable_module_nullmod:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD_MODULE], [test :${enable_module_nullmod:-module} = :module])
+	[AS_HELP_STRING([--enable-module-nullmod],
+	    [nullmod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_nullmod:-module}" in (yes|no) ;; (*) enable_module_nullmod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD], [test :"${enable_module_nullmod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD_MODULE], [test :"${enable_module_nullmod:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-pipemod],
-	AS_HELP_STRING([--enable-module-pipemod],
-	    [enable pipemod module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_pipemod="$enableval"],
-	    [enable_module_pipemod='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD], [test :${enable_module_pipemod:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE], [test :${enable_module_pipemod:-module} = :module])
+	[AS_HELP_STRING([--enable-module-pipemod],
+	    [pipemod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_pipemod:-module}" in (yes|no) ;; (*) enable_module_pipemod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD], [test :"${enable_module_pipemod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE], [test :"${enable_module_pipemod:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-connld],
-	AS_HELP_STRING([--enable-module-connld],
-	    [enable connld module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_connld="$enableval"],
-	    [enable_module_connld='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD], [test :${enable_module_connld:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE], [test :${enable_module_connld:-module} = :module])
+	[AS_HELP_STRING([--enable-module-connld],
+	    [connld linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_connld:-module}" in (yes|no) ;; (*) enable_module_connld=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD], [test :"${enable_module_connld:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE], [test :"${enable_module_connld:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-sc],
-	AS_HELP_STRING([--enable-module-sc],
-	    [enable sc module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_sc="$enableval"],
-	    [enable_module_sc='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_SC], [test :${enable_module_sc:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE], [test :${enable_module_sc:-module} = :module])
+	[AS_HELP_STRING([--enable-module-sc],
+	    [sc linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_sc:-module}" in (yes|no) ;; (*) enable_module_sc=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SC], [test :"${enable_module_sc:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE], [test :"${enable_module_sc:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-testmod],
-	AS_HELP_STRING([--enable-module-testmod],
-	    [enable testmod module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_testmod="$enableval"],
-	    [enable_module_testmod='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD], [test :${enable_module_testmod:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD_MODULE], [test :${enable_module_testmod:-module} = :module])
+	[AS_HELP_STRING([--enable-module-testmod],
+	    [testmod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_testmod:-module}" in (yes|no) ;; (*) enable_module_testmod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD], [test :"${enable_module_testmod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD_MODULE], [test :"${enable_module_testmod:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-timod],
-	AS_HELP_STRING([--enable-module-timod],
-	    [enable timod module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_timod="$enableval"],
-	    [enable_module_timod='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_TIMOD], [test :${enable_module_timod:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_TIMOD_MODULE], [test :${enable_module_timod:-module} = :module])
+	[AS_HELP_STRING([--enable-module-timod],
+	    [timod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_timod:-module}" in (yes|no) ;; (*) enable_module_timod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_TIMOD], [test :"${enable_module_timod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TIMOD_MODULE], [test :"${enable_module_timod:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-tirdwr],
-	AS_HELP_STRING([--enable-module-tirdwr],
-	    [enable tirdwr module for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_module_tirdwr="$enableval"],
-	    [enable_module_tirdwr='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR], [test :${enable_module_tirdwr:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR_MODULE], [test :${enable_module_tirdwr:-module} = :module])
+	[AS_HELP_STRING([--enable-module-tirdwr],
+	    [tirdwr linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_tirdwr:-module}" in (yes|no) ;; (*) enable_module_tirdwr=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR], [test :"${enable_module_tirdwr:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR_MODULE], [test :"${enable_module_tirdwr:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-clone],
-	AS_HELP_STRING([--enable-driver-clone],
-	    [enable clone driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_clone="$enableval"],
-	    [enable_driver_clone='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_CLONE], [test :${enable_driver_clone:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE], [test :${enable_driver_clone:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-clone],
+	    [clone linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_clone:-module}" in (yes|no) ;; (*) enable_driver_clone=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE], [test :"${enable_driver_clone:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE], [test :"${enable_driver_clone:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-echo],
-	AS_HELP_STRING([--enable-driver-echo],
-	    [enable echo driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_echo="$enableval"],
-	    [enable_driver_echo='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_ECHO], [test :${enable_driver_echo:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE], [test :${enable_driver_echo:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-echo],
+	    [echo linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_echo:-module}" in (yes|no) ;; (*) enable_driver_echo=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO], [test :"${enable_driver_echo:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE], [test :"${enable_driver_echo:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-fifo],
-	AS_HELP_STRING([--enable-driver-fifo],
-	    [enable fifo driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_fifo="$enableval"],
-	    [enable_driver_fifo='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_FIFO], [test :${enable_driver_fifo:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE], [test :${enable_driver_fifo:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-fifo],
+	    [fifo linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_fifo:-module}" in (yes|no) ;; (*) enable_driver_fifo=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO], [test :"${enable_driver_fifo:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE], [test :"${enable_driver_fifo:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-log],
-	AS_HELP_STRING([--enable-driver-log],
-	    [enable log driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_log="$enableval"],
-	    [enable_driver_log='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOG], [test :${enable_driver_log:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE], [test :${enable_driver_log:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-log],
+	    [log linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_log:-module}" in (yes|no) ;; (*) enable_driver_log=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG], [test :"${enable_driver_log:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE], [test :"${enable_driver_log:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-loop],
-	AS_HELP_STRING([--enable-driver-loop],
-	    [enable loop driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_loop="$enableval"],
-	    [enable_driver_loop='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOOP], [test :${enable_driver_loop:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE], [test :${enable_driver_loop:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-loop],
+	    [loop linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_loop:-module}" in (yes|no) ;; (*) enable_driver_loop=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP], [test :"${enable_driver_loop:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE], [test :"${enable_driver_loop:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-nsdev],
-	AS_HELP_STRING([--enable-driver-nsdev],
-	    [enable nsdev driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_nsdev="$enableval"],
-	    [enable_driver_nsdev='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV], [test :${enable_driver_nsdev:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE], [test :${enable_driver_nsdev:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-nsdev],
+	    [nsdev linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_nsdev:-module}" in (yes|no) ;; (*) enable_driver_nsdev=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV], [test :"${enable_driver_nsdev:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE], [test :"${enable_driver_nsdev:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-mux],
-	AS_HELP_STRING([--enable-driver-mux],
-	    [enable mux driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_mux="$enableval"],
-	    [enable_driver_mux='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_MUX], [test :${enable_driver_mux:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_MUX_MODULE], [test :${enable_driver_mux:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-mux],
+	    [mux linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_mux:-module}" in (yes|no) ;; (*) enable_driver_mux=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_MUX], [test :"${enable_driver_mux:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_MUX_MODULE], [test :"${enable_driver_mux:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-nuls],
-	AS_HELP_STRING([--enable-driver-nuls],
-	    [enable nuls driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_nuls="$enableval"],
-	    [enable_driver_nuls='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULS], [test :${enable_driver_nuls:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE], [test :${enable_driver_nuls:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-nuls],
+	    [nuls linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_nuls:-module}" in (yes|no) ;; (*) enable_driver_nuls=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS], [test :"${enable_driver_nuls:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE], [test :"${enable_driver_nuls:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-pipe],
-	AS_HELP_STRING([--enable-driver-pipe],
-	    [enable pipe driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_pipe="$enableval"],
-	    [enable_driver_pipe='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPE], [test :${enable_driver_pipe:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE], [test :${enable_driver_pipe:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-pipe],
+	    [pipe linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_pipe:-module}" in (yes|no) ;; (*) enable_driver_pipe=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE], [test :"${enable_driver_pipe:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE], [test :"${enable_driver_pipe:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-sad],
-	AS_HELP_STRING([--enable-driver-sad],
-	    [enable sad driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_sad="$enableval"],
-	    [enable_driver_sad='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_SAD], [test :${enable_driver_sad:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE], [test :${enable_driver_sad:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-sad],
+	    [sad linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_sad:-module}" in (yes|no) ;; (*) enable_driver_sad=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD], [test :"${enable_driver_sad:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE], [test :"${enable_driver_sad:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-sfx],
-	AS_HELP_STRING([--enable-driver-sfx],
-	    [enable sfx driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_sfx="$enableval"],
-	    [enable_driver_sfx='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_SFX], [test :${enable_driver_sfx:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE], [test :${enable_driver_sfx:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-sfx],
+	    [sfx linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_sfx:-module}" in (yes|no) ;; (*) enable_driver_sfx=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX], [test :"${enable_driver_sfx:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE], [test :"${enable_driver_sfx:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-spx],
-	AS_HELP_STRING([--enable-driver-spx],
-	    [enable spx driver for linkage with STREAMS.
-	    @<:@default=module@:>@]),
-	    [enable_driver_spx="$enableval"],
-	    [enable_driver_spx='module'])
-    AM_CONDITIONAL([CONFIG_STREAMS_SPX], [test :${enable_driver_spx:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE], [test :${enable_driver_spx:-module} = :module])
+	[AS_HELP_STRING([--enable-driver-spx],
+	    [spx linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_driver_spx:-module}" in (yes|no) ;; (*) enable_driver_spx=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX], [test :"${enable_driver_spx:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE], [test :"${enable_driver_spx:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-os7],
-	AS_HELP_STRING([--enable-compat-os7],
-	    [enable source compatibility with OpenSS7 variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_os7="$enableval"],
-	    [enable_compat_os7='module'])
+	[AS_HELP_STRING([--enable-compat-os7],
+	    [OpenSS7 compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_os7:-module}" in (yes|no) ;; (*) enable_compat_os7=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7], [test ":${enable_compat_os7:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7_MODULE], [test ":${enable_compat_os7:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-svr3],
-	AS_HELP_STRING([--enable-compat-svr3],
-	    [enable source compatibility with SVR 4.2 MP variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_svr3="$enableval"],
-	    [enable_compat_svr3='module'])
+	[AS_HELP_STRING([--enable-compat-svr3],
+	    [SVR 3 compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_svr3:-module}" in (yes|no) ;; (*) enable_compat_svr3=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3], [test ":${enable_compat_svr3:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE], [test ":${enable_compat_svr3:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-svr4],
-	AS_HELP_STRING([--enable-compat-svr4],
-	    [enable source compatibility with SVR 4.2 MP variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_svr4="$enableval"],
-	    [enable_compat_svr4='module'])
+	[AS_HELP_STRING([--enable-compat-svr4],
+	    [SVR 4.2 MP compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_svr4:-module}" in (yes|no) ;; (*) enable_compat_svr4=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4], [test ":${enable_compat_svr4:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE], [test ":${enable_compat_svr4:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-mps],
-	AS_HELP_STRING([--enable-compat-mps],
-	    [enable source compatibility with MPS variants.
-	    @<:@default=moudle@:>@]),
-	    [enable_compat_mps="$enableval"],
-	    [enable_compat_mps='module'])
+	[AS_HELP_STRING([--enable-compat-mps],
+	    [MPS compatibility linked @<:@default=moudle@:>@])])
+    case "${enable_compat_mps:-module}" in (yes|no) ;; (*) enable_compat_mps=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS], [test ":${enable_compat_mps:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS_MODULE], [test ":${enable_compat_mps:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-sol8],
-	AS_HELP_STRING([--enable-compat-sol8],
-	    [enable source compatibility with Solaris 8 variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_sol8="$enableval"],
-	    [enable_compat_sol8='module'])
+	[AS_HELP_STRING([--enable-compat-sol8],
+	    [Solaris 8 compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_sol8:-module}" in (yes|no) ;; (*) enable_compat_sol8=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN], [test ":${enable_compat_sol8:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE], [test ":${enable_compat_sol8:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-uw7],
-	AS_HELP_STRING([--enable-compat-uw7],
-	    [enable source compatibility with UnixWare 7 variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_uw7="$enableval"],
-	    [enable_compat_uw7='module'])
+	[AS_HELP_STRING([--enable-compat-uw7],
+	    [UnixWare 7 compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_uw7:-module}" in (yes|no) ;; (*) enable_compat_uw7=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7], [test ":${enable_compat_uw7:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7_MODULE], [test ":${enable_compat_uw7:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-osf],
-	AS_HELP_STRING([--enable-compat-osf],
-	    [enable source compatibility with OSF/1.2 variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_osf="$enableval"],
-	    [enable_compat_osf='module'])
+	[AS_HELP_STRING([--enable-compat-osf],
+	    [OSF/1.2 compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_osf:-module}" in (yes|no) ;; (*) enable_compat_osf=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF], [test ":${enable_compat_osf:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF_MODULE], [test ":${enable_compat_osf:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-aix],
-	AS_HELP_STRING([--enable-compat-aix],
-	    [enable source compatibility with AIX 4 variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_aix="$enableval"],
-	    [enable_compat_aix='module'])
+	[AS_HELP_STRING([--enable-compat-aix],
+	    [AIX 4 compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_aix:-module}" in (yes|no) ;; (*) enable_compat_aix=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX], [test ":${enable_compat_aix:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE], [test ":${enable_compat_aix:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-hpux],
-	AS_HELP_STRING([--enable-compat-hpux],
-	    [enable source compatibility with HPUX variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_hpux="$enableval"],
-	    [enable_compat_hpux='module'])
+	[AS_HELP_STRING([--enable-compat-hpux],
+	    [HPUX compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_hpux:-module}" in (yes|no) ;; (*) enable_compat_hpux=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX], [test ":${enable_compat_hpux:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test ":${enable_compat_hpux:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-irix],
-	AS_HELP_STRING([--enable-compat-irix],
-	    [enable source compatibility with IRIX variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_irix="$enableval"],
-	    [enable_compat_irix='module'])
+	[AS_HELP_STRING([--enable-compat-irix],
+	    [IRIX compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_irix:-module}" in (yes|no) ;; (*) enable_compat_irix=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX], [test ":${enable_compat_irix:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test ":${enable_compat_irix:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([compat-mac],
-	AS_HELP_STRING([--enable-compat-mac],
-	    [enable source compatibility with MacOT variants.
-	    @<:@default=module@:>@]),
-	    [enable_compat_mac="$enableval"],
-	    [enable_compat_mac='module'])
+	[AS_HELP_STRING([--enable-compat-mac],
+	    [MacOT compatibility linked @<:@default=module@:>@])])
+    case "${enable_compat_mac:-module}" in (yes|no) ;; (*) enable_compat_mac=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC], [test ":${enable_compat_mac:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE], [test ":${enable_compat_mac:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_WITH([ip],
-	AS_HELP_STRING([--with-ip],
-	    [include np-ip revision 2 driver in build.  @<:@default=yes@:>@]),
-	[with_ip="$withval"],
-	[with_ip='no'])
+	[AS_HELP_STRING([--with-ip],
+	    [include np-ip revision 2 driver @<:@default=yes@:>@])],
+	[], [with_ip=yes])
     AC_MSG_CHECKING([for NP-IP driver])
-    if test :"$with_ip" = :yes ; then
-	os7_cv_ip_v2='yes'
+    if test :"${with_ip:-yes}" = :yes ; then
+	os7_cv_ip_v2=yes
 	AC_DEFINE([IP_VERSION_2], [1], [Define for NP-IP driver.  This define is
 	    needed by test programs and other programs that need to determine if
 	    the NP-IP driver is included in the build or not.])
     else
-	os7_cv_ip_v2='yes'
+	os7_cv_ip_v2=no
     fi
-    AC_MSG_RESULT([$os7_cv_ip_v2])
-    AM_CONDITIONAL([WITH_IP], [test :"$os7_cv_ip_v2" = :yes])dnl
+    AC_MSG_RESULT([${os7_cv_ip_v2:-yes}])
+    AM_CONDITIONAL([WITH_IP], [test :"${os7_cv_ip_v2:-yes}" = :yes])dnl
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([xti-servtype],
-	AS_HELP_STRING([--disable-xti-servtype],
-	    [disable xnet library checks for service type.
-	     @<:@default=enabled@:>@]),
-	[enable_xti_servtype="$enableval"],
-	[enable_xti_servtype='yes'])
+	[AS_HELP_STRING([--enable-xti-servtype],
+	    [xnet library checks service type @<:@default=no@:>@])])
     AC_MSG_CHECKING([for XTI service type checks])
-    if test ${enable_xti_servtype:-yes} != yes ; then
+    if test :"${enable_xti_servtype:-no}" = :no ; then
 	AC_DEFINE_UNQUOTED([CONFIG_XTI_IS_TYPELESS], [1], [Define when the XTI
 	    library is not to check service types.  This is necessary when
 	    T_COTS semantics are expected to be applied to T_CLTS providers.
@@ -649,16 +562,13 @@ dnl--------------------------------------------------------------------------
 	    determine whether T_COTS/T_COTS_ORD primitives are supported or
 	    not.])
     fi
-    AC_MSG_RESULT([${enable_xti_servtype:-yes}])
+    AC_MSG_RESULT([${enable_xti_servtype:-no}])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([xti-states],
-	AS_HELP_STRING([--disable-xti-states],
-	    [disable xnet library checks for state.
-	     @<:@default=enabled@:>@]),
-	[enable_xti_states="$enableval"],
-	[enable_xti_states='yes'])
+	[AS_HELP_STRING([--enable-xti-states],
+	    [xnet library checks state @<:@default=no@:>@])])
     AC_MSG_CHECKING([for XTI state checks])
-    if test ${enable_xti_states:-yes} != yes ; then
+    if test :"${enable_xti_states:-no}" = :no ; then
 	AC_DEFINE_UNQUOTED([CONFIG_XTI_IS_STATELESS], [1], [Define when the
 	    XTI library is not to check states.  This is necessary when T_COTS
 	    semantics are expected to be applied to T_CLTS providers and
@@ -666,79 +576,74 @@ dnl--------------------------------------------------------------------------
 	    defined, the XTI library lets the underlying TPI driver determine
 	    whether the primitive is issued out of state or not.])
     fi
-    AC_MSG_RESULT([${enable_xti_states:-yes}])
+    AC_MSG_RESULT([${enable_xti_states:-no}])
 dnl--------------------------------------------------------------------------
     AC_ARG_WITH([udp],
-	AS_HELP_STRING([--with-udp],
-	    [include udp release 2 driver in build.  @<:@default=yes@:>@]),
-	[with_udp="$withval"],
-	[with_udp='no'])
+	[AS_HELP_STRING([--with-udp],
+	    [include udp release 2 driver @<:@default=yes@:>@])],
+	[], [with_udp=yes])
     AC_MSG_CHECKING([for UDP Release 2 driver])
-    if test :"$with_udp" = :yes ; then
-	os7_cv_udp_v2='yes'
+    if test :"${with_udp:-yes}" = :yes ; then
+	os7_cv_udp_v2=yes
 	AC_DEFINE([UDP_VERSION_2], [1], [Define for UDP Release 2.  This define
 	    is needed by test programs and other programs that need to determine
 	    if the UDP Release 2 driver is included in the build or not.])
     else
-	os7_cv_udp_v2='yes'
+	os7_cv_udp_v2=no
     fi
-    AC_MSG_RESULT([$os7_cv_udp_v2])
-    AM_CONDITIONAL([WITH_UDP], [test :"$os7_cv_udp_v2" = :yes])dnl
+    AC_MSG_RESULT([${os7_cv_udp_v2:-yes}])
+    AM_CONDITIONAL([WITH_UDP], [test :"${os7_cv_udp_v2:-yes}" = :yes])dnl
 dnl--------------------------------------------------------------------------
     AC_ARG_WITH([raw],
-	AS_HELP_STRING([--with-raw],
-	    [include raw release 2 driver in build.  @<:@default=yes@:>@]),
-	[with_raw="$withval"],
-	[with_raw='no'])
+	[AS_HELP_STRING([--with-raw],
+	    [include raw release 2 driver @<:@default=yes@:>@])],
+	[], [with_raw=yes])
     AC_MSG_CHECKING([for RAW Release 2 driver])
-    if test :"$with_raw" = :yes ; then
-	os7_cv_raw_v2='yes'
+    if test :"${with_raw:-yes}" = :yes ; then
+	os7_cv_raw_v2=yes
 	AC_DEFINE([RAW_VERSION_2], [1], [Define for RAW Release 2.  This define
 	    is needed by test programs and other programs that need to determine
 	    if the RAW Release 2 driver is included in the build or not.])
     else
-	os7_cv_raw_v2='yes'
+	os7_cv_raw_v2=no
     fi
-    AC_MSG_RESULT([$os7_cv_raw_v2])
-    AM_CONDITIONAL([WITH_RAW], [test :"$os7_cv_raw_v2" = :yes])dnl
+    AC_MSG_RESULT([${os7_cv_raw_v2:-yes}])
+    AM_CONDITIONAL([WITH_RAW], [test :"${os7_cv_raw_v2:-yes}" = :yes])dnl
 dnl--------------------------------------------------------------------------
     AC_ARG_WITH([tcp],
-	AS_HELP_STRING([--with-tcp],
-	    [include tcp release 2 driver in build.  @<:@default=no@:>@]),
-	[with_tcp="$withval"],
-	[with_tcp='no'])
+	[AS_HELP_STRING([--with-tcp],
+	    [include tcp release 2 driver @<:@default=no@:>@])],
+	[], [with_tcp='no'])
     AC_MSG_CHECKING([for TCP Release 2 driver])
-    if test :"$with_tcp" = :yes ; then
-	os7_cv_tcp_v2='yes'
+    if test :"${with_tcp:-no}" = :yes ; then
+	os7_cv_tcp_v2=yes
 	AC_DEFINE([TCP_VERSION_2], [1], [Define for TCP Release 2.  This define
 	    is needed by test programs and other programs that need to determine
 	    if the TCP Release 2 driver is included in the build or not.])
     else
-	os7_cv_tcp_v2='yes'
+	os7_cv_tcp_v2=no
     fi
-    AC_MSG_RESULT([$os7_cv_tcp_v2])
-    AM_CONDITIONAL([WITH_TCP], [test :"$os7_cv_tcp_v2" = :yes])dnl
+    AC_MSG_RESULT([${os7_cv_tcp_v2:-no}])
+    AM_CONDITIONAL([WITH_TCP], [test :"${os7_cv_tcp_v2:-no}" = :yes])dnl
 dnl--------------------------------------------------------------------------
     AC_ARG_WITH([sctp],
-	AS_HELP_STRING([--with-sctp],
-	    [include sctp release 1 driver in build.  @<:@default=no@:>@]),
-	[with_sctp="$withval"],
-	[with_sctp='no'])
+	[AS_HELP_STRING([--with-sctp],
+	    [include sctp release 1 driver @<:@default=no@:>@])],
+	[], [with_sctp=no])
     AC_ARG_WITH([sctp2],
-	AS_HELP_STRING([--with-sctp2],
-	    [include sctp release 2 driver in build.  @<:@default=yes@:>@]),
-	[with_sctp2="$withval"],
-	[with_sctp2='yes'])
+	[AS_HELP_STRING([--with-sctp2],
+	    [include sctp release 2 driver @<:@default=yes@:>@])],
+	[], [with_sctp2=yes])
     AC_MSG_CHECKING([for sctp version])
-    if test :"$with_sctp2" = :yes ; then
-	with_sctp='no'
+    if test :"${with_sctp2:-yes}" = :yes ; then
+	with_sctp=no
 	os7_cv_sctp_version=2
 	AC_DEFINE([SCTP_VERSION_2], [1], [Define for SCTP Release 2.  This
 	    define is needed by test programs and other programs that need to
 	    determine the difference between the address format and options
 	    conventions for the two versions.])
     else
-	with_sctp='yes'
+	with_sctp=yes
 	os7_cv_sctp_version=1
 	AC_DEFINE([SCTP_VERSION_1], [1], [Define for SCTP Release 1.  This
 	    define is needed by test programs and other programs that need to
@@ -1233,6 +1138,15 @@ dnl----------------------------------------------------------------------------
 	skb_linearize,
 	__symbol_get,
 	__symbol_put])
+dnl----------------------------------------------------------------------------
+dnl Stupid XFS module.  I wish SGI would stop trying to turn Linux into UNIX.
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_EXPORTS([
+	cmn_err,
+	icmn_err,
+	kmem_alloc,
+	kmem_free,
+	kmem_zalloc])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_EXPORTS([
 	add_wait_queue,
@@ -1936,10 +1850,9 @@ dnl 	fi
 	fi
     ])
 dnl----------------------------------------------------------------------------
-    _LINUX_KERNEL_ENV([dnl
-	AC_CHECK_MEMBER([struct inet_protocol.protocol],
-	    [linux_cv_inet_protocol_style='old'],
-	    [:], [
+    _LINUX_CHECK_MEMBER([struct inet_protocol.protocol],
+	[linux_cv_inet_protocol_style='old'],
+	[:], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1948,10 +1861,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/ip.h>
 #include <net/sock.h>
 #include <net/protocol.h>
-	    ])
-	AC_CHECK_MEMBER([struct inet_protocol.no_policy],
-	    [linux_cv_inet_protocol_style='new'],
-	    [:], [
+	])
+    _LINUX_CHECK_MEMBER([struct inet_protocol.no_policy],
+	[linux_cv_inet_protocol_style='new'],
+	[:], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1960,10 +1873,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/ip.h>
 #include <net/sock.h>
 #include <net/protocol.h>
-	    ])
-	AC_CHECK_MEMBER([struct dst_entry.path],
-	    [linux_cv_dst_entry_path='yes'],
-	    [linux_cv_dst_entry_path='no'], [
+	])
+    _LINUX_CHECK_MEMBER([struct dst_entry.path],
+	[linux_cv_dst_entry_path='yes'],
+	[linux_cv_dst_entry_path='no'], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -1972,7 +1885,6 @@ dnl----------------------------------------------------------------------------
 #include <linux/ip.h>
 #include <net/sock.h>
 #include <net/dst.h>
-	    ])
 	])
     if test :"${linux_cv_inet_protocol_style:+set}" = :set ; then
 	case "$linux_cv_inet_protocol_style" in
@@ -2009,12 +1921,11 @@ dnl----------------------------------------------------------------------------
 	    structure.])
     fi
 dnl----------------------------------------------------------------------------
-    _LINUX_KERNEL_ENV([
-	AC_CHECK_TYPES([struct sockaddr_storage], [
-	    AC_DEFINE([HAVE_STRUCT_SOCKADDR_STORAGE], [1], [Most 2.4 kernels do
-		not define struct sockaddr_storage.  Define to 1 if your kernel
-		supports struct sockaddr_storage.])
-	], [:], [
+    _LINUX_CHECK_TYPES([struct sockaddr_storage],
+	[AC_DEFINE([HAVE_STRUCT_SOCKADDR_STORAGE], [1], [Most 2.4 kernels do
+	    not define struct sockaddr_storage.  Define to 1 if your kernel
+	    supports struct sockaddr_storage.])],
+	[:], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -2024,7 +1935,6 @@ dnl----------------------------------------------------------------------------
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-	    ])
 	])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([
@@ -2470,14 +2380,16 @@ dnl fi
 	_LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu], [with_sctp='no'; with_sctp2='no'])
     fi
 dnl--------------------------------------------------------------------------
+    AC_MSG_NOTICE([+-------------------------------+])
+    AC_MSG_NOTICE([| Checks for SCTP Configuration |])
+    AC_MSG_NOTICE([+-------------------------------+])
+dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_SLOW_VERIFICATION
     AC_MSG_CHECKING([for sctp slow verification])
     AC_ARG_ENABLE([sctp-slow-verification],
-	AS_HELP_STRING([--enable-sctp-slow-verification],
-	    [enable slow verification of addresses and tags. @<:@default=no@:>@]),
-	[os7_cv_slow_verification="$enableval"],
-	[os7_cv_slow_verification='no'])
-    if test :"${os7_cv_slow_verification:-no}" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-slow-verification],
+	    [slow verification of addresses and tags @<:@default=no@:>@])])
+    if test :"${enable_sctp_slow_verification:-no}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_SLOW_VERIFICATION], [1], [When a message comes
 	    from an SCTP endpoint with the correct verification tag, it is not
 	    necessary to check ports or addresses to identify the SCTP
@@ -2488,16 +2400,14 @@ dnl--------------------------------------------------------------------------
 	    RFC 2960 compliant operation.  If in doubt, leave this
 	    undefined.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_slow_verification])
+    AC_MSG_RESULT([${enable_sctp_slow_verification:-no}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_THROTTLE_HEARTBEATS
     AC_MSG_CHECKING([for sctp throttle heartbeats])
     AC_ARG_ENABLE([sctp-throttle-heartbeats],
-	AS_HELP_STRING([--enable-sctp-throttle-heartbeats],
-	    [enable heartbeat throttling. @<:@default=no@:>@]),
-	[os7_cv_throttle_heartbeats="$enableval"],
-	[os7_cv_throttle_heartbeats='no'])
-    if test :"${os7_cv_throttle_heartbeats:-no}" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-throttle-heartbeats],
+	    [heartbeat throttling @<:@default=no@:>@])])
+    if test :"${enable_sctp_throttle_heartbeats:-no}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_THROTTLE_HEARTBEATS], [1], [Special feature of
 	    OpenSS7 SCTP which is not mentioned in RFC 2960.  When defined, SCTP
 	    will throttle the rate at which it responds to heartbeats to the
@@ -2505,20 +2415,19 @@ dnl--------------------------------------------------------------------------
 	    to implementations which flood heartbeat messages.  For RFC 2960
 	    compliant operation, leave this undefined.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_throttle_heartbeats])
+    AC_MSG_RESULT([${enable_sctp_throttle_heartbeats:-no}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_DISCARD_OOTB
     AC_MSG_CHECKING([for sctp dicard out-of-the-blue])
     AC_ARG_ENABLE([sctp-discard-ootb],
-	AS_HELP_STRING([--enable-sctp-discard-ootb],
-	    [enable discard out-of-the-blue packets. @<:@default=no@:>@]),
-	[os7_cv_discard_ootb="$enableval"],
-	[if test :"${linux_cv_openss7_sctp:-no}" = :yes ; then
-	    os7_cv_discard_ootb='yes'
-	 else
-	    os7_cv_discard_ootb='no'
-	 fi])
-    if test :"$os7_cv_discard_ootb" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-discard-ootb],
+	    [discard out-of-the-blue packets @<:@default=auto@:>@])], [], [dnl
+	if test :"${linux_cv_openss7_sctp:-no}" = :yes ; then
+	    enable_sctp_discard_ootb=yes
+	else
+	    enable_sctp_discard_ootb=no
+	fi])
+    if test :"${enable_sctp_discard_ootb:-no}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_DISCARD_OOTB], [1], [RFC 2960 requires the
 	    implementation to send ABORT to some OOTB packets (packets for which
 	    no SCTP association exists).  Sending ABORT chunks to unverified
@@ -2531,34 +2440,32 @@ dnl--------------------------------------------------------------------------
 	    the same machine.  For RFC 2960 compliant operation, leave
 	    undefined.  If in doubt, leave this undefined.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_discard_ootb])
+    AC_MSG_RESULT([${enable_sctp_discard_ootb:-no}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_EXTENDED_IP_SUPPORT
     AC_MSG_CHECKING([for sctp extended ip support])
     AC_ARG_ENABLE([sctp-extended-ip-support],
-	AS_HELP_STRING([--enable-sctp-extended-ip-support],
-	    [enable extended IP support for SCTP. @<:@default=disabled@:>@]),
-	[os7_cv_extended_ip_support="$enableval"],
-	[os7_cv_extended_ip_support='no'])
-    if test :"${os7_cv_extended_ip_support:-no}" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-extended-ip-support],
+	    [extended IP support for SCTP @<:@default=disabled@:>@])])
+    if test :"${enable_sctp_extended_ip_support:-no}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_EXTENDED_IP_SUPPORT], [1], [This provides
 	    extended IP support for SCTP for things like IP Transparent Proxy
 	    and IP Masquerading.  This is experimental stuff.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_extended_ip_support])
+    AC_MSG_RESULT([${enable_sctp_extended_ip_support:-no}])
+dnl--------------------------------------------------------------------------
     AC_C_BIGENDIAN(
 	[os7_cv_be_machine='yes'; os7_cv_le_machine='no'],
-	[os7_cv_be_machine='no'; os7_cv_le_machine='yes'],
+	[os7_cv_be_machine='no';  os7_cv_le_machine='yes'],
 	[os7_cv_be_machine='yes'; os7_cv_le_machine='yes'])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_HMAC_SHA1
     AC_MSG_CHECKING([for sctp hmac sha-1])
     AC_ARG_ENABLE([sctp-hmac-sha1],
-	AS_HELP_STRING([--disable-sctp-hmac-sha1],
-	    [disable SHA-1 HMAC. @<:@default=enabled(BE),disabled(LE)@:>@]),
-	[os7_cv_hmac_sha1="$enableval"],
-	[os7_cv_hmac_sha1="$os7_cv_be_machine"])
-    if test :"$os7_cv_hmac_sha1" = :yes ; then
+	[AS_HELP_STRING([--disable-sctp-hmac-sha1],
+	    [SHA-1 HMAC @<:@default=enabled(BE),disabled(LE)@:>@])],
+	[], [enable_sctp_hmac_sha1="$os7_cv_be_machine"])
+    if test :"${enable_sctp_hmac_sha1:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_HMAC_SHA1], [1], [When defined, this provides the
 	    ability to sue the FIPS 180-1 (SHA-1) message authentication code in
 	    SCTP cookies.  When defined and the appropriate sysctl and option is
@@ -2566,17 +2473,16 @@ dnl--------------------------------------------------------------------------
 	    chunk.  If undefined, the SHA-1 HMAC will be unavailable for use
 	    with SCTP.  If in doubt, leave defined.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_hmac_sha1])
-    AM_CONDITIONAL([WITH_HMAC_SHA1], [test :"$os7_cv_hmac_sha1" = :yes])dnl
+    AC_MSG_RESULT([${enable_sctp_hmac_sha1:-yes}])
+    AM_CONDITIONAL([WITH_HMAC_SHA1], [test :"${enable_sctp_hmac_sha1:-yes}" = :yes])dnl
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_HMAC_MD5
     AC_MSG_CHECKING([for sctp hmac md5])
     AC_ARG_ENABLE([sctp-hmac-md5],
-	AS_HELP_STRING([--disable-sctp-hmac-md5],
-	    [disable MD5 HMAC. @<:@default=enabled(LE),disabled(BE)@:>@]),
-	[os7_cv_hmac_md5="$enableval"],
-	[os7_cv_hmac_md5="$os7_cv_le_machine"])
-    if test :"$os7_cv_hmac_md5" = :yes ; then
+	[AS_HELP_STRING([--disable-sctp-hmac-md5],
+	    [MD5 HMAC @<:@default=enabled(LE),disabled(BE)@:>@])],
+	[], [enable_sctp_hmac_md5="$os7_cv_le_machine"])
+    if test :"${enable_sctp_hmac_md5:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_HMAC_MD5], [1], [When defined, this provides the
 	    ability to use the MD5 (RFC 1321) message authentication code in
 	    SCTP cookies.  If you define this macro, when the appropriate system
@@ -2585,51 +2491,45 @@ dnl--------------------------------------------------------------------------
 	    the HD5 HMAC will be unavailable for use with SCTP.  If in doubt,
 	    leave defined.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_hmac_md5])
-    AM_CONDITIONAL([WITH_HMAC_MD5], [test :"$os7_cv_hmac_md5" = :yes])dnl
+    AC_MSG_RESULT([${enable_sctp_hmac_md5:-yes}])
+    AM_CONDITIONAL([WITH_HMAC_MD5], [test :"${enable_sctp_hmac_md5:-yes}" = :yes])dnl
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_ADLER_32
     AC_MSG_CHECKING([for sctp Adler32 checksum])
     AC_ARG_ENABLE([sctp-adler32],
-	AS_HELP_STRING([--enable-sctp-adler32],
-	    [enable Adler32 checksum. @<:@default=disabled@:>@]),
-	[os7_cv_adler32="$enableval"],
-	[os7_cv_adler32='no'])
-    if test :"$os7_cv_adler32" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-adler32],
+	    [Adler32 checksum @<:@default=no@:>@])])
+    if test :"${enable_sctp_adler32:-no}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_ADLER_32], [1], [This provides the ability to use
 	    the older RFC 2960 Adler32 checksum.  If SCTP_CONFIG_CRC_32 below is
 	    not selected, the Adler32 checksum is always provided.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_adler32])
-    AM_CONDITIONAL([WITH_ADLER_32], [test :"$os7_cv_adler32" = :yes])dnl
+    AC_MSG_RESULT([${enable_sctp_adler32:-no}])
+    AM_CONDITIONAL([WITH_ADLER_32], [test :"${enable_sctp_adler32:-no}" = :yes])dnl
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_CRC_32C
     AC_MSG_CHECKING([for sctp CRC-32C checksum])
     AC_ARG_ENABLE([sctp-crc32c],
-	AS_HELP_STRING([--disable-sctp-crc32c],
-	    [disable CRC-32C checksum. @<:@default=enabled@:>@]),
-	[os7_cv_crc32c="$enableval"],
-	[os7_cv_crc32c='yes'])
-    if test :"${os7_cv_adler32:-no}" != :yes ; then
-	os7_cv_crc32c='yes'
+	[AS_HELP_STRING([--disable-sctp-crc32c],
+	    [CRC-32C checksum @<:@default=yes@:>@])])
+    if test :"${enable_sctp_adler32:-no}" != :yes ; then
+	enable_sctp_crc32c=yes
     fi
-    if test :"$os7_cv_crc32c" = :yes ; then
+    if test :"${enable_sctp_crc32c:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_CRC_32C], [1], [This provides the ability to use
 	    the newer CRC-32c checksum as described in RFC 3309.  When this is
 	    selected and SCTP_CONFIG_ADLER_32 is not selected above, then the
 	    only checksum that will be used is the CRC-32c checksum.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_crc32c])
-    AM_CONDITIONAL([WITH_CRC_32C], [test :"$os7_cv_crc32c" = :yes])dnl
+    AC_MSG_RESULT([${enable_sctp_crc32c:-yes}])
+    AM_CONDITIONAL([WITH_CRC_32C], [test :"${enable_sctp_crc32c:-yes}" = :yes])dnl
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_THROTTLE_PASSIVEOPENS
     AC_MSG_CHECKING([for sctp throttle passive opens])
     AC_ARG_ENABLE([sctp-throttle-passiveopens],
-	AS_HELP_STRING([--enable-sctp-throttle-passiveopens],
-	    [enable throttling of passive opens. @<:@default=disabled@:>@]),
-	[os7_cv_throttle_passiveopens="$enableval"],
-	[os7_cv_throttle_passiveopens='no'])
-    if test :"$os7_cv_throttle_passiveopens" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-throttle-passiveopens],
+	    [throttle passive opens @<:@default=disabled@:>@])])
+    if test :"${enable_sctp_throttle_passiveopens:-no}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_THROTTLE_PASSIVEOPENS], [1], [Special feature of
 	    Linux SCTP not mentioned in RFC 2960.  When secure algorithms are
 	    used for signing cookies, the implementation becomes vulnerable to
@@ -2639,98 +2539,86 @@ dnl--------------------------------------------------------------------------
 	    sctp_throttle_itvl to 0 defeats this function.  If undefined, each
 	    INIT and COOKIE ECHO will be processed.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_throttle_passiveopens])
+    AC_MSG_RESULT([${enable_sctp_throttle_passiveopens:-no}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_ECN
     AC_MSG_CHECKING([for sctp ecn])
     AC_ARG_ENABLE([sctp-ecn],
-	AS_HELP_STRING([--enable-sctp-ecn],
-	    [enable Explicit Congestion Notification. @<:@default=enabled@:>@]),
-	[os7_cv_ecn="$enableval"],
-	[os7_cv_ecn='yes'])
-    if test :"$os7_cv_ecn" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-ecn],
+	    [Explicit Congestion Notification @<:@default=yes@:>@])])
+    if test :"${enable_sctp_ecn:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_ECN], [1], [This enables support for Explicit
 	    Congestion Notification (ECN) chunks in SCTP messages as defined in
 	    RFC 2960 and RFC 3168.  It also adds syctl (/proc/net/ipv4/sctp_ecn)
 	    which allows ECN for SCTP to be disabled at runtime.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_ecn])
+    AC_MSG_RESULT([${enable_sctp_ecn:-yes}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_LIFETIMES
     AC_MSG_CHECKING([for sctp lifetimes])
     AC_ARG_ENABLE([sctp-lifetimes],
-	AS_HELP_STRING([--enable-sctp-lifetimes],
-	    [enable SCTP message lifetimes. @<:@default=enabled@:>@]),
-	[os7_cv_lifetimes="$enableval"],
-	[os7_cv_lifetimes='yes'])
-    if test :"$os7_cv_lifetimes" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-lifetimes],
+	    [SCTP message lifetimes @<:@default=yes@:>@])])
+    if test :"${enable_sctp_lifetimes:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_LIFETIMES], [1], [This enables support for
 	    message lifetimes as described in RFC 2960.  When enabled, message
 	    lifetimes can be set on messages.  See sctp(7).  This feature is
 	    always enabled when Partial Reliability Support is set.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_lifetimes])
+    AC_MSG_RESULT([${enable_sctp_lifetimes:-yes}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_ADD_IP
     AC_MSG_CHECKING([for sctp add ip])
     AC_ARG_ENABLE([sctp-add-ip],
-	AS_HELP_STRING([--enable-sctp-add-ip],
-	    [enable ADD-IP. @<:@default=enabled@:>@]),
-	[os7_cv_add_ip="$enableval"],
-	[os7_cv_add_ip='yes'])
-    if test :"$os7_cv_add_ip" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-add-ip],
+	    [ADD-IP @<:@default=yes@:>@])])
+    if test :"${enable_sctp_add_ip:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_ADD_IP], [1], [This enables support for ADD-IP as
 	    described in draft-ietf-tsvwg-addip-sctp-07.txt.  This allows the
 	    addition and removal of IP addresses from existing connections.
 	    This is experimental stuff.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_add_ip])
+    AC_MSG_RESULT([${enable_sctp_add_ip:-yes}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_ADAPTATION_LAYER_INFO
     AC_MSG_CHECKING([for sctp adaptation layer info])
     AC_ARG_ENABLE([sctp-adaptation-layer-info],
-	AS_HELP_STRING([--enable-sctp-adaptation-layer-info],
-	    [enable ALI. @<:@default=enabled@:>@]),
-	[os7_cv_adaptation_layer_info="$enableval"],
-	[os7_cv_adaptation_layer_info='yes'])
-    if test :"$os7_cv_adaptation_layer_info" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-adaptation-layer-info],
+	    [ALI @<:@default=yes@:>@])])
+    if test :"${enable_sctp_adaptation_layer_info:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_ADAPTATION_LAYER_INFO], [1], [This enables
 	    support for the Adaptation Layer Information parameter described in
 	    draft-ietf-tsvwg-addip-sctp-07.txt for communicating application
 	    layer information bits at initialization.  This is experimental
 	    stuff.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_adaptation_layer_info])
+    AC_MSG_RESULT([${enable_sctp_adaptation_layer_info:-yes}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_PARTIAL_RELIABILITY
     AC_MSG_CHECKING([for sctp partial reliability])
     AC_ARG_ENABLE([sctp-partial-reliability],
-	AS_HELP_STRING([--enable-sctp-partial-reliability],
-	    [enable SCTP Partial Reliability (PR-SCTP). @<:@default=enabled@:>@]),
-	[os7_cv_partial_reliability="$enableval"],
-	[os7_cv_partial_reliability='yes'])
-    if test :"$os7_cv_partial_reliability" = :yes ; then
+	[AS_HELP_STRING([--enable-sctp-partial-reliability],
+	    [SCTP Partial Reliability (PR-SCTP) @<:@default=yes@:>@])])
+    if test :"${enable_sctp_partial_reliability:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_PARTIAL_RELIABILITY], [1], [This enables support
 	    for PR-SCTP as described in draft-stewart-tsvwg-prsctp-03.txt.  This
 	    allows for partial reliability of message delivery on a "timed
 	    reliability" basis.  This is experimental stuff.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_partial_reliability])
+    AC_MSG_RESULT([${enable_sctp_partial_reliability:-yes}])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_ERROR_GENERATOR
     AC_MSG_CHECKING([for sctp error generator])
     AC_ARG_ENABLE([sctp-error-generator],
-	AS_HELP_STRING([--disable-sctp-error-generator],
-	    [disable SCTP error generator. @<:@default=enabled@:>@]),
-	[os7_cv_error_generator="$enableval"],
-	[os7_cv_error_generator='yes'])
-    if test :"$os7_cv_error_generator" = :yes ; then
+	[AS_HELP_STRING([--disable-sctp-error-generator],
+	    [SCTP error generator @<:@default=yes@:>@])])
+    if test :"${enable_sctp_error_generator:-yes}" = :yes ; then
 	AC_DEFINE([SCTP_CONFIG_ERROR_GENERATOR], [1], [This provides an internal
 	    error generator that can be accessed with socket options for testing
 	    SCTP operation under packet loss.  You will need this option to run
 	    some of the test programs distributed with the SCTP module.])dnl
     fi
-    AC_MSG_RESULT([$os7_cv_error_generator])
+    AC_MSG_RESULT([${enable_sctp_error_generator:-yes}])
 ])# _OS7_CONFIG_SCTP
 # =============================================================================
 
@@ -2785,12 +2673,16 @@ dnl--------------------------------------------------------------------------
 	;;
     esac
 dnl--------------------------------------------------------------------------
+    AC_MSG_NOTICE([+---------------------------------------+])
+    AC_MSG_NOTICE([| Checks for base STREAMS Configuration |])
+    AC_MSG_NOTICE([+---------------------------------------+])
+dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module sth])
-	if test :${enable_module_sth:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_sth:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_sth='yes'
 	fi
     AC_MSG_RESULT([${enable_module_sth:-module}])
-    case ${enable_module_sth:-module} in
+    case "${enable_module_sth:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_STH], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the sth module for linkage with
@@ -2807,11 +2699,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module bufmod])
-	if test :${enable_module_bufmod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_bufmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_bufmod='yes'
 	fi
     AC_MSG_RESULT([${enable_module_bufmod:-module}])
-    case ${enable_module_bufmod:-module} in
+    case "${enable_module_bufmod:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BUFMOD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the bufmod module for linkage
@@ -2828,11 +2720,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module nullmod])
-	if test :${enable_module_nullmod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_nullmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_nullmod='yes'
 	fi
     AC_MSG_RESULT([${enable_module_nullmod:-module}])
-    case ${enable_module_nullmod:-module} in
+    case "${enable_module_nullmod:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULLMOD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the nullmod module for linkage
@@ -2849,11 +2741,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module pipemod])
-	if test :${enable_module_pipemod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_pipemod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_pipemod='yes'
 	fi
     AC_MSG_RESULT([${enable_module_pipemod:-module}])
-    case ${enable_module_pipemod:-module} in
+    case "${enable_module_pipemod:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the pipemod module for linkage
@@ -2870,11 +2762,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module connld])
-	if test :${enable_module_connld:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_connld:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_connld='yes'
 	fi
     AC_MSG_RESULT([${enable_module_connld:-module}])
-    case ${enable_module_connld:-module} in
+    case "${enable_module_connld:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the connld module for linkage
@@ -2891,11 +2783,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module sc])
-	if test :${enable_module_sc:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_sc:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_sc='yes'
 	fi
     AC_MSG_RESULT([${enable_module_sc:-module}])
-    case ${enable_module_sc:-module} in
+    case "${enable_module_sc:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the sc module for linkage with
@@ -2911,11 +2803,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module testmod])
-	if test :$enable_module_testmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_testmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_testmod='yes'
 	fi
     AC_MSG_RESULT([${enable_module_testmod:-module}])
-    case ${enable_module_testmod:-module} in
+    case "${enable_module_testmod:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TESTMOD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the testmod module for linkage
@@ -2932,11 +2824,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module timod])
-	if test :$enable_module_timod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_timod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_timod='yes'
 	fi
     AC_MSG_RESULT([${enable_module_timod:-module}])
-    case ${enable_module_timod:-module} in
+    case "${enable_module_timod:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TIMOD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the timod module for linkage
@@ -2953,11 +2845,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS module tirdwr])
-	if test :$enable_module_tirdwr = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_module_tirdwr:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_module_tirdwr='yes'
 	fi
     AC_MSG_RESULT([${enable_module_tirdwr:-module}])
-    case ${enable_module_tirdwr:-module} in
+    case "${enable_module_tirdwr:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TIRDWR], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the tirdwr module for linkage
@@ -2974,11 +2866,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver clone])
-	if test :${enable_driver_clone:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_clone:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_clone='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_clone:-module}])
-    case ${enable_driver_clone:-module} in
+    case "${enable_driver_clone:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the clone driver for linkage
@@ -2995,11 +2887,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver echo])
-	if test :${enable_driver_echo:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_echo:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_echo='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_echo:-module}])
-    case ${enable_driver_echo:-module} in
+    case "${enable_driver_echo:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the echo driver for linkage with
@@ -3016,11 +2908,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver fifo])
-	if test :${enable_driver_fifo:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_fifo:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_fifo='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_fifo:-module}])
-    case ${enable_driver_fifo:-module} in
+    case "${enable_driver_fifo:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the fifo driver for linkage with
@@ -3037,11 +2929,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver log])
-	if test :${enable_driver_log:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_log:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_log='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_log:-module}])
-    case ${enable_driver_log:-module} in
+    case "${enable_driver_log:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the log driver for linkage with
@@ -3058,11 +2950,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver loop])
-	if test :${enable_driver_loop:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_loop:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_loop='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_loop:-module}])
-    case ${enable_driver_loop:-module} in
+    case "${enable_driver_loop:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the loop driver for linkage with
@@ -3079,11 +2971,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver nsdev])
-	if test :${enable_driver_nsdev:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_nsdev:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_nsdev='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_nsdev:-module}])
-    case ${enable_driver_nsdev:-module} in
+    case "${enable_driver_nsdev:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the nsdev driver for linkage
@@ -3100,11 +2992,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver mux])
-	if test :${enable_driver_mux:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_mux:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_mux='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_mux:-module}])
-    case ${enable_driver_mux:-module} in
+    case "${enable_driver_mux:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MUX], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the mux driver for linkage with
@@ -3121,11 +3013,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver nuls])
-	if test :${enable_driver_nuls:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_nuls:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_nuls='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_nuls:-module}])
-    case ${enable_driver_nuls:-module} in
+    case "${enable_driver_nuls:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the nuls driver for linkage with
@@ -3142,11 +3034,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver pipe])
-	if test :${enable_driver_pipe:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_pipe:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_pipe='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_pipe:-module}])
-    case ${enable_driver_pipe:-module} in
+    case "${enable_driver_pipe:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the pipe driver for linkage with
@@ -3163,11 +3055,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver sad])
-	if test :${enable_driver_sad:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_sad:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_sad='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_sad:-module}])
-    case ${enable_driver_sad:-module} in
+    case "${enable_driver_sad:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the sad driver for linkage with
@@ -3184,11 +3076,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver sfx])
-	if test :${enable_driver_sfx:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_sfx:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_sfx='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_sfx:-module}])
-    case ${enable_driver_sfx:-module} in
+    case "${enable_driver_sfx:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SFX], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the sfx driver for linkage with
@@ -3205,11 +3097,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl--------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS driver spx])
-	if test :${enable_driver_spx:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_driver_spx:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_driver_spx='yes'
 	fi
     AC_MSG_RESULT([${enable_driver_spx:-module}])
-    case ${enable_driver_spx:-module} in
+    case "${enable_driver_spx:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SPX], [1], [When defined,]
 		AC_PACKAGE_TITLE [ will include the spx driver for linkage with
@@ -3226,11 +3118,11 @@ dnl--------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS OpenSS7 compatibility])
-	if test :${enable_compat_os7:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_os7:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_os7='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_os7:-module}])
-    case ${enable_compat_os7:-module} in
+    case "${enable_compat_os7:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OS7], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3254,11 +3146,11 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS UNIX(R) SVR 3.2 compatibility])
-	if test :${enable_compat_svr3:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_svr3:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_svr3='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_svr3:-module}])
-    case ${enable_compat_svr3:-module} in
+    case "${enable_compat_svr3:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR3], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3284,15 +3176,15 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS Solaris(R) 8 compatibility])
-	case ${enable_compat_sol8:-module} in
+	case "${enable_compat_sol8:-module}" in
 	    (yes) enable_compat_svr4=yes ;;
-	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
+	    (module) if test :"${enable_compat_svr4:-module}" != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	if test :${enable_compat_sol8:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    enable_compat_sol8='yes'
+	if test :"${enable_compat_sol8:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_sol8=yes
 	fi
     AC_MSG_RESULT([${enable_compat_sol8:-module}])
-    case ${enable_compat_sol8:-module} in
+    case "${enable_compat_sol8:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3318,15 +3210,15 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS UnixWare(R) 7 compatibility])
-	case ${enable_compat_uw7:-module} in
+	case "${enable_compat_uw7:-module}" in
 	    (yes) enable_compat_svr4=yes ;;
-	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
+	    (module) if test :"${enable_compat_svr4:-module}" != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	if test :${enable_compat_uw7:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_uw7:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_uw7='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_uw7:-module}])
-    case ${enable_compat_uw7:-module} in
+    case "${enable_compat_uw7:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3352,19 +3244,19 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS OSF/1.2 compatibility])
-	case ${enable_compat_osf:-module} in
+	case "${enable_compat_osf:-module}" in
 	    (yes) enable_compat_svr4=yes ;;
-	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
+	    (module) if test :"${enable_compat_svr4:-module}" != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	case ${enable_compat_osf:-module} in
+	case "${enable_compat_osf:-module}" in
 	    (yes) enable_compat_mps=yes ;;
-	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
+	    (module) if test :"${enable_compat_mps:-module}" != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	if test :${enable_compat_osf:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_osf:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_osf='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_osf:-module}])
-    case ${enable_compat_osf:-module} in
+    case "${enable_compat_osf:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3389,19 +3281,19 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS AIX(R) 4 compatibility])
-	case ${enable_compat_aix:-module} in
+	case "${enable_compat_aix:-module}" in
 	    (yes) enable_compat_svr4=yes ;;
-	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
+	    (module) if test :"${enable_compat_svr4:-module}" != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	case ${enable_compat_aix:-module} in
+	case "${enable_compat_aix:-module}" in
 	    (yes) enable_compat_mps=yes ;;
-	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
+	    (module) if test :"${enable_compat_mps:-module}" != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	if test :${enable_compat_aix:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_aix:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_aix='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_aix:-module}])
-    case ${enable_compat_aix:-module} in
+    case "${enable_compat_aix:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3427,19 +3319,19 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS HPUX(R) compatibility])
-	case ${enable_compat_hpux:-module} in
+	case "${enable_compat_hpux:-module}" in
 	    (yes) enable_compat_svr4=yes ;;
-	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
+	    (module) if test :"${enable_compat_svr4:-module}" != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	case ${enable_compat_hpux:-module} in
+	case "${enable_compat_hpux:-module}" in
 	    (yes) enable_compat_mps=yes ;;
-	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
+	    (module) if test :"${enable_compat_mps:-module}" != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	if test :${enable_compat_hpux:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_hpux:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_hpux='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_hpux:-module}])
-    case ${enable_compat_hpux:-module} in
+    case "${enable_compat_hpux:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3463,15 +3355,15 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS IRIX(R) compatibility])
-	case ${enable_compat_irix:-module} in
+	case "${enable_compat_irix:-module}" in
 	    (yes) enable_compat_svr4=yes ;;
-	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
+	    (module) if test :"${enable_compat_svr4:-module}" != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	if test :${enable_compat_irix:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_irix:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_irix='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_irix:-module}])
-    case ${enable_compat_irix:-module} in
+    case "${enable_compat_irix:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_IRIX], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3495,15 +3387,15 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS MacOT compatibility])
-	case ${enable_compat_mac:-module} in
+	case "${enable_compat_mac:-module}" in
 	    (yes) enable_compat_mps=yes ;;
-	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
+	    (module) if test :"${enable_compat_mps:-module}" != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	if test :$enable_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_mac:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_mac='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_mac:-module}])
-    case ${enable_compat_mac:-module} in
+    case "${enable_compat_mac:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MAC], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3527,11 +3419,11 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS UNIX(R) SVR 4.2 compatibility])
-	if test :${enable_compat_svr4:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_svr4:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_svr4='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_svr4:-module}])
-    case ${enable_compat_svr4:-module} in
+    case "${enable_compat_svr4:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3557,11 +3449,11 @@ dnl----------------------------------------------------------------------------
     esac
 dnl----------------------------------------------------------------------------
     AC_MSG_CHECKING([for STREAMS MPS(R) compatibility])
-	if test :${enable_compat_mps:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	if test :"${enable_compat_mps:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    enable_compat_mps='yes'
 	fi
     AC_MSG_RESULT([${enable_compat_mps:-module}])
-    case ${enable_compat_mps:-module} in
+    case "${enable_compat_mps:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MPS], [], [When defined,
 		Linux Fast STREAMS will attempt to be as compatible as possible
@@ -3654,6 +3546,12 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.5  2009-07-21 11:06:11  brian
+# - changes from release build
+#
+# Revision 1.1.2.4  2009-07-13 07:13:26  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.3  2009-07-04 03:51:32  brian
 # - updates for release
 #

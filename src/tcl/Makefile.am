@@ -1,6 +1,6 @@
 # =============================================================================
 #
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-13 07:13:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-13 07:13:35 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:18 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
+
+pkgtcllibdir = $(tcllibdir)/$(PACKAGE_NAME)$(PACKAGE_VERSION)
 
 tcl_pkg_INDEX		= pkgIndex.tcl
 
@@ -72,6 +74,7 @@ xtitcldir		= $(pkgtcllibdir)/xti
 xti_la_SOURCES		= xti/xti_wrap.c
 xti_la_CPPFLAGS		= -I$(builddir)/xti -I$(srcdir)/xti $(PKG_INCLUDES) $(USER_CPPFLAGS) $(TCL_CPPFLAGS) -DMODULE
 xti_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+xti_la_CXXFLAGS		= $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 xti_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 xti_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
 
@@ -86,7 +89,8 @@ streamstcldir		= $(pkgtcllibdir)/streams
 
 streams_la_SOURCES	= streams/streams_wrap.cxx
 streams_la_CPPFLAGS	= -I$(builddir)/streams -I$(srcdir)/streams $(PKG_INCLUDES) $(USER_CPPFLAGS) $(TCL_CPPFLAGS) -DMODULE
-streams_la_CXXFLAGS	= $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
+streams_la_CFLAGS	= $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
+streams_la_CXXFLAGS	= $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS)
 streams_la_LIBADD	= $(top_builddir)/libstreams.la
 streams_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
 
@@ -101,7 +105,8 @@ tcaptcldir		= $(pkgtcllibdir)/tcap
 
 tcap_la_SOURCES		= tcap/tcap_wrap.cxx tcap/tcap.hh
 tcap_la_CPPFLAGS	= -I$(builddir)/tcap -I$(srcdir)/tcap $(PKG_INCLUDES) $(USER_CPPFLAGS) $(TCL_CPPFLAGS) -DMODULE
-tcap_la_CXXFLAGS	= $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
+tcap_la_CFLAGS		= $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
+tcap_la_CXXFLAGS	= $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS)
 tcap_la_LIBADD		= $(top_builddir)/libstreams.la
 tcap_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
 
@@ -117,6 +122,9 @@ include ../../am/swig.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-07-21 11:06:18  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-07-13 07:13:35  brian
 # - changes for multiple distro build
 #

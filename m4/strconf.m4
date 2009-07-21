@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-22 03:53:38 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-22 03:53:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,15 +56,12 @@
 # _STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCONF], [dnl
-dnl AC_MSG_NOTICE([------------------------------])
-dnl AC_MSG_NOTICE([starting STREAMS configuration])
-dnl AC_MSG_NOTICE([------------------------------])
+    AC_MSG_NOTICE([+-------------------------------------+])
+    AC_MSG_NOTICE([| STREAMS Configuration Script Checks |])
+    AC_MSG_NOTICE([+-------------------------------------+])
     _STRCONF_OPTIONS
     _STRCONF_SETUP
     _STRCONF_OUTPUT
-dnl AC_MSG_NOTICE([------------------------------])
-dnl AC_MSG_NOTICE([complete STREAMS configuration])
-dnl AC_MSG_NOTICE([------------------------------])
 ])# _STRCONF
 # =============================================================================
 
@@ -115,21 +112,20 @@ dnl
     done
     AC_MSG_RESULT([$STRCONF_CONFIGS])
     AC_MSG_CHECKING([for strconf script])
-    STRCONF_SCRIPT="$ac_aux_dir/strconf-sh"
+dnl STRCONF_SCRIPT="$ac_aux_dir/strconf-sh"
+    STRCONF_SCRIPT="$ac_aux_dir/strconf.awk"
     AC_MSG_RESULT([${STRCONF_SCRIPT}])
     AC_MSG_CHECKING([for strconf command])
-    STRCONF="$SHELL $STRCONF_SCRIPT"
+dnl STRCONF="$SHELL $STRCONF_SCRIPT"
+    STRCONF="${AWK} -f ${STRCONF_SCRIPT} --"
     AC_MSG_RESULT([${STRCONF}])
 dnl
 dnl There is really no need to allow the name of the normal master file to be
 dnl changed by configure
 dnl
     AC_ARG_WITH([strconf-master],
-	AS_HELP_STRING([--with-strconf-master=FILENAME],
-	    [specify the file name to which the configuration master
-	    file is written @<:@default=Config.master@:>@]),
-	[with_strconf_master="$withval"],
-	[with_strconf_master=''])
+	[AS_HELP_STRING([--with-strconf-master=FILENAME],
+	    [configuration master file @<:@default=Config.master@:>@])])
     AC_MSG_CHECKING([for strconf master file])
     if test :"${with_strconf_master:-no}" != :no ; then
 	STRCONF_INPUT="$with_strconf_master"
@@ -139,11 +135,8 @@ dnl
     eval "${strconf_prefix}_cv_input=\"\$STRCONF_INPUT\""
     AC_MSG_RESULT([${STRCONF_INPUT}])
     AC_ARG_WITH([base-major],
-	AS_HELP_STRING([--with-base-major=MAJOR],
-	    [specify the base major device number from which to start
-	    numbering major devices @<:@default=230@:>@]),
-	[with_base_major="$withval"],
-	[with_base_major=''])
+	[AS_HELP_STRING([--with-base-major=MAJOR],
+	    [base major device number @<:@default=230@:>@])])
     AC_MSG_CHECKING([for strconf base major device number])
     if test :"${with_base_major:-no}" != :no ; then
 	STRCONF_MAJBASE="$with_base_major"
@@ -153,11 +146,8 @@ dnl
     eval "${strconf_prefix}_cv_majbase=\"\$STRCONF_MAJBASE\""
     AC_MSG_RESULT([${STRCONF_MAJBASE}])
     AC_ARG_WITH([base-modid],
-	AS_HELP_STRING([--with-base-modid=MODID],
-	    [specify the base module id number from which to start
-	     numbering modules and devices @<:@default=1@:>@]),
-	[with_base_modid="$withval"],
-	[with_base_modid=''])
+	[AS_HELP_STRING([--with-base-modid=MODID],
+	    [base module id number default=1@:>@])])
     AC_MSG_CHECKING([for strconf base module id number])
     if test :"${with_base_modid:-no}" != :no ; then
 	STRCONF_MIDBASE="$with_base_modid"
@@ -213,12 +203,8 @@ dnl of the source or build tree: that way, one can configure with a simple
 dnl option and do not need to copy files from anywhere.
 dnl
     AC_ARG_WITH([strconf-pkgdir],
-	AS_HELP_STRING([--with-strconf-pkgdir=DIRECTORY],
-	    [specify the relative or absolute path to the binary package
-	     configuration directory in which to look for binary packages
-	     @<:@default=pkg@:>@]),
-	[with_strconf_pkgdir="$withval"],
-	[with_strconf_pkgdir=''])
+	[AS_HELP_STRING([--with-strconf-pkgdir=DIRECTORY],
+	    [binary package directory @<:@default=pkg@:>@])])
     AC_MSG_CHECKING([for strconf binary package directories])
     strconf_cv_packagedir=
     strconf_dir="$with_strconf_pkgdir"
@@ -273,11 +259,8 @@ dnl
     STRCONF_BPKGDIR="$strconf_cv_packagedir"
     AM_CONDITIONAL([WITH_PACKAGES], [test :${strconf_cv_packagedir:-no} != :no])dnl
     AC_ARG_WITH([strconf-pkgrules],
-	AS_HELP_STRING([--with-strconf-pkgrules=FILENAME],
-	    [specify the file name to which package make rules are written
-	     @<:@default=pkgrules@:>@]),
-	[with_strconf_pkgrules="$withval"],
-	[with_strconf_pkgrules=''])
+	[AS_HELP_STRING([--with-strconf-pkgrules=FILENAME],
+	    [package make rules file @<:@default=pkgrules@:>@])])
     AC_CACHE_CHECK([for strconf rules file], [strconf_cv_pkgrules], [dnl
 	if test "${with_strconf_pkgrules:-no}" != :no ; then
 	    strconf_cv_pkgrules="$with_strconf_pkgrules"
@@ -319,7 +302,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
     else
 	ac_abs_pkgdir=`(cd $ac_pkgdir ; /bin/pwd)`
     fi
-    strconf_list="`find ${ac_abs_srcdir:+$ac_abs_srcdir/} ${ac_abs_builddir:+$ac_abs_builddir/} ${ac_abs_pkgdir:+$ac_abs_pkgdir/} -type f -name \"$STRCONF_STEM\" | sort | uniq`"
+    strconf_list="`find ${ac_abs_srcdir:+$ac_abs_srcdir/} ${ac_abs_builddir:+$ac_abs_builddir/} ${ac_abs_pkgdir:+$ac_abs_pkgdir/} -type f -name \"$STRCONF_STEM\" | sort -u`"
     strconf_configs=
     ac_abs_srcdir_mask="^`echo $ac_abs_srcdir | sed -e 's|.|.|g'`"
     ac_abs_builddir_mask="^`echo $ac_abs_builddir | sed -e 's|.|.|g'`"
@@ -364,19 +347,38 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    strconf_configs="$strconf_tmp${strconf_configs:+ }${strconf_configs}"
 	fi
     done
+    STRCONF_INPUTS="$strconf_configs"
+    AC_SUBST([STRCONF_INPUTS])
     if test -n "${strconf_configs}" -a -n "${STRCONF_INPUT}"; then
 	AC_MSG_NOTICE([creating $STRCONF_INPUT])
 	cat /dev/null > $STRCONF_INPUT
+	strconf_tmp=
 	for file in $strconf_configs ; do
 	    AC_MSG_NOTICE([appending $file to  $STRCONF_INPUT])
 	    basename=`echo $file | sed -e 's|^.*/||'`
 	    dirname=`echo $file | sed -e 's|/[[^/]]*$||'`
 	    absdir=`( cd $dirname/ ; /bin/pwd )`
 	    abspath="$absdir/$basename"
-	    ( echo "#" ; echo "# included from $abspath `date`" ; echo "#" ; echo "file $file" ; cat $file ) | sed -e '/^##/d' | cat -s >> $STRCONF_INPUT
+	    strconf_tmp=${strconf_tmp:+$strconf_tmp }$file
 	done
+	$AWK '
+BEGIN { print "# Created by " me " -- DO NOT EDIT" }
+(FNR == 1) { print "file " FILENAME; SKIPPING = 0 }
+/^# / { print; next }
+/^$/ || /^#/ { SKIPPING = 1; next }
+(SKIPPING == 1) { SKIPPING = 0; print "line " FNR }
+{ print }
+END   { print "# Created by " me " -- DO NOT EDIT" }' \
+	me="$as_me" $strconf_tmp > "$tmp/Config.master"
+	if diff "$STRCONF_INPUT" "$tmp/Config.master" >/dev/null 2>&1; then
+	    AC_MSG_NOTICE([$STRCONF_INPUT is unchanged])
+	    rm -f "$tmp/Config.master"
+	else
+	    rm -f "$STRCONF_INPUT"
+	    mv "$tmp/Config.master" "$STRCONF_INPUT"
+	fi
 	if test :"${STRCONF_CONFIG:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_CONFIG from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_CONFIG])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -384,7 +386,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_MODCONF:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_MODCONF from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_MODCONF])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --modconf=$STRCONF_MODCONF $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -392,7 +394,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_MKNODES:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_MKNODES from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_MKNODES])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --makenodes=$STRCONF_MKNODES $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -400,7 +402,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_DRVCONF:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_DRVCONF from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_DRVCONF])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --driverconf=$STRCONF_DRVCONF $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -408,7 +410,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_CONFMOD:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_CONFMOD from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_CONFMOD])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --confmodules=$STRCONF_CONFMOD $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -416,7 +418,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_MAKEDEV:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_MAKEDEV from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_MAKEDEV])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -424,7 +426,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_STSETUP:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_STSETUP from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_STSETUP])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -432,7 +434,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_STRLOAD:+set}" = :set; then
-	    AC_MSG_NOTICE([creating $STRCONF_STRLOAD from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_STRLOAD])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -440,7 +442,7 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	    done
 	fi
 	if test :"${STRCONF_BPKGDIR:+set}" = :set ; then
-	    AC_MSG_NOTICE([creating $STRCONF_BPKGDIR from $STRCONF_INPUT])
+	    AC_MSG_NOTICE([creating $STRCONF_BPKGDIR])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --packagedir=$STRCONF_BPKGDIR --pkgrules=${STRCONF_PKGRULE}.in $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
@@ -478,6 +480,7 @@ STRCONF="$STRCONF"
 STRCONF_STEM="$STRCONF_STEM"
 STRCONF_SCRIPT="$STRCONF_SCRIPT"
 STRCONF_INPUT="$STRCONF_INPUT"
+STRCONF_INPUTS="$STRCONF_INPUTS"
 STRCONF_MAJBASE="$STRCONF_MAJBASE"
 STRCONF_MIDBASE="$STRCONF_MIDBASE"
 STRCONF_CONFIG="$STRCONF_CONFIG"
@@ -504,6 +507,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 	AC_SUBST([STRCONF_STEM])dnl
 	AC_SUBST([STRCONF_SCRIPT])dnl
 	AC_SUBST([STRCONF_INPUT])dnl
+	AC_SUBST([STRCONF_INPUTS])dnl
 	AC_SUBST([STRCONF_CONFIGS])dnl
 	AC_SUBST([STRCONF_MAJBASE])dnl
 	AC_SUBST([STRCONF_MIDBASE])dnl
@@ -527,6 +531,9 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: strconf.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-22 03:53:38  brian
 # - added files to new distro
 #

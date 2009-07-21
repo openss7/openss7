@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -218,7 +218,12 @@ Corporation at a fee.  See http://www.openss7.com/
 
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
+    AC_ARG_WITH([optimize],
+	[AS_HELP_STRING([--with-optimize=HOW],
+	    [optimization: normal, size, speed or quick @<:@default=auto@:>@])])
     _OPENSS7_OPTIONS_CFLAGS
+    _OPENSS7_OPTIONS_CXXFLAGS
+    _OPENSS7_OPTIONS_GCJFLAGS
     _OPENSS7_MISSING2
     _OPENSS7_MISSING3
     _OPENSS7_MISSING4
@@ -259,58 +264,59 @@ dnl
 	if test :"$infodir" = :'${prefix}/info' ; then infodir='${datarootdir}/info' ; fi
 	if test :"$mandir" = :'${prefix}/man' ; then mandir='${datarootdir}/man' ; fi
     fi
-    AC_SUBST([datarootdir])
+    AC_SUBST([datarootdir])dnl
     if test :"${datadir+set}" != :set ; then datadir='${datarootdir}' ; fi
-    AC_SUBST([datadir])
+    AC_SUBST([datadir])dnl
     if test :"${localedir+set}" != :set ; then localedir='${datarootdir}/locale' ; fi
-    AC_SUBST([localedir])
+    AC_SUBST([localedir])dnl
     if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE_TARNAME}' ; fi
     if test :"$docdir" = :'${datarootdir}/doc/${PACKAGE_TARNAME}' ; then
 	docdir='${datarootdir}/doc/${PACKAGE}-${VERSION}'
     fi
-    AC_SUBST([docdir])
+    AC_SUBST([docdir])dnl
     if test :"${htmldir+set}" != :set ; then htmldir='${docdir}' ; fi
-    AC_SUBST([htmldir])
+    AC_SUBST([htmldir])dnl
     if test :"${dvidir+set}" != :set ; then dvidir='${docdir}' ; fi
-    AC_SUBST([dvidir])
+    AC_SUBST([dvidir])dnl
     if test :"${pdfdir+set}" != :set ; then pdfdir='${docdir}' ; fi
-    AC_SUBST([pdfdir])
+    AC_SUBST([pdfdir])dnl
     if test :"${psdir+set}" != :set ; then psdir='${docdir}' ; fi
-    AC_SUBST([psdir])
-    AC_SUBST([rootdir])
+    AC_SUBST([psdir])dnl
+    AC_SUBST([rootdir])dnl
 dnl
 dnl Some more directories...
 dnl
-    if test :"${javadir+set}" != :set ; then javadir="${datarootdir}/java" ; fi
-    AC_SUBST([javadir])
-    if test :"${javadocdir+set}" != :set ; then javadocdir="${datarootdir}/javadoc" ; fi
-    AC_SUBST([javadocdir])
-    if test :"${jnidir+set}" != :set ; then jnidir="${libdir}/java" ; fi
-    AC_SUBST([jnidir])
+    if test :"${snmpdlmoddir+set}" != :set ; then snmpdlmoddir='${libdir}/snmp/dlmod' ; fi
+    AC_SUBST([snmpdlmoddir])dnl
+    if test :"${snmpmibdir+set}" != :set ; then snmpmibdir='${datarootdir}/snmp/mibs' ; fi
+    AC_SUBST([snmpmibdir])dnl
+    if test :"${javadir+set}" != :set ; then javadir='${datarootdir}/java' ; fi
+    AC_SUBST([javadir])dnl
+    if test :"${javadocdir+set}" != :set ; then javadocdir='${datarootdir}/javadoc' ; fi
+    AC_SUBST([javadocdir])dnl
+    if test :"${jnidir+set}" != :set ; then jnidir='${libdir}/java' ; fi
+    AC_SUBST([jnidir])dnl
+    if test :"${perldir+set}" != :set ; then perldir="${libdir}/perl5" ; fi
+    AC_SUBST([perldir])dnl
+    if test :"${tcllibdir+set}" != :set ; then tcllibdir='${libdir}' ; fi
+    AC_SUBST([tcllibdir])dnl
+    if test :"${tclsrcdir+set}" != :set ; then tclsrcdir='${datarootdir}' ; fi
+    AC_SUBST([tclsrcdir])dnl
 dnl
 dnl Need to check this before libtool gets done
 dnl
     AC_MSG_CHECKING([for development environment])
     AC_ARG_ENABLE([devel],
-	AS_HELP_STRING([--disable-devel],
-	    [disable development environment.  @<:@default=enabled@:>@]),
-	[dnl
-	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	    then
-		enable_devel='yes'
-	    else
-		enable_devel="$enableval"
-	    fi
-	], [enable_devel='yes'])
-    AC_MSG_RESULT([$enable_devel])
+	[AS_HELP_STRING([--disable-devel],
+	    [development environment @<:@default=enabled@:>@])])
+    AC_MSG_RESULT([${enable_devel:-yes}])
     AM_CONDITIONAL([DEVELOPMENT], [test :"${enable_devel:-yes}" = :yes])dnl
 dnl
 dnl Don't build libtool static libraries if development environment not
 dnl specified
 dnl
-    if test :"${enable_devel:-yes}" != :yes
-    then
-	enable_static='no'
+    if test :"${enable_devel:-yes}" != :yes ; then
+	enable_static=no
     fi
 ])# _OPENSS7_DIRCHANGE
 # =============================================================================
@@ -506,7 +512,8 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 		then
 		    if touch "$config_site" >/dev/null 2>&1
 		    then
-			cat "$cache_file" | egrep '^(ac_cv_|am_cv_|ap_cv_|lt_cv_)' > "$config_site" 2>/dev/null
+			cat "$cache_file" | egrep "^(test \"\\\[$]{)?(ac_cv_|acl_cv_|am_cv_|ap_cv_|gl_cv_|gt_cv_|lt_cv_|nls_cv_)" > "$config_site" 2>/dev/null
+			#cat "$cache_file" | egrep "^(test \"\[$]{)?(ac_cv_|am_cv_|ap_cv_|lt_cv_)" > "$config_site" 2>/dev/null
 			#cat "$cache_file" | egrep '^(ac_cv_|am_cv_|ap_cv_|lt_cv_)' | egrep -v '^(ac_cv_env_|ac_cv_host|ac_cv_target)' > "$config_site" 2>/dev/null
 			#cat "$cache_file" | egrep -v '\<(ac_cv_env_|ac_cv_host|ac_cv_target|linux_cv_|ksyms_cv_|rpm_cv_|deb_cv_|strconf_cv_|sctp_cv_|xns_cv_|lis_cv_|lfs_cv_|strcomp_cv_|streams_cv_|xti_cv_|xopen_cv_|inet_cv_|xnet_cv_|devfs_cv_|init_cv_|pkg_cv_)' > "$config_site" 2>/dev/null
 		    fi
@@ -541,6 +548,7 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_DOCS
     _OPENSS7_OPTIONS_GPG
     _OPENSS7_OPTIONS_PKG_EPOCH
+    _OPENSS7_OPTIONS_PKG_MAJOR_MINOR
     _OPENSS7_OPTIONS_PKG_RELEASE
     _OPENSS7_OPTIONS_PKG_PATCHLEVEL
     _OPENSS7_OPTIONS_PKG_DISTDIR
@@ -556,16 +564,9 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_CHECK], [dnl
     AC_MSG_CHECKING([for preinstall tests on check])
     AC_ARG_ENABLE([checks],
-	AS_HELP_STRING([--enable-checks],
-	    [enable preinstall checks. @<:@default=auto@:>@]),
-	[enable_checks="$enableval"], [dnl
-	     if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	     then
-		 enable_checks='yes'
-	     else
-		 enable_checks='no'
-	     fi])
-    AC_MSG_RESULT([$enable_checks])
+	[AS_HELP_STRING([--disable-checks],
+	    [preinstall checks @<:@default=enabled@:>@])])
+    AC_MSG_RESULT([${enable_checks:-yes}])
     AM_CONDITIONAL([PERFORM_CHECKS], [test :"${enable_checks:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_CHECK
 # =============================================================================
@@ -576,24 +577,15 @@ AC_DEFUN([_OPENSS7_OPTIONS_CHECK], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
     AC_MSG_CHECKING([for documentation included])
     AC_ARG_ENABLE([docs],
-	AS_HELP_STRING([--disable-docs],
-	    [disable documentation build and install.  @<:@default=enabled@:>@]),
-	[dnl
-	    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	    then
-		enable_docs='yes'
-	    else
-		enable_docs="$enableval"
-	    fi
-	], [enable_docs='yes'])
-    AC_MSG_RESULT([$enable_docs])
+	[AS_HELP_STRING([--disable-docs],
+	    [documentation @<:@default=enabled@:>@])])
+    AC_MSG_RESULT([${enable_docs:-yes}])
     AM_CONDITIONAL([DOCUMENTATION], [test :"${enable_docs:-yes}" = :yes])dnl
     AC_MSG_CHECKING([for documentation distributed])
     AC_ARG_ENABLE([distribute-docs],
-	AS_HELP_STRING([--enable-distribute-docs],
-	    [enable distribution of pre-built documentation. @<:@default=disabled@:>@]),
-	[enable_distribute_docs="$enableval"], [enable_distribute_docs='no'])
-    AC_MSG_RESULT([$enable_distribute_docs])
+	[AS_HELP_STRING([--enable-distribute-docs],
+	    [distribute pre-built documentation @<:@default=disabled@:>@])])
+    AC_MSG_RESULT([${enable_distribute_docs:-no}])
     AM_CONDITIONAL([DISTRIBUTE_DOCS], [test :"${enable_distribute_docs:-no}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_DOCS
 # =============================================================================
@@ -613,42 +605,38 @@ dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg user])
     AC_ARG_VAR([GNUPGUSER], [GPG user name. @<:@default=auto@:>@])
     AC_ARG_WITH([gpg-user],
-	AS_HELP_STRING([--with-gpg-user=USERNAME],
-	    [specify the USER for signing DEBs, RPMs and tarballs.
-	    @<:@default=${GNUPGUSER}@:>@]),
-	[with_gpg_user="$withval"],
-	[with_gpg_user="$GNUPGUSER"
-	 if test :"${with_gpg_user:-no}" = :no ; then
-	     if test -r .gnupguser; then d= ; else d="$srcdir/" ; fi
-	     if test -r ${d}.gnupguser
-	     then with_gpg_user="`cat ${d}.gnupguser`"
-	     else with_gpg_user=''
-	     fi
-dnl          if test :"${with_gpg_user:-no}" = :no ; then
-dnl              with_gpg_user="`whoami`"
-dnl          fi
-	 fi])
+	[AS_HELP_STRING([--with-gpg-user=USERNAME],
+	    [USER for signing DEBs, RPMs and tarballs @<:@default=${GNUPGUSER}@:>@])], [], [dnl
+	    with_gpg_user="$GNUPGUSER"
+	    if test :"${with_gpg_user:-no}" = :no ; then
+		if test -r .gnupguser; then d= ; else d="$srcdir/" ; fi
+		if test -r ${d}.gnupguser
+		then with_gpg_user="`cat ${d}.gnupguser`"
+		else with_gpg_user=''
+		fi
+dnl		if test :"${with_gpg_user:-no}" = :no ; then
+dnl		    with_gpg_user="`whoami`"
+dnl		fi
+	    fi])
     GNUPGUSER="${with_gpg_user:-`whoami`}"
     AC_MSG_RESULT([${GNUPGUSER:-no}])
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg home])
     AC_ARG_VAR([GNUPGHOME], [GPG home directory. @<:@default=auto@:>@])
     AC_ARG_WITH([gpg-home],
-	AS_HELP_STRING([--with-gpg-home=HOMEDIR],
-	    [specify the HOME for signing DEBs, RPMs and tarballs.
-	    @<:@default=${GNUPGHOME:-~/.gnupg}@:>@]),
-	[with_gpg_home="$withval"],
-	[with_gpg_home="$GNUPGHOME"
-	 if test :"${with_gpg_home:-no}" = :no ; then
-	     if test -r .gnupghome; then d= ; else d="$srcdir/" ; fi
-	     if test -r ${d}.gnupghome
-	     then with_gpg_home="`cat ${d}.gnupghome`"
-	     else with_gpg_home=''
-	     fi
-dnl          if test :"${with_gpg_home:-no}" = :no ; then
-dnl              with_gpg_home='~/.gnupg'
-dnl          fi
-	 fi])
+	[AS_HELP_STRING([--with-gpg-home=HOMEDIR],
+	    [HOME for signing DEBs, RPMs and tarballs @<:@default=${GNUPGHOME:-~/.gnupg}@:>@])], [], [dnl
+	    with_gpg_home="$GNUPGHOME"
+	    if test :"${with_gpg_home:-no}" = :no ; then
+		if test -r .gnupghome; then d= ; else d="$srcdir/" ; fi
+		if test -r ${d}.gnupghome
+		then with_gpg_home="`cat ${d}.gnupghome`"
+		else with_gpg_home=''
+		fi
+dnl		if test :"${with_gpg_home:-no}" = :no ; then
+dnl		    with_gpg_home='~/.gnupg'
+dnl		fi
+	    fi])
     GNUPGHOME="${with_gpg_home:-~/.gnupg}"
     AC_MSG_RESULT([${GNUPGHOME:-no}])
 ])# _OPENSS7_OPTIONS_GPG
@@ -660,14 +648,13 @@ dnl          fi
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_EPOCH], [dnl
     AC_MSG_CHECKING([for pkg epoch])
     AC_ARG_WITH([pkg-epoch],
-	AS_HELP_STRING([--with-pkg-epoch=EPOCH],
-	    [specify the EPOCH for the package file.  @<:@default=auto@:>@]),
-	[with_pkg_epoch="$withval"],
-	[if test -r .pkgepoch; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.pkgepoch
-	 then with_pkg_epoch="`cat ${d}.pkgepoch`"
-	 else with_pkg_epoch=1
-	 fi])
+	[AS_HELP_STRING([--with-pkg-epoch=EPOCH],
+	    [EPOCH of the package @<:@default=auto@:>@])], [], [dnl
+	    if test -r .pkgepoch; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.pkgepoch
+	    then with_pkg_epoch="`cat ${d}.pkgepoch`"
+	    else with_pkg_epoch=1
+	    fi])
     AC_MSG_RESULT([${with_pkg_epoch:-1}])
     PACKAGE_EPOCH="${with_pkg_epoch:-1}"
     AC_SUBST([PACKAGE_EPOCH])dnl
@@ -677,19 +664,44 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_EPOCH], [dnl
 # =========================================================================
 
 # =========================================================================
+# _OPENSS7_OPTIONS_PKG_MAJOR_MINOR
+# -------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_MAJOR_MINOR], [dnl
+    AC_MSG_CHECKING([for pkg major])
+    PACKAGE_MAJOR=`echo "$PACKAGE_VERSION" | sed -r 's,[[^[:digit:]]].*,,'`
+    PACKAGE_MAJOR="${PACKAGE_MAJOR:-1}"
+    AC_SUBST([PACKAGE_MAJOR])dnl
+    AC_MSG_RESULT([$PACKAGE_MAJOR])
+    AC_MSG_CHECKING([for pkg minor])
+    PACKAGE_MINOR=`echo "$PACKAGE_VERSION" | sed -r 's,^[[[:digit:]]]+[[^[:digit:]]]+,,'`
+    PACKAGE_MINOR="${PACKAGE_MINOR:-1}"
+    AC_MSG_RESULT([$PACKAGE_MINOR])
+    AC_SUBST([PACKAGE_MINOR])dnl
+    AC_MSG_CHECKING([for pkg revision])
+    PACKAGE_REVISION=`echo"$PACKAGE_RELEASE" | sed -r 's,[[^[:digit:]]].*,,'`
+    PACKAGE_REVISION="${PACKAGE_REVISION:-1}"
+    AC_MSG_RESULT([$PACKAGE_REVISION])
+    AC_SUBST([PACKAGE_REVISION])
+    AC_MSG_CHECKING([for pkg version number])
+    PACKAGE_VERNUMB="$PACKAGE_MAJOR:$PACKAGE_MINOR:$PACKAGE_REVISION"
+    AC_MSG_RESULT([$PACKAGE_VERNUMB])
+    AC_SUBST([PACKAGE_VERNUMB])
+])# _OPENSS7_OPTIONS_PKG_MAJOR_MINOR
+# =========================================================================
+
+# =========================================================================
 # _OPENSS7_OPTIONS_PKG_RELEASE
 # -------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_RELEASE], [dnl
     AC_MSG_CHECKING([for pkg release])
     AC_ARG_WITH([pkg-release],
-	AS_HELP_STRING([--with-pkg-release=RELEASE],
-	    [specify the RELEASE for the package files.  @<:@default=auto@:>@]),
-	[with_pkg_release="$withval"],
-	[if test -r .pkgrelease ; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.pkgrelease
-	 then with_pkg_release="`cat ${d}.pkgrelease`"
-	 else with_pkg_release=1
-	 fi])
+	[AS_HELP_STRING([--with-pkg-release=RELEASE],
+	    [RELEASE of the package @<:@default=auto@:>@])], [], [dnl
+	    if test -r .pkgrelease ; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.pkgrelease
+	    then with_pkg_release="`cat ${d}.pkgrelease`"
+	    else with_pkg_release=1
+	    fi])
     AC_MSG_RESULT([${with_pkg_release:-1}])
     PACKAGE_RELEASE="${with_pkg_release:-1}"
     AC_SUBST([PACKAGE_RELEASE])dnl
@@ -704,19 +716,19 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_RELEASE], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
     AC_MSG_CHECKING([for pkg patch level])
     AC_ARG_WITH([pkg-patchlevel],
-	AS_HELP_STRING([--with-pkg-patchlevel=@<:@PATCHLEVEL@:>@],
-	    [specify the PATCHLEVEL for the package files.  @<:@default=date@:>@]),
-	[if test :$with_pkg_patchlevel = :no
-	 then with_pkg_patchlevel=
-	 fi
-	 if test :$with_pkg_patchlevel = :
-	 then with_pkg_patchlevel=`date -uI | sed -e 's,-,,g'`
-	 fi],
-	[if test -r .pkgpatchlevel ; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.pkgpatchlevel
-	 then with_pkg_patchlevel="`cat ${d}.pkgpatchlevel`"
-	 else with_pkg_patchlevel=
-	 fi])
+	[AS_HELP_STRING([--with-pkg-patchlevel=@<:@PATCHLEVEL@:>@],
+	    [PATCHLEVEL of the package @<:@default=date@:>@])], [dnl
+	    if test :$with_pkg_patchlevel = :no
+	    then with_pkg_patchlevel=
+	    fi
+	    if test :$with_pkg_patchlevel = :
+	    then with_pkg_patchlevel=`date -uI | sed -e 's,-,,g'`
+	    fi], [dnl
+	    if test -r .pkgpatchlevel ; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.pkgpatchlevel
+	    then with_pkg_patchlevel="`cat ${d}.pkgpatchlevel`"
+	    else with_pkg_patchlevel=
+	    fi])
     AC_MSG_RESULT([$with_pkg_patchlevel])
     PACKAGE_PATCHLEVEL=${with_pkg_patchlevel:+.$with_pkg_patchlevel}
     AC_SUBST([PACKAGE_PATCHLEVEL])
@@ -739,10 +751,9 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
     pkg_tmp=`(cd . ; pwd)`
     AC_ARG_WITH([pkg-distdir],
-	AS_HELP_STRING([--with-pkg-distdir=DIR],
-	    [specify the package distribution directory. @<:@default=.@:>@]),
-	[with_pkg_distdir="$withval"],
-	[with_pkg_distdir="$pkg_tmp"])
+	[AS_HELP_STRING([--with-pkg-distdir=DIR],
+	    [package distribution directory @<:@default=.@:>@])],
+	[], [with_pkg_distdir="$pkg_tmp"])
     AC_CACHE_CHECK([for pkg distdir], [pkg_cv_distdir], [dnl
 	case :"${with_pkg_distdir:-default}" in
 	    (:no|:NO)
@@ -775,10 +786,9 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
 	pkg_tmp='$(PACKAGE_DISTDIR)/tarballs'
     fi
     AC_ARG_WITH([pkg-tardir],
-	AS_HELP_STRING([--with-pkg-tardir=DIR],
-	    [specify the tarball directory.  @<:@default=PKG-DISTDIR/tarballs@:>@]),
-	[with_pkg_tardir="$withval"],
-	[with_pkg_tardir="$pkg_tmp"])
+	[AS_HELP_STRING([--with-pkg-tardir=DIR],
+	    [tarball directory @<:@default=PKG-DISTDIR/tarballs@:>@])],
+	[], [with_pkg_tardir="$pkg_tmp"])
     AC_CACHE_CHECK([for pkg tardir], [pkg_cv_tardir], [dnl
 	case :"${with_pkg_tardir:-default}" in
 	    (:no|:NO)
@@ -807,10 +817,8 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_ARCH], [dnl
     AC_MSG_CHECKING([for deb build/install of arch packages])
     AC_ARG_ENABLE([arch],
-	AS_HELP_STRING([--enable-arch],
-	    [build and install arch packages.  @<:@default=yes@:>@]),
-	[enable_arch="$enableval"],
-	[enable_arch='yes'])
+	[AS_HELP_STRING([--disable-arch],
+	    [arch packages @<:@default=enabled@:>@])])
     AC_MSG_RESULT([${enable_arch:-yes}])
     AM_CONDITIONAL([PKG_BUILD_ARCH], [test :"${enable_arch:-yes}" = :yes])dnl
 	
@@ -827,10 +835,8 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_ARCH], [dnl
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_INDEP], [dnl
     AC_MSG_CHECKING([for deb build/install of indep packages])
     AC_ARG_ENABLE([indep],
-	AS_HELP_STRING([--enable-indep],
-	    [build and install indep packages.  @<:@default=yes@:>@]),
-	[enable_indep="$enableval"],
-	[enable_indep='yes'])
+	[AS_HELP_STRING([--disable-indep],
+	    [indep packages @<:@default=enabled@:>@])])
     AC_MSG_RESULT([${enable_indep:-yes}])
     AM_CONDITIONAL([PKG_BUILD_INDEP], [test :"${enable_indep:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_PKG_INDEP
@@ -843,17 +849,11 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
     AC_MSG_CHECKING([for user CFLAGS])
     AC_MSG_RESULT([${CFLAGS}])
     AC_MSG_CHECKING([for user CFLAGS])
-    AC_ARG_WITH([optimize],
-	AS_HELP_STRING([--with-optimize=HOW],
-	    [specify optimization, normal, size, speed or quick,
-	     @<:@default=auto@:>@]),
-	[with_optimize="$withval"],
-	[with_optimize=''])
     case "${with_optimize:-auto}" in
 	(size)
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    OFLAGS="-g -Os${OFLAGS:+ $OFLAGS}"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS="-Os -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
@@ -861,44 +861,55 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
 	    ;;
 	(speed)
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    OFLAGS="-g -O3${OFLAGS:+ $OFLAGS}"
+	    OFLAGS="${OFLAGS:+$OFLAGS }-freorder-blocks"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS="-O3 -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
 	    ;;
 	(normal)
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    OFLAGS="-g -O2${OFLAGS:+ $OFLAGS}"
+	    OFLAGS="${OFLAGS:+$OFLAGS }-freorder-blocks"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS="-O2 -g${CFLAGS:+ $CFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
 	    ;;
 	(quick)
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    OFLAGS="-g -O0${OFLAGS:+ $OFLAGS}"
+	    OFLAGS="${OFLAGS:+$OFLAGS }-finline"
+	    OFLAGS="${OFLAGS:+$OFLAGS }-fno-keep-inline-functions"
+	    OFLAGS="${OFLAGS:+$OFLAGS }-fno-keep-static-consts"
 	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
-	    CFLAGS="-O0 -g${CFLAGS:+ $CFLAGS}"
-	    CFLAGS="${CFLAGS:+$CFLAGS }-finline"
-	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-inline-functions"
-	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-static-consts"
-	(auto)
-	    : # don't do anything
+	    ;;
+	(auto|*)
+	    os7_tmp=`echo " $CFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
+	    OFLAGS="$OFLAGS${os7_tmp:+ $os7_tmp}"
+	    CFLAGS=`echo " $CFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
+	    os7_tmp=`echo " $CFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
+	    OFLAGS="$OFLAGS${os7_tmp:+ $os7_tmp}"
+	    CFLAGS=`echo " $CFLAGS" | sed 's, -O[[0-9s]]*,,g'`
 	    ;;
     esac
-    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
-    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-trigraphs"
+    OFLAGS="-pipe${OFLAGS:+ $OFLAGS}"
+dnl CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
+dnl CFLAGS="${CFLAGS:+$CFLAGS }-Wno-trigraphs"
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    OFLAGS="-Wp,-D_FORTIFY_SOURCE=2${OFLAGS:+ $OFLAGS}"
+	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
+	    OFLAGS="${OFLAGS:+$OFLAGS }-Wall"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-system-headers"
 dnl	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
@@ -923,16 +934,215 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wnested-externs"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wunreachable-code"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Winline"
 dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-Wall"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-Wp,-D_FORTIFY_SOURCE=2"
 	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	    CFLAGS="${CFLAGS:+$CFLAGS }-Werror"
     fi
+    CFLAGS="${OFLAGS:+$OFLAGS }$CFLAGS"
     CFLAGS=`echo "$CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
     AC_MSG_RESULT([${CFLAGS}])
 ])# _OPENSS7_OPTIONS_CFLAGS
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_CXXFLAGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_CXXFLAGS], [dnl
+    AC_MSG_CHECKING([for user CXXFLAGS])
+    AC_MSG_RESULT([${CXXFLAGS}])
+    AC_MSG_CHECKING([for user CXXFLAGS])
+    case "${with_optimize:-auto}" in
+	(size)
+	    OXXFLAGS="-g -Os${OXXFLAGS:+ $OXXFLAGS}"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    ;;
+	(speed)
+	    OXXFLAGS="-g -O3${OXXFLAGS:+ $OXXFLAGS}"
+	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-freorder-blocks"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    ;;
+	(normal)
+	    OXXFLAGS="-g -O2${OXXFLAGS:+ $OXXFLAGS}"
+	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-freorder-blocks"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    ;;
+	(quick)
+	    OXXFLAGS="-g -O0${OXXFLAGS:+ $OXXFLAGS}"
+	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-finline"
+	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-fno-keep-inline-functions"
+	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-fno-keep-static-consts"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    ;;
+	(auto|*)
+	    os7_tmp=`echo " $CXXFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
+	    OXXFLAGS="$OXXFLAGS${os7_tmp:+ $os7_tmp}"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
+	    os7_tmp=`echo " $CXXFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
+	    OXXFLAGS="$OXXFLAGS${os7_tmp:+ $os7_tmp}"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    ;;
+    esac
+    OXXFLAGS="-pipe${OXXFLAGS:+ $OXXFLAGS}"
+dnl CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
+dnl CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wno-trigraphs"
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+    then
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    OXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${OXXFLAGS:+ $OXXFLAGS}"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -Wall,,g'`
+	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-Wall"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wno-system-headers"
+dnl	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wundef"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wno-endif-labels"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wbad-function-cast"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wcast-qual"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wcast-align"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wwrite-strings"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wconversion"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wsign-compare"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Waggregate-return"
+dnl	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wstrict-prototypes"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-prototypes"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-declarations"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-noreturn"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-format-attribute"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wpacked"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wpadded"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wredundant-decls"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wnested-externs"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wunreachable-code"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Winline"
+dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wdisabled-optimization"
+	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
+	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Werror"
+    fi
+    CXXFLAGS="${OXXFLAGS:+$OXXFLAGS }$CXXFLAGS"
+    CXXFLAGS=`echo "$CXXFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${CXXFLAGS}])
+])# _OPENSS7_OPTIONS_CXXFLAGS
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_GCJFLAGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_GCJFLAGS], [dnl
+    AC_MSG_CHECKING([for user GCJFLAGS])
+    AC_MSG_RESULT([${GCJFLAGS}])
+    AC_MSG_CHECKING([for user GCJFLAGS])
+    case "${with_optimize:-auto}" in
+	(size)
+	    OCJFLAGS="-g -Os${OCJFLAGS:+ $OCJFLAGS}"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    ;;
+	(speed)
+	    OCJFLAGS="-g -O3${OCJFLAGS:+ $OCJFLAGS}"
+	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-freorder-blocks"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    ;;
+	(normal)
+	    OCJFLAGS="-g -O2${OCJFLAGS:+ $OCJFLAGS}"
+	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-freorder-blocks"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    ;;
+	(quick)
+	    OCJFLAGS="-g -O0${OCJFLAGS:+ $OCJFLAGS}"
+	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-finline"
+	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-fno-keep-inline-functions"
+	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-fno-keep-static-consts"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    ;;
+	(auto|*)
+	    os7_tmp=`echo " $GCJFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
+	    OCJFLAGS="$OCJFLAGS${os7_tmp:+ $os7_tmp}"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
+	    os7_tmp=`echo " $GCJFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
+	    OCJFLAGS="$OCJFLAGS${os7_tmp:+ $os7_tmp}"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    ;;
+    esac
+    OCJFLAGS="-pipe${OCJFLAGS:+ $OCJFLAGS}"
+dnl GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
+dnl GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-trigraphs"
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no
+    then
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    OCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${OCJFLAGS:+ $OCJFLAGS}"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -Wall,,g'`
+	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-Wall"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-system-headers"
+dnl	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wundef"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-endif-labels"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wbad-function-cast"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wcast-qual"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wcast-align"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wwrite-strings"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wconversion"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wsign-compare"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Waggregate-return"
+dnl	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wstrict-prototypes"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-prototypes"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-declarations"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-noreturn"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-format-attribute"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wpacked"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wpadded"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wredundant-decls"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wnested-externs"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wunreachable-code"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Winline"
+dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wdisabled-optimization"
+	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
+	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Werror"
+    fi
+    GCJFLAGS="${OCJFLAGS:+$OCJFLAGS }$GCJFLAGS"
+    GCJFLAGS=`echo "$GCJFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${GCJFLAGS}])
+])# _OPENSS7_OPTIONS_GCJFLAGS
 # =============================================================================
 
 # =============================================================================
@@ -999,6 +1209,12 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.5  2009-07-21 11:06:13  brian
+# - changes from release build
+#
+# Revision 1.1.2.4  2009-07-13 07:13:27  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.3  2009-07-05 12:04:27  brian
 # - updates for release builds
 #

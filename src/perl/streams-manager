@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # =============================================================================
 #
-# @(#) $RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:59 $
+# @(#) $RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,33 +47,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:41:59 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:18 $ by $Author: brian $
 #
 # =============================================================================
 
-use Tk;
-use Tk::HList;
-use Tk::Adjuster;
-use Tk::NoteBook;
-use Tk::ROText;
-use Tk::NumEntry;
-use Tk::Balloon;
-use Tk::Xrm;
-use Tk::Pane;
-use Tk::Dialog;
-use Tk::DialogBox;
-
-use Data::Dumper;
-
-use SNMP;
-
 $\ = "\n";
 
+use strict;
+
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:59 $';
-my $version = '$Revision: 1.1.2.1 $';
-my $date = '$Date: 2009-06-21 11:41:59 $';
+my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:18 $';
+my $version = '$Revision: 1.1.2.2 $';
+my $date = '$Date: 2009-07-21 11:06:18 $';
 my $title = 'STREAMS SNMP Manager';
+
+my $statusbar;
 
 my $Title = <<EOF;
 Linux Fast-STREAMS
@@ -87,7 +75,9 @@ $Title =~ s/^\n*//;
 my $Version = <<EOF;
 Version $version
 $ident
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
 Distributed under Affero GPL Version 3, included here by reference.
 See `$program --copying' for copying permissions.
 EOF
@@ -101,6 +91,7 @@ ________________________________________________________________________________
 $ident
 ________________________________________________________________________________
 
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -128,6 +119,7 @@ my $CopyingMono = <<EOF;
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -166,6 +158,404 @@ EOF
 
 $CopyingMono =~ s/\n*$//;
 $CopyingMono =~ s/^\n*//;
+
+my $Help = <<EOF;
+$program:
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+Arguments:
+    NONE
+Options:
+    -n, --dryrun
+        don't perform the actions, just check them
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+
+$Help =~ s/\n*$//;
+$Help =~ s/^\n*//;
+
+my $Usage = <<EOF;
+$program
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+
+$Usage =~ s/\n*$//;
+$Usage =~ s/^\n*//;
+
+my $debug = 0;
+my $verbose = 1;
+my $show = 'yes';
+
+sub version {
+	return if $show eq 'no';
+	print STDOUT<<EOF;
+Version $version
+$ident
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
+Distributed under Affero GPL Version 3, included here by reference.
+See `$program --copying' for copying permissions.
+EOF
+}
+
+sub usage {
+	return if $show eq 'no';
+	print STDERR<<EOF;
+$program
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+}
+
+sub help {
+	return if $show eq 'no';
+	print STDOUT<<EOF;
+$program:
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+Arguments:
+    NONE
+Options:
+    -n, --dryrun
+        don't perform the actions, just check them
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+}
+
+sub copying {
+	return if $show eq 'no';
+	print STDOUT<<EOF;
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the GNU General Public License  as  published by the Free Software
+Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should  have received a copy of the GNU  General  Public License  along with
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+}
+
+sub syntax_error($)
+{
+    my $error = shift;
+    if ($verbose > 0) {
+	print STDERR "$program: syntax error -- $error";
+	usage;
+    }
+    exit 2;
+}
+
+sub option_unrec($)
+{
+    my $opt = shift;
+    $opt =~ s/=.*//;
+    syntax_error "`$opt' unrecognized";
+}
+
+sub option_noarg($)
+{
+    my $opt = shift;
+    syntax_error "`$opt' does accept an argument";
+}
+
+sub option_needarg($)
+{
+    my $opt = shift;
+    syntax_error "`$opt' requires an argument";
+}
+
+sub option_after($$)
+{
+    my $opt = shift;
+    my $oth = shift;
+    syntax_error "`$opt' cannot occur with `$oth'";
+}
+
+my ($more,$arg,$optarg,$prev,$prevopt,$run,@nonopt);
+my ($show_help,$show_usage,$show_copy);
+
+$more = '';
+
+while (scalar(@ARGV) or $more ne '') {
+    if ($more) {
+	$arg = "-$more";
+	$more = '';
+    } else {
+	$arg = shift;
+    }
+    if ($arg =~ /^--(debug|verbose)=(.*)$/) {
+	$optarg = $2;
+    } elsif ($arg =~ /^--.*=/) {
+	option_noarg $arg;
+    } elsif ($arg =~ /^-[nqDvhVC]$/) {
+	$optarg = '';
+    } elsif ($arg =~ /^(-[nqDvhVC])(.*)$/) {
+	$arg = $1;
+	$more = $2;
+	$optarg = '';
+    } elsif ($arg =~ /^-[x]$/) {
+	$optarg = '';
+    } elsif ($arg =~ /^(-[x])(.*)$/) {
+	$arg = $1;
+	$optarg = $2;
+    } else {
+	$optarg = '';
+    }
+    if (ref($prev)) {
+	if ($arg =~ /^-/) {
+	    if (ref($prev) eq 'SUB') {
+	    } elsif (ref($prev) =~ /^(SCALAR|ARRAY)$/) {
+		option_needarg $prevopt;
+	    }
+	    $prev = ''; $prevopt = '';
+	} else {
+	    if (ref($prev) eq 'ARRAY') {
+		push @$prev, $arg;
+	    } elsif (ref($prev) eq 'SCALAR') {
+		$$prev = $arg;
+	    } elsif (ref($prev) eq 'SUB') {
+		&$prev($optarg);
+	    }
+	    $prev = ''; $prevopt = '';
+	    next;
+	}
+    }
+
+         if ($arg =~ /^-(-help|-h|-Help|-H|-\?|h|H|\?)$/) {
+	$show_help = 'yes';
+	help;
+	exit 0;
+    } elsif ($arg =~ /^-(-version|-versio|-versi|-vers|V)$/) {
+	$show_usage = 'yes';
+	version;
+	exit 0;
+    } elsif ($arg =~ /^-(-copying|-copyin|-copy|-cop|-co|-c|C)$/) {
+	$show_copy = 'yes';
+	copying;
+	exit 0;
+    } elsif ($arg =~ /^-(-verbose|-verbos|-verb)$/) {
+	$prevopt = $arg;
+	$prev = sub {
+	    if ($optarg eq '') {
+		$verbose++;
+	    } elsif ($optarg =~ /^[0-9]+$/) {
+		$verbose = $optarg;
+	    } else {
+		syntax_error "$arg $optarg";
+	    }
+	}
+    } elsif ($arg =~ /^-(v)$/) {
+	$verbose++;
+    } elsif ($arg =~ /^-(-verbose=|-verbos=|-verb=).*$/) {
+	if ($optarg eq '') {
+	    $verbose++;
+	} elsif ($optarg =~ /^[0-9]+$/) {
+	    $verbose = $optarg;
+	} else {
+	    syntax_error $arg;
+	}
+    } elsif ($arg =~ /^-(-debug|-debu|-deb)$/) {
+	$prevopt = $arg;
+	$prev = sub {
+	    if ($optarg eq '') {
+		$debug++;
+	    } elsif ($optarg =~ /^[0-9]+$/) {
+		$debug = $optarg;
+	    } else {
+		syntax_error "$arg $optarg";
+	    }
+	}
+    } elsif ($arg =~ /^-(D)$/) {
+	$debug++;
+    } elsif ($arg =~ /^-(-debug=|-debu=|-deb=|D).*$/) {
+	if ($optarg eq '') {
+	    $debug++;
+	} elsif ($optarg =~ /^[0-9]+$/) {
+	    $debug = $optarg;
+	} else {
+	    syntax_error "$arg $optarg";
+	}
+    } elsif ($arg =~ /^-(-dry-run|-dryrun|-n|n)$/) {
+	$run = 'no';
+    } elsif ($arg =~ /^-(-quiet|-silent|q)$/) {
+	$show = 'no';
+	$verbose = 0;
+	$debug = 0;
+    } elsif ($arg eq '--') {
+	last;
+    } elsif ($arg =~ /^-.*/) {
+	option_unrec $arg;
+    } else {
+	push @nonopt, $arg;
+    }
+}
+
+if (ref($prev)) {
+    if (ref($prev) eq 'SUB') {
+	&$prev('');
+    } else {
+	option_needarg $prevopt;
+    }
+}
+
+push @nonopt, @ARGV;
+@ARGV = ( @nonopt );
+
+my @defaults = (
+    'verbose', \$verbose, 1,
+    'debug', \$debug, 0,
+    'show', \$show, 1,
+    'show_help', \$show_help, 0,
+    'show_usage', \$show_usage, 0,
+    'show_copy', \$show_copy, 0,
+);
+
+while ($#defaults >= 2) {
+    my $lab = shift @defaults;
+    my $ref = shift @defaults;
+    my $val = shift @defaults;
+
+    if (not defined $$ref) {
+	$$ref = $val;
+    } else {
+    }
+}
+
+if (!eval { require SNMP; }) {
+	print STDERR<<EOF;
+ERROR: You do not have the SNMP perl module installed.  Please obtain
+this by getting the latest source release of the ucd-snmp toolkit from
+http://www.net-snmp.org/download/ .  The perl module is contained in
+the perl/SNMP directory.  See the INSTALL file there for instructions.
+EOF
+	exit;
+} else {
+	eval { import SNMP; }
+}
+
+if (!eval { require Tk; }) {
+    print STDERR<<EOF;
+ERROR: Use of the $0 program requires the availablity of the perl
+Tk module.  It can either be obtained from CPAN or by insgalling the
+necessary package on your system.
+EOF
+} else {
+    eval { import Tk; }
+}
+
+use Carp;
+use Data::Dumper;
+#use XML::Simple;
+
+#my $xml = new XML::Simple;
+
+use SNMP;
+
+#if (!eval { require Gtk2; }) {
+#	print STDERR<<EOF;
+#ERROR: Use of the $0 program requires the availability of the perl
+#Gtk2 module.  It can either be obtained from CPAN or by installing
+#the necessary package on your system.
+#EOF
+#} else {
+#	eval { import Gtk2; }
+#}
+
+#Gtk2->init;
+#
+#my $w = Gtk2::Window->new('toplevel');
+#my $b = Gtk2::Button->new('Quit');
+#my $m = Gtk2::MenuBar->new;
+#$m->set_pack_direction('ltr');
+#$m->set_child_pack_direction('ttb');
+#$b->signal_connect(clicked=>sub { Gtk2->main_quit; });
+#$w->add($b);
+#$w->show_all;
+#Gtk2->main;
+
+use Tk;
+use Tk::Xrm;
+require Tk::Adjuster;
+require Tk::Dialog;
+require Tk::DialogBox;
+require Tk::HList;
+require Tk::ROText;
+require Tk::NoteBook;
+require Tk::Pane;
+require Tk::Balloon;
+require Tk::NumEntry;
+
 
 package Mysession;
 use strict;
@@ -3554,9 +3944,16 @@ $myapp->ShowCopying();
 
 Tk::MainLoop;
 
+exit;
+
+1;
+
 # =============================================================================
 #
 # $Log: streams-manager,v $
+# Revision 1.1.2.2  2009-07-21 11:06:18  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:41:59  brian
 # - added files to new distro
 #

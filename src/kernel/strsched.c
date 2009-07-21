@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.2  2009-07-21 11:06:16  brian
+ - changes from release build
+
  Revision 1.1.2.1  2009-06-21 11:37:16  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $"
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -4567,6 +4570,10 @@ kmem_alloc_slow(size_t size, int flags)
 		       | ((flags & KM_DMA) ? GFP_DMA : 0));
 }
 
+#ifdef HAVE_KMEM_ALLOC_EXPORT
+#undef kmem_alloc
+#define kmem_alloc kmem_alloc_
+#endif
 /**
  *  kmem_alloc:	- allocate memory
  *  @size:	amount of memory to allocate in bytes
@@ -4588,7 +4595,14 @@ kmem_alloc(size_t size, int flags)
 }
 
 EXPORT_SYMBOL(kmem_alloc);	/* include/sys/openss7/kmem.h */
+#ifdef HAVE_KMEM_ALLOC_EXPORT
+#undef kmem_alloc
+#endif
 
+#ifdef HAVE_KMEM_ZALLOC_EXPORT
+#undef kmem_zalloc
+#define kmem_zalloc kmem_zalloc_
+#endif
 /**
  *  kmem_zalloc: - allocate and zero memory
  *  @size:	amount of memory to allocate in bytes
@@ -4610,7 +4624,14 @@ kmem_zalloc(size_t size, int flags)
 }
 
 EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/openss7/kmem.h */
+#ifdef HAVE_KMEM_ZALLOC_EXPORT
+#undef kmem_zalloc
+#endif
 
+#ifdef HAVE_KMEM_FREE_EXPORT
+#undef kmem_free
+#define kmem_free kmem_free_
+#endif
 /**
  *  kmem_free:	- free memory
  *  @addr:	address of memory
@@ -4629,6 +4650,9 @@ kmem_free(void *addr, size_t size)
 }
 
 EXPORT_SYMBOL(kmem_free);	/* include/sys/openss7/kmem.h */
+#ifdef HAVE_KMEM_FREE_EXPORT
+#undef kmem_free
+#endif
 
 /**
  *  kmem_alloc_node: - allocate memory

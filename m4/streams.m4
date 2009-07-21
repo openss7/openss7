@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -267,10 +267,9 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_OPTIONS], [dnl
     AC_ARG_WITH([lis],
-	AS_HELP_STRING([--with-lis=HEADERS],
-	    [specify the LiS header file directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
-	[with_lis="$withval" ; for s in ${!streams_cv_lis_*} ; do eval "unset $s" ; done],
-	[with_lis=''])
+	[AS_HELP_STRING([--with-lis=HEADERS],
+	    [LiS header directory @<:@default=INCLUDEDIR/LiS@:>@])],
+	[for s in ${!streams_cv_lis_*} ; do eval "unset $s" ; done])
 ])# _LIS_OPTIONS
 # =============================================================================
 
@@ -281,10 +280,9 @@ AC_DEFUN([_LIS_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_OPTIONS], [dnl
     AC_ARG_WITH([lfs],
-	AS_HELP_STRING([--with-lfs=HEADERS],
-	    [specify the LFS header file directory.  @<:@default=INCLUDEDIR/streams@:>@]),
-	[with_lfs="$withval" ; for s in ${!streams_cv_lfs_*} ; do eval "unset $s" ; done],
-	[with_lfs=''])
+	[AS_HELP_STRING([--with-lfs=HEADERS],
+	    [LFS header directory @<:@default=INCLUDEDIR/streams@:>@])],
+	[for s in ${!streams_cv_lfs_*} ; do eval "unset $s" ; done])
 ])# _LFS_OPTIONS
 # =============================================================================
 
@@ -1531,6 +1529,9 @@ AC_DEFUN([_LINUX_STREAMS_], [dnl
 # =============================================================================
 #
 # $Log: streams.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

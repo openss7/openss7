@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SIGTRAN_OPTIONS], [dnl
     AC_ARG_WITH([sigtran],
-	AS_HELP_STRING([--with-sigtran=HEADERS],
-	    [specify the SIGTRAN header file directory.  @<:@default=INCLUDEDIR/sigtran@:>@]),
-	[with_sigtran="$withval" ; for s in ${!sigtran_cv_*} ; do eval "unset $s" ; done],
-	[with_sigtran=''])
+	[AS_HELP_STRING([--with-sigtran=HEADERS],
+	    [SIGTRAN header directory @<:@default=INCLUDEDIR/sigtran@:>@])],
+	[for s in ${!sigtran_cv_*} ; do eval "unset $s" ; done])
 ])# _SIGTRAN_OPTIONS
 # =============================================================================
 
@@ -628,6 +627,9 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: sigtran.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

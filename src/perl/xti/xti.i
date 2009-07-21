@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:59 $
+ @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-13 07:13:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:41:59 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti.i,v $
+ Revision 1.1.2.2  2009-07-13 07:13:32  brian
+ - changes for multiple distro build
+
  Revision 1.1.2.1  2009-06-21 11:41:59  brian
  - added files to new distro
 
@@ -59,8 +62,64 @@
 
 %module Xti
 %{
+#define _XOPEN_SOURCE 600
+#ifndef _REENTRANT
+#define _REENTRANT
+#endif
+#define _THREAD_SAFE
+#define _SC_T_DEFAULT_ADDRLEN   2
+#define _SC_T_DEFAULT_CONNLEN   3
+#define _SC_T_DEFAULT_DISCLEN   4
+#define _SC_T_DEFAULT_OPTLEN    5
+#define _SC_T_DEFAULT_DATALEN   6
+#define _T_DEFAULT_ADDRLEN      128
+#define _T_DEFAULT_CONNLEN      256
+#define _T_DEFAULT_DISCLEN      256
+#define _T_DEFAULT_OPTLEN       256
+#define _T_DEFAULT_DATALEN      16384
+#define _T_TIMEOUT              -1
+#define _T_IOV_MAX              16
+
+#define NEED_T_USCALAR_T        1
+
+#include <stdlib.h>
 #include <sys/types.h>
-#include <stdint.h>
+#include <sys/stat.h>
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
+#include <sys/stropts.h>
+#include <sys/poll.h>
+#include <fcntl.h>
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+
+#ifndef __EXCEPTIONS
+#define __EXCEPTIONS 1
+#endif
+
+#include <unistd.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <stropts.h>
+#include <pthread.h>
+#include <linux/limits.h>
+#include <values.h>
+
+#ifndef __P
+#define __P(__prototype) __prototype
+#endif
+
+#include <xti.h>
+#include <timod.h>
+#include <tihdr.h>
 %}
 
 %include "typemaps.i"
@@ -85,12 +144,12 @@ typedef unsigned char u_int8_t;
 //%apply char *BYTE { char *buf }
 //%apply char *BYTE { char value[0] }
 
-%ignore _t_errno;
-%ignore opthdr;
-
-%ignore t_iovec_;
-#define t_iovec t_iovec_
-%immutable iov_base;
+// %ignore _t_errno;
+// %ignore opthdr;
+// 
+// %ignore t_iovec_;
+// #define t_iovec t_iovec_
+// %immutable iov_base;
 
 #define _XOPEN_SOURCE 600
 
@@ -100,28 +159,28 @@ typedef unsigned char u_int8_t;
 %include "sys/xti_osi.h"
 %include "sys/xti_mosi.h"
 
-#undef t_iovec
-
-%inline %{
-struct t_iovec {
-        %immutable;
-        char *iov_base;
-        size_t iov_len;
-        %mutable;
-};
-//union t_struct_p {
-//        struct t_bind *bind;
-//        struct t_optmgmt *optmgmt;
-//        struct t_call *call;
-//        struct t_discon *dis;
-//        struct t_unitdata *unitdata;
-//        struct t_uderr *uderror;
-//        struct t_info *info;
-//};
-int xti_errno(void) {
-        return t_errno;
-}
-%}
+// #undef t_iovec
+// 
+// %inline %{
+// struct t_iovec {
+//         //%immutable;
+//         char *iov_base;
+//         size_t iov_len;
+//         //%mutable;
+// };
+// //union t_struct_p {
+// //        struct t_bind *bind;
+// //        struct t_optmgmt *optmgmt;
+// //        struct t_call *call;
+// //        struct t_discon *dis;
+// //        struct t_unitdata *unitdata;
+// //        struct t_uderr *uderror;
+// //        struct t_info *info;
+// //};
+// int xti_errno(void) {
+//         return t_errno;
+// }
+// %}
 
 %rename(xti_accept) t_accept;
 %rename(xti_addleaf) t_addleaf;
@@ -189,19 +248,19 @@ extern int t_rcvrel(int fd);
 extern int t_rcvreldata(int fd, struct t_discon *OUTPUT);
 extern int t_rcvudata(int fd, struct t_unitdata *OUTPUT, int *OUTPUT);
 extern int t_rcvuderr(int fd, struct t_uderr *OUTPUT);
-extern int t_rcvv(int fd, const struct t_iovec *INPUT, unsigned int, int *OUTPUT);
-extern int t_rcvvopt(int fd, struct t_unitdata *OUTPUT, const struct t_iovec *INPUT, unsigned int iovcount, int flags);
-extern int t_rcvvudata(int fd, struct t_unitdata *OUTPUT, const struct t_iovec *INPUT, unsigned int iovcount, int *OUTPUT);
+extern int t_rcvv(int fd, struct t_iovec *INPUT, unsigned int, int *OUTPUT);
+extern int t_rcvvopt(int fd, struct t_unitdata *OUTPUT, struct t_iovec *INPUT, unsigned int iovcount, int flags);
+extern int t_rcvvudata(int fd, struct t_unitdata *OUTPUT, struct t_iovec *INPUT, unsigned int iovcount, int *OUTPUT);
 // extern int t_removeleaf(int fd, int, int);
 extern int t_snd(int fd, char *BYTE, unsigned int nbytes, int flags);
 extern int t_snddis(int fd, const struct t_call *INPUT);
 extern int t_sndopt(int fd, const struct t_unitdata *INPUT, int flags);
 extern int t_sndrel(int fd);
-extern int t_sndreldata(int fd, const struct t_discon *INPUT);
+extern int t_sndreldata(int fd, struct t_discon *INPUT);
 extern int t_sndudata(int fd, const struct t_unitdata *INPUT);
 extern int t_sndv(int fd, const struct t_iovec *INPUT, unsigned int iovcount, int flags);
 extern int t_sndvopt(int fd, const struct t_unitdata *INPUT, const struct t_iovec *INPUT, unsigned int iovcount, int flags);
-extern int t_sndvudata(int fd, const struct t_unitdata *INPUT, struct t_iovec *INPUT, unsigned int flags);
+extern int t_sndvudata(int fd, struct t_unitdata *INPUT, struct t_iovec *INPUT, unsigned int flags);
 extern const char *t_strerror(int fd);
 extern int t_sync(int fd);
 extern int t_sysconf(int fd);

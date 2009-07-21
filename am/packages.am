@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,7 +57,7 @@
 ## compatibility packages.
 ##
 
-sinclude $(STRCONF_PKGRULE)
+-include $(STRCONF_PKGRULE)
 
 DISTCLEANFILES		+= $(PACKAGE_WRAPPERS)
 
@@ -70,27 +70,44 @@ noinst_LIBRARIES		+= libBCMpkgs.a
 
 if AMDEP
 ## AMDEP
-sinclude $(DEPDIR)/packages.Ph
+-include $(DEPDIR)/packages.Ph
 
 $(DEPDIR)/packages.Ph: Makefile
-	@$(ECHO) "Creating $@ dependencies..." ; \
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..." ; \
 	( \
 		objs= ; \
 		list="$(PACKAGE_OBJECTS)" ; for obj in $$list ; do \
-			a=`$(ECHO) "$$obj" | sed 's,\<lib.*_a-,$(kpre),'` ; \
-			s=`$(ECHO) "$$obj" | sed 's,\<lib.*_a-,,;s,\<$(kpre),,;s,\.o$$,,'` ; \
+			a=`echo "$$obj" | sed 's,\<lib.*_a-,$(kpre),'` ; \
+			s=`echo "$$obj" | sed 's,\<lib.*_a-,,;s,\<$(kpre),,;s,\.o$$,,'` ; \
 			if test -f "$$s" ; then d= ; else d="$(srcdir)/" ; fi ; \
 			if test -f "$$d$$s" ; then s="$$s.c" ; else s= ; fi ; \
 			if test "$$a" = "$$obj" ; then \
-				$(ECHO) "$$a: $$s" ; $(ECHO) "" ; \
+				echo "$$a: $$s" ; echo "" ; \
 			else \
-				$(ECHO) "$$a: $$obj $$s" ; $(ECHO) "" ; \
+				echo "$$a: $$obj $$s" ; echo "" ; \
 			fi ; \
 			objs="$${objs:+$${objs} }$$obj" ; \
 		done ; \
-		$(ECHO) "stamp-pkgobjs: $$objs" ; $(ECHO) "" ; \
+		echo "stamp-pkgobjs: $$objs" ; echo "" ; \
 	) >$(DEPDIR)/packages.Tph || { rm -f -- $(DEPDIR)/packages.Tph ; exit 1 ; } ; \
 	$(am__mv) $(DEPDIR)/packages.Tph $@
+
+DISTCLEANFILES += $(DEPDIR)/packages.Tph $(DEPDIR)/packages.Ph
+
+distclean-packages_Ph:
+	@( \
+		echo "$(DEPDIR)/packages.Tph" ; \
+		echo "$(DEPDIR)/packages.Ph" ; \
+		list="$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
+			r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+			echo "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; \
+			echo "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-packages_Ph
 ## AMDEP
 endif
 
@@ -105,7 +122,7 @@ if am__fastdepCC
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list="$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -MT libBCMpkgs_a-$$r.o -MD -MP -MF "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
 		then $(am__mv) "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f -- "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
 	done ; \
@@ -118,7 +135,7 @@ if AMDEP
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		source="$$s" object="libBCMpkgs_a-$$r.o" libtool=no \
 		DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
@@ -130,7 +147,7 @@ else
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
+		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
 	done ; \
 	touch stamps-pkgobjs
@@ -140,7 +157,7 @@ endif
 endif
 
 clean-pkgobjs:
-	@objs=`$(ECHO) " $(PACKAGE_SRCFILES) " | sed 's, *  , ,g;s, [^[:space:]]*/, libBCMpkgs_a-,g;s,\.c ,.o ,g'` ; \
+	@objs=`echo " $(PACKAGE_SRCFILES) " | sed 's, *  , ,g;s, [^[:space:]]*/, libBCMpkgs_a-,g;s,\.c ,.o ,g'` ; \
 	list="stamp-pkgobjs $$objs" ; $(am__list_remove)
 
 CLEAN_LOCAL		+= clean-pkgobjs
@@ -153,6 +170,12 @@ endif
 ## =============================================================================
 ##
 ## $Log: packages.am,v $
+## Revision 1.1.2.4  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.3  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

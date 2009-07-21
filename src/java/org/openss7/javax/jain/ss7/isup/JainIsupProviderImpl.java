@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: JainIsupProviderImpl.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:36:43 $ <p>
+ @(#) $RCSfile: JainIsupProviderImpl.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:16 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:36:43 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:16 $ by $Author: brian $
  */
 
 package org.openss7.javax.jain.ss7.isup;
@@ -188,7 +188,7 @@ public class JainIsupProviderImpl implements Runnable, JainIsupProvider {
                     if (source instanceof JainIsupListener) {
                         JainIsupListener listener;
                         listener = (JainIsupListener) source;
-                        event.setSource((java.lang.Object) this);
+                        event.setSource(this);
                         /* TODO: we might want to spawn a thread from a
                          * thread pool to process the event. */
                         listener.processIsupEvent(event);
@@ -217,7 +217,7 @@ public class JainIsupProviderImpl implements Runnable, JainIsupProvider {
       * An IsupEvent to be delivered to a JainIsupListener.  */
     protected native IsupEvent recvIsupEvent();
 
-    private JainIsupStackImpl m_stack;
+    private JainIsupStack m_stack;
     private boolean running = true;
 }
 

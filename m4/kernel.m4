@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,17 +150,13 @@ dnl protect against nesting
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_OPTIONS], [dnl
 dnl AC_ARG_ENABLE([k-install],
-dnl     AS_HELP_STRING([--enable-k-install],
-dnl         [specify whether kernel modules will be installed.
-dnl         @<:@default=yes@:>@]),
-dnl     [enable_k_install="$enableval"],
-dnl     [enable_k_install='yes'])
+dnl     [AS_HELP_STRING([--enable-k-install],
+dnl         [kernel modules @<:@default=yes@:>@])],
+dnl     [], [enable_k_install=yes])
     AC_ARG_ENABLE([k-package],
-	AS_HELP_STRING([--enable-k-package],
-	    [specify whether kernel source packages will be generated.
-	     @<:@default=disabled@:>@]),
-	[enable_k_package="$enableval"],
-	[enable_k_package='no'])
+	[AS_HELP_STRING([--enable-k-package],
+	    [kernel source package @<:@default=disabled@:>@])],
+	[], [enable_k_package=no])
     AM_CONDITIONAL([WITH_K_PACKAGE], [test :"${enable_k_package:-no}" != :no])
 ])# _LINUX_KERNEL_OPTIONS
 # =============================================================================
@@ -170,6 +166,7 @@ dnl     [enable_k_install='yes'])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_RELEASE
+    _LINUX_CHECK_KERNEL_CACHE
     _LINUX_CHECK_KERNEL_LINKAGE
     _LINUX_CHECK_KERNEL_TOOLS
     _LINUX_CHECK_KERNEL_MODULES
@@ -213,13 +210,8 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
     AC_MSG_CHECKING([for kernel release])
     AC_ARG_WITH([k-release],
-	AS_HELP_STRING([--with-k-release=UTSRELEASE],
-	    [specify the UTS release of the linux kernel for which the build
-	    is targetted.  If this option is not set, the build will be
-	    targetted at the kernel running in the build environment.
-	    @<:@default=`uname -r`@:>@]),
-	[with_k_release="$withval"],
-	[with_k_release=])
+	[AS_HELP_STRING([--with-k-release=UTSRELEASE],
+	    [UTS release of target linux kernel @<:@default=`uname -r`@:>@])])
     linux_cv_k_running='no'
     if test :"${with_k_release:-no}" != :no ; then
 	linux_cv_k_release="$with_k_release"
@@ -334,15 +326,15 @@ dnl pull out versions from release number
 AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
     AC_CACHE_CHECK([for kernel module/object linkage], [linux_cv_k_linkage], [dnl
 	AC_ARG_WITH([k-linkage],
-	    AS_HELP_STRING([--with-k-linkage=LINKAGE],
-		[specify the kernel LINKAGE, either 'loadable' for loadable modules or 'linkable'
-		for linkable objects.  @<:@default=loadable@:>@]), [dnl
+	    [AS_HELP_STRING([--with-k-linkage=LINKAGE],
+		[kernel LINKAGE: 'loadable' for loadable modules or 'linkable'
+		for linkable objects.  @<:@default=loadable@:>@])], [dnl
 	    with_k_linkage="$withval"
 	    case :${with_k_linkage:-loadable} in
 		(:linkable|:objects)   with_k_linkage='linkable' ;;
 		(:loadable|:modules|:*) with_k_linkage='loadable';;
 	    esac],
-	    [with_k_linkage='loadable'])
+	    [with_k_linkage=loadable])
 	if test :${with_k_linkage:-loadable} = :linkable ; then
 	    linux_cv_k_linkage='linkable'
 	else
@@ -405,11 +397,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     AC_CACHE_CHECK([for kernel modules install directory], [linux_cv_k_modules_eval], [dnl
 	AC_ARG_WITH([k-modules],
-	    AS_HELP_STRING([--with-k-modules=DIR],
-		[specify the directory to which kernel modules will be installed.
-		@<:@default=/lib/modules/K-RELEASE/misc@:>@]),
-	    [with_k_modules="$withval"],
-	    [with_k_modules=])
+	    [AS_HELP_STRING([--with-k-modules=DIR],
+		[kernel module install directory @<:@default=/lib/modules/K-RELEASE/misc@:>@])])
 	if test :"${with_k_modules:-no}" != :no
 	then
 	    linux_cv_k_modules="$with_k_modules"
@@ -769,11 +758,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
     AC_CACHE_CHECK([for kernel build directory], [linux_cv_k_build], [dnl
 	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-build],
-	    AS_HELP_STRING([--with-k-build=DIR],
-		[specify the base kernel build directory in which configured
-		kernel source resides.  @<:@default=K-MODULES-DIR/build@:>@]),
-	    [with_k_build="$withval"],
-	    [with_k_build=])
+	    [AS_HELP_STRING([--with-k-build=DIR],
+		[kernel build directory @<:@default=K-MODULES-DIR/build@:>@])])
 	if test :"${with_k_build:-no}" != :no
 	then
 	    linux_cv_k_build="$with_k_build"
@@ -883,12 +869,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
     AC_CACHE_CHECK([for kernel source directory], [linux_cv_k_source], [dnl
 	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-source],
-	    AS_HELP_STRING([--with-k-source=DIR],
-		[specify the base kernel source directory in which source
-		resides separate from the build directory.
-		@<:@default=/usr/src/K_VERSION@:>@]),
-	    [with_k_source="$withval"],
-	    [with_k_source=])
+	    [AS_HELP_STRING([--with-k-source=DIR],
+		[kernel source directory @<:@default=/usr/src/K_VERSION@:>@])])
 	if test :"${with_k_souce:-no}" != :no
 	then
 	    linux_cv_k_source="$with_k_source"
@@ -948,11 +930,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
     AC_CACHE_CHECK([for kernel module ver], [linux_cv_k_modver], [dnl
 	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-modver],
-	    AS_HELP_STRING([--with-k-modver=MAP],
-		[specify the kernel module symbol versions file.
-		@<:@default=K-BUILD-DIR/Module.symvers@:>@]),
-	    [with_k_modver="$withval"],
-	    [with_k_modver=])
+	    [AS_HELP_STRING([--with-k-modver=MAP],
+		[kernel module symbol versions @<:@default=K-BUILD-DIR/Module.symvers@:>@])])
 	if test :"${with_k_modver:-no}" != :no
 	then
 	    linux_cv_k_modver="$with_k_modver"
@@ -1043,11 +1022,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [dnl
     AC_CACHE_CHECK([for kernel system map], [linux_cv_k_sysmap], [dnl
 	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-sysmap],
-	    AS_HELP_STRING([--with-k-sysmap=MAP],
-		[specify the kernel system map file.
-		@<:@default=K-BUILD-DIR/System.map@:>@]),
-	    [with_k_sysmap="$withval"],
-	    [with_k_sysmap=])
+	    [AS_HELP_STRING([--with-k-sysmap=MAP],
+		[kernel system map @<:@default=K-BUILD-DIR/System.map@:>@])])
 	if test :"${with_k_sysmap:-no}" != :no
 	then
 	    linux_cv_k_sysmap="$with_k_sysmap"
@@ -1364,11 +1340,8 @@ dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
     AC_CACHE_CHECK([for kernel arch directory], [linux_cv_k_archdir], [dnl
 	AC_ARG_WITH([k-archdir],
-	    AS_HELP_STRING([--with-k-archdir=DIR],
-		[specify the kernel source architecture specific directory.
-		@<:@default=K-BUILD-DIR/arch@:>@]),
-	    [with_k_archdir="$withval"],
-	    [with_k_archdir=])
+	    [AS_HELP_STRING([--with-k-archdir=DIR],
+		[kernel architecture directory @<:@default=K-BUILD-DIR/arch@:>@])])
 	if test :"${with_k_archdir:-no}" != :no
 	then
 	    linux_cv_k_archdir="$with_k_archdir"
@@ -1423,11 +1396,8 @@ dnl
 dnl
     AC_CACHE_CHECK([for kernel mach directory], [linux_cv_k_machdir], [dnl
 	AC_ARG_WITH([k-machdir],
-	    AS_HELP_STRING([--with-k-machdir=DIR],
-		[specify the kernel source machine specific directory.
-		@<:@default=K-ARCHDIR/ARCH@:>@]),
-	    [with_k_machdir="$withval"],
-	    [with_k_machdir=])
+	    [AS_HELP_STRING([--with-k-machdir=DIR],
+		[kernel machine directory @<:@default=K-ARCHDIR/ARCH@:>@])])
 	if test :"${with_k_machdir:-no}" != :no
 	then
 	    linux_cv_k_machdir="$with_k_machdir"
@@ -1459,11 +1429,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
     AC_CACHE_CHECK([for kernel config file], [linux_cv_k_config], [dnl
 	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-config],
-	    AS_HELP_STRING([--with-k-config=CONFIG],
-		[specify the kernel configuration file.
-		@<:@default=BOOT/config-K-RELEASE@:>@]),
-	    [with_k_config="$withval"],
-	    [with_k_config=])
+	    [AS_HELP_STRING([--with-k-config=CONFIG],
+		[kernel configuration @<:@default=BOOT/config-K-RELEASE@:>@])])
 	if test :"${with_k_config:-no}" != :no
 	then
 	    linux_cv_k_config="$with_k_config"
@@ -1625,7 +1592,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     AC_SUBST([kernel_image])
     AC_SUBST([kernel_source])
     AC_SUBST([kernel_headers])
-    AC_MSG_CHECKING([for kernel file sanity])
+    AC_CACHE_CHECK([for kernel file sanity], [linux_cv_kernel_sanity], [dnl
 	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
 	case "$target_vendor" in
 	    (mandrake)
@@ -1661,7 +1628,8 @@ dnl
 		done
 		;;
 	esac
-    AC_MSG_RESULT([ok])
+	linux_cv_kernel_sanity=ok
+    ])
 ])# _LINUX_CHECK_KERNEL_FILES
 # =========================================================================
 
@@ -1695,11 +1663,9 @@ dnl
 	rm -f .config
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
-	    AS_HELP_STRING([--with-k-optimize=HOW],
-		[specify optimization, normal, size, speed or quick.
-		@<:@default=auto@:>@]),
-	    [with_k_optimize="$withval"],
-	    [with_k_optimize="$with_optimize"])
+	    [AS_HELP_STRING([--with-k-optimize=HOW],
+		[optimization: normal, size, speed or quick @<:@default=auto@:>@])],
+	    [], [with_k_optimize="$with_optimize"])
 
 dnl
 dnl	Recent x86_64 makefiles add -fno-reorder-blocks which impedes __builtin_expect() which is
@@ -1795,10 +1761,9 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror"
 	fi
 	AC_ARG_ENABLE([k-inline],
-	    AS_HELP_STRING([--enable-k-inline],
-		[enable kernel inline functions.  @<:@default=no@:>@]),
-	    [enable_k_inline="$enableval"],
-	    [enable_k_inline='no'])
+	    [AS_HELP_STRING([--enable-k-inline],
+		[kernel inline functions @<:@default=disabled@:>@])],
+	    [], [enable_k_inline=no])
 	if test :"${enable_k_inline:-no}" != :no 
 	then
 	    linux_cflags="$linux_cflags${linux_cflags:+ }-finline-functions"
@@ -1998,38 +1963,30 @@ dnl
 AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
     AC_MSG_CHECKING([for kernel debugging])
     AC_ARG_ENABLE([k-safe],
-	AS_HELP_STRING([--enable-k-safe],
-	    [enable kernel module run-time safety checks.
-	    @<:@default=yes@:>@]),
-	[enable_k_safe="$enableval"],
-	[enable_k_safe='no'])
-    if test :"${enable_k_safe:-no}" != :no 
-    then
+	[AS_HELP_STRING([--enable-k-safe],
+	    [kernel run-time safety checks @<:@default=disabled@:>@])],
+	[], [enable_k_safe=no])
+    if test :"${enable_k_safe:-no}" != :no ; then
 	linux_cv_debug='_SAFE'
     fi
     AC_ARG_ENABLE([k-test],
-	AS_HELP_STRING([--enable-k-test],
-	    [enable kernel module run-time testing.  @<:@default=no@:>@]),
-	[enable_k_test="$enableval"],
-	[enable_k_test='no'])
-    if test :"${enable_k_test:-no}" != :no 
-    then
+	[AS_HELP_STRING([--enable-k-test],
+	    [kernel run-time testing @<:@default=disabled@:>@])],
+	[], [enable_k_test=no])
+    if test :"${enable_k_test:-no}" != :no ; then
 	linux_cv_debug='_TEST'
     fi
     AC_ARG_ENABLE([k-debug],
-	AS_HELP_STRING([--enable-k-debug],
-	    [enable kernel module run-time debugging.  @<:@default=no@:>@]),
-	[enable_k_debug="$enableval"],
-	[enable_k_debug='no'])
-    if test :"${enable_k_debug:-no}" != :no 
-    then
+	[AS_HELP_STRING([--enable-k-debug],
+	    [kernel run-time debugging @<:@default=disabled@:>@])],
+	[], [enable_k_debug=no])
+    if test :"${enable_k_debug:-no}" != :no ; then
 	linux_cv_debug='_DEBUG'
     fi
     AC_ARG_ENABLE([k-none],
-	AS_HELP_STRING([--enable-k-none],
-	    [enable no kernel module run-time checks.  @<:@default=no@:>@]),
-	[enable_k_none="$enableval"],
-	[enable_k_none='no'])
+	[AS_HELP_STRING([--enable-k-none],
+	    [kernel module run-time checks @<:@default=disabled@:>@])],
+	[], [enable_k_none=no])
     if test :"${enable_k_none:-no}" != :no 
     then
 	linux_cv_debug='_NONE'
@@ -2442,13 +2399,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
     AC_MSG_CHECKING([for kernel module symbol versioning])
     AC_ARG_ENABLE([k-modversions],
-	AS_HELP_STRING([--enable-k-modversions],
-	    [specify whether symbol versioning is to be used on symbols
-	    exported from built modules.  @<:@default=yes@:>@]),
-	[enable_k_modversions="$enableval"],
-	[enable_k_modversions="$linux_cv_k_versions"])
-    if test :"${enable_k_modversions:-no}" = :yes
-    then
+	[AS_HELP_STRING([--enable-k-modversions],
+	    [export symbol versioning @<:@default=auto@:>@])],
+	[], [enable_k_modversions="$linux_cv_k_versions"])
+    if test :"${enable_k_modversions:-no}" = :yes ; then
 	linux_cv_k_modversions='yes'
     else
 	linux_cv_k_modversions='no'
@@ -2552,6 +2506,17 @@ AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
 		linux_tmp="yes ($ksysmap)"
 	    fi
 	fi
+dnl
+dnl Should really be a separate modules check.  This is just for XFS module
+dnl symbols.
+dnl
+	if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"
+	then
+	    if ( $EGREP -q '\<$1\>' $kmodver 2>/dev/null )
+	    then
+		linux_tmp="yes ($kmodver)"
+	    fi
+	fi
 	if test -z "$linux_tmp" -a ":$linux_cv_k_ko_modules" != :yes
 	then
 	    _LINUX_KERNEL_ENV([dnl
@@ -2631,6 +2596,44 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOLS], [dnl
 # =============================================================================
 
 # =============================================================================
+# _LINUX_CHECK_KERNEL_CACHE
+# -----------------------------------------------------------------------------
+# When performing a config.status --recheck, re-performing all of the kernel
+# configuration checks is too time consuming to the development cycle.
+# Therefore, when we are performing a recheck and we have established all of the
+# information necessary to provide a distro- and kernel- specific cache file
+# name, read that file if it exists.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_CACHE], [dnl
+    # if kernel file is not specified, use local kernel file
+    if test -z "$CONFIG_KERNEL" ; then
+	CONFIG_KERNEL="${target}-${kversion}-config.cache"
+    fi
+    AC_SUBST([CONFIG_KERNEL])dnl
+    if test "$no_create" = yes ; then
+	for config_kernel in $CONFIG_KERNEL ; do
+	    if test -r "$config_kernel" ; then
+		. "$config_kernel"
+	    fi
+	done
+    fi
+    AC_CONFIG_COMMANDS([kernelconfig], [dnl
+	if test -n "$CONFIG_KERNEL" ; then
+	    for config_kernel in $CONFIG_KERNEL ; do
+		if test -w "$config_kernel" -o ! -e "$config_kernel" ; then
+		    if touch "$config_kernel" >/dev/null 2>&1 ; then
+			cat "$cache_file" | egrep "^(test \"\\\[$]{)?(linux_cv_|ksyms_cv_|os7_cv_|strconf_cv_)" > "$config_kernel" 2>/dev/null
+		    fi
+		fi
+	    done
+	fi], [dnl
+cache_file="$cache_file"
+CONFIG_KERNEL="$CONFIG_KERNEL"
+    ])
+])# _LINUX_CHECK_KERNEL_CACHE
+# =============================================================================
+
+# =============================================================================
 # _LINUX_KERNEL_
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_], [dnl
@@ -2640,6 +2643,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISDN_OPTIONS], [dnl
     AC_ARG_WITH([isdn],
-	AS_HELP_STRING([--with-isdn=HEADERS],
-	    [specify the ISDN header file directory.  @<:@default=INCLUDEDIR/strisdn@:>@]),
-	[with_isdn="$withval" ; for s in ${!isdn_cv_*} ; do eval "unset $s" ; done],
-	[with_isdn=''])
+	[AS_HELP_STRING([--with-isdn=HEADERS],
+	    [ISDN header directory @<:@default=INCLUDEDIR/strisdn@:>@])],
+	[for s in ${!isdn_cv_*} ; do eval "unset $s" ; done])
 ])# _ISDN_OPTIONS
 # =============================================================================
 
@@ -628,6 +627,9 @@ AC_DEFUN([_ISDN_], [dnl
 # =============================================================================
 #
 # $Log: isdn.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

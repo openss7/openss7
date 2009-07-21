@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: x25.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: x25.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_X25_OPTIONS], [dnl
     AC_ARG_WITH([x25],
-	AS_HELP_STRING([--with-x25=HEADERS],
-	    [specify the X25 header file directory.  @<:@default=INCLUDEDIR/strx25@:>@]),
-	[with_x25="$withval" ; for s in ${!x25_cv_*} ; do eval "unset $s" ; done],
-	[with_x25=''])
+	[AS_HELP_STRING([--with-x25=HEADERS],
+	    [specify the X25 header file directory @<:@default=INCLUDEDIR/strx25@:>@])],
+	[for s in ${!x25_cv_*} ; do eval "unset $s" ; done])
 ])# _X25_OPTIONS
 # =============================================================================
 
@@ -628,6 +627,9 @@ AC_DEFUN([_X25_], [dnl
 # =============================================================================
 #
 # $Log: x25.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:23:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 11:23:45 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -522,7 +522,7 @@ nobase_nodist_pkginclude_HEADERS = \
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
 TESTS_ENVIRONMENT	+= CTAGS='$(CTAGIDS)' \
 			   PKG_HEADERS='$(nobase_pkginclude_HEADERS) $(nobase_nodist_pkginclude_HEADERS)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
@@ -538,6 +538,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.2  2009-07-21 11:06:14  brian
+## - changes from release build
+##
 ## Revision 1.1.2.1  2009-06-21 11:23:45  brian
 ## - added files to new distro
 ##

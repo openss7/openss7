@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_OPTIONS], [dnl
     AC_ARG_WITH([xti],
-	AS_HELP_STRING([--with-xti=HEADERS],
-	    [specify the XTI header file directory.  @<:@default=INCLUDEDIR/xti@:>@]),
-	[with_xti="$withval" ; for s in ${!xti_cv_*} ; do eval "unset $s" ; done],
-	[with_xti=''])
+	[AS_HELP_STRING([--with-xti=HEADERS],
+	    [XTI header directory @<:@default=INCLUDEDIR/xti@:>@])],
+	[for s in ${!xti_cv_*} ; do eval "unset $s" ; done])
 ])# _XTI_OPTIONS
 # =============================================================================
 
@@ -646,6 +645,9 @@ AC_DEFUN([_XTI_], [dnl
 # =============================================================================
 #
 # $Log: xti.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

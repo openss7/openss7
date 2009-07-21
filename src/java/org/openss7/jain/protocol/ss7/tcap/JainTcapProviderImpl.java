@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: JainTcapProviderImpl.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-09 12:05:15 $ <p>
+ @(#) $RCSfile: JainTcapProviderImpl.java,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:16 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-07-09 12:05:15 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:16 $ by $Author: brian $
  */
 
 package org.openss7.jain.protocol.ss7.tcap;
@@ -112,11 +112,11 @@ public class JainTcapProviderImpl implements Runnable, JainTcapProvider {
                          * thread pool to process the event. */
                         if (rawevent instanceof DialogueIndEvent) {
                             DialogueIndEvent event = (DialogueIndEvent) rawevent;
-                            event.setSource((java.lang.Object) this);
+                            event.setSource(this);
                             listener.processDialogueIndEvent(event);
                         } else if (rawevent instanceof ComponentIndEvent) {
                             ComponentIndEvent event = (ComponentIndEvent) rawevent;
-                            event.setSource((java.lang.Object) this);
+                            event.setSource(this);
                             listener.processComponentIndEvent(event);
                         } else if (rawevent instanceof TcapErrorEvent) {
                             TcapErrorEvent event = new TcapErrorEvent(this, ((TcapErrorEvent)rawevent).getError());
@@ -126,6 +126,7 @@ public class JainTcapProviderImpl implements Runnable, JainTcapProvider {
                 }
             } catch (Exception e) {
                 /* If there is an exception, discard the event. */
+                return;
             }
         }
     }

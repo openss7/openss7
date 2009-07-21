@@ -1,7 +1,7 @@
-#!/usr/bin/perl -W
+#!/usr/bin/perl
 # =============================================================================
 #
-# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:58 $
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -34,6 +34,7 @@
 # successor regulations) and the Government is acquiring only the license rights
 # granted herein (the license rights customarily provided to non-Government
 # users).  If the Software is supplied to any unit or agency of the Government
+#
 # other than DoD, it is classified as "Restricted Computer Software" and the
 # Government's rights in the Software are defined in paragraph 52.227-19 of the
 # Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
@@ -47,82 +48,22 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:41:58 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
 #
 # =============================================================================
 
 #eval 'exec perl -S $0 ${1+"@"}'
 #    if $running_under_some_shell;
 
-if (!eval { require SNMP; }) {
-	print STDERR<<EOF;
-ERROR: You do not have the SNMP perl module installed.  Please obtain
-this by getting the latest source release of the ucd-snmp toolkit from
-http://www.net-snmp.org/download/ .  The perl module is contained in
-the perl/SNMP directory.  See the INSTALL file there for instructions.
-EOF
-	exit;
-} else {
-	eval { import SNMP; }
-}
-
-#if (!eval { require Gtk2; }) {
-#	print STDERR<<EOF;
-#ERROR: Use of the $0 program requires the availability of the perl
-#Gtk2 module.  It can either be obtained from CPAN or by installing
-#the necessary package on your system.
-#EOF
-#} else {
-#	eval { import Gtk2; }
-#}
-
-if (!eval { require Tk; }) {
-    print STDERR<<EOF;
-ERROR: Use of the $0 program requires the availablity of the perl
-Tk module.  It can either be obtained from CPAN or by insgalling the
-necessary package on your system.
-EOF
-} else {
-    eval { import Tk; }
-}
-
-use Carp;
-use Data::Dumper;
-#use XML::Simple;
-
-#my $xml = new XML::Simple;
-
-my $mibs = {};
-
 $\ = "\n";
 
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:41:58 $';
-my $version = '$Revision: 1.1.2.1 $';
-my $date = '$Date: 2009-06-21 11:41:58 $';
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $';
+my $version = '$Revision: 1.1.2.2 $';
+my $date = '$Date: 2009-07-21 11:06:17 $';
 my $title = 'OpenSS7 Network Manager';
-
-use SNMP;
-
-$SNMP::verbose = 1;
-$SNMP::use_long_names = 0;
-$SNMP::use_sprint_value = 0;
-$SNMP::use_enums = 1;
-$SNMP::use_numeric = 0;
-$SNMP::best_guess = 2;
-$SNMP::save_descriptions = 1;
-SNMP::initMib();
-#SNMP::addMibDirs(qw//);
-SNMP::loadModules('ALL');
-
-sub sess {
-    my (%args) = @_;
-    foreach (keys %args) {
-    }
-    return new SNMP::Session(%args);
-}
 
 my $statusbar;
 
@@ -138,7 +79,9 @@ $Title =~ s/^\n*//;
 my $Version = <<EOF;
 Version $version
 $ident
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
 Distributed under Affero GPL Version 3, included here by reference.
 See `$program --copying' for copying permissions.
 EOF
@@ -152,6 +95,7 @@ ________________________________________________________________________________
 $ident
 ________________________________________________________________________________
 
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -179,6 +123,7 @@ my $CopyingMono = <<EOF;
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -270,7 +215,9 @@ sub version {
 	print STDOUT<<EOF;
 Version $version
 $ident
+Copyright (c) 2008-2009  Monavacon Limited.    All Rights Reserved.
 Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Copyright (c) 1997-2000  Brian F. G. Bidulock. All Rights Reserved.
 Distributed under Affero GPL Version 3, included here by reference.
 See `$program --copying' for copying permissions.
 EOF
@@ -325,6 +272,7 @@ sub copying {
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
+Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
 
@@ -548,6 +496,46 @@ while ($#defaults >= 2) {
     }
 }
 
+if (!eval { require SNMP; }) {
+	print STDERR<<EOF;
+ERROR: You do not have the SNMP perl module installed.  Please obtain
+this by getting the latest source release of the ucd-snmp toolkit from
+http://www.net-snmp.org/download/ .  The perl module is contained in
+the perl/SNMP directory.  See the INSTALL file there for instructions.
+EOF
+	exit;
+} else {
+	eval { import SNMP; }
+}
+
+if (!eval { require Tk; }) {
+    print STDERR<<EOF;
+ERROR: Use of the $0 program requires the availablity of the perl
+Tk module.  It can either be obtained from CPAN or by insgalling the
+necessary package on your system.
+EOF
+} else {
+    eval { import Tk; }
+}
+
+use Carp;
+use Data::Dumper;
+#use XML::Simple;
+
+#my $xml = new XML::Simple;
+
+use SNMP;
+
+#if (!eval { require Gtk2; }) {
+#	print STDERR<<EOF;
+#ERROR: Use of the $0 program requires the availability of the perl
+#Gtk2 module.  It can either be obtained from CPAN or by installing
+#the necessary package on your system.
+#EOF
+#} else {
+#	eval { import Gtk2; }
+#}
+
 #Gtk2->init;
 #
 #my $w = Gtk2::Window->new('toplevel');
@@ -576,6 +564,26 @@ require Tk::TableMatrix::Spreadsheet;
 require Tk::Frame;
 
 use Storable qw(lock_store lock_nstore lock_retrieve);
+
+my $mibs = {};
+
+$SNMP::verbose = 0;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::save_descriptions = 1;
+SNMP::initMib();
+#SNMP::addMibDirs(qw//);
+SNMP::loadModules('ALL');
+
+sub sess {
+    my (%args) = @_;
+    foreach (keys %args) {
+    }
+    return new SNMP::Session(%args);
+}
 
 my $dragobj;
 
@@ -14802,9 +14810,14 @@ Tk::MainLoop;
 
 exit;
 
+1;
+
 # =============================================================================
 #
 # $Log: mibbrowser,v $
+# Revision 1.1.2.2  2009-07-21 11:06:17  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:41:58  brian
 # - added files to new distro
 #

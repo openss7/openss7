@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: tcl.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-13 07:13:34 $
+# @(#) $RCSfile: tcl.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,52 +49,69 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-13 07:13:34 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
-m4_define([AC_PROG_TCL], [dnl
-dnl
-dnl First order of business is to find tclConfig.sh.  This file contains
-dnl shell variables that provide information on where other things can
-dnl be found.  Unfortunately it is included in various places.  Debian
-dnl places this file in ${libdir}/tcl8.4 whereas RedHat/CentOS and SuSE
-dnl places it in ${libdir}.  Ubuntu places it in ${libdir}/tcl8.4
-dnl
-    AC_CACHE_CHECK([for tcl configuration], [ac_cv_tcl_config_sh], [dnl
-	eval "tcl_search_path=\"
-	    ${DESTDIR}${rootdir}${libdir}
-	    ${DESTDIR}${rootdir}/usr/lib
-	    ${DESTDIR}${libdir}
-	    ${DESTDIR}/usr/lib\""
-	tcl_search_path=`echo "$tcl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	AC_MSG_RESULT([searching])
-	for tcl_dir in $tcl_search_path ; do
-	    if test -d "$tcl_dir" ; then
-		AC_MSG_CHECKING([for tcl configuration... $tcl_dir])
-		tcl_files=`find "$tcl_dir" -mindepth 1 -maxdepth 2 -name 'tclConfig.sh' 2>/dev/null | sort -ru`
+# =============================================================================
+# _TCL_EXTENSIONS
+# -----------------------------------------------------------------------------
+# Search for the TCL include directories necessary to build TCL extensions.
+# This can be specified to configure by specifying --with-tcl=DIRECTORY.  The
+# TCL include directories are searched for in the host and then build
+# directories.  If we cannot find them, assume that TCL interfaces cannot build.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TCL_EXTENSIONS], [dnl
+    AC_CACHE_CHECK([for tcl include directory], [tcl_cv_includedir], [dnl
+	AC_ARG_WITH([tcl],
+	    [AS_HELP_STRING([--with-tcl=HEADERS],
+		[the TCL header directory @<:@default=search@:>@])],
+	    [], [with_tcl=search])
+	case "${with_tcl:-search}" in
+	    (no) tcl_cv_includedir=no ;;
+	    (yes|search) ;;
+	    (*) if test -f "$with_tcl/tcl.h" ; then tcl_cv_includedir="$with_tcl" ; fi ;;
+	esac
+	if test -z "$tcl_cv_includedir" ; then
+	    eval "tcl_search_path=\"
+		${DESTDIR}${rootdir}${includedir}
+		${DESTDIR}${rootdir}${oldincludedir}
+		${DESTDIR}${rootdir}/usr/include
+		${DESTDIR}${rootdir}/usr/local/include
+		${DESTDIR}${includedir}
+		${DESTDIR}${oldincludedir}
+		${DESTDIR}/usr/include
+		${DESTDIR}/usr/local/include\""
+	    tcl_search_path=`echo "$tcl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for tcl_dir in $tcl_search_path ; do
+		test -d "$tcl_dir" || continue
+		AC_MSG_CHECKING([for tcl include directory... $tcl_dir])
+		tcl_files=`find "$tcl_dir" -mindepth 1 -maxdepth 2 -type f -name 'tcl.h' 2>/dev/null`
 		for tcl_file in $tcl_files ; do
-		    if test -f "$tcl_file" && grep '^TCL_PACKAGE_PATH' "$tcl_file" >/dev/null ; then
-			ac_cv_tcl_config_sh="$tcl_file"
-			AC_MSG_RESULT([yes])
-			break 2
-		    fi
+		    test -r "$tcl_file" || continue
+		    tcl_dir="${tcl_file%/tcl.h}"
+		    #tcl_dir="${tcl_dir#$DESTDIR}"
+		    #tcl_dir="${tcl_dir#$rootdir}"
+		    tcl_cv_includedir="$tcl_dir"
+		    AC_MSG_RESULT([yes])
+		    break 2
 		done
 		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$ac_cv_tcl_config_sh" || ac_cv_tcl_config_sh=no
-	AC_MSG_CHECKING([for tcl configuration])
+	    done
+	    test -n "$tcl_cv_includedir" || tcl_cv_includedir=no
+	fi
+	AC_MSG_CHECKING([for tcl include directory])
     ])
-    if test :"${ac_cv_tcl_config_sh:-no}" = :no ; then
-	AC_MSG_ERROR([
+    if test :"${tcl_cv_includedir:-no}" = :no ; then
+	if test :"${with_tcl:-search}" != :no ; then
+	    AC_MSG_WARN([
 ***
-*** Configure could not find a suitable tclConfig.sh TCL configuration
-*** file.  This file is required to configure TCL interface libraries
-*** and TCL interpreted scripts.  This file is part of the 'tcl8.x'
-*** development package which is not always loaded on all distributions.
-*** Use the following commands to obtain the 'tcl8.x' development
-*** package:
+*** Configure could not find the TCL extension include file tcl.h.  This
+*** file is required to compile TCL extension libraries.  This file is
+*** part of the 'tcl8.x' development package which is not always loaded
+*** on all distributions.  Use the following commands to obtain the
+*** 'tcl8.x' development package:
 ***
 *** Debian 4.0:  'apt-get install tcl8.4-dev'
 *** Ubuntu 8.04: 'apt-get install tcl8.4-dev'
@@ -102,129 +119,41 @@ dnl
 *** openSUSE 11: 'zypper install tcl-devel'
 *** SLES 10:     'zypper install tcl-devel'
 *** RedHat 7.2:  'rpm install tcl-8.3.3-67'
-*** ])
-    else
-	TCLCONFIG="$ac_cv_tcl_config_sh"
-    fi
-dnl
-dnl We can now use tclConfig.sh to find out more information about where
-dnl to install things.  TCL_PACKAGE_PATH contains the same as the
-dnl $tcl_pkgPath variable under tclsh.  The first directory in this list
-dnl is the directory into which to install binary packages.  The second
-dnl directory (or first if there is only one directory) in this list is
-dnl the directory into which to install source packages.
-dnl
-    AC_CACHE_CHECK([for tcl binary install directory], [ac_cv_tcllibdir], [dnl
-	tcl_dirs=
-	tcl_cmd=`grep '^TCL_PACKAGE_PATH' "$TCLCONFIG" | sed -n 's,TCL_PACKAGE_PATH=,tcl_dirs=,p;t'`
-	eval "${tcl_cmd:-:}"
-	for tcl_dir in $tcl_dirs ; do
-	    ac_cv_tcllibdir="${rootdir}$tcl_dir"
-	    break
-	done
-	test -n "$ac_cv_tcllibdir" || ac_cv_tcllibdir=no
-    ])
-    if test :"${ac_cv_tcllibdir:-no}" = :no ; then
-	AC_MSG_WARN([Cannot find tcl binary install directory, assuming \[$]{libdir}.])
-	tcllibdir="${rootdir}${libdir}"
-    else
-	tcllibdir="$ac_cv_tcllibdir"
-    fi
-    AC_SUBST([tcllibdir])dnl
-    pkgtcllibdir='${tcllibdir}/${PACKAGE_NAME}${PACKAGE_VERSION}'
-    AC_SUBST([pkgtcllibdir])dnl
-    AC_CACHE_CHECK([for tcl source install directory], [ac_cv_tclsrcdir], [dnl
-	tcl_dirs=
-	tcl_cmd=`grep '^TCL_PACKAGE_PATH' "$TCLCONFIG" | sed -n 's,TCL_PACKAGE_PATH=,tcl_dirs=,p;t'`
-	eval "${tcl_cmd:-:}"
-	for tcl_dir in $tcl_dirs ; do
-	    if test -n "$ac_cv_tclsrcdir" ; then
-		ac_cv_tclsrcdir="${rootdir}$tcl_dir"
-		break
-	    else
-		ac_cv_tclsrcdir="${rootdir}$tcl_dir"
-		continue
-	    fi
-	done
-	test -n "$ac_cv_tclsrcdir" || ac_cv_tclsrcdir=no
-    ])
-    if test :"${ac_cv_tclsrcdir:-no}" = :no ; then
-	AC_MSG_WARN([Cannot find tcl source install directory, assuming \[$]{datadir}.])
-	tclsrcdir="${rootdir}${datadir}"
-    else
-	tclsrcdir="$ac_cv_tclsrcdir"
-    fi
-    AC_SUBST([tclsrcdir])dnl
-dnl
-dnl Search for the TCL include directories.  This can be specified to
-dnl configure by specifying the tclincludedir variable.  The TCL include
-dnl directories are searched for in the target, host and then build
-dnl directories.  We use tclConfig.sh to direct the search.  If we
-dnl cannot find them, assume that the compiler knows how to find tcl.h.
-dnl
-    AC_CACHE_CHECK([for tcl include directory], [ac_cv_tcl_includedir], [dnl
-	tcl_dirs=
-	tcl_cmd=`grep '^TCL_INCLUDE_SPEC' "$TCLCONFIG" | sed -n 's,TCL_INCLUDE_SPEC=,tcl_dirs=,p;t'`
-	eval "${tcl_cmd:-:}"
-	ac_cv_tcl_includedir="${tcl_tmp:-no}"
-	tcl_dirs=`echo " $tcl_dirs" | sed 's,[[[:space:]]]-I[[[:space:]]]*,,g'`
-	AC_MSG_RESULT([searching])
-	for tcl_dir in $tcl_dirs ; do
-	    eval "tcl_search_path=\"
-		${rootdir}${tcl_dir}
-		${tcl_dir}\""
-	    for tcl_tmp in $tcl_search_path ; do
-		AC_MSG_CHECKING([for tcl include directory... -I$tcl_tmp])
-		if test -d "${DESTDIR}$tcl_tmp" -a -f "${DESTDIR}$tcl_tmp/tcl.h" ; then
-		    ac_cv_tcl_includedir="$tcl_tmp"
-		    AC_MSG_RESULT([yes])
-		    break 2
-		else
-		    AC_MSG_RESULT([no])
-		fi
-	    done
-	done
-	test -n "$ac_cv_tcl_includedir" || ac_cv_tcl_includedir=no
-	AC_MSG_CHECKING([for tcl include directory])
-    ])
-    if test :"${ac_cv_tcl_includedir:-no}" = :no ; then
-	AC_MSG_WARN([Cannot find include flags, assuming -I\${includedir}.])
+***
+*** Otherwise, specify the location of the TCL headers with the
+*** --with-tcl=DIRECTORY argument, or --without-tcl, on the next run of
+*** configure.  Continuing under the assumption that --without-tcl was
+*** intended.
+***])
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_tcl --without-tcl\""
+	    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-tcl'"
+	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-tcl'"
+	    with_tcl=no
+	fi
 	tclincludedir=
     else
-	tclincludedir="$ac_cv_tcl_includedir"
+	tclincludedir="$tcl_cv_includedir"
     fi
+    AM_CONDITIONAL([WITH_TCL], [test :"${with_tcl:-search}" != :no])
     AC_SUBST([tclincludedir])dnl
-    AC_CACHE_CHECK([for tcl cppflags], [ac_cv_tcl_cppflags], [dnl
+    AC_CACHE_CHECK([for tcl cppflags], [tcl_cv_cppflags], [dnl
 	if test -n "$tclincludedir" ; then
-	    ac_cv_tcl_cppflags="-I$tclincludedir"
+	    tcl_cv_cppflags="-I$tclincludedir"
 	else
-	    ac_cv_tcl_cppflags=
+	    tcl_cv_cppflags=
 	fi
     ])
-    TCL_CPPFLAGS="$ac_cv_tcl_cppflags"
+    TCL_CPPFLAGS="$tcl_cv_cppflags"
     AC_SUBST([TCL_CPPFLAGS])dnl
-    AC_CACHE_CHECK([for tcl ldflags], [ac_cv_tcl_ldflags], [dnl
-	tcl_tmp=
-	tcl_cmd=`grep '^TCL_LIB_SPEC' "$TCLCONFIG" | sed -n 's,TCL_LIB_SPEC=,tcl_tmp=,p;t'`
-	eval "${tcl_cmd:-:}"
-	ac_cv_tcl_ldflags="${tcl_tmp:-no}"
-    ])
-    if test :"${ac_cv_tcl_ldflags:-no}" = :no ; then
-	AC_MSG_WARN([Cannot find library, assuming -ltcl.])
-	TCL_LDFLAGS='-ltcl'
-	TCL_DBGX=
-    else
-	TCL_LDFLAGS="$ac_cv_tcl_ldflags"
-	TCL_DBGX=
-    fi
-    AC_SUBST([TCL_LDFLAGS])dnl
-    AC_SUBST([TCL_DBGX])dnl
-])
-
+])# _TCL_EXTENSIONS
+# =============================================================================
 
 # =============================================================================
 #
 # $Log: tcl.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-07-13 07:13:34  brian
 # - changes for multiple distro build
 #

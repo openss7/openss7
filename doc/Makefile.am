@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,15 +57,17 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man manual
+SUBDIRS = manual
 
 if DOCUMENTATION
 SUBDIRS += drafts papers projects specs suites
 endif
 
+SUBDIRS += man
+
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
 TESTS_ENVIRONMENT	+= EXPOSED_SYMBOLS='$(EXPOSED_SYMBOLS) $(AM_EXPOSED_SYMBOLS)' \
 			   WARN_EXCESS=yes \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
@@ -81,6 +83,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.3  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.2  2009-06-29 07:35:35  brian
 # - improvements to build process
 #

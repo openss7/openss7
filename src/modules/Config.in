@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:29 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 11:40:29 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -72,7 +72,7 @@ module	tirdwr	    tirdwr
 module	aal1	    aal1
 module	aal2	    aal2
 module	aal5	    aal5
-module	cd	    cd
+#module	cd	    cd
 module	cd-daed	    cd_daed
 module	cd-hdlc	    cd_hdlc
 module	cdpmod	    cdpmod
@@ -88,8 +88,8 @@ module	ldterm	    ldterm
 module	lpp	    lpp
 module	m2pa-sl	    m2pa_sl
 module	m2tp	    m2tp
-module	m2ua-as	    m2ua_as
-module	m3ua-as	    m3ua_as
+#module	m2ua-as	    m2ua_as
+#module	m3ua-as	    m3ua_as
 module	mtp3b	    mtp3b
 module  mtp-mod	    mtp_mod
 module	mtp-npi	    mtp_npi
@@ -118,7 +118,7 @@ module	sm_mod	    sm_mod
 module	sockmod	    sockmod
 module	spm	    spm
 module	sscopmce    sscopmce
-module	sscop	    sscop
+#module	sscop	    sscop
 module	tcap-mod    tcap_mod
 module	tc-mod	    tc_mod
 module	tcpns	    tcpns
@@ -144,7 +144,7 @@ objname	module	tirdwr	    tirdwr
 objname	module	aal1	    aal1
 objname	module	aal2	    aal2
 objname	module	aal5	    aal5
-objname	module	cd	    cd
+#objname	module	cd	    cd
 objname	module	cd-daed	    cd_daed
 objname	module	cd-hdlc	    cd_hdlc
 objname	module	cdpmod	    cdpmod
@@ -160,10 +160,10 @@ objname	module	ldterm	    ldterm
 objname	module	lpp	    lpp
 objname	module	m2pa-sl	    m2pa_sl
 objname	module	m2tp	    m2tp
-objname	module	m2ua-as	    m2ua_as
-objname	module	m2ua	    m2ua
-objname	module	m3ua-as	    m3ua_as
-objname	module	m3ua	    m3ua
+#objname	module	m2ua-as	    m2ua_as
+#objname	module	m2ua	    m2ua
+#objname	module	m3ua-as	    m3ua_as
+#objname	module	m3ua	    m3ua
 objname	module	mg	    mg
 objname	module	mtp3b	    mtp3b
 objname module	mtp-mod	    mtp_mod
@@ -193,14 +193,13 @@ objname	module	sm_mod	    sm_mod
 objname	module	sockmod	    sockmod
 objname	module	spm	    spm
 objname	module	sscopmce    sscopmce
-objname	module	sscop	    sscop
+#objname	module	sscop	    sscop
 objname	module	tcap-mod    tcap_mod
 objname	module	tc-mod	    tc_mod
 objname	module	tcpns	    tcpns
 objname	module	tpi-sccp    tpi_sccp
 objname	module	tr-mod	    tr_mod
 objname	module	ttcompat    ttcompat
-objname	module	tua	    tua
 objname	module	xot	    xot
 objname	module	zaptel	    zaptel
 
@@ -223,10 +222,10 @@ loadable	aal1
 loadable	aal2
 loadable	aal5
 #loadable	cd
-loadable	cd-daed
-loadable	cd-hdlc
+loadable	cd_daed
+loadable	cd_hdlc
 loadable	cdpmod
-loadable	ch-pmod
+loadable	ch_pmod
 #loadable	ch_x400p
 loadable	cmot
 loadable	dlaix
@@ -247,14 +246,14 @@ loadable	mtp3b
 loadable	mtp_mod
 loadable	mtp_npi
 loadable	mtp_tpi
-loadable	mx-pmod
+loadable	mx_pmod
 loadable	mx_sdl
 loadable	npi_sccp
 loadable	pckt
 loadable	phys
 loadable	ptem
 loadable	sccp_mod
-loadable	s-cdi
+loadable	s_cdi
 loadable	sdl
 loadable	sdl_ch
 loadable	sdl_pmod
@@ -317,6 +316,9 @@ loadable	zaptel
 ## =============================================================================
 ##
 ## $Log: Config.in,v $
+## Revision 1.1.2.2  2009-07-21 11:06:17  brian
+## - changes from release build
+##
 ## Revision 1.1.2.1  2009-06-21 11:40:29  brian
 ## - added files to new distro
 ##

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:26 $
+# @(#) $RCSfile: java.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-05 12:04:26 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -66,7 +66,7 @@ AM_JAVACFLAGS		= -nowarn # -target 1.2 -nowarn # -warn:none # -target 1.2 -warn:
 
 EXTRA_LTLIBRARIES	=
 EXTRA_DATA		=
-my_JAVAFILES		=
+java_JAVAFILES		=
 
 ## -----------------------------------------------------------------------------
 ## This is for generating Java documentation
@@ -88,7 +88,6 @@ $(javadocsubdir)/index.html: $(javadoc_DEPFILES)
 	$(AM_V_GEN)$(JAVADOC) $(JAVADOCFLAGS) \
 		-d $(javadocsubdir) \
 		-sourcepath $(builddir):$(srcdir) \
-		-linkoffline http://developer.classpath.org/doc/ /usr/share/doc/gcj-4.1/html/ \
 		-protected -splitindex -linksource -use -author -version -docfilessubdirs -quiet \
 		-doctitle "OpenSS7 Jain APIs" \
 		-header "<a href=\"http://www.openss7.org/\">OpenSS7</a> Jain ($(VERSION))" \
@@ -100,7 +99,7 @@ $(javadocsubdir)/index.html: $(javadoc_DEPFILES)
 
 if MAINTAINER_MODE
 if AMDEP
-javadoc_DEPFILES	+= $(my_JAVAFILES) $(srcdir)/overview
+javadoc_DEPFILES	+= $(java_JAVAFILES) $(srcdir)/overview
 endif
 endif
 
@@ -254,27 +253,163 @@ CLEANFILES += $(PACKAGE).jar $(PACKAGE)-$(VERSION).jar
 ## This is for generating GCJ CNI or JNI header files and stubs.
 ## -----------------------------------------------------------------------------
 
-my_SOURCEFILES		=
-my_INCLUDES		=
 AM_GCJHFLAGS		= -I$(builddir) -I$(srcdir)
+
+java_jni_CLASSFILES	=
+java_jni_INCLUDES	=
+java_jni_SOURCEFILES	=
+
+java_cni_CLASSFILES	=
+java_cni_INCLUDES	=
+java_cni_SOURCEFILES	=
+
+-include ./$(DEPDIR)/modules.Pni
+
+$(DEPDIR)/modules.Pni: Makefile
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..."
+	$(AM_V_at)( \
+		classes='$(java_jni_CLASSFILES)' ; for c in $$classes ; do \
+			d=`dirname $$c` ; b=`basename $$c .class` ; \
+			echo "sinclude ./$$d/$(DEPDIR)/$$b.Ph" ; \
+			echo "sinclude ./$$d/$(DEPDIR)/$$b.Pc" ; \
+			test -d ./$$d/$(DEPDIR) || $(MKDIR_P) ./$$d/$(DEPDIR) ; \
+			echo "$$d/$$b.h: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Ph ; \
+			if test -f $(srcdir)/$$d/$$b.c ; then \
+				echo "$$d/$$b.c:" > ./$$d/$(DEPDIR)/$$b.Pc ; \
+			else \
+				echo "$$d/$$b.c: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Pc ; \
+			fi ; \
+		done ; \
+		classes='$(java_cni_CLASSFILES)' ; for c in $$classes ; do \
+			d=`dirname $$c` ; b=`basename $$c .class` ; \
+			echo "sinclude ./$$d/$(DEPDIR)/$$b.Phh" ; \
+			echo "sinclude ./$$d/$(DEPDIR)/$$b.Pcc" ; \
+			test -d ./$$d/$(DEPDIR) || $(MKDIR_P) ./$$d/$(DEPDIR) ; \
+			echo "$$d/$$b.h: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Phh ; \
+			if test -f $(srcdir)/$$d/$$b.cc ; then \
+				echo "$$d/$$b.cc:" > ./$$d/$(DEPDIR)/$$b.Pcc ; \
+			else \
+				echo "$$d/$$b.cc: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Pcc ; \
+			fi ; \
+		done  \
+	) >$(DEPDIR)/modules.Tpni || { rm -f $(DEPDIR)/modules.Tpni ; exit 1 ; } ; \
+	$(am__mv) $(DEPDIR)/modules.Tpni $@
+
+distclean-dependencies:
+	@( \
+		echo "$(DEPDIR)/modules.Tpni" ; echo "$(DEPDIR)/modules.Pni" ; \
+		classes='$(java_jni_CLASSFILES)' ; for c in $$classes ; do \
+			d=`dirname $$c` ; b=`basename $$c .class` ; \
+			echo "$$d/$(DEPDIR)/$$b.Tph" ; echo "$$d/$(DEPDIR)/$$b.Ph" ; \
+			echo "$$d/$(DEPDIR)/$$b.Tpc" ; echo "$$d/$(DEPDIR)/$$b.Pc" ; \
+		done ; \
+		classes='$(java_cni_CLASSFILES)' ; for c in $$classes ; do \
+			d=`dirname $$c` ; b=`basename $$c .class` ; \
+			echo "$$d/$(DEPDIR)/$$b.Tphh" ; echo "$$d/$(DEPDIR)/$$b.Phh" ; \
+			echo "$$d/$(DEPDIR)/$$b.Tpcc" ; echo "$$d/$(DEPDIR)/$$b.Pcc" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-dependencies
+
+##
+# This rule is for building JNI headers from .class files.
+##
+$(java_jni_INCLUDES):
+	$(AM_V_at)$(MKDIR_P) `dirname $@`
+	$(AM_V_GEN)p=$@ ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	d=`dirname $@` ; b=`basename $@ .h` ; \
+	test -f $$d/$$b.class || $(MAKE) $(AM_MAKEFLAGS) -- $$d/$$b.class ; \
+	echo "$$d/$$b.h: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Tph ; \
+	if $(GCJH) -jni $(AM_GCJHFLAGS) \
+		$(GCJHFLAGS) `echo $$f | sed 's,\.h$$,,'` ; \
+	then $(am__mv) ./$$d/$(DEPDIR)/$$b.Tph ./$$d/$(DEPDIR)/$$b.Ph ; touch $@ ; \
+	else rm -f ./$$d/$(DEPDIR)/$$b.Tph ; exit 1 ; fi
+
+clean-java_jni_INCLUDES:
+	list='$(java_jni_INCLUDES)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL	+= clean-java_jni_INCLUDES
+
+##
+# This rule is for building JNI stubs from .class files.
+##
+$(java_jni_SOURCEFILES):
+	$(AM_V_at)$(MKDIR_P) `dirname $@`
+	$(AM_V_GEN)p=$@ ; $(am__vpath_adj_setup) $(am__vpath_adj) \
+	d=`dirname $@` ; b=`basename $@ .c` ; \
+	test -f $$d/$$b.class || $(MAKE) $(AM_MAKEFLAGS) -- $$d/$$b.class ; \
+	echo "$$d/$$b.c: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Tpc ; \
+	if $(GCJH) -jni -stubs $(AM_GCJHFLAGS) \
+		$(GCJHFLAGS) `echo $$f | sed 's,\.c$$,,'` ; \
+	then $(am__mv) ./$$d/$(DEPDIR)/$$b.Tpc ./$$d/$(DEPDIR)/$$b.Pc ; touch $@ ; \
+	else rm -f ./$$d/$(DEPDIR)/$$b.Tpc ; exit 1 ; fi
+
+clean-java_jni_SOURCEFILES:
+	list='$(java_jni_SOURCEFILES)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL	+= clean-java_jni_SOURCEFILES
 
 ##
 # This rule is for building CNI headers from .class files.
 ##
-.class.h:
-	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+$(java_cni_INCLUDES):
+	$(AM_V_at)$(MKDIR_P) `dirname $@`
 	$(AM_V_GEN)p=$@ ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(GCJH) $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed 's,\.h$$,,'`
+	d=`dirname $@` ; b=`basename $@ .h` ; \
+	test -f $$d/$$b.class || $(MAKE) $(AM_MAKEFLAGS) -- $$d/$$b.class ; \
+	echo "$$d/$$b.h: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Tphh ; \
+	if $(GCJH) $(AM_GCJHFLAGS) \
+		$(GCJHFLAGS) `echo $$f | sed 's,\.h$$,,'` ; \
+	then $(am__mv) ./$$d/$(DEPDIR)/$$b.Tphh ./$$d/$(DEPDIR)/$$b.Phh ; touch $@ ; \
+	else rm -f ./$$d/$(DEPDIR)/$$b.Tphh ; exit 1 ; fi
+
+clean-java_cni_INCLUDES:
+	list='$(java_cni_INCLUDES)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL	+= clean-java_cni_INCLUDES
 
 ##
 # This rule is for building CNI stubs from .class files.
 ##
-.class.cc:
-	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
+$(java_cni_SOURCEFILES):
+	$(AM_V_at)$(MKDIR_P) `dirname $@`
 	$(AM_V_GEN)p=$@ ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(GCJH) -stubs $(AM_GCJHFLAGS) $(GCJHFLAGS) `echo $$f | sed 's,\.cc$$,,'`
+	d=`dirname $@` ; b=`basename $@ .cc` ; \
+	test -f $$d/$$b.class || $(MAKE) $(AM_MAKEFLAGS) -- $$d/$$b.class ; \
+	echo "$$d/$$b.cc: $$d/$$b.class" > ./$$d/$(DEPDIR)/$$b.Tpcc ; \
+	if $(GCJH) -stubs $(AM_GCJHFLAGS) \
+		--prepend '#include "jvfail.h"' \
+		$(GCJHFLAGS) `echo $$f | sed 's,\.cc$$,,'` ; \
+	then $(am__mv) ./$$d/$(DEPDIR)/$$b.Tpcc ./$$d/$(DEPDIR)/$$b.Pcc ; touch $@ ; \
+	else rm -f ./$$d/$(DEPDIR)/$$b.Tpcc ; exit 1 ; fi
+
+## This is for gcjh 3.0.4 which uses JvFail but never defines it.
+EXTRA_DIST	+= jvfail.h
+
+clean-java_cni_SOURCEFILES:
+	list='$(java_cni_SOURCEFILES)' ; $(am__list_remove_build)
+
+CLEAN_LOCAL	+= clean-java_cni_SOURCEFILES
 
 MY_SUFFIXES 		+= .class
+
+java_CLASSES		= $(java_jni_CLASSFILES) $(java_cni_CLASSFILES)
+
+java_INCLUDES		= $(java_jni_INCLUDES) $(java_cni_INCLUDES)
+
+java_SOURCEFILES	= $(java_jni_SOURCEFILES) $(java_cni_SOURCEFILES)
+
+#MY_INTERMEDIATE	+= $(java_INCLUDES) $(java_SOURCEFILES)
+#MY_SECONDARY		+= $(java_INCLUDES) $(java_SOURCEFILES)
+#MY_INTERMEDIATE	+= $(java_CLASSES)
+MY_PRECIOUS		+= $(java_SOURCEFILES)
+
+EXTRA_DIST		+= $(java_INCLUDES)
+
+DISTCLEANFILES		+= $(java_INCLUDES) $(java_SOURCEFILES)
 
 ## -----------------------------------------------------------------------------
 ## This is for generating GCJ compiled Java modules.
@@ -287,7 +422,7 @@ MY_SUFFIXES 		+= .class
 # The GCJ library install directory.  This is distro-specific and should be
 # set by configure instead of specified here.
 gcjlibdir		= $(libdir)/gcj/$(PACKAGE_LCNAME)
-AM_GCJFLAGS		= -I$(builddir) -I$(srcdir) -prefer-pic -shared -fPIC
+AM_GCJFLAGS		= -I$(builddir) -I$(srcdir)
 GCJLIB_INCLUDES		= -I$(builddir) -I$(srcdir) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 GCJCLASSCOMPILE		= $(GCJ) -I$(builddir) -I$(srcdir) $(GCJFLAGS)
 
@@ -296,16 +431,57 @@ GCJCLASSCOMPILE		= $(GCJ) -I$(builddir) -I$(srcdir) $(GCJFLAGS)
 ##CNIFLAGS		= -findirect-dispatch
 
 gcjlib_LTLIBRARIES 	=
-gcjlib_DATA		=
+
+-include ./$(DEPDIR)/modules.Pclass
+
+$(DEPDIR)/modules.Pclass: Makefile
+	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "Creating $@ dependencies..."
+	$(AM_V_at)( \
+		javafiles='$(java_JAVAFILES) $(swig_JAVAFILES)' ; \
+		for j in $$javafiles ; do \
+			d=`dirname $$j` ; b=`basename $$j .java` ; \
+			echo "sinclude ./$$d/$(DEPDIR)/$$b.Po" ; \
+			test -d ./$$d/$(DEPDIR) || $(MKDIR_P) ./$$d/$(DEPDIR) ; \
+			echo "$$d/$$b.class: $$d/$$b.java" > ./$$d/$(DEPDIR)/$$b.Po ; \
+		done \
+	) >$(DEPDIR)/modules.Tpclass || { rm -f $(DEPDIR)/modules.Tpclass ; exit 1 ; } ; \
+	$(am__mv) $(DEPDIR)/modules.Tpclass $@
+
+DISTCLEANFILES += $(DEPDIR)/modules.Tpclass $(DEPDIR)/modules.Pclass
+
+distclean-modules_Pclass:
+	@( \
+		echo "$(DEPDIR)/modules.Tpclass" ; \
+		echo "$(DEPDIR)/modules.Pclass" ; \
+		javafiles='$(java_JAVAFILES) $(swig_JAVAFILES)' ; \
+		for j in $$javafiles ; do \
+			d=`dirname $$j` ; b=`basename $$j .java` ; \
+			echo "$$d/$(DEPDIR)/$$b.Tpo" ; \
+			echo "$$d/$(DEPDIR)/$$b.Po" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-modules_Pclass
 
 ##
 # This rule specifies how to generate a .class file from a .java source file
 # with dependency tracking.
 ##
 .java.class:
-@am__fastdepGCJ_TRUE@	$(AM_V_GCJ)$(GCJCLASSCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$$(basename $@ .class).Tpo -C -d $(abs_builddir) $<
-@am__fastdepGCJ_TRUE@	$(AM_V_at)touch $(DEPDIR)/$$(basename $@ .class).Tpo
-@am__fastdepGCJ_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$$(basename $@ .class).Tpo $(DEPDIR)/$$(basename $@ .class).Po
+@am__fastdepGCJ_TRUE@	$(AM_V_GCJ)$(GCJCLASSCOMPILE) -MD -MP -MF `dirname $@`/$(DEPDIR)/`basename $@ .class`.Tpo -C -d $(abs_builddir) $<
+@am__fastdepGCJ_TRUE@	$(AM_V_at)touch `dirname $@`/$(DEPDIR)/`basename $@ .class`.Tpo
+@am__fastdepGCJ_TRUE@	$(AM_V_at)$(am__mv) `dirname $@`/$(DEPDIR)/`basename $@ .class`.Tpo `dirname $@`/$(DEPDIR)/`basename $@ .class`.Po
+@am__fastdepGCJ_FALSE@	$(AM_V_GCJ) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(GCJCLASSCOMPILE) -C -d $(abs_builddir) $<
+
+$(java_JAVAFILES:%.java=%.class): %.class: %.java
+@am__fastdepGCJ_TRUE@	$(AM_V_GCJ)$(GCJCLASSCOMPILE) -MD -MP -MF `dirname $@`/$(DEPDIR)/`basename $@ .class`.Tpo -C -d $(abs_builddir) $<
+@am__fastdepGCJ_TRUE@	$(AM_V_at)touch `dirname $@`/$(DEPDIR)/`basename $@ .class`.Tpo
+@am__fastdepGCJ_TRUE@	$(AM_V_at)$(am__mv) `dirname $@`/$(DEPDIR)/`basename $@ .class`.Tpo `dirname $@`/$(DEPDIR)/`basename $@ .class`.Po
 @am__fastdepGCJ_FALSE@	$(AM_V_GCJ) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
@@ -317,17 +493,20 @@ MY_SUFFIXES 		+= .java
 ## This is for generating GCJ classmap databases.
 ## -----------------------------------------------------------------------------
 
+if WITH_GCJDBTOOL
 # The GCJ classmap database install directory.  This is distro-specific and
 # should be set by configure instead of specified here.  This default is for
-# RedHat.
+# RedHat.  Note that Debian dh_nativegcj will move this .db files to
+# /usr/share/gcj/classmap.d but they still must have the installed .so directory
+# in the database.
 gcjdbdir		= $(gcjlibdir)
 gcjdb_DATA		=
 
 ##
 # This rule is for generating GCJ class map database files from jar files.
 ##
-$(gcjdb_DATA): lib-%.db: %
-	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjlibdir)/lib-%.so
+$(gcjdb_DATA): lib-%.db: %.jar
+	$(AM_V_GEN)$(GCJDBTOOL) -f $@ $< $(gcjdbdir)/`basename $@ .db`.so
 
 ##
 # The post-classmap target checks for a fully configured install directory by
@@ -341,14 +520,18 @@ $(gcjdb_DATA): lib-%.db: %
 post-classmap:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	db=`$(GCJDBTOOL) -p $(libdir)` ; \
-	test -n "$$db" -a -f $(DESTDIR)$$db || exit 0 ; \
-	$(GCJDBTOOL) -n $(DESTDIR)$$db 64 ; \
-	find $(gcdbdir) -follow -name '*.db' -print0 | \
-	xargs -0 $(GCJDBTOOL) -m $(DESTDIR)$$db $(DESTDIR)$$db
+	test -n "$$db" -a -f "$(DESTDIR)$(rootdir)$$db" || exit 0 ; \
+	db="$(DESTDIR)$(rootdir)$$db" ; \
+	$(GCJDBTOOL) -n $$db.tmp 64 ; \
+	$(GCJDBTOOL) -m $$db.tmp $$db.tmp $$db ; \
+	find $(DESTDIR)$(gcjdbdir) -follow -name '*.db' -print0 | \
+	xargs -0 $(GCJDBTOOL) -m $$db.tmp $$db.tmp ; \
+	$(am__mv) $$db.tmp $$db
 
 if PKG_BUILD_ARCH
 POST_INSTALL_AM		+= post-classmap
 POST_UNINSTALL_MA	+= post-classmap
+endif
 endif
 
 ## -----------------------------------------------------------------------------
@@ -361,45 +544,19 @@ endif
 
 jni_LTLIBRARIES =
 
-## The swig command is established by configure.
-##SWIG = swig
+swig_JAVAFILES =
 
-my_SWIGFILES =
-my_swig_JAVAFILES =
-
-# C wrapper files generated by SWIG.
-my_c_WRAPPERS =
-
-##
-# This rule is for using SWIG to generate headers and wrapper files for C.  Note
-# that this is only for Java.  These files are distributed similar to flex and
-# bison files and a proper version of SWIG is likely not required.  Note that we
-# need version 1.3.39 or better.  SWIG will not even compile on my old RedHat
-# 7.2 system.
-##
-$(my_c_WRAPPERS): %_wrap.c: %.i
-	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
-	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(SWIG) -java -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
-
-# C++ wrapper files generated by SWIG.
-my_cxx_WRAPPERS =
-
-##
-# This rule is for using SWIG to generate headers and wrapper files for C++.
-# Note that this is only for Java.  These files are distributed similar to flex
-# and bison files and a proper version of SWIG is likely not required.  Note
-# that we need version 1.3.39 or better.  SWIG will not even compile on my old
-# RedHat 7.2 system.
-##
-$(my_cxx_WRAPPERS): %_wrap.cxx : %.i
-	$(AM_V_at)$(MKDIR_P) $$(dirname $@)
-	$(AM_V_GEN)p=$< ; $(am__vpath_adj_setup) $(am__vpath_adj) \
-	$(SWIG) -java -c++ -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -package `echo $$f | sed 's,^//*,,;s,/[^/]*$$,,;s,/,.,g'` -o $@ $<
+## The rest is done by swig.am now.
 
 ## =============================================================================
 ##
 ## $Log: java.am,v $
+## Revision 1.1.2.6  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.5  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
 ## Revision 1.1.2.4  2009-07-05 12:04:26  brian
 ## - updates for release builds
 ##

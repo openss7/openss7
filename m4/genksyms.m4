@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,10 +68,8 @@ AC_DEFUN([_GENKSYMS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_OPTIONS], [dnl
 dnl AC_ARG_ENABLE([k-versions],
-dnl     AS_HELP_STRING([--enable-k-versions],
-dnl         [version all symbols @<:@default=automatic@:>@]),
-dnl     [enable_k_versions="$enableval"],
-dnl     [enable_k_versions=''])
+dnl     [AS_HELP_STRING([--enable-k-versions],
+dnl         [version all symbols @<:@default=automatic@:>@])])
 ])# _KSYMS_OPTIONS
 # =============================================================================
 
@@ -214,11 +212,11 @@ MODSYMS_MODDIR="$MODSYMS_MODDIR"
 AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     AC_CACHE_CHECK([for modpost script], [ksyms_cv_modpost_script], [dnl
 	ksyms_dir="`(cd $ac_aux_dir; pwd)`"
-	ksyms_cv_modpost_script="$ksyms_dir/modpost.sh"])
+	ksyms_cv_modpost_script="$ksyms_dir/modpost.awk"])
     MODPOST_SCRIPT="$ksyms_cv_modpost_script"
     AC_SUBST([MODPOST_SCRIPT])dnl
     AC_CACHE_CHECK([for modpost command], [ksyms_cv_modpost_command], [dnl
-	ksyms_cv_modpost_command="${CONFIG_SHELL:-$SHELL} $MODPOST_SCRIPT"])
+	ksyms_cv_modpost_command="${AWK:-gawk} -f $MODPOST_SCRIPT --"])
     MODPOST="$ksyms_cv_modpost_command"
     AC_SUBST([MODPOST])dnl
     AC_CACHE_CHECK([for modpost sys file], [ksyms_cv_modpost_sysver], [dnl
@@ -347,6 +345,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 1.1.2.5  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.4  2009-07-04 03:51:33  brian
 # - updates for release
 #

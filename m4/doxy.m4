@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -111,15 +111,19 @@ AC_DEFUN([_DOXY_CONFIG_STRIP_FROM_INC_PATH], [dnl
 AC_DEFUN([_DOXY_CONFIG_INPUT], [dnl
     doxy_abs_builddir=`(cd . ; pwd)`
     doxy_abs_srcdir=`(cd $srcdir ; pwd)`
-    doxy_tmp=`find $doxy_abs_builddir $doxy_abs_srcdir -name '*.h' -o -name '*.c' | xargs grep -l 'doxygen(1)' | sort | uniq`
+    doxy_tmp=`find $doxy_abs_builddir $doxy_abs_srcdir -name '*.h' -o -name '*.c' | xargs grep -l 'doxygen(1)' | sort -u`
+    AC_MSG_CHECKING([for doxy input files])
     doxy_inputs=
+    doxy_num=0
     for doxy_file in $doxy_tmp ; do
-	AC_MSG_CHECKING([for doxy input $doxy_file])
+dnl	AC_MSG_CHECKING([for doxy input $doxy_file])
 	doxy_inputs="${doxy_inputs:+$doxy_inputs }${doxy_file}"
-	AC_MSG_RESULT([yes])
+	((doxy_num++))
+dnl	AC_MSG_RESULT([yes])
     done
     doxy_inputs="AC_PACKAGE_NAME.dox${doxy_inputs:+ $doxy_inputs}"
     DOXY_CONFIG_INPUT="$doxy_inputs"
+    AC_MSG_RESULT([$doxy_num files])
     AC_SUBST([DOXY_CONFIG_INPUT])dnl
     AC_SUBST([doxy_abs_builddir])dnl
     AC_SUBST([doxy_abs_srcdir])dnl
@@ -191,6 +195,9 @@ AC_DEFUN([_DOXY_], [dnl
 # =============================================================================
 #
 # $Log: doxy.m4,v $
+# Revision 1.1.2.4  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.3  2009-07-04 03:51:33  brian
 # - updates for release
 #

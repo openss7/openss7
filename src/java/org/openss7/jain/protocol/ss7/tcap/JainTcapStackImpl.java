@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: JainTcapStackImpl.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-09 12:05:15 $ <p>
+ @(#) $RCSfile: JainTcapStackImpl.java,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:16 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-07-09 12:05:15 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:16 $ by $Author: brian $
  */
 
 package org.openss7.jain.protocol.ss7.tcap;
@@ -206,7 +206,7 @@ public class JainTcapStackImpl implements JainTcapStack {
             throw new PeerUnavailableException("Vendor Name not set.");
         JainTcapProviderImpl tcapProvider;
         try {
-            tcapProvider = new JainTcapProviderImpl((JainTcapStack)this);
+            tcapProvider = new JainTcapProviderImpl(this);
             m_providerList.add(tcapProvider);
         } catch (Exception e) {
             throw new PeerUnavailableException("Cannot create provider.");

@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: FacilitySelectedAndAvailable.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:34:59 $ <p>
+ @(#) $RCSfile: FacilitySelectedAndAvailable.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-13 07:13:29 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:34:59 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:29 $ by $Author: brian $
  */
 
 package javax.jain.ss7.inap.operation;
@@ -231,7 +231,7 @@ public class FacilitySelectedAndAvailable extends Operation implements java.io.S
         throw new ParameterNotSetException("Component Type: not set.");
     }
     /** Sets Component Type.  */
-    public void setComponentType(ComponentType componenttype) {
+    public void setComponentType(ComponentType componentType) {
         this.componentType  = componentType;
         this.isComponentType = true;
     }

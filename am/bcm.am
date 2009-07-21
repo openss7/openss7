@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -64,7 +64,7 @@ if RPM_BUILD_KERNEL
 
 if AMDEP
 ## AMDEP
-sinclude $(DEPDIR)/BCM.Ph
+-include $(DEPDIR)/BCM.Ph
 
 $(DEPDIR)/BCM.Ph: Makefile
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
@@ -72,20 +72,33 @@ $(DEPDIR)/BCM.Ph: Makefile
 	( \
 		objs= ; \
 		list="$(BCM_OBJECTS)" ; for obj in $$list ; do \
-			a=`$(ECHO) "$$obj" | sed 's|^lib.*_a-|$(kpre)|'` ; \
-			s=`$(ECHO) "$$obj" | sed 's|^lib.*_a-||;s|^$(kpre)||;s|\.o$$||'` ; \
+			a=`echo "$$obj" | sed 's|^lib.*_a-|$(kpre)|'` ; \
+			s=`echo "$$obj" | sed 's|^lib.*_a-||;s|^$(kpre)||;s|\.o$$||'` ; \
 			if test "$$a" = "$$obj" ; then \
-				$(ECHO) "$$a: $$s.c" ; $(ECHO) "" ; \
+				echo "$$a: $$s.c" ; echo "" ; \
 			else \
-				$(ECHO) "$$a: $$obj $$s.c" ; $(ECHO) "" ; \
+				echo "$$a: $$obj $$s.c" ; echo "" ; \
 			fi ; \
 			objs="$${objs:+$${objs} }$$obj" ; \
 		done ; \
-		$(ECHO) "stamp-pkgobjs: $$objs" ; $(ECHO) "" ; \
+		echo "stamp-pkgobjs: $$objs" ; echo "" ; \
 	) >$(DEPDIR)/BCM.Tph || { rm -f $(DEPDIR)/BCM.Tph ; exit 1 ; } ; \
 	$(am__mv) $(DEPDIR)/BCM.Tph $@
 
 DISTCLEANFILES += $(DEPDIR)/BCM.Tph $(DEPDIR)/BCM.Ph
+
+distclean-BCM_Ph:
+	@( \
+		echo "$(DEPDIR)/BCM.Tph" ; \
+		echo "$(DEPDIR)/BCM.Ph" ; \
+		sources="$(BCM_SOURCES)" ; for s in $$sources ; do \
+			r=`echo "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
+			echo "$(DEPDIR)/BCM-$$r.Tpo" ; \
+			echo "$(DEPDIR)/BCM-$$r.Po" ; \
+		done \
+	) | $(am__base_remove)
+
+DISTCLEAN_LOCAL += distclean-BCM_Ph
 ## AMDEP
 endif
 
@@ -111,7 +124,7 @@ if am__fastdepCC
 stamp-pkgobjs: $(BCM_SOURCES)
 	@list="$(BCM_SOURCES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
+		r=`echo "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(BCM_CPPFLAGS) $(CPPFLAGS) $(BCM_CFLAGS) $(CFLAGS) -MT BCM-$$r.o -MD -MP -MF "$(DEPDIR)/BCM-$$r.Tpo" -c -o BCM-$$r.o $$d$$s ; \
 		then $(am__mv) "$(DEPDIR)/BCM-$$r.Tpo" "$(DEPDIR)/BCM-$$r.Po" ; else rm -f "$(DEPDIR)/BCM-$$r.Tpo" ; exit 1 ; fi ; \
 	done ; \
@@ -124,7 +137,7 @@ if AMDEP
 stamp-pkgobjs: $(BCM_SOURCES)
 	@list"$(BCM_SOURCES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
+		r=`echo "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
 		source="$$s" object="BCM-$$r.o" libtool=no \
 		DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(BCM_CPPFLAGS) $(CPPFLAGS) $(BCM_CFLAGS) $(CFLAGS) -c -o BCM-$$r.o $$d$$s ; \
@@ -136,7 +149,7 @@ else
 stamp-pkgobjs: $(BCM_SOURCES)
 	@list"$(BCM_SOURCES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
+		r=`echo "$$s" | sed 's|^.*/||;s|\.c$$||'` ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(BCM_CPPFLAGS) $(CPPFLAGS) $(BCM_CFLAGS) $(CFLAGS) -c -o BCM-$$r.o $$d$$s ; \
 	done ; \
 	touch stamps-pkgobjs
@@ -146,7 +159,7 @@ endif
 endif
 
 clean-pkgobjs:
-	@objs=`$(ECHO) " $(BCM_SOURCES) " | sed 's| *  | |g;s| [^[:space:]]*/| BCM-|g;s|\.c |.o |g'` ; \
+	@objs=`echo " $(BCM_SOURCES) " | sed 's| *  | |g;s| [^[:space:]]*/| BCM-|g;s|\.c |.o |g'` ; \
 	$(ECHO) "rm -f -- stamp-pkgobjs $$objs" ; \
 	rm -f -- stamp-pkgobjs $$objs
 
@@ -160,6 +173,12 @@ endif
 ## =============================================================================
 ##
 ## $Log: bcm.am,v $
+## Revision 1.1.2.4  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.3  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

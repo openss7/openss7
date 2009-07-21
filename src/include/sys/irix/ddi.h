@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 1.1.2.1 2009-06-21 11:26:46 brian Exp $
+ @(#) $Id: ddi.h,v 1.1.2.2 2009-07-21 11:06:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:26:46 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 1.1.2.2  2009-07-21 11:06:15  brian
+ - changes from release build
+
  Revision 1.1.2.1  2009-06-21 11:26:46  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_IRIX_DDI_H__
 #define __SYS_IRIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -89,11 +92,20 @@
 #endif
 #include <sys/svr4/ddi.h>	/* for lock_t */
 
+#ifdef HAVE_ICMN_ERR_EXPORT
+#undef icmn_err
+#define icmn_err icmn_err_
+#endif
 __IRIX_EXTERN_INLINE void
 icmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	return vcmn_err(err_lvl, fmt, args);
 }
+#ifdef HAVE_ICMN_ERR_EXPORT
+#undef icmn_err
+__IRIX_EXTERN void icmn_err(int err_lvl, const char *fmt, va_list args);
+__asm__(".weakref icmn_err,icmn_err_");
+#endif
 
 /* gcc 3.4.3 can't handle inlining with variable argument list */
 __IRIX_EXTERN void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )

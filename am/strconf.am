@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -65,13 +65,13 @@ $(STRCONF_PKGRULE): $(STRCONF_PKGRULE).in
 	$(AM_V_GEN)$(SHELL) ./config.status Makefile strconf
 endif
 
-$(STRCONF_CONFIG): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+$(STRCONF_CONFIG): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(AM_V_GEN)$(STRCONF) --hconfig=$(STRCONF_CONFIG) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
 
-$(STRCONF_MODCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+$(STRCONF_MODCONF): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(AM_V_GEN)$(STRCONF) --modconf=$(STRCONF_MODCONF) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
 
-$(STRCONF_MKNODES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+$(STRCONF_MKNODES): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(AM_V_GEN)$(STRCONF) --makenodes=$(STRCONF_MKNODES) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
 
 $(STRCONF_DRVCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
@@ -127,6 +127,7 @@ CLEAN_LOCAL		+= clean-strconf
 DISTCLEAN_LOCAL		+= distclean-strconf
 MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-strconf
 dist_noinst_SCRIPTS	+= $(STRCONF_SCRIPT)
+EXTRA_SCRIPTS		+= scripts/strconf.awk
 EXTRA_SCRIPTS		+= scripts/strconf-sh
 
 ## Invoke creation of any installed devices if the installation directory is configured.
@@ -154,7 +155,7 @@ EXTRA_SCRIPTS		+= scripts/strconf-sh
 ##
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_streams
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_streams
 TESTS_ENVIRONMENT	+= STRCONF_CONFIG='$(STRCONF_CONFIG)' \
 			   STRCONF_MODCONF='$(STRCONF_MODCONF)' \
 			   STRCONF_MKNODES='$(STRCONF_MKNODES)' \
@@ -182,6 +183,9 @@ EXTRA_DIST		+= $(STRCONF_CONFIGS)
 ## =============================================================================
 ##
 ## $Log: strconf.am,v $
+## Revision 1.1.2.3  2009-07-21 11:06:11  brian
+## - changes from release build
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##

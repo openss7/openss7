@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP_OPTIONS], [dnl
     AC_ARG_WITH([compat],
-	AS_HELP_STRING([--with-compat=HEADERS],
-	    [specify the STREAMS compatibility header file directory.  @<:@default=INCLUDEDIR/strcompat@:>@]),
-	[with_compat="$withval" ; for s in ${!strcomp_cv_*} ; do eval "unset $s" ; done],
-	[with_compat=''])
+	[AS_HELP_STRING([--with-compat=HEADERS],
+	    [STREAMS compatibility header directory @<:@default=INCLUDEDIR/strcompat@:>@])],
+	[for s in ${!strcomp_cv_*} ; do eval "unset $s" ; done])
 ])# _STRCOMP_OPTIONS
 # =============================================================================
 
@@ -638,6 +637,9 @@ AC_DEFUN([_STRCOMP_], [dnl
 # =============================================================================
 #
 # $Log: strcomp.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
+# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,16 +78,16 @@ AC_DEFUN([_PAPERS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAPERS_ARGS], [dnl
     AC_ARG_ENABLE([papers],
-	AS_HELP_STRING([--disable-papers],
-	    [disable build and install of papers @<:@default=enabled@:>@]),
+	[AS_HELP_STRING([--disable-papers],
+	    [build and install of papers @<:@default=auto@:>@])],
 	[], [enable_papers=yes])
     AC_ARG_ENABLE([papers-html],
-	AS_HELP_STRING([--disable-papers-html],
-	    [disable html-formatted papers @<:@default=enabled@:>@]),
+	[AS_HELP_STRING([--disable-papers-html],
+	    [html-formatted papers @<:@default=auto@:>@])],
 	[], [enable_papers_html=yes])
     AC_ARG_ENABLE([papers-print],
-	AS_HELP_STRING([--disable-papers-print],
-	    [disable print-formatted papers @<:@default=enabled@:>@]),
+	[AS_HELP_STRING([--disable-papers-print],
+	    [print-formatted papers @<:@default=auto@:>@])],
 	[], [enable_papers_print=yes])
     AC_ARG_VAR([GNUPLOT],    [GNU plot command. @<:@default=gnuplot@:>@])
     AC_ARG_VAR([FIG2DEV],    [Fig to graphics format command. @<:@default=fig2dev@:>@])
@@ -145,12 +145,13 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'gnuplot' program.  Generating graphs for
-*** papers requires the 'gnuplot' program from the 'gnuplot' package.  You can
-*** normally get 'gnuplot' as part of most popular Linux distributions and all
-*** current versions are acceptable.  The 'gnuplot' package has been available
-*** for many years and is avalable from any GNU archive site.  Use the
-*** following commands to obtain 'gnuplot':
+*** Configure cannot find a suitable 'gnuplot' program.  Generating
+*** graphs for papers requires the 'gnuplot' program from the 'gnuplot'
+*** package.  You can normally get 'gnuplot' as part of most popular
+*** Linux distributions and all current versions are acceptable.  The
+*** 'gnuplot' package has been available for many years and is avalable
+*** from any GNU archive site.  Use the following commands to obtain
+*** 'gnuplot':
 ***
 *** Debian 4.0:  'apt-get install gnuplot-nox'
 *** Ubuntu 8.04: 'apt-get install gnuplot-nox'
@@ -161,8 +162,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:     'zypper install gnuplot'
 ***
 *** To get rid of this warning, load the 'gnuplot' package, specify the
-*** appropriate program with the GNUPLOT environment variable to 'configure',
-*** or specify the --disable-papers option to 'configure'.
+*** appropriate program with the GNUPLOT environment variable to
+*** 'configure', or specify the --disable-papers option to 'configure'.
 *** ])
 	fi
     fi
@@ -173,12 +174,13 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'fig2dev' program.  Generating figures for
-*** papers requires the 'fig2dev' program from the 'transfig' package.  You can
-*** normally get 'transfig' as part of most popular Linux distributions and all
-*** current versions are acceptable.  The 'transfig' package has been available
-*** for many years and is available from many web sources.  Use the following
-*** commands to obtain 'fig2dev':
+*** Configure cannot find a suitable 'fig2dev' program.  Generating
+*** figures for papers requires the 'fig2dev' program from the
+*** 'transfig' package.  You can normally get 'transfig' as part of most
+*** popular Linux distributions and all current versions are acceptable.
+*** The 'transfig' package has been available for many years and is
+*** available from many web sources.  Use the following commands to
+*** obtain 'fig2dev':
 ***
 *** Debian 4.0:  'apt-get install transfig'
 *** Ubuntu 8.04: 'apt-get install transfig'
@@ -189,8 +191,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:     'configure --disable-papers'
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
-*** appropriate program with the FIG2DEV environment variable to 'configure',
-*** or specify the --disable-papers option to 'configure'.
+*** appropriate program with the FIG2DEV environment variable to
+*** 'configure', or specify the --disable-papers option to 'configure'.
 *** ])
 	fi
     fi
@@ -201,12 +203,12 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers_print=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'bibtex' program.  Generating papers
-*** requires the 'bibtex' program from the 'tex' package.  You can normally get
-*** 'bibtex' as part of many popular GNU/Linux distributions and all current
-*** version are acceptable.  The 'tex' package has been available for many years
-*** and is available from any CTAN site.  Use the following command to obtain
-*** 'bibtex':
+*** Configure cannot find a suitable 'bibtex' program.  Generating
+*** papers requires the 'bibtex' program from the 'tex' package.  You
+*** can normally get 'bibtex' as part of many popular GNU/Linux
+*** distributions and all current version are acceptable.  The 'tex'
+*** package has been available for many years and is available from any
+*** CTAN site.  Use the following command to obtain 'bibtex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
@@ -214,8 +216,9 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:     'configure --disable-papers-print'
 ***
 *** To get rid of this warning, load the 'tetex' package, specify the
-*** appropriate program with the BIBTEX environment variable to 'configure',
-*** or specify the --disable-papers-print option to 'configure'.
+*** appropriate program with the BIBTEX environment variable to
+*** 'configure', or specify the --disable-papers-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -226,12 +229,12 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers_print=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'latex' program.  Generating print papers
-*** requires the 'latex' program from the 'latex' package.  You can normally
-*** get 'latex' as part of many popular Linux distributions and all current
-*** versions are acceptable.  The 'latex' package has been available for many
-*** years and is available from any CTAN site.  Use the following command to
-*** obtain 'latex':
+*** Configure cannot find a suitable 'latex' program.  Generating print
+*** papers requires the 'latex' program from the 'latex' package.  You
+*** can normally get 'latex' as part of many popular Linux distributions
+*** and all current versions are acceptable.  The 'latex' package has
+*** been available for many years and is available from any CTAN site.
+*** Use the following command to obtain 'latex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-latex-base'
@@ -242,8 +245,9 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:     'configure --disable-papers-print'
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
-*** appropriate program with the LATEX environment variable to 'configure', or
-*** specify the --disable-papers-print option to 'configure'.
+*** appropriate program with the LATEX environment variable to
+*** 'configure', or specify the --disable-papers-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -254,12 +258,12 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers_print=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'pslatex' program.  Generating print
-*** papers requires the 'pslatex' program from the 'latex' package.  You can
-*** normally get 'latex' as part of many popular Linux distributions and all
-*** current versions are acceptable.  The 'latex' package has been available
-*** for many years and is available from any CTAN site.  Use the following
-*** command to obtain 'latex':
+*** Configure cannot find a suitable 'pslatex' program.  Generating
+*** print papers requires the 'pslatex' program from the 'latex'
+*** package.  You can normally get 'latex' as part of many popular Linux
+*** distributions and all current versions are acceptable.  The 'latex'
+*** package has been available for many years and is available from any
+*** CTAN site.  Use the following command to obtain 'latex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-latex-base'
@@ -270,8 +274,9 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:     'configure --disable-papers-print'
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
-*** appropriate program with the PSLATEX environment variable to 'configure',
-*** or specify the --disable-papers-print option to 'configure'.
+*** appropriate program with the PSLATEX environment variable to
+*** 'configure', or specify the --disable-papers-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -282,12 +287,12 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers_print=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'pdflatex' program.  Generating print
-*** papers requires the 'pdflatex' program from the 'latex' package.  You can
-*** normally get 'latex' as part of many popular Linux distributions and all
-*** current versions are acceptable.  The 'latex' package has been available
-*** for many years and is available from any CTAN site.  Use the following
-*** commands to obtain 'latex':
+*** Configure cannot find a suitable 'pdflatex' program.  Generating
+*** print papers requires the 'pdflatex' program from the 'latex'
+*** package.  You can normally get 'latex' as part of many popular Linux
+*** distributions and all current versions are acceptable.  The 'latex'
+*** package has been available for many years and is available from any
+*** CTAN site.  Use the following commands to obtain 'latex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-latex-base'
@@ -298,8 +303,9 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:     'configure --disable-papers-print'
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
-*** appropriate program with the PDFLATEX environment variable to 'configure',
-*** or specify the --disable-papers-print option to 'configure'.
+*** appropriate program with the PDFLATEX environment variable to
+*** 'configure', or specify the --disable-papers-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -310,12 +316,13 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers_html=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'latex2html' program.  Generating HTML
-*** papers requires the 'latex2html' program from the 'latex2html' package.
-*** You can normally get 'latex2html' as part of many popular Linux
-*** distributions and all current versions are acceptable.  The 'latex2html'
-*** package has been available for many years and is available from any CTAN
-*** site.  Use the following commands to obtain 'latex2html':
+*** Configure cannot find a suitable 'latex2html' program.  Generating
+*** HTML papers requires the 'latex2html' program from the 'latex2html'
+*** package.  You can normally get 'latex2html' as part of many popular
+*** Linux distributions and all current versions are acceptable.  The
+*** 'latex2html' package has been available for many years and is
+*** available from any CTAN site.  Use the following commands to obtain
+*** 'latex2html':
 ***
 *** Debian 4.0:  'apt-get install latex2html'
 *** Ubuntu 8.04: 'apt-get install latex2html'
@@ -325,9 +332,10 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** openSUSE 11: 'zypper install latex2html'
 *** SLES 10:     'configure --disable-papers-html'
 ***
-*** To get rid of this warning, load the 'latex2html' package, specify the
-*** appropriate program with the LATEX2HTML environment variable to
-*** 'configure', or specify the --disable-papers-html option to 'configure'.
+*** To get rid of this warning, load the 'latex2html' package, specify
+*** the appropriate program with the LATEX2HTML environment variable to
+*** 'configure', or specify the --disable-papers-html option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -338,12 +346,13 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 	    disable_papers=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure cannot find a suitable 'convert' program.  Generating images for
-*** papers requires the 'convert' program from the 'ImageMagick' package.  You
-*** can normally get 'ImageMagick' as part of many popular Linux distributions
-*** and all current versions are acceptable.  The 'ImageMagick' package has
-*** been available for many years and is available on the web from many
-*** sources.  Use the following commands to obtain 'ImageMagick':
+*** Configure cannot find a suitable 'convert' program.  Generating
+*** images for papers requires the 'convert' program from the
+*** 'ImageMagick' package.  You can normally get 'ImageMagick' as part
+*** of many popular Linux distributions and all current versions are
+*** acceptable.  The 'ImageMagick' package has been available for many
+*** years and is available on the web from many sources.  Use the
+*** following commands to obtain 'ImageMagick':
 ***
 *** Debian 4.0:  'apt-get install imagemagick'
 *** Ubuntu 8.04: 'apt-get install imagemagick'
@@ -353,9 +362,10 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** openSUSE 11: 'zypper install ImageMagick'
 *** SLES 10:     'configure --disable-papers'
 ***
-*** To get rid of this warning, load the 'latex2html' package, specify the
-*** appropriate program with the CONVERT environment variable to 'configure',
-*** or specify the --disable-papers-print option to 'configure'.
+*** To get rid of this warning, load the 'latex2html' package, specify
+*** the appropriate program with the CONVERT environment variable to
+*** 'configure', or specify the --disable-papers-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -386,12 +396,12 @@ dnl
 	    disable_papers_print=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'dvips' program.  Generating PS formatted
-*** papers requires the 'dvips' program from the 'tex' package.  You can
-*** normally get 'tex' as part of many popular Linux distributions and all
-*** current versions are acceptable.  The 'tex' package has been available for
-*** may years and is available form any CTAN site.  Use the following command to
-*** obtain 'tex':
+*** Configure cannot find a suitable 'dvips' program.  Generating PS
+*** formatted papers requires the 'dvips' program from the 'tex'
+*** package.  You can normally get 'tex' as part of many popular Linux
+*** distributions and all current versions are acceptable.  The 'tex'
+*** package has been available for may years and is available form any
+*** CTAN site.  Use the following command to obtain 'tex':
 ***
 *** Debian 4.0:  'apt-get install tetex-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
@@ -402,8 +412,9 @@ dnl
 *** SLES 10:     'configure --disable-papers-print'
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
-*** appropriate program with the DVI2PS environment variable to 'configure',
-*** or specify the --disable-papers-print option to 'configure'.
+*** appropriate program with the DVI2PS environment variable to
+*** 'configure', or specify the --disable-papers-print option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -468,6 +479,9 @@ AC_DEFUN([_PAPERS_XXX], [dnl
 # =============================================================================
 #
 # $Log: papers.m4,v $
+# Revision 1.1.2.4  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.3  2009-07-05 12:04:27  brian
 # - updates for release builds
 #
