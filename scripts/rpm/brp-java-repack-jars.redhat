@@ -1,0 +1,97 @@
+#!/bin/sh
+
+# If using normal root, avoid changing anything.
+if [ -z "$RPM_BUILD_ROOT" -o "$RPM_BUILD_ROOT" = "/" ]; then
+	exit 0
+fi
+
+# If zip is not installed, we can't repack the jars.
+if [ ! -x /usr/bin/zip ]; then
+	exit 0
+fi
+if [ ! -x /usr/bin/unzip ]; then
+	exit 0
+fi
+
+JARS=`find $RPM_BUILD_ROOT -type f -name \*.jar -not -size 0`
+if [ ! -z "$JARS" ]; then 
+	
+	# make $RPM_BUILD_ROOT/tmp if it doesn't exist
+	rmtmp=0
+	if [ ! -x "$RPM_BUILD_ROOT/tmp" ]; then
+		mkdir -p $RPM_BUILD_ROOT/tmp
+		rmtmp=1
+	fi
+	
+	# unpack every jar, set the date of the files and directories and 
+	# repack the jar
+	for j in $JARS ; do
+		JARNAME=`basename $j`
+		JTMPDIR=`mktemp -d -p $RPM_BUILD_ROOT/tmp $JARNAME.tmpdir.XXXXXXXXXX` || exit 1
+		JARDIR=`mktemp -d -p $RPM_BUILD_ROOT/tmp $JARNAME.jardir.XXXXXXXXXX` || exit 1
+		TIMEREF=`mktemp -p $RPM_BUILD_ROOT/tmp $JARNAME.timeref.XXXXXXXXXX` || exit 1
+		
+		pushd $JTMPDIR > /dev/null
+		/usr/bin/unzip -qq -o $j
+		rm -f $j
+		
+		# Create the directories first.
+		find -type d | LC_ALL=C sort | while read d; do
+			mkdir -p "$JARDIR/$d"
+        	done 
+
+		# Get the modtime from the newest ChangeLog. If the project
+		# doesn't have a ChangeLog, Jan 1, 1970 will be used.
+		DATE="1970-01-01 UTC"
+
+		if [ -z $_PACKAGE_BUILD_DIR ]; then
+			_PACKAGE_BUILD_DIR=$RPM_BUILD_DIR/$RPM_PACKAGE_NAME-$RPM_PACKAGE_VERSION
+		fi
+
+		if [ -d $_PACKAGE_BUILD_DIR ]; then
+			CHANGELOGS=`find $_PACKAGE_BUILD_DIR -type f -name ChangeLog`
+			if [ ! -z "$CHANGELOGS" ]; then
+				for c in $CHANGELOGS; do
+					TMPDATE=`stat -c %y $c | cut -d " " -f 1-2`
+					if [ `date --date="$TMPDATE" +%s` -gt `date --date="$DATE" +%s` ]; then
+						DATE="$TMPDATE"
+					fi
+				done
+			fi 
+		fi
+
+		# move the contents over to the a new directory in order and set
+		# the times.
+		find -type f | LC_ALL=C sort | while read f; do
+			cp "$f" "$JARDIR/$f"
+			touch --date="$DATE" "$JARDIR/$f"
+        	done
+		popd > /dev/null
+
+		# Set the times of the directories.
+		find "$JARDIR" -type d | while read d; do
+			touch --date="$DATE" "$d"
+		done
+
+		# make the jar
+		pushd $JARDIR > /dev/null
+
+		if [ -n "`find -not -name '.'`" ]; then
+			find * -not -name '.' | LC_ALL=C sort | /usr/bin/zip -q -X -9 $j -@
+		else
+			# Put the empty jar back
+			touch $j
+		fi
+		popd > /dev/null
+
+		# Cleanup.
+		rm -rf $JTMPDIR
+		rm -rf $JARDIR
+		rm -f $TIMEREF
+	done
+
+	# remove $RPM_BUILD_ROOT/tmp if we created it
+	if [ $rmtmp -eq 1 ]; then
+		rm -rf $RPM_BUILD_ROOT/tmp
+	fi
+fi
