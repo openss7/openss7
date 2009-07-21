@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: URejectReqEvent.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:34:57 $ <p>
+ @(#) $RCSfile: URejectReqEvent.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-13 07:13:29 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:34:57 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:29 $ by $Author: brian $
  */
 
 package javax.jain.ss7.inap.event;
@@ -84,21 +84,21 @@ public class URejectReqEvent extends ComponentReqEvent implements java.io.Serial
         throws java.lang.IllegalArgumentException {
         if (rejectType == RejectType.INVOKE_PROBLEM) {
             InvokeProblem y = new InvokeProblem();
-            if (y.contains((java.lang.Object)(new Integer(rejectCode)))) {
+            if (y.contains(new Integer(rejectCode))) {
                 this.rejectCode = rejectCode;
             } else {
                 throw new IllegalArgumentException("ParameterOutOfRange");
             }
         } else if (rejectType == RejectType.RETURN_RESULT_PROBLEM) {
             ReturnResultProblem y = new ReturnResultProblem();
-            if (y.contains((java.lang.Object)(new Integer(rejectCode)))) {
+            if (y.contains(new Integer(rejectCode))) {
                 this.rejectCode = rejectCode;
             } else {
                 throw new IllegalArgumentException("ParameterOutOfRange");
             }
         } else if (rejectType == RejectType.RETURN_ERROR_PROBLEM) {
             ReturnErrorProblem y = new ReturnErrorProblem();
-            if (y.contains((java.lang.Object)(new Integer(rejectCode)))) {
+            if (y.contains(new Integer(rejectCode))) {
                 this.rejectCode = rejectCode;
             } else {
                 throw new IllegalArgumentException("ParameterOutOfRange");

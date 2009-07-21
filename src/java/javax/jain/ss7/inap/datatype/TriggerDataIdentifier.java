@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: TriggerDataIdentifier.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:34:55 $ <p>
+ @(#) $RCSfile: TriggerDataIdentifier.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-13 07:13:29 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:34:55 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:29 $ by $Author: brian $
  */
 
 package javax.jain.ss7.inap.datatype;
@@ -73,7 +73,7 @@ public class TriggerDataIdentifier implements java.io.Serializable {
         return profileIdentifier;
     }
     /** Sets Profile Identifier.  */
-    public void setProfileIdentifier(ProfileIdentifier profileidentifier) {
+    public void setProfileIdentifier(ProfileIdentifier profileIdentifier) {
         this.profileIdentifier = profileIdentifier;
     }
     /** Gets Extensions Parameter.  */

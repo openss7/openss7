@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-06-29 07:35:26 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:26 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-06-29 07:35:26 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1093,7 +1093,7 @@ read_sysmap() {
 
 #
 # This one is for reading in an existing kernel object module (.ko), possibly gzipped, and reading
-# the exported and undefined symbols from the module.  These are identified by the A or U flag.
+# the exported and undefined symbols from the module.  These are identified by the A or U (or w) flag.
 # This is for collecting information about our own kernel modules.  Note that we also have to watch
 # out for several special symbols.
 #
@@ -1264,6 +1264,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: modpost.sh,v $
+# Revision 1.1.2.5  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.4  2009-06-29 07:35:26  brian
 # - updated rpm spec and symvers
 #

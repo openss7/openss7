@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:17 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.2  2009-07-21 11:06:17  brian
+ - changes from release build
+
  Revision 1.1.2.1  2009-06-21 11:37:17  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -4305,6 +4308,10 @@ vcmn_err(int err_lvl, const char *fmt, va_list args)
 
 EXPORT_SYMBOL_GPL(vcmn_err);
 
+#ifdef HAVE_CMN_ERR_EXPORT
+#undef cmn_err
+#define cmn_err cmn_err_
+#endif
 /**
  *  cmn_err:	- print a command error
  *  @err_lvl:	severity
@@ -4323,6 +4330,9 @@ cmn_err(int err_lvl, const char *fmt, ...)
 }
 
 EXPORT_SYMBOL(cmn_err);
+#ifdef HAVE_CMN_ERR_EXPORT
+#undef cmn_err
+#endif
 
 __STRUTIL_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
 

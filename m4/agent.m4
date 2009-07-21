@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,135 +61,105 @@
 # _AGENT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AGENT], [dnl
-    AC_REQUIRE([_DISTRO])
-    _AGENT_OPTIONS
-    _AGENT_SETUP
-    _AGENT_USER
-    _AGENT_OUTPUT
+dnl
+dnl Building SNMP agents requires the presence of perl libraries.  Note that
+dnl only fedora, redhat and other broken packaging of net-snmp needs perl
+dnl libraries.  The Debian 4.0 (Etch) packaging have proper load dependencies
+dnl between libraries, so loading the SNMP agent libraries properly loads
+dnl dependent libraries.
+dnl
+    AC_REQUIRE([_PERL_LIBRARIES])
+dnl
+dnl Building SNMP agents requires the presence of snmp libraries.
+dnl
+    AC_REQUIRE([_SNMP])
+    _AGENT_EXTENSIONS
 ])# _AGENT
 # =============================================================================
 
-# =============================================================================
-# _AGENT_OPTIONS
-# -----------------------------------------------------------------------------
-# It is not necessary to compile the SNMP agents.  This option decides whether
-# to do so or not.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_OPTIONS], [dnl
-    AC_ARG_WITH([snmp-agent],
-	AS_HELP_STRING([--with-snmp-agent],
-	    [include SNMP agents in build. @<:@default=yes@:>@]),
-	[with_snmp_agent="$withval"],
-	[with_snmp_agent=''])
-])# _AGENT_OPTIONS
-# =============================================================================
+AC_DEFUN([_AGENT_MSG_WARN], [dnl
+    AS_REQUIRE_SHELL_FN([agent_msg_warn], [dnl
+    cat<<EOF
+
+*** 
+*** Compiling SNMP agents requires the availability of UCD-SNMP header
+*** files and in particular <[$]1>.  This file
+*** could not be found.  Perhaps you need to load the NET-SNMP
+*** development package (net-snmp-dev or libsnmp9-dev).  Use the
+*** following commands to obtain the NET-SNMP development package:
+***
+*** Debian 4.0:  'apt-get install libsnmp9-dev'
+*** Ubuntu 8.04: 'apt-get install libsnmp-dev'
+*** CentOS 5.x:  'yum install net-snmp-devel'
+*** SLES 10:     'zypper install net-snmp-devel'
+*** RedHat 7.2:  'rpm -i ucd-snmp-devel-4.2.5-8.72.1'
+*** RedHat 7.3:  'rpm -i ucd-snmp-devel-4.2.5-8.73.1'
+***
+*** Repeat after loading the correct package or by specifying the
+*** configure argument --without-snmp-agent: continuing under the
+*** assumption that the option --without-snmp was intended.
+***
+EOF
+    ])dnl
+    if test :"${with_snmp_agent:-yes}" != :no ; then
+	ac_msg=`agent_msg_warn $1`
+	AC_MSG_WARN([$ac_msg])
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_snmp_agent --without-snmp-agent\""
+	PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-snmp-agent'"
+	ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-snmp-agent'"
+	with_snmp_agent=no
+    fi
+])
 
 # =============================================================================
-# _AGENT_SETUP
+# _AGENT_EXTENSIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_SETUP], [dnl
-    if test :"${with_snmp_agent:-yes}" = :no ; then
-	agent_cv_snmp_agent=no
-    else
-	agent_cv_snmp_agent=yes
-    fi
-    if test :"${agent_cv_snmp_agent:-yes}" = :yes ; then :;
-	_AGENT_SETUP_PERL
-    fi
-    # Note that only fedora, redhat and other broken packaging of net-snmp
-    # needs perl libraries.  The Debian 4.0 (Etch) packaging have proper load
-    # dependencies between libraries, so loading the SNMP agent libraries
-    # properly loads dependent libraries.
-    AC_MSG_CHECKING([for agent perl libraries])
-    AC_MSG_RESULT([$agent_cv_snmp_agent])
-    if test :"${agent_cv_snmp_agent:-yes}" = :yes ; then :;
-	_AGENT_SETUP_SNMP
-    fi
-    AC_MSG_CHECKING([for agent snmp libraries])
-    AC_MSG_RESULT([$agent_cv_snmp_agent])
-    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/ucd-snmp-config.h>.  This file could not be
-*** found.  Perhaps you need to load the NET-SNMP development package
-*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
-*** Repeat after loading the correct package or setting --without-snmp-agent.
-*** ]) ])
-    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/ucd-snmp-includes.h>.  This file could not be
-*** found.  Perhaps you need to load the NET-SNMP development package
-*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
-*** Repeat after loading the correct package or setting --without-snmp-agent.
-*** ]) ], [
+AC_DEFUN([_AGENT_EXTENSIONS], [dnl
+    # It is not necessary to compile the SNMP agents.  This option
+    # decides whether to do so or not.
+    AC_ARG_WITH([snmp-agent],
+	[AS_HELP_STRING([--with-snmp-agent=HEADERS, --without-snmp-agent],
+	    [SNMP agent header directory @<:@default=$INCLUDEDIR@:>@])]
+	[AS_HELP_STRING([--without-snmp-agent],
+	    [suppress SNMP agents @<:@default=enabled@:>@])])
+    AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${with_snmp_agent:-yes}" != :no])dnl
+    AC_MSG_NOTICE([+-----------------------------------+])
+    AC_MSG_NOTICE([| SNMP agent UCD header file checks |])
+    AC_MSG_NOTICE([+-----------------------------------+])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/ucd-snmp-config.h])])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/ucd-snmp-includes.h])], [
 #include <ucd-snmp/ucd-snmp-config.h>
 ])
-    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-agent-includes.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/ucd-snmp-agent-includes.h>.  This file could
-*** not be found.  Perhaps you need to load the NET-SNMP development package
-*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
-*** Repeat after loading the correct package or setting --without-snmp-agent.
-*** ]) ], [
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-agent-includes.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/ucd-snmp-agent-includes.h])], [
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 ])
-    AC_CHECK_HEADERS([ucd-snmp/callback.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/callback.h>.  This file could not be found.
-*** Perhaps you need to load the NET-SNMP development package (net-snmp-dev or
-*** libsnmp9-dev).  Perhaps the file is simply mangled.  Repeat after loading
-*** the correct package or setting --without-snmp-agent.
-*** ]) ], [
+    AC_CHECK_HEADERS([ucd-snmp/callback.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/callback.h])], [
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
 ])
-    AC_CHECK_HEADERS([ucd-snmp/snmp-tc.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/snmp-tc.h>.  This file could not be found.
-*** Perhaps you need to load the NET-SNMP development package (net-snmp-dev or
-*** libsnmp9-dev).  Perhaps the file is simply mangled.  Repeat after loading
-*** the correct package or setting --without-snmp-agent.
-*** ]) ], [
+    AC_CHECK_HEADERS([ucd-snmp/snmp-tc.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/snmp-tc.h])], [
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
 #include <ucd-snmp/callback.h>
 ])
-    AC_CHECK_HEADERS([ucd-snmp/default_store.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/default_store.h>.  This file could not be
-*** found.  Perhaps you need to load the NET-SNMP development package
-*** (net-snmp-dev or libsnmp9-dev).  Perhaps the file is simply mangled.
-*** Repeat after loading the correct package or setting --without-snmp-agent.
-*** ]) ], [
+    AC_CHECK_HEADERS([ucd-snmp/default_store.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/default_store.h])], [
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
 #include <ucd-snmp/callback.h>
 #include <ucd-snmp/snmp-tc.h>
 ])
-    AC_CHECK_HEADERS([ucd-snmp/snmp_alarm.h], [], [
-	AC_MSG_WARN([
-*** 
-*** Compiling SNMP agents requires the availability of UCD-SNMP header files
-*** and in particular <ucd-snmp/snmp_alarm.h>.  This file could not be found.
-*** Perhaps you need to load the NET-SNMP development package (net-snmp-dev or
-*** libsnmp9-dev).  Perhaps the file is simply mangled.  Repeat after loading
-*** the correct package or setting --without-snmp-agent.
-*** ]) ], [
+    AC_CHECK_HEADERS([ucd-snmp/snmp_alarm.h], [],
+	[_AGENT_MSG_WARN([ucd-snmp/snmp_alarm.h])], [
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/ucd-snmp-agent-includes.h>
@@ -206,54 +176,15 @@ AC_DEFUN([_AGENT_SETUP], [dnl
 #include <ucd-snmp/default_store.h>
 #include <ucd-snmp/snmp_alarm.h>
 ])
-])# _AGENT_SETUP
-# =============================================================================
-
-# =============================================================================
-# _AGENT_SETUP_PERL
-# -----------------------------------------------------------------------------
-# Building SNMP agents requires the presence of perl libraries.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_SETUP_PERL], [dnl
-    _PERL
-])# _AGENT_SETUP_PERL
-# =============================================================================
-
-# =============================================================================
-# _AGENT_SETUP_SNMP
-# -----------------------------------------------------------------------------
-# Building SNMP agents requires the presence of snmp libraries.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_SETUP_SNMP], [dnl
-    _SNMP
-])# _AGENT_SETUP_SNMP
-# =============================================================================
-
-# =============================================================================
-# _AGENT_USER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_USER], [dnl
-])# _AGENT_USER
-# =============================================================================
-
-# =============================================================================
-# _AGENT_OUTPUT
-# -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_OUTPUT], [dnl
-    AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${agent_cv_snmp_agent:-yes}" = :yes])dnl
-])# _AGENT_OUTPUT
-# =============================================================================
-
-# =============================================================================
-# _AGENT_
-# -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_], [dnl
-])# _AGENT_
+])# _AGENT_EXTENSIONS
 # =============================================================================
 
 # =============================================================================
 #
 # $Log: agent.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

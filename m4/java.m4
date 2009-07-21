@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: java.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
+# @(#) $RCSfile: java.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,20 +49,19 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
 # =============================================================================
-# _JAVA
+# AC_PROG_JAVA
 # -----------------------------------------------------------------------------
-AC_DEFUN([_JAVA], [dnl
-    AC_REQUIRE([_DISTRO])
+m4_define([AC_PROG_JAVA], [dnl
     _JAVA_OPTIONS
     _JAVA_SETUP
     _JAVA_USER
     _JAVA_OUTPUT
-])# _JAVA
+])# AC_PROG_JAVA
 # =============================================================================
 
 # =============================================================================
@@ -70,8 +69,8 @@ AC_DEFUN([_JAVA], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAVA_OPTIONS], [dnl
     AC_ARG_ENABLE([java],
-	AS_HELP_STRING([--disable-java],
-	    [disable JAVA modules.  @<:@default=enabled@:>@]),
+	[AS_HELP_STRING([--disable-java],
+	    [JAVA modules @<:@default=enabled@:>@])],
 	    [], [enable_java=yes])
 ])# _JAVA_OPTIONS
 # =============================================================================
@@ -120,12 +119,13 @@ dnl
 	JAR="${am_missing4_run}jar"
 	AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'jar' program.  Generating Java archives
-*** requires the 'jar' program.  You can normally get 'jar' as part of most
-*** popular GNU/Linux distributions and all current versions are acceptable.
-*** The 'jar' program has been available for many years.  'fastjar' is part of
-*** the GNU Compiler Collection.  You can also get 'jar' as part of any JDK.
-*** Use the following command to obtain 'fastjar':
+*** Configure cannot find a suitable 'jar' program.  Generating Java
+*** archives requires the 'jar' program.  You can normally get 'jar' as
+*** part of most popular GNU/Linux distributions and all current
+*** versions are acceptable.  The 'jar' program has been available for
+*** many years.  'fastjar' is part of the GNU Compiler Collection.  You
+*** can also get 'jar' as part of any JDK.  Use the following command to
+*** obtain 'fastjar':
 ***
 *** Debian 4.0:	 'apt-get install fastjar'
 *** Ubuntu 8.04: 'apt-get install fastjar'
@@ -133,8 +133,9 @@ dnl
 *** SLES 10:	 'zypper install fastjar'
 *** RH 7.3:	 'rpm -i libgcj3'
 ***
-*** To get rid of this warning, load the 'fastjar' package or specify the
-*** appropriate program with the JAR environment variable to 'configure'.
+*** To get rid of this warning, load the 'fastjar' package or specify
+*** the appropriate program with the JAR environment variable to
+*** 'configure'.
 *** ])
     fi
     AC_ARG_VAR([ZIP],
@@ -148,7 +149,8 @@ dnl
 *** Configure cannot find a suitable 'zip' program.
 ***
 *** To get rid of this warning, load the 'zip' program or specify the
-*** appropriate program with the ZIP enviornment variable to 'configure'.
+*** appropriate program with the ZIP enviornment variable to
+*** 'configure'.
 *** ])
     fi
     AC_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner], [${am_missing4_run}jarsigner], [$jar_tmp])
@@ -189,6 +191,12 @@ AC_DEFUN([_JAVA_XXX], [dnl
 # =============================================================================
 #
 # $Log: java.m4,v $
+# Revision 1.1.2.5  2009-07-21 11:06:13  brian
+# - changes from release build
+#
+# Revision 1.1.2.4  2009-07-13 07:13:27  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.3  2009-07-05 12:04:27  brian
 # - updates for release builds
 #

@@ -1,4 +1,126 @@
-#!/bin/bash
+#!/usr/bin/awk -f
+
+BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-requires.so" >"/dev/stderr"
+    RPM_BUILD_DIR = ENVIRON[RPM_BUILD_DIR]
+    RPM_PACKAGE_NAME = ENVIRON[RPM_PACKAGE_NAME]
+    RPM_PACKAGE_VERSION = ENVIRON[RPM_PACKAGE_VERSION]
+    RPM_PACKAGE_RELEASE = ENVIRON[RPM_PACKAGE_RELEASE]
+    dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    if (ARGC > 1 && ARGV[1]) {
+	dir = ARGV[1]
+	delete ARGV[1]
+    }
+    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    if (ARGC > 2 && ARGV[2]) {
+	RPM_BUILD_ROOT = ARGV[2]
+	delete ARGV[2]
+    }
+    sub(/\/+$/, "", RPM_BUILD_ROOT)
+    mark64 = 1
+    uname = "uname -m"
+    if ((uname | getline)) {
+	if (/^alpha/) {
+	    mark64 = 0
+	}
+    }
+    close(uname)
+}
+{
+    file = $1
+    lib64 = ""
+    slib64 = ""
+    filetype = "file -L " file " 2>/dev/null"
+    filetype | getline type
+    close(filetype)
+    if (type!~/ELF/)
+	next
+    if ((mark64) && type~/ELF 64-bit/) {
+	lib64 = "()(64bit)"
+	slib64 = "(64bit)"
+    }
+    ldd = "ldd " file " 2>/dev/null"
+    while ((ldd | getline)) {
+	if (/=>/) {
+	    if ($1 !~ /libNoVersion.so/ && $1 !~ /4[um]lib.so/ && $1 !~ /linux-gate.so/ && $1 !~ /libredhat-kernel.so/) {
+		sub(".*/", "", $1)
+		requires[$1 lib64] = 1
+	    }
+	}
+    }
+    close(ldd)
+    soname = ""
+    libname = ""
+    section = 0
+    objdump = "objdump -p " file
+    while ((objdump | getline)) {
+	if (/^$/) {
+	    if (section == 3)
+		break
+	    section = 0
+	    continue
+	}
+	if (section == 0) {
+	    if (/^Dynamic Section:/) {
+		section = 1
+		continue
+	    }
+	    if (/^Version definitions:/) {
+		section = 2
+		continue
+	    }
+	    if (/^Version References:/) {
+		section = 3
+		continue
+	    }
+	    continue
+	}
+	if (section == 1) {
+	    if (/SONAME/) {
+		soname = $2
+		provides[soname lib64] = 1
+		continue
+	    }
+	    if (/NEEDED/) {
+		requires[$2 lib64] = 1
+		continue
+	    }
+	    continue
+	}
+	if (section == 2) {
+	    if (/^[0-9]/) {
+		provides[soname "(" $4 ")" slib64] = 1
+		continue
+	    }
+	    continue
+	}
+	if (section == 3) {
+	    if (/required from/) {
+		sub(":", "", $3)
+		libname = $3
+		continue
+	    }
+	    if (libname && $4) {
+		requires[libname "(" $4 ")" slib64] = 1
+	    }
+	}
+    }
+    close(objdump)
+}
+END {
+    j = 1
+    for (lib in requires) {
+	if (lib in provides)
+	    continue
+	indices[j] = lib
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
+
 # =============================================================================
 #
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -49,91 +171,8 @@
 #
 # Last Modified $Date$ by $Author$
 #
-# =============================================================================
-
-IFS=$'\n'
-filelist=($(cat))
-IFS=$' \t\n'
-
-# --- Alpha does not mark 64bit dependencies
-case `uname -m` in
-    alpha*) mark64=false ;;
-    *)	    mark64=true  ;;
-esac
-
-all_provides() {
-    for f in "${filelist[@]}" ; do
-	soname=$(objdump -p $f | awk '/SONAME/ {print $2}')
-	# skip symbolic links
-	if [ -n "$soname" -a -L "$f" ] ; then continue ; fi
-	# if there is no SONAME in file, use filename
-	if [ -z "$soname" ] ; then soname=$(basename $f) ; fi
-	lib64= slib64=
-	if $mark64 && file -L "$f" 2>/dev/null | grep 'ELF 64-bit' >/dev/null; then
-	    lib64='()(64bit)' slib64='(64bit)'
-	fi
-	echo "$soname$lib64"
-	objdump -p "$f" | awk '
-	    BEGIN { START=0; }
-	    /Version definitions:/ { START=1; }
-	    /^[0-9]/ && (START==1) { print $4; }
-	    /^$/ { START=0; }
-	' | \
-	while read symbol ; do
-	    echo "$soname($symbol)$slib64"
-	done
-    done | sort -u
-}
-
-all_requires() {
-    for f in "${filelist[@]}" ; do
-	if [ -r "$f" ] ; then
-	    lib64=
-	    if $mark64 && file -L "$f" 2>/dev/null | grep 'ELF 64-bit' >/dev/null ; then
-		lib64='()(64bit)'
-	    fi
-	    ldd "$f" | awk '
-		/=>/ {
-		    if ($1 !~ /libNoVersion.so/ && $1 !~ /4[um]lib.so/ && $1 !~ /linux-gate.so/ && $1 !~ /libredhat-kernel.so/) {
-			gsub(/'\''"/,"\\&",$1);
-			print $1;
-		    }
-		}
-	    ' | \
-	    while read lib ; do
-		libname=$(basename "$lib")
-		if [ -n "$libname" ] ; then
-		    echo "$libname$lib64"
-		fi
-	    done
-	    objdump -p "$f" | awk '
-		BEGIN { START=0; LIBNAME=""; }
-		/^$/ { START=0; }
-		/^Dynamic Section:$/ { START=1; }
-		(START==1) && /NEEDED/ {
-		    if ("'$lib64'" != "") {
-			sub(/$/, "()'$lib64'", $2);
-		    }
-		    print $2;
-		}
-		/^Version References:$/ { START=2; }
-		(START==2) && /required from/ {
-		    sub(/:/, "", $3);
-		    LIBNAME=$3;
-		}
-		(START==2) && (LIBNAME!="") && ($4!="") {
-		    print LIBNAME "(" $4 ")'$lib64'";
-		}'
-	fi
-    done | sort -u
-}
-
-join -v1 <(all_requires) <(all_provides)
-
-exit 0
-
-# =============================================================================
+# -----------------------------------------------------------------------------
 #
 # $Log$
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 11:20:44 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -121,8 +121,8 @@ driver	tali	    tali	*
 driver	tcap	    tcap	*		    
 driver	tcp	    tcp		*		    
 driver	tp	    tp		*		    
-driver	tua-as	    tua_as	*		    
 driver	tua	    tua		*		    
+driver	tua-as	    tua_as	*		    
 driver	ua-as	    ua_as	*		    
 driver	udp	    udp		*		    
 driver	unix	    unix	*		    
@@ -187,7 +187,9 @@ objname	driver	isdn	    isdn
 objname	driver	isua-as	    isua_as
 objname	driver	isup	    isup
 objname	driver	link-driver ldl
+objname driver	m2ua	    m2ua
 objname	driver	m2ua-as	    m2ua_as
+objname driver	m3ua	    m3ua
 objname	driver	m3ua-as	    m3ua_as
 objname	driver	mg	    mg
 objname	driver	mtp-min	    mtp_min
@@ -213,6 +215,7 @@ objname	driver	tali	    tali
 objname	driver	tcap	    tcap
 objname	driver	tcp	    tcp
 objname	driver	tp	    tp
+objname	driver	tua	    tua
 objname	driver	tua-as	    tua_as
 objname	driver	ua-as	    ua_as
 objname	driver	udp	    udp
@@ -308,8 +311,8 @@ loadable	sdt_x100p
 loadable	sdt_x400p
 loadable	sl_acb56
 loadable	slm
-loadable	sl-min
-loadable	sl-mux
+loadable	sl_min
+loadable	sl_mux
 loadable	sl_x100p
 loadable	sl_x400p
 loadable	socksys
@@ -557,6 +560,9 @@ node	/dev/xnet	    c	    *	    xnet	0
 ## =============================================================================
 ##
 ## $Log: Config.in,v $
+## Revision 1.1.2.2  2009-07-21 11:06:14  brian
+## - changes from release build
+##
 ## Revision 1.1.2.1  2009-06-21 11:20:44  brian
 ## - added files to new distro
 ##

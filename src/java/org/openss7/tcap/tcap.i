@@ -1,6 +1,6 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: tcap.i,v 1.1.2.1 2009-06-21 11:36:49 brian Exp $
+//  @(#) $Id: tcap.i,v 1.1.2.2 2009-07-13 07:13:31 brian Exp $
 //  
 //  --------------------------------------------------------------------------
 //  
@@ -48,17 +48,25 @@
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Last Modified $Date: 2009-06-21 11:36:49 $ by $Author: brian $
+//  Last Modified $Date: 2009-07-13 07:13:31 $ by $Author: brian $
 //  
 //  --------------------------------------------------------------------------
 //  
 //  $Log: tcap.i,v $
+//  Revision 1.1.2.2  2009-07-13 07:13:31  brian
+//  - changes for multiple distro build
+//
 //  Revision 1.1.2.1  2009-06-21 11:36:49  brian
 //  - added files to new distro
 //
 //  ==========================================================================
 
 %module Tcap
+%{
+#include <list>
+#pragma implementation
+#include "tcap.hh"
+%}
 
 %include "typemaps.i"
 %include "arrays_java.i"
@@ -66,6 +74,7 @@
 
 %javaconst(1);
 
+#include <list>
 %include "tcap.hh"
 
 // vim: ft=cpp sw=4 et

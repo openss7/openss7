@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:27 $
+# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -479,7 +479,11 @@ dnl
 dnl
 dnl We need the gcj-dbtool so that we can create classmap databses and add
 dnl native compile java modules to the global classmap database when
-dnl installing.
+dnl installing.  Note that older versions of gcj did not include classmap
+dnl database and used the name of the library to determine which library to
+dnl laod.  We have appropriate names for this approach on older systems.  If the
+dnl tool is not present, we simply indicate to the makefiles not to install
+dnl classmap databases.
 dnl
     AC_ARG_VAR([GCJDBTOOL],
 	[GCJ database tool. @<:@default=gcj-dbtool@:>@])
@@ -491,19 +495,19 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find a suitable GCJ database tool program, 'gcj-dbtool'.
-*** This program is part of the GNU Compiler Collection, but is not always
-*** loaded on recent distributions.  Also, older versions of libgcj, such as
-*** that distributed with GCC version 2 and early version 3, do not have this
-*** tool.  The first clue to this is that GCJ does not support the
-*** -indirect-dispatch flag.
+*** Configure could not find a suitable GCJ database tool program,
+*** 'gcj-dbtool'.  This program is part of the GNU Compiler Collection,
+*** but is not always loaded on recent distributions.  Also, older
+*** versions of libgcj, such as that distributed with GCC version 2 and
+*** early version 3, do not have this tool.  The first clue to this is
+*** that GCJ does not support the -indirect-dispatch flag.
 ***
 *** On RPM based distributions, try 'yum install libgcj'.
 *** On DEB based distributions, try 'apt-get install gij'.
 *** On SuSE distributions, try 'zypper install libgcj'.
 ***
-*** Alternatively, you can specify an equivalent command with the GCJDBTOOL
-*** environment variable when running configure.
+*** Alternatively, you can specify an equivalent command with the
+*** GCJDBTOOL environment variable when running configure.
 ***
 *** Debian 4.0:  'apt-get install gij'
 *** Ubuntu 8.04: 'apt-get install gij'
@@ -512,7 +516,7 @@ dnl
 ***])
 	fi
     fi
-
+    AM_CONDITIONAL([WITH_GCJDBTOOL], [test :"${ac_cv_path_GCJDBTOOL:-no}" != :no])dnl
 dnl
 dnl Note that we distribute the CNI header files.  Therefore, this tool should
 dnl only get invoked should the CNI header files need to be updated.  A
@@ -534,8 +538,8 @@ dnl
 	    AC_MSG_WARN([
 ***
 *** Configure could not find the GNU Java Compiler CNI header generation
-*** command, 'gcjh'.  This program is part of the GNU Compiler Collection, but
-*** is not always loaded on recent distributions.
+*** command, 'gcjh'.  This program is part of the GNU Compiler
+*** Collection, but is not always loaded on recent distributions.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
@@ -573,9 +577,10 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find the Java JNI header generation program 'javah' (nor
-*** 'gcjh').  This program is part of the GNU Compiler Collection, but is not
-*** always loaded on recent distributions.  It is also part of most Java SDKs.
+*** Configure could not find the Java JNI header generation program
+*** 'javah' (nor 'gcjh').  This program is part of the GNU Compiler
+*** Collection, but is not always loaded on recent distributions.  It is
+*** also part of most Java SDKs.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
@@ -612,16 +617,17 @@ dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure could not find the Java documentation program 'javadoc' (nor
-*** 'gjdoc').  This program is part of the GNU Compiler Colleciton, but is not
-*** always loaded on recent distributions.  It is also part of most Java SDKs.
+*** Configure could not find the Java documentation program 'javadoc'
+*** (nor 'gjdoc').  This program is part of the GNU Compiler Colleciton,
+*** but is not always loaded on recent distributions.  It is also part
+*** of most Java SDKs.
 ***
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE, try 'zypper install jdk-1_5_0-ibm-devel'.
 ***
-*** Alternatively, you can specify an equivalent command with the JAVADOC
-*** environment variable when running configure.
+*** Alternatively, you can specify an equivalent command with the
+*** JAVADOC environment variable when running configure.
 ***
 *** Debian 4.0:	 'apt-get install gjdoc'
 *** Ubuntu 8.04: 'apt-get install gjdoc'
@@ -631,10 +637,67 @@ dnl
 ***])
 	fi
     fi
+    AC_CACHE_CHECK([for libgcj javadoc directory], [ac_cv_libgcj_doc], [dnl
+	eval "gcj_search_path=\"
+	    ${DESTDIR}${rootdir}${javadocdir}
+	    ${DESTDIR}${rootdir}/usr/share/javadoc
+	    ${DESTDIR}${rootdir}${docdir}
+	    ${DESTDIR}${rootdir}/usr/share/doc
+	    ${DESTDIR}${javadocdir}
+	    ${DESTDIR}/usr/share/javadoc
+	    ${DESTDIR}${docdir}
+	    ${DESTDIR}/usr/share/doc\""
+	gcj_search_path=`echo "$gcj_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for gcj_dir in $gcj_search_path ; do
+	    if test -d "$gcj_dir" ; then
+		gcj_dirs=`find "$gcj_dir" -mindepth 1 -maxdepth 2 -type d -name '*gcj*' 2>/dev/null | sort -ru`
+		for gcj_sub in $gcj_dirs ; do
+		    for gcj_sdir in $gcj_sub $gcj_sub/html ; do
+			AC_MSG_CHECKING([for libgcj javadoc directory... $gcj_sdir])
+			if test -d "$gcj_sdir" -a \( -r $gcj_sdir/package-list -o -r $gcj_sdir/package-list.gz \) ; then
+			    ac_cv_libgcj_doc="$gcj_sdir"
+			    AC_MSG_RESULT([yes])
+			    break 3
+			else
+			    AC_MSG_RESULT([no])
+			fi
+		    done
+		done
+	    fi
+	done
+	test -n "$ac_cv_libgcj_doc" || ac_cv_libgcj_doc=no
+	AC_MSG_CHECKING([for libgcj javadoc directory])
+    ])
+    if test :"${ac_cv_libgcj_doc:-no}" = :no ; then
+	AC_MSG_WARN([
+***
+*** Configure could not find a suitable libgcj javadoc documentation
+*** directory.  The libgcj javadoc documentation is part of the 'libgcj'
+*** documentation package which is not always loaded on all
+*** distributions.  Use the following commands to obtain 'libgcj'
+*** javadoc documentation:
+***
+*** Debian 4.0:   'apt-get install libgcj-doc'
+*** Ubuntu 8.04:  'apt-get install libgcj-doc'
+*** CentOS 5.x:   'yum install '
+***
+])
+	gcjdocdir=
+    else
+	gcjdocdir="$ac_cv_libgcj_doc"
+    fi
+    AC_SUBST([gcjdocdir])dnl
     JAVADOCFLAGS=
     if test $(basename "$JAVADOC") = 'gjdoc'; then
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-validhtml"
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }-licensetext"
+    fi
+    if test -n "$gcjdocdir" ; then
+	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-linkoffline http://developer.classpath.org/doc/ $(gcjdocdir)'
+    else
+	AC_MSG_WARN([Linking javadoc online.])
+	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-link http://developer.classpath.org/doc/'
     fi
 ])# _GCJ_TOOLS
 # =============================================================================
@@ -669,6 +732,10 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
     AC_LANG_FLAG([-findirect-dispatch],
 		 [CNIFLAGS="-findirect-dispatch"],
 		 [CNIFLAGS=])
+    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -fsource=([[^[:space:]]]*),,g'`
+    AC_LANG_FLAG([-fsource=1.4],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fsource=1.4"],
+		 [])
     CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?out-of-date,,g'`
     AC_LANG_FLAG([-Wno-out-of-date],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-out-of-date"],
@@ -676,6 +743,14 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
     CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?deprecated,,g'`
     AC_LANG_FLAG([-Wno-deprecated],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-deprecated"],
+		 [])
+    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?serial,,g'`
+    AC_LANG_FLAG([-Wno-serial],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-serial"],
+		 [])
+    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?param-assign,,g'`
+    AC_LANG_FLAG([-Wno-param-assign],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-param-assign"],
 		 [])
     # It seems that older GCJ's that cannot recogize this flag have
     # no way of suppressing these warnings and cannot have -Werror set.
@@ -717,6 +792,12 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 #
 # $Log: gcj.m4,v $
+# Revision 1.1.2.6  2009-07-21 11:06:13  brian
+# - changes from release build
+#
+# Revision 1.1.2.5  2009-07-13 07:13:27  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.4  2009-07-05 12:04:27  brian
 # - updates for release builds
 #

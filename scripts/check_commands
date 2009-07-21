@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: check_commands,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+# @(#) $RCSfile: check_commands,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -217,6 +217,16 @@ then
 				continue
 			fi
 		fi
+		if test ! -x $s
+		then
+			SHELL=`head -1 $s | sed -r -n 's,^#\![[:space:]]*(.*)$,\1,p'`
+			if test -z "$SHELL" ; then
+				echo_w "$base is not executable: skipping" $LINENO
+				continue
+			fi
+		else
+			unset SHELL
+		fi
 		for opt in --help --version --copying
 		do
 			echo_t "testing $script $opt"
@@ -384,6 +394,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: check_commands,v $
+# Revision 1.1.2.3  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.2  2009-06-21 12:41:53  brian
 # - updated headers
 #

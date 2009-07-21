@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,13 +67,14 @@ AC_DEFUN([_DEB_DPKG_OPTIONS], [dnl
 AC_DEFUN([_DEB_OPTIONS_DEB_EPOCH], [dnl
     AC_MSG_CHECKING([for deb epoch])
     AC_ARG_WITH([deb-epoch],
-	AS_HELP_STRING([--with-deb-epoch=EPOCH],
-	    [specify the EPOCH for the package file.  @<:@default=auto@:>@]), [],
-	[if test -r .debepoch; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.debepoch
-	 then with_deb_epoch="`cat ${d}.debepoch`"
-	 else with_deb_epoch=0
-	 fi])
+	[AS_HELP_STRING([--with-deb-epoch=EPOCH],
+	    [deb package EPOCH @<:@default=auto@:>@])],
+	[], [dnl
+	    if test -r .debepoch; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.debepoch
+	    then with_deb_epoch="`cat ${d}.debepoch`"
+	    else with_deb_epoch=0
+	    fi])
     AC_MSG_RESULT([${with_deb_epoch:-0}])
     PACKAGE_DEBEPOCH="${with_deb_epoch:-0}"
     AC_SUBST([PACKAGE_DEBEPOCH])dnl
@@ -88,13 +89,14 @@ AC_DEFUN([_DEB_OPTIONS_DEB_EPOCH], [dnl
 AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
     AC_MSG_CHECKING([for deb release])
     AC_ARG_WITH([deb-release],
-	AS_HELP_STRING([--with-deb-release=RELEASE],
-	    [specify the RELEASE for the package files.  @<:@default=auto@:>@]), [],
-	[if test -r .debrelease ; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.debrelease
-	 then with_deb_release="`cat ${d}.debrelease`"
-	 else with_deb_release=0
-	 fi])
+	[AS_HELP_STRING([--with-deb-release=RELEASE],
+	    [deb package RELEASE @<:@default=auto@:>@])],
+	[], [dnl
+	    if test -r .debrelease ; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.debrelease
+	    then with_deb_release="`cat ${d}.debrelease`"
+	    else with_deb_release=0
+	    fi])
     AC_MSG_RESULT([${with_deb_release:-0}])
     PACKAGE_DEBRELEASE="${with_deb_release:-0}"
     AC_SUBST([PACKAGE_DEBRELEASE])dnl
@@ -144,9 +146,9 @@ AC_DEFUN([_DEB_DPKG_SETUP_DIST], [dnl
 AC_DEFUN([_DEB_DPKG_SETUP_ARCH], [dnl
     AC_MSG_CHECKING([for deb build/install of arch packages])
     AC_ARG_ENABLE([arch],
-	AS_HELP_STRING([--enable-arch],
-	    [build and install arch packages.  @<:@default=yes@:>@]), [],
-	[enable_arch='yes'])
+	[AS_HELP_STRING([--disable-arch],
+	    [arch components @<:@default=enabled@:>@])],
+	[], [enable_arch=yes])
     AC_MSG_RESULT([${enable_arch:-yes}])
     AM_CONDITIONAL([DEB_BUILD_ARCH], [test ":${enable_arch:-yes}" = :yes])dnl
 	
@@ -163,9 +165,9 @@ AC_DEFUN([_DEB_DPKG_SETUP_ARCH], [dnl
 AC_DEFUN([_DEB_DPKG_SETUP_INDEP], [dnl
     AC_MSG_CHECKING([for deb build/install of indep packages])
     AC_ARG_ENABLE([indep],
-	AS_HELP_STRING([--enable-indep],
-	    [build and install indep packages.  @<:@default=yes@:>@]), [],
-	[enable_indep='yes'])
+	[AS_HELP_STRING([--disable-indep],
+	    [indep components @<:@default=enabled@:>@])],
+	[], [enable_indep=yes])
     AC_MSG_RESULT([${enable_indep:-yes}])
     AM_CONDITIONAL([DEB_BUILD_INDEP], [test ":${enable_indep:-yes}" = :yes])dnl
 ])# _DEB_DPKG_SETUP_INDEP
@@ -182,9 +184,9 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
 	deb_tmp='$(PACKAGE_DISTDIR)/debs/'"${deb_cv_dist_subdir}"
     fi
     AC_ARG_WITH([deb-topdir],
-	AS_HELP_STRING([--with-deb-topdir=DIR],
-	    [specify the deb top directory.  @<:@default=PKG-DISTDIR/debian@:>@]), [],
-	[with_deb_topdir="$deb_tmp"])
+	[AS_HELP_STRING([--with-deb-topdir=DIR],
+	    [deb top directory @<:@default=PKG-DISTDIR/debian@:>@])],
+	[], [with_deb_topdir="$deb_tmp"])
     AC_CACHE_CHECK([for deb top build directory], [deb_cv_topdir], [dnl
 	case ":$with_deb_topdir" in
 	    (:no | :NO)
@@ -277,13 +279,13 @@ dnl
 dnl These commands are needed to perform DPKG package builds.
 dnl
     AC_ARG_ENABLE([debs],
-	AS_HELP_STRING([--disable-debs],
-	    [disable building of debs.  @<:@default=auto@:>@]),
+	[AS_HELP_STRING([--disable-debs],
+	    [build debs @<:@default=auto@:>@])],
 	[], [enable_debs=yes])
     AC_ARG_ENABLE([dscs],
-	AS_HELP_STRING([--disable-dscs],
-	    [disable building of dscs.  @<:@default=auto@:>@]), [],
-	[enable_dscs=yes])
+	[AS_HELP_STRING([--disable-dscs],
+	    [build dscs @<:@default=auto@:>@])],
+	[], [enable_dscs=yes])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
     AC_PATH_PROG([DPKG], [dpkg], [],
@@ -331,9 +333,9 @@ dnl
 dnl These commands are needed to create DPKG (e.g. APT) repositories.
 dnl
     AC_ARG_ENABLE([repo-apt],
-	AS_HELP_STRING([--disable-repo-apt],
-	    [disable apt repo construction.  @<:@default=auto@:>@]), [],
-	[enable_repo_apt=yes])
+	[AS_HELP_STRING([--disable-repo-apt],
+	    [apt repo construction @<:@default=auto@:>@])],
+	[], [enable_repo_apt=yes])
     AC_ARG_VAR([APT_FTPARCHIVE],
 	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
     AC_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [],
@@ -432,6 +434,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 1.1.2.4  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.3  2009-07-04 03:51:32  brian
 # - updates for release
 #

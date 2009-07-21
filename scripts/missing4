@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 # 
-# @(#) $RCSfile: missing4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-05 12:04:27 $
+# @(#) $RCSfile: missing4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:27 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,13 +67,15 @@ if test $# -eq 0; then
 fi
 
 script="$0"
-scriptname=$(basename $0)
-scriptdir=`(cd $(dirname $0); pwd)`
+scriptname=`basename $0`
+scriptdir=`dirname $0`
+scriptdir=`(cd $scriptdir; pwd)`
 srcdir=`(cd $scriptdir/../src/java; pwd)`
 run=:
-sed_output='s/.* --output[ =]\([^ ]*\).*/\1/p'
-sed_minuso='s/.* -o \([^ ]*\).*/\1/p'
-sed_minusd='s/.* -d \([^ ]*\).*/\1/p'
+sed_output='s/.* --output[ =]\([^ ]*\) .*/\1/p'
+sed_minuso='s/.* -o \([^ ]*\) .*/\1/p'
+sed_minusd='s/.* -d \([^ ]*\) .*/\1/p'
+sed_minusf='s/.* -f \([^ ]*\) .*/\1/p'
 sed_lastop='s/.* \([^ ]*\) *$/\1/p'
 
 
@@ -124,10 +126,14 @@ case $1 in
 	
 	Send problem reports to <bugs@openss7.org>.
 	EOF
-	exit $?
+	exit 0
 	;;
 
     (-v|--v|--ve|--ver|--vers|--versi|--versio|--version)
+	cat <<-EOF
+	Version $scriptversion
+	EOF
+	exit 0
 	;;
 
     (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
@@ -170,6 +176,7 @@ case $1 in
 	Commercial licensing and support of this software is available from
 	OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 	EOF
+	exit 0
 	;;
     (-*)
 	cat 1>&2 <<-EOF
@@ -391,16 +398,16 @@ esac
 # to emulate PROGRAM.
 case $program in
     (swig*) # could be swig-1.3
-	file=`echo "$*" | sed -n "$sed_output"`
-	test -z "$file" && file=`echo "$*" | sed -n "$sed_minuso"`
+	file=`echo " $* " | sed -n "$sed_output"`
+	test -z "$file" && file=`echo " $* " | sed -n "$sed_minuso"`
 	if test -z "$file" ; then
 	    # figure out the default output file name
-	    input=`echo "$*" | sed -n 's/.* \([^ ]*\)/\1/p'`
+	    input=`echo " $* " | sed -n 's/.* \([^ ]*\) /\1/p'`
 	    if test -f "$input" ; then
 		# look for %module statement
 		module=`grep '^%module' $input | sed -n 's/%module.* \([^ ]*\)/\1/p'`
 		if test -n "$module" ; then
-		    case "$*" in
+		    case " $* " in
 			(*" -c++ "*)
 			    # c++ wrapper file
 			    file="${module}_wrap.cxx"
@@ -433,11 +440,11 @@ case $program in
 	# was specified, the file is $file.h.  If -stubs was specified, with no
 	# -jni then the file is $file.cc.  If -stubs was specified with -jni,
 	# then the file is $file.c.
-	file=`echo "$*" | sed -n $sed_lastop`
+	file=`echo " $* " | sed -n "$sed_lastop"`
 	test -n "$file" -a -r $file.class || exit 1
-	if (echo "$*" | grep ' -stubs ' >/dev/null)
+	if (echo " $* " | grep ' -stubs ' >/dev/null)
 	then
-	    if (echo "$*" | grep ' -jni ' >/dev/null)
+	    if (echo " $* " | grep ' -jni ' >/dev/null)
 	    then
 		# -stubs and -jni
 		file="$file.c"
@@ -458,7 +465,7 @@ case $program in
 	fi
 	;;
     (javah|gcjh)
-	file=`echo "$*" | sed -n $sed_lastop`
+	file=`echo " $* " | sed -n "$sed_lastop"`
 	test -n "$file" -a -r $file.class || exit 1
 	file="$file.h"
 	if test -r $file ; then
@@ -474,11 +481,24 @@ case $program in
 	# directory is being written to and touch the index.html file.  If the
 	# index file does not exist, it was likely removed with distclean:
 	# error out in that case.
-	dir=`echo "$*" | sed -n "$sed_minusd"`
+	dir=`echo " $* " | sed -n "$sed_minusd"`
 	test -n "$dir" || dir='./api-docs'
 	file="$dir/index.html"
 	test -n "$file" -a -f "$file" || exit 1
 	touch $file
+	;;
+    (gcj-dbtool)
+	set -x
+	file=`echo " $* " | sed -n "$sed_minusf"`
+	test -n "$file" || exit 1
+	if test -r $file ; then
+	    touch $file
+	elif test -r $srcdir/$file ; then
+	    touch $srcdir/$file
+	else
+	    touch $file
+	fi
+	set +x
 	;;
     (*)
 	exit 1
@@ -490,6 +510,12 @@ exit 0
 # =============================================================================
 #
 # $Log: missing4,v $
+# Revision 1.1.2.5  2009-07-21 11:06:13  brian
+# - changes from release build
+#
+# Revision 1.1.2.4  2009-07-13 07:13:28  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.3  2009-07-05 12:04:27  brian
 # - updates for release builds
 #

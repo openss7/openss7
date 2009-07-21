@@ -1,4 +1,94 @@
-#!/bin/bash
+#!/usr/bin/awk -f
+
+BEGIN {
+    print "D: Executing: " ARGV[0] " -f find-provides.so" >"/dev/stderr"
+    RPM_BUILD_DIR = ENVIRON[RPM_BUILD_DIR]
+    RPM_PACKAGE_NAME = ENVIRON[RPM_PACKAGE_NAME]
+    RPM_PACKAGE_VERSION = ENVIRON[RPM_PACKAGE_VERSION]
+    RPM_PACKAGE_RELEASE = ENVIRON[RPM_PACKAGE_RELEASE]
+    dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    if (ARGC > 1 && ARGV[1]) {
+	dir = ARGV[1]
+	delete ARGV[1]
+    }
+    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    if (ARGC > 2 && ARGV[2]) {
+	RPM_BUILD_ROOT = ARGV[2]
+	delete ARGV[2]
+    }
+    sub(/\/+$/, "", RPM_BUILD_ROOT)
+    mark64 = 1
+    uname = "uname -m"
+    if ((uname | getline)) {
+	if (/^alpha/) {
+	    mark64 = 0
+	}
+    }
+    close(uname)
+}
+/\.so$/ || /\.so\./ {
+    file = $1
+    lib64 = ""
+    slib64 = ""
+    filetype = "file -L " file " 2>/dev/null"
+    if (!(filetype | getline) || !/:.*shared object/)
+	next
+    if ((mark64) && /ELF 64-bit/) {
+	lib64 = "()(64bit)"
+	slib64 = "(64bit)"
+    }
+    close(filetype)
+    soname = ""
+    section = 0
+    objdump = "objdump -p " file
+    while ((objdump | getline)) {
+	if (/^$/) {
+	    if (section == 2)
+		break
+	    section = 0
+	    continue
+	}
+	if (section == 0) {
+	    if (/^Dynamic Section:/) {
+		section = 1
+		continue
+	    }
+	    if (/^Version definitions:/) {
+		section = 2
+		continue
+	    }
+	    continue
+	}
+	if (section == 1) {
+	    if (/SONAME/) {
+		soname = $2
+		provides[soname lib64] = 1
+		continue
+	    }
+	    continue
+	}
+	if (section == 2) {
+	    if (/^[0-9]/) {
+		provides[soname "(" $4 ")" slib64] = 1
+		continue
+	    }
+	    continue
+	}
+    }
+    close(objdump)
+}
+END {
+    j = 1
+    for (p in provides) {
+	indices[j] = p
+	j++
+    }
+    n = asort(indices)
+    for (i = 1; i <= n; i++) {
+	print indices[i]
+    }
+}
+
 # =============================================================================
 #
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -49,45 +139,8 @@
 #
 # Last Modified $Date$ by $Author$
 #
-# =============================================================================
-
-IFS=$'\n'
-filelist=($(cat))
-IFS=$' \t\n'
-
-# --- Alpha does not mark 64bit dependencies
-case `uname -m` in
-    alpha*) mark64=false ;;
-    *)	    mark64=true  ;;
-esac
-
-for f in "${filelist[@]}" ; do
-    soname=$(objdump -p $f | awk '/SONAME/ {print $2}')
-    # skip symbolic links
-    if [ -n "$soname" -a -L "$f" ] ; then continue ; fi
-    # if there is no SONAME in file, use filename
-    if [ -z "$soname" ] ; then soname=$(basename $f) ; fi
-    lib64= slib64=
-    if $mark64 && file -L "$f" 2>/dev/null | grep 'ELF 64-bit' >/dev/null; then
-	lib64='()(64bit)' slib64='(64bit)'
-    fi
-    echo "$soname$lib64"
-    objdump -p "$f" | awk '
-	BEGIN { START=0; }
-	/Version definitions:/ { START=1; }
-	/^[0-9]/ && (START==1) { print $4; }
-	/^$/ { START=0; }
-    ' | \
-    while read symbol ; do
-	echo "$soname($symbol)$slib64"
-    done
-done | sort -u
-
-exit 0
-
-# =============================================================================
+# -----------------------------------------------------------------------------
 #
 # $Log$
 # =============================================================================
-# vim: tw=80 sw=4 nocin nosi
-
+# vim: ft=awk tw=80 sw=4 nocin nosi fo+=tcqlorn

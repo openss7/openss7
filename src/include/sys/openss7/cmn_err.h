@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 1.1.2.1 2009-06-21 11:26:47 brian Exp $
+ @(#) $Id: cmn_err.h,v 1.1.2.2 2009-07-21 11:06:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:26:47 $ by $Author: brian $
+ Last Modified $Date: 2009-07-21 11:06:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cmn_err.h,v $
+ Revision 1.1.2.2  2009-07-21 11:06:15  brian
+ - changes from release build
+
  Revision 1.1.2.1  2009-06-21 11:26:47  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_OPENSS7_CMN_ERR_H__
 #define __SYS_OPENSS7_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do not include sys/openss7/cmn_err.h directly, include sys/cmn_err.h instead."
@@ -89,5 +92,8 @@
 __STREAMS_EXTERN void vcmn_err(int err_lvl, const char *fmt, va_list args);
 __STREAMS_EXTERN void cmn_err(int err_lvl, const char *fmt, ...)
     __attribute__ ((__format__(__printf__, 2, 3)));
+#ifdef HAVE_CMN_ERR_EXPORT
+__asm__(".weakref cmn_err,cmn_err_");
+#endif
 
 #endif				/* __SYS_OPENSS7_CMN_ERR_H__ */

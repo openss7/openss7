@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,20 +66,19 @@ AC_DEFUN([_AUTOTEST], [dnl
 # ===========================================================================
 # _AUTOTEST_OPTIONS
 # ---------------------------------------------------------------------------
+# Set autotest to default on; however, set --disable-autotest in
+# DISTCHECK_CONFIGURE_FLAGS so that we can shut it off during a distcheck.
+# We can run some of the non-MAINTAINTER-MODE preinstall checks.
+# ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_OPTIONS], [dnl
     AC_MSG_CHECKING([for autotest on installcheck])
     AC_ARG_ENABLE([autotest],
-	AS_HELP_STRING([--enable-autotest],
-	    [disable pre- and post-install testing.  @<:@default=auto@:>@]),
-	[enable_autotest="$enableval"], [dnl
-	     if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	     then
-		 enable_autotest='yes'
-	     else
-		 enable_autotest='no'
-	     fi])
-    AC_MSG_RESULT([${enable_autotest}])
+	[AS_HELP_STRING([--disable-autotest],
+	    [pre- and post-install testing @<:@default=enabled@:>@])])
+    AC_MSG_RESULT([${enable_autotest:-yes}])
     AM_CONDITIONAL([PERFORM_TESTING], [test :"${enable_autotest:-yes}" = :yes])dnl
+    DISTCHECK_CONFIGURE_FLAGS="${DISTCHECK_CONFIGURE_FLAGS:+$DISTCHECK_CONFIGURE_FLAGS }'--disable-autotest'"
+    AC_SUBST([DISTCHECK_CONFIGURE_FLAGS])
 ])# _AUTOTEST_OPTIONS
 # ===========================================================================
 
@@ -139,8 +139,9 @@ cat >tests/atlocal <<ATEOF
 @%:@
 @%:@ -----------------------------------------------------------------------------
 @%:@
-@%:@ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-@%:@ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@%:@ Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@%:@ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@%:@ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @%:@
 @%:@ All Rights Reserved.
 @%:@
@@ -201,16 +202,12 @@ ac_target="$ac_cv_target"
 ])# _AUTOTEST_OUTPUT_CONFIG
 # ===========================================================================
 
-# ===========================================================================
-# _AUTOTEST_
-# ---------------------------------------------------------------------------
-AC_DEFUN([_AUTOTEST_], [dnl
-])# _AUTOTEST_
-# ===========================================================================
-
 # =============================================================================
 #
 # $Log: autotest.m4,v $
+# Revision 1.1.2.4  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.3  2009-07-04 03:51:32  brian
 # - updates for release
 #

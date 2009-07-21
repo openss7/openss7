@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:49:04 $
+dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:19 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,12 +61,12 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2009-06-21 11:49:04 $ by $Author: brian $
+dnl Last Modified $Date: 2009-07-21 11:06:19 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
-dnl AT_ARG_OPTION([dummy_option], AS_HELP_STRING([--dummy_option], [specify dummy option]))
-dnl AT_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify dummy optarg]))
+dnl AT_ARG_OPTION([dummy_option], AS_HELP_STRING([--dummy_option], [specify dummy option], [17]))
+dnl AT_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify dummy optarg], [17]))
 
 m4_divert_push([DEFAULTS])
 at_SMP=
@@ -219,6 +219,9 @@ m4_include([testsuite-m3ua-raw.at])
 dnl ==========================================================================
 dnl
 dnl $Log: testsuite.at,v $
+dnl Revision 1.1.2.2  2009-07-21 11:06:19  brian
+dnl - changes from release build
+dnl
 dnl Revision 1.1.2.1  2009-06-21 11:49:04  brian
 dnl - added files to new distro
 dnl

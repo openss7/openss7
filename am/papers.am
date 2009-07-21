@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: papers.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: papers.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-13 07:13:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,11 +48,11 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-13 07:13:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
-sinclude $(DEPDIR)/papers.Pd
+-include $(DEPDIR)/papers.Pd
 
 $(DEPDIR)/papers.Pd: Makefile $(LATEXES)
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
@@ -523,6 +523,9 @@ MY_PHONY		+= tex-am bibs-am dats-am plots-am figs-am pss-am pngs-am
 ## =============================================================================
 ##
 ## $Log: papers.am,v $
+## Revision 1.1.2.4  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

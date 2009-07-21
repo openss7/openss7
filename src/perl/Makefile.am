@@ -1,6 +1,6 @@
 # =============================================================================
 #
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-13 07:13:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-13 07:13:35 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,11 +58,12 @@ dist_bin_SCRIPTS	= mibbrowser streams-manager
 endif
 endif
 
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(dist_bin_SCRIPTS)
+
 perl_c_MODULES		= xti/xti.i
 perl_MODFILES		= xti/Xti.pm
 
-#perldir		= $(libdir)/perl5
-xtiperldir		= $(archlibdir)/auto/Xti
+xtiperldir		= $(perldir)/auto/Xti
 
 Xti_la_SOURCES		= xti/xti_wrap.c
 Xti_la_CPPFLAGS		= -I$(builddir)/xti -I$(srcdir)/xti $(PKG_INCLUDES) $(USER_CPPFLAGS) $(PERL_CPPFLAGS) -Dbool=char -DMODULE -fno-strict-aliasing
@@ -82,6 +83,9 @@ include ../../am/swig.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-07-21 11:06:17  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-07-13 07:13:35  brian
 # - changes for multiple distro build
 #

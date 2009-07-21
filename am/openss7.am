@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -75,6 +75,12 @@ am__echo_list = \
 
 am__list_remove = \
 	$(am__echo_list) | $(am__base_remove)
+
+am__echo_build = \
+	for f in $$list; do if test ! -f $(srcdir)/$$f ; then echo "$$f" ; fi ; done
+
+am__list_remove_build = \
+	$(am__echo_build) | $(am__base_remove)
 
 am__base_install = \
 	$(am__short_list) | \
@@ -306,7 +312,8 @@ MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
 # directory for test suites and other test programs
 ##
 if PERFORM_CHECKS
-dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
+dist_check_SCRIPTS	= $(top_srcdir)/scripts/check
+#dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
 TESTS			= $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
 			  top_srcdir='$(top_srcdir)' \
@@ -314,12 +321,13 @@ TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
 			  cross_compiling='$(cross_compiling)' \
 			  MAINTAINER_MODE='$(MAINTAINER_MODE)' \
 			  bin_PROGRAMS='$(bin_PROGRAMS)' \
-			  sbin_PROGRAMS='$(sbin_PROGRAMS)' \
-			  libexec_PROGRAMS='$(libexec_PROGRAMS)' \
-			  pkglibexec_PROGRAMS='$(pkglibexec_PROGRAMS)' \
 			  dist_bin_SCRIPTS='$(dist_bin_SCRIPTS)' \
+			  sbin_PROGRAMS='$(sbin_PROGRAMS)' \
+			  pkglibexec_PROGRAMS='$(pkglibexec_PROGRAMS)' \
 			  dist_sbin_SCRIPTS='$(dist_sbin_SCRIPTS)' \
-			  dist_libexec_SCRIPTS='$(dist_libexec_SCRIPTS)' \
+			  dist_pkglibexec_SCRIPTS='$(dist_pkglibexec_SCRIPTS)' \
+			  dist_initrd_SCRIPTS='$(dist_initrd_SCRIPTS)' \
+			  dist_noinst_SCRIPTS='$(dist_noinst_SCRIPTS)' \
 			  AM_INSTALLCHECK_STD_OPTIONS_EXEMPT='$(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)'
 else
 dist_check_SCRIPTS	= 
@@ -1126,9 +1134,17 @@ SECONDARY = .SECONDARY
 PRECIOUS = .PRECIOUS
 $(PRECIOUS): $(MY_PRECIOUS)
 
+DISTCLEANFILES		+= $(target)-config.cache
+
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.5  2009-07-21 11:06:11  brian
+## - changes from release build
+##
+## Revision 1.1.2.4  2009-07-13 07:13:26  brian
+## - changes for multiple distro build
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

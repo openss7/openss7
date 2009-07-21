@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xomi.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
+ @(#) $Id: xomi.h,v 1.1.2.2 2009-07-13 07:13:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xomi.h,v $
+ Revision 1.1.2.2  2009-07-13 07:13:28  brian
+ - changes for multiple distro build
+
  Revision 1.1.2.1  2009-06-21 11:23:46  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 #ifndef __XOMI_H__
 #define __XOMI_H__
 
-#ident "@(#) $RCSfile: xomi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xomi.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 typedef OM_return_code (*OMP_copy) (OM_private_object original, OM_workspace workspace,
 				    OM_private_object *copy);
@@ -152,7 +155,7 @@ typedef struct OMP_workspace_body {
  * client-generated public object is undefined. */
 #define OMP_FUNCTIONS(external) (OMP_WORKSPACE(external)->functions)
 
-#include <stddef.h>
+// #include <stddef.h>
 #define om_copy(ORIGINAL,WORKSPACE,COPY) \
 	( (WORKSPACE) == NULL ? \
 	  OM_NO_SUCH_WORKSPACE : \

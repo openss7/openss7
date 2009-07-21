@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,7 +65,7 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_DEVFS_MOUNT])
     AC_ARG_ENABLE([devfs],
 	AS_HELP_STRING([--enable-devfs],
-	    [build for the devfs. @<:@default=auto@:>@]))
+	    [build for the devfs @<:@default=auto@:>@]))
     AC_CACHE_CHECK([for devfs kernel support], [devfs_cv_kernel_support], [dnl
 	case ":$enable_devfs" in
 	    (:yes)   devfs_cv_kernel_support=yes ;;
@@ -141,6 +141,9 @@ dnl	ac_configure_args="$ac_configure_args --enable-devfs"
 # =============================================================================
 #
 # $Log: devfs.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

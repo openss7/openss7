@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,364 +48,260 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
 # =============================================================================
 # This macro file provides checks for perl libraries (primarily for SNMP).  What
 # we are looking for is libperl.so or libperl.a as well as DynaLoader.a.  We
-# also look for native and 32-bit compatibility libraries required by libperl.
+# also look for native libraries required by libperl.
 # =============================================================================
 
 # =============================================================================
 # _PERL
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PERL], [dnl
-    AC_REQUIRE([_DISTRO])
-    _PERL_OPTIONS
-    _PERL_SETUP
-    _PERL_USER
-    _PERL_OUTPUT
+    _PERL_EXTENSIONS
+    _PERL_LIBRARIES
 ])# _PERL
 # =============================================================================
 
 # =============================================================================
-# _PERL_OPTIONS
+# _PERL_EXTENSIONS
 # -----------------------------------------------------------------------------
-# Allow the user to specify the header file location.
+# Search for the PERL include directories necessary to build PERL extensions.
+# This can be specified to configure by specifying --with-perl=DIRECTORY.  The
+# PERL include directories are searched for in the host and then build
+# directories.  If we cannot find them, assume that PERL interfaces cannot
+# build.
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_OPTIONS], [dnl
-    AC_ARG_WITH([perl],
-		AS_HELP_STRING([--with-perl=HEADERS],
-			       [specify the PERL header file directory.
-				@<:@default=$INCLUDEDIR/perl@:>@]),
-		[with_perl="$withval"],
-		[with_perl=''])
-])# _PERL_OPTIONS
+AC_DEFUN([_PERL_EXTENSIONS], [dnl
+    AC_CACHE_CHECK([for perl headers], [perl_cv_includedir], [dnl
+	AC_ARG_WITH([perl],
+	    [AS_HELP_STRING([--with-perl=@<:@HEADERS@:>@],
+		[PERL header directory @<:@default=search@:>@])],
+	    [], [with_perl=search])
+	case "${with_perl:-search}" in
+	    (no) perl_cv_includedir=no ;;
+	    (yes|search) ;;
+	    (*) if test -f "$with_perl/EXTERN.h" ; then perl_cv_includedir ; fi ;;
+	esac
+	if test -z "$perl_cv_includedir" ; then
+	    eval "perl_search_path=\"
+		${DESTDIR}${rootdir}${libdir}/perl5
+		${DESTDIR}${rootdir}${libdir}/perl
+		${DESTDIR}${rootdir}/usr/lib/perl5
+		${DESTDIR}${rootdir}/usr/lib/perl
+		${DESTDIR}${rootdir}/usr/local/lib/perl5
+		${DESTDIR}${rootdir}/usr/local/lib/perl
+		${DESTDIR}${libdir}/perl5
+		${DESTDIR}${libdir}/perl
+		${DESTDIR}/usr/lib/perl5
+		${DESTDIR}/usr/lib/perl
+		${DESTDIR}/usr/local/lib/perl5
+		${DESTDIR}/usr/local/lib/perl\""
+	    perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for perl_dir in $perl_search_path ; do
+		test -d "$perl_dir" || continue
+		AC_MSG_CHECKING([for perl headers... $perl_dir])
+		perl_files=`find "$perl_dir" -type f -name 'EXTERN.h' 2>/dev/null | sort -ru`
+		for perl_file in $perl_files ; do
+		    test -r "$perl_file" || continue
+		    perl_dir="${perl_file%/EXTERN.h}"
+		    #perl_dir="${perl_dir#$DESTDIR}"
+		    #perl_dir="${perl_dir#$rootdir}"
+		    perl_cv_includedir="$perl_dir"
+		    AC_MSG_RESULT([yes])
+		    break 2
+		done
+		AC_MSG_RESULT([no])
+	    done
+	    test -n "$perl_cv_includedir" || perl_cv_includedir=no
+	fi
+	AC_MSG_CHECKING([for perl headers])
+    ])
+    if test :"${perl_cv_includedir:-no}" = :no ; then
+	if test :"${with_perl:-search}" != :no ; then
+	    AC_MSG_WARN([
+***
+*** Configure could not find the PERL extension include file EXTERN.h.
+*** This file is required to compile PERL extension libraries.  This
+*** file is part of the 'perl' development package which is not always
+*** loaded on all distributions.  Use the following commands to obtain
+*** the 'perl' development package:
+***
+*** Debian 4.0:  'apt-get install perl'
+*** Ubuntu 8.04: 'apt-get install perl'
+*** CentOS 5.x:  'yum install perl'
+*** openSUSE 11: 'zypper install perl'
+*** SLES 10:     'zypper install perl'
+*** RedHat 7.2:  'rpm -i perl-5.6.1-36.1.73'
+***
+*** Otherwise, specify the location of the PERL headers with the
+*** --with-perl=DIRECTORY argument, or --without-perl, on the next run
+*** of configure.  Continuing under the assumption that --without-perl
+*** was intended.
+***])
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"__without_perl --without-perl\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-perl'"
+	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-perl'"
+	    with_perl=no
+	fi
+	perlincludedir=
+    else
+	perlincludedir="$perl_cv_includedir"
+    fi
+    AM_CONDITIONAL([WITH_PERL], [test :"${with_perl:-search}" != :no])
+    AC_SUBST([perlincludedir])dnl
+    AC_CACHE_CHECK([for perl cppflags], [perl_cv_cppflags], [dnl
+	if test -n "$perlincludedir" ; then
+	    perl_cv_cppflags="-I$perlincludedir"
+	else
+	    perl_cv_cppflags=
+	fi
+    ])
+    PERL_CPPFLAGS="$perl_cv_cppflags"
+    AC_SUBST([PERL_CPPFLAGS])
+])# _PERL_EXTENSIONS
 # =============================================================================
 
-# =============================================================================
-# _PERL_SETUP
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_SETUP], [dnl
-    _PERL_CHECK_HEADERS
-    _PERL_CHECK_LIBS
-    if test :${dist_cv_32bit_libs:-no} = :yes ; then
-	_PERL_CHECK_LIBS32
-    fi
-    for perl_include in $perl_cv_includes ; do
-	PERL_CPPFLAGS="${PERL_CPPFLAGS}${PERL_CPPFLAGS:+ }-I${perl_include}"
-    done
-    if test ":${perl_cv_config:=no}" != :no ; then
-	PERL_CPPFLAGS="${PERL_CPPFLAGS}${PERL_CPPFLAGS:+ }-include ${perl_cv_config}"
-    fi
-    if test ":${perl_cv_modversions:-no}" != :no ; then
-	PERL_MODFLAGS="${PERL_MODFLAGS}${PERL_MODFLAGS:+ }-include ${perl_cv_modversions}"
-    fi
-])# _PERL_SETUP
-# =============================================================================
+AC_DEFUN([_PERL_LIB_ERROR], [dnl
+    AS_REQUIRE_SHELL_FN([perl_lib_error], [dnl
+    cat <<EOF
+
+***
+*** Compiling embedded perl applications requires the library
+*** [$]1.
+***
+EOF
+    ])dnl
+    ac_msg=`perl_lib_error $1`
+    AC_MSG_FAILURE([$ac_msg])
+])
 
 # =============================================================================
-# _PERL_CHECK_HEADERS
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_CHECK_HEADERS], [dnl
-])# _PERL_CHECK_HEADERS
-# =============================================================================
-
-# =============================================================================
-# _PERL_CHECK_LIBS
+# _PERL_LIBRARIES
 # -----------------------------------------------------------------------------
 # SuSE went and stuck the 64-bit perl libraries in the 32-bit library directory,
-# so look there too.
+# so look there too.  Note that Debian puts libperl.so in libdir.  This
+# procedure does not need to always find the library, it is ok to not add and
+# LDFLAGS when the library is where ld can find it.
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_CHECK_LIBS], [dnl
+AC_DEFUN([_PERL_LIBRARIES], [dnl
     # need to get LDFLAGS with the library path of libperl.so or libperl.a.
-    AC_CACHE_CHECK([for perl native ldflags], [perl_cv_ldflags], [dnl
+    AC_CACHE_CHECK([for perl ldflags], [perl_cv_ldflags], [dnl
 	perl_cv_ldflags=
 	eval "perl_search_path=\"
-	    ${DESTDIR}${rootdir}${libdir}/perl5/
-	    ${DESTDIR}${libdir}/perl5/
-	    ${DESTDIR}${rootdir}/usr/lib/perl5/
-	    ${DESTDIR}/usr/lib/perl5/\""
+	    ${DESTDIR}${rootdir}${libdir}
+	    ${DESTDIR}${rootdir}/usr/lib
+	    ${DESTDIR}${rootdir}/usr/local/lib
+	    ${DESTDIR}${libdir}
+	    ${DESTDIR}/usr/lib
+	    ${DESTDIR}/usr/local/lib\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	perl_done=
+	case "$host_cpu" in
+	    (*64) perl_targ=elf64 ;;
+	    (*)   perl_targ=elf32 ;;
+	esac
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
-	    case " $perl_done " in
-		(*" $perl_dir "*) continue ;;
-		(*) ;;
-	    esac
-	    perl_done="${perl_done}${perl_done:+ }$perl_dir"
-	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r | uniq`
-		for perl_dir in $perl_dirs ; do
-		    AC_MSG_CHECKING([for perl native ldflags...  $perl_dir])
-		    if test -r $perl_dir/libperl.so -o -r $perl_dir/libperl.a
-		    then
-			perl_cv_ldflags="${perl_cv_ldflags}${perl_cv_ldflags:+ }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
-			AC_MSG_RESULT([yes])
-		    else
-			AC_MSG_RESULT([no])
-		    fi
-		done
-	    fi
+	    test -d "$perl_dir" || continue
+	    perl_libs=`find $perl_dir -name 'libperl.so' -o -name 'libperl.a' 2>/dev/null | sort -ru`
+	    for perl_lib in $perl_libs ; do
+		test -r "$perl_lib" || continue
+		AC_MSG_CHECKING([for perl ldflags... $perl_lib])
+		if (${OBJDUMP:-objdump} -f "$perl_lib" | grep $perl_targ >/dev/null) 2>/dev/null
+		then
+		    perl_dir="${perl_lib%/libperl.*}"
+		    perl_dir="${perl_dir#$DESTDIR}"
+		    perl_dir="${perl_dir#$rootdir}"
+		    perl_cv_ldflags="${perl_cv_ldflags:+$perl_cv_ldflags }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
+		    AC_MSG_RESULT([yes])
+		    break 2
+		fi
+		AC_MSG_RESULT([no])
+	    done
 	done
-	AC_MSG_CHECKING([for perl native ldflags])
+	AC_MSG_CHECKING([for perl ldflags])
     ])
-    AC_CACHE_CHECK([for perl native libs], [perl_cv_libs], [dnl
+    PERL_LDFLAGS="$perl_cv_ldflags"
+    AC_SUBST([PERL_LDFLAGS])dnl
+    AC_CACHE_CHECK([for perl libs], [perl_cv_libs], [dnl
 	perl_save_LIBS="$LIBS" ; LIBS=
 	perl_save_LDFLAGS="$LDFLAGS" ; LDFLAGS="$perl_cv_ldflags"
 	AC_MSG_RESULT([checking])
-	AC_CHECK_LIB([c], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libc.
-*** ]) ])
-	AC_CHECK_LIB([pthread], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libpthread.
-*** ]) ])
-	AC_CHECK_LIB([util], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libutil.
-*** ]) ])
-	AC_CHECK_LIB([crypt], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libcrypt.
-*** ]) ])
-	AC_CHECK_LIB([m], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libm.
-*** ]) ])
-	AC_CHECK_LIB([dl], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libdl.
-*** ]) ])
-	AC_CHECK_LIB([nsl], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libnsl.
-*** ]) ])
-	AC_CHECK_LIB([resolv], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libresolv.
-*** ]) ])
-	AC_CHECK_LIB([perl], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling native embedded perl applications requires the
-*** native library libperl.
-*** ]) ])
+	AC_CHECK_LIB([c], [main], [],
+	    [_PERL_LIB_ERROR([libc])])
+	AC_CHECK_LIB([pthread], [main], [],
+	    [_PERL_LIB_ERROR([libpthread])])
+	AC_CHECK_LIB([util], [main], [],
+	    [_PERL_LIB_ERROR([libutil])])
+	AC_CHECK_LIB([crypt], [main], [],
+	    [_PERL_LIB_ERROR([libcrypt])])
+	AC_CHECK_LIB([m], [main], [],
+	    [_PERL_LIB_ERROR([libm])])
+	AC_CHECK_LIB([dl], [main], [],
+	    [_PERL_LIB_ERROR([libdl])])
+	AC_CHECK_LIB([nsl], [main], [],
+	    [_PERL_LIB_ERROR([libnsl])])
+	AC_CHECK_LIB([resolv], [main], [],
+	    [_PERL_LIB_ERROR([libresolv])])
+	AC_CHECK_LIB([perl], [main], [],
+	    [_PERL_LIB_ERROR([libperl])])
 	perl_cv_libs="$LIBS"
 	LIBS=$perl_save_LIBS
 	LDFLAGS=$perl_save_LDFLAGS
-	AC_MSG_CHECKING([for perl native libs])
+	AC_MSG_CHECKING([for perl libs])
     ])
-    AC_CACHE_CHECK([for perl native ldadd], [perl_cv_ldadd], [dnl
+    AC_CACHE_CHECK([for perl ldadd], [perl_cv_ldadd], [dnl
 	perl_cv_ldadd=
 	eval "perl_search_path=\"
-	    ${DESTDIR}${rootdir}${libdir}/perl5/
-	    ${DESTDIR}${libdir}/perl5/
-	    ${DESTDIR}${rootdir}/usr/lib/perl5/
-	    ${DESTDIR}/usr/lib/perl5/\""
+	    ${DESTDIR}${rootdir}${libdir}
+	    ${DESTDIR}${rootdir}/usr/lib
+	    ${DESTDIR}${rootdir}/usr/local/lib
+	    ${DESTDIR}${libdir}
+	    ${DESTDIR}/usr/lib
+	    ${DESTDIR}/usr/local/lib\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	case "$host_cpu" in
+	    (*64) perl_targ=elf64 ;;
+	    (*)   perl_targ=elf32 ;;
+	esac
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
-	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'DynaLoader' -type d | sort -r | uniq`
-		for perl_dir in $perl_dirs ; do
-		    AC_MSG_CHECKING([for perl native ldadd...  $perl_dir])
-		    if test -r $perl_dir/DynaLoader.a
-		    then
-			perl_cv_ldadd="$perl_dir/DynaLoader.a"
-			AC_MSG_RESULT([yes])
-			break 2
-		    fi
-		    AC_MSG_RESULT([no])
-		done
-	    fi
+	    test -d "$perl_dir" || continue
+	    perl_libs=`find $perl_dir -name 'DynaLoader.so' -o -name 'DynaLoader.a' 2>/dev/null | sort -ru`
+	    for perl_lib in $perl_libs ; do
+		test -r "$perl_lib" || continue
+		AC_MSG_CHECKING([for perl ldadd... $perl_lib])
+		if (${OBJDUMP:-objdump} -f "$perl_lib" | grep $perl_targ >/dev/null) 2>/dev/null
+		then
+		    perl_cv_ldadd="$perl_lib"
+		    AC_MSG_RESULT([yes])
+		    break 2
+		fi
+		AC_MSG_RESULT([no])
+	    done
 	done
 	perl_cv_ldadd="${perl_cv_ldadd}${perl_cv_ldadd:+ }${perl_cv_libs}"
-	AC_MSG_CHECKING([for perl native ldadd])
+	AC_MSG_CHECKING([for perl ldadd])
     ])
-])# _PERL_CHECK_LIBS
-# =============================================================================
-
-# =============================================================================
-# _PERL_CHECK_LIBS32
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_CHECK_LIBS32], [dnl
-    # need to get LDFLAGS with the library path of libperl.so or libperl.a.
-    AC_CACHE_CHECK([for perl 32-bit ldflags], [perl_cv_ldflags32], [dnl
-	perl_cv_ldflags32=-m32
-	eval "perl_search_path=\"
-	    ${DESTDIR}${rootdir}${lib32dir}/perl5/
-	    ${DESTDIR}${lib32dir}/perl5/\""
-	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	AC_MSG_RESULT([searching])
-	for perl_dir in $perl_search_path ; do
-	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r | uniq`
-		for perl_dir in $perl_dirs ; do
-		    AC_MSG_CHECKING([for perl 32-bit ldflags...  $perl_dir])
-		    if test -r $perl_dir/libperl.so -o -r $perl_dir/libperl.a
-		    then
-			perl_cv_ldflags32="${perl_cv_ldflags32}${perl_cv_ldflags32:+ }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
-			AC_MSG_RESULT([yes])
-		    else
-			AC_MSG_RESULT([no])
-		    fi
-		done
-	    fi
-	done
-	AC_MSG_CHECKING([for perl 32-bit ldflags])
-    ])
-    AC_CACHE_CHECK([for perl 32-bit libs], [perl_cv_libs32], [dnl
-	perl_save_LIBS="$LIBS" ; LIBS=
-	perl_save_LDFLAGS="$LDFLAGS" ; LDFLAGS="$perl_cv_ldflags32"
-	AC_MSG_RESULT([checking])
-	AC_CHECK_LIB32([c], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libc.
-*** ]) ])
-	AC_CHECK_LIB32([pthread], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libpthread.
-*** ]) ])
-	AC_CHECK_LIB32([util], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libutil.
-*** ]) ])
-	AC_CHECK_LIB32([crypt], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libcrypt.
-*** ]) ])
-	AC_CHECK_LIB32([m], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libm.
-*** ]) ])
-	AC_CHECK_LIB32([dl], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libdl.
-*** ]) ])
-	AC_CHECK_LIB32([nsl], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libnsl.
-*** ]) ])
-	AC_CHECK_LIB32([resolv], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libresolv.
-*** ]) ])
-	AC_CHECK_LIB32([perl], [main], [], [dnl
-	    AC_MSG_ERROR([
-***
-*** Compiling 32-bit embedded perl applications requires the
-*** 32-bit library libperl.
-*** ]) ])
-	perl_cv_libs32="$LIBS"
-	LIBS=$perl_save_LIBS
-	LDFLAGS=$perl_save_LDFLAGS
-	AC_MSG_CHECKING([for perl 32-bit libs])
-    ])
-    AC_CACHE_CHECK([for perl 32-bit ldadd], [perl_cv_ldadd32], [dnl
-	perl_cv_ldadd32=
-	eval "perl_search_path=\"
-	    ${DESTDIR}${rootdir}${lib32dir}/perl5/
-	    ${DESTDIR}${lib32dir}/perl5/\""
-	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	AC_MSG_RESULT([searching])
-	for perl_dir in $perl_search_path ; do
-	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'DynaLoader' -type d | sort -r | uniq`
-		for perl_dir in $perl_dirs ; do
-		    AC_MSG_CHECKING([for perl 32-bit ldadd...  $perl_dir])
-		    if test -r $perl_dir/DynaLoader.a
-		    then
-			perl_cv_ldadd32="$perl_dir/DynaLoader.a"
-			AC_MSG_RESULT([yes])
-			break 2
-		    fi
-		    AC_MSG_RESULT([no])
-		done
-	    fi
-	done
-	perl_cv_ldadd32="${perl_cv_ldadd32}${perl_cv_ldadd32:+ }${perl_cv_libs32}"
-	AC_MSG_CHECKING([for perl 32-bit ldadd])
-    ])
-])# _PERL_CHECK_LIBS32
-# =============================================================================
-
-# =============================================================================
-# _PERL_USER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_USER], [dnl
-])# _PERL_USER
-# =============================================================================
-
-# =============================================================================
-# _PERL_OUTPUT
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_OUTPUT], [dnl
-    _PERL_DEFINES
-    AC_SUBST([PERL_LDADD])dnl
-    AC_SUBST([PERL_LDFLAGS])dnl
-    AC_SUBST([PERL_LDADD32])dnl
-    AC_SUBST([PERL_LDFLAGS32])dnl
-])# _PERL_OUTPUT
-# =============================================================================
-
-# =============================================================================
-# _PERL_DEFINES
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_DEFINES], [dnl
     PERL_LDADD="$perl_cv_ldadd"
-    PERL_LDADD32="$perl_cv_ldadd32"
-    PERL_LDFLAGS="$perl_cv_ldflags"
-    PERL_LDFLAGS32="$perl_cv_ldflags32"
-])# _PERL_DEFINES
-# =============================================================================
-
-# =============================================================================
-# _PERL_
-# -----------------------------------------------------------------------------
-AC_DEFUN([_PERL_], [dnl
-])# _PERL_
+    AC_SUBST([PERL_LDADD])dnl
+])# _PERL_LIBRARIES
 # =============================================================================
 
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 1.1.2.3  2009-07-21 11:06:13  brian
+# - changes from release build
+#
+# Revision 1.1.2.2  2009-07-13 07:13:27  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

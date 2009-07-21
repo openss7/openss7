@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: tcl.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-13 07:13:34 $
+# @(#) $RCSfile: tcl.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-13 07:13:34 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -83,7 +83,7 @@ pkgtcllib_DATA		= src/tcl/pkgIndex.tcl
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_libs
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_libs
 TESTS_ENVIRONMENT	+= tcllib_LTLIBRARIES='$(tcllib_LTLIBRARIES)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
@@ -100,6 +100,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: tcl.am,v $
+## Revision 1.1.2.2  2009-07-21 11:06:11  brian
+## - changes from release build
+##
 ## Revision 1.1.2.1  2009-07-13 07:13:34  brian
 ## - changes for multiple distro build
 ##

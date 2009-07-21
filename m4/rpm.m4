@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,13 +80,13 @@ AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
 AC_DEFUN([_RPM_OPTIONS_RPM_EPOCH], [dnl
     AC_MSG_CHECKING([for rpm epoch])
     AC_ARG_WITH([rpm-epoch],
-	AS_HELP_STRING([--with-rpm-epoch=EPOCH],
-	    [specify the EPOCH for the package file.  @<:@default=auto@:>@]), [],
-	[if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.rpmepoch
-	 then with_rpm_epoch="`cat ${d}.rpmepoch`"
-	 else with_rpm_epoch=0
-	 fi])
+	[AS_HELP_STRING([--with-rpm-epoch=EPOCH],
+	    [rpm EPOCH for package @<:@default=auto@:>@])], [], [dnl
+	    if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.rpmepoch
+	    then with_rpm_epoch="`cat ${d}.rpmepoch`"
+	    else with_rpm_epoch=0
+	    fi])
     AC_MSG_RESULT([${with_rpm_epoch:-0}])
     PACKAGE_RPMEPOCH="${with_rpm_epoch:-0}"
     AC_SUBST([PACKAGE_RPMEPOCH])dnl
@@ -101,13 +101,13 @@ AC_DEFUN([_RPM_OPTIONS_RPM_EPOCH], [dnl
 AC_DEFUN([_RPM_OPTIONS_RPM_RELEASE], [dnl
     AC_MSG_CHECKING([for rpm release])
     AC_ARG_WITH([rpm-release],
-	AS_HELP_STRING([--with-rpm-release=RELEASE],
-	    [specify the RELEASE for the package files.  @<:@default=auto@:>@]), [],
-	[if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.rpmrelease
-	 then with_rpm_release="`cat ${d}.rpmrelease`"
-	 else with_rpm_release=1
-	 fi])
+	[AS_HELP_STRING([--with-rpm-release=RELEASE],
+	    [rpm RELEASE for package @<:@default=auto@:>@])], [], [dnl
+	    if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.rpmrelease
+	    then with_rpm_release="`cat ${d}.rpmrelease`"
+	    else with_rpm_release=1
+	    fi])
     AC_MSG_RESULT([${with_rpm_release:-1}])
     PACKAGE_RPMRELEASE="${with_rpm_release:-1}"
     AC_SUBST([PACKAGE_RPMRELEASE])dnl
@@ -135,13 +135,13 @@ AC_DEFUN([_RPM_SPEC_SETUP], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
     AC_REQUIRE([_DISTRO])
     AC_ARG_WITH([rpm-extra],
-	AS_HELP_STRING([--with-rpm-extra=EXTRA],
-	    [override or disable the EXTRA release string for built RPMS. @<:@default=auto@:>@]), [],
-	[if test -r .rpmextra ; then d= ; else d="$srcdir/" ; fi
-	 if test -r ${d}.rpmextra
-	 then with_rpm_extra="`cat ${d}.rpmextra`"
-	 else with_rpm_extra=""
-	 fi])
+	[AS_HELP_STRING([--with-rpm-extra=EXTRA],
+	    [EXTRA release string for RPMS @<:@default=auto@:>@])], [], [dnl
+	    if test -r .rpmextra ; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.rpmextra
+	    then with_rpm_extra="`cat ${d}.rpmextra`"
+	    else with_rpm_extra=""
+	    fi])
     AC_CACHE_CHECK([for rpm distribution extra release string], [rpm_cv_dist_extra], [dnl
 	case :${with_rpm_extra:-auto} in
 	    (:no)
@@ -364,9 +364,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
     AC_MSG_CHECKING([for rpm build/install of user packages])
     AC_ARG_ENABLE([tools],
-	AS_HELP_STRING([--enable-tools],
-	    [build and install user packages.  @<:@default=yes@:>@]), [],
-	[enable_tools='yes'])
+	[AS_HELP_STRING([--disable-tools],
+	    [user components @<:@default=enabled@:>@])],
+	[], [enable_tools=yes])
     AC_MSG_RESULT([${enable_tools:-yes}])
     AM_CONDITIONAL([RPM_BUILD_USER], [test ":${enable_tools:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_TOOLS
@@ -383,9 +383,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
 AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
     AC_MSG_CHECKING([for rpm build/install of kernel packages])
     AC_ARG_ENABLE([modules],
-	AS_HELP_STRING([--enable-modules],
-	    [build and install kernel packages.  @<:@default=yes@:>@]), [],
-	[enable_modules='yes'])
+	[AS_HELP_STRING([--disable-modules],
+	    [kernel components @<:@default=enabled@:>@])],
+	[], [enable_modules=yes])
     AC_MSG_RESULT([${enable_modules:-yes}])
     AM_CONDITIONAL([RPM_BUILD_KERNEL], [test ":${enable_modules:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_MODULES
@@ -417,8 +417,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 	rpm_tmp='$(PACKAGE_DISTDIR)/rpms/'"${rpm_cv_dist_subdir}"
     fi
     AC_ARG_WITH([rpm-topdir],
-	AS_HELP_STRING([--with-rpm-topdir=DIR],
-	    [specify the rpm top directory.  @<:@default=PKG-DISTDIR/rpms@:>@]),
+	[AS_HELP_STRING([--with-rpm-topdir=DIR],
+	    [rpm top directory @<:@default=PKG-DISTDIR/rpms@:>@])],
 	[], [with_rpm_topdir="$rpm_tmp"])
     AC_CACHE_CHECK([for rpm top build directory], [rpm_cv_topdir], [dnl
 	case ":${with_rpm_topdir:-default}" in
@@ -548,12 +548,12 @@ dnl
 dnl These commands are needed to perform RPM package builds.
 dnl
     AC_ARG_ENABLE([rpms],
-	AS_HELP_STRING([--disable-rpms],
-	    [disable building of rpms.  @<:@default=auto@:>@]),
+	[AS_HELP_STRING([--disable-rpms],
+	    [build rpms @<:@default=auto@:>@])],
 	[], [enable_rpms=yes])
     AC_ARG_ENABLE([srpms],
-	AS_HELP_STRING([--disable-srpms],
-	    [disable building of srpms.  @<:@default=auto@:>@]),
+	[AS_HELP_STRING([--disable-srpms],
+	    [build srpms @<:@default=auto@:>@])],
 	[], [enable_srpms=yes])
     AC_ARG_VAR([RPM],
 	       [Rpm command. @<:@default=rpm@:>@])
@@ -601,8 +601,8 @@ dnl
 dnl These commands are needed to create RPM (e.g. YUM) repositories.
 dnl
     AC_ARG_ENABLE([repo-yum],
-	AS_HELP_STRING([--disable-repo-yum],
-	    [disable yum repo construction.  @<:@default=auto@:>@]),
+	[AS_HELP_STRING([--disable-repo-yum],
+	    [yum repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_yum=yes])
     AC_ARG_VAR([CREATEREPO],
 	       [Create repomd repository command. @<:@default=createrepo@:>@])
@@ -626,8 +626,8 @@ dnl
 dnl These commands can be used to create YaST repositories.
 dnl
     AC_ARG_ENABLE([repo-yast],
-	AS_HELP_STRING([--disable-repo-yast],
-	    [disable yast repo construction.  @<:@default=auto@:>@]),
+	[AS_HELP_STRING([--disable-repo-yast],
+	    [yast repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_yast=yes])
     AC_ARG_VAR([CREATE_PACKAGE_DESCR],
 	       [Create YaST package descriptions command.  @<:@default=create_package_descr@:>@])
@@ -680,6 +680,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.4  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.3  2009-07-04 03:51:33  brian
 # - updates for release
 #

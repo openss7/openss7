@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_VOIP_OPTIONS], [dnl
     AC_ARG_WITH([voip],
-	AS_HELP_STRING([--with-voip=HEADERS],
-	    [specify the VOIP header file directory.  @<:@default=INCLUDEDIR/strvoip@:>@]),
-	[with_voip="$withval" ; for s in ${!voip_cv_*} ; do eval "unset $s" ; done],
-	[with_voip=''])
+	[AS_HELP_STRING([--with-voip=HEADERS],
+	    [VOIP header directory @<:@default=INCLUDEDIR/strvoip@:>@])],
+	[for s in ${!voip_cv_*} ; do eval "unset $s" ; done])
 ])# _VOIP_OPTIONS
 # =============================================================================
 
@@ -628,6 +627,9 @@ AC_DEFUN([_VOIP_], [dnl
 # =============================================================================
 #
 # $Log: voip.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

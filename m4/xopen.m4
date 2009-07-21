@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,15 +84,13 @@ AC_DEFUN([_XOPEN_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_SCTP], [dnl
     AC_ARG_WITH([sctp],
-	AS_HELP_STRING([--with-sctp],
-	    [include xopen sctp driver in build.  @<:@default=yes@:>@]),
-	[with_sctp="$withval"],
-	[with_sctp='no'])
+	[AS_HELP_STRING([--with-sctp],
+	    [include xopen sctp driver @<:@default=no@:>@])],
+	[], [with_sctp=no])
     AC_ARG_WITH([sctp2],
-	AS_HELP_STRING([--with-sctp2],
-	    [include xopen sctp release 2 driver in build.  @<:@default=no@:>@]),
-	[with_sctp2="$withval"],
-	[with_sctp2='no'])
+	[AS_HELP_STRING([--with-sctp2],
+	    [include xopen sctp release 2 driver @<:@default=yes@:>@])],
+	[], [with_sctp2=no])
 ])# _XOPEN_CHECK_SCTP
 # =============================================================================
 
@@ -101,10 +99,9 @@ AC_DEFUN([_XOPEN_CHECK_SCTP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_XNS], [dnl
     AC_ARG_WITH([xns],
-	AS_HELP_STRING([--with-xns],
-	    [include xopen xns headers in install.  @<:@default=yes@:>@]),
-	[with_xns="$withval"],
-	[with_xns='no'])
+	[AS_HELP_STRING([--with-xns],
+	    [include xopen xns headers @<:@default=yes@:>@])],
+	[], [with_xns=no])
 ])# _XOPEN_CHECK_XNS
 # =============================================================================
 
@@ -113,10 +110,9 @@ AC_DEFUN([_XOPEN_CHECK_XNS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_TLI], [dnl
     AC_ARG_WITH([tli],
-	AS_HELP_STRING([--with-tli],
-	    [include xopen tli modules in build.  @<:@default=yes@:>@]),
-	[with_tli="$withval"],
-	[with_tli='no'])
+	[AS_HELP_STRING([--with-tli],
+	    [include xopen tli modules @<:@default=yes@:>@])],
+	[], [with_tli=no])
 ])# _XOPEN_CHECK_TLI
 # =============================================================================
 
@@ -125,10 +121,9 @@ AC_DEFUN([_XOPEN_CHECK_TLI], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_INET], [dnl
     AC_ARG_WITH([inet],
-	AS_HELP_STRING([--with-inet],
-	    [include xopen inet driver in build.  @<:@default=yes@:>@]),
-	[with_inet="$withval"],
-	[with_inet='no'])
+	[AS_HELP_STRING([--with-inet],
+	    [include xopen inet driver @<:@default=yes@:>@])],
+	[], [with_inet=no])
 ])# _XOPEN_CHECK_INET
 # =============================================================================
 
@@ -137,10 +132,9 @@ AC_DEFUN([_XOPEN_CHECK_INET], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_XNET], [dnl
     AC_ARG_WITH([xnet],
-	AS_HELP_STRING([--with-xnet],
-	    [include xopen xnet library in build.  @<:@default=yes@:>@]),
-	[with_xnet="$withval"],
-	[with_xnet='no'])
+	[AS_HELP_STRING([--with-xnet],
+	    [include xopen xnet library @<:@default=yes@:>@])],
+	[], [with_xnet='no'])
 ])# _XOPEN_CHECK_XNET
 # =============================================================================
 
@@ -149,10 +143,9 @@ AC_DEFUN([_XOPEN_CHECK_XNET], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_XNSL], [dnl
     AC_ARG_WITH([xnsl],
-	AS_HELP_STRING([--with-xnsl],
-	    [include xopen xnsl library in build.  @<:@default=yes@:>@]),
-	[with_xnsl="$withval"],
-	[with_xnsl='no'])
+	[AS_HELP_STRING([--with-xnsl],
+	    [include xopen xnsl library @<:@default=yes@:>@])],
+	[], [with_xnsl=no])
 ])# _XOPEN_CHECK_XNSL
 # =============================================================================
 
@@ -161,10 +154,9 @@ AC_DEFUN([_XOPEN_CHECK_XNSL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XOPEN_CHECK_SOCK], [dnl
     AC_ARG_WITH([sock],
-	AS_HELP_STRING([--with-sock],
-	    [include xopen sock library in build.  @<:@default=yes@:>@]),
-	[with_sock="$withval"],
-	[with_sock='no'])
+	[AS_HELP_STRING([--with-sock],
+	    [include xopen sock library @<:@default=yes@:>@])],
+	[], [with_sock=no])
 ])# _XOPEN_CHECK_SOCK
 # =============================================================================
 
@@ -357,6 +349,9 @@ AC_DEFUN([_XOPEN_], [dnl
 # =============================================================================
 #
 # $Log: xopen.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

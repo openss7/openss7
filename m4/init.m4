@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,10 +67,9 @@ AC_DEFUN([_INIT_SCRIPTS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INIT_SCRIPTS_OPTIONS], [dnl
     AC_ARG_ENABLE([initscripts],
-	AS_HELP_STRING([--disable-initscripts],
-	    [disable installation of init scripts. @<:@default=enabled@:>@]),
-	[enable_initscripts="$enableval"],
-	[enable_initscripts='yes'])
+	[AS_HELP_STRING([--disable-initscripts],
+	    [installation of init scripts @<:@default=enabled@:>@])],
+	[], [enable_initscripts=yes])
 ])# _INIT_SCRIPTS_OPTIONS
 # =============================================================================
 
@@ -331,6 +330,9 @@ AC_DEFUN([_INIT_], [dnl
 # =============================================================================
 #
 # $Log: init.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

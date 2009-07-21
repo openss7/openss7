@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: public.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: public.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,10 +89,9 @@ AC_DEFUN([_PUBLIC_RELEASE_SETUP], [dnl
 AC_DEFUN([_PUBLIC_RELEASE_OUTPUT], [dnl
     AC_MSG_CHECKING([for public release])
     AC_ARG_ENABLE([public],
-	AS_HELP_STRING([--disable-public],
-	    [disable public release.  @<:@default=no@:>@]),
-	[enable_public="$enableval"],
-	[enable_public='yes'])
+	[AS_HELP_STRING([--disable-public],
+	    [disable public release @<:@default=enabled@:>@])],
+	[], [enable_public=yes])
     if test :"${enable_public:-yes}" != :yes ; then
 	AC_MSG_RESULT([no])
     else
@@ -113,6 +112,9 @@ AC_DEFUN([_PUBLIC_], [dnl
 # =============================================================================
 #
 # $Log: public.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

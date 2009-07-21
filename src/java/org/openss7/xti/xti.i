@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-09 12:05:16 $
+ @(#) $RCSfile: xti.i,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-13 07:13:31 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-09 12:05:16 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti.i,v $
+ Revision 1.1.2.3  2009-07-13 07:13:31  brian
+ - changes for multiple distro build
+
  Revision 1.1.2.2  2009-07-09 12:05:16  brian
  - updated implementation
 
@@ -63,7 +66,9 @@
 %module Xti
 %{
 #define _XOPEN_SOURCE 600
+#ifndef _REENTRANT
 #define _REENTRANT
+#endif
 #define _THREAD_SAFE
 #define _SC_T_DEFAULT_ADDRLEN   2
 #define _SC_T_DEFAULT_CONNLEN   3
@@ -116,8 +121,8 @@
 #endif
 
 #include <xti.h>
-#include <tihdr.h>
 #include <timod.h>
+#include <tihdr.h>
 %}
 
 %include "typemaps.i"
@@ -160,8 +165,10 @@ typedef unsigned char u_int8_t;
 #undef t_iovec
 
 struct t_iovec {
+%immutable;
         char *iov_base;
         size_t iov_len;
+%mutable;
 };
 %inline %{
 //union t_struct_p {
@@ -245,7 +252,7 @@ extern int t_rcvreldata(int fd, struct t_discon *OUTPUT);
 extern int t_rcvudata(int fd, struct t_unitdata *OUTPUT, int *OUTPUT);
 extern int t_rcvuderr(int fd, struct t_uderr *OUTPUT);
 extern int t_rcvv(int fd, struct t_iovec *INPUT, unsigned int, int *OUTPUT);
-extern int t_rcvvopt(int fd, struct t_unitdata *OUTPUT, const struct t_iovec *INPUT, unsigned int iovcount, int flags);
+extern int t_rcvvopt(int fd, struct t_unitdata *OUTPUT, struct t_iovec *INPUT, unsigned int iovcount, int flags);
 extern int t_rcvvudata(int fd, struct t_unitdata *OUTPUT, struct t_iovec *INPUT, unsigned int iovcount, int *OUTPUT);
 // extern int t_removeleaf(int fd, int, int);
 extern int t_snd(int fd, char *BYTE, unsigned int nbytes, int flags);

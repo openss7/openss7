@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OPTIONS], [dnl
     AC_ARG_WITH([inet],
-	AS_HELP_STRING([--with-inet=HEADERS],
-	    [specify the INET header file directory.  @<:@default=INCLUDEDIR/strinet@:>@]),
-	[with_inet="$withval" ; for s in ${!inet_cv_*} ; do eval "unset $s" ; done],
-	[with_inet=''])
+	[AS_HELP_STRING([--with-inet@<:@=HEADERS@:>@],
+	    [INET header directory @<:@default=INCLUDEDIR/strinet@:>@])],
+	[for s in ${!inet_cv_*} ; do eval "unset $s" ; done])
 ])# _INET_OPTIONS
 # =============================================================================
 
@@ -628,6 +627,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: inet.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

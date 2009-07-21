@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,7 @@ dnl _DISTRO_CHECK_OS
 dnl _DISTRO_OPTIONS
     _DISTRO_SETUP
     _DISTRO_OUTPUT
+    _DISTRO_CACHE
     _DISTRO_CHECK_VENDOR
     _DISTRO_ADJUST_64BIT_LIBDIR
 ])# _DISTRO
@@ -104,20 +105,14 @@ AC_DEFUN([_DISTRO_CHECK_OS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DISTRO_OPTIONS], [dnl
     AC_ARG_WITH([dist-vendor],
-	AS_HELP_STRING([--with-dist-vendor=VENDOR],
-	    [override distribution VENDOR. @<:@default=auto@:>@]),
-	[with_dist_vendor="$withval"],
-	[with_dist_vendor=''])
+	[AS_HELP_STRING([--with-dist-vendor=VENDOR],
+	    [distribution VENDOR @<:@default=auto@:>@])])
     AC_ARG_WITH([dist-flavor],
-	AS_HELP_STRING([--with-dist-flavor=FLAVOR],
-	    [override distribution FLAVOR. @<:@default=auto@:>@]),
-	[with_dist_flavor="$withval"],
-	[with_dist_flavor=''])
+	[AS_HELP_STRING([--with-dist-flavor=FLAVOR],
+	    [distribution FLAVOR @<:@default=auto@:>@])])
     AC_ARG_WITH([dist-release],
-	AS_HELP_STRING([--with-dist-release=RELEASE],
-	    [override distribution RELEASE. @<:@default=auto@:>@]),
-	[with_dist_release="$withval"],
-	[with_dist_release=''])
+	[AS_HELP_STRING([--with-dist-release=RELEASE],
+	    [distribution RELEASE @<:@default=auto@:>@])])
 ])# _DISTRO_OPTIONS
 # =============================================================================
 
@@ -707,9 +702,8 @@ AC_DEFUN([_DISTRO_CHECK_VENDOR], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     AC_ARG_ENABLE([32bit-libs],
-	AS_HELP_STRING([--disable-32bit-libs],
-	    [disable 32bit compatibility libraries (and test binaries) on
-	     64-bit processors.  @<:@default=enabled@:>@]), [:], [:])
+	[AS_HELP_STRING([--disable-32bit-libs],
+	    [32bit compatibility test binaries @<:@default=enabled@:>@])])
     have_32bit_libs=no
     lib32dir="$libdir"
     pkglib32dir="$pkglibdir"
@@ -740,6 +734,44 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 # =============================================================================
 
 # =============================================================================
+# _DISTRO_CACHE
+# -----------------------------------------------------------------------------
+# When performing a config.status --recheck, re-performing all of the distro
+# configuration checks is too time consuming to the development cycle.
+# Therefore, when we are performing a recheck and we have established all of the
+# information necessary to provide a distro- specific cache file name, read that
+# file name if it exists.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DISTRO_CACHE], [dnl
+    # if distro file is not specified, use local distro file
+    if test -z "$CONFIG_DIST" ; then
+	CONFIG_DIST="${target}-config.cache"
+    fi
+    AC_SUBST([CONFIG_DIST])dnl
+    if test "$no_create" = yes ; then
+	for config_dist in $CONFIG_DIST ; do
+	    if test -r "$config_dist" ; then
+		. "$config_dist"
+	    fi
+	done
+    fi
+    AC_CONFIG_COMMANDS([distconfig], [dnl
+	if test -n "$CONFIG_DIST" ; then
+	    for config_dist in $CONFIG_DIST ; do
+		if test -w "$config_dist" -o ! -e "$config_dist" ; then
+		    if touch "$config_dist" >/dev/null 2>&1 ; then
+			cat "$cache_file" | egrep "^(test \"\\\[$]{)?(ac_cv_|acl_cv_|am_cv_|ap_cv_|deb_cv_|devfs_cv_|dist_cv_|gl_cv_|gt_cv_|init_cv_|lt_cv_|nls_cv_|perl_cv_|pkg_cv_|rpm_cv_|snmp_cv_|tcl_cv_)" > "$config_dist" 2>/dev/null
+		    fi
+		fi
+	    done
+	fi], [dnl
+cache_file="$cache_file"
+CONFIG_DIST="$CONFIG_DIST"
+    ])
+])# _DISTRO_CACHE
+# =============================================================================
+
+# =============================================================================
 # _DISTRO_
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DISTRO_], [dnl
@@ -749,6 +781,9 @@ AC_DEFUN([_DISTRO_], [dnl
 # =============================================================================
 #
 # $Log: dist.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #

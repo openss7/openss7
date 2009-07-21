@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,30 +69,30 @@ AC_DEFUN([_ARCHIVE], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ARCHIVE_ARGS], [dnl
     AC_ARG_WITH([lzma],
-	AS_HELP_STRING([--with-lzma@<:@=LZMA_CMD@:>@],
-	    [create lzma archives @<:@default=no@:>@]),
-	[case "$with_lzma" in
-	     (no|yes) ;;
-	     (*) LZMA_CMD="$with_lzma" ; with_lzma=yes ;;
-	 esac], [with_lzma=no])
+	[AS_HELP_STRING([--with-lzma@<:@=LZMA_CMD@:>@],
+	    [create lzma archives @<:@default=no@:>@])], [dnl
+	    case "$with_lzma" in
+		(no|yes) ;;
+		(*) LZMA_CMD="$with_lzma" ; with_lzma=yes ;;
+	    esac], [with_lzma=no])
     AC_ARG_WITH([xz],
-	AS_HELP_STRING([--with-xz@<:@=XZ_CMD@:>@],
-	    [create xz archives @<:@default=no@:>@]),
-	[case "$with_xz" in
-	     (no|yes) ;;
-	     (*) XZ_CMD="$with_xz" ; with_xz=yes ;;
-	 esac], [with_xz=no])
+	[AS_HELP_STRING([--with-xz@<:@=XZ_CMD@:>@],
+	    [create xz archives @<:@default=no@:>@])], [dnl
+	    case "$with_xz" in
+		(no|yes) ;;
+		(*) XZ_CMD="$with_xz" ; with_xz=yes ;;
+	    esac], [with_xz=no])
     AC_ARG_ENABLE([bestzip],
-	AS_HELP_STRING([--enable-bestzip],
-	    [enable best compression of archives @<:@default=bzip2@:>@]),
-	[case "$enable_bestzip" in
-	     (xz|lzma|bzip2) disable_bestzip=no ;;
-	     (no) enable_bestzip=bzip2 ; disable_bestzip=yes;;
-	     (yes|*) enable_bestzip= ; disable_bestzip=no ;;
-	 esac], [enable_bestzip=bzip2 ; disable_bestzip=yes])
+	[AS_HELP_STRING([--enable-bestzip],
+	    [best compression of archives @<:@default=bzip2@:>@])], [dnl
+	    case "$enable_bestzip" in
+		(xz|lzma|bzip2) disable_bestzip=no ;;
+		(no) enable_bestzip=bzip2 ; disable_bestzip=yes;;
+		(yes|*) enable_bestzip= ; disable_bestzip=no ;;
+	    esac], [enable_bestzip=bzip2 ; disable_bestzip=yes])
     AC_ARG_ENABLE([repo-tar],
-	AS_HELP_STRING([--disable-repo-tar],
-	    [disable tar repo construction @<:@default=yes@:>@]),
+	[AS_HELP_STRING([--disable-repo-tar],
+	    [tar repo construction @<:@default=yes@:>@])],
 	[], [enable_repo_tar=yes])
     AC_SUBST([BESTZIP], [bzip2])
     AC_ARG_VAR([GZIP],      [Gzip default compression options @<:@default=-f9v@:>@])
@@ -121,17 +121,17 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	GZIP_CMD=
 	AC_MSG_ERROR([
 ***
-*** Configure cannot find a suitable 'gzip' program.  Creating gzip archives
-*** requires the 'gzip' program from the 'gzip' package on the build host.  The
-*** 'gzip' package has been available for many years on all distributions and is
-*** available from any GNU archive site.  Try:
+*** Configure cannot find a suitable 'gzip' program.  Creating gzip
+*** archives requires the 'gzip' program from the 'gzip' package on the
+*** build host.  The 'gzip' package has been available for many years on
+*** all distributions and is available from any GNU archive site.  Try:
 ***
 *** Debian:  'apt-get install gzip'
 *** SuSE:    'zypper install gzip'
 *** CentOS:  'yum install gzip'
 ***
-*** To get rid of this error, load the 'gzip' package, or specify the location
-*** with the GZIP_CMD environment variable to 'configure'.
+*** To get rid of this error, load the 'gzip' package, or specify the
+*** location with the GZIP_CMD environment variable to 'configure'.
 *** ])
     fi
     test -n "$BZIP2" || BZIP2='-f9v'
@@ -140,17 +140,17 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	BZIP_CMD=
 	AC_MSG_ERROR([
 ***
-*** Configure cannot find a suitable 'bzip2' program.  Creating bzip2 archives
-*** requires the 'bzip2' program from the 'bzip2' package on the build host.
-*** The 'bzip2' package has been available for many years on all distributions.
-*** Try:
+*** Configure cannot find a suitable 'bzip2' program.  Creating bzip2
+*** archives requires the 'bzip2' program from the 'bzip2' package on
+*** the build host.  The 'bzip2' package has been available for many
+*** years on all distributions.  Try:
 ***
 *** Debian:  'apt-get install bzip2'
 *** SuSE:    'zypper install bzip2'
 *** CentOS:  'yum install bzip2'
 ***
-*** To get rid of this error, load the 'bzip2' package, or specify the location
-*** with the BZIP2_CMD environment variable to 'configure'.
+*** To get rid of this error, load the 'bzip2' package, or specify the
+*** location with the BZIP2_CMD environment variable to 'configure'.
 *** ])
     fi
     test -n "$LZMA" || LZMA='-f9v'
@@ -161,16 +161,16 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find the 'lzma' program, which is sometimes present on
-*** recent systems.  Try:
+*** Configure cannot find the 'lzma' program, which is sometimes present
+*** on recent systems.  Try:
 ***
 *** Debian:  'apt-get install lzma'
 *** SuSE:    'zypper install lzma'
 *** CentOS:  'yum install lzma'
 ***
-*** To get rid of this warning, load the 'lzma' package, or specify the full
-*** path to the utility in the LZMA_CMD environment variable, or simply do not
-*** specify --enable-bestzip='lzma' to configure.
+*** To get rid of this warning, load the 'lzma' package, or specify the
+*** full path to the utility in the LZMA_CMD environment variable, or
+*** simply do not specify --enable-bestzip='lzma' to configure.
 *** ])
 	fi
     else
@@ -189,8 +189,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	then
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find the 'xz' program, which is sometimes present on
-*** recent systems.  Try:
+*** Configure cannot find the 'xz' program, which is sometimes present
+*** on recent systems.  Try:
 ***
 ***   #> wget http://tukaani.org/xz/xz-4.999.8beta.tar.gz
 ***   #> tar xzf xz-4.999.8beta.tar.gz
@@ -199,9 +199,9 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** To get rid of this warning, load the 'xz' package, or specify the full path
-*** to the utility in the XZ_CMD environment variable, or simply do not specify
-*** --enable-bestzip='xz' to configure.
+*** To get rid of this warning, load the 'xz' package, or specify the
+*** full path to the utility in the XZ_CMD environment variable, or
+*** simply do not specify --enable-bestzip='xz' to configure.
 *** ])
 	fi
     else
@@ -221,12 +221,13 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	    disable_repo_tar=yes
 	    AC_MSG_ERROR([
 *** 
-*** Configure could not find a suitable 'md5sum' program.  Installing tarball
-*** repositories requires the 'md5sum' program from the 'coreutils' package on
-*** the install host.  The 'coreutils' package is always installed: this script
-*** would not run without it.  It is likely that your distribution has failed to
-*** install the 'md5sum' program.  You can get the 'coreutils' pcakage from any
-*** GNU archive site.  For example:
+*** Configure could not find a suitable 'md5sum' program.  Installing
+*** tarball repositories requires the 'md5sum' program from the
+*** 'coreutils' package on the install host.  The 'coreutils' package is
+*** always installed: this script would not run without it.  It is
+*** likely that your distribution has failed to install the 'md5sum'
+*** program.  You can get the 'coreutils' pcakage from any GNU archive
+*** site.  For example:
 ***
 ***   #> wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.4.tar.gz
 ***   #> tar xzf coreutils-7.4.tar.gz
@@ -235,9 +236,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** To get rid of this warning, load the 'md5sum' program from the 'coreutils'
-*** package, specify the appropriate program with the MD5SUM environment
-*** variable to 'configure', or specify --disable-repo-tar to 'configure'.
+*** To get rid of this warning, load the 'md5sum' program from the
+*** 'coreutils' package, specify the appropriate program with the MD5SUM
+*** environment variable to 'configure', or specify --disable-repo-tar
+*** to 'configure'.
 *** ])
 	fi
     fi
@@ -248,12 +250,13 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	    disable_repo_tar=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure could not find a suitable 'sha1sum' program.  Installing tarball
-*** repositories requires the 'sha1sum' program from the 'coreutils' package on
-*** the install host.  The 'coreutils' package is always installed: this script
-*** would not run without it.  It is likely that your distribution has failed to
-*** install the 'sha1sum' program.  You can get the 'coreutils' package from any
-*** GNU archive site.  For example:
+*** Configure could not find a suitable 'sha1sum' program.  Installing
+*** tarball repositories requires the 'sha1sum' program from the
+*** 'coreutils' package on the install host.  The 'coreutils' package is
+*** always installed: this script would not run without it.  It is
+*** likely that your distribution has failed to install the 'sha1sum'
+*** program.  You can get the 'coreutils' package from any GNU archive
+*** site.  For example:
 ***
 ***   #> wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.4.tar.gz
 ***   #> tar xzf coreutils-7.4.tar.gz
@@ -262,9 +265,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** To get rid of this warning, load the 'sha1sum' program from the 'coreutils'
-*** package, specify the appropriate program with the SHA1SUM environment
-*** variable to 'configure', or specify --disable-repo-tar to 'configure'.
+*** To get rid of this warning, load the 'sha1sum' program from the
+*** 'coreutils' package, specify the appropriate program with the
+*** SHA1SUM environment variable to 'configure', or specify
+*** --disable-repo-tar to 'configure'.
 *** ])
 	fi
     fi
@@ -275,12 +279,13 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	    disable_repo_tar=yes
 	    AC_MSG_WARN([
 *** 
-*** Configure could not find a suitable 'sha256sum' program.  Installing tarball
-*** repositories requires the 'sha256sum' program from the 'coreutils' package
-*** on the install host.  The 'coreutils' package is always installed: this
-*** script would not run without it.  It is likely that your distribution has
-*** failed to install the 'sha256sum' program.  You can get the 'coreutils'
-*** package from any GNU archive site.  For example:
+*** Configure could not find a suitable 'sha256sum' program.  Installing
+*** tarball repositories requires the 'sha256sum' program from the
+*** 'coreutils' package on the install host.  The 'coreutils' package is
+*** always installed: this script would not run without it.  It is
+*** likely that your distribution has failed to install the 'sha256sum'
+*** program.  You can get the 'coreutils' package from any GNU archive
+*** site.  For example:
 ***
 ***   #> wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.4.tar.gz
 ***   #> tar xzf coreutils-7.4.tar.gz
@@ -290,9 +295,9 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> sudo make install
 ***
 *** To get rid of this warning, load the 'sha256sum' program from the
-*** 'coreutils' package, specify the appropriate program with the SHA1SUM
-*** environment variable to 'configure', or specify --disable-repo-tar to
-*** 'configure'.
+*** 'coreutils' package, specify the appropriate program with the
+*** SHA1SUM environment variable to 'configure', or specify
+*** --disable-repo-tar to 'configure'.
 *** ])
 	fi
     fi
@@ -338,6 +343,9 @@ AC_DEFUN([_ARCHIVE_XXX], [dnl
 # =============================================================================
 #
 # $Log: archive.m4,v $
+# Revision 1.1.2.3  2009-07-21 11:06:12  brian
+# - changes from release build
+#
 # Revision 1.1.2.2  2009-07-04 03:51:32  brian
 # - updates for release
 #

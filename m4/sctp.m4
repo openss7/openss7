@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,10 +121,9 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_OPTIONS], [dnl
     AC_ARG_WITH([sctp],
-	AS_HELP_STRING([--with-sctp=HEADERS],
-	    [specify the SCTP header file directory.  @<:@default=INCLUDEDIR/strsctp@:>@]),
-	[with_sctp="$withval" ; for s in ${!sctp_cv_*} ; do eval "unset $s" ; done],
-	[with_sctp=''])
+	[AS_HELP_STRING([--with-sctp=HEADERS],
+	    [SCTP header directory @<:@default=INCLUDEDIR/strsctp@:>@])],
+	[for s in ${!sctp_cv_*} ; do eval "unset $s" ; done])
 ])# _SCTP_OPTIONS
 # =============================================================================
 
@@ -638,6 +637,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: sctp.m4,v $
+# Revision 1.1.2.2  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #

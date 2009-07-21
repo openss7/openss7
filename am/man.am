@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -532,12 +532,13 @@ UNINSTALL_MANS_MA	+= uninstall-manpages uninstall-manmacros postun-manpages
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
-dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_mans
-TESTS_ENVIRONMENT	+= MANS='$(MANS)' \
-			   MANS_UNUSED='$(MANS_UNUSED)' \
+#dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_mans
+TESTS_ENVIRONMENT	+= MANS_UNUSED='$(MANS_UNUSED)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   MANS_EXEMPT='$(MANS_EXEMPT) $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)' \
-		       	   mandir='$(mandir)'
+		       	   mandir='$(mandir)' \
+			   CHECK_MANS='yes'
+#			   MANS='$(MANS)'
 CLEANFILES		+= check_mans.log
 DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS
@@ -563,6 +564,9 @@ EXTRA_DIST		+= \
 ## =============================================================================
 ##
 ## $Log: man.am,v $
+## Revision 1.1.2.4  2009-07-21 11:06:11  brian
+## - changes from release build
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

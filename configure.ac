@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -88,6 +88,7 @@ AM_SILENT_RULES
 
 AC_USE_SYSTEM_EXTENSIONS
 
+m4_include([m4/swig.m4])
 dnl
 dnl Checks for programs.
 dnl
@@ -106,8 +107,10 @@ AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 AC_PROG_LEX
 AC_PROG_YACC
+AC_PROG_SWIG
 
 m4_include([m4/gcj.m4])
+m4_include([m4/java.m4])
 dnl
 dnl older systems that have gcj3 and gcj should use the newer version
 dnl
@@ -116,6 +119,7 @@ AM_PROG_GCJ
 AC_PROG_GCJH
 AC_PROG_JAVAC
 AC_PROG_JAVAH
+AC_PROG_JAVA
 
 LT_INIT([dlopen])
 LT_LANG([C++])
@@ -259,6 +263,8 @@ AC_CONFIG_FILES([Makefile
 		 src/drivers/Config
 		 src/modules/Config
 		 src/include/Makefile
+		 src/tcl/Makefile
+		 src/perl/Makefile
 		 src/java/Makefile])
 
 _OPENSS7_OUTPUT
@@ -268,6 +274,12 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.5  2009-07-21 11:06:11  brian
+# - changes from release build
+#
+# Revision 1.1.2.4  2009-07-13 07:13:26  brian
+# - changes for multiple distro build
+#
 # Revision 1.1.2.3  2009-07-04 03:51:32  brian
 # - updates for release
 #

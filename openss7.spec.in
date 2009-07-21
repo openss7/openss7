@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-05 12:04:26 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-21 11:06:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-05 12:04:26 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,7 +73,10 @@
 %global nonrpmmods  LiS lis streams STREAMS strbcm strcompat strutil strtty strchan strxns strxnet strnsl strsock strinet strsctp strisdn strvoip strss7 sigtran stratm
 %global preloads    specfs streams
 %global libraries   streams
+%global perlmods    %{nil}
+%global tcllibs     %{nil}
 %global gcjlibs     %{nil}
+%global gcjmaps     %{nil}
 %global jarfiles    %{nil}
 %global jnilibs     %{nil}
 %global javadoc     %{nil}
@@ -81,6 +84,7 @@
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo
 %global manuals     openss7 ATM carrier cci cdi chi cnam dlpi dlpi_porting FR hlr INET ISDN lab libxnet libxnsl lli mapi MG mg mtpi mxi nli npi npi_mtp npi_sccp OSI PHYS porting sbc sccpi sdli sdti sg sgp SIGTRAN sli SPG2 SPG SS7 ssg ss STREAMS_FAQ STREAMS tci tpi tpi_sccp tri TTY VOIP voip wan X25 x25_porting x400p xcc xmap XNS xti_sccp
 %global pngfiles    *.png
+%global cssfiles    *.css
 %global initfiles   %{base} specfs streams strerr strace
 %global nonrpminit  strms_up strms_dn
 %global conffiles   *.conf
@@ -129,14 +133,18 @@
 %global HAVE_preloads       %{?preloads:    1}%{!?preloads:    0}
 %global HAVE_modules        %{?modules:     1}%{!?modules:     0}
 %global HAVE_libraries      %{?libraries:   1}%{!?libraries:   0}
-%global HAVE_gcjlibs        %{?gcjlibs:     1}%{!?gcjlibs      0}
-%global HAVE_jarfiles       %{?jarfiles:    1}%{!?jarfiles     0}
-%global HAVE_jnilibs        %{?jnilibs:     1}%{!?jnilibs      0}
-%global HAVE_javadoc        %{?javadoc:     1}%{!?javadoc      0}
+%global HAVE_perlmods       %{?perlmods:    1}%{!?perlmods:    0}
+%global HAVE_tcllibs        %{?tcllibs:     1}%{!?tcllibs:     0}
+%global HAVE_gcjlibs        %{?gcjlibs:     1}%{!?gcjlibs:     0}
+%global HAVE_gcjmaps        %{?gcjmaps:     1}%{!?gcjmaps:     0}
+%global HAVE_jarfiles       %{?jarfiles:    1}%{!?jarfiles:    0}
+%global HAVE_jnilibs        %{?jnilibs:     1}%{!?jnilibs:     0}
+%global HAVE_javadoc        %{?javadoc:     1}%{!?javadoc:     0}
 %global HAVE_locales        %{?locales:     1}%{!?locales:     0}
 %global HAVE_tools          %{?tools:       1}%{!?tools:       0}
 %global HAVE_manuals        %{?manuals:     1}%{!?manuals:     0}
 %global HAVE_pngfiles       %{?pngfiles:    1}%{!?pngfiles:    0}
+%global HAVE_cssfiles       %{?cssfiles:    1}%{!?cssfiles:    0}
 %global HAVE_initscripts    %{?initfiles:   1}%{!?initfiles:   0}
 %global HAVE_configfiles    %{?conffiles:   1}%{!?conffiles:   0}
 %global HAVE_testfiles      %{?testfiles:   1}%{!?testfiles:   0}
@@ -165,6 +173,7 @@
 %global HAVE_pdffiles       1
 %global HAVE_htmlfiles      1
 %global HAVE_pngfiles       1
+%global HAVE_cssfiles       1
 
 %if %{without_ko_modules}
 %global HAVE_oldmods        %{HAVE_modules}
@@ -194,6 +203,10 @@
 %global USE_rmnods          0
 %endif
 
+%if %(if (rpm -q --whatprovides /usr/bin/gcj-dbtool >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%global HAVE_gcjmaps        0
+%endif
+
 %if %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %global USE_makedev         0
 %endif
@@ -219,7 +232,10 @@
 %global FILES_libstatic     %{HAVE_libraries}
 %global FILES_lib32compat   %{HAVE_lib32compat}
 %global FILES_lib32static   %{HAVE_lib32compat}
+%global FILES_perlmods      %{HAVE_perlmods}
+%global FILES_tcllibs       %{HAVE_tcllibs}
 %global FILES_gcjlibs       %{HAVE_gcjlibs}
+%global FILES_gcjmaps       %{HAVE_gcjmaps}
 %global FILES_jarfiles      %{HAVE_jarfiles}
 %global FILES_jnilibs       %{HAVE_jnilibs}
 %global FILES_javadoc       %{HAVE_javadoc}
@@ -256,6 +272,7 @@
 %global FILES_pdffiles      %{HAVE_manuals}
 %global FILES_htmlfiles     %{HAVE_manuals}
 %global FILES_pngfiles      %{HAVE_pngfiles}
+%global FILES_cssfiles      %{HAVE_cssfiles}
 
 # These are the defaults for the WITH_zzz macros.  These
 # defaults can be changed by passing --with-zzz or --without-zzz
@@ -350,11 +367,13 @@
 %endif
 
 %global WITH_htmlfiles  0
+%global WITH_cssfiles   0
 %if %{WITH_texinfo_html}
 %global WITH_htmlfiles  1
 %endif
 %if %{WITH_papers_html}
 %global WITH_htmlfiles  1
+%global WITH_cssfiles   1
 %endif
 %if %{WITH_drafts_html}
 %global WITH_htmlfiles  1
@@ -364,8 +383,10 @@
 %else
 %global HAVE_htmlfiles  0
 %global HAVE_pngfiles   0
+%global HAVE_cssfiles   0
 %global FILES_htmlfiles 0
 %global FILES_pngfiles  0
+%global FILES_cssfiles  0
 %endif
 
 %global WITH_printfiles 0
@@ -429,6 +450,10 @@
 %{!?_javadir:           %{expand: %%global _javadir         %%{_datadir}/java}}
 %{!?_javadocdir:        %{expand: %%global _javadocdir      %%{_datadir}/javadoc}}
 %{!?_pkgjavadocdir:     %{expand: %%global _pkgjavadocdir   %%{_javadocdir}/%%{name}}}
+%{!?_tcllibdir:         %{expand: %%global _tcllibdir       %%{_libdir}}}
+%{!?_tclsrcdir:         %{expand: %%global _tclsrcdir       %%{_datadir}}}
+%{!?_pkgtcllibdir:      %{expand: %%global _pkgtcllibdir    %%{_tcllibdir}/@PACKAGE_NAME@@PACKAGE_VERSION@}}
+%{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch)}}
 
 # ---------------------------------------------------------------------------
 # Calculate which files were not built (and are not included)
@@ -478,6 +503,7 @@
 %global FILES_pdffiles      0
 %global FILES_htmlfiles     0
 %global FILES_pngfiles      0
+%global FILES_cssfiles      0
 %global FILES_manrefs       0
 %global FILES_manmacros     0
 %global FILES_manpages      0
@@ -497,7 +523,10 @@
 %global FILES_libstatic     0
 %global FILES_lib32compat   0
 %global FILES_lib32static   0
+%global FILES_perlmods      0
+%global FILES_tcllibs       0
 %global FILES_gcjlibs       0
+%global FILES_gcjmaps       0
 %global FILES_jarfiles      0
 %global FILES_jnilibs       0
 %global FILES_locales       0
@@ -521,6 +550,7 @@
 %global FILES_pdffiles      0
 %global FILES_htmlfiles     0
 %global FILES_pngfiles      0
+%global FILES_cssfiles      0
 %global FILES_initscripts   0
 %global FILES_configfiles   0
 %global FILES_mibfiles      0
@@ -553,7 +583,10 @@
 %global FILES_libstatic     0
 %global FILES_lib32compat   0
 %global FILES_lib32static   0
+%global FILES_perlmods      0
+%global FILES_tcllibs       0
 %global FILES_gcjlibs       0
+%global FILES_gcjmaps       0
 %global FILES_jarfiles      0
 %global FILES_jnilibs       0
 %global FILES_locales       0
@@ -597,6 +630,7 @@
 %else
 %global FILES_javadoc       0
 %global FILES_gcjlibs       0
+%global FILES_gcjmaps       0
 %global FILES_jarfiles      0
 %global FILES_jnilibs       0
 %endif
@@ -612,6 +646,7 @@
 %endif
 
 %if %{BUILD_debug}
+%global __debug_package     1
 %else
 %global FILES_debugfiles    0
 %global FILES_kdebugfiles   0
@@ -627,6 +662,13 @@
 %global WANT_debug          1
 %endif
 %if %{HAVE_kdebugfiles}
+%global WANT_debug          1
+%endif
+
+%if %{FILES_debugfiles}
+%global WANT_debug          1
+%endif
+%if %{FILES_kdebugfiles}
 %global WANT_debug          1
 %endif
 
@@ -702,6 +744,9 @@
 %global NEED_base       1
 %endif
 %if %{HAVE_pngfiles}
+%global NEED_base       1
+%endif
+%if %{HAVE_cssfiles}
 %global NEED_base       1
 %endif
 %if %{HAVE_manrefs}
@@ -788,6 +833,9 @@
 %if %{HAVE_pngfiles}
 %global NEED_doc        1
 %endif
+%if %{HAVE_cssfiles}
+%global NEED_doc        1
+%endif
 %if %{HAVE_manpages}
 %global NEED_doc        1
 %endif
@@ -811,6 +859,9 @@
 %global WANT_doc        1
 %endif
 %if %{FILES_pngfiles}
+%global WANT_doc        1
+%endif
+%if %{FILES_cssfiles}
 %global WANT_doc        1
 %endif
 %if %{FILES_manpages}
@@ -845,6 +896,12 @@
 %if %{HAVE_lib32compat}
 %global NEED_lib        1
 %endif
+%if %{HAVE_perlmods}
+%global NEED_lib        1
+%endif
+%if %{HAVE_tcllibs}
+%global NEED_lib        1
+%endif
 %if %{HAVE_locales}
 %global NEED_lib        1
 %endif
@@ -874,6 +931,12 @@
 %global WANT_lib        1
 %endif
 %if %{FILES_lib32compat}
+%global WANT_lib        1
+%endif
+%if %{FILES_perlmods}
+%global WANT_lib        1
+%endif
+%if %{FILES_tcllibs}
 %global WANT_lib        1
 %endif
 %if %{FILES_locales}
@@ -915,6 +978,12 @@
 %global NEED_devel      1
 %endif
 %if %{HAVE_libraries}
+%global NEED_devel      1
+%endif
+%if %{HAVE_perlmods}
+%global NEED_devel      1
+%endif
+%if %{HAVE_tcllibs}
 %global NEED_devel      1
 %endif
 
@@ -1022,6 +1091,9 @@
 %if %{HAVE_gcjlibs}
 %global NEED_java       1
 %endif
+%if %{HAVE_gcjmaps}
+%global NEED_java       1
+%endif
 %if %{HAVE_jnilibs}
 %global NEED_java       1
 %endif
@@ -1033,6 +1105,9 @@
 %global WANT_java       1
 %endif
 %if %{FILES_gcjlibs}
+%global WANT_java       1
+%endif
+%if %{FILES_gcjmaps}
 %global WANT_java       1
 %endif
 
@@ -1134,8 +1209,17 @@
 %global files_lib32static   %{nil}
 %global files_binaries      %{nil}
 %endif
+%if %{FILES_perlmods}
+%global files_perlmods      %{nil}
+%endif
+%if %{FILES_tcllibs}
+%global files_tcllibs       %{nil}
+%endif
 %if %{FILES_gcjlibs}
 %global files_gcjlibs       %{nil}
+%endif
+%if %{FILES_gcjmaps}
+%global files_gcjmaps       %{nil}
 %endif
 %if %{FILES_jarfiles}
 %global files_jarfiles      %{nil}
@@ -1169,6 +1253,9 @@
 %endif
 %if %{FILES_pngfiles}
 %global files_pngfiles      %{nil}
+%endif
+%if %{FILES_cssfiles}
+%global files_cssfiles      %{nil}
 %endif
 %if %{FILES_initscripts}
 %global files_initscripts   %{nil}
@@ -1479,6 +1566,9 @@ fi
     %{?_jnidir:jnidir=%{_jnidir}} \
     %{?_javadir:javadir=%{_javadir}} \
     %{?_javadocdir:javadocdir=%{_javadocdir}} \
+    %{?_perldir:perldir=%{_perldir}} \
+    %{?_tcllibdir:tcllibdir=%{_tcllibdir}} \
+    %{?_tclsrcdir:tclsrcdir=%{_tclsrcdir}} \
     --cache-file="%{_builddir}/%{cache_file}" \
 %ifnarch noarch
     --host=%{_target_platform} \
@@ -2710,6 +2800,7 @@ fi
 %{?files_pdffiles:%{_pdfdir}/@PACKAGE@-@VERSION@/*.pdf}
 %{?files_htmlfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.html}
 %{?files_pngfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.png}
+%{?files_cssfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.css}
 %{?files_infofiles:%{_infodir}/*.info*}
 %{?files_manrefs:%{_mandir}/%{base}.refs*}
 %{?files_manmacros:%{_mandir}/%{base}.macros*}
@@ -2744,6 +2835,12 @@ Prefix:         %{_libdir}
 %if %{FILES_lib32compat}
 Prefix:         %{_lib32dir}
 %endif
+%if %{FILES_perlmods}
+Prefix:         %{_archlibdir}
+%endif
+%if %{FILES_tcllibs}
+Prefix:         %{_pkgtcllibdir}
+%endif
 %if %{FILES_testfiles}
 Prefix:         %{_pkglibexecdir}
 %endif
@@ -2761,6 +2858,7 @@ Prefix:         %{_localedir}
 %endif
 
 Prereq:         /sbin/ldconfig
+Prereq:         /usr/bin/tclsh
 
 %if %{NEED_base}
 Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
@@ -2818,12 +2916,18 @@ fi
 
 %post lib
 # ---------------------------------------------------------------------------
-%if %{FILES_libraries}
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+%if %{FILES_libraries}
     # After a fresh install or upgrade, do a load config.
     /sbin/ldconfig
-fi
 %endif
+%if %{FILES_tcllibs}
+    # After a fresh install, create package index files
+    for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+        echo "pkg_mkIndex $d\\nexit" | tclsh
+    done
+%endif
+fi
 
 %postun lib
 # ---------------------------------------------------------------------------
@@ -2844,6 +2948,13 @@ fi
 %{?files_libraries:%{_libdir}/*.la}
 %{?files_lib32compat:%{_lib32dir}/*.so*}
 %{?files_lib32compat:%{_lib32dir}/*.la}
+%{?files_perlmods:%dir %{_archlibdir}/auto/*}
+%{?files_perlmods:%{_archlibdir}/auto/*}
+%{?files_tcllibs:%dir %{_pkgtcllibdir}}
+%{?files_tcllibs:%{_pkgtcllibdir}/pkgIndex.tcl}
+%{?files_tcllibs:%{_pkgtcllibdir}/*/*.tcl}
+%{?files_tcllibs:%{_pkgtcllibdir}/*/*.so}
+%{?files_tcllibs:%{_pkgtcllibdir}/*/*.la}
 %{?files_locales:%{_localedir}/*}
 %{?files_gdmofiles:%{_pkglibexecdir}/gdmo}
 %{?files_testfiles:%{_pkglibexecdir}/%{testfiles}}
@@ -3427,8 +3538,18 @@ Prefix:         %{_jnidir}
 %if %{FILES_gcjlibs}
 Prefix:         %{_pkggcjdir}
 %endif
+%if %{FILES_gcjmaps}
+Prefix:         %{_pkggcjdir}
+%endif
 %if %{FILES_jarfiles}
 Prefix:         %{_javadir}
+%endif
+
+%if %{FILES_jnilibs}
+Prereq:         /sbin/ldconfig
+%endif
+%if %{FILES_gcjmaps}
+Prereq:         /usr/bin/gcj-dbtool
 %endif
 
 # ---------------------------------------------------------------------------
@@ -3457,6 +3578,9 @@ if [ $1 = 1 ] ; then : # fresh install
 %if %{FILES_gcjlibs}
     # Fresh install: look for non-rpm libraries and remove then
 %endif
+%if %{FILES_gcjmaps}
+    # Fresh install: look for non-rpm classmaps and remove then
+%endif
 %if %{FILES_jarfiles}
     # Fresh install: look for non-rpm archives and remove them
 %endif
@@ -3469,10 +3593,31 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # Fresh install or upgrade: do a load config.
 %endif
 %if %{FILES_gcjlibs}
+    # Fresh install or upgrade: do nothing.
+%endif
+%if %{FILES_gcjmaps}
     # Fresh install or upgrade: rebuild classmap database.
+    if [ -x /usr/bin/rebuild-gcj-db ] ; then
+        /usr/bin/rebuild-gcj-db
+    else
+        # basically what rebuild-gcj-db does
+        for base in /usr/lib* ; do
+            db=`/usr/bin/gcj-dbtool -p $base`
+            d=$base/gcj
+            test -d $d || continue
+            dirname $db | xargs mkdir -p
+            /usr/bin/gcj-dbtool -n $db.tmp 64
+            find $d -follow -name '*.db' -print0 | \
+                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
+            /bin/mv -f $db.tmp $db
+        done
+    fi
 %endif
 %if %{FILES_jarfiles}
     # Fresh install or upgrade: relink the jar files.
+    if [ -x /usr/bin/rebuild-jar-repository ] ; then
+        /usr/bin/rebuild-jar-repository %{_javadir}
+    fi
 %endif
 fi
 
@@ -3483,10 +3628,31 @@ if [ $1 = 0 -o $1 = 1 ] ; then
     # Complete removal or upgrade: do a load config.
 %endif
 %if %{FILES_gcjlibs}
+    # Complete removal or upgrade: do nothing.
+%endif
+%if %{FILES_gcjmaps}
     # Complete removal or upgrade: rebuild classmap database.
+    if [ -x /usr/bin/rebuild-gcj-db ] ; then
+        /usr/bin/rebuild-gcj-db
+    else
+        # basically what rebuild-gcj-db does
+        for base in /usr/lib* ; do
+            db=`/usr/bin/gcj-dbtool -p $base`
+            d=$base/gcj
+            test -d $d || continue
+            dirname $db | xargs mkdir -p
+            /usr/bin/gcj-dbtool -n $db.tmp 64
+            find $d -follow -name '*.db' -print0 | \
+                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
+            /bin/mv -f $db.tmp $db
+        done
+    fi
 %endif
 %if %{FILES_jarfiles}
     # Complete removal or upgrade: relink the jar files.
+    if [ -x /usr/bin/rebuild-jar-repository ] ; then
+        /usr/bin/rebuild-jar-repository %{_javadir}
+    fi
 %endif
 fi
 
@@ -3496,7 +3662,8 @@ fi
 %defattr(-,root,root)
 %{?files_jnilibs:%{_jnidir}/*}
 %{?files_gcjlibs:%dir %{_pkggcjdir}}
-%{?files_gcjlibs:%{_pkggcjdir}/*}
+%{?files_gcjlibs:%{_pkggcjdir}/*.so}
+%{?files_gcjmaps:%{_pkggcjdir}/*.db}
 %{?files_jarfiles:%{_javadir}/*}
 %endif
 
@@ -3536,15 +3703,25 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 1.1.2.4  2009-07-05 12:04:26  brian
-# - updates for release builds
+# Revision 1.1.2.6  2009-07-21 11:06:11  brian
+# - changes from release build
 #
-# Revision 1.1.2.3  2009-07-04 03:51:32  brian
-# - updates for release
-#
-# Revision 1.1.2.2  2009-06-29 07:35:26  brian
-# - updated rpm spec and symvers
-#
+
+* Mon Jul 13 2009 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.5  2009-07-13 07:13:26  brian
+- changes for multiple distro build
+
+* Sun Jul  5 2009 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.4  2009-07-05 12:04:26  brian
+- updates for release builds
+
+* Sat Jul  4 2009 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.3  2009-07-04 03:51:32  brian
+- updates for release
+
+* Mon Jun 29 2009 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.2  2009-06-29 07:35:26  brian
+- updated rpm spec and symvers
 
 * Sun Jun 21 2009 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.1  2009-06-21 10:25:07  brian

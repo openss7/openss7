@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xom.h,v 1.1.2.1 2009-06-21 11:23:46 brian Exp $
+ @(#) $Id: xom.h,v 1.1.2.2 2009-07-13 07:13:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:23:46 $ by $Author: brian $
+ Last Modified $Date: 2009-07-13 07:13:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xom.h,v $
+ Revision 1.1.2.2  2009-07-13 07:13:28  brian
+ - changes for multiple distro build
+
  Revision 1.1.2.1  2009-06-21 11:23:46  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 #ifndef __XOM_H__
 #define __XOM_H__
 
-#ident "@(#) $RCSfile: xom.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: xom.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* BEGIN SERVICE INTERFACE */
 
@@ -391,6 +394,7 @@ typedef enum OMP_return_code_enum {
 
 /* END SERVICE INTERFACE */
 
+#if 0
 OM_return_code om_copy(const OM_private_object original, const OM_workspace workspace,
 		       OM_private_object *copy);
 
@@ -466,7 +470,9 @@ OM_return_code om_write(const OM_private_object subject, const OM_type type,
 			const OM_value_position value_position, OM_syntax syntax,
 			const OM_string_length *string_offet, OM_string elements);
 
-char **omp_strerrors = {
+#endif
+
+char *omp_strerrors[] = {
 	"The function completed successfully.",
 	"The octets that constitute the value of an encoding's Object Encoding attribute are invalid.",
 	"The function does not apply to the object to which it is addressed.",

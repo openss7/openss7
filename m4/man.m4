@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:38 $
+# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-29 07:35:38 $ by $Author: brian $
+# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,15 +68,13 @@ AC_DEFUN([_MAN_CONVERSION], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION_ARGS], [dnl
     AC_ARG_WITH([cooked-manpages],
-	AS_HELP_STRING([--with-cooked-manpages],
-	    [convert manual pages to remove macro dependencies and grefer
-	     references.  @<:@default=no@:>@]),
+	[AS_HELP_STRING([--with-cooked-manpages],
+	    [convert manual pages to simpler form @<:@default=no@:>@])],
 	[], [with_cooked_manpages=no])
     without_cooked_manpages=
     AC_ARG_ENABLE([compress-manpages],
-	AS_HELP_STRING([--disable-compress-manpages],
-	    [compress manpages with gzip, bzip2, lzma or xz, or leave them
-	     uncompressed.  @<:@default=yes@:>@]),
+	[AS_HELP_STRING([--disable-compress-manpages],
+	    [compress manpages @<:@default=enabled@:>@])],
 	[], [enable_compress_manpages=yes])
     disable_compress_manpages=
 ])# _MAN_CONVERSION_ARGS
@@ -110,21 +108,23 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    without_cooked_manpages=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'soelim' program.  Generating cooked manual
-*** pages requires the 'soelim' program from the 'groff' package.  You can
-*** normally get 'groff' as part of most poplular Linux distributions and all
-*** current versions are acceptable.  The 'groff' package has been available for
-*** many years and is available on the web from any GNU archive site.  Use the
-*** following commands to obtain 'groff':
+*** Configure cannot find a suitable 'soelim' program.  Generating
+*** cooked manual pages requires the 'soelim' program from the 'groff'
+*** package.  You can normally get 'groff' as part of most poplular
+*** Linux distributions and all current versions are acceptable.  The
+*** 'groff' package has been available for many years and is available
+*** on the web from any GNU archive site.  Use the following commands to
+*** obtain 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
 ***
-*** To get rid of this warning, load the 'groff' package, specify an appropriate
-*** program with the SOELIM environment variable to 'configure', or specify the
-*** --without-cooked-manpages option to 'configure'.
+*** To get rid of this warning, load the 'groff' package, specify an
+*** appropriate program with the SOELIM environment variable to
+*** 'configure', or specify the --without-cooked-manpages option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -136,21 +136,23 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    without_cooked_manpages=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'refer' program.  Generating cooked manual
-*** pages requires the 'refer' program from the 'groff' package.  You can
-*** normally get 'groff' as part of most poplular Linux distributions and all
-*** current versions are acceptable.  The 'groff' package has been available for
-*** many years and is available on the web from any GNU archive site.  Use the
-*** following commands to obtain 'groff':
+*** Configure cannot find a suitable 'refer' program.  Generating cooked
+*** manual pages requires the 'refer' program from the 'groff' package.
+*** You can normally get 'groff' as part of most poplular Linux
+*** distributions and all current versions are acceptable.  The 'groff'
+*** package has been available for many years and is available on the
+*** web from any GNU archive site.  Use the following commands to obtain
+*** 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
 ***
-*** To get rid of this warning, load the 'groff' package, specify an appropriate
-*** program with the REFER environment variable to 'configure', or specify the
-*** --without-cooked-manpages option to 'configure'.
+*** To get rid of this warning, load the 'groff' package, specify an
+*** appropriate program with the REFER environment variable to
+*** 'configure', or specify the --without-cooked-manpages option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -171,21 +173,23 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    without_cooked_manpages=yes
 	    AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'tbl' program.  Generating cooked manual
-*** pages requires the 'tbl' program from the 'groff' package.  You can normally
-*** get 'groff' as part of most poplular Linux distributions and all current
-*** versions are acceptable.  The 'groff' package has been available for many
-*** years and is available on the web from any GNU archive site.  Use the
-*** following commands to obtain 'groff':
+*** Configure cannot find a suitable 'tbl' program.  Generating cooked
+*** manual pages requires the 'tbl' program from the 'groff' package.
+*** You can normally get 'groff' as part of most poplular Linux
+*** distributions and all current versions are acceptable.  The 'groff'
+*** package has been available for many years and is available on the
+*** web from any GNU archive site.  Use the following commands to obtain
+*** 'groff':
 ***
 *** Debian 4.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
 ***
-*** To get rid of this warning, load the 'groff' package, specify an appropriate
-*** program with the TBL environment variable to 'configure', or specify the
-*** --without-cooked-manpages option to 'configure'.
+*** To get rid of this warning, load the 'groff' package, specify an
+*** appropriate program with the TBL environment variable to
+*** 'configure', or specify the --without-cooked-manpages option to
+*** 'configure'.
 *** ])
 	fi
     fi
@@ -195,12 +199,13 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     if test :"$MAKEWHATIS" = : ; then
 	AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'makewhatis' program.  Installing manual
-*** pages requires the 'makewhatis' program from the 'man' package.  You can
-*** normally get 'man' as part of most populate Linux distributions and all
-*** current versions are acceptable.  The 'man' package has been available for
-*** many years and is available on the web from the Linux Documentation Project.
-*** Use the following commands to obtain 'man':
+*** Configure cannot find a suitable 'makewhatis' program.  Installing
+*** manual pages requires the 'makewhatis' program from the 'man'
+*** package.  You can normally get 'man' as part of most populate Linux
+*** distributions and all current versions are acceptable.  The 'man'
+*** package has been available for many years and is available on the
+*** web from the Linux Documentation Project.  Use the following
+*** commands to obtain 'man':
 ***
 *** Debian 4.0:  'apt-get install man'
 *** Ubuntu 8.04: 'apt-get install man'
@@ -209,8 +214,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** openSUSE 11: 'zypper install man'
 *** SLES 10:     'zypper isntall man'
 ***
-*** To get rid of this warning, load the 'man' package, specify an appropriate
-*** program with the MAKEWHATIS environment variable to 'configure'.
+*** To get rid of this warning, load the 'man' package, specify an
+*** appropriate program with the MAKEWHATIS environment variable to
+*** 'configure'.
 *** ])
     else
 	tmp_program=`echo "$MAKEWHATIS" | sed 's,.*[^ ][^$-],,;s,.*/,,;s, *$,,'`
@@ -230,17 +236,17 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	GZIP_CMD=
 	AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'gzip' program.  Compressing manual pages
-*** may require the 'gzip' program from the 'gzip' package on the build host.
-*** The 'gzip' package has been available for many years on all distributions
-*** and is available from any GNU archive site.  Try:
+*** Configure cannot find a suitable 'gzip' program.  Compressing manual
+*** pages may require the 'gzip' program from the 'gzip' package on the
+*** build host.  The 'gzip' package has been available for many years on
+*** all distributions and is available from any GNU archive site.  Try:
 ***
 *** Debian:  'apt-get install gzip'
 *** SuSE:    'zypper install gzip'
 *** CentOS:  'yum install gzip'
 ***
-*** To get rid of this warning, load the 'gzip' package, or specify the location
-*** with the GZIP_CMD environment variable to 'configure'.
+*** To get rid of this warning, load the 'gzip' package, or specify the
+*** location with the GZIP_CMD environment variable to 'configure'.
 *** ])
     fi
     AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=-f9v@:>@])
@@ -251,17 +257,18 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	BZIP2_CMD=
 	AC_MSG_WARN([
 ***
-*** Configure cannot find a suitable 'bzip2' program.  Compressing manual pages
-*** may require the 'bzip2' program from the 'bzip2' package on the build host.
-*** The 'bzip2' package has been available for many years on all distributions
-*** and is available from various web sources.  Try:
+*** Configure cannot find a suitable 'bzip2' program.  Compressing
+*** manual pages may require the 'bzip2' program from the 'bzip2'
+*** package on the build host.  The 'bzip2' package has been available
+*** for many years on all distributions and is available from various
+*** web sources.  Try:
 ***
 *** Debian:  'apt-get install bzip2'
 *** SuSE:    'zypper install bzip2'
 *** CentOS:  'yum install bzip2'
 ***
-*** To get rid of this warning, load the 'bzip2' package, or specify the location
-*** with the BZIP2_CMD environment variable to 'configure'.
+*** To get rid of this warning, load the 'bzip2' package, or specify the
+*** location with the BZIP2_CMD environment variable to 'configure'.
 *** ])
     fi
     AC_ARG_VAR([LZMA], [Lzma default compression options @<:@default=-f9v@:>@])
@@ -316,6 +323,9 @@ AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: man.m4,v $
+# Revision 1.1.2.3  2009-07-21 11:06:13  brian
+# - changes from release build
+#
 # Revision 1.1.2.2  2009-06-29 07:35:38  brian
 # - improvements to build process
 #

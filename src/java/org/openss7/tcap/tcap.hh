@@ -1,6 +1,6 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: tcap.hh,v 1.1.2.1 2009-06-21 11:36:48 brian Exp $
+//  @(#) $Id: tcap.hh,v 1.1.2.2 2009-07-13 07:13:31 brian Exp $
 //  
 //  --------------------------------------------------------------------------
 //  
@@ -48,17 +48,20 @@
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Last Modified $Date: 2009-06-21 11:36:48 $ by $Author: brian $
+//  Last Modified $Date: 2009-07-13 07:13:31 $ by $Author: brian $
 //  
 //  --------------------------------------------------------------------------
 //  
 //  $Log: tcap.hh,v $
+//  Revision 1.1.2.2  2009-07-13 07:13:31  brian
+//  - changes for multiple distro build
+//
 //  Revision 1.1.2.1  2009-06-21 11:36:48  brian
 //  - added files to new distro
 //
 //  ==========================================================================
 
-#ident "@(#) $Id: tcap.hh,v 1.1.2.1 2009-06-21 11:36:48 brian Exp $"
+#ident "@(#) $Id: tcap.hh,v 1.1.2.2 2009-07-13 07:13:31 brian Exp $"
 
 #ifndef __LOCAL_TCAP_HH__
 #define __LOCAL_TCAP_HH__
@@ -72,23 +75,52 @@
 // use with JAIN TCAP.
 //
 
-typedef int np_ulong;
-typedef unsigned char uchar;
+extern "C" {
+    typedef int np_ulong;
+    typedef unsigned char uchar;
 
-typedef struct sccp_addr {
-	np_ulong ni;			/* network indicator */
-	np_ulong ri;			/* routing indicator */
-	np_ulong pc;			/* point code (-1 not present) */
-	np_ulong ssn;			/* subsystem number (0 not present) */
-	np_ulong gtt;			/* type of global title */
-	np_ulong tt;			/* translation type */
-	np_ulong es;			/* encoding scheme */
-	np_ulong nplan;			/* numbering plan */
-	np_ulong nai;			/* nature of address indicator */
-	np_ulong alen;			/* address length */
-	uchar addr[0];			/* address digits */
-	/* followed by address bytes */
-} sccp_addr_t;
+    typedef struct sccp_addr {
+            np_ulong ni;			/* network indicator */
+            np_ulong ri;			/* routing indicator */
+            np_ulong pc;			/* point code (-1 not present) */
+            np_ulong ssn;			/* subsystem number (0 not present) */
+            np_ulong gtt;			/* type of global title */
+            np_ulong tt;			/* translation type */
+            np_ulong es;			/* encoding scheme */
+            np_ulong nplan;			/* numbering plan */
+            np_ulong nai;			/* nature of address indicator */
+            np_ulong alen;			/* address length */
+            uchar addr[0];			/* address digits */
+            /* followed by address bytes */
+    } sccp_addr_t;
+
+    typedef unsigned int t_uscalar_t;
+    typedef int t_scalar_t;
+
+    struct t_opthdr {
+        t_uscalar_t len;		/* Option length, incl. header. */
+        t_uscalar_t level;		/* Option level. */
+        t_uscalar_t name;		/* Option name. */
+        t_uscalar_t status;		/* Negotiation result. */
+        char value[0];			/* and onwards...  */
+    };
+
+    typedef struct TC_info_ack {
+	t_scalar_t PRIM_type;		/* always TC_INFO_ACK */
+	t_scalar_t TSDU_size;		/* maximum TSDU size */
+	t_scalar_t ETSDU_size;		/* maximum ETSDU size */
+	t_scalar_t CDATA_size;		/* connect data size */
+	t_scalar_t DDATA_size;		/* disconnect data size */
+	t_scalar_t ADDR_size;		/* maximum address size */
+	t_scalar_t OPT_size;		/* maximum options size */
+	t_scalar_t TIDU_size;		/* transaction interface data size */
+	t_scalar_t SERV_type;		/* service type */
+	t_scalar_t CURRENT_state;	/* current state */
+	t_scalar_t PROVIDER_flag;	/* provider flags */
+	t_scalar_t TCI_version;		/* TCI version */
+    } TC_info_ack_t;
+
+}
 
 namespace tci {
     using namespace std;
@@ -151,7 +183,7 @@ namespace tci {
     class TcapDialogueEvent : public TcapEvent {
         private:
             int dialogue_id;
-            list<TcapOptions&> options;
+            ::std::list<TcapOption> options;
         public:
             virtual ~TcapDialogueEvent(void);
             TcapDialogueEvent(int id);
@@ -164,7 +196,7 @@ namespace tci {
             bool permission;
         public:
             virtual ~TcapBegin(void);
-            TcapBegin(int dialogue_id, const SccpAddress& originating, const SccpAddress& terminating, const list<TcapOption&>& options, bool permission);
+            TcapBegin(int dialogue_id, const SccpAddress& originating, const SccpAddress& terminating, const ::std::list<TcapOption>& options, bool permission);
     };
     class TcapAccept : public TcapDialogueEvent {
         private:
@@ -172,28 +204,28 @@ namespace tci {
             bool permission;
         public:
             virtual ~TcapAccept(void);
-            TcapAccept(int dialogue_id, const SccpAddress& responding, const list<TcapOption&>& options, bool permission);
+            TcapAccept(int dialogue_id, const SccpAddress& responding, const ::std::list<TcapOption>& options, bool permission);
     };
     class TcapCont : public TcapDialogueEvent {
         private:
             bool permission;
         public:
             virtual ~TcapCont(void);
-            TcapCont(int dialogue_id, const list<TcapOption&>& options, bool permission);
+            TcapCont(int dialogue_id, const ::std::list<TcapOption>& options, bool permission);
     };
     class TcapEnd : public TcapDialogueEvent {
         private:
             int term_scenario;
         public:
             virtual ~TcapEnd(void);
-            TcapEnd(int dialogue_id, const list<TcapOption&>& options, int term_scenario);
+            TcapEnd(int dialogue_id, const ::std::list<TcapOption>& options, int term_scenario);
     };
     class TcapAbort : public TcapDialogueEvent {
         private:
             int abort_reason;
         public:
             virtual ~TcapAbort(void);
-            TcapAbort(int dialogue_id, const list<TcapOption&>& options, int abort_reason);
+            TcapAbort(int dialogue_id, const ::std::list<TcapOption>& options, int abort_reason);
     };
     class TcapUni : public TcapDialogueEvent {
         private:
@@ -201,7 +233,7 @@ namespace tci {
             SccpAddress terminating;
         public:
             virtual ~TcapUni(void);
-            TcapUni(const SccpAddress& originating, const SccpAddress& terminating, const list<TcapOptions&>& options);
+            TcapUni(const SccpAddress& originating, const SccpAddress& terminating, const ::std::list<TcapOption>& options);
     };
 
     class TcapComponentEvent : public TcapEvent {
@@ -321,18 +353,18 @@ namespace tci {
         private:
             int fd;                                 // file descriptor
             struct TC_info_ack info;                // TC information
-            list<TcapOption&> dflt_options;         // Default options
-            list<TcapOption&> curr_options;         // Current options
+            ::std::list<TcapOption> dflt_options;         // Default options
+            ::std::list<TcapOption> curr_options;         // Current options
         protected:
             virtual int bind(SccpAddress& addr, int xacts);
             virtual int unbind(void);
-            virtual int optmgmt(list<TcapOption&>& options, int flags);
-            virtual int begin(const SccpAddress& originating, const SccpAddress& terminating, int& dialogue_id, const list<TcapOption&>& options, TcapData& data, bool permission);
-            virtual int accept(const SccpAddress& responding, int dialogue_id, const list<TcapOption&>& options, TcapData& data, bool permission);
-            virtual int cont(int dialogue_id, const list<TcapOption&>& options, TcapData& data, bool permission);
-            virtual int end(int dialogue_id, const list<TcapOption&>& options, TcapData& data, int term_scenario);
-            virtual int abort(int dialogue_id, const list<TcapOption&>& options, TcapData& data, int abort_reason);
-            virtual int uni(SccpAddress& originating, SccpAddress& terminating, list<TcapOption&>& options, TcapData& data);
+            virtual int optmgmt(::std::list<TcapOption>& options, int flags);
+            virtual int begin(const SccpAddress& originating, const SccpAddress& terminating, int& dialogue_id, const ::std::list<TcapOption>& options, TcapData& data, bool permission);
+            virtual int accept(const SccpAddress& responding, int dialogue_id, const ::std::list<TcapOption>& options, TcapData& data, bool permission);
+            virtual int cont(int dialogue_id, const ::std::list<TcapOption>& options, TcapData& data, bool permission);
+            virtual int end(int dialogue_id, const ::std::list<TcapOption>& options, TcapData& data, int term_scenario);
+            virtual int abort(int dialogue_id, const ::std::list<TcapOption>& options, TcapData& data, int abort_reason);
+            virtual int uni(SccpAddress& originating, SccpAddress& terminating, ::std::list<TcapOption>& options, TcapData& data);
 
             virtual int invoke(int dialogue_id, int pclass, int operation, int& invoke_id, int linked_id, TcapData& data, bool more, int timeout);
             virtual int result(int dialogue_id, int invoke_id, int operation, TcapData& data, bool more);

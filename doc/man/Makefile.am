@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-06-22 05:43:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:12 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-22 05:43:05 $ by $Author: brian $
+## Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -62,6 +62,11 @@ if PKG_BUILD_INDEP
 openss7_man_MANS = \
 	man1/asn1.1 \
 	man1/gdmo.1 \
+	man1/asn1check.1 \
+	man1/gdmocheck.1 \
+	man1/snmpcheck.1 \
+	man1/mibbrowser.1 \
+	man1/streams-manager.1 \
 	man1/strchg.1 \
 	man1/strconf.1 \
 	man1/strlog.1 \
@@ -3996,6 +4001,11 @@ man_MANS	= $(openss7_man_MANS)
 openss7_dist_noinst_MANS = \
 	man1/asn1.1.man \
 	man1/gdmo.1.man \
+	man1/asn1check.1.man \
+	man1/gdmocheck.1.man \
+	man1/snmpcheck.1.man \
+	man1/mibbrowser.1.man \
+	man1/streams-manager.1.man \
 	man1/strchg.1.man \
 	man1/strconf.1.man \
 	man1/strlog.1.man \
@@ -7985,7 +7995,6 @@ dist_noinst_MANS = $(openss7_dist_noinst_MANS)
 ##
 MANS_UNUSED = \
 	man1/asn1.1 \
-	man1/gdmo.1 \
 	man1/strlog.1 \
 	man2/poll.2s \
 	man2/read.2s \
@@ -8063,7 +8072,6 @@ MANS_UNUSED = \
 	man4/capi.4 \
 	man4/capi_ioctl.4 \
 	man4/cd-llc.4 \
-	man4/ch.4 \
 	man4/ch_ioctl.4 \
 	man4/ch_mux.4 \
 	man4/ch_x400p.4 \
@@ -8696,6 +8704,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.4  2009-07-21 11:06:12  brian
+## - changes from release build
+##
 ## Revision 1.1.2.3  2009-06-22 05:43:05  brian
 ## - needed to pass check target
 ##
