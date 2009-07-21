@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# If using normal root, avoid changing anything.
+if [ -z "$RPM_BUILD_ROOT" -o "$RPM_BUILD_ROOT" = "/" ]; then
+        exit 0
+fi
+
+tempdir=`mktemp -d /tmp/implant-ident-XXXXXX`
+if test -z "$tempdir" ; then
+	exit 1
+fi
+
+cleanup() {
+	rm -f $tempdir/*
+	rmdir $tempdir
+}
+trap cleanup 0 1 2 3 4 5 6 7 8 9 11 13 14 15
+
+for library in `find $RPM_BUILD_ROOT -type f -exec file \{\} \; | grep 'current ar archive' | sed 's,:.*,,g' ` ; do
+	pushd $tempdir > /dev/null
+	if test -n "$RPM_BUILD_ROOT" ; then
+		cleanedlibrary=`echo "$library" | sed s,"$RPM_BUILD_ROOT",,g`
+	else
+		cleanedlibrary="$library"
+	fi
+	ar x "$library"
+	for object in *.o ; do
+		echo '$RPM: '${RPM_PACKAGE_NAME:-UNKNOWN_NAME}-${RPM_PACKAGE_VERSION:-UNKNOWN_VERSION}-${RPM_PACKAGE_RELEASE:-UNKNOWN_RELEASE}:"$cleanedlibrary":"$object"' $' > __x_rpm_ident_string.txt
+		objcopy --add-section .rodata=__x_rpm_ident_string.txt "$object"
+		ar r "$library" "$object"
+	done
+	rm -f *.o
+	popd > /dev/null
+done

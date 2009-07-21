@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+
+# RPM (and it's source code) is covered under two separate licenses. 
+
+# The entire code base may be distributed under the terms of the GNU
+# General Public License (GPL), which appears immediately below.
+# Alternatively, all of the source code in the lib subdirectory of the
+# RPM source code distribution as well as any code derived from that
+# code may instead be distributed under the GNU Library General Public
+# License (LGPL), at the choice of the distributor. The complete text
+# of the LGPL appears at the bottom of this file.
+
+# This alternatively is allowed to enable applications to be linked
+# against the RPM library (commonly called librpm) without forcing
+# such applications to be distributed under the GPL.
+
+# Any questions regarding the licensing of RPM should be addressed to
+# Erik Troan <ewt@redhat.com>.
+
+# a simple makedepends like script for perl.
+ 
+# To save development time I do not parse the perl grammmar but
+# instead just lex it looking for what I want.  I take special care to
+# ignore comments and pod's.
+
+# It would be much better if perl could tell us the dependencies of a
+# given script.
+
+# The filenames to scan are either passed on the command line or if
+# that is empty they are passed via stdin.
+
+# If there are strings in the file which match the pattern
+#     m/^\s*\$RPM_Requires\s*=\s*["'](.*)['"]/i
+# then these are treated as additional names which are required by the
+# file and are printed as well.
+
+# I plan to rewrite this in C so that perl is not required by RPM at
+# build time.
+
+# by Ken Estes Mail.com kestes@staff.mail.com
+
+if ("@ARGV") {
+  foreach (@ARGV) {
+    process_file($_);
+  }
+} else {
+  
+  # notice we are passed a list of filenames NOT as common in unix the
+  # contents of the file.
+  
+  foreach (<>) {
+    process_file($_);
+  }
+}
+
+
+foreach $module (sort keys %require) {
+  if (length($require{$module}) == 0) {
+    print "perl($module)\n";
+  } else {
+
+    # I am not using rpm3.0 so I do not want spaces arround my
+    # operators. Also I will need to change the processing of the
+    # $RPM_* vairable when I upgrage.
+
+    print "perl($module) >= $require{$module}\n";
+  }
+}
+
+exit 0;
+
+
+
+sub process_file {
+  
+  my ($file) = @_;
+  chomp $file;
+  
+  open(FILE, "<$file") || return;
+  
+  while (<FILE>) {
+    
+    # skip the documentation
+
+    # we should not need to have item in this if statement (it
+    # properly belongs in the over/back section) but people do not
+    # read the perldoc.
+
+    if ( (m/^=(head1|head2|pod|item)/) .. (m/^=(cut)/) ) {
+      next;
+    }
+
+    if ( (m/^=(over)/) .. (m/^=(back)/) ) {
+      next;
+    }
+    
+    # skip the data section
+    if (m/^__(DATA|END)__$/) {
+      last;
+    }
+
+    # Each keyword can appear multiple times.  Don't
+    #  bother with datastructures to store these strings,
+    #  if we need to print it print it now.
+    
+    if ( m/^\s*\$RPM_Requires\s*=\s*["'](.*)['"]/i) {
+      foreach $_ (spit(/\s+/, $1)) {
+	print "$_\n";
+      }
+    }
+
+    if ( 
+
+# ouch could be in a eval, perhaps we do not want these since we catch
+# an exception they must not be required
+
+#   eval { require Term::ReadLine } or die $@;
+#   eval "require Term::Rendezvous;" or die $@;
+#   eval { require Carp } if defined $^S; # If error/warning during compilation,
+
+
+	(m/^(\s*)         # we hope the inclusion starts the line
+	 (require|use)\s+(?!\{)     # do not want 'do {' loops
+	 # quotes around name are always legal
+	 [\'\"]?([^\;\ \'\"\t]*)[\'\"]?[\t\;\ ]
+	 # the syntax for 'use' allows version requirements
+	 \s*([.0-9]*)
+	 /x)
+       ) {
+      my ($whitespace, $statement, $module, $version) = ($1, $2, $3,$4);
+
+      # we only consider require statements that are flush against
+      # the left edge. any other require statements give too many
+      # false positives, as they are usually inside of an if statement
+      # as a fallback module or a rarely used option
+
+      ($whitespace ne "" && $statement eq "require") && next;
+
+      # if there is some interpolation of variables just skip this
+      # dependency, we do not want
+      #        do "$ENV{LOGDIR}/$rcfile";
+   
+      ($module =~ m/\$/) && next;
+
+      # skip if the phrase was "use of" -- shows up in gimp-perl, et al
+      next if $module eq 'of';
+
+      # if the module ends in a comma we probaly caught some
+      # documentation of the form 'check stuff,\n do stuff, clean
+      # stuff.' there are several of these in the perl distribution
+
+      ($module  =~ m/[,>]$/) && next;
+
+      # if the module name starts in a dot it is not a module name.
+      # Is this necessary?  Please give me an example if you turn this
+      # back on.
+
+      #      ($module =~ m/^\./) && next;
+
+      # if the module ends with .pm strip it to leave only basename.
+      # starts with /, which means its an absolute path to a file
+      if ($module =~ m(^/)) {
+        print "$module\n";
+        next;
+      }
+
+      # sometimes people do use POSIX qw(foo), or use POSIX(qw(foo)) etc
+      # we can strip qw.*$, as well as (.*$:
+      $module =~ s/qw.*$//;
+      $module =~ s/\(*$//;
+
+      $module =~ s/\.pm$//;
+
+      # some perl programmers write 'require URI/URL;' when 
+      # they mean 'require URI::URL;'
+
+      $module =~ s/\//::/;
+
+      # trim off trailing parenthesis if any.  Sometimes people pass
+      # the module an empty list.
+
+      $module =~ s/\(\s*\)$//;
+
+      if ( $module =~ m/^[0-9._]+$/ ) {
+      # if module is a number then both require and use interpret that
+      # to mean that a particular version of perl is specified
+
+      if ($module =~ /5.00/) {
+        print "perl >= 0:$module\n";
+        next;
+      }
+      else {
+        print "perl >= 1:$module\n";
+        next;
+      }
+
+      };
+
+      # ph files do not use the package name inside the file.
+      # perlmodlib  documentation says:
+      
+      #       the .ph files made by h2ph will probably end up as
+      #       extension modules made by h2xs.
+      
+      # so do not expend much effort on these.
+
+
+      # there is no easy way to find out if a file named systeminfo.ph
+      # will be included with the name sys/systeminfo.ph so only use the
+      # basename of *.ph files
+
+      ($module  =~ m/\.ph$/) && next;
+
+      $require{$module}=$version;
+      $line{$module}=$_;
+    }
+    
+  }
+
+  close(FILE) ||
+    die("$0: Could not close file: '$file' : $!\n");
+  
+  return ; 
+}

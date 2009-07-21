@@ -1,0 +1,42 @@
+#!/bin/bash   
+# script checks wether package is 64-bit clean
+# and also for a linker bug. (linker allows 64bit libs to link 32bit libs)
+echo "sf@suse.de: if you find problems with this script, drop me a note"
+# If using normal root, avoid changing anything:
+if [ -z "$RPM_BUILD_ROOT" -o "$RPM_BUILD_ROOT" = "/" ]; then
+       exit 0
+fi
+files=
+tfiles=
+LC_ALL=
+LANG=
+# check for 64-bit libs in */lib
+for p in `grep -v 'lib64' /etc/ld.so.conf`
+do
+  if test  -d $RPM_BUILD_ROOT$p ; then
+    for f in `find $RPM_BUILD_ROOT$p \
+      -maxdepth 1 -type f -name \*.so\* -o -name \*.a -follow 2>/dev/null`
+    do
+	[ $HOSTTYPE = s390x ] && case $f in */lib/ld64.so.1) continue; esac
+       objdump -f $f 2>/dev/null | grep 'format elf64' \
+                     && { echo "$f: should be in */lib64"; exit 1; }
+
+    done
+  fi
+done
+
+# check for 64 bit libs that have an rpath to a 32 bit Library
+
+for p in `grep 'lib64' /etc/ld.so.conf`
+do
+  if test -d $RPM_BUILD_ROOT$p ; then
+    for f in `find $RPM_BUILD_ROOT$p \
+    -maxdepth 1 -type f -name \*.so\* -o -name \*.a -follow 2>/dev/null`
+    do
+     # check for rpath to 32bit libs
+       objdump -x $f  2>/dev/null | grep -v "lib64" | grep -i 'rpath.*lib$' \
+                     && { echo "$f: rpath to 32bit lib"; exit 1; }
+    done
+  fi
+done
+exit 0
