@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-23 16:39:29 $
 
  -----------------------------------------------------------------------------
 
@@ -47,16 +47,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2009-07-23 16:39:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: wrapper.c,v $
+ Revision 1.1.2.1  2009-07-23 16:39:29  brian
+ - added wrapper module
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-23 16:39:29 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-23 16:39:29 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
