@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2009-07-24 13:49:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -524,23 +524,6 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 # =============================================================================
 
 # =============================================================================
-# _OPENSS7_DEBUG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_OPENSS7_DEBUG], [dnl
-    if test :"${USE_MAINTAINER_MODE:-no}" != :no
-    then
-	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
-	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Werror,,g'`
-dnl	CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wundef,,g'`  dnl this frags out flex 2.5.33
-	CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
-dnl	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
-	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wno-trigraphs -Wp,-D_FORTIFY_SOURCE=2 -Werror"
-    fi
-])# _OPENSS7_DEBUG
-# =============================================================================
-
-# =============================================================================
 # _OPENSS7_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS], [dnl
@@ -847,99 +830,109 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_INDEP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
     AC_MSG_CHECKING([for user CFLAGS])
-    AC_MSG_RESULT([${CFLAGS}])
+    AC_MSG_RESULT([${USER_CFLAGS} ${USER_DFLAGS} ${CFLAGS}])
     AC_MSG_CHECKING([for user CFLAGS])
+    USER_CFLAGS="$CFLAGS${USER_CFLAGS:+ $USER_CFLAGS}"
+    USER_DFLAGS=
+    CFLAGS=
     case "${with_optimize:-auto}" in
 	(size)
-	    OFLAGS="-g -Os${OFLAGS:+ $OFLAGS}"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CFLAGS="-g -Os${CFLAGS:+ $CFLAGS}"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(speed)
-	    OFLAGS="-g -O3${OFLAGS:+ $OFLAGS}"
-	    OFLAGS="${OFLAGS:+$OFLAGS }-freorder-blocks"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CFLAGS="-g -O3${CFLAGS:+ $CFLAGS}"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(normal)
-	    OFLAGS="-g -O2${OFLAGS:+ $OFLAGS}"
-	    OFLAGS="${OFLAGS:+$OFLAGS }-freorder-blocks"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CFLAGS="-g -O2${CFLAGS:+ $CFLAGS}"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-freorder-blocks"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(quick)
-	    OFLAGS="-g -O0${OFLAGS:+ $OFLAGS}"
-	    OFLAGS="${OFLAGS:+$OFLAGS }-finline"
-	    OFLAGS="${OFLAGS:+$OFLAGS }-fno-keep-inline-functions"
-	    OFLAGS="${OFLAGS:+$OFLAGS }-fno-keep-static-consts"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    CFLAGS="-g -O0${CFLAGS:+ $CFLAGS}"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-finline"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-inline-functions"
+	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-static-consts"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(auto|*)
-	    os7_tmp=`echo " $CFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
-	    OFLAGS="$OFLAGS${os7_tmp:+ $os7_tmp}"
-	    CFLAGS=`echo " $CFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
-	    os7_tmp=`echo " $CFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
-	    OFLAGS="$OFLAGS${os7_tmp:+ $os7_tmp}"
-	    CFLAGS=`echo " $CFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    os7_tmp=`echo " $USER_CFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
+	    CFLAGS="$CFLAGS${os7_tmp:+ $os7_tmp}"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
+	    os7_tmp=`echo " $USER_CFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
+	    CFLAGS="$CFLAGS${os7_tmp:+ $os7_tmp}"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
     esac
-    OFLAGS="-pipe${OFLAGS:+ $OFLAGS}"
-dnl CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
-dnl CFLAGS="${CFLAGS:+$CFLAGS }-Wno-trigraphs"
+    CFLAGS="${CFLAGS:+$CFLAGS }-pipe"
+    USER_CFLAGS=`echo " $USER_CFLAGS" | sed 's, -pipe,,g'`
+dnl USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
+dnl USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-trigraphs"
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    OFLAGS="-Wp,-D_FORTIFY_SOURCE=2${OFLAGS:+ $OFLAGS}"
-	    CFLAGS=`echo " $CFLAGS" | sed -e 's, -Wall,,g'`
-	    OFLAGS="${OFLAGS:+$OFLAGS }-Wall"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-system-headers"
-dnl	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wundef"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wno-endif-labels"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wbad-function-cast"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wcast-qual"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wcast-align"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wwrite-strings"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wconversion"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wsign-compare"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Waggregate-return"
-dnl	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wstrict-prototypes"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-prototypes"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-declarations"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-noreturn"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wmissing-format-attribute"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wpacked"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wpadded"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wredundant-decls"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wnested-externs"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wunreachable-code"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Winline"
-dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
-	    CFLAGS=`echo " $CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
-	    CFLAGS="${CFLAGS:+$CFLAGS }-Werror"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -Wall,,g'`
+	    USER_CFLAGS="-Wall${USER_CFLAGS:+ $USER_CFLAGS}"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-system-headers"
+dnl	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wundef"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-endif-labels"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wbad-function-cast"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wcast-qual"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wcast-align"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wwrite-strings"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wconversion"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wsign-compare"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Waggregate-return"
+dnl	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wstrict-prototypes"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wmissing-prototypes"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wmissing-declarations"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wmissing-noreturn"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wmissing-format-attribute"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wpacked"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wpadded"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wredundant-decls"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wnested-externs"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wunreachable-code"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Winline"
+dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wdisabled-optimization"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
+	    USER_DFLAGS="${USER_DFLAGS:+$USER_DFLAGS }-Werror"
     fi
-    CFLAGS="${OFLAGS:+$OFLAGS }$CFLAGS"
-    CFLAGS=`echo "$CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
-    AC_MSG_RESULT([${CFLAGS}])
+    USER_CFLAGS="${CFLAGS:$CFLAGS }$USER_CFLAGS"; CFLAGS=
+    USER_CFLAGS=`echo "$USER_CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    USER_DFLAGS=`echo "$USER_DFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${USER_CFLAGS} ${USER_DFLAGS} ${CFLAGS}])
 ])# _OPENSS7_OPTIONS_CFLAGS
 # =============================================================================
 
@@ -948,99 +941,110 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_CXXFLAGS], [dnl
     AC_MSG_CHECKING([for user CXXFLAGS])
-    AC_MSG_RESULT([${CXXFLAGS}])
+    AC_MSG_RESULT([${USER_CXXFLAGS} ${USER_DXXFLAGS} ${CXXFLAGS}])
     AC_MSG_CHECKING([for user CXXFLAGS])
+    USER_CXXFLAGS="$CXXFLAGS${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+    USER_DXXFLAGS=
+    CXXFLAGS=
     case "${with_optimize:-auto}" in
 	(size)
-	    OXXFLAGS="-g -Os${OXXFLAGS:+ $OXXFLAGS}"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CXXFLAGS="-g -Os${CXXFLAGS:+ $CXXFLAGS}"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(speed)
-	    OXXFLAGS="-g -O3${OXXFLAGS:+ $OXXFLAGS}"
-	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-freorder-blocks"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CXXFLAGS="-g -O3${CXXFLAGS:+ $CXXFLAGS}"
+	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-freorder-blocks"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(normal)
-	    OXXFLAGS="-g -O2${OXXFLAGS:+ $OXXFLAGS}"
-	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-freorder-blocks"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    CXXFLAGS="-g -O2${CXXFLAGS:+ $CXXFLAGS}"
+	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-freorder-blocks"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(quick)
-	    OXXFLAGS="-g -O0${OXXFLAGS:+ $OXXFLAGS}"
-	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-finline"
-	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-fno-keep-inline-functions"
-	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-fno-keep-static-consts"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    CXXFLAGS="-g -O0${CXXFLAGS:+ $CXXFLAGS}"
+	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-finline"
+	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-fno-keep-inline-functions"
+	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-fno-keep-static-consts"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(auto|*)
-	    os7_tmp=`echo " $CXXFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
-	    OXXFLAGS="$OXXFLAGS${os7_tmp:+ $os7_tmp}"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
-	    os7_tmp=`echo " $CXXFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
-	    OXXFLAGS="$OXXFLAGS${os7_tmp:+ $os7_tmp}"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    os7_tmp=`echo " $USER_CXXFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
+	    CXXFLAGS="$CXXFLAGS${os7_tmp:+ $os7_tmp}"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
+	    os7_tmp=`echo " $USER_CXXFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
+	    CXXFLAGS="$CXXFLAGS${os7_tmp:+ $os7_tmp}"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
     esac
-    OXXFLAGS="-pipe${OXXFLAGS:+ $OXXFLAGS}"
-dnl CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
-dnl CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wno-trigraphs"
+    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-pipe"
+    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed 's, -pipe,,g'`
+dnl USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
+dnl USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-trigraphs"
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    OXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${OXXFLAGS:+ $OXXFLAGS}"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -e 's, -Wall,,g'`
-	    OXXFLAGS="${OXXFLAGS:+$OXXFLAGS }-Wall"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wno-system-headers"
-dnl	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wundef"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wno-endif-labels"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wbad-function-cast"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wcast-qual"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wcast-align"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wwrite-strings"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wconversion"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wsign-compare"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Waggregate-return"
-dnl	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wstrict-prototypes"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-prototypes"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-declarations"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-noreturn"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wmissing-format-attribute"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wpacked"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wpadded"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wredundant-decls"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wnested-externs"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wunreachable-code"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Winline"
-dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wdisabled-optimization"
-	    CXXFLAGS=`echo " $CXXFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
-	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Werror"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -Wall,,g'`
+	    USER_CXXFLAGS="-Wall${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-system-headers"
+dnl	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wundef"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-endif-labels"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wbad-function-cast"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wcast-qual"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wcast-align"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wwrite-strings"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wconversion"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wsign-compare"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Waggregate-return"
+dnl	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wstrict-prototypes"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wmissing-prototypes"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wmissing-declarations"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wmissing-noreturn"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wmissing-format-attribute"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wpacked"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wpadded"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wredundant-decls"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wnested-externs"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wunreachable-code"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Winline"
+dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wdisabled-optimization"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
+	    USER_DXXFLAGS="${USER_DXXFLAGS:+$USER_DXXFLAGS }-Werror"
     fi
-    CXXFLAGS="${OXXFLAGS:+$OXXFLAGS }$CXXFLAGS"
+    USER_CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }$USER_CXXFLAGS"; CXXFLAGS=
     CXXFLAGS=`echo "$CXXFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
-    AC_MSG_RESULT([${CXXFLAGS}])
+    USER_CXXFLAGS=`echo "$USER_CXXFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    USER_DXXFLAGS=`echo "$USER_DXXFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${USER_CXXFLAGS} ${USER_DXXFLAGS} ${CXXFLAGS}])
 ])# _OPENSS7_OPTIONS_CXXFLAGS
 # =============================================================================
 
@@ -1049,99 +1053,110 @@ dnl	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-Wdisabled-optimization"
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_GCJFLAGS], [dnl
     AC_MSG_CHECKING([for user GCJFLAGS])
-    AC_MSG_RESULT([${GCJFLAGS}])
+    AC_MSG_RESULT([${USER_GCJFLAGS} ${USER_GCDFLAGS} ${GCJFLAGS}])
     AC_MSG_CHECKING([for user GCJFLAGS])
+    USER_GCJFLAGS="$GCJFLAGS${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+    USER_GCDFLAGS=
+    GCJFLAGS=
     case "${with_optimize:-auto}" in
 	(size)
-	    OCJFLAGS="-g -Os${OCJFLAGS:+ $OCJFLAGS}"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    GCJFLAGS="-g -Os${GCJFLAGS:+ $GCJFLAGS}"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(speed)
-	    OCJFLAGS="-g -O3${OCJFLAGS:+ $OCJFLAGS}"
-	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-freorder-blocks"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    GCJFLAGS="-g -O3${GCJFLAGS:+ $GCJFLAGS}"
+	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-freorder-blocks"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(normal)
-	    OCJFLAGS="-g -O2${OCJFLAGS:+ $OCJFLAGS}"
-	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-freorder-blocks"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    GCJFLAGS="-g -O2${GCJFLAGS:+ $GCJFLAGS}"
+	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-freorder-blocks"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?inline-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-blocks,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?reorder-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?function-sections,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?unit-at-a-time,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(quick)
-	    OCJFLAGS="-g -O0${OCJFLAGS:+ $OCJFLAGS}"
-	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-finline"
-	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-fno-keep-inline-functions"
-	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-fno-keep-static-consts"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    GCJFLAGS="-g -O0${GCJFLAGS:+ $GCJFLAGS}"
+	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-finline"
+	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fno-keep-inline-functions"
+	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fno-keep-static-consts"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -g[[^[:space:]]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -O[[0-9s]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?keep-inline-functions,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?keep-static-consts,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(auto|*)
-	    os7_tmp=`echo " $GCJFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
-	    OCJFLAGS="$OCJFLAGS${os7_tmp:+ $os7_tmp}"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
-	    os7_tmp=`echo " $GCJFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
-	    OCJFLAGS="$OCJFLAGS${os7_tmp:+ $os7_tmp}"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    os7_tmp=`echo " $USER_GCJFLAGS" | sed -r -n 's,.* (-g[[^[:space:]]]*).*,\1,p'`
+	    GCJFLAGS="$GCJFLAGS${os7_tmp:+ $os7_tmp}"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed 's, -g[[^[:space:]]]*,,g'`
+	    os7_tmp=`echo " $USER_GCJFLAGS" | sed -r -n 's,.* (-O[[0-9s]]*).*,\1,p'`
+	    GCJFLAGS="$GCJFLAGS${os7_tmp:+ $os7_tmp}"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed 's, -O[[0-9s]]*,,g'`
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
     esac
-    OCJFLAGS="-pipe${OCJFLAGS:+ $OCJFLAGS}"
-dnl GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
-dnl GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-trigraphs"
+    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-pipe"
+    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed 's, -pipe,,g'`
+dnl USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?trigraphs,,g'`
+dnl USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-trigraphs"
     if test :"${USE_MAINTAINER_MODE:-no}" != :no
     then
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    OCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${OCJFLAGS:+ $OCJFLAGS}"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -e 's, -Wall,,g'`
-	    OCJFLAGS="${OCJFLAGS:+$OCJFLAGS }-Wall"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-system-headers"
-dnl	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wundef"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-endif-labels"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wbad-function-cast"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wcast-qual"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wcast-align"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wwrite-strings"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wconversion"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wsign-compare"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Waggregate-return"
-dnl	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wstrict-prototypes"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-prototypes"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-declarations"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-noreturn"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wmissing-format-attribute"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wpacked"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wpadded"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wredundant-decls"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wnested-externs"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wunreachable-code"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Winline"
-dnl	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wdisabled-optimization"
-	    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
-	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Werror"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -Wall,,g'`
+	    USER_GCJFLAGS="-Wall${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-system-headers"
+dnl	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wundef"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-endif-labels"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wbad-function-cast"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wcast-qual"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wcast-align"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wwrite-strings"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wconversion"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wsign-compare"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Waggregate-return"
+dnl	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?strict-prototypes,,g'`
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wstrict-prototypes"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wmissing-prototypes"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wmissing-declarations"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wmissing-noreturn"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wmissing-format-attribute"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wpacked"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wpadded"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wredundant-decls"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wnested-externs"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wunreachable-code"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Winline"
+dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wdisabled-optimization"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
+	    USER_GCDFLAGS="${USER_GCDFLAGS:+$USER_GCDFLAGS }-Werror"
     fi
-    GCJFLAGS="${OCJFLAGS:+$OCJFLAGS }$GCJFLAGS"
+    USER_GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }$USER_GCJFLAGS"; GCJFLAGS=
     GCJFLAGS=`echo "$GCJFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
-    AC_MSG_RESULT([${GCJFLAGS}])
+    USER_GCJFLAGS=`echo "$USER_GCJFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    USER_GCDFLAGS=`echo "$USER_GCDFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${USER_GCJFLAGS} ${USER_GCDFLAGS} ${GCJFLAGS}])
 ])# _OPENSS7_OPTIONS_GCJFLAGS
 # =============================================================================
 
@@ -1209,6 +1224,12 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.7  2009-07-24 13:49:44  brian
+# - updates for release build
+#
+# Revision 1.1.2.6  2009-07-23 16:37:50  brian
+# - updates for release
+#
 # Revision 1.1.2.5  2009-07-21 11:06:13  brian
 # - changes from release build
 #

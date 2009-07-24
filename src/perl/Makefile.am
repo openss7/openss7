@@ -1,6 +1,6 @@
 # =============================================================================
 #
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-24 13:49:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,8 +66,8 @@ perl_MODFILES		= xti/Xti.pm
 xtiperldir		= $(perldir)/auto/Xti
 
 Xti_la_SOURCES		= xti/xti_wrap.c
-Xti_la_CPPFLAGS		= -I$(builddir)/xti -I$(srcdir)/xti $(PKG_INCLUDES) $(USER_CPPFLAGS) $(PERL_CPPFLAGS) -Dbool=char -DMODULE -fno-strict-aliasing
-Xti_la_CFLAGS		= $(USER_CFLAGS) -Wno-unused -Wno-cast-qual
+Xti_la_CPPFLAGS		= -I$(builddir)/xti -I$(srcdir)/xti $(PKG_INCLUDES) $(USER_CPPFLAGS) $(PERL_CPPFLAGS) -Dbool=char -DMODULE
+Xti_la_CFLAGS		= $(USER_CFLAGS) -Wno-unused -Wno-cast-qual -fno-strict-aliasing
 Xti_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 Xti_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
 
@@ -83,6 +83,9 @@ include ../../am/swig.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.3  2009-07-24 13:49:46  brian
+# - updates for release build
+#
 # Revision 1.1.2.2  2009-07-21 11:06:17  brian
 # - changes from release build
 #

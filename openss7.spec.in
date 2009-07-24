@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2009-07-24 13:49:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -203,7 +203,7 @@
 %global USE_rmnods          0
 %endif
 
-%if %(if (rpm -q --whatprovides /usr/bin/gcj-dbtool >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%if %(if (rpm -q --whatprovides /usr/bin/gcj-dbtool >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %global HAVE_gcjmaps        0
 %endif
 
@@ -674,8 +674,6 @@
 
 %if %{WANT_debug}
 %global __debug_package     1
-%else
-%global __debug_package     0
 %endif
 
 %global debug_package       %{nil}
@@ -1331,6 +1329,17 @@
 %global files_mkvars        %{nil}
 %global files_kinfo         %{nil}
 %endif
+
+# ---------------------------------------------------------------------------
+
+#global _missing_build_ids_terminate_build 1
+#global _unpackaged_files_terminate_build 0
+#global _missing_doc_files_terminate_build 0
+#global _use_internal_dependency_generator 0
+
+%global __find_provides %{_builddir}/%{name}-%{version}/scripts/rpm/find-provides %{_builddir}/%{name}-%{version} %{buildroot}
+%global __find_requires %{_builddir}/%{name}-%{version}/scripts/rpm/find-requires %{_builddir}/%{name}-%{version} %{buildroot}
+%global __check_files   %{_builddir}/%{name}-%{version}/scripts/rpm/check-files %{buildroot}
 
 # ---------------------------------------------------------------------------
 
@@ -2836,7 +2845,7 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 %if %{FILES_perlmods}
-Prefix:         %{_archlibdir}
+Prefix:         %{_perldir}
 %endif
 %if %{FILES_tcllibs}
 Prefix:         %{_pkgtcllibdir}
@@ -2948,8 +2957,8 @@ fi
 %{?files_libraries:%{_libdir}/*.la}
 %{?files_lib32compat:%{_lib32dir}/*.so*}
 %{?files_lib32compat:%{_lib32dir}/*.la}
-%{?files_perlmods:%dir %{_archlibdir}/auto/*}
-%{?files_perlmods:%{_archlibdir}/auto/*}
+%{?files_perlmods:%dir %{_perldir}/auto/*}
+%{?files_perlmods:%{_perldir}/auto/*}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}}
 %{?files_tcllibs:%{_pkgtcllibdir}/pkgIndex.tcl}
 %{?files_tcllibs:%{_pkgtcllibdir}/*/*.tcl}
@@ -3663,6 +3672,7 @@ fi
 %{?files_jnilibs:%{_jnidir}/*}
 %{?files_gcjlibs:%dir %{_pkggcjdir}}
 %{?files_gcjlibs:%{_pkggcjdir}/*.so}
+%{?files_gcjlibs:%{_pkggcjdir}/*.la}
 %{?files_gcjmaps:%{_pkggcjdir}/*.db}
 %{?files_jarfiles:%{_javadir}/*}
 %endif
@@ -3703,6 +3713,12 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.8  2009-07-24 13:49:43  brian
+# - updates for release build
+#
+# Revision 1.1.2.7  2009-07-23 16:37:42  brian
+# - updates for release
+#
 # Revision 1.1.2.6  2009-07-21 11:06:11  brian
 # - changes from release build
 #

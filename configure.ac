@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-24 13:49:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-24 13:49:43 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -87,6 +87,12 @@ fi
 AM_SILENT_RULES
 
 AC_USE_SYSTEM_EXTENSIONS
+
+USER_CPPFLAGS="$CPPFLAGS"; unset CPPFLAGS
+USER_CFLAGS="$CFLAGS";     unset CFLAGS
+USER_CXXFLAGS="$CXXFLAGS"; unset CXXFLAGS
+USER_GCJFLAGS="$GCJFLAGS"; unset GCJFLAGS
+USER_LDFLAGS="$LDFLAGS";   unset LDFLAGS
 
 m4_include([m4/swig.m4])
 dnl
@@ -274,6 +280,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.6  2009-07-24 13:49:43  brian
+# - updates for release build
+#
 # Revision 1.1.2.5  2009-07-21 11:06:11  brian
 # - changes from release build
 #
