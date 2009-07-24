@@ -1,0 +1,181 @@
+#!/bin/sh
+remove() {
+	rm -f -- $DESTDIR/dev/clone
+	rm -f -- $DESTDIR/dev/echo
+	rm -f -- $DESTDIR/dev/strlog
+	rm -f -- $DESTDIR/dev/sloop
+	rm -f -- $DESTDIR/dev/loop_clone
+	rm -f -- $DESTDIR/dev/mux
+	rm -f -- $DESTDIR/dev/nuls
+	rm -f -- $DESTDIR/dev/sad
+	rm -f -- $DESTDIR/dev/ip2
+	rm -f -- $DESTDIR/dev/ldl
+	rm -f -- $DESTDIR/dev/rawip2
+	rm -f -- $DESTDIR/dev/tcp2
+	rm -f -- $DESTDIR/dev/udp2
+	rm -f -- $DESTDIR/dev/fifo
+	rm -f -- $DESTDIR/dev/conslog
+	rm -f -- $DESTDIR/dev/loop.1
+	rm -f -- $DESTDIR/dev/loop.2
+	rm -f -- $DESTDIR/dev/nsdev
+	rm -f -- $DESTDIR/dev/pipe
+	rm -f -- $DESTDIR/dev/sfx
+	rm -f -- $DESTDIR/dev/spx
+	rm -f -- $DESTDIR/dev/inet/ip
+	rm -f -- $DESTDIR/dev/ip
+	rm -f -- $DESTDIR/dev/icmp
+	rm -f -- $DESTDIR/dev/inet/icmp
+	rm -f -- $DESTDIR/dev/ggp
+	rm -f -- $DESTDIR/dev/inet/ggp
+	rm -f -- $DESTDIR/dev/inet/ipip
+	rm -f -- $DESTDIR/dev/ipip
+	rm -f -- $DESTDIR/dev/inet/tcp
+	rm -f -- $DESTDIR/dev/tcp
+	rm -f -- $DESTDIR/dev/egp
+	rm -f -- $DESTDIR/dev/inet/egp
+	rm -f -- $DESTDIR/dev/inet/pup
+	rm -f -- $DESTDIR/dev/pup
+	rm -f -- $DESTDIR/dev/arp
+	rm -f -- $DESTDIR/dev/inet/arp
+	rm -f -- $DESTDIR/dev/inet/rip
+	rm -f -- $DESTDIR/dev/inet/udp
+	rm -f -- $DESTDIR/dev/rip
+	rm -f -- $DESTDIR/dev/udp
+	rm -f -- $DESTDIR/dev/idp
+	rm -f -- $DESTDIR/dev/inet/idp
+	rm -f -- $DESTDIR/dev/inet/rawip
+	rm -f -- $DESTDIR/dev/rawip
+	rm -f -- $DESTDIR/dev/ticots_ord
+	rm -f -- $DESTDIR/dev/ticots
+	rm -f -- $DESTDIR/dev/ticlts
+	rm -f -- $DESTDIR/dev/sctp
+	rm -f -- $DESTDIR/dev/np_ip
+	rm -f -- $DESTDIR/dev/ipcl
+	rm -f -- $DESTDIR/dev/ipco
+	rm -f -- $DESTDIR/dev/sctp_n
+	rm -f -- $DESTDIR/dev/sctp_t
+	rm -f -- $DESTDIR/dev/socksys
+	rm -f -- $DESTDIR/dev/unix
+	rm -f -- $DESTDIR/dev/xnet
+	test -d /dev/inet && rmdir --ignore-fail-on-non-empty -- $DESTDIR/dev/inet
+}
+create() {
+	test -d /dev/inet || mkdir -p -- $DESTDIR/dev/inet
+	ln -s /dev/streams/clone/0 $DESTDIR/dev/clone
+	ln -s /dev/streams/clone/echo $DESTDIR/dev/echo
+	ln -s /dev/streams/clone/log $DESTDIR/dev/strlog
+	ln -s /dev/streams/clone/loop $DESTDIR/dev/sloop
+	ln -s /dev/streams/clone/loop $DESTDIR/dev/loop_clone
+	ln -s /dev/streams/clone/mux $DESTDIR/dev/mux
+	ln -s /dev/streams/clone/nuls $DESTDIR/dev/nuls
+	ln -s /dev/streams/clone/sad $DESTDIR/dev/sad
+	ln -s /dev/streams/clone/ip $DESTDIR/dev/ip2
+	ln -s /dev/streams/clone/rawip $DESTDIR/dev/rawip2
+	ln -s /dev/streams/clone/tcp $DESTDIR/dev/tcp2
+	ln -s /dev/streams/clone/udp $DESTDIR/dev/udp2
+	ln -s /dev/streams/fifo/0 $DESTDIR/dev/fifo
+	ln -s /dev/streams/log/1 $DESTDIR/dev/conslog
+	ln -s /dev/streams/loop/1 $DESTDIR/dev/loop.1
+	ln -s /dev/streams/loop/2 $DESTDIR/dev/loop.2
+	ln -s /dev/streams/nsdev/0 $DESTDIR/dev/nsdev
+	ln -s /dev/streams/pipe/0 $DESTDIR/dev/pipe
+	ln -s /dev/streams/sfx/0 $DESTDIR/dev/sfx
+	ln -s /dev/streams/spx/0 $DESTDIR/dev/spx
+	ln -s /dev/streams/inet/32 $DESTDIR/dev/inet/ip
+	ln -s /dev/streams/inet/32 $DESTDIR/dev/ip
+	ln -s /dev/streams/inet/33 $DESTDIR/dev/icmp
+	ln -s /dev/streams/inet/33 $DESTDIR/dev/inet/icmp
+	ln -s /dev/streams/inet/34 $DESTDIR/dev/ggp
+	ln -s /dev/streams/inet/34 $DESTDIR/dev/inet/ggp
+	ln -s /dev/streams/inet/35 $DESTDIR/dev/inet/ipip
+	ln -s /dev/streams/inet/35 $DESTDIR/dev/ipip
+	ln -s /dev/streams/inet/36 $DESTDIR/dev/inet/tcp
+	ln -s /dev/streams/inet/36 $DESTDIR/dev/tcp
+	ln -s /dev/streams/inet/37 $DESTDIR/dev/egp
+	ln -s /dev/streams/inet/37 $DESTDIR/dev/inet/egp
+	ln -s /dev/streams/inet/38 $DESTDIR/dev/inet/pup
+	ln -s /dev/streams/inet/38 $DESTDIR/dev/pup
+	ln -s /dev/streams/inet/39 $DESTDIR/dev/arp
+	ln -s /dev/streams/inet/39 $DESTDIR/dev/inet/arp
+	ln -s /dev/streams/inet/39 $DESTDIR/dev/inet/rip
+	ln -s /dev/streams/inet/39 $DESTDIR/dev/inet/udp
+	ln -s /dev/streams/inet/39 $DESTDIR/dev/rip
+	ln -s /dev/streams/inet/39 $DESTDIR/dev/udp
+	ln -s /dev/streams/inet/40 $DESTDIR/dev/idp
+	ln -s /dev/streams/inet/40 $DESTDIR/dev/inet/idp
+	ln -s /dev/streams/inet/41 $DESTDIR/dev/inet/rawip
+	ln -s /dev/streams/inet/41 $DESTDIR/dev/rawip
+	ln -s /dev/streams/inet/42 $DESTDIR/dev/ticots_ord
+	ln -s /dev/streams/inet/43 $DESTDIR/dev/ticots
+	ln -s /dev/streams/inet/44 $DESTDIR/dev/ticlts
+	ln -s /dev/streams/inet/45 $DESTDIR/dev/sctp
+	ln -s /dev/streams/np_ip/0 $DESTDIR/dev/np_ip
+	ln -s /dev/streams/np_ip/1 $DESTDIR/dev/ipcl
+	ln -s /dev/streams/np_ip/2 $DESTDIR/dev/ipco
+	ln -s /dev/streams/sctp_n/0 $DESTDIR/dev/sctp_n
+	ln -s /dev/streams/sctp_t/0 $DESTDIR/dev/sctp_t
+	ln -s /dev/streams/socksys/0 $DESTDIR/dev/socksys
+	ln -s /dev/streams/unix/0 $DESTDIR/dev/unix
+	ln -s /dev/streams/xnet/0 $DESTDIR/dev/xnet
+}
+
+if test ":$V" == :1 ; then
+    set -x
+fi
+if test $# -ne 1 ; then
+    set $0 --
+fi
+case :$1 in
+    :-c|:--create)
+	remove
+	create
+	exit 0
+	;;
+    :-r|:--remove)
+	remove
+	exit 0
+	;;
+    :-h|:--help)
+	cat<<EOF
+usage:
+    `basename $0` {-c,--create}
+    `basename $0` {-r,--remove}
+    `basename $0` {-h,--help}
+    `basename $0` {-V,--version}
+    `basename $0` {-C,--copying}
+EOF
+	exit 0
+	;;
+    :-V|:--version)
+	echo "Version 1.1.2"
+	exit 0
+	;;
+    :-C|:--copying)
+	cat<<EOF
+Copyright (c) 2008, 2009  Monavacon Limited.
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.
+Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.
+
+All Rights Reserved.
+
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Distributed by OpenSS7 under GNU Affero General Public License Version 3,
+with conditions, incorporated herein by reference.
+EOF
+	exit 0
+	;;
+    *)
+	cat>&2<<EOF
+usage:
+    `basename $0` {-c,--create}
+    `basename $0` {-r,--remove}
+    `basename $0` {-h,--help}
+    `basename $0` {-V,--version}
+    `basename $0` {-C,--copying}
+EOF
+	exit 2
+	;;
+esac
+
