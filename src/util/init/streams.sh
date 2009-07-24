@@ -1,8 +1,9 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-24 13:49:46 $
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
@@ -17,7 +18,7 @@
 # config:	/etc/default/streams
 # probe:	false
 # hide:		false
-# license:	GPL
+# license:	AGPL
 # description:	This STREAMS init script is part of Linux Fast-STREAMS.  \
 #		It is responsible for ensuring that the necessary STREAMS \
 #		character devices are present in the /dev directory and \
@@ -33,7 +34,7 @@
 # Default-Stop: 0 1 6
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop streams subsystem
-# License: GPL
+# License: AGPL
 # Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
 #	reponsible for ensuring that the necessary STREAMS character devices are
 #	present in the /dev directory and that the STREAMS subsystem is
@@ -44,16 +45,36 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='streams'
 config="/etc/default/$name"
 desc="the STREAMS subsystem"
-mknod="${name}_mknod"
+mkdev="${name}_mkdev"
 
 [ -e /proc/modules ] || exit 0
 
-if test -z "$STREAMS_MKNOD" ; then
-    for STREAMS_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
-	if [ -x $STREAMS_MKNOD ] ; then
+if test -z "$STREAMS_MKDEV" ; then
+    for STREAMS_MKDEV in /sbin/${mkdev} /usr/sbin/${mkdev} /bin/${mkdev} /usr/bin/${mkdev} ; do
+	if [ -x $STREAMS_MKDEV ] ; then
 	    break
 	else
-	    STREAMS_MKNOD=
+	    STREAMS_MKDEV=
+	fi
+    done
+fi
+
+if test -z "$INET_MKDEV" ; then
+    for INET_MKDEV in /sbin/inet_mkdev /usr/sbin/inet_mkdev /bin/inet_mkdev /usr/bin/inet_mkdev ; do
+	if [ -x $INET_MKDEV ] ; then
+	    break
+	else
+	    INET_MKDEV=
+	fi
+    done
+fi
+
+if test -z "$INET_RMDEV" ; then
+    for INET_RMDEV in /sbin/inet_rmdev /usr/sbin/inet_rmdev /bin/inet_rmdev /usr/bin/inet_rmdev ; do
+	if [ -x $INET_RMDEV ] ; then
+	    break
+	else
+	    INET_RMDEV=
 	fi
     done
 fi
@@ -73,8 +94,8 @@ for file in $config ; do
     [ -f $file ] && . $file
 done
 
-[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES="no"
-[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES="no"
+[ -z "$STREAMS_MKDEV" ] && STREAMS_MAKEDEVICES="no"
+[ -z "$STREAMS_MKDEV" ] && STREAMS_REMOVEDEVICES="no"
 
 RETVAL=0
 
@@ -88,6 +109,48 @@ case :$VERBOSE in
 	redir=
 	;;
 esac
+
+modprobe_name() {
+	module=$1
+	shift
+	modname=$module
+	case $module in
+	(streams-aixcompat)
+	    modname=$"AIX"
+	    ;;
+	(streams-hpuxcompat)
+	    modname=$"HP-UX"
+	    ;;
+	(streams-irixcompat)
+	    modname=$"IRIX"
+	    ;;
+	(streams-liscompat)
+	    modname=$"LiS"
+	    ;;
+	(streams-maccompat)
+	    modname=$"MacOT"
+	    ;;
+	(streams-mpscompat)
+	    modname=$"MPS"
+	    ;;
+	(streams-osfcompat)
+	    modname=$"OSF/1"
+	    ;;
+	(streams-suncompat)
+	    modname=$"Solaris"
+	    ;;
+	(streams-svr3compat)
+	    modname=$"SVR3.2"
+	    ;;
+	(streams-svr4compat)
+	    modname=$"SVR4.2"
+	    ;;
+	(streams-uw7compat)
+	    modname=$"UnixWare"
+	    ;;
+	esac
+	echo -n "$modname "
+}
 
 build_options() {
     # Build up the options string
@@ -141,14 +204,27 @@ start() {
 	fi
     fi
 
-    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
-	echo -n "Making STREAMS devices: "
-	$STREAMS_MKNOD
+    if [ -n "$STREAMS_MKDEV" -o -n "$INET_MKDEV" ] ; then
+	if [ ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	    if [ -n "$INET_MKDEV" ] ; then
+		echo -n "Making iBCS devices: "
+		$INET_MKDEV
 	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
 	    RETVAL=1
+	fi
+	    if [ -n "$STREAMS_MKDEV" ] ; then
+		echo -n "Making STREAMS devices: "
+		$STREAMS_MKDEV --create
+		if [ $? -eq 0 ] ; then
+		    echo "."
+		else
+		    echo "(failed.)"
+		    RETVAL=1
+		fi
+	    fi
 	fi
     fi
     return $RETVAL
@@ -157,14 +233,24 @@ start() {
 stop() {
     echo "Stopping $desc: $name "
     RETVAL=0
-    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
-	echo -n "Removing STREAMS devices: "
-	$STREAMS_MKNOD --remove
-	if [ $? -eq 0 ] ; then
-	    echo "."
-	else
-	    echo "(failed.)"
-	    RETVAL=1
+    if [ -n "$STREAMS_MKDEV" -o -n "$INET_RMDEV" ] ; then
+	if [ ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	    echo -n "Removing STREAMS devices: "
+	    $STREAMS_MKDEV --remove
+	    if [ $? -eq 0 ] ; then
+		echo "."
+	    else
+		echo "(failed.)"
+		RETVAL=1
+	    fi
+	    echo -n "Removing iBCS devices: "
+	    $INET_RMDEV
+	    if [ $? -eq 0 ] ; then
+		echo "."
+	    else
+		echo "(failed.)"
+		RETVAL=1
+	    fi
 	fi
     fi
     echo -n "Unloading STREAMS kernel modules: "
@@ -175,7 +261,7 @@ stop() {
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
 	if eval "grep '^$modrex\>' /proc/modules $redir" ; then
-	    echo -n "$module "
+	    modprobe_name $module
 	    eval "modprobe -r -q -- $module $redir"
 	    if [ $? -ne 0 ] ; then
 		echo -n "(failed) "
@@ -223,12 +309,13 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-24 13:49:46 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -268,11 +355,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:47:57 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: streams.sh,v $
+# Revision 1.1.2.2  2009-07-24 13:49:46  brian
+# - updates for release build
+#
 # Revision 1.1.2.1  2009-06-21 11:47:57  brian
 # - added files to new distro
 #

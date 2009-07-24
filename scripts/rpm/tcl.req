@@ -47,7 +47,7 @@ sub process_file {
     #  if we need to print it print it now.
     
     if ( m/^\s*\$RPM_Requires\s*=\s*["'](.*)['"]/i) {
-      foreach $_ (spit(/\s+/, $1)) {
+      foreach $_ (split(/\s+/, $1)) {
 	print "$_\n";
       }
     }
@@ -59,7 +59,7 @@ sub process_file {
     #  if we need to print it print it now.
     
     if ( m/^\s*\$RPM_Requires\s*=\s*["'](.*)['"]/i) {
-      foreach $_ (spit(/\s+/, $1))
+      foreach $_ (split(/\s+/, $1))
 	print "$_\n";
     }
 

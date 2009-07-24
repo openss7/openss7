@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-24 13:49:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1725,10 +1725,11 @@ dnl
 		;;
 	    (auto)
 dnl
-dnl		Try to pass through whatever optmization options are present.
+dnl		Try to pass through whatever optmization options are present.  Always include
+dnl		debugging information.  Use install-strip to remove it.
 dnl
 		linux_cflags="$linux_cflags${linux_cflags:+ }"`echo " $linux_cv_k_cflags " | sed -e 's|^.* -O|-O|;s| .*$||'`
-		linux_cflags="$linux_cflags${linux_cflags:+ }"`echo " $linux_cv_k_cflags " | sed -e 's|^.* -g|-g|;s| .*$||'`
+		linux_cflags="$linux_cflags${linux_cflags:+ }-g"
 		linux_cv_debug_default="_SAFE"
 		linux_cv_optimize='normal'
 		;;
@@ -1778,6 +1779,11 @@ dnl	directories.
 dnl
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -Iarch/| -I${ksrcdir}/arch/|g"`
+dnl
+dnl	We now always include -g for debugging information on kernel modules due to SLES 10.  Use
+dnl	install-strip instead of install to remove it when unnecessary.
+dnl
+	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -g | |g"`
 	linux_cv_k_cflags=`echo "$linux_cv_k_cflags" | sed -e "s| -O[[0-9s]]* | $linux_cflags |"`
 dnl
 dnl	Unfortunately, Linux 2.6 makefiles add (machine dependant) -I includes
@@ -2643,6 +2649,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.3  2009-07-24 13:49:44  brian
+# - updates for release build
+#
 # Revision 1.1.2.2  2009-07-21 11:06:13  brian
 # - changes from release build
 #

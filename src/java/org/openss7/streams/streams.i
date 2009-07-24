@@ -69,24 +69,26 @@ extern "C" {
         int len;
         char *buf;
     };
-
     extern int open(const char *pathname, int flags);
     extern int close(int fd);
     extern int *__errno_location(void);
     extern int ioctl(int fd, unsigned long int request, ...);
-    extern int isastream(int fd);
-    extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
-    extern int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp);
-    extern int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags);
-    extern int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags);
-    extern int fattach(int fd, const char *path);
-    extern int fdetach(const char *path);
-    extern int pipe(int fds[2]);
 }
 
 %ignore getStrbuf;
 
 %inline %{
+
+    extern "C" {
+        extern int isastream(int fd);
+        extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
+        extern int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp);
+        extern int putmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int flags);
+        extern int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags);
+        extern int fattach(int fd, const char *path);
+        extern int fdetach(const char *path);
+        extern int pipe(int fds[2]);
+    }
 
     namespace streams {
 

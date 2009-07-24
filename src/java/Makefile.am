@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2009-07-21 11:06:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2009-07-24 13:49:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:15 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3440,10 +3440,10 @@ my_streams_SOURCEFILES = \
 
 #nodist_lib_org_openss7_streams_la_SOURCES = org-openss7-streams.jar
 lib_org_openss7_streams_la_SOURCES 	  = $(my_streams_JAVAFILES)
-lib_org_openss7_streams_la_CPPFLAGS	  = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-lib_org_openss7_streams_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS)
-lib_org_openss7_streams_la_CXXFLAGS	  = $(USER_CXXFLAGS) $(USER_DXXFLAGS)
-lib_org_openss7_streams_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+lib_org_openss7_streams_la_CPPFLAGS	  = $(GCJLIB_INCLUDES) -DJNICALL=
+lib_org_openss7_streams_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
+lib_org_openss7_streams_la_CXXFLAGS	  = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
+lib_org_openss7_streams_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_streams_la_LIBADD	  = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 lib_org_openss7_streams_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
 
@@ -3456,10 +3456,10 @@ my_jar_CLASSFILES	+= $(my_streams_CLASSFILES)
 
 nodist_libopenss7StreamsJNI_la_SOURCES = $(my_streams_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7StreamsJNI_la_CPPFLAGS       = -I$(builddir)/org/openss7/streams -I$(srcdir)/org/openss7/streams $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-libopenss7StreamsJNI_la_CFLAGS	       = $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
-libopenss7StreamsJNI_la_CXXFLAGS       = $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS)
-libopenss7StreamsJNI_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+libopenss7StreamsJNI_la_CPPFLAGS       = -I$(builddir)/org/openss7/streams -I$(srcdir)/org/openss7/streams $(GCJLIB_INCLUDES) -DJNICALL=
+libopenss7StreamsJNI_la_CFLAGS	       = $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS) -fno-strict-aliasing
+libopenss7StreamsJNI_la_CXXFLAGS       = $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS) -fno-strict-aliasing
+libopenss7StreamsJNI_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 libopenss7StreamsJNI_la_LIBADD	       = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7StreamsJNI_la_LDFLAGS	       = -module -export-dynamic -release $(VERSION) -shared
 
@@ -3548,10 +3548,10 @@ my_xti_SOURCEFILES = \
 
 #nodist_lib_org_openss7_xti_la_SOURCES = org-openss7-xti.jar
 lib_org_openss7_xti_la_SOURCES	      = $(my_xti_JAVAFILES)
-lib_org_openss7_xti_la_CPPFLAGS	      = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-lib_org_openss7_xti_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLAGS)
-lib_org_openss7_xti_la_CXXFLAGS	      = $(USER_CXXFLAGS) $(USER_DXXFLAGS)
-lib_org_openss7_xti_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+lib_org_openss7_xti_la_CPPFLAGS	      = $(GCJLIB_INCLUDES) -DJNICALL=
+lib_org_openss7_xti_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
+lib_org_openss7_xti_la_CXXFLAGS	      = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
+lib_org_openss7_xti_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_xti_la_LIBADD	      = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 lib_org_openss7_xti_la_LDFLAGS	      = -module -export-dynamic -release $(VERSION) -shared
 
@@ -3564,10 +3564,10 @@ my_jar_CLASSFILES	+= $(my_xti_CLASSFILES)
 
 nodist_libopenss7XtiJNI_la_SOURCES = $(my_xti_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7XtiJNI_la_CPPFLAGS	   = -I$(builddir)/org/openss7/xti -I$(srcdir)/org/openss7/xti $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-libopenss7XtiJNI_la_CFLAGS	   = $(USER_CFLAGS)
-libopenss7XtiJNI_la_CXXFLAGS	   = $(USER_CXXFLAGS)
-libopenss7XtiJNI_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS)
+libopenss7XtiJNI_la_CPPFLAGS	   = -I$(builddir)/org/openss7/xti -I$(srcdir)/org/openss7/xti $(GCJLIB_INCLUDES) -DJNICALL=
+libopenss7XtiJNI_la_CFLAGS	   = $(USER_CFLAGS) -fno-strict-aliasing
+libopenss7XtiJNI_la_CXXFLAGS	   = $(USER_CXXFLAGS) -fno-strict-aliasing
+libopenss7XtiJNI_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) -fno-strict-aliasing
 libopenss7XtiJNI_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7XtiJNI_la_LDFLAGS	   = -module -export-dynamic -release $(VERSION) -shared
 
@@ -3677,10 +3677,10 @@ my_tcap_SOURCEFILES = \
 
 #nodist_lib_org_openss7_tcap_la_SOURCES = org-openss7-tcap.jar
 lib_org_openss7_tcap_la_SOURCES	       = $(my_tcap_JAVAFILES)
-lib_org_openss7_tcap_la_CPPFLAGS       = $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-lib_org_openss7_tcap_la_CFLAGS	       = $(USER_CFLAGS) $(USER_DFLAGS)
-lib_org_openss7_tcap_la_CXXFLAGS       = $(USER_CXXFLAGS) $(USER_DXXFLAGS)
-lib_org_openss7_tcap_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+lib_org_openss7_tcap_la_CPPFLAGS       = $(GCJLIB_INCLUDES) -DJNICALL=
+lib_org_openss7_tcap_la_CFLAGS	       = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
+lib_org_openss7_tcap_la_CXXFLAGS       = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
+lib_org_openss7_tcap_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_tcap_la_LIBADD	       = $(top_builddir)/libstreams.la
 lib_org_openss7_tcap_la_LDFLAGS	       = -module -export-dynamic -release $(VERSION) -shared
 
@@ -3693,10 +3693,10 @@ my_jar_CLASSFILES	+= $(my_xti_CLASSFILES)
 
 nodist_libopenss7TcapJNI_la_SOURCES = $(my_tcap_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7TcapJNI_la_CPPFLAGS	    = -I$(builddir)/org/openss7/tcap -I$(srcdir)/org/openss7/tcap $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-libopenss7TcapJNI_la_CFLAGS	    = $(USER_CFLAGS) $(USER_DFLAGS)
-libopenss7TcapJNI_la_CXXFLAGS	    = $(USER_CXXFLAGS) $(USER_DXXFLAGS)
-libopenss7TcapJNI_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+libopenss7TcapJNI_la_CPPFLAGS	    = -I$(builddir)/org/openss7/tcap -I$(srcdir)/org/openss7/tcap $(GCJLIB_INCLUDES) -DJNICALL=
+libopenss7TcapJNI_la_CFLAGS	    = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
+libopenss7TcapJNI_la_CXXFLAGS	    = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
+libopenss7TcapJNI_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 libopenss7TcapJNI_la_LIBADD	    = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7TcapJNI_la_LDFLAGS	    = -module -export-dynamic -release $(VERSION) -shared
 
@@ -3772,10 +3772,10 @@ my_xtcap_SOURCEFILES = \
 
 #nodist_lib_org_openss7_xtcap_la_SOURCES = org-openss7-xtcap.jar
 lib_org_openss7_xtcap_la_SOURCES	= $(my_xtcap_JAVAFILES)
-lib_org_openss7_xtcap_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-lib_org_openss7_xtcap_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
-lib_org_openss7_xtcap_la_CXXFLAGS	= $(USER_CXXFLAGS) $(USER_DXXFLAGS)
-lib_org_openss7_xtcap_la_GCJFLAGS	= $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+lib_org_openss7_xtcap_la_CPPFLAGS	= $(GCJLIB_INCLUDES) -DJNICALL=
+lib_org_openss7_xtcap_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
+lib_org_openss7_xtcap_la_CXXFLAGS	= $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
+lib_org_openss7_xtcap_la_GCJFLAGS	= $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_xtcap_la_LIBADD		= $(top_builddir)/libstreams.la
 lib_org_openss7_xtcap_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
 
@@ -3788,10 +3788,10 @@ my_jar_CLASSFILES	+= $(my_xtcap_CLASSFILES)
 
 nodist_libopenss7XtcapJNI_la_SOURCES = $(my_xtcap_SOURCEFILES)
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
-libopenss7XtcapJNI_la_CPPFLAGS	     = -I$(builddir)/org/openss7/xtcap -I$(srcdir)/org/openss7/xtcap $(GCJLIB_INCLUDES) -fno-strict-aliasing -DJNICALL=
-libopenss7XtcapJNI_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS)
-libopenss7XtcapJNI_la_CXXFLAGS	     = $(USER_CXXFLAGS) $(USER_DXXFLAGS)
-libopenss7XtcapJNI_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
+libopenss7XtcapJNI_la_CPPFLAGS	     = -I$(builddir)/org/openss7/xtcap -I$(srcdir)/org/openss7/xtcap $(GCJLIB_INCLUDES) -DJNICALL=
+libopenss7XtcapJNI_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
+libopenss7XtcapJNI_la_CXXFLAGS	     = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
+libopenss7XtcapJNI_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 libopenss7XtcapJNI_la_LIBADD	     = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 libopenss7XtcapJNI_la_LDFLAGS	     = -module -export-dynamic -release $(VERSION) -shared
 
@@ -4141,6 +4141,9 @@ include ../../am/swig.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.8  2009-07-24 13:49:45  brian
+# - updates for release build
+#
 # Revision 1.1.2.7  2009-07-21 11:06:15  brian
 # - changes from release build
 #

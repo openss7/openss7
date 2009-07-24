@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-24 13:49:44 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,14 +48,9 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+## Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
 ##
 ## =============================================================================
-
-if PKG_BUILD_ARCH
-## PKG_BUILD_ARCH
-if RPM_BUILD_KERNEL
-## RPM_BUILD_KERNEL
 
 $(STRCONF_INPUT): $(CONFIG_CLEAN_FILES) $(STRCONF_CONFIGS)
 	$(AM_V_GEN)$(SHELL) ./config.status Makefile strconf
@@ -65,33 +60,38 @@ $(STRCONF_PKGRULE): $(STRCONF_PKGRULE).in
 	$(AM_V_GEN)$(SHELL) ./config.status Makefile strconf
 endif
 
+am__strconf_inputs = --package=$(STRCONF_PACKAGE) -B$(STRCONF_MINORSZ) -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+
 $(STRCONF_CONFIG): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --hconfig=$(STRCONF_CONFIG) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --hconfig=$@ $(am__strconf_inputs)
 
 $(STRCONF_MODCONF): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --modconf=$(STRCONF_MODCONF) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --modconf=$@ $(am__strconf_inputs)
 
 $(STRCONF_MKNODES): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --makenodes=$(STRCONF_MKNODES) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --makenodes=$@ $(am__strconf_inputs)
 
 $(STRCONF_DRVCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --driverconf=$(STRCONF_DRVCONF) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --driverconf=$@ $(am__strconf_inputs)
 
 $(STRCONF_CONFMOD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --confmodules=$(STRCONF_CONFMOD) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --confmodules=$@ $(am__strconf_inputs)
 
 $(STRCONF_MAKEDEV): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --strmknods=$(STRCONF_MAKEDEV) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --strmknods=$@ $(am__strconf_inputs)
 
 $(STRCONF_STSETUP): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --strsetup=$(STRCONF_STSETUP) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --strsetup=$@ $(am__strconf_inputs)
 
 $(STRCONF_STRLOAD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --strload=$(STRCONF_STRLOAD) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --strload=$@ $(am__strconf_inputs)
+
+$(STRCONF_DEVICES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+	$(AM_V_GEN)$(STRCONF) --mkdevices=$@ $(am__strconf_inputs)
 
 if WITH_PACKAGES
 $(STRCONF_PKGRULE).in: $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --pkgrules=$(STRCONF_PKGRULE).in --packagedir=$(STRCONF_BPKGDIR) --package=$(STRCONF_PACKAGE) -B${STRCONF_MINORSZ} -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
+	$(AM_V_GEN)$(STRCONF) --pkgrules=$(STRCONF_PKGRULE).in --packagedir=$(STRCONF_BPKGDIR) $(am__strconf_inputs)
 endif
 
 ALL_LOCAL += \
@@ -103,7 +103,8 @@ ALL_LOCAL += \
 	$(STRCONF_CONFMOD) \
 	$(STRCONF_MAKEDEV) \
 	$(STRCONF_STSETUP) \
-	$(STRCONF_STRLOAD)
+	$(STRCONF_STRLOAD) \
+	$(STRCONF_DEVICES)
 
 if WITH_PACKAGES
 ALL_LOCAL += \
@@ -115,7 +116,7 @@ clean-strconf:
 
 distclean-strconf:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(STRCONF_INPUT) $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(STRCONF_MKNODES) $(STRCONF_DRVCONF) $(STRCONF_CONFMOD) $(STRCONF_MAKEDEV) $(STRCONF_STSETUP) $(STRCONF_STRLOAD)
+	rm -f -- $(STRCONF_INPUT) $(STRCONF_CONFIG) $(STRCONF_MODCONF) $(STRCONF_MKNODES) $(STRCONF_DRVCONF) $(STRCONF_CONFMOD) $(STRCONF_MAKEDEV) $(STRCONF_STSETUP) $(STRCONF_STRLOAD) $(STRCONF_DEVICES)
 if WITH_PACKAGES
 	rm -f -- $(STRCONF_PKGRULE) $(STRCONF_PKGRULE).in
 endif
@@ -130,25 +131,37 @@ dist_noinst_SCRIPTS	+= $(STRCONF_SCRIPT)
 EXTRA_SCRIPTS		+= scripts/strconf.awk
 EXTRA_SCRIPTS		+= scripts/strconf-sh
 
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+dist_sbin_SCRIPTS	+= $(STRCONF_DEVICES)
+## PKG_BUILD_INDEP
+endif
+
+if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
+
 ## Invoke creation of any installed devices if the installation directory is configured.
-#
-#install-devices: $(STRMAKENODES)
-#	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
-#		$(ECHO) './$(STRMAKENODES)' ; \
-#		./$(STRMAKENODES) ; \
-#	fi
-#
-## Invoke removal of any installed devices if the installation directory is configured.
-#
-#uninstall-devices: $(STRMAKENODES)
-#	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
-#		$(ECHO) './$(STRMAKENODES) --remove' ; \
-#		./$(STRMAKENODES) --remove ; \
-#	fi
-#
-#INSTALL_EXEC_HOOK	+= install-devices
-#UNINSTALL_HOOK		+= uninstall-devices
-#
+
+install-devices: $(STRCONF_DEVICES)
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+		$(ECHO) './$(STRCONF_DEVICES) --create' ; \
+		./$(STRCONF_DEVICES) --create ; \
+	fi
+
+# Invoke removal of any installed devices if the installation directory is configured.
+
+uninstall-devices: $(STRCONF_DEVICES)
+	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+		$(ECHO) './$(STRCONF_DEVICES) --remove' ; \
+		./$(STRCONF_DEVICES) --remove ; \
+	fi
+
+## RPM_BUILD_KERNEL
+endif
+
+INSTALL_EXEC_HOOK	+= install-devices
+
+UNINSTALL_HOOK		+= uninstall-devices
 
 ##
 # Check for conflicts for driver device nodes.
@@ -164,6 +177,7 @@ TESTS_ENVIRONMENT	+= STRCONF_CONFIG='$(STRCONF_CONFIG)' \
 			   STRCONF_MAKEDEV='$(STRCONF_MAKEDEV)' \
 			   STRCONF_STSETUP='$(STRCONF_STSETUP)' \
 			   STRCONF_STRLOAD='$(STRCONF_STRLOAD)' \
+			   STRCONF_DEVICES='$(STRCONF_DEVICES)' \
 			   STRCONF_BPKGDIR='$(STRCONF_BPKGDIR)' \
 			   STRCONF_PKGRULE='$(STRCONF_PKGRULE)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
@@ -173,16 +187,17 @@ DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS
 endif
 
-## RPM_BUILD_KERNEL
-endif
-## PKG_BUILD_ARCH
-endif
-
 EXTRA_DIST		+= $(STRCONF_CONFIGS)
 
 ## =============================================================================
 ##
 ## $Log: strconf.am,v $
+## Revision 1.1.2.5  2009-07-24 13:49:44  brian
+## - updates for release build
+##
+## Revision 1.1.2.4  2009-07-23 16:37:43  brian
+## - updates for release
+##
 ## Revision 1.1.2.3  2009-07-21 11:06:11  brian
 ## - changes from release build
 ##

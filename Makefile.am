@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-24 13:49:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+# Last Modified $Date: 2009-07-24 13:49:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,6 +76,10 @@ include am/pr.am
 AUTOMAKE_OPTIONS = nostdinc
 AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir)
 
+dist_bin_SCRIPTS		=
+
+dist_sbin_SCRIPTS		=
+
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -88,10 +92,6 @@ if RPM_BUILD_USER
 bin_PROGRAMS			=
 
 sbin_PROGRAMS			=
-
-dist_bin_SCRIPTS		=
-
-dist_sbin_SCRIPTS		=
 
 pkglibexec_PROGRAMS		=
 
@@ -113,6 +113,24 @@ if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
 noinst_LIBRARIES		=
+
+## =====================================================================
+
+noinst_LIBRARIES		+= libOS7wrapper.a
+
+EXTRA_libOS7wrapper_a_SOURCES	= src/kernel/wrapper.c
+libOS7wrapper_a_SOURCES		= src/kernel/wrapper.c
+libOS7wrapper_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libOS7wrapper_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libOS7wrapper_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
+
+wrapper.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOS7wrapper_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO_Q) "  CCLD  " $@ ; \
+	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
 
 ## =====================================================================
 
@@ -819,13 +837,15 @@ EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3 scripts/missing4
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libOS7specfs_a_OBJECTS) \
+KERNEL_OBJECTS			= $(libOS7wrapper_a_OBJECTS) \
+				  $(libOS7specfs_a_OBJECTS) \
 				  $(libOS7streams_a_OBJECTS) \
 				  $(libOS7kernel_a_OBJECTS) \
 				  $(libOS7modules_a_OBJECTS) \
 				  $(libOS7drivers_a_OBJECTS) \
 				  $(libOS7sctp_a_OBJECTS)
-KERNEL_MODULES			= specfs.o \
+KERNEL_MODULES			= wrapper.o \
+				  specfs.o \
 				  streams.o \
 				  $(libOS7kernel_a_OBJECTS) \
 				  $(libOS7modules_a_OBJECTS) \
@@ -2507,7 +2527,8 @@ EXPORT_SRCFILES			+= src/drivers/clone.c \
 				   src/kernel/suncompat.c \
 				   src/kernel/svr3compat.c \
 				   src/kernel/svr4compat.c \
-				   src/kernel/uw7compat.c
+				   src/kernel/uw7compat.c \
+				   src/kernel/wrapper.c
 
 EXPORT_VERFILES			=
 
@@ -2546,7 +2567,8 @@ EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver \
 				   $(PKGINCL)/versions/suncompat.ver \
 				   $(PKGINCL)/versions/svr3compat.ver \
 				   $(PKGINCL)/versions/svr4compat.ver \
-				   $(PKGINCL)/versions/uw7compat.ver
+				   $(PKGINCL)/versions/uw7compat.ver \
+				   $(PKGINCL)/versions/wrapper.ver
 
 GENKSYMS_CPPFLAGS		= -I./src/kernel -I$(srcdir)/src/kernel \
 				  -I./src/drivers -I$(srcdir)/src/drivers \
@@ -2567,30 +2589,34 @@ include am/strconf.am
 
 INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
+STREAMS_MKDEV			= scripts/streams_mkdev
 
-if PKG_BUILD_ARCH
-if RPM_BUILD_USER
-## these go with the utilities package
+if PKG_BUILD_INDEP
+## these go with the base package
 dist_sbin_SCRIPTS 		+= $(INET_MKDEV) $(INET_RMDEV)
-endif
+dist_sbin_SCRIPTS 		+= $(STREAMS_MKDEV)
 endif
 
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV) $(STREAMS_MKDEV)
+EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV) $(STREAMS_MKDEV)
 
 if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
-install-inet-devices: $(INET_MKDEV)
+install-inet-devices: $(INET_MKDEV) $(STREAMS_MKDEV)
 	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(STREAMS_MKDEV) --create' ; \
+		DESTDIR=$(DESTDIR) $(srcdir)/$(STREAMS_MKDEV) --create ; \
 		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)' ; \
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV) ; \
 	fi
 
-uninstall-inet-devices: $(INET_RMDEV)
+uninstall-inet-devices: $(INET_RMDEV) $(STREAMS_MKDEV)
 	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
 		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)' ; \
 		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
+		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(STREAMS_MKDEV) --remove' ; \
+		DESTDIR=$(DESTDIR) $(srcdir)/$(STREAMS_MKDEV) --remove ; \
 	fi
 
 ## RPM_BUILD_KERNEL
@@ -2895,6 +2921,12 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.6  2009-07-24 13:49:43  brian
+# - updates for release build
+#
+# Revision 1.1.2.5  2009-07-23 16:37:42  brian
+# - updates for release
+#
 # Revision 1.1.2.4  2009-07-21 11:06:11  brian
 # - changes from release build
 #
