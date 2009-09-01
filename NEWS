@@ -1,5 +1,5 @@
-OpenSS7 -- history of user visible changes.  2009-08-31
-$Id: NEWS,v 1.1.2.7 2009-09-01 09:09:45 brian Exp $
+OpenSS7 -- history of user visible changes.  2009-09-01
+$Id: NEWS,v 1.1.2.8 2009-09-01 23:08:46 brian Exp $
 Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -8,8 +8,8 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 `OpenSS7' package.
 
- Major changes for release openss7-1.1.2
-----------------------------------------
+ Major changes for release openss7-1.1.1.20090901
+-------------------------------------------------
 
 This the third `OpenSS7 Project' respin of the `OpenSS7' package.  This
 is a production grade release.  All existing validation test suites run
@@ -28,6 +28,10 @@ monolithic package containing Linux Fast-STREAMS and most of the other
 subpackages in a single build package.
 
 Major feature additions since the last public release are:
+
+   - Support for CentOS 5.3 and 2.6.18-128.1.10.el5 kernel.
+
+   - Support for SLES 10 SP2.
 
    - SNMP agents are more thorough and complete.
 
@@ -104,19 +108,28 @@ Major upgrades from the last public release are:
 
 Major maintenance items since the last public release are:
 
+   - Fixed hash races in open and close.  This was service affecting
+     under heavy open/close loads.  (Bug# openss7 006.)
+
+   - Fixed reference counting imbalance when entering and leaving
+     synchronization queues. (Bug# openss7 005.)
+
+   - Fixed reference counting imbalance when syncrhonization queues are
+     used on module. (Bug# openss7 004.)
+
    - Fixed timer reporting in the pstrlog() call resulting in
      near-epoch invalid timestamps.  This was an annoyance.  (Bug#
-     strutil 001.)
+     openss7 003.)
 
    - Fixed assurances in untimeout and unbufcall utilities.  This could
-     be service affecting on many-way machines.  (Bug# streams 027.)
+     be service affecting on many-way machines.  (Bug# openss7 002.)
 
    - Timer cancellation directly from ICS races removed.  This could be
-     service affecting on many-way machines.  (Bug# streams 027.)
+     service affecting on many-way machines.  (Bug# openss7 002.)
 
    - Corrected removal of SLAP_NO_REAP flag from recent kernels causing
      timeout problems on many-way machines under memory pressure.
-     (Bug# streams 026.)
+     (Bug# openss7 001.)
 
 For complete detail on maintenance items, see `BUGS'
 (http://www.openss7.org/codefiles/openss7/BUGS) in the release.
@@ -139,10 +152,11 @@ the package page (http://www.openss.org/openss7_pkg.html) for the
 repository page (http://www.openss7.org/repos.html) for information
 concerning network installation and update sources.
 
-See `http://www.openss7.org/codefiles/openss7-1.1.2/ChangeLog' and
-`http://www.openss7.org/codefiles/openss7-1.1.2/NEWS' in the release
-for more information.  Also, see the `openss7.pdf' manual in the
-release (also in html (http://www.openss7.org/openss7_manual.html)).
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20090901/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20090901/NEWS' in
+the release for more information.  Also, see the `openss7.pdf' manual
+in the release (also in html
+(http://www.openss7.org/openss7_manual.html)).
 
 For the news release, see `http://www.openss7.org/rel2009XXXX_L.html'.
 
@@ -232,10 +246,11 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the openss7 package page (http://www.openss7.org/openss7_pkg.html).
 
-See `http://www.openss7.org/codefiles/openss7-1.1.2/ChangeLog' and
-`http://www.openss7.org/codefiles/openss7-1.1.2/NEWS' in the release
-for more information.  Also, see the `openss7.pdf' manual in the
-release (also in html `http://www.openss7.org/openss7_manual.html').
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20090901/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20090901/NEWS' in
+the release for more information.  Also, see the `openss7.pdf' manual
+in the release (also in html
+`http://www.openss7.org/openss7_manual.html').
 
 For the news release, see `http://www.openss7.org/rel20081029_L.html'.
 
