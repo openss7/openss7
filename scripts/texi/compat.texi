@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: compat.texi,v 1.1.2.1 2009-06-21 11:11:36 brian Exp $
+@c @(#) $Id: compat.texi,v 1.1.2.2 2009-09-01 09:20:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 11:11:36 $ by $Author: brian $
+@c Last Modified $Date: 2009-09-01 09:20:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -102,6 +102,7 @@ release.}
 @item CentOS Enterprise Linux 5.0 (centos5)
 @item CentOS Enterprise Linux 5.1 (centos51)
 @item CentOS Enterprise Linux 5.2 (centos52)
+@item CentOS Enterprise Linux 5.3 (centos53)
 @item Debian 3.0r2 Woody (deb3.0) TBD
 @item Debian 3.1r0a Sarge (deb3.1) TBD
 @item Debian 4.0r1 Etch (deb4.0)
