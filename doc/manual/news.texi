@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+@c @(#) $Id: news.texi,v 1.1.2.2 2009-09-01 09:28:35 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+@c Last Modified $Date: 2009-09-01 09:28:35 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -128,6 +128,12 @@ containing Linux Fast-STREAMS and most of the other subpackages in a single buil
 Major feature additions since the last public release are:
 
 @itemize @minus
+@item
+Support for CentOS 5.3 and 2.6.18-128.1.10.el5 kernel.
+
+@item
+Support for SLES 10 SP2.
+
 @item
 SNMP agents are more thorough and complete.
 
@@ -224,20 +230,32 @@ Major maintenance items since the last public release are:
 
 @itemize @minus
 @item
+Fixed hash races in open and close.  This was service affecting under heavy open/close loads.  (Bug#
+openss7 006.)
+
+@item
+Fixed reference counting imbalance when entering and leaving synchronization queues. (Bug# openss7
+005.)
+
+@item
+Fixed reference counting imbalance when syncrhonization queues are used on module. (Bug# openss7
+004.)
+
+@item
 Fixed timer reporting in the pstrlog() call resulting in near-epoch invalid timestamps.  This was an
-annoyance.  (Bug# strutil 001.)
+annoyance.  (Bug# openss7 003.)
 
 @item 
 Fixed assurances in untimeout and unbufcall utilities.  This could be service affecting on many-way
-machines.  (Bug# streams 027.)
+machines.  (Bug# openss7 002.)
 
 @item
 Timer cancellation directly from ICS races removed.  This could be service affecting on many-way
-machines.  (Bug# streams 027.)
+machines.  (Bug# openss7 002.)
 
 @item
 Corrected removal of SLAP_NO_REAP flag from recent kernels causing timeout problems on many-way
-machines under memory pressure.  (Bug# streams 026.)
+machines under memory pressure.  (Bug# openss7 001.)
 @end itemize
 
 For complete detail on maintenance items, see
