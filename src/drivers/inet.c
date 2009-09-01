@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:52  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-06-29 07:35:43  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -366,58 +369,31 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #ifndef tcp_openreq_cachep
 #ifdef HAVE_TCP_OPENREQ_CACHEP_ADDR
 #include <linux/slab.h>
-static kmem_cachep_t *const _tcp_openreq_cachep_location =
-    (typeof(_tcp_openreq_cachep_location)) (HAVE_TCP_OPENREQ_CACHEP_ADDR);
-
-#define tcp_openreq_cachep (*_tcp_openreq_cachep_location)
+extern kmem_cachep_t *const _tcp_openreq_cachep_location;
 #endif
 #endif
 
 #ifndef tcp_set_keepalive
 #ifdef HAVE_TCP_SET_KEEPALIVE_ADDR
-void
-tcp_set_keepalive(struct sock *sk, int val)
-{
-	static void (*func) (struct sock *, int) = (typeof(func)) HAVE_TCP_SET_KEEPALIVE_ADDR;
-
-	return func(sk, val);
-}
+void tcp_set_keepalive(struct sock *sk, int val);
 #endif
 #endif
 
 #ifndef tcp_sync_mss
 #ifdef HAVE_TCP_SYNC_MSS_ADDR
-int
-tcp_sync_mss(struct sock *sk, u32 pmtu)
-{
-	static int (*func) (struct sock *, u32) = (typeof(func)) HAVE_TCP_SYNC_MSS_ADDR;
-
-	return func(sk, pmtu);
-}
+int tcp_sync_mss(struct sock *sk, u32 pmtu);
 #endif
 #endif
 
 #ifndef tcp_write_xmit
 #ifdef HAVE_TCP_WRITE_XMIT_ADDR
-int
-tcp_write_xmit(struct sock *sk, int nonagle)
-{
-	static int (*func) (struct sock *, int) = (typeof(func)) HAVE_TCP_WRITE_XMIT_ADDR;
-
-	return func(sk, nonagle);
-}
+int tcp_write_xmit(struct sock *sk, int nonagle);
 #endif
 #endif
 
 #ifndef tcp_cwnd_application_limited
 #ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
-void
-tcp_cwnd_application_limited(struct sock *sk)
-{
-	static void (*func) (struct sock *) = (typeof(func)) HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR;
-
-	return func(sk);
-}
+void tcp_cwnd_application_limited(struct sock *sk);
 #endif
 #endif
 
@@ -430,116 +406,73 @@ typeof(ip_tos2prio)
 	ip_tos2prio_t ip_tos2prio = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
 
 #ifndef sysctl_rmem_default
-#ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
-static __u32 *const _sysctl_rmem_default_location =
-    (typeof(_sysctl_rmem_default_location)) (HAVE_SYSCTL_RMEM_DEFAULT_ADDR);
-
-#define sysctl_rmem_default (*_sysctl_rmem_default_location)
-#else
+#ifndef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
+#else
+extern __u32 sysctl_rmem_default;
 #endif
 
 #ifndef sysctl_wmem_default
-#ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
-static __u32 *const _sysctl_wmem_default_location =
-    (typeof(_sysctl_wmem_default_location)) (HAVE_SYSCTL_WMEM_DEFAULT_ADDR);
-
-#define sysctl_wmem_default (*_sysctl_wmem_default_location)
-#else
+#ifndef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
+#else
+extern __u32 sysctl_wmem_default;
 #endif
 
 #ifndef sysctl_rmem_max
-#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
-static __u32 *const _sysctl_rmem_max_location =
-    (typeof(_sysctl_rmem_max_location)) (HAVE_SYSCTL_RMEM_MAX_ADDR);
-
-#define sysctl_rmem_max (*_sysctl_rmem_max_location)
-#else
+#ifndef HAVE_SYSCTL_RMEM_MAX_ADDR
 #define sysctl_rmem_max SK_RMEM_MAX
 #endif
+#else
+extern __u32 sysctl_rmem_max;
 #endif
 
 #ifndef sysctl_wmem_max
-#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
-static __u32 *const _sysctl_wmem_max_location =
-    (typeof(_sysctl_wmem_max_location)) (HAVE_SYSCTL_WMEM_MAX_ADDR);
-
-#define sysctl_wmem_max (*_sysctl_wmem_max_location)
-#else
+#ifndef HAVE_SYSCTL_WMEM_MAX_ADDR
 #define sysctl_wmem_max SK_WMEM_MAX
 #endif
+#else
+extern __u32 sysctl_wmem_max;
 #endif
 
 #ifndef sysctl_tcp_fin_timeout
-#ifdef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
-static __u32 *const _sysctl_tcp_fin_timeout_location =
-    (typeof(_sysctl_tcp_fin_timeout_location)) (HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR);
-
-#define sysctl_tcp_fin_timeout (*_sysctl_tcp_fin_timeout_location)
-#else
+#ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
 #define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
 #endif
 #endif
 
 #ifndef tcp_current_mss
 #ifdef HAVE_TCP_CURRENT_MSS_ADDR
-unsigned int
-tcp_current_mss(struct sock *sk, int large)
-{
-	static unsigned int (*func) (struct sock *, int) = (typeof(func)) HAVE_TCP_CURRENT_MSS_ADDR;
-
-	return func(sk, large);
-}
+unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
 #endif
 
 #ifndef sysctl_ip_dynaddr
 #ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
 extern int sysctl_ip_dynaddr;
-
-#define sysctl_ip_dynaddr (*((typeof(sysctl_ip_dynaddr) *)HAVE_SYSCTL_IP_DYNADDR_ADDR))
 #endif
 #endif
 
 #ifndef sysctl_ip_nonlocal_bind
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 extern int sysctl_ip_nonlocal_bind;
-
-#define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
 #endif
 #endif
 
 #ifndef sysctl_ip_default_ttl
 #ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
 extern int sysctl_ip_default_ttl;
-
-#define sysctl_ip_default_ttl (*((typeof(sysctl_ip_default_ttl) *)HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR))
 #endif
 #endif
 
 #ifndef tcp_set_skb_tso_segs
 #ifdef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
 #ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
-void
-tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb)
-{
-	static void (*func) (struct sock *, struct sk_buff *) =
-	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
-
-	return func(sk, skb);
-}
+void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
 #else
-void
-tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
-{
-	static void (*func) (struct sk_buff *, unsigned int) =
-	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
-
-	return func(skb, mss_std);
-}
+void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #endif
 #endif
@@ -547,14 +480,7 @@ tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 /* older 2.6.8 name for the same function */
 #ifndef tcp_set_skb_tso_factor
 #ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR
-void
-tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
-{
-	static void (*func) (struct sk_buff *, unsigned int) =
-	    (typeof(func)) HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR;
-
-	return func(skb, mss_std);
-}
+void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #endif
 
@@ -575,7 +501,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -10179,37 +10105,17 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 	return (-EFAULT);
 }
 
-#if !defined HAVE___TCP_PUSH_PENDING_FRAMES_EXPORT
-#if defined  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
-#if defined HAVE_OLD_SOCK_STRUCTURE
-void
-__tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss, int nonagle)
-{
-	void (*func) (struct sock * sk, struct tcp_opt * tp, unsigned int cur_mss, int nonagle) =
-	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
-	return (*func) (sk, tp, cur_mss, nonagle);
-}
+#ifdef  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
+#ifdef HAVE_OLD_SOCK_STRUCTURE
+void __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss, int nonagle);
 #else				/* defined HAVE_OLD_SOCK_STRUCTURE */
-#if !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
-void
-__tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss, int nonagle)
-{
-	void (*func) (struct sock * sk, struct tcp_opt * tp, unsigned int cur_mss, int nonagle) =
-	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
-	return (*func) (sk, tp, cur_mss, nonagle);
-}
+#ifndef  HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
+void __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss, int nonagle);
 #else				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
-void
-__tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle)
-{
-	void (*func) (struct sock * sk, unsigned int cur_mss, int nonagle) =
-	    (typeof(func)) HAVE___TCP_PUSH_PENDING_FRAMES_ADDR;
-	return (*func) (sk, cur_mss, nonagle);
-}
+void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle);
 #endif				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
 #endif				/* defined HAVE_OLD_SOCK_STRUCTURE */
 #endif				/* defined HAVE___TCP_PUSH_PENDING_FRAMES_ADDR */
-#endif				/* !defined HAVE___TCP_PUSH_PENDING_FRAMES_EXPORT */
 
 /**
  * t_build_negotiate_options: - build negotiate options
@@ -12464,6 +12370,8 @@ sock_listen(struct socket *sock, uint cons)
 	return sock->ops->listen(sock, cons);
 }
 
+struct socket *sock_alloc(void);
+
 /**
  * sock_accept: - accept a socket connection
  * @sock: the listening socket
@@ -12484,10 +12392,6 @@ static int
 sock_accept(struct socket *sock, struct socket **newsockp, mblk_t *cp)
 {
 	struct socket *newsock;
-
-#ifdef HAVE_SOCK_ALLOC_ADDR
-	struct socket *(*sock_alloc) (void) = (typeof(sock_alloc)) HAVE_SOCK_ALLOC_ADDR;
-#endif
 	struct ss_conind *ci = (typeof(ci)) cp->b_rptr;
 
 	ensure(sock, return (-EPROTO));

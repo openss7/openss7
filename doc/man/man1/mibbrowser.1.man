@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mibbrowser.1.man,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $
+.\" @(#) $Id: mibbrowser.1.man,v 1.1.2.2 2009-07-23 16:37:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -80,11 +80,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-07-21 11:06:21 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mibbrowser.1.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:44  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-07-21 11:06:21  brian
 .\" - new awk scripts for release check
 .\"
@@ -112,8 +115,30 @@ search-ignore T
 \- PerlTk application for browsing SNMP MIBS
 .\"
 .\"
+.SH SYNOPSIS
+.PP
+.ad l
+.hy 0
+.HP 12
+\fBmibbrowser\fP\ [\fIoptions\fP]
+.PD 0
+.HP 12
+\fBmibbrowser\fP {\fB-h\fP|\fB--help\fP}
+.HP 12
+\fBmibbrowser\fP {\fB-V\fP|\fB--version\fP}
+.HP 12
+\fBmibbrowser\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+.B mibbrowswer
+is a general-purpose PerlTk application written to manage the
+.B @PACKAGE_TITLE@
+with SNMP.
 .\"
 .\"
 .SH OPTIONS

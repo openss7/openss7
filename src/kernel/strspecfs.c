@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:17 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 1.1.2.2  2009-07-23 16:37:54  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:37:17  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $"
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -110,7 +113,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -337,10 +340,6 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	struct vfsmount *mnt;
 	int err;
 
-#if defined HAVE_FILE_MOVE_ADDR
-	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
-#define file_move(__f, __l) _file_move(__f, __l)
-#endif
 	if (!(mnt = mntget(specfs_mnt))) {
 		_ptrace(("Error path taken!\n"));
 		return (-ENODEV);

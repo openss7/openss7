@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: ldltest.8.man,v 1.1.2.1 2009-06-21 10:37:46 brian Exp $
+.\" @(#) $Id: ldltest.8.man,v 1.1.2.2 2009-07-23 16:37:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:37:46 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:47 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldltest.8.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:47  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:37:46  brian
 .\" - added files to new distro
 .\"
@@ -169,7 +172,7 @@ The remote MAC address for sending LLC TEST/XID frames.
 .TP
 \fB-c\fR, \fB--count\fR=\fIPACKET-COUNT\fR
 The number of ping packets to send.  The default is
-.BR 1 .
+.RB ( 1 ).
 .TP
 \fB-f\fR, \fB--framing\fR=\fIFRAMING\fR
 Set framing style to \fBEII\fR (default), \fBRAW\fR or \fBSNAP\fR.
@@ -228,7 +231,7 @@ Send the LLC XID command.
 Increase the verbosity of the output or set to
 .IR LEVEL .
 The default verbosity level is
-.BR 1 .
+.RB ( 1 ).
 .TP
 \fB-q\fR, \fB--quiet\fR
 Suppress normal output (equivalent to

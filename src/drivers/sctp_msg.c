@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_msg.c,v $
+ Revision 1.1.2.2  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:20:52  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $";
 
 #define __NO_VERSION__
 
@@ -4949,15 +4952,7 @@ sctp_recv_msg(sp, mp)
  *  -------------------------------------------------------------------------
  */
 #ifndef ip_rt_update_pmtu
-#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
-void
-ip_rt_update_pmtu(struct dst_entry *dst, u32 mtu)
-{
-	void (*func) (struct dst_entry *, u32) = (typeof(func)) HAVE_IP_RT_UPDATE_PMTU_ADDR;
-
-	return func(dst, mtu);
-}
-#endif
+void ip_rt_update_pmtu(struct dst_entry *dst, u32 mtu);
 #endif
 
 int

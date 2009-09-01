@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-21 11:06:21 $
+# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:21 $ by $Author: brian $
+# Last Modified $Date: 2009-07-23 16:37:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -101,7 +101,7 @@ function usage(output)
 	return
     print "\
 strconf:\n\
-  $Id: strconf.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+  $Id: strconf.awk,v 1.1.2.2 2009-07-23 16:37:52 brian Exp $\n\
 Usage:\n\
   strconf [options] CONFIGFILE[ CONFIGFILE]...\n\
   strconf -H\n\
@@ -118,57 +118,61 @@ function help(output)
 Options:\n\
   -I, --inputs='FILE[ FILE]*'\n\
       input files\n\
+      [default: " defaults["inputs"] "] {" environs["inputs"] "}\n\
   -b, --basemajor=MAJOR\n\
       major number to act as base for STREAMS drivers and devices\n\
-      [default: " defaults["basemajor"] "]\n\
+      [default: " defaults["basemajor"] "] {" environs["basemajor"] "}\n\
   -i, --basemodid=MODID\n\
       module id number to act as base for STREAMS modules\n\
-      [default: " defaults["basemodid"] "]\n\
+      [default: " defaults["basemodid"] "] {" environs["basemodid"] "}\n\
   -B, --minorbits=MINORBITS\n\
       number of bits in a minor devices number\n\
-      [default: " defaults["minorbits"] "]\n\
+      [default: " defaults["minorbits"] "] {" environs["minorbits"] "}\n\
   -h, --hconfig=[HCONFIG]\n\
       full path and filename of the STREAMS configuration header file\n\
-      [default: " defaults["hconfig"] "]\n\
+      [default: " defaults["hconfig"] "] {" environs["hconfig"] "}\n\
   -o, --modconf=[MODCONFINC]\n\
       full path and filename of the module configuration include file\n\
-      [default: " defaults["modconf"] "]\n\
+      [default: " defaults["modconf"] "] {" environs["modconf"] "}\n\
   -m, --makenodes=[MAKENODES]\n\
       full path and filename of the makenodes file\n\
-      [default: " defaults["makenodes"] "]\n\
+      [default: " defaults["makenodes"] "] {" environs["makenodes"] "}\n\
+  -M, --mkdevices=[MKDEVICES]\n\
+      full path and filename of the mkdevices file\n\
+      [default: " defaults["mkdevices"] "] {" environs["mkdevices"] "}\n\
   -p, --permission=PERM\n\
       permissions to assign to created files\n\
       [default: " defaults["permission"] "]\n\
   -l, --driverconf=[DRIVERCONF]\n\
       full path and filename of the driver configuration makefile\n\
-      [default: " defaults["driverconf"] "]\n\
+      [default: " defaults["driverconf"] "] {" environs["driverconf"] "}\n\
   -L, --confmodules=[CONFMODULES]\n\
       full path and filename of the modules configuration file\n\
-      [default: " defaults["confmodules"] "]\n\
+      [default: " defaults["confmodules"] "] {" environs["confmodules"] "}\n\
   -r, --functioname=FUNCNAME\n\
       function name of the function in makenodes\n\
       [default: " defaults["functionname"] "]\n\
   -s, --strmknods=[MAKEDEVICES]\n\
       full path and filename of the makedevices script\n\
-      [default: " defaults["strmknods"] "]\n\
+      [default: " defaults["strmknods"] "] {" environs["strmknods"] "}\n\
   -S, --strsetup=[STRSETUP]\n\
       full path and filename of the strsetup configuration file\n\
-      [default: " defaults["strsetup"] "]\n\
+      [default: " defaults["strsetup"] "] {" environs["strsetup"] "}\n\
   -O, --strload=[STRLOAD]\n\
       full path and filename of the strload configuration file\n\
-      [default: " defaults["strload"] "]\n\
+      [default: " defaults["strload"] "] {" environs["strload"] "}\n\
   -k, --package=[PACKAGE]\n\
       name of STREAMS package: LiS or LfS\n\
-      [default: " defaults["package"] "]\n\
+      [default: " defaults["package"] "] {" environs["package"] "}\n\
   -g, --pkgobject=[PKGOBJECT]\n\
       full path and filename of object file to package\n\
       [default: " defaults["pkgobject"] "]\n\
   -d, --packagedir=[PACKAGEDIR]\n\
       full path or vpath to binary package directory\n\
-      [default: " defaults["packagedir"] "]\n\
+      [default: " defaults["packagedir"] "] {" environs["packagedir"] "}\n\
   -R, --pkgrules=[PKGRULES]\n\
       full path and filename of the pkgrules make rules file\n\
-      [default: " defaults["pkgrules"] "]\n\
+      [default: " defaults["pkgrules"] "] {" environs["pkgrules"] "}\n\
   -n, --dryrun, --dry-run\n\
       don't perform the actions, just check them\n\
   -q, --quiet, --silent\n\
@@ -193,7 +197,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.2 2009-07-23 16:37:52 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -215,7 +219,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.2 2009-07-23 16:37:52 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -624,7 +628,7 @@ function write_hconfig(file,    name, prefix) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.2 2009-07-23 16:37:52 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -671,20 +675,14 @@ function write_hconfig(file,    name, prefix) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2009-07-21 11:06:21 $ by $Author: brian $\n\
-\n\
- -----------------------------------------------------------------------------\n\
-\n\
- $Log: strconf.awk,v $
- Revision 1.1.2.1  2009-07-21 11:06:21  brian
- - new awk scripts for release check
+ Last Modified $Date: 2009-07-23 16:37:52 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
 #ifndef __SYS_" toupper(values["package"]) "_CONFIG_H__\n\
 #define __SYS_" toupper(values["package"]) "_CONFIG_H__\n\
 \n\
-#ident \"@(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-" year() " Monavacon Limited.\"\n\
+#ident \"@(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-" year() " Monavacon Limited.\"\n\
 \n\
 /*\n\
  * GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
@@ -740,7 +738,7 @@ function write_modconf(file) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.2 2009-07-23 16:37:52 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -787,20 +785,14 @@ function write_modconf(file) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2009-07-21 11:06:21 $ by $Author: brian $\n\
-\n\
- -----------------------------------------------------------------------------\n\
-\n\
- $Log: strconf.awk,v $
- Revision 1.1.2.1  2009-07-21 11:06:21  brian
- - new awk scripts for release check
+ Last Modified $Date: 2009-07-23 16:37:52 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
 #ifndef __SYS_" toupper(values["package"]) "__MODCONF_INC__\n\
 #define __SYS_" toupper(values["package"]) "__MODCONF_INC__\n\
 \n\
-#ident \"@(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-" year() " Monavacon Limited.\"\n\
+#ident \"@(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-" year() " Monavacon Limited.\"\n\
 \n\
 /*\n\
  * GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
@@ -952,7 +944,7 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-21 11:06:21 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1187,6 +1179,100 @@ int main(int argc, char *argv[])\n\
  */\
 " > file
     file_compare(file)
+}
+function write_mkdevices(file,    i, name, majname, majnumb, minname, minnumb, dir, dirs, create, remove) {
+    print_debug("writing mkdevices `" file "'")
+    for (i = 1; i <= indices["node_names"]; i++) {
+	name = node_names[i]
+	majname = node_majname[name]
+	majnumb = 230
+	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
+	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
+	else { print_error("invalid major name `" majname "'"); continue }
+	minname = node_minname[name]
+	minnumb = 0
+	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
+	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
+	else { print_error("invalid minor name `" minname "'"); continue }
+	if (majnumb == 230) majname = "clone"
+	dir = name; sub(/\/[^\/]*$/, "", dir); dirs[dir] = 1
+	remove = remove "\n\trm -f -- $DESTDIR" name
+	create = create "\n\tln -s /dev/streams/" majname "/" minname " $DESTDIR" name
+    }
+    for (dir in dirs) {
+	if (dir && dir != "/dev") {
+	    remove = remove "\n\ttest -d " dir " && rmdir --ignore-fail-on-non-empty -- $DESTDIR" dir
+	    create = "\n\ttest -d " dir " || mkdir -p -- $DESTDIR" dir create
+	}
+    }
+    remove = remove "\n"
+    create = create "\n"
+    print "#!/bin/sh" > file
+    print "remove() {" remove "}" > file
+    print "create() {" create "}" > file
+    print "\n\
+if test \":$V\" == :1 ; then\n\
+    set -x\n\
+fi\n\
+if test $# -ne 1 ; then\n\
+    set $0 --\n\
+fi\n\
+case :$1 in\n\
+    :-c|:--create)\n\
+	remove\n\
+	create\n\
+	exit 0\n\
+	;;\n\
+    :-r|:--remove)\n\
+	remove\n\
+	exit 0\n\
+	;;\n\
+    :-h|:--help)\n\
+	cat<<EOF\n\
+usage:\n\
+    `basename $0` {-c,--create}\n\
+    `basename $0` {-r,--remove}\n\
+    `basename $0` {-h,--help}\n\
+    `basename $0` {-V,--version}\n\
+    `basename $0` {-C,--copying}\n\
+EOF\n\
+	exit 0\n\
+	;;\n\
+    :-V|:--version)\n\
+	echo \"Version 1.1.2\"\n\
+	exit 0\n\
+	;;\n\
+    :-C|:--copying)\n\
+	cat<<EOF\n\
+Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
+Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
+\n\
+All Rights Reserved.\n\
+\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+\n\
+Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
+with conditions, incorporated herein by reference.\n\
+EOF\n\
+	exit 0\n\
+	;;\n\
+    *)\n\
+	cat>&2<<EOF\n\
+usage:\n\
+    `basename $0` {-c,--create}\n\
+    `basename $0` {-r,--remove}\n\
+    `basename $0` {-h,--help}\n\
+    `basename $0` {-V,--version}\n\
+    `basename $0` {-C,--copying}\n\
+EOF\n\
+	exit 2\n\
+	;;\n\
+esac\n\
+" > file
+    system("chmod 0755 " file)
+    close(file)
 }
 function write_strmknods(file) {
     print_debug("writing strmknods `" file "'")
@@ -1587,9 +1673,9 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-#ident \"@(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-21 11:06:21 $\"\n\
+#ident \"@(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $\"\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-21 11:06:21 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -1759,6 +1845,7 @@ BEGIN {
     longopts["hconfig"     ] = "h::"; environs["hconfig"     ] = "STRCONF_CONFIG" ; defaults["hconfig"     ] = "config.h"
     longopts["modconf"     ] = "o::"; environs["modconf"     ] = "STRCONF_MODCONF"; defaults["modconf"     ] = "modconf.inc"
     longopts["makenodes"   ] = "m::"; environs["makenodes"   ] = "STRCONF_MKNODES"; defaults["makenodes"   ] = "makenodes.c"
+    longopts["mkdevices"   ] = "M::"; environs["mkdevices"   ] = "STRCONF_DEVICES"; defaults["mkdevices"   ] = "mkdevices"
     longopts["permission"  ] = "p:" ;                                               defaults["permission"  ] = "0666"
     longopts["driverconf"  ] = "l::"; environs["driverconf"  ] = "STRCONF_DRVCONF"; defaults["driverconf"  ] = "drvrconf.mk"
     longopts["confmodules" ] = "L::"; environs["confmodules" ] = "STRCONF_CONFMOD"; defaults["confmodules" ] = "conf.modules"
@@ -1779,7 +1866,7 @@ BEGIN {
     longopts["help"        ] = "H"
     longopts["version"     ] = "V"
     longopts["copying"     ] = "C"
-    optstring = "I:b:i:B:h::o::m::p:l::L::r:s::S::O::k::g::d::R::DvnqHVC"
+    optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::DvnqHVC"
     # set mandatory defaults
     values["basemajor" ] = defaults["basemajor" ]
     values["basemodid" ] = defaults["basemodid" ]
@@ -1791,7 +1878,7 @@ BEGIN {
     values["quiet"     ] = defaults["quiet"     ]
     while ((c = getopt_long(ARGC, ARGV, optstring, longopts))) {
 	if (c == -1) break
-	else if (c ~ /[IbiBhomplLrsSOkgdR]/) { values[option] = optarg }
+	else if (c ~ /[IbiBhomMplLrsSOkgdR]/) { values[option] = optarg }
 	else if (c ~ /[nq]/) { values[object] = 1 }
 	else if (c == "D") { if (optarg) { values["debug"  ] = optarg } else { values["debug"  ]++ } }
 	else if (c == "v") { if (optarg) { values["verbose"] = optarg } else { values["verbose"]++ } }
@@ -1839,6 +1926,8 @@ BEGIN {
 	write_strsetup(values["strsetup"])
     if ("strload" in values)
 	write_strload(values["strload"])
+    if ("mkdevices" in values)
+	write_mkdevices(values["mkdevices"])
     if ("confmodules" in values)
 	write_confmodules(values["confmodules"])
     if ("pkgobject" in values)
@@ -1851,6 +1940,9 @@ BEGIN {
 # =============================================================================
 #
 # $Log: strconf.awk,v $
+# Revision 1.1.2.2  2009-07-23 16:37:52  brian
+# - updates for release
+#
 # Revision 1.1.2.1  2009-07-21 11:06:21  brian
 # - new awk scripts for release check
 #

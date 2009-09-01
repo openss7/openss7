@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 1.1.2.2  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:37:16  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -202,9 +205,6 @@ do_spipe(int *fds)
 	int fd1, fd2;
 	int err;
 
-#ifdef HAVE_PUT_FILP_ADDR
-	static void (*put_filp) (struct file * file) = (typeof(put_filp)) HAVE_PUT_FILP_ADDR;
-#endif
 	err = -ENFILE;
 	if (!(file1 = pipe_file_open()))
 		goto no_file1;
@@ -250,35 +250,10 @@ do_spipe(int *fds)
 STATIC spinlock_t pipe_ino_lock = SPIN_LOCK_UNLOCKED;
 STATIC int pipe_ino = 0;
 
-#ifdef HAVE_FILE_MOVE_ADDR
-static
-typeof(&file_move)
-_file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+void file_kill(struct file *file);
 
-#define file_move(__f, __l) _file_move(__f, __l)
-#endif
-#ifdef HAVE_FILE_KILL_ADDR
-	static typeof(&file_kill) _file_kill = (typeof(_file_kill)) HAVE_FILE_KILL_ADDR;
-
-#define file_kill(__f) _file_kill(__f)
-#else
-	void file_kill(struct file *file)
-{
-	static LIST_HEAD(kill_list);
-
-	file_move(file, &kill_list);	/* out of the way.. */
-}
-#endif
-#ifdef HAVE_PUT_FILP_ADDR
-static
-typeof(&put_filp)
-_put_filp = (typeof(_put_filp)) HAVE_PUT_FILP_ADDR;
-
-#define put_filp(__f) _put_filp(__f)
-#endif
-
-	streams_fastcall long
-	 do_spipe(int *fds)
+streams_fastcall long
+do_spipe(int *fds)
 {
 	dev_t dev;
 	minor_t minor;

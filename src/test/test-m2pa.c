@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:17 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $
 
  -----------------------------------------------------------------------------
 
@@ -60,19 +60,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:44:17 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 1.1.2.2  2009-09-01 09:09:52  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-06-21 11:44:17  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:17 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:17 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -20902,7 +20905,7 @@ struct test_case {
 	numb_case_1_16_p, tgrp_case_1_16_p, sgrp_case_1_16_p, name_case_1_16_p, xtra_case_1_16_p, desc_case_1_16_p, sref_case_1_16_p, test_case_1_16_p, &begin_tests, &end_tests, 120000, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_16_np, tgrp_case_1_16_np, sgrp_case_1_16_np, name_case_1_16_np, xtra_case_1_16_np, desc_case_1_16_np, sref_case_1_16_np, test_case_1_16_np, &begin_tests, &end_tests, 120000, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_17, tgrp_case_1_17, sgrp_case_1_17, name_case_1_17, xtra_case_1_17, desc_case_1_17, sref_case_1_17, test_case_1_17, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
-	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, xtra_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_18, tgrp_case_1_18, sgrp_case_1_18, name_case_1_18, xtra_case_1_18, desc_case_1_18, sref_case_1_18, test_case_1_18, &begin_tests, &end_tests, 60000, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_19, tgrp_case_1_19, sgrp_case_1_19, name_case_1_19, xtra_case_1_19, desc_case_1_19, sref_case_1_19, test_case_1_19, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_20, tgrp_case_1_20, sgrp_case_1_20, name_case_1_20, xtra_case_1_20, desc_case_1_20, sref_case_1_20, test_case_1_20, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
 	numb_case_1_21, tgrp_case_1_21, sgrp_case_1_21, name_case_1_21, xtra_case_1_21, desc_case_1_21, sref_case_1_21, test_case_1_21, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {

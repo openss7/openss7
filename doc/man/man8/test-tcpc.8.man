@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: test-tcpc.8.man,v 1.1.2.1 2009-06-21 10:37:50 brian Exp $
+.\" @(#) $Id: test-tcpc.8.man,v 1.1.2.2 2009-07-23 16:37:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:37:50 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:49 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-tcpc.8.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:49  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:37:50  brian
 .\" - added files to new distro
 .\"
@@ -218,7 +221,7 @@ Suppress Nagle's algorithm.
 .TP
 \fB-t\fR, \fB--rep_time\fR \fIINTERVAL\fR
 Specify the report time \fIINTERVAL\fR in seconds.  The default is
-.BR 1 .
+.RB ( 1 ).
 .TP
 \fB-q\fR, \fB--quiet\fR
 Suppress normal output.  This option is equivalent to \fB--verbose\fR=\fI0\fR.
@@ -226,7 +229,7 @@ Suppress normal output.  This option is equivalent to \fB--verbose\fR=\fI0\fR.
 \fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
 Increase or set (to \fILEVEL\fR) the output verbosity.  This option may be repeated.  If not
 specified, the verbosity level is
-.BR 1 .
+.RB ( 1 ).
 .TP
 \fB-h\fR, \fB--help\fR
 When this option is encountered,

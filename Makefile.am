@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-24 13:49:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2009-09-01 09:09:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:43 $ by $Author: brian $
+# Last Modified $Date: 2009-09-01 09:09:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,30 +116,13 @@ noinst_LIBRARIES		=
 
 ## =====================================================================
 
-noinst_LIBRARIES		+= libOS7wrapper.a
-
-EXTRA_libOS7wrapper_a_SOURCES	= src/kernel/wrapper.c
-libOS7wrapper_a_SOURCES		= src/kernel/wrapper.c
-libOS7wrapper_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
-				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
-libOS7wrapper_a_CFLAGS		= $(KERNEL_CFLAGS)
-
-$(libOS7wrapper_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-
-wrapper.o: stamp-verobjs
-	@list=`$(ECHO) " $(libOS7wrapper_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO_Q) "  CCLD  " $@ ; \
-	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
-	$(LD) -r -o $@ $$list
-
-## =====================================================================
-
 noinst_LIBRARIES		+= libOS7specfs.a
 
 EXTRA_libOS7specfs_a_SOURCES	= src/kernel/strspecfs.c \
 				  src/kernel/strlookup.c \
 				  src/kernel/strattach.c \
-				  src/kernel/strpipe.c
+				  src/kernel/strpipe.c \
+				  src/kernel/wrapper.c
 libOS7specfs_a_SOURCES		= src/kernel/specfs.c \
 				  src/kernel/strspecfs.h \
 				  src/kernel/strlookup.h \
@@ -837,15 +820,13 @@ EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3 scripts/missing4
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libOS7wrapper_a_OBJECTS) \
-				  $(libOS7specfs_a_OBJECTS) \
+KERNEL_OBJECTS			= $(libOS7specfs_a_OBJECTS) \
 				  $(libOS7streams_a_OBJECTS) \
 				  $(libOS7kernel_a_OBJECTS) \
 				  $(libOS7modules_a_OBJECTS) \
 				  $(libOS7drivers_a_OBJECTS) \
 				  $(libOS7sctp_a_OBJECTS)
-KERNEL_MODULES			= wrapper.o \
-				  specfs.o \
+KERNEL_MODULES			= specfs.o \
 				  streams.o \
 				  $(libOS7kernel_a_OBJECTS) \
 				  $(libOS7modules_a_OBJECTS) \
@@ -2921,6 +2902,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.7  2009-09-01 09:09:45  brian
+# - added text image files
+#
 # Revision 1.1.2.6  2009-07-24 13:49:43  brian
 # - updates for release build
 #

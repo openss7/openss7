@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-24 13:49:43 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2009-09-01 09:09:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:43 $ by $Author: brian $
+# Last Modified $Date: 2009-09-01 09:09:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-24 13:49:43 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.7 $) $Date: 2009-09-01 09:09:45 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -72,7 +72,7 @@ AC_CANONICAL_TARGET
 
 _DISTRO
 
-AM_INIT_AUTOMAKE([gnits 1.11 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-ustar])
+AM_INIT_AUTOMAKE([gnits 1.11 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-pax])
 AM_MAINTAINER_MODE
 dnl
 dnl Default to --enable-silent-rules.  Let the user specify
@@ -280,6 +280,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.7  2009-09-01 09:09:45  brian
+# - added text image files
+#
 # Revision 1.1.2.6  2009-07-24 13:49:43  brian
 # - updates for release build
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $
+ @(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:45 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl-llc.c,v $
+ Revision 1.1.2.2  2009-07-23 16:37:52  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:20:45  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
+#ident "@(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $"
 
-static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $";
+static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $";
 
 /*
  * This is a DLPI interface LLC driver for Linux.  What it does is provides DLPI access to the Linux
@@ -101,7 +104,7 @@ static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.1
 #define LLC_DESCRIP	"UNIX SVR 4.2 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:52 $"
 #define LLC_DEVICE	"SVR 4.2MP IEEE 802.2 LLC Driver (LLC)"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"
@@ -596,11 +599,6 @@ dl_restore_state(struct dl *dl)
 #define LLC_MT_FRMR	0x87	/* 1000 0111 */
 #define LLC_MT_XID	0xaf	/* 1010 1111 */
 #define LLC_MT_TEST	0xe3	/* 1110 0011 */
-
-#undef skbuff_head_cache
-#ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
-#define skbuff_head_cache (*((kmem_cachep_t *) HAVE_SKBUFF_HEAD_CACHE_ADDR))
-#endif
 
 /* NOTE -- IEEE 802.2 LLC only really supports SABME (extended, modulo 128) mode */
 

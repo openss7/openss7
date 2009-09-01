@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-21 11:06:16 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-07-21 11:06:16  brian
  - changes from release build
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2009,15 +2012,6 @@ strsched_timeout(struct strevent *se)
 	add_timer(&se->x.t.timer);
 	return (id);
 }
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#undef module_text_address
-/* unfortunately, this function is not exported */
-struct module *module_text_address(ulong addr);
-
-#define module_text_address(__arg) \
-	((typeof(&module_text_address)) HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 
 #if 0
 STATIC streams_fastcall long
@@ -5681,11 +5675,16 @@ kstreamd(void *__bind_cpu)
 
 #ifndef HAVE_KTHREAD_SHOULD_STOP_EXPORT
 #ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
+#if 0
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_should_stop) kthread_should_stop_funcp =
 	    (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
 
 #define kthread_should_stop (*kthread_should_stop_funcp)
+#else
+__asm__(".equ " __stringify(kthread_should_stop) "," __stringify(HAVE_KTHREAD_SHOULD_STOP_ADDR));
+__asm__(".type " __stringify(kthread_should_stop) ",@function");
+#endif
 #endif
 #endif
 
@@ -5848,28 +5847,43 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 
 #ifndef HAVE_KTHREAD_CREATE_EXPORT
 #ifdef HAVE_KTHREAD_CREATE_ADDR
+#if 0
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_create) kthread_create_funcp =
 	    (void *) HAVE_KTHREAD_CREATE_ADDR;
 
 #define kthread_create(w, x, y, z) (*kthread_create_funcp)(w, x, y, z)
+#else
+__asm__(".equ " __stringify(kthread_create) "," __stringify(HAVE_KTHREAD_CREATE_ADDR));
+__asm__(".type " __stringify(kthread_create) ",@function");
+#endif
 #endif
 #endif
 #ifndef HAVE_KTHREAD_BIND_EXPORT
 #ifdef HAVE_KTHREAD_BIND_ADDR
+#if 0
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
 
 #define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#else
+__asm__(".equ " __stringify(kthread_bind) "," __stringify(HAVE_KTHREAD_BIND_ADDR));
+__asm__(".type " __stringify(kthread_bind) ",@function");
+#endif
 #endif
 #endif
 #if defined CONFIG_HOTPLUG_CPU
 #ifndef HAVE_KTHREAD_STOP_EXPORT
 #ifdef HAVE_KTHREAD_STOP_ADDR
+#if 0
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
 
 #define kthread_stop(x) (*kthread_stop_funcp)(x)
+#else
+__asm__(".equ " __stringify(kthread_stop) "," __stringify(HAVE_KTHREAD_STOP_ADDR));
+__asm__(".type " __stringify(kthread_stop) ",@function");
+#endif
 #endif
 #endif
 #endif
@@ -5967,19 +5981,29 @@ kill_kstreamd(void)
 #if 0
 #ifndef HAVE_KTHREAD_BIND_EXPORT
 #ifdef HAVE_KTHREAD_BIND_ADDR
+#if 0
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
 
 #define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
+#else
+__asm__(".equ " __stringify(kthread_bind) "," __stringify(HAVE_KTHREAD_BIND_ADDR));
+__asm__(".type " __stringify(kthread_bind) ",@function");
+#endif
 #endif
 #endif
 #endif
 #ifndef HAVE_KTHREAD_STOP_EXPORT
 #ifdef HAVE_KTHREAD_STOP_ADDR
+#if 0
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
 
 #define kthread_stop(x) (*kthread_stop_funcp)(x)
+#else
+__asm__(".equ " __stringify(kthread_stop) "," __stringify(HAVE_KTHREAD_STOP_ADDR));
+__asm__(".type " __stringify(kthread_stop) ",@function");
+#endif
 #endif
 #endif
 

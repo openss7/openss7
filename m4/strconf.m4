@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2009-07-23 16:37:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -189,6 +189,10 @@ dnl
     eval "STRCONF_STRLOAD=\"\${${strconf_prefix}_cv_strload:-strload.conf}\""
     eval "${strconf_prefix}_cv_strload=\"\$STRCONF_STRLOAD\""
     AC_MSG_RESULT([${STRCONF_STRLOAD}])
+    AC_MSG_CHECKING([for strconf mkdevices script file name])
+    eval "STRCONF_DEVICES=\"\${${strconf_prefix}_cv_mkdevices:-${PACKAGE_TARNAME}_mkdev}\""
+    eval "${strconf_prefix}_cv_mkdevices=\"\$STRCONF_DEVICES\""
+    AC_MSG_RESULT([${STRCONF_DEVICES}])
     AC_MSG_CHECKING([for strconf STREAMS package])
     eval "STRCONF_PACKAGE=\"\${${strconf_prefix}_cv_package:-\${streams_cv_package:-LfS}}\""
     eval "${strconf_prefix}_cv_package=\"\$STRCONF_PACKAGE\""
@@ -441,6 +445,14 @@ END   { print "# Created by " me " -- DO NOT EDIT" }' \
 		echo "$as_me: $line" >&2
 	    done
 	fi
+	if test :"${STRCONF_DEVICES:+set}" = :set; then
+	    AC_MSG_NOTICE([creating $STRCONF_DEVICES])
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --mkdevices=$STRCONF_DEVICES $STRCONF_INPUT" 2>&1 | \
+	    while read line ; do
+		echo "$as_me:$LINENO: $line" >&5
+		echo "$as_me: $line" >&2
+	    done
+	fi
 	if test :"${STRCONF_BPKGDIR:+set}" = :set ; then
 	    AC_MSG_NOTICE([creating $STRCONF_BPKGDIR])
 	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --packagedir=$STRCONF_BPKGDIR --pkgrules=${STRCONF_PKGRULE}.in $STRCONF_INPUT" 2>&1 | \
@@ -491,6 +503,7 @@ STRCONF_CONFMOD="$STRCONF_CONFMOD"
 STRCONF_MAKEDEV="$STRCONF_MAKEDEV"
 STRCONF_STSETUP="$STRCONF_STSETUP"
 STRCONF_STRLOAD="$STRCONF_STRLOAD"
+STRCONF_DEVICES="$STRCONF_DEVICES"
 STRCONF_BPKGDIR="$STRCONF_BPKGDIR"
 STRCONF_PKGRULE="$STRCONF_PKGRULE"
 STRCONF_PACKAGE="$STRCONF_PACKAGE"
@@ -519,6 +532,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 	AC_SUBST([STRCONF_MAKEDEV])dnl
 	AC_SUBST([STRCONF_STSETUP])dnl
 	AC_SUBST([STRCONF_STRLOAD])dnl
+	AC_SUBST([STRCONF_DEVICES])dnl
 	AC_SUBST([STRCONF_BPKGDIR])dnl
 	AC_SUBST([STRCONF_PKGRULE])dnl
 	AC_SUBST([STRCONF_PACKAGE])dnl
@@ -531,6 +545,9 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: strconf.m4,v $
+# Revision 1.1.2.3  2009-07-23 16:37:50  brian
+# - updates for release
+#
 # Revision 1.1.2.2  2009-07-21 11:06:13  brian
 # - changes from release build
 #

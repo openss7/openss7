@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: x25-llc.4.man,v 1.1.2.1 2009-06-21 10:34:59 brian Exp $
+.\" @(#) $Id: x25-llc.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:59 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: x25-llc.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:59  brian
 .\" - added files to new distro
 .\"
@@ -211,7 +214,8 @@ This driver has not been implemented.
 .SH BUGS
 .PP
 .B LLC
-has no known bugs.
+has no known bugs,
+as this driver has not been implemented.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -224,11 +228,6 @@ has no known bugs.
 .BR iso-ip (4),
 .BR iso-tp4 (4),
 .IR ISO (4).
-.\"
-.\"
-.SH BUGS
-.PP
-This driver has not been implemented.
 .\"
 .\"
 .SH COMPATIBILITY

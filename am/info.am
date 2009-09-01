@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-13 07:13:26 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-09-01 09:09:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,51 +48,21 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-13 07:13:26 $ by $Author: brian $
+## Last Modified $Date: 2009-09-01 09:09:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
 -include $(DEPDIR)/info.Pd
 
-$(DEPDIR)/info.Pd: Makefile $(info_TEXINFOS)
+$(DEPDIR)/info.Pd: Makefile $(info_TEXINFOS) $(top_srcdir)/scripts/info.deps
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	$(AM_V_GEN)list="$(info_TEXINFOS)" ; for f in $$list ; do \
 		if test -r $$f; then d=; else d=$(srcdir)/; fi; \
-		echo "$$f" | sed -r 's,(.*)\.texi,\1.ps: \1.dvi,' ; \
-		( echo "$$f" | sed -r 's,(.*)\.texi,$(srcdir)/\1.info \1.txt: \1.texi,' ; \
-		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
-		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.txt,p' ) | \
-		  while read p ; do \
-			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
-		  done ) | \
-		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
-		( echo "$$f" | sed -r 's,(.*)\.texi,\1.dvi: \1.texi,' ; \
-		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
-		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.eps,p' ) | \
-		  while read p ; do \
-			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
-		  done ) | \
-		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
-		( echo "$$f" | sed -r 's,(.*)\.texi,\1.pdf: \1.texi,' ; \
-		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
-		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.pdf,p' ) | \
-		  while read p ; do \
-			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
-		  done ) | \
-		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
-		( echo "$$f" | sed -r 's,(.*)\.texi,\1.html: \1.texi,' ; \
-		  ( cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(include|verbatiminclude)[[:space:]][[:space:]]*(.*), \2,p' ; \
-		    cat $$d$$f | sed -n -r 's,^@c[[:space:]].*,,;s,.*@(image|tabfig|tabfigsized|figure|figuresized|figureimage)\{([^,\}]*).*, \2.png,p' ) | \
-		  while read p ; do \
-			if test -f $(srcdir)/$$p ; then v=; elif test -f $(top_srcdir)/scripts/$$p ; then v=$(top_srcdir)/scripts/ ; else v=; fi ; \
-			if test $$(basename $$p) != args.texi ; then echo " $$v$$p" ; fi ; \
-		  done ) | \
-		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
-	done > $(DEPDIR)/info.Td || { rm -f -- $(DEPDIR)/info.Td ; exit 1 ; } ; \
+		echo "$$d$$f" ; \
+	done | $(top_srcdir)/scripts/info.deps srcdir=$(srcdir) top_srcdir=$(top_srcdir) > $(DEPDIR)/info.Td || { rm -f -- $(DEPDIR)/info.Td ; exit 1 ; } ; \
 	mv -f $(DEPDIR)/info.Td $@
+
+EXTRA_DIST += $(top_srcdir)/scripts/info.deps
 
 DISTCLEANFILES += $(DEPDIR)/info.Td $(DEPDIR)/info.Pd
 
@@ -533,6 +503,9 @@ MY_PHONY		+= pngs-am
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 1.1.2.5  2009-09-01 09:09:46  brian
+## - added text image files
+##
 ## Revision 1.1.2.4  2009-07-13 07:13:26  brian
 ## - changes for multiple distro build
 ##

@@ -79,6 +79,9 @@ extern "C" {
 
 %inline %{
 
+#ifndef __THROW
+#define __THROW
+#endif
     extern "C" {
         extern int isastream(int fd);
         extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);
@@ -87,7 +90,7 @@ extern "C" {
         extern int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags);
         extern int fattach(int fd, const char *path);
         extern int fdetach(const char *path);
-        extern int pipe(int fds[2]);
+        extern int pipe(int fds[2]) __THROW;
     }
 
     namespace streams {

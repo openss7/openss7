@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: drafts.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-13 07:13:26 $
+# @(#) $RCSfile: drafts.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-09-01 09:09:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-13 07:13:26 $ by $Author: brian $
+## Last Modified $Date: 2009-09-01 09:09:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -58,14 +58,11 @@ $(DEPDIR)/drafts.Pd: Makefile $(ME_MES)
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	$(AM_V_GEN)list="$(ME_MES)" ; for f in $$list ; do \
 		if test -r $$f; then d=; else d=$(srcdir)/; fi; \
-		( echo "$$f" | sed -r 's,(.*)\.me,\1.txt \1.dvi \1.ps \1.html:,' ; \
-		  echo " $$f" ; cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*), \1,p' ; \
-		  echo " idrefs" ) | \
-		sed '$$!N;$$!N;$$!N;$$!N;s,\n,,g;$$!s,$$, \\,' ; \
-		echo "$$f" | sed -r 's,(.*)\.me,\1.pdf: \1.ps,' ; \
-		cat $$d$$f | sed -n -r 's,^\.so[[:space:]][[:space:]]*(.*)\.pic,\1.pic: \1.fig#\1.gif: \1.fig#\1.eps: \1.fig,p' | tr '#' '\n' ; \
-	done > $(DEPDIR)/drafts.Td || { rm -f -- $(DEPDIR)/drafts.Td ; exit 1 ; } ; \
+		echo "$$d$$f"; \
+	done | $(top_srcdir)/scripts/drafts.deps srcdir=$(srcdir) top_srcdir=$(top_srcdir) > $(DEPDIR)/drafts.Td || { rm -f -- $(DEPDIR)/drafts.Td ; exit 1 ; } ; \
 	mv -f $(DEPDIR)/drafts.Td $@
+
+EXTRA_DIST += $(top_srcdir)/scripts/drafts.deps
 
 DISTCLEANFILES += $(DEPDIR)/drafts.Td $(DEPDIR)/drafts.Pd
 
@@ -214,6 +211,9 @@ uninstall-html-ma:
 ## =============================================================================
 ##
 ## $Log: drafts.am,v $
+## Revision 1.1.2.5  2009-09-01 09:09:46  brian
+## - added text image files
+##
 ## Revision 1.1.2.4  2009-07-13 07:13:26  brian
 ## - changes for multiple distro build
 ##

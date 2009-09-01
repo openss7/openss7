@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: test-sctp_nc.8.man,v 1.1.2.1 2009-06-21 10:37:50 brian Exp $
+.\" @(#) $Id: test-sctp_nc.8.man,v 1.1.2.2 2009-07-23 16:37:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:37:50 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:48 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-sctp_nc.8.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:48  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:37:50  brian
 .\" - added files to new distro
 .\"
@@ -219,7 +222,7 @@ options, these general options must appear ahead of the command option.
 Specifies that the caller is interested only in the return code and error diagnostics and that
 normal output should be suppressed.
 The default verbosity level if this option is not specified is
-.BR 1 .
+.RB ( 1 ).
 This option is equivalent to
 .BR --verbose=0 .
 .TP
@@ -231,7 +234,7 @@ argument, it specifies that the verbosity level should be increased by one.  If 
 argument is specified, the verbosity level is set to that integer value.  This option can be
 repeated.
 The default verbosity level if this option is not specified is
-.BR 1 .
+.RB ( 1 ).
 For example,
 .B -vvvv
 is equivalent to

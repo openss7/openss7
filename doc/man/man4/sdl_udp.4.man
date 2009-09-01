@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: sdl_udp.4.man,v 1.1.2.1 2009-06-21 10:34:54 brian Exp $
+.\" @(#) $Id: sdl_udp.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:54 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sdl_udp.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:54  brian
 .\" - added files to new distro
 .\"
@@ -324,6 +327,11 @@ signalling network.  It is intended for laboratory use and experimentation
 only.  SDL_UDP makes no attempt to perform all of the Level 2 functions of
 SS7.  It is mostly intended as a simple way of providing a large number of
 L2 links for testing upper level protocol modules (such as MTP).
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/sdl-udp .
 .\"
 .\"
 .SH "SEE ALSO"

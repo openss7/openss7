@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: XAP.3.man,v 1.1.2.2 2009-06-29 07:35:31 brian Exp $
+.\" @(#) $Id: XAP.3.man,v 1.1.2.3 2009-07-23 16:37:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-29 07:35:31 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: XAP.3.man,v $
+.\" Revision 1.1.2.3  2009-07-23 16:37:44  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.2  2009-06-29 07:35:31  brian
 .\" - pass check target
 .\"
@@ -1170,7 +1173,7 @@ primitives).
 .\".PD
 .\"
 .\"
-.SH NOTICES
+.SH IMPLEMENTATION
 .PP
 Note that, unlike other OSI-based application interfaces, the XAP
 .[

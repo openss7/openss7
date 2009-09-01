@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: MG.4.man,v 1.1.2.1 2009-06-21 10:34:45 brian Exp $
+.\" @(#) $Id: MG.4.man,v 1.1.2.2 2009-07-23 16:37:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:45 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: MG.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:44  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:45  brian
 .\" - added files to new distro
 .\"
@@ -271,6 +274,11 @@ device drivers:
 The devices, drivers and modules associated with the MG subsystem change
 rapidly and have not yet finalized.  The list presented in this manual page
 may be out of date.
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/mg .
 .\"
 .\"
 .SH BUGS

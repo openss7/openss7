@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: ISDN.4.man,v 1.1.2.1 2009-06-21 10:34:45 brian Exp $
+.\" @(#) $Id: ISDN.4.man,v 1.1.2.2 2009-07-23 16:37:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:45 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ISDN.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:44  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:45  brian
 .\" - added files to new distro
 .\"
@@ -139,7 +142,7 @@ capabilities in a number of related forms, including H.323, V5.2, GR-303 and
 GSM variants.
 .\"
 .\"
-.SS DRIVERS
+.SS Drivers
 .PP
 .B ISDN
 provides the following
@@ -256,7 +259,7 @@ for DL management,
 .BR dl_ioctl (4).
 .\"
 .\"
-.SS MODULES
+.SS Modules
 .PP
 .B ISDN
 provides the following pushable
@@ -280,7 +283,7 @@ Interface (CHI),
 .BR chi (7).
 .\"
 .\"
-.SS DEVICES
+.SS Devices
 .PP
 .B ISDN
 provides the following
@@ -324,6 +327,16 @@ driver to form a complete ISDN Q.921 data link.  The
 .BR mxi (7)
 device can be used to switch bearer channels, see
 .BR mx (4).
+.\"
+.\"
+.SH DEVICES
+.PP
+.IR /dev/lapd ,
+.IR /dev/isdn ,
+.IR /dev/capi ,
+.IR /dev/v5 ,
+.IR /dev/gr303 ,
+.IR /dev/dl .
 .\"
 .\"
 .SH NOTICES

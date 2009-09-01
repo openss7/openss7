@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:56  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-06-29 07:35:46  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $"
 
-static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
+static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -167,7 +170,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -892,14 +895,37 @@ str_task_pgrp(struct task_struct *t)
 #endif
 }
 
+extern rwlock_t tasklist_lock;
+
+#ifdef HAVE_SESSION_OF_PGRP_ADDR
+#ifdef HAVE_KFUNC_SESSION_OF_PGRP_STRUCT_ARG
+extern struct pid *session_of_pgrp(struct pid *pgrp);
+#else
+pid_t session_of_pgrp(pid_t);
+#endif
+#endif
+
 STATIC streams_fastcall __unlikely pid_t
 pgrp_session(pid_t pgrp)
 {
-#if defined HAVE_SESSION_OF_PGRP_ADDR
-	static pid_t (*session_of_pgrp) (pid_t) = (typeof(session_of_pgrp)) HAVE_SESSION_OF_PGRP_ADDR;
-#endif
+#ifdef HAVE_KFUNC_SESSION_OF_PGRP_STRUCT_ARG
+	pid_t pid;
+
+	read_lock(&tasklist_lock);
+	pid = pid_nr(session_of_pgrp(find_pid(pgrp)));
+	read_unlock(&tasklist_lock);
+	return (pid);
+#else
 	return (session_of_pgrp(pgrp));
+#endif
 }
+
+int is_ignored(int sig);
+int is_orphaned_pgrp(int pgrp);
+int is_current_pgrp_orphaned(void);
+int kill_proc_info(int sig, struct siginfo *sip, pid_t pid);
+int kill_sl_func(pid_t, int, int);
+int send_group_sig_info(int, struct siginfo *, struct task_struct *);
 
 /**
  *  straccess:   - check error and access conditions on a stream
@@ -947,16 +973,6 @@ pgrp_session(pid_t pgrp)
 streams_noinline streams_fastcall __unlikely int
 straccess_slow(struct stdata *sd, const register int access, const register int flags)
 {
-#if defined HAVE_IS_IGNORED_ADDR
-	static int (*is_ignored) (int sig) = (typeof(is_ignored)) HAVE_IS_IGNORED_ADDR;
-#endif
-#if defined HAVE_IS_ORPHANED_PGRP_ADDR
-	static int (*is_orphaned_pgrp) (int pgrp) = (typeof(is_orphaned_pgrp)) HAVE_IS_ORPHANED_PGRP_ADDR;
-#endif
-#if defined HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
-	static int (*is_current_pgrp_orphaned) (void) = (typeof(is_current_pgrp_orphaned)) HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR;
-#endif
-
 	/* POSIX semantics for pipes and FIFOs */
 	if (likely(access & (FREAD | FWRITE))) {
 		if (likely((flags & STRISPIPE) != 0)) {
@@ -1361,19 +1377,6 @@ alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *d
 #define thread_group_leader(p) (p->pid == p->tgid)
 #endif
 
-#ifndef HAVE_TASKLIST_LOCK_EXPORT
-#ifndef HAVE_TASKLIST_LOCK_ADDR
-#ifdef CONFIG_SMP
-#error Need access to tasklist_lock.
-#else
-static rwlock_t tasklist_lock = RW_LOCK_UNLOCKED;
-#endif
-#endif				/* HAVE_TASKLIST_LOCK_ADDR */
-static rwlock_t *tasklist_lock_p = (typeof(&tasklist_lock)) HAVE_TASKLIST_LOCK_ADDR;
-
-#define tasklist_lock (*tasklist_lock_p)
-#endif				/* HAVE_TASKLIST_LOCK_EXPORT */
-
 /**
  *  str_find_thread_group_leader: - given a thread find the thread group leader
  *  @procp:	the process
@@ -1567,9 +1570,6 @@ strevent_unregister(const struct file *file, struct stdata *sd)
 STATIC __unlikely void
 strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 {
-#if defined HAVE_KILL_PROC_INFO_ADDR
-	static int (*kill_proc_info) (int sig, struct siginfo * sip, pid_t pid) = (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
-#endif
 	struct strevent *se;
 	struct siginfo si;
 	int bits, sig;
@@ -3386,21 +3386,10 @@ strunlink(struct stdata *stp)
 }
 
 #if !defined HAVE_KILL_SL_EXPORT
-#if defined HAVE_KILL_SL_ADDR
-static int (*kill_sl_func) (pid_t, int, int) = (typeof(kill_sl_func)) HAVE_KILL_SL_ADDR;
-
-#define kill_sl kill_sl_func
-#else
+#if !defined HAVE_KILL_SL_ADDR
 STATIC __unlikely int
 __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 {
-#if defined HAVE_SEND_GROUP_SIG_INFO_ADDR
-	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) = (typeof(send_group_sig_info)) HAVE_SEND_GROUP_SIG_INFO_ADDR;
-#else
-#if defined HAVE_GROUP_SEND_SIG_INFO_ADDR
-	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) = (typeof(&group_send_sig_info)) HAVE_GROUP_SEND_SIG_INFO_ADDR;
-#endif
-#endif
 	struct task_struct *p;
 	int retval = -ESRCH;
 
@@ -10116,16 +10105,6 @@ struct ioctl_trans {
 	ioctl_trans_handler_t handler;
 	struct ioctl_trans *next;
 };
-#endif
-
-#ifdef HAVE_IOCTL32_HASH_TABLE_ADDR
-STATIC struct ioctl_trans **ioctl32_hash_table = (struct ioctl_trans **) HAVE_IOCTL32_HASH_TABLE_ADDR;
-#endif
-
-#ifdef HAVE_IOCTL32_SEM_ADDR
-STATIC struct rw_semaphore *ioctl32_sem_addr = (struct rw_semaphore *) HAVE_IOCTL32_SEM_ADDR;
-
-#define ioctl32_sem (*ioctl32_sem_addr)
 #endif
 
 /* Boy I'm glad this crap is gone... */

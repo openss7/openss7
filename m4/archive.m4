@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:12 $
+# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-23 16:37:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
+# Last Modified $Date: 2009-07-23 16:37:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,12 +84,12 @@ AC_DEFUN([_ARCHIVE_ARGS], [dnl
 	    esac], [with_xz=no])
     AC_ARG_ENABLE([bestzip],
 	[AS_HELP_STRING([--enable-bestzip],
-	    [best compression of archives @<:@default=bzip2@:>@])], [dnl
+	    [best compression of archives @<:@default=yes@:>@])], [dnl
 	    case "$enable_bestzip" in
 		(xz|lzma|bzip2) disable_bestzip=no ;;
 		(no) enable_bestzip=bzip2 ; disable_bestzip=yes;;
 		(yes|*) enable_bestzip= ; disable_bestzip=no ;;
-	    esac], [enable_bestzip=bzip2 ; disable_bestzip=yes])
+	    esac], [enable_bestzip= ; disable_bestzip=no])
     AC_ARG_ENABLE([repo-tar],
 	[AS_HELP_STRING([--disable-repo-tar],
 	    [tar repo construction @<:@default=yes@:>@])],
@@ -343,6 +343,9 @@ AC_DEFUN([_ARCHIVE_XXX], [dnl
 # =============================================================================
 #
 # $Log: archive.m4,v $
+# Revision 1.1.2.4  2009-07-23 16:37:50  brian
+# - updates for release
+#
 # Revision 1.1.2.3  2009-07-21 11:06:12  brian
 # - changes from release build
 #

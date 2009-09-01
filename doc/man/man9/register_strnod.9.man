@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: register_strnod.9.man,v 1.1.2.1 2009-06-21 10:38:53 brian Exp $
+.\" @(#) $Id: register_strnod.9.man,v 1.1.2.2 2009-07-23 16:37:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: register_strnod.9.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:50  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:53  brian
 .\" - added files to new distro
 .\"
@@ -363,7 +366,7 @@ with a minor device number of
 and another named
 .RB \(lq user \(rq,
 with a minor device number of
-.BR 1 .
+.RB ( 1 ).
 The
 .BR sad (4)
 driver, as shown under

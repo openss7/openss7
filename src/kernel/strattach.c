@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strattach.c,v $
+ Revision 1.1.2.2  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:37:16  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $"
 
-static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
+static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -98,20 +101,8 @@ static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.
 
 #if defined HAVE_KERNEL_FATTACH_SUPPORT
 
-#if defined HAVE_MOUNT_SEM_ADDR
-#define mount_sem (*((struct semaphore *)HAVE_MOUNT_SEM_ADDR))
-#endif
-#if defined HAVE_NAMESPACE_SEM_ADDR
-#define namespace_sem (*((struct rw_semaphore *)HAVE_NAMESPACE_SEM_ADDR))
-#endif
-
-#if defined HAVE_CLONE_MNT_ADDR
-STATIC struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * root)
-= (typeof(clone_mnt)) HAVE_CLONE_MNT_ADDR;
-#endif
-#if defined HAVE_CHECK_MNT_ADDR
-STATIC int (*check_mnt) (struct vfsmount * mnt)
-= (typeof(check_mnt)) HAVE_CHECK_MNT_ADDR;
+#ifdef HAVE_CHECK_MNT_ADDR
+int check_mnt(struct vfsmount *mnt);
 #else
 STATIC int
 check_mnt(struct vfsmount *mnt)
@@ -119,14 +110,10 @@ check_mnt(struct vfsmount *mnt)
 	return mnt->mnt_namespace == current->namespace;
 }
 #endif
-#if defined HAVE_GRAFT_TREE_ADDR
-STATIC int (*graft_tree) (struct vfsmount * mnt, struct nameidata * nd)
-= (typeof(graft_tree)) HAVE_GRAFT_TREE_ADDR;
-#endif
-#if defined HAVE_DO_UMOUNT_ADDR
-STATIC int (*do_umount) (struct vfsmount * mnt, int flags)
-= (typeof(do_umount)) HAVE_DO_UMOUNT_ADDR;
-#endif
+
+int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
+
+int do_umount(struct vfsmount *mnt, int flags);
 
 #ifndef HAVE_PATH_LOOKUP_EXPORT
 int
@@ -139,6 +126,8 @@ path_lookup(const char *path, unsigned flags, struct nameidata *nd)
 	return error;
 }
 #endif
+
+struct vfsmount *clone_mnt(struct vfsmount *old, struct dentry *root);
 
 streams_fastcall long
 do_fattach(const struct file *file, const char *file_name)

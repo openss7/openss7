@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: T_OPTDATA_REQ.7.man,v 1.1.2.1 2009-06-21 10:36:17 brian Exp $
+.\" @(#) $Id: T_OPTDATA_REQ.7.man,v 1.1.2.2 2009-07-23 16:37:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:17 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: T_OPTDATA_REQ.7.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:46  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:36:17  brian
 .\" - added files to new distro
 .\"
@@ -130,7 +133,7 @@ struct T_optdata_req {
 };
 \fR\s+1
 .fi
-.SH DESCRIPTION:
+.SH DESCRIPTION
 The primitive indicates to the transport provider that the message contains
 a transport interface data unit.  One or more transport interface data units
 form a transport service data units (TSDU).

@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: strlogd.8.man,v 1.1.2.1 2009-06-21 10:37:48 brian Exp $
+.\" @(#) $Id: strlogd.8.man,v 1.1.2.2 2009-07-23 16:37:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:37:48 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:47 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strlogd.8.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:47  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:37:48  brian
 .\" - added files to new distro
 .\"
@@ -611,7 +614,7 @@ uxpdoc
 .PP
 .B strlogd
 is new for the
-.I @PACAKGE_TITLE@
+.I @PACKAGE_TITLE@
 package.
 .\"
 .\"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hooks.h.in,v 1.1.2.1 2009-06-21 11:20:52 brian Exp $
+ @(#) $Id: sctp_hooks.h.in,v 1.1.2.2 2009-07-23 16:37:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hooks.h.in,v $
+ Revision 1.1.2.2  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:20:52  brian
  - added files to new distro
 
@@ -74,7 +77,7 @@
 #ifndef __LOCAL_SCTP_HOOKS_H__
 #define __LOCAL_SCTP_HOOKS_H__
 
-#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
@@ -100,99 +103,35 @@ struct sockaddr_storage {
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
-#undef HAVE_ICMP_ERR_CONVERT_ADDR
 extern struct icmp_err icmp_err_convert[];
 
-#ifdef HAVE_ICMP_ERR_CONVERT_ADDR
-struct icmp_err *icmp_err_convert___ = (void *) HAVE_ICMP_ERR_CONVERT_ADDR;
-
-#define icmp_err_convert icmp_err_convert___
-#endif
-
-#undef HAVE_ICMP_STATISTICS_ADDR
 extern struct icmp_mib icmp_statistic[];
-
-#ifdef HAVE_ICMP_STATISTICS_ADDR
-struct icmp_mib *icmp_statistic___ = (void *) HAVE_ICMP_STATISTICS_ADDR;
-
-#define icmp_statistics icmp_statistic___
-#endif
 
 #undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
-/* this was already declared and referenced by an inline (ip_route_connect) so
-   it must be a function and not a macro */
-int
-ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
-{
-	int (*func) (struct rtable ** rp, struct flowi * flp, struct sock * sk, int flags)
-	    = (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
-
-	return (*func) (rp, flp, sk, flags);
-}
+int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
 #endif
 
-#undef HAVE_IP_RT_MIN_PMTU_ADDR
 extern int ip_rt_min_pmtu;
 
-#ifdef HAVE_IP_RT_MIN_PMTU_ADDR
-#define ip_rt_min_pmtu (*((typeof(ip_rt_min_pmtu) *)HAVE_IP_RT_MIN_PMTU_ADDR))
-#endif
-
-#undef HAVE_IP_RT_MTU_EXPIRES_ADDR
 extern int ip_rt_mtu_expires;
-
-#ifdef HAVE_IP_RT_MTU_EXPIRES_ADDR
-#define ip_rt_mtu_expires (*((typeof(ip_rt_mtu_expires) *)HAVE_IP_RT_MTU_EXPIRES_ADDR))
-#endif
 
 #undef HAVE_IP_RT_UPDATE_PMTU_ADDR
 #ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
 void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
-
-#define ip_rt_update_pmtu (*((typeof(ip_rt_update_pmtu) *) HAVE_IP_RT_UPDATE_PMTU_ADDR))
 #endif
 
-#undef HAVE_SYSCTL_IP_DYNADDR_ADDR
 extern int sysctl_ip_dynaddr;
 
-#ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
-#define sysctl_ip_dynaddr (*((typeof(sysctl_ip_dynaddr) *)HAVE_SYSCTL_IP_DYNADDR_ADDR))
-#endif
-
-#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 extern int sysctl_ip_nonlocal_bind;
 
-#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
-#define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
-#endif
-
-#undef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
 extern int sysctl_ip_default_ttl;
 
-#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
-#define sysctl_ip_default_ttl (*((typeof(sysctl_ip_default_ttl) *)HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR))
-#endif
-
-#undef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
 extern int sysctl_local_port_range[2];
-
-#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
-#define sysctl_local_port_range (*((typeof(sysctl_local_port_range) *)HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR))
-#endif
 
 #undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
 #ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-/* this was already declared and referenced by an inline (ip_route_connect) so
-   it must be a function and not a macro */
-int
-__ip_route_output_key(struct rtable **rp, const struct flowi *flp)
-{
-	int (*func) (struct rtable ** rp, const struct flowi * flp)
-	    = (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
-
-	return (*func) (rp, flp);
-}
+int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #endif
 
 #undef HAVE_KFUNC_DST_MTU
@@ -247,37 +186,20 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 #undef HAVE___XFRM_POLICY_CHECK_ADDR
 #ifdef HAVE___XFRM_POLICY_CHECK_ADDR
 int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
-
-#define __xfrm_policy_check (*((typeof(__xfrm_policy_check) *) HAVE___XFRM_POLICY_CHECK_ADDR))
 #endif
 
 #undef HAVE_XFRM_POLICY_DELETE_ADDR
 #ifdef HAVE_XFRM_POLICY_DELETE_ADDR
-/* this needs to be function, not macro */
 #ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
-int
-xfrm_policy_delete(struct xfrm_policy *pol, int dir)
-{
-	int (*func) (struct xfrm_policy *, int) = (typeof(func)) HAVE_XFRM_POLICY_DELETE_ADDR;
-
-	return (*func) (pol, dir);
-}
+int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #else
-void
-xfrm_policy_delete(struct xfrm_policy *pol, int dir)
-{
-	void (*func) (struct xfrm_policy *, int) = (typeof(func)) HAVE_XFRM_POLICY_DELETE_ADDR;
-
-	return (*func) (pol, dir);
-}
+void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #endif
 
 #undef HAVE_SNMP_GET_INFO_ADDR
 #ifdef HAVE_SNMP_GET_INFO_ADDR
 int snmp_get_info(char *buffer, char **start, off_t offset, int length);
-
-#define snmp_get_info (*((typeof(snmp_get_info) *) HAVE_SNMP_GET_INFO_ADDR))
 #endif
 
 #undef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
@@ -292,11 +214,6 @@ extern int ip_frag_nqueues;
 #endif
 #endif
 
-#undef HAVE_IP_FRAG_NQUEUES_ADDR
-#ifdef HAVE_IP_FRAG_NQUEUES_ADDR
-#define ip_frag_nqueues (*((typeof(ip_frag_nqueues) *)HAVE_IP_FRAG_NQUEUES_ADDR))
-#endif
-
 #undef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
 #ifdef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
 int ip_frag_mem(struct net *net);
@@ -309,11 +226,6 @@ extern atomic_t ip_frag_mem;
 #endif
 #endif
 
-#undef HAVE_IP_FRAG_MEM_ADDR
-#ifdef HAVE_IP_FRAG_MEM_ADDR
-#define ip_frag_mem (*((typeof(ip_frag_mem) *)HAVE_IP_FRAG_MEM_ADDR))
-#endif
-
 #ifndef SK_WMEM_MAX
 #define SK_WMEM_MAX 65535
 #endif
@@ -323,46 +235,38 @@ extern atomic_t ip_frag_mem;
 
 #undef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
 #ifndef sysctl_rmem_default
-#ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
-static __inline__ __u32 *const _sysctl_rmem_default_location =
-    (typeof(_sysctl_rmem_default_location)) (HAVE_SYSCTL_RMEM_DEFAULT_ADDR);
-#define sysctl_rmem_default (*_sysctl_rmem_default_location)
-#else
+#ifndef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
+#else
+extern __u32 sysctl_rmem_default;
 #endif
 
 #undef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
 #ifndef sysctl_wmem_default
-#ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
-static __inline__ __u32 *const _sysctl_wmem_default_location =
-    (typeof(_sysctl_wmem_default_location)) (HAVE_SYSCTL_WMEM_DEFAULT_ADDR);
-#define sysctl_wmem_default (*_sysctl_wmem_default_location)
-#else
+#ifndef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
+#else
+extern __u32 sysctl_wmem_default;
 #endif
 
 #undef HAVE_SYSCTL_RMEM_MAX_ADDR
 #ifndef sysctl_rmem_max
-#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
-static __u32 *const _sysctl_rmem_max_location =
-    (typeof(_sysctl_rmem_max_location)) (HAVE_SYSCTL_RMEM_MAX_ADDR);
-#define sysctl_rmem_max (*_sysctl_rmem_max_location)
-#else
+#ifndef HAVE_SYSCTL_RMEM_MAX_ADDR
 #define sysctl_rmem_max SK_RMEM_MAX
 #endif
+#else
+extern __u32 sysctl_rmem_max;
 #endif
 
 #undef HAVE_SYSCTL_WMEM_MAX_ADDR
 #ifndef sysctl_wmem_max
-#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
-static __u32 *const _sysctl_wmem_max_location =
-    (typeof(_sysctl_wmem_max_location)) (HAVE_SYSCTL_WMEM_MAX_ADDR);
-#define sysctl_wmem_max (*_sysctl_wmem_max_location)
-#else
+#ifndef HAVE_SYSCTL_WMEM_MAX_ADDR
 #define sysctl_wmem_max SK_WMEM_MAX
 #endif
+#else
+extern __u32 sysctl_wmem_max;
 #endif
 
 #ifndef socklen_t
@@ -371,122 +275,55 @@ typedef int socklen_t;
 #define socklen_t socklen_t
 #endif
 
-#undef HAVE_TCP_MEMORY_ALLOCATED_ADDR
 extern atomic_t tcp_memory_allocated;
 
-#ifdef HAVE_TCP_MEMORY_ALLOCATED_ADDR
-#define tcp_memory_allocated (*((typeof(tcp_memory_allocated) *)HAVE_TCP_MEMORY_ALLOCATED_ADDR))
-#endif
-
-#undef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
 extern atomic_t tcp_sockets_allocated;
 
-#ifdef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
-#define tcp_sockets_allocated (*((typeof(tcp_sockets_allocated) *)HAVE_TCP_SOCKETS_ALLOCATED_ADDR))
-#endif
-
-#undef HAVE_TCP_ORPHAN_COUNT_ADDR
 extern atomic_t tcp_orphan_count;
 
-#ifdef HAVE_TCP_ORPHAN_COUNT_ADDR
-#define tcp_orphan_count (*((typeof(tcp_orphan_count) *)HAVE_TCP_ORPHAN_COUNT_ADDR))
-#endif
-
-#undef HAVE_TCP_TW_COUNT_ADDR
 extern int tcp_tw_count;
 
-#ifdef HAVE_TCP_TW_COUNT_ADDR
-#define tcp_tw_count (*((typeof(tcp_tw_count) *)HAVE_TCP_TW_COUNT_ADDR))
-#endif
-
-#undef HAVE_IP_CMSG_RECV_ADDR
-#ifdef HAVE_IP_CMSG_RECV_ADDR
 void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
-
-#define ip_cmsg_recv (*((typeof(ip_cmsg_recv) *) HAVE_IP_CMSG_RECV_ADDR))
-#endif
-
-#if 0
-#undef HAVE_IP_CMSG_SEND_ADDR
-#ifdef HAVE_IP_CMSG_SEND_ADDR
-int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
-
-#define ip_cmsg_send (*((typeof(ip_cmsg_send) *) HAVE_IP_CMSG_SEND_ADDR))
-#endif
-#endif
 
 #undef HAVE_INET_BIND_ADDR
 #ifdef HAVE_INET_BIND_ADDR
 int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
-
-#define inet_bind (*((typeof(inet_bind) *)HAVE_INET_BIND_ADDR))
 #endif
 
 #undef HAVE_INET_IOCTL_ADDR
 #ifdef HAVE_INET_IOCTL_ADDR
 int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
-
-#define inet_ioctl (*((typeof(inet_ioctl) *) HAVE_INET_IOCTL_ADDR))
 #endif
 
 #undef HAVE_INET_GETNAME_ADDR
 #ifdef HAVE_INET_GETNAME_ADDR
 int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
-
-#define inet_getname (*((typeof(inet_getname) *) HAVE_INET_GETNAME_ADDR))
 #endif
 
 #undef HAVE_INET_MULTI_GETNAME_ADDR
 #ifdef HAVE_INET_MULTI_GETNAME_ADDR
 int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
-
-#define inet_multi_getname (*((typeof(inet_mutli_getname) *) HAVE_INET_MULTI_GETNAME_ADDR))
 #endif
 
 #undef HAVE_SOCKET_GET_INFO_ADDR
 #ifdef HAVE_SOCKET_GET_INFO_ADDR
 int socket_get_info(char *buffer, char **start, off_t offset, int length);
-
-#define socket_get_info (*((typeof(socket_get_info) *) HAVE_SOCKET_GET_INFO_ADDR))
 #endif
 
 #undef HAVE_AFINET_GET_INFO_ADDR
 #ifdef HAVE_AFINET_GET_INFO_ADDR
 int afinet_get_info(char *buffer, char **start, off_t offset, int length);
-
-#define afinet_get_info (*((typeof(afinet_get_info) *) HAVE_AFINET_GET_INFO_ADDR))
 #endif
 
-#undef HAVE_TCP_PROT_ADDR
 extern struct proto tcp_prot;
 
-#ifdef HAVE_TCP_PROT_ADDR
-#define tcp_prot (*((typeof(tcp_prot) *)HAVE_TCP_PROT_ADDR))
-#endif
-
-#undef HAVE_UDP_PROT_ADDR
 extern struct proto udp_prot;
 
-#ifdef HAVE_UDP_PROT_ADDR
-#define udp_prot (*((typeof(udp_prot) *)HAVE_UDP_PROT_ADDR))
-#endif
-
-#undef HAVE_RAW_PROT_ADDR
 extern struct proto raw_prot;
-
-#ifdef HAVE_RAW_PROT_ADDR
-#define raw_prot (*((typeof(raw_prot) *)HAVE_RAW_PROT_ADDR))
-#endif
 
 #undef HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR
 #ifdef HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR
-__u32
-secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport)
-{
-	__u32(*func) (__u32 saddr, __u32 daddr, __u16 sport, __u16 dport)
-	    = (typeof(func)) HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR;
-	return (*func) (saddr, daddr, sport, dport);
-}
+__u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
 #endif
 
 #endif				/* __LOCAL_SCTP_HOOKS_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:17 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 1.1.2.2  2009-07-23 16:37:56  brian
+ - updates for release
+
  Revision 1.1.2.1  2009-06-21 11:37:17  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:56 $"
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $";
+static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:56 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:56 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -541,12 +544,6 @@ EXPORT_SYMBOL(SV_DEALLOC);	/* svr4/ddi.h */
 __SVR4_EXTERN void
 SV_SIGNAL(sv_t * svp)
 {
-#ifdef HAVE___WAKE_UP_SYNC_ADDR
-#undef	__wake_up_sync
-	typeof(&__wake_up_sync) ___wake_up_sync =
-	    (typeof(___wake_up_sync)) HAVE___WAKE_UP_SYNC_ADDR;
-#define	__wake_up_sync ___wake_up_sync
-#endif
 	svp->sv_condv = 1;
 	wake_up_interruptible_sync(&svp->sv_waitq);
 }

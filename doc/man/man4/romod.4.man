@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: romod.4.man,v 1.1.2.1 2009-06-21 10:34:53 brian Exp $
+.\" @(#) $Id: romod.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:53 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: romod.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:53  brian
 .\" - added files to new distro
 .\"
@@ -220,7 +223,7 @@ Nevertheless, the module may be pushed in a non-portable way by clients of
 sufficient privilege to acheive specific effects, such as for testing.
 .\"
 .\"
-.SH INTERFACE
+.SH "SERVICE INTERFACE"
 .PP
 As it appears that other implementations of the APLI and APRI Libraries are
 solely contained in user-space libraries, using IPC for communication with
@@ -434,7 +437,7 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 This
-.B @PACAKGE_TITLE@
+.B @PACKAGE_TITLE@
 implementation of
 .B romod
 is compatible with APRI,
