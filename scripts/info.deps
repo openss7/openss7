@@ -10,7 +10,7 @@ BEGIN {
     suffixes["pdf" ] = ".pdf"; depends["pdf" ] = ".texi"
     suffixes["html"] = ".png"; depends["html"] = ".texi"
     suffixes["txt" ] = ".txt"; depends["txt" ] = ".texi"
-    suffixes["info"] = ".txt"; depends["info"] = ".texi"
+#    suffixes["info"] = ".txt"; depends["info"] = ".texi"
 }
 {
     f = $0
@@ -27,8 +27,8 @@ BEGIN {
 	    includes[$0] = 1
 	    continue
 	}
-	if (/@(image|tabfig|tabfigsized|figureimage)\{/) {
-	    sub(/.*@(image|tabfig|tabfigsized|figureimage)\{/, "")
+	if (/@(image|tabfig|tabfigsized|figureimage|figuresized)\{/) {
+	    sub(/.*@(image|tabfig|tabfigsized|figureimage|figuresized)\{/, "")
 	    sub(/[,\}].*/, "")
 	    figures[$0] = 1
 	    continue
@@ -41,7 +41,7 @@ BEGIN {
     line["pdf" ] = t ".pdf: "  "\\\n\t" t depends["pdf" ]
     line["html"] = t ".html: " "\\\n\t" t depends["html"]
     line["txt" ] = t ".txt: "  "\\\n\t" t depends["txt" ]
-    line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
+#    line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
     for (p in figures) {
 	if (system("test -f " top_srcdir "/scripts/" p) == 0) {
 	    pd = top_srcdir "/scripts/" p
