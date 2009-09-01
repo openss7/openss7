@@ -1,0 +1,69 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    if ("srcdir" in ENVIRON)
+	srcdir = EINVRON["srcdir"]
+    if ("top_srcdir" in ENVIRON)
+	top_srcdir = EINVRON["top_srcdir"]
+    suffixes["ps"  ] = ".eps"; depends["ps"  ] = ".dvi"
+    suffixes["dvi" ] = ".eps"; depends["dvi" ] = ".texi"
+    suffixes["pdf" ] = ".pdf"; depends["pdf" ] = ".texi"
+    suffixes["html"] = ".png"; depends["html"] = ".texi"
+    suffixes["txt" ] = ".txt"; depends["txt" ] = ".texi"
+    suffixes["info"] = ".txt"; depends["info"] = ".texi"
+}
+{
+    f = $0
+    if (system("test -f " f) != 0) {
+	fd = srcdir "/" f
+    } else {
+	fd = f
+    }
+    while ((getline < fd) == 1) {
+	if (/^@c[[:space:]]/)
+	    continue
+	if (/@(include|verbatiminclude)[[:space:]]+/) {
+	    sub(/.*@(include|verbatiminclude)[[:space:]]+/, "")
+	    includes[$0] = 1
+	    continue
+	}
+	if (/@(image|tabfig|tabfigsized|figureimage)\{/) {
+	    sub(/.*@(image|tabfig|tabfigsized|figureimage)\{/, "")
+	    sub(/[,\}].*/, "")
+	    figures[$0] = 1
+	    continue
+	}
+    }
+    close(fd)
+    t = f; sub(/\.texi/, "", t); sub(srcdir "/", "", t)
+    line["ps"  ] = t ".ps: "   "\\\n\t" t depends["ps"  ]
+    line["dvi" ] = t ".dvi: "  "\\\n\t" t depends["dvi" ]
+    line["pdf" ] = t ".pdf: "  "\\\n\t" t depends["pdf" ]
+    line["html"] = t ".html: " "\\\n\t" t depends["html"]
+    line["txt" ] = t ".txt: "  "\\\n\t" t depends["txt" ]
+    line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
+    for (p in figures) {
+	if (system("test -f " top_srcdir "/scripts/" p) == 0) {
+	    pd = top_srcdir "/scripts/" p
+	} else {
+	    pd = p
+	}
+	for (v in line)
+	    line[v] = line[v] " \\\n\t" pd suffixes[v]
+    }
+    for (p in includes) {
+	if (system("test -f " top_srcdir "/scripts/" p) == 0) {
+	    pd = top_srcdir "/scripts/" p
+	} else {
+	    pd = p
+	}
+	for (v in line)
+	    line[v] = line[v] " \\\n\t" pd
+    }
+    for (v in line) {
+	print line[v]
+	delete line[v]
+    }
+}
+
+# vim: ft=awk sw=4 nocin fo+=tcqlorn
