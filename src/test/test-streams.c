@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:20 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $
 
  -----------------------------------------------------------------------------
 
@@ -60,19 +60,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:44:20 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 1.1.2.2  2009-09-01 09:09:52  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-06-21 11:44:20  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:20 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:20 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -20532,6 +20535,113 @@ struct test_stream test_3_10_15 = { &preamble_2_5, &test_case_3_10_15, &postambl
 #define test_case_3_10_15_stream_1 (NULL)
 #define test_case_3_10_15_stream_2 (NULL)
 
+static const char test_group_4[] = "Perform stress tessting";
+
+#define tgrp_case_4_1 test_group_4
+#define numb_case_4_1 "4.1"
+#define name_case_4_1 "Open and Close."
+#define sref_case_4_1 "POSIX 1003.1 2003/SuSv3 open(2p)/close(2p) reference page."
+#define desc_case_4_1 "\
+Check that open() and close() can be simultaneously peformed rapidly by\n\
+multiple processes."
+
+int
+test_case_4_1_run(int child)
+{
+	state++;
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (postamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_4_1(int child)
+{
+	int i;
+
+	if (test_case_4_1_run(child) != __RESULT_SUCCESS)
+		goto failure;
+	print_less(child);
+	for (i = 0; i < 99998; i++) {
+		if (test_case_4_1_run(child) != __RESULT_SUCCESS)
+			goto failure;
+	}
+	print_more(child);
+	if (test_case_4_1_run(child) != __RESULT_SUCCESS)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+struct test_stream test_4_1 = { NULL, &test_case_4_1, NULL };
+
+#define test_case_4_1_stream_0 (&test_4_1)
+#define test_case_4_1_stream_1 (&test_4_1)
+#define test_case_4_1_stream_2 (&test_4_1)
+
+#define tgrp_case_4_2 test_group_4
+#define numb_case_4_2 "4.2"
+#define name_case_4_2 "Open, I/O Control and Close."
+#define sref_case_4_2 "POSIX 1003.1 2003/SuSv3 open(2p)/ioctl(2p)/close(2p) reference page."
+#define desc_case_4_2 "\
+Check that open(), ioctl() and close() can be simultaneously\n\
+peformed rapidly by multiple processes."
+
+int
+test_case_4_2_run(int child)
+{
+	char buf[1024] = { 0, };
+	int i;
+
+	state++;
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_ioctl(child, TM_IOC_COPYOUT, (intptr_t) buf) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 64; i++)
+		if ((unsigned char) buf[i] != (unsigned char) 0xa5)
+			goto failure;
+	state++;
+	if (postamble_2(child) != __RESULT_SUCCESS)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int
+test_case_4_2(int child)
+{
+	int i;
+
+	if (test_case_4_2_run(child) != __RESULT_SUCCESS)
+		goto failure;
+	print_less(child);
+	for (i = 0; i < 99998; i++) {
+		if (test_case_4_2_run(child) != __RESULT_SUCCESS)
+			goto failure;
+	}
+	print_more(child);
+	if (test_case_4_2_run(child) != __RESULT_SUCCESS)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+struct test_stream test_4_2 = { NULL, &test_case_4_2, NULL };
+
+#define test_case_4_2_stream_0 (&test_4_2)
+#define test_case_4_2_stream_1 (&test_4_2)
+#define test_case_4_2_stream_2 (&test_4_2)
+
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -21904,6 +22014,10 @@ struct test_case {
 	test_case_3_10_14_stream_0, test_case_3_10_14_stream_1, test_case_3_10_14_stream_2}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_10_15, tgrp_case_3_10_15, NULL, name_case_3_10_15, NULL, desc_case_3_10_15, sref_case_3_10_15, {
 	test_case_3_10_15_stream_0, test_case_3_10_15_stream_1, test_case_3_10_15_stream_2}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_1, tgrp_case_4_1, NULL, name_case_4_1, NULL, desc_case_4_1, sref_case_4_1, {
+	test_case_4_1_stream_0, test_case_4_1_stream_1, test_case_4_1_stream_2}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_4_2, tgrp_case_4_2, NULL, name_case_4_2, NULL, desc_case_4_2, sref_case_4_2, {
+	test_case_4_2_stream_0, test_case_4_2_stream_1, test_case_4_2_stream_2}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
 	NULL,}
 };
 
@@ -22301,7 +22415,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.1 $ $Date: 2009-06-21 11:44:20 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2009-09-01 09:09:52 $");
 }
 
 void

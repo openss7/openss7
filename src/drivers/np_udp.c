@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
+ @(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_udp.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-06-29 07:35:43  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#ident "@(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 
-static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
+static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
 
 /*
  * This driver provides the functionality of a UDP (User Datagram Protocol) hook similary to udp
@@ -128,7 +131,7 @@ static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.2
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -854,21 +857,16 @@ np_v4_err_next(struct sk_buff *skb, __u32 info)
 #define net_protocol_unlock() local_bh_enable()
 #else				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTO_LOCK_ADDR
-STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-
-#define net_protocol_lock() spin_lock_bh(inet_proto_lockp)
-#define net_protocol_unlock() spin_unlock_bh(inet_proto_lockp)
+extern spinlock_t inet_proto_lock;
+#define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
+#define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
 #else
 #define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
 #endif				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTOS_ADDR
-STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
-#endif
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+STATIC struct mynet_protocol **inet_protosp = (void *)&inet_protos;
 #endif
 
 /**
@@ -1264,11 +1262,6 @@ np_udp_queue_xmit(struct sk_buff *skb)
 	}
 }
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
-
-#undef skbuff_head_cache
-#ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
-#define skbuff_head_cache (*((kmem_cachep_t *) HAVE_SKBUFF_HEAD_CACHE_ADDR))
-#endif
 
 /**
  * np_alloc_skb_slow - allocate a socket buffer from a message block

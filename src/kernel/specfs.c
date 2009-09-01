@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
+ @(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: specfs.c,v $
+ Revision 1.1.2.2  2009-09-01 09:09:51  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-06-21 11:37:16  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
+#ident "@(#) $RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
 
-static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
+static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $";
 
 /* can we just include these into one big compilation unit? */
 
@@ -77,6 +80,9 @@ static char const ident[] = "$RCSfile: specfs.c,v $ $Name:  $($Revision: 1.1.2.1
 BIG_STATIC int strlookup_init(void);
 BIG_STATIC void strlookup_exit(void);
 
+#undef ident
+#define ident ident_wrapper
+#include "wrapper.c"
 #undef ident
 #define ident ident_strspecfs
 #include "strspecfs.c"

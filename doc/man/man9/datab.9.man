@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: datab.9.man,v 1.1.2.1 2009-06-21 10:38:34 brian Exp $
+.\" @(#) $Id: datab.9.man,v 1.1.2.2 2009-07-23 16:37:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:34 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: datab.9.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:50  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:34  brian
 .\" - added files to new distro
 .\"
@@ -374,7 +377,7 @@ See
 .I db_class
 Indicates whether the message is a normal or priority message.  Note that this
 member is not used by
-.BR "@PACKAGE_NAME@" :
+.BR "@PACKAGE_TITLE@" :
 rather, the
 .I db_flag
 member is used instead.
@@ -389,7 +392,7 @@ below.
 .TP
 .I db_pad
 Padding.  Note that this member is not used by
-.BR "@PACKAGE_NAME@" :
+.BR "@PACKAGE_TITLE@" :
 rather, the
 .I db_flag
 member is used instead.
@@ -421,7 +424,7 @@ field can contain a logical OR of zero or more of the following flags:
 .B DB_WASDUPED
 the data block was duped.
 This flag is neither set nor examined by
-.BR "@PACKAGE_NAME@" .
+.BR "@PACKAGE_TITLE@" .
 See
 .RB \(lq COMPATIBILITY \(rq,
 below.
@@ -430,7 +433,7 @@ below.
 .B DB_2PIECE
 the data block is a two-piece data block.
 This flag is neither set nor examined by
-.BR "@PACKAGE_NAME@" .
+.BR "@PACKAGE_TITLE@" .
 See
 .RB \(lq COMPATIBILITY \(rq,
 below.

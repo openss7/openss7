@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:52  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-06-29 07:35:43  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 
-static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
+static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -115,7 +118,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 #define IP_DEVICE	"SVR 4.2 MP STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -637,19 +640,9 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 }
 
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
-#ifdef CONFIG_SMP
-STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-#else
-static spinlock_t *inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
-
-#define inet_proto_lockp (&inet_proto_lock_)
-#endif
-STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
+extern spinlock_t inet_proto_lock;
+extern struct net_protocol *inet_protos[];
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
-#endif
 
 /**
  * npi_init_nproto - initialize network protocol override

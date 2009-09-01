@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: isdn_ioctl.4.man,v 1.1.2.1 2009-06-21 10:34:49 brian Exp $
+.\" @(#) $Id: isdn_ioctl.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:49 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: isdn_ioctl.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:49  brian
 .\" - added files to new distro
 .\"
@@ -188,6 +191,14 @@ call control libraries.
 .\"
 .SH IOCTLS
 .PP
+All the Streams provided by the
+.B isdn
+multiplexing driver support the set of management controls described here.
+These controls require root privileges and permit the management of the ISDN
+configuration, routing, link devices, statistics and events.  This set of
+management control are available on all Streams and sockets provided by the
+.B isdn
+driver.
 .\"
 .\"
 .SS Options
@@ -1041,12 +1052,6 @@ typedef struct isdn_stats_dl {
 \fR\s+1
 .fi
 .RE
-
-.\"
-.\"
-.SH IOCTLS
-.PP
-
 .\"
 .\"
 .XX

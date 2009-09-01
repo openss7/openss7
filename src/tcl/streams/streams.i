@@ -14,7 +14,7 @@
 
         extern int open(const char *pathname, int flags);
         extern int close(int fd);
-        extern int *__errno_location(void);
+        extern int *__errno_location(void) throw();
         extern int ioctl(int fd, unsigned long int request, ...);
         extern int isastream(int fd);
         extern int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *flagsp);

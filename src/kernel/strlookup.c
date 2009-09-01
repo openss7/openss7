@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:16 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlookup.c,v $
+ Revision 1.1.2.2  2009-09-01 09:09:51  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-06-21 11:37:16  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:16 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -234,9 +237,11 @@ __cmaj_lookup(major_t major)
 		struct devnode *cmaj = list_entry(pos, struct devnode, n_hash);
 
 		if (cmaj->n_major == major) {
+#if 0
 			/* cache to front */
 			list_del_init(&cmaj->n_hash);
 			list_add(&cmaj->n_hash, slot);
+#endif
 			return (cmaj);
 		}
 	}
@@ -282,9 +287,11 @@ __cdrv_lookup(modID_t modid)
 		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_hash);
 
 		if (cdev->d_modid == modid) {
+#if 0
 			/* cache to front */
 			list_del_init(&cdev->d_hash);
 			list_add(&cdev->d_hash, slot);
+#endif
 			return (cdev);
 		}
 	}
@@ -307,9 +314,11 @@ __cmin_lookup(struct cdevsw *cdev, minor_t minor)
 		struct devnode *cmin = list_entry(pos, struct devnode, n_hash);
 
 		if (cmin->n_dev == cdev && cmin->n_minor == minor) {
+#if 0
 			/* pull to head of slot */
 			list_del_init(&cmin->n_hash);
 			list_add(&cmin->n_hash, slot);
+#endif
 			return (cmin);
 		}
 	}
@@ -335,9 +344,11 @@ __fmod_lookup(modID_t modid)
 		struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_hash);
 
 		if (fmod->f_modid == modid) {
+#if 0
 			/* pull to front of slot */
 			list_del_init(&fmod->f_hash);
 			list_add(&fmod->f_hash, slot);
+#endif
 			return (fmod);
 		}
 	}
@@ -355,9 +366,11 @@ __cdev_search(const char *name)
 		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_list);
 
 		if (!strncmp(cdev->d_name, name, FMNAMESZ)) {
+#if 0
 			/* pull to front of slot */
 			list_del_init(&cdev->d_list);
 			list_add(&cdev->d_list, slot);
+#endif
 			return (cdev);
 		}
 	}
@@ -375,9 +388,11 @@ __fmod_search(const char *name)
 		struct fmodsw *fmod = list_entry(pos, struct fmodsw, f_list);
 
 		if (!strncmp(fmod->f_name, name, FMNAMESZ)) {
+#if 0
 			/* pull to front of slot */
 			list_del_init(&fmod->f_list);
 			list_add(&fmod->f_list, slot);
+#endif
 			return (fmod);
 		}
 	}
@@ -397,9 +412,11 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 		struct devnode *cmin = list_entry(pos, struct devnode, n_list);
 
 		if (!strncmp(cmin->n_name, name, FMNAMESZ)) {
+#if 0
 			/* pull to head of slot */
 			list_del_init(&cmin->n_list);
 			list_add(&cmin->n_list, slot);
+#endif
 			return (cmin);
 		}
 	}

@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: dlpi_ioctl.4.man,v 1.1.2.1 2009-06-21 10:34:48 brian Exp $
+.\" @(#) $Id: dlpi_ioctl.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:48 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_ioctl.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:48  brian
 .\" - added files to new distro
 .\"
@@ -133,6 +136,7 @@ dlpi revision 2.0.0
 .\"
 .\"
 .SH IOCTLS
+.SS Solaris
 .PP
 The following are
 .IR Solaris \(rg-specific
@@ -247,7 +251,7 @@ Issuing this input-output control also places the DLS provider into fast-path
 mode, if it was not already in fast-path mode.
 .\"
 .\"
-.SH IOCTLS
+.SS HP-UX
 .PP
 The following are
 .IR HP-UX \(rg
@@ -740,7 +744,7 @@ value is set to zero (0), the input-output control enables loopback multicast
 and broadcast packets.
 .\"
 .\"
-.SH IOCTLS
+.SS "Additional Solaris"
 .PP
 These are additional
 .IR Solaris \(rg-specific
@@ -1515,7 +1519,7 @@ typedef struct wantune {
 .fi
 .\"
 .\"
-.SH IOCTLS
+.SS AIX
 .PP
 These are DLPI input-output controls from AIX:
 .\"
@@ -1721,7 +1725,7 @@ station.
 .\"
 .\"
 .\"
-.SH IOCTLS
+.SS "AIX GDLC"
 .PP
 These are generic Data Link control (GDLC) input-output controls from AIX.
 .[
@@ -1944,7 +1948,7 @@ manager.
 .\"
 .\"
 .\"
-.SH IOCTLS
+.SS "SVR4.2MP and UnixWare 2"
 .PP
 These are DLPI input-output controls from SVR4.2MP and UnixWare 2:
 .\"

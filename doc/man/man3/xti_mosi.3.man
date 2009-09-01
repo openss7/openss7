@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: xti_mosi.3.man,v 1.1.2.1 2009-06-21 10:34:27 brian Exp $
+.\" @(#) $Id: xti_mosi.3.man,v 1.1.2.2 2009-07-23 16:37:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:27 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_mosi.3.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:44  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:27  brian
 .\" - added files to new distro
 .\"
@@ -1391,7 +1394,7 @@ conformance tested and validated using the \fBtest-mosi\fP(8) test case executab
 \fB@PACKAGE@\0autotest\fP conformance and validation test suite.
 .\"
 .\"
-.SH NOTICES
+.SH CAVEATS
 .PP
 In support of the \fBsockets\fP(3) library for \fBtpi\fP(7) transport providers, the options
 described here have been made compatible with the socket options described in \fBx25\fP(7).  As a

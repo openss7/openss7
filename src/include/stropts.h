@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 1.1.2.1 2009-06-21 11:23:45 brian Exp $
+ @(#) $Id: stropts.h,v 1.1.2.2 2009-09-01 09:09:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:23:45 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 1.1.2.2  2009-09-01 09:09:51  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-06-21 11:23:45  brian
  - added files to new distro
 
@@ -61,7 +64,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /* This file can be processed with doxygen(1). */
 
@@ -73,6 +76,10 @@
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
+#endif
+
+#ifndef __THROW
+#define __THROW
 #endif
 
 /** @addtogroup strcalls STREAMS System Calls
@@ -118,7 +125,7 @@ extern int fdetach(const char *path);
   * If successful, two file descriptors are stored in fds; bytes written on
   * fds[1] can be read from fds[0].  Returns 0 if successful, -1 if not.
   */
-extern int pipe(int fds[2]);
+extern int pipe(int fds[2]) __THROW;
 
 /** @} */
 

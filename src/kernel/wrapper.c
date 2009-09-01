@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-23 16:39:29 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-23 16:39:29 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.c,v $
+ Revision 1.1.2.2  2009-09-01 09:09:51  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-07-23 16:39:29  brian
  - added wrapper module
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-23 16:39:29 $"
+#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
 
-static char const ident[] = "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-23 16:39:29 $";
+static char const ident[] = "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -94,7 +97,30 @@ static char const ident[] = "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.
 #include <linux/tcp.h>
 #include <linux/file.h>
 
+#if 0
 #include <sys/os7/compat.h>
+
+#define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
+#define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
+#define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define WRAPPER_LICENSE		"GPL"
+
+#ifdef CONFIG_STREAMS_MODULE
+MODULE_AUTHOR(WRAPPER_CONTACT);
+MODULE_DESCRIPTION(WRAPPER_DESCRIP);
+MODULE_SUPPORTED_DEVICE(WRAPPER_DEVICE);
+MODULE_LICENSE(WRAPPER_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("wrapper");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
+#endif
+#endif
 
 #ifdef HAVE_SESSION_OF_PGRP_ADDR
 //pid_t session_of_pgrp(pid_t);

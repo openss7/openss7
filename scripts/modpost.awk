@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-21 11:06:21 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-09-01 09:09:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:21 $ by $Author: brian $
+# Last Modified $Date: 2009-09-01 09:09:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,17 +81,22 @@ function allyears(    year, this, last, sep, result)
 }
 function print_debug(string)
 {
-    if (values["debug"] > 0)
-	print "modpost.awk: D: " string > "/dev/stderr"
+    if (values["debug"] > 0) {
+	print me ": D: " string > stderr
+	written[stderr] = 1
+    }
 }
 function print_error(string)
 {
-    print "modpost.awk: E: " string > "/dev/stderr"
+    print red me ": E: " string std > stderr
+    written[stderr] = 1
 }
 function print_warn(string)
 {
-    if (values["verbose"] > 0 || values["debug"] > 0)
-	print "modpost.awk: W: " string > "/dev/stderr"
+    if (values["verbose"] > 0 || values["debug"] > 0) {
+	print blu me ": W: " string std > stderr
+	written[stderr] = 1
+    }
 }
 function usage(output)
 {
@@ -99,13 +104,14 @@ function usage(output)
 	return
     print "\
 modpost:\n\
-  $Id: modpost.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.3 2009-09-01 09:09:50 brian Exp $\n\
 Usage:\n\
   modpost [options] [MODULE ...]\n\
   modpost -h\n\
   modpost -V\n\
   modpost -C\
-" >> output
+" > output
+    written[output] = 1
 }
 function help(output)
 {
@@ -151,9 +157,9 @@ Options:\n\
   -x, --exportsyms\n\
       place export symbols in versions files\n\
       [default: " defaults["exportsyms"] "]\n\
-  -p, --pkgdirectory SUBDIRECTORY\n\
+  -p, --pkgdirectory [SUBDIRECTORY]\n\
       subdirectory for module\n\
-      [default: " defaults["pkgdirector"] "]\n\
+      [default: " defaults["pkgdirectory"] "]\n\
   -n, --dryrun, --dry-run\n\
       don't perform the actions, just check them\n\
   -q, --quiet, --silent\n\
@@ -170,7 +176,8 @@ Options:\n\
       prints the version and exit\n\
   -C, --copying\n\
       prints copying permissions and exist\
-" >> output
+" > output
+    written[output] = 1
 }
 function version(output)
 {
@@ -178,7 +185,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.3 2009-09-01 09:09:50 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -191,8 +198,9 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
-See modpost.awk -- --copying' for copying permissions.\
-" >> output
+See " me " -- --copying' for copying permissions.\
+" > output
+    written[output] = 1
 }
 function copying(output)
 {
@@ -200,7 +208,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.1 2009-07-21 11:06:21 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.3 2009-09-01 09:09:50 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -237,19 +245,22 @@ regulations).\n\
 Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
 --------------------------------------------------------------------------------\
-" >> output
+" > output
+    written[output] = 1
 }
 function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg, wantarg)
 {
-    option = ""; optval = ""; optarg = ""
-    if (optind == 0) { optind = 1; more = "" }
-    while ((optind < argc) || (more)) {
-	if (more) { arg = "-" more; more = "" }
+    option = ""; optval = ""; optarg = ""; pos = 0; needarg = 0; wantarg = 0
+    if (optind == 0) {
+	optind = 1; more = "" }
+    while ((optind < argc) || (more != "")) {
+	if (more) {
+	    arg = "-" more; more = "" }
 	else { arg = argv[optind]; optind++ }
 	if (arg ~ /^--?[a-zA-Z0-9]/) {
 	    if (needarg) {
 		print_error("option -" optval " requires an argument")
-		usage("/dev/stderr")
+		usage(stderr)
 		exit 2
 	    }
 	    if (wantarg) {
@@ -261,12 +272,12 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		optarg = arg; sub(/^--([a-zA-Z0-9][-_a-zA-Z0-9]*)=/, "", optarg)
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		if (longopts[option] !~ /:/) {
 		    print_error("option --" option " does not take an argument")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		optval = substr(longopts[option], 1, 1)
@@ -276,11 +287,13 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		option = arg; sub(/^--/, "", option)
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
-		if (longopts[option] ~ /::/) { wantarg = 1 } else
-		if (longopts[option] ~ /:/ ) { needarg = 1 }
+		if (longopts[option] ~ /::/) {
+		    wantarg = 1 } else
+		if (longopts[option] ~ /:/ ) {
+		    needarg = 1 }
 		optval = substr(longopts[option], 1, 1)
 		for (option in longopts)
 		    if (substr(longopts[option], 1, 1) == optval)
@@ -291,17 +304,19 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    }
 	    if (arg ~ /^-[a-zA-Z0-9]/) {
 		optval = substr(arg, 2, 1)
-		if ((pos = index(optstring, optval)) == 0) {
+		pos = index(optstring, optval)
+		if (pos == 0) {
 		    print_error("option -" optval " not recognized")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		if (substr(optstring, pos+1, 1) == ":") {
 		    if (length(arg) > 2) {
 			if (substr(optstring, pos+2, 1) == ":") {
-			    if ((more = substr(arg, 3)) && more !~ /^[a-zA-Z0-9]/) {
+			    more = substr(arg, 3)
+			    if (more && more !~ /^[a-zA-Z0-9]/) {
 				print_error("bad option sequence " arg)
-				usage("/dev/stderr")
+				usage(stderr)
 				exit 2
 			    }
 			} else
@@ -311,16 +326,19 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 				break
 			return optval
 		    }
-		    if (substr(optstring, pos+2, 1) == ":") { wantarg = 1 } else
-		    if (substr(optstring, pos+1, 1) == ":") { needarg = 1 }
+		    if (substr(optstring, pos+2, 1) == ":") {
+			wantarg = 1 } else
+		    if (substr(optstring, pos+1, 1) == ":") {
+			needarg = 1 }
 		    for (option in longopts)
 			if (substr(longopts[option], 1, 1) == optval)
 			    break
 		    continue
 		}
-		if ((more = substr(arg, 3)) && more !~ /^[a-zA-Z0-9]/) {
+		if (length(arg) > 2) { more = substr(arg, 3) } else { more = "" }
+		if (more && more !~ /^[a-zA-Z0-9]/) {
 		    print_error("bad option sequence " arg)
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		for (option in longopts)
@@ -338,6 +356,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	optind--
 	return -1
     }
+    return -1
 }
 function show_junk(line, position)
 {
@@ -358,15 +377,27 @@ function cat_command(files,    command)
 	command = "xzcat " files
     return command
 }
-function set_sym(name, sym, mymodule)
+function set_sym(name, sym, mymodule,    base1, base2)
 {
     if (!(sym in syms))
 	count_syms++
     mod_mods[name] = 1
     mod_syms[name,sym] = 1
-    if (sym in mods)
-	if (mods[sym] != name)
-	    print_warn("module for " sym " change from " mods[sym] " to " name)
+    if (sym in mods) {
+	if (mods[sym] != name) {
+	    if (name == "vmlinux") {
+		print_error("symbol " sym " in module " mods[sym] " conflict with kernel")
+	    } else if (mods[sym] == "vmlinux") {
+		print_error("symbol " sym " in module " name " conflict with kernel")
+		name = mods[sym]
+	    } else {
+		base1 = name;      sub(/.*\//, "", base1)
+		base2 = mods[sym]; sub(/.*\//, "", base2)
+		if (base1 != base2)
+		    print_warn("symbol " sym " conflict between " mods[sym] " and " name)
+	    }
+	}
+    }
     mods[sym] = name
     syms[sym] = 1
     if (mymodule)
@@ -419,7 +450,7 @@ function read_modobject(command, mymodule)
 		    $0 = values["pkgdirectory"] "/" $0
 		} else {
 		    sub(values["moddir"] "/", "")
-		    sub(/[^\/]*\//, "")
+		    sub(/kernel\//, "")
 		}
 		modname = $0
 		continue
@@ -447,13 +478,15 @@ function read_modobject(command, mymodule)
 	}
 	if ($2 == "l") {
 	    if ((NF >= 6) && ($3 == "O")) {
-		if ($4 = ".modinfo") {
+		if ($4 == ".modinfo") {
 		    if ($6 ~ /^_?__mod_version[0-9]*$/)
 			mod_vers[modname] = 1
 		    continue
 		}
-		if (sub(/^_?__ksymtab/, "", $4)) {
-		    if (sub(/^_?__ksymtab_/, "", $6)) {
+		if ($4 ~ /^_?__ksymtab/) {
+		    sub(/^_?__ksymtab/, "", $4)
+		    if ($6 ~ /^_?__ksymtab_/) {
+			sub(/^_?__ksymtab_/, "", $6)
 			set_sym(modname,$6, mymodule)
 			set_exp(modname,$6, "EXPORT_SYMBOL" toupper($4))
 		    }
@@ -464,22 +497,26 @@ function read_modobject(command, mymodule)
 	if ($2 == "g") {
 	    if ($3 == "*ABS*") {
 		if ((NF >= 5) && ($5 ~ /^_?__crc_/)) {
-		    if (sub(/^_?__crc_/, "", $5)) {
+		    if ($5 ~ /^_?__crc_/) {
+			sub(/^_?__crc_/, "", $5)
 			set_sym(modname,$5,mymodule)
 			set_crc(modname,$5,"0x" $1)
 		    }
 		}
+		continue
 	    }
-	    continue
 	}
-	if (!mymodule)
+	if (mymodule == 0)
 	    continue
 	undef = ""
-	if (($2 == "w") && ($3 == "*UND*") && (NF == 5)) undef = $5
-	if (($2 == "*UND*") && (NF == 4)) undef = $4
-	if (undef) {
+	if (($2 == "w") && ($3 == "*UND*") && (NF == 5))
+	    undef = $5
+	if (($2 == "*UND*") && (NF == 4))
+	    undef = $4
+	if (undef != "") {
 	    if (undef ~ /^_?__this_module$/) {
-		delete mod_this[modname]
+		if (modname in mod_this)
+		    delete mod_this[modname]
 		continue
 	    }
 	    if (!((modname,undef) in mod_unds)) {
@@ -488,10 +525,26 @@ function read_modobject(command, mymodule)
 	    }
 	    continue
 	}
-	if ($0 ~ /\<_?init_module$/) mod_init[modname] = 1
-	if ($0 ~ /\<_?cleanup_module$/) mod_exit[modname] = 1
-	if ($0 ~ /\<_?__this_module$/) mod_this[modname] = 1
-	if ($0 ~ /\<_?__mod_version[0-9]*$/) mod_vers[modname] = 1
+	if ($NF ~ /^_?init_module$/) {
+	    mod_init[modname] = 1
+	    print_debug("r: module " modname " has init_module")
+	    continue
+	}
+	if ($NF ~ /^_?cleanup_module$/) {
+	    mod_exit[modname] = 1
+	    print_debug("r: module " modname " has cleanup_module")
+	    continue
+	}
+	if ($NF ~ /^_?__this_module$/) {
+	    mod_this[modname] = 1
+	    print_debug("r: module " modname " has this_module")
+	    continue
+	}
+	if ($NF ~ /^_?__mod_version[0-9]*$/) {
+	    mod_vers[modname] = 1
+	    print_debug("r: module " modname " has mod_version")
+	    continue
+	}
     }
     close(command)
     print_debug("r: ko object, " files " kernel modules")
@@ -513,7 +566,8 @@ function read_systemmap(command, modname, mymodule)
 	    continue
 	}
 	if ($2 ~ /^[Awat]$/) {
-	    if (sub(/^_?__crc_/, "", $3)) {
+	    if ($3 ~ /^_?__crc_/) {
+		sub(/^_?__crc_/, "", $3)
 		#print_debug("r: systemmap, symbol: " $3)
 		set_sym(modname,$3, mymodule)
 		set_crc(modname,$3,"0x" $1)
@@ -522,7 +576,7 @@ function read_systemmap(command, modname, mymodule)
 	    }
 	    continue
 	}
-	if (!mymodule)
+	if (mymodule == 0)
 	    continue
 	if ($1 ~ /^[Uw]$/) {
 	    if ($2 ~ /^_?__this_module$/) {
@@ -537,18 +591,22 @@ function read_systemmap(command, modname, mymodule)
 	}
 	if ($3 ~ /^_?init_module$/) {
 	    mod_init[modname] = 1
+	    print_debug("r: module " modname " has init_module")
 	    continue
 	}
 	if ($3 ~ /^_?cleanup_module$/) {
 	    mod_exit[modname] = 1
+	    print_debug("r: module " modname " has cleanup_module")
 	    continue
 	}
 	if ($3 ~ /^_?__this_module$/) {
 	    mod_this[modname] = 1
+	    print_debug("r: module " modname " has this_module")
 	    continue
 	}
 	if ($3 ~ /^_?__mod_version[0-9]*$/) {
 	    mod_vers[modname] = 1
+	    print_debug("r: module " modname " has mod_version")
 	    continue
 	}
     }
@@ -562,17 +620,19 @@ function read_cachefile(file,    result) {
     while ((result = (getline < file)) == 1) {
 	sub(/=/, " ")
 	sub(/^sym_/, "", $1)
-	if (sub(/_name$/, "", $1)) {
-	    set_sym($2,$1)
+	if ($1 ~ /_name$/) {
+	    sub(/_name$/, "", $1)
+	    set_sym($2,$1,0)
 	    if ($1 in crcs)
 		set_crc($2,$1,crcs[$1])
 	    if ($1 in exps)
 		set_exp($2,$1,exps[$1])
 	    continue
 	}
-	if (sub(/_crc$/, "", $1)) {
+	if ($1 ~ /_crc$/) {
+	    sub(/_crc$/, "", $1)
 	    if ($1 in mods) {
-		set_sym(mods[$1],$1)
+		set_sym(mods[$1],$1,0)
 		set_crc(mods[$1],$1,$2)
 	    }
 	    else {
@@ -581,9 +641,10 @@ function read_cachefile(file,    result) {
 	    }
 	    continue
 	}
-	if (sub(/_exp$/, "", $1)) {
+	if ($1 ~ /_exp$/) {
+	    sub(/_exp$/, "", $1)
 	    if ($1 in mods) {
-		set_sym(mods[$1],$1)
+		set_sym(mods[$1],$1,0)
 		set_exp(mods[$1],$1,$2)
 	    } else {
 		syms[$1] = 1
@@ -597,24 +658,25 @@ function read_cachefile(file,    result) {
     print_debug("r: cachefile, syms " count_syms ", crcs " count_crcs ", exps " count_exps ", unds " count_unds)
     return result
 }
-function write_cachefile(file)
+function write_cachefile(file,    sym, count_syms, count_crcs, count_exps, count_unds, written)
 {
     count_syms = 0; count_crcs = 0; count_exps = 0; count_unds = 0
     print_debug("w: cachefile, file = \"" file "\"")
-    print "" > file
     for (sym in mods) {
 	count_syms++
-	print "sym_" sym "_name=" mods[sym] >> file
+	print "sym_" sym "_name=" mods[sym] > file
     }
     for (sym in crcs) {
 	count_crcs++
-	print "sym_" sym "_crc="  crcs[sym] >> file
+	print "sym_" sym "_crc="  crcs[sym] > file
     }
     for (sym in exps) {
 	count_exps++
-	print "sym_" sym "_exp="  exps[sym] >> file
+	print "sym_" sym "_exp="  exps[sym] > file
     }
     cache_dirty = 0
+    if (count_syms + count_crcs + count_exps + count_unds)
+	close(file)
     print_debug("w: cachefile, syms " count_syms ", crcs " count_crcs ", exps " count_exps ", unds " count_unds)
 }
 function read_dumpfiles_line()
@@ -629,7 +691,7 @@ function read_dumpfiles_line()
     }
     if (NF < 3)
 	$3 = "vmlinux"
-    set_sym($3,$2)
+    set_sym($3,$2,0)
     set_crc($3,$2,$1)
     if (NF > 3)
 	set_exp($3,$2,$4)
@@ -646,7 +708,7 @@ function read_dumpfiles(command)
 function read_moduledir(directory)
 {
     print_debug("r: moduledir, directory = \"" directory "\"")
-    command = "find " values["moddir"] " -type f -name '*.ko' | xargs objdump -t"
+    command = "find " directory " -type f -name '*.ko' | xargs objdump -t"
     read_modobject(command, 0)
 }
 function read_mymodules(modules,    i, pair, ind, name, sym) {
@@ -672,7 +734,7 @@ function read_mymodules(modules,    i, pair, ind, name, sym) {
 	}
     }
 }
-function write_syssymver(file)
+function write_syssymver(file,    sym, line, count_syms, count_crcs, count_exps, count_unds)
 {
     print_debug("w: syssymver, file = \"" file "\"")
     count_syms = 0; count_crcs = 0; count_exps = 0; count_unds = 0
@@ -696,9 +758,11 @@ function write_syssymver(file)
 	count_crcs++
 	print line > file
     }
+    if (count_syms + count_crcs + count_exps + count_unds)
+	close(file)
     print_debug("w: syssymver, syms " count_syms ", crcs " count_crcs ", exps " count_exps ", unds " count_unds)
 }
-function write_modsymver(file)
+function write_modsymver(file,    sym, line, count_syms, count_crcs, count_exps, count_unds)
 {
     print_debug("w: modsymver, file = \"" file "\"")
     count_syms = 0; count_crcs = 0; count_exps = 0; count_unds = 0
@@ -720,6 +784,8 @@ function write_modsymver(file)
 	count_crcs++
 	print line > file
     }
+    if (count_syms + count_crcs + count_exps + count_unds)
+	close(file)
     print_debug("w: modsymver, syms " count_syms ", crcs " count_crcs ", exps " count_exps ", unds " count_unds)
 }
 function write_header(file, modname, basename)
@@ -748,10 +814,10 @@ __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	.name = __stringify(KBUILD_MODNAME),\
 " > file
 	if (modname in mod_init)
-	    print "\t.init = init_module," >> file
+	    print "\t.init = init_module," > file
 	if (modname in mod_exit)
-	    print "#ifdef CONFIG_MODULE_UNLOAD\n\t.exit = cleanup_module,\n#endif" >> file
-	print "};\n#endif" >> file
+	    print "#ifdef CONFIG_MODULE_UNLOAD\n\t.exit = cleanup_module,\n#endif" > file
+	print "};\n#endif" > file
 }
 function write_modversions(file, modname, basename,	count, pair, ind, name, sym)
 {
@@ -761,15 +827,15 @@ function write_modversions(file, modname, basename,	count, pair, ind, name, sym)
 static const struct modversion_info ____versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__versions\"))) = {\
-" >> file
+" > file
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	if (name != modname) continue
 	if (!(sym in crcs)) continue
-	print "\t{ " crcs[sym] ", \"" sym "\" }," >> file
+	print "\t{ " crcs[sym] ", \"" sym "\" }," > file
 	count ++
     }
-    print "};\n#endif" >> file
+    print "};\n#endif" > file
     if (count) print_debug("wrote " count " symbol versions")
 }
 function write_dependencies(file, modname, basename,	count, deps, sep, pair, ind, name, dep) {
@@ -788,7 +854,7 @@ static const char __module_depends[]\n\
 __attribute_used__\n\
 __attribute__((section(\".modinfo\"))) =\n\
 \"depends=" deps "\";\
-" >> file
+" > file
     }
 }
 function write_srcversion(file, modname, basename,	srcversion)
@@ -796,22 +862,26 @@ function write_srcversion(file, modname, basename,	srcversion)
     srcversion = "42e8e4e40dfa7590147e23a5b9a3105d"
     # first step, see if there are any __mod_version symbols
     reason = ""
-    if (modname in mod_vers) reason = "version"
-    else if (values["allsrcversion"]) reason = "all"
+    if (modname in mod_vers)
+	reason = "version"
+    else if (values["allsrcversion"])
+	reason = "all"
     else return
     # the tricky way to find sources is to use the dependencies; however,
     # this means that we must enable dependency tracking when building rpms
     srcbase = basename
     sub(/^streams[-_]/, "", srcbase)
     command = "find .deps -name 'lib*" srcbase "_a-*.Po' -o -name 'lib*_a-*" srcbase ".Po' | xargs egrep -h ':$' | sort -u | cut -f1 -d: | egrep -v '(/lib/modules|/usr/lib)' | xargs -r cat | md5sum" # openssl md4 | cut -f2 '-d '"
-    if ((result = (command | getline)) == 1) srcversion = $1
+    result = (command | getline)
+    if (result == 1)
+	srcversion = $1
     else print_error("comand result was " result ", ERRNO = " ERRNO)
     close(command)
     #system("rm -f " srcbase ".sources.log")
     if (reason == "all")
-	print "\n#ifdef CONFIG_MODULE_SRCVERSION_ALL\nMODULE_INFO(srcversion, \"" srcversion "\");\n#endif" >> file
+	print "\n#ifdef CONFIG_MODULE_SRCVERSION_ALL\nMODULE_INFO(srcversion, \"" srcversion "\");\n#endif" > file
     else
-	print "\nMODULE_INFO(srcversion, \"" srcversion "\");\n" >> file
+	print "\nMODULE_INFO(srcversion, \"" srcversion "\");\n" > file
 }
 function write_mymodules(modules,    i, basename, file, modname)
 {
@@ -825,11 +895,11 @@ function write_mymodules(modules,    i, basename, file, modname)
 	sub(/^.*\//, "", basename)
 	modname = values["pkgdirectory"] "/" basename
 	files++
-	 if (values["verbose"] == 0)
-	    print "  GEN   " basename ".mod.c"
+	if (values["verbose"] == 1 && values["debug"] == 0)
+	    print "  GEN    " basename ".mod.c"
 	print_debug("writing " file)
 	write_header(file, modname, basename)
-	if (values["modversion"])
+	if (values["modversions"])
 	    write_modversions(file, modname, basename)
 	write_dependencies(file, modname, basename)
 	write_srcversion(file, modname, basename)
@@ -838,9 +908,22 @@ function write_mymodules(modules,    i, basename, file, modname)
     print_debug("w: mymodules, " files " files written")
 }
 BEGIN {
-    print_debug("excuting " ARGV[0])
-    "uname -r" | getline uname
-    "pwd"      | getline pwd
+    LINT = "yes"
+    me = "modpost.awk"
+    "uname -r" | getline uname; close("uname -r")
+    "pwd"      | getline pwd  ; close("pwd")
+    if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
+    if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
+	stdout = "/dev/stderr"; written[stdout] = 0
+	stderr = "/dev/stderr"; written[stderr] = 0
+	cr = ""; lf = "\n"
+	red = ""; grn = ""; lgn = ""; blu = ""; std = ""
+    } else {
+	stdout = "/dev/stdout"; written[stdout] = 0
+	stderr = "/dev/stderr"; written[stderr] = 0
+	cr = "\r"; lf = ""
+	red = "\033[0;31m"; grn = "\033[0;32m"; lgn = "\033[1;32m"; blu = "\033[1;34m"; std = "\033[m"
+    }
     longopts["modules"      ] = "M:"                                                             ; defaults["modules"      ] = ""
     longopts["cachefile"    ] = "c:" ; environs["cachefile"    ] = "MODPOST_CACHE"               ; defaults["cachefile"    ] = "modpost.cache"
     longopts["moddir"       ] = "d:" ; environs["moddir"       ] = "MODPOST_MODDIR"              ; defaults["moddir"       ] = "/lib/modules/" uname
@@ -862,75 +945,97 @@ BEGIN {
     longopts["help"         ] = "h"  ;
     longopts["version"      ] = "V"  ;
     longopts["copying"      ] = "C"  ;
+    # mark options that must default to environment or default setting
+    values["cachefile"    ] = ""
     # set mandatory defaults
-    values["debug"     ] = defaults["debug"     ]
-    values["verbose"   ] = defaults["verbose"   ]
-    values["quiet"     ] = defaults["quiet"     ]
+    values["pkgdirectory" ] = defaults["pkgdirectory" ]
+    values["unload"       ] = defaults["unload"       ]
+    values["modversions"  ] = defaults["modversions"  ]
+    values["allsrcversion"] = defaults["allsrcversion"]
+    values["exportsyms"   ] = defaults["exportsyms"   ]
+    values["debug"        ] = defaults["debug"        ]
+    values["verbose"      ] = defaults["verbose"      ]
+    values["quiet"        ] = defaults["quiet"        ]
+    if ("V" in ENVIRON) {
+	if (ENVIRON["V"] == 1) {
+	    values["debug"        ] = 2
+	    values["verbose"      ] = 2
+	    values["quiet"        ] = 0
+	}
+    }
     optstring = "M:c:d:F:i:o:s:umaxp:nqD::v::hVC"
-    while ((c = getopt_long(ARGC, ARGV, optstring, longopts))) {
+    optind = 0
+    while (1) {
+	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	if (c == -1) break
-	else if (c ~ /[cdFiosp]/) { values[option] = optarg }
-	else if (c ~ /[umaxnq]/)  { values[option] = 1 }
+	else if (c ~ /[McdFiosp]/) { values[option] = optarg }
+	else if (c ~ /[umaxnq]/)   { values[option] = 1 }
 	else if (c == "D") { if (optarg) { values["debug"  ] = optarg } else { values["debug"  ]++ } }
 	else if (c == "v") { if (optarg) { values["verbose"] = optarg } else { values["verbose"]++ } }
-	else if (c == "h") { help("/dev/stdout"); exit 0 }
-	else if (c == "V") { version("/dev/stdout"); exit 0 }
-	else if (c == "C") { copying("/dev/stdout"); exit 0 }
-	else { usage("/dev/stderr"); exit 2 }
+	else if (c == "h") { help(   stdout); exit 0 }
+	else if (c == "V") { version(stdout); exit 0 }
+	else if (c == "C") { copying(stdout); exit 0 }
+	else               { usage(  stderr); exit 2 }
     }
     if (optind < ARGC) {
-	values["modules"] = ARGV[optind]; optind++
+	values["modules"] = ARGV[optind]
+	optind++
 	while (optind < ARGC) {
-	    values["modules"] = values["modules"] " " ARGV[optind]; optind++
+	    values["modules"] = values["modules"] " " ARGV[optind]
+	    optind++
 	}
     }
     for (value in values) {
-	if (!values[value] && (value in environs) && ENVIRON[environs[value]])
+	if (!values[value] && (value in environs) && (environs[value] in ENVIRON) && ENVIRON[environs[value]])
 	    values[value] = ENVIRON[environs[value]]
 	if (!values[value] && (value in defaults) && defaults[value])
 	    values[value] = defaults[value]
     }
-    split(values["modules"], modules)
-    #if (values["cachefile"])	print_debug("cachefile is " values["cachefile"])
-    #if (values["moddir"])		print_debug("moddir is " values["moddir"])
-    #if (values["filename"])	print_debug("filename is " values["filename"])
-    #if (values["infile"])	print_debug("infile is " values["infile"])
-    #if (values["outfile"])	print_debug("outfile is " values["outfile"])
-    #if (values["sysfile"])	print_debug("sysfile is " values["sysfile"])
-    #if (values["pkgdirectory"])	print_debug("pkgdirectory is " values["pkgdirectory"])
-    #if (values["unload"])	print_debug("module unloading is supported")
-    #if (values["modversion"])	print_debug("module versions are supported")
-    #if (values["allsrcversion"])	print_debug("source version all modules")
-    #if (exportsym)	print_debug("mark export of symbols")
-    if (values["modules"])	print_debug("modules are \"" values["modules"] "\"")
     cache_dirty = 1
-    if (values["cachefile"] && (read_cachefile(values["cachefile"]) != -1))
+    if (("cachefile" in values) && values["cachefile"] && (read_cachefile(values["cachefile"]) != -1))
 	cache_dirty = 0
     else {
-	if (values["filename"])
+	if (("filename" in values) && values["filename"])
 	    read_systemmap(cat_command(values["filename"]), "vmlinux", 0)
-	if (values["infile"])
+	if (("infile" in values) && values["infile"])
 	    read_dumpfiles(cat_command(values["infile"]))
-	if (values["moddir"])
+	if (("moddir" in values) && values["moddir"])
 	    read_moduledir(values["moddir"])
     }
-    if (values["modules"])
+    if (("modules" in values) && values["modules"]) {
+	split(values["modules"], modules)
 	read_mymodules(modules)
+    }
     # write out cache file
-    if (values["cachefile"] && cache_dirty)
+    if (("cachefile" in values) && values["cachefile"] && cache_dirty)
 	write_cachefile(values["cachefile"])
-    if (values["sysfile"])
+    if (("sysfile" in values) && values["sysfile"])
 	write_syssymver(values["sysfile"])
-    if (values["modules"]) {
-	if (values["outfile"])
+    if (("modules" in values) && values["modules"]) {
+	if (("outfile" in values) && values["outfile"])
 	    write_modsymver(values["outfile"])
 	write_mymodules(modules)
     }
+    if (written[stdout]) {
+	close(stdout)
+	written[stdout] = 0
+    }
+    if (written[stderr]) {
+	close(stderr)
+	written[stderr] = 0
+    }
+    exit 0
 }
 
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.3  2009-09-01 09:09:50  brian
+# - added text image files
+#
+# Revision 1.1.2.2  2009-07-23 16:37:51  brian
+# - updates for release
+#
 # Revision 1.1.2.1  2009-07-21 11:06:21  brian
 # - new awk scripts for release check
 #

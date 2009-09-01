@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:21 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:53 $
 
  -----------------------------------------------------------------------------
 
@@ -60,19 +60,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:44:21 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 1.1.2.2  2009-09-01 09:09:53  brian
+ - added text image files
+
  Revision 1.1.2.1  2009-06-21 11:44:21  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:21 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:53 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:21 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:53 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -7015,6 +7018,18 @@ test_case_2_1_8_bot(int child)
 	test_msleep(child, SHORT_WAIT);	/* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
+#ifdef CONFIG_XTI_IS_STATELESS
+	/* When XTI is stateless, the second T_BIND_REQ comes through. */
+	state++;
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);	/* delay to avoid LiS ioctl bug */
+	last_t_errno = TOUTSTATE;
+	last_errno = 0;
+	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+#endif				/* CONFIG_XTI_IS_STATELESS */
 	state++;
 	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -13771,8 +13786,13 @@ test_case_7_1_2_top(int child)
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#ifdef CONFIG_XTI_IS_TYPELESS
+	if (last_t_errno != TPROTO)
+		goto failure;
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (last_t_errno != TNOTSUPPORT)
 		goto failure;
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -13809,8 +13829,13 @@ test_case_7_1_3_top(int child)
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#ifdef CONFIG_XTI_IS_STATELESS
+	if (last_t_errno != TPROTO)
+		goto failure;
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (last_t_errno != TOUTSTATE)
 		goto failure;
+#endif				/* CONFIG_XTI_IS_STATELESS */
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -13857,7 +13882,23 @@ test_case_7_2_1_top(int child)
 int
 test_case_7_2_1_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	/* When XTI is stateless, the T_CONNECT_REQ comes through. */
+	state++;
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	last_t_errno = TOUTSTATE;
+	last_errno = 0;
+	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+#endif				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#ifdef CONFIG_XTI_IS_STATELESS
+      failure:
+	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_2_1_top preamble_3_top
@@ -13944,8 +13985,13 @@ test_case_7_3_2_top(int child)
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#ifdef CONFIG_XTI_IS_TYPELESS
+	if (last_t_errno != TBADQLEN)
+		goto failure;
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (last_t_errno != TNOTSUPPORT)
 		goto failure;
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -13978,6 +14024,9 @@ the t_listen library call."
 int
 test_case_7_3_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -13987,12 +14036,17 @@ test_case_7_3_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_3_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_3_3_top preamble_3_top
@@ -14178,6 +14232,9 @@ the t_rcv library call."
 int
 test_case_7_4_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14187,12 +14244,17 @@ test_case_7_4_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_4_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_4_2_top preamble_2cl_top
@@ -14215,6 +14277,9 @@ the t_rcv library call."
 int
 test_case_7_4_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14224,12 +14289,17 @@ test_case_7_4_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_4_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_4_3_top preamble_2_top
@@ -14292,6 +14362,9 @@ the t_rcvv library call."
 int
 test_case_7_5_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14301,12 +14374,17 @@ test_case_7_5_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_5_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_5_2_top preamble_2cl_top
@@ -14329,6 +14407,9 @@ the t_rcvv library call."
 int
 test_case_7_5_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14338,12 +14419,17 @@ test_case_7_5_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_5_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_5_3_top preamble_2_top
@@ -14431,6 +14517,9 @@ the t_rcvconnect library call."
 int
 test_case_7_6_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14440,12 +14529,17 @@ test_case_7_6_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_6_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_6_2_top preamble_2cl_top
@@ -14468,6 +14562,9 @@ the t_rcvconnect library call."
 int
 test_case_7_6_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14477,12 +14574,17 @@ test_case_7_6_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_6_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_6_3_top preamble_2_top
@@ -14545,6 +14647,9 @@ the t_rcvdis library call."
 int
 test_case_7_7_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14554,12 +14659,17 @@ test_case_7_7_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_7_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_7_2_top preamble_2cl_top
@@ -14582,6 +14692,9 @@ the t_rcvdis library call."
 int
 test_case_7_7_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14591,12 +14704,17 @@ test_case_7_7_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_7_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_7_3_top preamble_2_top
@@ -14659,6 +14777,9 @@ the t_rcvrel library call."
 int
 test_case_7_8_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14668,12 +14789,17 @@ test_case_7_8_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_8_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_8_2_top preamble_2cl_top
@@ -14696,6 +14822,9 @@ the t_rcvrel library call."
 int
 test_case_7_8_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14705,12 +14834,17 @@ test_case_7_8_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_8_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_8_3_top preamble_2_top
@@ -14773,6 +14907,9 @@ the t_rcvreldata library call."
 int
 test_case_7_9_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14782,12 +14919,17 @@ test_case_7_9_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_9_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_9_2_top preamble_2cl_top
@@ -14810,6 +14952,9 @@ the t_rcvreldata library call."
 int
 test_case_7_9_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14819,12 +14964,17 @@ test_case_7_9_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_9_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_9_3_top preamble_2_top
@@ -14887,6 +15037,9 @@ the t_rcvudata library call."
 int
 test_case_7_10_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14896,12 +15049,17 @@ test_case_7_10_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_10_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_10_2_top preamble_2_top
@@ -14924,6 +15082,9 @@ the t_rcvudata library call."
 int
 test_case_7_10_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14933,12 +15094,17 @@ test_case_7_10_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_10_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_10_3_top preamble_1cl_top
@@ -15001,6 +15167,9 @@ the t_rcvvudata library call."
 int
 test_case_7_11_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15010,12 +15179,17 @@ test_case_7_11_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_11_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_11_2_top preamble_2_top
@@ -15038,6 +15212,9 @@ the t_rcvvudata library call."
 int
 test_case_7_11_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15047,12 +15224,17 @@ test_case_7_11_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_11_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_11_3_top preamble_1cl_top
@@ -15115,6 +15297,9 @@ the t_rcvuderr library call."
 int
 test_case_7_12_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15124,12 +15309,17 @@ test_case_7_12_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_12_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_12_2_top preamble_2_top
@@ -15152,6 +15342,9 @@ the t_rcvuderr library call."
 int
 test_case_7_12_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15161,12 +15354,17 @@ test_case_7_12_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_12_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_12_3_top preamble_1cl_top
@@ -15254,6 +15452,9 @@ the t_snd library call."
 int
 test_case_7_13_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15263,12 +15464,17 @@ test_case_7_13_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_13_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_13_2_top preamble_2cl_top
@@ -15291,6 +15497,9 @@ the t_snd library call."
 int
 test_case_7_13_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15300,12 +15509,17 @@ test_case_7_13_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_13_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_13_3_top preamble_2_top
@@ -15393,6 +15607,9 @@ the t_sndv library call."
 int
 test_case_7_14_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15402,12 +15619,17 @@ test_case_7_14_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_14_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_14_2_top preamble_2cl_top
@@ -15430,6 +15652,9 @@ the t_sndv library call."
 int
 test_case_7_14_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15439,12 +15664,17 @@ test_case_7_14_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_14_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_14_3_top preamble_2_top
@@ -15532,6 +15762,9 @@ the t_sndudata library call."
 int
 test_case_7_15_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15541,12 +15774,17 @@ test_case_7_15_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_15_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_15_2_top preamble_2_top
@@ -15569,6 +15807,9 @@ the t_sndudata library call."
 int
 test_case_7_15_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15578,12 +15819,17 @@ test_case_7_15_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_15_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_15_3_top preamble_1cl_top
@@ -15671,6 +15917,9 @@ the t_sndvudata library call."
 int
 test_case_7_16_2_top(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15680,12 +15929,17 @@ test_case_7_16_2_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 int
 test_case_7_16_2_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_TYPELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_TYPELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_TYPELESS */
 }
 
 #define preamble_7_16_2_top preamble_2_top
@@ -15708,6 +15962,9 @@ the t_sndvudata library call."
 int
 test_case_7_16_3_top(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -15717,12 +15974,17 @@ test_case_7_16_3_top(int child)
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 int
 test_case_7_16_3_bot(int child)
 {
+#ifdef CONFIG_XTI_IS_STATELESS
+	return (__RESULT_SKIPPED);
+#else				/* CONFIG_XTI_IS_STATELESS */
 	return (__RESULT_SUCCESS);
+#endif				/* CONFIG_XTI_IS_STATELESS */
 }
 
 #define preamble_7_16_3_top preamble_1cl_top
@@ -18204,7 +18466,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.1 $ $Date: 2009-06-21 11:44:21 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2009-09-01 09:09:53 $");
 }
 
 void

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
+ Last Modified $Date: 2009-09-01 09:09:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 1.1.2.4  2009-09-01 09:09:50  brian
+ - added text image files
+
+ Revision 1.1.2.3  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-06-29 07:35:44  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,9 +66,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $"
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -142,7 +148,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.2 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS RAW IP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"
@@ -426,10 +432,10 @@ static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
-#define xti_default_rcvbuf		(sysctl_rmem_default << 1)
+#define xti_default_rcvbuf		(SK_RMEM_MAX << 1)
 #define xti_default_rcvlowat		1
-#define xti_default_sndbuf		(sysctl_wmem_default << 1)
-#define xti_default_sndlowat		sysctl_wmem_default
+#define xti_default_sndbuf		(SK_WMEM_MAX << 1)
+#define xti_default_sndlowat		SK_WMEM_MAX
 #define xti_default_priority		0
 
 #define ip_default_protocol		17
@@ -3416,22 +3422,17 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 #define net_protocol_lock() local_bh_disable()
 #define net_protocol_unlock() local_bh_enable()
 #else				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTO_LOCK_ADDR
-STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-
-#define net_protocol_lock() spin_lock_bh(inet_proto_lockp)
-#define net_protocol_unlock() spin_unlock_bh(inet_proto_lockp)
+#ifdef HAVE_INET_PROTO_LOCK_SYMBOL
+extern spinlock_t inet_proto_lock;
+#define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
+#define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
 #else
 #define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
 #endif				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTOS_ADDR
-STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
-#endif
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#ifdef HAVE_INET_PROTOS_SYMBOL
+STATIC struct mynet_protocol **inet_protosp = (void *)&inet_protos;
 #endif
 
 /**
@@ -3839,11 +3840,6 @@ tp_skb_destructor(struct sk_buff *skb)
 }
 #endif
 
-#undef skbuff_head_cache
-#ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
-#define skbuff_head_cache (*((kmem_cachep_t *) HAVE_SKBUFF_HEAD_CACHE_ADDR))
-#endif
-
 /**
  * tp_alloc_skb_slow - allocate a socket buffer from a message block
  * @tp: private pointer
@@ -3899,6 +3895,8 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	}
 	return (skb);
 }
+
+extern kmem_cachep_t skbuff_head_cache;
 
 /**
  * tp_alloc_skb_old - allocate a socket buffer from a message block

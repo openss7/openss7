@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-23 16:37:43 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
+## Last Modified $Date: 2009-07-23 16:37:43 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -8688,7 +8688,9 @@ MANS_UNUSED = \
 MANS_EXEMPT = \
 	man8/openss7.8 \
 	man8/specfs.8 \
-	man8/streams.8
+	man8/specfs.sh.8 \
+	man8/streams.8 \
+	man8/streams.sh.8
 
 if PUBLIC_RELEASE
 ## PUBLIC_RELEASE
@@ -8704,6 +8706,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.5  2009-07-23 16:37:43  brian
+## - updates for release
+##
 ## Revision 1.1.2.4  2009-07-21 11:06:12  brian
 ## - changes from release build
 ##

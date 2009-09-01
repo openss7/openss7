@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: ISO.4.man,v 1.1.2.1 2009-06-21 10:34:45 brian Exp $
+.\" @(#) $Id: ISO.4.man,v 1.1.2.2 2009-07-23 16:37:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:45 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ISO.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:44  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:45  brian
 .\" - added files to new distro
 .\"
@@ -751,8 +754,15 @@ See the OSI-FAQ at
 .\".PP
 .\"
 .\"
-.\".SH DEVICES
-.\".PP
+.SH DEVICES
+.PP
+.IR /dev/tp ,
+.IR /dev/tp0 ,
+.IR /dev/tp1 ,
+.IR /dev/tp2 ,
+.IR /dev/tp3 ,
+.IR /dev/tp4 ,
+.IR /dev/otpi .
 .\"
 .\"
 .SH "SEE ALSO"
@@ -785,7 +795,7 @@ See the OSI-FAQ at
 .\"
 .SH VERSIONS
 .PP
-This manual page was updated @DATE@ for
+This manual page was updated @PACKAGE_DATE@ for
 .B @PACKAGE@
 release
 .BR @VERSION@ .

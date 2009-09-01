@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: socksys.4.man,v 1.1.2.1 2009-06-21 10:34:56 brian Exp $
+.\" @(#) $Id: socksys.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:56 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: socksys.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:56  brian
 .\" - added files to new distro
 .\"
@@ -513,8 +516,6 @@ This technique ensures that the
 interface is compatible with all Linux system calls.
 .\"
 .\"
-.SH NOTICES
-.PP
 .PP
 When writing or converting a
 .BR tpi (7)

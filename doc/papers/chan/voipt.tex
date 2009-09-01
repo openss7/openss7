@@ -1,7 +1,7 @@
 % -*- tex -*- vim: ft=tex tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: voipt.tex,v 1.1.2.1 2009-06-21 10:41:31 brian Exp $
+% @(#) $Id: voipt.tex,v 1.1.2.2 2009-09-01 09:09:46 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:41:31 $ by $Author: brian $
+% Last Modified $Date: 2009-09-01 09:09:46 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -196,10 +196,10 @@ scalability, increasing vendor lock-in, and dedicating special purpose hardware
 where low-cost scalable commodity host processing power would more than suffice.
 
 Maximization of commodity host processor utilization and software
-approaches\footnote{Such as the high-performance Linux-STREAMS \cite[]{LfS}.}
-leads to greatly reduced interface card per-channel costs as well as providing
-for greater densities and scalability, and removing vendor lock-in with a
-Commodity Off-The Shelf (COTS) solution.
+approaches\footnote{Such as the high-performance Linux Fast-STREAMS
+\cite[]{LfS}.} leads to greatly reduced interface card per-channel costs as well
+as providing for greater densities and scalability, and removing vendor lock-in
+with a Commodity Off-The Shelf (COTS) solution.
 
 \textsl{Table \ref{table:channel}} lists the various costs of legacy solutions
 in comparison to the current design.
@@ -246,7 +246,7 @@ full bus rate burst speeds.  This PCI design replaced the Tormenta I cards which
 was an ISA card.  The ISA bus could not sustain a transfer rate that would
 permit more than 2 T1s to be provided on the same card.  Competing proprietary
 designs at the time (such as that provided by Pika) ran to \$5000 per card for a
-signle T1, or over \$50.00 per channel.
+single T1, or over \$50.00 per channel.
 
 The Tormenta II and III card design is illustrated in \textsl{Figure
 \ref{figure:voipt_fig05}}.
@@ -272,8 +272,8 @@ The card consists of:
 		byte-interleaved TDM bus and the PCI Interface.
 	\item \textsl{PCI Interface.}
 		The PLX Technology PCI 9030 interface chip is a slave 32-bit 33
-		MHz PCI target.  This chip permit host processor to access FPGA
-		buffered E1, T1 or J1 frames.
+		MHz PCI target.  This chip provides host processor access to FPGA buffered E1, T1 or
+		J1 frames.
 % 	\item \textsl{Miscellaneous components.}
 % 		Assorted crystals, decoupling capcitors, terminating resistors,
 % 		clock dividers and synthesizers, transorbs, serial EPROM, etc.
@@ -361,10 +361,10 @@ millisecond (typically 125 microseconds).
 Media Gateways and VoIP Trunking, on the other hand, have significant latencies.
 Therefore, hard real-time specialized hardware approaches are inefficient for
 MG and VoIP trunking designs.  Hardware designed to perform operations within
-125 microseconds are inappropriate considering the packetization delay of an RTP
-G.711 encoded packet is 30 milliseconds (or 2 orders of magnitude greater) and
-echo cancellation algorithms use a 120 millisecond tail (or 3 orders of
-magnitude greater).
+125 microseconds (e.g. DSP, TDM bus and switching chips) are inappropriate
+considering the packetization delay of an RTP G.711 encoded packet is 30
+milliseconds (or 2 orders of magnitude greater) and echo cancellation algorithms
+use a 120 millisecond tail (or 3 orders of magnitude greater).
 
 By avoiding use of these high-cost components to perform TDM processing within
 125 microseconds, the cost of interface equipment can be significantly reduced.
@@ -373,8 +373,8 @@ Criteria for functional placement are as follows:
 \begin{enumerate}
 \item \textsl{Is hard real-time response absolutely required by the function?}
 	For VoIP, the answer to this question for all processing of the voice
-	samples is \textit{no}.  DSP (Digital Signal Processors) is an emphatic
-	\textit{no}.
+	samples is \textit{no}.  DSP (Digital Signal Processors), and TDM (Time
+	Division Multiplexing) bus hardware, are an emphatic \textit{no}.
 \item \textsl{Can the function be performed using software and memory?}
 	This includes all voice sample processing which can easily be performed
 	in host memory with general purpose processors and software.
@@ -395,7 +395,7 @@ processing?}
 \section[SONET/SDH Card Design]{SONET/SDH Card Design}
 
 \textsl{Figure \ref{figure:voipt_fig06}} illustrates the overall SONET/SDH line
-card design, with a x4-lane PCIe option is shown in grey.
+card design, with a x4-lane PCIe option shown in grey.
 \begin{figure}[htp]
 \center\includegraphics[width=3.5in]{voipt_fig06}
 \caption[OC48card]{SONET/SDH Interface Card}
@@ -455,11 +455,11 @@ The SFP (Small Form-Factor Pluggable) transceivers are illustrated in
 The optical interface consists of 4 Small Form-Factor (SFP) receptacles for SPF
 optical (OC-3/12/48) or electrical (STS-3e/STM-1e 75 Ohm coaxial mini-BNC)
 tranceivers.  These accept hot-pluggable transceivers.  For the card's
-application (which is primarly short-reach interface to a SONET/SDH ADM), only
-short reach (SX) modules are necessary; however, the pluggable tranceiver
-modules permit a range of reaches.  The optical or electrical transceivers can
-be any combination of same speed tranceivers with a total aggregate 1+1
-protected or unprotected OC-48 line rate.
+application (which is primarly short-reach interface to a SONET/SDH ADM or
+DCCS), only short reach (SX) modules are necessary; however, the pluggable
+tranceiver modules permit a range of reaches.  The optical or electrical
+transceivers can be any combination of same speed tranceivers with a total
+aggregate 1+1 protected or unprotected OC-48 line rate.
 That is, the 4 SFP SX transceivers can be one of:
 \begin{itemize}
 \item \textsl{1 to 2 x OC-48.}
@@ -506,7 +506,8 @@ volumes.\footnote{
 % for the PM5332 is its inability to support OC-3 transceivers.  A more flexible
 % chip that provides low-order tributary processing as well is the PM5336B, but
 % its detractor is cost: approx. \$620.00 per chip.
-SONET/SDH framers are also available from other suppliers such as Mindspeed.}
+SONET/SDH framers are also available from other suppliers such as Mindspeed and
+TranSwitch.}
 
 \subsection[Field Programmable Gate Array]{Field Programmable Gate Array}
 
@@ -732,6 +733,9 @@ scalability and longevity of the overall solution.
 % =========================================================================
 %
 % $Log: voipt.tex,v $
+% Revision 1.1.2.2  2009-09-01 09:09:46  brian
+% - added text image files
+%
 % Revision 1.1.2.1  2009-06-21 10:41:31  brian
 % - added files to new distro
 %

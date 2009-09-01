@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl =========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:49:03 $
+dnl @(#) $RCSfile: testsuite-streams.at,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:53 $
 dnl 
 dnl -------------------------------------------------------------------------
 dnl 
@@ -62,7 +62,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl -------------------------------------------------------------------------
 dnl 
-dnl Last Modified $Date: 2009-06-21 11:49:03 $ by $Author: brian $
+dnl Last Modified $Date: 2009-09-01 09:09:53 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -2772,6 +2772,16 @@ AT_KEYWORDS([streams poll POLLNVAL])
 AT_CHECK([test_streams 3.10.14], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([posix streams test 4.1])
+AT_KEYWORDS([streams stress OPEN CLOSE])
+AT_CHECK([test_streams 4.1], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([posix streams test 4.2])
+AT_KEYWORDS([streams stress OPEN IOCTL CLOSE])
+AT_CHECK([test_streams 4.2], [], [ignore], [], [], [])
+AT_CLEANUP
+
 dnl AT_SETUP([posix streams test 3.10.15])
 dnl AT_KEYWORDS([streams poll POLLMSG])
 dnl AT_CHECK([test_streams 3.10.15], [], [ignore], [], [], [])
@@ -2780,6 +2790,9 @@ dnl AT_CLEANUP
 dnl ==========================================================================
 dnl
 dnl $Log: testsuite-streams.at,v $
+dnl Revision 1.1.2.2  2009-09-01 09:09:53  brian
+dnl - added text image files
+dnl
 dnl Revision 1.1.2.1  2009-06-21 11:49:03  brian
 dnl - added files to new distro
 dnl

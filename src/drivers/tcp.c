@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:53  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-06-29 07:35:44  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -141,7 +144,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -3902,7 +3905,6 @@ t_build_options(struct tpi *t, unsigned char *ip, size_t ilen, unsigned char *op
 #ifdef LINUX
 #define MAX_INET_SLOTS		1
 #define BASE_INET_PROTOCOL	IPPROTO_TCP
-STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
 
@@ -4063,17 +4065,8 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 	return (0);
 }
 
-#ifdef CONFIG_SMP
-STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
-#else				/* CONFIG_SMP */
-static spinlock_t inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
+extern spinlock_t inet_proto_lock;
 
-#define inet_proto_lockp (&inet_proto_lock_)
-#endif				/* CONFIG_SMP */
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
-#endif
 /**
  * tpi_init_nproto - initialize network protocol override
  *
@@ -4092,18 +4085,18 @@ tpi_init_nproto(unsigned char proto)
 		return (-EALREADY);	/* already initialized */
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
 	/* reduces to inet_add_protocol() if no protocol registered */
-	spin_lock_bh(inet_proto_lockp);
-	if ((ip->next = inet_protosp[hash]) != NULL) {
+	spin_lock_bh(&inet_proto_lock);
+	if ((ip->next = inet_protos[hash]) != NULL) {
 		if ((ip->kmod = module_text_address((ulong) ip->next))
 		    && ip->kmod != THIS_MODULE) {
 			if (!try_module_get(ip->kmod)) {
-				spin_unlock_bh(inet_proto_lockp);
+				spin_unlock_bh(&inet_proto_lock);
 				return (-EAGAIN);
 			}
 		}
 	}
-	inet_protosp[hash] = &ip->proto;
-	spin_unlock_bh(inet_proto_lockp);
+	inet_protos[hash] = &ip->proto;
+	spin_unlock_bh(&inet_proto_lock);
 	synchronize_net();
 	return (0);
 }
@@ -4125,9 +4118,9 @@ tpi_term_nproto(unsigned char proto)
 	if ((ip = tpi_bhash[slot].ipproto) == NULL)
 		return (-EALREADY);	/* already terminated */
 	/* reduces to inet_del_protocol() if no protocol was registered */
-	spin_lock_bh(inet_proto_lockp);
-	inet_protosp[hash] = ip->next;
-	spin_unlock_bh(inet_proto_lockp);
+	spin_lock_bh(&inet_proto_lock);
+	inet_protos[hash] = ip->next;
+	spin_unlock_bh(&inet_proto_lock);
 	synchronize_net();
 	tpi_bhash[slot].ipproto = NULL;
 	if (ip->next != NULL && ip->kmod != NULL && ip->kmod != THIS_MODULE)

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-07-23 16:37:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+# Last Modified $Date: 2009-07-23 16:37:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -129,15 +129,6 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _PERL_EXTENSIONS
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CPPFLAGS="${USER_CPPFLAGS}${USER_CPPFLAGS:+ }-DNAME=\\\"\`echo [\$][@] | sed -e 's,^[[^-]]*-,,;s,\.o,,'\`\\\""
-    USER_DFLAGS=`echo "$CFLAGS" | sed -n 's,.*-Werror,-Werror,p'`
-    CFLAGS=`echo "$CFLAGS" | sed 's, -Werror,,'`
-    USER_CFLAGS=
-    USER_DXXFLAGS=`echo "$CXXFLAGS" | sed -n 's,.*-Werror,-Werror,p'`
-    CXXFLAGS=`echo "$CXXFLAGS" | sed 's, -Werror,,'`
-    USER_CXXFLAGS=
-    USER_GCDFLAGS=`echo "$GCJFLAGS" | sed -n 's,.*-Werror,-Werror,p'`
-    USER_GCJFLAGS=`echo "$GCJFLAGS" | sed 's, -Werror,,'`
-    GCJFLAGS=
     USER_LDFLAGS="$LDFLAGS"
     _LINUX_KERNEL
     _LINUX_DEVFS
@@ -1246,6 +1237,8 @@ dnl _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_default_ttl])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
 dnl _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_default])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_default])
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_max])
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_max])
     _LINUX_KERNEL_SYMBOL_EXPORT([__wake_up_sync])
@@ -2245,6 +2238,62 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS], [1], [Define if
 		function ip_route_connect takes 10 arguments which is the case
 		from 2.6.21.])
+	fi
+    ])
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel session_of_pgrp with struct arg], [linux_cv_have_session_of_pgrp_with_struct_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */
+#include <linux/pm.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+	    [[struct pid *(*my_autoconf_function_pointer)(struct pid *) = &session_of_pgrp;]]) ],
+	    [linux_cv_have_session_of_pgrp_with_struct_arg='yes'],
+	    [linux_cv_have_session_of_pgrp_with_struct_arg='no'])
+	])
+	if test :$linux_cv_have_session_of_pgrp_with_struct_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_SESSION_OF_PGRP_STRUCT_ARG], [1], [Define if function
+		       session_of_pgrp() takes a struct pid * argument, which is not normally the
+		       case.])
 	fi
     ])
 dnl----------------------------------------------------------------------------
@@ -3546,6 +3595,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.6  2009-07-23 16:37:42  brian
+# - updates for release
+#
 # Revision 1.1.2.5  2009-07-21 11:06:11  brian
 # - changes from release build
 #

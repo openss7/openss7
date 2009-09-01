@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-24 13:49:44 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-09-01 09:09:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
+## Last Modified $Date: 2009-09-01 09:09:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -157,6 +157,14 @@ uninstall-devices: $(STRCONF_DEVICES)
 	fi
 
 ## RPM_BUILD_KERNEL
+else
+## RPM_BUILD_KERNEL
+
+install-devices:
+
+uninstall-devices:
+
+## RPM_BUILD_KERNEL
 endif
 
 INSTALL_EXEC_HOOK	+= install-devices
@@ -192,6 +200,9 @@ EXTRA_DIST		+= $(STRCONF_CONFIGS)
 ## =============================================================================
 ##
 ## $Log: strconf.am,v $
+## Revision 1.1.2.6  2009-09-01 09:09:46  brian
+## - added text image files
+##
 ## Revision 1.1.2.5  2009-07-24 13:49:44  brian
 ## - updates for release build
 ##

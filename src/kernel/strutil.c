@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-21 11:06:17 $ by $Author: brian $
+ Last Modified $Date: 2009-07-23 16:37:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.3  2009-07-23 16:37:54  brian
+ - updates for release
+
  Revision 1.1.2.2  2009-07-21 11:06:17  brian
  - changes from release build
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:54 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:17 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:54 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -310,15 +313,6 @@ freeb_skb(caddr_t arg)
 	dassert(skb != NULL);
 	kfree_skb(skb);
 }
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#undef module_text_address
-/* unfortunately, this function is not exported */
-struct module *module_text_address(ulong addr);
-
-#define module_text_address(__arg) \
-	((typeof(&module_text_address)) HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 
 /**
  *  skballoc:	- allocate a message block with a socket buffer

@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: cd_hdlc.4.man,v 1.1.2.1 2009-06-21 10:34:47 brian Exp $
+.\" @(#) $Id: cd_hdlc.4.man,v 1.1.2.2 2009-07-23 16:37:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:47 $ by $Author: brian $
+.\" Last Modified $Date: 2009-07-23 16:37:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cd_hdlc.4.man,v $
+.\" Revision 1.1.2.2  2009-07-23 16:37:45  brian
+.\" - updates for release
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:34:47  brian
 .\" - added files to new distro
 .\"
@@ -233,7 +236,6 @@ driver.  An examle of one that does, is the
 driver.
 .\"
 .\"
-.SH NOTICES
 .PP
 .B CD-HDLC
 modules are not normally pushed or accessed directly by user-level programs.
