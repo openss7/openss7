@@ -1,5 +1,5 @@
-OpenSS7 -- read me first file.  2009-09-01
-$Id: README,v 1.1.2.8 2009-09-01 23:08:46 brian Exp $
+OpenSS7 -- read me first file.  2009-09-08
+$Id: README,v 1.1.2.9 2009-09-08 10:46:51 brian Exp $
 Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
  OpenSS7
 ========
 
-Package openss7-1.1.1.20090901 was released under AGPLv3 2009-09-01.
+Package openss7-1.1.1.20090908 was released under AGPLv3 2009-09-08.
 
 This is the `OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -50,12 +50,12 @@ should build and install for other architectures as well.
  Release
 --------
 
-This is the `openss7-1.1.1.20090901' package, released 2009-09-01.  This
-`1.1.1.20090901' release, and the latest version, can be obtained from
+This is the `openss7-1.1.1.20090908' package, released 2009-09-08.  This
+`1.1.1.20090908' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090901.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090908.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', as a set of binary `rpm's or `deb's, or as a `yum(8)' or
@@ -91,7 +91,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install the `OpenSS7 Master Package',
-`openss7-1.1.20090901'.
+`openss7-1.1.20090908'.
 
 Prerequisites for the OpenSS7 package are as follows:
 
@@ -127,7 +127,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../openss7-1.1.1.20090901/configure CC='gcc-3.4'
+     $> ../openss7-1.1.1.20090908/configure CC='gcc-3.4'
 
 The package builds and installs SNMP agents.  When configuring and
 building the package, it is necessary to have the net-snmp development
@@ -159,11 +159,11 @@ the following distributions, use the following commands:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090901.tar.bz2
-     $> tar -xjvf openss7-1.1.1.20090901.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090908.tar.bz2
+     $> tar -xjvf openss7-1.1.1.20090908.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.1.20090901/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.1.20090908/configure --enable-autotest --enable-silent-rules
      $> make V=0
      $> make check
      $> sudo make install
@@ -171,8 +171,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.1.20090901
-     $> rm -f openss7-1.1.1.20090901.tar.bz2
+     $> rm -rf openss7-1.1.1.20090908
+     $> rm -f openss7-1.1.1.20090908.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -180,11 +180,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(5) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090901.tar.bz2
-     $> tar -xjvf openss7-1.1.1.20090901.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090908.tar.bz2
+     $> tar -xjvf openss7-1.1.1.20090908.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.1.20090901/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.1.20090908/configure --enable-autotest --enable-silent-rules
      $> make V=1 compile.log
      $> make check.log
      $> sudo make install.log
@@ -192,8 +192,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.1.20090901
-     $> rm -f openss7-1.1.1.20090901.tar.bz2
+     $> rm -rf openss7-1.1.1.20090908
+     $> rm -f openss7-1.1.1.20090908.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -209,14 +209,14 @@ The OpenSS7 package is available from the downloads area of The OpenSS7
 Project website (http://www.openss7.org/download.html) using a command
 such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090901.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20090908.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf openss7-1.1.1.20090901.tar.bz2
+     $> tar -xjvf openss7-1.1.1.20090908.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: openss7-1.1.1.20090901.
+package name: openss7-1.1.1.20090908.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -224,19 +224,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../openss7-1.1.1.20090901/configure
+     $> ../openss7-1.1.1.20090908/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../openss7-1.1.1.20090901/INSTALL
+     $> less ../openss7-1.1.1.20090908/INSTALL
 
 For specific options to the `configure' script, see the
 `INSTALL-openss7' file in the distribution, or simply execute the
 configure script with the `--help' option like so:
 
-     $> ../openss7-1.1.1.20090901/configure --help
+     $> ../openss7-1.1.1.20090908/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -283,8 +283,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf openss7-1.1.1.20090901
-     $> rm -f openss7-1.1.1.20090901.tar.bz2
+     $> rm -rf openss7-1.1.1.20090908
+     $> rm -f openss7-1.1.1.20090908.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -293,7 +293,7 @@ More detailed installation instructions can be found in the
 `Installation',in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../openss7-1.1.1.20090901
+     $> cd ../openss7-1.1.1.20090908
      $> less doc/manual/openss7.txt
      $> lynx doc/manual/openss7.html
      $> info doc/manual/openss7.info

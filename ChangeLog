@@ -1,3 +1,16 @@
+2009-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgpatchlevel: bumped patch level
+	* AUTHORS: updates for release
+	* Makefile.am: removed dependency on CONFIG_HEADER
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* po/de.po: updates for release
+	* scripts/modpost.awk: ensure struct_module is undefined
+	* scripts/strconf.awk: don't use symbolic links unless necessary
+	* scripts/streams_mkdev: never use symbolic links
+
 2009-05-05  Brian Bidulock  <bidulock@openss7.org>
 
 	- Initial release of combined package.

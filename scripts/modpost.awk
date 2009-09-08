@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-09-01 09:09:50 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-08 10:46:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-09-01 09:09:50 $ by $Author: brian $
+# Last Modified $Date: 2009-09-08 10:46:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -104,7 +104,7 @@ function usage(output)
 	return
     print "\
 modpost:\n\
-  $Id: modpost.awk,v 1.1.2.3 2009-09-01 09:09:50 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.4 2009-09-08 10:46:51 brian Exp $\n\
 Usage:\n\
   modpost [options] [MODULE ...]\n\
   modpost -h\n\
@@ -185,7 +185,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.3 2009-09-01 09:09:50 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.4 2009-09-08 10:46:51 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -208,7 +208,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.3 2009-09-01 09:09:50 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.4 2009-09-08 10:46:51 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -453,6 +453,9 @@ function read_modobject(command, mymodule)
 		    sub(/kernel\//, "")
 		}
 		modname = $0
+		if (mymodule == 1) {
+		    mod_unds[modname,"struct_module"] = 1
+		}
 		continue
 	    }
 	    if (/SYMBOL TABLE:/) {
@@ -1030,6 +1033,9 @@ BEGIN {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.4  2009-09-08 10:46:51  brian
+# - changes to avoid haldaemon problems
+#
 # Revision 1.1.2.3  2009-09-01 09:09:50  brian
 # - added text image files
 #
