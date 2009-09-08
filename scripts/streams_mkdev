@@ -1,26 +1,26 @@
 #!/bin/sh
 remove() {
 	rm -f -- $DESTDIR/dev/clone
-	rm -f -- $DESTDIR/dev/echo
-	rm -f -- $DESTDIR/dev/strlog
-	rm -f -- $DESTDIR/dev/sloop
-	rm -f -- $DESTDIR/dev/loop_clone
-	rm -f -- $DESTDIR/dev/mux
-	rm -f -- $DESTDIR/dev/nuls
-	rm -f -- $DESTDIR/dev/sad
-	rm -f -- $DESTDIR/dev/ip2
-	rm -f -- $DESTDIR/dev/ldl
-	rm -f -- $DESTDIR/dev/rawip2
-	rm -f -- $DESTDIR/dev/tcp2
-	rm -f -- $DESTDIR/dev/udp2
-	rm -f -- $DESTDIR/dev/fifo
-	rm -f -- $DESTDIR/dev/conslog
-	rm -f -- $DESTDIR/dev/loop.1
-	rm -f -- $DESTDIR/dev/loop.2
-	rm -f -- $DESTDIR/dev/nsdev
-	rm -f -- $DESTDIR/dev/pipe
-	rm -f -- $DESTDIR/dev/sfx
-	rm -f -- $DESTDIR/dev/spx
+	#rm -f -- $DESTDIR/dev/echo
+	#rm -f -- $DESTDIR/dev/strlog
+	#rm -f -- $DESTDIR/dev/sloop
+	#rm -f -- $DESTDIR/dev/loop_clone
+	#rm -f -- $DESTDIR/dev/mux
+	#rm -f -- $DESTDIR/dev/nuls
+	#rm -f -- $DESTDIR/dev/sad
+	#rm -f -- $DESTDIR/dev/ip2
+	#rm -f -- $DESTDIR/dev/ldl
+	#rm -f -- $DESTDIR/dev/rawip2
+	#rm -f -- $DESTDIR/dev/tcp2
+	#rm -f -- $DESTDIR/dev/udp2
+	#rm -f -- $DESTDIR/dev/fifo
+	#rm -f -- $DESTDIR/dev/conslog
+	#rm -f -- $DESTDIR/dev/loop.1
+	#rm -f -- $DESTDIR/dev/loop.2
+	#rm -f -- $DESTDIR/dev/nsdev
+	#rm -f -- $DESTDIR/dev/pipe
+	#rm -f -- $DESTDIR/dev/sfx
+	#rm -f -- $DESTDIR/dev/spx
 	rm -f -- $DESTDIR/dev/inet/ip
 	rm -f -- $DESTDIR/dev/ip
 	rm -f -- $DESTDIR/dev/icmp
@@ -49,74 +49,74 @@ remove() {
 	rm -f -- $DESTDIR/dev/ticots
 	rm -f -- $DESTDIR/dev/ticlts
 	rm -f -- $DESTDIR/dev/sctp
-	rm -f -- $DESTDIR/dev/np_ip
-	rm -f -- $DESTDIR/dev/ipcl
-	rm -f -- $DESTDIR/dev/ipco
-	rm -f -- $DESTDIR/dev/sctp_n
-	rm -f -- $DESTDIR/dev/sctp_t
-	rm -f -- $DESTDIR/dev/socksys
-	rm -f -- $DESTDIR/dev/unix
-	rm -f -- $DESTDIR/dev/xnet
+	#rm -f -- $DESTDIR/dev/np_ip
+	#rm -f -- $DESTDIR/dev/ipcl
+	#rm -f -- $DESTDIR/dev/ipco
+	#rm -f -- $DESTDIR/dev/sctp_n
+	#rm -f -- $DESTDIR/dev/sctp_t
+	#rm -f -- $DESTDIR/dev/socksys
+	#rm -f -- $DESTDIR/dev/unix
+	#rm -f -- $DESTDIR/dev/xnet
 	test -d /dev/inet && rmdir --ignore-fail-on-non-empty -- $DESTDIR/dev/inet
 }
 create() {
 	test -d /dev/inet || mkdir -p -- $DESTDIR/dev/inet
-	ln -s /dev/streams/clone/0 $DESTDIR/dev/clone
-	ln -s /dev/streams/clone/echo $DESTDIR/dev/echo
-	ln -s /dev/streams/clone/log $DESTDIR/dev/strlog
-	ln -s /dev/streams/clone/loop $DESTDIR/dev/sloop
-	ln -s /dev/streams/clone/loop $DESTDIR/dev/loop_clone
-	ln -s /dev/streams/clone/mux $DESTDIR/dev/mux
-	ln -s /dev/streams/clone/nuls $DESTDIR/dev/nuls
-	ln -s /dev/streams/clone/sad $DESTDIR/dev/sad
-	ln -s /dev/streams/clone/ip $DESTDIR/dev/ip2
-	ln -s /dev/streams/clone/rawip $DESTDIR/dev/rawip2
-	ln -s /dev/streams/clone/tcp $DESTDIR/dev/tcp2
-	ln -s /dev/streams/clone/udp $DESTDIR/dev/udp2
-	ln -s /dev/streams/fifo/0 $DESTDIR/dev/fifo
-	ln -s /dev/streams/log/1 $DESTDIR/dev/conslog
-	ln -s /dev/streams/loop/1 $DESTDIR/dev/loop.1
-	ln -s /dev/streams/loop/2 $DESTDIR/dev/loop.2
-	ln -s /dev/streams/nsdev/0 $DESTDIR/dev/nsdev
-	ln -s /dev/streams/pipe/0 $DESTDIR/dev/pipe
-	ln -s /dev/streams/sfx/0 $DESTDIR/dev/sfx
-	ln -s /dev/streams/spx/0 $DESTDIR/dev/spx
-	ln -s /dev/streams/inet/32 $DESTDIR/dev/inet/ip
-	ln -s /dev/streams/inet/32 $DESTDIR/dev/ip
-	ln -s /dev/streams/inet/33 $DESTDIR/dev/icmp
-	ln -s /dev/streams/inet/33 $DESTDIR/dev/inet/icmp
-	ln -s /dev/streams/inet/34 $DESTDIR/dev/ggp
-	ln -s /dev/streams/inet/34 $DESTDIR/dev/inet/ggp
-	ln -s /dev/streams/inet/35 $DESTDIR/dev/inet/ipip
-	ln -s /dev/streams/inet/35 $DESTDIR/dev/ipip
-	ln -s /dev/streams/inet/36 $DESTDIR/dev/inet/tcp
-	ln -s /dev/streams/inet/36 $DESTDIR/dev/tcp
-	ln -s /dev/streams/inet/37 $DESTDIR/dev/egp
-	ln -s /dev/streams/inet/37 $DESTDIR/dev/inet/egp
-	ln -s /dev/streams/inet/38 $DESTDIR/dev/inet/pup
-	ln -s /dev/streams/inet/38 $DESTDIR/dev/pup
-	ln -s /dev/streams/inet/39 $DESTDIR/dev/arp
-	ln -s /dev/streams/inet/39 $DESTDIR/dev/inet/arp
-	ln -s /dev/streams/inet/39 $DESTDIR/dev/inet/rip
-	ln -s /dev/streams/inet/39 $DESTDIR/dev/inet/udp
-	ln -s /dev/streams/inet/39 $DESTDIR/dev/rip
-	ln -s /dev/streams/inet/39 $DESTDIR/dev/udp
-	ln -s /dev/streams/inet/40 $DESTDIR/dev/idp
-	ln -s /dev/streams/inet/40 $DESTDIR/dev/inet/idp
-	ln -s /dev/streams/inet/41 $DESTDIR/dev/inet/rawip
-	ln -s /dev/streams/inet/41 $DESTDIR/dev/rawip
-	ln -s /dev/streams/inet/42 $DESTDIR/dev/ticots_ord
-	ln -s /dev/streams/inet/43 $DESTDIR/dev/ticots
-	ln -s /dev/streams/inet/44 $DESTDIR/dev/ticlts
-	ln -s /dev/streams/inet/45 $DESTDIR/dev/sctp
-	ln -s /dev/streams/np_ip/0 $DESTDIR/dev/np_ip
-	ln -s /dev/streams/np_ip/1 $DESTDIR/dev/ipcl
-	ln -s /dev/streams/np_ip/2 $DESTDIR/dev/ipco
-	ln -s /dev/streams/sctp_n/0 $DESTDIR/dev/sctp_n
-	ln -s /dev/streams/sctp_t/0 $DESTDIR/dev/sctp_t
-	ln -s /dev/streams/socksys/0 $DESTDIR/dev/socksys
-	ln -s /dev/streams/unix/0 $DESTDIR/dev/unix
-	ln -s /dev/streams/xnet/0 $DESTDIR/dev/xnet
+	mknod -m 0666 $DESTDIR/dev/clone c 230 0
+	#ln -s /dev/streams/clone/echo $DESTDIR/dev/echo
+	#ln -s /dev/streams/clone/log $DESTDIR/dev/strlog
+	#ln -s /dev/streams/clone/loop $DESTDIR/dev/sloop
+	#ln -s /dev/streams/clone/loop $DESTDIR/dev/loop_clone
+	#ln -s /dev/streams/clone/mux $DESTDIR/dev/mux
+	#ln -s /dev/streams/clone/nuls $DESTDIR/dev/nuls
+	#ln -s /dev/streams/clone/sad $DESTDIR/dev/sad
+	#ln -s /dev/streams/clone/ip $DESTDIR/dev/ip2
+	#ln -s /dev/streams/clone/rawip $DESTDIR/dev/rawip2
+	#ln -s /dev/streams/clone/tcp $DESTDIR/dev/tcp2
+	#ln -s /dev/streams/clone/udp $DESTDIR/dev/udp2
+	#ln -s /dev/streams/fifo/0 $DESTDIR/dev/fifo
+	#ln -s /dev/streams/log/1 $DESTDIR/dev/conslog
+	#ln -s /dev/streams/loop/1 $DESTDIR/dev/loop.1
+	#ln -s /dev/streams/loop/2 $DESTDIR/dev/loop.2
+	#ln -s /dev/streams/nsdev/0 $DESTDIR/dev/nsdev
+	#ln -s /dev/streams/pipe/0 $DESTDIR/dev/pipe
+	#ln -s /dev/streams/sfx/0 $DESTDIR/dev/sfx
+	#ln -s /dev/streams/spx/0 $DESTDIR/dev/spx
+	mknod -m 0666 $DESTDIR/dev/inet/ip c 30 32
+	mknod -m 0666 $DESTDIR/dev/ip c 30 32
+	mknod -m 0666 $DESTDIR/dev/icmp c 30 33
+	mknod -m 0666 $DESTDIR/dev/inet/icmp c 30 33
+	mknod -m 0666 $DESTDIR/dev/ggp c 30 34
+	mknod -m 0666 $DESTDIR/dev/inet/ggp c 30 34
+	mknod -m 0666 $DESTDIR/dev/inet/ipip c 30 35
+	mknod -m 0666 $DESTDIR/dev/ipip c 30 35
+	mknod -m 0666 $DESTDIR/dev/inet/tcp c 30 36
+	mknod -m 0666 $DESTDIR/dev/tcp c 30 36
+	mknod -m 0666 $DESTDIR/dev/egp c 30 37
+	mknod -m 0666 $DESTDIR/dev/inet/egp c 30 37
+	mknod -m 0666 $DESTDIR/dev/inet/pup c 30 38
+	mknod -m 0666 $DESTDIR/dev/pup c 30 38
+	mknod -m 0666 $DESTDIR/dev/arp c 30 39
+	mknod -m 0666 $DESTDIR/dev/inet/arp c 30 39
+	mknod -m 0666 $DESTDIR/dev/inet/rip c 30 39
+	mknod -m 0666 $DESTDIR/dev/inet/udp c 30 39
+	mknod -m 0666 $DESTDIR/dev/rip c 30 39
+	mknod -m 0666 $DESTDIR/dev/udp c 30 39
+	mknod -m 0666 $DESTDIR/dev/idp c 30 40
+	mknod -m 0666 $DESTDIR/dev/inet/idp c 30 40
+	mknod -m 0666 $DESTDIR/dev/inet/rawip c 30 41
+	mknod -m 0666 $DESTDIR/dev/rawip c 30 41
+	mknod -m 0666 $DESTDIR/dev/ticots_ord c 30 42
+	mknod -m 0666 $DESTDIR/dev/ticots c 30 43
+	mknod -m 0666 $DESTDIR/dev/ticlts c 30 44
+	mknod -m 0666 $DESTDIR/dev/sctp c 30 45
+	#ln -s /dev/streams/np_ip/0 $DESTDIR/dev/np_ip
+	#ln -s /dev/streams/np_ip/1 $DESTDIR/dev/ipcl
+	#ln -s /dev/streams/np_ip/2 $DESTDIR/dev/ipco
+	#ln -s /dev/streams/sctp_n/0 $DESTDIR/dev/sctp_n
+	#ln -s /dev/streams/sctp_t/0 $DESTDIR/dev/sctp_t
+	#ln -s /dev/streams/socksys/0 $DESTDIR/dev/socksys
+	#ln -s /dev/streams/unix/0 $DESTDIR/dev/unix
+	#ln -s /dev/streams/xnet/0 $DESTDIR/dev/xnet
 }
 
 if test ":$V" == :1 ; then
