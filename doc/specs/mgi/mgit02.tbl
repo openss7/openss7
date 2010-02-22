@@ -1,0 +1,105 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cbw(1.0i)|cbw(1.0i)|cbw(3.0i)
+l|l|l.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Session Establishment
+T}:T{
+.hy 0
+.ad l
+Join
+T}:T{
+.hy 0
+.ad l
+MG_JOIN_REQ, MG_JOIN_CON
+T}
+\^:_:_
+\^:T{
+.hy 0
+.ad l
+Connection
+T}:T{
+.hy 0
+.ad l
+MG_CONN_REQ, MG_CONN_CON
+T}
+_:_:_
+T{
+.hy 0
+.ad l
+Session Control
+T}:T{
+.hy 0
+.ad l
+Action
+T}:T{
+.hy 0
+.ad l
+MG_ACTION_REQ, MG_ACTION_CON, MG_ABORT_REQ, MG_ACTION_IND
+T}
+\^:_:_
+\^:T{
+.hy 0
+.ad l
+Data Transfer
+T}:T{
+.hy 0
+.ad l
+MG_DATA_REQ, MG_DATA_IND
+T}
+_:_:_
+T{
+.hy 0
+.ad l
+Session Release
+T}:T{
+.hy 0
+.ad l
+Disconnection
+T}:T{
+.hy 0
+.ad l
+MG_DISCON_REQ, MG_DISCON_IND, MG_DISCON_CON
+T}
+\^:_:_
+\^:T{
+.hy 0
+.ad l
+Leave
+T}:T{
+.hy 0
+.ad l
+MG_LEAVE_REQ, MG_LEAVE_IND, MG_LEAVE_CON
+T}
+.TE

@@ -1,0 +1,114 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+lbss|lbss|cb|cb
+lss|lss|c|c.
+Q.850:Description:ITU:IETF
+=
+\s-2CC_CAUS_NO_CCT_AVAILABLE\s+2:T{
+.ad l
+.hy 0
+\fIresource unavailable\fP
+T}:\fC480\fP:\fC503\fP
+\s-2CC_CAUS_NO_CCT_AVAILABLE\s+2:T{
+.ad l
+.hy 0
+\fIresource unavailable\fP
+T}:\fC486\fP:\fC503\fP
+\s-2CC_CAUS_NETWORK_OUT_OF_ORDER\s+2:T{
+.ad l
+.hy 0
+\fInetwork out of order\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_TEMPORARY_FAILURE\s+2:T{
+.ad l
+.hy 0
+\fItemporary failure\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_SWITCHING_EQUIP_CONGESTION\s+2:T{
+.ad l
+.hy 0
+\fIswitching equipment congestion\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_ACCESS_INFO_DISCARDED\s+2:T{
+.ad l
+.hy 0
+\fIaccess information discarded\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_REQUESTED_CCT_UNAVAILABLE\s+2:T{
+.ad l
+.hy 0
+\fIrequested circuit/channel not available\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_PRECEDENCE_CALL_BLOCKED\s+2:T{
+.ad l
+.hy 0
+\fIprecedence call blocked\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_RESOURCE_UNAVAILABLE\s+2:T{
+.ad l
+.hy 0
+\fIresource unavailable, unspecified\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_NOT_SUBSCRIBED\s+2:T{
+.ad l
+.hy 0
+\fIrequested facility not subscribed\fP
+T}:\fC500\fP:\-
+\s-2CC_CAUS_OGC_BARRED_WITHIN_CUG\s+2:T{
+.ad l
+.hy 0
+\fIoutgoing calls barred within CUG\fP
+T}:\fC500\fP:\fC403\fP
+\s-2CC_CAUS_ICC_BARRED_WITHIN_CUG\s+2:T{
+.ad l
+.hy 0
+\fIincoming calls barred within CUG\fP
+T}:\fC500\fP:\fC403\fP
+\s-2CC_CAUS_BC_NOT_AUTHORIZED\s+2:T{
+.ad l
+.hy 0
+\fIbearer capability not authorized\fP
+T}:\fC500\fP:\fC403\fP
+\s-2CC_CAUS_BC_NOT_AVAILABLE\s+2:T{
+.ad l
+.hy 0
+\fIbearer capability not presently available\fP
+T}:\fC500\fP:\fC503\fP
+\s-2CC_CAUS_INCONSISTENCY\s+2:T{
+.ad l
+.hy 0
+\fIinconsistency in designated outgoing access information and subscriber class\fP
+T}:\fC500\fP:\-
+\s-2CC_CAUS_SERVICE_OPTION_NOT_AVAILABLE\s+2:T{
+.ad l
+.hy 0
+\fIservice or option not available, unspecified\fP
+T}:\fC500\fP:\-
+.TE

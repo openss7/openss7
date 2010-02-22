@@ -1,0 +1,52 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+lb|cb|cb|cb|cb|cb|lb|lb
+l|l|c|n|n|c|n|n.
+Part Number:Rate:FM:nm:km:Digikey PN:Price:Avnet
+=
+SSFP3161-13-125+:OC-48:S:1310:2:::
+SSFP3261-23-125+:OC-48:S:1310:15:::
+SSFP5261-23-125+:OC-48:S:1550:40:::
+SSFP5561-33-125+:OC-48:S:1550:80:::
+SSFP3251-13-125:OC-24:S:1310:30:::
+SSFP5251-13-125:OC-24:S:1550:60:::
+SSFP5251-23-125:OC-24:S:1550:80:::
+SSFP3141-13-125+:OC-12:S:1310:20:::
+SSFP3141-23-125+:OC-12:S:1310:40:::
+SSFP5241-13-125+:OC-12:S:1550:40:::
+SSFP5241-23-125+:OC-12:S:1550:80:::
+SSFP3131-13-125+:OC-3:S:1310:20:::
+SSFP3131-23-125+:OC-3:S:1310:40:::
+SSFP3231-43-125+:OC-3:S:1310:80:::
+SSFP5131-13-125+:OC-3:S:1550:20:::
+SSFP5131-43-125:OC-3:S:1550:100:::
+SSFP5231-13-125+:OC-3:S:1550:40:::
+SSFP5231-23-125+:OC-3:S:1550:100:::
+.TE

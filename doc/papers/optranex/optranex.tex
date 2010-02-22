@@ -1,0 +1,582 @@
+\documentclass[letterpaper,final,notitlepage,twocolumn,10pt,twoside]{article}
+\usepackage{ftnright}
+\usepackage{makeidx}
+\usepackage{pictex}
+%\usepackage{psfig}
+%\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{eepic}
+%\usepackage{epsfig}
+%\usepackage[dvips]{graphicx,epsfig}
+%\usepackage[dvips]{epsfig}
+%\usepackage{epsf}
+\usepackage{natbib}
+\usepackage{placeins}
+%\usepackage{placeins}
+
+\setlength{\voffset}{-1.2in}
+\setlength{\topmargin}{0.2in}
+\setlength{\headheight}{0.2in}
+\setlength{\headsep}{0.3in}
+\setlength{\topskip}{0.0in}
+\setlength{\footskip}{0.3in}
+\setlength{\textheight}{10.0in}
+
+\setlength{\hoffset}{-1.0in}
+\setlength{\oddsidemargin}{0.5in}
+\setlength{\evensidemargin}{0.5in}
+\setlength{\textwidth}{7.5in}
+
+\setlength{\marginparwidth}{0.0in}
+\setlength{\marginparsep}{0.0in}
+
+\setlength{\columnsep}{0.3in}
+\setlength{\columnwidth}{3.6in}
+%\setlength{\columnseprule}{0.25pt}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+\let\Huge = \huge
+\let\huge = \LARGE
+\let\LARGE = \Large
+\let\Large = \large
+\let\large = \normalsize
+\let\normalsize = \small
+\let\small = \footnotesize
+\let\footnotesize = \scriptsize
+\let\scriptsize = \tiny
+
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-2ex \@plus -1ex \@minus -.2ex}%
+                                   {1ex \@plus .2ex}%
+                                   {\normalfont\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1.5ex \@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-1.25ex\@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                    {1.5ex \@plus .5ex \@minus .2ex}%
+                                    {-1em}%
+                                    {\normalfont\normalsize\bfseries\slshape}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                       {0ex \@plus 0ex \@minus 0ex}%
+                                       {-1em}%
+                                      {\normalfont\normalsize\bfseries\slshape}}
+\makeatother
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{6}
+
+\pagestyle{plain}
+%\pagestyle{myheadings}
+%\markboth{B. Bidulock}{B. Bidulock}
+
+\makeglossary
+
+\newcommand{\topfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\botfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\dblfigrule}{\vspace{0.5ex}\rule{\textwidth}{0.4pt}\vspace{0.5ex} }
+
+%\bibliographystyle{unsrtnat}
+%\bibliographystyle{plainnat}
+%\bibliographystyle{ieeetr}
+%\bibliographystyle{abbrvnat}
+%\bibliographystyle{acm}
+\bibliographystyle{plainnat}
+%\bibliographystyle{alpha}
+
+\begin{document}
+
+%\begin{titlepage}
+%\begin{center}
+%    STREAMS vs. Sockets Performance Comparison\\
+%    Experimental Test Results
+%\end{center}
+%\end{titlepage}
+
+\title{High Density SONET/SDH MG Interface for VoIP Trunking\\[0.5ex]
+	{\large \textsl{Draft Patent Application}}}
+\author{Brian Bidulock\thanks{bidulock@openss7.org}\\
+	OpenSS7 Corporation}
+\date{February 7, 2010}
+\maketitle
+
+\begin{abstract}
+\addcontentsline{toc}{section}{Abstract}
+An embodiment of a synchronous network to packet mapping and conversion device
+and methods for operating same are described.  This device may support the
+interconnection of synchronous optical networks using the SONET and SDH
+standards to Internet Protocol packet networks, and may be capable of
+converting plesiochronous digital hierarchy (PDH) time-domain multiplexed
+(TDM) signals contained within synchronous optical network frames to and from
+representations of the TDM samples, such representations contained in packets
+transferred over an interface to and from a packet network.
+\end{abstract}
+
+% \tableofcontents
+
+\FloatBarrier
+\addcontentsline{toc}{section}{References}
+\bibliography{optranex}
+
+\begin{figure}[htp]
+\center\includegraphics[width=3.5in]{optranex_fig01}
+\label{figure:optranex_fig01}
+\end{figure}
+
+\section[Field]{Field of the Invention}
+
+The present invention relates to the transformation of time-domain multiplexed
+(TDM) samples contained in plesiochronous digital hierarchy (PDH) signals
+transported by SONET/SDH synchronous optical networks, this transformation
+being from the time domain multiplexed (TDM) samples to representations of the
+TDM samples contained within packets exchanged over a packet network.  One
+possible application of this transformation being the interconnection of a
+public switched telephone network (PSTN) and an Internet Protocol based
+internetwork, commonly referred to by one skilled in the art as a media
+gateway (MG) function.
+
+\section[Background]{Background to the Invention}
+
+Aspects of the present invention relate to the efficient conversion of signals
+formatted for transport over traditional telecommunications synchronous
+optical networks to signals formatted for transport over the well known
+Internet Protocol (IP). \nocite{rfc791}
+
+In a traditional telecommunications synchronous optical network, data is
+transmitted from one location to another as a continuous stream of digital
+information moving from the source to the destination at a constant rate.  The
+stream is organized as a sequence of frames, each frame containing a fixed
+number of fields in a defined order, each field of the same length.  The
+Synchronous Optical Network (SONET) and Synchronous Digital Hierarchy (SDH)
+are the principle synchronous optical network standards currently in use.
+
+Synchronous optical networking (SONET) and synchronous digital hierarchy (SDH)
+are mechanisms commonly used for transporting time division multiplexing (TDM)
+samples embedded within a plesiochronous digital hierarchy (PDH) signal on
+a communications link.  Transmission networks for transporting TDM signals
+over a network of SONET/SDH communications links are commonly used within the
+field of the present invention for connecting telephone network switching
+equipment (e.g. telephone switches) into a telecommunications network.
+Consider for example, a single optical fibre connecting multiple voice or data
+channels between call switches of a telephone network.
+
+Another common mechanism for transporting TDM signals over a communications
+network makes use of the well known Internet Protocol (IP) for transport.  For
+example, the audio-visual profile of the Real Time Protocol (RTP) standardized
+by the Internet Engineering Task Force (IETF) is commonly used to transport
+pulse code modulation (PCM) encoded voice signals across a packet network
+using RTP. \nocite{rfc1889}
+
+Telephone network operators are keen to make use of both SONET/SDH and packet
+networks to carry user traffic.  To enable packet networks to interwork with
+conventional SONET/SDH networks, it is necessary to provide a mechanism for
+efficiently converting to and from the SONET/SDH format and the packet format.
+
+Current state of the art mechanisms for converting between the SONET/SDH
+format and the TDM formats used by telephone switches use a mechanism to
+convert between the SONET/SDH format used by the transport network and the TDM
+format used to connect to network switches.  The traditional mechanisms used
+to convert TDM formatted signals into the SONET/SDH signals used by the
+transport network adhere to stringent delay and jitter requirements.
+
+Synchronous optical networks are the primary transport mechanism for long
+distance transmission of information.  Some legacy equipment (e.g. a
+traditional telephone switch) requires lower speed time-division-multiplexed
+(TDM) network connections following the plesiochronous digital hierarchy
+(PDH) as standardized by the International Telecommunications Union in
+recommendations \nocite{g703} G.703 and \nocite{g704} G.704.
+
+The functionality that may be needed to connect a SONET or SDH synchronous
+optical network and a packet network includes that of an Add-Drop Multiplexer
+(ADM), terminal multiplexer (TM), a Digital Cross-Connect (DCC), and a
+Multi-Services Provisioning Platform (MSPP).  An ADM may be used to transport
+SONET or SDH traffic on network ring topologies.  The ADM are nodes on such
+rings that are used to arbitrate (add or drop) traffic to or from the ring.  A
+SONET/SDH terminal multiplexer performs a function similar to that of an ADM
+except that the network connection is not in a ring configuration.  A terminal
+multiplexer terminates a high-speed point-to-point SONET path, and hands off a
+number of lower rate lines and paths on the client side.  A DCC is a circuit
+switch and digital multiplexer used to switch and groom traffic between
+different lines and paths.  A network may include several ADM and terminal
+multiplexers to arbitrate or terminate traffic along rings or point-to-point
+connections, and a DCC may be used to multiplex and switch the traffic between
+all the paths.  A Multi-Service Provisioning Platform combines the
+functionality of the DCC, the ADM, and the terminal along with the ability to
+support data protocols such as Ethernet to the client users.
+
+Recent advances in integrated circuits has permitted the functions of the ADM,
+TM, DCC and MSPP to be combined or individually performed using application
+specific integrated circuits (ASIC) or field programmable gate arrays (FPGA).
+
+A current approach, well known to one skilled in the art, for converting
+isochronous TDM signals to and from packets containing representations of
+these TDM signals uses a mechanism that converts between the TDM signals
+carried on low-speed plesiochronous digital hierarchy (PDH) interfaces
+provided by a Digital Cross-Connect and used to connect telephone signals
+(e.g. T1 carriers) and packets containing representations of those TDM
+signals.  Examples of mechanisms in current use and well known to one skilled
+in the art include digital signal processors (DSP).  Digital signal processors
+are specialized devices that are capable of transforming the isochronous TDM
+signals to representations of those signals without degrading the low delay
+and jitter exhibited by the TDM signals.  For examples, mechanisms built from
+digital signal processors are in existence within the telephone network that
+add as little as 125 microseconds of delay between between a voice sample in
+the TDM signal at the input of the DSP and the representation of the voice
+sample suitable for placement in a packet at the output of the DSP.
+
+In contrast, packet networks used to carry TDM signals using the well known
+Internet Protocol (IP), have delay and jitter requirements that are greatly
+relaxed in comparison to those traditionally required for conversions between
+SONET/SDH signals and TDM signals, and further for conversions to and from TDM
+signals and packets containing the representations of those signals.  Methods
+well known to one of skill in the art for compensating for increased jitter is
+by transforming increased jitter to, instead, an increased delay by buffering
+the signal for a period and then playing out the signal at a later time, and
+on more regular intervals, reducing jitter.  Methods well known to one of
+skill in the art for compensating for the reduced perceived voice quality
+cause by increased delay include algorithms for performing suppression or
+elimination of the effects of echo and singing.
+
+Also, the very nature of the placing in packets of representations of the TDM
+signals requires that a plurality of consecutive voice samples within the TDM
+signal be collected, formatted, and placed into each packet.  Collection of
+the necessary plurality of TDM samples requires that the packet into which
+their representations will be contained must await the last TDM sample before
+being transmitted.  For commonly used voice over packet formats familiar to
+one skilled in the art, such as that of the Internet Engineering Task Force
+audio-visual profile for the Real-Time Transport protocol, the delay from the
+first TDM sample in the sequence to the last may typically be from as little
+as 10 milliseconds to as much as 30 milliseconds in duration.  This duration
+of time translates to a delay from the moment in time that a given TDM sample
+enters the telecommunications system at the sender to the the moment of time
+that the given TDM sample exits the telecommunications network at the
+receiver.
+
+A limitation of approaches using ADM, terminal multiplexers, DCC and DSP to
+convert TDM signals transported by SONET/SDH networks and representations of
+those TDM signals in packets transported over a packet network lies in the
+conversion of SONET/SDH serial data streams to the representations of TDM
+signals suitable for transport in a packet over the packet network.
+Currently, these conversions use traditional digital multiplex equipment (DME)
+and digital signal processors (DSP) to maintain the low delay and jitter
+characteristics of the TDM signals as transported by the synchronous optical
+network in the Add-Drop Multiplexers that add and drop the signals from
+optical networks in ring topologies; in the terminal multiplexers and Digital
+Cross-Connects that extract and switch intermediate and low-speed isochronous
+TDM signals from the SONET/SDH signals; and in Digital Signal Processors used
+to transform TDM signals to representations of the TDM signals suitable to be
+included in packets transferred to and from a packet network.  Maintaining the
+low delay and jitter required of traditional TDM digital multiplex equipment,
+and also the use of digital signal processors to achieve same, contributes
+significantly to the cost of systems using these traditional methods.
+
+Consequently, there is a need for a compact, low power and cost-effective
+means of interconnecting synchronous optical networks and packet networks for
+the transport of TDM signals and representations of the TDM signals in packets.
+Such means should avoid the sizable, high-power and inefficient mechanisms
+that are predicated on the preservation of the low delay and jitter
+characteristics of TDM signals during the conversion process.
+
+Further limitations and disadvantages of conventional and traditional
+approaches will become apparent to one of skill in the art, through comparison
+of such systems with some aspects of the present invention as set forth in the
+remainder of the present application with reference to the drawings.
+
+\section[Summary]{Summary of the Invention}
+
+According to a first aspect of the present invention there is provided a
+method of transforming the isochronous TDM signals contained in pleisochronous
+digital hierarchy (PDH) frames transported by a SONET/SDH network to and from
+packets containing representations of the transported TDM signal information
+for transmission and reception over a packet network.
+
+Another aspect of the current invention relates to a method that, unlike the
+current and traditional methods, relaxes timing constraints placed on the
+process of converting isochronous TDM signals carried in PDH frames by the
+SONET/SDH network to and from the representation of the TDM signals contained
+in packets transmitted and received over a packet network.  This aspect of the
+present invention relaxes the timing constraints placed on the conversion
+method, at one or more stages of the conversion, to the lesser timing
+constraints required by the transport of the representations of the TDM
+signals in packets over a packet network, from the more stringent timing
+constraints required for the transport of the TDM signals over a traditional
+telephone network.
+
+An aspect of the current invention relates to the relaxation of time
+constraints that allows the TDM signals to be extracted from the PDH frames
+carried in synchronous payload envelopes by the SONET/SDH network to be saved
+in a storage mechanism or delayed in a delay mechanism until the data therein
+can be processed in blocks more efficiently by general purpose processors.
+
+An embodiment of the present invention may comprise at least one optical
+network interface for terminating a receive serial data stream, and for
+generating a transmit data stream; and, at least one system interface for
+transferring received data to a storage or delay mechanism, and for retrieving
+data to be transmitted from the storage or delay mechanism; at least one
+packet interface for receiving packets from a packet network, and transmitting
+packets to a packet network; and a mechanism for converting the data
+transferred to the storage or delay mechanism into a sequence of packets for
+transmission, and for converting received packets into data saved to the
+storage or delay mechanism.
+
+The at least one optical network interface of an embodiment in accordance with
+the present invention may be compatible with the Telcordia GR-253-CORE
+\nocite{gr253core} or corresponding later SONET standard, and may be
+compatible with the International Telecommunication Union Synchronous Digital
+Hierarchy (SDH) standard.  It may be capable of supporting at least SONET
+STS-3 capacity on each of the receive serial data stream and the transmit data
+stream, and may support automatic protection switching compliant with the
+American National Standards Institute T1.105.01-5000 or corresponding later
+standard.  It may use optical or electrical interface modules compatible with
+the Small Form Factor Committee INF-8074i Specification for SFP (Small
+Formfactor Pluggable) Transceiver Revision 1.0 or corresponding later
+standard. \nocite{inf8074}
+
+The at least one packet interface of an embodiment in accordance with the
+present invention may be compatible with the IEEE 802.3ab, IEEE 802.3z or
+later equivalent Gigabit Ethernet standard.
+
+The at least one system interface of an embodiment in accordance with the
+present invention may be compatible with the Peripheral Component Interconnect
+Special Interest Group (PCI-SIG) PCI Express Card Electromechanical
+Specification Revision 1.1 or later equivalent standard.  \nocite{PCIeCEM} The
+at least one system interface so compatibile may allow an embodiment of the
+current invention to transfer SONET/SDH data for conversion between the
+SONET/SDH interface and a storage or delay mechanism to defer processing of
+the data until the stored data can be more efficiently processed in block
+operations.
+
+These and other advantages, aspects, and novel features of the present
+invention, as well as details of illustrated embodiments, thereof, will be
+more fully understood from the following description and drawings.
+
+\onecolumn
+\begin{figure}[htp]
+\center\includegraphics[width=9.0in,angle=90]{optranex_fig01}
+\caption[Figure1]{}
+\label{figure:optranex_fig01}
+\end{figure}
+\twocolumn
+
+\section[Drawings]{Brief Description of the Drawings}
+
+\textbf{Figure \ref{figure:optranex_fig01}} comprises a block diagram
+illustrating one preferred embodiment of the current invention.
+
+\section[Description]{Detailed Description of Certain Embodiments}
+
+An embodiment of the present invention may provide the functionality needed to
+allow TDM signals carried over a synchronous optical network to be converted
+to and from representations of the TDM signals within packets transported over
+a packet network in a more efficient manner that may be lower in cost, consume
+less power, or occupy a smaller physical space, than existing alternatives,
+and may be incorporated into an add-in circuit card for a general purpose
+computer.  It may also be used to convert TDM signals to their packet
+representations in a cost effective manner incorporated into an add-in circuit
+card for an add/drop multiplexer (ADM), a terminal multiplexer (TM), a Digital
+Cross-Connect (DCC) or a multi-services provisioning platform (MSPP).  It may
+also be used to convert TDM signals to their packet representations in
+application specific integrated circuits (ASIC) or field programmable gate
+arrays (FPGA) integrated with other components on an add-in card with a
+system.
+
+An embodiment in accordance with the present invention may comprise at least
+one synchronous optical network interface, at least one system interface, and
+at least one packet network interface.
+
+Another embodiment in accordance with the current invention may comprise at
+least one synchronous optical network interface and at least one system
+interface.  In such an embodiment, the at least one synchronous optical
+network interface may be capable of providing for the transport of both TDM
+signals and representations of TDM signals in packets, both using the
+synchronous optical network for transport.
+
+
+
+\textbf{Figure \ref{figure:optranex_fig01}} shows a block diagram illustrating
+the functional elements in one embodiment of the present invention.  An
+embodiment in accordance with the present invention may support both SONET TDM
+and packet services and may function as a SONET/SDH/PDH/IP media gateway.  The
+embodiment in accordance with the current invention comprises at least one
+SONET/SDH network interface \textbf{101} and \textbf{102}; at least one packet
+network interface \textbf{111}; and at least one system interface
+\textbf{107}.  This embodiment comprises a PCI Express add-in card
+\textbf{112} that contains a SONET/SDH transceiver \textbf{103} that may
+convert optical signals into electrical signals; SONET/SDH framer \textbf{104}
+extracts synchronous payload envelopes (SPE) from the SONET/SDH stream; FPGA
+or ASIC \textbf{105} passes the SPE to and from the PCI Express interface chip
+\textbf{106} that may transfer SPE to and from system memory \textbf{108} in
+an asynchronous transaction-oriented manner over a system bus \textbf{107}.  A
+computer processor \textbf{109} reads and writes the contents of the SPE so
+transferred to and from memory and converts between the TDM samples contained
+in the PDH signals embedded in the SPE to the representation of the TDM
+signals contained in packets; and transfers the packets to the packet network
+\textbf{111} using the network interface card \textbf{110}.  In accordance
+with the specification of the current invention, the computer processor
+\textbf{109} has a relaxed time constraint for each of: the extraction of PDH
+signals embedded within the SPE, the demultiplex of the TDM samples
+contained within the PDH signals, the conversion of the TDM samples to
+representations of the TDM samples suitable to be included in packets, and the
+inclusion of the representation of the TDM samples in packets transfered to
+the packet network \textbf{111}.
+
+
+In an alternative embodiment in accordance with the current invention, the at
+least one network interface \textbf{111} may be instead combined with the
+synchronous optical network interface \textbf{101} and \textbf{102}.  In this
+embodiment in accordance with the current invention, the packets containing
+representations of TDM samples are instead embedded into SPE and passed by the
+computer processor \textbf{109} over the system bus \textbf{107} into system
+memory \textbf{108} where the SPE are subsequently read by the PCI Express
+interface chip \textbf{106} via the FPGA or ASIC device \textbf{105} to the
+SONET/SDH framer \textbf{104} and SONET/SDH transceiver \textbf{103} for
+transmission to the SONET/SDH network \textbf{101} or \textbf{102}.  This
+embodiment of the current invention may not require the capabilities of a
+network interface card \textbf{110} nor packet network interface \textbf{111};
+but, rather, the packet network is attached to the SONET/SDH interface
+\textbf{101} or \textbf{102}.
+
+In a further embodiment in accordance with the current invention, the
+SONET/SDH transceiver \textbf{103}, SONET/SDH framer \textbf{104}, FPGA or
+ASIC device \textbf{105}, PCI Express interface chip \textbf{106}, and network
+interface card \textbf{110}, may be severally or individually combined into at
+least one FPGA or ASIC.
+
+In an additional embodiment in accordance with the current invention, the FPGA
+or ASIC device \textbf{105} may be capable of extracting the PDH frames
+embedded within the SONET/SDH SPE and transferring those PDH frames to the
+system memory \textbf{108} via the PCI Express interface chip \textbf{106}
+and system bus \textbf{107}.  In this embodiment, the computer processor
+\textbf{109} acts to extract the TDM samples from the PDH frames and converts
+them to representations of the TDM samples in packets transferred to the
+packet network \textbf{111}.  In this embodiment in accordance with the
+current invention, time constraints on the processing of PDH frames is relaxed
+to those of the packet network \textbf{111} to allow for efficient processing.
+
+
+
+Accordingly, the present invention may be realized in hardware, or software,
+or a combination of hardware and software.  The present invention may be
+realized in a centralized fashion in one computer system, or in a distributed
+fashion where different elements are spread across several interconnected
+computer systems.  Any kind of computer system or other apparatus adapted for
+carrying out the methods described herein is suited.  A typical combination of
+hardware and software may be a general-purpose computer system with a computer
+program that, when being loaded and executed, controls the computer system
+such that it carries out the methods described herein.
+
+The present invention also be embedded in a computer program product, which
+comprises all the features enabling the implementation of the methods
+described herein, and which when loaded in a computer system is able to carry
+out these methods.  Computer program in the present context means any
+expression, in any language, code or notation, of a set of instructions
+intended to cause a system having an information processing capability to
+perform in a particular function either directly or after either or both of
+the following: a) conversion to another language, code or notation; b)
+reproduction in a different material form.
+
+Notwithstanding, the invention and its inventive arrangements disclosed herein
+may be embodied in other forms without departing from the spirit or essential
+attributes thereof.  Accordingly, reference should be made to the following
+claims, rather than to the foregoing specification, as indicating the scope of
+the invention.  In this regard, the description above is intended by way of
+example only and is not intended to limit the present invention in any way,
+except as set forth in the following claims.
+
+While the present invention has been described with reference to certain
+embodiments, it will be understood by one skilled in the art that various
+changes may be made and equivalents may be substituted without departing from
+the scope of the present invention.  Also, many modifications may be made to
+adapt a particular situation or material to the teachings of the present
+invention without departing from its scope.  Therefore, it is intended that
+the present invention not be limited to the particular embodiment disclosed,
+but that the present invention will include all embodiments falling within the
+scope of the appended claims.
+
+It will be appreciated by the person of skill in the are that various
+modifications may be made to the embodiments described above without departing
+from the scope of the present invention.  For example, the relaxation of TDM
+timing constraints may occur at different stages between the SONET/SDH signal
+and the packet containing representations of the TDM signal, depending upon
+the availability of commonly used components.  Interfaces between components
+may be optical or electrical in nature.  The invention is applicable to
+systems with any number of channels and streams including single
+stream/multiple channel systems and multiple stream/single channel systems.
+Conversion may be performed by one or more application specific integrated
+circuits (ASIC), field programmable gate arrays (FPGA), microprocessors or
+computer processors.  The SONET/SDH to packet conversion may be implemented in
+software rather than hardware, or by a combination of hardware and software.
+
+\section[Claims]{Claims}
+
+What is claimed is:
+
+\begin{enumerate}
+\item A media gateway devices that comprises at least one synchronous optical
+network interface; at least one system interface; and, at least one packet
+network interface; where
+\begin{description}
+\item one or more synchronous payload envelopes (SPE) are transferred to and
+from the at least one optical network interface to and from a storage or delay
+mechanism permitting asynchronous extraction and insertion of plesiochronous
+digital hierarch (PDH) frames from and to the contents of the one or more SPE
+in an asychronous sequence not subject to regular isochronous time constraints;
+\item one ore more plesiochronous digital hierarchy (PDH) frames are
+transferred to and from a storage or delay mechanism permitting asynchronous
+demultiplexing and multiplexing of time-domain-multiplexing (TDM) samples from
+and to the one or more PDH frames in an asychronous sequence not subject to
+regular isochronous time constraints;
+\item one or more TDM samples are converted to and from representations of the
+TDM samples suitable for insertion into or extraction from one or more
+packets in an asynchronous sequence not subject to regular isochronous time
+constraints;
+\item one or more representations of TDM samples are transferred to or from a
+storage or delay mechanism to be inserted into or extracted from the sequence
+of one or more packets in an asychronous sequence not subject to regular
+isochronous time constraints; and,
+\item one or more packets are transferred to or from the at least one packet
+network interface in an asynchronous sequence not subject to regular
+isochronous time constraints.
+\end{description}
+\item The device of claim 1, wherein the at least one packet network interface
+is not necessary for transfering packets to the packet network because packets
+are instead transfered over the at least one synchronous optical network
+interface.
+\item The device of claim 1, wherein the extraction or insertion of PDH frames
+from the SPE of the SONET/SDH signal is performed instead in the traditional
+isochronous manner.
+\item The device of claim 1, wherein the demultiplexing or multiplexing of TDM
+samples from and to the PDH frames is performed instead in the traditional
+isochronous manner.
+\item The device of claim 3, wherein the demultiplexing or multiplexing of TDM
+samples from and to the PDH frames is performed instead in the traditional
+isochronous manner.
+\item The device of claim 4, wherein the conversion of TDM samples to and from
+representations of the TDM samples for placement into or removal from packets
+is performed instead in the traditional isochronous manner.
+\item The device of claim 2, wherein the extraction or insertion of PDH frames
+from the SPE of the SONET/SDH signal is performed instead in the traditional
+isochronous manner.
+\item The device of claim 2, wherein the demultiplexing or multiplexing of TDM
+samples from and to the PDH frames is performed instead in the traditional
+isochronous manner.
+\item The device of claim 7, wherein the demultiplexing or multiplexing of TDM
+samples from and to the PDH frames is performed instead in the traditional
+isochronous manner.
+\item The device of claim 8, wherein the conversion of TDM samples to and from
+representations of the TDM samples for placement into or removal from packets
+is performed instead in the traditional isochronous manner.
+\end{enumerate}
+
+% \clearpage
+% \begin{appendix}
+% \end{appendix}
+
+\end{document}
