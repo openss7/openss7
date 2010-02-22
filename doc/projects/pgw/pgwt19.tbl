@@ -1,0 +1,74 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|lbs|lbs|lb
+n|ls|ls|c.
+Q.850:Description:Q.1912.5 SIP Response:RFC3398
+=
+34:T{
+.ad l
+.hy 0
+\fIresource unavailable\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC503\fP
+34:T{
+.ad l
+.hy 0
+\fIresource unavailable\fP
+T}:\fC486 Busy Here\fP (CCBS possible):\fC503\fP
+38-47:T{
+.ad l
+.hy 0
+\fIresource unavailable\fP
+T}:\fC500 Server Internal Error\fP:\fC503\fP
+50:T{
+.ad l
+.hy 0
+\fIrequested facility not subscribed\fP
+T}:\fC500 Server Internal Error\fP:\-
+55:T{
+.ad l
+.hy 0
+\fIincoming calls barred within CUG\fP
+T}:\fC500 Server Internal Error\fP:\fC403\fP
+57:T{
+.ad l
+.hy 0
+\fIbearer capability not authorized\fP
+T}:\fC500 Server Internal Error\fP:\fC403\fP
+58:T{
+.ad l
+.hy 0
+\fIbearer capability not presently available\fP
+T}:\fC500 Server Internal Error\fP:\fC503\fP
+63:T{
+.ad l
+.hy 0
+\fIservice or option not available, unspecified\fP
+T}:\fC500 Server Internal Error\fP:\-
+.TE

@@ -1,0 +1,46 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+lb|cb|cb|cb|cb|cb|lb|lb
+l|l|c|n|n|c|n|n.
+Part Number:Rate:FM:nm:km:Digikey PN:Price:Avnet
+=
+SP-MR-SR1:OC-48/12/3:S:1310:2:::
+SP-MR-IR1:OC-48/12/3:S:1310:15:::
+SP-MR-IR2:OC-48/12/3:S:1550:40:::
+SP-MR-LR1:OC-48/12/3:S:1310:40:::
+SP-MR-LR2:OC-48/12/3:S:1550:80:::
+SP-DR-IR1:OC-12/3:S:1310:15:::
+SP-12-IR1:OC-12:S:1310:15:::
+SP-12-LR1:OC-12:S:1310:40:::
+SP-12-LR2:OC-12:S:1550:80:::
+SP-03-IR1:OC-3:S:1310:15:::
+SP-03-LR1:OC-3:S:1310:40:::
+SP-03-LR2:OC-3:S:1550:80:::
+.TE

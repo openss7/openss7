@@ -1,0 +1,85 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center expand tab(:);
+lb|lb|lb
+lb|lb|lb
+l|l|l.
+ISUP:P-Charge-Info:Reference:Description
+Parameter:Field
+=
+T{
+.ad l
+.hy 0
+Incoming Trunk Group
+T}:\fCtgrp=\fP parameter:RFC 4904:T{
+T}
+_
+T{
+.ad l
+.hy 0
+Charge Number
+.br
+Calling Party Number
+.br
+Called Party Number
+T}:T{
+\fCtelephone-subscriber\fP
+T}:RFC 3966:T{
+When the \fICalling Party Number\fP parameter is present in the IAM, the \fCtelephone-subscriber\fP
+portion of the \fBtel\fP URI will contain the international E.164 number.
+T}
+_
+T{
+.ad l
+.hy 0
+Originating Line Information
+T}:\fColi=\fP parameter:TS 29.163 Annex H:T{
+T}
+_
+T{
+.ad l
+.hy 0
+Jurisdiction Information Parameter
+T}:\fCrn=\fP parameter:RFC 4694:T{
+T}
+_
+T{
+.ad l
+.hy 0
+\-
+T}:\fCnpi=ISDN\fP parameter:draft-york-sipping-p-charge-info-07:T{
+T}
+_
+T{
+.ad l
+.hy 0
+Charge Number
+T}:\fCnoa=\fP parameter:draft-york-sipping-p-charge-info-07:T{
+T}
+.TE

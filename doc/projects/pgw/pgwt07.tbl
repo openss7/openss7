@@ -1,0 +1,49 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 5.9i
+.lt 5.9i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 5.9i
+.nr LT 5.9i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+lb|cb|cb
+l|n|n
+l|n|n
+l|n|n
+lb|cb|cb
+l|n|n
+l|n|n
+l|n|n.
+Physical Dimensions:inches:mm
+=
+Height:1.70:43.2
+Width:16.93:430.0
+Depth:20.0:508
+=
+Clearance (minimum):inches:mm
+=
+Front:2.0:76
+Side:1.0:25
+Rear:3.6:92
+.TE

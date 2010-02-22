@@ -1,0 +1,134 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|lbs|lbs|lb
+n|ls|ls|c.
+Q.850:Description:Q.1912.5 SIP Response:RFC3398
+=
+1:T{
+.ad l
+.hy 0
+\fIunallocated (unassigned) number\fP
+T}:\fC404 Not Found\fP:\fC404\fP
+2:T{
+.ad l
+.hy 0
+\fIno route to network\fP
+T}:\fC500 Server Internal Error\fP:\fC404\fP
+3:T{
+.ad l
+.hy 0
+\fIno route to destination\fP
+T}:\fC500 Server Internal Error\fP:\fC404\fP
+4:T{
+.ad l
+.hy 0
+\fIsend special information tone\fP
+T}:\fC500 Server Internal Error\fP:\-
+5:T{
+.ad l
+.hy 0
+\fImisdialled trunk prefix\fP
+T}:\fC404 Not Found\fP:\-
+8:T{
+.ad l
+.hy 0
+\fIpreemption\fP
+T}:\fC500 Server Internal Error\fP:\-
+9:T{
+.ad l
+.hy 0
+\fIpreemption-circuit reserved for reuse\fP
+T}:\fC500 Server Internal Error\fP:\-
+16:T{
+.ad l
+.hy 0
+\fInormal call clearing\fP
+T}:\-:\-
+17:T{
+.ad l
+.hy 0
+\fIuser busy\fP
+T}:\fC486 Busy Here\fP:\fC486\fP
+18:T{
+.ad l
+.hy 0
+\fIno user responding\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC408\fP
+19:T{
+.ad l
+.hy 0
+\fIno answer from the user\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC480\fP
+20:T{
+.ad l
+.hy 0
+\fIsubscriber absent\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC480\fP
+21:T{
+.ad l
+.hy 0
+\fIcall rejected\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC403/603\fP
+22:T{
+.ad l
+.hy 0
+\fInumber changed\fP
+T}:\fC410 Gone\fP:\fC301\fP
+23:T{
+.ad l
+.hy 0
+\fIredirection to new destination\fP
+T}:\-
+25:T{
+.ad l
+.hy 0
+\fIexchange routing error\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC410\fP
+27:T{
+.ad l
+.hy 0
+\fIdestination out of order\fP
+T}:\fC502 Bad Gateway\fP:\fC502\fP
+28:T{
+.ad l
+.hy 0
+\fIinvalid number format (address incomplete)\fP
+T}:\fC484 Address Incomplete\fP:\fC484\fP
+29:T{
+.ad l
+.hy 0
+\fIfacility rejected\fP
+T}:\fC500 Server Internal Error\fP:\fC501\fP
+31:T{
+.ad l
+.hy 0
+\fInormal unspecified\fP
+T}:\fC480 Temporarily Unavailable\fP:\fC480\fP
+.TE

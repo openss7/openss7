@@ -1,0 +1,268 @@
+OpenSS7 - LiS readme file.  2010-02-19
+$Id: README-LiS,v 1.1.2.9 2009-09-08 10:46:51 brian Exp $
+Copyright (c) 2008-2010  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+LiS
+===
+So, what about LiS.  Why does OpenSS7 recommend using Linux-Fast STREAMS
+instead of LiS?  This README is to answer that question from a technical
+perspective.
+
+Operational Problems
+====================
+
+LiS exhibits crashes and kernel locks on all architectures.  Some
+serious known problems are as follows:
+
+q_next
+------
+LiS does not provide plumbing locks or protection for the connection of
+STREAMS modules.  A process can call close(2) on a Stream or I_PUSH or
+I_POP a module concurrent with the execution of a put or service
+procedure.  I refer to this as the "q_next" bug because the dereference
+q->q_next can be invalidated while a put or service procedure is
+running, causing a null pointer dereference kernel crash.  qprocson(9)
+and qprocsoff(9) are largely dummy functions in LiS and provide no
+protection in this regard.  Affected functions are open(2), close(2),
+I_PUSH(7), I_POP(7), I_LINK(7), I_PLINK(7), I_UNLINK(7), I_PUNLINK(7).
+Repeatable crashes result from simple test cases that simply push and
+pop modules.  There is no way to fix this.
+
+LFS implements proper plumbing locks by design and does not exhibit this
+problem.
+
+qprocson(9)/qprocsoff(9)
+------------------------
+There is no way in LiS to halt put and service procedure processing
+during the open and close procedures for an LiS module.  qprocson(9) and
+qprocsoff(9) are not properly implemented in LiS and are largely dummy
+functions.  Performing qprocsoff(9) in an LiS module close procedure can
+cause message blocks to be discarded (disappear into a black hole) and
+can cause put and service procedures to run with invalid q->q_ptr
+(either NULL or referencing deallocated structures).  There is no way
+to fix this.  The problem can only be mitigated slighty by using
+extensive private locks in open, close, put and service procedures.
+
+LFS implements proper qprocson(9)/qprocsoff(9) procedures that perform
+half-inserts and half-removals of queue pairs to properly bypass the
+affected module per SVR 4.2 MP specifications.  LiS cannot take this
+approach because it cannot protect the q->q_next dereference in the
+first place because of the "q_next" bug.
+
+freezestr(9)/unfreezestr(9)
+---------------------------
+These functions are not properly implemented in LiS and amount to
+only locking the queue pair with a recursive lock.  Messages are still
+permitted to flow up and down the supposedly frozen stream in other
+queue pairs.  This makes it impossible to use these functions for what
+they are normally used for: freezing the Stream and examining the
+contents of an adjacent queue pair (typically the Stream head read
+queue while pushing or popping a module).  There is no way to fix this.
+
+Further, because LiS does not have a proper nor functional
+freezestr(9)/unfreezestr(9) implementation, all STREAMS DDI functions
+that require freezing the stream for their use can cause locks and
+crashes or corruption.  These include rmvq(9), insq(9), appq(9),
+strqset(9) and strqget(9), making these functions unusable.
+
+LFS implements proper plumbing and freeze locks by design and does
+exhibit this problem.
+
+timeout(9)/untimeout(9)
+-----------------------
+Under SVR 4.2 MP STREAMS, untimeout(9) is not supposed to return until
+either the timeout callback has completed or the timer is cancelled.
+This behaviour is necessary to successfully cancel all callbacks in a
+close procedure before the Stream structures are deallocated.  LiS does
+not provide any synchronization between external callbacks and the
+STREAMS framework.  Under LiS untimeout(9) may return before a the
+associated callback has completed.  The result is crash due to the
+callback function referencing a deallocated queue pair.  There is no way
+to fix this.  Use of private locks results in kernel locks (deadlock)
+instead of crashes.
+
+LFS provides the SVR 4.2 MP assurance and untimout(9) does not return
+before the callback either completes or is cancelled.
+
+bufcall(9)/unbufcall(9)
+-----------------------
+LiS does not provide the assurance that a buffer callback is either
+completed or cancelled before unbufcall(9) returns.  The result is the
+same as untimeout(9) above.  There is no way to fix this.
+
+LFS does not have this problem.
+
+esballoc(9)/freeb(9)
+--------------------
+When an LiS module implemented as a loadable kernel module calls
+esballoc(9) with a free function contained in the loadable kernel module
+and passes it up or down stream, LiS permits the loadable kernel module
+to unload before freeb(9) is called on the message block.  The result is
+that the freeb(9) call references a callback in code sections that no
+longer exist, resulting in kernel crashes.  There is no way to fix this.
+The result is that if esballoc(9) is called anywhere in a system of
+modules and drivers, it is unsafe to unload the kernel module containing
+the callback function.
+
+LFS holds a reference on the kernel module containing the esballoc(9)
+callback function until freeb(9) is called.  It does not have this
+problem.
+
+I_LINK(7)/I_PLINK(7)
+--------------------
+I_LINK(7) and I_PLINK(7) strap in the new put and service procedures for
+the former Stream head queue pair before passing the M_IOCTL message
+downstream to inform the multiplexing driver that the link has been
+performed.  If messages are coming up the linked Stream, the put or
+service procedure can be called without an allocated private structure,
+resulting in kernel crashes when dereferencing q->q_ptr.  There is no
+way to fix this.
+
+LFS sends the M_IOCTL message downstream before swapping put and service
+procedures, allowing the multiplexing driver to prepare the queue pair
+by allocating and assigning a private structure before the put and
+service procedure is activated.  Only after the M_IOCACK has been passed
+back are the put and service procedures activated.
+
+getq(9)/bcanput(9)
+------------------
+LiS has errors in the flow control and backenable logic that cause the
+loss of backenables.  This results in a stalled stream where messages
+exist in the queues of the stream but for which no service procedure is
+enabled.
+
+LFS implements proper SVR 4.2 MP flow control and backenabling.
+
+Syncrhonization
+---------------
+Synchronization in LiS is poorly implemented and can cause missequencing
+and loss of message blocks.  The only way around this is to provide
+sufficient private locks to make all modules fully MP-safe.
+
+LFS implements fully SVR 4.2 MP synchronization as well as Solaris
+perimeters and associated DDI functions, as well as AIX specific
+synchronization modes.
+
+M_IOCTL(9)
+----------
+Input-output control processing is broken in LiS.  LiS requires an
+M_IOCACK or M_IOCNAK after a failed M_COPYIN or M_COPYOUT which is
+against specifications from SVR3 through SVR4.2.  LiS drivers have rely
+on this broken behaviour and it is unfixable.
+
+LFS implements correct SVR 4.2 MP input-output control behaviour.
+
+LiS 2.18 does not run the uppermost module put procedure at user
+context.  This is because it erroneously implements a Stream head write
+queue.  Many STREAMS modules rely on the uppermost module put procedure
+to run at user context.  Under LiS they will result in kernel oops and
+kernel destabilization resulting in kernel locks and crashes.
+
+LFS implements correct SVR 4.2 MP input-output control behaviour and
+runs the uppermost put procedure at user context for the M_IOCTL(9)
+message.
+
+Stream head
+-----------
+The LiS Stream head is full of bugs and races.  The Stream head fails 219
+compliance tests for POSIX conformance from the validation testsuite.
+The LiS Stream head is not thread-safe.  Crashes, lock-ups and
+indeterminate behaviour results on threaded applications and SMP systems.
+
+LFS validates clean.
+
+64-bit Systems
+--------------
+LiS is not 64-bit clean.  There are serious structure alignment issues
+on 64-bit architectures.  All of the input-output control structures,
+iocblk(5), copyreq(5), copyresp(5) and implicated.
+
+LiS does not support 32-bit applications running over a 64-bit kernel.
+LiS has no way of even detecting a 32-bit application.  This
+significantly breaks input-output controls (Stream head as well as
+driver-specific input-output controls).
+
+Behaviour Problems
+==================
+
+All LiS STREAMS DDI functions exhibit bugs (some functions, multiple
+bugs) that cause their behaviour to deviate from SVR 4.2 specifications.
+
+LiS provides a set of lis_ wrapper functions for kernel functions that
+are deprecated, obsolete and unsafe in the Linux kernel.  Examples
+include the deprecated and unsafe lis_sleep(9) function and a host of
+long deprecated PCI functions.
+
+The LiS Stream head is buggy and fails 219 POSIX conformance test suite
+cases.
+
+Conclusions
+===========
+
+LiS is not compatible with any other STREAMS implementation and is
+incompatible with applications written to the UNIX 95, UNIX 98, SUSv1,
+SUSv2, SUSv3 and POSIX standards.
+
+On the other hand, Linux Fast-STREAMS validates to the entire
+POSIX/SUSv3 conformance test suite and is compatible at all levels with
+AIX, HP-UX, IRIX, MacOT, OSF/1, Solaris, SUPER-UX, UnixWare, UXP/V, USL
+DDI/DKI, and other systems based on SVR 4.2 MP.
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2010  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
+
