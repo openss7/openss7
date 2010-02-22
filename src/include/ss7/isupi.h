@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isupi.h,v 1.1.2.1 2009-06-21 11:25:33 brian Exp $
+ @(#) $Id: isupi.h,v 1.1.2.2 2010-02-22 14:48:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:25:33 $ by $Author: brian $
+ Last Modified $Date: 2010-02-22 14:48:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isupi.h,v $
+ Revision 1.1.2.2  2010-02-22 14:48:42  brian
+ - added documentation files to build
+
  Revision 1.1.2.1  2009-06-21 11:25:33  brian
  - added files to new distro
 
@@ -62,7 +65,7 @@
 
 /* This file can be processed by doxygen(1). */
 
-#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  *  ISUP addresss
@@ -443,7 +446,7 @@ enum {
 #define CC_CAUS_FACILITY_NOT_IMPLEMENTED     69	/* Requested facility not implemented */
 #define CC_CAUS_RESTRICTED_BC_ONLY	     70	/* Only restricted digital information
 						   bearer capability is available */
-#define CC_CAUS_SERIVCE_OPTION_NOT_IMPLEMENTED 79	/* Service or option not
+#define CC_CAUS_SERVICE_OPTION_NOT_IMPLEMENTED 79	/* Service or option not
 							   implemented, unspecified */
 /*
    Invalid Message (e.g., Parameter out of Range) Class 

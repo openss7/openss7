@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:46 $ by $Author: brian $
+ Last Modified $Date: 2010-02-22 14:48:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 1.1.2.2  2010-02-22 14:48:41  brian
+ - added documentation files to build
+
  Revision 1.1.2.1  2009-06-21 11:20:46  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $"
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:46 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1750,7 +1753,7 @@ typedef struct isup_msg {
 #define ISUP_MT_CCR	 17UL	/* 0x11 - 0b00010001 - Continuity check request */
 #define ISUP_MT_RSC	 18UL	/* 0x12 - 0b00010010 - Reset circuit */
 #define ISUP_MT_BLO	 19UL	/* 0x13 - 0b00010011 - Blocking */
-#define ISUP_MT_UBL	 20UL	/* 0x14 - 0b00010100 - Unblcoking */
+#define ISUP_MT_UBL	 20UL	/* 0x14 - 0b00010100 - Unblocking */
 #define ISUP_MT_BLA	 21UL	/* 0x15 - 0b00010101 - Blocking acknowledgement */
 #define ISUP_MT_UBA	 22UL	/* 0x16 - 0b00010110 - Unblocking acknowledgement */
 #define ISUP_MT_GRS	 23UL	/* 0x17 - 0b00010111 - Circuit group reset */
@@ -1785,14 +1788,10 @@ typedef struct isup_msg {
 #define ISUP_MT_IDR	 54UL	/* 0x36 - 0b00110110 - Identification request */
 #define ISUP_MT_IRS	 55UL	/* 0x37 - 0b00110111 - Identification response */
 #define ISUP_MT_SGM	 56UL	/* 0x38 - 0b00111000 - Segmentation */
-#define ISUP_MT_CRA	233UL	/* 0xe9 - 0b11101001 - Circuit Reservation Ack (old Bellcore/ANSI
-				   2000) */
-#define ISUP_MT_CRM	234UL	/* 0xea - 0b11101010 - Circuit Reservation (old Bellcore/ANSI 2000) 
-				 */
-#define ISUP_MT_CVR	235UL	/* 0xeb - 0b11101011 - Circuit Validation Response (old
-				   Bellcore/ANSI 2000) */
-#define ISUP_MT_CVT	236UL	/* 0xec - 0b11101100 - Circuit Validation Test (old Bellcore/ANSI
-				   2000) */
+#define ISUP_MT_CRA	233UL	/* 0xe9 - 0b11101001 - Circuit Reservation Ack (old Bellcore/ANSI 2000) */
+#define ISUP_MT_CRM	234UL	/* 0xea - 0b11101010 - Circuit Reservation (old Bellcore/ANSI 2000) */
+#define ISUP_MT_CVR	235UL	/* 0xeb - 0b11101011 - Circuit Validation Response (old Bellcore/ANSI 2000) */
+#define ISUP_MT_CVT	236UL	/* 0xec - 0b11101100 - Circuit Validation Test (old Bellcore/ANSI 2000) */
 #define ISUP_MT_EXM	237UL	/* 0xed - 0b11101101 - Exit (old Bellcore/ANSI 2000) */
 #define ISUP_MT_NON	248UL	/* 0xf8 - 0b11111000 - National Notification (Spain) */
 #define ISUP_MT_LLM	252UL	/* 0xfc - 0b11111100 - National Malicious Call (Spain) */
@@ -1820,6 +1819,7 @@ typedef struct isup_msg {
 #define ISUP_PT_BCI	 17UL	/* 0x11 - 0b00010001 - Backward call indicators */
 #define ISUP_PT_CAUS	 18UL	/* 0x12 - 0b00010010 - Cause indicators */
 #define ISUP_PT_RDI	 19UL	/* 0x13 - 0b00010011 - Redirection information */
+				/* 0x14 - 0b00010100 - reserved by ITU-T */
 #define ISUP_PT_CGI	 21UL	/* 0x15 - 0b00010101 - Circuit group supervision msg type ind */
 #define ISUP_PT_RS	 22UL	/* 0x16 - 0b00010110 - Range and status */
 #define ISUP_PT_CMI	 23UL	/* 0x17 - 0b00010111 - Call modification indicators (Blue Book) */
@@ -1827,52 +1827,70 @@ typedef struct isup_msg {
 #define ISUP_PT_FAII	 25UL	/* 0x19 - 0b00011001 - Facility information indicators (Bellcore) */
 #define ISUP_PT_CUGI	 26UL	/* 0x1a - 0b00011010 - Closed user group interlock code */
 #define ISUP_PT_INDEX	 27UL	/* 0x1b - 0b00011011 - Index (Bellcore) */
+#define ISUP_PT_CUGCRI	 28UL	/* 0x1c - 0b00011100 - Closed user group check response indicators */
 #define ISUP_PT_USI	 29UL	/* 0x1d - 0b00011101 - User service information */
 #define ISUP_PT_SPC	 30UL	/* 0x1e - 0b00011110 - Signalling point code @ (Bellcore) */
+				/* 0x1f - 0b00011111 - reserved by ITU-T */
 #define ISUP_PT_UUI	 32UL	/* 0x20 - 0b00100000 - User to user information */
 #define ISUP_PT_CONN	 33UL	/* 0x21 - 0b00100001 - Connected number */
 #define ISUP_PT_SRIS	 34UL	/* 0x22 - 0b00100010 - Suspend/resume indicators */
 #define ISUP_PT_TNS	 35UL	/* 0x23 - 0b00100011 - Transit network selection @ */
 #define ISUP_PT_EVNT	 36UL	/* 0x24 - 0b00100100 - Event information */
+#define ISUP_PT_CAM	 37UL	/* 0x25 - 0b00100101 - Circuit assignment map */
 #define ISUP_PT_CSI	 38UL	/* 0x26 - 0b00100110 - Circuit state indicator @ */
 #define ISUP_PT_ACL	 39UL	/* 0x27 - 0b00100111 - Automatic congestion level */
 #define ISUP_PT_OCDN	 40UL	/* 0x28 - 0b00101000 - Original called number */
 #define ISUP_PT_OBCI	 41UL	/* 0x29 - 0b00101001 - Optional backward call indicators */
 #define ISUP_PT_UUIND	 42UL	/* 0x2a - 0b00101010 - User to user indicators */
-#define ISUP_PT_ISPC	 43UL	/* 0x2b - 0b00101011 - Origination ISC point code */
-#define ISUP_PT_GNOT	 44UL	/* 0x2c - 0b00101100 - Generic notification */
-#define ISUP_PT_CHI	 45UL	/* 0x2d - 0b00101101 - Call history information */
-#define ISUP_PT_ADI	 46UL	/* 0x2e - 0b00101110 - Access delivery information */
+#define ISUP_PT_ISPC	 43UL	/* 0x2b - 0b00101011 - Origination ISC point code (not ANSI) */
+#define ISUP_PT_GNOT	 44UL	/* 0x2c - 0b00101100 - Generic notification (not ANSI) */
+#define ISUP_PT_CHI	 45UL	/* 0x2d - 0b00101101 - Call history information (not ANSI) */
+#define ISUP_PT_ADI	 46UL	/* 0x2e - 0b00101110 - Access delivery information (not ANSI) */
 #define ISUP_PT_NSF	 47UL	/* 0x2f - 0b00101111 - Network specific facilities @ */
 #define ISUP_PT_USIP	 48UL	/* 0x30 - 0b00110000 - User service information prime */
-#define ISUP_PT_PROP	 49UL	/* 0x31 - 0b00110001 - Propagation delay counter */
+#define ISUP_PT_PROP	 49UL	/* 0x31 - 0b00110001 - Propagation delay counter (not ANSI) */
 #define ISUP_PT_ROPS	 50UL	/* 0x32 - 0b00110010 - Remote operations @ */
 #define ISUP_PT_SA	 51UL	/* 0x33 - 0b00110011 - Service activation @ */
-#define ISUP_PT_UTI	 52UL	/* 0x34 - 0b00110100 - User teleservice information */
+#define ISUP_PT_UTI	 52UL	/* 0x34 - 0b00110100 - User teleservice information (not ANSI) */
 #define ISUP_PT_TMU	 53UL	/* 0x35 - 0b00110101 - Transmission medium used */
-#define ISUP_PT_CDI	 54UL	/* 0x36 - 0b00110110 - Call diversion information */
-#define ISUP_PT_ECI	 55UL	/* 0x37 - 0b00110111 - Echo control information */
+#define ISUP_PT_CDI	 54UL	/* 0x36 - 0b00110110 - Call diversion information (not ANSI) */
+#define ISUP_PT_ECI	 55UL	/* 0x37 - 0b00110111 - Echo control information (not ANSI) */
 #define ISUP_PT_MCI	 56UL	/* 0x38 - 0b00111000 - Message compatibility information */
 #define ISUP_PT_PCI	 57UL	/* 0x39 - 0b00111001 - Parameter compatibility information */
-#define ISUP_PT_MLPP	 58UL	/* 0x3a - 0b00111010 - MLPP preference */
-#define ISUP_PT_MCIQ	 59UL	/* 0x3b - 0b00111011 - MCID request indicator */
-#define ISUP_PT_MCIR	 60UL	/* 0x3c - 0b00111100 - MCID response indicator */
+#define ISUP_PT_MLPP	 58UL	/* 0x3a - 0b00111010 - MLPP preference (Precedence ANSI) */
+#define ISUP_PT_MCIQ	 59UL	/* 0x3b - 0b00111011 - MCID request indicator (not ANSI) */
+#define ISUP_PT_MCIR	 60UL	/* 0x3c - 0b00111100 - MCID response indicator (not ANSI) */
 #define ISUP_PT_HOPC	 61UL	/* 0x3d - 0b00111101 - Hop counter (reserved) */
-#define ISUP_PT_TMRP	 62UL	/* 0x3e - 0b00111110 - Transmission medium requirement prime */
-#define ISUP_PT_LN	 63UL	/* 0x3f - 0b00111111 - Location number */
-#define ISUP_PT_RDNR	 64UL	/* 0x40 - 0b01000000 - Redirection number restriction */
-#define ISUP_PT_FREEP	 65UL	/* 0x41 - 0b01000001 - Freephone indicators (reserved) */
-#define ISUP_PT_GREF	 66UL	/* 0x42 - 0b01000010 - Generic reference (reserved) */
-#define ISUP_PT_GNUM	192UL	/* 0xc0 - 0b11000000 - Generic number (address Bellcore) */
+#define ISUP_PT_TMRP	 62UL	/* 0x3e - 0b00111110 - Transmission medium requirement prime (not ANSI) */
+#define ISUP_PT_LN	 63UL	/* 0x3f - 0b00111111 - Location number (not ANSI) */
+#define ISUP_PT_RDNR	 64UL	/* 0x40 - 0b01000000 - Redirection number restriction (not ANSI) */
+#define ISUP_PT_FREEP	 65UL	/* 0x41 - 0b01000001 - Freephone indicators (reserved) (not ANSI) */
+#define ISUP_PT_GREF	 66UL	/* 0x42 - 0b01000010 - Generic reference (reserved) (not ANSI) */
+#define ISUP_PT_RCAP	 78UL	/* 0x4e - 0b01001110 - Redirect capability (ANSI) */
+#define ISUP_PT_NMC	 91UL	/* 0x5b - 0x01011011 - Network management controls (ANSI) */
+#define ISUP_PT_RCNT	119UL	/* 0x77 - 0x01110111 - Redirect counter (ANSI) */
+#define ISUP_PT_PCAP	123UL	/* 0x7b - 0x01111011 - Pivot capability (ANSI) */
+#define ISUP_PT_PRI	124UL	/* 0x7c - 0x01111100 - Pivot routing indicator (ANSI) */
+#define ISUP_PT_CGL	129UL	/* 0x81 - 0b10000001 - Calling geodetic location (ANSI) */
+#define ISUP_PT_PSTA	134UL	/* 0x86 - 0b10000110 - Pivot status (ANSI) */
+#define ISUP_PT_PCNT	135UL	/* 0x87 - 0b10000111 - Pivot counter (ANSI) */
+#define ISUP_PT_PRFI	136UL	/* 0x88 - 0b10001000 - Pivot routing forward information (ANSI) */
+#define ISUP_PT_PRBI	137UL	/* 0x89 - 0b10001001 - Pivot routing backward information (ANSI) */
+#define ISUP_PT_RSTA	138UL	/* 0x8a - 0b10001010 - Redirect status (ANSI) */
+#define ISUP_PT_RFI	139UL	/* 0x8b - 0b10001011 - Redirect forward information (ANSI) */
+#define ISUP_PT_RBI	140UL	/* 0x8c - 0b10001100 - Redirect backward information (ANSI) */
+#define ISUP_PT_GNUM	192UL	/* 0xc0 - 0b11000000 - Generic number (Generic address ANSI, Bellcore) */
 #define ISUP_PT_GDIG	193UL	/* 0xc1 - 0b11000001 - Generic digits @ */
+#define ISUP_PT_OSI	194UL	/* 0xc2 - 0b11000010 - Operator services information (ANSI) */
 #define ISUP_PT_EGRESS	195UL	/* 0xc3 - 0b11000011 - Egress (ANSI) */
 #define ISUP_PT_JUR	196UL	/* 0xc4 - 0b11000100 - Jurisdiction (ANSI) */
 #define ISUP_PT_CIDC	197UL	/* 0xc5 - 0b11000101 - Carrier identification code (ANSI) */
 #define ISUP_PT_BGROUP	198UL	/* 0xc6 - 0b11000110 - Business group (ANSI) */
+#define ISUP_PT_GNAM	199UL	/* 0xc7 - 0b11000111 - Generic name (ANSI) */
 #define ISUP_PT_NOTI	225UL	/* 0xe1 - 0b11100001 - Notification indicator (ANSI) */
-#define ISUP_PT_SVACT	226UL	/* 0xe2 - 0b11100010 - Service activation (ANSI) */
+#define ISUP_PT_CSPI	226UL	/* 0xe2 - 0b11100010 - Carrier service provider identification (ANSI) */
 #define ISUP_PT_TRNSRQ	227UL	/* 0xe3 - 0b11100011 - Transaction request (ANSI, Bellcore) */
-#define ISUP_PT_SPR	228UL	/* 0xe4 - 0b11100100 - Special processing request (Bellcore) */
+#define ISUP_PT_LSPI	228UL	/* 0xe4 - 0b11100100 - Local service provider information (ANSI) */
 #define ISUP_PT_CGCI	229UL	/* 0xe5 - 0b11100101 - Cc't group char ind (ANSI, Bellcore) */
 #define ISUP_PT_CVRI	230UL	/* 0xe6 - 0b11100110 - Cc't validation resp ind (ANSI, Bellcore) */
 #define ISUP_PT_OTGN	231UL	/* 0xe7 - 0b11100111 - Outgoing trunk group numb (ANSI, Bellcore) */
@@ -1881,7 +1899,9 @@ typedef struct isup_msg {
 #define ISUP_PT_OLI	234UL	/* 0xea - 0b11101010 - Originating line info (ANSI, Bellcore) */
 #define ISUP_PT_CHGN	235UL	/* 0xeb - 0b11101011 - Charge number (ANSI, Bellcore) */
 #define ISUP_PT_SVCD	236UL	/* 0xec - 0b11101100 - Service code indicator (ANSI, Bellcore) */
+#define ISUP_PT_SPR	237UL	/* 0xed - 0b11101101 - Special processing request (ANSI, Bellcore) */
 #define ISUP_PT_CSEL	238UL	/* 0xee - 0b11101110 - Carrier selection info (ANSI, Bellcore) */
+#define ISUP_PT_NT	239UL	/* 0xef - 0b11101111 - Network transport (ANSI) */
 #define ISUP_PT_ORI	243UL	/* 0xf3 - 0b11110011 - Outgoing route identification (Spain) */
 #define ISUP_PT_IRI	244UL	/* 0xf4 - 0b11110100 - Incoming route identification (Spain) */
 #define ISUP_PT_RATE	248UL	/* 0xf8 - 0b11111000 - Rate (Spain) */
@@ -7548,10 +7568,8 @@ isup_send_iam(queue_t *q, struct ct *ct, ulong type, ulong flags, uchar *usi_ptr
 	ulong tmr = type & 0xff;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_IAM) + size_nci(pvar, nci)
 	    + size_fci(pvar, fci) + size_cpc(pvar, cpc) + size_tmr(pvar, tmr)
-	    + (ansi ? size_usi(pvar, usi_len) + 1 : 0) + size_cdpn(pvar,
-								   cdpn_len) + 1 + size_opt(pvar,
-											    opt_len)
-	    + 1;
+	    + (ansi ? size_usi(pvar, usi_len) + 1 : 0) + size_cdpn(pvar, cdpn_len) + 1
+	    + size_opt(pvar, opt_len) + 1;
 
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
