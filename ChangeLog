@@ -1,3 +1,131 @@
+2010-02-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: added makefiles
+	* doc/papers/Makefile.am: added subdirectories
+	* doc/projects/Makefile.am: added subdirectories
+	* doc/projects/carrier/carrier.texi: spelling
+	* scripts/texi/macros.texi: don't indent
+	* src/drivers/isup.c: added ANSI parameters
+	* src/include/ss7/isupi.h: spelling
+
+	* doc/papers/optranex/.cvsignore: added doc files
+	* doc/papers/optranex/fig01.fig: added doc files
+	* doc/papers/optranex/Makefile.am: added doc files
+	* doc/papers/optranex/optranex.bib: added doc files
+	* doc/papers/optranex/optranex_fig01.fig: added doc files
+	* doc/papers/optranex/optranex.tex: added doc files
+	* doc/papers/optranex/org.css: added doc files
+
+	* doc/specs/mgi/.cvsignore: added doc files
+	* doc/specs/mgi/Makefile.am: added doc files
+	* doc/specs/mgi/mgcp.h: added doc files
+	* doc/specs/mgi/mgi01.fig: added doc files
+	* doc/specs/mgi/mgi01.txt: added doc files
+	* doc/specs/mgi/mgi02.fig: added doc files
+	* doc/specs/mgi/mgi02.txt: added doc files
+	* doc/specs/mgi/mgi03.fig: added doc files
+	* doc/specs/mgi/mgi03.txt: added doc files
+	* doc/specs/mgi/mgi04.fig: added doc files
+	* doc/specs/mgi/mgi04.txt: added doc files
+	* doc/specs/mgi/mgi05.fig: added doc files
+	* doc/specs/mgi/mgi05.txt: added doc files
+	* doc/specs/mgi/mgi06.fig: added doc files
+	* doc/specs/mgi/mgi06.txt: added doc files
+	* doc/specs/mgi/mgi07.fig: added doc files
+	* doc/specs/mgi/mgi07.txt: added doc files
+	* doc/specs/mgi/mgi08.fig: added doc files
+	* doc/specs/mgi/mgi08.txt: added doc files
+	* doc/specs/mgi/mgi09.fig: added doc files
+	* doc/specs/mgi/mgi09.txt: added doc files
+	* doc/specs/mgi/mgi10.fig: added doc files
+	* doc/specs/mgi/mgi10.txt: added doc files
+	* doc/specs/mgi/mgi11.fig: added doc files
+	* doc/specs/mgi/mgi11.txt: added doc files
+	* doc/specs/mgi/mgi12.fig: added doc files
+	* doc/specs/mgi/mgi12.txt: added doc files
+	* doc/specs/mgi/mgi13.fig: added doc files
+	* doc/specs/mgi/mgi13.txt: added doc files
+	* doc/specs/mgi/mgi14.fig: added doc files
+	* doc/specs/mgi/mgi14.txt: added doc files
+	* doc/specs/mgi/mgi15.fig: added doc files
+	* doc/specs/mgi/mgi15.txt: added doc files
+	* doc/specs/mgi/mgi16.fig: added doc files
+	* doc/specs/mgi/mgi16.txt: added doc files
+	* doc/specs/mgi/mgi17.fig: added doc files
+	* doc/specs/mgi/mgi17.txt: added doc files
+	* doc/specs/mgi/mgib1.fig: added doc files
+	* doc/specs/mgi/mgib1.txt: added doc files
+	* doc/specs/mgi/mgib2.fig: added doc files
+	* doc/specs/mgi/mgib2.txt: added doc files
+	* doc/specs/mgi/mgib3.fig: added doc files
+	* doc/specs/mgi/mgib3.txt: added doc files
+	* doc/specs/mgi/mgib4.fig: added doc files
+	* doc/specs/mgi/mgib4.txt: added doc files
+	* doc/specs/mgi/mgib5.fig: added doc files
+	* doc/specs/mgi/mgib5.txt: added doc files
+	* doc/specs/mgi/mgib6.fig: added doc files
+	* doc/specs/mgi/mgib6.txt: added doc files
+	* doc/specs/mgi/mgib7.fig: added doc files
+	* doc/specs/mgi/mgib8.fig: added doc files
+	* doc/specs/mgi/mgib9.fig: added doc files
+	* doc/specs/mgi/mgit01.tbl: added doc files
+	* doc/specs/mgi/mgit02.tbl: added doc files
+	* doc/specs/mgi/mgi.texi: added doc files
+
+	* doc/projects/pgw/.cvsignore: added doc files
+	* doc/projects/pgw/Makefile.am: added doc files
+	* doc/projects/pgw/pgst13.tbl: added doc files
+	* doc/projects/pgw/pgw01.fig: added doc files
+	* doc/projects/pgw/pgw02.fig: added doc files
+	* doc/projects/pgw/pgw03.fig: added doc files
+	* doc/projects/pgw/pgw04.fig: added doc files
+	* doc/projects/pgw/pgw05.fig: added doc files
+	* doc/projects/pgw/pgw06.fig: added doc files
+	* doc/projects/pgw/pgw07.fig: added doc files
+	* doc/projects/pgw/pgw08.fig: added doc files
+	* doc/projects/pgw/pgw09.fig: added doc files
+	* doc/projects/pgw/pgw10.fig: added doc files
+	* doc/projects/pgw/pgw11.fig: added doc files
+	* doc/projects/pgw/pgw12.fig: added doc files
+	* doc/projects/pgw/pgw13.jpg: added doc files
+	* doc/projects/pgw/pgw13.png: added doc files
+	* doc/projects/pgw/pgw14.fig: added doc files
+	* doc/projects/pgw/pgw15.fig: added doc files
+	* doc/projects/pgw/pgwcallflow.fig: added doc files
+	* doc/projects/pgw/pgwether.fig: added doc files
+	* doc/projects/pgw/pgwt01.tbl: added doc files
+	* doc/projects/pgw/pgwt02.tbl: added doc files
+	* doc/projects/pgw/pgwt03.tbl: added doc files
+	* doc/projects/pgw/pgwt04.tbl: added doc files
+	* doc/projects/pgw/pgwt05.tbl: added doc files
+	* doc/projects/pgw/pgwt06.tbl: added doc files
+	* doc/projects/pgw/pgwt07.tbl: added doc files
+	* doc/projects/pgw/pgwt08.tbl: added doc files
+	* doc/projects/pgw/pgwt09.tbl: added doc files
+	* doc/projects/pgw/pgwt10.tbl: added doc files
+	* doc/projects/pgw/pgwt11.tbl: added doc files
+	* doc/projects/pgw/pgwt12.tbl: added doc files
+	* doc/projects/pgw/pgwt13.tbl: added doc files
+	* doc/projects/pgw/pgwt14.tbl: added doc files
+	* doc/projects/pgw/pgwt15.tbl: added doc files
+	* doc/projects/pgw/pgwt16.tbl: added doc files
+	* doc/projects/pgw/pgwt17.tbl: added doc files
+	* doc/projects/pgw/pgwt18.tbl: added doc files
+	* doc/projects/pgw/pgwt19.tbl: added doc files
+	* doc/projects/pgw/pgwt20.tbl: added doc files
+	* doc/projects/pgw/pgwt21.tbl: added doc files
+	* doc/projects/pgw/pgwt22.tbl: added doc files
+	* doc/projects/pgw/pgwt23.tbl: added doc files
+	* doc/projects/pgw/pgwt24.tbl: added doc files
+	* doc/projects/pgw/pgwt25.tbl: added doc files
+	* doc/projects/pgw/pgwt26.tbl: added doc files
+	* doc/projects/pgw/pgwt27.tbl: added doc files
+	* doc/projects/pgw/pgwt28.tbl: added doc files
+	* doc/projects/pgw/pgwt29.tbl: added doc files
+	* doc/projects/pgw/pgwt30.tbl: added doc files
+	* doc/projects/pgw/pgw.texi: added doc files
+
+
 2009-09-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgpatchlevel: bumped patch level
@@ -17,7 +145,7 @@
 
 -----
 
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 

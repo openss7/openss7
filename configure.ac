@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2009-09-01 09:09:45 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2010-02-22 14:48:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-09-01 09:09:45 $ by $Author: brian $
+# Last Modified $Date: 2010-02-22 14:48:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.7 $) $Date: 2009-09-01 09:09:45 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.8 $) $Date: 2010-02-22 14:48:40 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -222,6 +222,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/papers/Makefile
+		 doc/papers/optranex/Makefile
 		 doc/papers/chan/Makefile
 		 doc/papers/inet/Makefile
 		 doc/papers/sctp/Makefile
@@ -239,6 +240,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/projects/ssg/Makefile
 		 doc/projects/ss/Makefile
 		 doc/projects/voip/Makefile
+		 doc/projects/pgw/Makefile
 		 doc/specs/Makefile
 		 doc/specs/cci/Makefile
 		 doc/specs/cdi/Makefile
@@ -248,6 +250,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/mapi/Makefile
 		 doc/specs/mtpi/Makefile
 		 doc/specs/mxi/Makefile
+		 doc/specs/mgi/Makefile
 		 doc/specs/nli/Makefile
 		 doc/specs/npi/Makefile
 		 doc/specs/sccpi/Makefile
@@ -280,6 +283,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.8  2010-02-22 14:48:40  brian
+# - added documentation files to build
+#
 # Revision 1.1.2.7  2009-09-01 09:09:45  brian
 # - added text image files
 #

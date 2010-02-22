@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:43:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,19 +48,22 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:43:54 $ by $Author: brian $
+# Last Modified $Date: 2010-02-22 14:48:40 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-SUBDIRS = carrier cnam hlr lab mg sbc sg ssg sgp ss voip
+SUBDIRS = carrier cnam hlr lab mg sbc sg ssg sgp ss voip pgw
 
 # bs cbc mgc
 
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.2  2010-02-22 14:48:40  brian
+# - added documentation files to build
+#
 # Revision 1.1.2.1  2009-06-21 10:43:54  brian
 # - added files to new distro
 #

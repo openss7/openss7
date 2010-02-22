@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: carrier.texi,v 1.1.2.1 2009-06-21 10:45:23 brian Exp $
+% @(#) $Id: carrier.texi,v 1.1.2.2 2010-02-22 14:48:41 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:45:23 $ by $Author: brian $
+% Last Modified $Date: 2010-02-22 14:48:41 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -301,7 +301,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Optional Hardware Support::
 * Programmatic Interfaces::
 * Platform Sizing::
-* Licences::
+* Licenses::
 * Index::
 @end menu
 
@@ -434,6 +434,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: carrier.texi,v $
+Revision 1.1.2.2  2010-02-22 14:48:41  brian
+- added documentation files to build
+
 Revision 1.1.2.1  2009-06-21 10:45:23  brian
 - added files to new distro
 
@@ -489,7 +492,7 @@ This document is organized as follows:
 * Optional Hardware Support::
 * Programmatic Interfaces::
 * Platform Sizing::
-* Licences::
+* Licenses::
 * Index::
 @end menu
 @end ifnottex
@@ -755,7 +758,7 @@ Gateway} have been decomposed, and in the past these functional groups have been
 separate physical platforms, modern compute capacity and densities permit these functions to be
 integrated into a single physical platform without limitation.  Open standard interfaces are
 utilized internal to the platform to permit a decomposed model to be split out and to permit ETSI
-Tiphon Version 4 compatiblity as well as Multi-Services Forum Version 2 compatibility.
+Tiphon Version 4 compatibility as well as Multi-Services Forum Version 2 compatibility.
 
 @subsection OpenSS7 VoIP Switch for Deployment
 
@@ -774,8 +777,8 @@ exposed for maximum deployment flexibility:
 @section Call Flows
 
 This section provides some illustrative application call flows:@footnote{This section is not
-intended as a @dfn{Detailed Design}, but provides illustration only for these @dfn{Application Notes}.
-Refer to RFC XXXX for detailed information.}
+intended as a @dfn{Detailed Design}, but provides illustration only for these @dfn{Application
+Notes}.  Refer to RFC XXXX for detailed information.}
 
 @node Network Architecture
 @chapter Network Architecture

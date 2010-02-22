@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: macros.texi,v 1.1.2.1 2009-06-21 11:11:36 brian Exp $
+@c @(#) $Id: macros.texi,v 1.1.2.2 2010-02-22 14:48:41 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 11:11:36 $ by $Author: brian $
+@c Last Modified $Date: 2010-02-22 14:48:41 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -97,6 +97,7 @@
 @caption{@emph{\caption\}}
 @end float
 @c @end cartouche
+@noindent
 @end macro
 
 @macro tabfigsized{image,number,caption,size}
@@ -106,6 +107,7 @@
 @caption{@emph{\caption\}}
 @end float
 @c @end cartouche
+@noindent
 @end macro
 
 @macro figure{image,number,caption}
@@ -115,6 +117,7 @@
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
+@noindent
 @end macro
 
 @macro figuresized{image,number,caption,size}
@@ -124,6 +127,7 @@
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
+@noindent
 @end macro
 
 @macro figureimage{image,number,caption,width,height,alttext,extension}
@@ -133,6 +137,7 @@
 @caption{@emph{\caption\}}
 @end float
 @end cartouche
+@noindent
 @end macro
 
 @macro manref{name}
@@ -159,6 +164,7 @@
 @anchor{Table \number\}
 @center @emph{Table \number\.@:  \caption\}
 @sp 1
+@noindent
 @end macro
 
 @macro tabfigsized{image,number,caption,size}
@@ -167,6 +173,7 @@
 @anchor{Table \number\}
 @center @emph{Table \number\.@:  \caption\}
 @sp 1
+@noindent
 @end macro
 
 @macro figure{image,number,caption}
@@ -176,6 +183,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro figuresized{image,number,caption,size}
@@ -185,6 +193,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro figureimage{image,number,caption,width,height,alttext,extension}
@@ -194,6 +203,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro href{url,desc}
@@ -222,6 +232,7 @@
 @anchor{Table \number\}
 @center @emph{Table \number\.@:  \caption\}
 @sp 1
+@noindent
 @end macro
 
 @macro tabfigsized{image,number,caption,size}
@@ -230,6 +241,7 @@
 @anchor{Table \number\}
 @center @emph{Table \number\.@:  \caption\}
 @sp 1
+@noindent
 @end macro
 
 @macro figure{image,number,caption}
@@ -239,6 +251,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro figuresized{image,number,caption,size}
@@ -248,6 +261,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro figureimage{image,number,caption,width,height,alttext,extension}
@@ -257,6 +271,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro href{url,desc}
@@ -290,6 +305,7 @@
 @anchor{Table \number\}
 @center @emph{Table \number\.@:  \caption\}
 @sp 1
+@noindent
 @end macro
 
 @macro tabfigsized{image,number,caption,size}
@@ -298,6 +314,7 @@
 @anchor{Table \number\}
 @center @emph{Table \number\.@:  \caption\}
 @sp 1
+@noindent
 @end macro
 
 @macro figure{image,number,caption}
@@ -307,6 +324,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro figuresized{image,number,caption,size}
@@ -316,6 +334,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro figureimage{image,number,caption,width,height,alttext,extension}
@@ -325,6 +344,7 @@
 @center @emph{Figure \number\.@:  \caption\}
 @sp 1
 @set fignum \number\
+@noindent
 @end macro
 
 @macro href{url,desc}
