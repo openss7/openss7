@@ -150,14 +150,14 @@ CircuitIdentificationCode ::= TEXTUAL-CONVENTION
 	 ISUP to identify a circuit (channel) between two signalling 
 	 point codes (MTP instances).  In ITU-T based networks, this can 
 	 take on the value (0..4095).  In ANSI based networks, this can 
-	 take on the value from (0..16383).  At one time, the 12 bits of 
+	 take on the value from (0..65535).  At one time, the 12 bits of 
 	 the ITU-T CIC were broken into 3 x 4-bit fields to identify the 
 	 facility, group and channel of the circuit.  Nowadays, while 
 	 the low order 4 bits still represents the channel for E1, CICs 
 	 are assigned pseudo-arbitrarily to circuits.  The only 
 	 constraint is that a contiguous range of CICs are assigned to 
 	 the channels making up a circuit group."
-    SYNTAX      Integer32 (0..16383)
+    SYNTAX      Integer32 (0..65535)
 
 CommonLanguageName ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1a"

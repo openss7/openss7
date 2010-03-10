@@ -64,6 +64,7 @@ export MIBFILES
 all: simple storage openss7 master
 
 check: \
+	isupMIB.tree \
 	cdr2MIB.tree \
 	dlMIB.tree \
 	ds0Bundle.tree \
@@ -99,6 +100,9 @@ check: \
 	x25MIB.tree \
 	x400pMIB.tree \
 	x400pMIB.tree
+
+isupMIB.tree: ../mibs/OPENSS7-ISUP-MIB.mib
+	snmptranslate -Tp OPENSS7-ISUP-MIB::isupMIB >isupMIB.tree
 
 #cdr2MIB.tree: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB.tree: ../mibs/OPENSS7-CDR2-MIB.mib
@@ -228,6 +232,7 @@ x400pMIB.tree: ../mibs/OPENSS7-X400P-MIB.mib
 #	snmptranslate -Tp OPENSS7-X400P-MX-MIB::x400pMIB >x400pMIB.tree
 
 simple: \
+	isupMIB_simple.c isupMIB_simple.h \
 	cdr2MIB_simple.c cdr2MIB_simple.h \
 	dlMIB_simple.c dlMIB_simple.h \
 	ds0Bundle_simple.c ds0Bundle_simple.h \
@@ -258,6 +263,11 @@ simple: \
 	tcapOmMIB_simple.c tcapOmMIB_simple.h \
 	x25MIB_simple.c x25MIB_simple.h \
 	x400pMIB_simple.c x400pMIB_simple.h
+
+#isupMIB_simple.c isupMIB_simple.h: MIBS+=OPENSS7-ISUP-MIB:OPENSS7-TC
+isupMIB_simple.c isupMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-ISUP-MIB.mib
+	./mib2c -c ./mib2c.conf -f isupMIB_simple isupMIB
+	indent -nhnl isupMIB_simple.[ch]
 
 #cdr2MIB_simple.c cdr2MIB_simple.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB_simple.c cdr2MIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-CDR2-MIB.mib
@@ -407,6 +417,8 @@ x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X400P-MIB.
 #	indent -nhnl x400pMIB_simple.[ch]
 
 storage: \
+	isupMIB_storage.c isupMIB_storage.h \
+	cdr2MIB_storage.c cdr2MIB_storage.h \
 	ds0Bundle_storage.c ds0Bundle_storage.h \
 	ds0_storage.c ds0_storage.h \
 	ds1EXT_storage.c ds1EXT_storage.h \
@@ -435,6 +447,11 @@ storage: \
 	tcapOmMIB_storage.c tcapOmMIB_storage.h \
 	x25MIB_storage.c x25MIB_storage.h \
 	x400pMIB_storage.c x400pMIB_storage.h
+
+#isupMIB_storage.c isupMIB_storage.h: MIBS+=OPENSS7-isup-MIB:OPENSS7-TC
+isupMIB_storage.c isupMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-ISUP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f isupMIB_storage isupMIB
+	indent -nhnl isupMIB_storage.[ch]
 
 #cdr2MIB_storage.c cdr2MIB_storage.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB_storage.c cdr2MIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-CDR2-MIB.mib
@@ -594,6 +611,7 @@ x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-
 #	indent -nhnl x400pMIB_storage.[ch]
 
 openss7: \
+	isupMIB_openss7.c isupMIB_openss7.h \
 	cdr2MIB_openss7.c cdr2MIB_openss7.h \
 	dlMIB_openss7.c dlMIB_openss7.h \
 	m2paMIB_openss7.c m2paMIB_openss7.h \
@@ -607,6 +625,11 @@ openss7: \
 	ss7MIB_openss7.c ss7MIB_openss7.h \
 	strMIB_openss7.c strMIB_openss7.h \
 	x25MIB_openss7.c x25MIB_openss7.h
+
+#isupMIB_openss7.c isupMIB_openss7.h: MIBS+=OPENSS7-ISUP-MIB:OPENSS7-TC
+isupMIB_openss7.c isupMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-ISUP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f isupMIB_openss7 isupMIB
+	indent -nhnl isupMIB_openss7.[ch]
 
 #cdr2MIB_openss7.c cdr2MIB_openss7.h: MIBS+=OPENSS7-CDR2-MIB:OPENSS7-TC
 cdr2MIB_openss7.c cdr2MIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-CDR2-MIB.mib
@@ -815,6 +838,13 @@ x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400
 	indent -nhnl x400pCardTable.[ch]
 
 clean:
+	rm -f isupMIB_openss7.[ch]
+	rm -f isupMIB_openss7.[ch]~
+	rm -f isupMIB_simple.[ch]
+	rm -f isupMIB_simple.[ch]~
+	rm -f isupMIB_storage.[ch]
+	rm -f isupMIB_storage.[ch]~
+	rm -f isupMIB.tree
 	rm -f cdr2MIB_openss7.[ch]
 	rm -f cdr2MIB_openss7.[ch]~
 	rm -f cdr2MIB_simple.[ch]

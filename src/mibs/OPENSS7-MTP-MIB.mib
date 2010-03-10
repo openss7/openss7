@@ -1309,11 +1309,11 @@ MtpResultOfAction ::= TEXTUAL-CONVENTION
     STATUS	current
     DESCRIPTION
 	"Provides the result of action on read and invokes the action on 
-	 write.  Objects with this textual convention in their SYNTAX	
-	 clause should have a MAX-ACCESS	clause of read-write or 
+	 write.  Objects with this textual convention in their SYNTAX 
+	 clause should have a MAX-ACCESS clause of read-write or 
 	 read-create.  When any value is written to the object, the 
-	 action is invoked.  When the object is read, the result of 
-	 the action is returned as follows:
+	 action is invoked.  When the object is read, the result of the 
+	 action is returned as follows:
 	 
 	  - success(0), the last action was successful;
 	 
@@ -3568,7 +3568,7 @@ mtpSapRowStatus OBJECT-TYPE
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-	"Provides a mechainsm whereby management stations may create and 
+	"Provides a mechanism whereby management stations may create and 
 	 delete entries in this table.  Rows may also be created and 
 	 deleted by the managed system as a part of system operation.
 	 

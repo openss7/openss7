@@ -108,6 +108,12 @@ FIG_FIGS		= \
 			  mgi15.fig \
 			  mgi16.fig \
 			  mgi17.fig \
+			  mgi18.fig \
+			  mgi19.fig \
+			  mgi20.fig \
+			  mgi21.fig \
+			  mgi22.fig \
+			  mgi23.fig \
 			  mgib1.fig \
 			  mgib2.fig \
 			  mgib3.fig \

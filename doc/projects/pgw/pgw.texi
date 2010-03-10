@@ -920,6 +920,7 @@ In @figref{1}, the @cite{Optranex 248} switch acts as a set of implicitly regist
 subscriber User Agents towards the customer SIP proxies, and as an originating, terminating or
 tandem local switch to the PSTN.
 
+@node Ethernet Connections
 @section Ethernet Connections
 
 As illustrated in @figref{5}, Ethernet connectivity of the @cite{Optranex 248} switch will consist
@@ -1326,6 +1327,7 @@ Management stations and monitoring devices should be synchronized to the same ti
 @cite{Optranex 248} platform.
 
 @page
+@node SONET/SDH Connections
 @section SONET/SDH Connections
 
 The SONET/SDH network connections are illustrated at the top of @figref{6}.
@@ -6452,16 +6454,27 @@ provided to meet specific test objectives during trial.
 
 @section Spares
 
-Spares will not be provided for the initial trial.  Spare modules consist of the following:
+Spares will not be provided for the initial trial.  Spare modules consist of
+the following:
 
 @itemize @bullet
+@item spare Intel Xeon 5400 series processor;
+@item spare memory modules;
 @item spare pluggable 450 Watt -48 VDC power supplies;
 @item spare pluggable fan modules (CPU fans, IO fans);
 @item spare filter packs;
-@item spare pluggable Ultra-SCSI harddrives;
+@item spare pluggable SAS harddrives;
 @item spare @cite{Optranex 248} SONET/SDH interface PCI Express cards; and,
 @item spare pluggable OC-12 SFP modules.
 @end itemize
+
+@noindent
+Note that with the exception of SONET optical modules, SAS harddrives
+and power supplies, replacement of parts including processors, memory modules,
+fan modules, filter packs, and PCI cards requires powering down at least one of
+the redundant servers.
+SONET optical modules, SAS harddrives and power supplies are
+hot-pluggable.
 
 @node Management Architecture
 @chapter Management Architecture
@@ -6604,75 +6617,187 @@ provide access to the equipment for service of hard drives and power supplies.
 
 @subsubsection Rack Mounts
 
-A separate rack mount kit is required depending upon the rack.  One rack mount kit is required for a
-19" 2- or 4-post rack, another for a 23" 2- or 4-post rack.
+A separate rack mount kit is required depending upon the rack.  One rack mount
+kit is required for a 19" 2- or 4-post rack, another for a 23" 2- or 4-post
+rack.  Rack mount kits will be provided with the @cite{Optranex} servers.
 
 @subsubsection Cable Management
 
+Rack mount kits for the @cite{Optranex} servers do not include cable
+management devices.  Sufficient slack in cabling, both DC power and interface
+cables, must be provided to allow each server chassis to be pulled out 24
+inches.  Otherwise, any cabling or power feeds must be disconnected before
+sliding out the equipment on its equipment rails.
+
 @subsection Power
 
-@subsubsection AC Power
+The hardenned (NEBS 3 compliant) PC servers are available with either
+110/220VAC or -48VDC single or dual redundant power supplies.  Renundant DC
+power supplies are required for the Central Office environment and are provided
+for trial and in-service.
 
 @subsubsection DC Power
 
+The -48VDC power supplies are rated at 450W per server.  Breakers or fuses
+should be rated at no more than 10 amps (per server).  For more details on
+DC power requirements, see @ref{DC Power}.  Breaker or fuse panels for trial
+will be provided by @cite{Heramax}.
+
+@subsubheading Grounding
+
+Each DC server chassis provides to #10-32 threaded studs for chassis grounding.
+A single 90-degree standard barrel, two-hole, compression terminal lug with
+5/8-inch pitch suitable for #14-10 AWG conductor (such as Thomas & Betts'
+terminal lug P/N 256-31426-141) must be used for proper safety grounding.  A
+crimping tool may be needed to secure the terminal lug to the grounding cable.
+For more details on grounding, see @ref{Grounding the Server}.
+
+@subsubsection AC Power
+
+The @cite{Optranex} servers for the trial are DC powered.  AC power will not be
+required for either the trial or in-service.
+
+
 @subsection Cooling
+
+@subsubsection Temperature
+The temperature, in which each server operates when installed in an equipment
+rack must not go below 5 degrees Celcius (41 degress Farenheit) or rise above
+35 degress Celcius (95 degress Farenheit).  Extreme fluctuations in temperature
+can cause a variety of problems.
+
+@subsubsection Ventilation
+The equipment rack must provide sufficient airflow to the front of each server
+to maintain proper cooling.  The rack must also include ventilation sufficient
+to exhaust a maximum of 1023 BTUs (British Thermal Units) per hour for each
+server, or 2046 BTU per hour total.  The rack selected and the ventilation
+provided must be suitable to the environment in which the servers will be used.
+
+Physical dimensions and minimum clearances for adequate ventilation are listed
+in @tabref{T-7}.
 
 @subsection Connections
 
 @subsubsection Ethernet Connections
 
+Each of the two server chassis has 4 x 1000baseT RJ-45 Ethernet NIC primary
+interfaces, and 1 x 100baseT RJ-45 Ethernet NIC for the remote management
+module.  This is a total of 8 x 1000baseT RJ-45 Ethernet NIC primary interfaces
+and 2 x 100baseT RJ-45 Ethernet NIC remote management modules, or, a total of
+10 RJ-45 connections for trial.  Provision should be made for growth to an
+additional two server chassis at in-service.
+
+Proper alien noise immunity on all Ethernet NIC cables requires Category 6 or
+6a STP (Shielded Twisted Pair).  These cables will be provided for trial and
+in-service by @cite{Heramax} at installation.
+
+For additional information on Ethernet connections, see @ref{Ethernet
+Connections}.
+
 @subsubsection SONET Connections
+
+Fiber patch cords for connection between GC optical passive cross-connects and
+the @cite{Optranex} server chasses will be provided by GC or @cite{Heramax}.
+Patch cords will be compiant to OC-12/3, short-reach, single-mode, 1310nm,
+9/125 fiber.  The @cite{Optranex} end of the fiber patch cords must have LC
+duplex connectors.
+
+Additional loop-back copper module terminated cables will be used for
+performance testing.  These copper loop-back cables will be provided by
+@cite{Optranex} for trial and are not required for in-service.
+
+For additional information of SONET/SDH connections, see @ref{SONET/SDH
+Connections}.
 
 @subsubsection Management Connections
 
+Additional management connections, beyond the Ethernet RMM connections which
+were included above under Ethernet Connections, such as the serial interface
+and local alarms panel dry contact interface will not be used for trial.
+
 @subsubsection Hardware APS Connections
+
+Hardware APS connections use SMA coaxial cables that connect between the server
+chasses.  These cables will be provided by @cite{Optranex} and need to be
+installed between the interface card SMA connectors.  These connections might
+not be used for trial but will be used for in-service.
 
 @node Equipment List
 @section Equipment List
 
 @subsection Servers
 
-The @cite{Optranex 248} consists of two server chassis.  Each is a Kontron TIGW1U (product code
-TMRA0201W or TMRD0201W or equivalent) server.
+The @cite{Optranex 248} consists of two server chassis.  Each is a Kontron
+TIGW1U (product code TMRA0201W or TMRD0201W or equivalent) server.
 
 @subsubsection Processors
 
-Each server is equipped with two Quad-Core Intel Xeon 5400 or 5500 series processors.
+Each server is equipped with two Quad-Core Intel Xeon 5400 or 5500 series
+processors, preinstalled.
 
 @subsubsection Memory
 
+Each server is equipped with DDR3 memory modules, preinstalled.
+
 @subsubsection Hard Drives
 
-The @cite{Optranex 248} servers are equipment with 3 hot-swappable SAS (Serial Attached SCSI)
-hard-drives.
+The @cite{Optranex 248} servers are each equipped with 3 hot-swappable SAS
+(Serial Attached SCSI) hard-drives, preinstalled.
 
 @subsubsection PCIe Riser
 
-Each @cite{Optranex 248} server is equipped with a PCIe Riser Card inserted into a PCI Super Slot.
-The PCIe Riser card provides for x1, x4 or x8 lane operation.  The @cite{Optranex 248} SONET/SDH
-cards are x4 lane PCIe cards.  The @cite{Optranex 192} SONET/SDH cards are x8 lane PCIe Cards.
+Each @cite{Optranex 248} server is equipped with a PCIe Riser Card inserted
+into a PCI Super Slot.  The PCIe Riser card provides for x1, x4 or x8 lane
+operation.  The @cite{Optranex 248} SONET/SDH cards are x4 lane PCIe cards.
+The @cite{Optranex 192} SONET/SDH cards are x8 lane PCIe Cards.
 
 @subsubsection Power Supplies
 
-Each @cite{Optranex 248} server can be equipment with one or two (redundant, hot-swappable) AC or DC
-power supplies.
+Each @cite{Optranex 248} server can be equipment with one or two (redundant,
+hot-swappable) AC or DC power supplies.  Each server chassis will be provided
+with two (redundant hot-swappable) DC power supplies, preinstalled.
 
 @subsection Interface Cards
 
-Each @cite{Optranex 248} server is equipped with either a @cite{Optranex 248} x4 lane PCIe or
-@cite{Optranex 192} x8 lane PCIe SONET/SDH card.  For the Dallas trial, each server will be equipped
-with one @cite{Optranex 248} x4 lane PCIe card.
+Each @cite{Optranex 248} server is equipped with either a @cite{Optranex 248}
+x4 lane PCIe or @cite{Optranex 192} x8 lane PCIe SONET/SDH card.  For the
+Dallas trial, each server will be equipped with one @cite{Optranex 248} x4 lane
+PCIe card.  Interface cards will be installed separately and after server
+installation.
 
 @subsection SFP Modules
 
-Each @cite{Optranx 248} SONET/SDH card accepts up to four SFP modules.  SFP modules must be
-compliant with @cite{SFF Committee INF-8074i Revision 1.0} specifications.
+Each @cite{Optranex 248} SONET/SDH card accepts up to four SFP modules.  SFP
+modules must be compliant with @cite{SFF Committee INF-8074i Revision 1.0}
+specifications.  SFP modules will be provided by @cite{Optranex} and will be
+installed with the interface cards.
 
 @subsection Cables
 
+Cable requirements are as follows:
+
+@itemize
+@item 10 Category 6 or 6a STP RJ-45 patch cords, 5 between the rear of each
+@cite{Optranex} server chassis and the Juniper router.
+@item 2 9/125 fiber patch cords with LC duplex connectors, one between the
+GC optical patch panel and the rear of each @cite{Optranex} server chassis.
+@item 4 x SMA coaxial patch cords between the rear of the @cite{Optranex}
+server chassis.
+@item 3 x SFP copper patch cables between the rear of the @cite{Optranex}
+server chassis.
+@end itemize
+
 @subsection Rack Mount Kits
 
+Two 19" rack mount kits will be provided by @cite{Optranex}: one for each
+server chassis.
+
 @subsection Cable Management Kits
+
+The @cite{Optranex} servers must be disconnected from power and interface units
+before the case is opened for service.  Cable managements kits are not required
+when connections are removed before the server is slid out on its equipment
+rails.
 
 @node Installation
 @section Installation
@@ -6719,6 +6844,7 @@ mains disconnect must be readily accessible, and it must be labeled as controlli
 servers.  The UL Listed circuit breaker of a centralized DC power system may be used as a disconnect
 device when easily accessilble and should be rated no more than 10 amps.
 
+@node Grounding the Server
 @subsubheading Grounding the Server
 The servers are inteneded for installation with an isolated DC return (DC-I) and is to be installed
 in a Commong Bonding Network (CBN) per NEBS GR-1089.  To avoid the potential for an electrical shock
@@ -6794,21 +6920,321 @@ The temperature, in which each server operates when installed in an equipment ra
 Extreme fluctuations in temperature can cause a variety of problems.
 
 @subsubheading Ventilation
-The equipment rack must provide sufficient airflow to the front of each server to maintain proper
-cooling.  The rack must also include ventilation sufficient to exhaust a maximum of 1023 BTUs
-(British Thermal Units) per hour for the server.  The rack selected and the ventilation provided
-must be suitable to the environment in which the servers will be used.
+The equipment rack must provide sufficient airflow to the front of each server
+to maintain proper cooling.  The rack must also include ventilation sufficient
+to exhaust a maximum of 1023 BTUs (British Thermal Units) per hour for the
+server.  The rack selected and the ventilation provided must be suitable to the
+environment in which the servers will be used.
 
 @node Spares
 @section Spares
 
-@subsection Processors
+Spares will not be provided for the initial trial.  Spares will be provisioned
+for the full in-service date.  Spares consist of the following:
 
-@subsection Memory
+@itemize @bullet
+@item spare Intel Xeon 5400 series processor;
+@item spare memory modules;
+@item spare pluggable 450 Watt -48 VDC power supplies;
+@item spare pluggable fan modules (CPU fans, IO fans);
+@item spare filter packs;
+@item spare pluggable SAS harddrives;
+@item spare @cite{Optranex 248} SONET/SDH interface PCI Express cards; and,
+@item spare pluggable OC-12 SFP modules.
+@end itemize
 
-@subsection Hard Drives
+@noindent
+Note that with the exception of SONET optical modules, SAS harddrives
+and power supplies, replacement of parts including processors, memory modules,
+fan modules, filter packs, and PCI cards requires powering down at least one of
+the redundant servers.
+SONET optical modules, SAS harddrives and power supplies are
+hot-pluggable.
 
-@subsection Power Supplies
+@node Schedule
+@section Schedule
+
+@subsection Equipment Delivery and Installation
+
+@cite{Optranex} server chassis and equipment rails will be delivered to site
+and installed first.  According to current schedules, servers will be shipped
+to arrive between March 1 and March 30, 2010.
+
+@cite{Optranex} interface cards, SONET pluggable modules, SMA patch cables, and
+SFP loop-back cables, will be shipped separately.  SONET/SDH Interface cards
+and components will be shipped, according to current schedules, to arrive
+between  March 30, 2010 and April 12, 2010.
+
+@subsection Field Trial
+
+Test plan execution and trunk turn up will commence, according to current
+schedules, the week of April 12, 2010.  During the period from April 12, 2010
+to May 12, 2010, the @cite{Optranex} platform may be turned up and down and may
+experience unplanned service outages.  All planned outages will be performed
+within an preplanned evening maintenance window after trunks have been turned
+up the week of April 12, 2010.  The @cite{Optranex} platform can only be
+provisioned by @cite{Optranex} staff during the field trial.
+
+@subsection Provisioning Trial
+
+Provisioning of the services provided by the @cite{Optranex 248} will be
+available, according to current schedules, the week of May 10, 2010.  The
+provisioning plan will be executed that week to prove the integration with
+back-end provisining systems.  After the provisioning trial is complete, the
+@cite{Optranex 248} platform will be provisionable by @cite{Heranax} personnel.
+
+@subsection Inservice
+
+In service will commence June 1, 2010.  A separate inservice plan will be
+prepared to address redundancy, spares, etc.
+
+@node Provisioning Plan
+@chapter Provisioning Plan
+@cindex Provisioning plan
+
+@section SONET Segment Assignments
+
+@section SONET Path Assignments
+
+@section SIGTRAN Signaling Gateway Additions
+
+This section provides an overview of the addition of signalling gateways for SIGTRAN connectivity
+from the Optranex switch to the SS7 signaling network.
+
+@section PSTN Signaling Point Additions
+
+This section provides an overview of the addition of remote signaling points for SS7 Signaling over
+SIGTRAN M3UA.
+
+@noindent
+To assign a signaling point, the following information is required:
+
+@enumerate
+@item Signaling point code.
+@item Protocol variant.
+@item Protocol options.
+Protocol options include the following:
+@itemize
+@item @pval{SS7_POPT_UPT} --- whether to send UPT messages.
+@item @pval{SS7_POPT_LPA} --- whether to send LPA messages.
+@item @pval{SS7_POPT_UCIC} --- whether to send UCIC messages.
+@end itemize
+@item Exchange type.  This can be one of the following:
+@itemize
+@item @pval{ISUP_XCHG_TYPE_A} --- the exchange is a end-office exchange.
+@item @pval{ISUP_XCHG_TYPE_B} --- the exchange is a tandem exchange.
+@end itemize
+@end enumerate
+
+@section PSTN Signaling Relation Additions
+
+This section provides an overview of the addition of signalling relations for SS7 ISUP Signaling
+over SIGTRAN M3UA.
+
+@noindent
+Assignments that need to be made prior to signaling relation additions are as follows:
+
+@enumerate
+@item Signaling point assignment.
+@end enumerate
+
+@noindent
+Assignments made to add signaling relations are as follows:
+
+@enumerate
+@item Signaling relation assignment.
+@end enumerate
+
+@noindent
+To assign as signaling relation, the following information is required:
+
+@enumerate
+@item The signaling point code of the near-end signaling point.  This signaling point is identified
+by its signaling point identifier (which is an identifier local to the Optranex switch).
+@item The signaling point code of the far-end signaling point.  This signaling point is identified
+by its signaling point code.
+@item Protocol variant used in the communication between signaling points.
+@item Protocol options used between signaling points.
+@item Timer values as follows (when they deviate from default values):
+@itemize
+@item T4 --- waiting for UPA or other messages.
+@item T18 --- waiting for circuit-group-blocking-acknowledge retry.
+@item T19 --- waiting for circuit-group-blocking-acknowledgement maintenance.
+@item T20 --- waiting for circuit-group-unblocking-acknowledge retry.
+@item T21 --- waiting for circuit-group-unblocking-acknowledge maintenance.
+@item T22 --- waiting group-reset-acknowledge retry.
+@item T23 --- waiting group-reset-acknowledge maintenance.
+@item T28 --- waiting circuit-query-response.
+@item T29 --- congestion attack timer.
+@item T30 --- congestion decay timer.
+@item Tcgb --- waiting for blocking-acknowledge (ANSI).
+@item Tgrs --- waiting for reset-acknowledge (ANSI).
+@item Thga --- waiting for blocking-acknowledge hardware (ANSI).
+@item Tscga ---- waiting for blocking-acknowledge software (ANSI).
+@item Tscga_d ---- waiting for blocking-acknowledge software (ANSI).
+@end itemize
+@end enumerate
+
+@section SIP Proxy Additions
+
+This section provides an overview of the addition of Customer proxies to the OpenSIPs and C-SCP
+platforms.  The Optranex is not involved in this assigment.
+
+@section PSTN Trunk Group Addtions
+
+This section provides an overview of the addition of PSTN trunks to establish trunk group
+connectivity between the Optranex and remote switches.
+
+@noindent
+Assignments that need to be made prior to PSTN trunk group additions are as follows:
+
+@enumerate
+@item SONET segment assignment.
+@item SIGTRAN  SG assignment.
+@item PSTN Signaling Point assignment.
+@end enumerate
+
+@noindent
+Assignments made to add PSTN trunk groups are as follows:
+
+@enumerate
+@item ISUP trunk group assignment.
+@end enumerate
+
+@noindent
+The attributes (data) necessary to make an ISUP trunk group assignment is as follows:
+
+@enumerate
+@item Near-end signaling point code.  The near-end signalling point code is a point code selected
+from the point codes assigned to the @cite{Optranex} switch.
+@item Far-end signaling point code.  The far-end signalling point code is a point code selected from
+the point codes assigned to the remote switch to which the trunk group connects.
+@item Direction.  This can be one of the following:
+@itemize
+@item @pval{ISUP_TG_TYPE_OG} --- one-way outgoing trunk group.
+@item @pval{ISUP_TG_TYPE_IC} --- one-way incoming trunk group.
+@item @pval{ISUP_TG_TYPE_2W} --- both-way trunk group.
+@end itemize
+@item Circuit selection procedure.  This can be one of the following:
+@itemize
+@item @pval{ISUP_SELECTION_TYPE_MRU} --- most recently used.
+@item @pval{ISUP_SELECTION_TYPE_LRU} --- least recently used.
+@item @pval{ISUP_SELECTION_TYPE_ASEQ} --- ascending sequential.
+@item @pval{ISUP_SELECTION_TYPE_DSEQ} --- descending sequential.
+@end itemize
+@item Trunk group options.  This can be zero or more of the following:
+@itemize
+@item @pval{ISUP_TGF_GLARE_PRIORITY} --- when set, indicates that the local exchange has priority in
+glare conditions; when unset, indicates that the remote exchange has priority in glare conditions.
+@item @pval{ISUP_TGF_INCOMING_INTERNATIONAL_EXCHANGE} --- set to indicate that the remote exchange
+is an incoming international exchange on this trunk group.
+@item @pval{ISUP_TGF_SUSPEND_NATIONALLY_PERFORMED} --- set to indicate that suspend and resume
+procedures are performed according to national specifications.
+@item @pval{ISUP_TGF_CONTROLLING_EXCHANGE} --- set to indicate that the local exchange is a
+controlling exchange on this trunk group.
+@end itemize
+@end enumerate
+
+@section PSTN Route Additions
+
+This section provides an overview of the addition of overflow routes.  Overflow routes consist of a
+series of one-way-outgoing or both-way trunk groups.  The series identifies the overflow pattern for
+outgoing circuit seizures.  The first trunk group in the series is attempted first.  If as circuits
+are busy in the first group in the series, the second group is attempted.
+
+@noindent
+Assignments that need to be made prior to PSTN route additions are as follows:
+
+@enumerate
+@item PSTN trunk group assignment.
+@end enumerate
+
+@noindent
+Assignments made to add PSTN routes are as follows:
+
+@enumerate
+@item PSTN route assignment.
+@end enumerate
+
+@section PSTN Circuit Group Additions
+
+This section provides an overview of the addition, change or removal of circuit groups.  Circuit
+groups are used in the management and maintenance procedures for ISUP signaling.  ANSI uses implied
+or pre-assigned circuit groups.  A circuit group is identified using one of the circuit
+identification codes assigned within the circuit group.  Circuit groups must be assigned before
+circuits within the group can be assigned.
+
+@noindent
+Assignments that need to be made prior to circuit group assignments are as follows:
+
+@enumerate
+@item PSTN Signaling Point assignments (both local and remote).
+@end enumerate
+
+@noindent
+Assignments made to add circuit groups are as follows:
+
+@enumerate
+@item PSTN circuit group assignment.
+@end enumerate
+
+@section PSTN Circuit Additions
+
+This section provides an overview of the addition, change or removal of trunks (circuits) within
+PSTN trunk groups.
+
+@noindent
+Assignments that need to be made prior to PSTN trunk additions are as follows:
+
+@enumerate
+@item PSTN trunk group assignment.
+@item PSTN circuit group assignment.
+@item SONET path assignment.
+@end enumerate
+
+@noindent
+Assignments made to add PSTN trunk groups are as follows:
+
+@enumerate
+@item Near-end signaling point code.
+@item Far-end signaling point code.
+@item Primary circuit identification code.
+@item Pre-assigned or implied grouping.
+@end enumerate
+
+@enumerate
+@item ISUP circuit assignment.
+@end enumerate
+
+@section PSTN Virtual Trunk Group Additions
+
+This section provides an overview of the addition, change or removal of PSTN virtual trunk groups
+(for outgoing calls only).
+
+@section SIP Virtual Trunk Group Additions
+
+This section provides and overview of the addition of SIP virtual trunk groups (for incoming calls
+only) to the OpenSIPs and C-SCP platforms.
+
+@subsection OpenSIPS
+
+@subsection Optranex
+
+@subsection C-SCP
+
+@node Test Plan
+@chapter Test Plan
+@cindex Test plan
+
+@section OpenSIPS
+
+@section Optranex
+
+@section C-SCP
+
+@section Outgoing Calls
+
+@section Incoming Calls
 
 @node Alternate Hardware
 @appendix Alternate Hardware
