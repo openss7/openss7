@@ -894,3 +894,7 @@ src/java/javax/jain/protocol/ss7/class-use/
 src/java/javax/jain/protocol/ss7/map/class-use/
 src/java/javax/jain/ss7/isup/Makefile
 src/java/javax/jain/ss7/isup/Makefile.make
+src/snmp/*_openss7.c
+src/snmp/*_openss7.h
+src/snmp/*.tree
+
