@@ -60,7 +60,8 @@ if DEVELOPMENT
 PAPER_PREFIX = optranex
 
 FIG_FIGS = \
-	optranex_fig01.fig
+	optranex_fig01.fig \
+	optranex_fig02.fig
 
 LATEXS = \
 	optranex.tex
@@ -74,6 +75,7 @@ EXTRA_DIST += \
 	optranex.tex \
 	optranex.bib \
 	optranex_fig01.fig \
+	optranex_fig02.fig \
 	org.css
 
 # =============================================================================

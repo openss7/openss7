@@ -298,13 +298,10 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * MGI Service Primitives::
 * MGI Input-Output Controls::
 * MGI Management::
-@c * Addendum for ITU-T Q.703 Conformance::
-@c * Addendum for ANSI T1.111.3 Conformance::
-@c * Addendum for ETSI Conformance::
-@c * Mapping of SDLI Primitives to ITU-T Q.703::
-@c * Mapping of SDLI Primitives to ANSI T1.111.3::
-@c * State/Event Tables::
-@c * Primitive Precedence Tables::
+* Addendum for ITU-T H.248 Conformance::
+* Mapping of MGI Primitives to ITU-T H.248::
+* State/Event Tables::
+* Primitive Precedence Tables::
 * MGI Header Files::
 * MGI Drivers and Modules::
 * MGI Applications::
@@ -536,7 +533,6 @@ primitives that originate from the MGS provider are either confirmations of a re
 indications to the MGS user that an event has occurred.  @figref{1} show the model of the MGI.
 
 @figuresized{mgi01,1,Model of the MGI,3.0in}
-
 The MGI allows the MGS provider to be configured with any media gateway layer user (such as a
 swtiching application) that also conforms to the MGI.  A media gateway layer user can also be a user
 program that conforms to the MGI and accesses the MGS provider via @command{@b{putmsg}(2s)} and
@@ -598,7 +594,6 @@ evident on a system that is attached to multiple physical media.  @figref{17} il
 identification approach, which is explained below.
 
 @figuresized{mgi17,17,Media Gateway Addressing Components,3.5in}
-
 @subsection Physical Attachment Identification
 
 The physical point of attachment (PPA in @figref{17}) is the point at which a system interface
@@ -741,7 +736,6 @@ failure to complete a service primitive request that requires negative acknowled
 A successful invocation of the acknowledgement service is illustrated in @figref{15}.
 
 @figuresized{mgi15,15,Message Flow: Successful Acknowledgement Service,4.0in}
-
 As illustrated in @figref{15}, the
 service primitives for which a positive acknowledgement may be returned are the
 @prim{MG_ATTACH_REQ} and @prim{MG_DETACH_REQ}.
@@ -749,7 +743,6 @@ service primitives for which a positive acknowledgement may be returned are the
 An unsuccessful invocation of the acknowledgement service is illustrated in @figref{16}.
 
 @figuresized{mgi16,16,Message Flow: Unsuccessful Acknowledgement Service,4.0in}
-
 As illustrated in @figref{16}, the service primitives for which a negative acknowledgement may be
 returned are the @prim{MG_INFO_REQ}, @prim{MG_ATTACH_REQ}, @prim{MG_DETACH_REQ},
 @prim{MG_ENABLE_REQ}, @prim{MG_DISABLE_REQ} and @prim{MG_OPTMGMT_REQ} messages.
@@ -1029,43 +1022,179 @@ The service primitives that implement the protocol services are described in det
 Service Primitives}.
 
 @menu
+* Create Service::
 * Join Service::
+* Enable Service::
 * Connection Service::
-* Data Transfer Service::
 * Action Service::
+* Data Transfer Service::
+* Notify Service::
 * Disconnection Service::
+* Disable Service::
 * Leave Service::
+* Destroy Service::
 @end menu
+
+@node Create Service
+@subsection Create Service
+
+The create service provides the ability for the MGS user to create a session context.  A session
+context so created does not have any termination points associated with it.  Session contexts
+created with the @dfn{Create Service} can be destroyed with the @ref{Destroy Service}.  Session
+contexts provide a mechanism whereby termination points can be enjoined into a communications
+session.
+
+@itemize @bullet
+
+@item @b{@prim{MG_CREATE_REQ}}:
+The @prim{MG_CREATE_REQ} primitive is used by the MGS user to create a session context.  The newly
+created session context has no terminations associated with it.
+
+@item @b{@prim{MG_CREATE_ACK}}:
+The @prim{MG_CREATE_REQ} primitive is issued by the MGS provider to acknowledge creation of a
+session context.
+
+@end itemize
+
+Session contexts can be long-lived or short-lived depending on the needs of the MGS user.  For
+example, it is possible for the @dfn{Media Gateway} to allocated all of the session contexts that it
+might need to perform its functions in advance of the need for communications within any given
+session context.  Sessions may alternately be created on demand using the @ref{Join Service}.
 
 @node Join Service
 @subsection Join Service
 
+The join service provides the ability for the MGS user to associate a termination point with a
+session.  It is equivalent to the @msg{Add} service for a single termination point in H.248.
+The join service may also be used to create a session context, on demand, by specifying a null
+session context identifier.
+
+@itemize @bullet
+
+@item @b{@prim{MG_JOIN_REQ}}:
+The @prim{MG_JOIN_REQ} primitive is used by the MGS user to associate a termination point with a
+session context.  The primitive only affects a single termination point within a single session.
+The primitive may also be used to create a session context.
+
+@item @b{@prim{MG_JOIN_CON}}:
+The @prim{MG_JOIN_CON} primitive is issued by the MGS provider to confirm that a termination point
+has been associated with a session context.  The primitive only confirms the association of a single
+termination point within a session.  The primitive may also be used to confirm the creation of a
+session.
+
+@end itemize
+
+@noindent
+A successful invocation of the join service is illustrated in @figref{18}.
+
+@figuresized{mgi18,18,Message Flow: Successful Join Service by MGS Provider,4.0in}
+The lifespan of a termination point within a session context can be long-lived or short-lived
+depending on the needs of the MGS user.  For example, a @dfn{Media Gateway} can establish all of the
+session contexts that it might need and enjoin termination points into the session contexts in
+advance of any need for communication amoung the termination points within the sessions.  This
+permits a pre-assigned association of termination points to session contexts.
+
+
+@node Enable Service
+@subsection Enable Service
+
+The enable service provides the ability for the MGS user to reserve resources or set parameters
+associated with a termination point.  It is equivalent in part to the @msg{Add} service for a single
+termination point in @cite{ITU-T Recommendation H.248}.
+
+The MGS user can choose the point at which termination points are to be enabled.  An enabled
+termination point is not necessarily connected into a session context.  Where the nature of the
+termination point does not require a procedure to be enabled, the @ref{Connection Service} can be
+used to both enable the termination point and establish communications within the session in a
+single operation.
+
+Note that a termination point does not need to be joined to a session context to be enabled.
+
+@itemize @bullet
+
+@item @b{@prim{MG_ENABLE_REQ}}:
+The @prim{MG_ENABLE_REQ} primitive is used by the MGS user to request that resources be allocated or
+parameters be set for a termination point.  This may include, for example, the activation of an RTP
+session, or the seizure of a TDM trunk.  Parameters that might be included when enabling a
+termination point might include, for an RTP stream, whether RTCP is used, the maximum jitter buffer
+size, the codec, and the IP address and port number of the remote end of the RTP stream.
+
+@item @b{@prim{MG_ENABLE_CON}}:
+The @prim{MG_ENABLE_CON} primitive is issued by the MGS provider to confirm that resources have been
+allocated and parameters negotiated for a termination point.  This may include, for example, the
+activation of an RTP session, or the seizure of a TDM trunk.
+
+@end itemize
+
+@noindent
+A successful invocation of the enable service is illustrated in @figref{19}.
+
+@figuresized{mgi19,19,Message Flow: Successful Enable Service by MGS Provider,4.0in}
+
 @node Connection Service
 @subsection Connection Service
 
-The connection service provides the ability for the MGS user to connect to the medium for the
-purpose of transmitting bits, receiving bits, or both.  In the OSI model, this is a Layer 1 function, possibly
-the responsibility of multiplex or digital cross-connect switch.
+The connection service provides the ability for the MGS user to specify that a termination point be
+connected within a session context.  Termination points can be connected for transmission (samples
+sent to the termination point) or for reception (samples received from the termination point) or
+both.  Connecting a termination point within a session context causes transmission to be taken from
+the session context and receiption to be provided to the session context.
 
 @itemize @bullet
 
 @item @b{@prim{MG_CONN_REQ}}:
-The @prim{MG_CONN_REQ} message is used by the MGS user to request that the Stream be connected to
-the medium.  Connection to the medium might require some switching or other mechanism to prepare the
-Stream for data transmission and reception.  Connections can be formed for the receive direction or
-the transmit direction independently.
+The @prim{MG_CONN_REQ} message is used by the MGS user to request that the termination point be
+connected to the session context.  Connection to the context might require some switching or other
+mechanism to prepare the termination point for data transmission and reception.  Connections can be
+formed for the receive direction or the transmit direction independently.
 
 @item @b{@prim{MG_CONN_CON}}:
-The @prim{MG_CONN_CON} message is used by the MGS provider to confirm that the Stream has been
-connected to the medium.  Connection to the medium may have required some switching or other
-mechanism to prepare the Stream for data transmission and receptoin.  Connection can be confirmed
-for the receive or transmit directions independently.
+The @prim{MG_CONN_CON} message is used by the MGS provider to confirm that the termination point has
+been connected to the session context.  Connection to the session context may have required some
+switching or other mechanism to prepare the termination point for data transmission and receptoin.
+Connection can be confirmed for the receive or transmit directions independently.
 
 @end itemize
 
 A successful invocation of the connection service is illustrated in @figref{11}.
 
 @figuresized{mgi11,11,Message Flow: Successful Connection Service,4.0in}
+
+@node Action Service
+@subsection Action Service
+
+The action service provides the ability for the MGS user to request that an action be performed on a
+termination point within a session, or on an entire session.  It allows the MGS user to provide
+tones, anouncements, test terminations, etc.
+
+@itemize @bullet
+@item @b{@prim{MG_ACTION_REQ}}:
+The @prim{MG_ACTION_REQ} message is used by the MGS user to request that an action be performed on a
+session or on a termination point within a session.  The action can be an audio pattern provided by
+the MGS user in associated data blocks, or can be a pre-established pattern specified by the MGS
+user.  The MGS user has control of the session and termination point within the session to which the
+action is applied, the duration or repetition of the action.
+@item @b{@prim{MG_ACTION_IND}}:
+The @prim{MG_ACTION_IND} message is used by the MGS provider to indicate to the MGS user that a
+requested action has been initiated or has passed a repetition point.
+@item @b{@prim{MG_ACTION_CON}}:
+The @prim{MG_ACTION_CON} message is used by the MGS provider to confirm to the MGS user that an
+action of restricted duration or repetitions has reached the endi of its duration or repetitions.
+@item @b{@prim{MG_ABORT_REQ}}:
+The @prim{MG_ABORT_REQ} message is used by an MGS user to abort an ongoing actions that was
+previously initiated with an @prim{MG_ACTION_REQ} message, but has not yet terminated (i.e. with an
+@prim{MG_ACTION_CON}).
+@end itemize
+
+@noindent
+A successful invocation of the action service is illustrated in @figref{20}.
+
+@figuresized{mgi20,20,Message Flow: Successful Action Service by MGS Provider,4.0in}
+
+@noindent
+An aborted invocation of the action service is illustrated in @figref{21}.
+
+@figuresized{mgi21,21,Message Flow: Aborted Action Service by MGS Provider,4.0in}
 
 @node Data Transfer Service
 @subsection Data Transfer Service
@@ -1091,31 +1220,27 @@ A successful invocation of the data transfer service is illustrated in @figref{1
 
 @figuresized{mgi12,12,Message Flow: Successful Data Transfer Service,4.0in}
 
-@node Action Service
-@subsection Action Service
+@node Notify Service
+@subsection Notify Service
 
-The action service provides the ability for the MGS user to request that an action be performed on a
-termination point within a session, or on an entire session.  It allows the MGS user to provide
-tones, anouncements, test terminations, etc.
+The notify service provides the MGS user with the ability to request notification of specific events
+or detected conditions.  These notifications can be on a specific termination point, within a
+session context, or on a global basis.
 
 @itemize @bullet
-@item @b{@prim{MG_ACTION_REQ}}:
-The @prim{MG_ACTION_REQ} message is used by the MGS user to request that an action be performed on a
-session or on a termination point within a session.  The action can be an audio pattern provided by
-the MGS user in associated data blocks, or can be a pre-established pattern specified by the MGS
-user.  The MGS user has control of the session and termination point within the session to which the
-action is applied, the duration or repetition of the action.
-@item @b{@prim{MG_ACTION_CON}}:
-The @prim{MG_ACTION_CON} message is used by the MGS provider to confirm to the MGS user that the
-requested action has begun.
-@item @b{@prim{MG_ACTION_IND}}:
-The @prim{MG_ACTION_IND} message is used by the MGS provider to indicate to the MGS user that an
-action of restricted duration or repetition has reached the end of its duration or has passed a
-repetition point.
-@item @b{@prim{MG_ABORT_REQ}}:
-The @prim{MG_ABORT_REQ} message is used by an MGS user to abort an ongoing actions that was
-previously initiated with an @prim{MG_ACTION_REQ} message.
+
+@item @b{@prim{MG_NOTIFY_REQ}}:
+The @prim{MG_NOTIFY_REQ} message is used by the MGS user to request that the MGS provider issue
+notification indications for specific events or detected conditions with the @dfn{Media Gateway}.
+
+@item @b{@prim{MG_NOTIFY_IND}}:
+The @prim{MG_NOTIFY_IND} message is issued by the MGS provider when a detected event requested by
+the MGS user has occured.
+
 @end itemize
+
+This service is roughly equivalent to the @msg{Audit} service of @cite{ITU-T Recommendation
+H.248.1}.
 
 @node Disconnection Service
 @subsection Disconnection Service
@@ -1141,21 +1266,121 @@ mechanism.  Disconnection can be confirmed for the receive or transmit direction
 
 @item @b{@prim{MG_DISCON_IND}}:
 The @prim{MG_DISCON_IND} message is used by the MGS provider to indicate to the MGS user
-that the Stream has been disconnected from the medium.  Disconnection is indicated for both the
-receive and transmit directions.
+that the termination point has been disconnected from the session context.  Disconnection is
+indicated for both the receive and transmit directions.  Disconnection indications can result from
+such things as loss of an RTP stream, on-hook condition, trunk release, or hardware-failure oriented
+circuit blocking.  This primitive is roughly equivalent to the @msg{ServiceChange} service of
+@cite{ITU-T Recommendation H.248} for a specific termination.
 
 @end itemize
 
 A successful invocation of the disconnection service by the MGS user is illustrated in @figref{13}.
 
 @figuresized{mgi13,13,Message Flow: Successful Disconnection Service by MGS User,4.0in}
-
 A successful invocation of the disconnection service by  the MGS provider is illustrated in @figref{14}.
 
 @figuresized{mgi14,14,Message Flow: Successful Disconnection Service by MGS Provider,4.0in}
 
+@node Disable Service
+@subsection Disable Service
+
+The disable service provides the ability for the MGS user to release resources associated with a
+termination point.  It is equivalent in part to the @msg{Subtract} service for a single termination
+point in @cite{ITU-T Recommendation H.248}.
+
+The MGS user can choose th point at which termination points are to be enabled and disabled.  An
+enabled or disable termination point is not necessarily connected into a session context.  Where the
+nature of the termination point does not require a procedure to be disabled, the @ref{Disconnection
+Service} can be used to both disable the termination point and disconnect communications within the
+session in a single operation.
+
+Note that a termination point does not need to be joined to a session context to be disabled.
+
+@itemize @bullet
+
+@item @b{@prim{MG_DISABLE_REQ}}:
+The @prim{MG_DISABLE_REQ} primitive is used by the MGS user to request that resources be released
+for a termination point.  This may include, for example, the deactivation of an RTP session, or the
+release of a TDM trunk.
+
+@item @b{@prim{MG_DISABLE_CON}}:
+The @prim{MG_DISABLE_CON} primitive is issued by the MGS provider to confirm that resources have
+been released for a termination point.  This may include, for example, the release of an RTP stream,
+or the release of a TDM trunk.
+
+@end itemize
+
+@noindent
+A successful invocation of the disable service is illustrated in @figref{22}.  The disable service
+is an acknowledged and confirmed service that requries the immediate acknowledgement or refusal of
+the requires penultimately followed by a confirmation on success.
+
+@figuresized{mgi22,22,Message Flow: Successful Disable Service by MGS Provider,4.0in}
+
 @node Leave Service
 @subsection Leave Service
+
+The leave service provides the ability for the MGS user to disassociate a termination point with a
+session context.  It is roughly equivalent to the @msg{Subtract} service for a single termination
+point in @cite{ITU-T Recommendation H.248}.  The leave service may also be used to disconnect a
+termination point in one operation.
+
+@itemize @bullet
+
+@item @b{@prim{MG_LEAVE_REQ}}:
+The @prim{MG_LEAVE_REQ} service provides the ability for the MGS user to disassociate a termination
+point from a session context.  The primitive affects one or more termination points within a given
+session context.  The primitive may also be used to disconnect termination points from the session
+context as they are being disassociated.
+
+@item @b{@prim{MG_LEAVE_CON}}:
+The @prim{MG_LEAVE_CON} primitive is issued by the MGS provider to confirm that a termination point,
+or a number of termination points, have been disconnected from and disassociated with a session
+context.  The primitive confirms one or more termination point disconnects and removals from the
+session.
+
+@c @item @b{@prim{MG_LEAVE_IND}}:
+
+@end itemize
+
+@noindent
+A successful invocation of the leave service is illustrated in @figref{23}.  The leave service is an
+acknowleged and confirmed service that requires the immediate acknowledgement or refusal of the
+request penultimately followed by a confirmation on success.
+
+@figuresized{mgi23,23,Message Flow: Successful Leave Service by MGS Provider,4.0in}
+The lifespan of termination points within a session context can be long-lived or short-lived
+depending on the needs of the MGS user.  For example, a @dfn{Media Gateway} can establish all of the
+session contexts that it might need in advance and enjoin termination points into the session
+contexts in advance of any need for communiction among the termination points within the sessions.
+This permits pre-assigned association of termination points to session contexts.  In this case, the
+leave service is only required when tearing down an entire @dfn{Media Gateway}.
+
+@node Destroy Service
+@subsection Destroy Service
+
+The destroy service allows an MGS user to request the destruction of a session context.  Destruction
+of a session context may result in the disconnection and disassociation of all termination points
+that are currently connected or enjoined in the session context.
+
+@itemize @bullet
+
+@item @b{@prim{MG_DESTROY_REQ}}:
+The @prim{MG_DESTROY_REQ} primitive is used by an MGS user to request that a session context be
+deleted.
+
+@item @b{@prim{MG_DESTROY_ACK}}:
+The @prim{MG_DESTROY_ACK} primitive is issued by the MGS provider to acknowledge the destruction of
+a session context.  The session context identfier is available again to be used for the creation of
+a session context.
+
+@end itemize
+
+Session contexts can be long-lived or short-lived depending on the needs of the MGS user.  For
+example, it is possible for the @dfn{Media Gateway} to allocated all of the session contexts that it
+might need to perform its functions in advance of the need for communications within any given
+session context.  In this case, the destroy service might only be required when tearing down an
+entire @dfn{Media Gateway}.
 
 @node MGI Service Primitives
 @chapter MGI Service Primitives
@@ -4162,28 +4387,52 @@ argument to the input-output control and acted upon for the media gateway.
 @node MGI Management
 @chapter MGI Management
 
-@ignore
-@node Addendum for ITU-T Q.703 Conformance
-@unnumbered Addendum for ITU-T Q.703 Conformance
+@node Mapping of MGI Primitives to ITU-T H.248
+@unnumbered Mapping of MGI Primitives to ITU-T H.248
 
-@node Addendum for ANSI T1.111.3 Conformance
-@unnumbered Addendum for ANSI T1.111.3 Conformance
+@table @command
+@item Add
+@prim{MG_JOIN_REQ}, @prim{MG_JOIN_CON}
+@prim{MG_CONN_REQ}, @prim{MG_CONN_CON}
+@item Modify
+@prim{MG_OPTMGMT_REQ}, @prim{MG_OPTMGMT_ACK}
+@prim{MG_CONN_REQ}, @prim{MG_CONN_CON}
+@prim{MG_DISCON_REQ}, @prim{MG_DISCON_IND}, @prim{MG_DISCON_CON}
+@item Subtract
+@prim{MG_LEAVE_REQ}, @prim{MG_LEAVE_IND}, @prim{MG_LEAVE_CON}
+@item Move
+@prim{MG_LEAVE_REQ}, @prim{MG_LEAVE_IND}, @prim{MG_LEAVE_CON}
+@prim{MG_DISCON_REQ}, @prim{MG_DISCON_IND}, @prim{MG_DISCON_CON}
+@prim{MG_CONN_REQ}, @prim{MG_CONN_CON}
+@prim{MG_JOIN_REQ}, @prim{MG_JOIN_CON}
+@item AuditValue
+@prim{MG_OPTMGMT_REQ}, @prim{MG_OPTMGMT_ACK}
+@item AuditCapabilities
+@prim{MG_INFO_REQ}, @prim{MG_INFO_ACK}
+@item Notify
+@prim{MG_NOTIFY_REQ}, @prim{MG_NOTIFY_IND}
+@item ServiceChange
+@prim{MG_DISCON_IND}, @prim{MG_LEAVE_IND}, @prim{MG_NOTIFY_IND}
+@end table
 
-@node Addendum for ETSI Conformance
-@unnumbered Addendum for ETSI Conformance
+@subsubheading Mode Property
 
-@node Mapping of MGI Primitives to ITU-T Q.703
-@appendix Mapping of MGI Primitives to ITU-T Q.703
+@table @parm
+@item SendOnly
+@item RecvOnly
+@item SendRecv
+@item Inactive
+@item LoopBack
+@end table
 
-@node Mapping of MGI Primitives to ANSI T1.111.3
-@appendix Mapping of MGI Primitives to ANSI T1.111.3
+@node Addendum for ITU-T H.248 Conformance
+@unnumbered Addendum for ITU-T H.248 Conformance
 
 @node State/Event Tables
 @appendix State/Event Tables
 
 @node Primitive Precedence Tables
 @appendix Primitive Precedence Tables
-@end ignore
 
 @node MGI Header Files
 @appendix MGI Header Files
@@ -4307,7 +4556,6 @@ Gateway} (MG) using several related protocols used for that purpose.  The protoc
 and @cite{MEGACO}@footnote{@cite{ITU-T Recommendation H.248}.}.
 
 @figuresized{mgib8,B-8,Media Gateway Controller Stack,5.75in}
-
 The MGI interface is responsible for providing access to media gateway services necessary for the
 @dfn{Media Gateway Controller} to control the functions of the @dfn{Media Gateway}.  Use of the MGI
 and the @cite{OpenSS7} media gateway controller MGCP/MEGACO component provides a mechanism whereby
@@ -4335,7 +4583,6 @@ As illustrated in @figref{B-9}, the MGI interface provides support for both the 
 for interaction using IP transport and the @cite{MGCP} or @cite{MEGACO} protocols.
 
 @figuresized{mgib9,B-9,Media Gateway Stack,5.75in}
-
 The MGI interface is responsible both for providing a service primitive interface that is capable of
 performing the functions of the H.248/MEGACO and MGCP protocols, as well as providing for the
 control of the media functions of the media gatway itself.  This is illustrated by the two

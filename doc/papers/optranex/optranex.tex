@@ -103,8 +103,9 @@
 \title{High Density SONET/SDH MG Interface for VoIP Trunking\\[0.5ex]
 	{\large \textsl{Draft Patent Application}}}
 \author{Brian Bidulock\thanks{bidulock@openss7.org}\\
-	OpenSS7 Corporation}
+	Optranex Inc.}
 \date{February 7, 2010}
+\date{March 2, 2010}
 \maketitle
 
 \begin{abstract}
@@ -363,12 +364,53 @@ more fully understood from the following description and drawings.
 \caption[Figure1]{}
 \label{figure:optranex_fig01}
 \end{figure}
+
+\begin{figure}[htp]
+\center\includegraphics[width=9.0in,angle=90]{optranex_fig02}
+\caption[Figure1]{}
+\label{figure:optranex_fig02}
+\end{figure}
 \twocolumn
 
 \section[Drawings]{Brief Description of the Drawings}
 
 \textbf{Figure \ref{figure:optranex_fig01}} comprises a block diagram
 illustrating one preferred embodiment of the current invention.
+
+\noindent
+\textbf{Figure \ref{figure:optranex_fig02}} comprises a flow diagram
+illustrating the general steps proscribed by the current invention.
+
+\section[Detail]{Detailed Description of the Drawings}
+
+\textbf{Figure \ref{figure:optranex_fig02}} provides a general description of
+the current invention.
+
+A synchronous process \textbf{200} receives bits representing isochronous or
+pleisosychronous signals \textbf{201} and transfers the bits representing those
+received signals into a storage or delay mechanism \textbf{202}.  This process
+\textbf{200} transfers bits \textbf{201} representing received signals to a
+storage or delay mechanism \textbf{202} in synchronicity with the received
+signals \textbf{201}.
+
+An on-demand process \textbf{203}, once sufficient bits have been received to
+formulate a packet, removes the bits from the storage or delay mechanism
+\textbf{204}, formats and places them into packets \textbf{205} and transmits
+the packets \textbf{205}.  This process \textbf{203} is performed on a demand
+basis whose timing meets the less stringent timing requirements of packet
+transmission \textbf{206}.
+
+In the reverse direction, another on-demand process \textbf{207} receives
+packets \textbf{208}, removes and unformats the bits representing the
+isochronous signals from the packets \textbf{209} and transfers the bits
+representing these signals to a storage or delay mechanism \textbf{210}.  This
+process \textbf{207} is performed on a demand basis whose timing meets the less
+stringent timing requirements of packet reception \textbf{208}.
+
+Another synchronous process \textbf{211} removes bits from the storage or delay
+mechanism \textbf{212} and transmits those bits as an isochronous stream
+\textbf{213}.  This process \textbf{211} transmits bits in accordance with the
+stringent timing requirements of the isochronous signals \textbf{213}.
 
 \section[Description]{Detailed Description of Certain Embodiments}
 
