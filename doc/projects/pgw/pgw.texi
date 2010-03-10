@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: pgw.texi,v 1.1.2.1 2010-02-22 14:25:51 brian Exp $
+% @(#) $Id: pgw.texi,v 1.1.2.2 2010-03-10 08:42:18 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2010-02-22 14:25:51 $ by $Author: brian $
+% Last Modified $Date: 2010-03-10 08:42:18 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -449,6 +449,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: pgw.texi,v $
+Revision 1.1.2.2  2010-03-10 08:42:18  brian
+- added Optranex files
+
 Revision 1.1.2.1  2010-02-22 14:25:51  brian
 - added new documentation files
 

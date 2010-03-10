@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isupi.h,v 1.1.2.2 2010-02-22 14:48:42 brian Exp $
+ @(#) $Id: isupi.h,v 1.1.2.3 2010-03-10 08:42:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-02-22 14:48:42 $ by $Author: brian $
+ Last Modified $Date: 2010-03-10 08:42:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isupi.h,v $
+ Revision 1.1.2.3  2010-03-10 08:42:19  brian
+ - added Optranex files
+
  Revision 1.1.2.2  2010-02-22 14:48:42  brian
  - added documentation files to build
 
@@ -65,7 +68,7 @@
 
 /* This file can be processed by doxygen(1). */
 
-#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
+#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 1.1.2.3 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  *  ISUP addresss
