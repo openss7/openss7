@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-02-22 14:48:41 $ by $Author: brian $
+ Last Modified $Date: 2010-04-01 17:21:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 1.1.2.3  2010-04-01 17:21:54  brian
+ - fix missing ISUP_PT_SVACT
+
  Revision 1.1.2.2  2010-02-22 14:48:41  brian
  - added documentation files to build
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $"
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:41 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1888,6 +1891,7 @@ typedef struct isup_msg {
 #define ISUP_PT_BGROUP	198UL	/* 0xc6 - 0b11000110 - Business group (ANSI) */
 #define ISUP_PT_GNAM	199UL	/* 0xc7 - 0b11000111 - Generic name (ANSI) */
 #define ISUP_PT_NOTI	225UL	/* 0xe1 - 0b11100001 - Notification indicator (ANSI) */
+#define ISUP_PT_SVACT	226UL	/* 0xe2 - 0b11100010 - Service activation (ANSI) */ /* XXX */
 #define ISUP_PT_CSPI	226UL	/* 0xe2 - 0b11100010 - Carrier service provider identification (ANSI) */
 #define ISUP_PT_TRNSRQ	227UL	/* 0xe3 - 0b11100011 - Transaction request (ANSI, Bellcore) */
 #define ISUP_PT_LSPI	228UL	/* 0xe4 - 0b11100100 - Local service provider information (ANSI) */
