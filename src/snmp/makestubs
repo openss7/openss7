@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 #
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-03-10 08:42:20 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-06-09 12:58:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-03-10 08:42:20 $ by $Author: brian $
+# Last Modified $Date: 2010-06-09 12:58:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,6 +64,8 @@ export MIBFILES
 all: simple storage openss7 master
 
 check: \
+	sfpMIB.tree \
+	sfpOmMIB.tree \
 	isupMIB.tree \
 	cdr2MIB.tree \
 	dlMIB.tree \
@@ -100,6 +102,12 @@ check: \
 	x25MIB.tree \
 	x400pMIB.tree \
 	x400pMIB.tree
+
+sfpMIB.tree: ../mibs/OPENSS7-SFP-MIB.mib
+	snmptranslate -Tp OPENSS7-SFP-MIB::sfpMIB >sfpMIB.tree
+
+sfpOmMIB.tree: ../mibs/OPENSS7-SFP-MIB.mib
+	snmptranslate -Tp OPENSS7-SFP-OM-MIB::sfpOmMIB >sfpOmMIB.tree
 
 isupMIB.tree: ../mibs/OPENSS7-ISUP-MIB.mib
 	snmptranslate -Tp OPENSS7-ISUP-MIB::isupMIB >isupMIB.tree
@@ -232,6 +240,8 @@ x400pMIB.tree: ../mibs/OPENSS7-X400P-MIB.mib
 #	snmptranslate -Tp OPENSS7-X400P-MX-MIB::x400pMIB >x400pMIB.tree
 
 simple: \
+	sfpMIB_simple.c sfpMIB_simple.h \
+	sfpOmMIB_simple.c sfpOmMIB_simple.h \
 	isupMIB_simple.c isupMIB_simple.h \
 	cdr2MIB_simple.c cdr2MIB_simple.h \
 	dlMIB_simple.c dlMIB_simple.h \
@@ -263,6 +273,16 @@ simple: \
 	tcapOmMIB_simple.c tcapOmMIB_simple.h \
 	x25MIB_simple.c x25MIB_simple.h \
 	x400pMIB_simple.c x400pMIB_simple.h
+
+#sfpMIB_simple.c sfpMIB_simple.h: MIBS+=OPENSS7-SFP-MIB:OPENSS7-TC
+sfpMIB_simple.c sfpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SFP-MIB.mib
+	./mib2c -c ./mib2c.conf -f sfpMIB_simple sfpMIB
+	indent -nhnl sfpMIB_simple.[ch]
+
+#sfpOmMIB_simple.c sfpOmMIB_simple.h: MIBS+=OPENSS7-SFP-OM-MIB:OPENSS7-TC
+sfpOmMIB_simple.c sfpOmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SFP-OM-MIB.mib
+	./mib2c -c ./mib2c.conf -f sfpOmMIB_simple sfpOmMIB
+	indent -nhnl sfpOmMIB_simple.[ch]
 
 #isupMIB_simple.c isupMIB_simple.h: MIBS+=OPENSS7-ISUP-MIB:OPENSS7-TC
 isupMIB_simple.c isupMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-ISUP-MIB.mib
@@ -417,6 +437,8 @@ x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X400P-MIB.
 #	indent -nhnl x400pMIB_simple.[ch]
 
 storage: \
+	sfpMIB_storage.c sfpMIB_storage.h \
+	sfpOmMIB_storage.c sfpOmMIB_storage.h \
 	isupMIB_storage.c isupMIB_storage.h \
 	cdr2MIB_storage.c cdr2MIB_storage.h \
 	ds0Bundle_storage.c ds0Bundle_storage.h \
@@ -447,6 +469,16 @@ storage: \
 	tcapOmMIB_storage.c tcapOmMIB_storage.h \
 	x25MIB_storage.c x25MIB_storage.h \
 	x400pMIB_storage.c x400pMIB_storage.h
+
+#sfpMIB_storage.c sfpMIB_storage.h: MIBS+=OPENSS7-isup-MIB:OPENSS7-TC
+sfpMIB_storage.c sfpMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SFP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f sfpMIB_storage sfpMIB
+	indent -nhnl sfpMIB_storage.[ch]
+
+#sfpOmMIB_storage.c sfpOmMIB_storage.h: MIBS+=OPENSS7-isup-MIB:OPENSS7-TC
+sfpOmMIB_storage.c sfpOmMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SFP-OM-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f sfpOmMIB_storage sfpOmMIB
+	indent -nhnl sfpOmMIB_storage.[ch]
 
 #isupMIB_storage.c isupMIB_storage.h: MIBS+=OPENSS7-isup-MIB:OPENSS7-TC
 isupMIB_storage.c isupMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-ISUP-MIB.mib
@@ -611,6 +643,8 @@ x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-
 #	indent -nhnl x400pMIB_storage.[ch]
 
 openss7: \
+	sfpMIB_openss7.c sfpMIB_openss7.h \
+	sfpOmMIB_openss7.c sfpOmMIB_openss7.h \
 	isupMIB_openss7.c isupMIB_openss7.h \
 	cdr2MIB_openss7.c cdr2MIB_openss7.h \
 	dlMIB_openss7.c dlMIB_openss7.h \
@@ -625,6 +659,16 @@ openss7: \
 	ss7MIB_openss7.c ss7MIB_openss7.h \
 	strMIB_openss7.c strMIB_openss7.h \
 	x25MIB_openss7.c x25MIB_openss7.h
+
+#sfpMIB_openss7.c sfpMIB_openss7.h: MIBS+=OPENSS7-SFP-MIB:OPENSS7-TC
+sfpMIB_openss7.c sfpMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-SFP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f sfpMIB_openss7 sfpMIB
+	indent -nhnl sfpMIB_openss7.[ch]
+
+#sfpOmMIB_openss7.c sfpOmMIB_openss7.h: MIBS+=OPENSS7-SFP-OM-MIB:OPENSS7-TC
+sfpOmMIB_openss7.c sfpOmMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-SFP-OM-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f sfpOmMIB_openss7 sfpOmMIB
+	indent -nhnl sfpOmMIB_openss7.[ch]
 
 #isupMIB_openss7.c isupMIB_openss7.h: MIBS+=OPENSS7-ISUP-MIB:OPENSS7-TC
 isupMIB_openss7.c isupMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-ISUP-MIB.mib
@@ -838,6 +882,20 @@ x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400
 	indent -nhnl x400pCardTable.[ch]
 
 clean:
+	rm -f sfpMIB_openss7.[ch]
+	rm -f sfpMIB_openss7.[ch]~
+	rm -f sfpMIB_simple.[ch]
+	rm -f sfpMIB_simple.[ch]~
+	rm -f sfpMIB_storage.[ch]
+	rm -f sfpMIB_storage.[ch]~
+	rm -f sfpMIB.tree
+	rm -f sfpOmMIB_openss7.[ch]
+	rm -f sfpOmMIB_openss7.[ch]~
+	rm -f sfpOmMIB_simple.[ch]
+	rm -f sfpOmMIB_simple.[ch]~
+	rm -f sfpOmMIB_storage.[ch]
+	rm -f sfpOmMIB_storage.[ch]~
+	rm -f sfpOmMIB.tree
 	rm -f isupMIB_openss7.[ch]
 	rm -f isupMIB_openss7.[ch]~
 	rm -f isupMIB_simple.[ch]
@@ -1099,6 +1157,9 @@ clean:
 # =============================================================================
 #
 # $Log: makestubs,v $
+# Revision 1.1.2.3  2010-06-09 12:58:33  brian
+# - updated mibs
+#
 # Revision 1.1.2.2  2010-03-10 08:42:20  brian
 # - added Optranex files
 #

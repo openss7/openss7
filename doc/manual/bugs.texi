@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 1.1.2.2 2009-09-01 09:09:46 brian Exp $
+@c @(#) $Id: bugs.texi,v 1.1.2.3 2010-06-09 12:58:34 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-09-01 09:09:46 $ by $Author: brian $
+@c Last Modified $Date: 2010-06-09 12:58:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,14 +89,20 @@ are still being designed and will not be available until a later date.  Most of 
 complete and for the most part bugs are currently available.
 
 @table @code
+@item openss7 007.  2010-06-09T12:13:41+0000
+The @manpage{t_rcv(3)} function was not reseting data when the amount of data to be read was exactly
+the amount of data available.  Thanks to John Hodgkinson at Boldon James for reporting this bug.
+
+@emph{*fixed*} in @command{openss7-1.2.3}
+
 @item openss7 006.  2009-08-31T04:04:52+0000
 A number of functions in @file{strlookup.c} were moving the found item in the hash collision list to
 the head of the list; however, a number of these functions were being called with a read lock
 instead of a write lock on the corresponding hash table.  This caused crashes on kernels checking
 for list corruption on SMP machines under heavy open/close loads.  The movement of the found entry
 to the head of the collision list has dubious performance advantages (as the hash entries are
-cached).  Therefore, the practice has been removed (actually suppressed).  Thanks to Tony Abo for
-the report leading to this bug.
+cached).  Therefore, the practice has been removed (actually suppressed).  Thanks to Tony Abo at
+HiTech for the report leading to this bug.
 
 @emph{*fixed*} in @command{openss7-1.2.2}
 
@@ -114,8 +120,8 @@ pair on driver close.
 @item openss7 004.  2009-06-12T08:16:08+0000
 @manref{qattach(9)} was taking a reference on a synchronization queue without the reference being
 released in @manref{qdelete(9)}.  @manref{qdelete(9)} was fixed to release the reference taken by
-@manref{setsq(9)} in @manref{qattach(9)}.  Thanks to Tony Abo for identifying and reporting this
-bug.
+@manref{setsq(9)} in @manref{qattach(9)}.  Thanks to Tony Abo at HiTech for identifying and
+reporting this bug.
 
 @emph{*fixed*} in @command{openss7-1.2.2}
 

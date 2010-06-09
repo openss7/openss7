@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SMI.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:32 $
+-- @(#) $RCSfile: OPENSS7-SMI.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:32 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:32 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:32 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SMI.mib,v $
+-- Revision 1.1.2.2  2010-06-09 12:58:32  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:32  brian
 -- - added files to new distro
 --
@@ -135,6 +138,18 @@ openss7MsSmi OBJECT-IDENTITY
         "Management Systems System Management Information."
     ::= { openss7Ms 3 }
 
+openss7G OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"ITU-T G-Series Specs."
+    ::= { openss7 7 }
+
+openss7G774 OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"ITU-T G.774 and G.774.X Specs."
+    ::= { openss7G 774 }
+
 openss7M OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
@@ -200,6 +215,12 @@ openss7Q7511 OBJECT-IDENTITY
     DESCRIPTION
 	"ITU-T Q.751.1 and ANSI T1.116.1 Specs."
     ::= { openss7Q751 1 }
+
+openss7Q7512 OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"ITU-T Q.751.2 and ANSI T1.116.2 Specs."
+    ::= { openss7Q751 2 }
 
 openss7Q752 OBJECT-IDENTITY
     STATUS	current

@@ -1,3 +1,31 @@
+2010-06-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: added bug #007.
+	* scripts/texi/funding.texi: added contributors.
+	* src/lib/xnet.c: fixed t_rcv bug #007.
+
+2010-04-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/xmap/.cvsignore: added ignore file
+	* src/gdmo/G.774.1.gdmo: corrected GDMO
+	* src/mibs/OPENSS7-ACSE-MIB.mib: mib corrections
+	* src/mibs/OPENSS7-ISUP-MIB.mib: mib corrections
+	* src/mibs/OPENSS7-SCCP2-MIB.mib: mib corrections
+	* src/mibs/OPENSS7-SMI-MIB.mib: mib corrections
+	* src/mibs/OPENSS7-SMI.mib: mib corrections
+	* src/mibs/OPENSS7-TCAP-MIB.mib: mib corrections
+	* src/mibs/OPENSS7-TCAP2-MIB.mib: mib corrections
+	* src/mibs/OPENSS7-O248-MIB.mib: added mib
+	* src/mibs/OPENSS7-SDH-OM-MIB.mib: added mib
+	* src/mibs/OPENSS7-SDHM-MIB.mib: added mib
+	* src/mibs/OPENSS7-SFP-MIB.mib: added mib
+	* src/mibs/OPENSS7-SFP-OM-MIB.mib: added mib
+	* src/snmp/makestubs: added SFP-MIB and SFP-OM-MIB to makefile
+
+2010-04-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/isup.c: fix missing ISUP_PT_SVACT
+
 2010-02-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: added makefiles

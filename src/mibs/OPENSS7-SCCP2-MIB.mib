@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SCCP2-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:31 $
+-- @(#) $RCSfile: OPENSS7-SCCP2-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:31 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,19 +55,43 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:31 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:31 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SCCP2-MIB.mib,v $
+-- Revision 1.1.2.2  2010-06-09 12:58:31  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:31  brian
 -- - added files to new distro
 --
 -- =============================================================================
 
-OPENSS7-SCCP-MIB DEFINITIONS ::= BEGIN
+OPENSS7-SCCP2-MIB DEFINITIONS ::= BEGIN
 
-sccpMIB MODULE-IDENTITY
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TEXTUAL-CONVENTION, enterprises
+	FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, RowStatus, RowPointer, AutonomousType, 
+    TimeInterval, DisplayString, TruthValue
+	FROM SNMPv2-TC
+    CommonLanguageName
+	FROM OPENSS7-TC
+    AdministrativeState, OperationalState, ProceduralStatus, 
+    AvailabilityStatus, AlarmStatus, SimpleNameType, UsageState
+	FROM OPENSS7-SMI-MIB
+    NEntitySystemTypes, NEntitySystemType
+	FROM OPENSS7-CLNS-MIB
+    Ss7ProtocolVariant
+	FROM OPENSS7-SS7-MIB
+    mtpMsId, MtpSapAddress, MtpUserPart, MtpUserPartStatus, 
+    MtpCongestedState, MtpCongestionLevel
+	FROM OPENSS7-MTP-MIB
+    openss7, openss7Q, openss7Q751
+	FROM OPENSS7-SMI;
+
+sccp2MIB MODULE-IDENTITY
     LAST-UPDATED "200903032246Z"
     ORGANIZATION
 	"The OpenSS7 Project"
@@ -88,16 +112,16 @@ sccpMIB MODULE-IDENTITY
     REVISION "200903032246Z"
     DESCRIPTION
 	"First release of this module."
-    ::= { openss7Q751 2 }
+    ::= { openss7Q751 22 }
 
 sccpNotifications OBJECT IDENTIFIER
-    ::= { sccpMIB 0 }
+    ::= { sccp2MIB 0 }
 
 sccpDefaults OBJECT IDENTIFIER
-    ::= { sccpMIB 1 }
+    ::= { sccp2MIB 1 }
 
 sccpTables OBJECT IDENTIFIER
-    ::= { sccpMIB 2 }
+    ::= { sccp2MIB 2 }
 
 -- =============================================================================
 
@@ -105,7 +129,7 @@ sccpTables OBJECT IDENTIFIER
 -- should be replaced with a row pointer to an mtpNaTable entry.
 
 sccpNetwork OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 1 }
 
 -- =============================================================================
 
@@ -114,7 +138,7 @@ sccpNetwork OBJECT IDENTIFIER
 -- or mtpL3Table entry.
 
 sccpSignallingPoint OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 2 }
 
 -- =============================================================================
 
@@ -123,7 +147,7 @@ sccpSignallingPoint OBJECT IDENTIFIER
 -- STREAMS driver.
 
 sccpUser OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 3 }
 
 -- =============================================================================
 
@@ -131,7 +155,7 @@ sccpUser OBJECT IDENTIFIER
 -- concert, provided an SCCP entity service.
 
 sccpEntitySet OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 4 }
 
 -- =============================================================================
 
@@ -141,7 +165,7 @@ sccpEntitySet OBJECT IDENTIFIER
 -- signalling point via the associated linkages.
 
 sccpSignallingRelation OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 5 }
 
 -- =============================================================================
 
@@ -149,7 +173,7 @@ sccpSignallingRelation OBJECT IDENTIFIER
 -- local version of the sccpAccessPoint MOC defined in Q.752.2.
 
 sccpSubsystem OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 6 }
 
 sccpSubsystemTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpSubsystemEntry
@@ -200,7 +224,7 @@ SccpSubsystemEntry ::=
 -- remote version of the sccpAccessPoint MOC defined in Q.752.2.
 
 sccpRemoteSubsystem OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 7 }
 
 sccpRemoteSubsystemTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SccpRemoteSubsystemEntry
@@ -249,23 +273,23 @@ SccpRemoteSubsystemEntry ::=
 
 
 sccpConcernedArea OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 8 }
 
 -- =============================================================================
 
 
 sccpLinkage OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 9 }
 
 -- =============================================================================
 
 
 sccpCoupling OBJECT IDENTIFIER
-    ::= { sccpTables yy }
+    ::= { sccpTables 10 }
 
 -- =============================================================================
 
 
-END -- OPENSS7-SCCP-MIB
+END -- OPENSS7-SCCP2-MIB
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
