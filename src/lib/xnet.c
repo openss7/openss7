@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:34 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,19 +47,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:47 $ by $Author: brian $
+ Last Modified $Date: 2010-06-09 12:58:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 1.1.2.2  2010-06-09 12:58:34  brian
+ - bug 007
+
  Revision 1.1.2.1  2009-06-21 11:37:47  brian
  - added files to new distro
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:34 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:34 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -3313,12 +3316,13 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 			default:
 				goto tlook;
 			}
-			if ((copied += data.len) >= nbytes)
-				break;
+			copied += data.len;
 			if (!(flag & T_MORE)) {
 				__xnet_u_reset_event(user);
 				break;
 			}
+			if( copied >= nbytes )
+				break;
 			data.maxlen -= data.len;
 			data.buf += data.len;
 			data.len = 0;
@@ -6182,10 +6186,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.1 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.2 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 1.1.2.1 $)
-  * @date \$Date: 2009-06-21 11:37:47 $
+  * @version \$Name:  $(\$Revision: 1.1.2.2 $)
+  * @date \$Date: 2010-06-09 12:58:34 $
   */
 
 /** @} */

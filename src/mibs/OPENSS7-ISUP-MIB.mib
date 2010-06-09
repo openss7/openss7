@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-ISUP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-03-10 08:42:20 $
+-- @(#) $RCSfile: OPENSS7-ISUP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-06-09 12:58:31 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2010-03-10 08:42:20 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:31 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-ISUP-MIB.mib,v $
+-- Revision 1.1.2.3  2010-06-09 12:58:31  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.2  2010-03-10 08:42:20  brian
 -- - added Optranex files
 --
@@ -77,7 +80,8 @@ IMPORTS
     ProceduralStatus, SimpleNameType, StandbyStatus, UsageState, 
     AlarmStatus, ControlStatus, attributeValueChangeNotificationPackage, 
     communicationsAlarmPackage, createDeleteNotificationsPackage, 
-    tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause
+    tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause, 
+    SystemTimingSource
 	FROM OPENSS7-SMI-MIB
     MtpSapAddress, MtpUserPart, GraphicString, MtpPointCodeFormat, 
     MtpCongestedState
@@ -299,31 +303,6 @@ ProtectionUnits ::= TEXTUAL-CONVENTION
 	""
     SYNTAX OCTET STRING (SIZE(0..255))
 
-SystemTimingSource ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
-	"Provides the source of primary or secondary timing according to 
-	 ITU-T M.3100.  An SNMP object with this textual convention in 
-	 its SYNTAX field specifies be one of the following sources:
-	 
-	 - none(0), no timing source;
-	 - internal(1), timing source is internal the to the 
-	   corresponding managed object;
-	 - remote(2), timing source is remote to the corresponding 
-	   managed object;
-	 - slaved(3), timing source is slaved from an interface 
-	   corresponding to the managed object.
-	   
-	 An object using this textual convention in its SYNTAX field can 
-	 have a MAX-ACCESS of read-only, read-write or read-create."
-    REFERENCE
-	"ITU-T Rec. M.3100 (2005) : SystemTiming"
-    SYNTAX INTEGER {
-	none(0),
-	internal(1),
-	remote(2),
-	slaved(3) }
-
 RangeAndStatus ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d,1b-"
     STATUS current
@@ -387,7 +366,6 @@ t17Timeout OBJECT-IDENTITY
 	 circuit.  When T17 expires before an RLC message is received, 
 	 an alarm with this probable cause is generated.  Cleared when a 
 	 RLC message is properly received for the circuit."
-
     REFERENCE
 	"ITU-T Rec. Q.752 (1997) : Table 12, 12.1,
 	 ANSI T1.116.1 (2000D) : Table 12, 12.1"

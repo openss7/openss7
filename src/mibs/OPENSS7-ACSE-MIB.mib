@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-ACSE-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:29 $
+-- @(#) $RCSfile: OPENSS7-ACSE-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:31 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,17 +55,20 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:29 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:31 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-ACSE-MIB.mib,v $
+-- Revision 1.1.2.2  2010-06-09 12:58:31  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:29  brian
 -- - added files to new distro
 --
 -- =============================================================================
 
-OPENSS7-TCAP-MIB DEFINITIONS ::= BEGIN
+OPENSS7-ACSE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     openss7Q751
@@ -90,7 +93,7 @@ IMPORTS
     TimeInterval, TruthValue
         FROM SNMPv2-TC;
 
-tcapMIB MODULE-IDENTITY
+acseMIB MODULE-IDENTITY
     LAST-UPDATED "200810092250Z"
     ORGANIZATION 
         "The OpenSS7 Project"
@@ -111,7 +114,7 @@ tcapMIB MODULE-IDENTITY
     REVISION	"200810092250Z"
     DESCRIPTION
 	"First release of this module."
-    ::= { openss7Q751 4 }
+    ::= { openss7Q751 47 }
 
 PresentationRequirements ::= TEXTUAL-CONVENTION
     DESCRIPTION
@@ -202,24 +205,25 @@ TransferSyntax ::= TEXTUAL-CONVENTION
 ApplicationContextName ::= TEXTUAL-CONVENTION
     DESCRIPTION
 	"Provides a specification of an application context name with 
-	 the syntax of an OBJECT IDENTIFIER.   Fields using this
+	 the syntax of an OBJECT IDENTIFIER.   Fields using this"
+    SYNTAX OBJECT IDENTIFIER
 
-tcapNotifications OBJECT IDENTIFIER
-    ::= { tcapMIB 0 }
+asceNotifications OBJECT IDENTIFIER
+    ::= { acseMIB 0 }
 
-tcapSpecificExtensions OBJECT IDENTIFIER
-    ::= { tcapMIB 1 }
+asceSpecificExtensions OBJECT IDENTIFIER
+    ::= { acseMIB 1 }
 
-tcapDefaults OBJECT IDENTIFIER
-    ::= { tcapMIB 2 }
+asceDefaults OBJECT IDENTIFIER
+    ::= { acseMIB 2 }
 
-tcapObjectClass OBJECT IDENTIFIER
-    ::= { tcapMIB 3 }
+asceObjectClass OBJECT IDENTIFIER
+    ::= { acseMIB 3 }
 
 -- ====================================================================
 
 aCSE OBJECT IDENTIFIER
-    ::= { tcapObjectClass 1 }
+    ::= { asceObjectClass 1 }
 
     -- DERIVED FROM aso
 	-- communiationsEntityId
@@ -270,7 +274,7 @@ AcseEntry ::=
 -- ====================================================================
 
 acseAssociation OBJECT IDENTIFIER
-    ::= { tcapObjectClass 2 }
+    ::= { asceObjectClass 2 }
 
     -- DERIVED FROM asoInvocation
 	-- connectionId
@@ -321,7 +325,7 @@ AcseAssociationEntry ::=
 -- ====================================================================
 
 apInvocation OBJECT IDENTIFIER
-    ::= { tcapObjectClass 3 }
+    ::= { asceObjectClass 3 }
 
     -- apInvocationId
     -- invocationOfPointer
@@ -375,7 +379,7 @@ ApInvocationEntry ::=
 -- ====================================================================
 
 applicationEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass 4 }
+    ::= { asceObjectClass 4 }
 
     -- DERIVED FROM asoEntity
 	-- DERIVED FROM communicationsEntity
@@ -396,7 +400,7 @@ applicationEntity OBJECT IDENTIFIER
 -- ====================================================================
 
 applicationEntityInvocation OBJECT IDENTIFIER
-    ::= { tcapObjectClass 5 }
+    ::= { asceObjectClass 5 }
 
     -- DERIVED FROM singlePeerConnection
 	-- connectionId
@@ -466,7 +470,7 @@ ApplicationEntityInvocationEntry ::=
 -- ====================================================================
 
 applicationSubsystem OBJECT IDENTIFIER
-    ::= { tcapObjectClass 6 }
+    ::= { asceObjectClass 6 }
 
     -- DERIVED FROM subsystem
 	-- subsystemId
@@ -503,7 +507,7 @@ ApplicationSubsystemEntry ::=
 -- ====================================================================
 
 applicationProcess OBJECT IDENTIFIER
-    ::= { tcapObjectClass 7 }
+    ::= { asceObjectClass 7 }
 
     -- applicationProcessId
     -- applicationProcessTitle
@@ -549,7 +553,7 @@ ApplicationProcessEntry ::=
 -- ====================================================================
 
 aso OBJECT IDENTIFIER
-    ::= { tcapObjectClass 8 }
+    ::= { asceObjectClass 8 }
 
     -- communicationsEntityId
     -- asoTitle
@@ -633,7 +637,7 @@ AsoEntry ::=
 -- ====================================================================
 
 asoEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass 9 }
+    ::= { asceObjectClass 9 }
 
     -- DERIVED FROM communicationsEntity
 	-- communicationsEntityId
@@ -690,7 +694,7 @@ AsoEntityEntry ::=
 -- ====================================================================
 
 asoInvocation OBJECT IDENTIFIER
-    ::= { tcapObjectClass 10 }
+    ::= { asceObjectClass 10 }
 
     -- connectionId
     -- invocationOfPointer
@@ -733,7 +737,7 @@ AsoInvocationEntry ::=
 -- ====================================================================
 
 monoULConnection OBJECT IDENTIFIER
-    ::= { tcapObjectClass 11 }
+    ::= { asceObjectClass 11 }
 
     -- DERIVED FROM applicationEntityInvocation
 	-- DERIVED FROM singlePeerConnection
@@ -801,7 +805,7 @@ MonoULConnectionEntry ::=
 -- ====================================================================
 
 monoULEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass 12 }
+    ::= { asceObjectClass 12 }
 
     -- DERIVED FROM applicationEntity
 	-- DERIVED FROM asoEntity
@@ -869,6 +873,7 @@ monoULEntityEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX {
+	systemId
     }
     ::= { monoULEntityTable 1 }
 
@@ -879,7 +884,7 @@ MonoULEntityEntry ::=
 -- ====================================================================
 
 monolithicUpperLayerSubsystem OBJECT IDENTIFIER
-    ::= { tcapObjectClass 13 }
+    ::= { asceObjectClass 13 }
 
     -- DERIVED FROM sessionSubsystem
 	-- DERIVED FROM subsystem
@@ -927,7 +932,7 @@ MonolithicUpperLayerSubsystemEntry ::=
 -- ====================================================================
 
 pSap OBJECT IDENTIFIER
-    ::= { tcapObjectClass 14 }
+    ::= { asceObjectClass 14 }
 
     -- DERIVED FROM sap1
 	-- sapId
@@ -954,6 +959,7 @@ pSapEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX {
+	systemId
     }
     ::= { pSapTable 1 }
 
@@ -968,7 +974,7 @@ PSapEntry ::=
 -- ====================================================================
 
 presentationConnection OBJECT IDENTIFIER
-    ::= { tcapObjectClass 15 }
+    ::= { asceObjectClass 15 }
 
     -- DERIVED FROM singlePeerConnection
 	-- connectionId
@@ -1019,7 +1025,7 @@ PresentationConnectionEntry ::=
 -- ====================================================================
 
 presentationCopm OBJECT IDENTIFIER
-    ::= { tcapObjectClass 16 }
+    ::= { asceObjectClass 16 }
 
     -- DERIVED FROM coProtocolMachine
 	-- coProtocolMachineId
@@ -1068,7 +1074,7 @@ PresentationCopmEntry ::=
 -- ====================================================================
 
 presentationEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass 17 }
+    ::= { asceObjectClass 17 }
 
     -- DERIVED FROM communicationsEntity
 	-- communicationsEntityId
@@ -1112,7 +1118,7 @@ PresentationEntityEntry ::=
 -- ====================================================================
 
 presentationSubsystem OBJECT IDENTIFIER
-    ::= { tcapObjectClass 18 }
+    ::= { asceObjectClass 18 }
 
     -- DERIVED FROM subsystem
 	-- subsystemId
@@ -1151,7 +1157,7 @@ PresentationSubsystemEntry ::=
 -- ====================================================================
 
 sSap OBJECT IDENTIFIER
-    ::= { tcapObjectClass 19 }
+    ::= { asceObjectClass 19 }
 
     -- DERIVED FROM sap1
 	-- sapId
@@ -1178,6 +1184,7 @@ sSapEntry OBJECT-TYPE
     REFERENCE
 	""
     INDEX {
+	systemId
     }
     ::= { sSapTable 1 }
 
@@ -1192,7 +1199,7 @@ SSapEntry ::=
 -- ====================================================================
 
 sessionConnection OBJECT IDENTIFIER
-    ::= { tcapObjectClass 20 }
+    ::= { asceObjectClass 20 }
 
     -- DERIVED FROM singlePeerConnection
 	-- connectionId
@@ -1246,7 +1253,7 @@ SessionConnectionEntry ::=
 -- ====================================================================
 
 sessionCopm OBJECT IDENTIFIER
-    ::= { tcapObjectClass 21 }
+    ::= { asceObjectClass 21 }
 
     -- DERIVED FROM coProtocolMachine
 	-- coProtocolMachineId
@@ -1295,7 +1302,7 @@ SessionCopmEntry ::=
 -- ====================================================================
 
 sessionEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass 22 }
+    ::= { asceObjectClass 22 }
 
     -- DERIVED FROM communicationsEntity
 	-- communicationsEntityId
@@ -1339,7 +1346,7 @@ SessionEntityEntry ::=
 -- ====================================================================
 
 sessionSubsystem OBJECT IDENTIFIER
-    ::= { tcapObjectClass 23 }
+    ::= { asceObjectClass 23 }
 
     -- DERIVED FROM subsystem
 	-- subsystemId
@@ -1381,12 +1388,12 @@ SessionSubsystemEntry ::=
 -- ====================================================================
 -- ====================================================================
 
-tcapEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass 24 }
+asceEntity OBJECT IDENTIFIER
+    ::= { asceObjectClass 24 }
 
 -- ====================================================================
 
-tcapEntityTable OBJECT-TYPE
+asceEntityTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapEntityEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1394,9 +1401,9 @@ tcapEntityTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapEntity 1 }
+    ::= { asceEntity 1 }
 
-tcapEntityEntry OBJECT-TYPE
+asceEntityEntry OBJECT-TYPE
     SYNTAX	TcapEntityEntry
     MAX-ACCESS	not-accessible
     STATUS	current
@@ -1406,17 +1413,17 @@ tcapEntityEntry OBJECT-TYPE
 	""
     INDEX {
 	    mtpMsId,		-- shared index
-	    tcapEntityId	-- index
+	    asceEntityId	-- index
     }
-    ::= { tcapEntityTable 1 }
+    ::= { asceEntityTable 1 }
 
 TcapEntityEntry ::=
     SEQUENCE {
-	tcapEntityId				Unsigned32,
-	tcapEntityRowStatus			RowStatus
+	asceEntityId				Unsigned32,
+	asceEntityRowStatus			RowStatus
     }
 
-tcapEntityId OBJECT-TYPE
+asceEntityId OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible -- index
     STATUS	current
@@ -1424,9 +1431,9 @@ tcapEntityId OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapEntityEntry 1 }
+    ::= { asceEntityEntry 1 }
 
-tcapEntityRowStatus OBJECT-TYPE
+asceEntityRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
@@ -1434,17 +1441,17 @@ tcapEntityRowStatus OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapEntityEntry 2 }
+    ::= { asceEntityEntry 2 }
 
 
 -- ====================================================================
 
-tcapAccessPoint OBJECT IDENTIFIER
-    ::= { tcapObjectClass 25 }
+asceAccessPoint OBJECT IDENTIFIER
+    ::= { asceObjectClass 25 }
 
 -- ====================================================================
 
-tcapAccessPointTable OBJECT-TYPE
+asceAccessPointTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapAccessPointEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1452,8 +1459,9 @@ tcapAccessPointTable OBJECT-TYPE
 	""
     REFERENCE
 	""
+    ::= { asceAccessPoint 1 }
 
-tcapAccessPointEntry OBJECT-TYPE
+asceAccessPointEntry OBJECT-TYPE
     SYNTAX TcapAccessPointEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1463,24 +1471,25 @@ tcapAccessPointEntry OBJECT-TYPE
 	""
     INDEX {
 	    mtpMsId,
-	    tcapEntityId,
-	    tcapAccessPointId
+	    asceEntityId,
+	    asceAccessPointId
 	}
+    ::= { asceAccessPointTable 1 }
 
 TcapAccessPointEntry ::=
     SEQUENCE {
-	tcapAccessPointId			Unsigned32,
-	tcapAccessPointRowStatus		RowStatus
+	asceAccessPointId			Unsigned32,
+	asceAccessPointRowStatus		RowStatus
     }
 
 -- ====================================================================
 
-tcapLinkage OBJECT IDENTIFIER
-    ::= { tcapObjectClass 26 }
+asceLinkage OBJECT IDENTIFIER
+    ::= { asceObjectClass 26 }
 
 -- ====================================================================
 
-tcapLinkageTable OBJECT-TYPE
+asceLinkageTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapLinkageEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1488,9 +1497,9 @@ tcapLinkageTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapLinkage 1  }
+    ::= { asceLinkage 1  }
 
-tcapLinkageEntry OBJECT-TYPE
+asceLinkageEntry OBJECT-TYPE
     SYNTAX TcapLinkageEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1502,14 +1511,14 @@ tcapLinkageEntry OBJECT-TYPE
 	    mtpMsId,
 	    sccp
 	}
-    ::= { tcapLinkageTable 1 }
+    ::= { asceLinkageTable 1 }
 
 TcapLinkageEntry ::=
     SEQUENCE {
-	tcapLinkageRowStatus			RowStatus
+	asceLinkageRowStatus			RowStatus
     }
 
-tcapLinkageRowStatus OBJECT-TYPE
+asceLinkageRowStatus OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS current
@@ -1517,38 +1526,38 @@ tcapLinkageRowStatus OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapLinkageEntry 1 }
+    ::= { asceLinkageEntry 1 }
 
 -- ====================================================================
 
-tcapParameters OBJECT IDENTIFIER
-    ::= { tcapMIB 4 }
+asceParameters OBJECT IDENTIFIER
+    ::= { acseMIB 4 }
 
-tcapScalars OBJECT IDENTIFIER
-    ::= { tcapMIB 5 }
+asceScalars OBJECT IDENTIFIER
+    ::= { acseMIB 5 }
 
-tcapTcUserId OBJECT-TYPE
+asceTcUserId OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { tcapScalars 1 }
+    ::= { asceScalars 1 }
 
-tcapApplicationEntityId OBJECT-TYPE
+asceApplicationEntityId OBJECT-TYPE
     SYNTAX	Unsigned32
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
 	""
-    ::= { tcapScalars 2 }
+    ::= { asceScalars 2 }
 
-tcapPackage OBJECT IDENTIFIER
-    ::= { tcapMIB 6 }
+ascePackage OBJECT IDENTIFIER
+    ::= { acseMIB 6 }
 
-tcapCompliances OBJECT IDENTIFIER
-    ::= { tcapMIB 7 }
+asceCompliances OBJECT IDENTIFIER
+    ::= { acseMIB 7 }
 
-END -- end of modules OPENSS7-TCAP-MIB
+END -- end of modules OPENSS7-ACSE-MIB
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

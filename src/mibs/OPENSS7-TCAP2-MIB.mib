@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TCAP2-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:32 $
+-- @(#) $RCSfile: OPENSS7-TCAP2-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:32 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,19 +55,49 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:32 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:32 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TCAP2-MIB.mib,v $
+-- Revision 1.1.2.2  2010-06-09 12:58:32  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:32  brian
 -- - added files to new distro
 --
 -- =============================================================================
 
-OPENSS7-TCAP-MIB DEFINITIONS ::= BEGIN
+OPENSS7-TCAP2-MIB DEFINITIONS ::= BEGIN
 
-tcapMIB MODULE-IDENTITY
+IMPORTS
+    openss7Q751
+	FROM OPENSS7-SMI
+    AdministrativeState, attributeValueChangeNotificationPackage, 
+    AvailabilityStatus, communicationsAlarmPackage, 
+    createDeleteNotificationsPackage, OperationalState, 
+    ProceduralStatus, SimpleNameType, tmnObjectInstance, 
+    tmnPerceivedSeverity, tmnProbableCause, UsageState
+        FROM OPENSS7-SMI-MIB
+    sccpNetworkEntityId
+	FROM OPENSS7-SCCP-MIB
+    MtpCongestionLevel, MtpLinkFailureReason, mtpMsId, 
+    MtpUserPartStatus, NetworkPointCode
+	FROM OPENSS7-MTP-MIB
+    AbstractSyntax, ApplicationContextName, PresentationRequirements,  
+    PresentationSelectorValue, SessFUs, SessionProtVer, 
+    SessionSelectorValue, SessOptSupport,  TransferSyntax
+	FROM OPENSS7-ACSE-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
+        FROM SNMPv2-SMI
+    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
+    TimeInterval, TruthValue
+        FROM SNMPv2-TC;
+
+tcap2MIB MODULE-IDENTITY
     LAST-UPDATED "200903032246Z"
     ORGANIZATION
 	"The OpenSS7 Project"
@@ -88,22 +118,22 @@ tcapMIB MODULE-IDENTITY
     REVISION "200903032246Z"
     DESCRIPTION
 	"First release of this module."
-    ::= { openss7Q751 4 }
+    ::= { openss7Q751 42 }
 
 tcapNotifications OBJECT IDENTIFIER
-    ::= { tcapMIB 0 }
+    ::= { tcap2MIB 0 }
 
 tcapDefaults OBJECT IDENTIFIER
-    ::= { tcapMIB 1 }
+    ::= { tcap2MIB 1 }
 
 tcapTables OBJECT IDENTIFIER
-    ::= { tcapMIB 2 }
+    ::= { tcap2MIB 2 }
 
 -- =============================================================================
 
 
 tcapApplicationSubsystem OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 1 }
 
 tcapApplicationSubsystemTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapApplicationSubsystemEntry
@@ -135,7 +165,7 @@ TcapApplicationSubsystemEntry ::=
     }
 
 tcapApplicationEntity OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 2 }
 
 -- =============================================================================
 
@@ -165,7 +195,7 @@ tcapApplicationEntityTable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapEntity 1 }
+    ::= { tcapApplicationEntity 1 }
 
 tcapApplicationEntityEntry OBJECT-TYPE
     SYNTAX TcapApplicationEntityEntry
@@ -179,7 +209,7 @@ tcapApplicationEntityEntry OBJECT-TYPE
 	tcapApplicationSubsystemId,
 	tcapApplicationEntityId
     }
-    ::= { tcapEntityTable 1 }
+    ::= { tcapApplicationEntityTable 1 }
 
 TcapApplicationEntityEntry ::=
     SEQUENCE {
@@ -253,7 +283,7 @@ TcapApplicationContextEntry ::=
 -- under the open Stream as a control Stream, or by binding the Stream.
 
 tcapTcUser OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 3 }
 
 tcapTcUserTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapTcUserEntry
@@ -299,9 +329,9 @@ TcapTcUserEntry ::=
 -- yet existing SCCP SAP.
 
 tcapSccpSap OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 4 }
 
-tcapSccpSapTable OBJECT-IDENTITY
+tcapSccpSapTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapSccpSapEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -312,7 +342,7 @@ tcapSccpSapTable OBJECT-IDENTITY
 	""
     ::= { tcapSccpSap 1 }
 
-tcapSccpSapEntry OBJECT-IDENTITY
+tcapSccpSapEntry OBJECT-TYPE
     SYNTAX TcapSccpSapEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -341,7 +371,7 @@ TcapSccpSapEntry ::=
 
 
 tcapRemoteEntity OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 5 }
 
 tcapRemoteEntityTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapRemoteEntityEntry
@@ -393,7 +423,7 @@ TcapRemoteEntityEntry ::=
 
 
 tcapRemoteSccp OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 6 }
 
 tcapRemoteSccpTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapRemoteSccpEntry
@@ -447,7 +477,7 @@ TcapRemoteSccpEntry ::=
 
 
 tcapSccp OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 7 }
 
 tcapSccpTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapSccpEntry
@@ -483,7 +513,7 @@ TcapSccpEntry ::=
     }
 
 tcapTransaction OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 8 }
 
 -- =============================================================================
 
@@ -496,7 +526,7 @@ tcapTransaction OBJECT IDENTIFIER
 -- Stream by dialog id.
 
 tcapDialogue OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 9 }
 
 
 -- =============================================================================
@@ -507,7 +537,7 @@ tcapDialogue OBJECT IDENTIFIER
 -- operation (such as response timeout value).
 
 tcapOperation OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 10 }
 
 
 -- =============================================================================
@@ -520,17 +550,17 @@ tcapOperation OBJECT IDENTIFIER
 -- can be associated with an operation structure by its operation code.
 
 tcapInvocation OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 11 }
 
 
 -- =============================================================================
 
 
 tcapComponent OBJECT IDENTIFIER
-    ::= { tcapTables yy }
+    ::= { tcapTables 12 }
 
 
 
-END -- OPENSS7-TCAP-MIB
+END -- OPENSS7-TCAP2-MIB
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

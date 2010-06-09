@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TCAP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:32 $
+-- @(#) $RCSfile: OPENSS7-TCAP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:32 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:32 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:32 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TCAP-MIB.mib,v $
+-- Revision 1.1.2.2  2010-06-09 12:58:32  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:32  brian
 -- - added files to new distro
 --
@@ -84,7 +87,7 @@ IMPORTS
     AbstractSyntax, ApplicationContextName, PresentationRequirements,  
     PresentationSelectorValue, SessFUs, SessionProtVer, 
     SessionSelectorValue, SessOptSupport,  TransferSyntax
-	FROM OPENSS7-ASCE-MIB
+	FROM OPENSS7-ACSE-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
     Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
@@ -134,12 +137,12 @@ tcapObjectClass OBJECT IDENTIFIER
 -- ====================================================================
 
 tcap OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 1 }
 
 -- ====================================================================
 
 tcapApplicationSubsystem OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 2 }
 
     -- DERIVED FROM applicationSubsystem
 	-- DERIVED FROM subsystem
@@ -199,7 +202,7 @@ tcapApplicationSubsystemRowStatus OBJECT-TYPE
 -- ====================================================================
 
 tcapTransactionCopm OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 3 }
 
     -- DERIVED FROM coProtocolMachine
 	-- coProtocolMachineId
@@ -233,7 +236,7 @@ TcapTransactionCopmEntry ::=
 -- ====================================================================
 
 tcapTransaction OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 4 }
 
     -- DERIVED FROM monoULConnection
 	-- DERIVED FROM applicationEntityInvocation
@@ -315,75 +318,82 @@ tcapTransactionId OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 1 }
 
 tcapTransactionUnderlyingConnectionNames OBJECT-TYPE
     SYNTAX RowPointer
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 2 }
 
 tcapTransactionInvocationOfPointer OBJECT-TYPE
     SYNTAX RowPointer
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 3 }
 
 tcapTransactionPresFUinUse OBJECT-TYPE
     SYNTAX PresentationRequirements
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 4 }
 
 tcapTransactionPresContextInUse OBJECT-TYPE
     SYNTAX PresentationContext
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 5 }
 
 tcapTransactionSessProtInUse OBJECT-TYPE
     SYNTAX SessProtVer
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 6 }
 
 tcapTransactionSessFUInUse OBJECT-TYPE
     SYNTAX SessFUs
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 7 }
 
 tcapTransactionMaxTSDUsize OBJECT-TYPE
     SYNTAX Unsigned32
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	""
     REFERENCE
 	""
-    ::= { tcapTransactionEntry xx }
+    ::= { tcapTransactionEntry 8 }
 
 -- ====================================================================
 
 tcapDialogue OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 5 }
 
     -- DERIVED from acseAssociation
 	-- DERIVED FROM asoInvocation
@@ -444,7 +454,7 @@ tcapDialogueId OBJECT-TYPE
 	 The value of this index is not significant."
     REFERENCE
 	""
-    ::= { tcapDialogEntry 1 }
+    ::= { tcapDialogueEntry 1 }
 
 tcapDialogueInvocationOfPointer OBJECT-TYPE
     SYNTAX RowPointer
@@ -452,7 +462,7 @@ tcapDialogueInvocationOfPointer OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	""
-    ::= { tcapDialogEntry 2 }
+    ::= { tcapDialogueEntry 2 }
 
 tcapDialogueCallingAEtitle OBJECT-TYPE
     SYNTAX SubSystemNumber
@@ -462,7 +472,7 @@ tcapDialogueCallingAEtitle OBJECT-TYPE
 	"Identifies the calling TCAP application entity title.  The 
 	 calling TCAP application entity title corresponds to the SCCP 
 	 calling party address."
-    ::= { tcapDialogEntry 3 }
+    ::= { tcapDialogueEntry 3 }
 
 tcapDialogueApplContextInUse OBJECT-TYPE
     SYNTAX OBJECT IDENTIFIER
@@ -471,7 +481,7 @@ tcapDialogueApplContextInUse OBJECT-TYPE
     DESCRIPTION
 	"Indicates the application context that is in use by the 
 	 dialogue."
-    ::= { tcapDialogEntry 4 }
+    ::= { tcapDialogueEntry 4 }
 
 tcapDialogueParentASOinvoc OBJECT-TYPE
     SYNTAX RowPointer
@@ -479,7 +489,7 @@ tcapDialogueParentASOinvoc OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	""
-    ::= { tcapDialogEntry 5 }
+    ::= { tcapDialogueEntry 5 }
 
 tcapDialogueCalledAEtitle OBJECT-TYPE
     SYNTAX SubSystemNumber
@@ -489,12 +499,12 @@ tcapDialogueCalledAEtitle OBJECT-TYPE
 	"Identifies the called TCAP application entity title.  The 
 	 called TCAP application entity title corresponds to the SCCP 
 	 called part address."
-    ::= { tcapDialogEntry 6 }
+    ::= { tcapDialogueEntry 6 }
 
 -- ====================================================================
 
 tcapOperation OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 6 }
 
     -- DERIVED FROM apInvocation
 	-- apInvocationId
@@ -504,7 +514,7 @@ tcapOperation OBJECT IDENTIFIER
 -- ====================================================================
 
 tcapTcUser OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 7 }
 
     -- DERIVED FROM apInvocation
 	-- apInvocationId
@@ -575,7 +585,7 @@ tcapTcUserInvocationOfPointer OBJECT-TYPE
 -- ====================================================================
 
 tcapApplicationProcess OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 8 }
 
     -- DERIVED FROM applicationProcess
 	-- applicationProcessId
@@ -767,7 +777,7 @@ tcapSupportEntityRowStatus OBJECT-TYPE
 -- ====================================================================
 
 tcapApplicationEntity OBJECT IDENTIFIER
-    ::= { tcapObjectClass xx }
+    ::= { tcapObjectClass 9 }
 
     -- DERIVED FROM monoULEntity
 	-- DERIVED FROM applicationEntity
@@ -1199,7 +1209,7 @@ tcapApplicationContextId OBJECT-TYPE
 	 numbers beginning at 1."
     REFERENCE
 	""
-    ::= { tcapApplicationContextEntry 1 }
+    ::= { tcapApplicationContextNameEntry 1 }
 
 tcapApplicationContextName OBJECT-TYPE
     SYNTAX ApplicationContextName
@@ -1219,7 +1229,7 @@ tcapApplicationContextName OBJECT-TYPE
 	"ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, 
 	     applicationContextNameSupport ATTRIBUTE."
     DEFVAL { { zeroDotZero } }
-    ::= { tcapApplicationContextEntry 2 }
+    ::= { tcapApplicationContextNameEntry 2 }
 
 tcapApplicationContextNumber OBJECT-TYPE
     SYNTAX INTEGER
@@ -1234,7 +1244,7 @@ tcapApplicationContextNumber OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, 
 	     applicationContextNameSupport ATTRIBUTE."
-    ::= { tcapApplicationContextEntry 3 }
+    ::= { tcapApplicationContextNameEntry 3 }
 
 tcapApplicationContextRowStatus OBJECT-TYPE
     SYNTAX RowStatus
@@ -1261,11 +1271,11 @@ tcapApplicationContextRowStatus OBJECT-TYPE
 	 Entries in this table persist across agent reboots."
     REFERENCE
 	"STD 58, RowStatus"
-    ::= { tcapApplicationContextEntry 4 }
+    ::= { tcapApplicationContextNameEntry 4 }
 
 -- side table for abstractSyntaxSupport
 
-tcapAbtractSyntaxTable OBJECT-TYPE
+tcapAbstractSyntaxTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TcapAbtractSyntaxEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1279,7 +1289,7 @@ tcapAbtractSyntaxTable OBJECT-TYPE
 	""
     ::= { tcapApplicationEntity 4 }
 
-tcapAbtractSyntaxEntry OBJECT-TYPE
+tcapAbstractSyntaxEntry OBJECT-TYPE
     SYNTAX TcapAbtractSyntaxEntry
     MAX-ACCESS not-accessible
     STATUS current
@@ -1434,6 +1444,7 @@ tcapOids OBJECT IDENTIFIER
     ::= { tcapMIB 5 }
 
 tcapQ773DialogueAsId OBJECT-IDENTITY
+    STATUS current
     DESCRIPTION
 	""
     REFERENCE
@@ -1442,14 +1453,18 @@ tcapQ773DialogueAsId OBJECT-IDENTITY
     -- { itu-t(0) recommendation(0) q(17) as(1) dialogue-as(1) version1(1) }
 
 tcapQ773UniDialogueAsId OBJECT-IDENTITY
+    STATUS current
     DESCRIPTION
+	""
     REFERENCE
 	"ITU-T Rec. Q.773, UnidialoguePDUs:uniDialogue-as-id"
     ::= { 0 0 17 773 1 2 1 }
     -- { itu-t(0) recommendation(0) q(17) as(1) unidialogue-as(2) version1(1) }
 
 tcapAsn1BerTsId OBJECT-IDENTITY
+    STATUS current
     DESCRIPTION
+	""
     REFERENCE
 	"ITU-T Rec. X.209, ASN.1 BER tranfser syntax."
     ::= { 2 1 1 }

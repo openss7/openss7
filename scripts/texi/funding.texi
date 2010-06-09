@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: funding.texi,v 1.1.2.1 2009-06-21 11:11:36 brian Exp $
+@c @(#) $Id: funding.texi,v 1.1.2.2 2010-06-09 12:58:34 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 11:11:36 $ by $Author: brian $
+@c Last Modified $Date: 2010-06-09 12:58:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -160,6 +160,8 @@ contributors to @uref{http://www.openss7.org/,, The OpenSS7 Project}:
 @item @tab @minus{} Christopher Lydick
 @tab @tab @minus{} D. Milanovic
 @item @tab @minus{} Omer Tunali
+@tab @tab @minus{} Tony Abo
+@item @tab @minus{} John Hodgkinson
 @tab @tab @minus{} Others
 @end multitable
 

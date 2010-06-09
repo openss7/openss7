@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\- fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SMI-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:32 $
+-- @(#) $RCSfile: OPENSS7-SMI-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:31 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:32 $ by $Author: brian $
+-- Last Modified $Date: 2010-06-09 12:58:31 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SMI-MIB.mib,v $
+-- Revision 1.1.2.2  2010-06-09 12:58:31  brian
+-- - updated mibs
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:32  brian
 -- - added files to new distro
 --
@@ -255,6 +258,37 @@ SpecificIdentifier ::= TEXTUAL-CONVENTION
     REFERENCE
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module SpecificIdentifier."
+    SYNTAX OBJECT IDENTIFIER
+
+CharacteristicInfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Provides the specification of the syntax of the 
+         identification of characteristic information.  It is 
+         an object identifier.
+         
+         An object having this syntax defines the characteristic 
+         information associated with a termination point the the 
+         GNM framework.  It is primarily used to identify 
+         SDH/SONET containers and payloads.
+         
+         The characteristic info textual convention is an object 
+         identifier that is one of the object identifiers 
+         assigned to characteristic information.  The actual 
+         characteristic information values from M.3100 (i.e. in 
+         the { itu-t recommendation m gnm(3100) 
+         informationModel(0) standardSpecificExtensions(0) 
+         charcteristicInfo(0) } are) may be used directly.  
+         Additional defined probable cause extensions dedfined 
+         by other documents may also be used.
+
+         Object identifiers use dwith the CharacteristicInfo 
+         textual convention must be defined in an 
+         OBJECT-IDENTITY macro and their use and meaning must be 
+         described in the DESCRIPTION clause of that macro."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1995) : ASN1DefinedTypesModule 
+               characteristicInfo"
     SYNTAX OBJECT IDENTIFIER
 
 SpecificProblems ::= TEXTUAL-CONVENTION
@@ -1770,6 +1804,30 @@ UnknownStatus ::= TEXTUAL-CONVENTION
 
 smiNotifications OBJECT IDENTIFIER
     ::= { smiMIB 0 }
+
+SystemTimingSource ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Provides the source of primary or secondary timing 
+         according to ITU-T M.3100.  An SNMP object with this 
+         textual convention in its SYNTAX field specifies be one 
+         of the following sources:
+         
+         - none(0), no timing source;
+         - internal(1), timing source is internal the to the 
+           corresponding managed object;
+         - remote(2), timing source is remote to the 
+           corresponding managed object;
+         - slaved(3), timing source is slaved from an interface 
+           corresponding to the managed object.
+           
+         An object using this textual convention in its SYNTAX 
+         field can have a MAX-ACCESS of read-only, read-write or 
+         read-create."
+    REFERENCE
+        "ITU-T Rec. M.3100 (2005) : SystemTiming"
+    SYNTAX INTEGER {
+        none(0), internal(1), remote(2), slaved(3) }
 
 smi2Notifications OBJECT IDENTIFIER
     ::= { smiNotifications 0 }
@@ -5670,6 +5728,391 @@ sfwrDownloadFailure OBJECT-IDENTITY
     REFERENCE
         "ITU-T Rec. M.3100 (1992) : sfwrDownloadFailure"
     ::= { gnmProbableCause 156 }
+
+gnmCharacteristicInfo OBJECT IDENTIFIER
+    ::= { smiOids 5 }
+
+opticalSTM1SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : opticalSTM1SPICI"
+    ::= { gnmCharacteristicInfo 1 }
+
+opticalSTM4SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : opticalSTM4SPICI"
+    ::= { gnmCharacteristicInfo 2 }
+
+opticalSTM16SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : opticalSTM16SPICI"
+    ::= { gnmCharacteristicInfo 3 }
+
+electricalSTM1SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : electricalSTM1SPICI"
+    ::= { gnmCharacteristicInfo 4 }
+
+rsSTM1SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : rsSTM1SPICI"
+    ::= { gnmCharacteristicInfo 5 }
+
+rsSTM4SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : rsSTM4SPICI"
+    ::= { gnmCharacteristicInfo 6 }
+
+rsSTM16SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : rsSTM16SPICI"
+    ::= { gnmCharacteristicInfo 7 }
+
+msSTM1SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : msSTM1SPICI"
+    ::= { gnmCharacteristicInfo 8 }
+
+msSTM4SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : msSTM4SPICI"
+    ::= { gnmCharacteristicInfo 9 }
+
+msSTM16SPICI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : msSTM16SPICI"
+    ::= { gnmCharacteristicInfo 10 }
+
+au3TU3VC3CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : au3TU3VC3CI"
+    ::= { gnmCharacteristicInfo 11 }
+
+au4VC4CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : au4VC4CI"
+    ::= { gnmCharacteristicInfo 12 }
+
+tu11VC11CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : tu11VC11CI"
+    ::= { gnmCharacteristicInfo 13 }
+
+tu12VC12CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : tu12VC12CI"
+    ::= { gnmCharacteristicInfo 14 }
+
+tu2CV2CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : tu2CV2CI"
+    ::= { gnmCharacteristicInfo 15 }
+
+tu12VC11CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : tu12VC11CI"
+    ::= { gnmCharacteristicInfo 16 }
+
+vpCI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : vpCI"
+    ::= { gnmCharacteristicInfo 17 }
+
+vcCI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : vcCI"
+    ::= { gnmCharacteristicInfo 18 }
+
+e0CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : e0CI"
+    ::= { gnmCharacteristicInfo 19 }
+
+e1CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : e1CI"
+    ::= { gnmCharacteristicInfo 20 }
+
+e2CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : e2CI"
+    ::= { gnmCharacteristicInfo 21 }
+
+e3CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : e3CI"
+    ::= { gnmCharacteristicInfo 22 }
+
+e4CI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : e4CI"
+    ::= { gnmCharacteristicInfo 23 }
+
+e5-565M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : e5-565M"
+    ::= { gnmCharacteristicInfo 24 }
+
+sts3c-and-VC4-1c OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : sts3c-and-VC4-1c"
+    ::= { gnmCharacteristicInfo 25 }
+
+sts12c-and-VC4-4c OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : sts12c-and-VC4-4c"
+    ::= { gnmCharacteristicInfo 26 }
+
+sts48c-and-VC4-16c OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : sts48c-and-VC4-16c"
+    ::= { gnmCharacteristicInfo 27 }
+
+sts192c-and-VC4-64c OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : sts192c-and-VC4-64c"
+    ::= { gnmCharacteristicInfo 28 }
+
+section-OC1-STS1-and-RS-STM0 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) 
+               : section-OC1-STS1-and-RS-STM0"
+    ::= { gnmCharacteristicInfo 29 }
+
+section-OC192-STS192-and-RS-STM64 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) 
+               : section-OC192-STS192-and-RS-STM64"
+    ::= { gnmCharacteristicInfo 30 }
+
+line-OC1-STS1-and-MS-STM0 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : line-OC1-STS1-and-MS-STM0"
+    ::= { gnmCharacteristicInfo 31 }
+
+line-OC192-STS192-and-MS-STM64 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) 
+               : line-OC192-STS192-and-MS-STM64"
+    ::= { gnmCharacteristicInfo 32 }
+
+fc-12-133M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : fc-12-133M"
+    ::= { gnmCharacteristicInfo 33 }
+
+fc-25-266M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : fc-25-266M"
+    ::= { gnmCharacteristicInfo 34 }
+
+fc-50-531M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : fc-50-531M"
+    ::= { gnmCharacteristicInfo 35 }
+
+fc-100-1063M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : fc-100-1063M"
+    ::= { gnmCharacteristicInfo 36 }
+
+fddi OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : fddi"
+    ::= { gnmCharacteristicInfo 37 }
+
+fast-Ethernet OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : fast-Ethernet"
+    ::= { gnmCharacteristicInfo 38 }
+
+gigabit-Ethernet OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : gigabit-Ethernet"
+    ::= { gnmCharacteristicInfo 39 }
+
+isdn-BRI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : isdn-BRI"
+    ::= { gnmCharacteristicInfo 40 }
+
+dsr-OC192-and-STM64 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : dsr-OC192-and-STM64"
+    ::= { gnmCharacteristicInfo 41 }
+
+dsr-OC768-and-STM256 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : dsr-OC768-and-STM256"
+    ::= { gnmCharacteristicInfo 42 }
+
+section-OC24-STS24-and-RS-STM8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) 
+               : section-OC24-STS24-and-RS-STM8"
+    ::= { gnmCharacteristicInfo 43 }
+
+line-OC24-STS24-and-MS-STM8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : line-OC24-STS24-and-MS-STM8"
+    ::= { gnmCharacteristicInfo 44 }
+
+section-OC768-STS768-and-RS-STM256 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) 
+               : section-OC768-STS768-and-RS-STM256"
+    ::= { gnmCharacteristicInfo 45 }
+
+line-OC768-STS768-and-MS-STM256 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) 
+               : line-OC768-STS768-and-MS-STM256"
+    ::= { gnmCharacteristicInfo 46 }
+
+tenGigabit-Ethernet OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Global value of M.3100 characteristic info."
+    REFERENCE
+        "ITU-T Rec. M.3100 (1992) : tenGigabit-Ethernet"
+    ::= { gnmCharacteristicInfo 47 }
 
 smiGroups OBJECT IDENTIFIER
     ::= { smiMIB 5 }

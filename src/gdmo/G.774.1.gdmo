@@ -1,10 +1,11 @@
---@@ GDMOCHECK $Revision: 1.1.2.1 $
---@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ GDMOCHECK $Revision: 1.1.2.2 $
+--@@ Copyright (c), 2008-2009 Monavacon Limited <http://www.monavacon.com/>
+--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Fri Sep 14 13:17:48 MDT 2007
+--@@ Date: Thu Apr 15 01:40:56 MDT 2010
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
@@ -641,6 +642,835 @@ REGISTERED AS { g774-01NameBinding 27 };
 -- None. 
 -- 14 Pointer constraints 
 -- None. 
+-- APPENDIX IV 
+-- Functionality that is no longer required 
+-- IV.1  Managed object class definitions 
+-- IV.1.1  Electrical Source Synchronous Physical Interface Current Data 
+
+
+electricalSourceSPICurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		transmitPowerLevelCurrentDataPackage,
+		electricalSourceSPICurrentDataPackage PACKAGE
+			BEHAVIOUR
+				electricalSourceSPICurrentDataBehaviour;;;
+	CONDITIONAL PACKAGES
+		transmitPowerLevelTideMarkPackage
+			PRESENT IF
+	"an instance supports it";
+REGISTERED AS { g774-01MObjectClass 4 };
+
+
+electricalSourceSPICurrentDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of the electricalSPICurrentData managed object Class are used to hold 
+		the monitoring of the physical characteristics of the output of an electrical 
+		source (electricalSPITTP). These characteristics are handled by gauge 
+		attributes. The following performance event is defined: transmit Power Level. 
+		When a Tide Mark Package is used ( in conjunction with its associated gauge), 
+		the corresponding Tide Mark attribute shall be reported in the history data at 
+		the end of the granularity period and the values of the tide marks shall be 
+		reset to the current values of the associated gauge at the end of the 
+		granularity period. The unavailableTimeAlarmPackage is not used in this class. 
+		This managed object class uses the electricalSPIHistoryData managed object class 
+		for history retention.";
+-- IV.1.2  Optical Source Synchronous Physical Interface Current Data 
+
+
+opticalSourceSPICurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		opticalSourceSPICurrentDataPackage PACKAGE
+			BEHAVIOUR
+				opticalSourceSPICurrentDataBehaviour;;;
+	CONDITIONAL PACKAGES
+		transmitPowerLevelCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		transmitPowerLevelTideMarkPackage
+			PRESENT IF
+	"an instance supports it and transmitPowerLevelCurrentDataPackage is present",
+		laserBiasCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		laserBiasTideMarkPackage
+			PRESENT IF
+	"an instance supports it and laserBiasCurrentDataPackage is present",
+		laserTemperatureCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		laserTemperatureTideMarkPackage
+			PRESENT IF
+	"an instance supports it and laserTemperatureCurrentDataPackage is present";
+REGISTERED AS { g774-01MObjectClass 5 };
+
+
+opticalSourceSPICurrentDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of the opticalSPICurrentData managed object Class are used to hold the 
+		monitoring of the physical characteristics of the output of an optical source 
+		(opticalSPITTP). These characteristics are handled by gauge attributes. The 
+		following performance primitives are observed:
+
+	 OSL Optical Signal Level
+
+		For the OSL performance primitive, the following performance events are defined:
+
+		- transmit Power Level
+
+	 LB Laser Bias
+
+		For the LB performance primitive, the following performance events are defined:
+
+		- laser Bias
+
+	 LT Laser Temperature
+
+		For the LT performance primitive, the following performance events are defined:
+
+		- laserTemperature
+
+		 These performance event counts are inhibited under certain failure or 
+		 unavailable conditions as specified in the following list:
+
+		Laser Shutdown
+
+		 When a Tide Mark Package is used (in conjunction with its associated gauge), 
+		 the corresponding Tide Mark attribute shall be reported in the history data at 
+		 the end of the granularity period and the tide marks shall be reset to the 
+		 current values of the associated gauge at the end of the granularity period. 
+		 The unavailableTimeAlarmPackage is not used in this class. This managed object 
+		 class uses the opticalSPIHistoryData managed object class for history 
+		 retention.";
+-- IV.1.3  Multiplex Section Current Data 
+
+
+msCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		msCurrentDataPackage PACKAGE
+			BEHAVIOUR
+				msCurrentDataBehaviour;
+			ATTRIBUTES
+				"Recommendation X.739":granularityPeriod
+					REQUIRED VALUES SDHPMASN1.SDHGranularityPeriod
+					,
+				bBE REPLACE-WITH-DEFAULT GET,
+				eS REPLACE-WITH-DEFAULT GET,
+				sES REPLACE-WITH-DEFAULT GET;;;
+	CONDITIONAL PACKAGES
+		cSESCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		farEndCSESCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		uASCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		farEndCurrentDataPackage
+			PRESENT IF
+	"monitoring of the far end is supported and the monitored point is bidirectional.";
+REGISTERED AS { g774-01MObjectClass 6 };
+
+
+msCurrentDataBehaviour BEHAVIOUR
+	DEFINED AS
+		*Instances of the msCurrentData managed object Class are used to hold the current 
+		register counts for a multiplex section trail termination point during a 
+		collection period. The following performance primitives are observed:
+
+	 EB Errored Block
+
+		For the EB performance primitive, the following performance events are defined:
+
+	 BBE Background Block Error
+
+		For the EB performance primitive and the following defect: MS-AIS, 
+		Excessive-Error, the following performance events are defined:
+
+		- ES Errored Second
+
+		- SES Severely Errored Second
+
+		 This managed object class uses the msHistoryData managed object class for 
+		 history retention.
+
+		 A QOS alarm shall be sent as soon as a threshold is reached or crossed. At the 
+		 end of the granularity period the QOS alarm is implictly cleared, providing 
+		 there are no other outstanding threshold crossing QOS alarms, "Threshold 
+		 crossing" removed from the currentProblemList (i.e. No Notification is Sent) 
+		 and a new QOS alarm shall be sent if the threshold is reached or crossed again 
+		 during the next granularity period. Only one threshold value per performance 
+		 counter will be supported.*;
+-- IV.1.4  Multiplex Section Current Data Threshold Reset 
+
+
+msCurrentDataTR MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		thresholdResetPackage,
+		msCurrentDataTRPackage PACKAGE
+			BEHAVIOUR
+				msCurrentDataTRBehaviour;
+			ATTRIBUTES
+				"Recommendation X.739":granularityPeriod
+					PERMITTED VALUES SDHPMASN1.SDHPVGranularityPeriod
+					,
+				bBE REPLACE-WITH-DEFAULT GET,
+				eS REPLACE-WITH-DEFAULT GET,
+				sES REPLACE-WITH-DEFAULT GET;;;
+	CONDITIONAL PACKAGES
+		cSESCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		farEndCSESCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		uASCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		farEndCurrentDataPackage
+			PRESENT IF
+	"monitoring of the far end is supported and the monitored point is bidirectional.";
+REGISTERED AS { g774-01MObjectClass 7 };
+
+
+msCurrentDataTRBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of the msCurrentDataTR managed object Class are used to hold the 
+		current register counts for a multiplex section trail termination point during a 
+		collection period.
+
+	 The following performance primitives are observed:
+
+	 EB Errored Block
+
+		 For the EB performance primitive, the following performance events are defined:
+
+	 BBE Background Block Error
+
+		 For the EB performance primitive and the following defect: MS-AIS, 
+		 Excessive-Error, the following performance events are defined:
+
+		 - ES Errored Second
+
+		 - SES Severely Errored Second
+
+		 This managed object class uses the msHistoryData managed object class for 
+		 history retention.";
+-- IV.1.5  Protection Current Data 
+-- NOTE – The use of this class is not meaningful for 1 + 1 non-revertive protection. 
+
+
+protectionCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		protectionCurrentDataPackage PACKAGE
+			BEHAVIOUR
+				protectionCurrentDataBehaviour;
+			ATTRIBUTES
+				"Recommendation X.739":granularityPeriod
+					REQUIRED VALUES SDHPMASN1.SDHGranularityPeriod
+					,
+				pSC REPLACE-WITH-DEFAULT GET,
+				pSD REPLACE-WITH-DEFAULT GET;;;
+REGISTERED AS { g774-01MObjectClass 8 };
+
+
+protectionCurrentDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of the protectionCurrentData managed object Class are used to hold the 
+		current register counts for a protection during a collection period. The 
+		following performance primitives are observed:
+
+	 - PSC Protection Switch Count.
+
+	 - PSD Protection Switch Duration.
+
+		 This managed object class uses the protectionHistoryData managed object class 
+		 for history retention.";
+-- IV.1.6  Path Termination Current Data Threshold Reset 
+
+
+pathTerminationCurrentDataTR MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		thresholdResetPackage,
+		pathTerminationCurrentDataTRPackage PACKAGE
+			BEHAVIOUR
+				pathTerminationCurrentDataTRBehaviour;
+			ATTRIBUTES
+				"Recommendation X.739":granularityPeriod
+					PERMITTED VALUES SDHPMASN1.SDHPVGranularityPeriod
+					,
+				bBE REPLACE-WITH-DEFAULT GET,
+				eS REPLACE-WITH-DEFAULT GET,
+				sES REPLACE-WITH-DEFAULT GET;;;
+	CONDITIONAL PACKAGES
+		cSESCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		farEndCSESCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		uASCurrentDataPackage
+			PRESENT IF
+	"an instance supports it",
+		farEndCurrentDataPackage
+			PRESENT IF
+				"if monitoring of the far end is supported and the monitored point is 
+				Bidirectional";
+REGISTERED AS { g774-01MObjectClass 10 };
+
+
+pathTerminationCurrentDataTRBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of the pathTerminationCurrentDataTR managed object Class are used to 
+		hold the current register counts for a High Order Path and or Low Order Path 
+		during a collection period. An instance of this object class, for a
+
+		 monitored managed object instance, holds the current register counts of each 
+		 performance events (BBE, ES, SES, FEBBE , FEES, FESES, UAS).
+
+	 Near End Monitoring
+
+		The following performance primitives are observed:
+
+		- EB Errored Block
+
+		  For the EB performance primitive, the following performance events are 
+		  defined:
+
+		- BBE Background Block Error
+
+		  For the EB performance primitive and the following defect: AU-AIS/TU-AIS, Path 
+		  Trace Mismatch, Signal Label Mismatch, and Loss of TU Multiframe the following 
+		  performance events are defined:
+
+		- ES Errored Second
+
+		- SES Severely Errored Second
+
+	 Far End Monitoring
+
+		The following performance primitive are observed:
+
+		- FEEB Far End Errored Block
+
+		  For the FEEB performance primitive, the following performance events are 
+		  defined:
+
+		- FEBBE Far End Background Block Error
+
+		  For the FEEB performance primitive and the following defect: Far End Remote 
+		  Failure the following performance events are defined:
+
+		- FEES Far End Errored Second
+
+		- FESES Far End Severely Errored Second
+
+		 This managed object class uses the pathTerminationHistoryData managed object 
+		 class for history retention.";
+-- IV.1.7  Electrical Synchronous Physical Interface History Data 
+
+
+electricalSPIHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":historyData;
+	CHARACTERIZED BY
+		transmitPowerLevelCurrentDataPackage,
+		electricalSPIHistoryDataPackage PACKAGE
+			BEHAVIOUR
+				opticalSPIHistoryDataBehaviour;;;
+	CONDITIONAL PACKAGES
+		transmitPowerLevelTideMarkPackage
+			PRESENT IF
+				"the containing electricalSPICurrentData instance contains this package";
+REGISTERED AS { g774-01MObjectClass 13 };
+
+
+electricalSPIHistoryDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of this class are used to store the observed events of an
+		electricalSourceSPICurrentData object at the end of an observation interval. An
+		instance of this managed object is contained by an 
+		electricalSourceSPICurrentData
+		managed object instance.";
+-- IV.1.8  Optical Synchronous Physical Interface History Data 
+
+
+opticalSPIHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":historyData;
+	CHARACTERIZED BY
+		opticalSPIHistoryDataPackage PACKAGE
+			BEHAVIOUR
+				opticalSPIHistoryDataBehaviour;;;
+	CONDITIONAL PACKAGES
+		transmitPowerLevelCurrentDataPackage
+			PRESENT IF
+				"the containing opticalSourceSPICurrentData instance contains this package",
+		transmitPowerLevelTideMarkPackage
+			PRESENT IF
+				"the containing opticalSourceSPICurrentData instance contains this package",
+		laserBiasCurrentDataPackage
+			PRESENT IF
+				"the containing opticalSourceSPICurrentData instance contains this package",
+		laserBiasTideMarkPackage
+			PRESENT IF
+				"the containing opticalSourceSPICurrentData instance contains this package",
+		laserTemperatureCurrentDataPackage
+			PRESENT IF
+				"the containing opticalSourceSPICurrentData instance contains this package",
+		laserTemperatureTideMarkPackage
+			PRESENT IF
+				"the containing opticalSourceSPICurrentData instance contains this package";
+REGISTERED AS { g774-01MObjectClass 14 };
+
+
+opticalSPIHistoryDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of this class are used to store the observed events of an 
+		opticalSourceSPICurrentData object at the end of an observation interval. An 
+		instance of this managed object is contained by an opticalSourceSPICurrentData 
+		managed object instance.";
+-- IV.1.9  Multiplex Section History Data 
+
+
+msHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":historyData;
+	CHARACTERIZED BY
+		msHistoryDataPackage PACKAGE
+			BEHAVIOUR
+				msHistoryDataBehaviour;
+			ATTRIBUTES
+				bBE GET,
+				eS GET,
+				sES GET;;;
+	CONDITIONAL PACKAGES
+		uASHistoryDataPackage
+			PRESENT IF
+				"the containing msCurrentData contains the uASCurrentDataPackage",
+		farEndHistoryDataPackage
+			PRESENT IF
+				"the containing msCurrentData or msCurrentDataTR instance contains the 
+				farEndCurrentDataPackage";
+REGISTERED AS { g774-01MObjectClass 15 };
+
+
+msHistoryDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of this class are used to store the observed events of an 
+		msCurrentData or msCurrentDataTR object at the end of an observation interval. 
+		An instance of this managed object is contained by an msCurrentData or 
+	 msCurrentDataTR managed object instance.";
+-- IV.1.10 Protection History Data 
+
+
+protectionHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":historyData;
+	CHARACTERIZED BY
+		protectionHistoryDataPackage PACKAGE
+			BEHAVIOUR
+				protectionHistoryDataBehaviour;
+			ATTRIBUTES
+				pSC GET,
+				pSD GET;;;
+REGISTERED AS { g774-01MObjectClass 16 };
+
+
+protectionHistoryDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of this class are used to store the observed events of a 
+		protectionCurrentData object at the end of an observation interval. An instance 
+		of this managed object is contained by a protectionCurrentData or subclass 
+	 managed object instance.";
+-- IV.2  Package definitions 
+-- IV.2.1  Laser Bias Current Data Package 
+
+
+laserBiasCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		laserBiasCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		laserBias GET;
+REGISTERED AS { g774-01Package 6 };
+
+
+laserBiasCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the gauge of percentage of laser bias of an SDH 
+		optical source.";
+-- IV.2.2  Laser Bias Tide Mark Package 
+
+
+laserBiasTideMarkPackage PACKAGE
+	BEHAVIOUR
+		laserBiasTideMarkPackageBehaviour;
+	ATTRIBUTES
+		laserBiasTideMarkMax GET,
+		laserBiasTideMarkMin GET;
+REGISTERED AS { g774-01Package 7 };
+
+
+laserBiasTideMarkPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the minimum and maximum values reached by the 
+		laser bias gauge during an observation period.";
+-- IV.2.3  Laser Temperature Current Data Package 
+
+
+laserTemperatureCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		laserTemperatureCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		laserTemperature GET;
+REGISTERED AS { g774-01Package 8 };
+
+
+laserTemperatureCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the gauge of laser temperature value of an SDH 
+		optical source.";
+-- IV.2.4  Laser Temperature Tide Mark Package 
+
+
+laserTemperatureTideMarkPackage PACKAGE
+	BEHAVIOUR
+		laserTemperatureTideMarkPackageBehaviour;
+	ATTRIBUTES
+		laserTemperatureTideMarkMax GET,
+		laserTemperatureTideMarkMin GET;
+REGISTERED AS { g774-01Package 9 };
+
+
+laserTemperatureTideMarkPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the minimum and maximum values reached by the 
+		laser temperature gauge during an observation period.";
+-- IV.2.5  Transmit Power Level Current Data Package 
+
+
+transmitPowerLevelCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		transmitPowerLevelCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		transmitPowerLevel GET;
+REGISTERED AS { g774-01Package 12 };
+
+
+transmitPowerLevelCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the gauge of transmit power level value of a 
+		physical source.";
+-- IV.2.6  Transmit Power Level Tide Mark Package 
+
+
+transmitPowerLevelTideMarkPackage PACKAGE
+	BEHAVIOUR
+		transmitPowerLevelTideMarkPackageBehaviour;
+	ATTRIBUTES
+		transmitPowerLevelTideMarkMax GET,
+		transmitPowerLevelTideMarkMin GET;
+REGISTERED AS { g774-01Package 13 };
+
+
+transmitPowerLevelTideMarkPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the minimum and maximum values reached by the 
+		transmit power level gauge during an observation period.";
+-- IV.3  Attributes definitions 
+-- IV.3.1 Laser Bias 
+
+
+laserBias ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		laserBiasBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the laserBias attribute represents the percentage of the normalized 
+				value of laser bias current at a SDH optical SPI source or a SDH optical SPI 
+				bidirectional trail termination point.";;
+REGISTERED AS { g774-01Attribute 6 };
+-- IV.3.2  Laser Bias Tide Mark Maximum 
+
+
+laserBiasTideMarkMax ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":tideMark;
+	BEHAVIOUR
+		laserBiasTideMarkMaxBeh BEHAVIOUR
+			DEFINED AS
+				"The laserBias TideMark Maximum attribute stores the maximum value reached by the 
+				laser bias during a granularity period.";;
+REGISTERED AS { g774-01Attribute 7 };
+-- IV.3.3  Laser Bias Tide Mark Minimum 
+
+
+laserBiasTideMarkMin ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":tideMark;
+	BEHAVIOUR
+		laserBiasTideMarkMinBeh BEHAVIOUR
+			DEFINED AS
+				"The laserBias TideMark Minimum attribute stores the minimum value reached by the 
+				laser bias during a granularity period.";;
+REGISTERED AS { g774-01Attribute 8 };
+-- IV.3.4 Laser Temperature 
+
+
+laserTemperature ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		laserTemperatureBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the laserTemperature attribute represents the laser temperature of 
+				a physical optical source.";;
+REGISTERED AS { g774-01Attribute 9 };
+-- IV.3.5  Laser Temperature Tide Mark Maximum 
+
+
+laserTemperatureTideMarkMax ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":tideMark;
+	BEHAVIOUR
+		laserTemperatureTideMarkMaxBeh BEHAVIOUR
+			DEFINED AS
+				"The laserTemperature TideMark Maximum attribute stores the maximum value reached 
+				by the laser temperature during a granularity period.";;
+REGISTERED AS { g774-01Attribute 10 };
+-- IV.3.6  Laser Temperature Tide Mark Minimum 
+
+
+laserTemperatureTideMarkMin ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":tideMark;
+	BEHAVIOUR
+		laserTemperatureTideMarkMinBeh BEHAVIOUR
+			DEFINED AS
+				"The laserTemperature TideMark Minimum attribute stores the minimum value reached 
+				by the laser temperature during a granularity period.";;
+REGISTERED AS { g774-01Attribute 11 };
+-- IV.3.7  Protection Switch Count 
+
+
+pSC ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		pSCBeh BEHAVIOUR
+			DEFINED AS
+				"In the case of a protected unit, the value of the pSC attribute represents the 
+				count of switches to the protecting unit. In the case of a protecting unit, this 
+				attribute represents the count of switches from any protected unit to that 
+				protecting unit. Editor Note: This behaviour needs clarification in accordance 
+				with protection management.";;
+REGISTERED AS { g774-01Attribute 15 };
+-- IV.3.8  Protection Switch Duration 
+
+
+pSD ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		pSDBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the pSD attribute represents the count of seconds during which the 
+				service was switched from working to protection.";;
+REGISTERED AS { g774-01Attribute 16 };
+-- IV.3.9 Transmit Power Level 
+
+
+transmitPowerLevel ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":gauge;
+	BEHAVIOUR
+		transmitPowerLevelBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the transmitPowerLevel gauge attribute represents the value of the 
+				output signal level emitted by a physical (electrical or optical) source.";;
+REGISTERED AS { g774-01Attribute 19 };
+-- IV.3.10 Transmit Power Level Tide Mark Maximum 
+
+
+transmitPowerLevelTideMarkMax ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":tideMark;
+	BEHAVIOUR
+		transmitPowerLevelTideMarkMaxBeh BEHAVIOUR
+			DEFINED AS
+				"The transmitPowerLevelTideMark Maximum attribute stores the maximum value 
+				reached by the transmit power level during an observation period.";;
+REGISTERED AS { g774-01Attribute 20 };
+-- IV.3.11 Transmit Power Level Tide Mark Minimum 
+
+
+transmitPowerLevelTideMarkMin ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":tideMark;
+	BEHAVIOUR
+		transmitPowerLevelTideMarkMinBeh BEHAVIOUR
+			DEFINED AS
+				"The transmitPowerLevelTideMark Minimum attribute stores the minimum value 
+				reached by the transmit power level during an observation period.";;
+REGISTERED AS { g774-01Attribute 21 };
+-- IV.4  Name binding definitions 
+-- IV.4.1  MS Current Data – MS TTP Sink 
+
+
+msCurrentData-msTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS msCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 2 };
+-- IV.4.2  MS Current Data Threshold Reset – MS TTP Sink 
+
+
+msCurrentDataTR-msTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS msCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 3 };
+-- IV.4.3  MS Current Data – Protected TTP Sink 
+
+
+msCurrentData-protectedTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS msCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774.03":protectedTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 4 };
+-- IV.4.4  MS Current Data Threshold Reset – Protected TTP Sink 
+
+
+msCurrentDataTR-protectedTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS msCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774.03":protectedTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 5 };
+-- IV.4.5  Protection Current Data – Protection Unit 
+
+
+protectionCurrentData-protectionUnit NAME BINDING
+	SUBORDINATE OBJECT CLASS protectionCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774.03":protectionUnit AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 6 };
+-- IV.4.6  Path Termination Current Data Threshold Reset – VC4 TTP SinkR1 
+
+
+pathTerminationCurrentDataTR-vc4TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 28 };
+-- IV.4.7  Path Termination Current Data Threshold Reset – VC3 TTP SinkR1 
+
+
+pathTerminationCurrentDataTR-vc3TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 29 };
+-- IV.4.8  Path Termination Current Data Threshold Reset – VC2 TTP SinkR1 
+
+
+pathTerminationCurrentDataTR-vc2TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc2TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 30 };
+-- IV.4.9  Path Termination Current Data Threshold Reset – VC12 TTP SinkR1 
+
+
+pathTerminationCurrentDataTR-vc12TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc12TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 31 };
+-- IV.4.10 Path Termination Current Data Threshold Reset – VC11 TTP SinkR1 
+
+
+pathTerminationCurrentDataTR-vc11TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentDataTR AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc11TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 32 };
+-- IV.4.11 Electrical Source SPI Current Data – Electrical SPITTP Source 
+
+
+electricalSourceSPICurrentData-electricalSPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS electricalSourceSPICurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":electricalSPITTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 19 };
+-- IV.4.12 Optical Source SPI Current Data – Optical SPITTP Source 
+
+
+opticalSourceSPICurrentData-opticalSPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS opticalSourceSPICurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":opticalSPITTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 20 };
 
 END
 --< GDMO.EndDocument "ITU-T G.774.1 (02/2001)"
@@ -1046,8 +1876,18 @@ END
 --@@ |  +- itut_q822::currentData
 --@@ |  |  +- itut_g774_1::sdhCurrentData
 --@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  |  +- itut_g774_1::electricalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::opticalSourceSPICurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentData
+--@@ |  |  |  +- itut_g774_1::msCurrentDataTR
+--@@ |  |  |  +- itut_g774_1::protectionCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentDataTR
 --@@ +- itut_q822::historyData
 --@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_g774_1::electricalSPIHistoryData
+--@@ |  +- itut_g774_1::opticalSPIHistoryData
+--@@ |  +- itut_g774_1::msHistoryData
+--@@ |  +- itut_g774_1::protectionHistoryData
 --@@ +- itut_q822::thresholdData
 --@@
 
@@ -1081,6 +1921,7 @@ END
 --@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
 --@@ |  >- itut_g774_3::protectionGroupR1
 --@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  |  |  >- itut_g774_1::protectionCurrentData
 --@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
 --@@ |  >- itut_x723::applicationProcess
 --@@ |  >- itut_m3100::arcIntervalProfile
@@ -1153,6 +1994,7 @@ END
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::electricalSPITTPSource
 --@@ |  >- itut_g774::rsCTPSource
+--@@ |  >- itut_g774_1::electricalSourceSPICurrentData
 --@@ >- itut_g774::msTTPBidirectional
 --@@ |  >- itut_g774::augBidirectional
 --@@ |  |  >- itut_g774::au3CTPBidirectionalR1
@@ -1175,6 +2017,8 @@ END
 --@@ |  >- itut_g774::msDatacomCTPSink
 --@@ |  >- itut_g774::msOrderwireCTPSink
 --@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ >- itut_g774::msTTPSource
 --@@ |  >- itut_g774::augSource
 --@@ |  |  >- itut_g774::au3CTPSource
@@ -1190,6 +2034,7 @@ END
 --@@ |  >- itut_g774::rsCTPSink
 --@@ >- itut_g774::opticalSPITTPSource
 --@@ |  >- itut_g774::rsCTPSource
+--@@ |  >- itut_g774_1::opticalSourceSPICurrentData
 --@@ >- itut_g774::rsTTPBidirectional
 --@@ |  >- itut_g774::msCTPBidirectional
 --@@ |  >- itut_g774::msCTPSink
@@ -1216,14 +2061,17 @@ END
 --@@ >- itut_g774::vc11TTPBidirectionalR1
 --@@ >- itut_g774::vc11TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc11TTPSource
 --@@ >- itut_g774::vc12TTPBidirectionalR1
 --@@ >- itut_g774::vc12TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc12TTPSource
 --@@ >- itut_g774::vc2TTPBidirectionalR1
 --@@ >- itut_g774::vc2TTPSinkR1
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc2TTPSource
 --@@ >- itut_g774::vc3TTPBidirectionalR1
 --@@ |  >- itut_g774::tug2Bidirectional
@@ -1246,6 +2094,7 @@ END
 --@@ |  |  >- itut_g774::tu2CTPSinkR1
 --@@ |  >- itut_g774::vcnUserChannelCTPSink
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc3TTPSourceR1
 --@@ |  >- itut_g774::tug2Source
 --@@ |  |  >- itut_g774::tu11CTPSource
@@ -1267,6 +2116,7 @@ END
 --@@ |  |  >- itut_g774::tug2Sink +++
 --@@ |  >- itut_g774::vcnUserChannelCTPSink
 --@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774_1::pathTerminationCurrentDataTR
 --@@ >- itut_g774::vc4TTPSourceR1
 --@@ |  >- itut_g774::tug3Source
 --@@ |  |  >- itut_g774::tu3CTPSource
@@ -1276,6 +2126,8 @@ END
 --@@ |  >- itut_g774::augBidirectional +++
 --@@ >- itut_g774_3::protectedTTPSink
 --@@ |  >- itut_g774::augSink +++
+--@@ |  >- itut_g774_1::msCurrentData
+--@@ |  >- itut_g774_1::msCurrentDataTR
 --@@ >- itut_g774_3::protectedTTPSource
 --@@ |  >- itut_g774::augSource +++
 --@@ itut_m3100::networkR1
