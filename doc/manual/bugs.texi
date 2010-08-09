@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 1.1.2.3 2010-06-09 12:58:34 brian Exp $
+@c @(#) $Id: bugs.texi,v 1.1.2.4 2010/08/09 17:55:04 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2010-06-09 12:58:34 $ by $Author: brian $
+@c Last Modified $Date: 2010/08/09 17:55:04 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,6 +89,14 @@ are still being designed and will not be available until a later date.  Most of 
 complete and for the most part bugs are currently available.
 
 @table @code
+@item openss7 008.  2010-08-09T17:41:46+0000
+The @manpage{t_alloc(3)} function was incorrectly returning a @perr{TLOOK} error when called when an
+outstanding event was pending.  Thanks to John Hodgkinson at Boldon James for reporting this bug.  A
+similar bug was found by inspection for @manpage{t_bind(3)}, @manpage{t_getinfo(3)},
+@manpage{t_getprotaddr(3)}.
+
+@emph{*fixed*} in @command{openss7-1.2.3}
+
 @item openss7 007.  2010-06-09T12:13:41+0000
 The @manpage{t_rcv(3)} function was not reseting data when the amount of data to be read was exactly
 the amount of data available.  Thanks to John Hodgkinson at Boldon James for reporting this bug.
