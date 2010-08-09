@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:34 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-06-09 12:58:34 $ by $Author: brian $
+ Last Modified $Date: 2010/08/09 17:55:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 1.1.2.3  2010/08/09 17:55:06  brian
+ - reported and fixed bug 008
+
  Revision 1.1.2.2  2010-06-09 12:58:34  brian
  - bug 007
 
@@ -60,9 +63,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:34 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:34 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -1634,7 +1637,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 {
 	struct _t_user *user;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
+	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	switch (type) {
 	case T_BIND:
@@ -2037,7 +2040,7 @@ __xnet_t_bind(int fd, const struct t_bind *req, struct t_bind *ret)
 {
 	struct _t_user *user;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, -1, TSF_UNBND)))
+	if (!(user = __xnet_t_tstuser(fd, -1, -1, TSF_UNBND)))
 		goto error;
 #ifdef DEBUG
 	if (req && (req->addr.len < 0 || (req->addr.len > 0 && !req->addr.buf)))
@@ -2465,7 +2468,7 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 {
 	struct _t_user *user;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
+	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 #ifdef DEBUG
 	if (!info)
@@ -2537,7 +2540,7 @@ __xnet_t_getprotaddr(int fd, struct t_bind *loc, struct t_bind *rem)
 {
 	struct _t_user *user;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
+	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	{
 		size_t add_max = min(__xnet_u_max_addr(user), _T_DEFAULT_ADDRLEN);
@@ -3182,7 +3185,7 @@ __xnet_t_optmgmt(int fd, const struct t_optmgmt *req, struct t_optmgmt *ret)
 {
 	struct _t_user *user;
 
-	if (!(user = __xnet_t_tstuser(fd, 0, -1, -1)))
+	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 #ifdef DEBUG
 	if (!req)
@@ -3275,9 +3278,7 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 	struct _t_user *user;
 	int copied = 0, event = 0, flag = 0, result;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
+	if (!(user = __xnet_t_tstuser(fd, -1, (1 << T_COTS) | (1 << T_COTS_ORD),
 			      TSF_DATA_XFER | TSF_WIND_ORDREL)))
 		goto error;
 	if (nbytes == 0)
@@ -3386,9 +3387,7 @@ __xnet_t_rcvconnect(int fd, struct t_call *call)
 	struct _t_user *user;
 	union T_primitives *p;
 
-	if (!
-	    (user =
-	     __xnet_t_tstuser(fd, T_CONNECT, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WCON_CREQ)))
+	if (!(user = __xnet_t_tstuser(fd, T_CONNECT, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WCON_CREQ)))
 		goto error;
 #ifdef DEBUG
 	if (call && (call->addr.maxlen < 0 || (call->addr.maxlen > 0 && !call->addr.buf)))
@@ -6186,10 +6185,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.2 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.3 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 1.1.2.2 $)
-  * @date \$Date: 2010-06-09 12:58:34 $
+  * @version \$Name:  $(\$Revision: 1.1.2.3 $)
+  * @date \$Date: 2010/08/09 17:55:06 $
   */
 
 /** @} */

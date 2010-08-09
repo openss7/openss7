@@ -1,3 +1,8 @@
+2010-08-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: added bug #008.
+	* src/lib/xnet.c: fixed t_alloc bug #008.
+
 2010-06-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: added bug #007.
