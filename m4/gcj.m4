@@ -509,7 +509,7 @@ dnl
 *** Alternatively, you can specify an equivalent command with the
 *** GCJDBTOOL environment variable when running configure.
 ***
-*** Debian 4.0:  'apt-get install gij'
+*** Debian 5.0:  'apt-get install gij'
 *** Ubuntu 8.04: 'apt-get install gij'
 *** CentOS 5.x:  'yum install libgcj'
 *** SLES 10:     'zypper install libgcj'
@@ -548,7 +548,7 @@ dnl
 *** Alternatively, you can specify an equivalent command with the GCJH
 *** environment variable when running configure.
 ***
-*** Debian 4.0:	 'apt-get install gcj'
+*** Debian 5.0:	 'apt-get install gcj'
 *** Ubuntu 8.04: 'apt-get install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
 *** SLES 10:	 'zypper install gcc-java'
@@ -589,7 +589,7 @@ dnl
 *** Alternatively, you can specify an equivalent command with the JAVAH
 *** environment variable when running configure.
 ***
-*** Debian 4.0:	 'apt-get install gcj'
+*** Debian 5.0:	 'apt-get install gcj'
 *** Ubuntu 8.04: 'apt-get install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
 *** SLES 10:	 'zypper install gcc-java'
@@ -629,7 +629,7 @@ dnl
 *** Alternatively, you can specify an equivalent command with the
 *** JAVADOC environment variable when running configure.
 ***
-*** Debian 4.0:	 'apt-get install gjdoc'
+*** Debian 5.0:	 'apt-get install gjdoc'
 *** Ubuntu 8.04: 'apt-get install gjdoc'
 *** CentOS 5.x:	 'yum install gjdoc'
 *** SLES 10:	 'zypper install java-1_5_0-ibm-devel'
@@ -678,7 +678,7 @@ dnl
 *** distributions.  Use the following commands to obtain 'libgcj'
 *** javadoc documentation:
 ***
-*** Debian 4.0:   'apt-get install libgcj-doc'
+*** Debian 5.0:   'apt-get install libgcj-doc'
 *** Ubuntu 8.04:  'apt-get install libgcj-doc'
 *** CentOS 5.x:   'yum install '
 ***

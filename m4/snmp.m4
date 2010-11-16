@@ -84,12 +84,12 @@ AC_DEFUN([_SNMP_MSG_WARN], [dnl
 ***	<[$]1>
 *** 
 *** Perhaps you forgot to load the NET-SNMP development package (e.g.,
-*** net-snmp-devel or libsnmp9-dev).  SNMP programs cannot be built.  If
+*** net-snmp-devel or libsnmp-dev).  SNMP programs cannot be built.  If
 *** this is not what you want, load the development package and rerun
 *** configure.  Use the following commands to obtain the NET-SNMP
 *** development package:
 ***
-*** Debian 4.0:  'apt-get install libsnmp9-dev'
+*** Debian 5.0:  'apt-get install libsnmp-dev'
 *** Ubuntu 8.04: 'apt-get install libsnmp-dev'
 *** CentOS 5.x:  'yum install net-snmp-devel'
 *** SLES 10:     'zypper install net-snmp-devel'

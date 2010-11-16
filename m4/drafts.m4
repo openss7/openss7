@@ -143,7 +143,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** and is available on the web from any GNU archive site.  Use the
 *** following commands to obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -168,7 +168,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** and is available on the web from any GNU archive site.  Use the
 *** following commands to obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff'
+*** Debian 5.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -193,7 +193,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** on the web from any GNU archive site.  Use the following commands to
 *** obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -218,7 +218,7 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** on the web from any GNU archive site.  Use the following commands to
 *** obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -251,7 +251,7 @@ dnl    fi
 *** and is available on the web from any GNU archive site.  Use the
 *** following commands to obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -278,7 +278,7 @@ dnl    fi
 *** available on the web from a number of sources.  Use the following
 *** commands to obtain 'ghostscript':
 ***
-*** Debian 4.0:  'apt-get install gs-common'
+*** Debian 5.0:  'apt-get install ghostscript'
 *** Ubuntu 8.04: 'apt-get install ghostscript'
 *** Fedora 7:    'yum install ghostscript'
 *** Fedora 9:    'yum install ghostscript'
@@ -309,7 +309,7 @@ dnl    fi
 *** available from many web sources.  Use the following commands to
 *** obtain 'fig2dev':
 ***
-*** Debian 4.0:  'apt-get install transfig'
+*** Debian 5.0:  'apt-get install transfig'
 *** Ubuntu 8.04: 'apt-get install transfig'
 *** Fedora 7:    'yum install transfig'
 *** Fedora 9:    'yum install transfig'

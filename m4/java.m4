@@ -127,7 +127,7 @@ dnl
 *** can also get 'jar' as part of any JDK.  Use the following command to
 *** obtain 'fastjar':
 ***
-*** Debian 4.0:	 'apt-get install fastjar'
+*** Debian 5.0:	 'apt-get install fastjar'
 *** Ubuntu 8.04: 'apt-get install fastjar'
 *** CentOS 5.x:	 'yum install libgcj'
 *** SLES 10:	 'zypper install fastjar'

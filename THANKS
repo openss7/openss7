@@ -1,6 +1,6 @@
-OpenSS7 -- acknowledgements.  2009-09-08
+OpenSS7 -- acknowledgements.  2010-02-22
 $Id: THANKS,v 1.1.2.9 2009-09-08 10:46:51 brian Exp $
-Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2010  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -59,7 +59,8 @@ contributors to The OpenSS7 Project:
      - Gurol Ackman                        - Christophe Nolibos
      - Pierre Crepieux                     - Bryan Shupe
      - Christopher Lydick                  - D. Milanovic
-     - Omer Tunali                         - Others
+     - Omer Tunali                         - Tony Abo
+     - John Hodgkinson                     - Others
 
  Supporters
 -----------
