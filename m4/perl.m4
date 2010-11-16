@@ -167,16 +167,19 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
 ])# _PERL_EXTENSIONS
 # =============================================================================
 
-AC_DEFUN([_PERL_LIB_ERROR], [dnl
-    AS_REQUIRE_SHELL_FN([perl_lib_error], [dnl
-    cat <<EOF
+AC_DEFUN([_PERL_LIB_ERROR],
+    [AC_REQUIRE_SHELL_FN([perl_lib_error],
+	[AS_FUNCTION_DESCRIBE([perl_lib_error],
+	    [LIBRARY],
+	    [Indicates that a library is required for embedded
+	     perl applications.])],
+	[cat <<EOF
 
 ***
 *** Compiling embedded perl applications requires the library
 *** [$]1.
 ***
-EOF
-    ])dnl
+EOF])dnl
     ac_msg=`perl_lib_error $1`
     AC_MSG_FAILURE([$ac_msg])
 ])

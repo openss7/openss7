@@ -229,7 +229,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
     then
 	AC_MSG_ERROR([
 *** 
-*** You have not specified --with-k-releease indicating that the build
+*** You have not specified --with-k-release indicating that the build
 *** is for the running kernel, however, you are cross-compiling.  When
 *** cross-compiling, you must specify the kernel release that you are
 *** targetting using the --with-k-release option.  This option should
@@ -279,17 +279,19 @@ dnl pull out versions from release number
 *** ])
     fi
     AC_CACHE_CHECK([for kernel extra release number], [linux_cv_k_extra], [dnl
-	linux_cv_k_extra="`echo $linux_cv_k_release | sed -e 's|[[^-]]*-||'`" ])
+	linux_cv_k_extra="`echo $linux_cv_k_release | sed -e 's|[[^-]]*-||;s|-.*||'`" ])
     kversion="${linux_cv_k_release}"
     AC_SUBST([kversion])dnl
     kmajor="${linux_cv_k_major}"
     kminor="${linux_cv_k_minor}"
     kpatch="${linux_cv_k_patch}"
+    kextra="${linux_cv_k_extra}"
     knumber="${kmajor}.${kminor}.${kpatch}"
     AC_SUBST([kmajor])dnl
     AC_SUBST([kminor])dnl
     AC_SUBST([kpatch])dnl
     AC_SUBST([knumber])dnl
+    AC_SUBST([kextra])dnl
     if test "$linux_cv_k_minor" -eq 4
     then
 	AC_DEFINE_UNQUOTED([LINUX_2_4], [1], [Define for the linux 2.4 kernel series.])
@@ -772,11 +774,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}${rootdir}/usr/src/linux-obj
 		${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}
+		${DESTDIR}${rootdir}/usr/src/kernel-headers-${knumber}-${kextra}
 		${DESTDIR}${rootdir}/usr/src/kernel-headers-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-headers-${kversion}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}-${kextra}
 		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}
+		${DESTDIR}${rootdir}/usr/src/linux-${knumber}-${kextra}
 		${DESTDIR}${rootdir}/usr/src/linux-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}${rootdir}/usr/src/linux
@@ -786,8 +791,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}/usr/src/linux-obj
 		${DESTDIR}/usr/src/kernel-headers-${kversion}
+		${DESTDIR}/usr/src/kernel-headers-${knumber}-${kextra}
 		${DESTDIR}/usr/src/kernel-headers-${knumber}
 		${DESTDIR}/usr/src/linux-headers-${kversion}
+		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}
 		${DESTDIR}/usr/src/linux-headers-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
@@ -871,7 +878,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 	AC_ARG_WITH([k-source],
 	    [AS_HELP_STRING([--with-k-source=DIR],
 		[kernel source directory @<:@default=/usr/src/K_VERSION@:>@])])
-	if test :"${with_k_souce:-no}" != :no
+	if test :"${with_k_source:-no}" != :no
 	then
 	    linux_cv_k_source="$with_k_source"
 	else
@@ -887,6 +894,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/source
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${kversion}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}
 		${DESTDIR}/usr/src/kernel-source-${knumber}
 		${DESTDIR}/usr/src/linux-source-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
@@ -896,7 +905,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}/usr/src/linux
 		${DESTDIR}/lib/modules/${kversion}/source
 		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}
-		${DESTDIR}/usr/src/kernels/${kversion}\""
+		${DESTDIR}/usr/src/kernels/${kversion}
+		${DESTDIR}/usr/src/linux-headers-${kversion}
+		${DESTDIR}/usr/src/linux-headers-${knumber}\""
 	    k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
 	    linux_cv_k_source=
 	    for linux_dir in $k_source_search_path ; do
@@ -1219,7 +1230,9 @@ dnl Ubuntu stuck some more paretheses into their /proc/version string.
 dnl Instead of keying off of the last parentheses in the string, use the key
 dnl string containing two parentheses: this is common to all.
 dnl
-	    linux_cv_k_compiler=`cat /proc/version | sed -e 's,^.*(gcc version,gcc version,;s,)).*[$],),' 2>/dev/null`
+dnl Debian added a blank between the last and extra parentheses.
+dnl
+	    linux_cv_k_compiler=`cat /proc/version | sed -e 's,^.*(gcc version,gcc version,;s,)).*[$],),;s,) ).*[$],) ,' 2>/dev/null`
 	else
 dnl
 dnl	    not all distros leave this hanging around
