@@ -199,6 +199,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
+*** Debian Squeeze:  'apt-get install xz-utils'
+***
 *** To get rid of this warning, load the 'xz' package, or specify the
 *** full path to the utility in the XZ_CMD environment variable, or
 *** simply do not specify --enable-bestzip='xz' to configure.
@@ -236,6 +238,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
+*** Debian:  'apt-get install coreutils'
+***
 *** To get rid of this warning, load the 'md5sum' program from the
 *** 'coreutils' package, specify the appropriate program with the MD5SUM
 *** environment variable to 'configure', or specify --disable-repo-tar
@@ -265,6 +269,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
+*** Debian:  'apt-get install coreutils'
+***
 *** To get rid of this warning, load the 'sha1sum' program from the
 *** 'coreutils' package, specify the appropriate program with the
 *** SHA1SUM environment variable to 'configure', or specify
@@ -293,6 +299,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> ./configure --enable-install-program=sha256sum
 ***   #> make
 ***   #> sudo make install
+***
+*** Debian:  'apt-get install coreutils'
 ***
 *** To get rid of this warning, load the 'sha256sum' program from the
 *** 'coreutils' package, specify the appropriate program with the

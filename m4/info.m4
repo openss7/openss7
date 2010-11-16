@@ -151,7 +151,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
 ***
-*** Debian 4.0:  'apt-get install tetex-bin'
+*** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
@@ -180,7 +180,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
 ***
-*** Debian 4.0:  'apt-get install tetex-bin'
+*** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
@@ -209,7 +209,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** years and is available on the web from any GNU archive site.  Use
 *** the following commands to obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff-base'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -242,7 +242,7 @@ dnl    fi
 *** many years and is available on the web from any GNU archive site.
 *** Use the following commands to obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff-base'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -273,7 +273,7 @@ dnl    fi
 *** years and is available from many web sources.  Use the following
 *** commands to obtain 'fig2dev':
 ***
-*** Debian 4.0:  'apt-get install transfig'
+*** Debian 5.0:  'apt-get install transfig'
 *** Ubuntu 8.04: 'apt-get install transfig'
 *** Fedora 7:    'yum install transfig'
 *** Fedora 9:    'yum install transfig'
@@ -308,7 +308,7 @@ dnl    fi
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
 ***
-*** Debian 4.0:  'apt-get install imagemagick'
+*** Debian 5.0:  'apt-get install imagemagick'
 *** Ubuntu 8.04: 'apt-get install imagemagick'
 *** Fedora 7:    'yum install ImageMagick'
 *** Fedora 9:    'yum install ImageMagick'
@@ -357,7 +357,7 @@ dnl
 *** 'tex' package has been available for may years and is available form
 *** any CTAN site.  Use the following command to obtain 'tex':
 ***
-*** Debian 4.0:  'apt-get install tetex-bin'
+*** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'

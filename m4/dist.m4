@@ -369,6 +369,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 			(3.0) dist_cv_build_codename='Woody' ;;
 			(3.1) dist_cv_build_codename='Sarge' ;;
 			(4.0) dist_cv_build_codename='Etch' ;;
+			(5.0) dist_cv_build_codename='Lenny' ;;
 			(*)   dist_cv_build_codename='unknown' ;;
 		    esac
 		    ;;
@@ -563,6 +564,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 			(3.0) dist_cv_host_codename='Woody' ;;
 			(3.1) dist_cv_host_codename='Sarge' ;;
 			(4.0) dist_cv_host_codename='Etch' ;;
+			(5.0) dist_cv_host_codename='Lenny' ;;
 			(*)   dist_cv_host_codename='unknown' ;;
 		    esac
 		    ;;

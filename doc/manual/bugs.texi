@@ -90,7 +90,7 @@ complete and for the most part bugs are currently available.
 
 @table @code
 @item openss7 008.  2010-08-09T17:41:46+0000
-The @manpage{t_alloc(3)} function was incorrectly returning a @perr{TLOOK} error when called when an
+The @manpage{t_alloc(3)} function was incorrectly returning a @var{TLOOK} error when called when an
 outstanding event was pending.  Thanks to John Hodgkinson at Boldon James for reporting this bug.  A
 similar bug was found by inspection for @manpage{t_bind(3)}, @manpage{t_getinfo(3)},
 @manpage{t_getprotaddr(3)}.

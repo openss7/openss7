@@ -116,7 +116,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** on the web from any GNU archive site.  Use the following commands to
 *** obtain 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -144,7 +144,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** web from any GNU archive site.  Use the following commands to obtain
 *** 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff'
+*** Debian 5.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -181,7 +181,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** web from any GNU archive site.  Use the following commands to obtain
 *** 'groff':
 ***
-*** Debian 4.0:  'apt-get install groff-base'
+*** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -207,7 +207,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** web from the Linux Documentation Project.  Use the following
 *** commands to obtain 'man':
 ***
-*** Debian 4.0:  'apt-get install man'
+*** Debian 5.0:  'apt-get install man-db'
 *** Ubuntu 8.04: 'apt-get install man'
 *** Fedora 9:    'yum install man'
 *** CentOS 5.x:  'yum install man'
@@ -277,6 +277,21 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path])
     if test :"${LZMA_CMD:-no}" = :no ; then
 	LZMA_CMD=
+	AC_MSG_WARN([
+***
+*** Configure cannot find a suitable 'lzma' program.  Compressing
+*** archives may require the 'lzma' program from the 'lzam' package on
+*** the build host.  The 'lzma' package has been available for a number
+*** of years on recent distributions and is available from various web
+*** sources for others.  Try:
+***
+*** Debian 5.0:  'apt-get install lzma'
+*** SuSE:        'zypper install lmza'
+*** CentOS:      'yum install lzma'
+***
+*** To get rid of this warning, load the 'lzma' package or specify the
+*** location with the LZMA_CMD environment variable to 'configure'.
+*** ])
     fi
     AC_ARG_VAR([XZ], [Xz default compression options @<:@default=-c@:>@])
     test -n "$XZ" || XZ='-c'
@@ -284,6 +299,21 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path])
     if test :"${XZ_CMD:-no}" = :no ; then
 	XZ_CMD=
+	AC_MSG_WARN([
+*** 
+*** Configurat cannot find a suitable 'xz' program.  Compressing
+*** archives may require the 'xz' program from the 'xz' package on the
+*** build host.  The 'xz' package has been available for a number
+*** of years on recent distributions and is available from various web
+*** sources for others.  Try:
+***
+*** Debian Squeeze: 'apt-get install xz'
+*** SuSE:           'zypper install xz'
+*** CentOS:         'yum install xz'
+***
+*** To get rid of this warning, load the 'xz' package or specify the
+*** location with the XZ_CMD environment variable to 'configure'.
+*** ])
     fi
 ])# _MAN_CONVERSION_SETUP
 # =========================================================================
