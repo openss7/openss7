@@ -146,6 +146,30 @@ dnl protect against nesting
 # =============================================================================
 
 # =============================================================================
+# _LINUX_KBUILD_ENV([COMMANDS])
+# -----------------------------------------------------------------------------
+# Sets up the file and environment necessary to invoke cflagcheck.  This
+# includes copying the configuration to .config, establishing .kernelvariables,
+# executing the required [COMMANDS] and then removing these files.
+#
+# Newer kernel makefiles (2.6.32) take their $(CC) from .kernelvariables and
+# cannot be overridden with the CC environment variable.  This was messing up
+# option checks on systems where there were multiple gcc's defined and the
+# kernel gcc is not the default.  So, now, when $(CC) is not simply gcc it needs
+# to be output to .kernelvariables  Note that some other things that we might
+# consider is AS, LD, CPP, AR, NM, STRIP, OBJCOPY, OBJDUMP, AWK, GENKSYMS,
+# DEPMOD, KALLSYMS, PERL and CHECK.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KBUILD_ENV], [dnl
+	cp -f "$kconfig" .config
+	echo "CC = \$(CROSS_COMPILE)$CC" > .kernelvariables
+	$1
+	rm -f .kernelvariables
+	rm -f .config
+])# _LINUX_KBUILD_ENV
+# =============================================================================
+
+# =============================================================================
 # _LINUX_KERNEL_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_OPTIONS], [dnl
@@ -1657,7 +1681,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	else
 	    linux_tmp="CROSS_COMPILING=`dirname $CC` ARCH=${linux_cv_k_mach}"
 	fi
-	cp -f "$kconfig" .config
+	_LINUX_KBUILD_ENV([dnl
 dnl
 dnl	On some later systems (noticed first on openSUSE 10.2, a mkmakefile script is making a dummy
 dnl	makefile in the current directory, however, it is outputing 'GEN /current/directory/Makefile'
@@ -1672,8 +1696,7 @@ dnl	compiler checks in kernel makefiles that attempt to write to the current dir
 dnl	was removed.
 dnl
 	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check | tail -1`"
-	linux_cv_k_cflags_orig="$linux_cv_k_cflags"
-	rm -f .config
+	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
 	    [AS_HELP_STRING([--with-k-optimize=HOW],
@@ -1840,7 +1863,7 @@ dnl
 	    ;;
     esac
     AC_CACHE_CHECK([for kernel CPPFLAGS], [linux_cv_k_cppflags], [dnl
-	cp -f "$kconfig" .config
+	_LINUX_KBUILD_ENV([dnl
 dnl
 dnl	On some later systems (noticed first on openSUSE 10.2, a mkmakefile script is making a dummy
 dnl	makefile in the current directory, however, it is outputing 'GEN /current/directory/Makefile'
@@ -1855,8 +1878,7 @@ dnl	compiler checks in kernel makefiles that attempt to write to the current dir
 dnl	was removed.
 dnl
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check | tail -1`"
-	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"
-	rm -f .config
+	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
 	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
 dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
@@ -1895,7 +1917,7 @@ dnl
 	fi
     ])
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
-	cp -f "$kconfig" .config
+	_LINUX_KBUILD_ENV([dnl
 dnl
 dnl	On some later systems (noticed first on openSUSE 10.2, a mkmakefile script is making a dummy
 dnl	makefile in the current directory, however, it is outputing 'GEN /current/directory/Makefile'
@@ -1910,8 +1932,7 @@ dnl	compiler checks in kernel makefiles that attempt to write to the current dir
 dnl	was removed.
 dnl
 	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check | tail -1`"
-	linux_cv_k_modflags_orig="$linux_cv_k_modflags"
-	rm -f .config
+	linux_cv_k_modflags_orig="$linux_cv_k_modflags"])
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source
 dnl	directory makefiles; however, the modversions.h file is in the build
@@ -1930,7 +1951,7 @@ dnl
 	fi
     ])
     AC_CACHE_CHECK([for kernel KBUILD_STR], [linux_cv_k_bldflags], [dnl
-	cp -f "$kconfig" .config
+	_LINUX_KBUILD_ENV([dnl
 dnl
 dnl	On some later systems (noticed first on openSUSE 10.2, a mkmakefile script is making a dummy
 dnl	makefile in the current directory, however, it is outputing 'GEN /current/directory/Makefile'
@@ -1945,8 +1966,7 @@ dnl	compiler checks in kernel makefiles that attempt to write to the current dir
 dnl	was removed.
 dnl
 	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check | tail -1`"
-	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"
-	rm -f .config
+	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"])
 dnl
 dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line
 dnl	and is no longer stringified in kernel source files.  This Makefile
