@@ -77,9 +77,13 @@ dnl
 ])# _AGENT
 # =============================================================================
 
-AC_DEFUN([_AGENT_MSG_WARN], [dnl
-    AS_REQUIRE_SHELL_FN([agent_msg_warn], [dnl
-    cat<<EOF
+AC_DEFUN([_AGENT_MSG_WARN],
+    [AC_REQUIRE_SHELL_FN([agent_msg_warn],
+	[AS_FUNCTION_DESCRIBE([agent_msg_warn],
+	    [HEADER],
+	    [Indicates that a header file is required for
+	     SNMP agents.])],
+	[cat<<EOF
 
 *** 
 *** Compiling SNMP agents requires the availability of UCD-SNMP header
@@ -99,8 +103,7 @@ AC_DEFUN([_AGENT_MSG_WARN], [dnl
 *** configure argument --without-snmp-agent: continuing under the
 *** assumption that the option --without-snmp was intended.
 ***
-EOF
-    ])dnl
+EOF])dnl
     if test :"${with_snmp_agent:-yes}" != :no ; then
 	ac_msg=`agent_msg_warn $1`
 	AC_MSG_WARN([$ac_msg])

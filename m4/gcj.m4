@@ -63,7 +63,7 @@
 
 # AC_LANG(Java)
 # -------------
-m4_define([AC_LANG(Java)],
+AC_LANG_DEFINE([Java], [gcj], [GCJ], [],
 [ac_ext=java
 ac_cpp=
 ac_compile='$GCJ -c $GCJFLAGS conftest.$ac_ext >&AS_MESSAGE_LOG_FD'
@@ -75,14 +75,6 @@ ac_compiler_gnu=yes
 # ------------
 AU_DEFUN([AC_LANG_JAVA], [AC_LANG(Java)])
 
-# _AC_LANG_ABBREV(Java)
-# ---------------------
-m4_define([_AC_LANG_ABBREV(Java)], [gcj])
-
-# _AC_LANG_PREFIX(Java)
-# ---------------------
-m4_define([_AC_LANG_PREFIX(Java)], [GCJ])
-
 ## ------------------------ ##
 ## 2. Producting programs.  ##
 ## ------------------------ ##
@@ -91,12 +83,14 @@ m4_define([_AC_LANG_PREFIX(Java)], [GCJ])
 # 2a. Java sources.  #
 # ------------------ #
 
-# AC_LANG_SOURCE(Java)(BODY)
-# --------------------------
-m4_define([AC_LANG_SOURCE(Java)],
-[// Java language source.
+# AC_LANG_CONFTEST(Java)(BODY)
+# ----------------------------
+m4_define([AC_LANG_CONFTEST(Java)],
+[cat >conftest.$ac_ext << _ACEOF
+// Java language source.
 package conftest;
-$1])
+$1
+_ACEOF])
 
 # AC_LANG_PROGRAM(Java)([PROLOGUE], [BODY])
 # -----------------------------------------

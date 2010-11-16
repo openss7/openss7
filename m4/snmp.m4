@@ -74,9 +74,12 @@ AC_DEFUN([_SNMP], [dnl
 ])# _SNMP
 # =============================================================================
 
-AC_DEFUN([_SNMP_MSG_WARN], [dnl
-    AS_REQUIRE_SHELL_FN([snmp_msg_warn], [dnl
-    cat <<EOF
+AC_DEFUN([_SNMP_MSG_WARN],
+    [AC_REQUIRE_SHELL_FN([snmp_msg_warn],
+	[AS_FUNCTION_DESCRIBE([snmp_msg_warn],
+	    [HEADER],
+	    [Indicates that a header file is required for SNMP.])],
+	[cat <<EOF
 
 *** 
 *** Cannot find the UCD-SNMP compatibility header:
@@ -100,8 +103,7 @@ AC_DEFUN([_SNMP_MSG_WARN], [dnl
 *** configure argument --without-snmp: continuing under the assumption
 *** that the option --without-snmp was intended.
 ***
-EOF
-    ])dnl
+EOF])dnl
     if test :"${with_snmp:-yes}" != :no ; then
 	ac_msg=`snmp_msg_warn $1`
 	AC_MSG_WARN([$ac_msg])
@@ -161,32 +163,36 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
 ])# _SNMP_HEADERS
 # =============================================================================
 
-AC_DEFUN([_SNMP_LIB_WARN], [dnl
-    AS_REQUIRE_SHELL_FN([snmp_lib_warn], [dnl
-    cat <<EOF
+AC_DEFUN([_SNMP_LIB_WARN],
+    [AC_REQUIRE_SHELL_FN([snmp_lib_warn],
+	[AS_FUNCTION_DESCRIBE([snmp_lib_warn],
+	    [LIBRARY],
+	    [Indicates tha a library is required for SNMP.])],
+	[cat <<EOF
 ***
 *** It is unlikely that SNMP agents will compile without the supporting
 *** [$]1 library.  Expect problems later.
 ***
-EOF
-    ])dnl
+EOF])dnl
     if test :"${with_snmp:-yes}" != :no ; then
 	ac_msg=`snmp_lib_warn $1`
 	AC_MSG_WARN([$ac_msg])
     fi
 ])
 
-AC_DEFUN([_SNMP_LIB_ERROR], [dnl
-    AS_REQUIRE_SHELL_FN([snmp_lib_error], [dnl
-    cat <<EOF
+AC_DEFUN([_SNMP_LIB_ERROR],
+    [AC_REQUIRE_SHELL_FN([snmp_lib_error],
+	[AS_FUNCTION_DESCRIBE([snmp_lib_error],
+	    [LIBRARY],
+	    [Indicates that SNMP agents require a missing library.])],
+	[cat <<EOF
 ***
 *** Compiling SNMP agents requires the library [$]1.  Most likely you
 *** need to install the net-snmp or ucd-snmp runtime package or a
 *** supporting library.  Otherwise, pass --without-snmp to configure.
 *** Continuing assuming that option --without-snmp was intended.
 ***
-EOF
-    ])dnl
+EOF])dnl
     if test :"${with_snmp:-yes}" != :no ; then
 	ac_msg=`snmp_lib_error $1`
 	AC_MSG_WARN([$ac_msg])
