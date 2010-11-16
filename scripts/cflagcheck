@@ -78,7 +78,12 @@ cppflag-check:
 	 if test -n "$$kflags" -a -n "$$cflags" ; then \
 		 kflags=`echo $$kflags | sed -e "s,$$cflags ,,"` ; \
 	 fi ; \
-	 echo "$${cflags:+$$cflags }$$kflags"
+	 cppflags="$${cflags:+$$cflags }$$kflags" ; \
+	 case "$$cppflags" in \
+	 	*-I*) break ;; \
+		*) cppflags="$${cppflags:+$$cppflags }"'$(LINUXINCLUDE)' ;; \
+	 esac ; \
+	 echo "$$cppflags"
 
 modflag-check:
 	@echo "$(MODFLAGS)"
