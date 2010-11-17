@@ -77,19 +77,32 @@ AC_DEFUN([_LINUX_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN_ONCE([_LINUX_KERNEL_ENV_FUNCTIONS], [dnl
 linux_flag_nest=0
-linux_flags_push() {
+])# _LINUX_KERNEL_ENV_FUNCTIONS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_ENV_BARE([COMMANDS])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
+AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
+AC_REQUIRE_SHELL_FN([linux_flags_push],
+    [AS_FUNCTION_DESCRIBE([linux_flags_push], [], [Save the current compilation
+     flags to be popped later.])], [dnl
     eval "linux_${linux_flag_nest}_cppflags=\"\$CPPFLAGS\""
     eval "linux_${linux_flag_nest}_cflags=\"\$CFLAGS\""
     eval "linux_${linux_flag_nest}_ldflags=\"\$LDFLAGS\""
-    ((linux_flag_nest++))
-}
-linux_flags_pop() {
+    ((linux_flag_nest++))])
+AC_REQUIRE_SHELL_FN([linux_flags_pop],
+    [AS_FUNCTION_DESCRIBE([linux_flags_pop], [], [Restore the previous
+     compilation flags that were pushed and saved.])], [dnl
     ((linux_flag_nest--))
     eval "CPPFLAGS=\"\$linux_${linux_flag_nest}_cppflags\""
     eval "CFLAGS=\"\$linux_${linux_flag_nest}_cflags\""
-    eval "LDFLAGS=\"\$linux_${linux_flag_nest}_ldflags\""
-}
-linux_kernel_env_push() {
+    eval "LDFLAGS=\"\$linux_${linux_flag_nest}_ldflags\""])
+AC_REQUIRE_SHELL_FN([linux_kernel_env_push],
+    [AS_FUNCTION_DESCRIBE([linux_kernel_env_push], [], [Save the current
+     compilation flags and the modify them so that they can be used for kernel
+     compilation tests.])], [dnl
     linux_flags_push
 dnl We need safe versions of these flags without warnings or strange optimizations
 dnl but with module flags included
@@ -118,16 +131,7 @@ dnl careful about -Wno warnings which we must keep, so put them back one at a ti
 	    (-Wno-*)
 		LDFLAGS="$LDFLAGS $i" ;;
 	esac
-    done
-}
-])# _LINUX_KERNEL_ENV_FUNCTIONS
-# =============================================================================
-
-# =============================================================================
-# _LINUX_KERNEL_ENV_BARE([COMMANDS])
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_ENV_BARE], [dnl
-AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
+    done])
 linux_kernel_env_push
 $1
 linux_flags_pop

@@ -7,7 +7,8 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -117,75 +118,6 @@ AC_DEFUN([_DISTRO_OPTIONS], [dnl
 # =============================================================================
 
 # =============================================================================
-# _DISTRO_FUNCTIONS
-# -----------------------------------------------------------------------------
-# Note: check for capitalized versions now too: SuSE 10 uses SUSE LINUX (all caps
-# for some stupid reaason).  Also, expect Mandrake to change to Mandriva any day
-# soon.
-# -----------------------------------------------------------------------------
-AC_DEFUN_ONCE([_DISTRO_FUNCTIONS], [dnl
-dist_get_flavor() {
-dnl AC_MSG_WARN([checking for flavor in $[1]])
-    case "$[1]" in
-	(*CentOS*|*CENTOS*)				echo 'centos'	;;
-	(*Lineox*|*LINEOX*)				echo 'lineox'	;;
-	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	;;
-	(*Fedora*|*FEDORA*)				echo 'fedora'	;;
-	(*Mandrake*|*Mandriva*|*MANDRAKE*|*MANDRIVA*)	echo 'mandrake'	;;
-	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
-	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	;;
-	(*Debian*|*DEBIAN*)				echo 'debian'	;;
-	(*Ubuntu*|*UBUNTU*)				echo 'ubuntu'	;;
-    esac
-}
-dist_get_vendor() {
-dnl AC_MSG_WARN([checking for vendor in $[1]])
-    case "$[1]" in
-	(centos)	echo 'centos'	;;
-	(lineox)	echo 'lineox'	;;
-	(whitebox)	echo 'whitebox'	;;
-	(fedora)	echo 'redhat'	;;
-	(mandrake)	echo 'mandrake'	;;
-	(redhat)	echo 'redhat'	;;
-	(suse)		echo 'suse'	;;
-	(debian)	echo 'debian'	;;
-	(ubuntu)	echo 'ubuntu'	;;
-	(unknown)	echo 'pc'	;;
-	(*)		echo "$[1]"	;;
-    esac
-}
-dist_get_release() {
-dnl AC_MSG_WARN([checking for release in $[1]])
-    echo "$[1]" | head -1 | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'
-}
-dist_get_distrib() {
-dnl AC_MSG_WARN([checking for distrib in $[1]])
-    case "$[1]" in
-	(centos)	echo 'CentOS Enterprise Linux' ;;
-	(lineox)	echo 'Lineox Enterprise Linux' ;;
-	(whitebox)	echo 'White Box Enterprise Linux' ;;
-	(fedora)	echo 'Fedora' ;;
-	(mandrake)	echo 'Mandrake Linux' ;;
-	(redhat)	echo 'Red Hat Linux' ;;
-	(suse)		echo 'SuSE Linux' ;;
-	(debian)	echo 'Debian GNU/Linux' ;;
-	(ubuntu)	echo 'Ubuntu' ;;
-	(unknown)	echo 'Unknown Linux' ;;
-	(*)		echo 'Linux' ;;
-    esac
-}
-dist_get_codename() {
-dnl AC_MSG_WARN([checking for codename in $[1]])
-    echo "$[1]" | head -1 | sed -e 's|^.*(|(|;s|).*|)|;s|^[[^(]]*||;s|[[^)]]*[$]||;s|^(||;s|)[$]||'
-}
-dist_get_cpu() {
-dnl AC_MSG_WARN([checking for cpu in $[1]])
-    echo "$[1]" | grep '\<for\>' | head -1 | sed -e 's|^.*\<for\>[[[:space:]]]*||;s|[[[:space:]]].*[$]||'
-}
-])# _DISTRO_FUNCTIONS
-# =============================================================================
-
-# =============================================================================
 # _DISTRO_SETUP
 # -----------------------------------------------------------------------------
 #
@@ -257,7 +189,22 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    dist_cv_build_issue_file='no'
 	fi
     ])
-    AC_REQUIRE([_DISTRO_FUNCTIONS])
+    AC_REQUIRE_SHELL_FN([dist_get_flavor],
+	[AS_FUNCTION_DESCRIBE([dist_get_flavor], [STRING], [Checks the string for linux distribution
+	 flavor.  Note: check for capitalized versions now too: SuSE 10 uses SUSE LINUX (all caps
+	 for some stupid reason).  Also expect Mandrake to change to Mandriva any day soon.])], [dnl
+dnl AC_MSG_WARN([checking for flavor in $[1]])
+    case "$[1]" in
+	(*CentOS*|*CENTOS*)				echo 'centos'	;;
+	(*Lineox*|*LINEOX*)				echo 'lineox'	;;
+	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	;;
+	(*Fedora*|*FEDORA*)				echo 'fedora'	;;
+	(*Mandrake*|*Mandriva*|*MANDRAKE*|*MANDRIVA*)	echo 'mandrake'	;;
+	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
+	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	;;
+	(*Debian*|*DEBIAN*)				echo 'debian'	;;
+	(*Ubuntu*|*UBUNTU*)				echo 'ubuntu'	;;
+    esac])
     AC_CACHE_CHECK([for dist build flavor], [dist_cv_build_flavor], [dnl
 	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
@@ -290,10 +237,32 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    dist_cv_build_flavor=$(dist_get_flavor "$(${CC-cc} $CFLAGS -v 2>&1 | grep 'gcc version')")
 	fi
     ])
+    AC_REQUIRE_SHELL_FN([dist_get_vendor],
+	[AS_FUNCTION_DESCRIBE([dist_get_vendor], [STRING], [Checks the string for linux distribution
+	 vendor.])], [dnl
+dnl AC_MSG_WARN([checking for vendor in $[1]])
+    case "$[1]" in
+	(centos)	echo 'centos'	;;
+	(lineox)	echo 'lineox'	;;
+	(whitebox)	echo 'whitebox'	;;
+	(fedora)	echo 'redhat'	;;
+	(mandrake)	echo 'mandrake'	;;
+	(redhat)	echo 'redhat'	;;
+	(suse)		echo 'suse'	;;
+	(debian)	echo 'debian'	;;
+	(ubuntu)	echo 'ubuntu'	;;
+	(unknown)	echo 'pc'	;;
+	(*)		echo "$[1]"	;;
+    esac])
     AC_CACHE_CHECK([for dist build vendor], [dist_cv_build_vendor], [dnl
 	dist_cv_build_vendor=$(dist_get_vendor "${dist_cv_build_flavor:-unknown}")
 	if test -z "$dist_cv_build_vendor" ; then dist_cv_build_vendor=$build_vendor ; fi
     ])
+    AC_REQUIRE_SHELL_FN([dist_get_release],
+	[AS_FUNCTION_DESCRIBE([dist_get_release], [STRING], [Checks the string for linux
+	 distribution release.])], [dnl
+dnl AC_MSG_WARN([checking for release in $[1]])
+    echo "$[1]" | head -1 | sed -e 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'])
     AC_CACHE_CHECK([for dist build release], [dist_cv_build_release], [dnl
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
@@ -330,9 +299,31 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    dist_cv_build_release=$(dist_get_release "$(${CC-cc} $CFLAGS -v 2>&1 | grep 'gcc version' | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||')")
 	fi
     ])
+    AC_REQUIRE_SHELL_FN([dist_get_distrib],
+	[AS_FUNCTION_DESCRIBE([dist_get_distrib], [STRING], [Checks the string for linux
+	 distribution description.])], [dnl
+dnl AC_MSG_WARN([checking for distrib in $[1]])
+    case "$[1]" in
+	(centos)	echo 'CentOS Enterprise Linux' ;;
+	(lineox)	echo 'Lineox Enterprise Linux' ;;
+	(whitebox)	echo 'White Box Enterprise Linux' ;;
+	(fedora)	echo 'Fedora' ;;
+	(mandrake)	echo 'Mandrake Linux' ;;
+	(redhat)	echo 'Red Hat Linux' ;;
+	(suse)		echo 'SuSE Linux' ;;
+	(debian)	echo 'Debian GNU/Linux' ;;
+	(ubuntu)	echo 'Ubuntu' ;;
+	(unknown)	echo 'Unknown Linux' ;;
+	(*)		echo 'Linux' ;;
+    esac])
     AC_CACHE_CHECK([for dist build distrib], [dist_cv_build_distrib], [dnl
 	dist_cv_build_distrib=$(dist_get_distrib "$dist_cv_build_flavor")
     ])
+    AC_REQUIRE_SHELL_FN([dist_get_codename],
+	[AS_FUNCTION_DESCRIBE([dist_get_codename], [STRING], [Checks the string for linux
+	 distribution codename.])], [dnl
+dnl AC_MSG_WARN([checking for codename in $[1]])
+    echo "$[1]" | head -1 | sed -e 's|^.*(|(|;s|).*|)|;s|^[[^(]]*||;s|[[^)]]*[$]||;s|^(||;s|)[$]||'])
     AC_CACHE_CHECK([for dist build codename], [dist_cv_build_codename], [dnl
 	if test -z "$dist_cv_build_codename" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
@@ -380,6 +371,10 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	fi
 	# cannot get the codename from the compiler
     ])
+    AC_REQUIRE_SHELL_FN([dist_get_cpu],
+	[AS_FUNCTION_DESCRIBE([dist_get_cpu], [STRING], [Checks the string for machine cpu.])], [dnl
+dnl AC_MSG_WARN([checking for cpu in $[1]])
+    echo "$[1]" | grep '\<for\>' | head -1 | sed -e 's|^.*\<for\>[[[:space:]]]*||;s|[[[:space:]]].*[$]||'])
     AC_CACHE_CHECK([for dist build cpu], [dist_cv_build_cpu], [dnl
 	if test -z "$dist_cv_build_cpu" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
@@ -456,7 +451,6 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    dist_cv_host_issue_file='no'
 	fi
     ])
-    AC_REQUIRE([_DISTRO_FUNCTIONS])
     AC_CACHE_CHECK([for dist host flavor], [dist_cv_host_flavor], [dnl
 	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` != 'debian_version' ; then
