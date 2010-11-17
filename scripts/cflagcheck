@@ -60,8 +60,9 @@ KERNELRELEASE = $(shell uname -r)
 
 .DEFAULT: cflag-check
 
+.PHONY: cflag-check
 cflag-check:
-	@kflags='$(KBUILD_CFLAGS)' ; if test -n "$$kflags" -a -n '$(KBUILD_CPPFLAGS)' ; then \
+	kflags='$(KBUILD_CFLAGS)' ; if test -n "$$kflags" -a -n '$(KBUILD_CPPFLAGS)' ; then \
 		kflags=`echo "$$kflags" | sed -e 's,^$(KBUILD_CPPFLAGS) ,,'` ; \
 	 fi ; \
 	 cflags='$(CFLAGS)' ; if test -n "$$cflags" -a -n '$(CPPFLAGS)' ; then  \
@@ -72,25 +73,28 @@ cflag-check:
 	 fi ; \
 	 echo "$${cflags:+$$cflags }$$kflags"
 
+.PHONY: cppflag-check
 cppflag-check:
-	@kflags='$(KBUILD_CPPFLAGS)' ; \
+	kflags='$(KBUILD_CPPFLAGS)' ; \
 	 cflags='$(CPPFLAGS)' ; \
 	 if test -n "$$kflags" -a -n "$$cflags" ; then \
 		 kflags=`echo $$kflags | sed -e "s,$$cflags ,,"` ; \
 	 fi ; \
 	 cppflags="$${cflags:+$$cflags }$$kflags" ; \
-	 case "$$cppflags" in \
-	 	*-I*) break ;; \
-		*) cppflags="$${cppflags:+$$cppflags }"'$(LINUXINCLUDE)' ;; \
-	 esac ; \
+	 iflags='$(LINUXINCLUDE)' ; \
+	 cppflags=`echo $$cppflags | sed -e "s, $$iflags,,"` ; \
+	 cppflags="$${cppflags:+$$cppflags }$$iflags" ; \
 	 echo "$$cppflags"
 
+.PHONY: modflag-check
 modflag-check:
 	@echo "$(MODFLAGS)"
 
+.PHONY: bldflag-check
 bldflag-check:
 	@echo '$(basename_flags)'
 
+.PHONY: flag-check
 flag-check:
 	-:
 	-echo "CROSS_COMPILE='$(CROSS_COMPILE)'"
@@ -115,17 +119,22 @@ flag-check:
 	-echo "AWK='$(AWK)'"
 	-echo "RPM='$(RPM)'"
 	-:
-	-if test -n '$(KBUILD_CFLAGS)' ; then echo "CFLAGS='$(KBUILD_CFLAGS)'" ; else echo "CFLAGS='$(CFLAGS)'" ; fi
-	-if test -n '$(KBUILD_CPPFLAGS)' ; then echo "CPPFLAGS='$(KBUILD_CPPFLAGS)'" ; else echo "CPPFLAGS='$(CPPFLAGS)'" ; fi
-	-if test -n '$(KBUILD_AFLAGS)' ; then echo "AFLAGS='$(KBUILD_AFLAGS)'" ; else echo "AFLAGS='$(AFLAGS)'" ; fi
+	-echo "CFLAGS='$(CFLAGS)'"
+	-echo "CPPFLAGS='$(CPPFLAGS)'"
+	-echo "AFLAGS='$(AFLAGS)'"
+	-:
+	-echo "KBUILD_CFLAGS='$(KBUILD_CFLAGS)'"
+	-echo "KBUILD_CPPFLAGS='$(KBUILD_CPPFLAGS)'"
+	-echo "KBUILD_AFLAGS='$(KBUILD_AFLAGS)'"
 
+.PHONY: env
 env:
 	@env
-
 
 #include $(KERNEL_CONFIG)
 include $(KERNEL_TOPDIR)/Makefile
 -include $(KERNEL_TOPDIR)/scripts/Makefile.lib
+
 
 # =============================================================================
 #

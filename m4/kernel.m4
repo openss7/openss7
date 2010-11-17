@@ -1695,7 +1695,11 @@ dnl	kernel build directory.  Do not configure as root.  Changing to build direct
 dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
 dnl	was removed.
 dnl
-	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check | tail -1`"
+dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile from trying to
+dnl	rebuild intermediate makefiles not necessary for an external module build.
+dnl
+	linux_builddir=`pwd`
+	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} cflag-check | tail -1`"
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -1877,7 +1881,11 @@ dnl	kernel build directory.  Do not configure as root.  Changing to build direct
 dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
 dnl	was removed.
 dnl
-	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check | tail -1`"
+dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile from trying to
+dnl	rebuild intermediate makefiles not necessary for an external module build.
+dnl
+	linux_builddir=`pwd`
+	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} cppflag-check | tail -1`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
 	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
@@ -1931,7 +1939,11 @@ dnl	kernel build directory.  Do not configure as root.  Changing to build direct
 dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
 dnl	was removed.
 dnl
-	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check | tail -1`"
+dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile from trying to
+dnl	rebuild intermediate makefiles not necessary for an external module build.
+dnl
+	linux_builddir=`pwd`
+	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} modflag-check | tail -1`"
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"])
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source
@@ -1965,7 +1977,11 @@ dnl	kernel build directory.  Do not configure as root.  Changing to build direct
 dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
 dnl	was removed.
 dnl
-	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check | tail -1`"
+dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile from trying to
+dnl	rebuild intermediate makefiles not necessary for an external module build.
+dnl
+	linux_builddir=`pwd`
+	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} bldflag-check | tail -1`"
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"])
 dnl
 dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line
