@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -56,9 +56,11 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ(2.64)
+AC_PREREQ(2.68)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
 AC_REVISION([$Name:  $($Revision: 1.1.2.8 $) $Date: 2010-02-22 14:48:40 $])
+
+AC_LANG_DEFINES_PROVIDED
 
 _OPENSS7_DIRCHANGE
 
@@ -87,6 +89,8 @@ fi
 AM_SILENT_RULES
 
 AC_USE_SYSTEM_EXTENSIONS
+
+AB_INIT
 
 USER_CPPFLAGS="$CPPFLAGS"; unset CPPFLAGS
 USER_CFLAGS="$CFLAGS";     unset CFLAGS
@@ -127,6 +131,7 @@ AC_PROG_JAVAC
 AC_PROG_JAVAH
 AC_PROG_JAVA
 
+LT_PREREQ([2.2.8])
 LT_INIT([dlopen])
 LT_LANG([C++])
 LT_LANG([Java])
@@ -309,7 +314,7 @@ AC_OUTPUT
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

@@ -1,5 +1,32 @@
 #!/usr/bin/awk -f
 
+function scanincludes(file)
+{
+    if(system("test -f " srcdir "/" file) == 0) {
+	file = srcdir "/" file
+    }
+    while((getline < file) == 1) {
+	if (/^@c[[:space:]]/)
+	    continue
+	if (/@(include|verbatiminclude)[[:space:]]+/) {
+	    sub(/.*@(include|verbatiminclude)[[:space:]]+/, "")
+	    if (/args\.texi/)
+		continue
+	    includes[$0] = 1
+	    if (/\.texi/)
+		scanincludes($0)
+	    continue
+	}
+	if (/@(image|tabfig|tabfigsized|figure|figuresized)\{/) {
+	    sub(/.*@(image|tabfig|tabfigsized|figure|figuresized)\{/, "")
+	    sub(/[,\}].*/, "")
+	    figures[$0] = 1
+	    continue
+	}
+    }
+    close(file)
+}
+
 BEGIN {
     if ("srcdir" in ENVIRON)
 	srcdir = EINVRON["srcdir"]
@@ -14,29 +41,7 @@ BEGIN {
 }
 {
     f = $0
-    if (system("test -f " f) != 0) {
-	fd = srcdir "/" f
-    } else {
-	fd = f
-    }
-    while ((getline < fd) == 1) {
-	if (/^@c[[:space:]]/)
-	    continue
-	if (/@(include|verbatiminclude)[[:space:]]+/) {
-	    sub(/.*@(include|verbatiminclude)[[:space:]]+/, "")
-	    if (/args\.texi/)
-		continue
-	    includes[$0] = 1
-	    continue
-	}
-	if (/@(image|tabfig|tabfigsized|figure|figuresized)\{/) {
-	    sub(/.*@(image|tabfig|tabfigsized|figure|figuresized)\{/, "")
-	    sub(/[,\}].*/, "")
-	    figures[$0] = 1
-	    continue
-	}
-    }
-    close(fd)
+    scanincludes(f)
     t = f; sub(/\.texi/, "", t); sub(srcdir "/", "", t)
     line["ps"  ] = t ".ps: "   "\\\n\t" t depends["ps"  ]
     line["dvi" ] = t ".dvi: "  "\\\n\t" t depends["dvi" ]
@@ -45,7 +50,9 @@ BEGIN {
     line["txt" ] = t ".txt: "  "\\\n\t" t depends["txt" ]
     line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
     for (p in figures) {
-	if (system("test -f " top_srcdir "/scripts/" p) == 0) {
+	if (system("test -f " srcdir "/" p) == 0) {
+	    pd = srcdir "/" p
+	} else if (system("test -f " top_srcdir "/scripts/" p) == 0) {
 	    pd = top_srcdir "/scripts/" p
 	} else {
 	    pd = p
@@ -54,7 +61,9 @@ BEGIN {
 	    line[v] = line[v] " \\\n\t" pd suffixes[v]
     }
     for (p in includes) {
-	if (system("test -f " top_srcdir "/scripts/" p) == 0) {
+	if (system("test -f " srcdir "/" p) == 0) {
+	    pd = srcdir "/" p
+	} else if (system("test -f " top_srcdir "/scripts/" p) == 0) {
 	    pd = top_srcdir "/scripts/" p
 	} else {
 	    pd = p

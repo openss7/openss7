@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -829,14 +829,15 @@ the other releases.
 The build host requires the following GNU tools:
 
 @multitable @columnfractions .05 .95
-@item @tab @bullet{} @command{m4 1.4.13}
-@item @tab @bullet{} @command{autoconf 2.63}
-@item @tab @bullet{} @command{automake 1.11}
-@item @tab @bullet{} @command{libtool 2.2.6a}
-@item @tab @bullet{} @command{gettext 0.17}
-@item @tab @bullet{} @command{flex 2.5.33}
-@item @tab @bullet{} @command{bison 2.4.1}
-@item @tab @bullet{} @command{swig 1.3.39}
+@item @tab @bullet{} @command{m4 1.4.15}
+@item @tab @bullet{} @command{autoconf 2.68}
+@item @tab @bullet{} @command{automake 1.11.1}
+@item @tab @bullet{} @command{libtool 2.2.8}
+@item @tab @bullet{} @command{gettext 0.18.1}
+@item @tab @bullet{} @command{flex 2.5.35}
+@item @tab @bullet{} @command{bison 2.4.3}
+@item @tab @bullet{} @command{swig 2.0.1}
+@item @tab @bullet{} @command{autobuild 5.3}
 @end multitable
 
 Most desktop development GNU/Linux distributions will have these tools; however, some non-development
@@ -848,18 +849,19 @@ Also, these tools can be acquired from the @url{http://www.fsf.org/,FSF website}
 software directory, and also at the following locations:
 
 @itemize
-@item @url{http://www.openss7.org/tarballs/m4-1.4.13.tar.bz2,m4-1.4.13}
-@item @url{http://www.openss7.org/tarballs/autoconf-2.63.tar.bz2,autoconf-2.63}
-@item @url{http://www.openss7.org/tarballs/automake-1.11.tar.bz2,automake-1.11}
-@item @url{http://www.openss7.org/tarballs/libtool-2.2.6a.tar.gz,libtool-2.2.6a}
-@item @url{http://www.openss7.org/tarballs/gettext-0.17.tar.gz,gettext-0.17}
-@item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}
-@item @url{http://www.openss7.org/tarballs/bison-2.4.1.tar.bz2,bison-2.4.1}
-@item @url{http://www.openss7.org/tarballs/swig-1.3.39.tar.bz2,swig-1.3.39}
+@item @url{http://www.openss7.org/tarballs/m4-1.4.15.tar.bz2,m4-1.4.15}
+@item @url{http://www.openss7.org/tarballs/autoconf-2.68.tar.bz2,autoconf-2.68}
+@item @url{http://www.openss7.org/tarballs/automake-1.11.1.tar.bz2,automake-1.11.1}
+@item @url{http://www.openss7.org/tarballs/libtool-2.2.8.tar.gz,libtool-2.2.8}
+@item @url{http://www.openss7.org/tarballs/gettext-0.18.1.tar.gz,gettext-0.18.1}
+@item @url{http://www.openss7.org/tarballs/flex-2.5.35.tar.bz2,flex-2.5.35}
+@item @url{http://www.openss7.org/tarballs/bison-2.4.3.tar.bz2,bison-2.4.3}
+@item @url{http://www.openss7.org/tarballs/swig-2.0.1.tar.bz2,swig-2.0.1}
+@item @url{http://www.openss7.org/tarballs/autobuild-5.3.tar.gz,autobuild-5.3}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
-must be at version releases @command{2.63} and @command{1.10.2}.  @emph{The versions normally
+must be at version releases @command{2.68} and @command{1.11.1}.  @emph{The versions normally
 distributed in some mainstream GNU/Linux distributions are, in fact, much older than these
 versions.}@footnote{A notable exception is Debian and Fedora 7.  Note that on Fedora 7 the
 @command{gettext-devel} package must be installed.}  GNU version of these packages configured and

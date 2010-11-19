@@ -5,7 +5,7 @@
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,7 +157,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2010  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -184,7 +184,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -280,7 +280,7 @@ Preface
 
 * Notice::			Notices for this package
 * Abstract::			Abstract for this manual
-* Revisions::			Revisions of this manual
+* Revision History::		Revisions of this manual
 * Disclaimer::			IPR Disclaimers for this package
 * Acknowledgements::		Sponsors of and Contributors to the package
 * Authors::			Authors of the package
@@ -379,7 +379,7 @@ Indices
 @menu
 * Notice::			Notices for this package
 * Abstract::			Abstract for this manual
-* Revisions::			Revisions of this manual
+* Revision History::		Revisions of this manual
 * Disclaimer::			IPR Disclaimers for this package
 * Acknowledgements::		Sponsors of and Contributors to the package
 * Authors::			Authors of the package
@@ -862,7 +862,7 @@ production grade implementation of STREAMS, because of a number of shortcomings 
 @item poorly adapted to distribution production kernels;
 @item is unsuitable for packaging or repeatability;
 @item portability objective unsuitable for mainline kernel adoption;
-@item ports form the same baseline obfuscate the code;
+@item ports from the same baseline obfuscate the code;
 @item poor performance due to portability or coding style;
 @item code bloat or over sized memory footprint;
 @item redundant debug statements obscuring defects or obfuscating code;
@@ -880,7 +880,7 @@ The replacement, named @cite{@value{PACKAGE_TITLE}}, was to correct all of these
 by the initial @samp{streams-0.7a.4} release, was:
 
 @enumerate a
-@item opensource;
+@item open source;
 @item completely Lindented and follows kernel coding practises;
 @item automatically adapts to production kernels with autoconf;
 @item packages itself into @acronym{LSB} compliant @acronym{RPM}s and @acronym{DEB}s;

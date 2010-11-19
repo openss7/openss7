@@ -925,7 +925,12 @@ int is_orphaned_pgrp(int pgrp);
 int is_current_pgrp_orphaned(void);
 int kill_proc_info(int sig, struct siginfo *sip, pid_t pid);
 int kill_sl_func(pid_t, int, int);
+#ifdef HAVE_SEND_GROUP_SIG_INFO_SYMBOL
 int send_group_sig_info(int, struct siginfo *, struct task_struct *);
+#endif
+#ifdef HAVE_GROUP_SEND_SIG_INFO_SYMBOL
+int group_send_sig_info(int, struct siginfo *, struct task_struct *);
+#endif
 
 /**
  *  straccess:   - check error and access conditions on a stream
@@ -3402,7 +3407,13 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 
 			if (!p->signal->leader)
 				continue;
+#if defined(HAVE_GROUP_SEND_SIG_INFO_SYMBOL)
+			err = group_send_sig_info(sig, info, p);
+#elif defined(HAVE_SEND_GROUP_SIG_INFO_SYMBOL)
 			err = send_group_sig_info(sig, info, p);
+#else
+#error Need a way of sending a signal to a group.
+#endif
 			if (retval)
 				retval = err;
 		}
@@ -3414,7 +3425,13 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 
 		if (!p->signal->leader)
 			continue;
+#if defined(HAVE_GROUP_SEND_SIG_INFO_SYMBOL)
+		err = group_send_sig_info(sig, info, p);
+#elif defined(HAVE_SEND_GROUP_SIG_INFO_SYMBOL)
 		err = send_group_sig_info(sig, info, p);
+#else
+#error Need a way of sending a signal to a group.
+#endif
 		if (retval)
 			retval = err;
 	}

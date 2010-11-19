@@ -7,7 +7,8 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -52,8 +53,10 @@
 #
 # =============================================================================
 
+m4_include([m4/autobuild.m4])
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
+m4_include([m4/bld.m4])
 m4_include([m4/pr.m4])
 m4_include([m4/public.m4])
 
@@ -717,6 +720,7 @@ dnl----------------------------------------------------------------------------
 	net/dst.h \
 	net/request_sock.h \
 	linux/percpu.h \
+	linux/cred.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -1193,7 +1197,6 @@ dnl----------------------------------------------------------------------------
 	remove_proc_entry,
 	remove_wait_queue,
 	schedule_timeout,
-	secure_tcp_sequence_number,
 	send_sig,
 	sk_alloc,
 	skb_clone,
@@ -1287,7 +1290,9 @@ dnl----------------------------------------------------------------------------
 	namespace_sem,
 	raw_prot,
 	sched_setscheduler,
+	secure_tcp_sequence_number,
 	send_group_sig_info,
+	group_send_sig_info,
 	session_of_pgrp,
 	__setscheduler,
 	skbuff_head_cache,
@@ -3618,7 +3623,8 @@ AC_DEFUN([_OS7_], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

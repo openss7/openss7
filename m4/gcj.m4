@@ -63,7 +63,7 @@
 
 # AC_LANG(Java)
 # -------------
-AC_LANG_DEFINE([Java], [gcj], [GCJ], [],
+AC_LANG_DEFINE([Java], [gcj], [GCJ], [GCJ], [],
 [ac_ext=java
 ac_cpp=
 ac_compile='$GCJ -c $GCJFLAGS conftest.$ac_ext >&AS_MESSAGE_LOG_FD'
@@ -726,39 +726,50 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
     AC_LANG_FLAG([-findirect-dispatch],
 		 [CNIFLAGS="-findirect-dispatch"],
 		 [CNIFLAGS=])
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -fsource=([[^[:space:]]]*),,g'`
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -fsource=([[^[:space:]]]*),,g'`
     AC_LANG_FLAG([-fsource=1.4],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fsource=1.4"],
 		 [])
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?out-of-date,,g'`
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?out-of-date,,g'`
     AC_LANG_FLAG([-Wno-out-of-date],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-out-of-date"],
 		 [GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -Werror,,g'`])
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?deprecated,,g'`
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?deprecated,,g'`
     AC_LANG_FLAG([-Wno-deprecated],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-deprecated"],
 		 [])
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?serial,,g'`
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?serial,,g'`
     AC_LANG_FLAG([-Wno-serial],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-serial"],
 		 [])
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?param-assign,,g'`
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?param-assign,,g'`
     AC_LANG_FLAG([-Wno-param-assign],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-param-assign"],
 		 [])
     # It seems that older GCJ's that cannot recogize this flag have
     # no way of suppressing these warnings and cannot have -Werror set.
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?unused,,g'`
+    GCJFLAGS=`echo " $GCJFLAGS " | sed -r -e 's, -W(no-)?unused , ,g'`
     AC_LANG_FLAG([-Wno-unused],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-unused"],
 		 [])
-    CGJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?redundant-modifiers,,g'`
+    GCJFLAGS=`echo " $GCJFLAGS " | sed -r -e 's, -W(no-)?unused-argument , ,g'`
+    AC_LANG_FLAG([-Wno-unused-argument],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-unused-argument"],
+		 [])
+    GCJFLAGS=`echo " $GCJFLAGS " | sed -r -e 's, -W(no-)?unused-import , ,g'`
+    AC_LANG_FLAG([-Wno-unused-import],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-unused-import"],
+		 [])
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?redundant-modifiers,,g'`
     AC_LANG_FLAG([-Wno-redundant-modifiers],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-redundant-modifiers"],
 		 [])
     AC_LANG_POP([Java])
+    JNIFLAGS=`echo "$JNIFLAGS" | sed -r -e 's,^[[[:space:]]]*,,;s,[[[:space:]]][$],,'`
     AC_SUBST([JNIFLAGS])dnl
+    CNIFLAGS=`echo "$CNIFLAGS" | sed -r -e 's,^[[[:space:]]]*,,;s,[[[:space:]]][$],,'`
     AC_SUBST([CNIFLAGS])dnl
+    GCJFLAGS=`echo "$GCJFLAGS" | sed -r -e 's,^[[[:space:]]]*,,;s,[[[:space:]]][$],,'`
 ])# _GCJ_OPTIONS
 # =============================================================================
 
