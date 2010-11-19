@@ -178,6 +178,14 @@ __asm__(".equ send_group_sig_info," __stringify(HAVE_SEND_GROUP_SIG_INFO_ADDR));
 __asm__(".global send_group_sig_info");
 EXPORT_SYMBOL_GPL(send_group_sig_info);
 #endif				/* HAVE_SEND_GROUP_SIG_INFO_ADDR */
+
+#ifdef HAVE_GROUP_SEND_SIG_INFO_ADDR
+int group_send_sig_info(int, struct siginfo *, struct task_struct *);
+__asm__(".equ group_send_sig_info," __stringify(HAVE_GROUP_SEND_SIG_INFO_ADDR));
+__asm__(".global group_send_sig_info");
+EXPORT_SYMBOL_GPL(group_send_sig_info);
+#endif				/* HAVE_GROUP_SEND_SIG_INFO_ADDR */
+
 #ifdef HAVE___WAKE_UP_SYNC_ADDR
 __asm__(".equ __wake_up_sync," __stringify(HAVE___WAKE_UP_SYNC_ADDR));
 __asm__(".global __wake_up_sync");
@@ -509,7 +517,7 @@ EXPORT_SYMBOL_GPL(ip_cmsg_recv);
 #endif				/* HAVE_IP_CMSG_RECV_ADDR */
 
 #ifdef HAVE_IP_CMSG_SEND_ADDR
-int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
+/* int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc); */
 __asm__(".equ ip_cmsg_send," __stringify(HAVE_IP_CMSG_SEND_ADDR));
 __asm__(".global ip_cmsg_send");
 EXPORT_SYMBOL_GPL(ip_cmsg_send);

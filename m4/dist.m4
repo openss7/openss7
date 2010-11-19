@@ -361,6 +361,8 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 			(3.1) dist_cv_build_codename='Sarge' ;;
 			(4.0) dist_cv_build_codename='Etch' ;;
 			(5.0) dist_cv_build_codename='Lenny' ;;
+			(6.0) dist_cv_build_codename='Squeeze' ;;
+			(7.0) dist_cv_build_codename='Wheezy' ;;
 			(*)   dist_cv_build_codename='unknown' ;;
 		    esac
 		    ;;
@@ -559,6 +561,8 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 			(3.1) dist_cv_host_codename='Sarge' ;;
 			(4.0) dist_cv_host_codename='Etch' ;;
 			(5.0) dist_cv_host_codename='Lenny' ;;
+			(6.0) dist_cv_host_codename='Squeeze' ;;
+			(7.0) dist_cv_host_codename='Wheezy' ;;
 			(*)   dist_cv_host_codename='unknown' ;;
 		    esac
 		    ;;
@@ -756,7 +760,7 @@ AC_DEFUN([_DISTRO_CACHE], [dnl
 	    for config_dist in $CONFIG_DIST ; do
 		if test -w "$config_dist" -o ! -e "$config_dist" ; then
 		    if touch "$config_dist" >/dev/null 2>&1 ; then
-			cat "$cache_file" | egrep "^(test \"\\\[$]{)?(ac_cv_|acl_cv_|am_cv_|ap_cv_|deb_cv_|devfs_cv_|dist_cv_|gl_cv_|gt_cv_|init_cv_|lt_cv_|nls_cv_|perl_cv_|pkg_cv_|rpm_cv_|snmp_cv_|tcl_cv_)" > "$config_dist" 2>/dev/null
+			cat "$cache_file" | egrep "^(test \"\\\[$]{)?(ac_cv_|acl_cv_|am_cv_|ap_cv_|bld_cv_|deb_cv_|devfs_cv_|dist_cv_|gl_cv_|gt_cv_|init_cv_|lt_cv_|nls_cv_|perl_cv_|pkg_cv_|rpm_cv_|snmp_cv_|tcl_cv_)" > "$config_dist" 2>/dev/null
 		    fi
 		fi
 	    done

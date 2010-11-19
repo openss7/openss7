@@ -95,17 +95,6 @@ AC_DEFUN([_ARCHIVE_ARGS], [dnl
 	    [tar repo construction @<:@default=yes@:>@])],
 	[], [enable_repo_tar=yes])
     AC_SUBST([BESTZIP], [bzip2])
-    AC_ARG_VAR([GZIP],      [Gzip default compression options @<:@default=-f9v@:>@])
-    AC_ARG_VAR([GZIP_CMD],  [Gzip compression command @<:@default=gzip@:>@])
-    AC_ARG_VAR([BZIP2],     [Bzip2 default compression options @<:@default=-f9v@:>@])
-    AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-    AC_ARG_VAR([LZMA],      [Lzma default compression options @<:@default=-f9v@:>@])
-    AC_ARG_VAR([LZMA_CMD],  [Lzma compression command @<:@default=lzma@:>@])
-    AC_ARG_VAR([XZ],        [Xz default compression options @<:@default=-f9v@:>@])
-    AC_ARG_VAR([XZ_CMD],    [Xz compression command @<:@default=xz@:>@])
-    AC_ARG_VAR([MD5SUM],    [MD5 sum command @<:@default=md5sum@:>@])
-    AC_ARG_VAR([SHA1SUM],   [SHA1 sum command @<:@default=sha1sum@:>@])
-    AC_ARG_VAR([SHA256SUM], [SHA256 sum command @<:@default=sha256sum@:>@])
 ])# _ARCHIVE_ARGS
 # =============================================================================
 
@@ -116,25 +105,53 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin:$am_aux_dir"
     test -n "$GZIP" || GZIP='-f9v'
-    AC_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path])
-    if test :"${GZIP_CMD:-no}" = :no ; then
-	GZIP_CMD=
+    AC_ARG_VAR([GZIP],      [Gzip default compression options @<:@default=-f9v@:>@])
+    _BLD_VAR_PATH_PROG([GZIP_CMD], [gzip], [$tmp_path], [Gzip compression command @<:@default=gzip@:>@],
+[	GZIP_CMD=
+	if test -n "$bld_cv_pkg_cmd_GZIP_CMD" ; then
+	    tmp_msg="*** 
+*** $dist_cv_build_flavor: $bld_cv_pkg_cmd_GZIP_CMD
+"
+	else
+	    tmp_msg="*** 
+*** Debian:  'apt-get install gzip'
+*** SuSE:    'zypper install gzip'
+*** CentOS:  'yum install gzip'
+"
+	fi
 	AC_MSG_ERROR([
 ***
 *** Configure cannot find a suitable 'gzip' program.  Creating gzip
 *** archives requires the 'gzip' program from the 'gzip' package on the
 *** build host.  The 'gzip' package has been available for many years on
 *** all distributions and is available from any GNU archive site.  Try:
-***
-*** Debian:  'apt-get install gzip'
-*** SuSE:    'zypper install gzip'
-*** CentOS:  'yum install gzip'
+$tmp_msg
 ***
 *** To get rid of this error, load the 'gzip' package, or specify the
 *** location with the GZIP_CMD environment variable to 'configure'.
-*** ])
-    fi
+*** ])])
+dnl	    AC_ARG_VAR([GZIP_CMD],  [Gzip compression command @<:@default=gzip@:>@])
+dnl	    AC_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path])
+dnl	    if test :"${GZIP_CMD:-no}" = :no ; then
+dnl		GZIP_CMD=
+dnl		AC_MSG_ERROR([
+dnl	***
+dnl	*** Configure cannot find a suitable 'gzip' program.  Creating gzip
+dnl	*** archives requires the 'gzip' program from the 'gzip' package on the
+dnl	*** build host.  The 'gzip' package has been available for many years on
+dnl	*** all distributions and is available from any GNU archive site.  Try:
+dnl	***
+dnl	*** Debian:  'apt-get install gzip'
+dnl	*** SuSE:    'zypper install gzip'
+dnl	*** CentOS:  'yum install gzip'
+dnl	***
+dnl	*** To get rid of this error, load the 'gzip' package, or specify the
+dnl	*** location with the GZIP_CMD environment variable to 'configure'.
+dnl	*** ])
+dnl	    fi
     test -n "$BZIP2" || BZIP2='-f9v'
+    AC_ARG_VAR([BZIP2],     [Bzip2 default compression options @<:@default=-f9v@:>@])
+    AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
     AC_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path])
     if test :"${BZIP2_CMD:-no}" = :no ; then
 	BZIP_CMD=
@@ -154,6 +171,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** ])
     fi
     test -n "$LZMA" || LZMA='-f9v'
+    AC_ARG_VAR([LZMA],      [Lzma default compression options @<:@default=-f9v@:>@])
+    AC_ARG_VAR([LZMA_CMD],  [Lzma compression command @<:@default=lzma@:>@])
     AC_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path])
     if test :"${LZMA_CMD:-no}" = :no ; then
 	LZMZ_CMD=
@@ -182,6 +201,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 	fi
     fi
     test -n "$XZ" || XZ='-f9v'
+    AC_ARG_VAR([XZ],        [Xz default compression options @<:@default=-f9v@:>@])
+    AC_ARG_VAR([XZ_CMD],    [Xz compression command @<:@default=xz@:>@])
     AC_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path])
     if test :"${XZ_CMD:-no}" = :no ; then
 	XZ_CMD=
@@ -216,6 +237,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     fi
     enable_bestzip="$BESTZIP"
     disable_repo_tar=
+    AC_ARG_VAR([MD5SUM],    [MD5 sum command @<:@default=md5sum@:>@])
     AC_PATH_PROG([MD5SUM], [md5sum], [], [$tmp_path])
     if test :"${MD5SUM:-no}" = :no ; then
 	MD5SUM="${am_missing3_run}md5sum"
@@ -247,6 +269,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** ])
 	fi
     fi
+    AC_ARG_VAR([SHA1SUM],   [SHA1 sum command @<:@default=sha1sum@:>@])
     AC_PATH_PROG([SHA1SUM], [sha1sum], [], [$tmp_path])
     if test :"${SHA1SUM:-no}" = :no ; then
 	SHA1SUM="${am_missing3_run}sha1sum"
@@ -278,6 +301,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** ])
 	fi
     fi
+    AC_ARG_VAR([SHA256SUM], [SHA256 sum command @<:@default=sha256sum@:>@])
     AC_PATH_PROG([SHA256SUM], [sha256sum], [], [$tmp_path])
     if test :"${SHA256SUM:-no}" = :no ; then
 	SHA256SUM="${am_missing3_run}sha256sum"

@@ -424,7 +424,7 @@ DISTCLEANFILES		+= $(java_INCLUDES) $(java_SOURCEFILES)
 gcjlibdir		= $(libdir)/gcj/$(PACKAGE_LCNAME)
 AM_GCJFLAGS		= -I$(builddir) -I$(srcdir)
 GCJLIB_INCLUDES		= -I$(builddir) -I$(srcdir) $(PKG_INCLUDES) $(USER_CPPFLAGS)
-GCJCLASSCOMPILE		= $(GCJ) -I$(builddir) -I$(srcdir) $(GCJFLAGS)
+GCJCLASSCOMPILE		= $(GCJ) -I$(builddir) -I$(srcdir) $(GCJFLAGS) $(USER_GCJFLAGS)
 
 ## These are already set by configure as testing is required.
 ##JNIFLAGS		= -fjni

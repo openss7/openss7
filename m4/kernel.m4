@@ -7,6 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -914,9 +915,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${kbuilddir}
 		${DESTDIR}${rootdir}/usr/src/kernel-source-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-source-${knumber}
+		${DESTDIR}${rootdir}/usr/src/linux-source-${knumber}-${kextra}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}
 		${DESTDIR}${rootdir}/usr/src/linux-${knumber}
+		${DESTDIR}${rootdir}/usr/src/linux-${knumber}-${kextra}
 		${DESTDIR}${rootdir}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}${rootdir}/usr/src/linux
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/source
@@ -924,18 +927,24 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-headers-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}-${kextra}
+		${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common
 		${DESTDIR}/usr/src/kernel-source-${knumber}
 		${DESTDIR}/usr/src/linux-source-${knumber}
+		${DESTDIR}/usr/src/linux-source-${knumber}-${kextra}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
 		${DESTDIR}/usr/src/linux-${knumber}
+		${DESTDIR}/usr/src/linux-${knumber}-${kextra}
 		${DESTDIR}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}/usr/src/linux
 		${DESTDIR}/lib/modules/${kversion}/source
 		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/linux-headers-${kversion}
-		${DESTDIR}/usr/src/linux-headers-${knumber}\""
+		${DESTDIR}/usr/src/linux-headers-${knumber}
+		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}
+		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}-common\""
 	    k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
 	    linux_cv_k_source=
 	    for linux_dir in $k_source_search_path ; do
@@ -951,6 +960,28 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		fi
 		AC_MSG_RESULT([no])
 	    done
+	    if test -z "$linux_cv_k_source"
+	    then
+		eval "k_source_search_path=\"
+		    ${DESTDIR}${rootdir}/lib/modules/${kversion}/source
+		    ${DESTDIR}${rootdir}/usr/src/linux-headers-${knumber}-${kextra}-common
+		    ${DESTDIR}/lib/modules/${kversion}/source
+		    ${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}-common\""
+		k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
+		linux_cv_k_source=
+		for linux_dir in $k_source_search_path ; do
+		    AC_MSG_CHECKING([for kernel source directory... $linux_dir])
+		    if test -d "$linux_dir" \
+			 -a -f "$linux_dir/Makefile" \
+			 -a -d "$linux_dir/arch" \
+			 -a -d "$linux_dir/include"
+		    then
+			linux_cv_k_source="$linux_dir"
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		done
+	    fi
 	    if test -z "$linux_cv_k_source"
 	    then
 		linux_cv_k_source="$linux_cv_k_build"
@@ -2755,6 +2786,7 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

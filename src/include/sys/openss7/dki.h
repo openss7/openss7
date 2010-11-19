@@ -77,7 +77,47 @@
 typedef __kernel_dev_t major_t;
 typedef __kernel_dev_t minor_t;
 
-/* same layout as in task_struct */
+#if 0 /* This was the SVR4/BSD definition. */
+typedef struct cred {
+    ulong   cr_ref;
+    uid_t   cr_uid;
+    gid_t   cr_gid;
+    uid_t   cr_ruid;
+    gid_t   cr_rgid;
+    uid_t   cr_suid;
+    gid_t   cr_sgid;
+    ulong   cr_ngroups;
+    gid_t   cr_groups[NGROUPS];
+} cred_t;
+#endif
+
+#include <sys/openss7/config.h>
+
+#ifdef HAVE_KINC_LINUX_CRED_H
+
+#include <linux/cred.h>
+
+/* This is a BSDish trick for 2.6.32 or before.  The module should
+ * not ever write to this structure or all hell will break loose. */
+typedef struct ucred {
+    struct cred cr_cred;
+} cred_t;
+#define cr_ruid    cr_cred.uid
+#define cr_rgid    cr_cred.gid
+#define cr_suid    cr_cred.suid
+#define cr_sgid    cr_cred.sgid
+#define cr_uid     cr_cred.euid
+#define cr_gid     cr_cred.egid
+#define cr_ngroups cr_cred.group_info->ngroups
+#define cr_groups  cr_cred.group_info->small_block
+#define NGROUPS    NGROUPS_SMALL
+
+/* doesn't work for LIS BCM. */
+#define current_creds ((cred_t *)current_cred())
+
+#else /* HAVE_KINC_LINUX_CRED_H */
+
+/* Same layout as in task_struct.  Good to 2.6.27. */
 typedef struct cred {
 	uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
 	gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
@@ -87,11 +127,16 @@ typedef struct cred {
 #endif
 #ifdef NGROUPS_SMALL
 	struct group_info *cr_group_info;
+#define cr_ngroups cr_group_info->ngroups
+#define cr_groups  cr_group_info->small_block
+#define NGROUPS    NGROUPS_SMALL
 #endif
 } cred_t;
 
 /* doesn't work for LIS BCM. */
 #define current_creds ((cred_t *)(&current->uid))
+
+#endif /* HAVE_KINC_LINUX_CRED_H */
 
 /* make SVR4.2 oflag from file flags and mode */
 #define make_oflag(__f) \
