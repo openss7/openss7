@@ -994,6 +994,34 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 # =========================================================================
 
 # =========================================================================
+# _LINUX_CHECK_KERNEL_MAKEDIR
+# -------------------------------------------------------------------------
+# the linux kernel make directory is the kernel makefile tree root against
+# which kernel makefiles are included.  Under 2.4 kernels, this is the same
+# as the build directory above (because builds can only be performed in the
+# source directory).  However, for earlier 2.6 kernels it is possible to
+# include makefiles from a directory separate from the source directory and
+# separate from the bild directory.  Debian 6.0 uses this to separate build,
+# source and make information.
+#
+# Debian Squeeze has
+# /lib/modules/`uname -r`/build  -> /usr/src/linux-headers-`uname -r`
+# /lib/modules/`uname -r`/source -> /usr/src/linux-headers-`uname -x`-common
+# where `uname -x` is `uname -r` minus the -variant at the end.  Kernel
+# variants (for 686) are as follows for Squeeze:
+# -686
+# -686-bigmem
+# -amd64
+# -openvz-686
+# -vserver-686
+# -vserver-686-bigmem
+# -xen-686
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_MAKEDIR], [dnl
+])# _LINUX_CHECK_KERNEL_MAKEDIR
+# =========================================================================
+
+# =========================================================================
 # _LINUX_CHECK_KERNEL_MODVER
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
