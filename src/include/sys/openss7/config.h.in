@@ -370,6 +370,9 @@
  
 /* Define to 1 if you have the <linux/utsrelease.h> header file. */
 #undef HAVE_KINC_LINUX_UTSRELEASE_H
+
+/* Define to 1 if you have the <linux/cred.h> header file. */
+#undef HAVE_KINC_LINUX_CRED_H
  
 /* Define to 1 if kernel macro MOD_DEC_USE_COUNT() exists. */
 #undef HAVE_KTYPE_BOOL
