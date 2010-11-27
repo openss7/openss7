@@ -1,7 +1,7 @@
 /*
  @(#) $RCSfile: JainTcapStackImpl.java,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:16 $ <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -315,9 +315,9 @@ public class JainTcapStackImpl implements JainTcapStack {
       */
     public JainTcapProvider[] getProviderList() {
         JainTcapProvider[] providerList = new JainTcapProvider[m_providerList.size()];
-        Iterator i = m_providerList.iterator();
+        Iterator<JainTcapProvider> i = m_providerList.iterator();
         for (int n=0; i.hasNext(); n++) {
-            providerList[n] = (JainTcapProvider)i.next();
+            providerList[n] = i.next();
         }
         return providerList;
     }
@@ -481,7 +481,7 @@ public class JainTcapStackImpl implements JainTcapStack {
     /** Whether the stack specification is user set. */
     private boolean m_stackSpecificationIsSet = false;
     /** A provider list. */
-    private Vector m_providerList = new Vector();
+    private Vector<JainTcapProvider> m_providerList = new Vector<JainTcapProvider>();
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

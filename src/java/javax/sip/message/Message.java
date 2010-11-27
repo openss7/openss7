@@ -2,7 +2,7 @@
 /*
  @(#) $RCSfile: Message.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:35:54 $ <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -145,7 +145,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         the SIP Message.
         @return The ListIterator over the set of all the Header Names in the Message.
       */
-    java.util.ListIterator getHeaderNames();
+    java.util.ListIterator<java.lang.String> getHeaderNames();
     /**
         Gets a ListIterator over all the Headers of the newly specified name in this Message. Note
         that order of the Headers in ListIterator is the same as the order in which they appear in
@@ -154,7 +154,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         @return The ListIterator over all the Headers of the specified name in the Message, this
         method returns an empty ListIterator if no Headers exist of this header type.
       */
-    java.util.ListIterator getHeaders(java.lang.String headerName);
+    java.util.ListIterator<Header> getHeaders(java.lang.String headerName);
     /**
         Gets the Header of the specified name in this Message. If multiple Headers of this header
         name exist in the message, the first header in the message is returned.
@@ -179,7 +179,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         @return The ListIterator over all the UnrecognizedHeaders in the Message represented as
         Strings, this method returns an empty ListIterator if no UnrecognizedHeaders exist.
       */
-    java.util.ListIterator getUnrecognizedHeaders();
+    java.util.ListIterator<Header> getUnrecognizedHeaders();
     /**
         Sets the new Header to replace existings Header of that type in the message. If the SIP
         message contains more than one Header of the new Header type it should replace the first
