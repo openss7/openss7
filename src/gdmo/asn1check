@@ -179,6 +179,6 @@ EOF
 $printit++ unless $nflag;
 
 $\ = "\n";	# add new-line to print
-$* = 0;		# do signleline matching
+#$* = 0;	# do signleline matching
 undef $/;	# read entire file
 
