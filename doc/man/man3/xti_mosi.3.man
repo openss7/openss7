@@ -1481,7 +1481,7 @@ The OpenGroup XNS Issue 5.2.
 xns99
 .]
 Conformance is validated using the \fBtest-mosi\fP8) test case executable and the
-\fB@PACAKAGE@\0autotest\fP validation test suite.
+\fB@PACKAGE@\0autotest\fP validation test suite.
 .\"
 .\"
 .SH HISTORY

@@ -457,19 +457,17 @@ results:
 .PP
 .RS
 .TS
-tab(:);
+box tab(:);
 lb|lb|lb
 l|l|l.
-_
 POSIX 1003.3:test-etsi_t:autotest
-_
+=
 PASS:PASS(0):PASS
 FAIL:FAIL(1):FAIL
 XFAIL:FAIL(1):XFAIL
 UNSUPPORTED:NOT APPLICABLE(0):PASS
 UNRESOLVED:INCONCLUSIVE(1):FAIL or XFAIL
 UNTESTED:SKIPPED(77):SKIPPED
-_
 .TE
 .RE
 .\"
