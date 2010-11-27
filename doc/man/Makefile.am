@@ -2804,6 +2804,7 @@ openss7_man_MANS = \
 	man8/mxmib.8 \
 	man8/nuimap.8 \
 	man8/openss7.8 \
+	man8/openss7_mkdev.8 \
 	man8/openss7_mknod.8 \
 	man8/osinetd.8 \
 	man8/perftest.8 \
@@ -6743,6 +6744,7 @@ openss7_dist_noinst_MANS = \
 	man8/mxmib.8.man \
 	man8/nuimap.8.man \
 	man8/openss7.8.man \
+	man8/openss7_mkdev.8.man \
 	man8/openss7_mknod.8.man \
 	man8/osinetd.8.man \
 	man8/perftest.8.man \

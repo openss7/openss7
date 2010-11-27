@@ -65,7 +65,7 @@ AC_LANG_DEFINES_PROVIDED
 _OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([openss7.lsm.in])
-AC_CONFIG_HEADERS([config.h src/include/sys/openss7/config.h])
+AC_CONFIG_HEADERS([config.h src/include/sys/openss7/config.h src/include/sys/openss7/wrapper.h])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

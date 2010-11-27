@@ -133,6 +133,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CPPFLAGS="${USER_CPPFLAGS}${USER_CPPFLAGS:+ }-DNAME=\\\"\`echo [\$][@] | sed -e 's,^[[^-]]*-,,;s,\.o,,'\`\\\""
     USER_LDFLAGS="$LDFLAGS"
+    KERNEL_WRAPPER="module_address module_text_address"
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
@@ -761,6 +762,8 @@ dnl----------------------------------------------------------------------------
 	create_proc_info_entry \
 	dst_mtu \
 	dst_output \
+	find_pid \
+	find_vpid \
 	finish_wait \
 	force_delete \
 	free_dma \
@@ -768,10 +771,14 @@ dnl----------------------------------------------------------------------------
 	iget_locked \
 	__in_dev_get_rcu \
 	inet_csk \
+	inet_get_local_port_range \
 	interruptible_sleep_on \
 	ip_dst_output \
 	ip_route_output_key \
 	kern_umount \
+	kill_pid \
+	kill_pid_info \
+	kill_proc \
 	MOD_DEC_USE_COUNT \
 	MOD_INC_USE_COUNT \
 	module_put \
@@ -811,6 +818,9 @@ dnl----------------------------------------------------------------------------
 	set_cpus_allowed \
 	set_user_nice \
 	simple_statfs \
+	skb_dst \
+	skb_dst_set \
+	skb_rtable \
 	skb_transport_header \
 	sleep_on \
 	sleep_on_timeout \
@@ -819,7 +829,9 @@ dnl----------------------------------------------------------------------------
 	__symbol_put \
 	synchronize_net \
 	task_pgrp_nr \
+	task_pgrp_nr_ns \
 	task_session_nr \
+	task_session_nr_ns \
 	to_kdev_t \
 	try_module_get \
 	unregister_ioctl32_conversion \
@@ -979,7 +991,8 @@ dnl----------------------------------------------------------------------------
 	pm_message_t,
 	struct sockaddr_storage,
 	struct inet_protocol,
-	struct net_protocol], [:], [:], [
+	struct net_protocol,
+	struct net_device_ops], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1028,6 +1041,9 @@ dnl----------------------------------------------------------------------------
 	struct ctl_table.de,
 	struct ctl_table.parent,
 	struct dst_entry.path,
+	struct file.f_cred,
+	struct file.f_gid,
+	struct file.f_uid,
 	struct file_operations.flush,
 	struct file_operations.unlocked_ioctl,
 	struct files_struct.fdtab,
@@ -1220,7 +1236,7 @@ dnl----------------------------------------------------------------------------
 	    AC_MSG_WARN([
 **** 
 **** Linux kernel symbol ']LK_Export[' should be exported but it
-**** isn't.  This could cause problems later.
+**** is not.  This could cause problems later.
 **** ])])
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
@@ -1252,7 +1268,9 @@ dnl----------------------------------------------------------------------------
 	cd_forget,
 	check_mnt,
 	compat_ptr,
+	_def_fifo_ops,
 	dev_base_head,
+	group_send_sig_info,
 	group_send_sig_info,
 	icmp_err_convert,
 	icmp_statistics,
@@ -1264,6 +1282,7 @@ dnl----------------------------------------------------------------------------
 	inet_protos,
 	ioctl32_hash_table,
 	ioctl32_sem,
+	ip_cmsg_recv,
 	ip_cmsg_send,
 	ip_frag_mem,
 	ip_frag_nqueues,
@@ -1279,12 +1298,17 @@ dnl----------------------------------------------------------------------------
 	is_ignored,
 	is_orphaned_pgrp,
 	kill_pgrp,
+	kill_pid_info,
 	kill_proc_info,
 	kill_sl,
 	kthread_bind,
 	kthread_create,
 	kthread_should_stop,
 	kthread_stop,
+	__module_address,
+	module_address,
+	modules,
+	__module_text_address,
 	module_text_address,
 	mount_sem,
 	namespace_sem,
@@ -1292,7 +1316,6 @@ dnl----------------------------------------------------------------------------
 	sched_setscheduler,
 	secure_tcp_sequence_number,
 	send_group_sig_info,
-	group_send_sig_info,
 	session_of_pgrp,
 	__setscheduler,
 	skbuff_head_cache,
@@ -1304,18 +1327,24 @@ dnl----------------------------------------------------------------------------
 	sysctl_ip_dynaddr,
 	sysctl_ip_nonlocal_bind,
 	sysctl_local_port_range,
+	sysctl_tcp_fin_timeout,
 	tasklist_lock,
 	task_rq_lock,
 	task_rq_unlock,
 	tcp_current_mss,
+	tcp_cwnd_application_limited,
 	tcp_memory_allocated,
+	tcp_openreq_cachep,
 	tcp_orphan_count,
 	tcp_prot,
 	__tcp_push_pending_frames,
+	tcp_set_keepalive,
 	tcp_set_skb_tso_factor,
 	tcp_set_skb_tso_segs,
 	tcp_sockets_allocated,
+	tcp_sync_mss,
 	tcp_tw_count,
+	tcp_write_xmit,
 	udp_prot,
 	__xfrm_policy_check,
 	xfrm_policy_delete,
@@ -1378,16 +1407,64 @@ dnl----------------------------------------------------------------------------
 	    ])
 	if test :$linux_cv_kmem_cache_create_5_args = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS], [1], [Define if
-		function kmem_cache_create takes 4 arguments.])
+		function kmem_cache_create takes 5 arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args new],
+		       [linux_cv_kmem_cache_create_5_new], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[struct kmem_cache *(*my_autoconf_function_pointer)
+			(const char*, size_t, size_t, unsigned long,
+			 void (*)(void *)) =
+			 &kmem_cache_create;]]) ],
+		[linux_cv_kmem_cache_create_5_new='yes'],
+		[linux_cv_kmem_cache_create_5_new='no'])
+	    ])
+	if test :$linux_cv_kmem_cache_create_5_new = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW], [1], [Define if
+		function kmem_cache_create takes 5 arguments in the new style.])
 	fi
 	AH_VERBATIM([kmem_create_cache],
-[/* silly kernel developers */
-#ifdef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+[/* stupid kernel developers keep changing this freaking thing */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
 #define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5)
 #else
 #define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
 #endif])dnl
-    ])
+	    ])
     at_ioctl_getmsg="$linux_cv_member_struct_file_operations_unlocked_ioctl"
     AC_SUBST([at_ioctl_getmsg])dnl
     AM_CONDITIONAL(USING_IOCTL_GETPMSG_PUTPMSG, test :$at_ioctl_getmsg = :yes)dnl
@@ -1687,6 +1764,29 @@ dnl 	])
     fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel ICMP_INC_STATS_BH with 2 args], [linux_cv_icmp_inc_stats_bh_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <linux/snmp.h>]],
+		[[
+struct net my_autoconf_net;
+ICMP_INC_STATS_BH(&my_autoconf_net, ICMP_MIB_INERRORS);]]) ],
+		    [linux_cv_icmp_inc_stats_bh_2_args='yes'],
+		    [linux_cv_icmp_inc_stats_bh_2_args='no'])
+	    ])
+    ])
+    if test :"${linux_cv_icmp_inc_stats_bh_2_args:-no}" = :yes ; then
+	AC_DEFINE([HAVE_ICMP_INC_STATS_BH_2_ARGS], [1], [Define if macro ICMP_INC_STATS_BH
+		   takes two arguments.])
+    fi
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ENV([dnl
 	if test :$linux_cv_xfrm_policy_delete_symbol = :yes ; then
 	    AC_CACHE_CHECK([for kernel xfrm_policy_delete_symbol returns int],
 			   [linux_cv_xfrm_policy_delete_returns_int], [dnl
@@ -1845,6 +1945,70 @@ dnl 	fi
 	    AC_DEFINE([HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS], [1],
 		[Define if function __tcp_push_pending_frames takes 3
 		 arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel tcp_current_mss with 1 argument], [linux_cv_have_tcp_current_mss_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <net/sock.h>
+#include <linux/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+]],
+		[[unsigned int (*my_autoconf_function_pointer)(struct sock *) = &tcp_current_mss;]]) ],
+		[linux_cv_have_tcp_current_mss_1_arg='yes'],
+		[linux_cv_have_tcp_current_mss_1_arg='no'])
+	])
+	AH_VERBATIM([HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG], m4_text_wrap([Define if function
+		     tcp_current_mss takes 1 argument. */], [   ], [/* ])[
+#undef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+unsigned int tcp_current_mss(struct sock *sk);
+#endif /* HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG */])
+	if test :"${linux_cv_have_tcp_current_mss_1_arg:-no}" = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG], [1])
+	fi
+	AC_CACHE_CHECK([for kernel tcp_current_mss with 2 arguments], [linux_cv_have_tcp_current_mss_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <net/sock.h>
+#include <linux/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+]],
+		[[unsigned int (*my_autoconf_function_pointer)(struct sock *, int) = &tcp_current_mss;]]) ],
+		[linux_cv_have_tcp_current_mss_2_args='yes'],
+		[linux_cv_have_tcp_current_mss_2_args='no'])
+	])
+	AH_VERBATIM([HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS], m4_text_wrap([Define if function
+		     tcp_current_mss takes 2 arguments. */], [   ], [/* ])[
+#undef HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS
+unsigned int tcp_current_mss(struct sock *sk, int large);
+#endif /* HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS */])
+	if test :"${linux_cv_have_tcp_current_mss_2_args:-no}" = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS], [1])
 	fi
     ])
 dnl----------------------------------------------------------------------------
@@ -2394,7 +2558,7 @@ AC_DEFUN([_OS7_CONFIG_SCTP], [dnl
 	AC_DEFINE([HAVE_LKSCTP_SCTP], [1], [Some more recent 2.4.25 and
 	    greater kernels have this poorman version of SCTP included in the
 	    kernel.  Define this symbol if you have such a bastardized kernel.
-	    When we have such a kernel we need to define lksctp's header
+	    When we have such a kernel we need to define lksctp header
 	    wrapper defines so that none of the lksctp header files are
 	    included (we use our own instead).])
     fi
