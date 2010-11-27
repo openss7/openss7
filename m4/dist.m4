@@ -750,7 +750,12 @@ AC_DEFUN([_DISTRO_CACHE], [dnl
     AC_SUBST([CONFIG_DIST])dnl
     if test "$no_create" = yes ; then
 	for config_dist in $CONFIG_DIST ; do
+	    case "$config_dist" in
+		(/*) ;;
+		(*) config_dist="`pwd`/$config_dist" ;;
+	    esac
 	    if test -r "$config_dist" ; then
+		AC_MSG_NOTICE([reading cache file... $config_dist])
 		. "$config_dist"
 	    fi
 	done

@@ -1,0 +1,8 @@
+bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='apt-get install gnupg'}
+bld_cv_pkg_cmd_GZIP_CMD=${bld_cv_pkg_cmd_GZIP_CMD='apt-get install gzip'}
+bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg}
+bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
+bld_cv_pkg_prog_GPG=${bld_cv_pkg_prog_GPG=gpg}
+bld_cv_pkg_prog_GZIP_CMD=${bld_cv_pkg_prog_GZIP_CMD=gzip}
+bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=1.4.9-3+lenny1}
+bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.3.12-6+lenny1}
