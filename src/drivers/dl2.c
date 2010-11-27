@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
-
 static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $";
 
 /*
@@ -91,7 +89,7 @@ static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.1 $)
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
-#define ND_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define ND_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ND_LICENSE	"GPL"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
 
 static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $";
 
@@ -133,7 +131,7 @@ static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
 #define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
-#define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_AS_LICENSE		"GPL"

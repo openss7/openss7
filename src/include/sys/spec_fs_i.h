@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -59,8 +59,6 @@
 
 #ifndef __SYS_SPEC_FS_I_H__
 #define __SYS_SPEC_FS_I_H__
-
-#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
  /* Note: this is identical layout to a socket (rearranged for validation).  The minor exception is 
     that the the sock pointer points to an stdata and the proto_ops pointer points to a stream_ops

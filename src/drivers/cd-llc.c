@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
-
 static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
 
 /*
@@ -77,7 +75,7 @@ static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.1
 
 #define LLC_DESCRIP	"SVR 4.2 CDI X.25 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LLC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define LLC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define LLC_REVISION	"OpenSS7 $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
 #define LLC_DEVICE	"SVR 4.2MP CDI Driver (CDI) for IEEE 802.2 LLC"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

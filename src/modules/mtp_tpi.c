@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $"
-
 static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $";
 
 
@@ -86,7 +84,7 @@ static char const ident[] = "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
 #define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:32 $"
-#define MTP_TPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define MTP_TPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_TPI_LICENSE		"GPL"

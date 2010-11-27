@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,13 +57,11 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $"
-
 static char const ident[] = "$RCSfile: ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
 #define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:57 $"
-#define UA_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define UA_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UA_LICENSE	"GPL"

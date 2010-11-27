@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
-
 static char const ident[] = "$RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $";
 
 
@@ -95,7 +93,7 @@ static char const ident[] = "$RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define PHYS_DESCRIP	"MTP3B-PHYS STREAMS MODULE."
 #define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
-#define PHYS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define PHYS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PHYS_LICENSE	"GPL"

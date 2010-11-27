@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,8 +70,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:15 $"
-
 static char const ident[] = "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:15 $";
 
 /*
@@ -88,8 +86,6 @@ static char const ident[] = "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 1.1.2.
  *       of this utility to do replies.
  *    3) This source is ugly.
  */
-
-#ident "@(#) LiS ldltest.c 2.13 9/9/03"
 
 #ifndef LINUX
 #define LINUX 2
@@ -2442,7 +2438,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\

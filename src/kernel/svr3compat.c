@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
-
 static char const ident[] = "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $";
 
 /* 
@@ -80,7 +78,7 @@ static char const ident[] = "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 1.1
 #include "sys/os7/compat.h"
 
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR3COMP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SVR3COMP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:17 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

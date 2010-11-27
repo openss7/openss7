@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
-
 static char const ident[] = "$RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
 
 #define _DEBUG 1
@@ -71,7 +69,7 @@ static char const ident[] = "$RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 
 
 #define TCMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TCMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TCMOD_REVISION	"Monavacon $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 #define TCMOD_DEVICE	"ITU-T Q.771 TC modules for ITU-T Q.771 TR"
 #define TCMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

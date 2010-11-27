@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
-
 static char const ident[] = "$RCSfile: testmod_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
 
 /*
@@ -82,7 +80,7 @@ static char const ident[] = "$RCSfile: testmod_mps.c,v $ $Name:  $($Revision: 1.
  /* This is simply defines for use with Linux module functions. */
 #define TM_MPS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TM_MPS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TM_MPS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TM_MPS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TM_MPS_REVISION		"OpenSS7 $RCSfile: testmod_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 #define TM_MPS_DEVICE		"MPS Compatability TEST Module (TEST-MOD-MPS)"
 #define TM_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

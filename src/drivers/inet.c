@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 
 static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $";
 
@@ -445,7 +443,11 @@ extern __u32 sysctl_wmem_max;
 
 #ifndef tcp_current_mss
 #ifdef HAVE_TCP_CURRENT_MSS_ADDR
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+unsigned int tcp_current_mss(struct sock *sk);
+#else
 unsigned int tcp_current_mss(struct sock *sk, int large);
+#endif
 #endif
 #endif
 
@@ -500,7 +502,7 @@ void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SS__COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SS__COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:55 $"
-
 static char const ident[] = "$RCSfile: sua.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:55 $";
 
 #include <sys/os7/compat.h>
@@ -81,7 +79,7 @@ static char const ident[] = "$RCSfile: sua.c,v $ $Name:  $($Revision: 1.1.2.1 $)
  */
 
 #define SUA_DESCRIP	"SUA STREAMS MULTIPLEXING DRIVER."
-#define SUA_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SUA_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SUA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SUA_LICENSE	"GPL"

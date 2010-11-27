@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
-
 static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $";
 
 /*
@@ -101,7 +99,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.2 $) 
 #include "tab.h"		/* HDLC tables */
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define CD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
 #define CD_DEVICE	"SVR 4.2 MP STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

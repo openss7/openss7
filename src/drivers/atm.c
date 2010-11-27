@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: atm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
-
 static char const ident[] = "$RCSfile: atm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
 
 /*
@@ -86,7 +84,7 @@ static char const ident[] = "$RCSfile: atm.c,v $ $Name:  $($Revision: 1.1.2.1 $)
 
 #define ATM_DESCRIP	"ATM STREAMS MULTIPLEXING DRIVER."
 #define ATM_REVISION	"OpenSS7 $RCSfile: atm.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
-#define ATM_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define ATM_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define ATM_DEVICE	"Provides OpenSS7 ATM I.432.X Pseudo-Device Driver."
 #define ATM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ATM_LICENSE	"GPL"

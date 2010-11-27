@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,14 +60,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $"
-
 static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/sched.h>
 
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -78,7 +77,7 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLONE_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define CLONE_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:42 $"
 #define CLONE_DEVICE	"SVR 4.2 MP STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

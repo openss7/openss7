@@ -56,8 +56,6 @@
 //
 //  ==========================================================================
 
-#ident "@(#) $Id$"
-
 static char const ident[] = "$Id$";
 
 GdmoObject::GdmoObject(const char *n) : name(n) { };

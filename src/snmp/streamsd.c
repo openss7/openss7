@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -59,8 +59,6 @@
  - added new standalone agent
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: streamsd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:42:35 $"
 
 static char const ident[] = "$RCSfile: streamsd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:42:35 $";
 
@@ -156,7 +154,7 @@ sa_version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.\n\
+Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved.\n\
 Distributed under Affero GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -277,7 +275,7 @@ sa_copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>\n\
+Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
-
 static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $";
 
 /*
@@ -94,7 +92,7 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define HDLC_DESCRIP	"HDLC OVER CH MODULE FOR LINUX FAST-STREAMS"
 #define HDLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define HDLC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define HDLC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:30 $"
 #define HDLC_DEVICE	"SVR 4.2MP HDLC over CH Module (HDLC) for X.25"
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

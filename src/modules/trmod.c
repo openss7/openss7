@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: trmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
-
 static char const ident[] = "$RCSfile: trmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 /*
@@ -83,7 +81,7 @@ static char const ident[] = "$RCSfile: trmod.c,v $ $Name:  $($Revision: 1.1.2.2 
 
 #define TRMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TRMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TRMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TRMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TRMOD_REVISION	"$RCSfile: trmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 #define TRMOD_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Module"
 #define TRMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

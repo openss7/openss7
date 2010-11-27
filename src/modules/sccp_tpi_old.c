@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $"
-
 static char const ident[] = "$RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $";
 
 /*
@@ -96,7 +94,7 @@ static char const ident[] = "$RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1
 
 #define SCCP_TPI_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) TPI STREAMS MODULE."
 #define SCCP_TPI_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCCP_TPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SCCP_TPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $"
 #define SCCP_TPI_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define SCCP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

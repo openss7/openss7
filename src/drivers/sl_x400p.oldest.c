@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $"
-
 static char const ident[] = "$RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $";
 
 /*
@@ -95,7 +93,7 @@ static char const ident[] = "$RCSfile: sl_x400p.oldest.c,v $ $Name:  $($Revision
 #endif
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
-#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"

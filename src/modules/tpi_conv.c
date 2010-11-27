@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
-
 static char const ident[] = "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
 
 
@@ -76,7 +74,7 @@ static char const ident[] = "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/tpi.h>
 
 #define TPI_CONV_DESCRIP	"TPI ENDIAN CONVERSION (TPI-CONV) FOR LINUX FAST-STREAMS"
-#define TPI_CONV_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TPI_CONV_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 #define TPI_CONV_DEVICE		"SVR 4.2 TPI Endian Conversion (TPI-CONV) for STREAMS"
 #define TPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 #ifndef __SYS_OPENSS7_DDI_H__
 #define __SYS_OPENSS7_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
-
 #ifndef __SYS_DDI_H__
 #warning "Do not include sys/openss7/ddi.h directly, include sys/ddi.h instead."
 #endif
@@ -92,6 +90,7 @@
 #define __STRUTIL_EXTERN_INLINE __EXTERN_INLINE streams_fastcall
 #endif				/* __STRUTIL_EXTERN_INLINE */
 
+#include <linux/sched.h>
 #include <asm/uaccess.h>	/* for copy_[to|from]_user */
 #include <asm/delay.h>		/* for udelay */
 #include <sys/dki.h>

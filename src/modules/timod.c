@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
-
 static char const ident[] = "$RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 /*
@@ -91,7 +89,7 @@ static char const ident[] = "$RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.2.2 
 #endif
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIMOD_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TIMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 #define TIMOD_DEVICE	"SVR 4.2 MP STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

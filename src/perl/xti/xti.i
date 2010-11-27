@@ -62,7 +62,9 @@
 
 %module Xti
 %{
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
+#endif
 #ifndef _REENTRANT
 #define _REENTRANT
 #endif

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
-
 static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
 
 
@@ -95,7 +93,7 @@ static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 1.1.2.2 
 #include <net/ip.h>
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TCPNS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TCPNS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
 #define TCPNS_DEVICE	"SVR 4.2 MP STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

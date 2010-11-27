@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
-
 static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $";
 
 /*
@@ -85,7 +83,7 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:44 $"
-#define CHMUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define CHMUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CHMUX_LICENSE	"GPL"

@@ -63,8 +63,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $"
-
 static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $";
 
 /* This file can be processed with doxygen(1). */
@@ -75,7 +73,9 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $
 /** @file
   * OpenSS7 X/Open Networking Library (XNET) implementation file.  */
 
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
+#endif
 #define _REENTRANT
 #define _THREAD_SAFE
 

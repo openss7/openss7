@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $"
-
 static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $";
 
 
@@ -78,7 +76,7 @@ static char const ident[] = "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 1.1.2
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
 #define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:34 $"
-#define SDL_SCTP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SDL_SCTP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_SCTP_LICENSE	"GPL"

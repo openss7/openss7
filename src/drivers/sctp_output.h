@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -59,8 +59,6 @@
 
 #ifndef __SCTP_OUTPUT_H__
 #define __SCTP_OUTPUT_H__
-
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
 extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);
