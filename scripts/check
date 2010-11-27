@@ -40,8 +40,7 @@ function get_sections(sections,    i, result) {
     }
     return result
 }
-function print_s(string, sections) {
-    string = string get_sections(sections)
+function print_s(string) {
     if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
 	print cr grn me ": S: " string std > stdout
 	written["stdout"]++ }
@@ -49,16 +48,23 @@ function print_s(string, sections) {
     written["logfile"]++
     success++
 }
-function print_f(string, sections) {
+function print_s_s(string, sections) {
     string = string get_sections(sections)
+    print_s(string)
+}
+function print_f(string) {
     if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
 	print cr std me ": F: " string std > stdout
 	written["stdout"]++ }
     print me ": F: " string >> logfile
     written["logfile"]++
 }
-function print_w(string, sections) {
+function print_f_s(string, sections)
+{
     string = string get_sections(sections)
+    print_f(string)
+}
+function print_w(string) {
     if (ENVIRON["MAINTAINER_MODE"] ~ /^(verbose|continue)$/ || ENVIRON["V"] == 1) {
 	print cr blu me ": W: --- " string std > stderr
 	written["stderr"]++ }
@@ -66,13 +72,20 @@ function print_w(string, sections) {
     written["logfile"]++
     warnings++
 }
-function print_e(string, sections) {
+function print_w_s(string, sections) {
     string = string get_sections(sections)
+    print_w(string)
+}
+function print_e(string) {
     print cr red me ": E: --- " string std > stderr
     written["stderr"]++
     print me ": E: " string >> logfile
     written["logfile"]++
     errors++
+}
+function print_e_s(string, sections) {
+    string = string get_sections(sections)
+    print_e(string)
 }
 function show_starting(doing, things) {
     print_q(doing " " things lf)
@@ -187,9 +200,9 @@ function search_symbol(symbol, sections, weak,    string) {
     if (!search_one(symbol, sections)) {
 	string = "could not find manual page for symbol " symbol
 	if (weak || symbol ~ /^_/)
-	    print_w(string, sections)
+	    print_w_s(string, sections)
 	else
-	    print_e(string, sections)
+	    print_e_s(string, sections)
     }
 }
 function search_multi(myname, sections,    mcname, msname, nlname, ucname, usname, ulname, CHECKS, checks) {
@@ -203,7 +216,7 @@ function search_multi(myname, sections,    mcname, msname, nlname, ucname, usnam
     split(CHECKS, checks, ", ")
     print_d("checking " CHECKS get_sections(sections))
     if (!search_many(checks, sections))
-	print_e("could not find " CHECKS, sections)
+	print_e_s("could not find " CHECKS, sections)
 }
 function no_support(runnable, option,    line) {
     print_e(runnable " does not support " option)
@@ -296,6 +309,8 @@ BEGIN {
 	ENVIRON["lib_LTLIBRARIES"] = ""
     if (!("KERNEL_MODULES" in ENVIRON))
 	ENVIRON["KERNEL_MODULES"] = ""
+    if (!("KERNEL_WRAPPER" in ENVIRON))
+	ENVIRON["KERNEL_WRAPPER"] = ""
     if (!("AM_INSTALLCHECK_STD_OPTIONS_EXEMPT" in ENVIRON))
 	ENVIRON["AM_INSTALLCHECK_STD_OPTIONS_EXEMPT"] = ""
     if (!("cross_compiling" in ENVIRON))
@@ -391,6 +406,10 @@ BEGIN {
     if (n["modules"]) {
 	need[4] = 1; need[5] = 1; need[7] = 1; need[9] = 1; needctags = 1 }
 
+    WRAPPER = ENVIRON["KERNEL_WRAPPER"]
+    n["wrapper"] = split(WRAPPER, wrapper)
+    for (i = 1; i <= n["wrapper"]; i++) { wrapper[wrapper[i]] = 1; delete wrapper[i] }
+
     if (("STRCONF_MAKEDEV" in ENVIRON) && ("top_builddir" in ENVIRON)) {
 	    makedev = ENVIRON["top_builddir"] "/" ENVIRON["STRCONF_MAKEDEV"]
 	    need[4] = 1 }
@@ -452,7 +471,7 @@ BEGIN {
 		if ((base in exempt) || (command in exempt) || ((ENVIRON["srcdir"] "/" command) in exempt))
 		    print_s(base " is standard options exempt")
 		else
-		    print_e("could not find " base, sections)
+		    print_e_s("could not find " base, sections)
 	    }
 	    show_progress("checked", "commands", 1000)
 	}
@@ -477,7 +496,7 @@ BEGIN {
 	command ="xargs ctags -x --c-kinds=defgpstuvx " ENVIRON["CTAGS"] " 2>/dev/null | sed -e 's,\\$,\\ ,' > " ctaglog
 	show_starting("checking", "headers")
 	split("3 5 7", sections)
-	for (i = 1; i < n["headers"]; i++) {
+	for (i = 1; i <= n["headers"]; i++) {
 	    header = headers[i]
 	    print header | command
 	    print ENVIRON["srcdir"] "/" header | command
@@ -486,7 +505,7 @@ BEGIN {
 	    CHECKS = base " " name
 	    split(CHECKS, checks)
 	    if (!search_many(checks, sections))
-		print_w("could not find " CHECKS, sections)
+		print_w_s("could not find " CHECKS, sections)
 	    show_progress("checked", "headers", 1000)
 	}
 	close(command)
@@ -508,12 +527,12 @@ BEGIN {
 		if (!search_one($1, sections)) {
 		    string = "could not find " $2 " " $1
 		    if (onerror[type] == "S")
-			print_f(string, sections)
+			print_f_s(string, sections)
 		    else
 		    if (onerror[type] == "W" || (type == "externvar" && $5 == "struct"))
-			print_w(string, sections)
+			print_w_s(string, sections)
 		    else
-			print_e(string, sections)
+			print_e_s(string, sections)
 		}
 	    }
 	    show_progress("checked", "symbols", 1000)
@@ -650,9 +669,17 @@ BEGIN {
 	    } else {
 		string = "exported symbol " symb " has no declaration"
 		if (symb ~ /^_/) print_w(string)
-		else print_e(string)
+		else {
+		    if (symb in wrapper)
+			print_w(string)
+		    else
+			print_e(string)
+		}
 	    }
-	    search_symbol(symb, sections, 0)
+	    if (symb in wrapper)
+		search_symbol(symb, sections, 1)
+	    else
+		search_symbol(symb, sections, 0)
 	    if (crc_seen) {
 		if (!(symb in versioned))
 		    print_e(symb " has no version")

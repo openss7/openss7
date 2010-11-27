@@ -50,23 +50,34 @@ BEGIN {
     line["txt" ] = t ".txt: "  "\\\n\t" t depends["txt" ]
     line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
     for (p in figures) {
-	if (system("test -f " srcdir "/" p) == 0) {
-	    pd = srcdir "/" p
-	} else if (system("test -f " top_srcdir "/scripts/" p) == 0) {
-	    pd = top_srcdir "/scripts/" p
-	} else {
-	    pd = p
+	for (v in line ) {
+	    f0 = p suffixes[v]
+	    f1 = srcdir "/" f0
+	    f2 = top_srcdir "/scripts/" f0
+	    if (system("test -f " f0) == 0) {
+		pd = f0
+	    } else if (system("test -f " f2) == 0) {
+		pd = f2
+	    } else if (system("test -f " f1) == 0) {
+		pd = f1
+	    } else {
+		pd = f0
+	    }
+	    line[v] = line[v] " \\\n\t" pd
 	}
-	for (v in line)
-	    line[v] = line[v] " \\\n\t" pd suffixes[v]
     }
     for (p in includes) {
-	if (system("test -f " srcdir "/" p) == 0) {
-	    pd = srcdir "/" p
-	} else if (system("test -f " top_srcdir "/scripts/" p) == 0) {
-	    pd = top_srcdir "/scripts/" p
+	f0 = p
+	f1 = srcdir "/" f0
+	f2 = top_srcdir "/scripts/" f0
+	if (system("test -f " f0) == 0) {
+	    pd = f0
+	} else if (system("test -f " f2) == 0) {
+	    pd = f2
+	} else if (system("test -f " f1) == 0) {
+	    pd = f1
 	} else {
-	    pd = p
+	    pd = f0
 	}
 	for (v in line)
 	    line[v] = line[v] " \\\n\t" pd

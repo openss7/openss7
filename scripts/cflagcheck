@@ -69,21 +69,24 @@ cflag-check:
 		 cflags=`echo "$$cflags" | sed -e 's,^$(CPPFLAGS) ,,'` ; \
 	 fi ; \
 	 if test -n "$$kflags" -a -n "$$cflags" ; then \
-		 kflags=`echo $$kflags | sed -e "s,$$cflags ,,"` ; \
+		 kflags=`echo "$$kflags" | sed -e "s,$$cflags ,,"` ; \
 	 fi ; \
-	 echo "$${cflags:+$$cflags }$$kflags"
+	 cflags="$${cflags:+$$cflags$${kflags:+ }}$$kflags" ; \
+	 echo "$$cflags"
 
 .PHONY: cppflag-check
 cppflag-check:
 	kflags='$(KBUILD_CPPFLAGS)' ; \
 	 cflags='$(CPPFLAGS)' ; \
 	 if test -n "$$kflags" -a -n "$$cflags" ; then \
-		 kflags=`echo $$kflags | sed -e "s,$$cflags ,,"` ; \
+		 kflags=`echo "$$kflags" | sed -e "s,$$cflags ,,"` ; \
 	 fi ; \
-	 cppflags="$${cflags:+$$cflags }$$kflags" ; \
+	 cppflags="$${cflags:+$$cflags$${kflags:+ }}$$kflags" ; \
 	 iflags='$(LINUXINCLUDE)' ; \
-	 cppflags=`echo $$cppflags | sed -e "s, $$iflags,,"` ; \
-	 cppflags="$${cppflags:+$$cppflags }$$iflags" ; \
+	 if test -n "$$cppflags" -a -n "$$iflags" ; then \
+		 cppflags=`echo "$$cppflags" | sed -e "s, $$iflags,,"` ; \
+	 fi ; \
+	 cppflags="$${cppflags:+$$cppflags$${iflags:+ }}$$iflags" ; \
 	 echo "$$cppflags"
 
 .PHONY: modflag-check
