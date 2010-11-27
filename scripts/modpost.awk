@@ -454,7 +454,13 @@ function read_modobject(command, mymodule)
 		}
 		modname = $0
 		if (mymodule == 1) {
-		    mod_unds[modname,"struct_module"] = 1
+		    if (("vmlinux","struct_module") in mod_syms) {
+			mod_unds[modname,"struct_module"] = 1
+		    } else if (("vmlinux","module_layout") in mod_syms) {
+			mod_unds[modname,"module_layout"] = 1
+		    } else {
+			mod_unds[modname,"struct_module"] = 1
+		    }
 		}
 		continue
 	    }
