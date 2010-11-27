@@ -1,7 +1,7 @@
 /*
  @(#) $RCSfile: HeaderFactory.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:35:53 $ <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -273,7 +273,7 @@ public interface HeaderFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the headers
         value or a List of that Header type is not allowed.
       */
-    java.util.List createHeaders(java.lang.String headers)
+    java.util.List<Header> createHeaders(java.lang.String headers)
         throws java.text.ParseException;
     /**
         Creates a new FromHeader based on the newly supplied address and tag values.
@@ -449,7 +449,7 @@ public interface HeaderFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the List of
         product values.
       */
-    ServerHeader createServerHeader(java.util.List product)
+    ServerHeader createServerHeader(java.util.List<java.lang.String> product)
         throws java.text.ParseException;
     /**
         Creates a new SubjectHeader based on the newly supplied subject value.
@@ -512,7 +512,7 @@ public interface HeaderFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the List of
         product values.
       */
-    UserAgentHeader createUserAgentHeader(java.util.List product)
+    UserAgentHeader createUserAgentHeader(java.util.List<java.lang.String> product)
         throws java.text.ParseException;
     /**
         Creates a new ViaHeader based on the newly supplied uri and branch values.

@@ -1,7 +1,7 @@
 /*
  @(#) $RCSfile: UserAgentHeader.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:35:54 $ <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -69,14 +69,14 @@ public interface UserAgentHeader extends Header {
         Returns the List of product values.
         @return The List of strings identifying the software of this ServerHeader.
       */
-    java.util.ListIterator getProduct();
+    java.util.ListIterator<java.lang.String> getProduct();
     /**
         Sets the List of product values of the ServerHeader.
         @param product A List of Strings specifying the product values.
         @exception java.text.ParseException Thrown when an error was found while parsing the List of
         product value strings.
       */
-    void setProduct(java.util.List product)
+    void setProduct(java.util.List<java.lang.String> product)
         throws java.text.ParseException;
 }
 

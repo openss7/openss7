@@ -881,7 +881,7 @@ src/.hide/
 src/api-docs/
 src/java/com/
 src/java/jain/protocol/ss7/class-use/
-src/java/jain/protocol/ss7/oam/
+src/java/jain/protocol/ss7/doc-files/
 src/java/jain/protocol/ss7/tcap/Makefile
 src/java/jain/protocol/ss7/tcap/Makefile.make
 src/java/jain/protocol/ss7/tcap/component/Parameters.h

@@ -1,7 +1,7 @@
 /*
  @(#) $RCSfile: JainInapStack.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:34:46 $ <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -99,7 +99,7 @@ public interface JainInapStack {
       * A Vector containing all the of JainInapProviderImpls created by
       * this JainInapStackImpl.
       */
-    public java.util.Vector getProviderList();
+    public java.util.Vector<JainInapProvider> getProviderList();
     /**
       * Returns the name of the stack as a string.
       * @return

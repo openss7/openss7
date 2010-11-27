@@ -2,7 +2,7 @@
 /*
  @(#) $RCSfile: SipStack.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:35:51 $ <p>
  
- Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -198,7 +198,7 @@ public interface SipStack {
         the SipProviders of this SipStack will belong to the same stack vendor.
         @return The list of Providers attached to this Sipstack.
       */
-    java.util.Iterator getSipProviders();
+    java.util.Iterator<SipProvider> getSipProviders();
     /**
         @deprecated Since v1.2. This has been replaced by createListeningPoint(java.lang.String, int, java.lang.String)
         For backwards compatibility with v1.1 implementations should support this method.
@@ -249,7 +249,7 @@ public interface SipStack {
         @return An Iterator containing all existing ListeningPoints created by this SipStack.
         Returns an empty Iterator if no ListeningPoints exist.
       */
-    java.util.Iterator getListeningPoints();
+    java.util.Iterator<ListeningPoint> getListeningPoints();
     /**
         Gets the user friendly name that identifies this SipStack instance. This value is set using
         the Properties object passed to the SipFactory.createSipStack(Properties)method upon
