@@ -71,8 +71,6 @@
 #ifndef __LOCAL_HEADER_COMPLEX_H__
 #define __LOCAL_HEADER_COMPLEX_H__
 
-#ident "@(#) $RCSfile: header_complex.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
-
 /*
  *  header_complex.h:  More complex storage and data sorting for mib modules
  */

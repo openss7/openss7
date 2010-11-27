@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $"
-
 static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $";
 
 /*
@@ -67,7 +65,9 @@ static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 1.1.2.
  *  because syslogd does not check the STREAMS log device.
  */
 
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -587,7 +587,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\

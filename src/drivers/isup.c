@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,8 +63,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $"
-
 static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $";
 
 /*
@@ -93,7 +91,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
 #define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-04-01 17:21:54 $"
-#define ISUP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define ISUP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"

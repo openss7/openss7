@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $"
 
 static char const ident[] = "$RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:54 $";
 
@@ -252,15 +250,19 @@ t_bind_req(queue_t *q, mblk_t *pdu)
 		/* See if we need to assign a port number */
 		if (!(sp->bport = htons(bport)) && !(sp->cons = cons)) {
 			static u16 sscop_port_rover = 0;
-
 			/* 
 			 *  This stream can only be used for outgoing connections, so
 			 *  if it is assigned a zero port number we choose an unused
 			 *  port number for the stream and assign it.
 			 */
-			int low = sysctl_local_port_range[0];
-			int high = sysctl_local_port_range[1];
-			int rem = (high - low) + 1;
+                        int low, high, rem;
+#ifdef HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
+                        inet_get_local_port_range(&low, &high);
+#else
+			low = sysctl_local_port_range[0];
+			high = sysctl_local_port_range[1];
+#endif
+			rem = (high - low) + 1;
 
 			bport = sscop_port_rover;
 

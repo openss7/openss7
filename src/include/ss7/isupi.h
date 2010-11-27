@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -67,8 +67,6 @@
 #define __SS7_ISUPI_H__
 
 /* This file can be processed by doxygen(1). */
-
-#ident "@(#) $RCSfile: isupi.h,v $ $Name:  $($Revision: 1.1.2.3 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 /*
  *  ISUP addresss

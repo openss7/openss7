@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
 
 static char const ident[] = "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
 
@@ -122,7 +120,7 @@ static char const ident[] = "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
 #define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
-#define TC_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TC_LICENSE	"GPL"

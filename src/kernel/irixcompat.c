@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $"
-
 static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $";
 
 /* 
@@ -83,7 +81,7 @@ static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1
 #include "sys/os7/compat.h"
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define IRIXCOMP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define IRIXCOMP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:16 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

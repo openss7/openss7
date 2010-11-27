@@ -16,7 +16,9 @@ typedef char int8_t;
 typedef unsigned char uint8_t;
 typedef unsigned char u_int8_t;
 
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
+#endif
 
 %include "sys/xti.h"
 %include "sys/xti_inet.h"

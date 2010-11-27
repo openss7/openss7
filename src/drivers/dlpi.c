@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
-
 static char const ident[] = "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $";
 
 /*
@@ -103,7 +101,7 @@ static char const ident[] = "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define DLPI_DESCRIP	"UNIX SVR 4.2 DLPI DRIVER FOR LINUX FAST-STREAMS"
 #define DLPI_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
-#define DLPI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define DLPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define DLPI_REVISION	"OpenSS7 $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $"
 #define DLPI_DEVICE	"SVR 4.2MP DLPI Driver (DLPI)"
 #define DLPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

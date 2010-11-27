@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,15 +70,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:22 $"
-
 static char const ident[] = "$RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:22 $";
 
 /*
  *  This is a little user space program to test the correctness of the formatting of the data blocks
  *  used by the strlog function and the log driver.
  */
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
+#endif
 #define _GNU_SOURCE 1
 
 #include <stddef.h>

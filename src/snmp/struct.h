@@ -71,8 +71,6 @@
 #ifndef __LOCAL_STRUCT_H__
 #define __LOCAL_STRUCT_H__
 
-#ident "@(#) $RCSfile: struct.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
-
 #define STRMAX			1024
 
 #define SHPROC			1

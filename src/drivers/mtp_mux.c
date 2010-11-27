@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $"
-
 static char const ident[] = "$RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $";
 
 #define _SVR4_SOURCE	1
@@ -76,7 +74,7 @@ static char const ident[] = "$RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.
 #define MTP_MUX_DESCRIP		"MTP-MUX SS7/MTP (Message Transfer Part) STREAMS MULTIPLEXING DRIVER."
 #define MTP_MUX_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MTP_MUX_REVISION	"OpenSS7 $RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $"
-#define MTP_MUX_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define MTP_MUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define MTP_MUX_DEVICE		"Supports the OpenSS7 MTP and M3UA drivers."
 #define MTP_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_MUX_LICENSE		"GPL"

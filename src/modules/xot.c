@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
-
 static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $";
 
 
@@ -97,7 +95,7 @@ static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.1 $)
 
 #define XOT_DESCRIP	"X.25 OVER TCP MODULE FOR LINUX FAST-STREAMS"
 #define XOT_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define XOT_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define XOT_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:37 $"
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
-
 static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
 
 /*
@@ -81,7 +79,7 @@ static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 
 
 #define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define PLP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define PLP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
 #define PLP_DEVICE	"SVR 4.2 MP STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: s_lli.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
-
 static char const ident[] = "$RCSfile: s_lli.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $";
 
 /*
@@ -79,7 +77,7 @@ static char const ident[] = "$RCSfile: s_lli.c,v $ $Name:  $($Revision: 1.1.2.1 
 
 #define S_LLI_DESCRIP	"SPIDER LLI COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_LLI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define S_LLI_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define S_LLI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define S_LLI_REVISION	"OpenSS7 $RCSfile: s_lli.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
 #define S_LLI_DEVICE	"SVR 4.2MP DLPI Devices"
 #define S_LLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

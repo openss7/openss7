@@ -58,8 +58,6 @@
 //
 //  ==========================================================================
 
-#ident "@(#) $Id: streams.hh,v 1.1.2.1 2009-07-13 07:13:36 brian Exp $"
-
 #ifndef __LOCAL_STREAMS_HH__
 #define __LOCAL_STREAMS_HH__
 

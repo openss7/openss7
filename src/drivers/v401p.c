@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $"
 
 static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $";
 
@@ -255,7 +253,7 @@ static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $"
-#define MX_V400P_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define MX_V400P_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_V400P_LICENSE	"GPL"

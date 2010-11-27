@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
-
 static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $";
 
 /*
@@ -79,7 +77,7 @@ static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2
 
 #define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS MODULE."
 #define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
-#define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOPMCE_LICENSE	"GPL"

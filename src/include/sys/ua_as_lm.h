@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -59,8 +59,6 @@
 
 #ifndef __SYS_UA_AS_LM_H__
 #define __SYS_UA_AS_LM_H__
-
-#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #define UA_USER_REQ	(('U'<<8)+ 0)	/* User management request */
 #define UA_ATTACH_REQ	(('U'<<8)+ 1)	/* Attach user request */

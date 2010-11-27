@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -59,8 +59,6 @@
 
 #ifndef __LOCAL_V400PFW_H__
 #define __LOCAL_V400PFW_H__
-
-#ident "@(#) $RCSfile: v400pfw.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 static unsigned char v400pfw[] = {
 	0xff, 0xff, 0xff, 0xff, 0x55, 0x99, 0xaa, 0x66, 0x0c, 0x00, 0x01, 0x80, 0x00,

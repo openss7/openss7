@@ -4,7 +4,7 @@
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+//  Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 //  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 //  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 //  
@@ -57,8 +57,6 @@
 //  - changes for multiple distro build
 //
 //  ==========================================================================
-
-#ident "@(#) $Id: streams.cc,v 1.1.2.1 2009-07-13 07:13:36 brian Exp $"
 
 static char const ident[] = "$Id: streams.cc,v 1.1.2.1 2009-07-13 07:13:36 brian Exp $";
 

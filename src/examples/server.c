@@ -4,6 +4,7 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -58,8 +59,6 @@
  - added new files for NLI and DLPI
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:21:17 $"
 
 static char const ident[] = "$RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:21:17 $";
 

@@ -58,8 +58,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
-
 static char const ident[] =
     "$RCSfile$ $Name$($Revision$) $Date$";
 

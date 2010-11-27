@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
-
 static char const ident[] = "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $";
 
 /*
@@ -86,7 +84,7 @@ static char const ident[] = "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 1.1.
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
-#define ACB56_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define ACB56_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ACB56_LICENSE	"GPL"

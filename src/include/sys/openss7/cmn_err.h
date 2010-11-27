@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
 
 #ifndef __SYS_OPENSS7_CMN_ERR_H__
 #define __SYS_OPENSS7_CMN_ERR_H__ 1
-
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2008-2009 Monavacon Limited."
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do not include sys/openss7/cmn_err.h directly, include sys/cmn_err.h instead."

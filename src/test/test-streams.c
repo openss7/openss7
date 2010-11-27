@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -72,8 +72,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $"
 
 static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $";
 
@@ -22349,7 +22347,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\

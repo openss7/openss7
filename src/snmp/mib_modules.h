@@ -4,6 +4,7 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,8 +71,6 @@
 
 #ifndef __LOCAL_MIB_MODULES_H__
 #define __LOCAL_MIB_MODULES_H__
-
-#ident "@(#) $RCSfile: mib_modules.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define DO_INITIALIZE   1
 #define DONT_INITIALIZE 0
