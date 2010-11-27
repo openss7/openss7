@@ -1,0 +1,762 @@
+/*****************************************************************************
+
+ @(#) $Id: config.h.in,v 1.1.2.2 2009-07-21 11:06:15 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2009-07-21 11:06:15 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: config.h.in,v $
+ Revision 1.1.2.2  2009-07-21 11:06:15  brian
+ - changes from release build
+
+ Revision 1.1.2.1  2009-06-21 11:26:47  brian
+ - added files to new distro
+
+ *****************************************************************************/
+
+#ifndef __SYS_OPENSS7_WRAPPER_H__
+#define __SYS_OPENSS7_WRAPPER_H__
+
+/*
+ * @configure_input@
+ *
+ * This file needs to include any wrappered kernel definitions that are exported
+ * by the specfs module.  This file will be installed in
+ * /usr/include/openss7/sys/wrapper.h to be included by header files installed
+ * in /usr/include/openss7/ with an include line something like:
+ *
+ * #include "sys/openss7/wrapper.h"
+ */
+
+/* The symbol session_of_pgrp is not exported by some kernels. Define this to
+   the address of session_of_pgrp in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SESSION_OF_PGRP_ADDR
+#ifdef HAVE_SESSION_OF_PGRP_ADDR
+pid_t session_of_pgrp(pid_t);
+#endif				/* defined HAVE_SESSION_OF_PGRP_ADDR */
+
+/* The symbol is_ignored is not exported by some kernels. Define this to the
+   address of is_ignored in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_IS_IGNORED_ADDR
+#ifdef HAVE_IS_IGNORED_ADDR
+extern int is_ignored(int sig);
+#endif				/* HAVE_IS_IGNORED_ADDR */
+
+/* The symbol is_orphaned_pgrp is not exported by some kernels. Define this to
+   the address of is_orphaned_pgrp in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_IS_ORPHANED_PGRP_ADDR
+#ifdef HAVE_IS_ORPHANED_PGRP_ADDR
+extern int is_orphaned_pgrp(int pgrp);
+#endif				/* HAVE_IS_ORPHANED_PGRP_ADDR */
+
+/* The symbol is_current_pgrp_orphaned is not exported by some kernels. Define
+   this to the address of is_current_pgrp_orphaned in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
+#ifdef HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
+extern int is_current_pgrp_orphaned(void);
+#endif				/* HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR */
+
+/* The symbol tasklist_lock is not exported by some kernels. Define this to
+   the address of tasklist_lock in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_TASKLIST_LOCK_ADDR
+#ifdef HAVE_TASKLIST_LOCK_ADDR
+extern rwlock_t tasklist_lock;
+#endif				/* HAVE_TASKLIST_LOCK_ADDR */
+
+/* The symbol kill_pid_info is not exported by some kernels. Define this to
+   the address of kill_pid_info in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_KILL_PID_INFO_ADDR
+#ifdef HAVE_KILL_PID_INFO_ADDR
+int kill_pid_info(int sig, struct siginfo *info, struct pid *pid);
+#endif                          /* HAVE_KILL_PID_INFO_ADDR */
+
+/* The symbol kill_proc_info is not exported by some kernels. Define this to
+   the address of kill_proc_info in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_KILL_PROC_INFO_ADDR
+#ifdef HAVE_KILL_PROC_INFO_ADDR
+int kill_proc_info(int sig, struct siginfo *sip, pid_t pid);
+#endif				/* HAVE_KILL_PROC_INFO_ADDR */
+
+/* The symbol kill_sl is not exported by some kernels. Define this to the
+   address of kill_sl in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_KILL_SL_ADDR
+#ifdef HAVE_KILL_SL_ADDR
+int kill_sl_func(pid_t, int, int);
+#endif				/* HAVE_KILL_SL_ADDR */
+
+/* The symbol send_group_sig_info is not exported by some kernels. Define this
+   to the address of send_group_sig_info in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_SEND_GROUP_SIG_INFO_ADDR
+#ifdef HAVE_SEND_GROUP_SIG_INFO_ADDR
+int send_group_sig_info(int, struct siginfo *, struct task_struct *);
+#endif				/* HAVE_SEND_GROUP_SIG_INFO_ADDR */
+
+/* The symbol group_send_sig_info is not exported by some kernels. Define this
+   to the address of group_send_sig_info in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_GROUP_SEND_SIG_INFO_ADDR
+#ifdef HAVE_GROUP_SEND_SIG_INFO_ADDR
+int group_send_sig_info(int, struct siginfo *, struct task_struct *);
+#endif				/* HAVE_GROUP_SEND_SIG_INFO_ADDR */
+
+/* The symbol __wake_up_sync is not exported by some kernels. Define this to
+   the address of __wake_up_sync in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE___WAKE_UP_SYNC_ADDR
+#ifdef HAVE___WAKE_UP_SYNC_ADDR
+#endif				/* HAVE___WAKE_UP_SYNC_ADDR */
+
+/* The symbol modules is not exported by some kernels. Define this to the
+   address of modules in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_MODULES_ADDR
+#ifdef HAVE_MODULES_ADDR
+extern struct list_head modules;
+#endif				/* HAVE_MODULES_ADDR */
+
+/* The symbol module_text_address is not exported by some kernels. Define this
+   to the address of module_text_address in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_MODULE_TEXT_ADDRESS_ADDR
+extern struct module *module_text_address(unsigned long addr);
+
+/* The symbol __module_text_address is not exported by some kernels. Define
+   this if the symbol __module_text_address is exported by your kernel so that
+   kernel modules can be supported properly. */
+#undef HAVE___MODULE_TEXT_ADDRESS_EXPORT
+
+/* The symbol __module_address is not exported by some kernels. Define this if
+   the symbol __module_address is exported by your kernel so that kernel
+   modules can be supported properly. */
+#undef HAVE___MODULE_ADDRESS_EXPORT
+struct module *module_address(unsigned long addr);
+
+/* The symbol file_move is not exported by some kernels. Define this to the
+   address of file_move in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_FILE_MOVE_ADDR
+#ifdef HAVE_FILE_MOVE_ADDR
+extern void file_move(struct file *f, struct list_head *list);
+#endif				/* HAVE_FILE_MOVE_ADDR */
+
+/* The symbol file_kill is not exported by some kernels. Define this to the
+   address of file_kill in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_FILE_KILL_ADDR
+#ifdef HAVE_FILE_KILL_ADDR
+extern void file_kill(struct file *file);
+#endif				/* HAVE_FILE_KILL_ADDR */
+
+/* The symbol put_filp is not exported by some kernels. Define this to the
+   address of put_filp in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_PUT_FILP_ADDR
+#ifdef HAVE_PUT_FILP_ADDR
+extern void put_filp(unsigned start, unsigned flags);
+#endif				/* HAVE_PUT_FILP_ADDR */
+
+/* The symbol kthread_should_stop is not exported by some kernels. Define this
+   to the address of kthread_should_stop in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_KTHREAD_SHOULD_STOP_ADDR
+#ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
+extern int kthread_should_stop(void);
+#endif				/* HAVE_KTHREAD_SHOULD_STOP_ADDR */
+
+/* The symbol kthread_create is not exported by some kernels. Define this to
+   the address of kthread_create in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_KTHREAD_CREATE_ADDR
+#ifdef HAVE_KTHREAD_CREATE_ADDR
+extern struct task_struct *kthread_create(int (*threadfn)(void *data),
+        void *data, const char namefmt[], ..) __attribute__((format(printf, 3, 4)));
+#endif				/* HAVE_KTHREAD_CREATE_ADDR */
+
+/* The symbol kthread_bind is not exported by some kernels. Define this to the
+   address of kthread_bind in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_KTHREAD_BIND_ADDR
+#ifdef HAVE_KTHREAD_BIND_ADDR
+extern void kthread_bind(struct task_struct *k, unsigned int cpu);
+#endif				/* HAVE_KTHREAD_BIND_ADDR */
+
+/* The symbol kthread_stop is not exported by some kernels. Define this to the
+   address of kthread_stop in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_KTHREAD_STOP_ADDR
+#ifdef HAVE_KTHREAD_STOP_ADDR
+extern int kthread_stop(struct task_struct *k);
+#endif				/* HAVE_KTHREAD_STOP_ADDR */
+
+/* The symbol inet_proto_lock is not exported by some kernels. Define this to
+   the address of inet_proto_lock in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_INET_PROTO_LOCK_ADDR
+#ifdef HAVE_INET_PROTO_LOCK_ADDR
+extern spinlock_t inet_proto_lock;
+#endif				/* HAVE_INET_PROTO_LOCK_ADDR */
+
+/* The symbol inet_protos is not exported by some kernels. Define this to the
+   address of inet_protos in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_INET_PROTOS_ADDR
+#ifdef HAVE_INET_PROTOS_ADDR
+extern const struct net_protocol *inet_protos[];
+#endif				/* HAVE_INET_PROTOS_ADDR */
+
+/* The symbol skbuff_head_cache is not exported by some kernels. Define this
+   to the address of skbuff_head_cache in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SKBUFF_HEAD_CACHE_ADDR
+#ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
+extern kmem_cachep_t skbuff_head_cache;
+#endif				/* HAVE_SKBUFF_HEAD_CACHE_ADDR */
+
+/* The symbol icmp_err_convert is not exported by some kernels. Define this to
+   the address of icmp_err_convert in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_ICMP_ERR_CONVERT_ADDR
+#ifdef HAVE_ICMP_ERR_CONVERT_ADDR
+extern struct icmp_err icmp_err_convert[];
+#endif				/* HAVE_ICMP_ERR_CONVERT_ADDR */
+
+/* The symbol icmp_statistics is not exported by some kernels. Define this to
+   the address of icmp_statistics in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_ICMP_STATISTICS_ADDR
+#ifdef HAVE_ICMP_STATISTICS_ADDR
+extern struct icmp_mib icmp_statistic[];
+#endif				/* HAVE_ICMP_STATISTICS_ADDR */
+
+/* The symbol ip_route_output_flow is not exported by some kernels. Define
+   this to the address of ip_route_output_flow in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#endif				/* HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR */
+
+/* The symbol ip_rt_min_pmtu is not exported by some kernels. Define this to
+   the address of ip_rt_min_pmtu in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_IP_RT_MIN_PMTU_ADDR
+#ifdef HAVE_IP_RT_MIN_PMTU_ADDR
+extern int ip_rt_min_pmtu;
+#endif				/* HAVE_IP_RT_MIN_PMTU_ADDR */
+
+/* The symbol ip_rt_mtu_expires is not exported by some kernels. Define this
+   to the address of ip_rt_mtu_expires in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_IP_RT_MTU_EXPIRES_ADDR
+#ifdef HAVE_IP_RT_MTU_EXPIRES_ADDR
+extern int ip_rt_mtu_expires;
+#endif				/* HAVE_IP_RT_MTU_EXPIRES_ADDR */
+
+/* The symbol ip_rt_update_pmtu is not exported by some kernels. Define this
+   to the address of ip_rt_update_pmtu in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_IP_RT_UPDATE_PMTU_ADDR
+#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
+void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+#endif				/* HAVE_IP_RT_UPDATE_PMTU_ADDR */
+
+/* The symbol sysctl_ip_dynaddr is not exported by some kernels. Define this
+   to the address of sysctl_ip_dynaddr in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SYSCTL_IP_DYNADDR_ADDR
+#ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
+extern int sysctl_ip_dynaddr;
+#endif				/* HAVE_SYSCTL_IP_DYNADDR_ADDR */
+
+/* The symbol sysctl_ip_nonlocal_bind is not exported by some kernels. Define
+   this to the address of sysctl_ip_nonlocal_bind in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+extern int sysctl_ip_nonlocal_bind;
+#endif				/* HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR */
+
+/* The symbol sysctl_ip_default_ttl is not exported by some kernels. Define
+   this to the address of sysctl_ip_default_ttl in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
+extern int sysctl_ip_default_ttl;
+#endif				/* HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR */
+
+/* The symbol __ip_route_output_key is not exported by some kernels. Define
+   this to the address of __ip_route_output_key in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
+int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+#endif				/* HAVE___IP_ROUTE_OUTPUT_KEY_ADDR */
+
+/* The symbol __xfrm_policy_check is not exported by some kernels. Define this
+   to the address of __xfrm_policy_check in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE___XFRM_POLICY_CHECK_ADDR
+#ifdef HAVE___XFRM_POLICY_CHECK_ADDR
+int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
+#endif				/* HAVE___XFRM_POLICY_CHECK_ADDR */
+
+/* The symbol xfrm_policy_delete is not exported by some kernels. Define this
+   to the address of xfrm_policy_delete in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_XFRM_POLICY_DELETE_ADDR
+
+/* Define if function xfrm_policy_delete returns int. */
+#undef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+
+#ifdef HAVE_XFRM_POLICY_DELETE_ADDR
+#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#else
+void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#endif
+#endif				/* HAVE_XFRM_POLICY_DELETE_ADDR */
+
+/* The symbol snmp_get_info is not exported by some kernels. Define this to
+   the address of snmp_get_info in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SNMP_GET_INFO_ADDR
+#ifdef HAVE_SNMP_GET_INFO_ADDR
+int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+#endif				/* HAVE_SNMP_GET_INFO_ADDR */
+
+/* The symbol ip_frag_nqueues is not exported by some kernels. Define this to
+   the address of ip_frag_nqueues in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_IP_FRAG_NQUEUES_ADDR
+#ifdef HAVE_IP_FRAG_NQUEUES_ADDR
+int ip_frag_nqueues(struct net *net);
+#endif				/* HAVE_IP_FRAG_NQUEUES_ADDR */
+
+/* The symbol ip_frag_mem is not exported by some kernels. Define this to the
+   address of ip_frag_mem in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_IP_FRAG_MEM_ADDR
+#ifdef HAVE_IP_FRAG_MEM_ADDR
+int ip_frag_mem(struct net *net);
+#endif				/* HAVE_IP_FRAG_MEM_ADDR */
+
+/* The symbol sysctl_rmem_default is not exported by some kernels. Define this
+   to the address of sysctl_rmem_default in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+extern __u32 sysctl_rmem_default;
+#endif				/* HAVE_SYSCTL_RMEM_DEFAULT_ADDR */
+
+/* The symbol sysctl_wmem_default is not exported by some kernels. Define this
+   to the address of sysctl_wmem_default in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+extern __u32 sysctl_wmem_default;
+#endif				/* HAVE_SYSCTL_WMEM_DEFAULT_ADDR */
+
+/* The symbol sysctl_rmem_max is not exported by some kernels. Define this to
+   the address of sysctl_rmem_max in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
+extern __u32 sysctl_rmem_max;
+#endif				/* HAVE_SYSCTL_RMEM_MAX_ADDR */
+
+/* The symbol sysctl_wmem_max is not exported by some kernels. Define this to
+   the address of sysctl_wmem_max in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
+extern __u32 sysctl_wmem_max;
+#endif				/* HAVE_SYSCTL_WMEM_MAX_ADDR */
+
+/* The symbol tcp_openreq_cachep is not exported by some kernels. Define this
+   to the address of tcp_openreq_cachep in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_TCP_OPENREQ_CACHEP_ADDR
+#ifdef HAVE_TCP_OPENREQ_CACHEP_ADDR
+extern kmem_cachep_t tcp_openreq_cachep;
+#endif				/* HAVE_TCP_OPENREQ_CACHEP_ADDR */
+
+/* The symbol tcp_set_keepalive is not exported by some kernels. Define this
+   to the address of tcp_set_keepalive in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_ADDR
+void tcp_set_keepalive(struct sock *sk, int val);
+#endif				/* HAVE_TCP_SET_KEEPALIVE_ADDR */
+
+/* The symbol tcp_sync_mss is not exported by some kernels. Define this to the
+   address of tcp_sync_mss in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_TCP_SYNC_MSS_ADDR
+#ifdef HAVE_TCP_SYNC_MSS_ADDR
+int tcp_sync_mss(struct sock *sk, u32 pmtu);
+#endif				/* HAVE_TCP_SYNC_MSS_ADDR */
+
+/* The symbol tcp_write_xmit is not exported by some kernels. Define this to
+   the address of tcp_write_xmit in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_TCP_WRITE_XMIT_ADDR
+#ifdef HAVE_TCP_WRITE_XMIT_ADDR
+int tcp_write_xmit(struct sock *sk, int nonagle);
+#endif				/* HAVE_TCP_WRITE_XMIT_ADDR */
+
+/* The symbol tcp_cwnd_application_limited is not exported by some kernels.
+   Define this to the address of tcp_cwnd_application_limited in the kernel
+   system map so that kernel modules can be properly supported. */
+#undef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
+#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
+void tcp_cwnd_application_limited(struct sock *sk);
+#endif				/* HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR */
+
+/* The symbol sysctl_tcp_fin_timeout is not exported by some kernels. Define
+   this to the address of sysctl_tcp_fin_timeout in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
+#ifdef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
+extern int sysctl_tcp_fin_timeout;
+#endif				/* HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR */
+
+/* The symbol tcp_current_mss is not exported by some kernels. Define this to
+   the address of tcp_current_mss in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_TCP_CURRENT_MSS_ADDR
+
+/* Define if function tcp_current_mss takes 1 argument. */
+#undef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+
+#ifdef HAVE_TCP_CURRENT_MSS_ADDR
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+unsigned int tcp_current_mss(struct sock *sk);
+#else
+unsigned int tcp_current_mss(struct sock *sk, int large);
+#endif
+#endif				/* HAVE_TCP_CURRENT_MSS_ADDR */
+
+/* The symbol tcp_set_skb_tso_segs is not exported by some kernels. Define
+   this to the address of tcp_set_skb_tso_segs in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
+
+/* Define to 1 if function tcp_set_skb_tso_segs takes a (struct sock *, struct
+   sk_buff *) argument list. */
+#undef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
+
+#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
+#ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
+void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
+#else
+void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
+#endif
+#endif				/* HAVE_TCP_SET_SKB_TSO_SEGS_ADDR */
+
+/* The symbol tcp_set_skb_tso_factor is not exported by some kernels. Define
+   this to the address of tcp_set_skb_tso_factor in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR
+
+#ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR
+/* older 2.6.8 name for the same function */
+void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
+#endif				/* HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR */
+
+/* The symbol sock_alloc is not exported by some kernels. Define this to the
+   address of sock_alloc in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_SOCK_ALLOC_ADDR
+#ifdef HAVE_SOCK_ALLOC_ADDR
+struct socket *sock_alloc(void);
+#endif				/* HAVE_SOCK_ALLOC_ADDR */
+
+/* The symbol sysctl_local_port_range is not exported by some kernels. Define
+   this to the address of sysctl_local_port_range in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
+extern int sysctl_local_port_range[2];
+#endif				/* HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR */
+
+/* The symbol tcp_memory_allocated is not exported by some kernels. Define
+   this to the address of tcp_memory_allocated in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_TCP_MEMORY_ALLOCATED_ADDR
+#ifdef HAVE_TCP_MEMORY_ALLOCATED_ADDR
+extern atomic_t tcp_memory_allocated;
+#endif				/* HAVE_TCP_MEMORY_ALLOCATED_ADDR */
+
+/* The symbol tcp_sockets_allocated is not exported by some kernels. Define
+   this to the address of tcp_sockets_allocated in the kernel system map so
+   that kernel modules can be properly supported. */
+#undef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
+#ifdef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
+extern atomic_t tcp_sockets_allocated;
+#endif				/* HAVE_TCP_SOCKETS_ALLOCATED_ADDR */
+
+/* The symbol tcp_orphan_count is not exported by some kernels. Define this to
+   the address of tcp_orphan_count in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_TCP_ORPHAN_COUNT_ADDR
+#ifdef HAVE_TCP_ORPHAN_COUNT_ADDR
+extern atomic_t tcp_orphan_count;
+#endif				/* HAVE_TCP_ORPHAN_COUNT_ADDR */
+
+/* The symbol tcp_tw_count is not exported by some kernels. Define this to the
+   address of tcp_tw_count in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_TCP_TW_COUNT_ADDR
+#ifdef HAVE_TCP_TW_COUNT_ADDR
+extern int tcp_tw_count;
+#endif				/* HAVE_TCP_TW_COUNT_ADDR */
+
+/* The symbol ip_cmsg_recv is not exported by some kernels. Define this to the
+   address of ip_cmsg_recv in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_IP_CMSG_RECV_ADDR
+#ifdef HAVE_IP_CMSG_RECV_ADDR
+void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
+#endif				/* HAVE_IP_CMSG_RECV_ADDR */
+
+/* The symbol ip_cmsg_send is not exported by some kernels. Define this to the
+   address of ip_cmsg_send in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_IP_CMSG_SEND_ADDR
+#ifdef HAVE_IP_CMSG_SEND_ADDR
+int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
+#endif				/* HAVE_IP_CMSG_SEND_ADDR */
+
+/* The symbol inet_bind is not exported by some kernels. Define this to the
+   address of inet_bind in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_INET_BIND_ADDR
+#ifdef HAVE_INET_BIND_ADDR
+int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
+#endif				/* HAVE_INET_BIND_ADDR */
+
+/* The symbol inet_ioctl is not exported by some kernels. Define this to the
+   address of inet_ioctl in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_INET_IOCTL_ADDR
+#ifdef HAVE_INET_IOCTL_ADDR
+int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+#endif				/* HAVE_INET_IOCTL_ADDR */
+
+/* The symbol inet_getname is not exported by some kernels. Define this to the
+   address of inet_getname in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_INET_GETNAME_ADDR
+#ifdef HAVE_INET_GETNAME_ADDR
+int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+#endif				/* HAVE_INET_GETNAME_ADDR */
+
+/* The symbol inet_multi_getname is not exported by some kernels. Define this
+   to the address of inet_multi_getname in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_INET_MULTI_GETNAME_ADDR
+#ifdef HAVE_INET_MULTI_GETNAME_ADDR
+int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
+#endif				/* HAVE_INET_MULTI_GETNAME_ADDR */
+
+/* The symbol socket_get_info is not exported by some kernels. Define this to
+   the address of socket_get_info in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_SOCKET_GET_INFO_ADDR
+#ifdef HAVE_SOCKET_GET_INFO_ADDR
+int socket_get_info(char *buffer, char **start, off_t offset, int length);
+#endif				/* HAVE_SOCKET_GET_INFO_ADDR */
+
+/* The symbol afinet_get_info is not exported by some kernels. Define this to
+   the address of afinet_get_info in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_AFINET_GET_INFO_ADDR
+#ifdef HAVE_AFINET_GET_INFO_ADDR
+int afinet_get_info(char *buffer, char **start, off_t offset, int length);
+#endif				/* HAVE_AFINET_GET_INFO_ADDR */
+
+/* The symbol tcp_prot is not exported by some kernels. Define this to the
+   address of tcp_prot in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_TCP_PROT_ADDR
+#ifdef HAVE_TCP_PROT_ADDR
+extern struct proto tcp_prot;
+#endif				/* HAVE_TCP_PROT_ADDR */
+
+/* The symbol udp_prot is not exported by some kernels. Define this to the
+   address of udp_prot in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_UDP_PROT_ADDR
+#ifdef HAVE_UDP_PROT_ADDR
+extern struct proto udp_prot;
+#endif				/* HAVE_UDP_PROT_ADDR */
+
+/* The symbol raw_prot is not exported by some kernels. Define this to the
+   address of raw_prot in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_RAW_PROT_ADDR
+#ifdef HAVE_RAW_PROT_ADDR
+extern struct proto raw_prot;
+#endif				/* HAVE_RAW_PROT_ADDR */
+
+/* The symbol secure_tcp_sequence_number is not exported by some kernels.
+   Define this to the address of secure_tcp_sequence_number in the kernel
+   system map so that kernel modules can be properly supported. */
+#undef HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR
+#ifdef HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR
+extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
+#endif				/* HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR */
+
+/* The symbol ioctl32_hash_table is not exported by some kernels. Define this
+   to the address of ioctl32_hash_table in the kernel system map so that
+   kernel modules can be properly supported. */
+#undef HAVE_IOCTL32_HASH_TABLE_ADDR
+#ifdef HAVE_IOCTL32_HASH_TABLE_ADDR
+extern struct ioctl_trans *ioctl32_hash_table[];
+#endif				/* HAVE_IOCTL32_HASH_TABLE_ADDR */
+
+/* The symbol ioctl32_sem is not exported by some kernels. Define this to the
+   address of ioctl32_sem in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_IOCTL32_SEM_ADDR
+#ifdef HAVE_IOCTL32_SEM_ADDR
+extern struct rw_semaphore ioctl32_sem;
+#endif				/* HAVE_IOCTL32_SEM_ADDR */
+
+/* The symbol mount_sem is not exported by some kernels. Define this to the
+   address of mount_sem in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_MOUNT_SEM_ADDR
+#ifdef HAVE_MOUNT_SEM_ADDR
+#endif /* HAVE_MOUNT_SEM_ADDR */
+
+/* The symbol namespace_sem is not exported by some kernels. Define this to
+   the address of namespace_sem in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE_NAMESPACE_SEM_ADDR
+#ifdef HAVE_NAMESPACE_SEM_ADDR
+extern struct rw_semaphore namespace_sem;
+#endif				/* HAVE_NAMESPACE_SEM_ADDR */
+
+/* The symbol clone_mnt is not exported by some kernels. Define this to the
+   address of clone_mnt in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_CLONE_MNT_ADDR
+#ifdef HAVE_CLONE_MNT_ADDR
+extern struct vfsmount *clone_mnt(struct vfsmount *old, struct dentry *root);
+#endif				/* defined HAVE_CLONE_MNT_ADDR */
+
+/* The symbol check_mnt is not exported by some kernels. Define this to the
+   address of check_mnt in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_CHECK_MNT_ADDR
+#ifdef HAVE_CHECK_MNT_ADDR
+int check_mnt(struct vfsmount *mnt);
+#endif				/* HAVE_CHECK_MNT_ADDR */
+
+/* The symbol graft_tree is not exported by some kernels. Define this to the
+   address of graft_tree in the kernel system map so that kernel modules can
+   be properly supported. */
+#undef HAVE_GRAFT_TREE_ADDR
+#ifdef HAVE_GRAFT_TREE_ADDR
+int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
+#endif				/* HAVE_GRAFT_TREE_ADDR */
+
+/* The symbol do_umount is not exported by some kernels. Define this to the
+   address of do_umount in the kernel system map so that kernel modules can be
+   properly supported. */
+#undef HAVE_DO_UMOUNT_ADDR
+#ifdef HAVE_DO_UMOUNT_ADDR
+extern int do_umount(struct vfsmount *mnt, int flags);
+#endif				/* HAVE_DO_UMOUNT_ADDR */
+
+/* The symbol _def_fifo_ops is not exported by some kernels. Define this to
+   the address of _def_fifo_ops in the kernel system map so that kernel
+   modules can be properly supported. */
+#undef HAVE__DEF_FIFO_OPS_ADDR
+#ifdef HAVE__DEF_FIFO_OPS_ADDR
+extern const struct file_operations *_def_fifo_ops;
+#endif				/* HAVE__DEF_FIFO_OPS_ADDR */
+
+/* The symbol __tcp_push_pending_frames is not exported by some kernels.
+   Define this to the address of __tcp_push_pending_frames in the kernel
+   system map so that kernel modules can be properly supported. */
+#undef HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
+
+/* Define to 1 if you have the older Linux 2.4 style struct sock. Otherwise
+   leave undefined for the new Linux 2.6 struct sock. */
+#undef HAVE_OLD_SOCK_STRUCTURE
+
+/* Define if function __tcp_push_pending_frames takes 3 arguments. */
+#undef HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
+
+#ifdef  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
+#ifdef HAVE_OLD_SOCK_STRUCTURE
+void __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss,
+			       int nonagle);
+#else				/* defined HAVE_OLD_SOCK_STRUCTURE */
+#ifndef HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
+void __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss,
+			       int nonagle);
+#else				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
+void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle);
+#endif				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
+#endif				/* defined HAVE_OLD_SOCK_STRUCTURE */
+#endif				/* defined HAVE___TCP_PUSH_PENDING_FRAMES_ADDR */
+
+#endif				/* __SYS_OPENSS7_WRAPPER_H__ */

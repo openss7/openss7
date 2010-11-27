@@ -105,7 +105,12 @@ AC_DEFUN([_BLD_BUILD_REQ], [dnl
     AC_SUBST([CONFIG_BLDREQ])dnl
     if test "$no_create" = yes ; then
 	for config_bldreq in $CONFIG_BLDREQ ; do
+	    case "$config_bldreq" in
+		(/*) ;;
+		(*) config_bldreq="`pwd`/$config_bldreq" ;;
+	    esac
 	    if test -r "$config_bldreq" ; then
+		AC_MSG_NOTICE([reading cache file... $config_bldreq])
 		. "$config_bldreq"
 	    fi
 	done
