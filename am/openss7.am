@@ -1134,7 +1134,8 @@ SECONDARY = .SECONDARY
 PRECIOUS = .PRECIOUS
 $(PRECIOUS): $(MY_PRECIOUS)
 
-DISTCLEANFILES		+= $(target)-config.cache
+DISTCLEANFILES		+= $(CONFIG_DIST)
+DISTCLEANFILES		+= $(CONFIG_BLDREQ)
 
 ## =============================================================================
 ##

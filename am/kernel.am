@@ -747,6 +747,7 @@ TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
 			   ksysmap='$(ksysmap)' \
 			   KERNEL_MODULES='$(KERNEL_MODULES)' \
 			   KERNEL_MODMAPS='$(KERNEL_MODMAPS)' \
+			   KERNEL_WRAPPER='$(KERNEL_WRAPPER)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= check_modules.log
@@ -759,7 +760,7 @@ endif
 ## RPM_BUILD_KERNEL
 endif
 
-DISTCLEANFILES		+= $(target)-$(kversion)-config.cache
+DISTCLEANFILES		+= $(CONFIG_KERNEL)
 
 dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/modpost.awk
 dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/modpost.sh

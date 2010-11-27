@@ -3409,6 +3409,32 @@ CLEAN_LOCAL += clean-org_openss7_javax_csapi_cc_jcc
 # This is how we build STREAMS JNI classes for Java.
 #############################################################################
 
+OBJCOPY = objcopy
+objectlink_objects =
+AM_V_FIX = $(am__v_FIX_$(v))
+am__v_FIX_ = $(am__v_FIX_$(AM_DEFAULT_VERBOSITY))
+am__v_FIX_0 = echo "  FIX   " `basename $$o`;
+am__v_FIX_1 = echo "$(OBJCOPY) -L '_ZGr8_\$$_dummy' $$o";
+CLEANFILES += objectlink_fix.stamp
+#
+# This hack is to get around a bug in gcj-4.3.4 and beyond that introduces
+# a java resource of .dummy into the compiled objects.  We must remove the
+# erroneous symbol using objcopy before they are linked.
+#
+objectlink_fix.stamp: $(objectlink_objects)
+	@list='$?'; list2=; if test -n "$$list"; then \
+		for o in $$list; do \
+			obj=`echo "$$o" | sed -e 's,\.lo$$,.$(OBJEXT),'`; \
+			if test -e "$$obj"; then list2="$$list2 $$obj"; fi; \
+			lib=`echo "$$obj" | sed -e 's,/\([^/]*\)$$,/.libs/\1,'`; \
+			if test -e "$$lib"; then list2="$$list2 $$lib"; fi; \
+		done; \
+		if test -n "$$list2"; then for o in $$list2; do \
+			$(AM_V_FIX)$(OBJCOPY) -L '_ZGr8_$$_dummy' $$o; \
+		done; fi; \
+	 else :; fi
+	 $(AM_V_at)echo timestamp > objectlink_fix.stamp
+
 #	org/openss7/streams/bandinfo.java
 #	org/openss7/streams/strbuf.java
 #	org/openss7/streams/StreamsConstants.java
@@ -3446,6 +3472,10 @@ lib_org_openss7_streams_la_CXXFLAGS	  = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-s
 lib_org_openss7_streams_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_streams_la_LIBADD	  = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 lib_org_openss7_streams_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+
+objectlink_objects += ${lib_org_openss7_streams_la_OBJECTS}
+my_streams_LIBFILE = lib-org-openss7-streams.la
+$(my_streams_LIBFILE): objectlink_fix.stamp
 
 org-openss7-streams-$(VERSION).jar: classdist_java.stamp $(my_streams_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/streams' ; \
@@ -3555,6 +3585,10 @@ lib_org_openss7_xti_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLA
 lib_org_openss7_xti_la_LIBADD	      = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 lib_org_openss7_xti_la_LDFLAGS	      = -module -export-dynamic -release $(VERSION) -shared
 
+objectlink_objects += $(lib_org_openss7_xti_la_OBJECTS)
+my_xti_LIBFILE = lib-org-openss7-xti.la
+$(my_xti_LIBFILE): objectlink_fix.stamp
+
 org-openss7-xti-$(VERSION).jar: classdist_java.stamp $(my_xti_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/xti' ; \
 	find $$d -name '*.class' -type f | sort -u | $(JAR) c@f $@
@@ -3610,7 +3644,7 @@ CLEAN_LOCAL += clean-org_openss7_xti
 my_tcap_JAVAFILES = \
 	org/openss7/tcap/SccpAddress.java \
 	org/openss7/tcap/sccp_addr_t.java \
-	org/openss7/tcap/SWIGTYPE_p_std__listT_tci__TcapOption_t.java \
+	org/openss7/tcap/SWIGTYPE_p___std__listT_tci__TcapOption_t.java \
 	org/openss7/tcap/TcapAbort.java \
 	org/openss7/tcap/TcapAccept.java \
 	org/openss7/tcap/TcapAllow.java \
@@ -3643,7 +3677,7 @@ my_tcap_JAVAFILES = \
 my_tcap_CLASSFILES = \
 	org/openss7/tcap/SccpAddress.class \
 	org/openss7/tcap/sccp_addr_t.class \
-	org/openss7/tcap/SWIGTYPE_p_std__listT_tci__TcapOption_t.class \
+	org/openss7/tcap/SWIGTYPE_p___std__listT_tci__TcapOption_t.class \
 	org/openss7/tcap/TcapAbort.class \
 	org/openss7/tcap/TcapAccept.class \
 	org/openss7/tcap/TcapAllow.class \
@@ -3683,6 +3717,10 @@ lib_org_openss7_tcap_la_CXXFLAGS       = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-
 lib_org_openss7_tcap_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_tcap_la_LIBADD	       = $(top_builddir)/libstreams.la
 lib_org_openss7_tcap_la_LDFLAGS	       = -module -export-dynamic -release $(VERSION) -shared
+
+objectlink_objects += $(lib_org_openss7_tcap_la_OBJECTS)
+my_tcap_LIBFILE = lib-org-openss7-tcap.la
+$(my_tcap_LIBFILE): objectlink_fix.stamp
 
 org-openss7-tcap-$(VERSION).jar: classdist_java.stamp $(my_xti_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/tcap'; \
@@ -3778,6 +3816,10 @@ lib_org_openss7_xtcap_la_CXXFLAGS	= $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-stric
 lib_org_openss7_xtcap_la_GCJFLAGS	= $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_xtcap_la_LIBADD		= $(top_builddir)/libstreams.la
 lib_org_openss7_xtcap_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
+
+objectlink_objects += $(lib_org_openss7_xtcap_la_OBJECTS)
+my_xtcap_LIBFILE = lib-org-openss7-xtcap.la
+$(my_xtcap_LIBFILE): objectlink_fix.stamp
 
 org-openss7-xtcap-$(VERSION).jar: classdist_java.stamp $(my_xtcap_CLASSFILES)
 	$(AM_V_GEN)d='org/openss7/xtcap'; \

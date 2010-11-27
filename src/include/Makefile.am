@@ -518,6 +518,7 @@ dist_noinst_HEADERS = \
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \
 	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/wrapper.h
 #	sys/$(PACKAGE)/modversions.h
 
 if PERFORM_CHECKS
