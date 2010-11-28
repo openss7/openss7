@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,8 +57,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $"
-
 static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $";
 
 #define _SVR4_SOURCE
@@ -77,7 +75,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $"
-#define SCTP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SCTP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -756,6 +754,7 @@ struct sctp {
 	uint8_t hashent;		/* vtag cache entry */
 	uint8_t nonagle;		/* Nagle setting */
 	struct sctp_ifops *ops;		/* interface operations */
+        struct net *net;                /* network */
 	bufq_t rcvq;			/* read queue */
 	bufq_t sndq;			/* write queue */
 	uint route_caps;		/* routing capabilities */
@@ -5351,7 +5350,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 STATIC INLINE int
 sctp_queue_xmit(struct sk_buff *skb)
 {
-	struct rtable *rt = (struct rtable *) skb->dst;
+	struct rtable *rt = skb_rtable(skb);
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #ifdef NETIF_F_TSO
@@ -5439,7 +5438,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph = (typeof(iph)) __skb_put(skb, tlen);
 			sh = (typeof(sh)) (iph + 1);
 			data = (unsigned char *) (sh);
-			skb->dst = &rt->u.dst;
+                        skb_dst_set(skb, &rt->u.dst);
 			skb->priority = 0;
 			iph->version = 4;
 			iph->ihl = 5;
@@ -5553,7 +5552,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph = (struct iphdr *) __skb_put(skb, tlen);
 			sh = (struct sctphdr *) (iph + 1);
 			data = (unsigned char *) (sh);
-			skb->dst = &rt->u.dst;
+                        skb_dst_set(skb, &rt->u.dst);
 			skb->priority = sp->priority;
 			iph->version = 4;
 			iph->ihl = 5;
@@ -5718,7 +5717,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph = (struct iphdr *) __skb_put(skb, tlen);	/* XXX */
 		sh = (struct sctphdr *) (iph + 1);
 		head = data = (unsigned char *) sh;
-		skb->dst = dst_clone(sd->dst_cache);
+                skb_dst_set(skb, dst_clone(sd->dst_cache));
 		skb->priority = sp->priority;
 		iph->version = 4;
 		iph->ihl = 5;
@@ -11835,7 +11834,11 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 					   SCTP_CAUSE_NO_RESOURCE, NULL, 0);
 		if (err == -ERESTART)
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+			NET_INC_STATS_BH(sp->net, LINUX_MIB_LISTENOVERFLOWS);
+#else
 			NET_INC_STATS_BH(LINUX_MIB_LISTENOVERFLOWS);
+#endif
 #else
 			NET_INC_STATS_BH(ListenOverflows);
 #endif
@@ -13948,10 +13951,14 @@ sctp_get_port(struct sctp *sp, uint16_t port)
 		/* This approach to selecting an available port number is identical to that used
 		   for TCP IPv4. We use the same port ranges.  */
 		static spinlock_t sctp_portalloc_lock = SPIN_LOCK_UNLOCKED;
-		int low = sysctl_local_port_range[0];
-		int high = sysctl_local_port_range[1];
-		int rem = (high - low) + 1;
-		int rover;
+                int low, high, rem, rover;
+#ifdef HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
+                inet_get_local_port_range(&low, &high);
+#else
+		low = sysctl_local_port_range[0];
+		high = sysctl_local_port_range[1];
+#endif
+		rem = (high - low) + 1;
 
 		/* find a fresh, completely unused port number (that way we are guaranteed not to
 		   have a port conflict */
@@ -29700,7 +29707,11 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
 #endif
