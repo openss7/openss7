@@ -135,7 +135,7 @@ filename=
 debug=0
 verbose=1
 
-function version()
+version()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -148,7 +148,7 @@ See \`$program --copying' for copying permissions.
 EOF
 }
 
-function usage()
+usage()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -164,7 +164,7 @@ Usage:
 EOF
 }
 
-function help()
+help()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -197,7 +197,7 @@ Options:
 EOF
 }
 
-function copying()
+copying()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -244,7 +244,7 @@ Corporation at a fee.  See http://www.openss7.com/
 EOF
 }
 
-function option_unrec()
+option_unrec()
 {
     if test ${verbose:-0} -gt 0 ; then
 	opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
@@ -254,7 +254,7 @@ function option_unrec()
     exit 2
 }
 
-function option_noarg()
+option_noarg()
 {
     if test ${verbose:-0} -gt 0 ; then
 	opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
@@ -264,7 +264,7 @@ function option_noarg()
     exit 2
 }
 
-function option_needarg()
+option_needarg()
 {
     if test ${verbose:-0} -gt 0 ; then
 	$ECHO "$program: syntax error -- \`$1' requires an argument" >&2
@@ -273,7 +273,7 @@ function option_needarg()
     exit 2
 }
 
-function option_after()
+option_after()
 {
     if test ${verbose:-0} -gt 0 ; then
 	$ECHO "$program: syntax error -- \`$1' cannot occur after \`$2'" >&2
@@ -282,7 +282,7 @@ function option_after()
     exit 2
 }
 
-function option_with()
+option_with()
 {
     if test ${verbose:-0} -gt 0 ; then
 	$ECHO "$program: syntax error -- \`$1' cannot occur with \`$2'" >&2
@@ -453,7 +453,7 @@ if test ":$filename" = ":" ; then
     filename="$default_filename"
 fi
 
-function parse_file()
+parse_file()
 {
     lineno=0
     while read -a tokens
@@ -568,7 +568,7 @@ function parse_file()
     done
 }
 
-function none_command()
+none_command()
 {
     if test -n "$show_version$show_help$show_copying" ; then
 	if test ${verbose:-0} -gt 1 ; then
@@ -586,14 +586,14 @@ function none_command()
     fi
 }
 
-function config_command()
+config_command()
 {
     if test ${verbose:-0} -gt 1 ; then
 	$ECHO "Displaying configuration"
     fi
 }
 
-function test_input_file()
+test_input_file()
 {
     if test ! -e $filename ; then
 	if test ${verbose:-0} -gt 0 ; then
@@ -615,7 +615,7 @@ function test_input_file()
     fi
 }
 
-function install_command()
+install_command()
 {
     if test ${verbose:-0} -gt 1 ; then
 	$ECHO "Installing devices using \`$filename'"
@@ -722,7 +722,7 @@ function install_command()
     done
 }
 
-function delete_command()
+delete_command()
 {
     if test ${verbose:-0} -gt 1 ; then
 	$ECHO "Deleting devices using \`$filename'"
