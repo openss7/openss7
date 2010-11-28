@@ -4,6 +4,7 @@
 
  -----------------------------------------------------------------------------
 
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -82,8 +83,6 @@
 
 #ifndef __LOCAL_IP_HOOKS_H__
 #define __LOCAL_IP_HOOKS_H__
-
-#ident "@(#) $RCSfile: ip_hooks.h.in,v $ $Name:  $($Revision: 1.1.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
@@ -283,6 +282,33 @@ extern __u32 sysctl_wmem_max;
 typedef int socklen_t;
 
 #define socklen_t socklen_t
+#endif
+
+#undef HAVE_KFUNC_SKB_DST
+#ifndef HAVE_KFUNC_SKB_DST
+static __inline__ struct dst_entry*
+skb_dst(struct sk_buff *skb)
+{
+    return skb->dst;
+}
+#endif
+
+#undef HAVE_KFUNC_SKB_DST_SET
+#ifndef HAVE_KFUNC_SKB_DST_SET
+static __inline__ void
+skb_dst_set(struct sk_buff *skb, struct dst_entry *dst)
+{
+    skb->dst = dst;
+}
+#endif
+
+#undef HAVE_KFUNC_SKB_RTABLE
+#ifndef HAVE_KFUNC_SKB_RTABLE
+static __inline__ struct rtable*
+skb_rtable(struct sk_buff *skb)
+{
+    return skb->rtable;
+}
 #endif
 
 #endif				/* __LOCAL_IP_HOOKS_H__ */
