@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $"
 
 static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $";
 
@@ -169,7 +167,7 @@ compat_ptr(compat_uptr_t uptr)
 #include "src/drivers/clone.h"	/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STH_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define STH_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -864,16 +862,14 @@ str_task_session(struct task_struct *t)
 {
 #if defined HAVE_KFUNC_TASK_SESSION_NR
 	return (task_session_nr(t));
-#else
-#if defined HAVE_KFUNC_PROCESS_SESSION
+#elif defined HAVE_KFUNC_TASK_SESSION_NR_NS
+        return (task_session_nr_ns(t, &init_pid_ns));
+#elif defined HAVE_KFUNC_PROCESS_SESSION
 	return (process_session(t));
-#else
-#if !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+#elif !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 	return (t->signal->session);
 #else
 	return (t->session);
-#endif
-#endif
 #endif
 }
 
@@ -903,6 +899,12 @@ extern struct pid *session_of_pgrp(struct pid *pgrp);
 #else
 pid_t session_of_pgrp(pid_t);
 #endif
+#endif
+
+#ifdef HAVE_KFUNC_FIND_PID
+#define find_pid(_x_) find_pid(_x_)
+#elif HAVE_KFUNC_FIND_VPID
+#define find_pid(_x_) find_vpid(_x_)
 #endif
 
 STATIC streams_fastcall __unlikely pid_t
@@ -1599,7 +1601,11 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 		/* kill_proc_info will do the right thing visa vi thread groups */
 		if (likely(kill_proc_info(sig, &si, pid) == 0))
 			continue;
+#if defined HAVE_KFUNC_KILL_PROC
 		kill_proc(pid, sig, 1);	/* force */
+#elif defined HAVE_KFUNC_KILL_PID_INFO
+                kill_pid_info(sig, SEND_SIG_PRIV, find_pid(pid));
+#endif
 	}
 }
 
@@ -8220,8 +8226,20 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 			/* we now have a M_PASSFP message in mp */
 			f2 = *(struct file **) mp->b_rptr;
 			sr->fd = fd;
+#if defined HAVE_KMEMB_STRUCT_FILE_F_UID
 			sr->uid = f2->f_uid;
+#elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
+                        sr->uid = f2->f_cred->uid;
+#else
+#error Do not know how to get file uid.
+#endif
+#if defined HAVE_KMEMB_STRUCT_FILE_F_GID
 			sr->gid = f2->f_gid;
+#elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
+                        sr->gid = f2->f_cred->gid;
+#else
+#error Do not know how to get file gid.
+#endif
 
 			fd_install(fd, f2);
 			/* we need to do another get because an fput will be done when the mblk is
