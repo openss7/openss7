@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,8 +63,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
-
 static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $";
 
 /*
@@ -117,7 +115,7 @@ typedef unsigned int socklen_t;
 
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define IP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define IP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:52 $"
 #define IP_DEVICE	"SVR 4.2 MP STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -644,6 +642,65 @@ extern spinlock_t inet_proto_lock;
 extern struct net_protocol *inet_protos[];
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 
+#ifdef HAVE___MODULE_ADDRESS_EXPORT
+static struct module *module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
+    defined HAVE_MODULES_SYMBOL
+static struct module *
+__module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	list_for_each_entry_rcu(mod, &modules, list) {
+		if (((void *)addr >= (void *)mod->module_init &&
+		     (void *)addr <  (void *)mod->module_init + mod->init_size)
+		    || ((void *)addr >= (void *)mod->module_core &&
+			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
+			return mod;
+		}
+	}
+	return NULL;
+}
+static struct module_address(unsigned long addr )
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
+static struct module_address(unsigned long addr)
+{
+	return module_text_address(addr);
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
+static struct module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_text_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#else
+#undef HAVE_MODULE_ADDRESS_SYMBOL
+#endif
+
 /**
  * npi_init_nproto - initialize network protocol override
  * @proto: the protocol to register or override
@@ -702,7 +759,7 @@ npi_init_nproto(unsigned char proto, unsigned int type)
 		pp->kmod = NULL;
 		spin_lock_bh(inet_proto_lockp);
 		if ((pp->next = inet_protosp[hash]) != NULL) {
-			if ((pp->kmod = module_text_address((ulong) pp->next))
+			if ((pp->kmod = module_address((ulong) pp->next))
 			    && pp->kmod != THIS_MODULE) {
 				if (!try_module_get(pp->kmod)) {
 					spin_unlock_bh(inet_proto_lockp);

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 
 static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
 
@@ -219,10 +217,12 @@ strblocking(void)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-qbinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 qbinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+qbinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+qbinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -345,10 +345,12 @@ bput(qband_t **bp)
  *  keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-apinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 apinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+apinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+apinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -434,10 +436,12 @@ ap_put(struct apinfo *api)
  *  -------------------------------------------------------------------------
  */
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-devinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 devinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+devinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+devinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -541,10 +545,12 @@ EXPORT_SYMBOL_GPL(di_put);	/* include/sys/openss7/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-mdlinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 mdlinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+mdlinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+mdlinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -652,10 +658,12 @@ queinfo_init(struct queinfo *qu)
 #endif
 }
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-queinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 queinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+queinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+queinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -829,10 +837,12 @@ qput(queue_t **qp)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __hot_out void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 mdbblock_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+mdbblock_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {				/* IRQ DISABLED? */
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -1376,10 +1386,12 @@ term_freemblks(void)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 linkinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+linkinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -1459,10 +1471,12 @@ EXPORT_SYMBOL_GPL(freelk);	/* include/sys/openss7/strsubr.h */
  */
 
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-syncq_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 syncq_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+syncq_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+syncq_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -1703,10 +1717,12 @@ event_export(struct strevent *se)
 	return (id);
 }
 STATIC void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 seinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+seinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -2028,6 +2044,22 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 	return (id);
 }
 #endif
+
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+struct module* module_text_address(unsigned long addr);
+#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
+static struct module *module_text_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_text_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_TEXT_ADDRESS_SYMBOL 1
+#endif
+
 STATIC streams_fastcall long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long),
 		    long arg)
@@ -2036,7 +2068,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_BUFCALL, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		struct module *kmod;
 
 		if ((kmod = module_text_address((ulong) func))
@@ -2044,7 +2076,7 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 			se->x.b.kmod = kmod;
 		else
 			se->x.b.kmod = NULL;
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->se_state = SE_ARMED;
 		se->x.b.queue = q ? qget(q) : NULL;
 		se->x.b.func = func;
@@ -2062,7 +2094,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_TIMEOUT, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		struct module *kmod;
 
 		if ((kmod = module_text_address((ulong) func))
@@ -2070,7 +2102,7 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 			se->x.t.kmod = kmod;
 		else
 			se->x.t.kmod = NULL;
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->x.t.queue = q ? qget(q) : NULL;
 		se->x.t.func = func;
 		se->x.t.arg = arg;
@@ -2090,7 +2122,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_WELDQ, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		struct module *kmod;
 
 		if ((kmod = module_text_address((ulong) func))
@@ -2098,7 +2130,7 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 			se->x.w.kmod = kmod;
 		else
 			se->x.w.kmod = NULL;
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -2118,7 +2150,7 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_UNWELDQ, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		struct module *kmod;
 
 		if ((kmod = module_text_address((ulong) func))
@@ -2126,7 +2158,7 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 			se->x.w.kmod = kmod;
 		else
 			se->x.w.kmod = NULL;
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -2201,10 +2233,9 @@ unbufcall(register bcid_t bcid)
 	unsigned long flags;
 	int state;
 	queue_t *q;
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 	struct module *kmod;
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 
 	if (unlikely(bcid == 0))
 		return;
@@ -2216,16 +2247,16 @@ unbufcall(register bcid_t bcid)
 			/* cancellation before processing could begin */
 			se->se_state = SE_CANCELLED;
 			q = XCHG(&se->x.b.queue, NULL);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 			kmod = XCHG(&se->x.b.kmod, NULL);
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 			spin_unlock_irqrestore(&event_hash_lock, flags);
 			/* we can release the module and queue at this point, it is not necessary
 			   to wait until the STREAMS scheduler frees the event. */
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 			if (likely(kmod != NULL))
 				module_put(kmod);
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 			if (unlikely(!!q))
 				qput(&q);
 			return;
@@ -2314,10 +2345,9 @@ untimeout(toid_t toid)
 	int state;
 	queue_t *q;
 	clock_t rem;
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 	struct module *kmod;
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 
 	if (unlikely(toid == 0))
 		return (-1);
@@ -2331,16 +2361,16 @@ untimeout(toid_t toid)
 			/* cancellation before processing could begin */
 			se->se_state = SE_CANCELLED;
 			q = XCHG(&se->x.t.queue, NULL);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 			kmod = XCHG(&se->x.t.kmod, NULL);
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 			spin_unlock_irqrestore(&event_hash_lock, flags);
 			/* We can release the module and queue at this point, it is not necessary
 			   to wait until the STREAMS scheduler frees the event. */
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 			if (likely(kmod != NULL))
 				module_put(kmod);
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 			if (unlikely(!!q))
 				qput(&q);
 			if (likely(del_timer(&se->x.t.timer))) {
@@ -3986,7 +4016,7 @@ do_bufcall_synced(struct strevent *se)
 				qput(&q);
 			} else
 				(*func) (se->x.b.arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 			{
 				struct module *kmod;
 
@@ -3995,7 +4025,7 @@ do_bufcall_synced(struct strevent *se)
 					se->x.b.kmod = NULL;
 				}
 			}
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		}
 		spin_lock_irqsave(&event_hash_lock, flags);
 		se->se_task = NULL;
@@ -4114,7 +4144,7 @@ do_timeout_synced(struct strevent *se)
 				if (unlikely(safe))
 					streams_local_restore(pl);
 			}
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 			{
 				struct module *kmod;
 
@@ -4123,7 +4153,7 @@ do_timeout_synced(struct strevent *se)
 					se->x.t.kmod = NULL;
 				}
 			}
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		}
 		spin_lock_irqsave(&event_hash_lock, flags);
 		se->se_task = NULL;
@@ -4327,7 +4357,7 @@ do_weldq_synced(struct strevent *se)
 					qput(&q);
 				} else
 					(*func) (se->x.w.arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 				{
 					struct module *kmod;
 
@@ -4336,7 +4366,7 @@ do_weldq_synced(struct strevent *se)
 						se->x.w.kmod = NULL;
 					}
 				}
-#endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 			}
 			spin_lock_irqsave(&event_hash_lock, flags);
 			se->se_task = NULL;
@@ -5355,10 +5385,12 @@ clear_shinfo(struct shinfo *sh)
 	qu->qu_str = sd;
 }
 STATIC __unlikely void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
-shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
-#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 shinfo_ctor(kmem_cachep_t cachep, void *obj)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+shinfo_ctor(void *obj)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 #endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
@@ -5564,9 +5596,12 @@ STATIC struct cacheinfo {
 	size_t size;
 	size_t offset;
 	unsigned long flags;
-#ifdef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 	void (*ctor) (kmem_cachep_t, void *);
 	void (*dtor) (kmem_cachep_t, void *);
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+        void (*ctor) (void *);
+        void (*dtor) (void *);
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 	void (*ctor) (void *, kmem_cachep_t, unsigned long);
 	void (*dtor) (void *, kmem_cachep_t, unsigned long);

@@ -133,7 +133,6 @@ AC_DEFUN([AC_OPENSS7], [dnl
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CPPFLAGS="${USER_CPPFLAGS}${USER_CPPFLAGS:+ }-DNAME=\\\"\`echo [\$][@] | sed -e 's,^[[^-]]*-,,;s,\.o,,'\`\\\""
     USER_LDFLAGS="$LDFLAGS"
-    KERNEL_WRAPPER="module_address module_text_address"
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
