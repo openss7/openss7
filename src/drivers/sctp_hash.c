@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $"
 
 static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $";
 
@@ -419,7 +417,8 @@ __sctp_conn_unhash(sp)
  */
 STATIC int sctp_port_rover = 0;
 
-#ifdef sysctl_local_port_range
+#ifdef HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
+#elif HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
 extern int sysctl_local_port_range[2];
 #else
 STATIC int sysctl_local_port_range[2] = { 1024, 4999 };
@@ -432,9 +431,14 @@ sctp_get_port(void)
 	uint16_t sport = 0;
 	sctp_t *sb = NULL;
 
-	int low = sysctl_local_port_range[0];
-	int high = sysctl_local_port_range[1];
-	int rem = (high - low) + 1;
+	int low, high, rem;
+#ifdef HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
+        inet_get_local_port_range(&low, &high);
+#else
+	low = sysctl_local_port_range[0];
+	high = sysctl_local_port_range[1];
+#endif
+        rem = (high - low) + 1;
 
 	seldom();
 
