@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:54 $"
 
 static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:54 $";
 
@@ -314,6 +312,21 @@ freeb_skb(caddr_t arg)
 	kfree_skb(skb);
 }
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+struct module* module_text_address(unsigned long addr);
+#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
+static struct module *module_text_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_text_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_TEXT_ADDRESS_SYMBOL 1
+#endif
+
 /**
  *  skballoc:	- allocate a message block with a socket buffer
  *  @skb:	socket buffer
@@ -331,9 +344,9 @@ skballoc(struct sk_buff *skb, uint priority)
 
 		frtnp->free_func = &freeb_skb;
 		frtnp->free_arg = (caddr_t) skb;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		*(struct module **) (frtnp + 1) = NULL;
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		/* set up message block */
 		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
@@ -394,20 +407,19 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
 		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
-
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		struct module *kmod;
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 
 		frtnp->free_func = freeinfo->free_func;
 		frtnp->free_arg = freeinfo->free_arg;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 		*(struct module **) (frtnp + 1) = NULL;
 		if ((kmod = module_text_address((ulong) frtnp->free_func)))
 			if (kmod != THIS_MODULE)
 				if (try_module_get(kmod))
 					*(struct module **) (frtnp + 1) = kmod;
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		/* set up message block */
 		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
@@ -724,14 +736,14 @@ freedb(dblk_t *db)
 				register void streamscall (*free_func) (caddr_t);
 
 				if (likely((free_func = frtnp->free_func) != NULL)) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 					struct module *kmod;
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 					free_func(frtnp->free_arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 					if ((kmod = *(struct module **) (frtnp + 1)))
 						module_put(kmod);
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 				}
 			} else
 				kmem_free(db->db_base, db->db_size);
@@ -4350,16 +4362,14 @@ drv_getparm(const unsigned int parm, void *value_p)
 	case PPGP:
 #if defined HAVE_KFUNC_TASK_PGRP_NR
 		*(pid_t *) value_p = task_pgrp_nr(current);
-#else
-#if defined HAVE_KFUNC_PROCESS_GROUP
+#elif defined HAVE_KFUNC_TASK_PGRP_NR_NS
+                *(pid_t *) value_p = task_pgrp_nr_ns(current, &init_pid_ns);
+#elif defined HAVE_KFUNC_PROCESS_GROUP
 		*(pid_t *) value_p = process_group(current);
-#else
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
+#elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 		*(pid_t *) value_p = current->pgrp;
 #else
 		*(pid_t *) value_p = current->signal->pgrp;
-#endif
-#endif
 #endif
 		return (0);
 	case UPROCP:
@@ -4371,16 +4381,14 @@ drv_getparm(const unsigned int parm, void *value_p)
 	case PSID:
 #if defined HAVE_KFUNC_TASK_SESSION_NR
 		*(pid_t *) value_p = task_session_nr(current);
-#else
-#if defined HAVE_KFUNC_PROCESS_SESSION
+#elif defined HAVE_KFUNC_TASK_SESSION_NR_NS
+                *(pid_t *) value_p = task_session_nr_ns(current, &init_pid_ns);
+#elif defined HAVE_KFUNC_PROCESS_SESSION
 		*(pid_t *) value_p = process_session(current);
-#else
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+#elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 		*(pid_t *) value_p = current->session;
 #else
 		*(pid_t *) value_p = current->signal->session;
-#endif
-#endif
 #endif
 		return (0);
 	case TIME:

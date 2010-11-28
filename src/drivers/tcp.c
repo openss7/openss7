@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 
 static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
 
@@ -143,7 +141,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TCP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4067,6 +4065,65 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 
 extern spinlock_t inet_proto_lock;
 
+#ifdef HAVE___MODULE_ADDRESS_EXPORT
+static struct module *module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
+    defined HAVE_MODULES_SYMBOL
+static struct module *
+__module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	list_for_each_entry_rcu(mod, &modules, list) {
+		if (((void *)addr >= (void *)mod->module_init &&
+		     (void *)addr <  (void *)mod->module_init + mod->init_size)
+		    || ((void *)addr >= (void *)mod->module_core &&
+			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
+			return mod;
+		}
+	}
+	return NULL;
+}
+static struct module_address(unsigned long addr )
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
+static struct module_address(unsigned long addr)
+{
+	return module_text_address(addr);
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
+static struct module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_text_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#else
+#undef HAVE_MODULE_ADDRESS_SYMBOL
+#endif
+
 /**
  * tpi_init_nproto - initialize network protocol override
  *
@@ -4086,8 +4143,8 @@ tpi_init_nproto(unsigned char proto)
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
 	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(&inet_proto_lock);
-	if ((ip->next = inet_protos[hash]) != NULL) {
-		if ((ip->kmod = module_text_address((ulong) ip->next))
+	if ((ip->next = (struct net_protocol *)inet_protos[hash]) != NULL) {
+		if ((ip->kmod = module_address((ulong) ip->next))
 		    && ip->kmod != THIS_MODULE) {
 			if (!try_module_get(ip->kmod)) {
 				spin_unlock_bh(&inet_proto_lock);
@@ -4418,7 +4475,7 @@ t_tpi_disconnect(struct tpi *tpi)
 STATIC INLINE int
 t_tpi_queue_xmit(struct sk_buff *skb)
 {
-	struct rtable *rt = (struct rtable *) skb->dst;
+	struct rtable *rt = skb_rtable(skb);
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
@@ -4507,7 +4564,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			th->source = htons(tpi->port);
 			// uh->len = htons(ulen);
 			th->check = 0;
-			skb->dst = &rt->u.dst;
+			skb_dst_set(skb, &rt->u.dst);
 			/* Should probably add an XTI_PRIORITY option at the XTI_GENERIC level. */
 			skb->priority = 0;
 			iph->version = 4;
@@ -6435,7 +6492,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 
 	if (skb->pkt_type != PACKET_HOST)
 		goto bad_pkt_type;
-	rt = (struct rtable *) skb->dst;
+	rt = skb_rtable(skb);
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
@@ -6617,7 +6674,11 @@ tpi_v4_err(struct sk_buff *skb, u32 info)
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+        ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
 #endif

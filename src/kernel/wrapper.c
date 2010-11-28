@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,9 +60,8 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
-
-static char const ident[] = "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $";
+static char const ident[] =
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -101,7 +100,7 @@ static char const ident[] = "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/os7/compat.h>
 
 #define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -138,7 +137,6 @@ EXPORT_SYMBOL_GPL(is_ignored);
 
 #ifdef HAVE_IS_ORPHANED_PGRP_ADDR
 extern int is_orphaned_pgrp(int pgrp);
-
 __asm__(".equ is_orphaned_pgrp," __stringify(HAVE_IS_ORPHANED_PGRP_ADDR));
 __asm__(".global is_orphaned_pgrp");
 EXPORT_SYMBOL_GPL(is_orphaned_pgrp);
@@ -158,6 +156,13 @@ __asm__(".global tasklist_lock");
 EXPORT_SYMBOL_GPL(tasklist_lock);
 #endif				/* HAVE_TASKLIST_LOCK_ADDR */
 
+#ifdef HAVE_KILL_PID_INFO_ADDR
+int kill_pid_info(int sig, struct siginfo *info, struct pid *pid);
+__asm__(".equ kill_pid_info," __stringify(HAVE_KILL_PID_INFO_ADDR));
+__asm__(".global kill_pid_info");
+EXPORT_SYMBOL_GPL(kill_pid_info);
+#endif                          /* HAVE_KILL_PID_INFO_ADDR */
+
 #ifdef HAVE_KILL_PROC_INFO_ADDR
 int kill_proc_info(int sig, struct siginfo *sip, pid_t pid);
 __asm__(".equ kill_proc_info," __stringify(HAVE_KILL_PROC_INFO_ADDR));
@@ -167,7 +172,7 @@ EXPORT_SYMBOL_GPL(kill_proc_info);
 
 #ifdef HAVE_KILL_SL_ADDR
 int kill_sl_func(pid_t, int, int);
-__asm__(".equ kill_sl_func," __stringify(HAVE_KILL_SL_FUNC_ADDR));
+__asm__(".equ kill_sl_func," __stringify(HAVE_KILL_SL_ADDR));
 __asm__(".global kill_sl_func");
 EXPORT_SYMBOL_GPL(kill_sl_func);
 #endif				/* HAVE_KILL_SL_ADDR */
@@ -192,13 +197,26 @@ __asm__(".global __wake_up_sync");
 EXPORT_SYMBOL_GPL(__wake_up_sync);
 #endif				/* HAVE___WAKE_UP_SYNC_ADDR */
 
+#ifdef HAVE_MODULES_ADDR
+extern struct list_head modules;
+__asm__(".equ modules," __stringify(HAVE_MODULES_ADDR));
+__asm__(".global modules");
+EXPORT_SYMBOL_GPL(modules);
+#endif				/* HAVE_MODULES_ADDR */
+
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-//extern struct module *module_text_address(ulong addr);
-//
+extern struct module *module_text_address(unsigned long addr);
 __asm__(".equ module_text_address," __stringify(HAVE_MODULE_TEXT_ADDRESS_ADDR));
 __asm__(".global module_text_address");
 EXPORT_SYMBOL_GPL(module_text_address);
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+
+#ifdef HAVE___MODULE_ADDRESS_ADDR
+extern struct module *__module_address(unsigned long addr);
+__asm__(".eq __module_address," __stringify(HAVE___MODULE_ADDRESS_ADDR));
+__asm__(".global __module_address");
+EXPORT_SYMBOL_GPL(__module_address);
+#endif                          /* HAVE___MODULE_ADDRESS_ADDR */
 
 #ifdef HAVE_FILE_MOVE_ADDR
 __asm__(".equ file_move," __stringify(HAVE_FILE_MOVE_ADDR));
@@ -442,7 +460,11 @@ EXPORT_SYMBOL_GPL(sysctl_tcp_fin_timeout);
 #endif				/* HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR */
 
 #ifdef HAVE_TCP_CURRENT_MSS_ADDR
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+unsigned int tcp_current_mss(struct sock *sk);
+#else
 unsigned int tcp_current_mss(struct sock *sk, int large);
+#endif
 __asm__(".equ tcp_current_mss," __stringify(HAVE_TCP_CURRENT_MSS_ADDR));
 __asm__(".global tcp_current_mss");
 EXPORT_SYMBOL_GPL(tcp_current_mss);
@@ -607,16 +629,16 @@ __asm__(".global ioctl32_sem");
 EXPORT_SYMBOL_GPL(ioctl32_sem);
 #endif				/* HAVE_IOCTL32_SEM_ADDR */
 
-#if defined HAVE_MOUNT_SEM_ADDR
+#ifdef HAVE_MOUNT_SEM_ADDR
 __asm__(".equ mount_sem," __stringify(HAVE_MOUNT_SEM_ADDR));
 __asm__(".global mount_sem");
 EXPORT_SYMBOL_GPL(mount_sem);
-#endif
+#endif				/* HAVE_MOUNT_SEM_ADDR */
 
 #ifdef HAVE_NAMESPACE_SEM_ADDR
+extern struct rw_semaphore namespace_sem;
 __asm__(".equ namespace_sem," __stringify(HAVE_NAMESPACE_SEM_ADDR));
 __asm__(".global namespace_sem");
-extern struct rw_semaphore namespace_sem;
 EXPORT_SYMBOL_GPL(namespace_sem);
 #endif				/* HAVE_NAMESPACE_SEM_ADDR */
 
@@ -643,7 +665,6 @@ EXPORT_SYMBOL_GPL(graft_tree);
 
 #ifdef HAVE_DO_UMOUNT_ADDR
 extern int do_umount(struct vfsmount *mnt, int flags);
-
 __asm__(".equ do_umount," __stringify(HAVE_DO_UMOUNT_ADDR));
 __asm__(".global do_umount");
 EXPORT_SYMBOL_GPL(do_umount);
@@ -651,7 +672,6 @@ EXPORT_SYMBOL_GPL(do_umount);
 
 #ifdef HAVE__DEF_FIFO_OPS_ADDR
 extern const struct file_operations *_def_fifo_ops;
-
 __asm__(".equ _def_fifo_ops," __stringify(HAVE__DEF_FIFO_OPS_ADDR));
 __asm__(".global _def_fifo_ops");
 EXPORT_SYMBOL_GPL(_def_fifo_ops);
@@ -659,10 +679,12 @@ EXPORT_SYMBOL_GPL(_def_fifo_ops);
 
 #ifdef  HAVE___TCP_PUSH_PENDING_FRAMES_ADDR
 #ifdef HAVE_OLD_SOCK_STRUCTURE
-void __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss, int nonagle);
+void __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss,
+			       int nonagle);
 #else				/* defined HAVE_OLD_SOCK_STRUCTURE */
 #ifndef HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
-void __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss, int nonagle);
+void __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss,
+			       int nonagle);
 #else				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
 void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle);
 #endif				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
@@ -671,4 +693,3 @@ __asm__(".equ __tcp_push_pending_frames," __stringify(HAVE___TCP_PUSH_PENDING_FR
 __asm__(".global __tcp_push_pending_frames");
 EXPORT_SYMBOL_GPL(__tcp_push_pending_frames);
 #endif				/* defined HAVE___TCP_PUSH_PENDING_FRAMES_ADDR */
-

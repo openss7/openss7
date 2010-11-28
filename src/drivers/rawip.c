@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,8 +65,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $"
 
 static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $";
 
@@ -147,7 +145,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-09-01 09:09:50 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS RAW IP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3435,6 +3433,65 @@ extern spinlock_t inet_proto_lock;
 STATIC struct mynet_protocol **inet_protosp = (void *)&inet_protos;
 #endif
 
+#ifdef HAVE___MODULE_ADDRESS_EXPORT
+static struct module *module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
+    defined HAVE_MODULES_SYMBOL
+static struct module *
+__module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	list_for_each_entry_rcu(mod, &modules, list) {
+		if (((void *)addr >= (void *)mod->module_init &&
+		     (void *)addr <  (void *)mod->module_init + mod->init_size)
+		    || ((void *)addr >= (void *)mod->module_core &&
+			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
+			return mod;
+		}
+	}
+	return NULL;
+}
+static struct module_address(unsigned long addr )
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
+static struct module_address(unsigned long addr)
+{
+	return module_text_address(addr);
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
+static struct module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_text_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#else
+#undef HAVE_MODULE_ADDRESS_SYMBOL
+#endif
+
 /**
  * tp_init_nproto - initialize network protocol override
  * @proto: the protocol to register or override
@@ -3519,8 +3576,8 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-				if ((pp->kmod = module_text_address((ulong) *ppp))
+#ifdef HAVE_MODULE_ADDRESS_SYMBOL
+				if ((pp->kmod = module_address((ulong) *ppp))
 				    && pp->kmod != THIS_MODULE) {
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
@@ -3530,7 +3587,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 						return (NULL);
 					}
 				}
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
 				pp->proto.next = (*ppp)->next;
 #endif
@@ -3597,10 +3654,10 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 				*ppp = pp->next;
 				net_protocol_unlock();
 			}
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_ADDRESS_SYMBOL
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 			/* unlink from hash slot */
 			tp_prots[proto] = NULL;
 
@@ -3740,7 +3797,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 STATIC INLINE __hot_out int
 tp_ip_queue_xmit(struct sk_buff *skb)
 {
-	struct dst_entry *dst = skb->dst;
+	struct dst_entry *dst = skb_dst(skb);
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
@@ -4203,7 +4260,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt,
 			__skb_push(skb, sizeof(struct iphdr));
 			skb_reset_network_header(skb);
 
-			skb->dst = &rt->u.dst;
+			skb_dst_set(skb, &rt->u.dst);
 			skb->priority = 0;	// opt->xti.priority;
 
 			iph = (typeof(iph)) skb_network_header(skb);
@@ -8432,7 +8489,7 @@ tp_v4_rcv(struct sk_buff *skb)
 	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
 #endif
-	rt = (struct rtable *) skb->dst;
+	rt = skb_rtable(skb);
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
@@ -8627,7 +8684,11 @@ tp_v4_err(struct sk_buff *skb, u32 info)
       drop:
 #endif
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+        ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
 #endif

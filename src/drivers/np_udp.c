@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,8 +62,6 @@
  - added files to new distro
 
  *****************************************************************************/
-
-#ident "@(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
 
 static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
 
@@ -869,6 +867,8 @@ extern spinlock_t inet_proto_lock;
 STATIC struct mynet_protocol **inet_protosp = (void *)&inet_protos;
 #endif
 
+struct module *module_address(unsigned long addr);
+
 /**
  * np_init_nproto - initialize network protocol override
  * @proto: the protocol to register or override
@@ -951,8 +951,8 @@ np_init_nproto(unsigned char proto, unsigned int type)
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-				if ((pp->kmod = module_text_address((ulong) *ppp))
+#ifdef HAVE_MODULE_ADDRESS_SYMBOL
+				if ((pp->kmod = module_address((ulong) *ppp))
 				    && pp->kmod != THIS_MODULE) {
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
@@ -962,7 +962,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 						return (NULL);
 					}
 				}
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
 				pp->proto.next = (*ppp)->next;
 #endif
@@ -1028,10 +1028,10 @@ np_term_nproto(unsigned char proto, unsigned int type)
 				*ppp = pp->next;
 				net_protocol_unlock();
 			}
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+#ifdef HAVE_MODULE_ADDRESS_SYMBOL
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 			/* unlink from hash slot */
 			np_prots[proto] = NULL;
 
