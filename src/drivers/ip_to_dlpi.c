@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,8 +63,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-03-10 08:42:19 $"
-
 static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-03-10 08:42:19 $";
 
 #include <sys/os7/compat.h>
@@ -86,7 +84,7 @@ static char const ident[] = "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 1.1
 
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-03-10 08:42:19 $"
 #define IP2XINET_DEVICE		"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -249,7 +247,7 @@ struct ip2xinet_priv {
 	int state;
 	int packetlen;
 	u8 *packetdata;
-} ip2xinet_private[NUMIP2XINET];
+};
 
 struct ip2xinet_state {
 	int ip2x_dlstate;		/* TSG: DLPI user state */
@@ -260,7 +258,12 @@ struct ip2xinet_state {
 
 } ip2xinet_status;
 
-extern struct net_device ip2xinet_devs[];
+struct ip2xinet_dev {
+	struct net_device dev;
+	struct ip2xinet_priv priv;
+};
+
+extern struct ip2xinet_dev ip2xinet_devs[];
 
 /* These are the flags in the statusword */
 #define UNLINKED        0x20	/* our addition to DLPI states */
@@ -537,10 +540,10 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 			ip2xinet_status.ip2x_dlstate = UNLINKED;
 			/* can't transmit any more */
 			for (i = 0; i < NUMIP2XINET; i++) {
-				struct ip2xinet_priv *privptr = &ip2xinet_private[i];
+				struct ip2xinet_priv *privptr = &ip2xinet_devs[i].priv;
 
 				if (privptr->state == 1)
-					netif_stop_queue(&(ip2xinet_devs[i]));
+					netif_stop_queue(&(ip2xinet_devs[i].dev));
 			}
 
 			flushq(q, FLUSHALL);
@@ -622,7 +625,7 @@ ip2xinet_lwsrv(queue_t *q)
 	mblk_t *mp;
 	int allsent = 1;
 	int i;
-	struct net_device *dev = ip2xinet_devs;
+	struct ip2xinet_dev *dev = ip2xinet_devs;
 	struct ip2xinet_priv *privp;
 
 	while ((mp = getq(q))) {
@@ -649,12 +652,12 @@ ip2xinet_lwsrv(queue_t *q)
 	   and set the appropriate state. */
 	spin_lock(ip2xinet_lock);
 	for (i = 0; i < NUMIP2XINET; i++, dev++) {
-		privp = (struct ip2xinet_priv *) dev->priv;
+		privp = &dev->priv;
 		if (privp->state == 1 && ip2xinet_status.ip2x_dlstate == DL_IDLE) {
 			if (allsent) {
-				netif_start_queue(dev);	/* kernel can transmit */
+				netif_start_queue(&dev->dev);	/* kernel can transmit */
 			} else {
-				netif_stop_queue(dev);	/* We are flow controlled. */
+				netif_stop_queue(&dev->dev);	/* We are flow controlled. */
 			}
 		}
 	}
@@ -695,7 +698,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 
 	/* use the first open ip device */
 	for (i = 0; i < NUMIP2XINET; i++) {
-		privptr = &ip2xinet_private[i];
+		privptr = &ip2xinet_devs[i].priv;
 
 		if (privptr->state == 1)
 			break;
@@ -703,7 +706,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 	if (i == NUMIP2XINET)
 		i = 0;		/* All devices closed, pick the 1st one */
 	/* send data up to ip through the 1st open device */
-	dev = &ip2xinet_devs[i];
+	dev = &ip2xinet_devs[i].dev;
 
 	switch (mp->b_datap->db_type) {
 	case M_CTL:
@@ -734,10 +737,10 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 
 			/* If we're DL_IDLE, then dev is open and the kernel can transmit */
 			for (i = 0; i < NUMIP2XINET; i++) {
-				privptr = &ip2xinet_private[i];
+				privptr = &ip2xinet_devs[i].priv;
 
 				if (privptr->state == 1)
-					netif_start_queue(&(ip2xinet_devs[i]));
+					netif_start_queue(&(ip2xinet_devs[i].dev));
 			}
 			freemsg(mp);	/* Frees bind_ack no longer needed */
 			break;
@@ -1010,7 +1013,7 @@ ip2xinet_devopen(struct net_device *dev)
 {
 	int i;
 	int err;
-	struct ip2xinet_priv *privp = (struct ip2xinet_priv *) dev->priv;
+	struct ip2xinet_priv *privp = &((struct ip2xinet_dev *) dev)->priv;
 
 	spin_lock(ip2xinet_lock);
 
@@ -1037,7 +1040,7 @@ ip2xinet_devopen(struct net_device *dev)
 	   byte is '\0': a safe choice with regard to multicast */
 	for (i = 0; i < ETH_ALEN; i++)
 		dev->dev_addr[i] = "\0IP2X0"[i];
-	dev->dev_addr[ETH_ALEN - 1] += (dev - ip2xinet_devs);	/* the number */
+	dev->dev_addr[ETH_ALEN - 1] += ((struct ip2xinet_dev *)dev - ip2xinet_devs);	/* the number */
 
 	privp->state = 1;
 	if (ip2xinet_status.ip2x_dlstate == DL_IDLE)
@@ -1054,7 +1057,7 @@ ip2xinet_release(struct net_device *dev)
 {
 	queue_t *q;
 	mblk_t *mp;
-	struct ip2xinet_priv *privp = (struct ip2xinet_priv *) dev->priv;
+	struct ip2xinet_priv *privp = &((struct ip2xinet_dev *) dev)->priv;
 
 	spin_lock(ip2xinet_lock);
 	privp->state = 0;
@@ -1135,7 +1138,7 @@ ip2xinet_config(struct net_device *dev, struct ifmap *map)
 void
 ip2xinet_rx(struct net_device *dev, struct sk_buff *skb)
 {
-	struct ip2xinet_priv *privp = (struct ip2xinet_priv *) dev->priv;
+	struct ip2xinet_priv *privp = &((struct ip2xinet_dev *) dev)->priv;
 
 	/* The packet has been retrieved from the transmission medium. Build an skb around it, so
 	   upper layers can handle it */
@@ -1156,7 +1159,7 @@ ip2xinet_rx(struct net_device *dev, struct sk_buff *skb)
  * grabbed the driver lock when it was called.
  */
 void
-ip2xinet_hw_tx(unsigned char *buf, int len, struct net_device *dev)
+ip2xinet_hw_tx(unsigned char *buf, int len, struct ip2xinet_dev *dev)
 {
 	/* This function deals with hw details, while all other procedures are rather
 	   device-independent */
@@ -1181,7 +1184,7 @@ ip2xinet_hw_tx(unsigned char *buf, int len, struct net_device *dev)
 
 	/* Here we do a putq to the bottom q.  */
 
-	privp = &ip2xinet_private[dev - ip2xinet_devs];
+	privp = &dev->priv;
 	q = ip2xinet_status.lowerq;
 
 	/* THIS IS WHERE WE ALLOCATE UNITDATA_REQ and send data down */
@@ -1256,7 +1259,7 @@ ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	dev->trans_start = jiffies;	/* save the timestamp */
-	ip2xinet_hw_tx(skb->data, skb->len, dev);
+	ip2xinet_hw_tx(skb->data, skb->len, (struct ip2xinet_dev*) dev);
 	spin_unlock(ip2xinet_lock);
 	dev_kfree_skb(skb);	/* release it */
 
@@ -1278,7 +1281,7 @@ ip2xinet_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 struct net_device_stats *
 ip2xinet_stats(struct net_device *dev)
 {
-	struct ip2xinet_priv *priv = (struct ip2xinet_priv *) dev->priv;
+	struct ip2xinet_priv *priv = &((struct ip2xinet_dev *) dev)->priv;
 
 	/* The only stats we keep are transmitted and received packets. Note: xinet stats are kind
 	   of useless since the structure ifstats doesn't exist under linux.  So rather than keep
@@ -1375,6 +1378,7 @@ ip2xinet_devinit(struct net_device *dev)
 {
 	/* Assign other fields in dev, using ether_setup() and some hand assignments */
 	ether_setup(dev);
+#if !defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
 	dev->open = ip2xinet_devopen;
 	dev->stop = ip2xinet_release;
 	dev->set_config = ip2xinet_config;
@@ -1382,6 +1386,7 @@ ip2xinet_devinit(struct net_device *dev)
 	dev->do_ioctl = ip2xinet_ioctl;
 	dev->get_stats = ip2xinet_stats;
 	dev->change_mtu = ip2xinet_change_mtu;
+#endif
 #ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_REBUILD_HEADER
 	dev->rebuild_header = ip2xinet_rebuild_header;
 #endif
@@ -1399,11 +1404,6 @@ ip2xinet_devinit(struct net_device *dev)
 	dev->flags &= ~IFF_BROADCAST;	/* X25 doesn't broadcast */
 	dev->flags &= ~IFF_MULTICAST;	/* X25 doesn't multicast */
 
-	/* Then, allocate the priv field. This encloses the statistics and a few private fields.  */
-	dev->priv = &ip2xinet_private[dev - ip2xinet_devs];
-	if (dev->priv == NULL)
-		return -ENOMEM;
-	memset(dev->priv, 0, sizeof(struct ip2xinet_priv));
 #ifdef HAVE_KFUNC_DEV_INIT_BUFFERS
 	dev_init_buffers(dev);
 #endif
@@ -1411,7 +1411,21 @@ ip2xinet_devinit(struct net_device *dev)
 	return 0;
 }
 
-struct net_device ip2xinet_devs[NUMIP2XINET];
+struct ip2xinet_dev ip2xinet_devs[NUMIP2XINET];
+
+#if defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
+struct net_device_ops ip2xinet_dev_ops =
+{
+    .ndo_init = ip2xinet_devinit,
+    .ndo_open = ip2xinet_devopen,
+    .ndo_stop = ip2xinet_release,
+    .ndo_set_config = ip2xinet_config,
+    .ndo_start_xmit = ip2xinet_tx,
+    .ndo_do_ioctl = ip2xinet_ioctl,
+    .ndo_get_stats = ip2xinet_stats,
+    .ndo_change_mtu = ip2xinet_change_mtu,
+};
+#endif
 
 /*
  * Finally, the module stuff
@@ -1422,23 +1436,27 @@ init_linuxip(void)
 {
 
 	int result, i, device_present = 0;
-	struct net_device *dev = ip2xinet_devs;
+	struct ip2xinet_dev *dev = ip2xinet_devs;
 
 	ip2xinet_eth = eth;	/* copy the cfg datum in the non-static place */
 
 	/* call them "ip2x0"... "ip2x7" */
 	for (i = 0; i < NUMIP2XINET; i++, dev++) {
-		memset(dev, 0, sizeof(struct net_device));
-		memcpy(dev->name, "ip2x0", 6);
-		dev->name[4] = (char) ('0' + i);
-		dev->init = ip2xinet_devinit;
+		memset(dev, 0, sizeof(*dev));
+		memcpy(dev->dev.name, "ip2x0", 6);
+		dev->dev.name[4] = (char) ('0' + i);
+#if defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
+		dev->dev.netdev_ops = &ip2xinet_dev_ops;
+#else
+		dev->dev.init = ip2xinet_devinit;
+#endif
 		/* the rest of the fields are filled in by ip2xinet_devinit */
 	}
 
 	dev = ip2xinet_devs;
 	for (i = 0; i < NUMIP2XINET; i++, dev++)
-		if ((result = register_netdev(dev)))
-			printk("ip2xinet: error %i registering device \"%s\"\n", result, dev->name);
+		if ((result = register_netdev(&dev->dev)))
+			printk("ip2xinet: error %i registering device \"%s\"\n", result, dev->dev.name);
 		else
 			device_present++;
 
@@ -1451,7 +1469,7 @@ cleanup_linuxip(void)
 	int i;
 
 	for (i = 0; i < NUMIP2XINET; i++) {
-		unregister_netdev(&ip2xinet_devs[i]);
+		unregister_netdev(&ip2xinet_devs[i].dev);
 	}
 }
 
