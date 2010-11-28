@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,8 +60,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $"
-
 static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $";
 
 #include <linux/autoconf.h>
@@ -112,7 +110,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 #include "sys/config.h"
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:54 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1363,10 +1361,13 @@ specfs_term_cache(void)
 }
 
 static void
-#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+#if !defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS) && \
+    !defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
 snode_init_once(void *data, kmem_cachep_t cachep, unsigned long flags)
-#else
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 snode_init_once(kmem_cachep_t cachep, void *data)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+snode_init_once(void *data)
 #endif
 {
 	struct inode *inode = (struct inode *) data;
