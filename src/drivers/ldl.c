@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,8 +63,6 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-03-10 08:42:19 $"
-
 static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-03-10 08:42:19 $";
 
 #define _SVR4_SOURCE
@@ -94,7 +92,7 @@ static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define LDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define LDL_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-03-10 08:42:19 $"
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1251,6 +1249,9 @@ ndev_release(struct dl *dl)
 	*dlp = dl->next_ndev;
 	dl->ndev = NULL;
 	if (ndev->endpoints == NULL) {
+                /* This has been unnecessary for some time.  esballoc now keeps
+                 * a hold on the module until all buffers are freed. */
+#if !defined HAVE_MODULE_TEXT_ADDRESS_ADDR && !defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
 		/* No more attached endpoints: Try to free. */
 		if (ndev->dev != NULL) {
 			/* 
@@ -1268,6 +1269,7 @@ ndev_release(struct dl *dl)
 			END_BH_ATOMIC(ndev->dev);
 			ndev->dev = NULL;
 		}
+#endif
 		ndev_free(ndev);
 	}
 }
