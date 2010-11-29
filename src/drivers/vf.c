@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 1.1.2.3  2010-11-28 14:21:41  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:44  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:41 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.2 $) 
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:41 $"
 #define VF_DEVICE	"SVR 4.2 MP STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"

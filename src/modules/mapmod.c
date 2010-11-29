@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $
+ @(#) $RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:31 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mapmod.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:03  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:40:31  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $";
+static char const ident[] = "$RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $";
 
 
 /*
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.1
 #define MCMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MCMOD_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define MCMOD_REVISION		"Monavacon $RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:31 $"
+#define MCMOD_REVISION		"Monavacon $RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $"
 #define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
 #define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MCMOD_LICENSE		"GPL"

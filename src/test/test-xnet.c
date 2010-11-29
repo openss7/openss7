@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:53 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:36 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-09-01 09:09:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 1.1.2.3  2010-11-28 14:22:36  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-09-01 09:09:53  brian
  - added text image files
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:53 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:36 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -18464,7 +18467,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2009-09-01 09:09:53 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2010-11-28 14:22:36 $");
 }
 
 void

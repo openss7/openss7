@@ -897,4 +897,5 @@ src/java/javax/jain/ss7/isup/Makefile.make
 src/snmp/*_openss7.c
 src/snmp/*_openss7.h
 src/snmp/*.tree
-
+src/gdmo/tmp.ps
+src/gdmo/tmp.txt

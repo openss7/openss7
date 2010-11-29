@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $
+ @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl-mux.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:36  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:53  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $";
+static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $";
 
 /*
  *  This is a signalling link multiplexer: its primary purpose is to provide a single nexus for the

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:44 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 1.1.2.3  2010-11-28 14:21:35  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:44  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $";
+static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:35 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:44 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:35 $"
 #define PTY_DEVICE	"SVR 4.2 MP STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"

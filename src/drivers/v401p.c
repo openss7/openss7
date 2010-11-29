@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:58 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:41  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:58  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $";
+static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:41 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -252,7 +255,7 @@ static char const ident[] = "$RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:41 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

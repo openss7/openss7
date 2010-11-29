@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ixe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $
+ @(#) $RCSfile: ixe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:47 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ixe.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:32  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:47  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ixe.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:47 $";
+static char const ident[] = "$RCSfile: ixe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $";
 
 /*
  * This is the IXE (IP over X.25 Encapsulation) driver. It accepts X.25 PLP

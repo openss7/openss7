@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:24 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:51 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:32:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 1.1.2.2  2010-11-28 14:32:24  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
  Revision 1.1.2.1  2009-06-21 11:20:51  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:24 $";
 
 #define _SVR4_SOURCE
 #define _SUN_SOURCE
@@ -74,7 +77,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:51 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:24 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

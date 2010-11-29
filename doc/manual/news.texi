@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 1.1.2.2 2009-09-01 09:28:35 brian Exp $
+@c @(#) $Id: news.texi,v 1.1.2.3 2010-11-28 13:41:16 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-09-01 09:28:35 $ by $Author: brian $
+@c Last Modified $Date: 2010-11-28 13:41:16 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -123,7 +123,7 @@ Major features since the last release are as follows:
 
 @itemize -
 @item
-Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake 2.11.1, libtool 2.2.8, gettext 0.18.1,
+Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake 2.11.1, libtool 2.4, gettext 0.18.1,
 flex 2.5.35, bison 2.4.3, swig 2.0.1, autobuild 5.3.
 
 @item

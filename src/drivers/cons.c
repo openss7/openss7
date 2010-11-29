@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cons.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $
+ @(#) $RCSfile: cons.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:45 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cons.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:31  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:45  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: cons.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:45 $";
+static char const ident[] = "$RCSfile: cons.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $";
 
 /*
  *  This is an X.223 CONS driver.

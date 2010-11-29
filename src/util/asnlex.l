@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+ @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: asnlex.l,v $
+ Revision 1.1.2.3  2010-11-28 14:22:36  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-21 12:41:53  brian
  - updated headers
 
@@ -64,7 +67,7 @@
 
 %{
 
-static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $";
+static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:36 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 

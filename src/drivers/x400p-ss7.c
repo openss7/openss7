@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:42 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-05 12:04:28 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p-ss7.c,v $
+ Revision 1.1.2.3  2010-11-28 14:21:42  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-07-05 12:04:28  brian
  - updates for release builds
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $";
+static char const ident[] = "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:42 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -106,7 +109,7 @@ static char const ident[] = "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 1.1.
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2009-07-05 12:04:28 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:42 $"
 #define X400P_COPYRIGHT		"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

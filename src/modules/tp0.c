@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
+ @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp0.c,v $
+ Revision 1.1.2.3  2010-11-28 14:22:08  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:46  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
+static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:08 $";
 
 /*
  *  ISO Transport Class 0 over TCP/IP (TP0)
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 
 #define TP0_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP0_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:08 $"
 #define TP0_DEVICE	"SVR 4.2 MP STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"

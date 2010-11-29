@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-23 16:37:56 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 1.1.2.4  2010-11-28 14:32:26  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
  Revision 1.1.2.3  2009-07-23 16:37:56  brian
  - updates for release
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $";
+static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -168,7 +171,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:56 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: STREAMS.texi,v 1.1.2.2 2010-11-28 13:41:16 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2010-11-28 13:41:16 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -477,6 +477,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: STREAMS.texi,v $
+Revision 1.1.2.2  2010-11-28 13:41:16  brian
+- documentation updates
+
 Revision 1.1.2.1  2009-06-21 10:40:08  brian
 - added files to new distro
 

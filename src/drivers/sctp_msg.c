@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_msg.c,v $
+ Revision 1.1.2.3  2010-11-28 14:21:35  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-07-23 16:37:53  brian
  - updates for release
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:35 $";
 
 #define __NO_VERSION__
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtpMIBevent.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:42:34 $
+ @(#) $RCSfile: mtpMIBevent.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:14 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:42:34 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpMIBevent.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:14  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:42:34  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtpMIBevent.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:42:34 $";
+static char const ident[] = "$RCSfile: mtpMIBevent.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:14 $";
 
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>

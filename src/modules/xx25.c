@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
+ @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xx25.c,v $
+ Revision 1.1.2.3  2010-11-28 14:22:08  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:46  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
+static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:08 $";
 
 /*
  * This is XX25 implemented as a pushable module that pushes over an NPI
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #define XX25_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XX25_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:08 $"
 #define XX25_DEVICE	"SVR 4.2 MP STREAMS XX25 Modle for X.25-PLP (X25MOD)"
 #define XX25_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XX25_LICENSE	"GPL"

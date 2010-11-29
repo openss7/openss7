@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.4  2010-11-28 14:32:26  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
  Revision 1.1.2.3  2009-07-23 16:37:53  brian
  - updates for release
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2045,6 +2048,7 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 }
 #endif
 
+#ifndef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 struct module* module_text_address(unsigned long addr);
 #elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
@@ -2059,6 +2063,7 @@ static struct module *module_text_address(unsigned long addr)
 }
 #define HAVE_MODULE_TEXT_ADDRESS_SYMBOL 1
 #endif
+#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 
 STATIC streams_fastcall long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long),

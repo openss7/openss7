@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $
+ @(#) $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:36 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcmod.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:07  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:40:36  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $";
+static char const ident[] = "$RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $";
 
 #define _DEBUG 1
 
@@ -70,7 +73,7 @@ static char const ident[] = "$RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 
 #define TCMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCMOD_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TCMOD_REVISION	"Monavacon $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:36 $"
+#define TCMOD_REVISION	"Monavacon $RCSfile: tcmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $"
 #define TCMOD_DEVICE	"ITU-T Q.771 TC modules for ITU-T Q.771 TR"
 #define TCMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCMOD_LICENSE	"GPL"

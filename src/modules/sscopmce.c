@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $
+ @(#) $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:35 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscopmce.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:06  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:40:35  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $";
+static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $";
 
 /*
  * This is an SSCOPE-MCE module for use with MTP3b.  It can be pushed over a UDP or IP Stream to
@@ -76,7 +79,7 @@ static char const ident[] = "$RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/npi_ip.h>
 
 #define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS MODULE."
-#define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:35 $"
+#define SSCOPMCE_REVISION	"OpenSS7 $RCSfile: sscopmce.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $"
 #define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

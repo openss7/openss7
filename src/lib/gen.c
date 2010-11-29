@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $
+ @(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:58 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:46 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gen.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:58  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:37:46  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: gen.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:46 $";
+static char const ident[] = "$RCSfile: gen.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:58 $";
 
 /*
  *  Linux Fast-STREAMS libc replacement functions for logging

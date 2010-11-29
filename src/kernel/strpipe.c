@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 1.1.2.3  2010-11-28 14:21:56  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-07-23 16:37:53  brian
  - updates for release
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-23 16:37:53 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

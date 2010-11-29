@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $
+ @(#) $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:56 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testdrv_mps.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:40  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:56  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $";
+static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $";
 
 /*
  * This is a test module for MPS compatability.  Its purpose is to test MPS compatability functions
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.
 #define TD_MPS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TD_MPS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TD_MPS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TD_MPS_REVISION		"OpenSS7 $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:56 $"
+#define TD_MPS_REVISION		"OpenSS7 $RCSfile: testdrv_mps.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $"
 #define TD_MPS_DEVICE		"MPS Compatability TEST Driver (TEST-DRV-MPS)"
 #define TD_MPS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TD_MPS_LICENSE		"GPL"

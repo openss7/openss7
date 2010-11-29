@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $
+ @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:50 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rmux.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:35  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:50  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:50 $";
+static char const ident[] = "$RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $";
 
 /*
  *  RMUX is a remote multiplexing driver using SCTP.  Its purpose is to make remote STREAMS devices

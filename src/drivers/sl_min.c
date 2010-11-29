@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $
+ @(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_min.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:36  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:53  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $";
+static char const ident[] = "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $";
 
 #include <sys/os7/compat.h>
 
@@ -65,7 +68,7 @@ static char const ident[] = "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 1.1.2.1
 #include <ss7/sli.h>
 
 #define SL_MIN_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:53 $"
+#define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $"
 #define SL_MIN_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SL_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

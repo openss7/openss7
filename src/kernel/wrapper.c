@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-09-01 09:09:51 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.c,v $
+ Revision 1.1.2.3  2010-11-28 14:32:26  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
  Revision 1.1.2.2  2009-09-01 09:09:51  brian
  - added text image files
 
@@ -61,7 +64,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $";
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:51 $"
+#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $"
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define WRAPPER_LICENSE		"GPL"

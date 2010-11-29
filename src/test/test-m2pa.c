@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:28 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-09-01 09:09:52 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 1.1.2.3  2010-11-28 14:22:28  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-09-01 09:09:52  brian
  - added text image files
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-09-01 09:09:52 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:28 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0

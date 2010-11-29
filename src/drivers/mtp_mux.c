@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $
+ @(#) $RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:49 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_mux.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:34  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:49  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $";
+static char const ident[] = "$RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $";
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -73,7 +76,7 @@ static char const ident[] = "$RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define MTP_MUX_DESCRIP		"MTP-MUX SS7/MTP (Message Transfer Part) STREAMS MULTIPLEXING DRIVER."
 #define MTP_MUX_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MTP_MUX_REVISION	"OpenSS7 $RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:49 $"
+#define MTP_MUX_REVISION	"OpenSS7 $RCSfile: mtp_mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $"
 #define MTP_MUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define MTP_MUX_DEVICE		"Supports the OpenSS7 MTP and M3UA drivers."
 #define MTP_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

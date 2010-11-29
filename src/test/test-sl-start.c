@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sl-start.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:20 $
+ @(#) $RCSfile: test-sl-start.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:32 $
 
  -----------------------------------------------------------------------------
 
@@ -60,17 +60,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:44:20 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sl-start.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:32  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:44:20  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-sl-start.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:20 $";
+static char const ident[] = "$RCSfile: test-sl-start.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:32 $";
 
 #include <stropts.h>
 #include <stdlib.h>

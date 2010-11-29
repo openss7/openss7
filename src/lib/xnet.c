@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010/08/09 17:55:06 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 1.1.2.4  2010-11-28 14:22:00  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.3  2010/08/09 17:55:06  brian
  - reported and fixed bug 008
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010/08/09 17:55:06 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:22:00 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -6185,10 +6188,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.3 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 1.1.2.4 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 1.1.2.3 $)
-  * @date \$Date: 2010/08/09 17:55:06 $
+  * @version \$Name:  $(\$Revision: 1.1.2.4 $)
+  * @date \$Date: 2010-11-28 14:22:00 $
   */
 
 /** @} */

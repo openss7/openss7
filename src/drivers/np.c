@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-07-23 16:37:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:32:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 1.1.2.4  2010-11-28 14:32:24  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
  Revision 1.1.2.3  2009-07-23 16:37:53  brian
  - updates for release
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $";
+static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:53 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

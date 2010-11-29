@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:21:17 $
+ @(#) $RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:43 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:21:17 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: server.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:43  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:21:17  brian
  - added files to new distro
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:21:17 $";
+static char const ident[] = "$RCSfile: server.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:43 $";
 
 /*
  * From Tru64 UNIX Network Programmer's Guide AR-H9UE-TE.

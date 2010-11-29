@@ -1,6 +1,6 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: streams.cc,v 1.1.2.1 2009-07-13 07:13:36 brian Exp $
+//  @(#) $Id: streams.cc,v 1.1.2.2 2010-11-28 14:22:21 brian Exp $
 //  
 //  --------------------------------------------------------------------------
 //  
@@ -48,17 +48,20 @@
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Last Modified $Date: 2009-07-13 07:13:36 $ by $Author: brian $
+//  Last Modified $Date: 2010-11-28 14:22:21 $ by $Author: brian $
 //  
 //  --------------------------------------------------------------------------
 //  
 //  $Log: streams.cc,v $
+//  Revision 1.1.2.2  2010-11-28 14:22:21  brian
+//  - remove #ident, protect _XOPEN_SOURCE
+//
 //  Revision 1.1.2.1  2009-07-13 07:13:36  brian
 //  - changes for multiple distro build
 //
 //  ==========================================================================
 
-static char const ident[] = "$Id: streams.cc,v 1.1.2.1 2009-07-13 07:13:36 brian Exp $";
+static char const ident[] = "$Id: streams.cc,v 1.1.2.2 2010-11-28 14:22:21 brian Exp $";
 
 #pragma implementation
 #include "streams.hh"

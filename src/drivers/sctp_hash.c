@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $
+ @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:25 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:52 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:32:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hash.c,v $
+ Revision 1.1.2.2  2010-11-28 14:32:25  brian
+ - updates to support debian squeeze 2.6.32 kernel
+
  Revision 1.1.2.1  2009-06-21 11:20:52  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:52 $";
+static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:25 $";
 
 #define __NO_VERSION__
 

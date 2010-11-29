@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $
+ @(#) $RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:47:55 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7d.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:38  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:47:55  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:55 $";
+static char const ident[] = "$RCSfile: ss7d.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $";
 
 /*
  * This is ss7d(8).  The purpose of the daemon is to configure the SS7 stack from configuration
