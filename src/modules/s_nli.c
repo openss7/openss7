@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $
+ @(#) $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:40:33 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: s_nli.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:04  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:40:33  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $";
+static char const ident[] = "$RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $";
 
 /*
  * This is s_nli, a pushable STREAMS module that interprets the SpiderX25
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.1 
 #define S_NLI_DESCRIP	"SPIDER X25 COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_NLI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_NLI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define S_NLI_REVISION	"OpenSS7 $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:40:33 $"
+#define S_NLI_REVISION	"OpenSS7 $RCSfile: s_nli.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $"
 #define S_NLI_DEVICE	"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_NLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define S_NLI_LICENSE	"GPL"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:12 $
+# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 13:55:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -185,6 +185,9 @@ AC_DEFUN([_AGENT_EXTENSIONS], [dnl
 # =============================================================================
 #
 # $Log: agent.m4,v $
+# Revision 1.1.2.3  2010-11-28 13:55:51  brian
+# - update build requirements, proper autoconf functions, build updates
+#
 # Revision 1.1.2.2  2009-07-21 11:06:12  brian
 # - changes from release build
 #

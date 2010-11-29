@@ -1,3 +1,1409 @@
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/.cvsignore: added ignores
+	* src/gdmo/.cvsignore: added ignores
+	* src/java/.cvsignore: added ignores
+	* src/java/com/.cvsignore: added ignore file
+	* src/lib/.cvsignore: added ignore file
+	* src/mibs/.cvsignore: added ignore file
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* aclocal.m4: remove from revision control
+	* po/de.po: updated translation file
+	* src/include/Makefile.am: consider new wrapper.h header
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/gdmo/asn1check: updates to perlvar
+	* src/gdmo/gdmocheck: updates to perlvar
+	* src/gdmo/snmpcheck: updates to perlvar
+	* src/perl/mibbrowser: updates to perlvar
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/ip.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/ip_hooks.h.in: support debian squeeze 2.6.32 kernel
+	* src/drivers/ip_to_dlpi.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/ldl.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/np.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/np_ip.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/np_udp.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/rawip.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/sctp2.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/sctp_hash.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/sctp_hooks.h.in: support debian squeeze 2.6.32 kernel
+	* src/drivers/sscop_n.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/sscop_t_user.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/tcp.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/udp.c: support debian squeeze 2.6.32 kernel
+	* src/drivers/udp_hooks.h.in: support debian squeeze 2.6.32 kernel
+	* src/include/sys/openss7/dki.h: support debian squeeze 2.6.32 kernel
+	* src/include/sys/os7/bufpool.h: support debian squeeze 2.6.32 kernel
+	* src/include/sys/svr4/ddi.h: support debian squeeze 2.6.32 kernel
+	* src/kernel/strsched.c: support debian squeeze 2.6.32 kernel
+	* src/kernel/strspecfs.c: support debian squeeze 2.6.32 kernel
+	* src/kernel/strutil.c: support debian squeeze 2.6.32 kernel
+	* src/kernel/wrapper.c: support debian squeeze 2.6.32 kernel
+	* src/modules/sth.c: support debian squeeze 2.6.32 kernel
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/java/jain/protocol/ss7/JainSS7Factory.java: correct warnings
+	* src/java/javax/jain/protocol/ss7/JainSS7Factory.java: correct warnings
+	* src/java/javax/jain/ss7/JainSS7Factory.java: correct warnings
+	* src/java/javax/jain/ss7/inap/JainInapStack.java: correct warnings
+	* src/java/javax/jain/ss7/inap/constants/InvokeProblem.java: correct warnings
+	* src/java/javax/jain/ss7/inap/constants/ReturnErrorProblem.java: correct warnings
+	* src/java/javax/jain/ss7/inap/constants/ReturnResultProblem.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/BeginIndEvent.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/BeginReqEvent.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/ContinueIndEvent.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/ContinueReqEvent.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/DialogueEvent.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/DialogueIndEvent.java: correct warnings
+	* src/java/javax/jain/ss7/inap/event/DialogueReqEvent.java: correct warnings
+	* src/java/javax/jcat/JcatAddress.java: correct warnings
+	* src/java/javax/jcat/JcatConnection.java: correct warnings
+	* src/java/javax/jcat/JcatProvider.java: correct warnings
+	* src/java/javax/jcat/JcatTerminal.java: correct warnings
+	* src/java/javax/sip/Dialog.java: correct warnings
+	* src/java/javax/sip/SipStack.java: correct warnings
+	* src/java/javax/sip/address/Router.java: correct warnings
+	* src/java/javax/sip/address/SipURI.java: correct warnings
+	* src/java/javax/sip/header/HeaderFactory.java: correct warnings
+	* src/java/javax/sip/header/Parameters.java: correct warnings
+	* src/java/javax/sip/header/ServerHeader.java: correct warnings
+	* src/java/javax/sip/header/UserAgentHeader.java: correct warnings
+	* src/java/javax/sip/message/Message.java: correct warnings
+	* src/java/javax/sip/message/MessageFactory.java: correct warnings
+	* src/java/org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.java: correct warnings
+	* src/java/org/openss7/javax/jain/ss7/inap/JainInapStackImpl.java: correct warnings
+	* src/java/org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.java: correct warnings
+	* src/java/org/openss7/javax/jcat/JcatProviderImpl.java: correct warnings
+	* src/java/org/openss7/javax/sip/SipStackImpl.java: correct warnings
+
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/java/Makefile.am: correct java build
+	* src/util/strsetup: remove function for portability
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/java/org/openss7/streams/streams.i: remove #ident, protect _XOPEN_SOURCE
+	* src/java/org/openss7/xti/xti.i: remove #ident, protect _XOPEN_SOURCE
+	* src/perl/xti/xti.i: remove #ident, protect _XOPEN_SOURCE
+	* doc/specs/mgi/mgcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/atm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/biquad.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/bufq.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cddev.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cd.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cdi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cd-llc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cd.other.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ch.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/chmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/clns.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/clns-ip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/clns-udp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/clone.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/clone.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/cons.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/crc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/debug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_dua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_gr303.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_gr303ua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_gsma.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_h225.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_ip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_iua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_lapb.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_lapd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_lapf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl-llc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_master.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dlp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dlpi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_v52.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/dl_v5ua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ecdis.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/echo.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/fasthdlc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/fifo.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/fifo.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/h225.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/hdlc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ifr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/isdn.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/isua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/isup.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ixe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/lcd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ldl2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/llc2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/llc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/lm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/log.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/log.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/loop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m2ua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m2ua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m2ua.old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_as.old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_asp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_asp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_data.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_lm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_lower.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_msg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_msg.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_mtp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_mtp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_mtpp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_mtpu.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_nsp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_nsp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_sg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_sgp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_spp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_ss7.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_tsp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/m3ua_tsp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/map.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/matrix.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mcmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mfe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mlp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mtp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mtp_min.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mtp_mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mtp_sm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mx.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mx_mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/mxmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/nf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/np.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/npi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/np_mtp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/nsdev.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/nuls.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/otk6.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/pipe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/pipe.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/pty.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/rmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/rmux.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/rtp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sad.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sccop_user.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sccp2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sccp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_adler32.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_adler32.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_cache.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_cache.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_compat.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_cookie.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_cookie.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_crc32c.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_crc32c.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_defs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_hash.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_hmac_md5.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_hmac_md5.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_hmac_sha1.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_hmac_sha1.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_input.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_input.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_md5.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_md5.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_msg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_msg.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_namespace.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_n.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_n.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_output.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_output.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_route.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_route.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_sha1.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_sha1.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_t.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sctp_t.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdl_acb56.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdlm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdl_x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdt_acb56.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdt_ch.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdtmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sdt_x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sfx.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_acb56.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/slm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_min.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl-mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/slmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_mux.new.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_v400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_x100p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_x400p.curr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sl_x400p.oldest.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/socksys.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/spx.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_ip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_msgs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_n2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_n_prov.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_n_user.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_prov.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_recv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_send.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_t.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_time.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_time.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_t_prov.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_udp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sscop_user.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_asp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_asp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_ctrl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_data.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_lm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_lower.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_msg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_msg.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_nsp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_nsp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_sccp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_sccp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_send.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_sgp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_sm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_spp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_ss7.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_tsp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/sua_tsp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali_data.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali_isup.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali_lm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali_msgs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali_mtp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tali_sccp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tcap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/testdrv_mps.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/trmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tstdrv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tstdrv.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_asp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_asp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_data.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_msg.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_sgp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_spp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/tua_ss7.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_dlpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_msg.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_mtp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_npi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_sl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_tci.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_tpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/ua_tri.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/v400pfw.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/v401p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/v401pfw.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/v401p.other.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/vf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/wan.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x100p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x100p-ss7.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x25-lapb.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x25-llc2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x25-llc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x25-plp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x25-plp.other.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x400pfw.h: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x400p_mx.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/x400p-ss7.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/zap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/zapmux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/zaptel.c: remove #ident, protect _XOPEN_SOURCE
+	* src/drivers/zaptel.h: remove #ident, protect _XOPEN_SOURCE
+	* src/examples/server.c: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ap_lib.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ap_poll.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/cdiapi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/dlpiapi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/libdlpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/log.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/loop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netconfig.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netdir.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netx25/ll_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netx25/nli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netx25/x25_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netx25/x25_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/netx25/xnetdb.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/npiapi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/npi_x25.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/omp_dmi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/osi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/osi_lib.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ro_lib.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sad.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sgtty.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/dl_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/dl_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/ixe_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/ixe_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/ll_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/ll_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/mlp_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/mlp_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/wan_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/wan_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/x25_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/x25_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/x32_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/snet/xxx_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sockdb.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sockio.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sockmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/socksys.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/capi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/capi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/cci.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/cdi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/chi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/chi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/devi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/devi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/dl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/dl_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/dlpi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/dua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/gr303_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/gr303ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/gsma_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/h225_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/hdlc_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/isdni.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/isdni_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/isupi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/isupi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/iua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lapb_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lapd_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lapf_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lki.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lki_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lmi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/lmi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/m2pa_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/m2ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/m3ua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/m3ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/map.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/map_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mgcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mgi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mgi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mtp2_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mtp3b.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mtp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mtpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mtpi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mtp_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mxi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/mxi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/ph.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/q920.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sccp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sccpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sccpi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sccp_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sctp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sctpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sctpi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sdli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sdli_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sdti.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sdti_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sli_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sl_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/slmi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/sl_mux.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/slsi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/slsi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/smi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/smi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/tcap.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/tcapi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/tcap_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/tc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/tcmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/tr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/ua_lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/ua_lm_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/v52_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/v5ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/x400p_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ss7/zapata.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/strlog.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/stropts.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sx25.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/aix/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/aix/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/aix/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/apli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/atm_dlpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/capi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/capi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cci.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cdi_daed.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cdi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cdi_hdlc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cdli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ch.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/chi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/chi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/clns.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cmn_err.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/cons.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/debug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dki.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_aix.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_dua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_ext.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_gr303.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_gr303ua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_gsma.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_h225.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_isdn.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_iua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_lapb.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_lapd.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_lapf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_m2ua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_mtp2.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_sgi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_sun.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_v52.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dlpi_v5ua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dl_x25.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dsx_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/dua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/gr303_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/gr303ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/h225.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/h225_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/hpux/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/hpux/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/hpux/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/irix/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/irix/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/irix/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/isdni.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/isdni_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/iua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/kmem.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/lapb_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/lapd_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/lapf_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ldl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/llc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/log.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/loop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m2pa_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m2ua_as.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m2ua_as_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m2ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m2ua_lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m3ua_as.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m3ua_as_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m3ua.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/m3ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mac/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mac/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mac/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/map.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mgcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mgi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mgi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mps/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mps/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mps/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mxi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mxi_ioctl2.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/mxi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/netconfig.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/np.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npiext.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_ip.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_mtp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_sccp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_sctp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_ss7.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_sscop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_tcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_udp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/npi_x25.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/cmn_err.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/config.h.in: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/debug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/kmem.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/log.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/loop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/sad.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/sc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/strdebug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/strlog.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/stropts32.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/stropts.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/strsubr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/testmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/openss7/version.h.in: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/allocb.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/bufq.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/compat.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/debug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/lock.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/priv.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/queue.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/os7/timer.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/osf/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/osf/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/osf/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/osi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ph.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/plp_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/pty.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/q920.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sad.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/scodlpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sgtty.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/smi_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/dl_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/dl_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/ixe_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/ixe_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/ll_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/ll_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/mlp_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/mlp_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/wan_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/wan_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/x25_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/x25_proto.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/x32_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/snet/xxx_control.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sockio.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/socklib.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sockmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sockpath.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/socksys.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/spec_fs_i.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/strdebug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/strlog.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/stropts32.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/stropts.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/strsubr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/strsun.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/strtty.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sun/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sunddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sun/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sun/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/sun/strsun.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/svr3/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/svr3/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/svr3/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/svr4/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/svr4/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/termio.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/termios.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/testmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ticlts.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ticots.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ticotsord.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tihdr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/timod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tirdwr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tiuser.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_inet.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_ip.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_mtp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_sccp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_sctp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_sl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_ss7.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_sscop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_tcap.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_tcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/tpi_udp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ttychars.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ttydev.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ttyio.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ua_as_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ua_as_lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ua_lm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ua_lm_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/ua_sg_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/uw7/ddi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/uw7/strconf.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/uw7/stream.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/v52_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/v5ua_ioctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_apli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_atm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_inet.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_ip.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_local.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_mosi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_mtp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_osi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_sccp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_sctp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_sl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_ss7.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_sscop.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_tcap.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_tcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_udp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_xti.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/xti_xx25.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/sys/zapata.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/tcmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/termio.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/termios.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ticlts.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ticots.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ticotsord.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/tihdr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/timod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/tirdwr.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/tiuser.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ttcompat.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/ttychars.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xap_env.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xap.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xap_rose.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xdsbdcp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xds.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xdsmdup.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xdssap.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_ansi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_at.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_ch.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_err.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_gc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_ho.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_in.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_ls.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_mm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_ms.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_om.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_sb.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_sm.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_ss.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_st.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_gsm_xx.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmap_sms.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmp_cmis.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmp_snmp.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmsga.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xms.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xmsima.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xnetdb.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xom.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xom.hh: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xomi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xti_apli.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xti.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xti_inet.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xti_mosi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xti_osi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/include/xti_xx25.h: remove #ident, protect _XOPEN_SOURCE
+	* src/java/org/openss7/tcap/tcap.hh: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/aixcompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/hpuxcompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/irixcompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/maccompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/mpscompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/os7compat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/osfcompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/specfs.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strargs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strattach.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strattach.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/streams.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strlookup.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strlookup.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strmain.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strmain.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strpipe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strpipe.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strprocfs.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strprocfs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strreg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strreg.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strsad.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strsad.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strsched.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strspecfs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strsyms.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strsysctl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strsysctl.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/strutil.h: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/suncompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/svr3compat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/svr4compat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/kernel/uw7compat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/apli.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/cdiapi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/dlpiapi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/dlpi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/fattach.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/fdetach.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/gen.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/getmsg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/getpmsg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/isastream.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/netdir.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/netdir_inet.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/netselect.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/netselect.h: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/npiapi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/osi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/osilib.h: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/padent.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/pipe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/pthread.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/putmsg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/putpmsg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/slpcap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/socket.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/socklib.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/sockpath.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/sockpath.h: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/streams.h: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/strlog.c: remove #ident, protect _XOPEN_SOURCE
+	* ? src/lib/swig: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/testcancel.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/x25config.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xap_rose.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xds.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xftam.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xhostent.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xmap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xmap_gsmi.h: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xmap_sms.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xmp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xnet.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xnsl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xom.c: remove #ident, protect _XOPEN_SOURCE
+	* src/lib/xtcap.c: remove #ident, protect _XOPEN_SOURCE
+	* ? src/mibs/mibs.tar.gz: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/aal1.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/aal2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/aal5.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/apmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/bufmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cd_daed.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cd.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cd_hdlc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cdi_conv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cdi_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cd_old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cdpmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ch.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/chmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ch_pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ch_x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/cmot.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/connld.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/dcc.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/debug.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/dlaix.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/dlpi_conv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/dl_sl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/hdlc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/hdlc.old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/iax.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ip_strm_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ip_strm_mod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/isos.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/isot.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/itos.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/itot.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/lapb.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/lapb.other.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/lapd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/lapf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ldterm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/lpp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/m2pa_dl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/m2pa_sl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/m2tp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/m2ua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/m3ua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/map_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mapmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/momod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mtp3b.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mtp_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mtp_npi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mtp_tpi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mx_pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mx_sdl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/mx_x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/npi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/npi_conv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/npi_sccp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/nullmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/pckt.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/perf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/phys.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/pipemod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ptem.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sccp_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sccp_npi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sccp_tpi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sccp_tpi_old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_cdi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sctpstr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdl_cd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdl_ch.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdl_pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdl_sctp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdt.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdt_cd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdt_pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdt_sctp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sdt_tpi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sl_dl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_lli.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_llic.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sl.new.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/slpmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sl_tpi.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sm_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_nli.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_nlic.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sockmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/spm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sscop2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sscop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sscopmce.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sscop-mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sth.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/sua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_wan.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/s_wanc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tab.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tab.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tabold.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tabold.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tc_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tcmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tcpns.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tdm_ip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/testboth.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/test.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/testmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/testmod_mps.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/testold.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/timod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tirdwr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tp0.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tpi_conv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tpiperf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tpi_sccp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tr_mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/trmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tstmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tstmod.h: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/ttcompat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/tua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/vtoip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/xos.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/xot.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/xx25.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/xx25.old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/zaptel.c: remove #ident, protect _XOPEN_SOURCE
+	* src/modules/zaptel-mod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/cdr2MIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/cdr2MIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/chand.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/dlMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/dlMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds0Bundle.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds0Bundle.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds0.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds0.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds1.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds1EXT.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds1EXT.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds1.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ds_agent.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/gmiMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/gmiMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/header_complex.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/lapbMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/lapbMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/llcMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/llcMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m2paMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m2paMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m2uaAspMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m2uaAspMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m2uaMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m2uaMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m3uaAspMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m3uaAspMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m3uaSgpMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/m3uaSgpMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mib2c.master.conf: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mib2c.openss7.conf: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mib2c.storage.conf: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mib_modules.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mtpMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mtpMIBevent.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mtpMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mtpOmMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mtpOmMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mxMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/mxMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/phyMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/phyMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sccpMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sccpMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sccpOmMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sccpOmMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sigtrand.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sigtranMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/sigtranMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/slMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/slMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/smiMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/smiMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ss7confd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ss7MIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ss7MIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ss7OmMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/ss7OmMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/streamsd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/strExtMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/strExtMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/strMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/strMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/struct.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/tcapMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/tcapMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/tcapOmMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/tcapOmMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/util_funcs.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/x25MIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/x25MIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/x400pMIB.c: remove #ident, protect _XOPEN_SOURCE
+	* src/snmp/x400pMIB.h: remove #ident, protect _XOPEN_SOURCE
+	* src/tcl/streams/streams.cc: remove #ident, protect _XOPEN_SOURCE
+	* src/tcl/streams/streams.hh: remove #ident, protect _XOPEN_SOURCE
+	* src/tcl/tcap/tcap.hh: remove #ident, protect _XOPEN_SOURCE
+	* src/tcl/xti/xti.hh: remove #ident, protect _XOPEN_SOURCE
+	* src/tcl/xti/xti.i: remove #ident, protect _XOPEN_SOURCE
+	* src/test/ldltest.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/perftest.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-atm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-bcm.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-call2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-call.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-chan.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-ch-pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-clone.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-connld.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-crc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-e400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-echo.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-etsi_n.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-etsi_t.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-fifo.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-inet_raw.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-inet_sctp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-inet_tcp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-inet_udp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-interop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-ip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-isdn.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-log.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/testlog.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-loop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-m2pa.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-m2ua_as.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-m3ua-raw.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-mgmt.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-mtp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-mtp-mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-mx-pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-np_ip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-nsdev.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-nuls.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-pipe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-pipemod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-q781.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-q781-pipe.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-q784.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sad.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sccp-mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sctp.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sctp_n2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sctp_n.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sctp_nc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sctp_ns.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sctp_t.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sdl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sdl-pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sdt-pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sigtran.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl-data.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl-mux.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl.new.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl-pmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl-start.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sl-stop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sock.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-socket.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-socklib.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sockmod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-sockpath.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-socksys.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-streams.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-tcpc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-tcps.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-timod.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-tirdwr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-tty.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-udpc.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-udps.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-voip.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x100p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-cap2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-cap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-hsl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-perf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-sdl3.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-sdl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-sdt2.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-sdt3.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-sdt.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-x400p-sl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-xnet.c: remove #ident, protect _XOPEN_SOURCE
+	* src/test/test-xnsl.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/asnlex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/asnyac.y: remove #ident, protect _XOPEN_SOURCE
+	* src/util/autopush.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/dlcommon.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/dlinfo.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/dlmdata.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/dlrcv.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/dltest.h: remove #ident, protect _XOPEN_SOURCE
+	* src/util/dlunitdatareq.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/fattach.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/fdetach.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/gdmolex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/gdmoyac.y: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ifrdlci.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ifrstat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ifrtune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/initsock.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/insf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ixemap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ixetune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ldlconfig.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linkadd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linkdel.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linklist.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linkreset.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linkstart.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linkstate.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/linkstop.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/lltune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/m2palex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/m2payac.y: remove #ident, protect _XOPEN_SOURCE
+	* src/util/m2uaasd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/mlptune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/mtpconf_lex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/mtpconf_yac.y: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ndget.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/nuimap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/pvcmap.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/scls.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/sdlconf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/sdllex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/sdlyac.y: remove #ident, protect _XOPEN_SOURCE
+	* src/util/sdtconf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slconf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slconfd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slconf_lex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slconf.old.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slconf_yac.y: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slmon.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/slstatsd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/soconfig.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ss7capd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ss7d.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/ss7statsd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strace.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strchg.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strconf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strerr.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strinfo.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strlog.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strlogd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strreset.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strtune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/strvf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/usage.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/vcstat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/wantune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25diags.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25file.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25info.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25netd.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25route.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25stat.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25trace.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x25tune.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x32map.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x400config.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x400config.h: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x400lex.l: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x400pconf.c: remove #ident, protect _XOPEN_SOURCE
+	* src/util/x400yac.y: remove #ident, protect _XOPEN_SOURCE
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/cflagcheck: update and correct flag checks
+	* scripts/check: correct check awk program for new awk and add wrappers
+	* scripts/info.deps: correct for new awk and general corrections
+	* scripts/modpost.awk: struct_module renamed to module_layout for 2.6.32
+	* scripts/strconf-sh: remove #ident
+	* scripts/strconf.awk: corrections for new awk, remove #ident
+	* scripts/texinfo.tex: latest upstream file
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/agent.m4: update requirements
+	* m4/archive.m4: update build requirements
+	* m4/dist.m4: convert to proper autoconf functions
+	* m4/drafts.m4: update build requirements
+	* m4/gcj.m4: update gcj checks to autoconf 2.68
+	* m4/info.m4: update build requirements
+	* m4/java.m4: update build requirements
+	* m4/kernel.m4: support for autoconf 2.68 and debian squeeze 2.6.32
+	* m4/man.m4: update build requirements
+	* m4/openss7.m4: update build requirements
+	* m4/papers.m4: update build requirements
+	* m4/perl.m4: proper autoconf functions
+	* m4/snmp.m4: proper autoconf functions, update build requirements
+	* m4/tcl.m4: update build requirements
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/Makefile.am: add missing subdirectory
+	* doc/specs/cci/Makefile.am: update header
+	* doc/specs/cdi/Makefile.am: update header
+	* doc/specs/chi/Makefile.am: update header
+	* doc/specs/dlpi/Makefile.am: update header
+	* doc/specs/lli/Makefile.am: update header
+	* doc/specs/mgi/Makefile.am: update header
+	* doc/specs/mtpi/Makefile.am: update header
+	* doc/specs/mxi/Makefile.am: update header
+	* doc/specs/nli/Makefile.am: update header
+	* doc/specs/npi/Makefile.am: update header
+	* doc/specs/sccpi/Makefile.am: update header
+	* doc/specs/sdli/Makefile.am: update header
+	* doc/specs/sdti/Makefile.am: update header
+	* doc/specs/sli/Makefile.am: update header
+	* doc/specs/tci/Makefile.am: update header
+	* doc/specs/tpi/Makefile.am: update header
+	* doc/specs/tri/Makefile.am: update header
+	* doc/specs/wan/Makefile.am: update header
+	* doc/specs/xmap/Makefile.am: update header
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/STREAMS.texi: spelling corrections
+	* doc/manual/bugs.texi: macro correction
+	* doc/manual/install.texi: document new tool chain
+	* doc/manual/news.texi: document updates
+	* doc/manual/releases.texi: update header
+	* scripts/texi/install.texi: document tool chain updates
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: updates for debian squeeze 2.6.32 and updated tool chain
+	* configure.ac: update to autoconf 2.68
+	* am/java.am: add missing user flags
+	* am/kernel.am: tell check script about kernel wrappers
+	* am/openss7.am: distribute build requirements
+	* am/sctp.am: tell check script about kernel wrappers
+	* doc/man/Makefile.am: add missing manual page
+
+	* doc/man/man3/ap_ro_bind.3.man: fix manpage rendering
+	* doc/man/man3/xti_mosi.3.man: fix manpage rendering
+	* doc/man/man8/test-atm.8.man: fix manpage rendering
+	* doc/man/man8/test-bcm.8.man: fix manpage rendering
+	* doc/man/man8/test-chan.8.man: fix manpage rendering
+	* doc/man/man8/test-clone.8.man: fix manpage rendering
+	* doc/man/man8/test-connld.8.man: fix manpage rendering
+	* doc/man/man8/test-echo.8.man: fix manpage rendering
+	* doc/man/man8/test-etsi_n.8.man: fix manpage rendering
+	* doc/man/man8/test-etsi_t.8.man: fix manpage rendering
+	* doc/man/man8/test-fifo.8.man: fix manpage rendering
+	* doc/man/man8/test-inet_raw.8.man: fix manpage rendering
+	* doc/man/man8/test-inet_sctp.8.man: fix manpage rendering
+	* doc/man/man8/test-inet_tcp.8.man: fix manpage rendering
+	* doc/man/man8/test-inet_udp.8.man: fix manpage rendering
+	* doc/man/man8/test-interop.8.man: fix manpage rendering
+	* doc/man/man8/test-ip.8.man: fix manpage rendering
+	* doc/man/man8/test-isdn.8.man: fix manpage rendering
+	* doc/man/man8/test-log.8.man: fix manpage rendering
+	* doc/man/man8/test-loop.8.man: fix manpage rendering
+	* doc/man/man8/test-m2pa.8.man: fix manpage rendering
+	* doc/man/man8/test-m2ua_as.8.man: fix manpage rendering
+	* doc/man/man8/test-m3ua-raw.8.man: fix manpage rendering
+	* doc/man/man8/test-m3ua_as.8.man: fix manpage rendering
+	* doc/man/man8/test-mux.8.man: fix manpage rendering
+	* doc/man/man8/test-np_ip.8.man: fix manpage rendering
+	* doc/man/man8/test-nsdev.8.man: fix manpage rendering
+	* doc/man/man8/test-nuls.8.man: fix manpage rendering
+	* doc/man/man8/test-pipe.8.man: fix manpage rendering
+	* doc/man/man8/test-pipemod.8.man: fix manpage rendering
+	* doc/man/man8/test-q781-pipe.8.man: fix manpage rendering
+	* doc/man/man8/test-q781.8.man: fix manpage rendering
+	* doc/man/man8/test-q784.8.man: fix manpage rendering
+	* doc/man/man8/test-sad.8.man: fix manpage rendering
+	* doc/man/man8/test-sc.8.man: fix manpage rendering
+	* doc/man/man8/test-sctp_n.8.man: fix manpage rendering
+	* doc/man/man8/test-sctp_n2.8.man: fix manpage rendering
+	* doc/man/man8/test-sctp_t.8.man: fix manpage rendering
+	* doc/man/man8/test-sigtran.8.man: fix manpage rendering
+	* doc/man/man8/test-socket.8.man: fix manpage rendering
+	* doc/man/man8/test-socklib.8.man: fix manpage rendering
+	* doc/man/man8/test-sockmod.8.man: fix manpage rendering
+	* doc/man/man8/test-sockpath.8.man: fix manpage rendering
+	* doc/man/man8/test-socksys.8.man: fix manpage rendering
+	* doc/man/man8/test-streams.8.man: fix manpage rendering
+	* doc/man/man8/test-timod.8.man: fix manpage rendering
+	* doc/man/man8/test-tirdwr.8.man: fix manpage rendering
+	* doc/man/man8/test-tty.8.man: fix manpage rendering
+	* doc/man/man8/test-voip.8.man: fix manpage rendering
+	* doc/man/man8/test-x100p.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-cap.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-cap2.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-hsl.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-perf.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-sdl.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-sdt.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-sdt2.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p-sl.8.man: fix manpage rendering
+	* doc/man/man8/test-x400p.8.man: fix manpage rendering
+	* doc/man/man8/test-xnet.8.man: fix manpage rendering
+	* doc/man/man8/test-xnsl.8.man: fix manpage rendering
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgpatchlevel: new build number
+	* AUTHORS: new build number
+	* NEWS: new build number
+	* README: new build number
+	* THANKS: new build number
+
+2010-11-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian-lenny-i386-config.cache: added build requirements cache
+	* debian-unknown-i386-config.cache: added build requirements cache
+	* redhat-7.2-i686-config.cache: added build requirements cache
+	* todo: release todo file
+	* doc/man/man8/openss7_mkdev.8.man: missing manpage
+	* m4/autobuild.m4: add autobuild
+	* m4/bld.m4: added build requirements macros
+	* src/include/sys/openss7/wrapper.h.in: added wrapper header
+
+	* doc/projects/mg/netarch2: removed useless file
+	* src/drivers/sctp2.old.c: removed useless file
+
 2010-08-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: added bug #008.

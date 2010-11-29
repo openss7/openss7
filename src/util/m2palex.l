@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $
+ @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:47:54 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2palex.l,v $
+ Revision 1.1.2.2  2010-11-28 14:22:37  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:47:54  brian
  - added files to new distro
 
@@ -61,7 +64,7 @@
 
 %{
 
-static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:54 $";
+static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:37 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-24 13:49:44 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 13:55:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3007,6 +3007,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.4  2010-11-28 13:55:51  brian
+# - update build requirements, proper autoconf functions, build updates
+#
 # Revision 1.1.2.3  2009-07-24 13:49:44  brian
 # - updates for release build
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $
+ @(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:58 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-lapb.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:42  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:58  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:58 $";
+static char const ident[] = "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $";
 
 /*
  *  Here is an X.25 lapb (SLP and MLP) driver.  This is a DLPI driver that can push over or link a

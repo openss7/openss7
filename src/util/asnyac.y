@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:53 $
+ @(#) $RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:47:53 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: asnyac.y,v $
+ Revision 1.1.2.2  2010-11-28 14:22:36  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:47:53  brian
  - added files to new distro
 
@@ -61,7 +64,7 @@
 
 %{
 
-static char const ident[] = "$RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:53 $";
+static char const ident[] = "$RCSfile: asnyac.y,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $";
 
 #include <stdlib.h>
 #include <unistd.h>

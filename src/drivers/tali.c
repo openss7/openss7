@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:55 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:39 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:55 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tali.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:39  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:55  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tali.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:55 $";
+static char const ident[] = "$RCSfile: tali.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:39 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +78,7 @@ static char const ident[] = "$RCSfile: tali.c,v $ $Name:  $($Revision: 1.1.2.1 $
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:55 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:39 $"
 #define TALI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

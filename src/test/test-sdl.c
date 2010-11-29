@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sdl.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $
+ @(#) $RCSfile: test-sdl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -60,17 +60,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:44:19 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sdl.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:31  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:44:19  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-sdl.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:44:19 $";
+static char const ident[] = "$RCSfile: test-sdl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:31 $";
 
 int card = 0;
 int span = 0;

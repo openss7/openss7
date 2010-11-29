@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:16:41 $
+# @(#) $RCSfile: strconf-sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:01:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:16:41 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 14:01:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -365,7 +365,7 @@ if test -n "$prev" ; then
 fi
 
 if test X"$show_version" = Xyes ; then
-    $echo "$progname:"' Version $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:16:41 $'
+    $echo "$progname:"' Version $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:01:53 $'
 fi
 
 if test X"$show_help" = Xyes ; then
@@ -2813,6 +2813,9 @@ fi
 # =============================================================================
 #
 # $Log: strconf-sh,v $
+# Revision 1.1.2.2  2010-11-28 14:01:53  brian
+# - awk script updates and corrections
+#
 # Revision 1.1.2.1  2009-06-21 11:16:41  brian
 # - added files to new distro
 #

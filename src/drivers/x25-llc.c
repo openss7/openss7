@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $
+ @(#) $RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:20:59 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-llc.c,v $
+ Revision 1.1.2.2  2010-11-28 14:21:42  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:20:59  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $";
+static char const ident[] = "$RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $";
 
 /*
  * This is a driver for the IEEE 802.2 Logical Link Contrl (LLC).  It presents
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.
 #define LLC_DESCRIP	"SVR 4.2 DLPI LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the Openss7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:20:59 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile: x25-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $"
 #define LLC_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for IEEE 802.2 LLC"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"

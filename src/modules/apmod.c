@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $
+ @(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:45 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: apmod.c,v $
+ Revision 1.1.2.3  2010-11-28 14:22:00  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:45  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $";
+static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:00 $";
 
 /*
  * ASCE/Presentation (A/P) Module
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.2 
 
 #define APLI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define APLI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:45 $"
+#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:00 $"
 #define APLI_DEVICE	"SVR 4.2 MP STREAMS APLI Module for APLI"
 #define APLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define APLI_LICENSE	"GPL"

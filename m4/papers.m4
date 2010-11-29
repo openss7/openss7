@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 13:55:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -479,6 +479,9 @@ AC_DEFUN([_PAPERS_XXX], [dnl
 # =============================================================================
 #
 # $Log: papers.m4,v $
+# Revision 1.1.2.5  2010-11-28 13:55:51  brian
+# - update build requirements, proper autoconf functions, build updates
+#
 # Revision 1.1.2.4  2009-07-21 11:06:13  brian
 # - changes from release build
 #

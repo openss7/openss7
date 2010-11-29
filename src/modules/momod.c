@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $
+ @(#) $RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:46 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: momod.c,v $
+ Revision 1.1.2.3  2010-11-28 14:22:03  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:46  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $";
+static char const ident[] = "$RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:03 $";
 
 /*
  * Minimal OSI (mOSI) Module
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.2 
 
 #define MOSI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MOSI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define MOSI_REVISION	"OpenSS7 $RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:46 $"
+#define MOSI_REVISION	"OpenSS7 $RCSfile: momod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:03 $"
 #define MOSI_DEVICE	"SVR 4.2 MP STREAMS MOSI Module for RFC 1698 (mOSI)"
 #define MOSI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MOSI_LICENSE	"GPL"

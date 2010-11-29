@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:51:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 13:44:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 10:51:25 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 13:44:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,6 +59,9 @@ SUBDIRS = cci cdi chi dlpi lli mapi mtpi mxi mgi nli npi sccpi sdli sdti sli tci
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.2  2010-11-28 13:44:39  brian
+## - update makefiles
+##
 ## Revision 1.1.2.1  2009-06-21 10:51:25  brian
 ## - added files to new distro
 ##

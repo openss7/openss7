@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xmp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $
+ @(#) $RCSfile: xmp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-21 11:37:47 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:22:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmp.c,v $
+ Revision 1.1.2.2  2010-11-28 14:22:00  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.1  2009-06-21 11:37:47  brian
  - added files to new distro
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: xmp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:37:47 $";
+static char const ident[] = "$RCSfile: xmp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:00 $";
 
 #include <xom.h>
 #include <xmp.h>

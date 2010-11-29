@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # =============================================================================
 #
-# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:14 $
+# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:14 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 14:34:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -90,7 +90,7 @@ EOF
 	}
 	if (/^--version/) {
 		print<<'EOF';
-$RCSfile: gdmocheck,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:14 $
+$RCSfile: gdmocheck,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $
 Copyright (c) 2008, 2009, 2010  Monavacon Limited.
 Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation.
 Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001  Brian Bidulock.
@@ -103,7 +103,7 @@ EOF
 	if (/^--copying/) {
 		print<<'EOF';
 -----------------------------------------------------------------------------
-@(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:14 $
+@(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:34:48 $
 -----------------------------------------------------------------------------
 Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
@@ -1280,7 +1280,7 @@ sub head {
 
 sub gdmo {
 	my $self = shift;
-	print '--@@ GDMOCHECK $Revision: 1.1.2.2 $';
+	print '--@@ GDMOCHECK $Revision: 1.1.2.3 $';
 	print '--@@ Copyright (c), 2008-2010 Monavacon Limited <http://www.monavacon.com/>';
 	print '--@@ Copyright (c), 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>';
 	print '--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>';
@@ -20460,6 +20460,9 @@ if (($gdmo = Gdmo->parse($file))) {
 # =============================================================================
 #
 # $Log: gdmocheck,v $
+# Revision 1.1.2.3  2010-11-28 14:34:48  brian
+# - updates to perlvar
+#
 # Revision 1.1.2.2  2009-07-21 11:06:14  brian
 # - changes from release build
 #

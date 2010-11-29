@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $
+ @(#) $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2009-06-29 07:35:43 $ by $Author: brian $
+ Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mcmux.c,v $
+ Revision 1.1.2.3  2010-11-28 14:21:34  brian
+ - remove #ident, protect _XOPEN_SOURCE
+
  Revision 1.1.2.2  2009-06-29 07:35:43  brian
  - SVR 4.2 => SVR 4.2 MP
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $";
+static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $";
 
 /*
  * This is MCMUX, a GSM MAP Common Services (MC) driver implementing the MAPI
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.2 
 #define MCMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:43 $"
+#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $"
 #define MCMUX_DEVICE	"SVR 4.2 MP STREAMS 3GPP TS 29.002 MAP Common Services (MC) Driver"
 #define MCMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MCMUX_LICENSE	"GPL"

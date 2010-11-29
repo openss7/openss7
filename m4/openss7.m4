@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2009-07-24 13:49:44 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2010-11-28 13:55:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
+# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1227,6 +1227,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.8  2010-11-28 13:55:51  brian
+# - update build requirements, proper autoconf functions, build updates
+#
 # Revision 1.1.2.7  2009-07-24 13:49:44  brian
 # - updates for release build
 #
