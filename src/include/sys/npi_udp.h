@@ -88,6 +88,7 @@ typedef struct N_qos_sel_info_udp {
 	np_ulong mtu;			/* default mtu for outgoing packets */
 	np_ulong saddr;			/* default srce IP address for outgoing packets */
 	np_ulong daddr;			/* default dest IP address for outgoing packets */
+        np_ulong checksum;              /* default checksum for packets */
 } N_qos_sel_info_udp_t;
 
 typedef struct N_qos_sel_conn_udp {
@@ -99,6 +100,7 @@ typedef struct N_qos_sel_conn_udp {
 	np_ulong mtu;			/* default maximum-transfer-unit for connection */
 	np_ulong saddr;			/* default srce IP address for outgoing packets */
 	np_ulong daddr;			/* default dest IP address for outgoing packets */
+        np_ulong checksum;              /* default checksum for packets */
 } N_qos_sel_conn_udp_t;
 
 typedef struct N_qos_sel_ud_udp {
@@ -108,6 +110,7 @@ typedef struct N_qos_sel_ud_udp {
 	np_ulong ttl;			/* time to live for outgoing packet */
 	np_ulong tos;			/* type of service for outgoing packet */
 	np_ulong saddr;			/* source IP address for outgoing packet */
+        np_ulong checksum;              /* default checksum for packets */
 } N_qos_sel_ud_udp_t;
 
 typedef struct {

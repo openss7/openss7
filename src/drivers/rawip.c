@@ -3449,6 +3449,7 @@ static struct module *module_address(unsigned long addr)
 #define HAVE_MODULE_ADDRESS_SYMBOL 1
 #elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
     defined HAVE_MODULES_SYMBOL
+extern struct list_head modules;
 static struct module *
 __module_address(unsigned long addr)
 {
@@ -3464,7 +3465,7 @@ __module_address(unsigned long addr)
 	}
 	return NULL;
 }
-static struct module_address(unsigned long addr )
+static struct module *module_address(unsigned long addr )
 {
 	struct module *mod;
 
@@ -3475,13 +3476,13 @@ static struct module_address(unsigned long addr )
 }
 #define HAVE_MODULE_ADDRESS_SYMBOL 1
 #elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module_address(unsigned long addr)
+static struct module *module_address(unsigned long addr)
 {
 	return module_text_address(addr);
 }
 #define HAVE_MODULE_ADDRESS_SYMBOL 1
 #elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module_address(unsigned long addr)
+static struct module *module_address(unsigned long addr)
 {
 	struct module *mod;
 
@@ -8123,9 +8124,9 @@ tp_wput(queue_t *q, mblk_t *mp)
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
 		tp_wstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
-		if (unlikely(!putbq(q, mp))) {
+		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;	/* must succeed */
-			putbq(q, mp);
+			putq(q, mp);
 		}
 	}
 	return (0);

@@ -1,3 +1,29 @@
+2010-12-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/mudp.4.man: added manual page
+	* doc/man/man4/np_udp.4.man: added manual page
+	* doc/man/man4/rsw.4.man: added manual page
+	* doc/man/man4/udpcl.4.man: added manual page
+	* doc/man/man4/udpco.4.man: added manual page
+	* doc/man/man7/npi_udp.7.man: added manual page
+	* src/drivers/rsw.c: start of rsw driver
+	* src/include/sys/rsw.h: start of rsw driver
+
+	* Makefile.am: added np_udp driver
+	* doc/man/Makefile.am: added manual pages
+	* doc/man/openss7.macros: updated dates
+	* doc/man/openss7.refs: added reference
+	* doc/man/man4/np_ip.4.man: updated manpage
+	* doc/man/man4/udp.4.man: updated manpage
+	* doc/man/man7/npi_ip.7.man: updated manpage
+	* src/drivers/Config.in: added np_udp driver
+	* src/drivers/np_ip.c: fixed lenny regression
+	* src/drivers/np_udp.c: fixed lenny regression
+	* src/drivers/rawip.c: fixed lenny regression
+	* src/drivers/tcp.c: fixed lenny regression
+	* src/drivers/udp.c: fixed lenny regression
+	* src/include/sys/npi_udp.h: added checksum option
+
 2010-11-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/.cvsignore: added ignores

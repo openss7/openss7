@@ -7307,7 +7307,7 @@ Part 1: Protocol Specification
 %K rfc4960
 %L SCTP
 %R RFC 4960
-%E Randall R. Stewart (ed)
+%E Randall R. Stewart
 %Q Internet Engineering Task Force
 %T Stream Control Transmission Protocol (SCTP)
 %D September 2007
@@ -7810,6 +7810,18 @@ Part 1: Protocol Specification
 %D June 2002
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3267.txt
+
+%K rfc4961
+%K bcp131
+%L BCP 131
+%R BCP 131/RFC 4961
+%A Dan Wing
+%Q Internet Engineering Task Force
+%T Symmetric RTP/RTP Control Protocol (RTCP)
+%D July 2007
+%O (Status: BEST COMMON PRACTICE)
+%I The IETF Trust
+%U http://www.ietf.org/rfc/bcp/bcp131.txt
 
 %K rfc5456
 %L RFC5456
