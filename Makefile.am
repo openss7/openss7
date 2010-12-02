@@ -552,6 +552,7 @@ libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
 				  src/drivers/np_ip.c \
+				  src/drivers/np_udp.c \
 				  src/drivers/socksys.c \
 				  src/drivers/inet.c \
 				  src/drivers/udp.c \

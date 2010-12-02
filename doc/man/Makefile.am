@@ -778,6 +778,8 @@ openss7_man_MANS = \
 	man4/ip2.4 \
 	man4/ipcl.4 \
 	man4/ipco.4 \
+	man4/udpcl.4 \
+	man4/udpco.4 \
 	man4/ipip.4 \
 	man4/ip_to_dlpi.4 \
 	man4/ipx25.4 \
@@ -874,6 +876,7 @@ openss7_man_MANS = \
 	man4/npi.4 \
 	man4/npi_ip.4 \
 	man4/np_ip.4 \
+	man4/np_udp.4 \
 	man4/nsdev.4 \
 	man4/ns-tcp.4 \
 	man4/nullmod.4 \
@@ -904,6 +907,7 @@ openss7_man_MANS = \
 	man4/rawip.4 \
 	man4/rip.4 \
 	man4/romod.4 \
+	man4/rsw.4 \
 	man4/rtp.4 \
 	man4/sad.4 \
 	man4/sc.4 \
@@ -4718,6 +4722,8 @@ openss7_dist_noinst_MANS = \
 	man4/ip2.4.man \
 	man4/ipcl.4.man \
 	man4/ipco.4.man \
+	man4/udpcl.4.man \
+	man4/udpco.4.man \
 	man4/ipip.4.man \
 	man4/ip_to_dlpi.4.man \
 	man4/ipx25.4.man \
@@ -4814,6 +4820,7 @@ openss7_dist_noinst_MANS = \
 	man4/npi.4.man \
 	man4/npi_ip.4.man \
 	man4/np_ip.4.man \
+	man4/np_udp.4.man \
 	man4/nsdev.4.man \
 	man4/ns-tcp.4.man \
 	man4/nullmod.4.man \
@@ -4844,6 +4851,7 @@ openss7_dist_noinst_MANS = \
 	man4/rawip.4.man \
 	man4/rip.4.man \
 	man4/romod.4.man \
+	man4/rsw.4.man \
 	man4/rtp.4.man \
 	man4/sad.4.man \
 	man4/sc.4.man \
@@ -8177,6 +8185,7 @@ MANS_UNUSED = \
 	man4/q922.4 \
 	man4/q931.4 \
 	man4/romod.4 \
+	man4/rsw.4 \
 	man4/rtp.4 \
 	man4/sccp_ioctl.4 \
 	man4/s_cons.4 \

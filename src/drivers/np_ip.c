@@ -133,7 +133,7 @@ static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.5 
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2010-11-28 14:32:24 $"
-#define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_IP Data Link Provider"
+#define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_IP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
 #define NP_BANNER	NP_DESCRIP	"\n" \
@@ -179,8 +179,8 @@ MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(NP_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/np_ip");
-#endif				/* MODULE_ALIAS */
-#endif				/* LINUX */
+#endif				/* defined MODULE_ALIAS */
+#endif				/* defined LINUX */
 
 /*
  *  ==========================================================================
@@ -881,6 +881,7 @@ static struct module *module_address(unsigned long addr)
 #define HAVE_MODULE_ADDRESS_SYMBOL 1
 #elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
     defined HAVE_MODULES_SYMBOL
+extern struct list_head modules;
 static struct module *
 __module_address(unsigned long addr)
 {
@@ -896,7 +897,7 @@ __module_address(unsigned long addr)
 	}
 	return NULL;
 }
-static struct module_address(unsigned long addr )
+static struct module *module_address(unsigned long addr)
 {
 	struct module *mod;
 
@@ -907,13 +908,13 @@ static struct module_address(unsigned long addr )
 }
 #define HAVE_MODULE_ADDRESS_SYMBOL 1
 #elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module_address(unsigned long addr)
+static struct module *module_address(unsigned long addr)
 {
 	return module_text_address(addr);
 }
 #define HAVE_MODULE_ADDRESS_SYMBOL 1
 #elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module_address(unsigned long addr)
+static struct module *module_address(unsigned long addr)
 {
 	struct module *mod;
 
@@ -1273,7 +1274,7 @@ np_ip_queue_xmit(struct sk_buff *skb)
 STATIC INLINE __hot_out int
 np_ip_queue_xmit(struct sk_buff *skb)
 {
-	struct dst_entry *dst = skb->dst;
+	struct dst_entry *dst = skb_dst(skb);
 	struct iphdr *iph = skb->nh.iph;
 
 	if (skb->len > dst_pmtu(dst)) {

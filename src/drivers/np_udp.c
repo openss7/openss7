@@ -130,8 +130,8 @@ static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.4
 #include <sys/npi_udp.h>
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
+#define NP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -378,8 +378,7 @@ typedef struct np {
 	unsigned short dport;		/* destination (connected) port number (network order) */
 	struct np_daddr daddrs[8];	/* destination (connected) addresses */
 	struct N_qos_sel_info_udp qos;	/* network service provider quality of service */
-	struct N_qos_range_info_udp qor;	/* network service provider quality of service
-						   range */
+	struct N_qos_range_info_udp qor;/* network service provider quality of service range */
 } np_t;
 
 #define PRIV(__q) (((__q)->q_ptr))
@@ -661,6 +660,7 @@ np_dupmsg(queue_t *q, mblk_t *bp)
  */
 
 /* State flags */
+#ifndef NSF_UNBND
 #define NSF_UNBND	(1 << NS_UNBND		)
 #define NSF_WACK_BREQ	(1 << NS_WACK_BREQ	)
 #define NSF_WACK_UREQ	(1 << NS_WACK_UREQ	)
@@ -681,6 +681,7 @@ np_dupmsg(queue_t *q, mblk_t *bp)
 #define NSF_WACK_DREQ10	(1 << NS_WACK_DREQ10	)
 #define NSF_WACK_DREQ11	(1 << NS_WACK_DREQ11	)
 #define NSF_NOSTATES	(1 << NS_NOSTATES	)
+#endif
 
 /* State masks */
 #define NSM_ALLSTATES	(NSF_NOSTATES - 1)
@@ -857,7 +858,7 @@ np_v4_err_next(struct sk_buff *skb, __u32 info)
 #define net_protocol_lock() local_bh_disable()
 #define net_protocol_unlock() local_bh_enable()
 #else				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTO_LOCK_ADDR
+#ifdef HAVE_INET_PROTO_LOCK_SYMBOL
 extern spinlock_t inet_proto_lock;
 #define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
 #define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
@@ -866,11 +867,69 @@ extern spinlock_t inet_proto_lock;
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
 #endif				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTOS_ADDR
-STATIC struct mynet_protocol **inet_protosp = (void *)&inet_protos;
+#ifdef HAVE_INET_PROTOS_SYMBOL
+struct mynet_protocol **inet_protosp = (void *)&inet_protos;
 #endif
 
-struct module *module_address(unsigned long addr);
+#ifdef HAVE___MODULE_ADDRESS_EXPORT
+static struct module *module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
+    defined HAVE_MODULES_SYMBOL
+extern struct list_head modules;
+static struct module *
+__module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	list_for_each_entry_rcu(mod, &modules, list) {
+		if (((void *)addr >= (void *)mod->module_init &&
+		     (void *)addr <  (void *)mod->module_init + mod->init_size)
+		    || ((void *)addr >= (void *)mod->module_core &&
+			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
+			return mod;
+		}
+	}
+	return NULL;
+}
+static struct module *module_address(unsigned long addr )
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
+static struct module *module_address(unsigned long addr)
+{
+	return module_text_address(addr);
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
+static struct module *module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_text_address(addr);
+	preempt_enable();
+	return mod;
+}
+#define HAVE_MODULE_ADDRESS_SYMBOL 1
+#else
+#undef HAVE_MODULE_ADDRESS_SYMBOL
+#endif
 
 /**
  * np_init_nproto - initialize network protocol override
@@ -1118,7 +1177,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 {
 	static unsigned short np_prev_port = 61000;
 	static const unsigned short np_frst_port = 61000;
-	static const unsigned short tp_last_port = 65000;
+	static const unsigned short np_last_port = 65000;
 
 	struct np_bhash_bucket *hp;
 	unsigned short bport = ADDR_buffer[0].sin_port;
@@ -1131,7 +1190,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 
 	PROTOID_length = 1;
 	if (bport == 0) {
-		num = tp_prev_port;	/* UNSAFE */
+		num = np_prev_port;	/* UNSAFE */
 	      try_again:
 		bport = htons(num);
 	}
@@ -1230,7 +1289,7 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 STATIC INLINE __hot_out int
 np_udp_queue_xmit(struct sk_buff *skb)
 {
-	struct dst_entry *dst = skb->dst;
+	struct dst_entry *dst = skb_dst(skb);
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
@@ -1252,7 +1311,7 @@ np_udp_queue_xmit(struct sk_buff *skb)
 STATIC INLINE __hot_out int
 np_udp_queue_xmit(struct sk_buff *skb)
 {
-	struct dst_entry *dst = skb->dst;
+	struct dst_entry *dst = skb_dst(skb);
 	struct iphdr *iph = skb->nh.iph;
 
 	if (skb->len > dst_pmtu(dst)) {
@@ -1305,6 +1364,8 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	}
 	return (skb);
 }
+
+extern kmem_cachep_t skbuff_head_cache;
 
 /**
  * np_alloc_skb_old - allocate a socket buffer from a message block
@@ -1514,7 +1575,7 @@ np_senddata(struct np *np, uint8_t protocol, const unsigned short dport, uint32_
 
 			skb->ip_summed = CHECKSUM_UNNECESSARY;
 			skb->csum = 0;
-			if (unlikely(opt->udp.checksum != T_YES))
+			if (unlikely(np->qos.checksum == 0))
 				goto no_csum;
 			if (likely(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				goto no_csum;
@@ -1529,7 +1590,7 @@ np_senddata(struct np *np, uint8_t protocol, const unsigned short dport, uint32_
 			__skb_push(skb, sizeof(struct iphdr));
 			skb_reset_network_header(skb);
 
-			skb->dst = &rt->u.dst;
+			skb_dst_set(skb, &rt->u.dst);
 			skb->priority = 0;	// np->qos.priority;
 
 			iph = (typeof(iph)) skb_network_header(skb);
@@ -1553,12 +1614,10 @@ np_senddata(struct np *np, uint8_t protocol, const unsigned short dport, uint32_
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
-#else
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 			__ip_select_ident(iph, &rt->u.dst, 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
-#endif
 #endif
 #endif
 			_printd(("sending message %p\n", skb));
@@ -2402,7 +2461,7 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, const socklen_t RES_le
 
 	if (dp != NULL)
 		if (unlikely
-		    ((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != QR_ABSORBED))
+		    ((err = np_senddata(np, np->qos.protocol, np->dport, np->qos.daddr, dp)) != QR_ABSORBED))
 			goto recover;
 	if (SEQ_number != NULL) {
 		bufq_unlink(&np->conq, SEQ_number);
@@ -2453,7 +2512,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
 	unsigned long flags;
 
 	if (dp != NULL) {
-		err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp);
+		err = np_senddata(np, np->qos.protocol, np->dport, np->qos.daddr, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto error;
 	}
@@ -2639,8 +2698,8 @@ ne_info_ack(queue_t *q)
 	mblk_t *mp;
 	N_info_ack_t *p;
 	struct sockaddr_in *ADDR_buffer;
-	struct N_qos_sel_info_ip *QOS_buffer = &np->qos;
-	struct N_qos_range_info_ip *QOS_range_buffer = &np->qor;
+	struct N_qos_sel_info_udp *QOS_buffer = &np->qos;
+	struct N_qos_range_info_udp *QOS_range_buffer = &np->qor;
 	unsigned char *PROTOID_buffer = np->protoids;
 	size_t ADDR_length = np->snum * sizeof(*ADDR_buffer);
 	size_t QOS_length = sizeof(*QOS_buffer);
@@ -2986,7 +3045,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
  */
 STATIC INLINE fastcall int
 ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
-	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
+	    struct N_qos_sel_conn_udp *QOS_buffer, np_ulong CONN_flags)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -3100,7 +3159,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 	mblk_t *mp, *cp;
 	N_conn_ind_t *p;
 	struct sockaddr_in *DEST_buffer, *SRC_buffer;
-	struct N_qos_sel_conn_ip *QOS_buffer;
+	struct N_qos_sel_conn_udp *QOS_buffer;
 	np_ulong DEST_length, SRC_length, QOS_length;
 	size_t size;
 	struct iphdr *iph = (struct iphdr *) SEQ_number->b_rptr;
@@ -3183,7 +3242,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		mp->b_wptr += sizeof(struct sockaddr_in);
 	}
 	if (QOS_length) {
-		QOS_buffer = (struct N_qos_sel_conn_ip *) mp->b_wptr;
+		QOS_buffer = (struct N_qos_sel_conn_udp *) mp->b_wptr;
 		QOS_buffer->n_qos_type = N_QOS_SEL_CONN_IP;
 		/* FIXME: might be a problem here on 2.4 where we steal the packet by overwritting
 		   the protocol id. */
@@ -4227,6 +4286,7 @@ ne_unitdata_req_slow(queue_t *q, mblk_t *mp)
 	int err;
 	mblk_t *dp = mp->b_cont;
 	uint32_t daddr;
+	uint16_t dport;
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -4256,12 +4316,14 @@ ne_unitdata_req_slow(queue_t *q, mblk_t *mp)
 		goto error;
 	if (unlikely((daddr = DEST_buffer->sin_addr.s_addr) == INADDR_ANY))
 		goto error;
+	if (unlikely((dport = DEST_buffer->sin_port) == 0))
+		goto error;
 	err = NBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
 	if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely((err = np_senddata(np, np->qos.protocol, daddr, dp)) != QR_ABSORBED))
+	if (unlikely((err = np_senddata(np, np->qos.protocol, dport, daddr, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
       error:
@@ -4287,6 +4349,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 	int err;
 	struct sockaddr_in dst_buf;
 	uint32_t daddr;
+	uint16_t dport;
 
 	prefetch(np);
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -4322,7 +4385,8 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
 			goto go_slow;
 	}
 	daddr = dst_buf.sin_addr.s_addr;
-	if (unlikely((err = np_senddata(np, np->qos.protocol, daddr, dp)) != QR_ABSORBED))
+	dport = dst_buf.sin_port;
+	if (unlikely((err = np_senddata(np, np->qos.protocol, dport, daddr, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
       error:
@@ -4362,7 +4426,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
 	N_conn_req_t *p;
-	struct N_qos_sel_conn_ip qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = &qos_buf;
+	struct N_qos_sel_conn_udp qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = &qos_buf;
 	struct sockaddr_in dst_buf[8] = { {AF_INET,}, }, *DEST_buffer = NULL;
 	int err;
 	mblk_t *dp = mp->b_cont;
@@ -4454,7 +4518,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	/* send data only after connection complete */
 	if (dp == NULL)
 		return (QR_DONE);
-	if (np_senddata(np, np->qos.protocol, np->qos.daddr, dp) != QR_ABSORBED) {
+	if (np_senddata(np, np->qos.protocol, np->dport, np->qos.daddr, dp) != QR_ABSORBED) {
 		pswerr(("Discarding data on N_CONN_REQ\n"));
 		return (QR_DONE);	/* discard the data */
 	}
@@ -4509,7 +4573,7 @@ ne_conn_res(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q), *TOKEN_value = np;
 	N_conn_res_t *p;
-	struct N_qos_sel_conn_ip qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = NULL;
+	struct N_qos_sel_conn_udp qos_buf = { N_QOS_SEL_CONN_IP, }, *QOS_buffer = NULL;
 	struct sockaddr_in res_buf[8] = { {AF_INET,}, }, *RES_buffer = NULL;
 	mblk_t *dp, *SEQ_number;
 	size_t dlen;
@@ -4742,7 +4806,7 @@ ne_write_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dlen = msgsize(mp)) == 0
 		     || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, mp)) != QR_ABSORBED))
+	if (unlikely((err = np_senddata(np, np->qos.protocol, np->dport, np->qos.daddr, mp)) != QR_ABSORBED))
 		goto error;
 	return (QR_ABSORBED);	/* np_senddata() consumed message block */
       discard:
@@ -4803,7 +4867,7 @@ ne_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely
 	    ((dlen = msgsize(dp)) == 0 || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != QR_ABSORBED))
+	if (unlikely((err = np_senddata(np, np->qos.protocol, np->dport, np->qos.daddr, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);	/* np_senddata() consumed message blocks */
       discard:
@@ -4850,7 +4914,7 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 	dlen = msgsize(dp);
 	if (unlikely(dlen == 0 || dlen > np->info.NIDU_size || dlen > np->info.ENSDU_size))
 		goto error;
-	err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp);
+	err = np_senddata(np, np->qos.protocol, np->dport, np->qos.daddr, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
@@ -5960,7 +6024,7 @@ np_v4_rcv(struct sk_buff *skb)
 		goto too_small;
 	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
-	rt = (struct rtable *) skb->dst;
+	rt = skb_rtable(skb);
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		/* need to do something about broadcast and multicast */ ;
 
@@ -6114,7 +6178,11 @@ np_v4_err(struct sk_buff *skb, u32 info)
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	np_v4_err_next(skb, info);
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
 #endif
@@ -6196,6 +6264,7 @@ np_alloc_priv(queue_t *q, struct np **npp, int type, dev_t *devp, cred_t *crp)
 		np->qos.mtu = 65535;
 		np->qos.saddr = 0;
 		np->qos.daddr = QOS_UNKNOWN;
+		np->qos.checksum = 0;
 		/* qos range info */
 		np->qor.n_qos_type = N_QOS_RANGE_INFO_IP;
 		np->qor.priority.priority_min_value = 0;

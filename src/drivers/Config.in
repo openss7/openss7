@@ -102,6 +102,7 @@ driver	mtp-min	    mtp_min	*
 driver	mtp	    mtp		*		    
 driver	mx	    mx		*		    
 driver	np_ip	    np_ip	*		    
+driver	np_udp	    np_udp	*		    
 driver	ptm	    ptm		127	256	    2
 driver	pts	    pts		128	256	    2
 driver	rawip	    raw		*		    
@@ -196,6 +197,7 @@ objname	driver	mtp-min	    mtp_min
 objname	driver	mtp	    mtp
 objname	driver	mx	    mx
 objname	driver	np_ip	    np_ip
+objname	driver	np_udp	    np_udp
 objname	driver	ptm	    pty
 objname	driver	pts	    pty
 objname	driver	rawip	    rawip
@@ -299,6 +301,7 @@ loadable	mtp_min
 loadable	mx
 loadable	mx_x400p
 loadable	np_ip
+loadable	np_udp
 loadable	pty
 loadable	rawip
 loadable	sccp
@@ -467,6 +470,9 @@ node	/dev/mx-lm	    c	    0666    mx		1
 node	/dev/np_ip	    c	    *	    np_ip	0
 node	/dev/ipcl	    c	    *	    np_ip	1
 node	/dev/ipco	    c	    *	    np_ip	2
+node	/dev/np_udp	    c	    *	    np_udp	0
+node	/dev/udpcl	    c	    *	    np_udp	1
+node	/dev/udpco	    c	    *	    np_udp	2
 #node	/dev/pts/0	    c	    0666    pts		0
 #node	/dev/pts/1	    c	    0666    pts		1
 #node	/dev/pts/10	    c	    0666    pts		10
