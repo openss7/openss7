@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2009-09-08 10:46:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2010-12-02 22:22:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-09-08 10:46:51 $ by $Author: brian $
+# Last Modified $Date: 2010-12-02 22:22:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -348,7 +348,8 @@ EXTRA_libOS7modules_a_SOURCES	= src/modules/mx_sdl.c \
 				  src/modules/sscop.c \
 				  src/modules/sscop2.c \
 				  src/modules/m2tp.c
-libOS7modules_a_SOURCES		= src/modules/pckt.c \
+libOS7modules_a_SOURCES		= src/modules/mstr.c \
+				  src/modules/pckt.c \
 				  src/modules/ptem.c \
 				  src/modules/ttcompat.c \
 				  src/modules/ldterm.c \
@@ -2890,6 +2891,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.9  2010-12-02 22:22:42  brian
+# - regression fix and np_udp driver
+#
 # Revision 1.1.2.8  2009-09-08 10:46:51  brian
 # - changes to avoid haldaemon problems
 #
