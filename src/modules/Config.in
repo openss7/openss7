@@ -69,6 +69,8 @@ module	testmod	    testmod
 module	timod	    timod
 module	tirdwr	    tirdwr
 
+module	mstr	    mstr
+
 module	aal1	    aal1
 module	aal2	    aal2
 module	aal5	    aal5
@@ -140,6 +142,8 @@ objname	module	testmod	    testmod
 
 objname	module	timod	    timod
 objname	module	tirdwr	    tirdwr
+
+objname	module	mstr	    mstr
 
 objname	module	aal1	    aal1
 objname	module	aal2	    aal2
@@ -217,6 +221,8 @@ objname	module	zaptel	    zaptel
 
 @CONFIG_STREAMS_TIMOD_MODULE_TRUE@loadable	timod
 @CONFIG_STREAMS_TIRDWR_MODULE_TRUE@loadable	tirdwr
+
+loadable	mstr
 
 loadable	aal1
 loadable	aal2
