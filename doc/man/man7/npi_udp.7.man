@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id$
+.\" @(#) $Id: npi_udp.7.man,v 1.1.2.2 2011-01-11 23:43:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,17 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date$ by $Author$
+.\" Last Modified $Date: 2011-01-11 23:43:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log$
+.\" $Log: npi_udp.7.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:15  brian
+.\" - updated manual pages
+.\"
+.\" Revision 1.1.2.1  2010-12-02 22:22:44  brian
+.\" - regression fix and np_udp driver
+.\"
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -400,7 +406,7 @@ the source address associated with the outgoing interface will be used for
 each given packet.
 .TP
 .I checksum
-Specifies whether checksum will be calculated and included int he outgoing
+Specifies whether checksum will be calculated and included in the outgoing
 UDP packet.
 .RE
 .\"
@@ -807,7 +813,7 @@ When set, the Stream is considered to be a CLNS Stream.  When clear, whether the
 CLNS is dependent upon other factors.
 .IP ""
 This flag is honoured by NPI-UDP.  When set, this flag indicates that this
-Stream is the \*(lqdefault destination Stream.\*(rq  This Stream will receive
+Stream is the \*(lq\)default destination Stream.\*(rq  This Stream will receive
 all packets destined for the NSAP specified in the bind request.  If no NSAP
 is specified in the bind request, then this Stream should receive all packets
 destined to an NSAP which is bound to no other Stream.  Only one default

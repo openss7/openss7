@@ -175,6 +175,17 @@
 %U http://www.opengroup.org/onlinepubs/
 %S X/Open CAE Specification
 
+%K openss7
+%L openss7-@VERSION@
+%R openss7-@VERSION@
+%A OpenSS7
+%Q OpenSS7
+%T OpenSS7 Source Code
+%D @PACKAGE_DATE@
+%E Brian Bidulock
+%I OpenSS7 Corporation
+%U http://www.openss7.org/
+
 %L TCI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
@@ -4543,6 +4554,17 @@ Part 1: Protocol Specification
 
 %K h248.1
 %L H.248.1
+%A ITU-T
+%Q International Telecommunication Union
+%R ITU-T Recommendation H.248.1
+%T Gateway control protocol: Version 3
+%D September 2005
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%U http://www.itu.int/rec/T-REC-H.248/
+
+%K h248.1
+%L H.248.1
 %A ITU
 %Q International Telecommunication Union
 %R ITU-T Recommendation H.248.1
@@ -7029,6 +7051,21 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2474.txt
 
+%K rfc3550
+%L RFC3550
+%R RFC 3550
+%A Henry Shulzrinne
+%A Stephen L. Casner
+%A Ron Frederick
+%A Van Jacobson
+%E Henry Shulzrinne
+%Q Internet Engineering Task Force
+%T RTP: A Transport Protocol for Real-Time Application
+%D July 2003
+%O (Obsoletes RFC 1889) (Updated by RFC 5506, 5761, 6051) (Also STD 0064) (Status: STANDARD)
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3550.txt
+
 %K rfc1889
 %L RFC1889
 %R RFC 1889
@@ -7039,9 +7076,22 @@ Part 1: Protocol Specification
 %E Henry Shulzrinne
 %Q Internet Engineering Task Force
 %T RTP: A Transport Protocol for Real-Time Application
+%O (Obsoleted by RFC 3550) (Status: PROPOSED STANDARD)
 %D January 1996
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1889.txt
+
+%K rfc3551
+%L RFC3551
+%R RFC 3551
+%A Henry Shulzrinne
+%A Stephen L. Casner
+%T RTP Profile for Audio and Video Conferences with Minimal Control
+%D July 2003
+%Q Internet Engineering Task Force
+%O (Obsoletes RFC 1890) (Updated by RFC 5761) (Also STD 0065)
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3551.txt
 
 %K rfc2001
 %L RFC2001
@@ -7168,6 +7218,33 @@ Part 1: Protocol Specification
 %D October 1998
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2434.txt
+
+%K rfc4566
+%L RFC4566
+%R RFC 4566
+%A Mark Handley
+%A Van Jacobsen
+%A Colin Perkins
+%E Mark Handley
+%T SDP: Session Description Protocol
+%D July 2006
+%O (Obsoletes RFC 2327, RFC 3266) (Status PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc4566.txt
+
+%K rfc2327
+%L RFC2327
+%R RFC 2327
+%A Mark Handley
+%A Van Jacobson
+%E Mark Handley
+%T SDP: Session Description Protocol
+%D April 1998
+%O (Obsoleted by RFC 4566) (Updated by RFC 3266) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2327.txt
 
 %K rfc2705
 %L RFC2705

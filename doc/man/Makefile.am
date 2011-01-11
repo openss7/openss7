@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2010-11-28 13:35:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-01-11 23:43:15 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2010-11-28 13:35:23 $ by $Author: brian $
+## Last Modified $Date: 2011-01-11 23:43:15 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -848,6 +848,7 @@ openss7_man_MANS = \
 	man4/mg-lm.4 \
 	man4/mlp.4 \
 	man4/momod.4 \
+	man4/mstr.4 \
 	man4/mtp3b.4 \
 	man4/mtp.4 \
 	man4/mtp_ioctl.4 \
@@ -876,6 +877,7 @@ openss7_man_MANS = \
 	man4/npi.4 \
 	man4/npi_ip.4 \
 	man4/np_ip.4 \
+	man4/np_rtp.4 \
 	man4/np_udp.4 \
 	man4/nsdev.4 \
 	man4/ns-tcp.4 \
@@ -2244,9 +2246,11 @@ openss7_man_MANS = \
 	man7/npi_mtp.7 \
 	man7/npi_osi.7 \
 	man7/npi_q933.7 \
+	man7/npi_rtp.7 \
 	man7/npi_sccp.7 \
 	man7/npi_sctp.7 \
 	man7/npi_sscop.7 \
+	man7/npi_udp.7 \
 	man7/npi_x25.7 \
 	man7/N_putpvcmap.7 \
 	man7/N_PVC_ATTACH.7 \
@@ -2287,6 +2291,10 @@ openss7_man_MANS = \
 	man7/N_X25_GET_ROUTE.7 \
 	man7/N_X25_RM_ROUTE.7 \
 	man7/N_Xcanlis.7 \
+	man7/N_XCON_REQ.7 \
+	man7/N_xcon_req_t.7 \
+	man7/N_XDIS_REQ.7 \
+	man7/N_xdis_req_t.7 \
 	man7/N_Xelisten.7 \
 	man7/N_Xlisten.7 \
 	man7/N_zerostats.7 \
@@ -3501,6 +3509,8 @@ openss7_man_MANS = \
 	man9/mi_close_put.9 \
 	man9/mi_close_size.9 \
 	man9/mi_close_unlink.9 \
+	man9/mi_copyb.9 \
+	man9/mi_copymsg.9 \
 	man9/MI_COPY_CASE.9 \
 	man9/mi_copy_done.9 \
 	man9/mi_copyin.9 \
@@ -3510,12 +3520,17 @@ openss7_man_MANS = \
 	man9/mi_copy_set_rval.9 \
 	man9/mi_copy_state.9 \
 	man9/mi_detach.9 \
+	man9/mi_dupb.9 \
+	man9/mi_dupmsg.9 \
+	man9/mi_esballoc.9 \
+	man9/mi_esbbcall.9 \
 	man9/mi_first_dev_ptr.9 \
 	man9/mi_first_ptr.9 \
 	man9/mi_free.9 \
 	man9/mi_freeq.9 \
 	man9/mi_mpprintf.9 \
 	man9/mi_mpprintf_nr.9 \
+	man9/mi_msgpullup.9 \
 	man9/min.9 \
 	man9/mi_next_dev_ptr.9 \
 	man9/mi_next_ptr.9 \
@@ -4792,6 +4807,7 @@ openss7_dist_noinst_MANS = \
 	man4/mg-lm.4.man \
 	man4/mlp.4.man \
 	man4/momod.4.man \
+	man4/mstr.4.man \
 	man4/mtp3b.4.man \
 	man4/mtp.4.man \
 	man4/mtp_ioctl.4.man \
@@ -4820,6 +4836,7 @@ openss7_dist_noinst_MANS = \
 	man4/npi.4.man \
 	man4/npi_ip.4.man \
 	man4/np_ip.4.man \
+	man4/np_rtp.4.man \
 	man4/np_udp.4.man \
 	man4/nsdev.4.man \
 	man4/ns-tcp.4.man \
@@ -6188,9 +6205,11 @@ openss7_dist_noinst_MANS = \
 	man7/npi_mtp.7.man \
 	man7/npi_osi.7.man \
 	man7/npi_q933.7.man \
+	man7/npi_rtp.7.man \
 	man7/npi_sccp.7.man \
 	man7/npi_sctp.7.man \
 	man7/npi_sscop.7.man \
+	man7/npi_udp.7.man \
 	man7/npi_x25.7.man \
 	man7/N_putpvcmap.7.man \
 	man7/N_PVC_ATTACH.7.man \
@@ -6231,6 +6250,10 @@ openss7_dist_noinst_MANS = \
 	man7/N_X25_GET_ROUTE.7.man \
 	man7/N_X25_RM_ROUTE.7.man \
 	man7/N_Xcanlis.7.man \
+	man7/N_XCON_REQ.7.man \
+	man7/N_xcon_req_t.7.man \
+	man7/N_XDIS_REQ.7.man \
+	man7/N_xdis_req_t.7.man \
 	man7/N_Xelisten.7.man \
 	man7/N_Xlisten.7.man \
 	man7/N_zerostats.7.man \
@@ -7445,6 +7468,8 @@ openss7_dist_noinst_MANS = \
 	man9/mi_close_put.9.man \
 	man9/mi_close_size.9.man \
 	man9/mi_close_unlink.9.man \
+	man9/mi_copyb.9.man \
+	man9/mi_copymsg.9.man \
 	man9/MI_COPY_CASE.9.man \
 	man9/mi_copy_done.9.man \
 	man9/mi_copyin.9.man \
@@ -7454,12 +7479,17 @@ openss7_dist_noinst_MANS = \
 	man9/mi_copy_set_rval.9.man \
 	man9/mi_copy_state.9.man \
 	man9/mi_detach.9.man \
+	man9/mi_dupb.9.man \
+	man9/mi_dupmsg.9.man \
+	man9/mi_esballoc.9.man \
+	man9/mi_esbbcall.9.man \
 	man9/mi_first_dev_ptr.9.man \
 	man9/mi_first_ptr.9.man \
 	man9/mi_free.9.man \
 	man9/mi_freeq.9.man \
 	man9/mi_mpprintf.9.man \
 	man9/mi_mpprintf_nr.9.man \
+	man9/mi_msgpullup.9.man \
 	man9/min.9.man \
 	man9/mi_next_dev_ptr.9.man \
 	man9/mi_next_ptr.9.man \
@@ -8170,6 +8200,7 @@ MANS_UNUSED = \
 	man4/mx_mux.4 \
 	man4/mx_x400p.4 \
 	man4/np.4 \
+	man4/np_rtp.4 \
 	man4/npi.4 \
 	man4/npi_ip.4 \
 	man4/oclt.4 \
@@ -8619,6 +8650,7 @@ MANS_UNUSED = \
 	man9/mfree.9 \
 	man9/minor.9 \
 	man9/mi_sprintf_putc.9 \
+	man9/mi_testb.9 \
 	man9/mi_tpi_ack_alloc.9 \
 	man9/mi_tpi_conn_con.9 \
 	man9/mi_tpi_conn_ind.9 \
@@ -8717,6 +8749,12 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.8  2011-01-11 23:43:15  brian
+## - updated manual pages
+##
+## Revision 1.1.2.7  2010-12-02 22:22:42  brian
+## - regression fix and np_udp driver
+##
 ## Revision 1.1.2.6  2010-11-28 13:35:23  brian
 ## - build updates and manual page corrections
 ##

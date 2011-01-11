@@ -2,11 +2,11 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: mi_copyout_alloc.9.man,v 1.1.2.1 2009-06-21 10:38:47 brian Exp $
+.\" @(#) $Id: mi_copyout_alloc.9.man,v 1.1.2.2 2011-01-11 23:43:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -23,7 +23,7 @@
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2011-01-11 23:43:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copyout_alloc.9.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:16  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:47  brian
 .\" - added files to new distro
 .\"
@@ -125,7 +128,7 @@ search-ignore T
 .br
 .B #include <sys/mpsddi.h>
 .HP
-.BI "mblk_t *mi_copyout_alloc(queue_t *" q ", mblk_t *" mp ", caddr_t " uaddr ", size_t " len );
+.BI "mblk_t *mi_copyout_alloc(queue_t *" q ", mblk_t *" mp ", caddr_t " uaddr ", size_t " len ", int " free );
 .\"
 .\"
 .SH ARGUMENTS
@@ -160,6 +163,9 @@ to copy data from the user-space memory address from which data would be copied 
 .TP
 .I len
 the number of bytes to copy out to user space.
+.TP
+.I free
+specifies, when non-zero, to automatically close the input-output operation on error.
 .\"
 .\"
 .SH INTERFACE
@@ -225,7 +231,7 @@ before calling
 .BR mi_copyout (9)
 is typicaly, but not necessary: should
 .BR mi_copyout (9)
-be called without every calling
+be called without ever calling
 .BR mi_copyout_alloc ()
 it has the same effect as calling
 .BR mi_copy_done (9)
@@ -292,7 +298,20 @@ when it fails, it returns
 .SH ERRORS
 .PP
 .BR mi_copyout_alloc ()
-fails when it cannot allocate a message block.
+fails when it cannot allocate a message block, or the structure of the passed
+in message block is invalid.
+When
+.I free
+is non-zero, and
+.BR mi_copyout_alloc ()
+fails, it will have the same effect as calling
+.BR mi_copy_done ()
+with an error code of
+.RB [ ENOSR ]
+when a message block could not be allocated, or
+.RB [ EPROTO ]
+when the structure or configuration of the passed in message block was
+incorrect.
 .\"
 .\"
 .SH EXAMPLE
@@ -353,7 +372,7 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
-.B mi_copyin ()
+.BR mi_copyout_alloc ()
 is implemented by directly manipulating the
 .BR iocblk (9),
 .BR copyreq (9)

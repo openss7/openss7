@@ -2,11 +2,11 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: chi.7.man,v 1.1.2.1 2009-06-21 10:36:19 brian Exp $
+.\" @(#) $Id: chi.7.man,v 1.1.2.2 2011-01-11 23:43:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -23,7 +23,7 @@
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:19 $ by $Author: brian $
+.\" Last Modified $Date: 2011-01-11 23:43:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: chi.7.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:15  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:36:19  brian
 .\" - added files to new distro
 .\"
@@ -150,7 +153,7 @@ protocol modules that require channel service.
 .PP
 The Channel Services Provider provides the means to manage the connection and
 disconnection of channels.  It is a local control protocol in the sense that
-there not necessarily any remote peer entitites.  Communications is between
+there not necessarily any remote peer entities.  Communications is between
 the local user entity and the local provider entity.
 .SS "Model of the CHI"
 .PP
@@ -162,11 +165,11 @@ primitives defined as
 messages that provide access to the channel services, and a transferred
 between the channel services user entity and the channel services provider
 entity.  These primitives are of two types: ones that originate from the
-channel services user (CSU), and other tha originate from the channel services
+channel services user (CSU), and other that originate from the channel services
 provider (CSP).  The primitives that originate from the CSU make requests to
 the CSP, or respond to an indication or event of the CSP.  The primitives that
-originate from the CSP are etiher confirmation of a requies or are indications
-to the CSU that an event has occured.
+originate from the CSP are either confirmation of a requires or are indications
+to the CSU that an event has occurred.
 .PP
 The CHI allows the CSP to be configured with any media streams (such as
 G.703/G.704 digital channels) that also conform to the CHI.  A CSU can also be
@@ -241,14 +244,14 @@ The channel detachment service uses the following primitives:
 .BR CH_DETACH_REQ (7):
 Detach the currently attached channel from the requesting stream.
 .PP
-.B Receipt Acknowledgment Service.
-The receipt acknowlegment service provides an indication to the channel
-service user of the positive or negative acknowledgment of the previous
+.B Receipt Acknowledgement Service.
+The receipt acknowledgement service provides an indication to the channel
+service user of the positive or negative acknowledgement of the previous
 primitive issued by the channel service user.
 The receipt acknowledgement service uses the following primitives:
 .IP \(em 4
 .BR CH_OK_ACK (7):
-Successful receipt acknowledgment.
+Successful receipt acknowledgement.
 .IP \(em 4
 .BR CH_ERROR_ACK (7):
 Unsuccessful receipt acknowledgement.
@@ -266,7 +269,7 @@ The enable service uses the following primitives:
 .IP \(em 4
 .BR CH_ENABLE_REQ (7):
 Request that the attached channel be enabled.
-This primitives requires local acknowledgment.
+This primitives requires local acknowledgement.
 .IP \(em 4
 .BR CH_ENABLE_CON (7):
 Confirms that the attached channel has been enabled as requested.
@@ -277,15 +280,15 @@ disable the attached channel.  Some channel service providers can disable
 channels (remove them from operation) locally, and others will require
 exchanges with the transmission peer that may take some time before the
 channel can be disabled.
-In addition, it is possible tha an autonomous disabling of the channel occurs
+In addition, it is possible that an autonomous disabling of the channel occurs
 without the request of the channel service user.  In this case, the channel
 disable service is used to indicate to the channel service user that an
-autonomous disabling of the channel has occured.
+autonomous disabling of the channel has occurred.
 The disable service uses the following primitives:
 .IP \(em 4
 .BR CH_DISABLE_REQ (7):
 Request that the attached enabled channel be disabled.
-This primitives requires local acknowledgment.
+This primitives requires local acknowledgement.
 .IP \(em 4
 .BR CH_DISABLE_CON (7):
 Confirms that the attached channel has been enabled as requested.
@@ -294,7 +297,7 @@ Confirms that the attached channel has been enabled as requested.
 Indicates that the attached channel has autonomously been disabled.
 .PP
 .B Connect Service.
-The connect service provides the channel service user iwth the ability to
+The connect service provides the channel service user with the ability to
 connect an enabled channel in the receive and/or transmit directions.  Some
 channel service providers can connect channels locally, and others will
 required exchanges with the transmission peer that will take some time before
@@ -304,17 +307,17 @@ The connect service uses the following primitives:
 .BR CH_CONNECT_REQ (7):
 Requests that the attached and enabled channel be connected in the specified
 direction.
-This primitives requires local acknowledgment.
+This primitives requires local acknowledgement.
 .IP \(em 4
 .BR CH_CONNECT_CON (7):
 Confirms that the attached and enabled channel has been connected in the
 indicated directions as requested.
 .PP
 .B Disconnect Service.
-The disconnect service provides the channe service user with the ability to
+The disconnect service provides the channel service user with the ability to
 disconnect a connected channel in the specified receive or transmit
 directions.  Some channel service providers can disconnect channels locally,
-and others will require exchanges with the transmission peer tha may take some
+and others will require exchanges with the transmission peer that may take some
 time before the channel can be disconnected in the specified direction.  In
 addition, it is possible that an autonomous disconnection occurs without the
 request of the channel service user.  In this case, the channel disconnect
@@ -325,7 +328,7 @@ The disconnect service uses the following primitives:
 .BR CH_DISCONNECT_REQ (7):
 Requests that the attached, enabled and connected channel be disconnected in
 ths specified directions.
-This primitives requires local acknowledgment.
+This primitives requires local acknowledgement.
 .IP \(em 4
 .BR CH_DISCONNECT_CON (7):
 Confirms that the attached, enabled and connected channel has been
@@ -340,11 +343,11 @@ The channel service provider provides the following event services:
 .PP
 .B Notification Service.
 The notification service is used by the channel service provider to
-inform the channel service user that a specific event has occured.
+inform the channel service user that a specific event has occurred.
 The notification service uses the following primitives:
 .IP \(em 4
 .BR CH_EVENT_IND (7):
-Indicates that the indicated event has occured.
+Indicates that the indicated event has occurred.
 .SS "Media Services"
 .PP
 The channel service provider provides the following media services:
@@ -361,6 +364,126 @@ Requests that the specified media data be transmitted.
 .IP \(em 4
 .BR CH_DATA_IND (7):
 Indicates that the indicated media data was received.
+.SH "MULTIPLEXED CONNECTIONS"
+.PP
+In support of multiplexing drivers that do not wish to link an additional CHI
+stream for each channel, an extension to the CHI service interface was
+crafted to support multiplexing many virtual CHI channels onto a single
+Stream.  This enhancement was created to ease the burden of configuration
+control of multiplexing drivers in protocol stacks.
+.PP
+Without this enhancement, switching matrices and media gateways implemented
+as multiplexing drivers that required that a channel not be shared between
+channel users would require that an additional channel Stream be temporarily
+linked under the multiplexing driver for each open of a media Stream on the
+multiplexing driver.  While this is not impossible, it does not scale well.
+.PP
+A case where this is evident is in the MG protocol stack, where a separate
+channel connection must be established for each RTP media connection.  The
+approach taken historically was to create a pool of channel Streams that are
+permanently linked under the RTP driver, and from which an RTP stream can be
+selected when a mediate gateway connection is initiated.  This was performed
+at the UDP-to-RTP, RTP-to-channel, channel-to-matrix, matrix-to-MG layers.
+An obvious difficulty with this approach is that only a fixed number of
+application Streams can be opened and active at any given point in time.
+Further, configuration information specifying the size of the pools is
+required and the linking was necessarily performed at boot time using a
+startup script.  Modifications of pool sizes while the protocol stack is
+running is difficult with this approach.
+.PP
+By provide a multiplex Stream that supports an unlimited number of
+connections, the @acronym{STREAMS} stack runs more efficiently and the number
+of connections is limited only by available memory.
+.PP
+It should be noted, however, that multiplexed CHI Streams are intended as an
+internal module-to-module interface, and the multiplexed service interface is
+not intended on being directly used by user-space programs (other than test
+programs).
+.SS Operation
+.PP
+The multiplexed CHI service interface modifies the CHI primitives by
+prepending a channel identifier tag to each end every CHI primitive.  This
+tag is a 32-bit work in 32-bit kernels and a 64-bit word on 64-bit kernels.
+The intention here is that the tag be able to hold a memory pointer.
+.PP
+The tag value in the upward direction is selected by the by the CHI user
+module and should be sufficiently unique that the CHI user can distinguish
+messages belonging to different virtual CHI interfaces on the Stream.  The
+tag value in the downward direction is selected by the CHI provider and must
+be used by the CHI user in all further primitives associated with the
+channel.  A tag is associated with a virtual CHI interface when the first
+.BR CH_ATTACH_REQ "(7) (Style II)"
+or
+.BR CH_ENABLE_REQ "(7) (Style I)"
+primitive is issued.  The CHI provider associates the user tag with the
+virtual interface and will tag all CHI primitives issued to the CHI user for
+the virtual interface with the CHI user selected tag.  In this way, the CHI
+user can independently control each of the virtual interfaces associated with
+the Stream.
+.PP
+When a virtual interface transitions to the
+.BR CHS_UNINIT " (Style II)"
+or
+.BR CHS_ATTACHED " (Style I)"
+state (as a result of the success of a
+.BR CH_DETACH_REQ "(7) (Style II)"
+or
+.BR CH_DISABLE_REQ "(7) (Style I)"
+primitive), the virtual interface is destroyed and its associated tag
+removed.  Upon successful processing of a
+.BR CH_ATTACH_REQ "(7) (Style II)"
+or
+.BR CH_ENABLE_REQ "(7) (Style I)"
+primitive, a new virtual interface is created and the tag provided with the 
+.BR CH_ATTACH_REQ "(7) (Style II)"
+or
+.BR CH_ENABLE_REQ "(7) (Style I)"
+primitive will be associated with the newly created virtual interface.
+.PP
+Aside from this different and the tagging of primitives, each virtual
+interface operates in a manner similar to an interface provided on on
+independent Stream.  However, because the Stream does not belong to a single
+interface, several issues emerge:
+.IP 1. \w'0.\(em'u
+Under the normal non-multiplexed CHI,
+.BR CH_ATTACH_REQ (7)
+and
+.BR CH_ENABLE_REQ (7)
+primitives are normally issued by the CHI user as
+.BR M_PROTO (9)
+message blocks.  Under the multiplexed CHI,
+.BR CH_ATTACH_REQ (7)
+and
+.BR CH_ENABLE_REQ (7)
+primitives should be issued by the CHI user as
+.BR M_PCPROTO (9)
+message blocks, particularly when setup delays are critical.
+.IP 2. \w'0.\(em'u
+In the non-multiplexed CHI Stream, the CH user must await acknowledgement for
+primitives required an acknowledgement before issuing any other primitives.
+This is largely because the Stream head will only process one priority
+message at a time.  If an
+.BR M_PCPROTO (9)
+message appears at the Stream head while another is queued, the first will be
+discarded.  For the multiplexed CHI stream, the module representing the CH
+user must be cognisant of this fact.  The multiplexed interface was not
+intended to be used by use processes, but, for test programs, the user must
+await acknowledgement of primitives that require acknowledgement before
+issuing any other primitives on any virtual interface.
+.IP 3. \w'0.\(em'u
+In the non-multiplex CHI Stream, the CHS provider issues
+.BR M_ERROR (9)
+message upstream with the error numbers set to
+.RB [ EPROTO ]
+to indicate fatal protocol errors.  These error messages can be correlated
+with the interface because there is only one interface per Stream.  In the
+multiplexed CHI Stream, these error messages can no longer be correlated with
+the virtual interface.  Therefore, the CHS provider should issue a
+.BR CH_EVENT_IND (7)
+message instead.
+.PP
+Aside from these, relatively minor issues, each virtual interface on the
+multiplexed CHI Stream acts as a real interface on its own Stream.
 .SH OPTIONS
 .PP
 The Channel Interface (CHI) does not define any general options at this

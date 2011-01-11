@@ -2,11 +2,11 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: msgpullup.9.man,v 1.1.2.1 2009-06-21 10:38:49 brian Exp $
+.\" @(#) $Id: msgpullup.9.man,v 1.1.2.2 2011-01-11 23:43:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -23,7 +23,7 @@
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:49 $ by $Author: brian $
+.\" Last Modified $Date: 2011-01-11 23:43:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: msgpullup.9.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:16  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:49  brian
 .\" - added files to new distro
 .\"
@@ -119,7 +122,7 @@ search-ignore T
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "mblk_t msgpullup(mblk_t *" mp ", int " len ");
+.BI "mblk_t *\fRmsgpullup(\fPmblk_t *" mp ", int " len "\fR)\fP;
 .\"
 .\"
 .SH ARGUMENTS
@@ -145,14 +148,14 @@ will copy and align
 .I len
 bytes from the message pointed to by
 .I mp
-into a new message, if possible, whose pointer is returned.
-If the passed in message pointed to by
+into a new message, if possible, whose pointer is returned.  If the passed in
+message pointed to by
 .I mp
 contains more bytes than specified by
 .IR len ,
 .BR msgpullup ()
-will copy the remaining bytes onto the end of the new message.
-If the passed in message pointed to by
+will copy the remaining bytes onto the end of the new message.  If the passed
+in message pointed to by
 .I mp
 contains less than
 .I len
@@ -168,12 +171,52 @@ all the bytes of the passed in message pointed to by
 will be concatenated, copied and aligned into the new message.
 .\"
 .\"
+.SH USAGE
+.PP
+.BR msgpullup ()
+is typically used where it is necessary for the first number of bytes in a
+.I STREAMS
+message to be contiguous to meet the needs of the routines processing the
+bytes contained in the message.  In this case,
+.BR msgpullup ()
+is called before processing the bytes.
+.PP
+The primary difference between
+.BR pullupmsg (9)
+and
+.BR msgpullup ()
+is that
+.BR pullupmsg (9)
+reuses the message blocks and data blocks where possible,
+.BR msgpullup ()
+always copies.  This is similar to the differences between
+.BR dupmsg (9)
+and
+.BR copymsg (9)
+in that
+.BR pullupmsg (9)
+is more efficient under many circumstances.  Nevertheless,
+.BR pullupmsg (9)
+can be problematic in a multiprocessor (MP) environment in that it may be difficult to ensure that
+the caller has exclusive access to the passed in message.  Because
+.BR msgpullup ()
+treats the passed in message as read-only, there are fewer difficulties on MP architectures.  This
+is probably why
+.BR msgpullup ()
+was originally added to
+.IR "SVR 4.0 MP STREAMS" .
+But, perhaps it is because
+.BR pullupmsg (9)
+has the notion of architectural alignment, whereas
+.BR msgpullup ()
+does not.
+.\"
+.\"
 .SH RETURN
 .PP
 Upon success,
 .BR msgpullup ()
-returns a pointer to the new message.
-Upon failure,
+returns a pointer to the new message.  Upon failure,
 .BR msgpullup ()
 returns
 .BR NULL .
@@ -184,26 +227,27 @@ returns
 .BR msgpullup ()
 fails and returns
 .B NULL
-when the number of bytes in the passed in message pointed to by
-.I mp
+when
+the number of bytes in the passed in message,
+.IR mp ,
 is less than
 .IR len ;
-and when allocation for the new message fails.
+or when an allocation for the new message fails.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR msgpullup ()
-can be called from any context, including user context, module procedures, call outs, callbacks,
-soft interrupts (tasklets and bottom halves), and interrupt service routines.
+can be called from any context, including user context, module procedures,
+call-outs, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR msgpullup ()
 is MP-safe.  It is the caller's responsibility to ensure exclusive access to
-the passed in message.
-See
+the passed in message.  See
 .BR mp-streams (9).
 .\"
 .\"
@@ -231,7 +275,11 @@ in place of
 .SH BUGS
 .PP
 .BR msgpullup ()
-has no known bugs.
+currently has no known bugs.
+A previous version had the serious bug that it always returned
+.B NULL
+regardless of what arguments were passed.  This was corrected in
+.BR openss7-1.1.1.20101115 .
 .\"
 .\"
 .SH COMPATIBILITY
@@ -249,6 +297,14 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+Passing
+.BR msgpullup ()
+a
+.B NULL
+.I mp
+pointer will yield indeterminate results (it might or might not crash the
+kernel).
+.IP \(em
 .IR AIX \(rg,
 .IR OSF/1 \(rg
 and
@@ -272,8 +328,9 @@ states that
 .BR msgpullup ()
 is a \*(lq\)DKI-compliant replacement for the older
 .BR pullupmsg (9)
-routine,\*(rq that is \*(lq\)not included in the DKI and will be removed form the system in a future
-release\*(rq and that users \*(lq\)are strongly encouraged to use
+routine,\*(rq that is \*(lq\)not included in the DKI and will be removed from
+the system in a future release\*(rq and that users \*(lq\)are strongly
+encouraged to use
 .BR msgpullup ()
 instead of
 .BR pullupmsg (9).\*(rq
@@ -342,19 +399,19 @@ are suitable for worst-case DMA and are physically contiguous.
 uw7doc
 .]
 .B Linux Fast-STREAMS
-also exhibits this behaviour.  Physical contiguous data buffers, aligned on a layer 1 cache boundary
-and suitable for worst-case DMA are allocated by
+also exhibits this behaviour.  Physical contiguous data buffers, aligned on a
+layer 1 cache boundary and suitable for worst-case DMA are allocated by
 .BR pullupmsg (9)
 but not
 .BR msgpullup ().
-Physical contiguous data buffers, not necessarily aligned on a layer 1 cache boundary and not
-necessarily suitable for worst-case DMA are allocated by
+Physical contiguous data buffers, not necessarily aligned on a layer 1 cache
+boundary and not necessarily suitable for worst-case DMA are allocated by
 .BR msgpullup ().
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will not make any assumptions about the physical contiguity or suitability for
-worst-case DMA of data buffers allocated via
+drivers and modules will not make any assumptions about the physical
+contiguity or suitability for worst-case DMA of data buffers allocated via
 .BR msgpullup ().
 .IP \(em
 .IR SUPER-UX \(rg
@@ -365,7 +422,8 @@ suxspg
 .BR msgpullup ()
 as failing under the same circumstances as
 .BR pullupmsg (9)
-with regard to the number of bytes of messages of the same type being pulled up.  That is, if
+with regard to the number of bytes of messages of the same type being pulled
+up.  That is, if
 .I len
 is not
 .B -1
@@ -378,7 +436,8 @@ fails and returns
 .IP ""
 Portable
 .I STREAMS
-drivers and modules will not rely upon any expected behaviour in this corner case.
+drivers and modules will not rely upon any expected behaviour in this corner
+case.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

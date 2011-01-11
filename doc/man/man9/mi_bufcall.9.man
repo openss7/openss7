@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: mi_bufcall.9.man,v 1.1.2.1 2009-06-21 10:38:46 brian Exp $
+.\" @(#) $Id: mi_bufcall.9.man,v 1.1.2.2 2011-01-11 23:43:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -23,7 +23,7 @@
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2011-01-11 23:43:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_bufcall.9.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:16  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:46  brian
 .\" - added files to new distro
 .\"
@@ -125,14 +128,14 @@ search-ignore T
 .br
 .B #include <sys/mpsddi.h>
 .HP
-.BI "void mi_bufcall(queue_t *" q ", int " size ", int " priority );
+.BI "void \fRmi_bufcall(\fPqueue_t *" q ", int " size ", int " priority \fR)\fP;
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP \w'\ priority\ 'u
 .I q
-Specifies the queue which is to be passed to
+Specifies the queue that is to be passed to
 .BR qenable (9).
 .PD 0
 .TP
@@ -167,7 +170,7 @@ is unable to allocate a block for a message, and invokes a specified callback
 function (typically
 .BR qenable (9))
 with a given queue when a large enough block becomes available.  This can
-cause system problems if the stream closes so that that queue becomes invalid
+cause system problems if the stream closes so that the queue becomes invalid
 before the callback function is invoked.
 .PP
 The
@@ -199,10 +202,10 @@ and a buffer call is issued with
 .BR bufcall (9)
 that, once it expires, simply enables the queue on which the message was
 placed awaiting a buffer.
-This would normally involve allocating some are in the private structure for
+This would normally involve allocating some area in the private structure for
 buffer callback identifiers, invoking
 .BR bufcall (9)
-with a simply function that performs
+with a pointer to a simple function that performs
 .BR qenable (9)
 on its argument.  Then the buffer callbacks must be cancelled before
 .BR qi_qclose (9)
@@ -233,8 +236,10 @@ was not a particularly good idea.
 fails when there is insufficient memory available to allocate the necessary
 internal data structures to represent the buffer call.  Because
 .BR mi_bufcall ()
-returns void, it is not possible to determine whether the call was successful
-or whether it failed, rendering the function rather useless.
+returns
+.BR void ,
+it is not possible to determine whether the call was successful or whether it
+failed, rendering the function rather useless.
 .PP
 .IR MacOT \(rg
 documentation
@@ -267,7 +272,8 @@ fails, so will
 .PP
 .BR mi_bufcall ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts (tasklets and bottom halves), and interrupt service routines.
+call-outs, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -282,20 +288,13 @@ is MP-safe.
 is an
 .IR MPS \(rg-specific
 function:
-.BR _MPS_SOURCE ,
-.B _AIX_SOURCE
-or
-.B _MAC_SOURCE
+.BR _MPS_SOURCE ", " _AIX_SOURCE " or " _MAC_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
 .BR "@PACKAGE_TITLE@"
 must also have been compiled with
-.BR CONFIG_STREAMS_COMPAT_MPS ,
-.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
-.BR CONFIG_STREAMS_COMPAT_AIX ,
-.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
-.BR CONFIG_STREAMS_COMPAT_MAC
-or
-.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+.BR CONFIG_STREAMS_COMPAT_MPS ", " CONFIG_STREAMS_COMPAT_MPS_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_AIX ", " CONFIG_STREAMS_COMPAT_AIX_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_MAC " or " CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
 .PP
 Under the current implementations of
@@ -307,6 +306,24 @@ e.g.
 .BR mi_open_comm (9)
 and
 .BR mi_close_comm (9).
+.PP
+Because
+.BR mi_bufcall ()
+stores a buffer callback identifier in the module private structure for
+queue,
+.IR q ,
+.BR mi_bufcall ()
+cannot be called for a queue pair that has not had its private structure
+allocated with one of the
+.BR mi_open_comm (9)
+family of functions.
+.PP
+Because
+.BR mi_bufcall ()
+utilizes
+.BR bufcall (9),
+many of the caveats that apply to that function also applies to
+.BR mi_bufcall ().
 .\"
 .\"
 .SH IMPLEMENTATION

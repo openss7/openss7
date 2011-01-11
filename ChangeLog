@@ -1,5 +1,23 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: updated manual pages
+	* doc/man/openss7.refs: updated manual pages
+	* doc/man/man4/bufmod.4.man: updated manual pages
+	* doc/man/man7/chi.7.man: updated manual pages
+	* doc/man/man7/npi_ip.7.man: updated manual pages
+	* doc/man/man7/npi_udp.7.man: updated manual pages
+	* doc/man/man9/TRYLOCK.9.man: updated manual pages
+	* doc/man/man9/mi_acquire.9.man: updated manual pages
+	* doc/man/man9/mi_allocb.9.man: updated manual pages
+	* doc/man/man9/mi_bufcall.9.man: updated manual pages
+	* doc/man/man9/mi_copyout_alloc.9.man: updated manual pages
+	* doc/man/man9/mi_trylock.9.man: updated manual pages
+	* doc/man/man9/msgpullup.9.man: updated manual pages
+	* doc/man/man9/noenable.9.man: updated manual pages
+	* doc/man/man9/pullupmsg.9.man: updated manual pages
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/man/man4/mstr.4.man: added manual pages
 	* doc/man/man4/np_rtp.4.man: added manual pages
 	* doc/man/man7/N_XCON_REQ.7.man: added manual pages

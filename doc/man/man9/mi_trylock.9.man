@@ -2,11 +2,11 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: mi_trylock.9.man,v 1.1.2.1 2009-06-21 10:38:48 brian Exp $
+.\" @(#) $Id: mi_trylock.9.man,v 1.1.2.2 2011-01-11 23:43:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -23,7 +23,7 @@
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:48 $ by $Author: brian $
+.\" Last Modified $Date: 2011-01-11 23:43:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_trylock.9.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:16  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:48  brian
 .\" - added files to new distro
 .\"
@@ -189,6 +192,15 @@ lock to be placed (back) onto message queue,
 When the lock is released by the current lock holder, the message queue,
 .IR q ,
 will be enabled.
+.PP
+.BR mi_trylock ()
+is only suitable when the private structure that is being locked is attached
+the the queue,
+.IR q .
+When attempting to lock another queue private structure across a multiplexing
+driver, use
+.BR mi_acquire (9)
+instead.
 .\"
 .\"
 .SH RETURN
@@ -346,6 +358,7 @@ do_rsrv(queue_t *q)
 .PP
 .BR mi_sleeplock (9),
 .BR mi_unlock (9),
+.BR mi_acquire (9),
 .BR TRYLOCK (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
