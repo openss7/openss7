@@ -1,3 +1,31 @@
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/mstr.4.man: added manual pages
+	* doc/man/man4/np_rtp.4.man: added manual pages
+	* doc/man/man7/N_XCON_REQ.7.man: added manual pages
+	* doc/man/man7/N_XDIS_REQ.7.man: added manual pages
+	* doc/man/man7/N_xcon_req_t.7.man: added manual pages
+	* doc/man/man7/N_xdis_req_t.7.man: added manual pages
+	* doc/man/man7/npi_rtp.7.man: added manual pages
+	* doc/man/man9/mi_copyb.9.man: added manual pages
+	* doc/man/man9/mi_copymsg.9.man: added manual pages
+	* doc/man/man9/mi_dupb.9.man: added manual pages
+	* doc/man/man9/mi_dupmsg.9.man: added manual pages
+	* doc/man/man9/mi_esballoc.9.man: added manual pages
+	* doc/man/man9/mi_esbbcall.9.man: added manual pages
+	* doc/man/man9/mi_msgpullup.9.man: added manual pages
+	* doc/suites/mg02.fig: added figures
+	* doc/suites/mg03.fig: added figures
+	* doc/suites/voip02.fig: added figures
+	* src/modules/rtp_ch.c: added experimental CH RTP module
+	* src/modules/rtp_test.c: added RTP test module
+
+2010-12-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/mstr.c: added multi-stream conversion module
+	* src/modules/Config.in: added multi-stream conversion module
+	* Makefile.am: added multi-stream conversion module
+
 2010-12-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/mudp.4.man: added manual page
