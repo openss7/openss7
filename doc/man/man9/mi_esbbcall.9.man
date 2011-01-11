@@ -1,0 +1,469 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mi_esbbcall.9.man,v 1.1.2.1 2011-01-11 23:40:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-01-11 23:40:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_esbbcall.9.man,v $
+.\" Revision 1.1.2.1  2011-01-11 23:40:10  brian
+.\" - added new files
+.\"
+.\" Revision 1.1.2.1  2009-06-21 10:38:46  brian
+.\" - added files to new distro
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore T
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MI_ESBBCALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_esbbcall
+\- reliable alternative to \fBesbbcall\fP(9)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "void \fRmi_esbbcall(\fPqueue_t *" q ", int " priority \fR)\fP;
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\ priority\ 'u
+.I q
+Specifies the queue that is to be passed to
+.BR qenable (9).
+.PD 0
+.TP
+.I priority
+Specifies the priority as used by the standard
+.I STREAMS
+.BR esbbcall (9)
+mechanism.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.br
+.I "Linux Fast-STREAMS"
+specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_esbbcall ()
+provides a reliable alternative to
+.BR esbbcall (9).
+Standard
+.I STREAMS
+.BR esbbcall (9)
+is intended to be called when
+.BR esballoc (9)
+is unable to allocate a block for a message, and invokes a sepcified callback
+function (typically
+.BR qenable (9))
+with a given queue when a message block becomes available.  This can
+cause system problems if the Stream closes so that the queue becomes invalid
+before the callback function is invoked.
+.PP
+The
+.BR mi_esbbcall ()
+is a reliable aternative, as the queue is not deallocated until the call is
+complete.  It uses the standard
+.BR esbbcall (9)
+mechanism with its own internal callback routine.  The callback routine
+either invokes
+.BR qenable (9)
+with the specified queue,
+.IR q ,
+or simply deallocates the instance data associated with the stream if the
+queue has already been closed.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_esbbcall ()
+is used in the common situation where an attempt is made to allocate an
+external buffer message block with
+.BR esballoc (9),
+which fails, and then the message being processed is put on the queue using
+.BR putbq (9)
+(from a service procedure) or
+.BR putq (9)
+(from a put procedure)
+and a buffer call is issued with
+.BR esbbcall (9)
+that, once it expires, simply enables the queue on which the message was
+placed awaiting a buffer.
+This would normally involve allocating some area in the private structure for
+buffer callback identifiers, invoking
+.BR ebbcall (9)
+with a pointer to a simple function that perfoms
+.BR qenable (9)
+on its argument.  Then the buffer callbacks must be cancelled before
+.BR qi_qclose (9)
+returns.
+.BR mi_esbbcall ()
+accomplishes these last steps in a single function call.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_esbbcal ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR mi_esbbcall ()
+fails, it fails silently (because it returns
+.BR void ).
+Having
+.BR mi_esbbcall ()
+return
+.B void
+was not a particularly good idea.
+.BR mi_esbbcall ()
+fails when there is insufficient memory available to allocate the necessary
+internal data structures to represent the buffer call.  Because
+.BR mi_esbbcall ()
+returns
+.BR void ,
+it is not possible to determine whether the call was successful or whether it
+failed, rendering the function rather useless.
+.PP
+.IR MacOT \(rg
+documentation
+.[
+macspg
+.]
+indicates that when
+.BR mi_esbbcall ()
+detects a failure from the
+.BR esbbcall (9)
+routine called internally, it sets a timer and continues to reattempt until
+.BR esbbcall (9)
+succeeds.  The problem with this approach on
+.B @PACKAGE_TITLE@
+is that both
+.BR esbbcall (9)
+and
+.BR timeout (9)
+allocate a
+.I STREAMS
+event structure,
+.BR strevent (9).
+When
+.BR esbbcall (9)
+fails, so will
+.BR timeout (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_esbbcall ()
+can be called from any context, including user context, module procedures,
+call-outs, callbacks, soft interrupts (tasklets and bottom halves), and
+interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_esbbcall ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_esbbcall ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ", " _AIX_SOURCE " or " _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ", " CONFIG_STREAMS_COMPAT_MPS_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_AIX ", " CONFIG_STREAMS_COMPAT_AIX_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_MAC " or " CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.PP
+Under the current implementations of
+.BR mi_esbbcall ()
+it is necessary to use the other
+.IR MPS \(rg-specific
+functions when allocating a stream:
+e.g.
+.BR mi_open_comm (9)
+and
+.BR mi_close_comm (9).
+.PP
+Because
+.BR mi_esbbcall ()
+stores a buffer callback identifier in the module private structure for
+queue,
+.IR q ,
+.BR mi_esbbcall ()
+cannot be called for a queue pair that has not had its private structure
+allocated with one of the
+.BR mi_open_comm (9)
+family of functions.
+.PP
+Because
+.BR mi_esbbcall ()
+utilizes
+.BR esbbcall (9),
+many of the caveats that apply to that function also applies to
+.BR mi_esbbcall ().
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_esbbcall ()
+is an
+.IR MPS \(rg-specific
+function that should not be used by portable
+.I STREAMS
+drivers or modules.
+A similar, and equally non-portable function, is the
+.IR Solaris \(rg-specific
+.BR qbufcall (9)
+facility.
+Portable
+.I STREAMS
+drivers and modules should use the more standard
+.BR esbbcall (9)
+function directly.
+.PP
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+provides enhancements to the
+.BR esbbcall (9)
+facility that permit it to function similar to
+.BR mi_esbbcall ()
+without changing the
+.BR esbbcall (9)
+function prototype.
+See
+.BR esbbcall (9)
+for more details.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR esbbcall (9),
+.BR qbufcall (9),
+.BR unbufcall (9),
+.BR qunbufcall (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_esbbcall ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_esbbcall ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_esbbcall ()
+is an
+.IR "OpenSS7 Project" specific
+implementation of an
+.IR MPS \(rg-compatible
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.BR esbbcall (9)
+or
+.BR qbufcall (9)
+function should be used in its stead.
+.IP \(em
+.BR mi_esbbcall ()
+is provided for use with SS7 drivers and modules that need some automatic
+handling of buffer callbacks for speed and efficiency.
+.IP \(em
+.BR mi_esbbcall ()
+does not exist in any other
+.IR MPS \(rg
+implementation other than
+.IR "Linux Fast-STREAMS" .
+.IP \(em
+.BR mi_esbbcall ()
+is compatible with
+.BR ss7_esbbcall (9),
+which is now deprecated.
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Conforms to
+.B OpenSS7
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_esbbcall ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+It is largely equivalent to the
+.BR ss7_esbbcall (9)
+SS7 common function that appeared in early releases of the
+.B strss7
+package and is also contained in
+.BR "@PACKAGE_TITLE@" .
+.PP
+.BR mi_esbbcall ()
+first appeared in
+.I OpenSS7
+release 1.1.1 as a result of an effort to remove the remaining undocumented
+SS7 helper functions.  Because
+.BR mi_esbbcall ()
+relies on the set of
+.BR mi_*
+helper functions being used to allocate private structures, the function was
+transposed into the
+.BR mi_*
+group of helper functions.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+
+
