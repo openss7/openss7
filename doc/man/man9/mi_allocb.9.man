@@ -2,11 +2,11 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: mi_allocb.9.man,v 1.1.2.1 2009-06-21 10:38:46 brian Exp $
+.\" @(#) $Id: mi_allocb.9.man,v 1.1.2.2 2011-01-11 23:43:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
@@ -23,7 +23,7 @@
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2011-01-11 23:43:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_allocb.9.man,v $
+.\" Revision 1.1.2.2  2011-01-11 23:43:16  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:46  brian
 .\" - added files to new distro
 .\"
@@ -125,7 +128,7 @@ search-ignore T
 .br
 .B #include <sys/mpsddi.h>
 .HP
-.BI "int \fRmi_allocb(\fPqueue_t *" q ", size_t " size ", int " priority \fR)\fP;
+.BI "mblk_t *\fRmi_allocb(\fPqueue_t *" q ", size_t " size ", int " priority \fR)\fP;
 .\"
 .\"
 .SH ARGUMENTS
@@ -151,7 +154,7 @@ argument to
 .PP
 .IR MPS \(rg-specific
 DDI.
-.PP
+.br
 .I "Linux Fast-STREAMS"
 specific.
 .\"
@@ -190,7 +193,7 @@ can be used throughout the driver or module from the
 synchronous environment, whenever a message block would otherwise be allocated using
 .BR allocb (9).
 .BR mi_allocb ()
-is called instead, an passed the queue,
+is called instead, and passed the queue,
 .IR q ,
 for which an active message is being processed by a put or service procedure.
 .PP
@@ -261,7 +264,7 @@ message blocks received on a Stream.
  14              putq(q, mp);
  15              break;
  16          }
- 17          if (!canpuntext(q)) {
+ 17          if (!canputnext(q)) {
  18              freeb(pp);
  19              putq(q, mp);
  20              break;
@@ -307,13 +310,13 @@ message blocks received on a Stream.
 \s+2\fP
 .fi
 .PP
-In the example, when a buyffer cannot be immediately allocated with
+In the example, when a buffer cannot be immediately allocated with
 .BR mi_allocb (),
 the caller simply places the message to be processed on the queue,
 .IR q ,
 and returns.  The queue,
 .IR q ,
-will have its service procedured scheduled, using
+will have its service procedure scheduled, using
 .BR qenable (9),
 when a buffer is available and processing of the message can continue.
 .\"
@@ -322,7 +325,7 @@ when a buffer is available and processing of the message can continue.
 .PP
 .BR mi_allocb ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts (tasklets and bottom halves), and
+call-outs, callbacks, soft interrupts (tasklets and bottom halves), and
 interrupt service routines.
 .\"
 .\"
@@ -351,7 +354,7 @@ defined.
 .PP
 Because
 .BR mi_allocb ()
-store a buffer callback identifier in the module private structure for queue,
+stores a buffer callback identifier in the module private structure for queue,
 .IR q ,
 .BR mi_allocb ()
 cannot be called for a queue pair that has not had its private structure allocated with one of the
@@ -381,8 +384,10 @@ with the queue pointer,
 upon failure of the call to
 .BR allocb (9)
 to immediately allocate a buffer.
-Because the buffer callback must be cancelled before returning from the STREAM close procedure, the
-buffer callback identifier is saved in the module private structure.  Because this is automatic,
+Because the buffer callback must be cancelled before returning from the
+.I STREAMS
+close procedure, the buffer callback identifier is saved in the module
+private structure.  Because this is automatic,
 .BR mi_allocb ()
 can only be called on Streams that have their private data structures allocated with one of the
 .BR mi_open_comm (9)
@@ -420,21 +425,28 @@ and
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR mi_allocb ()
-is an OpenSS7 Project specific implemetnation of an
+is an
+.I OpenSS7 Project
+specific implementation of an
 .IR MPS \(rg-compatible
 function and should not be used by portable
 .I STREAMS
 drivers and modules.
 .IP \(em
 .BR mi_allocb ()
-is provided for use with SS7 drivers and modules that need some automatic handling of buffer
-callbacks for speed and efficiency.
+is provided for use with SS7 drivers and modules that need some automatic
+handling of buffer callbacks for speed and efficiency.
 .IP \(em
 .BR mi_allocb ()
 does not exist in any other
 .IR MPS \(rg
 implementation other than
 .IR "Linux Fast-STREAMS" .
+.IP \(em
+.BR mi_allocb ()
+is compatible with
+.BR ss7_allocb (9)
+which is now deprecated.
 .PP
 See
 .BR mpscompat (9),
@@ -464,6 +476,19 @@ SS7 common function that appeared in early releases of the
 .B strss7
 package and is also contained in
 .BR "@PACKAGE_TITLE@" .
+.PP
+.BR mi_allocb ()
+first appeared in
+.I OpenSS7
+release 1.1.1 as a result of an effort to remove the remaining undocumented
+SS7 helper functions.  Because
+.BR mi_allocb ()
+relies on the set of
+.B mi_*
+helper functions being used to allocate private structures, the function was
+transposed into the
+.B mi_*
+group of helper functions.
 .\"
 .\"
 .[
