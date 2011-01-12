@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
+# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -103,7 +103,7 @@ start() {
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
 	if ! eval "grep '^$modrex\>' /proc/modules $redir" ; then
 	    echo -n "$module "
-	    eval "modprobe -k -q -- $module $redir"
+	    eval "modprobe -q -- $module $redir"
 	    [ $? -eq 0 ] || echo -n "(failed)"
 	fi
     done
@@ -221,11 +221,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -266,11 +266,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:47:58 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.sh,v $
+# Revision 1.1.2.2  2011-01-12 00:19:32  brian
+# - modprobe no longer accepts k option
+#
 # Revision 1.1.2.1  2009-06-21 11:47:58  brian
 # - added files to new distro
 #

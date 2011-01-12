@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-24 13:49:46 $
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com>
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 00:19:32 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -168,7 +168,7 @@ start() {
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
 	if ! eval "grep '^$modrex\>' /proc/modules $redir" ; then
 	    echo -n "$module "
-	    eval "modprobe -k -q -- $module $redir"
+	    eval "modprobe -q -- $module $redir"
 	    [ $? -eq 0 ] || echo -n "(failed)"
 	fi
     done
@@ -309,11 +309,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-24 13:49:46 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 00:19:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -355,11 +355,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:46 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: streams.sh,v $
+# Revision 1.1.2.3  2011-01-12 00:19:32  brian
+# - modprobe no longer accepts k option
+#
 # Revision 1.1.2.2  2009-07-24 13:49:46  brian
 # - updates for release build
 #
