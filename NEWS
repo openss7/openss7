@@ -1,6 +1,6 @@
-OpenSS7 -- history of user visible changes.  2010-11-28
-$Id: NEWS,v 1.1.2.11 2011-01-12 04:12:44 brian Exp $
-Copyright (c) 2008-2010  Monavacon Limited. <http://www.monavacon.com/>
+OpenSS7 -- history of user visible changes.  2011-01-11
+$Id: NEWS,v 1.1.2.12 2011-01-12 06:02:54 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 `OpenSS7' package.
 
- Major changes for release openss7-1.1.1.20101115
+ Major changes for release openss7-1.1.1.20110111
 -------------------------------------------------
 
 This is the fourth release of the `OpenSS7' package.  This is a
@@ -16,6 +16,12 @@ production grade release.  All existing validation test suites run
 clean on supported distributions, production kernels and architectures.
 
 Major features since the last release are as follows:
+
+   - Support for RHEL 6.0 Beta 2 (refresh) on a
+     2.6.32-44.1.el6.x86_64(.debug) kernel.  Also added support for
+     compiling with gcc 4.4.
+
+   - Support for CentOS 5.5 on a 2.6.18-194.25.1.el5 kernel.
 
    - Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake
      2.11.1, libtool 2.4, gettext 0.18.1, flex 2.5.35, bison 2.4.3,
@@ -172,8 +178,8 @@ the package page (http://www.openss.org/openss7_pkg.html) for the
 repository page (http://www.openss7.org/repos.html) for information
 concerning network installation and update sources.
 
-See `http://www.openss7.org/codefiles/openss7-1.1.1.20101115/ChangeLog'
-and `http://www.openss7.org/codefiles/openss7-1.1.1.20101115/NEWS' in
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20110111/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20110111/NEWS' in
 the release for more information.  Also, see the `openss7.pdf' manual
 in the release (also in html
 (http://www.openss7.org/openss7_manual.html)).
@@ -276,8 +282,8 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the openss7 package page (http://www.openss7.org/openss7_pkg.html).
 
-See `http://www.openss7.org/codefiles/openss7-1.1.1.20101115/ChangeLog'
-and `http://www.openss7.org/codefiles/openss7-1.1.1.20101115/NEWS' in
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20110111/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20110111/NEWS' in
 the release for more information.  Also, see the `openss7.pdf' manual
 in the release (also in html
 `http://www.openss7.org/openss7_manual.html').
