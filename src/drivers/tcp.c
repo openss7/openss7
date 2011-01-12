@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:25 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-12-02 22:22:45 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:25 $ by $Author: brian $
+ Last Modified $Date: 2010-12-02 22:22:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 1.1.2.5  2010-12-02 22:22:45  brian
+ - regression fix and np_udp driver
+
  Revision 1.1.2.4  2010-11-28 14:32:25  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:25 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-12-02 22:22:45 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -145,7 +148,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:25 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-12-02 22:22:45 $"
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

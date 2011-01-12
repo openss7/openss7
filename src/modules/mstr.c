@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-12-19 00:26:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,14 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2010-12-19 00:26:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mstr.c,v $
+ Revision 1.1.2.1  2010-12-19 00:26:46  brian
+ - added multi-stream conversion module
+
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-12-19 00:26:46 $";
 
 /*
  *  This is a single-stream to multi-stream conversion module.  What it does is accept a
@@ -71,7 +74,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define MSTR_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MSTR_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define MSTR_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define MSTR_REVISION	"OpenSS7 $RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-12-19 00:26:46 $"
 #define MSTR_DEVICE	"SVR 4.2 MP STREAMS Multi-Stream Module"
 #define MSTR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MSTR_LICENSE	"GPL"
