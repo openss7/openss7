@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 03:44:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -166,7 +166,7 @@ function version()
     cat <<EOF
 Version $version
 $ident
-Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.
+Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.
 Distributed under AGPL Version 3, included here by reference.
 See \`$program --copying' for copying permissions.
 EOF
@@ -247,7 +247,7 @@ function copying()
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
-Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -597,6 +597,7 @@ add_this_module() {
 #define __attribute_used__ __used
 #endif
 
+#undef KBUILD_MODNAME
 #define KBUILD_MODNAME $1
 
 #ifdef KBUILD_MODNAME
@@ -1264,6 +1265,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: modpost.sh,v $
+# Revision 1.1.2.6  2011-01-12 03:44:13  brian
+# - update awk scripts and work around gawk close bug
+#
 # Revision 1.1.2.5  2009-07-21 11:06:13  brian
 # - changes from release build
 #
