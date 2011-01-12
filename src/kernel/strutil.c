@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.5  2011-01-12 04:10:32  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.4  2010-11-28 14:32:26  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -878,32 +881,32 @@ msgpullup(mblk_t *mp, ssize_t length)
 	register mblk_t *b = NULL;
 	register ssize_t size, blen, type, len;
 
-	if (!msg)
+	if (unlikely(!mp))
 		goto error;
 	if (!(len = length))
 		goto copy_rest;
-	type = msg->b_datap->db_type;
+	type = mp->b_datap->db_type;
 	size = 0;
-	for (b = msg; b; b = b->b_cont) {
-		if ((blen = b->b_wptr - b->b_rptr) <= 0)
+	for (b = mp; b; b = b->b_cont) {
+		if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 			continue;
-		if (b->b_datap->db_type != type)
+		if (unlikely(b->b_datap->db_type != type))
 			break;
 		if ((size += blen) > len && len > 0)
 			goto copy_len;
 	}
-	if (size <= len)
+	if (unlikely(size <= len))
 		goto error;
 	if (len < 0)
 		len = size;
       copy_len:
-	if (!(msg = allocb(len, BPRI_MED)))
+	if (unlikely(!(msg = allocb(len, BPRI_MED))))
 		goto error;
 	bp = &msg->b_cont;
 	for (b = msg; b; b = b->b_cont) {
-		if ((blen = b->b_wptr - b->b_rptr) <= 0)
+		if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 			continue;
-		if (b->b_datap->db_type != type)
+		if (unlikely(b->b_datap->db_type != type))
 			break;
 		if ((size = blen - len) <= 0) {
 			bcopy(b->b_rptr, msg->b_wptr, blen);
@@ -913,7 +916,7 @@ msgpullup(mblk_t *mp, ssize_t length)
 		} else {
 			bcopy(b->b_rptr, msg->b_wptr, len);
 			msg->b_wptr += len;
-			if (!(*bp = copyb(b)))
+			if (unlikely(!(*bp = copyb(b))))
 				goto error;
 			(*bp)->b_datap->db_type = b->b_datap->db_type;
 			(*bp)->b_rptr += size;
@@ -924,7 +927,7 @@ msgpullup(mblk_t *mp, ssize_t length)
 	}
       copy_rest:
 	if (b)			/* just copy rest of message */
-		if (!(*bp = copymsg(b)))
+		if (unlikely(!(*bp = copymsg(b))))
 			goto error;
 	return (msg);
       error:

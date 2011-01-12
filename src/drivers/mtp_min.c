@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:29  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -89,8 +92,8 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/tihdr.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $"
-#define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $"
+#define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_MIN_LICENSE		"GPL"
@@ -1485,7 +1488,7 @@ sl_pdu_req(queue_t *q, mblk_t *dp)
 			p->sl_mp = 0;
 			mp->b_wptr += sizeof(*p);
 			mp->b_cont = dp;
-			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", DRV_NAME, sl, msgdsize(dp)));
+			printd(("%s: %p: SL_PDU_REQ [%ld] ->\n", DRV_NAME, sl, (long) msgdsize(dp)));
 			putnext(sl->wq, mp);
 			return (QR_ABSORBED);
 		}
@@ -5606,27 +5609,27 @@ t_conn_req(queue_t *q, mblk_t *mp)
 	}
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mtp));
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, mtp));
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: address cannot be assigned\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: address cannot be assigned\n", DRV_NAME, mtp));
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: address is unusable\n", DRV_NAME, mtp));
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: invalid message format\n", DRV_NAME, mtp));
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mtp));
 	goto error;
       error:
 	return t_error_ack(q, T_CONN_REQ, err);
@@ -5692,7 +5695,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 		return (QR_TRIMMED);
 	return (err);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mt, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %ld\n", DRV_NAME, mt, (long) dlen));
 	goto error;
       outstate:
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
@@ -5872,7 +5875,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	ptrace(("%s: %p: ERROR: would place i/f out of state\n", DRV_NAME, mt));
 	goto error;
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mt, dlen));
+	ptrace(("%s: %p: ERROR: bad data size %ld\n", DRV_NAME, mt, (long) dlen));
 	goto error;
       error:
 	return m_error(q, mp, EPROTO);
@@ -6065,7 +6068,7 @@ t_capability_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	return t_capability_ack(q, p->CAP_bits1);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, mt));
+	ptrace(("%s: %p: ERROR: invalid primitive format\n", DRV_NAME, MT_PRIV(q)));
 	return t_error_ack(q, T_CAPABILITY_REQ, -EINVAL);
 }
 #endif
@@ -6354,7 +6357,7 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_PLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PLINK\n",
-					DRV_NAME, mt));
+					DRV_NAME, MT_PRIV(q)));
 				ret = -EPERM;
 				break;
 			}
@@ -6366,7 +6369,7 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_PUNLINK):
 			if (iocp->ioc_cr->cr_uid != 0) {
 				ptrace(("%s: %p: ERROR: Non-root attempt to I_PUNLINK\n",
-					DRV_NAME, mt));
+					DRV_NAME, MT_PRIV(q)));
 				ret = -EPERM;
 				break;
 			}
@@ -6376,14 +6379,15 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 					break;
 			if (!sl) {
 				ret = -EINVAL;
-				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n"));
+				ptrace(("%s: %p: ERROR: Couldn't find I_UNLINK muxid\n",
+					DRV_NAME, MT_PRIV(q)));
 				break;
 			}
 			sl_free_priv(sl->rq);
 			break;
 		default:
 		case _IOC_NR(I_STR):
-			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, nr));
+			ptrace(("%s: %p: ERROR: Unsupported STREAMS ioctl %d\n", DRV_NAME, MT_PRIV(q), nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}
@@ -6448,7 +6452,7 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 			ret = mtp_ioccpass(q, mp);
 			break;
 		default:
-			ptrace(("%s: %d: ERROR: Unsupported MTP ioctl %d\n", nr));
+			ptrace(("%s: %p: ERROR: Unsupported MTP ioctl %d\n", DRV_NAME, MT_PRIV(q), nr));
 			ret = (-EOPNOTSUPP);
 			break;
 		}

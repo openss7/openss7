@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:36 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:36 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x100p.c,v $
+ Revision 1.1.2.4  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:21:36  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:36 $";
+static char const ident[] = "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -103,8 +106,8 @@ static char const ident[] = "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 1.1.2
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:36 $"
-#define SL_X100P_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $"
+#define SL_X100P_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X100P_LICENSE	"GPL"
@@ -6141,7 +6144,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 
 	if (!MBLKIN(mp, 0, sizeof(*p))) {
-		ptrace(("%s: ERROR: primitive too small = %d bytes\n", DRV_NAME,
+		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME,
 			mp->b_wptr - mp->b_rptr));
 		goto lmi_badprim;
 	}
@@ -6451,7 +6454,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	}
 #ifdef _DEBUG
 	if (cd->config.ifgtype != SDL_GTYPE_E1 && cd->config.ifgtype != SDL_GTYPE_T1) {
-		ptrace(("%s: ERROR: card group type = %lu\n", DRV_NAME, cd->config.ifgtype));
+		ptrace(("%s: ERROR: card group type = %u\n", DRV_NAME, cd->config.ifgtype));
 		return m_error(q, xp, EFAULT);
 	}
 #endif

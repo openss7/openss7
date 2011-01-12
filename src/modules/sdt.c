@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:05 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:33  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:05  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdt.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $";
+static char const ident[] = "$RCSfile: sdt.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
 
 
 /*
@@ -86,8 +89,8 @@ static char const ident[] = "$RCSfile: sdt.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $"
-#define SDT_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $"
+#define SDT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_LICENSE	"GPL"
@@ -562,7 +565,7 @@ STATIC INLINE int
 sdt_rc_signal_unit_ind(queue_t *q, struct sdt *s, mblk_t *dp, ulong count)
 {
 	if (count == 1) {
-		printd(("%s: %p: <- M_DATA [%d]\n", MOD_NAME, s, msgdsize(dp)));
+		printd(("%s: %p: <- M_DATA [%ld]\n", MOD_NAME, s, (long) msgdsize(dp)));
 		putnext(s->oq, dp);
 		return (QR_DONE);
 	} else if (count > 1) {
@@ -575,8 +578,8 @@ sdt_rc_signal_unit_ind(queue_t *q, struct sdt *s, mblk_t *dp, ulong count)
 			p->sdt_primitive = SDT_RC_SIGNAL_UNIT_IND;
 			p->sdt_count = count;
 			mp->b_cont = dp;
-			printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND [%lu x %d]\n", MOD_NAME, s,
-				count, msgdsize(dp)));
+			printd(("%s: %p: <- SDT_RC_SIGNAL_UNIT_IND [%lu x %ld]\n", MOD_NAME, s,
+				count, (long) msgdsize(dp)));
 			putnext(s->oq, mp);
 			return (QR_DONE);
 		}
@@ -3958,16 +3961,16 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	struct sdt *s = SDT_PRIV(q);
 	ulong oldstate = s->i_state;
 	if ((prim = *(ulong *) mp->b_rptr) == SDT_DAEDT_TRANSMISSION_REQ) {
-		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%ld]\n", MOD_NAME, s,
+			(long) msgdsize(mp->b_cont)));
 		if ((rtn = sdt_daedt_transmission_req(q, mp)) < 0)
 			s->i_state = oldstate;
 		return (rtn);
 	}
 	switch (prim) {
 	case SDT_DAEDT_TRANSMISSION_REQ:
-		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> SDT_DAEDT_TRANSMISSION_REQ [%ld]\n", MOD_NAME, s,
+			(long) msgdsize(mp->b_cont)));
 		rtn = sdt_daedt_transmission_req(q, mp);
 		break;
 	case SDT_DAEDT_START_REQ:
@@ -4050,16 +4053,16 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
 	/* 
 	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SDL_RECEIVED_BITS_IND) {
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%d] <-\n", MOD_NAME, s,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%ld] <-\n", MOD_NAME, s,
+			(long) msgdsize(mp->b_cont)));
 		if ((rtn = sdl_received_bits_ind(q, mp)) < 0)
 			s->i_state = oldstate;
 		return (rtn);
 	}
 	switch (prim) {
 	case SDL_RECEIVED_BITS_IND:
-		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%d] <-\n", MOD_NAME, s,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: SDL_RECEIVED_BITS_IND [%ld] <-\n", MOD_NAME, s,
+			(long) msgdsize(mp->b_cont)));
 		rtn = sdl_received_bits_ind(q, mp);
 		break;
 	case SDL_DISCONNECT_IND:
@@ -4124,7 +4127,7 @@ sdt_w_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *s = SDT_PRIV(q);
 	(void) s;
-	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%ld]\n", MOD_NAME, s, (long) msgdsize(mp)));
 	return sdt_send_data(q, mp);
 }
 STATIC INLINE int
@@ -4132,7 +4135,7 @@ sdt_r_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *s = SDT_PRIV(q);
 	(void) s;
-	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%ld] <-\n", MOD_NAME, s, (long) msgdsize(mp)));
 	return sdt_recv_data(q, mp);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.5  2011-01-12 04:10:32  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.4  2010-11-28 14:32:26  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2
 #ifdef CONFIG_PROC_FS
 #include <linux/proc_fs.h>
 #endif
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 #include <linux/kmod.h>
 #endif
 #include <linux/major.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_udp.h,v 1.1.2.2 2010-11-28 14:21:49 brian Exp $
+ @(#) $Id: npi_udp.h,v 1.1.2.4 2011-01-12 04:10:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:49 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_udp.h,v $
+ Revision 1.1.2.4  2011-01-12 04:10:31  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
+ Revision 1.1.2.3  2010-12-02 22:22:46  brian
+ - regression fix and np_udp driver
+
  Revision 1.1.2.2  2010-11-28 14:21:49  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -93,7 +99,7 @@ typedef struct N_qos_sel_info_udp {
 
 typedef struct N_qos_sel_conn_udp {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_CONN_UDP */
-	np_ulong protocol;
+	np_ulong protocol;              /* always IPPROTO_UDP */
 	np_ulong priority;
 	np_ulong ttl;			/* default time-to-live for connection */
 	np_ulong tos;			/* default type-of-service for connection */

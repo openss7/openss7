@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:05 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:33  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:05  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $";
+static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
 
 
 //#define _SVR4_SOURCE	1
@@ -79,8 +82,8 @@ static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $"
-#define SDL_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $"
+#define SDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_LICENSE	"GPL"
@@ -1945,16 +1948,16 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 	ulong oldstate = s->i_state;
 
 	if ((prim = *(ulong *) mp->b_rptr) == SDL_BITS_FOR_TRANSMISSION_REQ) {
-		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%ld]\n", MOD_NAME, s,
+			(long) msgdsize(mp->b_cont)));
 		if ((rtn = sdl_bits_for_transmission_req(q, mp)) < 0)
 			s->i_state = oldstate;
 		return (rtn);
 	}
 	switch (prim) {
 	case SDL_BITS_FOR_TRANSMISSION_REQ:
-		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%d]\n", MOD_NAME, s,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: -> SDL_BITS_FOR_TRANSMISSION_REQ [%ld]\n", MOD_NAME, s,
+			(long) msgdsize(mp->b_cont)));
 		rtn = sdl_bits_for_transmission_req(q, mp);
 		break;
 	case SDL_CONNECT_REQ:
@@ -2014,7 +2017,7 @@ sdl_w_data(queue_t *q, mblk_t *mp)
 	struct sdl *s = SDL_PRIV(q);
 
 	(void) s;
-	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%ld]\n", MOD_NAME, s, (long) msgdsize(mp)));
 	return sdl_send_data(q, mp);
 }
 STATIC INLINE int
@@ -2023,7 +2026,7 @@ sdl_r_data(queue_t *q, mblk_t *mp)
 	struct sdl *s = SDL_PRIV(q);
 
 	(void) s;
-	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, s, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%ld] <-\n", MOD_NAME, s, (long) msgdsize(mp)));
 	return sdl_recv_data(q, mp);
 }
 

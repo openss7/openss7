@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:31  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -1114,6 +1117,10 @@ mi_bufcall(queue_t *q, int size, int priority)
 
 EXPORT_SYMBOL(mi_bufcall);
 
+__MPS_EXTERN_INLINE void mi_esbbcall(queue_t *q, int priority);
+
+EXPORT_SYMBOL(mi_esbbcall);
+
 /*
  *  =========================================================================
  *
@@ -1167,6 +1174,31 @@ EXPORT_SYMBOL(mi_reallocb);
 __MPS_EXTERN_INLINE mblk_t *mi_allocb(queue_t *q, size_t size, int priority);
 
 EXPORT_SYMBOL(mi_allocb);	/* mps/stream.h */
+
+__MPS_EXTERN_INLINE mblk_t *mi_esballoc(queue_t *q, unsigned char *base,
+		size_t size, uint priority, frtn_t *freeinfo);
+
+EXPORT_SYMBOL(mi_esballoc);	/* mps/stream.h */
+
+__MPS_EXTERN_INLINE mblk_t *mi_copyb(queue_t *q, mblk_t *bp);
+
+EXPORT_SYMBOL(mi_copyb);	/* mps/stream.h */
+
+__MPS_EXTERN_INLINE mblk_t *mi_dupb(queue_t *q, mblk_t *bp);
+
+EXPORT_SYMBOL(mi_dupb);		/* mps/stream.h */
+
+__MPS_EXTERN_INLINE mblk_t *mi_copymsg(queue_t *q, mblk_t *mp);
+
+EXPORT_SYMBOL(mi_copymsg);	/* mps/stream.h */
+
+__MPS_EXTERN_INLINE mblk_t *mi_dupmsg(queue_t *q, mblk_t *mp);
+
+EXPORT_SYMBOL(mi_dupmsg);	/* mps/stream.h */
+
+__MPS_EXTERN_INLINE mblk_t *mi_msgpullup(queue_t *q, mblk_t *mp, ssize_t length);
+
+EXPORT_SYMBOL(mi_msgpullup);	/* mps/stream.h */
 
 /*
  *  =========================================================================

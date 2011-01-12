@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:37 $
+ @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:37 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fattach.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:36  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:37  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:37 $";
+static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:36 $";
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -154,7 +157,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:37 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-01-12 04:10:36 $");
 }
 
 static void
@@ -234,6 +237,8 @@ main(int argc, char *argv[])
 
 	um = umask(0);
 	umask(um);
+	new_mode[0] = new_mode[1] = (0666 & ~um);
+
 	for (;;) {
 		int c, val;
 
@@ -274,7 +279,6 @@ main(int argc, char *argv[])
 			break;
 		case 'u':	/* -u, --umask */
 			use_new_mode = 1;
-			new_mode[0] = new_mode[1] = (0666 & ~um);
 			break;
 		case 'M':	/* -M, --mode [MODE] */
 			if (optarg == NULL) {
@@ -286,11 +290,9 @@ main(int argc, char *argv[])
 			break;
 		case 'p':	/* -p, --pipe */
 			use_pipe = use_new_mode = 1;
-			new_mode[0] = new_mode[1] = (0666 & ~um);
 			break;
 		case 'c':	/* -c, --connld */
 			push_connld = use_pipe = use_new_mode = 1;
-			new_mode[0] = new_mode[1] = (0666 & ~um);
 			break;
 		case 'D':	/* -D, --debug [level] */
 			if (debug)

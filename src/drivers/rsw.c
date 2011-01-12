@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 04:10:29 $
 
  -----------------------------------------------------------------------------
 
@@ -47,14 +47,164 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: rsw.c,v $
+ Revision 1.1.2.2  2011-01-12 04:10:29  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
+ Revision 1.1.2.1  2010-12-02 22:22:46  brian
+ - regression fix and np_udp driver
+
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 04:10:29 $";
+
+/*
+ * This is the RTP-SW multiplexing driver.  It s purpose is to allo a single
+ * device, /dev/streams/rsw, to represent all RTP multiplex and channel device
+ * streams in the system.  The Matrix SNMP (mxMIB) configuration script opens
+ * the appropriate device drivers (NPI-UDP) and links (I_PLINKS) then under this
+ * multiplexer to form a single view of the device drivers.  It is then possible
+ * to open a single MX or CH upper stream on this multiplexer and either use it
+ * directly or link it, with appropriate modules pushed, under another
+ * multiplexing device driver.  Examples for MX streams would be linking them
+ * under the MG multiplexer or ZAPTEL multiplexer.
+ *
+ * The driver also provides pseudo-digital cross-connect capabilities within
+ * lower NPI-UDP streams or between lower NPI-UDP streams.  This cross-connect
+ * can be performed on a dynamic basis (switching), a semi-permanent basis
+ * (DCCS), or a permanent basis (channel bank).
+ *
+ * Whether an upper stream is a CH stream or an MX stream is determined using
+ * the minor device number of the opened Stream.  Upper CH and MX streams can be
+ * clone streams or non-clone streams.  Clone streams are Style 2 streams that
+ * can be attached to any available PPA.  Non-clone streams have a minor device
+ * number that maps to a global PPA or CLEI of a lower Stream (the mapping is
+ * assigned when the Stream is I_PLINKED beneath the multiplexing driver).
+ * These are Style 1 MX or CH streams.  Only individual channel or full span CH
+ * streams are available as Style 1 streams.  Fractional CH streams must utilize
+ * the clone CH device number and attach to the appropriate fraction of the
+ * span.
+ *
+ * The primary reason that the MX and CH portion of the switching matrix are
+ * combined into one multiplexing device driver is to support the switching of
+ * multi-rate ISDN and ISUP calls, where multiple 64 kbps channels are ganged
+ * together to provide the multirate connection.
+ *
+ * Note that the only time that it is necessary to pass channel data to and from
+ * the driver using an upper CH stream is for data or voice connections that are
+ * terminated on the host.  For example, a CH stream is opened and attached to a
+ * channel and an application plays an announcement of tone into the connection.
+ *
+ * Note that this switching matrix is not capable of performing channle
+ * conversion that is not provided by the lower CH or MX streams themselves.
+ * All pseudo-digital cross-connect is performed clear channel and consists of
+ * siimiply full or half-duplex connections.  At a later data, one exception to
+ * this might be the non-intensive mu-Law to A-law conversion.
+ *
+ * To perform dynamic media conversion, conferencing, or other media conversion
+ * functions, MX and CH upper streams on this driver (or their corresponding
+ * underlying devices) should be linked beneath the MG driver.  However, static
+ * media conversion can also be performed using a module or the device driver
+ * directly.  For example, VT over IP or RTP streams can have conversion modules
+ * pushed to provide an MX or CH interface that can then be linked directly
+ * underneath the MATRIX multiplexing driver.  For example, the RTP stream then
+ * can convert between the codec in use on the RTP stream and either mu-Law or
+ * A-law PCM presented to the MATRIX driver as a CH stream.  To facilitate this,
+ * the upper management CH stream on the MATRIX driver can pass whatever
+ * input-output controls it wishes to a managed lower CH stream.  For example,
+ * this could be used to set the codec used by a lower RTP stream before it is
+ * enabled.  The same is true for the MX management stream of the MATRIX driver.
+ */
+
+/*
+ *  The purpose of the RTP-SW multiplexing driver is to accept RTP packets using
+ *  a stream or multi-stream NPI interface at the lower multiplex and determine
+ *  the upper multiplex stream onto which they are to be delivered.  The intent
+ *  is that there is a separate upper multiplex stream for each codec (although
+ *  this driver does not perform transcoding).  The transcoding itself is
+ *  peformed by a RTP-XC transcoding module that pushed over the upper multiplex
+ *  stream.
+ *
+ *  The driver does perform jitter buffering and statistical analysis on the RTP
+ *  media stream using the RTP envelope.  The RTP envelope is also examined to
+ *  determine the static or dynamic payload type mapping to determine upon which
+ *  upper stream the packets are to be delivered.  A change in payload type on
+ *  the RTP media stream can result in a change in selection of the upper
+ *  multiplex stream.  Each upper multiplex queue pair performs jitter buffering
+ *  and statistical analysis of each virtual RTP channel.
+ *
+ *  The upper multiplex presents a CHI interface: either single-stream using
+ *  M_PROTO/M_PCPROTO primitives, or multi-stream using M_CTL/M_PCCTL
+ *  primitives.  The life-cycle of an RTP media stream is somewhat different
+ *  than the TDM application of the CH interface.  Whereas TDM channels are
+ *  ready to be enabled and connected in either or both directions after being
+ *  attached, RTP channels are only able to be connected in the receive
+ *  direction once being attached.  An additional step is required to connect
+ *  the channel in the transmit direction: this step requires specification of
+ *  the remote IP address and port number to which to transmit and can either be
+ *  peformed before or after connection.  The channel cannot transfer data in
+ *  the transmit direction until this remote descriptor has been specified.
+ *  Specification of the remote descriptor is accomplished using the
+ *  CH_OPTMGMT_REQ primitive, (or maybe a new CH_MODIFY_REQ, CH_OK_ACK and
+ *  CH_MODIFY_CON sequence).
+ *
+ *  A second wrinke with RTP channels is that it is advantageous to permit the
+ *  underlying driver to select the IP address or port number that is to be used
+ *  for the connection and this selection needs to be communicated back the the
+ *  CHS user.  TDM channels are fully specified.  This means that when a
+ *  CH_ATTACH_REQ is issued, the driver needs to be able to communicate the
+ *  selected channel back to the CHS-user.  A difficulty with the CHI as
+ *  originally specified is that the CH_ATTACH_REQ was acknowledged with a
+ *  CH_OK_ACK.  The CHI interface needs to be modified to respond with a
+ *  CH_ATTACH_ACK that returns the CHS provider selected address.  The state
+ *  machine does not need to be altered much, a CH_ATTACH_ACK is simply used to
+ *  respond to the CH_ATTACH_REQ instead of a CH_OK_ACK.
+ *
+ *  A third wrinkle with RTP channels is that RTP payload types can be mapped to
+ *  different upper streams.  During the initial phase of connection, where
+ *  receive-only is possible, it is possible that the remote sender will select
+ *  one or another of a set of possible codecs in which to send information.
+ *  The exact codec used is determined by the RTP payload type.  The reason the
+ *  we use multiple upper multiplex streams, one for each codec, is for
+ *  efficiency.  Queueing messages that need to have the same algorithmic
+ *  functions performed on them increases processor instruction cache
+ *  performance dramatically.  A mechanism is required to tell the driver on
+ *  which upper stream to connect.  This might beg the use of an additional
+ *  multiplexing driver has the individual streams opened on the upper portion
+ *  of this driver under the new multiplexing driver in question.  This new
+ *  multiplexing driver could then reaggregate transcoded channel information
+ *  back into a single multi-stream CH interface.  The assembly procedure would
+ *  then be to open a stream on this driver, push a transcoding module, and then
+ *  link it under the aggregation driver.  When a channel is established on an
+ *  upper multiplex stream to the aggregation driver, the mapping could be
+ *  performed once the media stream is attached.  The mapping could be specified
+ *  with CH_OPTMGMT_REQ/CH_OK_ACK primitives after the attach and the mapping
+ *  communicated downward by issuing single-codec CH_OPTMGMT_REQ/CH_OK_ACK
+ *  exchanges on the appropriate downside stream.
+ *
+ *  Another approach would be to perform multiple attachments of the same
+ *  virtual channel interface, one for each downward stream.  This would require
+ *  the ability to perform a subsequent attachment on the same tag.
+ *
+ *
+ *  Another approach can be to uses the PROTOID fields of a slightly modified
+ *  NPI-UDP driver (modified into a NPI-RTP) driver to specify the payloads
+ *  associated with a connection and to have the ability to form separate NPI
+ *  virtual connections for different payload types.  This would permit binding
+ *  and connecting different payloads on different streams.
+ *
+ *  A major reason for all this perambulation is that when connecting a VoIP
+ *  call over RTP it might be desirable to cross-connect same-payload types
+ *  while transcoding different payload types.  For example, although the
+ *  connection on one leg is G.711, it might be advantageous to offer G.711 and
+ *  G.729 to the connecting leg.  Received G.711 payload could then be directly
+ *  cross-connected between legs, whereas any received G.729 packets are
+ *  terminated and transcoded.
+ */
 
 #define _SVR4_SOURCE
 
@@ -113,7 +263,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #define RSW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RSW_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define RSW_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 04:10:29 $"
 #define RSW_DEVICE	"SVR 4.2 MP STREAMS RTP Switch Driver"
 #define RSW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RSW_LICENSE	"GPL"
@@ -237,6 +387,37 @@ struct rsw_connection {
 	uint16_t sport;
 	struct rp *rsw;
 };
+
+
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  CH-User to CH-Provider primitives
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/** ch_attach_req - attach a CH stream to a PPA
+  * @q: active queue
+  * @mp: the CH_ATTACH_REQ primitive
+  * @rs: private structure (locked)
+  * @ch: channel structure
+  */
+static int
+ch_attach_req(queue_t *q, mblk_t *mp, struct rs *rs, struct ch *ch)
+{
+	CH_attach_req_t *p;
+	int err;
+
+	err = CHBADPRIM;
+	if (unlikely(!MBLKIN(mp, sizeof(ch), sizeof(*p))))
+		goto error;
+	p = (typeof(p))(mp->b_rptr + sizeof(ch));
+	dassert(p->ch_primitive == CH_ATTACH_REQ);
+	if (unlikely(!MBLKIN(mp, p->ch_addr_offset, p->ch_addr_length)))
+		goto error;
+}
 
 
 /** rsw_w_prim_put - process primitive for write queue

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:06 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:33  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:06  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $";
+static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
 
 
 /*
@@ -81,8 +84,8 @@ static char const ident[] = "$RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) 
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $"
-#define SL_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $"
+#define SL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_LICENSE	"GPL"
@@ -1792,7 +1795,7 @@ sl_daedt_fisu(queue_t *q, struct sl *sl, mblk_t *mp)
 		mp->b_wptr += sizeof(sl_uchar);
 	}
 	sl->statem.txc_state = SL_STATE_SLEEPING;
-	printd(("%s: %p: FISU [%x/%x] %ld ->\n", MOD_NAME, sl,
+	printd(("%s: %p: FISU [%x/%x] %u ->\n", MOD_NAME, sl,
 		sl->statem.tx.N.bib | sl->statem.tx.N.bsn,
 		sl->statem.tx.N.fib | sl->statem.tx.N.fsn, sl->option.popt & SS7_POPT_PCR));
 }
@@ -2683,9 +2686,9 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 		sl->statem.rx.R.fib = *mp->b_rptr++ & 0x80;
 		sl->statem.rx.len = *mp->b_rptr++ & 0x3f;
 	}
-	printd(("%s: %p: [%x/%x] SU [%d] li = %d <-\n", MOD_NAME, sl,
+	printd(("%s: %p: [%x/%x] SU [%ld] li = %d <-\n", MOD_NAME, sl,
 		sl->statem.rx.R.bsn | sl->statem.rx.R.bib,
-		sl->statem.rx.R.fsn | sl->statem.rx.R.fib, msgdsize(mp), sl->statem.rx.len));
+		sl->statem.rx.R.fsn | sl->statem.rx.R.fib, (long) msgdsize(mp), sl->statem.rx.len));
 	if (sl->statem.rx.len == 1) {
 		sl->statem.rx.sio = *mp->b_rptr++ & 0x07;
 	}
@@ -2741,9 +2744,9 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 		}
 		goto discard;
 	}
-	printd(("%s: %p: [%x/%x] FISU or MSU [%d] li = %d <-\n", MOD_NAME, sl,
+	printd(("%s: %p: [%x/%x] FISU or MSU [%ld] li = %d <-\n", MOD_NAME, sl,
 		sl->statem.rx.R.bib | sl->statem.rx.R.bsn,
-		sl->statem.rx.R.fib | sl->statem.rx.R.fsn, msgdsize(mp), sl->statem.rx.len));
+		sl->statem.rx.R.fib | sl->statem.rx.R.fsn, (long) msgdsize(mp), sl->statem.rx.len));
 	if (SN_OUTSIDE
 	    (((sl->statem.rx.F.fsn - 1) & sl->statem.sn_mask), sl->statem.rx.R.bsn,
 	     sl->statem.rx.T.fsn)) {
@@ -2782,7 +2785,7 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 		if ((sl->statem.rx.R.fsn == sl->statem.rx.X.fsn)
 		    && (sl->statem.rx.len > 2)) {
 			sl->statem.rx.X.fsn = (sl->statem.rx.X.fsn + 1) & sl->statem.sn_mask;
-			printd(("%s: %p: MSU [%d] <-\n", MOD_NAME, sl, msgdsize(mp)));
+			printd(("%s: %p: MSU [%ld] <-\n", MOD_NAME, sl, (long) msgdsize(mp)));
 			bufq_queue(&sl->rb, mp);
 			sl->statem.Cr++;
 			if (sl->statem.congestion_accept)
@@ -2819,7 +2822,7 @@ sl_rc_signal_unit(queue_t *q, struct sl *sl, mblk_t *mp)
 		    && (sl->statem.rx.len > 2)) {
 			sl->statem.rx.X.fsn = (sl->statem.rx.X.fsn + 1) & sl->statem.sn_mask;
 			sl->statem.rtr = 0;
-			printd(("%s: %p: MSU [%d] <-\n", MOD_NAME, sl, msgdsize(mp)));
+			printd(("%s: %p: MSU [%ld] <-\n", MOD_NAME, sl, (long) msgdsize(mp)));
 			bufq_queue(&sl->rb, mp);
 			sl->statem.Cr++;
 			if (sl->statem.congestion_accept)
@@ -3190,7 +3193,7 @@ sl_txc_start(queue_t *q, struct sl *sl)
 	sl->statem.tx.X.fsn = 0;
 	sl->statem.tx.N.fib = sl->statem.tx.N.bib = sl->statem.ib_mask;
 	sl->statem.tx.F.fsn = 0;
-	ptrace(("%s: %p: [%x/%x] %ld\n", MOD_NAME, sl, sl->statem.tx.N.bib | sl->statem.tx.N.bsn,
+	ptrace(("%s: %p: [%x/%x] %u\n", MOD_NAME, sl, sl->statem.tx.N.bib | sl->statem.tx.N.bsn,
 		sl->statem.tx.N.fib | sl->statem.tx.N.fsn, sl->option.popt & SS7_POPT_PCR));
 	sl->statem.Cm = 0;
 	sl->statem.Z = 0;
@@ -3475,7 +3478,7 @@ sl_tx_wakeup(queue_t *q)
 	mblk_t *mp;
 	while ((sl->statem.txc_state == SL_STATE_IN_SERVICE) && canputnext(sl->iq)
 	       && (mp = sl_txc_transmission_request(q, sl))) {
-		printd(("%s: %p: M_DATA [%d] ->\n", MOD_NAME, sl, msgdsize(mp)));
+		printd(("%s: %p: M_DATA [%ld] ->\n", MOD_NAME, sl, (long) msgdsize(mp)));
 		putnext(sl->iq, mp);
 	}
 	return;
@@ -3517,7 +3520,7 @@ sl_rx_wakeup(queue_t *q)
 				mblk_t *mp;
 				mp = bufq_dequeue(&sl->rb);
 				sl->statem.Cr--;
-				printd(("%s: %p: <- MSU [%d]\n", MOD_NAME, sl, msgdsize(mp)));
+				printd(("%s: %p: <- MSU [%ld]\n", MOD_NAME, sl, (long) msgdsize(mp)));
 				putnext(sl->oq, mp);
 			} while (sl->rb.q_msgs && canputnext(sl->oq));
 		}
@@ -5588,8 +5591,8 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == SDT_RC_SIGNAL_UNIT_IND) {
-		printd(("%s: %p: SDT_RC_SIGNAL_UNIT_IND [%x/%x:%d] <-\n", MOD_NAME, sl,
-			mp->b_cont->b_rptr[0], mp->b_cont->b_rptr[1], msgdsize(mp->b_cont)));
+		printd(("%s: %p: SDT_RC_SIGNAL_UNIT_IND [%x/%x:%ld] <-\n", MOD_NAME, sl,
+			mp->b_cont->b_rptr[0], mp->b_cont->b_rptr[1], (long) msgdsize(mp->b_cont)));
 		if ((rtn = sdt_rc_signal_unit_ind(q, mp)) < 0)
 			sl->i_state = oldstate;
 		return (rtn);
@@ -5632,8 +5635,8 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 		rtn = sdt_event_ind(q, mp);
 		break;
 	case SDT_RC_SIGNAL_UNIT_IND:
-		printd(("%s: %p: SDT_RC_SIGNAL_UNIT_IND [%d] <-\n", MOD_NAME, sl,
-			msgdsize(mp->b_cont)));
+		printd(("%s: %p: SDT_RC_SIGNAL_UNIT_IND [%ld] <-\n", MOD_NAME, sl,
+			(long) msgdsize(mp->b_cont)));
 		rtn = sdt_rc_signal_unit_ind(q, mp);
 		break;
 	case SDT_RC_CONGESTION_ACCEPT_IND:
@@ -5690,7 +5693,7 @@ sl_w_data(queue_t *q, mblk_t *mp)
 	(void) sl;
 	/* 
 	   data from above */
-	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, sl, msgdsize(mp)));
+	printd(("%s: %p: -> M_DATA [%ld]\n", MOD_NAME, sl, (long) msgdsize(mp)));
 	return sl_send_data(q, mp);
 }
 STATIC int
@@ -5700,7 +5703,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
 	(void) sl;
 	/* 
 	   data from below */
-	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, sl, msgdsize(mp)));
+	printd(("%s: %p: M_DATA [%ld] <-\n", MOD_NAME, sl, (long) msgdsize(mp)));
 	return sl_recv_data(q, mp);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strreg.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:32  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -68,7 +71,7 @@ static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.2
 #include <linux/module.h>
 #include <linux/init.h>
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 #include <linux/kmod.h>
 #endif
 

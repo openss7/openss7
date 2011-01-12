@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlookup.c,v $
+ Revision 1.1.2.4  2011-01-12 04:10:32  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -71,7 +74,7 @@ static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.
 #include <linux/module.h>
 #include <linux/init.h>
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 #include <linux/kmod.h>
 #endif
 #include <linux/kernel.h>	/* for FASTCALL(), fastcall */
@@ -440,7 +443,7 @@ __smod_search(const char *name)
 
 EXPORT_SYMBOL_GPL(__smod_search);
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 STATIC struct cdevsw *
 cdev_grab(struct cdevsw *cdev)
 {
@@ -461,7 +464,7 @@ cdev_grab(struct cdevsw *cdev)
 }
 #endif
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 STATIC struct fmodsw *
 fmod_grab(struct fmodsw *fmod)
 {
@@ -492,7 +495,7 @@ cdev_lookup(major_t major, int load)
 {
 	struct cdevsw *cdev = NULL;
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
 
 	read_lock(&cdevsw_lock);
@@ -532,7 +535,8 @@ cdev_lookup(major_t major, int load)
 	read_lock(&cdevsw_lock);
 	cdev = __cdev_lookup(major);
 	read_unlock(&cdevsw_lock);
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	return (cdev);
 }
 
@@ -546,7 +550,7 @@ cdrv_lookup(modID_t modid, int load)
 {
 	struct cdevsw *cdev = NULL;
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
 
 	read_lock(&fmodsw_lock);
@@ -574,7 +578,8 @@ cdrv_lookup(modID_t modid, int load)
 	read_lock(&fmodsw_lock);
 	cdev = __cdrv_lookup(modid);
 	read_unlock(&fmodsw_lock);
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	return (cdev);
 }
 
@@ -588,7 +593,7 @@ fmod_lookup(modID_t modid, int load)
 {
 	struct fmodsw *fmod = NULL;
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
 
 	read_lock(&fmodsw_lock);
@@ -616,7 +621,8 @@ fmod_lookup(modID_t modid, int load)
 	read_lock(&fmodsw_lock);
 	fmod = __fmod_lookup(modid);
 	read_unlock(&fmodsw_lock);
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	return (fmod);
 }
 
@@ -692,11 +698,11 @@ cdev_search(const char *name, int load)
 {
 	struct cdevsw *cdev = NULL;
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
 #endif
 	read_lock(&cdevsw_lock);
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[64];
@@ -730,9 +736,11 @@ cdev_search(const char *name, int load)
 			}
 		cdev = NULL;
 	}
-#else				/* CONFIG_KMOD */
+#else				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	cdev = __cdev_search(name);
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	read_unlock(&cdevsw_lock);
 	return (cdev);
 }
@@ -751,11 +759,11 @@ fmod_search(const char *name, int load)
 {
 	struct fmodsw *fmod = NULL;
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
 #endif
 	read_lock(&fmodsw_lock);
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[64];
@@ -778,9 +786,11 @@ fmod_search(const char *name, int load)
 			}
 		fmod = NULL;
 	}
-#else				/* CONFIG_KMOD */
+#else				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	fmod = __fmod_search(name);
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	read_unlock(&fmodsw_lock);
 	return (fmod);
 }
@@ -805,11 +815,12 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 {
 	struct devnode *cmin = NULL;
 
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	read_lock(&cdevsw_lock);
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
 		do {
 			char devname[96];
@@ -851,9 +862,11 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 #endif				/* CONFIG_DEVFS */
 		} while (0);
 	}
-#else				/* CONFIG_KMOD */
+#else				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	cmin = __cmin_search(cdev, name);
-#endif				/* CONFIG_KMOD */
+#endif				/* defined(CONFIG_KMOD) ||
+                                   defined(CONFIG_MODULES) */
 	read_unlock(&cdevsw_lock);
 	return (cmin);
 }
@@ -942,7 +955,7 @@ EXPORT_SYMBOL_GPL(sdev_get);
 streams_fastcall void
 sdev_put(struct cdevsw *cdev)
 {
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	if (cdev && cdev->d_kmod) {
 		_printd(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
 		__assert(module_refcount(cdev->d_kmod) > 0);
@@ -1002,7 +1015,7 @@ EXPORT_SYMBOL_GPL(fmod_get);
 streams_fastcall void
 fmod_put(struct fmodsw *fmod)
 {
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	if (fmod && fmod->f_kmod) {
 		_ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, fmod->f_name));
 		__assert(module_refcount(fmod->f_kmod) > 0);

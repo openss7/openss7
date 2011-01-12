@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:40 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:40  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $";
+static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -109,8 +112,8 @@ static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $"
-#define TCAP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $"
+#define TCAP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCAP_LICENSE	"GPL"
@@ -4119,7 +4122,7 @@ tcap_set_state(struct tc *tc, uint newstate)
 	uint oldstate = tc->state;
 
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, tc, tcap_state(newstate), tcap_state(oldstate)));
+	_printd(("%s: %p: %s <- %s\n", DRV_NAME, tc, tcap_state(newstate), tcap_state(oldstate)));
 	tc->state = newstate;
 }
 static inline uint

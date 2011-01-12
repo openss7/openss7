@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:35 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:35  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -96,8 +99,8 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $"
-#define SCCP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $"
+#define SCCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_LICENSE	"GPL"
@@ -10026,10 +10029,9 @@ sccp_dec_cr(uchar *p, uchar *e, struct sccp_msg *m)
 	p += rtn;
 	if (m->pcl != 2 && m->pcl != 3)
 		return (-EPROTO);
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
 	if (*p)
@@ -10168,10 +10170,9 @@ sccp_dec_dt1(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_seg(p, e, m)) < 0)
 		return (rtn);	/* SEG F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	m->imp = SCCP_DI_DT1;
@@ -10198,10 +10199,9 @@ sccp_dec_dt2(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_seq(p, e, m)) < 0)
 		return (rtn);	/* SEQ F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	m->imp = SCCP_DI_DT2;
@@ -10251,10 +10251,9 @@ sccp_dec_ed(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_dlr(p, e, m)) < 0)
 		return (rtn);	/* DLR F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	m->imp = SCCP_DI_ED;
@@ -10406,22 +10405,19 @@ sccp_dec_udt(uchar *p, uchar *e, struct sccp_msg *m)
 	p += rtn;
 	if (m->pcl != 0 && m->pcl != 1)
 		return (-EPROTO);
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	m->imp = SCCP_DI_UDT;
@@ -10445,22 +10441,19 @@ sccp_dec_udts(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_retc(p, e, m)) < 0)
 		return (rtn);	/* RETC F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	m->imp = SCCP_DI_UDTS;
@@ -10489,22 +10482,19 @@ sccp_dec_xudt(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_hopc(p, e, m)) < 0)
 		return (rtn);	/* HOPC F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	if (*p)
@@ -10534,22 +10524,19 @@ sccp_dec_xudts(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_hopc(p, e, m)) < 0)
 		return (rtn);	/* HOPC F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_data(pp, ep, m)) < 0)
 		return (rtn);	/* DATA V */
 	if (*p)
@@ -10581,22 +10568,22 @@ sccp_dec_ludt(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_hopc(p, e, m)) < 0)
 		return (rtn);	/* HOPC F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e) if ((ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e) if ((ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
-	if ((pp = p + *p++) + 1 > e)
+	if ((pp = p + *p) + 1 > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + ((*pp++) | ((*p++) << 8))) > e)
+        p++;
+	if ((ep = pp + ((*pp) | ((*p) << 8))) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_ldata(pp, ep, m)) < 0)
 		return (rtn);	/* LDATA V */
 	if (*p)
@@ -10626,22 +10613,22 @@ sccp_dec_ludts(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_hopc(p, e, m)) < 0)
 		return (rtn);	/* HOPC F */
 	p += rtn;
-	if ((pp = p + *p++) > e)
+	if ((pp = p + *p) > e) if ((ep = pp + *pp) > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
-		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
-	if ((pp = p + *p++) > e)
-		return (-EMSGSIZE);
-	if ((ep = pp + *pp++) > e)
+	if ((pp = p + *p) > e) if ((ep = pp + *pp) > e)
+        p++; pp++;
 		return (-EMSGSIZE);
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
-	if ((pp = p + *p++) + 1 > e)
+	if ((pp = p + *p) + 1 > e)
 		return (-EMSGSIZE);
-	if ((ep = pp + ((*pp++) | ((*p++) << 8))) > e)
+        p++;
+	if ((ep = pp + ((*pp) | ((*p) << 8))) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_ldata(pp, ep, m)) < 0)
 		return (rtn);	/* LDATA V */
 	if (*p)
@@ -20896,7 +20883,7 @@ sccp_alloc_sr(uint id, struct sp *sp, uint pc)
 {
 	struct sr *sr, **srp;
 
-	printd(("%s: %s: create sr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sr->id = %u\n", DRV_NAME, __FUNCTION__, id));
 	if ((sr = kmem_cache_alloc(sccp_sr_cachep, GFP_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
 		sr_get(sr);	/* first get */
@@ -20919,7 +20906,7 @@ sccp_alloc_sr(uint id, struct sp *sp, uint pc)
 		sr->add = sp->add;
 		sr->add.pc = pc;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sr structure %lu\n", DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sr structure %u\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sr);
 }
@@ -21042,7 +21029,7 @@ sccp_alloc_sp(uint id, struct na *na, mtp_addr_t * add)
 {
 	struct sp *sp, **spp;
 
-	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
+	printd(("%s: %s: create sp->id = %u\n", DRV_NAME, __FUNCTION__, id));
 	if ((sp = kmem_cache_alloc(sccp_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
@@ -21063,7 +21050,7 @@ sccp_alloc_sp(uint id, struct na *na, mtp_addr_t * add)
 		na->sp.numb++;
 		sp->add = *add;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate sp structure %lu\n", DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate sp structure %u\n", DRV_NAME,
 			__FUNCTION__, id));
 	return (sp);
 }
@@ -21190,7 +21177,7 @@ sccp_alloc_link(queue_t *q, struct mt **mpp, uint index, cred_t *crp)
 {
 	struct mt *mt;
 
-	printd(("%s: %s: create mt index = %lu\n", DRV_NAME, __FUNCTION__, index));
+	printd(("%s: %s: create mt index = %u\n", DRV_NAME, __FUNCTION__, index));
 	if ((mt = kmem_cache_alloc(sccp_mt_cachep, GFP_ATOMIC))) {
 		bzero(mt, sizeof(*mt));
 		mtp_get(mt);	/* first get */
@@ -21214,7 +21201,7 @@ sccp_alloc_link(queue_t *q, struct mt **mpp, uint index, cred_t *crp)
 		*mpp = mtp_get(mt);
 		master.mt.numb++;
 	} else
-		printd(("%s: %s: ERROR: failed to allocate mt structure %lu\n", DRV_NAME,
+		printd(("%s: %s: ERROR: failed to allocate mt structure %u\n", DRV_NAME,
 			__FUNCTION__, index));
 	return (mt);
 }

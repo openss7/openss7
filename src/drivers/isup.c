@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:21:32 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:32 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 1.1.2.5  2011-01-12 04:10:29  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.4  2010-11-28 14:21:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:21:32 $";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:29 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -93,8 +96,8 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.4 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:21:32 $"
-#define ISUP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:29 $"
+#define ISUP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"
@@ -10452,203 +10455,203 @@ ct_timer_start(struct ct *ct, const uint t)
 		__ct_timer_stop(ct, t);
 		switch (t) {
 		case t1:
-			printd(("%s: %p: starting t1 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t1 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t1 * 1000 / HZ, jiffies));
 			ct->timers.t1 = timeout(&ct_t1_expiry, (caddr_t) ct_get(ct), tg->config.t1);
 			break;
 		case t2:
-			printd(("%s: %p: starting t2 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t2 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t2 * 1000 / HZ, jiffies));
 			ct->timers.t2 = timeout(&ct_t2_expiry, (caddr_t) ct_get(ct), tg->config.t2);
 			break;
 		case t3:
-			printd(("%s: %p: starting t3 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t3 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t3 * 1000 / HZ, jiffies));
 			ct->timers.t3 = timeout(&ct_t3_expiry, (caddr_t) ct_get(ct), tg->config.t3);
 			break;
 		case t5:
-			printd(("%s: %p: starting t5 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t5 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t5 * 1000 / HZ, jiffies));
 			ct->timers.t5 = timeout(&ct_t5_expiry, (caddr_t) ct_get(ct), tg->config.t5);
 			break;
 		case t6:
-			printd(("%s: %p: starting t6 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t6 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t6 * 1000 / HZ, jiffies));
 			ct->timers.t6 = timeout(&ct_t6_expiry, (caddr_t) ct_get(ct), tg->config.t6);
 			break;
 		case t7:
-			printd(("%s: %p: starting t7 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t7 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t7 * 1000 / HZ, jiffies));
 			ct->timers.t7 = timeout(&ct_t7_expiry, (caddr_t) ct_get(ct), tg->config.t7);
 			break;
 		case t8:
-			printd(("%s: %p: starting t8 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t8 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t8 * 1000 / HZ, jiffies));
 			ct->timers.t8 = timeout(&ct_t8_expiry, (caddr_t) ct_get(ct), tg->config.t8);
 			break;
 		case t9:
-			printd(("%s: %p: starting t9 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t9 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t9 * 1000 / HZ, jiffies));
 			ct->timers.t9 = timeout(&ct_t9_expiry, (caddr_t) ct_get(ct), tg->config.t9);
 			break;
 		case t10:
-			printd(("%s: %p: starting t10 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t10 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t10 * 1000 / HZ, jiffies));
 			ct->timers.t10 =
 			    timeout(&ct_t10_expiry, (caddr_t) ct_get(ct), tg->config.t10);
 			break;
 		case t11:
-			printd(("%s: %p: starting t11 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t11 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t11 * 1000 / HZ, jiffies));
 			ct->timers.t11 =
 			    timeout(&ct_t11_expiry, (caddr_t) ct_get(ct), tg->config.t11);
 			break;
 		case t24:
-			printd(("%s: %p: starting t24 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t24 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t24 * 1000 / HZ, jiffies));
 			ct->timers.t24 =
 			    timeout(&ct_t24_expiry, (caddr_t) ct_get(ct), tg->config.t24);
 			break;
 		case t31:
-			printd(("%s: %p: starting t31 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t31 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t31 * 1000 / HZ, jiffies));
 			ct->timers.t31 =
 			    timeout(&ct_t31_expiry, (caddr_t) ct_get(ct), tg->config.t31);
 			break;
 		case t32:
-			printd(("%s: %p: starting t32 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t32 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t32 * 1000 / HZ, jiffies));
 			ct->timers.t32 =
 			    timeout(&ct_t32_expiry, (caddr_t) ct_get(ct), tg->config.t32);
 			break;
 		case t33:
-			printd(("%s: %p: starting t33 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t33 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t33 * 1000 / HZ, jiffies));
 			ct->timers.t33 =
 			    timeout(&ct_t33_expiry, (caddr_t) ct_get(ct), tg->config.t33);
 			break;
 		case t34:
-			printd(("%s: %p: starting t34 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t34 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t34 * 1000 / HZ, jiffies));
 			ct->timers.t34 =
 			    timeout(&ct_t34_expiry, (caddr_t) ct_get(ct), tg->config.t34);
 			break;
 		case t35:
-			printd(("%s: %p: starting t35 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t35 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t35 * 1000 / HZ, jiffies));
 			ct->timers.t35 =
 			    timeout(&ct_t35_expiry, (caddr_t) ct_get(ct), tg->config.t35);
 			break;
 		case t38:
-			printd(("%s: %p: starting t38 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t38 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t38 * 1000 / HZ, jiffies));
 			ct->timers.t38 =
 			    timeout(&ct_t38_expiry, (caddr_t) ct_get(ct), tg->config.t38);
 			break;
 		case tacc_r:
-			printd(("%s: %p: starting tacc_r %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting tacc_r %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.tacc_r * 1000 / HZ, jiffies));
 			ct->timers.tacc_r =
 			    timeout(&ct_tacc_r_expiry, (caddr_t) ct_get(ct), tg->config.tacc_r);
 			break;
 		case tcra:
-			printd(("%s: %p: starting tcra %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting tcra %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.tcra * 1000 / HZ, jiffies));
 			ct->timers.tcra =
 			    timeout(&ct_tcra_expiry, (caddr_t) ct_get(ct), tg->config.tcra);
 			break;
 		case tcrm:
-			printd(("%s: %p: starting tcrm %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting tcrm %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.tcrm * 1000 / HZ, jiffies));
 			ct->timers.tcrm =
 			    timeout(&ct_tcrm_expiry, (caddr_t) ct_get(ct), tg->config.tcrm);
 			break;
 		case texm_d:
-			printd(("%s: %p: starting texm_d %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting texm_d %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.texm_d * 1000 / HZ, jiffies));
 			ct->timers.texm_d =
 			    timeout(&ct_texm_d_expiry, (caddr_t) ct_get(ct), tg->config.texm_d);
 			break;
 		case t12:
-			printd(("%s: %p: starting t12 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t12 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t12 * 1000 / HZ, jiffies));
 			ct->timers.t12 =
 			    timeout(&ct_t12_expiry, (caddr_t) ct_get(ct), tg->config.t12);
 			break;
 		case t13:
-			printd(("%s: %p: starting t13 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t13 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t13 * 1000 / HZ, jiffies));
 			ct->timers.t13 =
 			    timeout(&ct_t13_expiry, (caddr_t) ct_get(ct), tg->config.t13);
 			break;
 		case t14:
-			printd(("%s: %p: starting t14 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t14 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t14 * 1000 / HZ, jiffies));
 			ct->timers.t14 =
 			    timeout(&ct_t14_expiry, (caddr_t) ct_get(ct), tg->config.t14);
 			break;
 		case t15:
-			printd(("%s: %p: starting t15 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t15 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t15 * 1000 / HZ, jiffies));
 			ct->timers.t15 =
 			    timeout(&ct_t15_expiry, (caddr_t) ct_get(ct), tg->config.t15);
 			break;
 		case t16:
-			printd(("%s: %p: starting t16 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t16 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t16 * 1000 / HZ, jiffies));
 			ct->timers.t16 =
 			    timeout(&ct_t16_expiry, (caddr_t) ct_get(ct), tg->config.t16);
 			break;
 		case t17:
-			printd(("%s: %p: starting t17 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t17 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t17 * 1000 / HZ, jiffies));
 			ct->timers.t17 =
 			    timeout(&ct_t17_expiry, (caddr_t) ct_get(ct), tg->config.t17);
 			break;
 		case t25:
-			printd(("%s: %p: starting t25 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t25 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t25 * 1000 / HZ, jiffies));
 			ct->timers.t25 =
 			    timeout(&ct_t25_expiry, (caddr_t) ct_get(ct), tg->config.t25);
 			break;
 		case t26:
-			printd(("%s: %p: starting t26 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t26 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t26 * 1000 / HZ, jiffies));
 			ct->timers.t26 =
 			    timeout(&ct_t26_expiry, (caddr_t) ct_get(ct), tg->config.t26);
 			break;
 		case t27:
-			printd(("%s: %p: starting t27 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t27 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t27 * 1000 / HZ, jiffies));
 			ct->timers.t27 =
 			    timeout(&ct_t27_expiry, (caddr_t) ct_get(ct), tg->config.t27);
 			break;
 		case t36:
-			printd(("%s: %p: starting t36 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t36 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t36 * 1000 / HZ, jiffies));
 			ct->timers.t36 =
 			    timeout(&ct_t36_expiry, (caddr_t) ct_get(ct), tg->config.t36);
 			break;
 		case t37:
-			printd(("%s: %p: starting t37 %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting t37 %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.t37 * 1000 / HZ, jiffies));
 			ct->timers.t37 =
 			    timeout(&ct_t37_expiry, (caddr_t) ct_get(ct), tg->config.t37);
 			break;
 		case tccr:
-			printd(("%s: %p: starting tccr %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting tccr %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.tccr * 1000 / HZ, jiffies));
 			ct->timers.tccr =
 			    timeout(&ct_tccr_expiry, (caddr_t) ct_get(ct), tg->config.tccr);
 			break;
 		case tccr_r:
-			printd(("%s: %p: starting tccr_r %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting tccr_r %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.tccr_r * 1000 / HZ, jiffies));
 			ct->timers.tccr_r =
 			    timeout(&ct_tccr_r_expiry, (caddr_t) ct_get(ct), tg->config.tccr_r);
 			break;
 		case tcvt:
-			printd(("%s: %p: starting tcvt %lu ms at %lu\n", DRV_NAME, ct,
+			printd(("%s: %p: starting tcvt %u ms at %lu\n", DRV_NAME, ct,
 				tg->config.tcvt * 1000 / HZ, jiffies));
 			ct->timers.tcvt =
 			    timeout(&ct_tcvt_expiry, (caddr_t) ct_get(ct), tg->config.tcvt);
@@ -10952,73 +10955,73 @@ cg_timer_start(struct cg *cg, const uint t)
 		__cg_timer_stop(cg, t);
 		switch (t) {
 		case t18:
-			printd(("%s: %p: starting t18 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t18 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t18 * 1000 / HZ, jiffies));
 			cg->timers.t18 =
 			    timeout(&cg_t18_expiry, (caddr_t) cg_get(cg), sr->config.t18);
 			break;
 		case t19:
-			printd(("%s: %p: starting t19 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t19 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t19 * 1000 / HZ, jiffies));
 			cg->timers.t19 =
 			    timeout(&cg_t19_expiry, (caddr_t) cg_get(cg), sr->config.t19);
 			break;
 		case t20:
-			printd(("%s: %p: starting t20 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t20 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t20 * 1000 / HZ, jiffies));
 			cg->timers.t20 =
 			    timeout(&cg_t20_expiry, (caddr_t) cg_get(cg), sr->config.t20);
 			break;
 		case t21:
-			printd(("%s: %p: starting t21 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t21 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t21 * 1000 / HZ, jiffies));
 			cg->timers.t21 =
 			    timeout(&cg_t21_expiry, (caddr_t) cg_get(cg), sr->config.t21);
 			break;
 		case t22:
-			printd(("%s: %p: starting t22 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t22 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t22 * 1000 / HZ, jiffies));
 			cg->timers.t22 =
 			    timeout(&cg_t22_expiry, (caddr_t) cg_get(cg), sr->config.t22);
 			break;
 		case t23:
-			printd(("%s: %p: starting t23 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t23 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t23 * 1000 / HZ, jiffies));
 			cg->timers.t23 =
 			    timeout(&cg_t23_expiry, (caddr_t) cg_get(cg), sr->config.t23);
 			break;
 		case t28:
-			printd(("%s: %p: starting t28 %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting t28 %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.t28 * 1000 / HZ, jiffies));
 			cg->timers.t28 =
 			    timeout(&cg_t28_expiry, (caddr_t) cg_get(cg), sr->config.t28);
 			break;
 		case tcgb:
-			printd(("%s: %p: starting tcgb %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting tcgb %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.tcgb * 1000 / HZ, jiffies));
 			cg->timers.tcgb =
 			    timeout(&cg_tcgb_expiry, (caddr_t) cg_get(cg), sr->config.tcgb);
 			break;
 		case tgrs:
-			printd(("%s: %p: starting tgrs %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting tgrs %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.tgrs * 1000 / HZ, jiffies));
 			cg->timers.tgrs =
 			    timeout(&cg_tgrs_expiry, (caddr_t) cg_get(cg), sr->config.tgrs);
 			break;
 		case thga:
-			printd(("%s: %p: starting thga %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting thga %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.thga * 1000 / HZ, jiffies));
 			cg->timers.thga =
 			    timeout(&cg_thga_expiry, (caddr_t) cg_get(cg), sr->config.thga);
 			break;
 		case tscga:
-			printd(("%s: %p: starting tscga %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting tscga %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.tscga * 1000 / HZ, jiffies));
 			cg->timers.tscga =
 			    timeout(&cg_tscga_expiry, (caddr_t) cg_get(cg), sr->config.tscga);
 			break;
 		case tscga_d:
-			printd(("%s: %p: starting tscga_d %lu ms at %lu\n", DRV_NAME, cg,
+			printd(("%s: %p: starting tscga_d %u ms at %lu\n", DRV_NAME, cg,
 				sr->config.tscga_d * 1000 / HZ, jiffies));
 			cg->timers.tscga_d =
 			    timeout(&cg_tscga_d_expiry, (caddr_t) cg_get(cg), sr->config.tscga_d);
@@ -11152,18 +11155,18 @@ sr_timer_start(struct sr *sr, const uint t)
 		__sr_timer_stop(sr, t);
 		switch (t) {
 		case t4:
-			printd(("%s: %p: starting t4 %lu ms at %lu\n", DRV_NAME, sr,
+			printd(("%s: %p: starting t4 %u ms at %lu\n", DRV_NAME, sr,
 				sr->config.t4 * 1000 / HZ, jiffies));
 			sr->timers.t4 = timeout(&sr_t4_expiry, (caddr_t) sr_get(sr), sr->config.t4);
 			break;
 		case t29:
-			printd(("%s: %p: starting t29 %lu ms at %lu\n", DRV_NAME, sr,
+			printd(("%s: %p: starting t29 %u ms at %lu\n", DRV_NAME, sr,
 				sr->config.t29 * 1000 / HZ, jiffies));
 			sr->timers.t29 =
 			    timeout(&sr_t29_expiry, (caddr_t) sr_get(sr), sr->config.t29);
 			break;
 		case t30:
-			printd(("%s: %p: starting t30 %lu ms at %lu\n", DRV_NAME, sr,
+			printd(("%s: %p: starting t30 %u ms at %lu\n", DRV_NAME, sr,
 				sr->config.t30 * 1000 / HZ, jiffies));
 			sr->timers.t30 =
 			    timeout(&sr_t30_expiry, (caddr_t) sr_get(sr), sr->config.t30);
@@ -13814,7 +13817,7 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 
 			ask = cg->rs_ptr[i] & (0x1 << j);
 			ack = m->msg.cgba.rs.ptr[i] & (0x1 << j);
-			if (!ask & ack) {
+			if (!ask && ack) {
 				/* 
 				   abnormal acknowledgement */
 				if ((err =
@@ -13942,7 +13945,7 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 
 			ask = cg->rs_ptr[i] & (0x1 << j);
 			ack = m->msg.cgua.rs.ptr[i] & (0x1 << j);
-			if (!ask & ack) {
+			if (!ask && ack) {
 				/* 
 				   abnormal acknowledgement */
 				if ((err =
@@ -14991,8 +14994,9 @@ isup_dec_iam(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	p += rtn;
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
-		if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+		if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 			return (-EMSGSIZE);
+                p++; pp++;
 		if ((rtn = unpack_usi(pvar, pp, ep, &m->msg.iam.usi)) < 0)
 			return (rtn);	/* USI V */
 		break;
@@ -15002,8 +15006,9 @@ isup_dec_iam(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		p += rtn;
 		break;
 	}
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cdpn(pvar, pp, ep, &m->msg.iam.cdpn)) < 0)
 		return (rtn);	/* CDPN V */
 	if (*p)
@@ -15025,8 +15030,9 @@ isup_dec_sam(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_subn(pvar, pp, ep, &m->msg.sam.subn)) < 0)
 		return (rtn);	/* SUBN V */
 	if (*p)
@@ -15169,8 +15175,9 @@ isup_dec_rel(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_caus(pvar, pp, ep, &m->msg.rel.caus)) < 0)
 		return (rtn);
 	if (*p)
@@ -15315,8 +15322,9 @@ isup_dec_grs(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.grs.rs;
 
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
@@ -15351,8 +15359,9 @@ isup_dec_cgb(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgb.cgi)) < 0)
 		return (rtn);
 	p += rtn;
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
@@ -15400,8 +15409,9 @@ isup_dec_cgu(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgu.cgi)) < 0)
 		return (rtn);
 	p += rtn;
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
@@ -15448,8 +15458,9 @@ isup_dec_cgba(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgba.cgi)) < 0)
 		return (rtn);
 	p += rtn;
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
@@ -15497,8 +15508,9 @@ isup_dec_cgua(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgua.cgi)) < 0)
 		return (rtn);
 	p += rtn;
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
@@ -15646,8 +15658,9 @@ isup_dec_frj(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	if ((rtn = unpack_faci(pvar, p, e, &m->msg.frj.faci)) < 0)
 		return (rtn);
 	p += rtn;
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_caus(pvar, pp, ep, &m->msg.frj.caus)) < 0)
 		return (rtn);
 	if (*p)
@@ -15759,8 +15772,9 @@ isup_dec_gra(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, &m->msg.gra.rs)) < 0)
 		return (rtn);
 	return (0);
@@ -15779,8 +15793,9 @@ isup_dec_cqm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.cqm.rs;
 
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
 		return (rtn);
 	switch (pvar & SS7_PVAR_MASK) {
@@ -15811,12 +15826,14 @@ isup_dec_cqr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_rs(pvar, pp, ep, &m->msg.cqr.rs)) < 0)
 		return (rtn);
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_csi(pvar, pp, ep, &m->msg.cqr.csi)) < 0)
 		return (rtn);
 	return (0);
@@ -15855,8 +15872,9 @@ isup_dec_usr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_uui(pvar, pp, ep, &m->msg.usr.uui)) < 0)
 		return (rtn);
 	if (*p)
@@ -15890,8 +15908,9 @@ isup_dec_cfn(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
-	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
+	if ((pp = p + *p) > e || (ep = pp + *pp + 1) > e)
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_caus(pvar, pp, ep, &m->msg.cfn.caus)) < 0)
 		return (rtn);
 	if (*p)
@@ -21942,7 +21961,7 @@ cc_blocking_req(queue_t *q, mblk_t *mp)
 	}
 	return (QR_DONE);
       badflag:
-	printd(("%s: %s: %p: ERROR bad flags = 0x%08lx\n", DRV_NAME, __FUNCTION__, cc,
+	printd(("%s: %s: %p: ERROR bad flags = 0x%08x\n", DRV_NAME, __FUNCTION__, cc,
 		p->cc_flags));
 	return cc_error_ack(q, cc, ct, p->cc_primitive, CCBADFLAG);
       noaddr:

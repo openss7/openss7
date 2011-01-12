@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:28 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:34 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:28 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 1.1.2.4  2011-01-12 04:10:34  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:22:28  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -76,7 +79,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:28 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:34 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -5097,30 +5100,30 @@ test_m2pa_status(int child, uint32_t status)
 	struct strbuf *ctrl = &ctrl_buf;
 	struct strbuf *data = &data_buf;
 	union N_primitives *p = (typeof(p)) cbuf;
+        uint32_t *d = (typeof(d)) dbuf;
 
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
 		data->len = 3 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint32_t *) dbuf)[2] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = status;
 		break;
 	case M2PA_VERSION_DRAFT4:
 	case M2PA_VERSION_DRAFT4_1:
 		data->len = 4 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint16_t *) dbuf)[4] = htons(bsn[child]);
-		((uint16_t *) dbuf)[5] = htons(fsn[child]);
-		((uint32_t *) dbuf)[3] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = htonl(((bsn[child] & 0x0000ffff) << 16) | (fsn[child] & 0x0000ffff));
+		d[3] = status;
 		break;
 	case M2PA_VERSION_DRAFT6_9:
 	case M2PA_VERSION_DRAFT7:
 		data->len = 3 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint32_t *) dbuf)[2] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = status;
 		break;
 	case M2PA_VERSION_DRAFT4_9:
 	case M2PA_VERSION_DRAFT5:
@@ -5131,11 +5134,11 @@ test_m2pa_status(int child, uint32_t status)
 	case M2PA_VERSION_DRAFT11:
 	case M2PA_VERSION_RFC4165:
 		data->len = 5 * sizeof(uint32_t);
-		((uint32_t *) dbuf)[0] = M2PA_STATUS_MESSAGE;
-		((uint32_t *) dbuf)[1] = htonl(data->len);
-		((uint32_t *) dbuf)[2] = htonl(bsn[child] & 0x00ffffff);
-		((uint32_t *) dbuf)[3] = htonl(fsn[child] & 0x00ffffff);
-		((uint32_t *) dbuf)[4] = status;
+		d[0] = M2PA_STATUS_MESSAGE;
+		d[1] = htonl(data->len);
+		d[2] = htonl(bsn[child] & 0x00ffffff);
+		d[3] = htonl(fsn[child] & 0x00ffffff);
+		d[4] = status;
 		break;
 	default:
 		return __RESULT_SCRIPT_ERROR;

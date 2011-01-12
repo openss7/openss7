@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:24 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:24 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:32:24  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:24 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $";
 
 #define _SVR4_SOURCE
 #define _SUN_SOURCE
@@ -77,8 +80,8 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:24 $"
-#define SCTP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $"
+#define SCTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -5167,8 +5170,12 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 					       IPPROTO_SCTP, sp->sport, sp->dport, NULL);
 #else
 #if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
+#if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
 					       IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0);
+#else
+			err = ip_route_output(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
+#endif
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
@@ -5248,8 +5255,12 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 					      IPPROTO_SCTP, sp->sport, sp->dport, NULL))
 #else
 #if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
+#if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
 					      IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0))
+#else
+			if (!ip_route_output(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif))
+#endif
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
@@ -9613,7 +9624,7 @@ sctp_deliver_data(struct sctp *sp)
 				   sctp_recvmsg. Thus sockets calculates delivered reassembled user
 				   messages whereas STREAMS calculates provider reassembled user
 				   messages. */
-				if (!(cb)->flags & SCTPCB_FLAG_FIRST_FRAG)
+				if (!(cb->flags & SCTPCB_FLAG_FIRST_FRAG))
 					SCTP_INC_STATS_USER(SctpReasmUsrMsgs);
 				sp->nunds--;
 			} else {

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:34 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 1.1.2.5  2011-01-12 04:10:34  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.4  2010-11-28 14:32:26  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $";
+static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:34 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -170,8 +173,8 @@ compat_ptr(compat_uptr_t uptr)
 #include "src/drivers/clone.h"	/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STH_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:26 $"
+#define STH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:34 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -10053,7 +10056,7 @@ EXPORT_SYMBOL_GPL(strioctl);
 streams_noinline __hot long
 _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
-	struct stdata *sd;
+	struct stdata *sd = NULL;
 	int err;
 
 	switch (cmd) {

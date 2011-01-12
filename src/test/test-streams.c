@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:32 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:35 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:32 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 1.1.2.4  2011-01-12 04:10:35  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:22:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -76,7 +79,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:32 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:35 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -20568,7 +20571,7 @@ test_case_4_1(int child)
 	if (test_case_4_1_run(child) != __RESULT_SUCCESS)
 		goto failure;
 	print_less(child);
-	for (i = 0; i < 99998; i++) {
+	for (i = 0; i < 9998; i++) {
 		if (test_case_4_1_run(child) != __RESULT_SUCCESS)
 			goto failure;
 	}
@@ -20625,7 +20628,7 @@ test_case_4_2(int child)
 	if (test_case_4_2_run(child) != __RESULT_SUCCESS)
 		goto failure;
 	print_less(child);
-	for (i = 0; i < 99998; i++) {
+	for (i = 0; i < 9998; i++) {
 		if (test_case_4_2_run(child) != __RESULT_SUCCESS)
 			goto failure;
 	}
@@ -22416,7 +22419,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2010-11-28 14:22:32 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.4 $ $Date: 2011-01-12 04:10:35 $");
 }
 
 void

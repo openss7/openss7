@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 1.1.2.2 2010-11-28 14:21:48 brian Exp $
+ @(#) $Id: chi.h,v 1.1.2.3 2011-01-12 04:10:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:48 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi.h,v $
+ Revision 1.1.2.3  2011-01-12 04:10:31  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:48  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -84,14 +87,15 @@ typedef uint8_t ch_uchar;
 #define CH_OPTMGMT_ACK		11U
 #define CH_OK_ACK		12U
 #define CH_ERROR_ACK		13U
-#define CH_ENABLE_CON		14U
-#define CH_CONNECT_CON		15U
-#define CH_DATA_IND		16U
-#define CH_DISCONNECT_IND	17U
-#define CH_DISCONNECT_CON	18U
-#define CH_DISABLE_IND		19U
-#define CH_DISABLE_CON		20U
-#define CH_EVENT_IND		21U
+#define CH_ATTACH_ACK		14U
+#define CH_ENABLE_CON		15U
+#define CH_CONNECT_CON		16U
+#define CH_DATA_IND		17U
+#define CH_DISCONNECT_IND	18U
+#define CH_DISCONNECT_CON	19U
+#define CH_DISABLE_IND		20U
+#define CH_DISABLE_CON		21U
+#define CH_EVENT_IND		22U
 
 /*
  *  CH STATES
@@ -165,13 +169,16 @@ typedef struct CH_info_ack {
 } CH_info_ack_t;
 
 #define CH_CIRCUIT	0x01	/* circuit provider class */
+#define CH_RTP		0x02	/* RTP provider class */
 
 #define CH_STYLE1	0x0	/* does not perform attach */
 #define CH_STYLE2	0x1	/* does perform attach */
+#define CH_STYLE3	0x2	/* multi-stream attach */
 
 #define CH_VERSION_1_0	0x10	/* version 1.0 of interface */
 #define CH_VERSION_1_1	0x11	/* version 1.1 of interface */
-#define CH_VERSION	CH_VERSION_1_1
+#define CH_VERSION_1_2	0x12	/* version 1.2 of interface */
+#define CH_VERSION	CH_VERSION_1_2
 
 #define CH_PARMS_CIRCUIT	0x01	/* parms structure type */
 typedef struct CH_parms_circuit {
@@ -186,9 +193,17 @@ typedef struct CH_parms_circuit {
 	ch_ulong cp_opt_flags;		/* options flags */
 } CH_parms_circuit_t;
 
+#define CH_PARMS_RTP_LOCAL	0x02	/* parms structure type */
+#define CH_PARMS_RTP_REMOTE	0x03	/* parms structure type */
+typedef struct CH_parms_rtp {
+	ch_ulong cp_type;		/* always CH_PARMS_RTP_LOCAL or CH_PARMS_RTP_REMOTE */
+//	struct sockaddr cp_addr;	/* local or remote address */
+} CH_parms_rtp_t;
+
 union CH_parms {
 	ch_ulong cp_type;		/* structure type */
 	CH_parms_circuit_t circuit;	/* circuit structure */
+	CH_parms_rtp_t rtp;		/* rtp structure */
 };
 
 #define CH_PARM_OPT_CLRCH	0x01	/* supports clear channel */
@@ -278,6 +293,17 @@ typedef struct CH_attach_req {
 	ch_ulong ch_addr_offset;	/* offset of channel address */
 	ch_ulong ch_flags;		/* options flags */
 } CH_attach_req_t;
+
+/*
+ *  CH_ATTACH_ACK
+ *  -------------------------------------------------------------------------
+ */
+typedef struct CH_attach_ack {
+	ch_ulong ch_primitive;		/* always CH_ATTACH_ACK */
+	ch_ulong ch_addr_length;	/* length of attached channel address */
+	ch_ulong ch_addr_offset;	/* offset of channel address */
+	ch_ulong ch_flags;		/* options flags */
+} CH_attach_ack_t;
 
 /*
  *  CH_DETACH_REQ

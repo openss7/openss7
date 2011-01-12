@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:38 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:36  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:38  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $";
+static char const ident[] = "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:36 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -142,7 +145,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -189,7 +192,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -199,7 +202,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:38 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-01-12 04:10:36 $");
 }
 
 static void
@@ -423,7 +426,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 1.1.2.2 2010-11-28 14:22:38 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 1.1.2.3 2011-01-12 04:10:36 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -534,9 +537,11 @@ decode_data(void)
 int
 decode_ctrl(int flag)
 {
+	uint32_t *p = (typeof(p)) cbuf;
+
 	if (output > 2)
-		fprintf(stderr, "Got control meesage! %d\n", *(uint32_t *) cbuf);
-	switch (*(uint32_t *) cbuf) {
+		fprintf(stderr, "Got control message! %d\n", p[0]);
+	switch (p[0]) {
 	case SDT_RC_SIGNAL_UNIT_IND:
 		decode_data();
 		return CAP_NONE;	/* go around again */

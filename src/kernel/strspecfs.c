@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 1.1.2.4  2011-01-12 04:10:32  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:32:26  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 #ifdef CONFIG_PROC_FS
 #include <linux/proc_fs.h>
 #endif
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 #include <linux/kmod.h>
 #endif
 #include <linux/major.h>
@@ -114,7 +117,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -340,9 +343,20 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	struct dentry *dentry;
 	struct vfsmount *mnt;
 	int err;
+	void (*my_file_move)(struct file *file, struct list_head *list)
+		= (typeof(my_file_move)) HAVE_FILE_MOVE_ADDR;
+
+	if (file == NULL) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
+	if (cdev == NULL) {
+		ptrace(("Error path taken!\n"));
+		return (-EFAULT);
+	}
 
 	if (!(mnt = mntget(specfs_mnt))) {
-		_ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		return (-ENODEV);
 	}
 	{
@@ -359,24 +373,24 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 					    cdev->d_name, getminor(dev));
 
 		if (!(dentry = d_alloc(NULL, &name))) {
-			_ptrace(("Error path taken!\n"));
+			ptrace(("Error path taken!\n"));
 			err = -ENOMEM;
 			goto mnt_error;
 		}
 		dentry->d_sb = mnt->mnt_sb;
-		dentry->d_parent = dentry;
+		dentry->d_parent = dentry;  /* XXX */
 	}
 
 	if (IS_ERR((snode = spec_snode(dev, cdev)))) {
-		_ptrace(("Error path taken!\n"));
+		ptrace(("Error path taken!\n"));
 		err = PTR_ERR(snode);
 		goto put_error;
 	}
 	d_instantiate(dentry, snode);
 
 	err = -ENXIO;
-	if (!snode->i_fop || !snode->i_fop->open) {
-		_ptrace(("Error path taken!\n"));
+	if (!snode || !snode->i_fop || !snode->i_fop->open) {
+		ptrace(("Error path taken!\n"));
 		goto put_error;
 	}
 
@@ -384,31 +398,33 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		const struct file_operations *f_op;
 
 		if (!(f_op = fops_get(snode->i_fop))) {
-			_ptrace(("Error path taken!\n"));
+			ptrace(("Error path taken!\n"));
 			goto put_error;
 		}
 #ifdef _DEBUG
 		if (f_op->owner)
-			_printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
+			printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
 				 f_op->owner->name, module_refcount(f_op->owner)));
 		else
-			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
+			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
 #ifdef _DEBUG
 		if (file->f_op->owner)
-			_printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
+			printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
 				 file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
 		else
-			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
+			printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
 #endif
 		fops_put(file->f_op);
 		file->f_op = (struct file_operations *) f_op;
 	}
-	dput(file->f_dentry);
+	if (file->f_dentry != NULL)
+		dput(file->f_dentry);
 	file->f_dentry = dentry;
-	mntput(file->f_vfsmnt);
+	if (file->f_vfsmnt != NULL)
+		mntput(file->f_vfsmnt);
 	file->f_vfsmnt = mnt;
-	file_move(file, &mnt->mnt_sb->s_files);
+	(*my_file_move)(file, &mnt->mnt_sb->s_files);
 	return (0);
 
       put_error:

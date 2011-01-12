@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:32 $
+ @(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:35 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:32 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sl.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:35  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:32 $";
+static char const ident[] = "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:35 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -353,7 +356,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:32 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-01-12 04:10:35 $");
 }
 
 void
@@ -517,8 +520,8 @@ stop_timer(void)
 int
 decode_msg(void)
 {
-	if (ctrl.len >= sizeof(ulong))
-		return *(ulong *) cbuf;
+	if (ctrl.len >= sizeof(p->sl_primitive))
+		return p->sl_primitive;
 	return -1;
 }
 
