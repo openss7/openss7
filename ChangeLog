@@ -1,5 +1,9 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/drafts/fixup: comment out deprecated perl var
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/java/jain/protocol/ss7/JainSS7Factory.java
 	* src/java/javax/jain/protocol/ss7/JainSS7Factory.java
 	* src/java/javax/jain/ss7/JainSS7Factory.java
