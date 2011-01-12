@@ -1,6 +1,6 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\"
-.\" @(#) $Id: openss7.macros,v 1.1.2.1 2009-06-21 10:32:53 brian Exp $
+.\" @(#) $Id: openss7.macros,v 1.1.2.2 2010-12-02 22:22:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -79,11 +79,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:32:53 $ by $Author: brian $
+.\" Last Modified $Date: 2010-12-02 22:22:43 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: openss7.macros,v $
+.\" Revision 1.1.2.2  2010-12-02 22:22:43  brian
+.\" - regression fix and np_udp driver
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:32:53  brian
 .\" - added files to distro
 .\"
