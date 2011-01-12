@@ -1,5 +1,17 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* scripts/cflagcheck: updated to generate KBUILD_MODNAME flags as well
+	  as DEBUG_HASH flags for dynamic debugging.
+	* scripts/check: turn off LINT because it is generating warnings on
+	  successful file close (gawk bug).
+	* scripts/modpost.awk: turn off LINT because it is generating warnings
+	  on successful file close (gawk bug).  Also undefine KBUILD_MODNAME
+	  before defining it.
+	* scripts/modpost.pl: mimic changes for modpost.awk
+	* scripts/modpost.sh: mimic changes for modpost.awk
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/manual/bugs.texi: document msgpullup bug
 	* doc/manual/descrip.texi: remove ignored text
 	* doc/manual/install.texi: update header

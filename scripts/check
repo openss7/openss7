@@ -282,7 +282,7 @@ function check_runnable(runnable,    SHELL, result) {
 }
 
 BEGIN {
-    LINT = "yes"
+#   LINT = "yes"
     success = 0
     warnings = 0
     errors = 0

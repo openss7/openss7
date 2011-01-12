@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 14:01:53 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 14:01:53 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 03:44:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,7 +73,7 @@ function year()
 function allyears(    year, this, last, sep, result)
 {
     last = year()
-    for (this = 2009; this <= last; this++) {
+    for (this = 2011; this <= last; this++) {
 	result = result sep this
 	sep = ", "
     }
@@ -104,7 +104,7 @@ function usage(output)
 	return
     print "\
 modpost:\n\
-  $Id: modpost.awk,v 1.1.2.5 2010-11-28 14:01:53 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.6 2011-01-12 03:44:13 brian Exp $\n\
 Usage:\n\
   modpost [options] [MODULE ...]\n\
   modpost -h\n\
@@ -185,7 +185,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.5 2010-11-28 14:01:53 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.6 2011-01-12 03:44:13 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -208,7 +208,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.5 2010-11-28 14:01:53 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.6 2011-01-12 03:44:13 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -815,6 +815,7 @@ MODULE_INFO(supported, \"yes\");\n\
 #define __attribute_used__ __used\n\
 #endif\n\
 \n\
+#undef KBUILD_MODNAME\n\
 #define KBUILD_MODNAME " basename "\n\
 \n\
 #ifdef KBUILD_MODNAME\n\
@@ -917,7 +918,7 @@ function write_mymodules(modules,    i, basename, file, modname)
     print_debug("w: mymodules, " files " files written")
 }
 BEGIN {
-    LINT = "yes"
+#   LINT = "yes"
     me = "modpost.awk"
     "uname -r" | getline uname; close("uname -r")
     "pwd"      | getline pwd  ; close("pwd")
@@ -1039,6 +1040,9 @@ BEGIN {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.6  2011-01-12 03:44:13  brian
+# - update awk scripts and work around gawk close bug
+#
 # Revision 1.1.2.5  2010-11-28 14:01:53  brian
 # - awk script updates and corrections
 #
