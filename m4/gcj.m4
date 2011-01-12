@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-01-12 03:49:24 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 03:49:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -172,14 +172,14 @@ if test -z "$GCJ"; then
     dnl Until the check is removed from there, copy the code:
     if test -n "$ac_tool_prefix"; then
 	AC_CHECK_PROGS(GCJ, [${ac_tool_prefix}gcj3 ${ac_tool_prefix}gcj], [${ac_tool_prefix}gcj])
-    fi # gcj.m4 181
-fi # gcj.m4 182
+    fi
+fi
 if test -z "$GCJ" ; then
     AC_CHECK_PROG(GCJ, gcj, gcj, , , /usr/ucb/gcj)
-fi # gcj.m4 185
+fi
 if test -z "$GCJ"; then
     AC_CHECK_TOOLS(GCJ, cl.exe)
-fi # gcj.m4 188
+fi
 ])
 
 test -z "$GCJ" && AC_MSG_FAILURE([no acceptable GCJ compiler found in \$PATH])
@@ -220,7 +220,7 @@ if test -z "$JAVAC"; then
     AC_CHECK_TOOLS(JAVAC,
 	[m4_default([$1], [gcj javac])],
 	gcj)
-fi # gcj.m4 228
+fi
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javac compiler version])
 ac_compiler=$JAVAC
@@ -248,7 +248,7 @@ if test -z "$GCJH"; then
     AC_CHECK_TOOLS(GCJH,
 	[m4_default([$1], [gcjh3 gcjh])],
 	gcjh)
-fi # gcj.m4 255
+fi
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javah compiler version])
 ac_compiler=$GCJH
@@ -280,7 +280,7 @@ if test -z "$JAVAH"; then
     AC_CHECK_TOOLS(JAVAH,
 	[m4_default([$1], [$GCJH gcjh3 gcjh gcjnih javah])],
 	gcjh)
-fi # gcj.m4 286
+fi
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javah compiler version])
 ac_compiler=$JAVAH
@@ -321,7 +321,7 @@ elif test $ac_cv_prog_gcj_g = yes; then
     GCJFLAGS="-g -O2"
 else
     GCJFLAGS="-O2"
-fi # gcj.m4 327
+fi
 ])
 
 # AC_LANG_FLAG(Java)(FLAG, [IF-WORKS], [IF-DOES-NOT-WORK])
@@ -349,13 +349,13 @@ AC_CACHE_CHECK([whether $GCJ accepts $1], CacheVar,
      ac_gcj_werror_flag=$ac_save_gcj_werror_flag])
 if test "$ac_test_GCJFLAGS" = set; then
     GCJFLAGS=$ac_save_GCJFLAGS
-fi # gcj.m4 355
-if test :AS_VAR_GET([CacheVar]) = :yes
+fi
+if test :AS_VAR_GET(CacheVar) = :yes
 then :;
 $2
 else :;
 $3
-fi # gcj.m4 361
+fi
 AS_VAR_POPDEF([CacheVar])dnl
 ])
 
@@ -385,12 +385,12 @@ AC_CACHE_CHECK([whether $JAVAH accepts $1], CacheVar,
 if test "$ac_test_JAVAHFLAGS" = set; then
     JAVAHFLAGS=$ac_save_JAVAHFLAGS
 fi
-if test :AS_VAR_GET([CacheVar]) = :yes
+if test :AS_VAR_GET(CacheVar) = :yes
 then :;
 $2
 else :;
 $3
-fi # gcj.m4 396
+fi
 AS_VAR_POPDEF([CacheVar])dnl
 ])
 
@@ -716,7 +716,7 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
 	GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wall"
 	GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Werror"
-    fi # gcj.m4 630
+    fi
     AC_LANG_PUSH([Java])
     JNIFLAGS=`echo " $JNIFLAGS" | sed -r -e 's, -f(no-)?jni,,g'`
     AC_LANG_FLAG([-fjni],
@@ -764,6 +764,10 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
     AC_LANG_FLAG([-Wno-redundant-modifiers],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-redundant-modifiers"],
 		 [])
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?raw,,g'`
+    AC_LANG_FLAG([-Wno-raw],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-raw"],
+		 [])
     AC_LANG_POP([Java])
     JNIFLAGS=`echo "$JNIFLAGS" | sed -r -e 's,^[[[:space:]]]*,,;s,[[[:space:]]][$],,'`
     AC_SUBST([JNIFLAGS])dnl
@@ -797,6 +801,9 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 #
 # $Log: gcj.m4,v $
+# Revision 1.1.2.8  2011-01-12 03:49:24  brian
+# - support for RHEL 6 kernel
+#
 # Revision 1.1.2.7  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -820,7 +827,7 @@ AC_DEFUN([_GCJ_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

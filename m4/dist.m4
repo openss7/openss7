@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 03:49:24 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 03:49:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -786,6 +786,9 @@ AC_DEFUN([_DISTRO_], [dnl
 # =============================================================================
 #
 # $Log: dist.m4,v $
+# Revision 1.1.2.4  2011-01-12 03:49:24  brian
+# - support for RHEL 6 kernel
+#
 # Revision 1.1.2.3  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #

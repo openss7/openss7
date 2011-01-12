@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 03:49:24 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 03:49:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,7 +109,7 @@ dnl We need safe versions of these flags without warnings or strange optimizatio
 dnl but with module flags included
 dnl But we need to skip -DMODVERSIONS and -include /blah/blah/modversion.h on rh systems.
     BLDFLAGS=`echo "$KERNEL_BLDFLAGS" | sed -e "s|'||g;s|.#s|#s|;s|-DKBUILD_BASENAME.*|-DKBUILD_BASENAME=KBUILD_STR(phony)|"`
-    MODFLAGS=`echo " $KERNEL_MODFLAGS -DKBUILD_MODNAME=\"phony\" " | sed -e 's| -DMOVERSIONS||g;s| -include [[^ ]]*||g'`
+    MODFLAGS=`echo " $KERNEL_MODFLAGS -DKBUILD_MODNAME=\"phony\" -DDEBUG_HASH=0 -DDEBUG_HASH2=0" | sed -e 's| -DMODVERSIONS||g;s| -include [[^ ]]*||g'`
     CPPFLAGS=`echo " $BLDFLAGS $MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
@@ -2282,13 +2282,12 @@ dnl
 	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} bldflag-check | tail -1`"
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"])
 dnl
-dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line
-dnl	and is no longer stringified in kernel source files.  This Makefile
-dnl	check checks to see if the KBUILD_STR symbol is defined by the
-dnl	makefile, and, if so, stringifies the KBUILD_BASENAME's.  We used to
-dnl	have -DKBUILD_BASENAME in the Makefile.am, but as it should always
-dnl	contain a name unique for the object linked into a module, it can
-dnl	always be derived from the compilation target, and so we do that here.
+dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line and is no longer
+dnl	stringified in kernel source files.  This Makefile check checks to see if the KBUILD_STR
+dnl	symbol is defined by the makefile, and, if so, stringifies the KBUILD_BASENAME's.  We used
+dnl	to have -DKBUILD_BASENAME in the Makefile.am, but as it should always contain a name unique
+dnl	for the object linked into a module, it can always be derived from the compilation target,
+dnl	and so we do that here.
 dnl
 	case "$linux_cv_k_bldflags" in
 	    (*KBUILD_STR*)
@@ -2301,11 +2300,71 @@ dnl
 	# the escapes and quotes here are delicate: don't change them!
 	linux_cv_k_bldflags="${linux_cv_k_bldflags} '-DKBUILD_BASENAME=KBUILD_STR('\`echo [\$][@] | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'\`')'"
     ])
+    AC_CACHE_CHECK([for kernel KBUILD_MODNAME], [linux_cv_k_mnflags], [dnl
+	_LINUX_KBUILD_ENV([dnl
+dnl
+dnl	At some point (I first noticed it in 2.6.32 builds for RHEL 6.0, but they also occur in
+dnl	Debian 2.6.32 kernel makefiles--the net says it started in 2.6.30) debug flags require that
+dnl	KBUILD_MODNAME be defined when objects are compiled (not simply when they are having modpost
+dnl	performed on them).  The target modnameflag-check was added to cflagcheck to rip these flags
+dnl	from the makefile.
+dnl
+	linux_builddir=`pwd`
+	linux_cv_k_mnflags="`${srcdir}/scripts/cflagcheck modname=phony srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} mnflag-check | tail -1`"
+	linux_cv_k_mnflags_orig="$linux_cv_k_mnflags"])
+	case "$linux_cv_k_mnflags" in
+	    (*KBUILD_MODNAME*)
+dnl
+dnl	This is only a temporary fix.  This needs to be the module name as seen by lsmod.  In almost
+dnl	all cases, modules and drivers are $(kpre)KBUILD_BASENAME, but there are some exceptions:
+dnl	specfs, streams itself, compatibility modules.  However, those are unlikely to invoke
+dnl	anything requiring a dynamic debug anyways, and those will simply use a different name.
+dnl
+		# the escapes and quotes here are delicate: don't change them!
+		linux_cv_k_mnflags="'-DKBUILD_MODNAME=KBUILD_STR('\`echo [\$](kpre)[\$][@] | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'\`')'"
+		;;
+	    (*)
+		linux_cv_k_mnflags=''
+		;;
+	esac
+    ])
+    AC_CACHE_CHECK([for kernel DEBUG_HASH], [linux_cv_k_dhflags], [dnl
+	_LINUX_KBUILD_ENV([dnl
+dnl
+dnl	At some point (I first noticed it in 2.6.32 builds for RHEL 6.0, but they also occur in
+dnl	Debian 2.6.32 kernel makefiles--the net says it started in 2.6.30) debug flags required that
+dnl	DEBUG_HASH and DEBUG_HASH2 be defined and are created when CONFIG_DYNAMIC_DEBUG is defined.
+dnl	The script/basic/hash function is used to hash the directory and module name.  The target
+dnl	debugflag-check was added to cflagcheck to rip these flags from the makefile.  From the
+dnl	copyright on the hash.c program, RedHat is responsible for this commerical idiocy.
+dnl
+	linux_builddir=`pwd`
+	linux_cv_k_dhflags="`${srcdir}/scripts/cflagcheck modname=phony srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} dhflag-check | tail -1`"
+	linux_cv_k_dhflags_orig="$linux_cv_k_dhflags"])
+	case "$linux_cv_k_dhflags" in
+	    (*DEBUG_HASH*)
+dnl
+dnl	There are two hashes (unsigned char but only significant to 6 bits) that are used to shift a
+dnl	bit to match against a 64-bit mask.  Two hash functions are used to generate the a djb2 and
+dnl	r5 hash from the build directory and KBUILD_MODNAME.  Because the build directory is not
+dnl	maintained in the kernel, the hashes can be whatever we want.  There is a 1:4096 chance that
+dnl	whatever is used will be invoked by some other dynamic debug request, which will cause a
+dnl	little data cache polution if unlucky.  Later I can write a short awk script to generate the
+dnl	hash. From the copyright on the hash.c program, RedHat is responsible for this commerical
+dnl	idiocy.
+dnl
+		linux_cv_k_dhflags='-DDEBUG_HASH=0 -DDEBUG_HASH2=63'
+		;;
+	    (*)
+		linux_cv_k_dhflags=''
+		;;
+	esac
+    ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"
     KERNEL_MODFLAGS="$linux_cv_k_modflags"
     AC_SUBST([KERNEL_MODFLAGS])dnl
-    KERNEL_BLDFLAGS="$linux_cv_k_bldflags"
+    KERNEL_BLDFLAGS="$linux_cv_k_bldflags${linux_cv_k_mnflags:+ $linux_cv_k_mnflags}${linux_cv_k_dhflags:+ $linux_cv_k_dhflags}"
     AC_SUBST([KERNEL_BLDFLAGS])dnl
 ])# _LINUX_SETUP_KERNEL_CFLAGS
 # =========================================================================
@@ -3007,6 +3066,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.5  2011-01-12 03:49:24  brian
+# - support for RHEL 6 kernel
+#
 # Revision 1.1.2.4  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -3063,7 +3125,7 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
