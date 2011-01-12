@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:34 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:06 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:34  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:06  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $";
+static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:34 $";
 
 
 /*
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 1.1.2.2
 #include <ss7/sli_ioctl.h>
 
 #define SL_TPI_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_TPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SL_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_TPI_LICENSE		"GPL"
@@ -2275,55 +2278,55 @@ sl_timer_start(queue_t *q, const uint t)
 		sl_timer_stop(q, t);
 		switch (t) {
 		case t1:
-			printd(("%s: %p: starting t1 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t1 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.config.t1 * 10, jiffies));
 			sl->sl.timer.t1 = timeout(&sl_t1_timeout, (caddr_t) sl, sl->sl.config.t1);
 			sl->refcnt++;
 			break;
 		case t2:
-			printd(("%s: %p: starting t2 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t2 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.config.t2 * 10, jiffies));
 			sl->sl.timer.t2 = timeout(&sl_t2_timeout, (caddr_t) sl, sl->sl.config.t2);
 			sl->refcnt++;
 			break;
 		case t3:
-			printd(("%s: %p: starting t3 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t3 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.config.t3 * 10, jiffies));
 			sl->sl.timer.t3 = timeout(&sl_t3_timeout, (caddr_t) sl, sl->sl.config.t3);
 			sl->refcnt++;
 			break;
 		case t4:
-			printd(("%s: %p: starting t4 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t4 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.statem.t4v * 10, jiffies));
 			sl->sl.timer.t4 = timeout(&sl_t4_timeout, (caddr_t) sl, sl->sl.statem.t4v);
 			sl->refcnt++;
 			break;
 		case t5:
-			printd(("%s: %p: starting t5 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t5 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.config.t5 * 10, jiffies));
 			sl->sl.timer.t5 = timeout(&sl_t5_timeout, (caddr_t) sl, sl->sl.config.t5);
 			sl->refcnt++;
 			break;
 		case t6:
-			printd(("%s: %p: starting t6 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t6 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.config.t6 * 10, jiffies));
 			sl->sl.timer.t6 = timeout(&sl_t6_timeout, (caddr_t) sl, sl->sl.config.t6);
 			sl->refcnt++;
 			break;
 		case t7:
-			printd(("%s: %p: starting t7 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t7 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sl.config.t7 * 10, jiffies));
 			sl->sl.timer.t7 = timeout(&sl_t7_timeout, (caddr_t) sl, sl->sl.config.t7);
 			sl->refcnt++;
 			break;
 		case t8:
-			printd(("%s: %p: starting t8 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			printd(("%s: %p: starting t8 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 				sl->sdt.config.t8 * 10, jiffies));
 			sl->sdt.timer.t8 = timeout(&sl_t8_timeout, (caddr_t) sl, sl->sdt.config.t8);
 			sl->refcnt++;
 			break;
 		case t9:
-			// printd(("%s: %p: starting t9 %lu ms at %lu\n", SL_TPI_MOD_NAME, sl,
+			// printd(("%s: %p: starting t9 %u ms at %lu\n", SL_TPI_MOD_NAME, sl,
 			// (ulong)
 			// (10), jiffies));
 			sl->sdl.timer.t9 = timeout(&sl_t9_timeout, (caddr_t) sl, 1);
@@ -6698,7 +6701,7 @@ t_unitdata_ind(queue_t *q, mblk_t *mp)
 			/* 
 			   ignore packets not from remote address */
 		}
-		ptrace(("%s: %p: lsc_state = %ld, rc_state = %ld, daedr_state = %ld\n",
+		ptrace(("%s: %p: lsc_state = %u, rc_state = %u, daedr_state = %u\n",
 			SL_TPI_MOD_NAME, sl, sl->sl.statem.lsc_state, sl->sl.statem.rc_state,
 			sl->sdt.statem.daedr_state));
 		return (QR_DONE);
@@ -8808,7 +8811,7 @@ sl_free_priv(queue_t *q)
 	printd(("%s: unlinked module private structure\n", SL_TPI_MOD_NAME));
 	if (sl->refcnt) {
 		assure(sl->refcnt);
-		printd(("%s: WARNING: sl->refcnt = %d\n", SL_TPI_MOD_NAME, sl->refcnt));
+		printd(("%s: WARNING: sl->refcnt = %ld\n", SL_TPI_MOD_NAME, (long) sl->refcnt));
 	}
 	kmem_cache_free(sl_priv_cachep, sl);
 	printd(("%s: freed module private structure\n", SL_TPI_MOD_NAME));

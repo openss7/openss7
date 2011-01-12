@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:59 $
+ @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:59 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socklib.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:33  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:59  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: socklib.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:59 $";
+static char const ident[] = "$RCSfile: socklib.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -646,6 +649,11 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_SNDBUF:	/* POSIX */
+                        if (optval == NULL) {
+				errno = EINVAL;
+				return (-1);
+			}
+			val = (*(int *) optval);
 #if defined XTI_GENERIC && defined XTI_SNDBUF
 			/** @def SO_SNDBUF
 			  * Handle with XTI_GENERIC/XTI_SNDBUF. */
@@ -659,6 +667,11 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 			errno = ENOPROTOOPT;
 			return (-1);
 		case SO_RCVBUF:	/* POSIX */
+                        if (optval == NULL) {
+				errno = EINVAL;
+				return (-1);
+			}
+			val = (*(int *) optval);
 #if defined XTI_GENERIC && defined XTI_RCVBUF
 			/** @def SO_RCVBUF
 			  * Handle with XTI_GENERIC/XTI_RCVBUF. */

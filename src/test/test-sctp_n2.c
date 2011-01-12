@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:30 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:35 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:30 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:35  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:22:30  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:30 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:35 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -7112,7 +7115,7 @@ address but a specific port number in the NS_UNBND state."
 int
 test_case_1_6_2_3(int child)
 {
-	int port = htons(TEST_PORT_NUMBER);
+	int port = htons(TEST_PORT_NUMBER + child);
 	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
@@ -7303,7 +7306,7 @@ returned."
 int
 test_case_1_6_2_5(int child)
 {
-	int port = htons(TEST_PORT_NUMBER);
+	int port = htons(TEST_PORT_NUMBER + child);
 	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
@@ -7391,7 +7394,7 @@ issued twice from the NS_UNBND state (double bind)."
 int
 test_case_1_6_3_1(int child)
 {
-	int port = htons(TEST_PORT_NUMBER);
+	int port = htons(TEST_PORT_NUMBER + child);
 	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 

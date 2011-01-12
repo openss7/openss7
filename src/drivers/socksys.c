@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:36 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:36 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 1.1.2.4  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:21:36  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:36 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -109,8 +112,8 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.
 #include <sys/socksys.h>
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:36 $"
+#define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 MP STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -817,11 +820,13 @@ ssys_free_priv(queue_t *q)
 	s = SOCKSYS_PRIV(q);
 	ensure(q, return);
 #if 0
+#if 0
 	strlog(DRV_ID, s->dev.cminor, 0, SL_TRACE,
 	       "unlinking private structure: reference count = %d", atomic_read(&s->refcnt));
 #else
 	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME,
 		atomic_read(&s->refcnt)));
+#endif
 #endif
 	/* remove from master list */
 	if ((*s->prev = s->next))

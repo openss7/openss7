@@ -1,5 +1,63 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/dl_master.c: CONFIG_KMOD is deprecated, now CONFIG_MODULES
+	* src/drivers/ip_hooks.h.in: anonymous union was removed, cast remaining
+	* src/drivers/isup.c: support gcc-4.4 under debug
+	* src/drivers/mg.c: updated documentation format and reformatted
+	  file (using indent)
+	* src/drivers/mtp.c: one gcc-4.4 detected flag logic error and support
+	  for gcc-4.4 under debug
+	* src/drivers/mtp_min.c: support for gcc-4.4 under debug
+	* src/drivers/nsdev.c: CONFIG_KMOD is deprecated, now CONFIG_MODULES
+	* src/drivers/rsw.c: new RTP switch driver workup
+	* src/drivers/sccp.c: support for gcc-4.4 and debug
+	* src/drivers/sctp2.c: cannot use ip_route_connect anymore because it
+	  dereferences the socket pointer, use ip_route_output instead.
+	* src/drivers/sctp_hooks.h.in: anonymous union was removed, cast remaining
+	* src/drivers/sl_x100p.c: support for debug flag
+	* src/drivers/socksys.c: support for debug flag
+	* src/drivers/tcap.c: support for debug flag
+	* src/drivers/udp.c: ???
+	* src/drivers/udp_hooks.h.in: anonymous union was removed, cast remaining
+	* src/drivers/x100p-ss7.c: support for debug flag
+	* src/drivers/x400p-ss7.c: support for debug flag
+	* src/include/sys/chi.h: add CH_ATTACH_ACK
+	* src/include/sys/npi_udp.h: minor comment
+	* src/include/sys/mps/stream.h: add the following mi_ functions:
+	  mi_esbbcall, mi_copyb, mi_dupb, mi_copymsg, mi_dupmsg, mi_msgpullup
+	* src/include/sys/openss7/strsubr.h: corrected rather serious bug in
+	  sq_list: a struct list_head * was used where a struct list_head was
+	  required
+	* src/kernel/mpscompat.c: added declarations for mi_esbbcall, mi_copyb,
+	  mi_dupb, mi_copymsg, mi_dupmsg, mi_msgpullup
+	* src/kernel/strlookup.c: CONFIG_KMOD is deprecated, now CONFIG_MODULES
+	* src/kernel/strprocfs.c: support for debug flag
+	* src/kernel/strreg.c: CONFIG_KMOD is deprecated, now CONFIG_MODULES
+	* src/kernel/strsched.c: CONFIG_KMOD is deprecated, now CONFIG_MODULES
+	* src/kernel/strspecfs.c: workaround gcc-4.4 linkage bug in
+	  spec_reparent affecting function file_move().
+	* src/kernel/strutil.c: fix msgpullup bug.
+	* src/lib/dlpi.c: reformat file
+	* src/lib/socklib.c: correct socklib options processing.
+	* src/modules/sdl.c: support debug flags
+	* src/modules/sdt.c: support debug flags
+	* src/modules/sdt_tpi.c: support debug flags
+	* src/modules/sl.c: support debug flags
+	* src/modules/sl_tpi.c: support debug flags
+	* src/modules/sth.c: correct unimportant compiler warning (gcc-4.4 bug)
+	* src/test/ldltest.c: correct antialiasing under gcc-4.4
+	* src/test/test-m2pa.c: correct antialiasing under gcc-4.4
+	* src/test/test-sctp_n2.c: avoid timing related failure of test case
+	* src/test/test-sl.c: correct antialiasing under gcc-4.4
+	* src/test/test-streams.c: too slow on debug kernel, fix timing related
+	  failure of test case
+	* src/util/fattach.c: correct unimportant compiler warning (gcc-4.4 bug)
+	* src/util/ldlconfig.c: correct antaliasing under gcc-4.4
+	* src/util/slmon.c: correct antialiasing under gcc-4.4
+	* src/util/ss7capd.c: correct antialiasing under gcc-4.4
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* m4/dist.m4: update header
 	* m4/gcj.m4: add check for -Wno-raw flag.  Work around autoconf (m4?)
 	  bug that kept first AS_PUSH_VAR from begin generated properly

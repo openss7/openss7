@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 1.1.2.2 2010-11-28 14:21:51 brian Exp $
+ @(#) $Id: stream.h,v 1.1.2.3 2011-01-12 04:10:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:51 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 1.1.2.3  2011-01-12 04:10:31  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:51  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -276,6 +279,11 @@ __MPS_EXTERN void mi_unlock(caddr_t ptr);
  */
 __MPS_EXTERN void mi_bufcall(queue_t *q, int size, int priority);
 
+__MPS_EXTERN_INLINE void mi_esbbcall(queue_t *q, int priority)
+{
+	mi_bufcall(q, 0, priority);
+}
+
 /*
  *  Message block allocation helper functions.
  */
@@ -290,6 +298,71 @@ mi_allocb(queue_t *q, size_t size, int priority)
 	if (unlikely((mp = allocb(size, priority)) == NULL))
 		mi_bufcall(q, size, priority);
 	return (mp);
+}
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_esballoc(queue_t *q, unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
+{
+	mblk_t *mp;
+
+	if (unlikely((mp = esballoc(base, size, priority, freeinfo)) == NULL))
+		mi_esbbcall(q, priority);
+	return (mp);
+}
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_copyb(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (unlikely((mp = copyb(bp)) == NULL))
+		if (likely(bp != NULL))
+			mi_bufcall(q, bp->b_wptr - bp->b_rptr, BPRI_MED);
+	return (mp);
+}
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_dupb(queue_t *q, mblk_t *bp)
+{
+	mblk_t *mp;
+
+	if (unlikely((mp = dupb(bp)) == NULL))
+		if (likely(bp != NULL && bp->b_datap->db_ref < 255))
+			mi_bufcall(q, 0, BPRI_MED);
+	return (mp);
+}
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_copymsg(queue_t *q, mblk_t *mp)
+{
+	mblk_t *msg;
+
+	if (unlikely((msg = copymsg(mp)) == NULL))
+		if (likely(mp != NULL))
+			mi_bufcall(q, msgsize(mp), BPRI_MED);
+	return (msg);
+}
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_dupmsg(queue_t *q, mblk_t *mp)
+{
+	mblk_t *msg;
+
+	if (unlikely((msg = dupmsg(mp)) == NULL))
+		if (likely(mp != NULL) )
+			mi_bufcall(q, 0, BPRI_MED);
+	return (msg);
+}
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_msgpullup(queue_t *q, mblk_t *mp, ssize_t length)
+{
+	mblk_t *msg;
+
+	if (unlikely((msg = msgpullup(mp, length)) == NULL))
+		if (likely(mp != NULL && length != -1 && msgsize(mp) >= length))
+			mi_bufcall(q, msgsize(mp), BPRI_MED);
+	return (msg);
 }
 
 /*

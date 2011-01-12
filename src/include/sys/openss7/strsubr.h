@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 1.1.2.3 2010-11-28 14:21:52 brian Exp $
+ @(#) $Id: strsubr.h,v 1.1.2.4 2011-01-12 04:10:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:52 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 1.1.2.4  2011-01-12 04:10:31  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:21:52  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -194,7 +197,7 @@ typedef struct syncq {
 	struct syncq *sq_next;		/* list of all elsewhere structures */
 	struct syncq **sq_prev;		/* list of all elsewhere structures */
 #if defined CONFIG_STREAMS_DEBUG
-	struct list_head *sq_list;	/* Strinfo list linkage */
+	struct list_head sq_list;	/* Strinfo list linkage */
 #endif
 } syncq_t;
 

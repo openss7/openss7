@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $
+ @(#) $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_master.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:29  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:31  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $";
+static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -70,8 +73,8 @@ static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 1.1.2.2 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 1.1.2.3 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -225,7 +228,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		if (!(devname = dl_modules[cminor]))
 			return (ENOENT);
 		if ((err = dl_find_strdev(devname)) < 0) {
-#ifdef CONFIG_KMOD
+#if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 			sprintf(drvname, "streams-%s", devname);
 			if ((err = request_module(drvname)))
 				return (err < 0 ? -err : err);

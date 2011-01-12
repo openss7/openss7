@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: udp_hooks.h.in,v 1.1.2.3 2010-11-28 14:32:25 brian Exp $
+ @(#) $Id: udp_hooks.h.in,v 1.1.2.4 2011-01-12 04:10:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:25 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp_hooks.h.in,v $
+ Revision 1.1.2.4  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.3  2010-11-28 14:32:25  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -303,7 +306,7 @@ skb_dst_set(struct sk_buff *skb, struct dst_entry *dst)
 static __inline__ struct rtable*
 skb_rtable(struct sk_buff *skb)
 {
-    return skb->rtable;
+    return (struct rtable *)skb->dst;
 }
 #endif
 

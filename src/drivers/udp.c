@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 14:32:25 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-12 04:10:30 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:25 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 1.1.2.7  2011-01-12 04:10:30  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
+ Revision 1.1.2.6  2010-12-02 22:22:45  brian
+ - regression fix and np_udp driver
+
  Revision 1.1.2.5  2010-11-28 14:32:25  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -69,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 14:32:25 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-12 04:10:30 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -150,7 +156,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 14:32:25 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-12 04:10:30 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"
@@ -8308,7 +8314,6 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
-#if 0
 STATIC INLINE streamscall __hot_in int
 tp_r_prim_put(queue_t *q, mblk_t *mp)
 {
@@ -8318,7 +8323,6 @@ tp_r_prim_put(queue_t *q, mblk_t *mp)
 			return (-EAGAIN);
 	return tp_r_prim_slow(q, mp);
 }
-#endif
 
 /**
  * tp_r_prim_srv - process primitive on read queue
@@ -8413,7 +8417,7 @@ streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
+	    || tp_r_prim_put(q, mp) != QR_ABSORBED) {
 		np_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {

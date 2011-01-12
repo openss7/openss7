@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:29  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -100,8 +103,8 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #define STRLOGDA	7	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $"
-#define MTP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $"
+#define MTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_LICENSE	"GPL"
@@ -7299,7 +7302,7 @@ rl_reroute(queue_t *q, struct rs *rs, struct rl *rl_onto, const bool force)
 		}
 	}
 	/* special transfer-allowed, -restricted, and -prohibited procedures only apply to STPs. */
-	if (!sp->flags & SPF_XFER_FUNC) {
+	if (!(sp->flags & SPF_XFER_FUNC)) {
 		if (rl_from && rl_from != rl_prim) {
 			/* rerouting from a non-primary route list */
 			switch (rs->state) {
@@ -21579,7 +21582,7 @@ mtp_alloc_link(queue_t *q, int index, cred_t *crp, minor_t unit)
 	struct mtp_timer *t;
 
 	if ((sl = (struct sl *) mi_open_alloc_cache(mtp_sl_cachep, GFP_ATOMIC))) {
-		printd(("%s: %p: allocated sl private structure %lu\n", DRV_NAME, sl, index));
+		printd(("%s: %p: allocated sl private structure %d\n", DRV_NAME, sl, index));
 		bzero(sl, sizeof(*sl));
 		sl->rq = RD(q);
 		sl->wq = WR(q);
@@ -21702,7 +21705,7 @@ mtp_alloc_link(queue_t *q, int index, cred_t *crp, minor_t unit)
 		t->sl = sl;
 		/* assign defaults */
 	} else
-		ptrace(("%s: ERROR: Could not allocate sl private structure %lu\n",
+		ptrace(("%s: ERROR: Could not allocate sl private structure %d\n",
 			DRV_NAME, index));
 	return (sl);
       enobufs:
@@ -21826,7 +21829,7 @@ mtp_alloc_cb(uint id, struct lk *lk, struct sl *from, struct sl *onto, uint inde
 		cb->sl.onto = onto;
 		printd(("%s: %p: linked cb structure %lu\n", DRV_NAME, cb, cb->id));
 	} else
-		ptrace(("%s: ERROR: Could not allocate cb structure %lu\n", DRV_NAME, id));
+		ptrace(("%s: ERROR: Could not allocate cb structure %d\n", DRV_NAME, id));
 	return (cb);
 }
 static void

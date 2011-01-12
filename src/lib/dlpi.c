@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:58 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:58 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:33  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:58  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -82,7 +85,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:58 $";
+    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
 
 /* This file can be processed by doxygen(1). */
 
@@ -292,41 +295,49 @@ __dlpi_lock_rdlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_rdlock(rwlock);
 }
+
 static inline int
 __dlpi_lock_wrlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_wrlock(rwlock);
 }
+
 static inline void
 __dlpi_lock_unlock(pthread_rwlock_t * rwlock)
 {
 	pthread_rwlock_unlock(rwlock);
 }
+
 static inline int
 __dlpi_list_rdlock(void)
 {
 	return __dlpi_lock_rdlock(&__dlpi_fd_lock);
 }
+
 static inline int
 __dlpi_list_wrlock(void)
 {
 	return __dlpi_lock_wrlock(&__dlpi_fd_lock);
 }
+
 static void
 __dlpi_list_unlock(void *ignore)
 {
 	return __dlpi_lock_unlock(&__dlpi_fd_lock);
 }
+
 static inline int
 __dlpi_user_rdlock(dlpi_handle_t dh)
 {
 	return __dlpi_lock_rdlock(&dh->du_lock);
 }
+
 static inline int
 __dlpi_user_wrlock(dlpi_handle_t dh)
 {
 	return __dlpi_lock_wrlock(&dh->du_lock);
 }
+
 static inline void
 __dlpi_user_unlock(dlpi_handle_t dh)
 {
@@ -335,44 +346,68 @@ __dlpi_user_unlock(dlpi_handle_t dh)
 
 /* Forward declarations of internal functions. */
 static __hot void __dlpi_putuser(void *arg);
+
 static __hot dlpi_handle_t __dlpi_getuser(dlpi_handle_t dh, int *errp);
+
 static __hot dlpi_handle_t __dlpi_hlduser(dlpi_handle_t dh, int *errp);
+
 static __hot dlpi_handle_t __dlpi_chkuser(dlpi_handle_t dh, int *errp);
+
 #if 0
 static int __dlpi_getmsg(dlpi_handle_t dh, struct strbuf *ctrl, struct strbuf *data, int *flagsp);
 #endif
 static int __dlpi_putmsg(dlpi_handle_t dh, struct strbuf *ctrl, struct strbuf *data, int flags);
+
 #if 0
 static int __dlpi_peek(dlpi_handle_t dh, int timeout);
 #endif
 static int __dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl);
 
 static uint _dlpi_arptype(uint mactype);
+
 static int _dlpi_bind(dlpi_handle_t dh, uint sap, uint *boundsap);
+
 static void _dlpi_close(dlpi_handle_t dh);
+
 static int _dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
+
 static int _dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp);
+
 static int _dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
-static int _dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
-			    dlpi_notifyid_t * nid);
+
+static int _dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg,
+			    dlpi_notifyid_t *nid);
 static int _dlpi_fd(dlpi_handle_t dh);
+
 static int _dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen);
+
 static uint _dlpi_iftype(uint mactype);
+
 static int _dlpi_info(dlpi_handle_t dh, dlpi_info_t * di, uint opt);
+
 static const char *_dlpi_linkname(dlpi_handle_t dh);
+
 static const char *_dlpi_mactype(uint mactype);
-static int _dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags);
+
+static int _dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags);
+
 static int _dlpi_promiscoff(dlpi_handle_t dh, uint level);
+
 static int _dlpi_promiscon(dlpi_handle_t dh, uint level);
+
 static int _dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen,
 		      int wait, dlpi_recvinfo_t * recvp);
 static int _dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf,
 		      size_t buflen, const dlpi_sendinfo_t * sendp);
 static int _dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen);
+
 static int _dlpi_set_timeout(dlpi_handle_t dh, int seconds);
+
 static const char *_dlpi_strerror(int error);
+
 static int _dlpi_unbind(dlpi_handle_t dh);
-static void _dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags);
+
+static void _dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags);
 
 /** @internal
   * @brief release a user whether held or got
@@ -382,6 +417,7 @@ static __hot void
 __dlpi_putuser(void *arg)
 {
 	int fd = *(int *) arg;
+
 	dlpi_handle_t dh = __dlpi_dhs[fd];
 
 	__dlpi_user_unlock(dh);
@@ -404,6 +440,7 @@ static __hot dlpi_handle_t
 __dlpi_getuser(dlpi_handle_t dh, int *errp)
 {
 	dlpi_handle_t du;
+
 	int err, fd;
 
 	if (unlikely((err = __dlpi_list_rdlock())))
@@ -456,6 +493,7 @@ static __hot dlpi_handle_t
 __dlpi_hlduser(dlpi_handle_t dh, int *errp)
 {
 	dlpi_handle_t du;
+
 	int err, fd;
 
 	if (unlikely((err = __dlpi_list_rdlock())))
@@ -506,6 +544,7 @@ static __hot dlpi_handle_t
 __dlpi_chkuser(dlpi_handle_t dh, int *errp)
 {
 	dlpi_handle_t du;
+
 	int fd;
 
 	if (unlikely(dh == NULL))
@@ -598,6 +637,7 @@ __dlpi_peek(dlpi_handle_t dh, int timeout)
 	}
 	if (dh->du_event == 0) {
 		int ret, flag = 0;
+
 		union DL_primitives *p = (typeof(p)) dh->du_ctlbuf;
 
 		dh->du_ctrl.maxlen = dh->du_ctlmax;
@@ -634,11 +674,10 @@ __dlpi_peek(dlpi_handle_t dh, int timeout)
 static int
 __dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl)
 {
-	struct {
-		union DL_primitives prim;
-		unsigned char buffer[64];
-	} buf;
+	union DL_primitives *p = (typeof(p)) ctrl->buf;
+
 	int ret, flag;
+
 	struct pollfd pfd;
 
 	pfd.fd = dh->du_fd;
@@ -661,68 +700,64 @@ __dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl)
 		return (DL_SYSERR);
 	if (ret != 0)
 		return (DLPI_EBADMSG);
-	if (ctrl->len < sizeof(buf.prim.dl_primitive))
+	if (ctrl->len < sizeof(p->dl_primitive))
 		return (DLPI_EBADMSG);
-	switch (buf.prim.dl_primitive) {
+	switch (p->dl_primitive) {
 	case DL_ERROR_ACK:
 		/* handle DL_ERROR_ACK reply */
-		if (ctrl->len < sizeof(buf.prim.error_ack))
+		if (ctrl->len < sizeof(p->error_ack))
 			return (DLPI_EBADMSG);
-		if (buf.prim.error_ack.dl_error_primitive != prim)
+		if (p->error_ack.dl_error_primitive != prim)
 			return (DLPI_EBADMSG);
-		if (buf.prim.error_ack.dl_errno == DL_SYSERR) {
-			errno = buf.prim.error_ack.dl_unix_errno;
+		if (p->error_ack.dl_errno == DL_SYSERR) {
+			errno = p->error_ack.dl_unix_errno;
 			return (DL_SYSERR);
 		}
-		return (buf.prim.error_ack.dl_errno);
+		return (p->error_ack.dl_errno);
 	case DL_OK_ACK:
 		/* handle DL_OK_ACK reply */
-		if (ctrl->len < sizeof(buf.prim.ok_ack))
+		if (ctrl->len < sizeof(p->ok_ack))
 			return (DLPI_EBADMSG);
-		if (buf.prim.ok_ack.dl_correct_primitive != prim)
+		if (p->ok_ack.dl_correct_primitive != prim)
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_INFO_ACK:
 		if (prim != DL_INFO_REQ)
 			return (DLPI_EBADMSG);
-		if (ctrl->len < sizeof(buf.prim.info_ack))
+		if (ctrl->len < sizeof(p->info_ack))
 			return (DLPI_EBADMSG);
-		if (buf.prim.info_ack.dl_addr_length != 0
-		    && ctrl->len <
-		    buf.prim.info_ack.dl_addr_length + buf.prim.info_ack.dl_addr_offset)
+		if (p->info_ack.dl_addr_length != 0
+		    && ctrl->len < p->info_ack.dl_addr_length + p->info_ack.dl_addr_offset)
 			return (DLPI_EBADMSG);
-		if (buf.prim.info_ack.dl_qos_length != 0
-		    && ctrl->len <
-		    buf.prim.info_ack.dl_qos_length + buf.prim.info_ack.dl_qos_offset)
+		if (p->info_ack.dl_qos_length != 0
+		    && ctrl->len < p->info_ack.dl_qos_length + p->info_ack.dl_qos_offset)
 			return (DLPI_EBADMSG);
-		if (buf.prim.info_ack.dl_qos_range_length != 0
+		if (p->info_ack.dl_qos_range_length != 0
 		    && ctrl->len <
-		    buf.prim.info_ack.dl_qos_range_length + buf.prim.info_ack.dl_qos_range_offset)
+		    p->info_ack.dl_qos_range_length + p->info_ack.dl_qos_range_offset)
 			return (DLPI_EBADMSG);
-		if (buf.prim.info_ack.dl_brdcst_addr_length != 0
+		if (p->info_ack.dl_brdcst_addr_length != 0
 		    && ctrl->len <
-		    buf.prim.info_ack.dl_brdcst_addr_length +
-		    buf.prim.info_ack.dl_brdcst_addr_offset)
+		    p->info_ack.dl_brdcst_addr_length + p->info_ack.dl_brdcst_addr_offset)
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_BIND_ACK:
 		if (prim != DL_BIND_REQ)
 			return (DLPI_EBADMSG);
-		if (ctrl->len < sizeof(buf.prim.bind_ack))
+		if (ctrl->len < sizeof(p->bind_ack))
 			return (DLPI_EBADMSG);
-		if (buf.prim.bind_ack.dl_addr_length != 0
-		    && ctrl->len <
-		    buf.prim.bind_ack.dl_addr_length + buf.prim.bind_ack.dl_addr_offset)
+		if (p->bind_ack.dl_addr_length != 0
+		    && ctrl->len < p->bind_ack.dl_addr_length + p->bind_ack.dl_addr_offset)
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_PHYS_ADDR_ACK:
 		if (prim != DL_PHYS_ADDR_REQ)
 			return (DLPI_EBADMSG);
-		if (ctrl->len < sizeof(buf.prim.phys_addr_ack))
+		if (ctrl->len < sizeof(p->phys_addr_ack))
 			return (DLPI_EBADMSG);
-		if (buf.prim.phys_addr_ack.dl_addr_length != 0
+		if (p->phys_addr_ack.dl_addr_length != 0
 		    && ctrl->len <
-		    buf.prim.phys_addr_ack.dl_addr_length + buf.prim.phys_addr_ack.dl_addr_offset)
+		    p->phys_addr_ack.dl_addr_length + p->phys_addr_ack.dl_addr_offset)
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_NOTIFY_ACK:
@@ -916,8 +951,11 @@ _dlpi_bind(dlpi_handle_t dh, uint sap, uint *boundsap)
 		union DL_primitives prim;
 		unsigned char buffer[BUFSIZ];
 	} buf;
+
 	struct strbuf ctrl;
+
 	uint mysap = sap;
+
 	int err;
 
 	if (mysap == DLPI_ANY_SAP) {
@@ -1121,7 +1159,9 @@ _dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
 		union DL_primitives prim;
 		unsigned char buffer[DLPI_PHYSADDR_MAX];
 	} buf;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	if (unlikely(aptr == NULL))
@@ -1211,8 +1251,11 @@ static int
 _dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp)
 {
 	union DL_primitives prim;
+
 	struct strbuf ctrl;
+
 	dlpi_notifyid_t dln, *np, n;
+
 	int err;
 
 	if (unlikely((dln = (typeof(dln)) id) == NULL))
@@ -1314,7 +1357,9 @@ _dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
 		union DL_primitives prim;
 		unsigned char buffer[DLPI_PHYSADDR_MAX];
 	} buf;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	if (unlikely(aptr == NULL))
@@ -1403,12 +1448,15 @@ __asm__(".symver __dlpi_enabmulti_r,dlpi_enabmulti@@DLPI_1.1");
   * the DLPI handle.
   */
 static int
-_dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
-		 dlpi_notifyid_t * nid)
+_dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg,
+		 dlpi_notifyid_t *nid)
 {
 	dlpi_notifyid_t dln, n;
+
 	union DL_primitives prim;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	if (unlikely(notes & ~((1 << 11) - 1)))
@@ -1471,8 +1519,8 @@ _dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *a
   * @param nid location to receive notification handle.
   */
 int
-__dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
-		  dlpi_notifyid_t * nid)
+__dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg,
+		  dlpi_notifyid_t *nid)
 {
 	int err = DLPI_SUCCESS;
 
@@ -1491,8 +1539,8 @@ __dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *
   * This symbol is an implementation of dlpi_enabnotify().
   */
 int
-__dlpi_enabnotify_r(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
-		    dlpi_notifyid_t * nid)
+__dlpi_enabnotify_r(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg,
+		    dlpi_notifyid_t *nid)
 {
 	int ret = DLPI_SUCCESS;
 
@@ -1589,8 +1637,11 @@ _dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
 		union DL_primitives prim;
 		unsigned char buffer[DLPI_PHYSADDR_MAX];
 	} buf;
+
 	struct strbuf ctrl;
+
 	int len, err;
+
 	unsigned char *ptr;
 
 	switch (type) {
@@ -1802,7 +1853,9 @@ _dlpi_info(dlpi_handle_t dh, dlpi_info_t * di, uint opt)
 		union DL_primitives prim;
 		unsigned char buffer[BUFSIZ];
 	} buf;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	buf.prim.dl_primitive = DL_INFO_REQ;
@@ -1944,6 +1997,7 @@ const char *
 __dlpi_linkname_r(dlpi_handle_t dh)
 {
 	int err = DLPI_SUCCESS;
+
 	char *ret = NULL;
 
 	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
@@ -2173,14 +2227,20 @@ __asm__(".symver __dlpi_mactype_r,dlpi_mactype@@DLPI_1.1");
   * @param flags open flags.
   */
 static int
-_dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
+_dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags)
 {
 	int fd = 0, ppa, err, save, flag, type;
+
 	dlpi_handle_t dh = NULL;
+
 	struct strioctl ic;
+
 	union DL_primitives prim;
+
 	struct strbuf ctrl;
+
 	struct pollfd pfd;
+
 	int len;
 
 	if (unlikely(linkname == NULL))
@@ -2200,7 +2260,7 @@ _dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 		goto syserr;
 	dh->du_fd = fd;
 
-	ic.ic_cmd = 0 /* DLIOCGETPPA */;
+	ic.ic_cmd = 0 /* DLIOCGETPPA */ ;
 	ic.ic_timout = 0;
 	ic.ic_len = strnlen(linkname, 16);
 	ic.ic_dp = (char *) linkname;
@@ -2400,7 +2460,7 @@ _dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
   * is set in flags, and DL_PASSIVE_REQ if DLPI_PASSIVE is set in flags.
   */
 int
-__dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
+__dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags)
 {
 	return _dlpi_open(linkname, dhp, flags);
 }
@@ -2414,7 +2474,7 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
   * This symbol is an implementation of dlpi_open().
   */
 int
-__dlpi_open_r(const char *linkname, dlpi_handle_t * dhp, uint flags)
+__dlpi_open_r(const char *linkname, dlpi_handle_t *dhp, uint flags)
 {
 	int err = DLPI_SUCCESS;
 
@@ -2452,7 +2512,9 @@ static int
 _dlpi_promiscoff(dlpi_handle_t dh, uint level)
 {
 	union DL_primitives prim;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	switch (level) {
@@ -2539,7 +2601,9 @@ static int
 _dlpi_promiscon(dlpi_handle_t dh, uint level)
 {
 	union DL_primitives prim;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	switch (level) {
@@ -2787,7 +2851,9 @@ _dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen)
 		union DL_primitives prim;
 		unsigned char buffer[DLPI_PHYSADDR_MAX];
 	} buf;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	if (unlikely(type != DL_CURR_PHYS_ADDR))
@@ -3384,9 +3450,9 @@ _dlpi_strerror(int error)
 	if (error == DL_SYSERR)
 		return strerror(errno);
 	if (DLPI_SUCCESS <= error && error <= DLPI_ENOTEIDINVAL)
-		return __dlpi_lib_errstr[error];
+		return __dlpi_lib_errstr[error - DLPI_SUCCESS];
 	if (0 <= error && error < 0x1c)
-		return __dlpi_std_errstr[error];
+		return __dlpi_std_errstr[error - DL_BADSAP];
 	return ("Unknown DLPI error");
 }
 
@@ -3430,7 +3496,9 @@ static int
 _dlpi_unbind(dlpi_handle_t dh)
 {
 	union DL_primitives prim;
+
 	struct strbuf ctrl;
+
 	int err;
 
 	prim.unbind_req.dl_primitive = DL_UNBIND_REQ;
@@ -3499,7 +3567,7 @@ __asm__(".symver __dlpi_unbind_r,dlpi_unbind@@DLPI_1.1");
   * @param flags options flags.
   */
 static void
-_dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags)
+_dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags)
 {
 	return;
 }
@@ -3510,7 +3578,7 @@ _dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags)
   * @param flags options flags.
   */
 void
-__dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags)
+__dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags)
 {
 	return _dlpi_walk(fn, arg, flags);
 }
@@ -3524,7 +3592,7 @@ __dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags)
   * This symbol is an implementation of dlpi_walk().
   */
 void
-__dlpi_walk_r(dlpi_walkfunc_t * fn, void *arg, uint flags)
+__dlpi_walk_r(dlpi_walkfunc_t *fn, void *arg, uint flags)
 {
 	return _dlpi_walk(fn, arg, flags);
 }

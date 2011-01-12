@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 1.1.2.3  2011-01-12 04:10:32  brian
+ - code updates for 2.6.32 kernel and gcc 4.4
+
  Revision 1.1.2.2  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -720,11 +723,11 @@ get_streams_stdata(char *page, int maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_other);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_strtab);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_inode);
-	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_flag);
+	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_flag);
 	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_rdopt);
 	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_wropt);
 	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_eropt);
-	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_iocid);
+	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_iocid);
 //      len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_iocwait);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_session);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_pgrp);
@@ -1308,7 +1311,7 @@ get_streams_strevent(char *page, int maxlen, int type, struct strevent *se)
 		len += snprintf(page + len, maxlen - len, ", %d", se->x.t.cpu);
 		len += snprintf(page + len, maxlen - len, ", %lu }", se->x.t.timer.expires);
 	}
-	len += snprintf(page + len, maxlen - len, ", %d", se->se_id);
+	len += snprintf(page + len, maxlen - len, ", %ld", se->se_id);
       done:
 	return (len);
 }
