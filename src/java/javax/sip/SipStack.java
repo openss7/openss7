@@ -1,8 +1,8 @@
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
 /*
- @(#) $RCSfile: SipStack.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:37 $ <p>
+ @(#) $RCSfile: SipStack.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:45 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -41,7 +41,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:37 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:45 $ by $Author: brian $
  */
 
 package javax.sip;
@@ -198,7 +198,7 @@ public interface SipStack {
         the SipProviders of this SipStack will belong to the same stack vendor.
         @return The list of Providers attached to this Sipstack.
       */
-    java.util.Iterator<SipProvider> getSipProviders();
+    java.util.Iterator getSipProviders();
     /**
         @deprecated Since v1.2. This has been replaced by createListeningPoint(java.lang.String, int, java.lang.String)
         For backwards compatibility with v1.1 implementations should support this method.
@@ -249,7 +249,7 @@ public interface SipStack {
         @return An Iterator containing all existing ListeningPoints created by this SipStack.
         Returns an empty Iterator if no ListeningPoints exist.
       */
-    java.util.Iterator<ListeningPoint> getListeningPoints();
+    java.util.Iterator getListeningPoints();
     /**
         Gets the user friendly name that identifies this SipStack instance. This value is set using
         the Properties object passed to the SipFactory.createSipStack(Properties)method upon

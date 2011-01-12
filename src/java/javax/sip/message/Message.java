@@ -1,8 +1,8 @@
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
 /*
- @(#) $RCSfile: Message.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:37 $ <p>
+ @(#) $RCSfile: Message.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:46 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -41,7 +41,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:37 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:46 $ by $Author: brian $
  */
 
 package javax.sip.message;
@@ -145,7 +145,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         the SIP Message.
         @return The ListIterator over the set of all the Header Names in the Message.
       */
-    java.util.ListIterator<java.lang.String> getHeaderNames();
+    java.util.ListIterator getHeaderNames();
     /**
         Gets a ListIterator over all the Headers of the newly specified name in this Message. Note
         that order of the Headers in ListIterator is the same as the order in which they appear in
@@ -154,7 +154,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         @return The ListIterator over all the Headers of the specified name in the Message, this
         method returns an empty ListIterator if no Headers exist of this header type.
       */
-    java.util.ListIterator<Header> getHeaders(java.lang.String headerName);
+    java.util.ListIterator getHeaders(java.lang.String headerName);
     /**
         Gets the Header of the specified name in this Message. If multiple Headers of this header
         name exist in the message, the first header in the message is returned.
@@ -179,7 +179,7 @@ public interface Message extends java.lang.Cloneable, java.io.Serializable {
         @return The ListIterator over all the UnrecognizedHeaders in the Message represented as
         Strings, this method returns an empty ListIterator if no UnrecognizedHeaders exist.
       */
-    java.util.ListIterator<Header> getUnrecognizedHeaders();
+    java.util.ListIterator getUnrecognizedHeaders();
     /**
         Sets the new Header to replace existings Header of that type in the message. If the SIP
         message contains more than one Header of the new Header type it should replace the first

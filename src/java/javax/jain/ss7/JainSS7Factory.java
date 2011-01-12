@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: JainSS7Factory.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:35 $ <p>
+ @(#) $RCSfile: JainSS7Factory.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:44 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:35 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:44 $ by $Author: brian $
  */
 
 package javax.jain.ss7;
@@ -219,12 +219,12 @@ public class JainSS7Factory {
       * A vector containing all JAIN SS7 Objects created through this
       * JAIN SS7 Factory.
       */
-    public java.util.Vector<java.lang.Object> getJainObjectList() {
+    public java.util.Vector getJainObjectList() {
         return m_jainObjectList;
     }
     protected static JainSS7Factory m_jainSS7Factory = null;
     protected static java.lang.String m_pathName = "com.sun";
-    protected static java.util.Vector<java.lang.Object> m_jainObjectList = new java.util.Vector<java.lang.Object>();
+    protected static java.util.Vector m_jainObjectList = new java.util.Vector();
 }
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-

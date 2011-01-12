@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: JcatProvider.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:36 $ <p>
+ @(#) $RCSfile: JcatProvider.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:45 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:36 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:45 $ by $Author: brian $
  */
 
 package javax.jcat;
@@ -70,7 +70,7 @@ public interface JcatProvider extends JccProvider {
       *
       * @param address  The address that participates in the calls
       */
-    public java.util.Set<JcatCall> getCalls(JcatAddress address);
+    public java.util.Set getCalls(JcatAddress address);
     /**
       * Returns a Set of JcatTerminal objects administered by the JcatProvider who's name
       * satisfies the regular expression.
@@ -78,7 +78,7 @@ public interface JcatProvider extends JccProvider {
       * @param nameRegex  denotes the regular expression (for the purpose of this
       * specification, the platform will use the Perl5 regular expressions).
       */
-    public java.util.Set<JcatTerminal> getTerminals(java.lang.String nameRegex);
+    public java.util.Set getTerminals(java.lang.String nameRegex);
     /**
       * This method returns a standard EventFilter which is implemented by the JCAT
       * platform. For all events that require filtering by this EventFilter, apply the
