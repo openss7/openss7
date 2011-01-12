@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: MessageFactory.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:37 $ <p>
+ @(#) $RCSfile: MessageFactory.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:46 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:37 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:46 $ by $Author: brian $
  */
 
 package javax.sip.message;
@@ -75,7 +75,7 @@ public interface MessageFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the method
         or the body.
       */
-    Request createRequest(URI requestURI, java.lang.String method, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List<ViaHeader> via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, java.lang.Object content) throws java.text.ParseException;
+    Request createRequest(URI requestURI, java.lang.String method, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, java.lang.Object content) throws java.text.ParseException;
     /**
         Creates a new Request message of type specified by the method paramater, containing the URI
         of the Request, the mandatory headers of the message with a body in the form of a byte array
@@ -94,7 +94,7 @@ public interface MessageFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the method
         or the body.
       */
-    Request createRequest(URI requestURI, java.lang.String method, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List<ViaHeader> via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, byte[] content) throws java.text.ParseException;
+    Request createRequest(URI requestURI, java.lang.String method, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, byte[] content) throws java.text.ParseException;
     /**
         Creates a new Request message of type specified by the method paramater, containing the URI
         of the Request, the mandatory headers of the message. This new Request does not contain a
@@ -109,7 +109,7 @@ public interface MessageFactory {
         @return The newly created Request object.
         @exception java.text.ParseException Thrown when an error was found while parsing the method.
       */
-    Request createRequest(URI requestURI, java.lang.String method, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List<ViaHeader> via, MaxForwardsHeader maxForwards) throws java.text.ParseException;
+    Request createRequest(URI requestURI, java.lang.String method, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List via, MaxForwardsHeader maxForwards) throws java.text.ParseException;
     /**
         Create a new SIP Request object based on a specific string value. This method parses the
         supplied string into a SIP Request. The request string should only consist of the SIP
@@ -138,7 +138,7 @@ public interface MessageFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the
         statusCode or the body.
       */
-    Response createResponse(int statusCode, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List<ViaHeader> via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, java.lang.Object content) throws java.text.ParseException;
+    Response createResponse(int statusCode, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, java.lang.Object content) throws java.text.ParseException;
     /**
         Creates a new Response message of type specified by the statusCode paramater, containing the
         mandatory headers of the message with a body in the form of a byte array and the body
@@ -156,7 +156,7 @@ public interface MessageFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the
         statusCode or the body.
       */
-    Response createResponse(int statusCode, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List<ViaHeader> via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, byte[] content) throws java.text.ParseException;
+    Response createResponse(int statusCode, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List via, MaxForwardsHeader maxForwards, ContentTypeHeader contentType, byte[] content) throws java.text.ParseException;
     /**
         Creates a new Response message of type specified by the statusCode paramater, containing the
         mandatory headers of the message. This new Response does not contain a body.
@@ -170,7 +170,7 @@ public interface MessageFactory {
         @exception java.text.ParseException Thrown when an error was found while parsing the
         statusCode.
       */
-    Response createResponse(int statusCode, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List<ViaHeader> via, MaxForwardsHeader maxForwards) throws java.text.ParseException;
+    Response createResponse(int statusCode, CallIdHeader callId, CSeqHeader cSeq, FromHeader from, ToHeader to, java.util.List via, MaxForwardsHeader maxForwards) throws java.text.ParseException;
     /**
         Creates a new Response message of type specified by the statusCode paramater, based on a
         specific Request with a new body in the form of a Java object and the body content type.

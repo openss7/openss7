@@ -1,5 +1,43 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/java/jain/protocol/ss7/JainSS7Factory.java
+	* src/java/javax/jain/protocol/ss7/JainSS7Factory.java
+	* src/java/javax/jain/ss7/JainSS7Factory.java
+	* src/java/javax/jain/ss7/inap/JainInapStack.java
+	* src/java/javax/jain/ss7/inap/constants/InvokeProblem.java
+	* src/java/javax/jain/ss7/inap/constants/ReturnErrorProblem.java
+	* src/java/javax/jain/ss7/inap/constants/ReturnResultProblem.java
+	* src/java/javax/jain/ss7/inap/event/BeginIndEvent.java
+	* src/java/javax/jain/ss7/inap/event/BeginReqEvent.java
+	* src/java/javax/jain/ss7/inap/event/ContinueIndEvent.java
+	* src/java/javax/jain/ss7/inap/event/ContinueReqEvent.java
+	* src/java/javax/jain/ss7/inap/event/DialogueEvent.java
+	* src/java/javax/jain/ss7/inap/event/DialogueIndEvent.java
+	* src/java/javax/jain/ss7/inap/event/DialogueReqEvent.java
+	* src/java/javax/jcat/JcatAddress.java
+	* src/java/javax/jcat/JcatConnection.java
+	* src/java/javax/jcat/JcatProvider.java
+	* src/java/javax/jcat/JcatTerminal.java
+	* src/java/javax/sip/Dialog.java
+	* src/java/javax/sip/SipStack.java
+	* src/java/javax/sip/address/Router.java
+	* src/java/javax/sip/address/SipURI.java
+	* src/java/javax/sip/header/HeaderFactory.java
+	* src/java/javax/sip/header/Parameters.java
+	* src/java/javax/sip/header/ServerHeader.java
+	* src/java/javax/sip/header/UserAgentHeader.java
+	* src/java/javax/sip/message/Message.java
+	* src/java/javax/sip/message/MessageFactory.java
+	* src/java/org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.java
+	* src/java/org/openss7/javax/jain/ss7/inap/JainInapStackImpl.java
+	* src/java/org/openss7/javax/jain/ss7/isup/JainIsupStackImpl.java
+	* src/java/org/openss7/javax/jcat/JcatProviderImpl.java
+	* src/java/org/openss7/javax/sip/SipStackImpl.java:
+	  revert to 1.4 sources (fixed autoconf bug that removed -fsource=1.4
+	  flag to gcj)
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/util/init/openss7: modprobe no longer accepts k option
 	* src/util/init/openss7.sh: modprobe no longer accepts k option
 	* src/util/init/sigtran: modprobe no longer accepts k option

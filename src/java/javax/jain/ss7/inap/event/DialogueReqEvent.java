@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: DialogueReqEvent.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:36 $ <p>
+ @(#) $RCSfile: DialogueReqEvent.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:45 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:36 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:45 $ by $Author: brian $
  */
 
 package javax.jain.ss7.inap.event;
@@ -79,7 +79,7 @@ public class DialogueReqEvent extends DialogueEvent {
             TransportAddress destinationAddress,
             int callID,
             byte[] applicationContext,
-            java.util.Vector<java.lang.Object> inapMessages,
+            java.util.Vector inapMessages,
             DialoguePrimitiveType dialoguePrimitiveType) {
         super(source, destinationAddress, callID, applicationContext, inapMessages, dialoguePrimitiveType);
     }

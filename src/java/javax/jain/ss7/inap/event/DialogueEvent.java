@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: DialogueEvent.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:28:36 $ <p>
+ @(#) $RCSfile: DialogueEvent.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:45 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:36 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:45 $ by $Author: brian $
  */
 
 package javax.jain.ss7.inap.event;
@@ -63,7 +63,7 @@ public class DialogueEvent extends InapEvent {
     private TransportAddress transportAddress;
     private int callID;
     private byte[] applicationContext;
-    private java.util.Vector<java.lang.Object> inapMessages = null;
+    private java.util.Vector inapMessages = null;
     /** Constructs a new DialogueEvent.  */
     protected DialogueEvent(java.lang.Object source) {
         super(source);
@@ -87,7 +87,7 @@ public class DialogueEvent extends InapEvent {
     protected DialogueEvent(java.lang.Object source,
             TransportAddress transportAddress,
             int callID, byte[] applicationContext,
-            java.util.Vector<java.lang.Object> inapMessages,
+            java.util.Vector inapMessages,
             DialoguePrimitiveType dialoguePrimitiveType) {
         this(source, transportAddress, callID, applicationContext, dialoguePrimitiveType);
         setInapMessages(inapMessages);
@@ -125,13 +125,13 @@ public class DialogueEvent extends InapEvent {
         this.applicationContext = applicationContext;
     }
     /** Sets a reference of the message objects for the event.  */
-    public void setInapMessages(java.util.Vector<java.lang.Object> inapMessages) {
+    public void setInapMessages(java.util.Vector inapMessages) {
         this.inapMessages = inapMessages;
     }
     /** Adds a message object for the event.  */
     public void addInapMessage(java.lang.Object inapMessage) {
         if (inapMessages == null)
-            inapMessages = new java.util.Vector<java.lang.Object>();
+            inapMessages = new java.util.Vector();
         inapMessages.addElement(inapMessage);
     }
     /** Gets the number of message objects for the event.  */
@@ -143,7 +143,7 @@ public class DialogueEvent extends InapEvent {
         return inapMessages.elementAt(index);
     }
     /** Gets a reference of the message objects for the event.  */
-    public java.util.Vector<java.lang.Object> getInapMessages() {
+    public java.util.Vector getInapMessages() {
         return inapMessages;
     }
 }

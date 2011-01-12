@@ -1,7 +1,7 @@
 /*
- @(#) $RCSfile: SipStackImpl.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:28:39 $ <p>
+ @(#) $RCSfile: SipStackImpl.java,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 03:23:48 $ <p>
  
- Copyright &copy; 2008-2010  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
+ Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
  Copyright &copy; 1997-2001  Brian F. G. Bidulock <a href="mailto:bidulock@openss7.org">&lt;bidulock@openss7.org&gt;</a>. <p>
  
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2010-11-28 14:28:39 $ by $Author: brian $
+ Last Modified $Date: 2011-01-12 03:23:48 $ by $Author: brian $
  */
 
 package org.openss7.javax.sip;
@@ -292,7 +292,7 @@ public class SipStackImpl implements SipStack {
       * @return
       * The list of Providers attached to this Sipstack.
       */
-    public native java.util.Iterator<SipProvider> getSipProviders();
+    public native java.util.Iterator getSipProviders();
     /**
       * This has been replaced by createListeningPoint(java.lang.String, int,
       * java.lang.String) For backwards compatibility with v1.1 implementations
@@ -367,7 +367,7 @@ public class SipStackImpl implements SipStack {
       * this SipStack. Returns an empty Iterator if no ListeningPoints
       * exist.
       */
-    public native java.util.Iterator<ListeningPoint> getListeningPoints();
+    public native java.util.Iterator getListeningPoints();
     /**
       * Gets the user friendly name that identifies this SipStack
       * instance.
