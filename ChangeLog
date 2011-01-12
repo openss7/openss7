@@ -1,5 +1,10 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/np_rtp.c: added RTP driver
+	* src/include/sys/npi_rtp.h: added RTP driver
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/man/Makefile.am: updated manual pages
 	* doc/man/openss7.refs: updated manual pages
 	* doc/man/man4/bufmod.4.man: updated manual pages
