@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+@c @(#) $Id: descrip.texi,v 1.1.2.2 2011-01-12 03:37:37 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -129,44 +129,3 @@ This distribution is applicable to both @cite{Linux} 2.4 and 2.6 kernels as was
 targeted at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64}
 architectures, but should build and install for other architectures as well.
 
-@ignore
-This is the @cite{@value{PACKAGE_TITLE}} package.  It consists of a master
-package that contains all other
-@uref{http://www.openss7.org/,, OpenSS7 Project} package releases.  Use this
-package if you are interested in ease of installation of a wide range of
-@uref{http://www.openss7.org/,, OpenSS7 Project} packages.
-
-The @cite{@value{PACKAGE_TITLE}} package contains:
-
-@command{sctp-@value{VERSION_SCTP}} (@cite{Linux Native Sockets SCTP}), @*
-@command{iperf-@value{VERSION_IPERF}} (@cite{Internet Performance}), @*
-@command{streams-@value{VERSION_STREAMS}} (@cite{Linux Fast-STREAMS}), @*
-@command{strcompat-@value{VERSION_STRCOMPAT}} (@cite{STREAMS Compatibility Modules}), @*
-@command{strutil-@value{VERSION_STRUTIL}} (@cite{STREAMS Utilities}), @*
-@command{strbcm-@value{VERSION_STRBCM}} (@cite{STREAMS Binary Compatibility Module}), @*
-@command{strtty-@value{VERSION_STRTTY}} (@cite{STREAMS Terminals}), @*
-@command{strxns-@value{VERSION_STRXNS}} (@cite{STREAMS X/Open Networking Services}), @*
-@command{strxnet-@value{VERSION_STRXNET}} (@cite{STREAMS X/Open Networking}), @*
-@command{strsock-@value{VERSION_STRSOCK}} (@cite{STREAMS Sockets}), @*
-@command{strinet-@value{VERSION_STRINET}} (@cite{STREAMS Internet}), @*
-@command{strsctp-@value{VERSION_STRSCTP}} (@cite{STREAMS SCTP}), @*
-@command{strchan-@value{VERSION_STRCHAN}} (@cite{STREAMS Channels}), @*
-@command{strx25-@value{VERSION_STRX25}} (@cite{STREAMS X.25}), @*
-@command{striso-@value{VERSION_STRISO}} (@cite{STREAMS Open Systems Interconnect}), @*
-@command{netperf-@value{VERSION_NETPERF}} (@cite{Network Performance}), @*
-@command{strisdn-@value{VERSION_STRISDN}} (@cite{STREAMS ISDN Stack}), @*
-@command{stratm-@value{VERSION_STRATM}} (@cite{STREAMS ATM Stack}), @*
-@command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7 Stacks}), @*
-@command{sigtran-@value{VERSION_SIGTRAN}} (@cite{STREAMS SIGTRAN Stack}), @*
-@command{strvoip-@value{VERSION_STRVOIP}} (@cite{STREAMS VoIP Stacks}), @*
-@command{osr61-@value{VERSION_OSR}} (@cite{Dialogic Open System Release 6.1}) and @*
-@command{LiS-@value{VERSION_LIS}} (@cite{Linux STREAMS}).
-
-If you need to build an install a significant number of these packages, the
-@cite{@value{PACKAGE_TITLE}} package is the easiest way to do so.
-
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
-kernels and was targeted at @code{ix86}, @code{x86_64}, @code{ppc} and
-@code{ppc64} architectures, but should build and install for other
-architectures as well.
-@end ignore

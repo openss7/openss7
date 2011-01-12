@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+@c @(#) $Id: todo.texi,v 1.1.2.2 2011-01-12 03:37:37 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -642,6 +642,22 @@ STREAMS facilities.
 @end table
 
 @item
+Provide support for assigning a processor affinity for queue pairs.  The current STREAMS scheduler
+will schedule a queue enabled as a result of, for example, a put() on the same processor that
+performed the action that caused the enable.  This has been adequate for event driven systems.
+However, for pipelined hard real-time, better processor instruction cache efficiency and concurrency
+might be gained by assigning portions of the pipeline to different processors, so that, for example,
+when a put is performed to a queue, that the queue will become enabled against the process with
+which it has an affinity rather than the enabling processor.  This might permit assigning a
+different processor affinity to each queue-pair in a pipeline to exploit concurrency in the
+pipeline.
+
+@table @emph
+@item TODO:
+Add an optional processor affinity to the STREAMS scheduler.
+@end table
+
+@item
 Split @file{include/sys/streams/stropts.h} by architecture.  There is conflicting numbering on the
 standard @acronym{STREAMS} input-output controls:
 
@@ -949,7 +965,7 @@ Tested.
 Kernel objects are another thing.  For 2.6 kernels, we need to hold our data structures in the
 kobject manner so that the /sys file system is usable.  This requires another adaptation layer
 because 2.4 kernels do this in a completely different way.  Much of our /proc file system stuff needs
-to move into /sys for 2.6 kernels by stay the same for 2.4 kernels.
+to move into /sys for 2.6 kernels but stay the same for 2.4 kernels.
 
 The /sys file system does not really do much for STREAMS.  The /dev/streams specfs file system does
 more for us.

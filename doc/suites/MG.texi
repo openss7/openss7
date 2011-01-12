@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: MG.texi,v 1.1.2.1 2009-06-21 10:59:42 brian Exp $
+% @(#) $Id: MG.texi,v 1.1.2.2 2011-01-12 03:37:38 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:59:42 $ by $Author: brian $
+% Last Modified $Date: 2011-01-12 03:37:38 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -386,6 +386,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: MG.texi,v $
+Revision 1.1.2.2  2011-01-12 03:37:38  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:59:42  brian
 - added files to new distro
 
@@ -445,7 +448,167 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 @node Drivers and Modules
 @chapter Drivers and Modules
 
+@menu
+* Drivers::
+* Modules::
+* Interfaces::
+@end menu
+
+The MG Protocol Suite provides services using a number of @acronym{STREAMS} drivers and modules in
+addition to user-space libraries and applications.  @cite{OpenSS7} provides a range of
+@acronym{STREAMS} multiplexing drivers, pseudo-device drivers and pushable modules that complement
+the primary MG multiplexing driver.
+
+@figref{1} illustrates the @acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and
+pushable modules, and their organization.  The modules and drivers toward the top of the diagram are
+associated with media gateway control and do not form part of the primary MG suite, but are
+discussed in more detail in the VOIP suite.
+
 @figuresized{mg01,1,Media Gateway Drivers and Modules,5.0in}
+
+@node Drivers
+@section Drivers
+
+@subsection MG --- Media Gateway Multiplexing Driver
+
+To provide for synchronization and load balancing, the MG driver uses a timing slot approach.
+This is illustrated in @figref{2}.
+The fundamental timing source is a 1 millisecond pulse.  This timing pulse is both divided and
+distributed in single stage.  The timing pulse is divided to 10 milliseconds using 10 action lists.
+Each action list has a pulse once every 10 milliseconds.
+
+@figuresized{mg03,2,Timing Slots,2.5in}
+
+This can be modelled using action trees.  The root of the tree is an action list node that executes
+each of its sublists each millisecond.  The root node typically contains a single sublist that
+contains a divider node that has @var{n} action sublists, and executes 1 of the @var{n} action
+sublists every @var{n} milliseconds.
+
+A typical arrangement for the MG driver would be to have a action node as the root node of the
+action tree.  This node is executed every millisecond.  The action sublists consist of 5 divider
+nodes: one for 10 milliseconds, one for 20 milliseconds, one for 30 milliseconds, 40 and 50.  The
+divider nodes could be dynamically assigned (created when the first action requiring @var{n}
+millisecond timing is required).  Each of these dividers represents a specific blocking size for RTP
+channels or MX drivers.  Dividers with a smaller divisor (i.e. that execute more frequently) are
+placed earlier in the lists than those that execute less frequently.  This can reduce overall jitter
+in the system.  The assumption here is that processes that execute less frequently will be less
+affected by delays in processing.  This is generally true for media streams.
+
+The purpose of the action lists is to perform functions on a regular basis while distributing
+actions over the available processor real-time.  Therefore, when action are added to action sublists
+of divisor nodes, an attempt is made to equally distribute the load over the sublists.  This can
+best be accomplished by assigning a relative weighting factor to the process and selecting the slot
+on the basis of the accumulated load for other actions for each list.
+
+So, for example, for tone generation being fed into many RTP channels with a 30 millisecond payload
+size, each action node corresponding to an RTP channel is linked into a 30 millisecond
+divider/distributor node that will feed some channels with tone samples every 30 milliseconds.  For
+60,000 channels, 2,000 channels will be processed every millisecond, permitting 500 nanoseconds of
+real-time per channel, per processor.
+
+@subsection MATRIX --- Switching Matrix Multiplexing Driver
+
+@subsection MX --- Multiplex Device Driver
+
+@subsection CH --- Channel Device Driver
+
+@subsection SX --- SONET/SDH Multiplexing Driver
+
+@subsection RTP --- Real-Time Transport Protocol (RTP) Driver
+
+@subsection RSW --- RTP Switch (RSW) Driver
+
+The RTP Switch (RSW) driver is a multiplexing driver that provides a switching matrix of multiplex
+RTP media streams to and from the UDP driver that is linked beneath the multiplexer.  A single
+multiplex UDP stream is provided at the lower interface and multiple UDP streams are provided at the
+upper interface.  The driver provides simply switching between RTP streams at the lower interface.
+This permits the RTP and RTCP packets from one UDP multiplex stream to be switched to and from
+another UDP multiplex stream.
+
+Because RTP/RTCP packets can be switched between any upper or lower channel and any other upper or
+lower channel, this acts as a general purpose multiplexing driver.  Typical use is to open an
+independent upper Stream for each AVT profile payload type and push an RTP module over each Stream
+to perform jitter buffering and other RTP/RTCP termination functions.
+
+
+@subsection UDP --- User Datagram Protocol (UDP) Driver
+
+The User Datagram Protocol (UDP) driver is a pseudo-device driver that provides access to the Linux
+UDP subsystem for the purpose of supporting Real-Time Transport Protocol (RTP).  This pseudo-device
+networking driver is the second generation UDP driver (@file{/dev/udp2}) that is provided as a pure
+@acronym{STREAMS} version of the older XTIoS driver.
+
+This driver has been specially modified to also suit the needs of large-scale RTP implementations.
+For large-scale devices it is not efficient to link each and every RTP media stream under a
+multiplexing driver.  For example, should the application require 64,000 RTP media streams, the
+normal UDP driver would require the opening and linking of 64,000 file descriptors.  This is not
+possible on a normally configured Linux system (which has a maximum of about 8192 file descriptors).
+Also, even it were possible, this would mean that each of the 64,000 queues would have to be
+serviced once every 10 milliseconds or so.
+
+To avoid this problem, the NPI service interface was altered on one of the clone minor device nodes
+of the UDP2 driver to permit an unlimited number of NPI connections to be managed on a single
+Stream.  This was accomplished by prepending a 64-bit tag to each and every NPI service primitive
+send on the Stream.
+
+@node Modules
+@section Modules
+
+@subsection RTP --- Real-Time Transport Protocol (RTP) Module
+
+The RTP module is a module pushed over a UDP Stream or multi-Stream that provides RTP jitter
+buffering and resynchronization, independent of the AVT payload.  This is accomplished using only
+the RTP header fields.  The only buffering that is performed is buffering out of sequence packets
+awaiting messing packets in the sequence (reordering).  Complete sequences of packets are delivered
+upstream as soon as they are available.  This buffering and resequencing can be performed in both
+directions.  Media streams that do not require buffering will simply be monitored as the algorithm
+has no effect on correctly ordered packets.  When delays awaiting missing packets exceeds specified
+parameters, subsequent packets will be delivered.  Should the missing packet later arrive, it will
+be dropped.  Because the module does not know about payload formats, it does not attempt to fill in
+silence or any other substitute for missing packets.
+
+The RTP module can support RTCP control and reporting on any RTP media channel.
+
+The RTP module can also support a pass-through capability on RTP media channels.  This is useful for
+AVT profile payload formats that do not require state information for reassembly (such as G.711).
+In this case, there is simply a 1:1 packet sequence mapping between the input and output channels.
+Nevertheless, when in transparent mode, the RTP module can still support RTCP control and reporting.
+
+The RTP module is normally pushed over a multi-Stream UDP driver that provides the UDP connectivity
+for supporting many RTP media channels.  It presents a control interface based on NPI just as does
+the UDP multi-stream pseudo-device driver.
+
+@subsection RTP-CH --- Real-Time Transport Protocol (RTP) Channel (CH) Module
+
+The RTP-CH module is an RTP to Channel conversion module that support transcoding.  This module is
+intended on being pushed over an RTP module.  It supports a multi-Stream Channel Interface (CHI) at
+the upper interface and a UDP interface using the multi-Stream Network Provider Interface (NPI) at
+the lower interface.  The purpose of this module is to adapt between an MG driver lower multiplex at
+the upper interface and a multi-Stream UDP driver or RTP Switch driver at the lower interface.
+
+The module expects de-jittered RTP input at the lower interface and unpacks and transcodes the AVT
+profile payload into channel samples that are PCM A-Law, @math{\mu}-Law or Linear (signed 16-bit).
+The module expects a steady stream of PCM A-Law, @math{\mu}-Law or Linear (signed 16-bit) samples on
+the upper interface which it will encode in the appropriate format for output on the lower
+interface.  The simplest instance of the RTP-CH module simply packs and unpacks PCM @math{\mu}-Law
+samples to and from G.711 RTP packets.
+
+For efficiency on large scale systems, one RTP-CH module instance should be created for each coding
+format.  This is so that instruction caches will be kept hot for transcoding blocks of packets.
+
+
+@subsection RTP-TEST --- Real-Time Transport Protocol (RTP) Test Driver
+
+The RTP Test module is a @acronym{STREAMS} module that can be pushed over a multiplex UDP Stream and
+provides the ability to generate a significant amount of RTP media traffic for testing purposes.
+UDP multiplex NPI control messages are transparently passed through the module to the lower UDP
+multiplex Stream, forming and releasing connections as required.  However, multiplex UDP NPI data
+messages received from the lower Stream are simply discarded; whereas, UDP NPI data messages written
+to the module on multiplex 0 are duplicated to each of the connected UDP NPI multiplexes on the
+lower interface.
+
+@node Interfaces
+@section Interfaces
 
 @node Libraries
 @chapter Libraries

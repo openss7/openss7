@@ -1,5 +1,21 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: document msgpullup bug
+	* doc/manual/descrip.texi: remove ignored text
+	* doc/manual/install.texi: update header
+	* doc/manual/news.texi: remove ignored text, document supported distros
+	* doc/manual/prerequisites.texi: update supported kernel range, remove
+	  ignored text
+	* doc/manual/releases.texi: updated header
+	* doc/manual/todo.texi: added processor affinity to wishlist
+	* doc/suites/MG.texi: expanded to include RTP driver description
+	* doc/suites/Makefile.am: added figures
+	* doc/suites/VOIP.texi: expanded driver module and interface section
+	* doc/suites/mg01.fig: updated figure
+	* scripts/texi/compat.texi: added supported distros
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/drafts/fixup: comment out deprecated perl var
 
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>

@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: VOIP.texi,v 1.1.2.1 2009-06-21 10:59:42 brian Exp $
+% @(#) $Id: VOIP.texi,v 1.1.2.2 2011-01-12 03:37:38 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:59:42 $ by $Author: brian $
+% Last Modified $Date: 2011-01-12 03:37:38 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -386,6 +386,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: VOIP.texi,v $
+Revision 1.1.2.2  2011-01-12 03:37:38  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:59:42  brian
 - added files to new distro
 
@@ -445,7 +448,31 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 @node Drivers and Modules
 @chapter Drivers and Modules
 
+@menu
+* Drivers::
+* Modules::
+* Interfaces::
+@end menu
+
+The VOIP Protocol Suite provides services using a number of @acronym{STREAMS} drivers and modules in
+addition to user-space libraries and applications.  @cite{OpenSS7} provides a range of
+@acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and pushable modules.
+
+@figref{1} illustrates the @acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and
+pushable modules, and their organization.
+
 @figuresized{voip01,1,VoIP Drivers and Modules,5.0in}
+
+@figuresized{voip02,2,VoIP Drivers and Modules,5.0in}
+
+@node Drivers
+@section Drivers
+
+@node Modules
+@section Modules
+
+@node Interfaces
+@section Interfaces
 
 @node Libraries
 @chapter Libraries

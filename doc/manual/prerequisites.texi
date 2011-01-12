@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 1.1.2.2 2011-01-12 03:37:37 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -88,93 +88,6 @@ The quickest and easiest way to ensure that all prerequisites are met is to down
 @cite{OpenSS7 Master Package}, @command{openss7-@value{VERSION_OPENSS7}}.
 
 Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
-
-@ignore
-@itemize @bullet
-@item
-A fairly LSB compliant GNU/Linux distribution.@footnote{See @refman{GNU/Linux Distributions}, for
-more information.}
-
-@item
-Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.26)
-
-@item
-glibc2 or better.
-
-@item
-GNU info (for info files).
-
-@item
-GNU groff (for man pages).@footnote{If you are using a Debian release, please make sure to install
-the groff extension package (@samp{groff_ext}), as it contains the @command{refer} or
-@command{grefer} commands necessary for including references in the manual pages.}
-
-@item
-OpenSS7 Linux Fast-STREAMS
-(@uref{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2,, streams-@value{VERSION_STREAMS}}
-or better)
-
-@item
-OpenSS7 STREAMS Compatibility Modules
-(@uref{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2,, strcompat-@value{VERSION_STRCOMPAT}} or better)
-
-@item
-OpenSS7 STREAMS XNS
-(@uref{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2,, strxns-@value{VERSION_STRXNS}} or better)
-
-@item
-OpenSS7 STREAMS XTI/TLI Library
-(@uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2,, strxnet-@value{VERSION_STRXNET}} or better)
-
-@item
-OpenSS7 STREAMS NSL Library
-(@uref{http://www.openss7.org/tarballs/strnsl-@value{VERSION_STRNSL}.tar.bz2,, strnsl-@value{VERSION_STRNSL}} or better)
-
-@item
-OpenSS7 STREAMS Sockets Library
-(@uref{http://www.openss7.org/tarballs/strsock-@value{VERSION_STRSOCK}.tar.bz2,, strsock-@value{VERSION_STRSOCK}} or better)
-
-@item
-OpenSS7 STREAMS INET
-(@uref{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2,, strinet-@value{VERSION_STRINET}} or better)
-
-@item
-OpenSS7 STREAMS SCTP
-(@uref{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2,, strsctp-@value{VERSION_STRSCTP}} or better)
-
-@item
-OpenSS7 STREAMS Channels
-(@uref{http://www.openss7.org/tarballs/strchan-@value{VERSION_STRCHAN}.tar.bz2,, strchan-@value{VERSION_STRCHAN}} or better)
-
-@item
-OpenSS7 STREAMS X.25
-(@uref{http://www.openss7.org/tarballs/strx25-@value{VERSION_STRX25}.tar.bz2,, strx25-@value{VERSION_STRX25}} or better)
-
-@item
-OpenSS7 STREAMS ISO
-(@uref{http://www.openss7.org/tarballs/striso-@value{VERSION_STRISO}.tar.bz2,, striso-@value{VERSION_STRISO}} or better)
-
-@item
-OpenSS7 STREAMS ISDN
-(@uref{http://www.openss7.org/tarballs/strisdn-@value{VERSION_STRISDN}.tar.bz2,, strisdn-@value{VERSION_STRISDN}} or better)
-
-@item
-OpenSS7 STREAMS ATM
-(@uref{http://www.openss7.org/tarballs/stratm-@value{VERSION_STRATM}.tar.bz2,, stratm-@value{VERSION_STRATM}} or better)
-
-@item
-OpenSS7 STREAMS SS7
-(@uref{http://www.openss7.org/tarballs/strss7-@value{VERSION_STRSS7}.tar.bz2,, strss7-@value{VERSION_STRSS7}} or better)
-
-@item
-OpenSS7 STREAMS SIGTRAN
-(@uref{http://www.openss7.org/tarballs/sigtran-@value{VERSION_SIGTRA}.tar.bz2,, sigtran-@value{VERSION_SIGTRA}} or better)
-
-@item
-OpenSS7 STREAMS VoIP
-(@uref{http://www.openss7.org/tarballs/strvoip-@value{VERSION_STRVOIP}.tar.bz2,, strvoip-@value{VERSION_STRVOIP}} or better)
-@end itemize
-@end ignore
 
 @enumerate 1
 @item
@@ -190,7 +103,7 @@ more information.}
 @item @tab @minus{}
 Linux 2.4 kernel (2.4.10 - 2.4.27), or
 @item @tab @minus{}
-Linux 2.6 kernel (2.6.3 - 2.6.26);
+Linux 2.6 kernel (2.6.3 - 2.6.32);
 @item @tab @minus{}
 glibc2 or better.
 @item @tab @minus{}
@@ -211,95 +124,3 @@ swig (for Java, Tcl, Perl and Ruby interfaces).
 @end multitable
 @end enumerate
 
-@ignore
-(Note: If you acquired @command{@value{PACKAGE}} a part of the @cite{OpenSS7 Master Package}, then
-the dependencies listed below will already have been met by unpacking the master package.)
-
-@enumerate 2
-@item
-@cite{OpenSS7 Linux Fast-STREAMS},
-@uref{http://www.openss7.org/tarballs/streams-@value{VERSION_STREAMS}.tar.bz2, streams-@value{VERSION_STREAMS}}.
-
-@item
-@cite{OpenSS7 STREAMS Compatibility Modules},
-@uref{http://www.openss7.org/tarballs/strcompat-@value{VERSION_STRCOMPAT}.tar.bz2, strcompat-@value{VERSION_STRCOMPAT}}.
-
-@item
-@cite{OpenSS7 STREAMS Utilities},
-@uref{http://www.openss7.org/tarballs/strutil-@value{VERSION_STRUTIL}.tar.bz2, strutil-@value{VERSION_STRUTIL}}.
-(Optional.)
-
-@item
-@cite{OpenSS7 STREAMS Binary Compatibility},
-@uref{http://www.openss7.org/tarballs/stbcm-@value{VERSION_STRBCM}.tar.bz2, stbcm-@value{VERSION_STRBCM}}.
-(Optional.)
-
-@item
-@cite{OpenSS7 STREAMS Terminals},
-@uref{http://www.openss7.org/tarballs/strtty-@value{VERSION_STRTTY}.tar.bz2, strtty-@value{VERSION_STRTTY}}.
-(Optional.)
-
-@item
-@cite{OpenSS7 STREAMS XNS},
-@uref{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2, strxns-@value{VERSION_STRXNS}}.
-
-@item
-@cite{OpenSS7 STREAMS XTI/TLI},
-@uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2, strxnet-@value{VERSION_STRXNET}}.
-
-@item
-@cite{OpenSS7 STREAM Network Services Library},
-@uref{http://www.openss7.org/tarballs/strnsl-@value{VERSION_STRNSL}.tar.bz2, strnsl-@value{VERSION_STRNSL}}.
-(Optional.)
-
-@item
-@cite{OpenSS7 STREAMS Sockets},
-@uref{http://www.openss7.org/tarballs/strsock-@value{VERSION_STRSOCK}.tar.bz2, strsock-@value{VERSION_STRSOCK}}.
-(Optional.)
-
-@item
-@cite{OpenSS7 STREAMS INET},
-@uref{http://www.openss7.org/tarballs/strinet-@value{VERSION_STRINET}.tar.bz2, strinet-@value{VERSION_STRINET}}.
-
-@item
-@cite{OpenSS7 STREAMS SCTP},
-@uref{http://www.openss7.org/tarballs/strsctp-@value{VERSION_STRSCTP}.tar.bz2, strsctp-@value{VERSION_STRSCTP}}.
-
-@item
-@cite{OpenSS7 STREAMS Channels},
-@uref{http://www.openss7.org/tarballs/strchan-@value{VERSION_STRCHAN}.tar.bz2, strchan-@value{VERSION_STRCHAN}}.
-
-@item
-@cite{OpenSS7 STREAMS X.25},
-@uref{http://www.openss7.org/tarballs/strx25-@value{VERSION_STRX25}.tar.bz2, strx25-@value{VERSION_STRX25}}.
-
-@item
-@cite{OpenSS7 STREAMS ISO},
-@uref{http://www.openss7.org/tarballs/striso-@value{VERSION_STRISO}.tar.bz2, striso-@value{VERSION_STRISO}}.
-
-@item
-@cite{OpenSS7 STREAMS ISDN},
-@uref{http://www.openss7.org/tarballs/strisdn-@value{VERSION_STRISDN}.tar.bz2, strisdn-@value{VERSION_STRISDN}}.
-
-@item
-@cite{OpenSS7 STREAMS ATM},
-@uref{http://www.openss7.org/tarballs/stratm-@value{VERSION_STRATM}.tar.bz2, stratm-@value{VERSION_STRATM}}.
-
-@item
-@cite{OpenSS7 STREAMS SS7},
-@uref{http://www.openss7.org/tarballs/strss7-@value{VERSION_STRSS7}.tar.bz2, strss7-@value{VERSION_STRSS7}}.
-
-@item
-@cite{OpenSS7 STREAMS SIGTRAN},
-@uref{http://www.openss7.org/tarballs/sigtran-@value{VERSION_SIGTRAN}.tar.bz2, sigtran-@value{VERSION_SIGTRAN}}.
-
-@item
-@cite{OpenSS7 STREAMS VoIP},
-@uref{http://www.openss7.org/tarballs/strvoip-@value{VERSION_STRVOIP}.tar.bz2, strvoip-@value{VERSION_STRVOIP}}.
-
-@item
-@cite{OpenSS7 Sockets SCTP},
-@uref{http://www.openss7.org/tarballs/sctp-@value{VERSION_SCTP}.tar.bz2, sctp-@value{VERSION_SCTP}}.
-(Optional.)
-@end enumerate
-@end ignore

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.2 2010-11-28 13:41:16 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.3 2011-01-12 03:37:37 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2010-11-28 13:41:16 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
