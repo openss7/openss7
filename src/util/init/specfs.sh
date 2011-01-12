@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
+# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -91,7 +91,7 @@ start() {
     if [ -n "$SPECFS_MOUNTPOINT" ] ; then
 	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
 	    echo -n "Loading SPECFS kernel modules: "
-	    eval "modprobe -k -q -- specfs $redir"
+	    eval "modprobe -q -- specfs $redir"
 	    RETVAL=$? ; if [ $RETVAL -ne 0 ] ; then echo "(failed.)" ; return $RETVAL ; fi
 	    echo "specfs."
 	fi
@@ -189,11 +189,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -234,11 +234,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:47:57 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: specfs.sh,v $
+# Revision 1.1.2.2  2011-01-12 00:19:32  brian
+# - modprobe no longer accepts k option
+#
 # Revision 1.1.2.1  2009-06-21 11:47:57  brian
 # - added files to new distro
 #

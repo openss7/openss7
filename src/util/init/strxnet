@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strxnet,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strxnet,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:33 $
+# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -129,7 +129,7 @@ start() {
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
 	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
-		modprobe -k -q -- $module
+		modprobe -q -- $module
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] || return $RETVAL
 	fi
@@ -270,11 +270,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
+# @(#) $RCSfile: strxnet,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:33 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -315,11 +315,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:47:58 $ by $Author: brian $
+# Last Modified $Date: 2011-01-12 00:19:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strxnet,v $
+# Revision 1.1.2.2  2011-01-12 00:19:33  brian
+# - modprobe no longer accepts k option
+#
 # Revision 1.1.2.1  2009-06-21 11:47:58  brian
 # - added files to new distro
 #

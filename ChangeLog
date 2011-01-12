@@ -1,5 +1,46 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/util/init/openss7: modprobe no longer accepts k option
+	* src/util/init/openss7.sh: modprobe no longer accepts k option
+	* src/util/init/sigtran: modprobe no longer accepts k option
+	* src/util/init/sigtran.sh: modprobe no longer accepts k option
+	* src/util/init/specfs: modprobe no longer accepts k option
+	* src/util/init/specfs.sh: modprobe no longer accepts k option
+	* src/util/init/stratm: modprobe no longer accepts k option
+	* src/util/init/stratm.sh: modprobe no longer accepts k option
+	* src/util/init/strbcm: modprobe no longer accepts k option
+	* src/util/init/strbcm.sh: modprobe no longer accepts k option
+	* src/util/init/strchan: modprobe no longer accepts k option
+	* src/util/init/strchan.sh: modprobe no longer accepts k option
+	* src/util/init/strcompat: modprobe no longer accepts k option
+	* src/util/init/strcompat.sh: modprobe no longer accepts k option
+	* src/util/init/streams: modprobe no longer accepts k option
+	* src/util/init/streams.sh: modprobe no longer accepts k option
+	* src/util/init/strinet: modprobe no longer accepts k option
+	* src/util/init/strinet.sh: modprobe no longer accepts k option
+	* src/util/init/strisdn: modprobe no longer accepts k option
+	* src/util/init/strisdn.sh: modprobe no longer accepts k option
+	* src/util/init/striso: modprobe no longer accepts k option
+	* src/util/init/striso.sh: modprobe no longer accepts k option
+	* src/util/init/strsctp: modprobe no longer accepts k option
+	* src/util/init/strsctp.sh: modprobe no longer accepts k option
+	* src/util/init/strsock: modprobe no longer accepts k option
+	* src/util/init/strsock.sh: modprobe no longer accepts k option
+	* src/util/init/strss7: modprobe no longer accepts k option
+	* src/util/init/strss7.sh: modprobe no longer accepts k option
+	* src/util/init/strtty: modprobe no longer accepts k option
+	* src/util/init/strtty.sh: modprobe no longer accepts k option
+	* src/util/init/strvoip: modprobe no longer accepts k option
+	* src/util/init/strvoip.sh: modprobe no longer accepts k option
+	* src/util/init/strx25: modprobe no longer accepts k option
+	* src/util/init/strx25.sh: modprobe no longer accepts k option
+	* src/util/init/strxnet: modprobe no longer accepts k option
+	* src/util/init/strxnet.sh: modprobe no longer accepts k option
+	* src/util/init/strxns: modprobe no longer accepts k option
+	* src/util/init/strxns.sh: modprobe no longer accepts k option
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/drivers/np_rtp.c: added RTP driver
 	* src/include/sys/npi_rtp.h: added RTP driver
 
