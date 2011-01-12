@@ -1,5 +1,14 @@
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
+	* m4/dist.m4: update header
+	* m4/gcj.m4: add check for -Wno-raw flag.  Work around autoconf (m4?)
+	  bug that kept first AS_PUSH_VAR from begin generated properly
+	* m4/kernel.m4: added checks and support for KBUILD_MODNAME and
+	  DEBUG_HASH declarations.  Still need to add support for dwarf2
+	  declarations in cflags.
+
+2011-01-11  Brian Bidulock  <bidulock@openss7.org>
+
 	* scripts/cflagcheck: updated to generate KBUILD_MODNAME flags as well
 	  as DEBUG_HASH flags for dynamic debugging.
 	* scripts/check: turn off LINT because it is generating warnings on
