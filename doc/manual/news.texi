@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 1.1.2.3 2010-11-28 13:41:16 brian Exp $
+@c @(#) $Id: news.texi,v 1.1.2.4 2011-01-12 03:37:37 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2010-11-28 13:41:16 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -122,6 +122,13 @@ kernels and architectures.
 Major features since the last release are as follows:
 
 @itemize -
+@item
+Support for RHEL 6.0 Beta 2 (refresh) on a 2.6.32-44.1.el6.x86_64(.debug) kernel.  Also added
+support for compiling with gcc 4.4.
+
+@item
+Support for CentOS 5.5 on a 2.6.18-194.25.1.el5 kernel.
+
 @item
 Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake 2.11.1, libtool 2.4, gettext 0.18.1,
 flex 2.5.35, bison 2.4.3, swig 2.0.1, autobuild 5.3.
@@ -312,105 +319,6 @@ information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (al
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
 
 For the news release, see @uref{http://www.openss7.org/rel2009XXXX_L.html}.
-@ignore
-This is the seventh @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}} package.  For
-a sub-package listing, see
-@uref{http://www.openss7.org/codefiles/@value{PACKAGE}/README,@file{README}} in the release.  Most
-of the sub-packages in the release are production grade for @cite{Linux
-Fast-STREAMS}.  All existing validation test suites run clean on supported distributions, production
-kernels and architectures.
-
-The original intention was that the @cite{@value{PACKAGE_TITLE}} package not be released as often as
-subpackages and, indeed, newer subpackages can be strapped into the master package and built
-automatically.  However, in reality, the @cite{@value{PACKAGE_TITLE}} package has been released as
-often as the subpackages.  To rebuild the master package with a new sub-package release, simply
-replace the directory to which the sub-package belongs with the unpackged sub-package reelase and
-then rebuild the master package.  This release provides support for recent distributions, production
-kernels and tool chains.  The release also provides support for significiant new features in the
-sub-packages.
-
-Major features since the last public release are:
-
-@itemize -
-@item
-Updated to @file{automake-1.11}.
-
-@item
-Deprecated sub-packages have been excluded from the master package release.  The excluded
-sub-packages are:
-
-@multitable @columnfractions .05 .95
-@item @tab -- @file{sctp-@value{VERSION_SCTP}}
-@item @tab -- @file{iperf-@value{VERSION_IPERF}}
-@item @tab -- @file{netperf-@value{VERSION_NETPERF}}
-@item @tab -- @file{osr61-@value{VERSION_OSR}}
-@end multitable
-
-@item
-Documentation license upgraded to GFDL 1.3.
-
-@item
-Updated tool chain to @file{m4-1.4.13}, @file{automake-1.10.2}, @file{bison-2.4.1},
-@file{libtool-2.2.6a}, @file{texinfo-4.13a}.
-
-@item
-Addition of the following sub-packages:
-
-@multitable @columnfractions .05 .95
-@item @tab -- @file{stratm-@value{VERSION_STRATM}}
-@end multitable
-
-@item
-Addition of the @file{stratm} sub-package to the master build and release that now includes all of
-the ATM components that were previously part of the @file{strss7} sub-package.
-
-@item
-Significant feature updates were made to:
-
-@multitable @columnfractions .05 .95
-@item @tab -- @file{strchan-@value{VERSION_STRCHAN}}
-@item @tab -- @file{strsock-@value{VERSION_STRSOCK}}
-@item @tab -- @file{strnsl-@value{VERSION_STRNSL}}
-@item @tab -- @file{sigtran-@value{VERSION_SIGTRAN}}
-@end multitable
-
-@item
-Significant rework of the @file{strchan} sub-package into the @file{strss7}, @file{strisdn},
-@file{strx25} and @file{striso} packages.  One single driver now meets the needs of all sub-packages.
-
-@item
-Completion of the @file{strsock} package, moves from pre-alpha to beta.
-
-@item
-The @file{strnsl} subpackage moves from alpha to production.
-
-@item
-Significant completion of the @file{sigtran} package: all components moved back to production.
-
-@end itemize
-
-@emph{This is a public, stable, production grade release of the package: it deprecates previous
-releases.  Please upgrade to the current release before reporting bugs.}
-
-As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
-for a wide range of Linux 2.4 and 2.6 @manref{rpm(8)} and @manref{dpkg(1)} based distributions, and
-can be used on production kernels without patching or recompiling the kernel.
-
-This package is publicly released strictly under the @cite{GNU Affero General Public License Version
-3}; however, commercial licensing is available.  The release is available as an @manref{autoconf(1)}
-tarball, SRPM, DSC, and a set of binary RPMs and DEBs for popular distributions.  See the
-@uref{http://www.openss.org/@value{PACKAGE}_pkg.html,package page} for the @mantype{autoconf(1)}
-tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
-@uref{http://www.openss7.org/repos.html,repository page} for information concerning network
-installation and update sources.
-
-See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog} and
-@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the release for more
-information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in
-@uref{http://www.openss7.org/@value{PACKAGE}_manual.html,html}).
-
-For the news release, see @uref{http://www.openss7.org/rel2009XXXX_L.html}.
-@end ignore
 
 @c ----------------------------------------------------------------------------
 

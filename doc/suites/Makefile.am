@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:59:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 03:37:38 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-21 10:59:42 $ by $Author: brian $
+## Last Modified $Date: 2011-01-12 03:37:38 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -200,7 +200,10 @@ FIG_FIGS		= \
 			ss701.fig \
 			sigtran01.fig \
 			mg01.fig \
-			voip01.fig
+			mg02.fig \
+			mg03.fig \
+			voip01.fig \
+			voip02.fig
 
 ## PKG_BUILD_INDEP
 endif
@@ -213,6 +216,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.2  2011-01-12 03:37:38  brian
+## - updated manuals
+##
 ## Revision 1.1.2.1  2009-06-21 10:59:42  brian
 ## - added files to new distro
 ##
