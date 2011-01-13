@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2010-11-28 13:35:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-01-13 16:19:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:35:22 $ by $Author: brian $
+# Last Modified $Date: 2011-01-13 16:19:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -694,6 +694,8 @@ dnl----------------------------------------------------------------------------
 	linux/kdev_t.h \
 	linux/statfs.h \
 	linux/namei.h \
+	linux/path.h \
+	linux/nsproxy.h \
 	linux/locks.h \
 	asm/softirq.h \
 	linux/brlock.h \
@@ -883,6 +885,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
 #endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #ifdef HAVE_KINC_LINUX_HARDIRQ_H
@@ -1086,7 +1091,13 @@ dnl----------------------------------------------------------------------------
 	struct task_struct.namespace.sem,
 	struct task_struct.pgrp,
 	struct task_struct.session,
-	struct task_struct.signal], [:], [:], [
+	struct task_struct.signal,
+	struct vfsmount.mnt_namespace,
+	struct vfsmount.mnt_ns,
+	struct task_struct.namespace,
+	struct task_struct.uid,
+	struct nameidata.dentry,
+	struct nameidata.mnt], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1112,6 +1123,13 @@ dnl----------------------------------------------------------------------------
 #ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
+#ifdef HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
+#endif
+#include <linux/mount.h>
 #ifdef CONFIG_PROC_FS
 #include <linux/proc_fs.h>
 #endif
@@ -1493,6 +1511,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
 #endif]],
 			[[struct inode_operations temp;
 (*temp.lookup)((struct inode *)0, (struct dentry *)0, (struct nameidata *)0);]]) ],
@@ -1528,6 +1549,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
 #endif]],
 [[struct file_operations temp;
 (*temp.flush)((struct file *)0, (fl_owner_t)0);]]) ],
@@ -1563,6 +1587,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
 #endif]],
 [[struct super_operations temp;
 (*temp.statfs)((struct dentry *)0, (struct kstatfs *)0);]]) ],
@@ -1598,6 +1625,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
 #endif]],
 [[struct file_system_type temp;
 (*temp.get_sb)((struct file_system_type *)0, 0, (char *)0, (void *)0, (struct vfsmount *)0);]]) ],
@@ -1638,6 +1668,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
 #ifdef HAVE_KINC_LINUX_HARDIRQ_H
@@ -2099,7 +2132,7 @@ dnl----------------------------------------------------------------------------
 	])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([
-	AC_CACHE_CHECK([for ip_frag_mem with 1 arg],
+	AC_CACHE_CHECK([for kernel ip_frag_mem with 1 arg],
 		       [linux_cv_ip_frag_mem_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2122,7 +2155,7 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_MEM_1_ARG], [1], [Define if function
 		ip_frag_mem() takes 1 argument.])
 	fi
-	AC_CACHE_CHECK([for ip_frag_mem with 0 args],
+	AC_CACHE_CHECK([for kernel ip_frag_mem with 0 args],
 		       [linux_cv_ip_frag_mem_0_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2145,7 +2178,7 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_MEM_0_ARGS], [1], [Define if function
 		ip_frag_mem() takes 0 arguments.])
 	fi
-	AC_CACHE_CHECK([for ip_frag_nqueues with 1 arg],
+	AC_CACHE_CHECK([for kernel ip_frag_nqueues with 1 arg],
 		       [linux_cv_ip_frag_nqueues_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2168,7 +2201,7 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG], [1], [Define if
 		function ip_frag_nqueues() takes 1 argument.])
 	fi
-	AC_CACHE_CHECK([for ip_frag_nqueues with 0 args],
+	AC_CACHE_CHECK([for kernel ip_frag_nqueues with 0 args],
 		       [linux_cv_ip_frag_nqueues_0_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2191,7 +2224,7 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS], [1], [Define if
 		function ip_frag_nqueues() takes 0 arguments.])
 	fi
-	AC_CACHE_CHECK([for first_net_device with 1 arg],
+	AC_CACHE_CHECK([for kernel first_net_device with 1 arg],
 		       [linux_cv_first_net_device_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2214,7 +2247,7 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG], [1], [Define if
 		function first_net_device() takes 1 argument.])
 	fi
-	AC_CACHE_CHECK([for inet_addr_type with 2 args],
+	AC_CACHE_CHECK([for kernel inet_addr_type with 2 args],
 		       [linux_cv_inet_addr_type_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2237,7 +2270,7 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS], [1], [Define if
 		function inet_addr_type() takes 2 arguments.])
 	fi
-	AC_CACHE_CHECK([for ip_route_output_key with 3 args],
+	AC_CACHE_CHECK([for kernel ip_route_output_key with 3 args],
 		       [linux_cv_ip_route_output_key_3_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -3763,6 +3796,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.8  2011-01-13 16:19:07  brian
+# - changes for SLES 11 support
+#
 # Revision 1.1.2.7  2010-11-28 13:35:22  brian
 # - build updates and manual page corrections
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: wrapper.h.in,v 1.1.2.1 2010-11-28 13:25:01 brian Exp $
+ @(#) $Id: wrapper.h.in,v 1.1.2.2 2011-01-13 16:19:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 13:25:01 $ by $Author: brian $
+ Last Modified $Date: 2011-01-13 16:19:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.h.in,v $
+ Revision 1.1.2.2  2011-01-13 16:19:07  brian
+ - changes for SLES 11 support
+
  Revision 1.1.2.1  2010-11-28 13:25:01  brian
  - added new build files, removed redundant files
 
@@ -210,7 +213,7 @@ extern void file_kill(struct file *file);
    properly supported. */
 #undef HAVE_PUT_FILP_ADDR
 #ifdef HAVE_PUT_FILP_ADDR
-extern void put_filp(unsigned start, unsigned flags);
+extern void put_filp(struct file *file);
 #endif				/* HAVE_PUT_FILP_ADDR */
 
 /* The symbol kthread_should_stop is not exported by some kernels. Define this
@@ -717,7 +720,13 @@ int check_mnt(struct vfsmount *mnt);
    be properly supported. */
 #undef HAVE_GRAFT_TREE_ADDR
 #ifdef HAVE_GRAFT_TREE_ADDR
+/* Define to 1 if you have the <linux/path.h> header file. */
+#undef HAVE_KINC_LINUX_PATH_H
+#ifdef HAVE_KINC_LINUX_PATH_H
+int graft_tree(struct vfsmount *mnt, struct path *nd);
+#else
 int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
+#endif
 #endif				/* HAVE_GRAFT_TREE_ADDR */
 
 /* The symbol do_umount is not exported by some kernels. Define this to the

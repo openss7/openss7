@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:07 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-01-13 16:19:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strattach.c,v $
+ Revision 1.1.2.4  2011-01-13 16:19:07  brian
+ - changes for SLES 11 support
+
  Revision 1.1.2.3  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:07 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -91,6 +94,12 @@ static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
+#ifdef HAVE_KINC_LINUX_PATH_H
+#include <linux/path.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NSPROXY_H
+#include <linux/nsproxy.h>
+#endif
 #if defined HAVE_KINC_LINUX_SECURITY_H
 #include <linux/security.h>	/* avoid ptrace conflict */
 #endif
@@ -108,11 +117,21 @@ int check_mnt(struct vfsmount *mnt);
 STATIC int
 check_mnt(struct vfsmount *mnt)
 {
+#if defined HAVE_KMEMB_STRUCT_VFSMOUNT_MNT_NS
+	return mnt->mnt_ns == current->nsproxy->mnt_ns;
+#elif defined HAVE_KMEMB_STRUCT_VFSMOUNT_MNT_NAMESPACE
 	return mnt->mnt_namespace == current->namespace;
+#else
+#error One of vfsmount.mnt_ns or vfsmount.mnt_namepsace must exist.
+#endif
 }
 #endif
 
+#ifdef HAVE_KINC_LINUX_PATH_H
+int graft_tree(struct vfsmount *mnt, struct path *nd);
+#else
 int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
+#endif
 
 int do_umount(struct vfsmount *mnt, int flags);
 
@@ -135,9 +154,35 @@ do_fattach(const struct file *file, const char *file_name)
 {
 	/* very much like do_add_mount() but with different permissions and clone_mnt() of the file 
 	   instead of do_kern_mount() of the filesystem root */
+#ifdef HAVE_KINC_LINUX_PATH_H
+	struct path nd;
+#else
 	struct nameidata nd;
+#endif
 	struct vfsmount *mnt;
 	int err;
+#ifdef LOOKUP_POSITIVE
+	const unsigned int flags = LOOKUP_FOLLOW | LOOKUP_POSITIVE;
+#else
+	const unsigned int flags = LOOKUP_FOLLOW;
+#endif
+#ifdef HAVE_CLONE_MNT_ADDR
+	struct vfsmount *(*my_clone_mnt)(struct vfsmount *, struct dentry *)
+		= (typeof(my_clone_mnt)) HAVE_CLONE_MNT_ADDR;
+#undef clone_mnt
+#define clone_mnt my_clone_mnt
+#endif
+#ifdef HAVE_GRAFT_TREE_ADDR
+#ifdef HAVE_KINC_LINUX_PATH_H
+	int (*my_graft_tree)(struct vfsmount *mnt, struct path *nd)
+		= (typeof(my_graft_tree)) HAVE_GRAFT_TREE_ADDR;
+#else
+	int (*my_graft_tree)(struct vfsmount *mnt, struct nameidata *nd)
+		= (typeof(my_graft_tree)) HAVE_GRAFT_TREE_ADDR;
+#endif
+#undef graft_tree
+#define graft_tree my_graft_tree
+#endif
 
 	err = -EINVAL;
 	if (file->f_dentry->d_sb->s_magic != SPECFS_MAGIC)
@@ -146,17 +191,17 @@ do_fattach(const struct file *file, const char *file_name)
 	if (!file_name || !*file_name)
 		goto out;
 
-#ifdef LOOKUP_POSITIVE
-	err = path_lookup(file_name, LOOKUP_FOLLOW | LOOKUP_POSITIVE, &nd);
+#ifdef HAVE_KINC_LINUX_PATH_H
+	err = kern_path(file_name, flags, &nd);
 #else
-	err = path_lookup(file_name, LOOKUP_FOLLOW, &nd);
+	err = path_lookup(file_name, flags, &nd);
 #endif
 	if (err)
 		goto out;
 
 	err = -EPERM;
 	/* the owner of the file is permitted to fattach */
-	if (!capable(CAP_SYS_ADMIN) && current->uid != file->f_dentry->d_inode->i_uid)
+	if (!capable(CAP_SYS_ADMIN) && current_creds->cr_uid != file->f_dentry->d_inode->i_uid)
 		goto release;
 
 	err = -ENOMEM;
@@ -175,7 +220,11 @@ do_fattach(const struct file *file, const char *file_name)
 #endif
 
 	/* Something was mounted here while we slept */
+#ifdef HAVE_KINC_LINUX_PATH_H
+	while (d_mountpoint(nd.dentry) && follow_down(&nd)) ;
+#else
 	while (d_mountpoint(nd.dentry) && follow_down(&nd.mnt, &nd.dentry)) ;
+#endif
 
 	err = -EINVAL;
 	if (!check_mnt(nd.mnt))
@@ -201,7 +250,11 @@ do_fattach(const struct file *file, const char *file_name)
 #endif
 	mntput(mnt);
       release:
+#ifdef HAVE_KINC_LINUX_PATH_H
+	path_put(&nd);
+#else
 	path_release(&nd);
+#endif
       out:
 	return err;
 }
@@ -212,17 +265,32 @@ streams_fastcall long
 do_fdetach(const char *file_name)
 {
 	/* pretty much the same as sys_umount() with different permissions */
+#ifdef HAVE_KINC_LINUX_PATH_H
+	struct path nd;
+#else
 	struct nameidata nd;
+#endif
 	int err;
+#ifdef LOOKUP_POSITIVE
+	unsigned int flags = LOOKUP_FOLLOW | LOOKUP_POSITIVE;
+#else
+	unsigned int flags = LOOKUP_FOLLOW;
+#endif
+#ifdef HAVE_DO_UMOUNT_ADDR
+	int (*my_do_umount)(struct vfsmount *, int)
+		= (typeof(my_do_umount)) HAVE_DO_UMOUNT_ADDR;
+#undef do_umount
+#define do_umount my_do_umount
+#endif
 
 	err = -ENOENT;
 	if (!file_name || !*file_name)
 		goto out;
 
-#ifdef LOOKUP_POSITIVE
-	err = path_lookup(file_name, LOOKUP_FOLLOW | LOOKUP_POSITIVE, &nd);
+#ifdef HAVE_KINC_LINUX_PATH_H
+	err = kern_path(file_name, flags, &nd);
 #else
-	err = path_lookup(file_name, LOOKUP_FOLLOW, &nd);
+	err = path_lookup(file_name, flags, &nd);
 #endif
 	if (err)
 		goto out;
@@ -237,13 +305,17 @@ do_fdetach(const char *file_name)
 
 	err = -EPERM;
 	/* the owner of the (real) file is permitted to fdetach */
-	if (!capable(CAP_SYS_ADMIN) && current->uid != nd.mnt->mnt_mountpoint->d_inode->i_uid)
+	if (!capable(CAP_SYS_ADMIN) && current_creds->cr_uid != nd.mnt->mnt_mountpoint->d_inode->i_uid)
 		goto release;
 
 	err = do_umount(nd.mnt, MNT_DETACH);
 
       release:
+#ifdef HAVE_KINC_LINUX_PATH_H
+	path_put(&nd);
+#else
 	path_release(&nd);
+#endif
       out:
 	return err;
 }

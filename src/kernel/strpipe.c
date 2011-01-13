@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-01-13 16:19:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 1.1.2.4  2011-01-13 16:19:08  brian
+ - changes for SLES 11 support
+
  Revision 1.1.2.3  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -265,7 +268,26 @@ do_spipe(int *fds)
 	struct cdevsw *cdev;
 	int fdr, fdw, err;
 	struct file *fr, *fw;
-	struct file_operations *f_op;
+	const struct file_operations *f_op;
+#ifdef HAVE_FILE_MOVE_ADDR
+	void (*my_file_move)(struct file *, struct list_head*)
+		= (typeof(my_file_move)) HAVE_FILE_MOVE_ADDR;
+#undef file_move
+#define file_move my_file_move
+#endif
+#ifdef HAVE_FILE_KILL_ADDR
+	void (*my_file_kill)(struct file *)
+		= (typeof(my_file_kill)) HAVE_FILE_KILL_ADDR;
+#undef file_kill
+#define file_kill my_file_kill
+#endif
+#ifdef HAVE_PUT_FILP_ADDR
+        void (*my_put_filp)(struct file *)
+		= (typeof(my_put_filp)) HAVE_PUT_FILP_ADDR;
+#undef put_filp
+#define put_filp my_put_filp
+#endif
+
 
 	err = -ENFILE;
 	if (!(fr = get_empty_filp())) {
