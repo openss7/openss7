@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-13 16:19:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
+ Last Modified $Date: 2011-01-13 16:19:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 1.1.2.5  2011-01-13 16:19:08  brian
+ - changes for SLES 11 support
+
  Revision 1.1.2.4  2011-01-12 04:10:32  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-13 16:19:08 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -117,7 +120,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-13 16:19:08 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -343,8 +346,12 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	struct dentry *dentry;
 	struct vfsmount *mnt;
 	int err;
+#ifdef HAVE_FILE_MOVE_ADDR
 	void (*my_file_move)(struct file *file, struct list_head *list)
 		= (typeof(my_file_move)) HAVE_FILE_MOVE_ADDR;
+#undef file_move
+#define file_move my_file_move
+#endif
 
 	if (file == NULL) {
 		ptrace(("Error path taken!\n"));
@@ -424,7 +431,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	if (file->f_vfsmnt != NULL)
 		mntput(file->f_vfsmnt);
 	file->f_vfsmnt = mnt;
-	(*my_file_move)(file, &mnt->mnt_sb->s_files);
+	file_move(file, &mnt->mnt_sb->s_files);
 	return (0);
 
       put_error:

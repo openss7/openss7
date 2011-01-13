@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:26 $ by $Author: brian $
+ Last Modified $Date: 2011-01-13 16:19:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.c,v $
+ Revision 1.1.2.4  2011-01-13 16:19:08  brian
+ - changes for SLES 11 support
+
  Revision 1.1.2.3  2010-11-28 14:32:26  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -64,7 +67,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $";
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -104,7 +107,7 @@ static char const ident[] =
 
 #define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:32:26 $"
+#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $"
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define WRAPPER_LICENSE		"GPL"
@@ -216,7 +219,7 @@ EXPORT_SYMBOL_GPL(module_text_address);
 
 #ifdef HAVE___MODULE_ADDRESS_ADDR
 extern struct module *__module_address(unsigned long addr);
-__asm__(".eq __module_address," __stringify(HAVE___MODULE_ADDRESS_ADDR));
+__asm__(".equ __module_address," __stringify(HAVE___MODULE_ADDRESS_ADDR));
 __asm__(".global __module_address");
 EXPORT_SYMBOL_GPL(__module_address);
 #endif                          /* HAVE___MODULE_ADDRESS_ADDR */
@@ -660,7 +663,11 @@ EXPORT_SYMBOL_GPL(check_mnt);
 #endif				/* HAVE_CHECK_MNT_ADDR */
 
 #ifdef HAVE_GRAFT_TREE_ADDR
+#ifdef HAVE_KINC_LINUX_PATH_H
+int graft_tree(struct vfsmount *mnt, struct path *nd);
+#else
 int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
+#endif
 __asm__(".equ graft_tree," __stringify(HAVE_GRAFT_TREE_ADDR));
 __asm__(".global graft_tree");
 EXPORT_SYMBOL_GPL(graft_tree);
