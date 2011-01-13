@@ -1,3 +1,19 @@
+2011-01-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release files
+	* NEWS: updated release files
+	* README: updated release files
+	* THANKS: updated release files
+
+	* acinclude.m4: changes for SLES 11 support
+	* src/include/sys/openss7/wrapper.h.in: changes for SLES 11 support
+	* src/kernel/strattach.c: changes for SLES 11 support
+	* src/kernel/strpipe.c: changes for SLES 11 support
+	* src/kernel/strspecfs.c: changes for SLES 11 support
+	* src/kernel/wrapper.c: changes for SLES 11 support
+
+	* scripts/check: handle kmem_alloc_ versioning quirk for SLES 11
+
 2011-01-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/dl_master.c: CONFIG_KMOD is deprecated, now CONFIG_MODULES
