@@ -647,8 +647,8 @@ BEGIN {
 		exports[$1] = 1
 	    } else if (/^.*. _?__crc_/) {
 		sub(/^.*. _?__crc_/, "")
-		versioned[$1] = 1
 		sub(/_+$/, "", $1)
+		versioned[$1] = 1
 		exports[$1] = 1
 		crc_seen = 1
 	    } else if (/\<[Uw]\>/) {
