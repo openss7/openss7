@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-01-11 23:43:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-01-18 16:47:33 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-01-11 23:43:15 $ by $Author: brian $
+## Last Modified $Date: 2011-01-18 16:47:33 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -72,14 +72,14 @@ openss7_man_MANS = \
 	man1/strlog.1 \
 	man1/strreset.1 \
 	man2/fattach.2 \
-	man2/fdetach.2 \
-	man2/getmsg.2 \
+	man2/fdetach.2s \
+	man2/getmsg.2s \
 	man2/getpmsg.2s \
 	man2/ioctl.2s \
-	man2/isastream.2 \
+	man2/isastream.2s \
 	man2/pipe.2s \
 	man2/poll.2s \
-	man2/putmsg.2 \
+	man2/putmsg.2s \
 	man2/putpmsg.2s \
 	man2/read.2s \
 	man2/readv.2s \
@@ -4031,14 +4031,14 @@ openss7_dist_noinst_MANS = \
 	man1/strlog.1.man \
 	man1/strreset.1.man \
 	man2/fattach.2.man \
-	man2/fdetach.2.man \
-	man2/getmsg.2.man \
+	man2/fdetach.2s.man \
+	man2/getmsg.2s.man \
 	man2/getpmsg.2s.man \
 	man2/ioctl.2s.man \
-	man2/isastream.2.man \
+	man2/isastream.2s.man \
 	man2/pipe.2s.man \
 	man2/poll.2s.man \
-	man2/putmsg.2.man \
+	man2/putmsg.2s.man \
 	man2/putpmsg.2s.man \
 	man2/read.2s.man \
 	man2/readv.2s.man \
@@ -8035,7 +8035,6 @@ dist_noinst_MANS = $(openss7_dist_noinst_MANS)
 ##
 MANS_UNUSED = \
 	man1/asn1.1 \
-	man1/strlog.1 \
 	man2/poll.2s \
 	man2/read.2s \
 	man2/readv.2s \
@@ -8200,9 +8199,9 @@ MANS_UNUSED = \
 	man4/mx_mux.4 \
 	man4/mx_x400p.4 \
 	man4/np.4 \
-	man4/np_rtp.4 \
 	man4/npi.4 \
 	man4/npi_ip.4 \
+	man4/np_rtp.4 \
 	man4/oclt.4 \
 	man4/onpi.4 \
 	man4/oopi.4 \
@@ -8271,7 +8270,6 @@ MANS_UNUSED = \
 	man4/wan.4 \
 	man4/x100p-ch.4 \
 	man4/X25.4 \
-	man4/x25-llc.4 \
 	man4/x400p-ch.4 \
 	man4/xapmod.4 \
 	man4/XNS.4 \
@@ -8314,7 +8312,6 @@ MANS_UNUSED = \
 	man8/sdt.8 \
 	man8/sigtran.8 \
 	man8/sl.8 \
-	man8/slconfig.8 \
 	man8/sls.8 \
 	man8/soip.8 \
 	man8/specfs.sh.8 \
@@ -8650,7 +8647,6 @@ MANS_UNUSED = \
 	man9/mfree.9 \
 	man9/minor.9 \
 	man9/mi_sprintf_putc.9 \
-	man9/mi_testb.9 \
 	man9/mi_tpi_ack_alloc.9 \
 	man9/mi_tpi_conn_con.9 \
 	man9/mi_tpi_conn_ind.9 \
@@ -8728,18 +8724,16 @@ MANS_UNUSED = \
 	man9/uxpcompat.9 \
 	man9/vtop.9
 
+##
+# Init scripts are exempt from standard options.
+##
 MANS_EXEMPT = \
 	man8/openss7.8 \
+	man8/openss7.sh.8 \
 	man8/specfs.8 \
 	man8/specfs.sh.8 \
 	man8/streams.8 \
 	man8/streams.sh.8
-
-if PUBLIC_RELEASE
-## PUBLIC_RELEASE
-#MANS_UNUSED += 
-## PUBLIC_RELEASE
-endif
 
 ## PKG_BUILD_INDEP
 endif
@@ -8749,6 +8743,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.9  2011-01-18 16:47:33  brian
+## - updated manual pages
+##
 ## Revision 1.1.2.8  2011-01-11 23:43:15  brian
 ## - updated manual pages
 ##
