@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:08 $
+ @(#) $RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:08 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vtoip.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:53  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:22:08  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:08 $";
+static char const ident[] =
+    "$RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
 
 /*
  * This is a Y.1452 VToIP (Voice Trunking over IP) module.  It pushes over a UDP
@@ -79,3 +83,99 @@ static char const ident[] = "$RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.2 
  * be made available to the switching matrix.
  */
 
+#define _SVR4_SOURCE
+#define _MPS_SOURCE
+#define _SUN_SOURCE
+
+#include <sys/os7/compat.h>
+
+#define VTOIP_DESCRIP	"VTOIP STREAMS MODULE"
+#define VTOIP_REVISION	"OpenSS7 $RCSfile: vtoip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define VTOIP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define VTOIP_DEVICE	"Provides OpenSS7 Voice Trunking over IP (VTOIP)"
+#define VTOIP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define VTOIP_LICENSE	"GPL"
+#define VTOIP_BANNER	VTOIP_DESCRIP	"\n" \
+			VTOIP_REVISION	"\n" \
+			VTOIP_COPYRIGHT	"\n" \
+			VTOIP_DEVICE	"\n" \
+			VTOIP_CONTACT	"\n"
+#define VTOIP_SPLASH	VTOIP_DEVICE	" - " \
+			VTOIP_REVISION	"\n"
+
+#ifdef LINUX
+MODULE_AUTHOR(VTOIP_CONTACT);
+MODULE_DESCRIPTION(VTOIP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(VTOIP_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(VTOIP_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-vtoip");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "."
+	       PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#define VTOIP_MOD_ID	CONFIG_STREAMS_VTOIP_MODID
+#define VTOIP_MOD_NAME	CONFIG_STREAMS_VTOIP_NAME
+
+#ifndef VTOIP_MOD_NAME
+#define VTOIP_MOD_NAME	"vtoip"
+#endif				/* VTOIP_MOD_NAME */
+
+#ifndef VTOIP_MOD_ID
+#define VTOIP_MOD_ID	0
+#endif				/* VTOIP_MOD_ID */
+
+/*
+ *  STREAMS DEFINITIONS
+ *  -------------------------------------------------------------------------
+ */
+
+#define MOD_ID		VTOIP_MOD_ID
+#define MOD_NAME	VTOIP_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	VTOIP_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	VTOIP_SPLASH
+#endif				/* MODULE */
+
+/*
+ *  LINUX INITIALIZATION
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef LINUX
+unsigned short modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, short, 0444);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module ID for VTOIP module.  (0 for allocation.)");
+
+/** vtoipinit - initialize VTOIP
+  */
+static __init int
+vtoipinit(void)
+{
+	cmn_err(CE_NOTE, MOD_BANNER);
+	return (0);
+}
+
+/** vtoipexit - terminate VTOIP
+  */
+static __exit void
+vtoipexit(void)
+{
+	return;
+}
+
+module_init(vtoipinit);
+module_exit(vtoipexit);
+
+#endif				/* LINUX */

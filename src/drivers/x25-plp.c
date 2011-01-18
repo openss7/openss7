@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:42 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:52  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:21:42  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $";
+static char const ident[] =
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $";
 
 /*
  * This is a multiplexing driver for the X.25 Packet Layer Protocol (PLP).  It
@@ -83,15 +87,19 @@ static char const ident[] = "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define NEVER 0
 
-#if NEVER
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
+#if NEVER
 #include <sys/nli.h>
+#endif
 
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP DRIVER FOR LINUX FAST-STREAMS"
-#define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STERAMS"
-#define PLP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $"
+#define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
+#define PLP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $"
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"
@@ -102,7 +110,7 @@ static char const ident[] = "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 1.1.2.
 			PLP_DEVICE	"\n" \
 			PLP_CONTACT	"\n"
 #define PLP_SPLASH	PLP_DESCRIP	" - " \
-			PLP_REVISION	"\n"
+			PLP_REVISION
 
 #ifndef CONFIG_STREAMS_PLP_NAME
 #error "CONFIG_STREAMS_PLP_NAME must be defined."
@@ -145,9 +153,23 @@ MODULE_ALIAS("/dev/cons");
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
+#endif				/* MODULE_VERSION */
 #endif				/* MODULE */
 #endif				/* LINUX */
+
+#define PLP_DRV_ID	CONFIG_STREAMS_PLP_MODID
+#define PLP_DRV_NAME	CONFIG_STREAMS_PLP_NAME
+#define PLP_CMAJORS	CONFIG_STREAMS_PLP_NMAJORS
+#define PLP_CMAJOR_0	CONFIG_STREAMS_PLP_MAJOR
+#define PLP_UNITS	CONFIG_STREAMS_PLP_NMINORS
+
+#ifndef PLP_DRV_NAME
+#define PLP_DRV_NAME	"x25-plp"
+#endif				/* PLP_DRV_NAME */
+
+#ifndef PLP_DRV_ID
+#define PLP_DRV_ID	0
+#endif				/* PLP_DRV_ID */
 
 /*
  * --------------------------------------------------------------------------
@@ -159,7 +181,6 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #define DRV_ID	    PLP_DRV_ID
 #define DRV_NAME    PLP_DRV_NAME
-#define MOD_ID	    PLP_MOD_ID
 #define CMAJORS	    PLP_CMAJORS
 #define CMAJOR_0    PLP_CMAJOR_0
 #define UNITS	    PLP_UNITS
@@ -169,6 +190,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define DRV_BANNER  PLP_SPLASH
 #endif				/* MODULE */
 
+#if NEVER
 static struct module_info nl_minfo = {
 	.mi_idnum = DRV_ID,
 	.mi_idname = DRV_NAME,
@@ -204,8 +226,7 @@ struct dl;
 
 /* Upper multiplex structure. */
 struct nl {
-	struct nl *nl_next;		/* linkage for network layers belonging 
-					   to same data link */
+	struct nl *nl_next;		/* linkage for network layers belonging to same data link */
 	struct dl *dl;
 	queue_t *oq;
 	int state;
@@ -219,8 +240,8 @@ struct nl {
 
 /* Lower multiplex structure. */
 struct dl {
-	struct nl *nl;			/* list of network layers for this
-					   belonging to this data link */
+	struct nl *nl;			/* list of network layers for this belonging to this data
+					   link */
 	queue_t *oq;
 	dl_ulong state;
 	dl_ulong oldstate;
@@ -242,16 +263,16 @@ struct x25_ple {
 			uint8_t anytime[2];	/* Negotiable anytime. */
 			uint8_t idle[1];	/* Negotiable while idle. */
 			struct {
-				uint8_t ic; /* Incoming non-standard default packet size */
-				uint8_t og; /* Outgoing non-standard default packet size */
+				uint8_t ic;	/* Incoming non-standard default packet size */
+				uint8_t og;	/* Outgoing non-standard default packet size */
 			} ndps;
 			struct {
-				uint8_t ic; /* Incoming non-standard default window size */
-				uint8_t og; /* Outgoing non-standard default window size */
+				uint8_t ic;	/* Incoming non-standard default window size */
+				uint8_t og;	/* Outgoing non-standard default window size */
 			} ndws;
 			struct {
-				uint8_t ic; /* Incoming default throughput class */
-				uint8_t og; /* Outgoing default throughput class */
+				uint8_t ic;	/* Incoming default throughput class */
+				uint8_t og;	/* Outgoing default throughput class */
 			} dtca;
 			/* Logical Channel Type Ranges */
 			struct {
@@ -2398,17 +2419,17 @@ dl_get_statistics_req(struct dl *dl, queue_t *q, mblk_t *msg)
  * --------------------------------------------------------------------------
  */
 
-#define REG_NONNEG  0x06    /* 00000110 - Non-negotiable facilities */
-#define REG_AVAIL   0x46    /* 01000110 - Availability of facilities */
-#define REG_ANYTIME 0x45    /* 01000101 - Negotiated any time */
-#define REG_IDLE    0x05    /* 00000101 - Negotiated with no VCs */
-#define REG_NDPS    0x42    /* 01000010 - Nonstd Default Packet Sizes */
-#define REG_NDWSB   0x43    /* 01000011 - Nonstd Default Window Sizes Basic */
-#define REG_NDWSE   0xd5    /* 11010101 - Nonstd Default Window Sizes Extended */
-#define REG_DTCAB   0x02    /* 00000010 - Default Tput Class Assign Basic */
-#define REG_DTCAE   0x4c    /* 01001100 - Default Tput Class Assign Extended */
-#define REG_LCTR    0xd8    /* 11001000 - Logical Channel Type Ranges */
-#define REG_MARKER  0x00    /* 00000000 - Marker */
+#define REG_NONNEG  0x06	/* 00000110 - Non-negotiable facilities */
+#define REG_AVAIL   0x46	/* 01000110 - Availability of facilities */
+#define REG_ANYTIME 0x45	/* 01000101 - Negotiated any time */
+#define REG_IDLE    0x05	/* 00000101 - Negotiated with no VCs */
+#define REG_NDPS    0x42	/* 01000010 - Nonstd Default Packet Sizes */
+#define REG_NDWSB   0x43	/* 01000011 - Nonstd Default Window Sizes Basic */
+#define REG_NDWSE   0xd5	/* 11010101 - Nonstd Default Window Sizes Extended */
+#define REG_DTCAB   0x02	/* 00000010 - Default Tput Class Assign Basic */
+#define REG_DTCAE   0x4c	/* 01001100 - Default Tput Class Assign Extended */
+#define REG_LCTR    0xd8	/* 11001000 - Logical Channel Type Ranges */
+#define REG_MARKER  0x00	/* 00000000 - Marker */
 
 #define REGF_NONNEG	(1<<0)
 #define REGF_AVAIL	(1<<1)
@@ -4361,11 +4382,10 @@ nl_m_ioctl(queue_t *q, mblk_t *mp)
 	mi_copy_done(q, mp, EFAULT);
 	return (0);
       notforus:
-	/* Yes, it is possible to send this data link input-output controls
-	   down to the data link provided that we are associated with a data
-	   link.  We mark the ioc_id in the private structure so that the lower 
-	   multiplex stream can search for the correct upper multiplex stream
-	   when passing acknowledgment or copy messages up. */
+	/* Yes, it is possible to send this data link input-output controls down to the data link
+	   provided that we are associated with a data link.  We mark the ioc_id in the private
+	   structure so that the lower multiplex stream can search for the correct upper multiplex
+	   stream when passing acknowledgment or copy messages up. */
 	pl = RW_RDLOCK(plp_mux_lock, plstr);
 	if (nl->dl) {
 		nl->ioc_cmd = ioc->ioc_cmd;
@@ -4688,8 +4708,7 @@ dl_m_sig(queue_t *q, mblk_t *mp)
 static fastcall int
 dl_m_copy(queue_t *q, mblk_t *mp)
 {
-	/* FIXME: find the upper stream that passed the ioctl and pass it
-	 * there. */
+	/* FIXME: find the upper stream that passed the ioctl and pass it there. */
 	freemsg(mp);
 	return (0);
 }
@@ -4702,8 +4721,7 @@ dl_m_copy(queue_t *q, mblk_t *mp)
 static fastcall int
 dl_m_iocack(queue_t *q, mblk_t *mp)
 {
-	/* FIXME: find the upper stream that passed the ioctl and pass it
-	 * there. */
+	/* FIXME: find the upper stream that passed the ioctl and pass it there. */
 	freemsg(mp);
 	return (0);
 }
@@ -4963,9 +4981,10 @@ struct streamtab plp_info = {
 	.st_muxrinit = &dl_rinit,
 	.st_muxwinit = &dl_winit,
 };
+#endif
 
-static modID_t modid = MOD_ID;
-static major_t major = CMAJOR;
+static modID_t modid = DRV_ID;
+static unsigned short major = CMAJOR_0;
 
 /*
  * --------------------------------------------------------------------------
@@ -4987,6 +5006,7 @@ module_param(major, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for X25-PLP. (0 for allocation.)");
 MODULE_PARM_DESC(major, "Major device number for X25-PLP. (0 for allocation.)");
 
+#if NEVER
 /*
  * --------------------------------------------------------------------------
  *
@@ -5021,29 +5041,36 @@ plp_unregister_strdev(major_t major)
 		return (err);
 	return (0);
 }
+#endif
 
 static __init int
 plp_modinit(void)
 {
+#if NEVER
 	int err;
+#endif
 
 	cmn_err(CE_NOTE, DRV_BANNER);
+#if NEVER
 	if ((err = plp_register_strdev(major)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register driver major %d", DRV_NAME, (int) major);
 		return (err);
 	}
+#endif
 	return (0);
 }
 
 static __exit void
 plp_modexit(void)
 {
+#if NEVER
 	int err;
 
 	if ((err = plp_unregister_strdev(major)) < 0) {
 		cmn_err(CE_WARN, "%s: could not unregister driver, err = %d", DRV_NAME, err);
 		return;
 	}
+#endif
 	return;
 }
 
@@ -5051,5 +5078,3 @@ module_init(plp_modinit);
 module_exit(plp_modexit);
 
 #endif				/* LINUX */
-
-#endif

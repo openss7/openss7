@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 16:55:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 1.1.2.4  2011-01-18 16:55:52  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.3  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 16:55:52 $";
 
 
 /*
@@ -77,10 +80,14 @@ static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.3 $
  *  Protocol Class 0 (TP0).
  */
 
-#define NEVER 0
-#if NEVER
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
+
 #include <sys/os7/compat.h>
 
+#define NEVER 0
+#if NEVER
 #if defined HAVE_TIHDR_H
 #   include <tihdr.h>
 #else
@@ -88,14 +95,19 @@ static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #endif
 
 #include <sys/npi.h>
+#endif
 
-#define ISOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ISOT_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $"
+/* ----------------------------- */
+
+#define ISOT_DESCRIP	"SVR 4.2 ISO TRANSPORT OVER TCP FOR LINUX FAST-STREAMS"
+#define ISOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
+#define ISOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 16:55:52 $"
 #define ISOT_DEVICE	"SVR 4.2 MP STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOT_LICENSE	"GPL"
 #define ISOT_BANNER	ISOT_DESCRIP	"\n" \
+			ISOT_EXTRA	"\n" \
 			ISOT_COPYRIGHT	"\n" \
 			ISOT_REVISION	"\n" \
 			ISOT_DEVICE	"\n" \
@@ -116,7 +128,7 @@ MODULE_ALIAS("streams-isot");
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
+#endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_ISOT_NAME
@@ -126,19 +138,20 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #error "CONFIG_STREAMS_ISOT_MODID must be defined."
 #endif
 
-#ifndef ISOT_MOD_NAME
-#define ISOT_MOD_NAME		CONFIG_STREAMS_ISOT_NAME
-#endif				/* ISOT_MOD_NAME */
-#ifndef ISOT_MOD_ID
 #define ISOT_MOD_ID		CONFIG_STREAMS_ISOT_MODID
+#define ISOT_MOD_NAME		CONFIG_STREAMS_ISOT_NAME
+
+#ifndef ISOT_MOD_NAME
+#define ISOT_MOD_NAME		"isot"
+#endif				/* ISOT_MOD_NAME */
+
+#ifndef ISOT_MOD_ID
+#define ISOT_MOD_ID		0
 #endif				/* ISOT_MOD_ID */
 
 /*
- * --------------------------------------------------------------------------
- *
  * STREAMS DEFINITIONS
- *
- * --------------------------------------------------------------------------
+ * -------------------------------------------------------------------------
  */
 
 #define MOD_ID	    ISOT_MOD_ID
@@ -149,6 +162,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define MOD_BANNER  ISOT_SPLASH
 #endif				/* MODULE */
 
+#if NEVER
 static struct module_info isot_info = {
 	.mi_idnum = MOD_ID,		/* Module ID number */
 	.mi_idname = MOD_NAME,		/* Module name */
@@ -3343,8 +3357,6 @@ struct streamtab isot_info = {
 	.st_wrinit = &isot_winit,
 };
 
-static modID_t modid = MOD_ID;
-
 /*
  * --------------------------------------------------------------------------
  *
@@ -3352,8 +3364,10 @@ static modID_t modid = MOD_ID;
  *
  * --------------------------------------------------------------------------
  */
+#endif
 
 #ifdef LINUX
+static modID_t modid = MOD_ID;
 
 #ifndef module_param
 MODULE_PARM(modid, "h");
@@ -3363,34 +3377,38 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for ISOT. (0 for allocation.)");
 
 static __init int
-isot_modinit(void)
+isotinit(void)
 {
+#if NEVER
 	int err;
-
+#endif
 	cmn_err(CE_NOTE, MOD_BANNER);
+#if NEVER
 	if ((err = register_strmod(&isot_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register module %d", MOD_NAME, (int) modid);
 		return (err);
 	}
 	if (modid == 0)
 		modid = err;
+#endif
 	return (0);
 }
 
 static __exit void
-isot_modexit(void)
+isotexit(void)
 {
+#if NEVER
 	int err;
 
 	if ((err = unregister_strmod(&isot_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not unregister module, err = %d", MOD_NAME, err);
 		return;
 	}
+#endif
 	return;
 }
 
-module_init(isot_modinit);
-module_exit(isot_modexit);
+module_init(isotinit);
+module_exit(isotexit);
 
 #endif				/* LINUX */
-#endif /* 0 */

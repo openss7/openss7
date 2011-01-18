@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $
+ @(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:42 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-lapb.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:52  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:21:42  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:42 $";
+static char const ident[] =
+    "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $";
 
 /*
  *  Here is an X.25 lapb (SLP and MLP) driver.  This is a DLPI driver that can push over or link a
@@ -69,3 +73,125 @@ static char const ident[] = "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2
  *  streams need to be raw packet streams with or without SNAP headers.  This driver will use LLC2
  *  over these streams as described under ISO/IEC 8881.
  */
+
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
+
+#include <sys/os7/compat.h>
+
+#define LAPB_DESCRIP	"SVR 4.2 DLPI X25-LAPB DRIVER FOR LINUX FAST-STREAMS"
+#define LAPB_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
+#define LAPB_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define LAPB_REVISION	"OpenSS7 $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $"
+#define LAPB_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for X.25 Link Access Protocol B-Channel (X25-LAPB)"
+#define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define LAPB_LICENSE	"GPL"
+#define LAPB_BANNER	LAPB_DESCRIP	"\n" \
+			LAPB_EXTRA	"\n" \
+			LAPB_COPYRIGHT	"\n" \
+			LAPB_REVISION	"\n" \
+			LAPB_DEVICE	"\n" \
+			LAPB_CONTACT	"\n"
+#define LAPB_SPLASH	LAPB_DESCRIP	" - " \
+			LAPB_REVISION
+
+#ifndef CONFIG_STREAMS_LAPB_NAME
+#error "CONFIG_STREAMS_LAPB_NAME must be defined."
+#endif				/* CONFIG_STREAMS_LAPB_NAME */
+#ifndef CONFIG_STREAMS_LAPB_MODID
+#error "CONFIG_STREAMS_LAPB_MODID must be defined."
+#endif				/* CONFIG_STREAMS_LAPB_MODID */
+
+#ifdef LINUX
+#ifdef MODULE
+MODULE_AUTHOR(LAPB_CONTACT);
+MODULE_DESCRIPTION(LAPB_DESCRIP);
+MODULE_SUPPORTED_DEVICE(LAPB_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(LAPB_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LAPB_MODID));
+MODULE_ALIAS("streams-driver-lapb");
+MODULE_ALIAS("streams-module-lapb");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LAPB_MAJOR));
+MODULE_ALIAS("/dev/streams/lapb");
+MODULE_ALIAS("/dev/streams/lapb/*");
+MODULE_ALIAS("/dev/streams/clone/lapb");
+MODULE_ALIAS("char-major-" __stringify(LAPB_MAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(LAPB_MAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(LAPB_MAJOR_0) "-0");
+MODULE_ALIAS("/dev/lapb");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* MODULE */
+#endif				/* LINUX */
+
+#define LAPB_DRV_ID	CONFIG_STREAMS_LAPB_MODID
+#define LAPB_DRV_NAME	CONFIG_STREAMS_LAPB_NAME
+
+#ifndef LAPB_DRV_NAME
+#define LAPB_DRV_NAME	"lapb"
+#endif				/* LAPB_DRV_NAME */
+
+#ifndef LAPB_DRV_ID
+#define LAPB_DRV_ID	0
+#endif				/* LAPB_DRV_ID */
+
+/*
+ *  STREAMS DEFINITIONS
+ *  -------------------------------------------------------------------------
+ */
+
+#define DRV_ID		LAPB_DRV_ID
+#define DRV_NAME	LAPB_DRV_NAME
+#define CMAJORS		LAPB_CMAJORS
+#define CMAJOR_0	LAPB_CMAJOR_0
+#define UNITS		LAPB_UNITS
+#ifdef MODULE
+#define DRV_BANNER	LAPB_BANNER
+#else				/* MODULE */
+#define DRV_BANNER	LAPB_SPLASH
+#endif				/* MODULE */
+
+/*
+ *  LINUX INITIALIZATION
+ *  -------------------------------------------------------------------------
+ */
+
+static modID_t modid = DRV_ID;
+
+#ifdef LINUX
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, ushort, 0444);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module ID for LAPB.  (0 for allocation.)");
+
+/** lapbinit - initialize LAPB
+  */
+static __init int
+lapbinit(void)
+{
+	cmn_err(CE_NOTE, DRV_BANNER);
+	return (0);
+}
+
+/** lapbexit - terminate LAPB
+  */
+static __exit void
+lapbexit(void)
+{
+	return;
+}
+
+module_init(lapbinit);
+module_exit(lapbexit);
+
+#endif				/* LINUX */

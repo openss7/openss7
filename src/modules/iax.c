@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: iax.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:52  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] =
+    "$RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $";
 
 /*
  *  This is an IAX module.  It pushes over a UDP Stream that provides connectivity to the peer IAX
@@ -77,3 +81,99 @@ static char const ident[] = "$RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.2 $)
  *  matrix.
  */
 
+#define _SVR4_SOURCE
+#define _MPS_SOURCE
+#define _SUN_SOURCE
+
+#include <sys/os7/compat.h>
+
+#define IAX_DESCRIP	"IAX STREAMS MODULE"
+#define IAX_REVISION	"OpenSS7 $RCSfile: iax.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $"
+#define IAX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define IAX_DEVICE	"Provides OpenSS7 Asterisk (IAX)"
+#define IAX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define IAX_LICENSE	"GPL"
+#define IAX_BANNER	IAX_DESCRIP	"\n" \
+			IAX_REVISION	"\n" \
+			IAX_COPYRIGHT	"\n" \
+			IAX_DEVICE	"\n" \
+			IAX_CONTACT	"\n"
+#define IAX_SPLASH	IAX_DEVICE	" - " \
+			IAX_REVISION	"\n"
+
+#ifdef LINUX
+MODULE_AUTHOR(IAX_CONTACT);
+MODULE_DESCRIPTION(IAX_DESCRIP);
+MODULE_SUPPORTED_DEVICE(IAX_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(IAX_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-iax");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "."
+	       PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#define IAX_MOD_ID	CONFIG_STREAMS_IAX_MODID
+#define IAX_MOD_NAME	CONFIG_STREAMS_IAX_NAME
+
+#ifndef IAX_MOD_NAME
+#define IAX_MOD_NAME	"iax"
+#endif				/* IAX_MOD_NAME */
+
+#ifndef IAX_MOD_ID
+#define IAX_MOD_ID	0
+#endif				/* IAX_MOD_ID */
+
+/*
+ *  STREAMS DEFINITIONS
+ *  -------------------------------------------------------------------------
+ */
+
+#define MOD_ID		IAX_MOD_ID
+#define MOD_NAME	IAX_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	IAX_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	IAX_SPLASH
+#endif				/* MODULE */
+
+/*
+ *  LINUX INITIALIZATION
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef LINUX
+unsigned short modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, short, 0444);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module ID for IAX module.  (0 for allocation.)");
+
+/** iaxinit - initialize IAX
+  */
+static __init int
+iaxinit(void)
+{
+	cmn_err(CE_NOTE, MOD_BANNER);
+	return (0);
+}
+
+/** iaxexit - terminate IAX
+  */
+static __exit void
+iaxexit(void)
+{
+	return;
+}
+
+module_init(iaxinit);
+module_exit(iaxexit);
+
+#endif				/* LINUX */
