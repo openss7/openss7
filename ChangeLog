@@ -53,6 +53,7 @@
 	* scripts/missing4: update diagnostics
 
 	* am/archive.am: sign xz archives
+	* am/deb.am: always expand bz2 archive
 
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
