@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:01:53 $
+# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-18 17:03:37 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 14:01:53 $ by $Author: brian $
+# Last Modified $Date: 2011-01-18 17:03:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,7 +70,7 @@ function year()
 function allyears(    year, this, last, sep, result)
 {
     last = year()
-    for (this = 2009; this <= last; this++) {
+    for (this = 2011; this <= last; this++) {
 	result = result sep this
 	sep = ", "
     }
@@ -101,7 +101,7 @@ function usage(output)
 	return
     print "\
 strconf:\n\
-  $Id: strconf.awk,v 1.1.2.4 2010-11-28 14:01:53 brian Exp $\n\
+  $Id: strconf.awk,v 1.1.2.5 2011-01-18 17:03:37 brian Exp $\n\
 Usage:\n\
   strconf [options] CONFIGFILE[ CONFIGFILE]...\n\
   strconf -H\n\
@@ -197,7 +197,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.4 2010-11-28 14:01:53 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.5 2011-01-18 17:03:37 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -219,7 +219,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.4 2010-11-28 14:01:53 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.5 2011-01-18 17:03:37 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -628,7 +628,7 @@ function write_hconfig(file,    name, prefix) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.4 2010-11-28 14:01:53 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.5 2011-01-18 17:03:37 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -675,7 +675,7 @@ function write_hconfig(file,    name, prefix) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2010-11-28 14:01:53 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-01-18 17:03:37 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -736,7 +736,7 @@ function write_modconf(file) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.4 2010-11-28 14:01:53 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.5 2011-01-18 17:03:37 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -783,7 +783,7 @@ function write_modconf(file) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2010-11-28 14:01:53 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-01-18 17:03:37 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -940,7 +940,7 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:01:53 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-18 17:03:37 $\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1215,7 +1215,7 @@ if test \":$V\" = :1 ; then\n\
     set -x\n\
 fi\n\
 if test $# -ne 1 ; then\n\
-    set $0 --\n\
+    set $0 --create\n\
 fi\n\
 case :$1 in\n\
     :-c|:--create)\n\
@@ -1673,7 +1673,7 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:01:53 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-18 17:03:37 $\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -1938,6 +1938,9 @@ BEGIN {
 # =============================================================================
 #
 # $Log: strconf.awk,v $
+# Revision 1.1.2.5  2011-01-18 17:03:37  brian
+# - create by default in mkdev script
+#
 # Revision 1.1.2.4  2010-11-28 14:01:53  brian
 # - awk script updates and corrections
 #
