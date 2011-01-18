@@ -35,6 +35,10 @@
 	* src/util/init/streams: init script updates
 	* src/util/sysconfig/openss7: init script updates
 
+	* src/util/slconf.c: added back to compile
+	* src/util/slconf_yac.y: added back to compile
+	* src/util/strlog.c: added back to compile
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files

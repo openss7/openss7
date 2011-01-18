@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $
+ @(#) $RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:59:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:38 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:59:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconf_yac.y,v $
+ Revision 1.1.2.3  2011-01-18 16:59:52  brian
+ - added back to compile
+
  Revision 1.1.2.2  2010-11-28 14:22:38  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -64,7 +67,7 @@
 
 %{
 
-static char const ident[] = "$RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $";
+static char const ident[] = "$RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:59:52 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -111,13 +114,13 @@ static char const ident[] = "$RCSfile: slconf_yac.y,v $ $Name:  $($Revision: 1.1
 #define YYENABLE_NLS 0
 #endif
 
-static const char *prompt = "slconfig";
+static char *prompt = "slconfig";
 extern int interactive;
 
-void version(const char *);
-void copying(const char *);
-void usage(const char *);
-void help(const char *);
+void version(int, char*[]);
+void copying(int, char*[]);
+void usage(int, char*[]);
+void help(int, char*[]);
 
 void newline(void);
 
@@ -765,15 +768,15 @@ command:
     ;
 
 usage_command:
-    TOK_USAGE { help(prompt); }
+    TOK_USAGE { help(1, &prompt); }
     ;
 
 copying_command:
-    TOK_COPYING { copying(prompt); }
+    TOK_COPYING { copying(1, &prompt); }
     ;
 
 version_command:
-    TOK_VERSION { version(prompt); }
+    TOK_VERSION { version(1, &prompt); }
     ;
 
 clear_command:
@@ -810,15 +813,15 @@ help_command:
 what:
     TOK_USAGE
     {
-	help(prompt);
+	help(1, &prompt);
     }
     | TOK_VERSION
     {
-	version(prompt);
+	version(1, &prompt);
     }
     | TOK_COPYING
     {
-	copying(prompt);
+	copying(1, &prompt);
     }
     | TOK_OPEN
     {
@@ -2384,7 +2387,7 @@ newline(void)
 extern void yyrestart(FILE *);
 
 void
-yyinit(const char *name, FILE *input, FILE *output)
+yyinit(char *name, FILE *input, FILE *output)
 {
 	if ((prompt = strrchr(name, '/')) != NULL)
 		prompt++;
@@ -2394,7 +2397,7 @@ yyinit(const char *name, FILE *input, FILE *output)
 	yyout = output;
 	yyrestart(yyin);
 	if (interactive) {
-		copying(prompt);
+		copying(1, &prompt);
 		fprintf(stdout, "Type \"help\" for help...\n");
 	}
 	newline();
