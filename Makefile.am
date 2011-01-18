@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2010-12-19 00:26:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-01-18 17:11:41 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-12-19 00:26:46 $ by $Author: brian $
+# Last Modified $Date: 2011-01-18 17:11:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1223,6 +1223,15 @@ bin_PROGRAMS			+= gdmo
 
 ## =====================================================================
 
+strlog_SOURCES			= src/util/strlog.c
+strlog_CPPFLAGS			= $(UTIL_INCLUDES)
+strlog_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strlog_LDADD			= -lrt
+
+bin_PROGRAMS			+= strlog
+
+## =====================================================================
+
 autopush_SOURCES		= src/util/autopush.c
 autopush_CPPFLAGS		= $(UTIL_INCLUDES)
 autopush_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
@@ -1707,18 +1716,18 @@ ss7statsd_LDADD			= libstreams.la
 sbin_PROGRAMS			+= ss7statsd
 
 ## =====================================================================
-#
-#slconfig_SOURCES		= src/util/slconf_yac.y \
-#				  src/util/slconf_lex.l \
-#				  src/util/slconf.c \
-#				  slconf_yac.h
-#slconfig_CPPFLAGS		= $(UTIL_INCLUDES)
-#slconfig_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
-#slconfig_LDADD			= libstreams.la
-#
-#EXTRA_PROGRAMS			+= slconfig
-##sbin_PROGRAMS			+= slconfig
-#
+
+slconfig_SOURCES		= src/util/slconf_yac.y \
+				  src/util/slconf_lex.l \
+				  src/util/slconf.c \
+				  slconf_yac.h
+slconfig_CPPFLAGS		= $(UTIL_INCLUDES)
+slconfig_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+slconfig_LDADD			= libstreams.la
+
+EXTRA_PROGRAMS			+= slconfig
+sbin_PROGRAMS			+= slconfig
+
 ## =====================================================================
 
 mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
@@ -2563,48 +2572,48 @@ include am/genksyms.am
 ##
 include am/strconf.am
 
-INET_MKDEV			= scripts/inet_mkdev
-INET_RMDEV			= scripts/inet_rmdev
-
-if PKG_BUILD_INDEP
-## these go with the base package
-dist_sbin_SCRIPTS 		+= $(INET_MKDEV) $(INET_RMDEV)
-endif
-
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
-EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
-
-if RPM_BUILD_KERNEL
-## RPM_BUILD_KERNEL
-
-install-inet-devices: $(INET_MKDEV)
-	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
-		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)' ; \
-		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV) ; \
-	fi
-
-uninstall-inet-devices: $(INET_RMDEV)
-	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
-		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)' ; \
-		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
-	fi
-
-## RPM_BUILD_KERNEL
-else
-## ! RPM_BUILD_KERNEL
-
-install-inet-devices:
-
-uninstall-inet-devices:
-
-## ! RPM_BUILD_KERNEL
-endif
-
-INSTALL_EXEC_HOOK += install-inet-devices
-
-UNINSTALL_HOOK += uninstall-inet-devices
-
-.PHONY: install-inet-devices uninstall-inet-devices
+#INET_MKDEV			= scripts/inet_mkdev
+#INET_RMDEV			= scripts/inet_rmdev
+#
+#if PKG_BUILD_INDEP
+### these go with the base package
+#dist_sbin_SCRIPTS 		+= $(INET_MKDEV) $(INET_RMDEV)
+#endif
+#
+#AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
+#EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+#
+#if RPM_BUILD_KERNEL
+### RPM_BUILD_KERNEL
+#
+#install-inet-devices: $(INET_MKDEV)
+#	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+#		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV)' ; \
+#		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_MKDEV) ; \
+#	fi
+#
+#uninstall-inet-devices: $(INET_RMDEV)
+#	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
+#		echo 'DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV)' ; \
+#		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
+#	fi
+#
+### RPM_BUILD_KERNEL
+#else
+### ! RPM_BUILD_KERNEL
+#
+#install-inet-devices:
+#
+#uninstall-inet-devices:
+#
+### ! RPM_BUILD_KERNEL
+#endif
+#
+#INSTALL_EXEC_HOOK += install-inet-devices
+#
+#UNINSTALL_HOOK += uninstall-inet-devices
+#
+#.PHONY: install-inet-devices uninstall-inet-devices
 
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
@@ -2891,6 +2900,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.11  2011-01-18 17:11:41  brian
+# - add files back to the build
+#
 # Revision 1.1.2.10  2010-12-19 00:26:46  brian
 # - added multi-stream conversion module
 #

@@ -54,6 +54,8 @@
 
 	* am/archive.am: sign xz archives
 	* am/deb.am: always expand bz2 archive
+	* am/openss7.am: update header
+	* Makefile.am: add files back to the build
 
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
