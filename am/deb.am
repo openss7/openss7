@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:35 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 17:09:52 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-06-29 07:35:35 $ by $Author: brian $
+## Last Modified $Date: 2011-01-18 17:09:52 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -126,10 +126,10 @@ DEBXOPTS	= -D
 #! --help' for more information on options.
 #!
 $(debian_dir):: $(debian_dir_stamp)
-$(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.gz
+$(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 	rm -rf $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)
 	$(mkdir_p) $(debbuilddir)/$(PACKAGE)-$(VERSION)
-	$(GZIP_CMD) -dc $< | tar xf - -C $(debbuilddir)
+	$(BZIP2_CMD) -dc $< | tar xf - -C $(debbuilddir)
 	@if test "$(debbuilddir)/$(PACKAGE)-$(VERSION)" != "$(debian_dir)"; then \
 		$(ECHO) "$(am__mv) -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir)"; \
 		$(am__mv) -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir); \
@@ -615,6 +615,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 1.1.2.3  2011-01-18 17:09:52  brian
+## - always expand bz2 archive
+##
 ## Revision 1.1.2.2  2009-06-29 07:35:35  brian
 ## - improvements to build process
 ##
