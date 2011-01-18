@@ -48,6 +48,9 @@
 
 	* scripts/speccommon.in: remove non-POSIX function syntax
 
+	* scripts/missing3: update diagnostics
+	* scripts/missing4: update diagnostics
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
