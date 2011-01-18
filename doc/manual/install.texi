@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.3 2011-01-12 03:37:37 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.4 2011-01-18 17:06:46 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-18 17:06:46 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -119,25 +119,27 @@ dependencies between RPMs and DEBs.}
 The @value{PACKAGE_TITLE} package release can be accessed from the repositories of
 @uref{http://www.openss7.org/repos, The OpenSS7 Project}.  For @manpage{rpm(1)} based systems, the
 package is available in a @manpage{yum(8)} repository based on @file{repomd} XML and may also be
-accessed using @manpage{zypper(8)} or @manpage{yast(8)}.  For @manpage{dpkg(1)} based systems, the
-package is available in an @manpage{apt(8)} repository.
+accessed using @manpage{up2date(8)}, @manpage{zypper(8)} or @manpage{yast(8)}.  For
+@manpage{dpkg(1)} based systems, the package is available in an @manpage{apt(8)} repository.
 
 By far the easiest (most repeatable and manageable) form for installing and using the
 @value{PACKAGE_TITLE} package is to install from the @manpage{yum(8)} or @manpage{apt(8)}
 repositories.  If your distribution does not support @manpage{yum(8)}, @manpage{zypper(8)},
-@manpage{yast(8)} or @manpage{apt(8)}, then it is still possible to install the RPMs or DEBs from the
-repositories using @manpage{rpm(1)}, @manpage{dpkg(1)}; or by using @manpage{wget(1)} and then
-installing them from RPM or DEB using @manpage{rpm(1)} or @manpage{dpkg(1)} locally.
+@manpage{up2date(8)}, @manpage{yast(8)} or @manpage{apt(8)}, then it is still possible to install
+the RPMs or DEBs from the repositories using @manpage{rpm(1)}, @manpage{dpkg(1)}; or by using
+@manpage{wget(1)} and then installing them from RPM or DEB using @manpage{rpm(1)} or
+@manpage{dpkg(1)} locally.
 
-If binaries are not available for your distribution or specific kernel, but your distribution supports
-@manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
-@value{PACKAGE_TITLE} package is to download and rebuild the source RPMs or DSCs from the repository.
-This can also be performed with @manpage{yum(8)}, @manpage{zypper(8)}, @manpage{yast(8)},
-@manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(1)} or @manpage{dpkg(1)}.
+If binaries are not available for your distribution or specific kernel, but your distribution
+supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
+@value{PACKAGE_TITLE} package is to download and rebuild the source RPMs or DSCs from the
+repository.  This can also be performed with @manpage{yum(8)}, @manpage{zypper(8)},
+@manpage{yast(8)}, @manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(1)} or
+@manpage{dpkg(1)}.
 
 If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
-special needs (such as cross-compiling for embedded targets or for development), the last method is to
-download, configure, build and install from the tarball.
+special needs (such as cross-compiling for embedded targets or for development), the last method is
+to download, configure, build and install from the tarball.
 
 @menu
 Repositories for YUM::			the @manpage{yum(8)} repository
@@ -155,21 +157,33 @@ your @file{/etc/yum.repo.d/} directory.  This file can be obtained directly from
 
 @smallexample
 $> REPOS="http://www.openss7.org/repos/rpms"
-$> wget $REPOS/centos/5.3/x86_64/repodata/openss7.repo
+$> REPOFILE="$REPOS/centos/5.5/x86_64/repodata/openss7.repo"
+$> wget $REPOFILE
 $> sudo cp -f openss7.repo /etc/yum.repo.d/
 $> sudo yum makecache
 @end smallexample
 
 This example assumes the the distribution is @samp{centos} and the distribution release is
-@samp{5.3} and the architecture requires is @samp{x86_64}.  Another example would be
-@file{$REPOS/i686/suse/11.0/i686/repodata/openss7.repo}, for using @manpage{yum(8)} with SUSE.
+@samp{5.5} and the architecture requires is @samp{x86_64}.  Another example would be
+@file{$REPOS/suse/11.0/i686/repodata/openss7.repo}, for using @manpage{yum(8)} or
+@manpage{zypper(8)} with SUSE.
 
-Once the repository is set up, @cite{OpenSS7} includes a number of virtual package definitions that
-ease the installation and removal of kernel modules, libraries and utilities.  Downloading,
-configuring, building and installation for a single-kernel distribution is as easy as:
+If you have the @file{yum-tmprepo} plugin, you can use the @cite{OpenSS7} repository as a temporary
+repository in any @manpage{yum(8)} command (such as those provided in the examples that follow),
+like so:
 
 @smallexample
-$> sudo yum groupinstall @value{PACKAGE_TITLE}
+$> REPOS="http://www.openss7.org/repos/rpms"
+$> REPOFILE="$REPOS/centos/5.5/x86_64/repodata/openss7.repo"
+$> yum --temprepo=$REPOFILE grouplist
+@end smallexample
+
+Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
+definitions that ease the installation and removal of kernel modules, libraries and utilities.
+Downloading, configuring, building and installation for a single-kernel distribution is as easy as:
+
+@smallexample
+$> sudo yum groupinstall @value{PACKAGE}
 @end smallexample
 
 @noindent
@@ -199,7 +213,7 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 -| [openss7]
 -| enabled = 1
 -| name = OpenSS7 Repository
--| baseurl = http://www.openss7.org/repos/rpms/centos/5.3/x86_64
+-| baseurl = http://www.openss7.org/repos/rpms/centos/5.5/x86_64
 -| gpgcheck = 1
 -| gpgkey = http://www.openss7.org/pubkey.asc
 @end smallexample
@@ -207,6 +221,67 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 Note that it is also possible to point to these repositories as an additional installation source
 when installing CentOS, RedHat, Fedora, or others.  You will have an additional @acronym{STREAMS}
 category from which to choose installation packages.
+
+The category that is provided is as follows:
+@table @asis
+@item @samp{@value{PACKAGE}-components} -- OpenSS7 STREAMS and Protocol Suite Components.
+
+The groups that are provided in this category are as follows:
+@table @asis
+@item @samp{@value{PACKAGE}} --- OpenSS7 STREAMS and Protocol Suites.
+
+The packages that are provided in this group are as follows:
+@table @asis
+@item @samp{@value{PACKAGE}}
+@item @samp{@value{PACKAGE}-base}
+The @samp{@value{PACKAGE}-base} binary package contains init scripts, test scripts, maintenance
+scripts and the base system configuration files necessary for the operation of STREAMS and the
+protocol suites contained in the @samp{@value{PACKAGE}} package.  It contains user and
+administrative documentation in @file{info}, @file{pdf} and @file{html} formats as well as sections
+1, 4, 5 and 8 of the manual pages.  This binary package is required for any installation of the
+@samp{@value{PACKAGE}} package.  It is a @var{mandatory} component of the
+@samp{@value{PACKAGE}-base} group.
+@item @samp{@value{PACKAGE}-lib}
+@item @samp{@value{PACKAGE}-kernel}
+@item @samp{@value{PACKAGE}-java}
+@item @samp{@value{PACKAGE}-doc}
+@item @samp{@value{PACKAGE}-javadoc}
+@item @samp{@value{PACKAGE}-devel}
+@item @samp{@value{PACKAGE}-devel-kernel}
+@item @samp{@value{PACKAGE}-source-kernel}
+@end table
+
+@item @samp{@value{PACKAGE}-java} --- OpenSS7 STREAMS and Protocol Suite Java Components.
+
+The packages that are provided in this group are as follows:
+@table @asis
+@item @samp{@value{PACKAGE}-java}
+@item @samp{@value{PACKAGE}-javadoc}
+@end table
+
+@item @samp{@value{PACKAGE}-devel} --- OpenSS7 STREAMS and Protocol Suite Development.
+
+The packages that are provided in this group are as follows:
+@table @asis
+@item @samp{@value{PACKAGE}-devel}
+@item @samp{@value{PACKAGE}-devel-kernel}
+@item @samp{@value{PACKAGE}-doc}
+@item @samp{@value{PACKAGE}-javadoc}
+@item @samp{@value{PACKAGE}-source-kernel}
+@end table
+
+@item @samp{@value{PACKAGE}-doc} --- OpenSS7 STREAMS and Protocol Suite Documentation.
+
+The packages that are provided in this group are as follows:
+@table @asis
+@item @samp{@value{PACKAGE}-doc}
+@item @samp{@value{PACKAGE}-javadoc}
+@end table
+
+@end table
+
+@end table
+
 
 Some additional installation real or virtual package names and the installations they accomplish are
 as follows:
@@ -218,14 +293,10 @@ This package can be used to install or remove the entire @value{PACKAGE_TITLE} p
 installing, kernel modules will be installed automatically for the highest version kernel on your
 system.  When removing, all corresponding kernel modules will also be removed.
 
-@item @value{PACKAGE}-devel
+@item @value{PACKAGE}-base
 
-This package can be used to install or remove the development components of the
-@value{PACKAGE_TITLE} package.  When installing, @samp{@value{PACKAGE}} and appropriate kernel
-module and kernel module development and debug packages will also be installed.  When removing, the
-development package and all kernel module development and debug packages will also be removed.
-
-@item @value{PACKAGE}-@value{_kversion}
+@item @value{PACKAGE}-kernel
+@itemx @value{PACKAGE}-@value{_kversion}
 
 This package can be used to install or remove the package for a specific kernel version.  When
 installing, the @samp{@value{PACKAGE}} package will also be installed if necessary.  When removing
@@ -234,7 +305,17 @@ the last kernel module package, the @samp{@value{PACKAGE}} package will also be 
 Note that the version @samp{@value{_kversion}} is just an example.  Use the version returned by
 @samp{$(uname -r)} for the kernel for which you wish to install or remove the packages.
 
-@item @value{PACKAGE}-@value{_kversion}-devel
+@item @value{PACKAGE}-java
+
+@item @value{PACKAGE}-devel
+
+This package can be used to install or remove the development components of the
+@value{PACKAGE_TITLE} package.  When installing, @samp{@value{PACKAGE}} and appropriate kernel
+module and kernel module development and debug packages will also be installed.  When removing, the
+development package and all kernel module development and debug packages will also be removed.
+
+@item @value{PACKAGE}-kernel-devel
+@itemx @value{PACKAGE}-@value{_kversion}-devel
 
 This package can be used to install or remove the development and debug packages for a specific
 kernel version.  When installing, the @samp{@value{PACKAGE}} and @samp{@value{PACKAGE}-devel}
@@ -302,7 +383,7 @@ and removal of kernel modules, libraries and utilities.  Downloading, configurat
 installation for a single-kernel distribution installation is as easy as:
 
 @smallexample
-% sudo yum groupinstall @value{PACKAGE_TITLE}
+% sudo yum groupinstall @value{PACKAGE}
 @end smallexample
 
 This and additional packages for installation are detailed as follows:
@@ -315,8 +396,11 @@ Install this package if you need the runtime @file{@value{PACKAGE}} package.
 % sudo yum install @value{PACKAGE}
 @end smallexample
 
-This will install the @file{@value{PACKAGE}}, @file{@value{PACKAGE}-lib} and
-@file{@value{PACKAGE}-KVERSION} RPMs, where @samp{KVERSION} is the highest version number kernel on
+This will install the
+@file{@value{PACKAGE}},
+@file{@value{PACKAGE}-base} and
+@file{@value{PACKAGE}-lib} and
+@file{@value{PACKAGE}-kernel} RPMs, where @samp{kernel} is the highest version number kernel on
 your system.
 
 Remove this package if you need to remove all vestiges of the @file{@value{PACKAGE}} package.
@@ -325,9 +409,13 @@ Remove this package if you need to remove all vestiges of the @file{@value{PACKA
 % sudo yum remove @value{PACKAGE}
 @end smallexample
 
-This will remove the @file{@value{PACKAGE}}, @file{@value{PACKAGE}-lib},
-@file{@value{PACKAGE}-devel}, @file{@value{PACKAGE}-KVERSION} and
-@file{@value{PACKAGE}-devel-KVERSION} RPMs for all kernels on your system.
+This will remove the
+@file{@value{PACKAGE}},
+@file{@value{PACKAGE}-base},
+@file{@value{PACKAGE}-lib},
+@file{@value{PACKAGE}-devel},
+@file{@value{PACKAGE}-kernel} and
+@file{@value{PACKAGE}-devel-kernel} RPMs for all kernels on your system.
 
 @item @value{PACKAGE}-devel
 Install this package if you need the development @file{@value{PACKAGE}} package.
@@ -336,9 +424,13 @@ Install this package if you need the development @file{@value{PACKAGE}} package.
 % sudo yum install @value{PACKAGE}-devel
 @end smallexample
 
-This will install the @file{@value{PACKAGE}}, @file{@value{PACKAGE}-lib},
-@file{@value{PACKAGE}-devel}, @file{@value{PACKAGE}-KVERSION} and
-@file{@value{PACKAGE}-devel-KVERSION} RPMs, where @samp{KVERSION} is the highest version number
+This will install the
+@file{@value{PACKAGE}},
+@file{@value{PACKAGE}-base},
+@file{@value{PACKAGE}-lib},
+@file{@value{PACKAGE}-devel},
+@file{@value{PACKAGE}-kernel} and
+@file{@value{PACKAGE}-devel-kernel} RPMs, where @samp{kernel} is the highest version number
 kernel on your system.
 
 Remove this package if you do not need development capabilities for the @file{@value{PACKAGE}}
@@ -348,7 +440,7 @@ package for any kernel.
 % sudo yum remove @value{PACKAGE}-devel
 @end smallexample
 
-This will remove the @file{@value{PACKAGE}-devel} and @file{@value{PACKAGE}-devel-KVERSION}
+This will remove the @file{@value{PACKAGE}-devel} and @file{@value{PACKAGE}-devel-kernel}
 RPMs for all kernels on your system.
 
 @item @value{PACKAGE}-@value{_kversion}
@@ -360,7 +452,10 @@ kernel, you can install the runtime @file{@value{PACKAGE}} components with:
 % sudo yum install @value{PACKAGE}-$(uname -r)
 @end smallexample
 
-This will install the @file{@value{PACKAGE}}, @file{@value{PACKAGE}-lib} and
+This will install the
+@file{@value{PACKAGE}},
+@file{@value{PACKAGE}-base},
+@file{@value{PACKAGE}-lib} and
 @file{@value{PACKAGE}-@value{_kversion}} RPMs, where @samp{@value{_kversion}} is the kernel version
 specified.
 
@@ -375,8 +470,11 @@ kernel, you can remove the runtime @file{@value{PACKAGE}} components with:
 This will remove the @file{@value{PACKAGE}-@value{_kversion}} and
 @file{@value{PACKAGE}-devel-@value{_kversion}} RPMs, where @samp{@value{_kversion}} is the kernel
 version specified.  Also, if this is the last kernel for which @file{@value{PACKAGE}} was installed,
-the @file{@value{PACKAGE}} @file{@value{PACKAGE}-lib} and @file{@value{PACKAGE}-devel} RPMs will
-also be removed.
+the
+@file{@value{PACKAGE}},
+@file{@value{PACKAGE}-base},
+@file{@value{PACKAGE}-lib} and
+@file{@value{PACKAGE}-devel} RPMs will also be removed.
 
 Note that this is a virtual package name: the actual RPMs installed or removed from the system is a
 kernel module package whose precise name will depend upon the system being used.
@@ -390,8 +488,12 @@ kernel, you can install the kernel development @file{@value{PACKAGE}} components
 % sudo yum install @value{PACKAGE}-devel-$(uname -r)
 @end smallexample
 
-This will install the @file{@value{PACKAGE}}, @file{@value{PACKAGE}-lib},
-@file{@value{PACKAGE}-devel}, @file{@value{PACKAGE}-@value{_kversion}} and
+This will install the
+@file{@value{PACKAGE}},
+@file{@value{PACKAGE}-base},
+@file{@value{PACKAGE}-lib},
+@file{@value{PACKAGE}-devel},
+@file{@value{PACKAGE}-@value{_kversion}} and
 @file{@value{PACKAGE}-devel-@value{_kversion}} RPMs, where @samp{@value{_kversion}} is the kernel
 version specified.
 
@@ -412,10 +514,40 @@ removed.
 Note that this is a virtual package name: the actual RPMs installed or removed from the system is a
 kernel module package whose precise name will depend upon the system being used.
 
-@item @value{PACKAGE}-lib
-This package is an auxilliary package that should be removed and inserted automatically by
-@manref{yum(8)}.  In rare instances you might need to remove or install this package explicitly.
+@item @value{PACKAGE}-base
+@itemx @value{PACKAGE}-lib
+These packages are auxilliary package that should be removed and inserted automatically by
+@manref{yum(8)}.  In rare instances you might need to remove or install one of these package
+explicitly.
 
+@item @value{PACKAGE}-doc
+@itemx @value{PACKAGE}-javadoc
+These packages contain documentation and are independent of the other @value{PACKAGE_TITLE}
+packages.  They can be installed and removed separately.  They can also be installed and removed as
+a pair with the @file{@value{PACKAGE}-doc} group.  These files are massive in size.
+
+To add these package as a pair, use:
+@smallexample
+% sudo yum install @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+@end smallexample
+or
+@smallexample
+% sudo yum groupinstall @value{PACKAGE}-doc
+@end smallexample
+
+To remove these packages, use:
+@smallexample
+% sudo yum remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+@end smallexample
+or
+@smallexample
+% sudo yum groupremove @value{PACKAGE}-doc
+@end smallexample
+
+@item @value{PACKAGE}-source
+This package is deprecated.  Use the source RPM or download the tarball if you really need to
+compile from source.  The tarball will also build RPMs and regenerate the source RPM.
+ 
 @end table
 
 @c ----------------------------------------------------------------------------
@@ -730,8 +862,8 @@ For non-@manpage{rpm(1)} and non-@manpage{dpkg(1)} architectures,
 download the tarball as follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
+@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
+@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.xz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.xz}
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on
@@ -751,7 +883,7 @@ or
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.xz
 @end smallexample
 @end cartouche
 
@@ -765,8 +897,8 @@ following commands:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
-% tar -xzvf @value{PACKAGE}-@value{VERSION}.tar.gz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end smallexample
 @end cartouche
 
@@ -775,8 +907,8 @@ or
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.xz
+% tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 @end smallexample
 @end cartouche
 
@@ -2277,8 +2409,8 @@ Following is an example of a native build against the running kernel:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
+% tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
 % make
@@ -2299,8 +2431,8 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-% tar -xjvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
+% tar -xJvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
 % pushd @value{PACKAGE}@--@value{VERSION}
 % ./configure DESTDIR="/some/@-other/@-root" \ 
 	--with-k-release=2.4.18 --host sparc-linux
@@ -2526,8 +2658,8 @@ built and use the @samp{uninstall} @manpage{automake(1)} target as follows:
 % make uninstall
 % cd ..
 % rm -fr @value{PACKAGE}-@value{VERSION}
-% rm -f @value{PACKAGE}-@value{VERSION}.tar.gz
 % rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
+% rm -f @value{PACKAGE}-@value{VERSION}.tar.xz
 @end smallexample
 @end cartouche
 
@@ -2760,8 +2892,8 @@ to @file{configure}.)
 @mkindex dist
 Creates a distribution package (tarball) in the top level build directory.  @cite{OpenSS7 Project}
 packages distribute two archives: a @samp{gzip tar} archive and a @samp{bzip tar} archive.  These
-archives will have the name @file{@value{PACKAGE}-@value{VERSION}.tar.gz} and
-@file{@value{PACKAGE}-@value{VERSION}.tar.bz2}.
+archives will have the name @file{@value{PACKAGE}-@value{VERSION}.tar.bz2} and
+@file{@value{PACKAGE}-@value{VERSION}.tar.xz}.
 
 This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target does not require
 root privilege.
@@ -3082,9 +3214,9 @@ default is the top build directory.
 
 The files generated are named:
 
-@file{@value{PACKAGE}-@value{VERSION}.tar.gz}
-and
 @file{@value{PACKAGE}-@value{VERSION}.tar.bz2}
+and
+@file{@value{PACKAGE}-@value{VERSION}.tar.xz}
 
 You can change this distribution directory with the @option{--with-pkg-distdir} option to
 @file{configure}.  See @samp{./configure --help} for more details on options.
@@ -3103,9 +3235,9 @@ variable like so:
 
 Signature files will be named:
 
-@file{@value{PACKAGE}-@value{VERSION}.tar.gz.asc}
-and
 @file{@value{PACKAGE}-@value{VERSION}.tar.bz2.asc}
+and
+@file{@value{PACKAGE}-@value{VERSION}.tar.xz.asc}
 
 These files will be moved to the package distribution directory with the plain text archives.
 
