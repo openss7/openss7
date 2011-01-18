@@ -4,6 +4,9 @@
 	* doc/man/man2/getmsg.2s.man: added 2s version of 2 page
 	* doc/man/man2/isastream.2s.man: added 2s version of 2 page
 	* doc/man/man2/putmsg.2s.man: added 2s version of 2 page
+	* doc/man/Makefile.am: updated manual pages
+	* doc/man/openss7.macros: updated manual pages
+	* doc/man/man9/undoc.9.man: updated manual pages
 
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
