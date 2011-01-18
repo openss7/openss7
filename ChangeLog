@@ -41,6 +41,7 @@
 
 	* scripts/texi/install.texi: documentation updates
 	* scripts/texi/quick.texi: documentation updates
+	* doc/manual/install.texi: documentation updates
 
 	* src/drivers/Config.in: add x25-llc to config
 
