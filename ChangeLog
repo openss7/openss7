@@ -44,6 +44,8 @@
 
 	* src/drivers/Config.in: add x25-llc to config
 
+	* scripts/strconf.awk: create by default in mkdev script
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
