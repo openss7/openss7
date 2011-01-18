@@ -42,6 +42,8 @@
 	* scripts/texi/install.texi: documentation updates
 	* scripts/texi/quick.texi: documentation updates
 
+	* src/drivers/Config.in: add x25-llc to config
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
