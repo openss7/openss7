@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $
+ @(#) $RCSfile: slconf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:59:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:38 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:59:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconf.c,v $
+ Revision 1.1.2.3  2011-01-18 16:59:52  brian
+ - added back to compile
+
  Revision 1.1.2.2  2010-11-28 14:22:38  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: slconf.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $";
+static char const ident[] = "$RCSfile: slconf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:59:52 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -105,7 +108,7 @@ enum {
 
 int interactive = 0;
 
-static void
+void
 copying(int argc, char *argv[])
 {
 	if (!verbose)
@@ -114,7 +117,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -152,7 +155,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-static void
+void
 version(int argc, char *argv[])
 {
 	if (!verbose)
@@ -161,7 +164,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -171,10 +174,10 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:38 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-01-18 16:59:52 $");
 }
 
-static void
+void
 usage(int argc, char *argv[])
 {
 	if (!verbose)
@@ -190,7 +193,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
+void
 help(int argc, char *argv[])
 {
 	if (!verbose)
@@ -229,8 +232,19 @@ Command Options:\n\
 ", argv[0], filename);
 }
 
+extern void yyinit(char *name, FILE *input, FILE *output);
+extern int yyparse(void);
+
 void
-slconf_file(const char *name, const char *filename)
+slconf_stdin(char *name)
+{
+    yyinit(name, stdin, stdout);
+    while (yyparse() == 0) ;
+    return;
+}
+
+void
+slconf_file(char *name, const char *filename)
 {
 	FILE *f;
 
@@ -359,9 +373,11 @@ main(int argc, char *argv[])
 		}
 		source = SOURCE_STDIN;
 		goto reevaluate;
+#if 0
 	case SOURCE_CMDLINE:
 		slconf_cmdline(argv[0], argc, argv, optind);
 		break;
+#endif
 	case SOURCE_STDIN:
 		if (optind < argc)
 			goto syntax_error;
