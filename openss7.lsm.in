@@ -3,25 +3,28 @@ Title:			@PACKAGE@
 Version:		@VERSION@
 Entered-date:		@PACKAGE_DATE@
 Description:		@PACKAGE_TITLE@.
-			OpenSS7 SS7/ISDN/VoIP/SIGTRAN Protocol Stacks for Linux
-			Fast-STREAMS.
-			@PACKAGE@ is a collection of SCTP and STREAMS protocol
-			stacks for IP and SS7.
-			This distribution is currently applicable to Linux 2.4
-			and 2.6 kernels and was targetted at ix86, x86_64, ppc
-			and ppc64 architectures, but should build and install
+			OpenSS7 Linux Fast-STREAMS and SS7/ISDN/VoIP/SIGTRAN 
+			Protocol Stacks.
+			@PACKAGE@ provides a fully SVR 4.2 MP compatible 
+			STREAMS implementation called Linux Fast-STREAMS as 
+			well as a collection of STREAMS protocol stacks for 
+			IP, OSI and SS7.
+			This distribution is currently applicable to Linux 2.4 
+			and 2.6 kernels and was targetted at ix86, x86_64, ppc 
+			and ppc64 architectures, but should build and install 
 			for other architectures as well.
-			Supports a wide range of new and old Linux distributions.
+			Supports a wide range of new and old Linux 
+			distributions and production kernels without kernel 
+			patching.
 			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
-Keywords:		STREAMS, SCTP, SVR 4.2 MP, SS7, SIGTRAN, VoIP, ISDN
+Keywords:		STREAMS, SVR 4.2 MP, SCTP, SS7, SIGTRAN, VoIP, ISDN
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ repos/tarballs/
-			101M @PACKAGE@-@VERSION@.tar.gz
-			87M @PACKAGE@-@VERSION@.tar.bz2
-			49M @PACKAGE@-@VERSION@.tar.lzma
+			29M @PACKAGE@-@VERSION@.tar.bz2
+			14M @PACKAGE@-@VERSION@.tar.xz
 Alternate-site:		http://www.openss7.org/ repos/rpms/SRPMS/
-			87M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			29M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6
