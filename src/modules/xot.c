@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:08 $
+ @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:08 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xot.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:53  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:22:08  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,14 +63,13 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:08 $";
-
+static char const ident[] =
+    "$RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
 
 /*
  *  X.25 over TCP (XOT).
  */
 
-#if 0
 /*
  * This is a XOT [RFC 1613] module.  It pushes over a TCP TPI stream and
  * provides a DLPI interface for use by the X25-PLP module.  Some nuances are
@@ -83,23 +85,26 @@ static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.2 $)
  */
 
 #define _SVR4_SOURCE	1
-#define _UW7_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
 
-
 #include <sys/os7/compat.h>
+
+#if 0
 #include <sys/dlpi.h>
 #include <sys/tihdr.h>
 #include <sys/tpi_ip.h>
 #include <sys/tpi_tcp.h>
 
 #include <linux/in.h>
+#endif
+
+/* ---------------------- */
 
 #define XOT_DESCRIP	"X.25 OVER TCP MODULE FOR LINUX FAST-STREAMS"
 #define XOT_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOT_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:08 $"
+#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOT_LICENSE	"GPL"
@@ -135,16 +140,16 @@ MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_XOT_MODID));
 #ifdef MODULE_VERSION
 MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
-#endif
+#endif				/* MODULE_VERSION */
 #endif				/* MODULE */
 #endif				/* LINUX */
 
-#ifndef XOT_MOD_NAME
-#define XOT_MOD_NAME		CONFIG_STREAMS_XOT_NAME
-#endif				/* XOT_MOD_NAME */
 #ifndef XOT_MOD_MOD_ID
 #define XOT_MOD_MOD_ID		CONFIG_STREAMS_XOT_MODID
 #endif				/* XOT_MOD_MOD_ID */
+#ifndef XOT_MOD_NAME
+#define XOT_MOD_NAME		CONFIG_STREAMS_XOT_NAME
+#endif				/* XOT_MOD_NAME */
 
 /*
  * --------------------------------------------------------------------------
@@ -162,6 +167,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define MOD_BANNER	XOT_SPLASH
 #endif				/* MODULE */
 
+#if 0
 static struct module_info xot_minfo = {
 	.mi_idnum = MOD_ID,
 	.mi_idname = MOD_NAME,
@@ -1243,7 +1249,7 @@ static fastcall noinline __unlikely int
 dl_unitdata_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1256,7 +1262,7 @@ static fastcall noinline __unlikely int
 dl_uderror_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1448,7 +1454,7 @@ static fastcall noinline __unlikely int
 dl_reset_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1461,7 +1467,7 @@ static fastcall noinline __unlikely int
 dl_reset_con(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1474,7 +1480,7 @@ static fastcall noinline __unlikely int
 dl_data_ack_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1487,7 +1493,7 @@ static fastcall noinline __unlikely int
 dl_data_ack_status_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1500,7 +1506,7 @@ static fastcall noinline __unlikely int
 dl_reply_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1513,7 +1519,7 @@ static fastcall noinline __unlikely int
 dl_reply_status_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1526,7 +1532,7 @@ static fastcall noinline __unlikely int
 dl_reply_update_status_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1539,7 +1545,7 @@ static fastcall noinline __unlikely int
 dl_xid_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1552,7 +1558,7 @@ static fastcall noinline __unlikely int
 dl_xid_con(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1565,7 +1571,7 @@ static fastcall noinline __unlikely int
 dl_test_ind(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1578,7 +1584,7 @@ static fastcall noinline __unlikely int
 dl_test_con(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1591,7 +1597,7 @@ static fastcall noinline __unlikely int
 dl_phys_addr_ack(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /**
@@ -1604,7 +1610,7 @@ static fastcall noinline __unlikely int
 dl_get_statistics_ack(struct dl *dl, queue_t *q, mblk_t *msg)
 {
 	freemsg(msg);
-	return(0);
+	return (0);
 }
 
 /*
@@ -2171,14 +2177,13 @@ dl_connect_res(struct dl *dl, queue_t *q, mblk_t *mp)
 	if (dl->qos.dl_resilience.dl_reset_prob == DL_UNKNOWN) {
 		dl->qos.dl_resilience.dl_reset_prob = dl->qor.dl_resilience.dl_reset_prob;
 	}
-	/* Otherwise we trust the correlation value because we use TPI's
-	   connection identifier for this purpose.  If the value is bad, TPI
-	   will tell us later. */
+	/* Otherwise we trust the correlation value because we use TPI's connection identifier for
+	   this purpose.  If the value is bad, TPI will tell us later. */
 	if (p->dl_correlation == 0)
 		goto badcor;
-	/* We use our own token values because, although we could just use
-	   TPI's, that means that a DLPI user could erroneously accept on a TPI 
-	   stream for which no XOT module has been pushed. */
+	/* We use our own token values because, although we could just use TPI's, that means that a 
+	   DLPI user could erroneously accept on a TPI stream for which no XOT module has been
+	   pushed. */
 	if ((al = dl_lookup(dl, p->dl_token)) == NULL)
 		goto badtok;
 	dl_set_state(dl, DL_CONN_RES_PENDING);
@@ -2253,10 +2258,9 @@ dl_reset_req(struct dl *dl, queue_t *q, mblk_t *mp)
 	if (dl_get_state(dl) != DL_DATAXFER)
 		goto outstate;
 	dl_set_state(dl, DL_USER_RESET_PENDING);
-	/* Note that if we come through here twice due to, say, failure to
-	   allocate a buffer in dl_disconnect_ind(), sending the T_DISCON_REQ
-	   again will have no negative effects as TPI requires that a
-	   T_DISCON_REQ received in the TS_IDLE state simply be discarded. */
+	/* Note that if we come through here twice due to, say, failure to allocate a buffer in
+	   dl_disconnect_ind(), sending the T_DISCON_REQ again will have no negative effects as TPI 
+	   requires that a T_DISCON_REQ received in the TS_IDLE state simply be discarded. */
 	if ((err = tp_discon_req(dl->tp, q, NULL, 0, NULL)))
 		goto error;
 	return dl_disconnect_ind(dl, q, mp, orig, reason, 0, NULL);
@@ -2910,9 +2914,8 @@ tp_ok_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 
 	switch (p->CORRECT_prim) {
 	case T_CONN_REQ:
-		/* Note that TPI sends T_OK_ACK in response to T_CONN_REQ,
-		   whereas NPI and DLPI do not.  They only send N_ERROR_ACK or
-		   DL_ERROR_ACK if there is a problem. */
+		/* Note that TPI sends T_OK_ACK in response to T_CONN_REQ, whereas NPI and DLPI do
+		   not.  They only send N_ERROR_ACK or DL_ERROR_ACK if there is a problem. */
 		prim = DL_CONNECT_REQ;
 		break;
 	case T_CONN_RES:
@@ -2946,17 +2949,15 @@ tp_ok_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 		tp_set_state(tp, TS_IDLE);
 		break;
 	case TS_WACK_CREQ:
-		/* Note that DLPI does not wait for DL_OK_ACK having issued a
-		   DL_CONNECT_REQ, but moves directly tot he DL_OUTCON_PENDING
-		   state and awaits either DL_ERROR_ACK, DL_DISCONNECT_IND or
-		   DL_CONNECT_CON.  Free this excess primitive here. */
+		/* Note that DLPI does not wait for DL_OK_ACK having issued a DL_CONNECT_REQ, but
+		   moves directly tot he DL_OUTCON_PENDING state and awaits either DL_ERROR_ACK,
+		   DL_DISCONNECT_IND or DL_CONNECT_CON.  Free this excess primitive here. */
 		tp_set_state(tp, TS_WCON_CREQ);
 		freemsg(mp);
 		return (0);
 	case TS_WACK_CRES:
-		/* If we accepted on the same stream, the we need to move to
-		   the TS_DATA_XFER state instead of the TS_IDLE state.
-		   Otherwise it is the accepting stream that moves to
+		/* If we accepted on the same stream, the we need to move to the TS_DATA_XFER state 
+		   instead of the TS_IDLE state. Otherwise it is the accepting stream that moves to
 		   TS_DATA_XFER. */
 		tp->coninds--;
 		tp_set_state(tp, (tp->coninds > 0) ? TS_WRES_CIND : TS_IDLE);
@@ -4028,8 +4029,7 @@ xot_qclose(queue_t *q, int oflags, cred_t *crp)
 		mi_close_unlink(&xot_opens, (caddr_t) p);
 		RW_UNLOCK(&xot_rwlock, pl);
 	}
-	/* This does not call mi_close_free until the last reference is
-	   released. */
+	/* This does not call mi_close_free until the last reference is released. */
 	priv_put(p);
 	return (0);
 }
@@ -4062,6 +4062,7 @@ struct streamtab xot_info = {
 	.st_rdinit = &xot_rinit,
 	.st_wrinit = &xot_winit,
 };
+#endif 
 
 static modID_t modid = MOD_ID;
 
@@ -4082,35 +4083,44 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for XOT.  (0 for allocation.)");
 
+/** cmotinit - initialize CMOT
+  */
 static __init int
-xot_modinit(void)
+xotmodinit(void)
 {
+#if 0
 	int err;
+#endif
 
 	cmn_err(CE_NOTE, MOD_BANNER);
+#if 0
 	if ((err = register_strmod(&xot_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register module %d", MOD_NAME, (int) modid);
 		return (err);
 	}
 	if (modid == 0)
 		modid = err;
+#endif
 	return (0);
 }
 
+/** cmotexit - terminate CMOT
+  */
 static __exit void
-xot_modexit(void)
+xotmodexit(void)
 {
+#if 0
 	int err;
 
 	if ((err = unregister_strmod(&xot_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not unregister module, err = %d", MOD_NAME, err);
 		return;
 	}
+#endif
 	return;
 }
 
-module_init(xot_modinit);
-module_exit(xot_modexit);
+module_init(xotmodinit);
+module_exit(xotmodexit);
 
 #endif				/* LINUX */
-#endif

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $
+ @(#) $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:04 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: s_cdi.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:53  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:22:04  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $";
+static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
 
 /*
  * S_CDI is a simple conversion module that converts between a CDI Stream
@@ -70,3 +73,99 @@ static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.2 
  * non-clone minor device number of a device driver Stream.
  */
 
+#define _SVR4_SOURCE
+#define _MPS_SOURCE
+#define _SUN_SOURCE
+
+#include <sys/os7/compat.h>
+
+#define S_CDI_DESCRIP	"S_CDI STREAMS MODULE"
+#define S_CDI_REVISION	"OpenSS7 $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define S_CDI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define S_CDI_DEVICE	"Provides OpenSS7 SpiderWAN to CDI (S_CDI)"
+#define S_CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define S_CDI_LICENSE	"GPL"
+#define S_CDI_BANNER	S_CDI_DESCRIP	"\n" \
+			S_CDI_REVISION	"\n" \
+			S_CDI_COPYRIGHT	"\n" \
+			S_CDI_DEVICE	"\n" \
+			S_CDI_CONTACT	"\n"
+#define S_CDI_SPLASH	S_CDI_DEVICE	" - " \
+			S_CDI_REVISION	"\n"
+
+#ifdef LINUX
+MODULE_AUTHOR(S_CDI_CONTACT);
+MODULE_DESCRIPTION(S_CDI_DESCRIP);
+MODULE_SUPPORTED_DEVICE(S_CDI_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(S_CDI_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-s_cdi");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "."
+	       PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#define S_CDI_MOD_ID	CONFIG_STREAMS_S_CDI_MODID
+#define S_CDI_MOD_NAME	CONFIG_STREAMS_S_CDI_NAME
+
+#ifndef S_CDI_MOD_NAME
+#define S_CDI_MOD_NAME	"s_cdi"
+#endif				/* S_CDI_MOD_NAME */
+
+#ifndef S_CDI_MOD_ID
+#define S_CDI_MOD_ID	0
+#endif				/* S_CDI_MOD_ID */
+
+/*
+ *  STREAMS DEFINITIONS
+ *  -------------------------------------------------------------------------
+ */
+
+#define MOD_ID		S_CDI_MOD_ID
+#define MOD_NAME	S_CDI_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	S_CDI_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	S_CDI_SPLASH
+#endif				/* MODULE */
+
+/*
+ *  LINUX INITIALIZATION
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef LINUX
+unsigned short modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, short, 0444);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module ID for S_CDI module.  (0 for allocation.)");
+
+/** s_cdiinit - initialize S_CDI
+  */
+static __init int
+s_cdiinit(void)
+{
+	cmn_err(CE_NOTE, MOD_BANNER);
+	return (0);
+}
+
+/** s_cdiexit - terminate S_CDI
+  */
+static __exit void
+s_cdiexit(void)
+{
+	return;
+}
+
+module_init(s_cdiinit);
+module_exit(s_cdiexit);
+
+#endif				/* LINUX */

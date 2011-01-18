@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapd.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:53  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,6 +63,106 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] =
+    "$RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
 
+/*
+ *  LAPD module
+ */
 
+#define _SVR4_SOURCE
+#define _MPS_SOURCE
+#define _SUN_SOURCE
+
+#include <sys/os7/compat.h>
+
+#define LAPD_DESCRIP	"LAPD STREAMS MODULE"
+#define LAPD_REVISION	"OpenSS7 $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define LAPD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define LAPD_DEVICE	"Provides OpenSS7 Link Access Protocol D-Channel (LAPD)"
+#define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define LAPD_LICENSE	"GPL"
+#define LAPD_BANNER	LAPD_DESCRIP	"\n" \
+			LAPD_REVISION	"\n" \
+			LAPD_COPYRIGHT	"\n" \
+			LAPD_DEVICE	"\n" \
+			LAPD_CONTACT	"\n"
+#define LAPD_SPLASH	LAPD_DEVICE	" - " \
+			LAPD_REVISION	"\n"
+
+#ifdef LINUX
+MODULE_AUTHOR(LAPD_CONTACT);
+MODULE_DESCRIPTION(LAPD_DESCRIP);
+MODULE_SUPPORTED_DEVICE(LAPD_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(LAPD_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-lapd");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "."
+	       PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#define LAPD_MOD_ID	CONFIG_STREAMS_LAPD_MODID
+#define LAPD_MOD_NAME	CONFIG_STREAMS_LAPD_NAME
+
+#ifndef LAPD_MOD_NAME
+#define LAPD_MOD_NAME	"lapd"
+#endif				/* LAPD_MOD_NAME */
+
+#ifndef LAPD_MOD_ID
+#define LAPD_MOD_ID	0
+#endif				/* LAPD_MOD_ID */
+
+/*
+ *  STREAMS DEFINITIONS
+ *  -------------------------------------------------------------------------
+ */
+
+#define MOD_ID		LAPD_MOD_ID
+#define MOD_NAME	LAPD_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	LAPD_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	LAPD_SPLASH
+#endif				/* MODULE */
+
+/*
+ *  LINUX INITIALIZATION
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef LINUX
+unsigned short modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, short, 0444);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module ID for LAPD module.  (0 for allocation.)");
+
+/** lapdinit - initialize LAPD
+  */
+static __init int
+lapdinit(void)
+{
+	cmn_err(CE_NOTE, MOD_BANNER);
+	return (0);
+}
+
+/** lapdexit - terminate LAPD
+  */
+static __exit void
+lapdexit(void)
+{
+	return;
+}
+
+module_init(lapdinit);
+module_exit(lapdexit);
+
+#endif				/* LINUX */

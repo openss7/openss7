@@ -14,6 +14,23 @@
 	* THANKS: update release files
 	* openss7.lsm.in: update release files
 
+	* src/drivers/x25-lapb.c: added stub driver
+	* src/drivers/x25-llc.c: added stub driver
+	* src/drivers/x25-llc2.c: added stub driver
+	* src/drivers/x25-plp.c: added stub driver
+	* src/modules/cmot.c: added stub module
+	* src/modules/iax.c: added stub module
+	* src/modules/isos.c: added stub module
+	* src/modules/isot.c: added stub module
+	* src/modules/itos.c: added stub module
+	* src/modules/lapd.c: added stub module
+	* src/modules/lapf.c: added stub module
+	* src/modules/lpp.c: added stub module
+	* src/modules/s_cdi.c: added stub module
+	* src/modules/tstmod.c: added stub module
+	* src/modules/vtoip.c: added stub module
+	* src/modules/xot.c: added stub module
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files

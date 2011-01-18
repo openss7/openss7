@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itos.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: itos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itos.c,v $
+ Revision 1.1.2.3  2011-01-18 16:55:53  brian
+ - added stub drivers and modules
+
  Revision 1.1.2.2  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,6 +63,106 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: itos.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] =
+    "$RCSfile: itos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
 
+/*
+ *  ITOS module
+ */
 
+#define _SVR4_SOURCE
+#define _MPS_SOURCE
+#define _SUN_SOURCE
+
+#include <sys/os7/compat.h>
+
+#define ITOS_DESCRIP	"ITOS STREAMS MODULE"
+#define ITOS_REVISION	"OpenSS7 $RCSfile: itos.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define ITOS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define ITOS_DEVICE	"Provides OpenSS7 ISO Transport over SCTP (ITOS)"
+#define ITOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define ITOS_LICENSE	"GPL"
+#define ITOS_BANNER	ITOS_DESCRIP	"\n" \
+			ITOS_REVISION	"\n" \
+			ITOS_COPYRIGHT	"\n" \
+			ITOS_DEVICE	"\n" \
+			ITOS_CONTACT	"\n"
+#define ITOS_SPLASH	ITOS_DEVICE	" - " \
+			ITOS_REVISION	"\n"
+
+#ifdef LINUX
+MODULE_AUTHOR(ITOS_CONTACT);
+MODULE_DESCRIPTION(ITOS_DESCRIP);
+MODULE_SUPPORTED_DEVICE(ITOS_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(ITOS_LICENSE);
+#endif				/* MODULE_LICENSE */
+#ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-itos");
+#endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "."
+	       PACKAGE_RELEASE PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif				/* MODULE_VERSION */
+#endif				/* LINUX */
+
+#define ITOS_MOD_ID	CONFIG_STREAMS_ITOS_MODID
+#define ITOS_MOD_NAME	CONFIG_STREAMS_ITOS_NAME
+
+#ifndef ITOS_MOD_NAME
+#define ITOS_MOD_NAME	"itos"
+#endif				/* ITOS_MOD_NAME */
+
+#ifndef ITOS_MOD_ID
+#define ITOS_MOD_ID	0
+#endif				/* ITOS_MOD_ID */
+
+/*
+ *  STREAMS DEFINITIONS
+ *  -------------------------------------------------------------------------
+ */
+
+#define MOD_ID		ITOS_MOD_ID
+#define MOD_NAME	ITOS_MOD_NAME
+#ifdef MODULE
+#define MOD_BANNER	ITOS_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	ITOS_SPLASH
+#endif				/* MODULE */
+
+/*
+ *  LINUX INITIALIZATION
+ *  -------------------------------------------------------------------------
+ */
+
+#ifdef LINUX
+unsigned short modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else				/* module_param */
+module_param(modid, short, 0444);
+#endif				/* module_param */
+MODULE_PARM_DESC(modid, "Module ID for ITOS module.  (0 for allocation.)");
+
+/** itosinit - initialize ITOS
+  */
+static __init int
+itosinit(void)
+{
+	cmn_err(CE_NOTE, MOD_BANNER);
+	return (0);
+}
+
+/** itosexit - terminate ITOS
+  */
+static __exit void
+itosexit(void)
+{
+	return;
+}
+
+module_init(itosinit);
+module_exit(itosexit);
+
+#endif				/* LINUX */
