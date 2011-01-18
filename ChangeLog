@@ -31,6 +31,10 @@
 	* src/modules/vtoip.c: added stub module
 	* src/modules/xot.c: added stub module
 
+	* src/util/init/openss7: init script updates
+	* src/util/init/streams: init script updates
+	* src/util/sysconfig/openss7: init script updates
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
