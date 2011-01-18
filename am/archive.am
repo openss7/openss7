@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 17:08:41 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2011-01-18 17:08:41 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -86,10 +86,10 @@ DIST_HOOK		+= deb-rules-check
 # overriding the dist target.
 ##
 dist-best: distdir
-	@WITH_BZIP2_TRUE@tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	tardir=$(distdir) && $(am__tar) | bzip2 -9 -c >$(distdir).tar.bz2
-	@WITH_LZMA_TRUE@tardir=$(distdir) && $(am__tar) | lzma -9 -c >$(distdir).tar.lzma
-	@WITH_XZ_TRUE@tardir=$(distdir) && $(am__tar) | xz -c >$(distdir).tar.xz
+	@WITH_BZIP2_TRUE@tardir=$(distdir) && ( $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz )
+	tardir=$(distdir) && ( $(am__tar) | bzip2 -9 -c >$(distdir).tar.bz2 )
+	@WITH_LZMA_TRUE@tardir=$(distdir) && ( $(am__tar) | lzma -9 -c >$(distdir).tar.lzma )
+	@WITH_XZ_TRUE@tardir=$(distdir) && ( $(am__tar) | xz -c >$(distdir).tar.xz )
 	$(am__remove_distdir)
 
 
@@ -182,6 +182,7 @@ $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 #!
 #!     The files generated are named:
 #!         @PACKAGE@-@VERSION@.tar.gz and @PACKAGE@-@VERSION@.tar.bz2
+#!         @PACKAGE@-@VERSION@.tar.lzma and @PACKAGE@-@VERSION@.tar.xz
 #!
 #!     You can change this distribution directory with the --with-pkg-distdir
 #!     option to 'configure'.  See './configure --help' for more details on
@@ -258,7 +259,7 @@ $(tardir)/OPENSS7-GPG-KEY:: scripts/OPENSS7-GPG-KEY
 #!
 #!     Signature files will be named:
 #!         @PACKAGE@-@VERSION@.tar.gz.asc and @PACKAGE@-@VERSION@.tar.bz2.asc
-#!         @PACKAGE@-@VERSION@.tar.lzma.asc
+#!         @PACKAGE@-@VERSION@.tar.lzma.asc and @PACKAGE@-@VERSION@.tar.xz.asc
 #!
 #!     These files will be moved to the package distribution directory
 #!     @tardir@ with the plaintext archives.
@@ -399,7 +400,7 @@ tar_files		= $(tardir)/MD5SUMS \
 $(tardir)/MD5SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 	if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
 		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
-		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
 		  	case $$f in (*MD5SUMS*|*SHA1SUMS*) continue ;; esac ; \
 		  	$(MD5SUM) $$f; \
@@ -414,7 +415,7 @@ $(tardir)/MD5SUMS.meta: $(tardir)/MD5SUMS
 $(tardir)/SHA1SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 	if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
 		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
-		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
 		  	case $$f in (*MD5SUMS*|*SHA1SUMS*) continue ;; esac ; \
 			$(SHA1SUM) $$f; \
@@ -544,6 +545,9 @@ EXTRA_DIST		+= scripts/OPENSS7-GPG-KEY \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 1.1.2.4  2011-01-18 17:08:41  brian
+## - sign xz archives
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##
