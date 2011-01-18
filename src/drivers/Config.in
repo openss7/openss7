@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-12-02 22:22:44 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 17:02:23 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2010-12-02 22:22:44 $ by $Author: brian $
+## Last Modified $Date: 2011-01-18 17:02:23 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -133,7 +133,8 @@ driver	x100p-sdt   sdt_x100p	*
 driver	x100p-sl    sl_x100p	*		    
 driver	x100p	    x100p	*		    
 driver	x25-lapb    lapb	*		    
-driver	x25-llc2    llc		*		    
+driver	x25-llc	    llc		*		    
+driver	x25-llc2    llc2	*		    
 driver	x25-plp	    plp		*		    
 driver	x400p-mx    mx_x400p	*		    
 driver	x400p-sdl   sdl_x400p	*		    
@@ -228,6 +229,7 @@ objname	driver	x100p-sdt   sdt_x100p
 objname	driver	x100p-sl    sl_x100p
 objname	driver	x100p	    x100p_ss7
 objname	driver	x25-lapb    x25_lapb
+objname	driver	x25-llc	    x25_llc
 objname	driver	x25-llc2    x25_llc2
 objname	driver	x25-plp	    x25_plp
 objname	driver	x400p-mx    x400p_mx
@@ -334,6 +336,7 @@ loadable	unix
 loadable	x100p_mx
 loadable	x100p_ss7
 loadable	x25_lapb
+loadable	x25_llc
 loadable	x25_llc2
 loadable	x25_plp
 loadable	x400p_mx
@@ -397,6 +400,7 @@ node	/dev/tcp2	    c	    0666    clone	tcp
 node	/dev/tp		    c	    0666    clone	tp
 node	/dev/udp2	    c	    0666    clone	udp
 node	/dev/x25-lapb	    c	    0666    clone	x25-lapb
+node	/dev/x25-llc	    c	    0666    clone	x25-llc
 node	/dev/x25-llc2	    c	    0666    clone	x25-llc2
 node	/dev/x25-plp	    c	    0666    clone	x25-plp
 node	/dev/fifo	    c	    0666    fifo	0
@@ -566,6 +570,9 @@ node	/dev/xnet	    c	    *	    xnet	0
 ## =============================================================================
 ##
 ## $Log: Config.in,v $
+## Revision 1.1.2.4  2011-01-18 17:02:23  brian
+## - add x25-llc to config
+##
 ## Revision 1.1.2.3  2010-12-02 22:22:44  brian
 ## - regression fix and np_udp driver
 ##
