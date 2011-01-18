@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.2 2010-11-28 14:01:53 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.3 2011-01-18 17:01:05 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2010-11-28 14:01:53 $ by $Author: brian $
+@c Last Modified $Date: 2011-01-18 17:01:05 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -148,13 +148,13 @@ your @file{/etc/yum.repo.d/} directory.  This file can be obtained directly from
 
 @example
 $> REPOS="http://www.openss7.org/repos/rpms"
-$> wget $REPOS/centos/5.2/x86_64/repodata/openss7.repo
+$> wget $REPOS/centos/5.5/x86_64/repodata/openss7.repo
 $> sudo cp -f openss7.repo /etc/yum.repo.d/
 $> sudo yum makecache
 @end example
 
 This example assumes the the distribution is @samp{centos} and the distribution release is
-@samp{5.2} and the architecture requires is @samp{x86_64}.  Another example would be
+@samp{5.5} and the architecture requires is @samp{x86_64}.  Another example would be
 @file{$REPOS/i686/suse/11.0/i686/repodata/openss7.repo}, for using @manpage{yum(8)} with SUSE.
 
 Once the repository is set up, @cite{OpenSS7} includes a number of virtual package definitions that
@@ -178,7 +178,7 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 -| [openss7]
 -| enabled = 1
 -| name = OpenSS7 Repository
--| baseurl = http://www.openss7.org/repos/rpms/centos/5.2/x86_64
+-| baseurl = http://www.openss7.org/repos/rpms/centos/5.5/x86_64
 -| gpgcheck = 1
 -| gpgkey = http://www.openss7.org/pubkey.asc
 @end example
@@ -864,8 +864,8 @@ For non-@manpage{rpm(1)} and non-@manpage{dpkg(1)} architectures,
 download the tarball as follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
+@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
+@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.xz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.xz}
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on
@@ -885,7 +885,7 @@ or
 
 @cartouche
 @example
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.xz
 @end example
 @end cartouche
 
@@ -899,8 +899,8 @@ following commands:
 
 @cartouche
 @example
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
-% tar -xzvf @value{PACKAGE}-@value{VERSION}.tar.gz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 @end cartouche
 
@@ -909,8 +909,8 @@ or
 
 @cartouche
 @example
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.xz
+% tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 @end example
 @end cartouche
 
@@ -2211,8 +2211,8 @@ Following is an example of a native build against the running kernel:
 
 @cartouche
 @example
-% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
+% tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
 % make
@@ -2233,8 +2233,8 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 
 @cartouche
 @example
-% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-% tar -xjvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
+% tar -xJvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
 % pushd @value{PACKAGE}@--@value{VERSION}
 % ./configure DESTDIR="/some/@-other/@-root" \ 
 	--with-k-release=2.4.18 --host sparc-linux
@@ -2446,8 +2446,8 @@ built and use the @samp{uninstall} @manpage{automake(1)} target as follows:
 % make uninstall
 % cd ..
 % rm -fr @value{PACKAGE}-@value{VERSION}
-% rm -f @value{PACKAGE}-@value{VERSION}.tar.gz
 % rm -f @value{PACKAGE}-@value{VERSION}.tar.bz2
+% rm -f @value{PACKAGE}-@value{VERSION}.tar.xz
 @end example
 @end cartouche
 
@@ -2680,8 +2680,8 @@ to @file{configure}.)
 @mkindex dist
 Creates a distribution package (tarball) in the top level build directory.  @cite{OpenSS7 Project}
 packages distribute two archives: a @samp{gzip tar} archive and a @samp{bzip tar} archive.  These
-archives will have the name @file{@value{PACKAGE}-@value{VERSION}.tar.gz} and
-@file{@value{PACKAGE}-@value{VERSION}.tar.bz2}.
+archives will have the name @file{@value{PACKAGE}-@value{VERSION}.tar.bz2} and
+@file{@value{PACKAGE}-@value{VERSION}.tar.xz}.
 
 This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target does not require
 root privilege.
@@ -3002,9 +3002,9 @@ default is the top build directory.
 
 The files generated are named:
 
-@file{@value{PACKAGE}-@value{VERSION}.tar.gz}
-and
 @file{@value{PACKAGE}-@value{VERSION}.tar.bz2}
+and
+@file{@value{PACKAGE}-@value{VERSION}.tar.xz}
 
 You can change this distribution directory with the @option{--with-pkg-distdir} option to
 @file{configure}.  See @samp{./configure --help} for more details on options.
@@ -3023,9 +3023,9 @@ variable like so:
 
 Signature files will be named:
 
-@file{@value{PACKAGE}-@value{VERSION}.tar.gz.asc}
-and
 @file{@value{PACKAGE}-@value{VERSION}.tar.bz2.asc}
+and
+@file{@value{PACKAGE}-@value{VERSION}.tar.xz.asc}
 
 These files will be moved to the package distribution directory with the plain text archives.
 

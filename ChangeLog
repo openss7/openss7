@@ -39,6 +39,9 @@
 	* src/util/slconf_yac.y: added back to compile
 	* src/util/strlog.c: added back to compile
 
+	* scripts/texi/install.texi: documentation updates
+	* scripts/texi/quick.texi: documentation updates
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
