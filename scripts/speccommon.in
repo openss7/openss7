@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 17:04:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
+# Last Modified $Date: 2011-01-18 17:04:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1708,7 +1708,7 @@ make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir" || :
 
-function package_source() {
+package_source () {
 # remove include2 symbolic link
     rm -fr include2
 # punch rpm release to Custom
@@ -1750,7 +1750,7 @@ package_source
 # ---------------------------------------------------------------------------
 arg="$1"
 %if %{HAVE_modules}
-function remove_depmods() {
+remove_depmods () {
     local t
     [ $# -gt 0 ] || return 0
     echo "$*"
@@ -2900,7 +2900,7 @@ matches your kernel, rebuild from the source rpm.
 %pre -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 arg="$1"
-function remove_depmods() {
+remove_depmods () {
     local t
     [ $# -gt 0 ] || return 0
     echo "$*"
@@ -3294,6 +3294,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 1.1.2.3  2011-01-18 17:04:36  brian
+# - remove non-POSIX function syntax
+#
 # Revision 1.1.2.2  2009-06-21 12:41:53  brian
 # - updated headers
 #

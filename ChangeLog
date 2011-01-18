@@ -46,6 +46,8 @@
 
 	* scripts/strconf.awk: create by default in mkdev script
 
+	* scripts/speccommon.in: remove non-POSIX function syntax
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
