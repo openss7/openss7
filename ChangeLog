@@ -1,3 +1,10 @@
+2011-01-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man2/fdetach.2s.man: added 2s version of 2 page
+	* doc/man/man2/getmsg.2s.man: added 2s version of 2 page
+	* doc/man/man2/isastream.2s.man: added 2s version of 2 page
+	* doc/man/man2/putmsg.2s.man: added 2s version of 2 page
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
