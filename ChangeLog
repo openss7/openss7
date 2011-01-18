@@ -8,6 +8,12 @@
 	* doc/man/openss7.macros: updated manual pages
 	* doc/man/man9/undoc.9.man: updated manual pages
 
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* openss7.lsm.in: update release files
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
