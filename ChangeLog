@@ -57,6 +57,9 @@
 	* am/openss7.am: update header
 	* Makefile.am: add files back to the build
 
+	* openss7.spec.in: rpm build updates
+	* scripts/comps.xml: rpm build updates
+
 2011-01-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release files
