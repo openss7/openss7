@@ -1,5 +1,5 @@
-OpenSS7 -- read me first file.  2011-01-15
-$Id: README,v 1.1.2.14 2011-01-18 16:49:35 brian Exp $
+OpenSS7 -- read me first file.  2011-01-23
+$Id: README,v 1.1.2.15 2011-02-07 04:56:18 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
  OpenSS7
 ========
 
-Package openss7-1.1.1.20110111 was released under AGPLv3 2011-01-15.
+Package openss7-1.1.1.20110111 was released under AGPLv3 2011-01-23.
 
 This is the `OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -50,12 +50,12 @@ should build and install for other architectures as well.
  Release
 --------
 
-This is the `openss7-1.1.1.20110111' package, released 2011-01-15.  This
+This is the `openss7-1.1.1.20110111' package, released 2011-01-23.  This
 `1.1.1.20110111' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.xz
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', as a set of binary `rpm's or `deb's, or as a `yum(8)' or
@@ -159,8 +159,8 @@ the following distributions, use the following commands:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.bz2
-     $> tar -xjvf openss7-1.1.1.20110111.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.xz
+     $> tar -xJvf openss7-1.1.1.20110111.tar.xz
      $> mkdir build
      $> pushd build
      $> ../openss7-1.1.1.20110111/configure --enable-autotest --enable-silent-rules
@@ -172,7 +172,7 @@ validate, uninstall and remove the package:
      $> popd
      $> sudo rm -rf build
      $> rm -rf openss7-1.1.1.20110111
-     $> rm -f openss7-1.1.1.20110111.tar.bz2
+     $> rm -f openss7-1.1.1.20110111.tar.xz
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -180,8 +180,8 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(5) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.bz2
-     $> tar -xjvf openss7-1.1.1.20110111.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.xz
+     $> tar -xJvf openss7-1.1.1.20110111.tar.xz
      $> mkdir build
      $> pushd build
      $> ../openss7-1.1.1.20110111/configure --enable-autotest --enable-silent-rules
@@ -193,7 +193,7 @@ proceed as follows:
      $> popd
      $> sudo rm -rf build
      $> rm -rf openss7-1.1.1.20110111
-     $> rm -f openss7-1.1.1.20110111.tar.bz2
+     $> rm -f openss7-1.1.1.20110111.tar.xz
 
 See `README-make' for additional specialized make targets.
 
@@ -209,11 +209,11 @@ The OpenSS7 package is available from the downloads area of The OpenSS7
 Project website (http://www.openss7.org/download.html) using a command
 such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.bz2
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.xz
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf openss7-1.1.1.20110111.tar.bz2
+     $> tar -xJvf openss7-1.1.1.20110111.tar.xz
 
 The tarball will unpack into the relative subdirectory named after the
 package name: openss7-1.1.1.20110111.
@@ -284,7 +284,7 @@ Then the build directory and tarball can be simply removed:
      $> cd ..
      $> rm -rf build
      $> rm -rf openss7-1.1.1.20110111
-     $> rm -f openss7-1.1.1.20110111.tar.bz2
+     $> rm -f openss7-1.1.1.20110111.tar.xz
 
  Detailed Installation Instructions
 -----------------------------------
