@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 1.1.2.1 2009-06-21 10:57:16 brian Exp $
+% @(#) $Id: tpi_tcap.texi,v 1.1.2.2 2011-02-07 02:21:47 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:57:16 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:47 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* TPI-TCAP: (tpi_tcap).		TPI Corrigendum for TCAP
+* TPI-TCAP: (tpi_tcap).			TPI Corrigendum for TCAP
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -402,6 +402,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: tpi_tcap.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:47  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:57:16  brian
 - added files to new distro
 

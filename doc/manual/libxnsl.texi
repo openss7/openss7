@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: libxnsl.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: libxnsl.texi,v 1.1.2.2 2011-02-07 02:21:34 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -96,7 +96,7 @@
 
 @dircategory GNU libraries
 @direntry
-* Libxnsl: (libxnsl).           An Open NSL library for STREAMS.
+* Libxnsl: (libxnsl).			An Open NSL library for STREAMS.
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -111,7 +111,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -160,7 +160,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @ignore
 @sp 4
@@ -191,7 +191,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -412,7 +412,7 @@ argument to calls to @manpage{getnetconfig(3)}.
 
 @item netid
 A network identifier string.  This should match one of the network identifier
-strings from the @manpage{netconfig(5)} file.
+strings from the @manpage{netconfig(5s)} file.
 
 @item netconfig
 A pointer to a @type{netconfig} structure returned from
@@ -519,7 +519,7 @@ the caller's specifications.
 @subsubheading File Format
 
 The format of the @file{/etc/netconfig} Network Configuration database file is
-as described in @manpage{netconfig(5)}.
+as described in @manpage{netconfig(5s)}.
 
 @subsubheading Database Structure
 
@@ -651,7 +651,7 @@ retrieved using @manpage{nc_perror(3)} or @manpage{nc_sperror(3)}.
 
 The @manpage{setnetconfig(3)} subroutine will fail, and return a @var{NULL}
 pointer, if: an error was encountered opening the Network Configuration
-database, @file{/etc/netconfig}, see @manpage{netconfig(5)}.
+database, @file{/etc/netconfig}, see @manpage{netconfig(5s)}.
 
 The @manpage{getnetconfig(3)} subroutine will fail, and return a @var{NULL}
 pointer, if: no entries exist in the Network Configuration database; or, the
@@ -733,7 +733,7 @@ An error string associated with the error number can be obtained using
 @table @file
 
 @item /etc/netconfig
-The Network Configuration database file.  See @manref{netconfig(5)}.
+The Network Configuration database file.  See @manref{netconfig(5s)}.
 
 @item /usr/lib/libxnsl.so
 The X/Open Network Services Library shared object library.
@@ -745,7 +745,7 @@ The X/Open Network Services Library static library.
 
 @subsubheading See Also
 
-@manref{netconfig(5)},
+@manref{netconfig(5s)},
 @manref{netpath(3)},
 @manref{netdir(3)},
 @refman{netdir_getbyname},
@@ -845,7 +845,7 @@ Network Services Library.
 The @manpage{netconfig(3)} component (of which @command{setnetconfig()} is a
 member) consists of an interface that provides a set of Network Configuration
 database access subroutines for accessing the Network Configuration database
-contained in @file{/etc/netconfig}, @manref{netconfig(5)}, file:
+contained in @file{/etc/netconfig}, @manref{netconfig(5s)}, file:
 @manpage{setnetconfig(3)}, @manpage{getnetconfig(3)},
 @manpage{endnetconfig(3)}, @manpage{getnetconfigent(3)},
 @manpage{freenetconfigent(3)}, @manpage{nc_perror(3)} and
@@ -868,7 +868,7 @@ subroutines.
 @subsubheading File Format
 
 The format of the @file{/etc/netconfig} Network Configuration database file is
-as described in @manref{netconfig(5)}.
+as described in @manref{netconfig(5s)}.
 
 @subsubheading Caveats
 
@@ -937,7 +937,7 @@ An error string associated with the error number can be obtained using
 @table @file
 
 @item /etc/netconfig
-The Network Configuration database file.  See @manref{netconfig(5)}.
+The Network Configuration database file.  See @manref{netconfig(5s)}.
 
 @item /usr/lib/libxnsl.so
 The X/Open Network Services Library shared object library.
@@ -960,7 +960,7 @@ This environment variable contains the network path.
 
 @refman{getnetconfig},
 @refman{endnetconfig},
-@manref{netconfig(5)},
+@manref{netconfig(5s)},
 @manref{netpath(3)},
 @refman{nc_perror},
 @refman{nc_sperror},
@@ -1347,7 +1347,7 @@ the Network Services Library.
 @subsubheading Database Format
 
 The @type{netconfig} structure is defined in @manpage{netconfig(3)} and
-@manpage{netconfig(5)}.
+@manpage{netconfig(5s)}.
 
 @subsubheading Structure Format
 
@@ -1511,20 +1511,20 @@ could not find, or does not support, the specified service name.
 "@i{n2a: symbol missing in shared object : %s}" @*
 One of the required symbols, see @manpage{netdir(5)}, was missing from a
 shared object specified in the @member{nc_lookup} member of the
-@manpage{netconfig(5)} structure referenced by a @var{config} argument.
+@manpage{netconfig(5s)} structure referenced by a @var{config} argument.
 @samp{%s} is replaced with the last @manpage{dlerror(3)} string.
 
 @item ND_OPEN
 "@i{n2a: could not open shared object : %s}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
-@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+@manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened.  @samp{%s} is replaced with the last @manpage{dlerror(3)}
 string.
 
 @item ND_ACCESS
 "@i{n2a: access denied for shared object}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
-@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+@manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened due to access permission.
 
 @item ND_UKNWN
@@ -1568,7 +1568,7 @@ retrieved using @manpage{netdir_sperror(3)} or printed to standard error using
 
 @table @file
 @item /etc/netconfig
-The Network Configuration database file.  See @manref{netconfig(5)}.
+The Network Configuration database file.  See @manref{netconfig(5s)}.
 
 @item /usr/lib/libxnsl.so
 The X/Open Network Services Library shared object library.
@@ -1580,7 +1580,7 @@ The X/Open Network Services Library static library.
 
 @subsubheading See Also
 
-@manref{netconfig(5)},
+@manref{netconfig(5s)},
 @manref{netconfig(3)},
 @manref{netpath(3)},
 @cite{RFC 1833}.
@@ -1698,7 +1698,7 @@ the network transport protocol specified with a pointer to a @type{netconfig}
 structure, @var{config}.  The @var{config} pointer is acquired using the
 @manpage{getnetconfig(3)}, @manpage{getnetconfigent(3)} or
 @manpage{getnetpath(3)} subroutines and describes a particular transport
-protocol from the @manpage{netconfig(5)} network configuration database.  The
+protocol from the @manpage{netconfig(5s)} network configuration database.  The
 host and service name type to forward lookup is specified as a pointer to a
 @type{hd_hostserv} structure, @var{service}, that contains the host and
 service name tuple (the structure is described below).
@@ -1714,7 +1714,7 @@ of @var{ND_ADDRLIST}.
 @subsubheading Structure Format
 
 The @type{netconfig} structure is defined in @file{netconfig.h} and described
-in @manpage{netconfig(3)} and @manpage{netconfig(5)}.
+in @manpage{netconfig(3)} and @manpage{netconfig(5s)}.
 
 The @type{nd_hostserv} structure is defined in @file{netconfig.h} and is
 structured as follows:
@@ -1782,7 +1782,7 @@ The @type{netbuf} structure is defined in @file{xti.h} and described in
 
 The procedure for use of the @manpage{netdir_getbyname(3)} subroutine is to
 first acquire a pointer to a @type{netconfig} structure representing the entry
-in the @manpage{netconfig(5)} database using a function such as
+in the @manpage{netconfig(5s)} database using a function such as
 @manpage{getnetconfig(3)}, @manpage{getnetconfigent(3)} or
 @manpage{getnetpath(3)}.  Then a host and service name tuple is placed in a
 @type{nd_hostserv} structure and passed to the @manpage{netdir_getbyname(3)}
@@ -1857,20 +1857,20 @@ could not find, or does not support, the specified service name.
 "@i{n2a: symbol missing in shared object : %s}" @*
 One of the required symbols, see @manpage{netdir(5)}, was missing from a
 shared object specified in the @member{nc_lookup} member of the
-@manpage{netconfig(5)} structure referenced by a @var{config} argument.
+@manpage{netconfig(5s)} structure referenced by a @var{config} argument.
 @samp{%s} is replaced with the last @manpage{dlerror(3)} string.
 
 @item ND_OPEN
 "@i{n2a: could not open shared object : %s}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
-@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+@manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened.  @samp{%s} is replaced with the last @manpage{dlerror(3)}
 string.
 
 @item ND_ACCESS
 "@i{n2a: access denied for shared object}" @*
 One of the shared objects specified in the @member{nc_lookup} member of the
-@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+@manpage{netconfig(5s)} structure referenced by a @var{config} argument could
 not be opened due to access permission.
 
 @item ND_SYSTEM
@@ -1925,7 +1925,7 @@ fail, return minus one (@samp{-1}) and set @manpage{_nderror(3)} to
 
 @table @file
 @item /etc/netconfig
-The Network Configuration database file.  See @manref{netconfig(5)}.
+The Network Configuration database file.  See @manref{netconfig(5s)}.
 
 @item /usr/lib/libxnsl.so
 The X/Open Network Services Library shared object library.
@@ -1938,7 +1938,7 @@ The X/Open Network Services Library static library.
 @subsubheading See Also
 
 @manref{netdir(3)},
-@manref{netconfig(5)},
+@manref{netconfig(5s)},
 @manref{netconfig(3)},
 @manref{netpath(3)},
 @cite{RFC 1833}.

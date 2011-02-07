@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: npi.texi,v 1.1.2.1 2009-06-21 10:55:02 brian Exp $
+% @(#) $Id: npi.texi,v 1.1.2.2 2011-02-07 02:21:41 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:55:02 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:41 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenGroup
 @direntry
-* NPI: (npi).                   Network Provider Interface Specification
+* NPI: (npi).				Network Provider Interface Specification
 @end direntry
 
 @include ../../../scripts/texi/args.texi

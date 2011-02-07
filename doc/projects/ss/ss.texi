@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: ss.texi,v 1.1.2.1 2009-06-21 10:48:59 brian Exp $
+% @(#) $Id: ss.texi,v 1.1.2.2 2011-02-07 02:21:37 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:48:59 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:37 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* Open SoftSwitch Complex: (openss).		OpenSS7 SoftSwitch Complex
+* SSC: (ss).				OpenSS7 SoftSwitch Complex
 @end direntry
 
 @include ../../../scripts/texi/args.texi

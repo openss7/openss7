@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mgi.texi,v 1.1.2.2 2010-03-10 08:42:18 brian Exp $
+% @(#) $Id: mgi.texi,v 1.1.2.3 2011-02-07 02:21:40 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2010-03-10 08:42:18 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:40 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* MGI: (mgi).			    Media Gateway Interface
+* MGI: (mgi).				Media Gateway Interface
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2010  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -400,6 +400,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: mgi.texi,v $
+Revision 1.1.2.3  2011-02-07 02:21:40  brian
+- updated manuals
+
 Revision 1.1.2.2  2010-03-10 08:42:18  brian
 - added Optranex files
 
@@ -639,14 +642,14 @@ typical PCIe systems and, therefore, is ample.
 
 @dfn{Style 1} providers do not user the @prim{MG_ATTACH_REQ} and @prim{MG_DETACH_REQ} primitives and
 when freshly opened are in the @psta{MGS_ATTACHED} state.  That is, as illustrated in @figref{17},
-the @dfn{Style 1} MGS provider associates the Stream with the PPA during the @manref{open(2)} system
+the @dfn{Style 1} MGS provider associates the Stream with the PPA during the @manref{open(2s)} system
 call.
 
 @subsubsection Style 2 MGS Provider
 
 If the number of PPAs as MGS provider will support is large, a @dfn{Style 2} provider implementation
 is more suitable.  The @dfn{Style 2} provider requires a MGS user to explicitly identify the desired
-PPA using a special attach service primitive.  For a @dfn{Style 2} driver, the @manref{open(2)}
+PPA using a special attach service primitive.  For a @dfn{Style 2} driver, the @manref{open(2s)}
 system call creates a Stream between the MGS user and MGS provider, and the attach primitive then
 associated a particular PPA with that Stream.  The format of the PPA identifier is specific to the
 MGS provider, and should be described in the provider-specific addendum documentation.
@@ -654,7 +657,7 @@ MGS provider, and should be described in the provider-specific addendum document
 The MGS user uses the support primitvies(@prim{MG_ATTACH_REQ}, @prim{MG_ENABLE_REQ}) to associate a
 Stream with a given Physical Point of Appearance.  @dfn{Style 2} MGS providers, when freshly opened,
 are in the @psta{MGS_DETACHED} state.  That is, the @dfn{Style 2} MGS provider does not associate
-the Stream with the PPA during the @manref{open(2)} call, but only later when the
+the Stream with the PPA during the @manref{open(2s)} call, but only later when the
 @prim{MG_ATTACH_REQ} primitive is issued by the MGS user.
 
 @subsection Multiplex Media
@@ -783,8 +786,8 @@ Addressing}.}
 @subsubheading Style 1 MGS Provider
 
 A @dfn{Style 1} MGS provider is a provider that associates a Stream with a PPA at the time of the
-first @manref{open(2)} call for the device, and disassociates a Stream from a PPA at the time of the
-last @manref{close(2)} call for the device.
+first @manref{open(2s)} call for the device, and disassociates a Stream from a PPA at the time of the
+last @manref{close(2s)} call for the device.
 
 Physical points of attachment (PPA) are assigned to major and minor device number combinations.
 When the major and minor device number combination is opened, the opened Stream is automatically
@@ -1821,7 +1824,7 @@ For a @dfn{Style 1} driver, when @parm{mg_ppa_stype} is @pval{MG_STYLE1}, the le
 Indicates the PPA style of the MGS provider.  This value can be one of the following values;
 
 @multitable @columnfractions .15 .65
-@item @pval{MG_STYLE1} @tab PPA is implicitly attached by @manref{open(2)}.
+@item @pval{MG_STYLE1} @tab PPA is implicitly attached by @manref{open(2s)}.
 @item @pval{MG_STYLE2} @tab PPA must be explicitly attached using @prim{MG_ATTACH_REQ}.
 @end multitable
 
@@ -3967,23 +3970,23 @@ provider specific and no generic options have yet been defined.
 @subsubheading @pioc{MG_IOCGCONFIG}
 
 Gets the media gateway configuration.  Upon success, the media gateway configuration is written to the memory
-extent indicated by the pointer argument to the @manref{ioctl(2)} call.
+extent indicated by the pointer argument to the @manref{ioctl(2s)} call.
 
 @node MGI Set Configuration
 @subsection MGI Set Configuration
 @subsubheading @pioc{MG_IOCSCONFIG}
 
 Set the media gateway configuration.  Upon success, the media gateway configuration is read from the memory
-extent specified by the pointer argument to the @manref{ioctl(2)} call.
+extent specified by the pointer argument to the @manref{ioctl(2s)} call.
 
 @node MGI Test Configuration
 @subsection MGI Test Configuration
 @subsubheading @pioc{MG_IOCTCONFIG}
 
 Test the media gateway configuration.  Upon success, the media gateway configuration is read from the memory
-extent specified by the pointer argument to the @manref{ioctl(2)} call, values adjusted according to
+extent specified by the pointer argument to the @manref{ioctl(2s)} call, values adjusted according to
 the rules for configuration, and the resulting configuraiton written back to the memory extent
-specified by the pointer argumnet to the @manref{ioctl(2)} call.  Actual configuration is not
+specified by the pointer argumnet to the @manref{ioctl(2s)} call.  Actual configuration is not
 changed.
 
 @node MGI Commit Configuration
@@ -3991,9 +3994,9 @@ changed.
 @subsubheading @pioc{MG_IOCCCONFIG}
 
 Confirms the media gateway configuration.  Upon success, the media gateway configuration is read from the memory
-extent specified by the pointer argument to the @manref{ioctl(2)} call, values adjusted according to
+extent specified by the pointer argument to the @manref{ioctl(2s)} call, values adjusted according to
 the rules for configuration, the configuration applied, and then the resulting configuration written
-back to the memory extent specified by the pointer argument to the @manref{ioctl(2)} call.
+back to the memory extent specified by the pointer argument to the @manref{ioctl(2s)} call.
 
 Normally, the argument to the @pioc{MG_IOCCCONFIG} call is the same as to an immediately preceding
 @pioc{MG_IOCTCONFIG} call.

@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: xmap.texi,v 1.1.2.1 2009-06-21 10:58:46 brian Exp $
+% @(#) $Id: xmap.texi,v 1.1.2.2 2011-02-07 02:21:48 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:58:46 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:48 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* XMAP: (xmap).                 XOM Mobile Application Part
+* XMAP: (xmap).				XOM Mobile Application Part
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -385,6 +385,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: xmap.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:48  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:58:46  brian
 - added files to new distro
 
@@ -1511,7 +1514,7 @@ generated.  Other errors are notified later by @i{Receive()}, when the result of
 asynchronous confirmed operation is returned.  All errors occurring during a synchronous request are
 reported when the function returns.  Full details of error handling are given in @ref{Errors}.
 
-Where vendors provide suitable system primitives (such as System V @manref{poll(2)}, or BSD
+Where vendors provide suitable system primitives (such as System V @manref{poll(2s)}, or BSD
 @manref{select(2)}), applications can obtain a file descriptor from the @b{Session} by inspecting
 the value fo the OM attribute @i{File-Descriptor}.  Applications may use the file descriptor to
 suspend the process until data is received on the particular file descriptor.
@@ -4714,7 +4717,7 @@ Application Service provider may still honor operation and service requests.
 @item file-Descriptor
 Indicates the file descriptor associated with the session.  The file descriptor may be used by
 implementors of the @i{Wait()} function.  The file descriptor may be used in subsequent calls to
-vendor-specific system facilities to suspend the process (for example, System V @manref{poll(2)} or
+vendor-specific system facilities to suspend the process (for example, System V @manref{poll(2s)} or
 BSD @manref{select(2)}).  Its use for any other purpose is unspecified.
 
 If the implementation does not define any suitable supsension facilities, or if the session is not

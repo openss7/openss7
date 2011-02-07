@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: nli.texi,v 1.1.2.1 2009-06-21 10:54:48 brian Exp $
+% @(#) $Id: nli.texi,v 1.1.2.2 2011-02-07 02:21:41 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:54:48 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:41 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* NLI: (nli).			Network Layer Interface Specification
+* NLI: (nli).				Network Layer Interface Specification
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -404,6 +404,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: nli.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:41  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:54:48  brian
 - added files to new distro
 
@@ -473,9 +476,9 @@ SX.25}, @cite{PT X.25} and @cite{SBE X.25} implement the Network Layer Interface
 
 The Network Layer Interface (NLI) was designed to be used directly with standard @acronym{STREAMS}
 system calls and does not require the use of a cooperating user space shared library.  Applications
-programs directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
-@command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See @manref{getmsg(2s)},
-@manref{getpmsg(2)}, @manref{putmsg(2s)}, @manref{putpmsg(2)} and @manref{ioctl(2)} manual pages.}
+programs directly use the @command{getmsg(2s)}, @command{getpmsg(2s)}, @command{putmsg(2s)},
+@command{putpmsg(2s)} and @command{ioctl(2s)} system calls.@footnote{See @manref{getmsg(2s)},
+@manref{getpmsg(2s)}, @manref{putmsg(2s)}, @manref{putpmsg(2s)} and @manref{ioctl(2s)} manual pages.}
 Nevertheless, user shared object libraries can easily be constructed using this @acronym{STREAMS}
 service primitive interface.
 
@@ -639,8 +642,8 @@ X.25 user that the event has occured.  @figref{1} shows the model of the NLI.
 The NLI allows the X.25 packet layer (as a @acronym{STREAMS} driver) to be
 configured with an X.25 user (as a @acronym{STREAMS} module) that conforms to the
 NLI.  An X.25 user can also be a user program that conforms to the NLI and
-accesses the X.25 packet layer using @manref{putmsg(2s)}, @manref{putpmsg(2)},
-@manref{getmsg(2s)}, @manref{getpmsg(2)}, and @manref{ioctl(2)} system calls.
+accesses the X.25 packet layer using @manref{putmsg(2s)}, @manref{putpmsg(2s)},
+@manref{getmsg(2s)}, @manref{getpmsg(2s)}, and @manref{ioctl(2s)} system calls.
 
 @node NLI Services Definition
 @chapter NLI Services Definition

@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: npi_sccp.texi,v 1.1.2.1 2009-06-21 10:56:05 brian Exp $
+% @(#) $Id: npi_sccp.texi,v 1.1.2.2 2011-02-07 02:21:42 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:56:05 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* NPI-SCCP: (npi_sccp).		NPI Addendum for SCCP
+* NPI-SCCP: (npi_sccp).			NPI Addendum for SCCP
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -194,7 +194,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -407,6 +407,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: npi_sccp.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:42  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:56:05  brian
 - added files to new distro
 
@@ -3230,7 +3233,7 @@ Provides UNIX system error number definitions.
 @item @header{sys/types.h} @tab
 Provides C types used by the header files.
 @item @header{sys/ioctl.h} @tab
-Provides types and declarations associated with the @manref{ioctl(2)} system call.
+Provides types and declarations associated with the @manref{ioctl(2s)} system call.
 @item @header{sys/npi.h} @tab
 Provides the base Network Provider Interface (NPI) definitions and declarations.
 @item @header{sys/npi_mtp.h} @tab
@@ -3260,7 +3263,7 @@ Provides UNIX system error number definitions.
 @item @header{sys/types.h} @tab
 Provides C types used by the header files.
 @item @header{sys/ioctl.h} @tab
-Provides types and declarations associated with the @manref{ioctl(2)} system call.
+Provides types and declarations associated with the @manref{ioctl(2s)} system call.
 @item @header{sys/npi.h} @tab
 Provides the base Network Provider Interface (NPI) definitions and declarations.
 @item @header{sys/npi_mtp.h} @tab

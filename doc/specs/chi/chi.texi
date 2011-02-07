@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: chi.texi,v 1.1.2.1 2009-06-21 11:50:35 brian Exp $
+% @(#) $Id: chi.texi,v 1.1.2.2 2011-02-07 02:21:38 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 11:50:35 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:38 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* CHI: (chi).			    Channel Interface
+* CHI: (chi).				Channel Interface
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -403,6 +403,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: chi.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:38  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 11:50:35  brian
 - added files to new distro
 
@@ -646,14 +649,14 @@ systems and, therefore, is ample.
 
 @dfn{Style 1} providers do not user the @prim{CH_ATTACH_REQ} and @prim{CH_DETACH_REQ} primitives and
 when freshly opened are in the @psta{CHS_ATTACHED} state.  That is, as illustrated in @figref{17},
-the @dfn{Style 1} CHS provider associates the Stream with the PPA during the @manref{open(2)} system
+the @dfn{Style 1} CHS provider associates the Stream with the PPA during the @manref{open(2s)} system
 call.
 
 @subsubsection Style 2 CHS Provider
 
 If the number of PPAs as CHS provider will support is large, a @dfn{Style 2} provider implementation
 is more suitable.  The @dfn{Style 2} provider requires a CHS user to explicitly identify the desired
-PPA using a special attach service primitive.  For a @dfn{Style 2} driver, the @manref{open(2)}
+PPA using a special attach service primitive.  For a @dfn{Style 2} driver, the @manref{open(2s)}
 system call creates a Stream between the CHS user and CHS provider, and the attach primitive then
 associated a particular PPA with that Stream.  The format of the PPA identifier is specific to the
 CHS provider, and should be described in the provider-specific addendum documentation.
@@ -661,7 +664,7 @@ CHS provider, and should be described in the provider-specific addendum document
 The CHS user uses the support primitvies(@prim{CH_ATTACH_REQ}, @prim{CH_ENABLE_REQ}) to associate a
 Stream with a given Physical Point of Appearance.  @dfn{Style 2} CHS providers, when freshly opened,
 are in the @psta{CHS_DETACHED} state.  That is, the @dfn{Style 2} CHS provider does not associate
-the Stream with the PPA during the @manref{open(2)} call, but only later when the
+the Stream with the PPA during the @manref{open(2s)} call, but only later when the
 @prim{CH_ATTACH_REQ} primitive is issued by the CHS user.
 
 @subsection Multiplex Media
@@ -792,8 +795,8 @@ Addressing}.}
 @subsubheading Style 1 CHS Provider
 
 A @dfn{Style 1} CHS provider is a provider that associates a Stream with a PPA at the time of the
-first @manref{open(2)} call for the device, and disassociates a Stream from a PPA at the time of the
-last @manref{close(2)} call for the device.
+first @manref{open(2s)} call for the device, and disassociates a Stream from a PPA at the time of the
+last @manref{close(2s)} call for the device.
 
 Physical points of attachment (PPA) are assigned to major and minor device number combinations.
 When the major and minor device number combination is opened, the opened Stream is automatically
@@ -1563,7 +1566,7 @@ For a @dfn{Style 1} driver, when @parm{ch_ppa_stype} is @pval{CH_STYLE1}, the le
 Indicates the PPA style of the CHS provider.  This value can be one of the following values;
 
 @multitable @columnfractions .15 .65
-@item @pval{CH_STYLE1} @tab PPA is implicitly attached by @manref{open(2)}.
+@item @pval{CH_STYLE1} @tab PPA is implicitly attached by @manref{open(2s)}.
 @item @pval{CH_STYLE2} @tab PPA must be explicitly attached using @prim{CH_ATTACH_REQ}.
 @end multitable
 
@@ -3316,23 +3319,23 @@ provider specific and no generic options have yet been defined.
 @subsubheading @pioc{CH_IOCGCONFIG}
 
 Gets the channel configuration.  Upon success, the channel configuration is written to the memory
-extent indicated by the pointer argument to the @manref{ioctl(2)} call.
+extent indicated by the pointer argument to the @manref{ioctl(2s)} call.
 
 @node CHI Set Configuration
 @subsection CHI Set Configuration
 @subsubheading @pioc{CH_IOCSCONFIG}
 
 Set the channel configuration.  Upon success, the channel configuration is read from the memory
-extent specified by the pointer argument tot he @manref{ioctl(2)} call.
+extent specified by the pointer argument tot he @manref{ioctl(2s)} call.
 
 @node CHI Test Configuration
 @subsection CHI Test Configuration
 @subsubheading @pioc{CH_IOCTCONFIG}
 
 Test the channel configuration.  Upon success, the channel configuration is read from the memory
-extent specified by the pointer argument to the @manref{ioctl(2)} call, values adjusted according to
+extent specified by the pointer argument to the @manref{ioctl(2s)} call, values adjusted according to
 the rules for configuration, and the resulting configuraiton written back to the memory extent
-specified by the pointer argumnet to the @manref{ioctl(2)} call.  Actual configuration is not
+specified by the pointer argumnet to the @manref{ioctl(2s)} call.  Actual configuration is not
 changed.
 
 @node CHI Commit Configuration
@@ -3340,9 +3343,9 @@ changed.
 @subsubheading @pioc{CH_IOCCCONFIG}
 
 Confirms the channel configuration.  Upon success, the channel configuration is read from the memory
-extent specified by the pointer argument to the @manref{ioctl(2)} call, values adjusted according to
+extent specified by the pointer argument to the @manref{ioctl(2s)} call, values adjusted according to
 the rules for configuration, the configuration applied, and then the resulting configuration written
-back to the memory extent specified by the pointer argument to the @manref{ioctl(2)} call.
+back to the memory extent specified by the pointer argument to the @manref{ioctl(2s)} call.
 
 Normally, the argument to the @pioc{CH_IOCCCONFIG} call is the same as to an immediately preceding
 @pioc{CH_IOCTCONFIG} call.

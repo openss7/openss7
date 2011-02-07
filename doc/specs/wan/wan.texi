@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: wan.texi,v 1.1.2.1 2009-06-21 10:57:42 brian Exp $
+% @(#) $Id: wan.texi,v 1.1.2.2 2011-02-07 02:21:48 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:57:42 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:48 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* WAN: (wan).			Wide Area Network Interface Specification
+* WAN: (wan).				Wide Area Network Interface Specification
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -395,6 +395,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: wan.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:48  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:57:42  brian
 - added files to new distro
 
@@ -460,9 +463,9 @@ Interface.
 
 The Wide Area Network (WAN) Inteface was designed to be used directly with standard @acronym{STREAMS}
 system calls and does not require the use of a cooperating user space shared library.  Applications
-program directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)} and
-@command{putpmsg(2)} system calls.@footnote{See @manref{getmsg(2s)}, @manref{getpmsg(2)},
-@manref{putmsg(2s)} and @manref{putpmsg(2)} manual pages.} Nevertheless, user shared object
+program directly use the @command{getmsg(2s)}, @command{getpmsg(2s)}, @command{putmsg(2s)} and
+@command{putpmsg(2s)} system calls.@footnote{See @manref{getmsg(2s)}, @manref{getpmsg(2s)},
+@manref{putmsg(2s)} and @manref{putpmsg(2s)} manual pages.} Nevertheless, user shared object
 libraries can easily be constructed using this @acronym{STREAMS} service primitive interface.
 
 The system header files that must be included when compiling user applications, or @acronym{STREAMS}
@@ -1871,7 +1874,7 @@ of the provided structure.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -1909,7 +1912,7 @@ structure.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -1946,7 +1949,7 @@ provided structure.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -1996,7 +1999,7 @@ provided structure.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2031,7 +2034,7 @@ subnetwork identifier, @parm{w_snid}.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2066,7 +2069,7 @@ associated with the specified subnetwork identifier, @parm{w_snid}.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2101,7 +2104,7 @@ specified subnetwork identifier, @parm{w_snid}.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2137,7 +2140,7 @@ When successful, the input-output control operation returns zero (0) when the
 associated @parm{w_snid} is disabled, and one (1) when the associated
 @parm{w_snid} is enabled.
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2171,7 +2174,7 @@ data transfer for the @parm{w_snid} contained in the passed-in structure.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2205,7 +2208,7 @@ data transfer for the @parm{w_snid} contained in the passed-in structure.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2241,7 +2244,7 @@ primitive of the @manref{cdi(7)}.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 
@@ -2277,7 +2280,7 @@ primitive of the @manref{cdi(7)}.
 
 When successful, the input-output control operation returns zero (0).
 
-In addition to the errors that may be returned by @manref{ioctl(2)} and
+In addition to the errors that may be returned by @manref{ioctl(2s)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
 are as follows:
 

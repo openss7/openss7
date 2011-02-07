@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: openss7.texi,v 1.1.2.2 2011-02-07 02:21:34 brian Exp $
 %
 % =========================================================================
 %
@@ -81,7 +81,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -94,7 +94,7 @@
 
 @dircategory OpenSS7
 @direntry
-* openss7: (@value{PACKAGE_TARNAME}).	    OpenSS7 Master Package.
+* openss7: (@value{PACKAGE_TARNAME}).			OpenSS7 Master Package.
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -332,6 +332,7 @@ Releases
 
 Installation
 
+* Repositories::		Repositories for the package
 * Downloading::			Downloading the package
 * Configuration::		Configuration of the package
 * Building::			Building the package
@@ -444,8 +445,8 @@ The guide is intended for installers and maintainers of @cite{@value{PACKAGE_TIT
 Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
 system, programming, networking, and data communication.
 
-@node Revision History
-@section Revision History
+@node Revisions
+@section Revisions
 @cindex manual revisions
 
 Take care that you are working with a current version of this manual: you will not be notified of
@@ -474,6 +475,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: openss7.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:34  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:40:08  brian
 - added files to new distro
 

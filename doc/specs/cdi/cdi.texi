@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: cdi.texi,v 1.1.2.1 2009-06-21 10:53:07 brian Exp $
+% @(#) $Id: cdi.texi,v 1.1.2.2 2011-02-07 02:21:38 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:53:07 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:38 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* CDI: (cdi).                   Communication Device Interface Specification
+* CDI: (cdi).				Communication Device Interface Specification
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -394,6 +394,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: cdi.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:38  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:53:07  brian
 - added files to new distro
 
@@ -565,10 +568,10 @@ environment, constitute a major portion of this effort.  The service primitives 
 defined as STREAMS messages that are transferred between the user and provider of the service.  CDI is one such
 kernel-level interface, and is targeted for STREAMS protocol modules that either use or provide communications device
 services.  Also, user programs that wish to access a STREAMS-based communications device provider directly may do so
-using the @manref{putmsg(2)} and @manref{getmsg(2)} system calls.
+using the @manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
 
 Referring to the abstract view of CDI (@figref{1}), the CDS provider is configured as a STREAMS driver, and the CDS user
-accesses the provider using @manref{open(2)} to establish a stream to the CDS provider.  The stream acts as a
+accesses the provider using @manref{open(2s)} to establish a stream to the CDS provider.  The stream acts as a
 @cpindex Communication endpoint
 communication endpoint between a CDS user and the CDS provider.  After the stream is created, the CDS user and CDS
 provider communicate via tht messages presented later in this specification.
@@ -768,14 +771,14 @@ primitives and when freshly opened are in
 the CD_DISABLED
 @stindex CD_DISABLED
 state.  That is, as illustrated in @figref{2}, the @dfn{Style 1} CDS provider associates the stream with the PPA during
-the @manref{open(2)} call.
+the @manref{open(2s)} call.
 
 @node Style 2 CDS Provider
 @subsubsection Style 2 CDS Provider
 
 If the number of PPAs a CDS provider will support is large, a @dfn{Style 2} provider implementation is more suitable.
 The @dfn{Style 2} provider requires a CDS user to explicitly identify the desired PPA using a special attach service
-primitive.  For a @dfn{Style 2} driver, the @manref{open(2)} creates a stream between the CDS user and CDS provider, and
+primitive.  For a @dfn{Style 2} driver, the @manref{open(2s)} creates a stream between the CDS user and CDS provider, and
 the attach primitive then associates a particular PPA with that stream.  The format of the PPA identifier is specific to
 the CDS provider, and should be described in the provider-specific addendum documentation.
 
@@ -787,7 +790,7 @@ CD_ENABLE_REQ)
 to associate a stream with a given Physical Point of Appearance.  @dfn{Style 2} CDS providers, when freshly opened, are
 in the CD_UNATTACHED
 @stindex CD_UNATTACHED
-state.  That is, the @dfn{Style 2} CDS provider does not associated the stream with the PPA during the @manref{open(2)}
+state.  That is, the @dfn{Style 2} CDS provider does not associated the stream with the PPA during the @manref{open(2s)}
 call, but only later when the CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 primitive is issued by the CDS user.
@@ -1870,7 +1873,7 @@ in the @var{cd_ppa_style}
 field) can exist in this state.
 CD_STYLE2
 @pvindex CD_STYLE2
-communication devices start in this state after @manref{open(2)}.
+communication devices start in this state after @manref{open(2s)}.
 
 @item CD_UNUSABLE
 @stindex CD_UNUSABLE
@@ -1883,7 +1886,7 @@ communications devices (streams that return CD_STYLE1
 @pvindex CD_STYLE1
 in the @var{cd_ppa_style}
 @vrindex cd_ppa_style
-field) start in this state after @manref{open(2)}.
+field) start in this state after @manref{open(2s)}.
 
 @item CD_ENABLE_PENDING
 @stindex CD_ENABLE_PENDING
@@ -2040,14 +2043,14 @@ Indicates the Physical Point of Attachment (PPA) style.  @var{cd_ppa_style} can 
 
 @item CD_STYLE1
 @pvindex CD_STYLE1
-The communications device is already attached to the physical point of appearance at @manref{open(2)}.  The device
+The communications device is already attached to the physical point of appearance at @manref{open(2s)}.  The device
 starts in the CD_DISABLED
 @stindex CD_DISABLED
 state.
 
 @item CD_STYLE2
 @pvindex CD_STYLE2
-The communications device is not attached to the physical point of appearance at @manref{open(2)}, and must be attached
+The communications device is not attached to the physical point of appearance at @manref{open(2s)}, and must be attached
 with CD_ATTACH_REQ.
 @prindex CD_ATTACH_REQ
 The device starts in the CD_UNATTACHED

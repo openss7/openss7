@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: VOIP.texi,v 1.1.2.2 2011-01-12 03:37:38 brian Exp $
+% @(#) $Id: VOIP.texi,v 1.1.2.3 2011-02-07 02:21:49 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-01-12 03:37:38 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:49 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* VOIP: (VOIP).		    Voice Over IP Protocol Suite
+* VOIP: (VOIP).				Voice Over IP Protocol Suite
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -386,6 +386,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: VOIP.texi,v $
+Revision 1.1.2.3  2011-02-07 02:21:49  brian
+- updated manuals
+
 Revision 1.1.2.2  2011-01-12 03:37:38  brian
 - updated manuals
 

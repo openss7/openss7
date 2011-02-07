@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lli.texi,v 1.1.2.1 2009-06-21 10:53:45 brian Exp $
+% @(#) $Id: lli.texi,v 1.1.2.2 2011-02-07 02:21:39 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:53:45 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* LLI: (lli).			Link Layer Interface Specification
+* LLI: (lli).				Link Layer Interface Specification
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -395,6 +395,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: lli.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:39  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:53:45  brian
 - added files to new distro
 
@@ -466,9 +469,9 @@ instead sunk inside the Network Layer Interface (NLI).}
 
 The Link Layer Interface (LLI) as designed to be used directly with standard @acronym{STREAMS} system
 calls and does not require the use of a cooperating user space shared library.  Applications
-programs directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
-@command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See @manref{getmsg(2s)},
-@manref{getpmsg(2)}, @manref{putmsg(2s)}, @manref{putpmsg(2)} and @manref{ioctl(2)} manual pages.}
+programs directly use the @command{getmsg(2s)}, @command{getpmsg(2s)}, @command{putmsg(2s)},
+@command{putpmsg(2s)} and @command{ioctl(2s)} system calls.@footnote{See @manref{getmsg(2s)},
+@manref{getpmsg(2s)}, @manref{putmsg(2s)}, @manref{putpmsg(2s)} and @manref{ioctl(2s)} manual pages.}
 Nevertheless, user shared object libraries can easily be constructed using this @acronym{STREAMS}
 service primitive interface.
 
@@ -1310,8 +1313,8 @@ The number of SLP transmission retries.
 @end menu
 
 @multitable @columnfractions .2 .8
-@item @pioc{L_SETSNID} @tab Set subnetwork identifier.
-@item @pioc{L_GETSNID} @tab Get subnetwork identifier.
+@item @pioc{L_SETSNID} @tab Set subnetwork identifier.  (Also @pioc{L_SETPPA}.)
+@item @pioc{L_GETSNID} @tab Get subnetwork identifier.  (Also @pioc{L_GETPPA}.)
 @item @pioc{L_SETTUNE} @tab Set common tuning parameters.
 @item @pioc{L_GETTUNE} @tab Get common tuning parameters.
 @item @pioc{L_GETSTATS} @tab Get subnetwork statistics.
@@ -1362,19 +1365,30 @@ The number of SLP transmission retries.
 @node L_SETSNID
 @subsubsection L_SETSNID
 
-The argument of this input-output control is a pointer to the @type{ll_snioc}
+This input-output control command is used to set the subnetwork (link)
+identifier associated with the Stream upon which the input-output control
+command is issued.  @cite{Solaris X.25} calls this input-output control command
+@pioc{L_SETPPA}.
+The argument of this input-output control command is a pointer to the @type{ll_snioc}
 structure described in @ref{ll_snioc Structure}.
 
 @node L_GETSNID
 @subsubsection L_GETSNID
 
-The argument of this input-output control is a pointer to the @type{ll_snioc}
+This input-output control command is used to retrieve the subnetwork (link)
+identifier associated with the Stream upon which the input-output control
+command is issued.  @cite{Solaris X.25} calls this input-output control command
+@pioc{L_GETPPA}.
+The argument of this input-output control command is a pointer to the @type{ll_snioc}
 structure described in @ref{ll_snioc Structure}.
 
 @node L_SETTUNE
 @subsubsection L_SETTUNE
 
-The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+This input-output control command is used to set the tunable parameters
+associated with the LAPB or LLC2 link associated with the Stream upon which the
+input-output control command is issued.
+The argument of this input-output control command is a pointer to the @type{lapb_tnioc},
 @type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
 described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @ref{mlp_tnioc Structure}.}
@@ -1382,7 +1396,10 @@ described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @node L_GETTUNE
 @subsubsection L_GETTUNE
 
-The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+This input-output control command is used to retreive the tunable parameters
+associated with the LAPB or LLC2 link associated with the Stream upon which the
+input-output control command is issued.
+The argument of this input-output control command is a pointer to the @type{lapb_tnioc},
 @type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
 described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @ref{mlp_tnioc Structure}.}
@@ -1390,7 +1407,10 @@ described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @node L_GETSTATS
 @subsubsection L_GETSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_stioc},
+This input-output control command is used to retrieve the LAPB or LLC2 link-specific
+statistics associated with the Stream upon which the input-output control
+command is issued.
+The argument of this input-output control command is a pointer to the @type{lapb_stioc},
 @type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
 described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @ref{mlp_stioc Structure}.}
@@ -1398,7 +1418,10 @@ described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @node L_ZEROSTATS
 @subsubsection L_ZEROSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_stioc},
+This input-output control command is used to zero the LAPB or LLC2 link-specific
+statistics associated with the Stream upon which the input-output control
+command is issued.
+The argument of this input-output control command is a pointer to the @type{lapb_stioc},
 @type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
 described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @ref{mlp_stioc Structure}.}
@@ -1406,19 +1429,26 @@ described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @node L_TRACEON
 @subsubsection L_TRACEON
 
-The argument of this input-output control is a pointer to the @type{ll_hdioc}
+This input-output control command is used to initiate tracing of messages on the
+Stream upon which the input-output control command is issued.
+The argument of this input-output control command is a pointer to the @type{ll_hdioc}
 structure described in @ref{ll_hdioc Structure}.
 
 @node L_TRACEOFF
 @subsubsection L_TRACEOFF
 
-The argument of this input-output control is a pointer to the @type{ll_hdioc}
+This input-output control command is used to terminate tracing of messages on the
+Stream upon which the input-output control command is issued.
+The argument of this input-output control command is a pointer to the @type{ll_hdioc}
 structure described in @ref{ll_hdioc Structure}.
 
 @node L_GETGSTATS
 @subsubsection L_GETGSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+This input-output control command is used to retrieve global statistics for the
+driver associated with the Stream upon which the input-output control command is
+issued.
+The argument of this input-output control command is a pointer to the @type{lapb_gstioc},
 @type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
 described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @ref{mlp_gstioc Structure}.}
@@ -1426,7 +1456,10 @@ described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @node L_ZEROGSTATS
 @subsubsection L_ZEROGSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+This input-output control command is used to zero the global statistics for the
+driver associated with the Stream upon which the input-output control command is
+issued.
+The argument of this input-output control command is a pointer to the @type{lapb_gstioc},
 @type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
 described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @ref{mlp_gstioc Structure}.}
@@ -1434,13 +1467,13 @@ described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @node L_LINKDISABLE
 @subsubsection L_LINKDISABLE
 
-The argument of this input-output control is a pointer to the @type{ll_hdioc}
+The argument of this input-output control command is a pointer to the @type{ll_hdioc}
 structure described in @ref{ll_hdioc Structure}.
 
 @node L_LINKENABLE
 @subsubsection L_LINKENABLE
 
-The argument of this input-output control is a pointer to the @type{ll_hdioc}
+The argument of this input-output control command is a pointer to the @type{ll_hdioc}
 structure described in @ref{ll_hdioc Structure}.
 
 @node L_PUTX32MAP
@@ -1468,19 +1501,19 @@ structure described in @ref{ll_hdioc Structure}.
 @node M_SETSNID
 @subsubsection M_SETSNID
 
-The argument of this input-output control is a pointer to the @type{ll_snioc}
+The argument of this input-output control command is a pointer to the @type{ll_snioc}
 structure described in @ref{ll_snioc Structure}.
 
 @node M_GETSNID
 @subsubsection M_GETSNID
 
-The argument of this input-output control is a pointer to the @type{ll_snioc}
+The argument of this input-output control command is a pointer to the @type{ll_snioc}
 structure described in @ref{ll_snioc Structure}.
 
 @node M_SETTUNE
 @subsubsection M_SETTUNE
 
-The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+The argument of this input-output control command is a pointer to the @type{lapb_tnioc},
 @type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
 described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @ref{mlp_tnioc Structure}.}
@@ -1488,7 +1521,7 @@ described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @node M_GETTUNE
 @subsubsection M_GETTUNE
 
-The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+The argument of this input-output control command is a pointer to the @type{lapb_tnioc},
 @type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
 described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @ref{mlp_tnioc Structure}.}
@@ -1496,7 +1529,7 @@ described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
 @node M_GETSTATS
 @subsubsection M_GETSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_stioc},
+The argument of this input-output control command is a pointer to the @type{lapb_stioc},
 @type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
 described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @ref{mlp_stioc Structure}.}
@@ -1504,7 +1537,7 @@ described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @node M_ZEROSTATS
 @subsubsection M_ZEROSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_stioc},
+The argument of this input-output control command is a pointer to the @type{lapb_stioc},
 @type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
 described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @ref{mlp_stioc Structure}.}
@@ -1512,19 +1545,19 @@ described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
 @node M_TRACEON
 @subsubsection M_TRACEON
 
-The argument of this input-output control is a pointer to the @type{ll_hdioc}
+The argument of this input-output control command is a pointer to the @type{ll_hdioc}
 structure described in @ref{ll_hdioc Structure}.
 
 @node M_TRACEOFF
 @subsubsection M_TRACEOFF
 
-The argument of this input-output control is a pointer to the @type{ll_hdioc}
+The argument of this input-output control command is a pointer to the @type{ll_hdioc}
 structure described in @ref{ll_hdioc Structure}.
 
 @node M_GETGSTATS
 @subsubsection M_GETGSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+The argument of this input-output control command is a pointer to the @type{lapb_gstioc},
 @type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
 described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @ref{mlp_gstioc Structure}.}
@@ -1532,7 +1565,7 @@ described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @node M_ZEROGSTATS
 @subsubsection M_ZEROGSTATS
 
-The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+The argument of this input-output control command is a pointer to the @type{lapb_gstioc},
 @type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
 described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
 @ref{mlp_gstioc Structure}.}
@@ -1769,9 +1802,9 @@ below.  Each parameter value is described using its line number in the file, a
 parameter name, and a description of the format of the value.  Only the value
 appears in the file, each value on a line by itself, one value per line.
 
-Each of the LAPB configuration parameters correspons to the member and values
+Each of the LAPB configuration parameters corresponds to the member and values
 of the @type{lapb_tune} structure, that is carried in a @type{lapb_tnioc}
-structure by the @pioc{L_LAPBTUNE} input-output control.
+structure by the @pioc{L_LAPBTUNE} input-output control command.
 
 These protocol parameters, and the default values that exist when tuning has
 not been applied to a newly created LAPB subnetwork, correspond directly to the
@@ -1931,7 +1964,7 @@ appears in the file, each value on a line by itself, one value per line.
 
 Each of the LLC2 configuration parameters corresponds to the member and values
 of the @type{llc2_tune} structure, that is carried in a @type{llc2_tnioc}
-structure by the @pioc{L_LLC2TUNE} input-output control.
+structure by the @pioc{L_LLC2TUNE} input-output control command.
 
 These protocol parameters, and the default values that exist when tuning has
 not been applied to a newly created LLC2 subnetwork, correspond directly to the

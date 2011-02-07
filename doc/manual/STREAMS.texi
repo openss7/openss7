@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 1.1.2.2 2010-11-28 13:41:16 brian Exp $
+% @(#) $Id: STREAMS.texi,v 1.1.2.3 2011-02-07 02:21:33 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2010-11-28 13:41:16 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -93,7 +93,7 @@
 
 @dircategory STREAMS
 @direntry
-* streams: (@value{PACKAGE_TARNAME}).		Linux Fast-STREAMS.
+* STREAMS: (STREAMS).			Linux Fast-STREAMS.
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,7 +157,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2010  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -184,7 +184,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -477,6 +477,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: STREAMS.texi,v $
+Revision 1.1.2.3  2011-02-07 02:21:33  brian
+- updated manuals
+
 Revision 1.1.2.2  2010-11-28 13:41:16  brian
 - documentation updates
 
@@ -951,7 +954,7 @@ See @manref{STREAMS(9)} for more information.
 
 This kernel module contains the @file{fifo} @acronym{STREAMS} driver.
 This is a standard @acronym{STREAMS} driver, but is also used by the conformance and validation test suite.
-See @manref{fifo(4)} for more information.
+See @manref{fifo(4s)} for more information.
 
 @item @file{streams-sad}
 @pgindex streams-sad
@@ -1114,19 +1117,19 @@ This is a commonly implemented @acronym{STREAMS} driver.  It is implemented by @
 
 See @manref{echo(4)} for more information.
 
-@item @manpage{fifo(4)} (@file{streams-fifo})
+@item @manpage{fifo(4s)} (@file{streams-fifo})
 @pgindex streams-fifo
 @pgindex fifo
 
 FIFO (Named Pipe) device driver.
 This is a standard @cite{SVR 4.2 @acronym{STREAMS}} driver.
-The @manpage{fifo(4)} driver provides @cite{POSIX}-compliant @acronym{STREAMS}-based @dfn{FIFO} device.
+The @manpage{fifo(4s)} driver provides @cite{POSIX}-compliant @acronym{STREAMS}-based @dfn{FIFO} device.
 Not all implementations of @acronym{STREAMS} provide @acronym{STREAMS}-based @dfn{FIFO}s: some
 implementations use the older @cite{SVR 3}-style @dfn{FIFO}s that are not @acronym{STREAMS}-based.
-@cite{@value{PACKAGE_TITLE}} provides @acronym{STREAMS}-based @dfn{FIFO}s with the @manpage{fifo(4)}
+@cite{@value{PACKAGE_TITLE}} provides @acronym{STREAMS}-based @dfn{FIFO}s with the @manpage{fifo(4s)}
 driver.
 
-See @manref{fifo(4)} for more information.
+See @manref{fifo(4s)} for more information.
 
 @item @manpage{log(4)} (@file{streams-log})
 @pgindex streams-log
@@ -1384,22 +1387,22 @@ on these routines.
 @item fattach(2)
 Name a @acronym{STREAMS} special file.
 
-@item fdetach(2)
+@item fdetach(2s)
 Unname a @acronym{STREAMS} special file.
 
-@item getmsg(2)
+@item getmsg(2s)
 Get next message off of a Stream.
 
 @item getpmsg(2s)
 Get next message off of a Stream.
 
-@item isastream(2)
+@item isastream(2s)
 Test for a @acronym{STREAMS} special file.
 
 @item pipe(2s)
 Create a @acronym{STREAMS} pipe.
 
-@item putmsg(2)
+@item putmsg(2s)
 Put a message to a @acronym{STREAMS} character device.
 
 @item putpmsg(2s)
@@ -1444,7 +1447,7 @@ versions of the library.
 Failure to link the executable runtime path for @file{libstreams} will result in linker-loader
 warnings that the functions @manpage{getpmsg(2s)} or @manpage{putpmsg(2s)} are not implemented and
 will always fail.@footnote{These warnings are generated when linking only against the @file{libc}
-library that includes only failing stubs for @manpage{getpmsg(2)} and @manpage{putpmsg(2)}}.
+library that includes only failing stubs for @manpage{getpmsg(2s)} and @manpage{putpmsg(2s)}}.
 
 See also @refman{Development} for more information.
 
@@ -1827,7 +1830,7 @@ See @manref{test-echo(8)} for more information.
 
 The @manpage{test-fifo(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{fifo(4)} @acronym{STREAMS} driver.
+@manpage{fifo(4s)} @acronym{STREAMS} driver.
 
 See @manref{test-fifo(8)} for more information.
 
@@ -2234,13 +2237,13 @@ The following manual pages are installed in Section 2 of the manual (in the subd
 
 @multitable @columnfractions .40 .60
 @item @manref{fattach(2)} -- @tab name a @acronym{STREAMS} special file.
-@item @manref{fdetach(2)} -- @tab unname a @acronym{STREAMS} special file.
-@item @manref{getmsg(2)} -- @tab get next message off a Stream.
+@item @manref{fdetach(2s)} -- @tab unname a @acronym{STREAMS} special file.
+@item @manref{getmsg(2s)} -- @tab get next message off a Stream.
 @item @manref{getpmsg(2s)} -- @tab get next message off a Stream.
-@item @manref{isastream(2)} -- @tab test for a @acronym{STREAMS} special file.
+@item @manref{isastream(2s)} -- @tab test for a @acronym{STREAMS} special file.
 @item @manref{pipe(2s)} -- @tab create a @acronym{STREAMS} pipe.
 @item @manref{poll(2s)} -- @tab wait for an event on a @acronym{STREAMS} file descriptor.
-@item @manref{putmsg(2)} -- @tab put a message to a @acronym{STREAMS} character device.
+@item @manref{putmsg(2s)} -- @tab put a message to a @acronym{STREAMS} character device.
 @item @manref{putpmsg(2s)} -- @tab put a band message to a @acronym{STREAMS} character device.
 @item @manref{read(2s)} -- @tab read from a file descriptor.
 @item @manref{readv(2s)} -- @tab read or write a vector.
@@ -2313,7 +2316,7 @@ The following manual pages are installed in Section 7 of the manual (in the subd
 @item @manref{I_EGETSIG(7)} -- @tab get enhanced @acronym{STREAMS} SIGPOLL events.
 @item @manref{I_ESETSIG(7)} -- @tab set enhanced @acronym{STREAMS} SIGPOLL events.
 @item @manref{I_FATTACH(7)} -- @tab emulate @manpage{fattach(2)} system call.
-@item @manref{I_FDETACH(7)} -- @tab emulate @manpage{fdetach(2)} system call.
+@item @manref{I_FDETACH(7)} -- @tab emulate @manpage{fdetach(2s)} system call.
 @item @manref{I_FDINSERT(7)} -- @tab insert a Stream identifier into a @acronym{STREAMS} message and send it downstream.
 @item @manref{I_FIND(7)} -- @tab find a @acronym{STREAMS} module on a Stream.
 @item @manref{I_FLUSH(7)} -- @tab flush messages from a @acronym{STREAMS} special file.
@@ -2325,7 +2328,7 @@ The following manual pages are installed in Section 7 of the manual (in the subd
 @item @manref{I_GETSIG(7)} -- @tab get SIGPOLL events.
 @item @manref{I_GRDOPT(7)} -- @tab get @acronym{STREAMS} read options.
 @item @manref{I_GWROPT(7)} -- @tab get @acronym{STREAMS} write options.
-@item @manref{I_ISASTREAM(7)} -- @tab emulate @manpage{isastream(2)} system call.
+@item @manref{I_ISASTREAM(7)} -- @tab emulate @manpage{isastream(2s)} system call.
 @item @manref{I_LINK(7)} -- @tab link a Stream beneath a @acronym{STREAMS} multiplexing driver.
 @item @manref{I_LIST(7)} -- @tab list @acronym{STREAMS} module names on a Stream.
 @item @manref{I_LOOK(7)} -- @tab look at topmost @acronym{STREAMS} module on a Stream.
@@ -2373,7 +2376,7 @@ The following manual pages are installed in Section 8 of the manual (in the subd
 @item @manref{test-clone(8)} -- @tab a test suite executable for the @manpage{clone(4)} @acronym{STREAMS} driver.
 @item @manref{test-connld(8)} -- @tab a test suite executable for the @manpage{connld(4)} @acronym{STREAMS} module.
 @item @manref{test-echo(8)} -- @tab a test suite executable for the @manpage{echo(4)} @acronym{STREAMS} driver.
-@item @manref{test-fifo(8)} -- @tab a test suite executable for the @manpage{fifo(4)} @acronym{STREAMS} driver.
+@item @manref{test-fifo(8)} -- @tab a test suite executable for the @manpage{fifo(4s)} @acronym{STREAMS} driver.
 @item @manref{test-log(8)} -- @tab a test suite executable for the @manpage{log(4)} @acronym{STREAMS} driver.
 @item @manref{test-loop(8)} -- @tab a test suite executable for the @manpage{loop(4)} @acronym{STREAMS} driver.
 @item @manref{test-mux(8)} -- @tab a test suite executable for the @manpage{mux(4)} @acronym{STREAMS} driver.
@@ -2507,7 +2510,7 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{dev_t(9)} -- @tab @acronym{STREAMS} device type.
 @item @manref{devnode(9)} -- @tab @acronym{STREAMS} character device node structure.
 @item @manref{do_fattach(9)} -- @tab implement the @manpage{fattach(2)} system call.
-@item @manref{do_fdetach(9)} -- @tab implement the @manpage{fdetach(2)} system call.
+@item @manref{do_fdetach(9)} -- @tab implement the @manpage{fdetach(2s)} system call.
 @item @manref{do_spipe(9)} -- @tab implement the @manpage{pipe(2s)} system call.
 @item @manref{drv_getparm(9)} -- @tab driver retrieve kernel parameter.
 @item @manref{drv_hztomsec(9)} -- @tab convert kernel tick time between microseconds or milliseconds.
@@ -2575,7 +2578,7 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{noenable(9)} -- @tab disable a @acronym{STREAMS} message queue from being scheduled.
 @item @manref{pcmsg(9)} -- @tab test a data block message type for priority control.
 @item @manref{pullupmsg(9)} -- @tab pull up the bytes in a @acronym{STREAMS} message.
-@item @manref{put(9)} -- @tab invoke the put procedure for a @acronym{STREAMS} driver of module with a @acronym{STREAMS} message.
+@item @manref{put(9s)} -- @tab invoke the put procedure for a @acronym{STREAMS} driver of module with a @acronym{STREAMS} message.
 @item @manref{putbq(9)} -- @tab put a message back on a @acronym{STREAMS} message queue.
 @item @manref{putctl(9)} -- @tab put a control message on a @acronym{STREAMS} message queue.
 @item @manref{putctl1(9)} -- @tab put a one-byte control message on a @acronym{STREAMS} message queue.

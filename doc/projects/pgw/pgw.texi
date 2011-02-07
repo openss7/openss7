@@ -2,10 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: pgw.texi,v 1.1.2.2 2010-03-10 08:42:18 brian Exp $
+% @(#) $Id: pgw.texi,v 1.1.2.3 2011-02-07 02:21:36 brian Exp $
 %
 % =========================================================================
 %
+% Copyright (c) 2010-2011  Optranex Incorporated <http://www.optranex.com/>
 % Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -82,7 +83,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2010-03-10 08:42:18 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:36 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +96,7 @@
 
 @dircategory OpenSS7
 @direntry
-* PSTN Gateway: (pgw).			    Optranex 248 PSTN Gateway
+* PSTN Gateway: (pgw).			Optranex 248 PSTN Gateway
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +111,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2010-2010  @uref{http://www.optranex.com/, Optranex Incorporated} @*
+Copyright @copyright{} 2010-2011  @uref{http://www.optranex.com/, Optranex Incorporated} @*
 Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
@@ -161,7 +162,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2010  Monavacon Limited
+@subtitle Copyright @copyright{} 2010-2011  Optranex Incorporated
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -186,6 +187,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
+Copyright @copyright{} 2010-2011  @uref{http://www.optranex.com/, Optranex Incorporated} @*
 Copyright @copyright{} 2008-2010  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
@@ -449,6 +451,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: pgw.texi,v $
+Revision 1.1.2.3  2011-02-07 02:21:36  brian
+- updated manuals
+
 Revision 1.1.2.2  2010-03-10 08:42:18  brian
 - added Optranex files
 
@@ -5062,9 +5067,9 @@ Project} and released under the @ref{GNU Affero General Public License}.
 
 The @cite{OpenSS7} ISUP stack is a @acronym{STREAMS} application and API that consists primarily of a
 call control API user that passes primitives to the ISUP stack using formatted @samp{C} language
-structures which are written to a @acronym{STREAMS} file descriptor using @manref{putmsg(2)}.
+structures which are written to a @acronym{STREAMS} file descriptor using @manref{putmsg(2s)}.
 Primitives are read from the ISUP stack by reading primitives formatted as @samp{C} language
-structures which are read from a @acronym{STREAMS} file descriptor using @manref{getmsg(2)}.  The first
+structures which are read from a @acronym{STREAMS} file descriptor using @manref{getmsg(2s)}.  The first
 field of each primitive contains a primitive type which corresponds to a defined primitive for the
 interface.  The remaining members of the @samp{C} language structure are specific to the primitive
 indicated in the first field.  In this way, the interface and API consists of a fully asynchronous
@@ -5094,14 +5099,14 @@ The SIP to ISUP interworking function is written within the scope of a @cite{sof
 application.  The interworking function uses the event loop and dispatch mechanisms of the @dfn{su}
 module of the @cite{sofia-SIP} libraries.  As with any other event loop based library, some
 mechanism is provided to permit the callback of a function one typical @manref{select(2)} or
-@manref{poll(2)} events.@footnote{@cite{net-snmp} only provides @manpage{select(2)}.}
+@manref{poll(2s)} events.@footnote{@cite{net-snmp} only provides @manpage{select(2)}.}
 Because the @cite{OpenSS7} ISUP stack is based on a @acronym{STREAMS} interface whose file descriptors
 support the entire range of functionality of @manref{poll(2s)}, including that of @acronym{STREAMS}, it
 is very easy to simply install the ISUP file descriptor with a @type{pollfd} structure using the
 @command{su_root_register()} function in @cite{sofia-SIP}.
 
 The interworking function will open three streams (file descriptors resulting from a
-@manref{open(2)} call on device @file{/dev/streams/isup}) for processing call control.  One stream
+@manref{open(2s)} call on device @file{/dev/streams/isup}) for processing call control.  One stream
 will be bound (with the @prim{CC_BIND_REQ} primitive after opening) as a listening streams with the
 @parm{cc_setup_ind} field of the @prim{CC_BIND_REQ} set to a positive non-zero integer.  A second
 stream will be bound with the @parm{cc_setup_ind} field of the @prim{CC_BIND_REQ} set to zero.  A

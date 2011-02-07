@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mtpi.texi,v 1.1.2.1 2009-06-21 10:54:11 brian Exp $
+% @(#) $Id: mtpi.texi,v 1.1.2.2 2011-02-07 02:21:40 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:54:11 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:40 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* MTPI: (mtpi).			Message Transfer Part Interface
+* MTPI: (mtpi).				Message Transfer Part Interface
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -406,6 +406,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: mtpi.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:40  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:54:11  brian
 - added files to new distro
 

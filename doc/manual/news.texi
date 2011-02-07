@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 1.1.2.4 2011-01-12 03:37:37 brian Exp $
+@c @(#) $Id: news.texi,v 1.1.2.5 2011-02-07 02:21:34 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -308,7 +308,7 @@ can be used on production kernels without patching or recompiling the kernel.
 This package is publicly released strictly under the @cite{GNU Affero General Public License Version
 3}; however, commercial licensing is available.  The release is available as an @manref{autoconf(1)}
 tarball, SRPM, DSC, and a set of binary RPMs and DEBs for popular distributions.  See the
-@uref{http://www.openss.org/@value{PACKAGE}_pkg.html,package page} for the @mantype{autoconf(1)}
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,package page} for the @mantype{autoconf(1)}
 tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
 @uref{http://www.openss7.org/repos.html,repository page} for information concerning network
 installation and update sources.
