@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: mlp_proto.h,v 1.1.2.2 2010-11-28 14:21:53 brian Exp $
+ @(#) $Id: mlp_proto.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:53 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mlp_proto.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:53  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,5 +66,10 @@
 #ifndef __SYS_SNET_MLP_PROTO_H__
 #define __SYS_SNET_MLP_PROTO_H__
 
-#endif				/* __SYS_SNET_MLP_PROTO_H__ */
+#define LC_MLAPBDTE	23
+#define LC_MLAPBXDTE	24
+#define LC_MLAPBDCE	25
+#define LC_MLAPBXDCE	26
+#define LC_MLP		27
 
+#endif				/* __SYS_SNET_MLP_PROTO_H__ */

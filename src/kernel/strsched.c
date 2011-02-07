@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:43 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.6  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.5  2011-01-12 04:10:32  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:43 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2542,7 +2545,7 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/openss7/stream.h */
  *  qwakeup:	- wake waiters on a queue pair
  *  @q:		one queue of the queue pair to wake
  */
-STATIC streams_fastcall __hot void
+streams_fastcall __hot void
 qwakeup(queue_t *q)
 {
 	struct queinfo *qu = ((struct queinfo *) RD(q));
@@ -2550,6 +2553,8 @@ qwakeup(queue_t *q)
 	if (unlikely(waitqueue_active(&qu->qu_qwait)))
 		wake_up_all(&qu->qu_qwait);
 }
+
+EXPORT_SYMBOL(qwakeup);         /* include/sys/openss7/stream.h */
 
 /*
  *  Immediate event processing.

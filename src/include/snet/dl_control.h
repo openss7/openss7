@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: dl_control.h,v 1.1.2.2 2010-11-28 14:21:45 brian Exp $
+ @(#) $Id: dl_control.h,v 1.1.2.3 2011-02-07 04:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:45 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_control.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:42  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:45  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,5 +66,50 @@
 #ifndef __SYS_SNET_DL_CONTROL_H__
 #define __SYS_SNET_DL_CONTROL_H__
 
-#endif				/* __SYS_SNET_DL_CONTROL_H__ */
+#define DL_VERSION	2
 
+#define DATAL_STAT	('E'<<8| 1)
+#define DATAL_ZERO	('E'<<8| 2)
+#define DATAL_REGISTER	('E'<<8| 3)
+#define DATAL_GPARM	('E'<<8| 4)
+#define DATAL_DEBUG	('E'<<8| 5)
+#define DATAL_SET_ADDR	('E'<<8| 6)
+#define DATAL_DFLT_ADDR	('E'<<8| 7)
+#define DATAL_VERSION	('E'<<8| 8)
+
+#define DATAL_RANGETAB	0x01
+
+struct datal_stat {
+	uint32_t dl_tx;
+	uint32_t dl_rx;
+	uint32_t dl_coll;
+	uint32_t dl_lost;
+	uint32_t dl_txerr;
+	uint32_t dl_rxerr;
+};
+
+struct datal_register {
+	uint8_t version;
+	uint32_t mac_type;
+	uint8_t addr_len;
+	uint8_t align;
+	uint16_t lwb;
+	uint16_t upb;
+};
+
+struct datal_gparm {
+	uint8_t version;
+	uint32_t mac_type;
+	uint8_t addr_len;
+	uint8_t align;
+	uint16_t frgsz;
+	uint8_t addr[1];
+};
+
+struct datal_debug {
+	int flags;
+	int count;
+	char space[1024];
+};
+
+#endif				/* __SYS_SNET_DL_CONTROL_H__ */

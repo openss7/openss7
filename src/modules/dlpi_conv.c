@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi_conv.c,v $
+ Revision 1.1.2.3  2011-02-07 04:54:44  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $";
 
 /*
  *  DLPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts
@@ -69,12 +72,14 @@ static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.
  *  service procedure is required and the conversion is performed completely in the put procedure.
  */
 
-#include <sys/stream.h>
+#define _SUN_SOURCE		1
+
+#include <sys/os7/compat.h>
 #include <sys/dlpi.h>
 
 #define DLPI_CONV_DESCRIP	"DLPI ENDIAN CONVERSION (DLPI-CONV) FOR LINUX FAST-STREAMS"
 #define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $"
+#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_CONV_LICENSE	"GPL"
@@ -174,7 +179,7 @@ dlpi_m_proto(queue_t *q, mblk_t *mp, uint32_t prim)
 		break;
 	}
 	putnext(q, mp);
-	break;
+	return (0);
 }
 
 static streamscall int
@@ -263,7 +268,7 @@ static struct module_stat dlpi_conv_rstat __attribute__ ((__aligned__(SMP_CACHE_
 static struct module_stat dlpi_conv_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int
-dlpi_qclose(queue_t *q, dev_t *devp, int oflag)
+dlpi_qclose(queue_t *q, int oflag, cred_t *credp)
 {
 	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = (queue_t *) 0;	/* just mark it closed */
@@ -324,5 +329,5 @@ dlpi_convexit(void)
 
 #ifdef CONFIG_STREAMS_DLPI_CONV_MODULE
 module_init(dlpi_convinit);
-module_init(dlpi_convexit);
+module_exit(dlpi_convexit);
 #endif				/* CONFIG_STREAMS_DLPI_CONV_MODULE */

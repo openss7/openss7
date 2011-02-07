@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $
+ @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:04 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_conv.c,v $
+ Revision 1.1.2.3  2011-02-07 04:54:45  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:22:04  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $";
+static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $";
 
 
 /*
@@ -70,12 +73,14 @@ static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2
  *  procedure is required and the conversion is performed completely in the put procedure.
  */
 
-#include <sys/stream.h>
+#define _SUN_SOURCE		1
+
+#include <sys/os7/compat.h>
 #include <sys/npi.h>
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"
@@ -150,7 +155,7 @@ npi_m_proto(queue_t *q, mblk_t *mp, uint32_t prim)
 		break;
 	}
 	putnext(q, mp);
-	break;
+	return (0);
 }
 
 static streamscall int
@@ -239,7 +244,7 @@ static struct module_stat npi_conv_rstat __attribute__ ((__aligned__(SMP_CACHE_B
 static struct module_stat npi_conv_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int
-npi_qclose(queue_t *q, dev_t *devp, int oflag)
+npi_qclose(queue_t *q, int oflag, cred_t *credp)
 {
 	qprocsoff(q);
 	q->q_ptr = WR(q)->q_ptr = (queue_t *) 0;	/* just mark it closed */
@@ -300,5 +305,5 @@ npi_convexit(void)
 
 #ifdef CONFIG_STREAMS_NPI_CONV_MODULE
 module_init(npi_convinit);
-module_init(npi_convexit);
+module_exit(npi_convexit);
 #endif				/* CONFIG_STREAMS_NPI_CONV_MODULE */

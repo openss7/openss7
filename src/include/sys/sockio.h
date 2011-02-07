@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sockio.h,v 1.1.2.2 2010-11-28 14:21:49 brian Exp $
+ @(#) $Id: sockio.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:49 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockio.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:49  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -67,27 +70,30 @@
 
 #define SOCKIO ('s'<<8)
 
-#define SIOCHIWAT	(SOCKIO|0)	/* set hi watermark */
-#define SIOGHIWAT	(SOCKIO|1)	/* get hi watermark */
-#define SIOCLOWAT	(SOCKIO|2)	/* set lo watermark */
-#define SIOGLOWAT	(SOCKIO|3)	/* get lo watermark */
+/* These are from 4.4BSD-Lite. */
+#define SIOCSHIWAT	(SOCKIO|0)	/* (int) set hi watermark */
+#define SIOCGHIWAT	(SOCKIO|1)	/* (int) get hi watermark */
+#define SIOCSLOWAT	(SOCKIO|2)	/* (int) set lo watermark */
+#define SIOCGLOWAT	(SOCKIO|3)	/* (int) get lo watermark */
 
 /* Linux sometimes defines these three... */
 
 #ifndef SIOCATMARK
-#define SIOCATMARK	(SOCKIO|7)	/* at oob mark */
+#define SIOCATMARK	(SOCKIO|7)	/* (int) at oob mark */
 #endif				/* SIOCATMARK */
 #ifndef SIOCSPGRP
-#define SIOCSPGRP	(SOCKIO|8)	/* set process group */
+#define SIOCSPGRP	(SOCKIO|8)	/* (int) set process group */
 #endif				/* SIOCSPGRP */
 #ifndef SIOCGPGRP
-#define SIOCGPGRP	(SOCKIO|9)	/* get process group */
+#define SIOCGPGRP	(SOCKIO|9)	/* (int) get process group */
 #endif				/* SIOCGPGRP */
 
-#define SIOCPROTO	(SOCKIO|51)	/* link proto */
-#define SIOCGETNAME	(SOCKIO|52)	/* getsockname */
-#define SIOCGETPEER	(SOCKIO|53)	/* getpeername */
-#define IF_UNITSEL	(SOCKIO|54)	/* set unit number */
-#define SIOCXPROTO	(SOCKIO|55)	/* empty proto table */
+/* STREAMS based socket emulation */
+
+#define SIOCPROTO	(SOCKIO|51)	/* (socknewproto) link proto */
+#define SIOCGETNAME	(SOCKIO|52)	/* (sockaddr) getsockname */
+#define SIOCGETPEER	(SOCKIO|53)	/* (sockaddr) getpeername */
+#define IF_UNITSEL	(SOCKIO|54)	/* (int) set unit number */
+#define SIOCXPROTO	(SOCKIO|55)	/* () empty proto table */
 
 #endif				/* __SYS_SOCKIO_H__ */

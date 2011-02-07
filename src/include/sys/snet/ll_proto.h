@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ll_proto.h,v 1.1.2.2 2010-11-28 14:21:53 brian Exp $
+ @(#) $Id: ll_proto.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:53 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ll_proto.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:53  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -62,6 +65,26 @@
 
 #ifndef __SYS_SNET_LL_PROTO_H__
 #define __SYS_SNET_LL_PROTO_H__
+
+#define LC_LLC1		15
+#define LC_LLC2		16
+#define LC_LAPBDTE	17
+#define LC_LAPBXDTE	18
+#define LC_LAPBDCE	19
+#define LC_LAPBXDCE	20
+#define LC_LAPDTE	21
+#define LC_LAPDCE	22
+#define LC_HDLC		27
+#define LC_HDLCX	28
+
+#define	LS_FAILED	 0
+#define	LS_SUCCESS	 1
+#define	LS_EXHAUSTED	 2
+#define LS_RESETDONE	 3
+#define LS_CONFLICT	 4
+#define LS_DISCONNECT	 5
+#define LS_RST_FAILED	 6
+#define LS_RST_REFUSED	 7
 
 #endif				/* __SYS_SNET_LL_PROTO_H__ */
 

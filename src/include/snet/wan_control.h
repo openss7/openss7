@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: wan_control.h,v 1.1.2.2 2010-11-28 14:21:46 brian Exp $
+ @(#) $Id: wan_control.h,v 1.1.2.3 2011-02-07 04:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:46 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wan_control.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:42  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:46  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -70,5 +73,209 @@
  * and modules, should use the CDI interface instead.
  */
 
-#endif				/* __SYS_SNET_WAN_CONTROL_H__ */
+/* values for w_type field */
+#define WAN_STATS	1	/* 0x34 wan_stioc structure */
+#define WAN_TUNE	2	/* 0x35 wan_tnioc structure */
+#define WAN_MAP		3	/* 0x36 wan_mpioc union */
+#define WAN_PLAIN	4	/* 0x37 wan_hdioc structure */
+#define WAN_SETSIG	5	/* 0x38 wan_setsigf structure */
 
+/* WAN_STATS structures */
+
+typedef struct hstats {
+	uint32_t hc_txgood;		/* good frames transmitted */
+	uint32_t hc_txurun;		/* transmitter underruns */
+	uint32_t hc_rxgood;		/* good frames received */
+	uint32_t hc_rxorun;		/* receiver overruns */
+	uint32_t hc_rxcrc;		/* CRC or framing errors */
+	uint32_t hc_rxnobuf;		/* no receive buffer */
+	uint32_t hc_rxnflow;		/* frame received no flow control */
+	uint32_t hc_rxoflow;		/* buffer overflows */
+	uint32_t hc_rxabort;		/* received aborts */
+	uint32_t hc_intframes;		/* tranmission failures */
+} hdlcstats_t;
+
+/* values for w_state field */
+#define HDLC_IDLE	0	/*  0 */
+#define HDLC_ESTB	1	/* 30 */
+#define HDLC_DISABLED	2	/* 31 */
+#define HDLC_CONN	3	/* 40 */
+#define HDLC_DISC	4	/* 41 */
+
+struct wan_stioc {
+	uint8_t w_type;			/* always WAN_STATS */
+	uint8_t w_state;		/* HDLC state */
+	uint8_t w_spare[2];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+	hdlcstats_t hdlc_stats;		/* statistics */
+};
+
+/* WAN_TUNE structures */
+
+/* values for WAN_cptype field */
+#define WAN_NONE	0
+#define WAN_X21P	1
+#define WAN_V25bis	2
+
+/* for a description of timers and defaults, see X.21 Annex C DTE Timers */
+struct WAN_x21 {
+	uint16_t WAN_cptype;		/* Always WAN_X21P. */
+	uint16_t T1;			/* X.21 T1: call-request to proceed-to-select timer */
+	uint16_t T2;			/* X.21 T2: end-of-selection to ready-for-data timer */
+	uint16_t T3A;			/* X.21 T3A: addtn'l call prog or DCE provided info timer */
+	uint16_t T4B;			/* X.21 T4B: call-accept to ready-for-data timer */
+	uint16_t T5;			/* X.21 T5: DTE clear-request to DCE ready timer */
+	uint16_t T6;			/* X.21 T6: DTE clear-confirmation to DCE ready timer */
+};
+
+/* default values for the WAN_x21 structure */
+const struct WAN_x21 WAN_x21_defaults = {
+	.WAN_cptype = WAN_X21P,	/* Always WAN_X21P */
+	.T1 = 30,		/* 3.0 seconds */
+	.T2 = 200,		/* 20.0 seconds */
+	.T3A = 60,		/* 6.0 seconds */
+	.T4B = 60,		/* 6.0 seconds */
+	.T5 = 20,		/* 2.0 seconds */
+	.T6 = 20,		/* 2.0 seconds */
+};
+
+/* for a description of timers and defaults, see V.25 bis Clause 5.2 */
+struct WAN_v25 {
+	uint16_t WAN_cptype;		/* Always WAN_V25bis. */
+	uint16_t callreq;		/* V.25 bis T1: call init. to call estab. timer */
+};
+
+/* default values for the WAN_v25 structure */
+const struct WAN_v25 WAN_v25_defaults = {
+	.WAN_cptype = WAN_V25bis,	/* Always WAN_X21P */
+	.callreq = 6000,	/* 600.0 seconds, 5 minutes */
+};
+
+/* values for WAN_interface field */
+#define WAN_X21		0
+#define WAN_V28		1
+#define WAN_V35		2
+
+/* values for WAN_phy_if field */
+#define WAN_DTE		0
+#define WAN_DCE		1
+
+struct WAN_hddef {
+	uint16_t WAN_maxframe;		/* WAN maximum frame size (octets). */
+	uint32_t WAN_baud;		/* WAN baud rate. */
+	uint16_t WAN_interface;		/* WAN physical interface. */
+	union {
+		uint16_t WAN_cptype;	/* significant when WAN_NONE */
+		struct WAN_x21 WAN_x21def;	/* significant when WAN_X21P */
+		struct WAN_v25 WAN_v25def;	/* significant when WAN_V25bis */
+	} WAN_cpdef;			/* call procedure definitions */
+};
+
+/* values for WAN_options field */
+#define TRANSLATE	0x0001
+
+typedef struct wantune {
+	uint16_t WAN_options;
+	struct WAN_hddef WAN_hd;
+} wantune_t;
+
+struct wan_tnioc {
+	uint8_t w_type;			/* always WAN_TUNE */
+	uint8_t w_spare[3];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+	wantune_t wan_tune;		/* WAN tunables */
+};
+
+/* WAN_MAP structures */
+
+typedef struct wanmap {
+	uint8_t remsize;		/* remote address size in octets */
+	uint8_t remaddr[20];		/* remote address containing remsize octets */
+	uint8_t infsize;		/* interface address size in octets */
+	uint8_t infaddr[30];		/* interface address containing infsize octets */
+} wanmap_t;
+
+typedef struct wanget {
+	uint16_t first_ent;		/* index of first entry in entries member */
+	uint16_t num_ent;		/* number of entries in entries member */
+	wanmap_t entries[1];
+	/* followed by (num_ent - 1) * sizeof(wanmap_t) entry buffer */
+} wanget_t;
+
+/* used with W_GETWANMAP */
+struct wanmapgf {
+	uint8_t w_type;			/* always WAN_MAP */
+	uint8_t w_spare[3];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+	wanget_t wan_ents;		/* block of mapping entries */
+};
+
+/* used with W_PUTWANMAP */
+struct wanmappf {
+	uint8_t w_type;			/* always WAN_MAP */
+	uint8_t w_spare[3];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+	wanmap_t wan_ent;		/* single mapping entry */
+};
+
+/* used with W_DELWANMAP */
+struct wanmapdf {
+	uint8_t w_type;			/* always WAN_MAP */
+	uint8_t w_spare[3];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+};
+
+union wan_mpioc {
+	uint8_t w_type;			/* always WAN_MAP */
+	struct wanmapgf wan_getmap;	/* W_GETWANMAP structure */
+	struct wanmappf wan_putmap;	/* W_PUTWANMAP structure */
+	struct wanmapdf wan_delmap;	/* W_DELWANMAP structure */
+};
+
+/* WAN_PLAIN structures */
+
+struct wan_hdioc {
+	uint8_t w_type;			/* always WAN_PLAIN */
+	uint8_t w_spare[3];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+};
+
+/* WAN_SETSIG structures */
+
+/* definitions for w_ctrlsignal field */
+#define W_RTS_HIGH	(1<<0)	/* set or indicate RTS high (X.21 C) */
+#define W_DTR_HIGH	(1<<1)	/* set or indicate DTR high */
+#define W_DCD_HIGH	(1<<2)	/* indicate DCD high */
+#define W_DSR_HIGH	(1<<3)	/* indicate DSR high */
+#define W_CTS_HIGH	(1<<4)	/* indicate CTS high (X.21 I) */
+#define W_RI_HIGH	(1<<5)	/* indicate RI high */
+#define W_RTS_LOW	(1<<6)	/* set RTS low */
+#define W_DTR_LOW	(1<<7)	/* set DTR low */
+
+typedef struct wan_setsig {
+	uint8_t w_ctrlsignal;
+	uint8_t w_reserved[3];
+} wan_setsig_t;
+
+struct wan_setsigf {
+	uint8_t w_type;			/* always WAN_SETSIG */
+	uint8_t w_spare[3];		/* spare bytes for alignment */
+	uint32_t w_snid;		/* subnetwork identifier */
+	wan_setsig_t wan_setsig;	/* signals and leads set */
+};
+
+#define W_ZEROSTATS	(('W'<<8)|000)	/* zero statistics */
+#define W_GETSTATS	(('W'<<8)|001)	/* get statistics */
+#define W_SETTUNE	(('W'<<8)|002)	/* set tunables */
+#define W_GETTUNE	(('W'<<8)|003)	/* get tunables */
+#define W_PUTWANMAP	(('W'<<8)|004)	/* put address mapping */
+#define W_GETWANMAP	(('W'<<8)|005)	/* get address mappings */
+#define W_DELWANMAP	(('W'<<8)|006)	/* del address mappings */
+#define W_STATUS	(('W'<<8)|007)	/* get interface status */
+#define W_ENABLE	(('W'<<8)|010)	/* enable interface */
+#define W_DISABLE	(('W'<<8)|011)	/* disable interface */
+#define W_SETSIG	(('W'<<8)|012)	/* set signals and leads */
+#define W_GETSIG	(('W'<<8)|013)	/* get signals and leads */
+#define W_POLLSIG	(('W'<<8)|014)	/* poll signals and leads */
+
+#endif				/* __SYS_SNET_WAN_CONTROL_H__ */

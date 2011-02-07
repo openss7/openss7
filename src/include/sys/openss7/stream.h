@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 1.1.2.2 2010-11-28 14:21:52 brian Exp $
+ @(#) $Id: stream.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:52 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:52  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -1069,6 +1072,7 @@ __STREAMS_EXTERN int qdetach(queue_t *rq, int oflag, cred_t *crp);
 __STREAMS_EXTERN int qclose(queue_t *q, int oflag, cred_t *credp);
 __STREAMS_EXTERN int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp);
 __STREAMS_EXTERN int qready(void);
+__STREAMS_EXTERN void qwakeup(queue_t *q);
 __STREAMS_EXTERN int strqget(register queue_t *q, qfields_t what, register unsigned char band,
 			     long *val);
 __STREAMS_EXTERN int strqset(register queue_t *q, qfields_t what, register unsigned char band,

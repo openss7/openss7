@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-12-19 00:26:46 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:44 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2010-12-19 00:26:46 $ by $Author: brian $
+## Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -70,6 +70,11 @@ module	timod	    timod
 module	tirdwr	    tirdwr
 
 module	mstr	    mstr
+
+module	cdi_conv    cdi_conv
+module	dlpi_conv   dlpi_conv
+module	npi_conv    npi_conv
+module	tpi_conv    tpi_conv
 
 module	aal1	    aal1
 module	aal2	    aal2
@@ -144,6 +149,11 @@ objname	module	timod	    timod
 objname	module	tirdwr	    tirdwr
 
 objname	module	mstr	    mstr
+
+objname	module	cdi_conv    cdi_conv
+objname	module	dlpi_conv    dlpi_conv
+objname	module	npi_conv    npi_conv
+objname	module	tpi_conv    tpi_conv
 
 objname	module	aal1	    aal1
 objname	module	aal2	    aal2
@@ -223,6 +233,11 @@ objname	module	zaptel	    zaptel
 @CONFIG_STREAMS_TIRDWR_MODULE_TRUE@loadable	tirdwr
 
 loadable	mstr
+
+loadable	cdi_conv
+loadable	dlpi_conv
+loadable	npi_conv
+loadable	tpi_conv
 
 loadable	aal1
 loadable	aal2
@@ -322,6 +337,9 @@ loadable	zaptel
 ## =============================================================================
 ##
 ## $Log: Config.in,v $
+## Revision 1.1.2.4  2011-02-07 04:54:44  brian
+## - code updates for new distro support
+##
 ## Revision 1.1.2.3  2010-12-19 00:26:46  brian
 ## - added multi-stream conversion module
 ##

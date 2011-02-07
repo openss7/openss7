@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:54:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:24 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 1.1.2.5  2011-02-07 04:54:41  brian
+ - code updates for new distro support
+
  Revision 1.1.2.4  2010-11-28 14:32:24  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:54:41 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -506,7 +509,7 @@ void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:54:41 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -16806,7 +16809,6 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	t_scalar_t tpi_oldstate = ss_get_state(ss);
 	int tcp_oldstate = ss->tcp_state;
-	int tcp_newstate = sk->sk_state;
 
 	LOGRX(ss, "%s", __FUNCTION__);
 	if (unlikely(sk->sk_err == 0))
@@ -16848,7 +16850,7 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		break;
 	}
 	LOGERR(ss, "SWERR: socket type %d state %s -> %s in TPI state %s: %s %s:%d", type,
-		  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
+		  tcp_statename(tcp_oldstate), tcp_statename(sk->sk_state),
 		  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
 	return;
 }
@@ -16871,7 +16873,6 @@ __ss_r_data_ready(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	t_scalar_t tpi_oldstate = ss_get_state(ss);
 	int tcp_oldstate = ss->tcp_state;
-	int tcp_newstate = sk->sk_state;
 
 	LOGRX(ss, "%s", __FUNCTION__);
 	switch (__builtin_expect(type, SOCK_STREAM)) {
@@ -16911,7 +16912,7 @@ __ss_r_data_ready(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		break;
 	}
 	LOGERR(ss, "SWERR: socket %d state %s -> %s in TPI state %s: %s %s:%d", type,
-		  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
+		  tcp_statename(tcp_oldstate), tcp_statename(sk->sk_state),
 		  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
 	return;
 }

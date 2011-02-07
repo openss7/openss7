@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ixe_proto.h,v 1.1.2.2 2010-11-28 14:21:45 brian Exp $
+ @(#) $Id: ixe_proto.h,v 1.1.2.3 2011-02-07 04:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:45 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ixe_proto.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:42  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:45  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,5 +66,12 @@
 #ifndef __SYS_SNET_IXE_PROTO_H__
 #define __SYS_SNET_IXE_PROTO_H__
 
-#endif				/* __SYS_SNET_IXE_PROTO_H__ */
+typedef union ixe_proto {
+	int type;
+	S_NET_TX net_tx;
+	S_IP_RX ip_rx;
+	S_SN_FRGSZ sn_frgsz;
+	IP_DL_REG ip_reg;
+} S_IXE_PROTO;
 
+#endif				/* __SYS_SNET_IXE_PROTO_H__ */

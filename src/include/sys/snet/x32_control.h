@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: x32_control.h,v 1.1.2.2 2010-11-28 14:21:54 brian Exp $
+ @(#) $Id: x32_control.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:54 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x32_control.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:54  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,5 +66,51 @@
 #ifndef __SYS_SNET_X32_CONTROL_H__
 #define __SYS_SNET_X32_CONTROL_H__
 
-#endif				/* __SYS_SNET_X32_CONTROL_H__ */
+#define MAX_IDENTITY_LEN	32
+#define MAX_SIGNATURE_LEN	32
 
+#define PKT			 1
+#define LNK			 2
+
+#define NO_X32_CONF		 0
+#define X32_NOT_REG		 1
+#define X32_REG_FAILED		 2
+#define X32_ID_SENT		 3
+#define X32_CMD_CONF_PENDING	 4
+#define X32_RSP_CONF_PENDING	 5
+#define X32_REG_SUCCESS		 6
+
+#define X32_MAP_SIZE   (MAXIOCBSZ - 8)
+#define MAX_X32_ENTS   (X32_MAP_SIZE / sizeof(struct x32conff))
+
+struct x32_facilities {
+	uint8_t identity_len;		/* X.32 identity len */
+	uint8_t signature_len;		/* X.32 sig. len */
+	uint8_t x32_state;		/* X.32 state */
+	uint8_t diagnostic;		/* X.32 diagnostic */
+	uint8_t identity[MAX_IDENTITY_LEN];	/* X.32 identity */
+	uint8_t signature[MAX_SIGNATURE_LEN];	/* X.32 signature */
+};
+
+struct x32conff {
+	uint32_t sn_id;			/* Subnetwork */
+	struct x32_facilities x32_facs;
+};
+
+struct x32mapf {
+	struct x32conff entries[MAX_X32_ENTS];	/* Data buffer */
+	uint32_t first_ent;		/* Where to start search */
+	uint32_t num_ent;		/* Number entries returned */
+};
+
+struct reg_facilities {
+	uint8_t has_x32;		/* Has X.32 facs */
+	struct x32_facilities x32_facs;
+};
+
+struct xid_user_data {
+	uint8_t has_x32;		/* Has X.32 facs */
+	struct x32_facilities x32_facs;
+};
+
+#endif				/* __SYS_SNET_X32_CONTROL_H__ */

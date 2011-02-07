@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:06 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockmod.c,v $
+ Revision 1.1.2.3  2011-02-07 04:54:45  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:22:06  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $";
+static char const ident[] = "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $";
 
 
 /*
@@ -137,7 +140,7 @@ static char const ident[] = "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
@@ -920,10 +923,10 @@ STATIC struct sockmod_trans sockmod_trans_map[] = {
 	, {.cmd = SI_TCL_UNLINK,}
 	, {.cmd = SI_SOCKPARAMS,}
 	, {.cmd = SI_GETUDATA,}
-	, {.cmd = SIOCHIWAT,}
-	, {.cmd = SIOGHIWAT,}
-	, {.cmd = SIOCLOWAT,}
-	, {.cmd = SIOGLOWAT,}
+	, {.cmd = SIOCSHIWAT,}
+	, {.cmd = SIOCGHIWAT,}
+	, {.cmd = SIOCSLOWAT,}
+	, {.cmd = SIOCGLOWAT,}
 	, {.cmd = SIOCATMARK,}
 	, {.cmd = SIOCGPGRP,}
 	, {.cmd = SIOCSPGRP,}

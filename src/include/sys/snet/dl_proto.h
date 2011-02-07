@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: dl_proto.h,v 1.1.2.2 2010-11-28 14:21:53 brian Exp $
+ @(#) $Id: dl_proto.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:53 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_proto.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:53  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,5 +66,73 @@
 #ifndef __SYS_SNET_DL_PROTO_H__
 #define __SYS_SNET_DL_PROTO_H__
 
-#endif				/* __SYS_SNET_DL_PROTO_H__ */
+#define DATAL_TYPE	'R'
+#define DATAL_RESPONSE	'D'
+#define DATAL_PARAMS	'P'
+#define DATAL_TX	't'
+#define DATAL_RX	'r'
 
+typedef struct data1_type {
+	uint8_t prim_type;
+	uint8_t version;
+	uint16_t pad;
+	uint16_t lwb;
+	uint16_t upb;
+	uint16_t frgsz;
+	uint8_t addr[0];
+} S_DATAL_TYPE;
+
+typedef struct datal_response {
+	uint8_t prim_type;
+	uint8_t version;
+	uint8_t mac_type;
+	uint8_t addr_len;
+	uint16_t lwb;
+	uint16_t upb;
+	uint16_t frgsz;
+	uint8_t addr[0];
+} S_DATAL_RESPONSE;
+
+#define HW_ETHERNET	1
+#define HW_TOKEN_RING	4
+#define HW_802		6
+
+typedef struct datal_params {
+	uint8_t prim_type;
+	uint8_t version;
+	uint8_t mac_type;
+	uint8_t addr_len;
+	uint16_t frgsz;
+	uint8_t addr[0];
+} S_DATAL_PARAMS;
+
+typedef struct datal_tx {
+	uint8_t prim_type;
+	uint8_t version;
+	uint16_t pad;
+	uint8_t route_length;
+	uint8_t addr_length;
+	uint16_t type;
+	uint8_t dst[0];
+} S_DATAL_TX;
+
+typedef struct datal_rx {
+	uint8_t prim_type;
+	uint8_t version;
+	uint16_t pad;
+	uint8_t route_length;
+	uint8_t addr_length;
+	uint16_t type;
+	uint8_t src[0];
+} S_DATAL_RX;
+
+typedef union datal_proto {
+	uint8_t type;
+	struct datal_type dltype;
+	struct datal_response dlresp;
+	struct datal_params dlparm;
+	struct datal_tx dltx;
+	struct datal_rx dlrx;
+} S_DATAL_PROTO;
+
+#endif				/* __SYS_SNET_DL_PROTO_H__ */

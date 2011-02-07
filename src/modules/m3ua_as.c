@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:03 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 1.1.2.3  2011-02-07 04:54:44  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:22:03  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $";
+static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -133,7 +136,7 @@ static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -293,6 +296,7 @@ struct mtp {
 #define LOGDA(priv, fmt, ...) STRLOG(priv, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
 #endif
 
+#ifndef _OPTIMIZE_SPEED
 static const char *
 unix_errname(t_scalar_t err)
 {
@@ -312,6 +316,7 @@ unix_errname(t_scalar_t err)
 	}
 	return ("(unknown)");
 }
+#endif					/* _OPTIMIZE_SPEED */
 static const char *
 unix_errstring(t_scalar_t err)
 {
@@ -332,6 +337,7 @@ unix_errstring(t_scalar_t err)
 	return ("Unknown error code.");
 }
 
+#ifndef _OPTIMIZE_SPEED
 static const char *
 m_statename(mtp_long state)
 {
@@ -443,6 +449,7 @@ m_errname(mtp_long err)
 	}
 	return ("(unknown)");
 }
+#endif					/* _OPTIMIZE_SPEED */
 const char *
 m_errstring(mtp_long err)
 {
@@ -471,6 +478,7 @@ m_errstring(mtp_long err)
 	return ("Unknown error code");
 }
 
+#ifndef _OPTIMIZE_SPEED
 static const char *
 n_statename(np_long state)
 {
@@ -614,6 +622,7 @@ n_errname(np_long err)
 	}
 	return ("(unknown)");
 }
+#endif					/* _OPTIMIZE_SPEED */
 const char *
 n_errstring(np_long err)
 {
@@ -653,7 +662,8 @@ n_errstring(np_long err)
 	}
 	return ("Unknown error code");
 }
-
+ 
+#ifndef _OPTIMIZE_SPEED
 static const char *
 l_statename(lmi_long state)
 {
@@ -677,6 +687,7 @@ l_statename(lmi_long state)
 	}
 	return ("(unknown)");
 }
+#endif					/* _OPTIMIZE_SPEED */
 
 static np_long
 n_set_state(struct mtp *mtp, np_long newstate)
@@ -4716,8 +4727,6 @@ mtp_r_sig(queue_t *q, mblk_t *mp)
 noinline fastcall __unlikely int
 mtp_w_proto_return(struct mtp *mtp, queue_t *q, mblk_t *mp, int err)
 {
-	mtp_long type = *(mtp_long *) mp->b_rptr;
-
 	if (err < 0)
 		p_restore_state(mtp);
 	switch (__builtin_expect(-err, EAGAIN)) {
@@ -4729,7 +4738,7 @@ mtp_w_proto_return(struct mtp *mtp, queue_t *q, mblk_t *mp, int err)
 		return (err);
 	default:
 		freemsg(mp);
-		LOGNO(mtp, "Primitive <%s> on upper write queue generated error [%s]", mtp_primname(type), m_errname(err));
+		LOGNO(mtp, "Primitive <%s> on upper write queue generated error [%s]", mtp_primname(*(mtp_long *)mp->b_rptr), m_errname(err));
 		/* fall through */
 	case 0:
 		return (0);
@@ -4741,8 +4750,6 @@ mtp_w_proto_return(struct mtp *mtp, queue_t *q, mblk_t *mp, int err)
 noinline fastcall __unlikely int
 mtp_r_proto_return(struct mtp *mtp, queue_t *q, mblk_t *mp, int err)
 {
-	np_long type = *(np_long *) mp->b_rptr;
-
 	if (err < 0)
 		p_restore_state(mtp);
 	switch (__builtin_expect(-err, EAGAIN)) {
@@ -4754,7 +4761,7 @@ mtp_r_proto_return(struct mtp *mtp, queue_t *q, mblk_t *mp, int err)
 		return (err);
 	default:
 		freemsg(mp);
-		LOGERR(mtp, "Primitive <%s> on lower read queue generated error [%s]", n_primname(type), n_errname(err));
+		LOGERR(mtp, "Primitive <%s> on lower read queue generated error [%s]", n_primname(*(np_long *)mp->b_rptr), n_errname(err));
 		/* fall through */
 	case 0:
 		return (0);

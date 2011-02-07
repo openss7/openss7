@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 1.1.2.2 2010-11-28 14:21:48 brian Exp $
+ @(#) $Id: dlpi.h,v 1.1.2.3 2011-02-07 04:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:48 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:42  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:48  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -81,14 +84,14 @@ typedef u_int16_t dl_ushort;
 /*
    Primitives for Local Management Services
  */
-#define DL_INFO_REQ		0x00	/* Information Req */
-#define DL_INFO_ACK		0x03	/* Information Ack */
+#define DL_INFO_REQ		0x00	/* Information Req (S) */
+#define DL_INFO_ACK		0x03	/* Information Ack (S) */
 #define DL_ATTACH_REQ		0x0b	/* Attach a PPA */
 #define DL_DETACH_REQ		0x0c	/* Detach a PPA */
-#define DL_BIND_REQ		0x01	/* Bind dlsap address */
-#define DL_BIND_ACK		0x04	/* Dlsap address bound */
-#define DL_UNBIND_REQ		0x02	/* Unbind dlsap address */
-#define DL_OK_ACK		0x06	/* Success acknowledgment */
+#define DL_BIND_REQ		0x01	/* Bind dlsap address (S) */
+#define DL_BIND_ACK		0x04	/* Dlsap address bound (S) */
+#define DL_UNBIND_REQ		0x02	/* Unbind dlsap address (S) */
+#define DL_OK_ACK		0x06	/* Success acknowledgment (S) */
 #define DL_ERROR_ACK		0x05	/* Error acknowledgment */
 #define DL_SUBS_BIND_REQ	0x1b	/* Bind Subsequent DLSAP address */
 #define DL_SUBS_BIND_ACK	0x1c	/* Subsequent DLSAP address bound */
@@ -101,9 +104,9 @@ typedef u_int16_t dl_ushort;
 /*
    Primitives used for Connectionless Service
  */
-#define DL_UNITDATA_REQ		0x07	/* datagram send request */
-#define DL_UNITDATA_IND		0x08	/* datagram receive indication */
-#define DL_UDERROR_IND		0x09	/* datagram error indication */
+#define DL_UNITDATA_REQ		0x07	/* datagram send request (S) */
+#define DL_UNITDATA_IND		0x08	/* datagram receive indication (S) */
+#define DL_UDERROR_IND		0x09	/* datagram error indication (S) */
 #define DL_UDQOS_REQ		0x0a	/* set QOS for subsequent datagrams */
 
 /*
@@ -158,6 +161,7 @@ typedef u_int16_t dl_ushort;
  */
 #define DL_GET_STATISTICS_REQ	0x34	/* Request to get statistics */
 #define DL_GET_STATISTICS_ACK	0x35	/* Return statistics */
+#define DL_MONITOR_LINK_LAYER	0x36	/* Request link layer monitor (Spider) */
 
 /*
    Invalid primitive
@@ -170,10 +174,10 @@ typedef u_int16_t dl_ushort;
 #define DL_UNATTACHED		0x04	/* PPA not attached */
 #define DL_ATTACH_PENDING	0x05	/* Waiting ack of DL_ATTACH_REQ */
 #define DL_DETACH_PENDING	0x06	/* Waiting ack of DL_DETACH_REQ */
-#define DL_UNBOUND		0x00	/* PPA attached */
-#define DL_BIND_PENDING		0x01	/* Waiting ack of DL_BIND_REQ */
-#define DL_UNBIND_PENDING	0x02	/* Waiting ack of DL_UNBIND_REQ */
-#define DL_IDLE			0x03	/* dlsap bound, awaiting use */
+#define DL_UNBOUND		0x00	/* PPA attached (S) */
+#define DL_BIND_PENDING		0x01	/* Waiting ack of DL_BIND_REQ (S) */
+#define DL_UNBIND_PENDING	0x02	/* Waiting ack of DL_UNBIND_REQ (S) */
+#define DL_IDLE			0x03	/* dlsap bound, awaiting use (S) */
 #define DL_UDQOS_PENDING	0x07	/* Waiting ack of DL_UDQOS_REQ */
 #define DL_OUTCON_PENDING	0x08	/* awaiting DL_CONN_CON */
 #define DL_INCON_PENDING	0x09	/* awaiting DL_CONN_RES */
@@ -193,7 +197,7 @@ typedef u_int16_t dl_ushort;
 /*
    DL_ERROR_ACK error return values
  */
-#define DL_ACCESS	0x02	/* Improper permissions for request */
+#define DL_ACCESS	0x02	/* Improper permissions for request (S) */
 #define DL_BADADDR	0x01	/* DLSAP addr in improper format or invalid */
 #define DL_BADCORR	0x05	/* Seq number not from outstand DL_CONN_IND */
 #define DL_BADDATA	0x06	/* User data exceeded provider limit */
@@ -201,14 +205,14 @@ typedef u_int16_t dl_ushort;
 #define DL_BADPRIM	0x09	/* Primitive received not known by provider */
 #define DL_BADQOSPARAM	0x0a	/* QOS parameters contained invalid values */
 #define DL_BADQOSTYPE	0x0b	/* QOS structure type is unknown/unsupported */
-#define DL_BADSAP	0x00	/* Bad LSAP selector */
+#define DL_BADSAP	0x00	/* Bad LSAP selector (S) */
 #define DL_BADTOKEN	0x0c	/* Token used not an active stream */
 #define DL_BOUND	0x0d	/* Attempted second bind with dl_max_conind */
 #define DL_INITFAILED	0x0e	/* Physical Link initialization failed */
 #define DL_NOADDR	0x0f	/* Provider couldn't allocate alt. address */
 #define DL_NOTINIT	0x10	/* Physical Link not initialized */
-#define DL_OUTSTATE	0x03	/* Primitive issued in improper state */
-#define DL_SYSERR	0x04	/* UNIX system error occurred */
+#define DL_OUTSTATE	0x03	/* Primitive issued in improper state (S) */
+#define DL_SYSERR	0x04	/* UNIX system error occurred (S) */
 #define DL_UNSUPPORTED	0x07	/* Requested serv. not supplied by provider */
 #define DL_UNDELIVERABLE 0x11	/* Previous data unit could not be delivered */
 #define DL_NOTSUPPORTED	0x12	/* Primitive is known but not supported */
@@ -232,11 +236,11 @@ typedef u_int16_t dl_ushort;
 /*
    DLPI media types supported
  */
-#define DL_CSMACD	0x00	/* IEEE 802.3 CSMA/CD network */
-#define DL_TPB		0x01	/* IEEE 802.4 Token Passing Bus */
-#define DL_TPR		0x02	/* IEEE 802.5 Token Passing Ring */
-#define DL_METRO	0x03	/* IEEE 802.6 Metro Net */
-#define DL_ETHER	0x04	/* Ethernet Bus */
+#define DL_CSMACD	0x00	/* IEEE 802.3 CSMA/CD network (S) */
+#define DL_TPB		0x01	/* IEEE 802.4 Token Passing Bus (S) */
+#define DL_TPR		0x02	/* IEEE 802.5 Token Passing Ring (S) */
+#define DL_METRO	0x03	/* IEEE 802.6 Metro Net (S) */
+#define DL_ETHER	0x04	/* Ethernet Bus (S) */
 #define DL_HDLC		0x05	/* ISO HDLC protocol support */
 #define DL_CHAR		0x06	/* Character Synchronous protocol support */
 #define DL_CTCA		0x07	/* IBM Channel-to-Channel Adapter */
@@ -1250,6 +1254,7 @@ union DL_primitives {
 #define DL_REPLY_STATUS_IND_SIZE	sizeof(dl_reply_status_ind_t)
 #define DL_REPLY_UPDATE_REQ_SIZE	sizeof(dl_reply_update_req_t)
 #define DL_REPLY_UPDATE_STATUS_IND_SIZE	sizeof(dl_reply_update_status_ind_t)
+#define DL_MONITOR_LINK_LAYER_SIZE	sizeof(dl_monitor_link_layer_t) /* Spider */
 
 #ifdef _SUN_SOURCE
 
