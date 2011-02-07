@@ -175,12 +175,25 @@
 %U http://www.opengroup.org/onlinepubs/
 %S X/Open CAE Specification
 
-%K openss7
-%L openss7-@VERSION@
-%R openss7-@VERSION@
+%L XMAP
+%A The\ OpenSS7\ Project
+%Q The\ OpenSS7\ Project
+%R XMAP
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
+%T XOM Mobile Application Part (XMAP) Specification
+%D @PACKAGE_DATE@
+%C Edmonton, Alberta
+%E Brian Bidulock
+%I OpenSS7\ Corporation
+%U http://www.openss7.org/docs/xmap.pdf
+%O Distributed with package @PACKAGE@-@VERSION@
+
+%K @PACKAGE@
+%L @PACKAGE@-@VERSION@
+%R @PACKAGE@-@VERSION@
 %A OpenSS7
 %Q OpenSS7
-%T OpenSS7 Source Code
+%T @PACKAGE_TITLE@ Source Code
 %D @PACKAGE_DATE@
 %E Brian Bidulock
 %I OpenSS7 Corporation
@@ -196,7 +209,7 @@
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tci.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L TRI
 %A The\ OpenSS7\ Project
@@ -208,7 +221,7 @@
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tri.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L TPI
 %A Open\ Group
@@ -221,7 +234,7 @@
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
 %S Open Group CAE Specification
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L NPI
 %A UNIX\ International,\ Inc.
@@ -234,7 +247,7 @@
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
 %S Open Group CAE Specification
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L DLPI
 %A UNIX International,\ Inc.
@@ -247,7 +260,7 @@
 %I UNIX International Press
 %U http://www.openss7.org/doc/dlpi.pdf
 %S Open Group CAE Specification
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L TLI
 %A UNIX\ International,\ Inc.
@@ -325,7 +338,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/nli.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L LLI
 %A Brian Bidulock
@@ -337,7 +350,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lli.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L CDI
 %A Brian Bidulock
@@ -349,7 +362,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L WAN
 %A Brian Bidulock
@@ -361,7 +374,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/wan.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L LMI
 %A Brian Bidulock
@@ -373,7 +386,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lmi.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L SLI
 %A Brian Bidulock
@@ -385,7 +398,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sli.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L SDTI
 %A Brian Bidulock
@@ -397,7 +410,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdti.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L SDLI
 %A Brian Bidulock
@@ -409,7 +422,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdli.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L MTPI
 %A Brian Bidulock
@@ -421,7 +434,7 @@
 %C Edmonton, Canada
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/specs/mtpi.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L CHI
 %A Brian Bidulock
@@ -433,7 +446,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/chi.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %L MXI
 %A Brian Bidulock
@@ -445,7 +458,31 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/mxi.pdf
-%O Distributed with package @PACKAGE@-@VERSION@.
+%O Distributed with package @PACKAGE@-@VERSION@
+
+%L CCI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Call Control Interface (CCI) Specification
+%R CCI
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
+%C Edmonton, Canada
+%D @PACKAGE_PDATE@
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/cci.pdf
+%O Distributed with package @PACKAGE@-@VERSION@
+
+%L MGI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%T Media Gateway Interface (MGI) Specification
+%R MGI
+%J Revision @PACKAGE_VERSION@, Draft @PACKAGE_RELEASE@
+%C Edmonton, Canada
+%D @PACKAGE_PDATE@
+%I OpenSS7 Corporation
+%U http://www.openss7.org/docs/mgi.pdf
+%O Distributed with package @PACKAGE@-@VERSION@
 
 %K xxx
 %A X Programmer's Group
@@ -5845,66 +5882,6 @@ Part 1: Protocol Specification
 %I British Telecom
 %U http://www.bt.com/
 
-%K cci
-%L CCI
-%A Brian Bidulock
-%Q OpenSS7 Corporation
-%T Call Control Interface (CCI) Specification
-%R CCI Revision 1.0.0
-%J Draft 1
-%C Edmonton
-%D April 2003
-%I OpenSS7 Corporation
-%U http://www.openss7.org/docs/cci.pdf
-
-%K chi
-%L CHI
-%A Brian Bidulock
-%Q OpenSS7 Corporation
-%T Channel Interface (CHI) Specification
-%R CHI Revision 1.0.0
-%J Draft 1
-%C Edmonton
-%D May 2003
-%I OpenSS7 Corporation
-%U http://www.openss7.org/docs/chi.pdf
-
-%K mgi
-%L MGI
-%A Brian Bidulock
-%Q OpenSS7 Corporation
-%T Media Gateway Interface (MGI) Specification
-%R MGI Revision 1.0.0
-%J Draft 1
-%C Edmonton
-%D May 2003
-%I OpenSS7 Corporation
-%U http://www.openss7.org/docs/mgi.pdf
-
-%K mtpi
-%L MTPI
-%A Brian Bidulock
-%Q OpenSS7 Corporation
-%T Messages Transfer Part Interface (MTPI) Specification
-%R MTPI Revision 1.0.0
-%J Draft 1
-%C Edmonton
-%D January 2003
-%I OpenSS7 Corporation
-%U http://www.openss7.org/docs/mtpi.pdf
-
-%K mxi
-%L MXI
-%A Brian Bidulock
-%Q OpenSS7 Corporation
-%T Multiplex Interface (MXI) Specification
-%R MXI Revision 1.0.0
-%J Draft 1
-%C Edmonton
-%D May 2003
-%I OpenSS7 Corporation
-%U http://www.openss7.org/docs/mxi.pdf
-
 %K rfc768
 %L RFC768
 %R RFC 768/STD 6
@@ -6489,6 +6466,39 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1613.txt
 
+%K XOS
+%R draft-bidulock-tsvwg-xos-00.txt
+%A Brian Bidulock
+%E Brian Bidulock
+%T X.25 over SCTP (XOS)
+%D May 1, 2009
+%O (Intended Status: INFORMATIONAL) (Defines SCTP port number 1998.)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/id/draft-bidulock-tsvwg-xos-00.txt
+
+%K ISOS
+%R draft-bidulock-tsvwg-isos-00.txt
+%A Brian Bidulock
+%E Brian Bidulock
+%T ISO Transport Service on top of the SCTP (ISOS)
+%D May 1, 2009
+%O (Intended Status: INFORMATIONAL) (Defines SCTP port number 1998.)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/id/draft-bidulock-tsvwg-isos-00.txt
+
+%K ITOS
+%R draft-bidulock-tsvwg-itos-00.txt
+%A Brian Bidulock
+%E Brian Bidulock
+%T ISO Transport Service on top of the SCTP (ITOS)
+%D May 1, 2009
+%O (Intended Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/id/draft-bidulock-tsvwg-itos-00.txt
+
 %K rfc1371
 %L RFC1371
 %R RFC 1371
@@ -6794,6 +6804,7 @@ Part 1: Protocol Specification
 %A Marshall T. Rose
 %T ISO-TP0 Bridge Between TCP and X.25.
 %D December 1988
+%O (Status: UNKNOWN) (Defines TCP port number 146.)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1086.txt
@@ -7430,6 +7441,73 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3436.txt
+
+%K rfc4820
+%L RFC4820
+%R RFC 4820
+%T Padding Chunk and Parameter for Stream Control Transmission Protocol (SCTP)
+%A Michael Tuexen
+%A Randall Stewart
+%A Peter Lei
+%D March 2007
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc4820.txt
+
+%K rfc4895
+%L RFC4895
+%R RFC 4895
+%T Authenticated Chunks for the Stream Control Transmission Protocol (SCTP)
+%A Michael Tuexen
+%A Randall Stewart
+%A Peter Lei
+%A Eric Rescorla
+%D August 2007
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc4895.txt
+
+%K rfc5043
+%L RFC5043
+%R RFC 5043
+%T Stream Control Transmission Protocol (SCTP) Direct Data Placement (DDP) Adaptation
+%E C. Bestler
+%E Randall Stewart
+%D October 2007
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc5043.txt
+
+%K rfc5061
+%L RFC5061
+%R RFC 5061
+%T Stream Control Transmission Protocol (SCTP) Dynamic Address Reconfiguration
+%A Randall Stewart
+%A Qiaobing Xie
+%A Michael Tuexen
+%A S. Maruyamma
+%A M. Kozuka
+%D September 2007
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The ITEF Trust
+%U http://www.ietf.org/rfc/rfc5061.txt
+
+%K rfc5062
+%L RFC5062
+%R RFC 5062
+%T Security Attacks Found Against the Stream Control Transmission Protocol (SCTP) and Current Countermeasures
+%A Randall Stewart
+%A Michael Tuexen
+%A Gonzalo Camarillo
+%D September 2007
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force
+%I The ITEF Trust
+%U http://www.ietf.org/rfc/rfc5062.txt
 
 %K rfc2976
 %L RFC2976
