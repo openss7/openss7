@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: mlptemplate.5.man,v 1.1.2.1 2011-02-07 02:14:40 brian Exp $
+.\" @(#) $Id: mlptemplate.5.man,v 1.1.2.2 2011-02-07 04:42:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2011-02-07 02:14:40 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 04:42:16 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mlptemplate.5.man,v $
+.\" Revision 1.1.2.2  2011-02-07 04:42:16  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
 .\" - added manual pages
 .\"
@@ -230,7 +233,7 @@ ptx25
 sbex25
 .]
 with the following compatibility considerations:
-.IP \(em '\(em\(em'u
+.IP \(em \w'\(em\(em'u
 Some implementations do not document this template file format.
 .PP
 For additional information, see,

@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: ioconfig.4.man,v 1.1.2.2 2011-02-07 04:42:16 brian Exp $
+.\" @(#) $Id: snmpcheck.1s.man,v 1.1.2.1 2011-02-07 04:42:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,16 +81,16 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2011-02-07 04:42:16 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 04:42:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: ioconfig.4.man,v $
-.\" Revision 1.1.2.2  2011-02-07 04:42:16  brian
+.\" $Log: snmpcheck.1s.man,v $
+.\" Revision 1.1.2.1  2011-02-07 04:42:15  brian
 .\" - updated manual pages
 .\"
-.\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
-.\" - added manual pages
+.\" Revision 1.1.2.2  2011-02-07 02:17:57  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -108,215 +108,181 @@ search-truncate 40
 search-ignore CGIQOSTU
 .R2
 .so openss7.macros
-.\"
-.\"
-.TH IOCONFIG 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH SNMPCHECK 1 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
 .\"
 .\"
 .SH NAME
-.B ioconfig
-\- ioconfig entry format
+.B snmpcheck
+\- parse and print SNMP files
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <sys/ioparams.h>
+.ad l
+.nh
+.HP 12
+\fBsnmpcheck\fP [\fIoptions\fP]
+.PD 0
+.HP 12
+\fBsnmpcheck\fP\ [\fIoptions\fP]
+[{\fB-f\fP|\fB--filename\fP}\ \fIFILENAME\fP]
+[{\fB-o\fP|\fB--outfile\fP}\ \fIOUTFILE\fP]
+[{\fB-D\fP|\fB--debug\fP}\ [\fIERRFILE\fP]]
+.HP 12
+\fBsnmpcheck\fP {\fB-h\fP|\fB--help\fP}
+.HP 12
+\fBsnmpcheck\fP {\fB-V\fP|\fB--version\fP}
+.HP 12
+\fBsnmpcheck\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B snmpcheck
+is a utility program that can be used to parse, validate and pretty print
+SNMP files.
+.[
+x680
+.]
+.[
+x681
+.]
+.[
+x682
+.]
+.[
+x683
+.]
 The
-.B ioconfig
-file is used to retain information on system's IO configuration across
-reboots.  It contains two types of information:
-.IP \(bu \w'\(bu\(em'u
-Mappings of dynamically allocated major numbers to drivers.
-.IP \(bu
-Mappings of instance numbers to hardware paths.
-.PP
-At boot time this file is read and the information is stored in the
-.B io_tree
-kernel data structure.  The
-.B ioconfig
-file is created by
-.BR insf (8)
-at install time; and is modified by
-.BR insf "(8), " rmsf "(8) and " ioscan (8)
-when devices are added or removed.  The only purpose of the
-.B ioconfig
-file is to maintain configuration information when the system is not
-running.  While the system is running, all accesses are made directly to the
-kernel
-.B io_tree
-structure, although any tools that change the kernel structures must also
-keep
-.B ioconfig
-consistent.
-.PP
-There will be two copies of
-.B ioconfig
-maintained:
-.BR /etc/ioconfig " and " /stand/ioconfig .
-A second copy is placed in
-.B /stand
-because NFS diskless clients are not guaranteed to have a reliable
-.B /etc
-directory at boot time.
-.PP
-The
-.B ioconfig
-file begins with the
-.B ioconfig
-magic number.
-.sp
-.nf
-\fC\s-1\
-#define IOCONFIG_MAGIC 0x21224941 /* magic number */
-.fi
-.PP
-Following the magic number is an array of
-.B ioconfig_record
-structures, which logically form a tree structure defining the connectivity
-of the various levels of software modules and managers, the device class and
-hardware address of each element, and the logical unit associated with each
-leaf node.  The root of the tree is array element 0.
-.PP
-Each
-.B ioconfig_record
-contains the following fields as defined in
-.BR <sys/ioparams.h> :
-.sp
-.nf
-\fC\s-1\
-#define IOCONFIG_FILE    "/etc/ioconfig"
-#define MAX_NAME_LEN     16
-
-union ioconfig_record {
-    char rec_name[MAX_NAME_LEN]; /* record type */
-    ioconfig_t ioc;
-    dyn_major_t dm;
-} ioconfig_record;
-\s+1\fP
-.fi
-.PP
-The definitions of each element are as follows:
-.TP
-.I rec_name
-Each record must have a character string as its first entry that is used to
-identify the record type.  The default record is the
-.B ioconfig_t .
-When the string begins with an underscore
-.RB ( _ )
-character then it is one of the variants.
-.TP
-.I ioc
-This is the default record entry for the
-.B ioconfig
-file.  The
-.I rec_name
-must not begin with underscore
-.RB ( _ )
-character to distinguish the record from other record types.
-.RS
-.PP
-The
-.B ioconfig_t
-contains the following elements:
-.sp
-.nf
-\fC\s-1\
-typedef struct ioconfig {
-    char name[MAX_NAME_LEN];  /* Node name: disc4, scsi_disk */
-    char class[MAX_NAME_LEN]; /* Node class: disk, tape, etc */
-    hw_path_t hw_path;        /* Path to this node */
-    int instance;             /* Instance number within class */
-} ioconfig_t;
-\s+1\fP
-.fi
-.RE
-.TP
-.I dm
-This record stores information about major numbers dynamically assigned to
-drivers.  It is used to allow major number assignments to persist across
-boots.  The
-.I rec_name
-must begin with an underscore
-.RB ( _ )
-character to distinguish the record from other record types.
-.RS
-.PP
-The
-.B dyn_major_t
-contains the following elements:
-.sp
-.nf
-\fC\s-1\
-typedef struct dyn_major {
-    char rec_name[MAX_NAME_LEN]; /* Must be _DYN_MAJOR" */
-    char name[MAX_NAME_LEN];     /* Driver name */
-    int c_major;
-    int b_major;
-    int reserved;
-} dyn_major_t;
-\s+1\fP
-.fi
-.RE
+.B snmpcheck
+utility program is intended to be compatible with XOM.
+.[
+xom c607
+.]
 .\"
 .\"
-.SH FILES
-.TP
-.B /etc/ioconfig
-.TP
-.B /stand/ioconfig
-.\"
-.\"
-.SH SEE ALSO
+.SH OPTIONS
 .PP
-.BR ioscan (8),
-.BR ioinit (8),
-.BR insf (8),
-.BR rmsf (8).
+.PP
+The following general purpose options are provided:
+.TP
+\fB-f\fP, \fB--filename\fP \fIFILENAME\fP
+Specifies the input filename,
+.IR FILENAME .
+When the input file is not specified, the default input for the program is
+.BR stdin .
+.TP
+\fB-o\fP, \fB--outfile\fP \fIOUTFILE\fP
+Specifies the output filename,
+.IR OUTFILE .
+When the output file is not specified, the default output file for the program
+is
+.BR stdout .
+.TP
+\fB-D\fP, \fB--debug\fP [\fIERRFILE\fP]
+Specifies that copious debugging information should also be printed to the
+error file,
+.IR ERRFILE ,
+or if
+.I ERRFILE
+is not specified,
+.BR stderr .
+.TP
+\fB-v\fP, \fB--verbose\fP [\fILEVEL\fP]
+Increases or sets to
+.IR LEVEL
+the output verbosity, typically for diagnostic purposes.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Specifies that normal output (to
+.BR stdout " and " stderr )
+is to be suppressed.
+(Equivalent to
+.BR --verbose = 0 .)
+.PP
+The following command level options are provided:
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is ecnountered, print usage information to
+.B stdout
+and exit.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, print version information to
+.B stdout
+and exit.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, print copyright and copying information to
+.B stdout
+and exit.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occurred and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR asn1check (1),
+.BR gdmocheck (1).
+.\"
+.\"
+.SH BUGS
+.PP
+.B snmpcheck
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-The
-.B ioconfig
-file format is provided for compatibility with the
-.IR HP-UX \(rg
-file of the same name,
+.B snmpcheck
+is compatible with XOM,
 .[
-hpuxdoc
+xom c607
 .]
-with the following portability considerations:
+with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
-.B ioconfig
-is provided only for compatibility with
-.IR HP-UX \(rg
-for
-.I Linux Fast-STREAMS
-devices.
-The file will not function with regular
-.B Linux
-devices.
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR HP-UX \(rg
-documentation.
+XOM.
 .[
-hpuxdoc
+xom c607
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
-.B ioconfig
-was developed by HP.
+.B snmpcheck
+was first released in
+.B openss7
+version
+.BR 1.1.2 .
 .\"
 .\"
 .[
 $LIST$
 .]
 .TI
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77

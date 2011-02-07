@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: ioscan.8.man,v 1.1.2.1 2011-02-07 02:14:43 brian Exp $
+.\" @(#) $Id: ioscan.8.man,v 1.1.2.2 2011-02-07 04:42:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -81,11 +81,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2011-02-07 02:14:43 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 04:42:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ioscan.8.man,v $
+.\" Revision 1.1.2.2  2011-02-07 04:42:17  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2011-02-07 02:14:43  brian
 .\" - added manual pages
 .\"
@@ -434,6 +437,14 @@ exits with a status of
 upon normal completion and
 .B 1
 when an error occurred.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B ioscan
+encounters and error, it prints a diagnostic message to
+.IR stderr .
 .\"
 .\"
 .SH NOTICES

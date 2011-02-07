@@ -1,6 +1,6 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\"
-.\" @(#) $Id: openss7.macros,v 1.1.2.3 2011-01-18 16:47:33 brian Exp $
+.\" @(#) $Id: openss7.macros,v 1.1.2.4 2011-02-07 04:42:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -79,11 +79,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2011-01-18 16:47:33 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 04:42:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: openss7.macros,v $
+.\" Revision 1.1.2.4  2011-02-07 04:42:15  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.3  2011-01-18 16:47:33  brian
 .\" - updated manual pages
 .\"
@@ -464,7 +467,7 @@ Other trademarks are the property of their respective owners.
 ..
 .de TA
 .ie '\\*(.T'ps' \{\
-.if !'\\nC'1' \{\
+.if !'\nC'1' \{\
 .VR
 .AU
 .CO
@@ -476,7 +479,7 @@ Other trademarks are the property of their respective owners.
 ..
 .de T2
 .ie '\\*(.T'ps' \{\
-.if !'\\nC'1' \{\
+.if !'\nC'1' \{\
 .I2
 .\}
 .\}
@@ -486,7 +489,7 @@ Other trademarks are the property of their respective owners.
 ..
 .de T4
 .ie '\\*(.T'ps' \{\
-.if !'\\nC'1' \{\
+.if !'\nC'1' \{\
 .ID
 .\}
 .\}

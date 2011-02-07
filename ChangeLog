@@ -1,5 +1,15 @@
 2011-02-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man1/snmpcheck.1s.man: moved conflicting page
+	* doc/man/Makefile.am: updated manual pages
+	* doc/man/openss7.macros: updated manual pages
+	* doc/man/openss7.refs: updated manual pages
+	* doc/man/man4/ioconfig.4.man: updated manual pages
+	* doc/man/man5/mlptemplate.5.man: updated manual pages
+	* doc/man/man8/ioscan.8.man: updated manual pages
+
+2011-02-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/manual/SPG.texi: updated manuals
 	* doc/manual/SPG2.texi: updated manuals
 	* doc/manual/STREAMS.texi: updated manuals
