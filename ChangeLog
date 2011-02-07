@@ -1,5 +1,17 @@
 2011-02-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/util/init/openss7: updated init scripts
+	* src/util/init/specfs: updated init scripts
+	* src/util/init/specfs.sh: updated init scripts
+	* src/util/init/strace: updated init scripts
+	* src/util/init/streams: updated init scripts
+	* src/util/init/strerr: updated init scripts
+	* src/util/sysconfig/openss7: updated init scripts
+	* src/util/sysconfig/specfs: updated init scripts
+	* src/util/sysconfig/streams: updated init scripts
+
+2011-02-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/man/man1/snmpcheck.1s.man: moved conflicting page
 	* doc/man/Makefile.am: updated manual pages
 	* doc/man/openss7.macros: updated manual pages
